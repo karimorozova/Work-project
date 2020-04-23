@@ -527,7 +527,7 @@ function taskDeliveryMessage(obj) {
                             This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
                         <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
                         <p>
-                            I'm pleased to inform you that task ${obj.task.taskId} (${obj.task.service.title}) from project ${obj.projectId} - ${obj.projectName} has been completed and is ready for review.
+                            I'm pleased to inform you that task <strong>${obj.task.taskId} (${obj.task.service.title})</strong> from project <strong>${obj.projectId} - ${obj.projectName}</strong> has been completed and is ready for review.
                         </p>
                         <p>
                             The files are available for you in our <a href="https://pangea.s.xtrf.eu/xtrf/faces/login.seam?conversationId=26593#!project/${obj.projectId}">Portal</a> and attached to this email in a zip format.
@@ -553,10 +553,10 @@ function projectCancelledMessage(obj) {
                         This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
                     <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
                     <p>
-                        We are sorry to update you , but project ${obj.projectId} - ${obj.projectName} has been cancelled.
+                        We are sorry to update you , but project <strong>${obj.projectId} - ${obj.projectName}</strong> has been cancelled.
                     </p>
                     <p>
-                        Reason: ${obj.reason}
+                        Reason: <strong>${obj.reason}</strong>
                     </p>
                     <p>
                         Kindly contact your Account Manager for further information.
@@ -570,6 +570,7 @@ function projectCancelledMessage(obj) {
 }
 
 function projectMiddleCancelledMessage(obj) {
+    const isPayRow = obj.isPay ? `<p>You will need to pay a partial amount of <strong>${obj.finance.Price.halfReceivables}</strong></p>` : `<p>You will not be charged for this project.</p>`;
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -579,13 +580,13 @@ function projectMiddleCancelledMessage(obj) {
                         This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
                     <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
                     <p>
-                        We would like to inform you that project ${obj.projectId} - ${obj.projectName} has been cancelled in the middle of the work.
+                        We would like to inform you that project <strong>${obj.projectId} - ${obj.projectName}</strong> has been cancelled in the middle of the work.
                     </p>
                     <p>
-                        Reason: ${obj.reason}.
+                        Reason: <strong>${obj.reason}</strong>.
                     </p>
                     <p>
-                        You will need to pay a partial amount of ${obj.finance.Price.halfReceivables}
+                        ${isPayRow}
                     </p>
                 </div>
                 <footer>
@@ -594,7 +595,7 @@ function projectMiddleCancelledMessage(obj) {
                 </footer>
             </div>`;
 
-}
+} 
 
 function tasksCancelledMessage(obj) {
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -606,7 +607,7 @@ function tasksCancelledMessage(obj) {
                         This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
                     <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
                     <p>
-                        The task ${obj.taskId} from your project ${obj.projectId} - ${obj.projectName} has been cancelled.
+                        The task <strong>${obj.taskId}</strong> from your project <strong>${obj.projectId} - ${obj.projectName}</strong> has been cancelled.
                     </p>
                 </div>
                 <footer>
@@ -626,13 +627,13 @@ function tasksMiddleCancelledMessage(obj) {
                     This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
                     <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
                     <p>
-                        We would like to information that task ${obj.task.taskId} (${obj.task.service.title}) from project ${obj.projectId} - ${obj.projectName} has been cancelled in the middle of the work.
+                        We would like to information that task <strong>${obj.task.taskId} (${obj.task.service.title})</strong> from project <strong>${obj.projectId} - ${obj.projectName}</strong> has been cancelled in the middle of the work.
                     </p>
                     <p>
-                        Reason: ${obj.reason}.
+                        Reason: <strong>${obj.reason}</strong>.
                     </p>
                     <p>
-                        You will need to pay a partial amount of ${obj.task.finance.Price.halfReceivables}
+                        You will need to pay a partial amount of <strong>${obj.task.finance.Price.halfReceivables}</strong>
                     </p>
                 </div>
                 <footer>
@@ -653,7 +654,7 @@ function projectDeliveryMessage(obj) {
                         This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
                     <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
                     <p>
-                        I'm pleased to inform you that project: ${obj.projectId} - ${obj.projectName}, has been completed and is ready
+                        I'm pleased to inform you that project: <strong>${obj.projectId} - ${obj.projectName}</strong>, has been completed and is ready
                         for review.
                     </p>
                     <p>
