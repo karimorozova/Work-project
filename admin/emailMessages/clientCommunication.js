@@ -277,10 +277,10 @@ function getPdfOfQuote(obj){
                         </div>
                         <div class="quote__row" style="padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;display:-webkit-box;" >
                             <div class="quote__row-title" style="font-weight:bold;width:100px;" >
-                                Reference:
+                                Quote ID:
                             </div>
                             <div class="quote__row-text" style="width:300px;" >
-                                Sample quote
+                                ${obj.projectId}
                             </div>
                         </div>
                     </div>
