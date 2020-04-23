@@ -104,7 +104,11 @@ router.get('/languages', async (req, res) => {
 
 router.get('/services', async (req, res) => {
   try {
-    const services = await getServices();
+    const { filter } = req.query;
+    let services = await getServices();
+    if(filter) {
+        services = services.filter(item => item.active);  
+    }
     res.send(services);
   } catch(err) {
       console.log(err);

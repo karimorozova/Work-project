@@ -171,7 +171,7 @@
         this.dropdownVisible = false;
       },
       async getServices() {
-        const result = await this.$axios.$get('/api/services');
+        const result = await this.$axios.$get('/api/services?filter=active');
         result.sort((a, b) => {
           return a.sortIndex - b.sortIndex
         });

@@ -17,7 +17,7 @@ export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payl
 export const getServices = async ({ commit, dispatch }) => {
   commit('startRequest')
   try {
-    const result = await Vue.http.get('/api/services');
+    const result = await Vue.http.get('/api/services?filter=active');
     const allServices = result.body;
     allServices.sort((a, b) => {return a.sortIndex - b.sortIndex});
     dispatch('servicesGetting', allServices);
