@@ -115,22 +115,7 @@ function messageForClient(obj) {
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                                     ${tmDiscount}</td>
                             </tr>
-                            <tr>
-                                <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                                    Discount [%]:</td>
-                                <td
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    --</td>
-                            </tr>
-                            <tr>
-                                <td class="main_weight600"
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                                    PM fee [%]:</td>
-                                <td
-                                    style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    --</td>
-                            </tr>
+                            
                             <tr>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -302,7 +287,7 @@ function getPdfOfQuote(obj){
 
                 </div>
                 <div class="quote__subheader" style="text-align:center;font-weight:bold;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;border-top-width:1px;border-top-style:solid;border-top-color:#66563D;" >
-                    Betting Metrics / Sample quote
+                    ${obj.projectName}
                 </div>
                 <table style="width:100%;border-collapse:collapse;color:#66563D;" >
                     <thead style="background-color:#66563D;color:white;" >
@@ -332,24 +317,7 @@ function getPdfOfQuote(obj){
                             <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>
                             ${subTotal.toFixed(2)}</td>
                         </tr>
-                        <tr>
-                            <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;" >
-                            Project Management Fee - %</td>
-                            <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" >
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;" >
-                            Introductory Discount - %</td>
-                            <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-                            <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" >
-                            </td>
-                        </tr>
+                        
                         <tr>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
@@ -370,7 +338,7 @@ function getPdfOfQuote(obj){
                             Valid for:
                         </div>
                         <div class="notes__row-text">
-                            Sample Quote
+                            30 days
                         </div>
                     </div>
                     <div class="notes__row" style="display:-webkit-box;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;" >
@@ -386,7 +354,7 @@ function getPdfOfQuote(obj){
                             Turnaround time: 
                         </div>
                         <div class="notes__row-text">
-                            TBC
+                            ${moment(obj.deadline).format('LLL')}
                         </div>
                     </div>
                 </div>
