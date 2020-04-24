@@ -215,7 +215,7 @@ async function updateProjectStatus(id, status, reason) {
     try {
         const project = await getProject({"_id": id});
         if(status !== "Cancelled") {
-            return await setNewProjectDetails(project, status);
+            return await setNewProjectDetails(project, status, reason);
         }
         const { tasks, steps } = project;
         const notifySteps = steps.length ? steps.map(item => { return {...item._doc}}) : [];
@@ -236,7 +236,7 @@ async function updateProjectStatus(id, status, reason) {
     }
 }
 
-async function setNewProjectDetails(project, status) {
+async function setNewProjectDetails(project, status, reason) {
     try {
         if(status === "Started" || status === "Approved") {
             return await getApprovedProject(project, status);
@@ -246,7 +246,7 @@ async function setNewProjectDetails(project, status) {
             const user = await User.findOne({"_id": client.projectManager._id});
             await pmMail(project, client, user);
         }
-        return await updateProject({"_id": project.id}, { status, isPriceUpdated: false });
+        return await updateProject({"_id": project.id}, { status, isPriceUpdated: false, reason: reason});
     } catch(err) {
         console.log(err);
         console.log("Error in setNewProjectDetails");
