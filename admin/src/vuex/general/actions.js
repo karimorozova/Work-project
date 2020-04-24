@@ -30,9 +30,9 @@ export const getServices = async ({ commit, dispatch }) => {
 export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
     commit('startRequest')
     try {      
-      const {status, message, reason} = payload;
+      const {status, reason} = payload;
       const id = state.currentProject._id;
-      const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status, message, reason}); 
+      const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status, reason}); 
       await commit('storeCurrentProject', updatedProject.body);
     } catch(err) {
           dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
@@ -40,6 +40,21 @@ export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
           commit('endRequest');
     } 
   }
+
+export const sendCancelProjectMessage = async ({ commit, state }, payload) => {
+    commit('startRequest')
+    try { 
+        const id = state.currentProject._id;
+        const { message } = payload;
+        await Vue.http.put("/pm-manage/send-cancel-message", { id, message }); 
+    } catch (err) {
+        dispatch('alertToggle', { message: err.body, isShow: true, type: "error" });
+    } finally {
+        commit('endRequest');
+    }
+}
+
+
 export const setStepsStatus = async ({ commit, dispatch, state }, payload) => {
   commit('startRequest')
   try {
@@ -66,8 +81,8 @@ export const setStepVendor = async ({ commit, dispatch, state }, payload) => {
         }
         const status = "Created";
         const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor, status}, index});
-        if(step.vendor && step.status !== "Started") {
-            await Vue.http.post('/pm-manage/vendor-assignment', { step });
+        if(step.vendor) {
+            await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
         }
         await commit('storeCurrentProject', updatedProject.body);
         dispatch('alertToggle', {message: "Step data updated", isShow: true})
