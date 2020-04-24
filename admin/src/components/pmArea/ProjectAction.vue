@@ -88,7 +88,8 @@ export default {
     async getCancelMessage() {
       const template = await this.$http.post("/pm-manage/get-cancel-message", {
         ...this.project,
-        reason: this.selectedReason
+        reason: this.selectedReason,
+        isPay: this.isPay
       });
       this.previewMessage = template.body.message;
       this.openPreview();
