@@ -105,7 +105,7 @@ function messageForClient(obj) {
                                     Sub-total:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    ${subTotal.toFixed(2)}</td>
+                                    &euro; ${subTotal.toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600"
@@ -113,7 +113,7 @@ function messageForClient(obj) {
                                     TM Discount:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    ${tmDiscount}</td>
+                                    &euro; ${tmDiscount}</td>
                             </tr>
                             
                             <tr>
@@ -122,7 +122,7 @@ function messageForClient(obj) {
                                 Total:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    ${obj.finance.Price.receivables}</td>
+                                    &euro; ${obj.finance.Price.receivables}</td>
                             </tr>
                         </table>
 
@@ -209,7 +209,7 @@ function getTaskCode(taskInfo) {
                     ${taskInfo.langPair}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    ${taskInfo.unitPrice}</td>
+                    &euro; ${taskInfo.unitPrice}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                     ${taskInfo.unit}</td>
@@ -218,7 +218,7 @@ function getTaskCode(taskInfo) {
                     ${taskInfo.quantity}</td>
                 <td
                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    ${taskInfo.cost.toFixed(2)}</td>
+                    &euro; ${taskInfo.cost.toFixed(2)}</td>
             </tr>`;
 }
 
