@@ -23,7 +23,7 @@
                 Button(:value="'Edit & Send'" @clicked="getSendQuoteMessage")
     div(v-if="isAction('Deliver')")
         .project-action__confirm
-                Button(:value="'Edit & Send'" @clicked="getCancelMessage")
+                Button(:value="'Edit & Send'" @clicked="getDeliveryMessage")
     div(v-if="isAction('Send Project Details')")
         .project-action__confirm
                 Button(:value="'Edit & Send'" @clicked="getProjectDetailsMessage")
@@ -92,6 +92,18 @@ export default {
         isPay: this.isPay
       });
       this.previewMessage = template.body.message;
+      if (this.project.status === "In progress") {
+        await this.setStatus("Cancelled Halfway", this.selectedReason);
+      } else {
+        await this.setStatus("Cancelled", this.selectedReason);
+      }
+      this.openPreview();
+    },
+    async getDeliveryMessage() {
+      const template = await this.$http.post("/pm-manage/get-delivery-message", {
+        ...this.project
+      });
+      this.previewMessage = template.body.message;
       this.openPreview();
     },
     async getSendQuoteMessage() {
@@ -152,7 +164,7 @@ export default {
             await this.acceptQuote();
             break;
           case "Cancel":
-            await this.cancelProject(message);
+            await this.cancelProjectMessage(message);
             break;
         }
       } catch (err) {
@@ -214,23 +226,28 @@ export default {
         this.setDefaults();
       }
     },
-    async cancelProject(message) {
+    async cancelProjectMessage(message) {
       if (
         this.project.status === "Delivered" ||
         this.project.status === "Closed"
       )
         return;
       try {
-        await this.setStatus("Cancelled", message);
-      } catch (err) {}
+        await this.sendCancelProjectMessage({ message });
+        this.alertToggle({
+          message: "Letter sent successfully",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
-    async setStatus(status, message) {
+    async setStatus(status, reason) {
       try {
         await this.setProjectStatus({
           status,
-          message,
-          reason: this.selectedReason,
-          isPay: this.isPay
+          reason
         });
         this.alertToggle({
           message: "Project's status changed",
@@ -252,25 +269,6 @@ export default {
         await this.setStatus("Rejected");
       } catch (err) {}
     },
-    // async sendQuote() {
-    //   try {
-    //     const result = await this.$http.post("/pm-manage/send-quote", {
-    //       id: this.project._id
-    //     });
-    //     await this.storeProject(result.body);
-    //     this.alertToggle({
-    //       message: "The Quote has been sent",
-    //       isShow: true,
-    //       type: "success"
-    //     });
-    //   } catch (err) {
-    //     this.alertToggle({
-    //       message: "Internal server error. Cannot send the Quote.",
-    //       isShow: true,
-    //       type: "error"
-    //     });
-    //   }
-    // },
     async deliverProject(message) {
       try {
         await this.deliverProjectToClient({
@@ -285,7 +283,8 @@ export default {
       setProjectStatus: "setProjectStatus",
       sendClientQuote: "sendClientQuote",
       sendProjectDetails: "sendProjectDetails",
-      deliverProjectToClient: "deliverProjectToClient"
+      deliverProjectToClient: "deliverProjectToClient",
+      sendCancelProjectMessage: "sendCancelProjectMessage"
     })
   },
   computed: {

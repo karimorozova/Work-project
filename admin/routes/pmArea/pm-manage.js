@@ -170,19 +170,29 @@ router.put("/project-prop", async (req, res) => {
 })
 
 router.put("/project-status", async (req, res) => {
-    const { id, status, message, reason} = req.body;
+    const { id, status, reason} = req.body;    
     try {
         const result = await updateProjectStatus(id, status, reason);
-        if(status === "Cancelled") {
-            await notifyClientProjectCancelled(result, message);
-            await notifyVendorsProjectCancelled(result);
-            const wordsTasks = result.tasks.filter(item => item.service.calculationUnit === 'Words');
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Internal server error / Cannot change Project's status");
+    }
+})
+
+router.put("/send-cancel-message", async (req, res) => {
+    const { id, message} = req.body;    
+    try {
+        const project = await getProject({"_id": id});
+            await notifyClientProjectCancelled(project, message);
+        if(project.status === "Cancelled") {
+            const wordsTasks = project.tasks.filter(item => item.service.calculationUnit === 'Words');
             if(wordsTasks.length) {
                 await cancelMemoqDocs(wordsTasks);
-                await setCancelledNameInMemoq(wordsTasks, `${result.projectId} - ${result.projectName}`);
+                await setCancelledNameInMemoq(wordsTasks, `${project.projectId} - ${project.projectName}`);
             }
         }
-        res.send(result);
+    res.send("Message sent");
     } catch(err) {
         console.log(err);
         res.status(500).send("Internal server error / Cannot change Project's status");
@@ -741,12 +751,27 @@ router.post("/get-cancel-message", async (req, res) => {
     const { accManager, contact } = getAccManagerAndContact(req.body);
     try {
         const message = (req.body.status === "In progress") ? await projectMiddleCancelledMessage({ ...req.body, accManager, contact }) :
-            (req.body.status === "Ready for Delivery") ? await projectDeliveryMessage({ ...req.body, accManager, contact }) :
-                await projectCancelledMessage({ ...req.body, accManager, contact })
-        res.send({message}); 
-    } catch(err) {
-        console.log(err); 
-        res.status(500).send("Error on getting quote message");
+            await projectCancelledMessage({ ...req.body, accManager, contact })
+        res.send({ message });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on getting cancelled message");
+    }
+})
+
+router.post("/get-delivery-message", async (req, res) => {
+    function getAccManagerAndContact(project) {
+        const accManager = project.accountManager;
+        const contact = project.customer.contacts.find(item => item.leadContact);
+        return { accManager, contact };
+    }
+    const { accManager, contact } = getAccManagerAndContact(req.body);
+    try {
+        const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
+        res.send({ message });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on getting delivery message");
     }
 })
 
