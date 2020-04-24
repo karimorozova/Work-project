@@ -232,11 +232,6 @@ export default {
         this.project.status === "Closed"
       )
         return;
-
-      // console.log(this.project.status);
-      // await this.setStatus(this.project.status, message);
-      // await this.setStatus("Cancelled", message);
-
       try {
         await this.sendCancelProjectMessage({ message });
         this.alertToggle({
@@ -274,25 +269,6 @@ export default {
         await this.setStatus("Rejected");
       } catch (err) {}
     },
-    // async sendQuote() {
-    //   try {
-    //     const result = await this.$http.post("/pm-manage/send-quote", {
-    //       id: this.project._id
-    //     });
-    //     await this.storeProject(result.body);
-    //     this.alertToggle({
-    //       message: "The Quote has been sent",
-    //       isShow: true,
-    //       type: "success"
-    //     });
-    //   } catch (err) {
-    //     this.alertToggle({
-    //       message: "Internal server error. Cannot send the Quote.",
-    //       isShow: true,
-    //       type: "error"
-    //     });
-    //   }
-    // },
     async deliverProject(message) {
       try {
         await this.deliverProjectToClient({
