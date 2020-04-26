@@ -297,7 +297,8 @@ router.post("/vendor-assignment", async (req, res) => {
     const { step } = req.body;
     try {
         const project = await getProject({"steps._id": step._id});
-        await stepReassignedNotification(project, step);
+        await stepReassignedNotification(step);
+        await updateMemoqProjectUsers(project.steps);
         res.send('messages sent');
     } catch(err) {
         console.log(err);
