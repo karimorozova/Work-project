@@ -3,6 +3,7 @@ const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTempla
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact, tasksMiddleCancelledMessage } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage } = require("../emailMessages/vendorCommunication");
+const { emailMessageForContact, tasksCancelledMessage, tasksMiddleCancelledMessage } = require("../emailMessages/clientCommunication");
 const { getClient } = require('../clients');
 
 async function notifyManagerProjectRejected(project) {
