@@ -188,18 +188,12 @@ async function notifyClientProjectCancelled(project, template) {
     }
 }
 
-async function notifyClientTasksCancelled(project, tasks) {
-    try {
-        const { accManager, contact } = getAccManagerAndContact(project);
-        const tasksIds = tasks.map(item => item.taskId);
-        const cancelledTasks = project.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
-        for(let task of cancelledTasks) {
-            if(task.status === 'Cancelled Halfway') {
-                const message = tasksMiddleCancelledMessage({...project._doc, task, accManager, contact, reason: "Some reason"});
-                const subject = `Task has been cancelled in the middle of the work: ${task.taskId} - ${task.service.title} (ID C008.1)`;
-                await clientQuoteEmail({contact, subject}, message);
-            }
-        }
+async function notifyClientTasksCancelled(project, template) {    
+    try { 
+        const { contact } = getAccManagerAndContact(project);
+        const message = template;
+        const subject = `Task(s) has been cancelled in the middle of the work (ID C008.1)`;
+        await clientQuoteEmail({contact, subject}, message);
     } catch(err) {
         console.log(err);
         console.log('Error in notifyClientTasksCancelled');

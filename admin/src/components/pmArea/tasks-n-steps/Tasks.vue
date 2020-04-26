@@ -1,5 +1,7 @@
 <template lang="pug">
 .tasks
+    .tasks__preview(v-if="isEditAndSend")
+        Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
     .tasks__action
         .tasks__title Task Action
         .tasks__drop-menu
@@ -79,17 +81,22 @@
                 img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review.png" @click="reviewForDelivery(row)")
     .tasks__approve-action(v-if="isApproveActionShow")
         ApproveModal(
+            :isCheckbox="true"
             :text="modalTexts.main" 
             :approveValue="modalTexts.approve"
             :notApproveValue="modalTexts.notApprove"
             @approve="approveAction"
             @notApprove="notApproveAction"
-            @close="closeApproveModal")
+            @close="closeApproveModal"
+            @returnReason="getReason"
+            @returnPayment="getPayment"
+        )
     .tasks__review(v-if="isDeliveryReview")
         DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updatereviewTask")
 </template>
 
 <script>
+import Preview from "../../vendors/VendorPreview";
 import DataTable from "../../DataTable";
 import ProgressLine from "../../ProgressLine";
 import Tabs from "../../Tabs";
@@ -126,10 +133,29 @@ export default {
             modalTexts: {main: "Are you sure?", approve: "Yes", notApprove: "No"},
             isApproveActionShow: false,
             isDeliveryReview: false,
-            reviewTask: []
+            isEditAndSend: false,
+            previewMessage: "",
+            reviewTask: [],
+            isPay:false,
+            reason:"",
+            currentProjectId:"",
         }
     },
     methods: {
+        closePreview() {
+            this.isEditAndSend = false;
+        },
+        openPreview() {
+            this.isEditAndSend = true;
+        },
+        async sendMessage(message) {
+            try {
+                console.log(message);
+            } catch (err) {
+                this.alertToggle({ message: err.message, isShow: true, type: "error" });
+            }
+            this.closePreview();
+        },
         getPair(task) {
             if(task.packageSize) {
                 return `${task.targetLanguage} / ${task.packageSize}`;
@@ -192,6 +218,7 @@ export default {
             this.closeApproveModal();
             this.unCheckAllTasks();
         },
+
         async cancelTasks(tasks) {
             const validStatuses = ["Created", "Started", "Approved"];
             const filteredTasks = tasks.filter(item => validStatuses.indexOf(item.status) !== -1);
@@ -199,13 +226,53 @@ export default {
             try {
                 if(this.allTasks === tasks.length) {
                     await setProjectStatus({status: "Cancelled"});
-                } else {
-                    const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id});
-                    await this.storeProject(updatedProject.body);
+                } else { 
+                    const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id });
+                    await this.storeProject(updatedProject.body.project);
+                    this.currentProjectId = updatedProject.body.project._id;
+                    const tasksIds = updatedProject.body.tasks.map(item => item.taskId);
+                    const cancelledTasks = updatedProject.body.project.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
+                    const template = await this.$http.post("/pm-manage/get-task-cancel-message", {
+                        project: updatedProject.body.project,
+                        tasks: cancelledTasks, 
+                        reason: this.reason,
+                        isPay: this.isPay
+                    });
+                    this.previewMessage = template.body.message;
+                    const cancelledHalfwayTasks = cancelledTasks.filter(item => item.status === 'Cancelled Halfway');
+                    if(cancelledTasks.length == cancelledHalfwayTasks.length){
+                        this.openPreview();
+                    }
                 }
                 this.alertToggle({message: "Tasks cancelled", isShow: true, type: "success"})
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot cancel chosen tasks", isShow: true, type: "error"})
+            }
+        },
+        async sendMessage(message){
+            try {
+                await this.$http.post("/pm-manage/send-task-cancel-message", { 
+                        id: this.currentProjectId,
+                        message: message 
+                     });
+                this.alertToggle({message: "Message sent", isShow: true, type: "success"})
+            } catch (err) {
+                this.alertToggle({ message: err.message, isShow: true, type: "error" });
+            }
+            this.closePreview();
+        },
+        async getReason(reason){
+            try {
+                this.reason = reason;
+            } catch (err) {
+                this.alertToggle({ message: err.message, isShow: true, type: "error" });
+            }
+        },
+        async getPayment(isPay){
+            try {
+                this.isPay = isPay;
+            } catch (err) {
+                this.alertToggle({ message: err.message, isShow: true, type: "error" });
             }
         },
         showTab({index}) {
@@ -296,6 +363,7 @@ export default {
     },
     components: {
         DataTable,
+        Preview,
         ProgressLine,
         CheckBox,
         SelectSingle,
