@@ -304,9 +304,10 @@ export default {
                         await this.requestConfirmation(checkedSteps);
                         break;
                     case "Mark as accept/reject":
-                        const status = this.getAcceptedStepStatus();
                         const assignedSteps = checkedSteps.filter(item => item.vendor);
-                        await this.setStepsStatus({status, steps: assignedSteps});
+                        if(assignedSteps.length) {
+                            await this.decideOnSteps(assignedSteps, "Accepted");
+                        }
                         break;
                     case "ReOpen":
                         const steps = checkedSteps.filter(item => item.status === "Completed");
@@ -317,6 +318,18 @@ export default {
             } finally {
                 this.closeApproveModal();
             }
+        },
+        async decideOnSteps(assignedSteps, selectedStatus) {
+            try {
+                const withPayables = assignedSteps.filter(item => item.finance.Price.payables);
+                if(withPayables.length) {
+                    const status = selectedStatus === 'Accepted' ? this.getAcceptedStepStatus() : selectedStatus;
+                    await this.setStepsStatus({status, steps: withPayables});
+                }
+                if(withPayables.length < assignedSteps.length) {
+                    this.showErrors([`One or more steps could not be ${selectedStatus.toLowerCase()} as payables are missing`]);
+                }
+            } catch(err) {}
         },
         getAcceptedStepStatus() {
             let status = "Accepted";
@@ -337,7 +350,10 @@ export default {
                         this.closeApproveModal();
                         break;
                     case "Rejected":
-                        await this.setStepsStatus({status: "Rejected", steps: checkedSteps});
+                        const assignedSteps = checkedSteps.filter(item => item.vendor);
+                        if(assignedSteps.length) {
+                            await this.decideOnSteps(assignedSteps, "Rejected");
+                        }
                 }
             } catch(err) {
                 this.alertToggle({message: "Internal server error.Try later.", isShow: true, type: 'error'});
