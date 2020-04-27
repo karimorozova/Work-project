@@ -227,7 +227,7 @@ export default {
                     await setProjectStatus({status: "Cancelled"});
                 } else { 
                     const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id });
-                    await this.storeProject(updatedProject.body.project);
+                    await this.storeProject(updatedProject.body);
                     await this.messageTemplateFormation(filteredTasks);
                 }
                 this.alertToggle({message: "Tasks cancelled", isShow: true, type: "success"})
@@ -237,7 +237,7 @@ export default {
         },
         async messageTemplateFormation(filteredTasks){
             const tasksIds = filteredTasks.map(item => item.taskId);
-            const cancelledHalfwayTasks = this.currentProject.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1).filter(item => item.status === 'Cancelled Halfway');
+            const cancelledHalfwayTasks = this.currentProject.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1 && item.status === 'Cancelled Halfway');
             if(cancelledHalfwayTasks.length){
                 try{
                     const template = await this.$http.post("/pm-manage/tasks-cancel-message", {
@@ -248,7 +248,7 @@ export default {
                     });
                     this.previewMessage = template.body.message;
                     this.openPreview(); 
-                }catch(err){
+                } catch(err){
                     this.alertToggle({message: "Cannot formation message", isShow: true, type: "error"})
                 }
             }

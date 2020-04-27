@@ -618,12 +618,14 @@ function tasksCancelledMessage(obj) {
 }
 
 
-function listOfPaymentTasks(taskList) {
+function listOfPaymentTasks(taskList, steps) {
     let tableBody="";
     for (let task of taskList) {
+        const taskSteps = steps.filter(item => item.taskId === task.taskId);
+        const porgress = getTaskProgress(task, taskSteps);
         tableBody += `<tr>
                         <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${task.taskId}</td>
-                        <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">--</td>
+                        <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${porgress}%</td>
                         <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${task.finance.Price.halfReceivables} EUR</td>
                     </tr>`
     }
@@ -639,7 +641,7 @@ function listOfTasks(taskList) {
 }
 
 function tasksMiddleCancelledMessage(obj) {
-    const paymentTasks = listOfPaymentTasks(obj.tasks)
+    const paymentTasks = listOfPaymentTasks(obj.tasks, obj.project.steps)
     const listTasks = listOfTasks(obj.tasks);
     const isPayHead = obj.isPay ? `<p>The following tasks have been completed partially and payment will be as following</p>` : `<p>You will not be charged for the following tasks:</p>`
     let isPayRow;
@@ -710,6 +712,17 @@ function projectDeliveryMessage(obj) {
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
             </div>`;
+}
+
+function getTaskProgress(task, steps) {
+    if(task.service.calculationUnit === 'Words') {
+        return steps.reduce((init, cur) => {
+            return init + (cur.progress.wordsDone/cur.progress.totalWordCount)*100/steps.length;
+        }, 0).toFixed(2);
+    }
+    return Math.round(steps.reduce((init, cur) => {
+            return init + cur.progress/steps.length;
+        }, 0))
 }
 
 module.exports = {
