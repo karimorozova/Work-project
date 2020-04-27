@@ -761,8 +761,9 @@ router.post("/get-cancel-message", async (req, res) => {
     }
     const { accManager, contact } = getAccManagerAndContact(req.body);
     try {
-        const message = (req.body.status === "In progress") ? await projectMiddleCancelledMessage({ ...req.body, accManager, contact }) :
-            await projectCancelledMessage({ ...req.body, accManager, contact })
+        const message = req.body.status === "Cancelled Halfway" ? 
+            await projectMiddleCancelledMessage({ ...req.body, accManager, contact }) 
+            : await projectCancelledMessage({ ...req.body, accManager, contact })
         res.send({ message });
     } catch (err) {
         console.log(err);

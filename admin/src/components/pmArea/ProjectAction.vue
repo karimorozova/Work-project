@@ -86,17 +86,15 @@ export default {
       this.isEditAndSend = true;
     },
     async getCancelMessage() {
+      if (this.project.status === "In progress") {
+        await this.setStatus("Cancelled", this.selectedReason);
+      }
       const template = await this.$http.post("/pm-manage/get-cancel-message", {
         ...this.project,
         reason: this.selectedReason,
         isPay: this.isPay
       });
       this.previewMessage = template.body.message;
-      if (this.project.status === "In progress") {
-        await this.setStatus("Cancelled Halfway", this.selectedReason);
-      } else {
-        await this.setStatus("Cancelled", this.selectedReason);
-      }
       this.openPreview();
     },
     async getDeliveryMessage() {
@@ -255,7 +253,6 @@ export default {
           type: "success"
         });
       } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
     async acceptQuote() {
