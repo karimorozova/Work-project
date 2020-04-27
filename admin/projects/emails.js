@@ -17,7 +17,7 @@ async function stepCancelNotifyVendor(steps) {
                     stepCancelledMessage(step)
                     : stepMiddleCancelledMessage(step);
                 step["to"] = step.vendor.email;
-                const id = step.status === "Cancelled" ? "V003.1" : "V004.0";
+                const id = step.status === "Cancelled" ? "V003.0" : "V004.0";
                 const subject = step.status === "Cancelled" ? "Step cancelled" : "Step cancelled in the middle";
                 step.subject = `${subject}: ${step.stepId} (${step.serviceStep.title}) (ID ${id})`;
                 await sendEmail(step, message);
