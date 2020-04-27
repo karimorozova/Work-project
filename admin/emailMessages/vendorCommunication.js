@@ -229,12 +229,13 @@ function vendorReassignmentMessage(obj, reason) {
 
 function vendorMiddleReassignmentMessage(obj, reason, isPay) {
     const fee = isPay ? obj.finance.Price.halfPayables : obj.finance.Price.payables;
-    const approveText = isPay ? 
-        `Payment for step: ${obj.stepId} (${obj.serviceStep.title}) has been approved`
-        : ``
+    const progress = obj.serviceStep.calculationUnit === "Words" ?
+        (obj.progress.wordsDone/obj.progress.totalWordCount*100).toFixed(2)
+        : obj.progress
     const payText = isPay ?
-        `You will be paid ${fee} according to relative work that has been done.`
-        : `Reason: ${reason || ""}`
+        `<p>You will be paid according to your partial completion of the step.</p>
+        <p>You have completed ${progress} % of the task and your fee for this step is: ${fee} &euro;</p>`
+        : ""
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -242,11 +243,37 @@ function vendorMiddleReassignmentMessage(obj, reason, isPay) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <h4 class="contact-name">Dear ${obj.vendor.firstName}</h4>
                     <p>
-                        ${approveText}
+                        Step ${obj.stepId} (${obj.serviceStep.title}) has been reassigned to another vendor.
                     </p>
+                    <p>Reason: ${reason}</p>
                     <p>
                         ${payText}
                     </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+function vendorMiddleAssignmentMessage(obj) {
+    const mainMessage = obj.isStart ? 
+        "Although someone else has worked on this step, you shall start the task from the brining."
+        : "You should continue your work from the place it has been stopped."
+    return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <h4 class="contact-name">Dear ${obj.step.vendor.firstName}</h4>
+                    <p>
+                        Step: ${obj.step.stepId} has been reassigned to you. 
+                    </p>
+                    <p>
+                        ${mainMessage}
+                    </p>
+                    <p>An availability email with all the details of the project will be sent to you shortly.</p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -308,6 +335,7 @@ module.exports = {
     stepMiddleCancelledMessage,
     vendorReassignmentMessage,
     vendorMiddleReassignmentMessage,
+    vendorMiddleAssignmentMessage,
     stepReopenedMessage,
     stepReadyToStartMessage
 }

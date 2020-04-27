@@ -1,6 +1,6 @@
 const { payablesCalc } = require('../сalculations/wordcount');
 const { getVendorRate } = require('../сalculations/general');
-const { stepVendorsRequestSending, stepMiddleReassignedNotification } = require('../utils');
+const { stepMiddleAssignNotification, stepMiddleReassignedNotification } = require('../utils');
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects');
 
 async function reassignVendor(project, reassignData) {
@@ -16,7 +16,7 @@ async function reassignVendor(project, reassignData) {
         tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
         tasks[taskIndex].status = "Created";
         await stepMiddleReassignedNotification(updatedStep, reason, isPay);
-        await stepVendorsRequestSending(project, [newStep]);
+        await stepMiddleAssignNotification(newStep, isStart);
         return { steps, tasks };
     } catch(err) {
         console.log(err);
@@ -45,7 +45,7 @@ function getNewStep({step, vendor, isStart, progress, project, task}) {
     let newStep = {
         ...stepInfo,
         stepId,
-        status: 'Request Sent',
+        status: 'Created',
         vendor,
         vendorsClickedOffer: [],
         isVendorRead: false,

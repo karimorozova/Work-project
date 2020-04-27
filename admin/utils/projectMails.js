@@ -2,7 +2,7 @@ const { User, Projects, Services } = require('../models');
 const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
-const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage } = require("../emailMessages/vendorCommunication");
+const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage, vendorMiddleAssignmentMessage } = require("../emailMessages/vendorCommunication");
 const { getClient } = require('../clients');
 
 async function notifyManagerProjectRejected(project) {
@@ -93,14 +93,22 @@ async function stepReassignedNotification(step, reason) {
 async function stepMiddleReassignedNotification(step, reason, isPay) {
     try {
         const message = vendorMiddleReassignmentMessage(step, reason, isPay);
-        const id = isPay ? "V005.0" : "V006.0";
-        const subject = isPay ? 
-            `Payment approved: Step ${step.stepId} (${step.serviceStep.title}) (ID ${id})` 
-            : `Payment not approved: Step ${step.stepId} (${step.serviceStep.title}) (ID ${id})`
+        const subject = `Step ${step.stepId} has been reassigned to another vendor (ID V002.0)`;
         await sendEmail({ to: step.vendor.email, subject }, message);
     } catch(err) {
         console.log(err);
-        console.log("Error in stepMiddleReassignedNotification")
+        console.log("Error in stepMiddleReassignedNotification");
+    }
+}
+
+async function stepMiddleAssignNotification(step, isStart) {
+    try {
+        const message = vendorMiddleAssignmentMessage({step, isStart});
+        const subject = `Step ${step.stepId} has been reassigned to you (ID V002.1)`;
+        await sendEmail({ to: step.vendor.email, subject }, message);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in stepMiddleAssignNotification");
     }
 }
 
@@ -209,5 +217,6 @@ module.exports = {
     stepReassignedNotification,
     notifyClientProjectCancelled,
     notifyClientTasksCancelled,
-    stepMiddleReassignedNotification
+    stepMiddleReassignedNotification,
+    stepMiddleAssignNotification
 };

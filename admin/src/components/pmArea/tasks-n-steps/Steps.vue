@@ -314,7 +314,6 @@ export default {
                         await this.reopenSteps(steps);
                 }
             } catch(err) {
-                
             } finally {
                 this.closeApproveModal();
             }

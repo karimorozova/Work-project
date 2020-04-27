@@ -4,7 +4,8 @@ const { sendMailClient } = require('./mailhandlerclient');
 const { sendMailPortal } = require('./mailhandlerportal');
 const { pmMail } = require('./mailtopm');
 const { notifyManagerProjectStarts, notifyManagerProjectRejected, stepVendorsRequestSending, stepEmailToVendor,
-     sendEmailToContact, stepReassignedNotification, stepMiddleReassignedNotification, notifyClientProjectCancelled, notifyClientTasksCancelled } = require('./projectMails');
+     sendEmailToContact, stepReassignedNotification, stepMiddleReassignedNotification, stepMiddleAssignNotification, 
+     notifyClientProjectCancelled, notifyClientTasksCancelled } = require('./projectMails');
 const upload = require('./uploads');
 const { moveFile } = require('./movingFile');
 const { archiveFile } = require('./archiving');
@@ -28,5 +29,6 @@ module.exports = {
     stepReassignedNotification,
     notifyClientProjectCancelled,
     notifyClientTasksCancelled,
-    stepMiddleReassignedNotification
+    stepMiddleReassignedNotification,
+    stepMiddleAssignNotification
 }
