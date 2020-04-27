@@ -13,12 +13,12 @@ async function stepCancelNotifyVendor(steps) {
     try {
         for(let step of steps) {
             if(step.vendor && step.status !== "Completed") {
-                const message = step.status !== "Cancelled Halfway" ? 
+                const message = step.status !== "Started" ? 
                     stepCancelledMessage(step)
                     : stepMiddleCancelledMessage(step);
                 step["to"] = step.vendor.email;
-                const id = step.status === "Cancelled" ? "V003.0" : "V004.0";
-                const subject = step.status === "Cancelled" ? "Step cancelled" : "Step cancelled in the middle";
+                const id = step.status !== "Started" ? "V004.0" : "V003.0";
+                const subject = step.status !== "Started" ? "Step cancelled" : "Step cancelled in the middle";
                 step.subject = `${subject}: ${step.stepId} (${step.serviceStep.title}) (ID ${id})`;
                 await sendEmail(step, message);
             }

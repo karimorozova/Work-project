@@ -199,7 +199,7 @@ function stepMiddleCancelledMessage(obj) {
                         We would like to inform you that step: ${obj.stepId} ${obj.serviceStep.title} has been cancelled in the middle.
                     </p>
                     <p>
-                        You will be paid ${fee}, which is according to relative work you have completed.
+                        You will be paid ${fee} &euro;, which is according to relative work you have completed.
                     </p>
                 </div>
                 <footer>

@@ -570,7 +570,7 @@ function projectCancelledMessage(obj) {
 }
 
 function projectMiddleCancelledMessage(obj) {
-    const isPayRow = obj.isPay ? `<p>You will need to pay a partial amount of <strong>${obj.finance.Price.halfReceivables}</strong></p>` : `<p>You will not be charged for this project.</p>`;
+    const isPayRow = obj.isPay ? `<p>You will need to pay a partial amount of <strong>${obj.finance.Price.receivables} &euro;</strong></p>` : `<p>You will not be charged for this project.</p>`;
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
