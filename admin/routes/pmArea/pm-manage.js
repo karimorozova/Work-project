@@ -786,7 +786,7 @@ router.post("/get-delivery-message", async (req, res) => {
     }
 })
 
-router.post("/get-task-cancel-message", async (req, res) => {
+router.post("/tasks-cancel-message", async (req, res) => {
     function getAccManagerAndContact(project) {
         const accManager = project.accountManager;
         const contact = project.customer.contacts.find(item => item.leadContact);
@@ -794,7 +794,6 @@ router.post("/get-task-cancel-message", async (req, res) => {
     }
     const { project , tasks, reason, isPay } = req.body;
     const { accManager, contact } = getAccManagerAndContact(project);
-
     try { 
         const message = await tasksMiddleCancelledMessage({
             project, 
@@ -805,7 +804,6 @@ router.post("/get-task-cancel-message", async (req, res) => {
             isPay
         });
         res.send({ message });
-
     } catch (err) {
         console.log(err);
         res.status(500).send("Error on getting delivery message");

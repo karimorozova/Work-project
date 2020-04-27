@@ -18,7 +18,7 @@
                         span.slider.round
 
             .approve-modal__buttons
-                .approve-modal__button(@click="approve();returnData();")
+                .approve-modal__button(@click="returnData")
                     Button(:value="approveValue")
                 .approve-modal__button(@click.stop="notApprove")
                     Button(:value="notApproveValue")
@@ -64,14 +64,8 @@ export default {
       this.$emit("approve");
     },
     returnData(){
-        this.returnReason();
-        this.returnPayment();
-    },
-    returnReason(){
-        this.$emit("returnReason", this.selectedReason);
-    },
-    returnPayment(){
-        this.$emit("returnPayment", this.isPay);
+        this.approve();
+        this.$emit("returnData", { reason: this.selectedReason, isPay: this.isPay });
     },
     notApprove() {
       this.$emit("notApprove");
