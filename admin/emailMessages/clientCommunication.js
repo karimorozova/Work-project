@@ -530,7 +530,7 @@ function taskDeliveryMessage(obj) {
                             I'm pleased to inform you that task <strong>${obj.task.taskId} (${obj.task.service.title})</strong> from project <strong>${obj.projectId} - ${obj.projectName}</strong> has been completed and is ready for review.
                         </p>
                         <p>
-                            The files are available for you in our <a href="https://pangea.s.xtrf.eu/xtrf/faces/login.seam?conversationId=26593#!project/${obj.projectId}">Portal</a> and attached to this email in a zip format.
+                            The files are available for you in our <a href="${apiUrl}/dashboard/details/${obj.id}">Portal</a> and attached to this email in a zip format.
                         </p>
                         <p>
                             In case of any questions, please do not hesitate to contact us :-)

@@ -117,7 +117,7 @@ async function sendClientDeliveries({taskId, project, contacts}) {
         const content = fs.createReadStream(`./dist${deliverables}`);
         const attachments = [{filename: "deliverables.zip", content}];
         for(let contact of notifyContacts) {
-            const message = taskDeliveryMessage({task, contact, accManager, ...project._doc});
+            const message = taskDeliveryMessage({task, contact, accManager, ...project._doc, id: project.id});
             await sendEmail({to: contact.email, attachments, subject}, message);
         }
     } catch(err) {
