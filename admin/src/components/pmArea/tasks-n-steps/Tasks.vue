@@ -138,7 +138,6 @@ export default {
             reviewTask: [],
             isPay:false,
             reason:"",
-            currentProjectId:"",
         }
     },
     methods: {
@@ -229,37 +228,35 @@ export default {
                 } else { 
                     const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id });
                     await this.storeProject(updatedProject.body.project);
-                    await this.messageTemplateFormation(updatedProject.body.project, updatedProject.body.tasks);
+                    await this.messageTemplateFormation(filteredTasks);
                 }
                 this.alertToggle({message: "Tasks cancelled", isShow: true, type: "success"})
             } catch(err) {
                 this.alertToggle({message: "Server error / Cannot cancel chosen tasks", isShow: true, type: "error"})
             }
         },
-        async messageTemplateFormation(updatedProject, allTasks){
-            this.currentProjectId = updatedProject._id;
-            const tasksIds = allTasks.map(item => item.taskId);
-            const cancelledTasks = updatedProject.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
-            const cancelledHalfwayTasks = cancelledTasks.filter(item => item.status === 'Cancelled Halfway');
-            try{
-                const template = await this.$http.post("/pm-manage/tasks-cancel-message", {
-                    project: updatedProject,
-                    tasks: cancelledHalfwayTasks, 
-                    reason: this.reason, 
-                    isPay: this.isPay
-                });
-                 this.previewMessage = template.body.message;
-            }catch(err){
-                this.alertToggle({message: "Cannot formation message", isShow: true, type: "error"})
-            }
+        async messageTemplateFormation(filteredTasks){
+            const tasksIds = filteredTasks.map(item => item.taskId);
+            const cancelledHalfwayTasks = this.currentProject.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1).filter(item => item.status === 'Cancelled Halfway');
             if(cancelledHalfwayTasks.length){
-                this.openPreview();
+                try{
+                    const template = await this.$http.post("/pm-manage/tasks-cancel-message", {
+                        project: this.currentProject,
+                        tasks: cancelledHalfwayTasks, 
+                        reason: this.reason, 
+                        isPay: this.isPay
+                    });
+                    this.previewMessage = template.body.message;
+                    this.openPreview(); 
+                }catch(err){
+                    this.alertToggle({message: "Cannot formation message", isShow: true, type: "error"})
+                }
             }
         },  
-        async sendMessage(message){
+        async sendMessage(message){           
             try {
                 await this.$http.post("/pm-manage/send-task-cancel-message", { 
-                        id: this.currentProjectId,
+                        id: this.currentProject._id,
                         message: message 
                      });
                 this.alertToggle({message: "Message sent", isShow: true, type: "success"})
