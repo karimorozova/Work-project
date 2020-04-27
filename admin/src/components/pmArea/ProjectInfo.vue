@@ -139,7 +139,7 @@ export default {
         async getVendors() {
             try{
                 if(!this.allVendors.length) {
-                    const result = await this.$http.get('/all-vendors');
+                    const result = await this.$http.get('/all-vendors?filter=Active');
                     this.vendorsSetting(result.body);
                 }
             } catch(err) {

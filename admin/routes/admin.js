@@ -56,9 +56,11 @@ router.get('/active-clients', requiresLogin, async (req, res) => {
     }
 })
 
-router.get('/all-vendors', requiresLogin, async (req, res, next) => {
+router.get('/all-vendors', requiresLogin, async (req, res) => {
     try {
-        const vendors = await getVendors({});
+        const { filter } = req.query;
+        const query = filter ? {status: filter} : {};
+        const vendors = await getVendors(query);
         res.send(vendors)
     } catch(err) {
         console.log(err);
