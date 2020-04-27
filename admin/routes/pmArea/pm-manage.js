@@ -753,12 +753,13 @@ router.post('/step-target', upload.fields([{name: 'targetFile'}]), async (req, r
     }
 })
 
-router.post("/get-cancel-message", async (req, res) => {
-    function getAccManagerAndContact(project) {
-        const accManager = project.accountManager;
-        const contact = project.customer.contacts.find(item => item.leadContact);
-        return { accManager, contact };
-    }
+function getAccManagerAndContact(project) {
+    const accManager = project.accountManager;
+    const contact = project.customer.contacts.find(item => item.leadContact);
+    return { accManager, contact };
+}
+
+router.post("/making-cancel-message", async (req, res) => {
     const { accManager, contact } = getAccManagerAndContact(req.body);
     try {
         const message = req.body.status === "Cancelled Halfway" ? 
@@ -767,47 +768,30 @@ router.post("/get-cancel-message", async (req, res) => {
         res.send({ message });
     } catch (err) {
         console.log(err);
-        res.status(500).send("Error on getting cancelled message");
+        res.status(500).send("Error on making project cancelled message");
     }
 })
 
-router.post("/get-delivery-message", async (req, res) => {
-    function getAccManagerAndContact(project) {
-        const accManager = project.accountManager;
-        const contact = project.customer.contacts.find(item => item.leadContact);
-        return { accManager, contact };
-    }
+router.post("/making-delivery-message", async (req, res) => {
     const { accManager, contact } = getAccManagerAndContact(req.body);
     try {
         const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
         res.send({ message });
     } catch (err) {
         console.log(err);
-        res.status(500).send("Error on getting delivery message");
+        res.status(500).send("Error on making delivery message");
     }
 })
 
-router.post("/tasks-cancel-message", async (req, res) => {
-    function getAccManagerAndContact(project) {
-        const accManager = project.accountManager;
-        const contact = project.customer.contacts.find(item => item.leadContact);
-        return { accManager, contact };
-    }
+router.post("/making-tasks-cancel-message", async (req, res) => {
     const { project , tasks, reason, isPay } = req.body;
     const { accManager, contact } = getAccManagerAndContact(project);
     try { 
-        const message = await tasksMiddleCancelledMessage({
-            project, 
-            tasks,
-            accManager, 
-            contact,
-            reason,
-            isPay
-        });
+        const message = await tasksMiddleCancelledMessage({ project, tasks, accManager, contact, reason, isPay });
         res.send({ message });
     } catch (err) {
         console.log(err);
-        res.status(500).send("Error on getting delivery message");
+        res.status(500).send("Error on making tasks cancelled message");
     }
 })
 

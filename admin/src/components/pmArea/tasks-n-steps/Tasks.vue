@@ -240,7 +240,7 @@ export default {
             const cancelledHalfwayTasks = this.currentProject.tasks.filter(item => tasksIds.indexOf(item.taskId) !== -1 && item.status === 'Cancelled Halfway');
             if(cancelledHalfwayTasks.length){
                 try{
-                    const template = await this.$http.post("/pm-manage/tasks-cancel-message", {
+                    const template = await this.$http.post("/pm-manage/making-tasks-cancel-message", {
                         project: this.currentProject,
                         tasks: cancelledHalfwayTasks, 
                         reason: this.reason, 

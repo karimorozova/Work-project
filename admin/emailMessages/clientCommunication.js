@@ -700,7 +700,7 @@ function projectDeliveryMessage(obj) {
                     </p>
                     <p>
                         The files are available for you in our
-                        <a href="https://pangea.s.xtrf.eu/xtrf/faces/login.seam?conversationId=26578#!project/${obj.projectId}">Portal</a>
+                        <a href="${apiUrl}/dashboard/details/${obj.id}">Portal</a>
                         and attached to this email in a zip format.
                     </p>
                     <p>
