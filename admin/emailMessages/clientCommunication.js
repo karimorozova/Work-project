@@ -617,7 +617,48 @@ function tasksCancelledMessage(obj) {
             </div>`;
 }
 
+
+function listOfPaymentTasks(taskList) {
+    let tableBody="";
+    for (let task of taskList) {
+        tableBody += `<tr>
+                        <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${task.taskId}</td>
+                        <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">--</td>
+                        <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${task.finance.Price.halfReceivables} EUR</td>
+                    </tr>`
+    }
+    return tableBody;
+}
+
+function listOfTasks(taskList) {
+    let list="";
+    for (let task of taskList) {
+        list += `<li>${task.taskId}</li>`
+    }
+    return list;
+}
+
 function tasksMiddleCancelledMessage(obj) {
+    const paymentTasks = listOfPaymentTasks(obj.tasks)
+    const listTasks = listOfTasks(obj.tasks);
+    const isPayHead = obj.isPay ? `<p>The following tasks have been completed partially and payment will be as following</p>` : `<p>You will not be charged for the following tasks:</p>`
+    let isPayRow;
+    if (obj.isPay) {
+        isPayRow = `<table style="width:100%;color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">Task ID</th>
+                    <th style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">Completion</th>
+                    <th style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${paymentTasks}
+            </tbody>
+        </table>`
+    } else {
+        isPayRow = `<ul>${listTasks}</ul>`
+    }
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -627,21 +668,19 @@ function tasksMiddleCancelledMessage(obj) {
                     This message is sent to you on behalf of ${obj.accManager.firstName} ${obj.accManager.lastName}</p>
                     <h4 class="contact-name">Dear ${obj.contact.firstName} ${obj.contact.surname}</h4>
                     <p>
-                        We would like to information that task <strong>${obj.task.taskId} (${obj.task.service.title})</strong> from project <strong>${obj.projectId} - ${obj.projectName}</strong> has been cancelled in the middle of the work.
+                        We would like to information that task(s) from project <strong>${obj.project.projectId} - ${obj.project.projectName}</strong> has been cancelled in the middle of the work.
                     </p>
                     <p>
                         Reason: <strong>${obj.reason}</strong>.
                     </p>
-                    <p>
-                        You will need to pay a partial amount of <strong>${obj.task.finance.Price.halfReceivables}</strong>
-                    </p>
+                    ${isPayHead}
+                    ${isPayRow}
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
             </div>`;
-
 }
 
 function projectDeliveryMessage(obj) {

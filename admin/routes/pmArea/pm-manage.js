@@ -15,7 +15,7 @@ const { getTasksWithFinanceUpdated } = require("../../projectTasks");
 const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile, removeRequestFiles, sendNotificationToManager, removeClientRequest } = require("../../clientRequests");
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const { getMemoqUsers} = require("../../services/memoqs/users");
-const { projectCancelledMessage, projectMiddleCancelledMessage, projectDeliveryMessage } = require("../../emailMessages/clientCommunication")
+const { projectCancelledMessage, projectMiddleCancelledMessage, projectDeliveryMessage, tasksMiddleCancelledMessage } = require("../../emailMessages/clientCommunication")
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -347,18 +347,29 @@ router.post('/step-payables', async (req, res) => {
 
 router.post("/cancel-tasks", async (req, res) => {
     const { tasks, projectId } = req.body;
-    try {
+    try { 
         const project = await getProject({"_id": projectId});
         const updatedProject = await getProjectAfterCancelTasks(tasks, project);
         const wordsCancelledTasks = tasks.filter(item => item.service.calculationUnit === 'Words');
         if(wordsCancelledTasks.length) {
             await cancelMemoqDocs(wordsCancelledTasks);
         }
-        await notifyClientTasksCancelled(updatedProject, tasks);
-        res.send(updatedProject);
+        res.send({project: updatedProject, tasks: tasks});
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on cancelling tasks / cancel-tasks");
+    }
+})
+
+router.post("/send-task-cancel-message", async (req, res) => {
+    const { id, message} = req.body;    
+    try {
+        const project = await getProject({"_id": id});
+        await notifyClientTasksCancelled(project, message);
+    res.send("Message sent");
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Internal server error / Cannot change Project's status");
     }
 })
 
@@ -582,7 +593,7 @@ router.post("/deliver", async (req, res) => {
         console.log(err);
         res.status(500).send("Error on delivering tasks");
     }
-})
+}) 
 
 router.post("/project-delivery", async (req, res) => {
     const { _id, message } = req.body;
@@ -768,6 +779,30 @@ router.post("/get-delivery-message", async (req, res) => {
     const { accManager, contact } = getAccManagerAndContact(req.body);
     try {
         const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
+        res.send({ message });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on getting delivery message");
+    }
+})
+
+router.post("/tasks-cancel-message", async (req, res) => {
+    function getAccManagerAndContact(project) {
+        const accManager = project.accountManager;
+        const contact = project.customer.contacts.find(item => item.leadContact);
+        return { accManager, contact };
+    }
+    const { project , tasks, reason, isPay } = req.body;
+    const { accManager, contact } = getAccManagerAndContact(project);
+    try { 
+        const message = await tasksMiddleCancelledMessage({
+            project, 
+            tasks,
+            accManager, 
+            contact,
+            reason,
+            isPay
+        });
         res.send({ message });
     } catch (err) {
         console.log(err);
