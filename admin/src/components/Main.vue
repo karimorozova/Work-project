@@ -32,13 +32,14 @@
             .admin-navbar
                 .admin-navbar__sidebar
                     ul.navbar__menu
-                        li.navbar__menu_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
-                            .image(v-if="!note.active && note.imgWhite")
-                                img.image.navbar_no-filter(:src="note.imgWhite")
-                            .image(v-else)
-                                img(:src="note.imgBrown")
-                            .title
-                                span {{ note.title }}
+                        router-link(:to="note.path" v-for="(note, index) in navbarList")
+                            li.navbar__menu_item(@click="switchSection(index)" :class="{active: note.active}")
+                                .image(v-if="!note.active && note.imgWhite")
+                                    img.image.navbar_no-filter(:src="note.imgWhite")
+                                .image(v-else)
+                                    img(:src="note.imgBrown")
+                                .title
+                                    span {{ note.title }}
                     .balloons
             .admin-main-wrapper__inner
                 router-view(:isSidebar="isSidebar"
@@ -57,39 +58,46 @@ export default {
             navbarList: [{
                     title: "DASHBOARD",
                     imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
-                    active: true
+                    active: true,
+                    path: "/dashboard"
                 },
                 {
                     title: "VENDORS",
                     imgBrown: require("../assets/images/CATEGORIES/VENDORS.png"),
                     imgWhite: require("../assets/images/CATEGORIES/VENDORS2.png"),
-                    active: false
+                    active: false,
+                    path: "/vendors"
                 },
                 {
                     title: "CLIENTS",
                     imgBrown: require("../assets/images/CATEGORIES/clients.png"),
-                    active: false
+                    active: false,
+                    path: "/clients"
                 },
                 {
                     title: "PROJECTS",
                     imgBrown: require("../assets/images/CATEGORIES/pm-brown.png"),
-                    active: false
+                    active: false,
+                    path: "/projects/open-projects"
                 },
                 {
                     title: "FINANCE",
                     imgBrown: require("../assets/images/CATEGORIES/FINANCE.png"),
-                    active: false
+                    active: false,
+                    path: "/finance"
                 },
                 {
                     title: "REPORTS",
                     imgBrown: require("../assets/images/CATEGORIES/REPORTS.png"),
                     imgWhite: require("../assets/images/CATEGORIES/REPORTS2.png"),
-                    active: false
+                    active: false,
+                    path: "/reports"
                 },
                 {
                     title: "SETTINGS",
                     imgBrown: require("../assets/images/CATEGORIES/SETTINGS.png"),
-                    active: false
+                    active: false,
+                    path: "/settings"
                 }
             ],
             newProject: [{
@@ -512,25 +520,27 @@ export default {
             overflow-y: scroll;
             margin-bottom: 0;
             margin-left: 16px;
-
+            a {
+                text-decoration: none;
+                display: block;
+                margin-bottom: 20px;
+            }
             &_item {
                 padding-bottom: 10px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                margin-bottom: 20px;
                 margin-left: 0;
                 margin-right: 0;
                 cursor: pointer;
-                transition: all 0.4s;
-
+                transition: all 0.2s;
                 &:last-child {
                     margin-bottom: 0;
                 }
 
                 .title {
-                    transition: all 0.3s;
+                    transition: all 0.2s;
                     color: #fff;
                 }
 
