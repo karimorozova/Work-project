@@ -89,34 +89,50 @@ export default {
       if (this.project.status === "In progress") {
         await this.setStatus("Cancelled", this.selectedReason);
       }
-      const template = await this.$http.post("/pm-manage/get-cancel-message", {
-        ...this.project,
-        reason: this.selectedReason,
-        isPay: this.isPay
-      });
-      this.previewMessage = template.body.message;
-      this.openPreview();
+      try {
+        const template = await this.$http.post(
+          "/pm-manage/making-cancel-message",
+          { ...this.project, reason: this.selectedReason, isPay: this.isPay }
+        );
+        this.previewMessage = template.body.message;
+        this.openPreview();
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
     async getDeliveryMessage() {
-      const template = await this.$http.post("/pm-manage/get-delivery-message", {
-        ...this.project
-      });
-      this.previewMessage = template.body.message;
-      this.openPreview();
+      try {
+        const template = await this.$http.post(
+          "/pm-manage/making-delivery-message",
+          { ...this.project }
+        );
+        this.previewMessage = template.body.message;
+        this.openPreview();
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
     async getSendQuoteMessage() {
-      const template = await this.$http.get(
-        `/pm-manage/quote-message?projectId=${this.project._id}`
-      );
-      this.previewMessage = template.body.message;
-      this.openPreview();
+      try {
+        const template = await this.$http.get(
+          `/pm-manage/quote-message?projectId=${this.project._id}`
+        );
+        this.previewMessage = template.body.message;
+        this.openPreview();
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
     async getProjectDetailsMessage() {
-      const template = await this.$http.get(
-        `/pm-manage/project-details?projectId=${this.project._id}`
-      );
-      this.previewMessage = template.body.message;
-      this.openPreview();
+      try {
+        const template = await this.$http.get(
+          `/pm-manage/project-details?projectId=${this.project._id}`
+        );
+        this.previewMessage = template.body.message;
+        this.openPreview();
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
     async sendMessage(message) {
       try {
@@ -253,18 +269,23 @@ export default {
           type: "success"
         });
       } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
     async acceptQuote() {
       const status = this.project.isStartAccepted ? "Started" : "Approved";
       try {
         await this.setStatus(status);
-      } catch (err) {}
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
     async rejectQuote() {
       try {
         await this.setStatus("Rejected");
-      } catch (err) {}
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
     async deliverProject(message) {
       try {
@@ -272,7 +293,9 @@ export default {
           id: this.project._id,
           message: message
         });
-      } catch (err) {}
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" });
+      }
     },
     ...mapActions({
       alertToggle: "alertToggle",
