@@ -8,6 +8,7 @@ const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, 
     removeVendorEdu, updateVendorAssessment, notifyTestStatus } = require('../vendors');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
+const { testSentMessage } = require("../emailMessages/candidateCommunication");
 
 
 function moveFile(oldFile, vendorId) {
@@ -360,13 +361,22 @@ router.post('/remove-lang-test', async (req, res) => {
 })
 
 router.post('/test-emails', async (req, res) => {
-    const { vendor, qualification, testPath } = req.body;
+    const { vendor, qualification, testPath , message } = req.body;
     try {
-        await notifyTestStatus({vendor, qualification, testPath});
+        await notifyTestStatus({vendor, qualification, testPath, template:message}); 
         res.send("email sent");
     } catch(err) {
         res.send(500).send("Error on sending test status email to vendor");
     }
 })
 
+router.post("/get-message", async (req, res) => {
+    try { 
+        const message = await testSentMessage(req.body);    
+        res.send({message});
+    } catch(err) {
+        console.log(err); 
+        res.status(500).send("Error on getting quote message");
+    }
+})
 module.exports = router;
