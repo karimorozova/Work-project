@@ -40,12 +40,13 @@
       .clientsNavbar
         .clientsNavbar__sideBar
           ul.navbar__ulist
-            li.navbar__ulist_item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{active: note.active}")
-              .image
-                img.navbar_no-filter-image(v-if="!note.active && note.imgWhite" :src="note.imgWhite")
-                img.navbar__image(v-else :src="note.imgBrown")
-              .title(:class="{showTitle: true}")
-                span {{ note.title }}
+            router-link(:to="note.path" v-for="(note, index) in navbarList")
+              li.navbar__ulist_item(@click="switchSection(index)" :class="{active: note.active}")
+                .image
+                  img.navbar_no-filter-image(v-if="!note.active && note.imgWhite" :src="note.imgWhite")
+                  img.navbar__image(v-else :src="note.imgBrown")
+                .title(:class="{showTitle: true}")
+                  span {{ note.title }}
           .logoImage(v-if="expander")
           .balloons(v-else)
       .clientsMainWrapper__inner
@@ -650,6 +651,9 @@
         height: 77vh;
         margin-bottom: 0;
         overflow-y: scroll;
+        a{
+          text-decoration: none;
+        }
 
         &_item {
           padding-bottom: 10px;
