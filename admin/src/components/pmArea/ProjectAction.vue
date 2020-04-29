@@ -3,9 +3,11 @@
     .project-action__preview(v-if="isEditAndSend")
         Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
 
-    .project-action__title 
-      span Project Action:
-      span(style="float:right" @click="refreshProject") Update project
+    .project-action__title
+      .project-action__title-text Project Action:
+      .project-action__title-button
+        Button(:value="'Update project'" @clicked="refreshProject")
+
     .project-action__drop-menu
         SelectSingle(
             :selectedOption="selectedAction"
@@ -20,17 +22,17 @@
         .project-action__button(v-if="isAlternativeAction")
             Button(:value="'Reject'" @clicked="makeAlterAction")
 
-    div(v-if="isAction('Send a Quote')")
+    .project-action__setting(v-if="isAction('Send a Quote')")
         .project-action__confirm
                 Button(:value="'Edit & Send'" @clicked="getSendQuoteMessage")
-    div(v-if="isAction('Deliver')")
+    .project-action__setting(v-if="isAction('Deliver')")
         .project-action__confirm
                 Button(:value="'Edit & Send'" @clicked="getDeliveryMessage")
-    div(v-if="isAction('Send Project Details')")
+    .project-action__setting(v-if="isAction('Send Project Details')")
         .project-action__confirm
                 Button(:value="'Edit & Send'" @clicked="getProjectDetailsMessage")
 
-    div(v-if="isAction('Cancel')")
+    .project-action__setting(v-if="isAction('Cancel')")
         .project-action__drop-menu
             SelectSingle(
                 :selectedOption="selectedReason"
@@ -40,7 +42,7 @@
             )
         span More Information:
         textarea(type="text" v-model="moreInformation" rows="4" class="project-action__text-input")
-        div(v-if="project.status === 'In progress'")
+        .project-action__setting(v-if="project.status === 'In progress'")
             .project-action__payment
                 .project-action__payment-span
                     span Partial Payment
@@ -393,6 +395,9 @@ export default {
     font-size: 20px;
     border-bottom: 1px solid $brown-border;
     margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   &__drop-menu {
     width: 191px;

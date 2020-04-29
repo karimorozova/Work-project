@@ -58,10 +58,12 @@
                     Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
                 img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
             .filters__item
-                span(@click="refreshProjects") Update projects
+                .filters__item-button
+                    Button(:value="'Update projects'" @clicked="refreshProjects")
 </template>
 
 <script>
+import Button from "../Button"
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
 import LanguagesSelect from "../LanguagesSelect";
@@ -177,6 +179,7 @@ export default {
         LanguagesSelect,
         Datepicker,
         LabelValue,
+        Button
     }
 }
 </script>
@@ -188,6 +191,12 @@ export default {
     width: 100%;
     justify-content: space-between;
     margin-bottom: 20px;
+    &__item{
+        &-button{
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
     &__col {
         display: flex;
         flex-direction: column;
