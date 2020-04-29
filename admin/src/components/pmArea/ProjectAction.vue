@@ -3,7 +3,9 @@
     .project-action__preview(v-if="isEditAndSend")
         Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
 
-    .project-action__title Project Action: 
+    .project-action__title 
+      span Project Action:
+      span(style="float:right" @click="refreshProject") Update project
     .project-action__drop-menu
         SelectSingle(
             :selectedOption="selectedAction"
@@ -79,6 +81,9 @@ export default {
     };
   },
   methods: {
+    refreshProject(){
+      this.$emit('refreshProject')
+    },
     closePreview() {
       this.isEditAndSend = false;
     },

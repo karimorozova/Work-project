@@ -14,6 +14,7 @@
                 @removeLangFilter="removeLangFilter"
                 @setFilter="setFilter"
                 :projectsType="projectsType"
+                @refreshProjects="refreshProjects"
             )
         .all-projects__table
             ProjectsTable(v-if="projectsType !== 'requests'"
@@ -83,6 +84,9 @@ export default {
         },
         bottomScrolled() {
             this.$emit("bottomScrolled", {filters: this.filters});
+        },
+        refreshProjects(){
+            this.$emit('filterProjects', this.filters);
         }
     },
     computed: {
