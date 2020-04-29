@@ -57,6 +57,8 @@
                 LabelValue(label="Deadline")
                     Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
                 img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
+            .filters__item
+                span(@click="refreshProjects") Update projects
 </template>
 
 <script>
@@ -94,6 +96,9 @@ export default {
         }
     },
     methods: {
+        refreshProjects(){
+            this.$emit('refreshProjects')
+        },
         setStart(event) {
             const date = event;
             date.setHours(0,0,0,0);
@@ -141,7 +146,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            languages: "getAllLanguages"
+            languages: "getAllLanguages",
         }),
         languageNames() {
             return this.languages.map(item => {

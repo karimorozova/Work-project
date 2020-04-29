@@ -23,7 +23,9 @@
             ProjectAction(
                 :project="currentProject"
                 @editAndSend="editAndSend"
-                @setStatus="setStatus")
+                @setStatus="setStatus"
+                @refreshProject="refreshProject"
+                )
     .project-info__all-info
         ProjectFinance
     .project-info__preview(v-if="isEditAndSend")
@@ -190,7 +192,12 @@ export default {
             } catch(err) {
 
             }
-        }
+        },
+        async refreshProject(){
+            const { id } = this.$route.params;
+            const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+            await this.setCurrentProject(curProject.body);
+        },
     },
     computed: {
         ...mapGetters({

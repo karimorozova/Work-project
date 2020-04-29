@@ -29,14 +29,15 @@
       .vendor-portal__nav
         .vendor-portal__sidebar
           ul.vendor-portal__nav-menu
-            li.vendor-portal__nav-item(@click="switchSection(index)" v-for="(note, index) in navbarList" :class="{'vendor-portal_active': note.active}")
-              .vendor-portal__image
-                img(:src="note.imgBrown")
-              .vendor-portal__nav-title
-                span {{ note.title }}
+            router-link(:to="note.path" v-for="(note, index) in navbarList")
+              li.vendor-portal__nav-item(@click="switchSection(index)" :class="{'vendor-portal_active': note.active}")
+                .vendor-portal__image
+                  img(:src="note.imgBrown")
+                .vendor-portal__nav-title
+                  span {{ note.title }}
           .vendor-portal__balloons
       nuxt-child
-</template>
+</template> 
 
 <script>
 
@@ -327,6 +328,10 @@ export default {
     height: 77vh;
     margin-bottom: 0;
     overflow-y: scroll;
+    a{
+      text-decoration: none;
+    }
+
   }
   &__nav-item {
     padding-bottom: 10px;
