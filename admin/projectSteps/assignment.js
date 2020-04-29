@@ -31,12 +31,23 @@ function updateCurrentStep({step, isStart, isPay, progress}) {
     if(+progress) {
         updatedStep.status = "Cancelled Halfway";
         updatedStep.finance.Price.halfPayables = isPay ? +(payables*progress/100).toFixed(2) : 0;
-        updatedStep.finance.Price.halfReceivables = isPay && !isStart ? +(receivables*progress/100).toFixed(2) : 0;
+        updatedStep.finance.Price.halfReceivables = !isStart ? +(receivables*progress/100).toFixed(2) : 0;
     } else {
         updatedStep.status = "Cancelled";
         updatedStep.finance.Price.payables = isPay ? +(payables*progress/100).toFixed(2) : 0;
+        updatedStep.finance.Price.payables = !isStart ? +(payables*progress/100).toFixed(2) : 0;
     }
+    updatedStep.progress = getUpdatedStepProgress(step, progress);
     return updatedStep;
+}
+
+function getUpdatedStepProgress(step, progress) {
+    if(step.serviceStep.calculationUnit === "Words") {
+        let updatedProgress = {...step.progress};
+        updatedProgress.wordsDone = +(progress*step.progress.totalWordCount/100).toFixed(2);
+        return updatedProgress;
+    } 
+    return progress;
 }
 
 function getNewStep({step, vendor, isStart, progress, project, task}) {
@@ -49,12 +60,24 @@ function getNewStep({step, vendor, isStart, progress, project, task}) {
         vendor,
         vendorsClickedOffer: [],
         isVendorRead: false,
+        progress: getNewStepProgress(step, progress, isStart)
     };
     const stepWithPaybles = getStepPayables({task, step: newStep, project})
     if(!isStart && progress > 0) {
         return updateFinanceForNewStep(stepWithPaybles, progress);
     }
     return stepWithPaybles;
+}
+
+function getNewStepProgress(step, progress, isStart) {
+    if(!isStart) {
+        return getUpdatedStepProgress(step, progress);
+    }
+    let newProgress = 0;
+    if(step.serviceStep.calculationUnit === "Words") {
+        newProgress = {...step.progress, wordsDone: 0}
+    }
+    return newProgress;
 }
 
 function getStepPayables({task, step, project}) {

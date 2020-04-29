@@ -39,7 +39,7 @@
                         CheckBox(@check="(e)=>toggle(e, 'isPay', 'no')" @uncheck="(e)=>toggle(e, 'isPay', 'no')" :isChecked="isPay.no")
                         .reassignment__check-label No
                     .reassignment__work
-                        input.reassignment__percent(type="text" :value="progress" @change="setProgress")
+                        input.reassignment__percent(type="text" :value="progress" @input="setProgress" @click.stop="selectInputVal" ref="progress")
                         span.reassignment__text %  is done
         .reassignment__buttons
             .reassignment__button
@@ -84,12 +84,21 @@ export default {
             "alertToggle",
             "reassignVendor"
         ]),
+        selectInputVal() {
+            this.$refs.progress.select();
+        },
         setProgress(e) {
-            this.enteredProgress = e.target.value;
+            const { value } = e.target;
+            const regex = /^[0-9]+$/;
+            const characters = value.split("").filter(item => regex.test(item));
+            const clearedValue = characters.join("");
+            this.enteredProgress = clearedValue.length > 3 ? clearedValue.slice(0, 3) : clearedValue;
+            this.enteredProgress = this.enteredProgress > 100 ? 100 : this.enteredProgress;
+            this.$refs.progress.value = this.enteredProgress;
         },
         getCurrentProgress() {
             const { progress } = this.step;
-            return progress.totalWordCount ? Math.floor(progress.wordsDone/progress.totalWordCount*100) : progress;
+            return progress.totalWordCount ? (progress.wordsDone/progress.totalWordCount*100).toFixed(2) : progress;
         },
         currentVendorName(vendor) {
             return vendor ? vendor.firstName + ' ' + vendor.surname : "";
@@ -122,7 +131,10 @@ export default {
             if(!this.reason) this.errors.push("Please, set the Reason.");
             if(!this.newVendor) this.errors.push("Please, set the Vendor.");
             const currentProgress = this.getCurrentProgress();
-            if(this.enteredProgress > currentProgress) this.errors.push("Entered progress cannot be higher than current progress.");
+            if(this.enteredProgress > currentProgress) {
+                this.errors.push("Entered progress cannot be higher than current progress.");
+                this.enteredProgress = "";
+            }
             if(this.errors.length) {
                 return this.areErrors = true;
             }
@@ -131,7 +143,7 @@ export default {
         async save() {
             const reassignData = {
                 step: this.step,
-                progress: this.progress,
+                progress: +this.progress,
                 isStart: this.isStart.yes,
                 isPay: this.isPay.yes,
                 reason: this.reason,
@@ -215,7 +227,7 @@ export default {
         margin-left: 5px;
     }
     &__percent {
-        width: 30px;
+        width: 50px;
         margin: 5px 5px 0 0;
         padding: 0 5px;
         box-sizing: border-box;
