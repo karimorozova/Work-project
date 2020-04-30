@@ -99,11 +99,11 @@
             template(slot="status" slot-scope="{ row }")
                 span.steps__step-status {{ row.status }}
             template(slot="receivables" slot-scope="{ row }")
-                span.steps__money(v-if="row.finance.Price.receivables") &euro;
+                span.steps__money(v-if="isEuro(row, 'receivables')") &euro;
                 span.steps__step-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ getTotalReceivables(row) }}
                 span.steps__step-data(v-if="row.finance.Price.halfReceivables") {{ row.finance.Price.halfReceivables }}
             template(slot="payables" slot-scope="{ row }")
-                span.steps__money(v-if="row.finance.Price.payables") &euro;                
+                span.steps__money(v-if="isEuro(row, 'payables')") &euro;                
                 span.steps__step-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ getTotalPayables(row) }}
                 span.steps__step-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
             template(slot="margin" slot-scope="{ row }")
@@ -219,6 +219,13 @@ export default {
                 return (finance.Price.payables - finance.Price.payables*vendorDiscount/100).toFixed(2);
             }
             return finance.Price.payables;
+        },
+        isEuro(step, prop) {
+            if(step.status === "Cancelled Halfway") {
+                const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables";
+                return step.finance.Price[halfProp];
+            }
+            return step.finance.Price[prop];
         },
         isScrollDrop(drop, elem) {
             return drop && elem.clientHeight >= 320;

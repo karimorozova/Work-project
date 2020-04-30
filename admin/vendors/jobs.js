@@ -247,8 +247,9 @@ function getProjectStatus({project, status, updatedTasks}) {
 function isAllStepsCompleted({jobId, steps}) {
     const currentStep = steps.find(item => item.id === jobId);
     const taskSteps = steps.filter(item => item.taskId === currentStep.taskId);
+    const validStatuses = ["Completed", "Cancelled", "Cancelled Halfway"]
     const nonCompleted = taskSteps.reduce((init, cur) => {
-        if(cur.taskId === currentStep.taskId && cur.status === "Completed") {
+        if(cur.taskId === currentStep.taskId && validStatuses.indexOf(cur.status) !== "Completed") {
             return init;
         }
         return ++init;
