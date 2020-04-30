@@ -40,7 +40,7 @@
       .clientsNavbar
         .clientsNavbar__sideBar
           ul.navbar__ulist
-            router-link(:to="note.path" v-for="(note, index) in navbarList")
+            router-link(:to="note.path" v-for="(note, index) in navbarList" :key="index")
               li.navbar__ulist_item(@click="switchSection(index)" :class="{active: note.active}")
                 .image
                   img.navbar_no-filter-image(v-if="!note.active && note.imgWhite" :src="note.imgWhite")

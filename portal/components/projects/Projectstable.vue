@@ -83,7 +83,11 @@ export default {
             } catch(err) {
                 this.alertToggle({message: err.message, isShow: true, type: "error"});
             }
-        }
+        },
+        getDetails({index}) {
+            const id = this.projects[index]._id
+            this.$router.push(`/projects/details/${id}`);
+        },
     },
     components: {
         DataTable
