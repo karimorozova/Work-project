@@ -5,8 +5,7 @@
 
     .project-action__title
       .project-action__title-text Project Action:
-      .project-action__title-button
-        Button(:value="'Update project'" @clicked="refreshProject")
+      .project-action__title-button(@click="refreshProject")
 
     .project-action__drop-menu
         SelectSingle(
@@ -398,6 +397,12 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    &-button{
+      background-image: url('../../assets/images/refresh-icon.png');
+      width: 24px;
+      height: 20px;
+      cursor: pointer;
+    }
   }
   &__drop-menu {
     width: 191px;

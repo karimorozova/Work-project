@@ -57,13 +57,11 @@
                 LabelValue(label="Deadline")
                     Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
                 img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
-            .filters__item
-                .filters__item-button
-                    Button(:value="'Update projects'" @clicked="refreshProjects")
+            .filters__itemCenter
+                .filters__itemCenter-button(@click="refreshProjects")
 </template>
 
 <script>
-import Button from "../Button"
 import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
 import LanguagesSelect from "../LanguagesSelect";
@@ -178,8 +176,7 @@ export default {
         SelectMulti,
         LanguagesSelect,
         Datepicker,
-        LabelValue,
-        Button
+        LabelValue
     }
 }
 </script>
@@ -191,10 +188,14 @@ export default {
     width: 100%;
     justify-content: space-between;
     margin-bottom: 20px;
-    &__item{
+    &__itemCenter{
+        display: flex;
+        justify-content: center;
         &-button{
-            display: flex;
-            justify-content: flex-end;
+            background-image: url('../../assets/images/refresh-icon.png');
+            width: 24px;
+            height: 20px;
+            cursor: pointer;
         }
     }
     &__col {
