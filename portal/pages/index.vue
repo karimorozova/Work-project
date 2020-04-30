@@ -653,6 +653,14 @@
         overflow-y: scroll;
         a{
           text-decoration: none;
+          display: block;
+          margin-bottom: 20px;
+          &:last-child {
+            margin-bottom: 120px;
+            @media (max-height: 768px) {
+              margin-bottom: 57px;
+            }
+          }
         }
 
         &_item {
@@ -661,15 +669,8 @@
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          margin-bottom: 60px;
           cursor: pointer;
           transition: all 0.4s;
-          &:last-child {
-            margin-bottom: 120px;
-            @media (max-height: 768px) {
-              margin-bottom: 57px;
-            }
-          }
 
           .intothelist {
             margin-bottom: 78%;
