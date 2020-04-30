@@ -29,7 +29,7 @@
       .vendor-portal__nav
         .vendor-portal__sidebar
           ul.vendor-portal__nav-menu
-            router-link(:to="note.path" v-for="(note, index) in navbarList")
+            router-link(:to="note.path" v-for="(note, index) in navbarList" :key="index")
               li.vendor-portal__nav-item(@click="switchSection(index)" :class="{'vendor-portal_active': note.active}")
                 .vendor-portal__image
                   img(:src="note.imgBrown")
