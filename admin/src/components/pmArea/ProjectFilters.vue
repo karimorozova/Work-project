@@ -57,8 +57,8 @@
                 LabelValue(label="Deadline")
                     Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
                 img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
-            .filters__item
-                span(@click="refreshProjects") Update projects
+            .filters__itemCenter
+                .filters__itemCenter-button(@click="refreshProjects")
 </template>
 
 <script>
@@ -176,7 +176,7 @@ export default {
         SelectMulti,
         LanguagesSelect,
         Datepicker,
-        LabelValue,
+        LabelValue
     }
 }
 </script>
@@ -188,6 +188,16 @@ export default {
     width: 100%;
     justify-content: space-between;
     margin-bottom: 20px;
+    &__itemCenter{
+        display: flex;
+        justify-content: center;
+        &-button{
+            background-image: url('../../assets/images/refresh-icon.png');
+            width: 24px;
+            height: 20px;
+            cursor: pointer;
+        }
+    }
     &__col {
         display: flex;
         flex-direction: column;

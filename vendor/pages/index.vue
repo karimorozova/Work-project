@@ -330,6 +330,8 @@ export default {
     overflow-y: scroll;
     a{
       text-decoration: none;
+      display: block;
+      margin-bottom: 20px;
     }
 
   }
@@ -339,7 +341,6 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
     margin-left: 0;
     margin-right: 0;
     cursor: pointer;
