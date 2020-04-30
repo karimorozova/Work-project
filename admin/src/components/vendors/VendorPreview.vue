@@ -6,8 +6,8 @@ div
           .preview__drop-menu
               SelectSingle(
                   placeholder="Choose Email Template"
-                  :selectedOption="currentTemplate"
-                  :options="templates"
+                  :selectedOption="currentTemplate.title"
+                  :options="templatesData"
                   @chooseOption="setTemplate"
                   @scrollDrop="scrollDrop"
               )
@@ -30,12 +30,14 @@ export default {
   props: {
     message: {
       type: String
+    },
+    templates:{
+      type: Array
     }
   },
   data() {
     return {
       isTableDropMenu: true,
-      templates: ["None", "Test template1", "Test template2", "Test template3"],
       currentTemplate: "",
       editorData: this.message,
       editorConfig: {
@@ -51,14 +53,24 @@ export default {
       this.$emit("send", this.editorData);
     },
     setTemplate({ option }) {
-      this.currentTemplate = this.templates.find(item => item === option);
-    }
+      this.currentTemplate = this.templates.find(item => item.title === option);
+    },
   },
   mounted() {
-    document.body.style.overflow = "hidden"
+    document.body.style.overflow = "hidden"    
   },
   destroyed() {
     document.body.style.overflow = "auto"
+  },
+  watch:{
+     currentTemplate: function (val, oldVal) {
+      this.editorData = val.message
+    },
+  },
+  computed:{
+    templatesData() {
+        return this.templates.map(item => item.title)
+    },
   },
   components: {
     Button,
