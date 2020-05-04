@@ -1,7 +1,7 @@
 <template lang="pug">
 .project-action
     .project-action__preview(v-if="isEditAndSend")
-        Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
+        Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
 
     .project-action__title
       .project-action__title-text Project Action:
@@ -94,6 +94,12 @@ export default {
       moreInformation: "",
       reasons: [],
       managers: [],
+      templatesWysiwyg: [
+        {
+          title: "tempate",
+          message: "<p>test message</p>"
+        }
+      ],
       actions: ["Cancel"],
       approveButtonValue: "Confirm",
       alternativeButtonValue: "Reject",
@@ -337,7 +343,6 @@ export default {
             value: manager
           });
         } else {
-          
         }
       } catch (err) {}
     },
@@ -441,9 +446,9 @@ export default {
     Button
   },
   async created() {
-    this.getManagers();
     const reasons = await this.$http.get("/api/reasons");
     for (let key in reasons.data) this.reasons.push(reasons.data[key].reason);
+    this.getManagers();
   }
 };
 </script>
@@ -564,7 +569,7 @@ export default {
       }
     }
   }
-  .drops {
+    .drops {
     width: 100%;
     position: relative;
     &__menu {
@@ -590,7 +595,7 @@ export default {
       width: 15px;
     }
   }
-  #sub-line{
+  #sub-line {
     margin-top: 29px;
   }
   %item-style {
