@@ -1,7 +1,7 @@
 <template lang="pug">
 .project-action
     .project-action__preview(v-if="isEditAndSend")
-        Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
+        Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
 
     .project-action__title
       .project-action__title-text Project Action:
@@ -51,6 +51,26 @@
                         span.slider.round
         .project-action__confirm
             Button(:value="'Confirm'" @clicked="getCancelMessage")
+    
+    .project-action__title#sub-line
+    .drops
+          .drops__item
+              .drops__label Account Manager:
+                  img.drops__assigned-icon(v-if="!project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
+              .drops__menu
+                  SelectSingle(
+                      :options="accManagers" 
+                      :selectedOption="selectedAccManager" 
+                      @chooseOption="(e) => setManager(e, 'accountManager')")
+          .drops__item
+              .drops__label Project Manager:
+                  img.drops__assigned-icon(v-if="project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
+              .drops__menu
+                  SelectSingle(
+                      :options="projManagers" 
+                      :selectedOption="selectedProjManager"
+                      @chooseOption="(e) => setManager(e, 'projectManager')")
+          slot
 
 </template>
 
@@ -73,6 +93,13 @@ export default {
       selectedReason: "",
       moreInformation: "",
       reasons: [],
+      managers: [],
+      templatesWysiwyg: [
+        {
+          title: "tempate",
+          message: "<p>test message</p>"
+        }
+      ],
       actions: ["Cancel"],
       approveButtonValue: "Confirm",
       alternativeButtonValue: "Reject",
@@ -82,8 +109,8 @@ export default {
     };
   },
   methods: {
-    refreshProject(){
-      this.$emit('refreshProject')
+    refreshProject() {
+      this.$emit("refreshProject");
     },
     closePreview() {
       this.isEditAndSend = false;
@@ -303,7 +330,37 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
     },
+    async setManager({ option }, prop) {
+      const manager = this.managers.find(
+        item => `${item.firstName} ${item.lastName}` === option
+      );
+      if (manager._id === this.project[prop]._id) return;
+      try {
+        if (this.type === "project") {
+          await this.setProjectValue({
+            id: this.project._id,
+            prop,
+            value: manager
+          });
+        } else {
+        }
+      } catch (err) {}
+    },
+    async getManagers() {
+      try {
+        const result = await this.$http.get("/users");
+        this.managers = result.data;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting managers",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     ...mapActions({
+      setRequestValue: "setRequestValue",
+      setProjectValue: "setProjectValue",
       alertToggle: "alertToggle",
       storeProject: "setCurrentProject",
       setProjectStatus: "setProjectStatus",
@@ -314,6 +371,43 @@ export default {
     })
   },
   computed: {
+    type() {
+      return this.project.projectId ? "project" : "request";
+    },
+    accManagers() {
+      let result = [];
+      if (this.managers.length) {
+        result = this.managers.filter(
+          item => item.group.name === "Account Managers"
+        );
+        result = result.map(item => `${item.firstName} ${item.lastName}`);
+      }
+      return result;
+    },
+    projManagers() {
+      let result = [];
+      if (this.managers.length) {
+        result = this.managers.filter(
+          item => item.group.name === "Project Managers"
+        );
+        result = result.map(item => `${item.firstName} ${item.lastName}`);
+      }
+      return result;
+    },
+    selectedAccManager() {
+      return this.project.accountManager
+        ? this.project.accountManager.firstName +
+            " " +
+            this.project.accountManager.lastName
+        : "";
+    },
+    selectedProjManager() {
+      return this.project.projectManager
+        ? this.project.projectManager.firstName +
+            " " +
+            this.project.projectManager.lastName
+        : "";
+    },
     filteredActions() {
       let result = this.actions;
       const nonStartedStatuses = [
@@ -354,6 +448,7 @@ export default {
   async created() {
     const reasons = await this.$http.get("/api/reasons");
     for (let key in reasons.data) this.reasons.push(reasons.data[key].reason);
+    this.getManagers();
   }
 };
 </script>
@@ -397,8 +492,8 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    &-button{
-      background-image: url('../../assets/images/refresh-icon.png');
+    &-button {
+      background-image: url("../../assets/images/refresh-icon.png");
       width: 24px;
       height: 20px;
       cursor: pointer;
@@ -473,6 +568,40 @@ export default {
         border-radius: 50%;
       }
     }
+  }
+    .drops {
+    width: 100%;
+    position: relative;
+    &__menu {
+      position: relative;
+      width: 165px;
+      height: 30px;
+    }
+    &__item {
+      @extend %item-style;
+      width: 100%;
+      justify-content: space-between;
+    }
+    &__text {
+      font-size: 14px;
+      font-weight: bolder;
+    }
+    &__label {
+      position: relative;
+    }
+    &__assigned-icon {
+      position: absolute;
+      left: -18px;
+      width: 15px;
+    }
+  }
+  #sub-line {
+    margin-top: 29px;
+  }
+  %item-style {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
   }
 }
 </style>
