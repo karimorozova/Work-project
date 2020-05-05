@@ -16,4 +16,8 @@ export default {
 
 <style lang="scss" scoped>
 
+.other-projects {
+    width: calc(100% - 150px);
+}
+
 </style>

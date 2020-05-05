@@ -10,12 +10,24 @@ const mongoose = require("mongoose");
 const port = config.server.port;
 const db = mongoose.connection;
 const checkCollections = require("./helpers/dbSetDefault");
-const { LanguagesModel, RequestSchema } = require("./models");
 const { checkRoutes } = require("./middleware/index");
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
 
-// TODO : check origins from localhost only
+const { updateMemoqProjectsData } = require('./services/memoqs/projects');
+const schedule = require('node-schedule');
+
+schedule.scheduleJob('0 */3 * * *', async function() {
+    console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
+    try {
+        await updateMemoqProjectsData();
+        console.log('------ Finish updating memoq projects data ------', `${new Date()} ------`);
+    } catch(err) {
+        console.log(err.message);
+    }
+});
+
+
 const allowedOrigins = [
   "https://admin.pangea.global",
   "https://vendor.pangea.global",
