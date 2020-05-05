@@ -132,7 +132,7 @@ function fillGroups() {
         if(!groups.length) {
           for(const group of groupsDefault) {
             await new Group({ name: group }).save().then((res) => {
-  
+
             }).catch(err => {
               console.log(`Group ${group} hasn't been saved because of ${err.message}`)
             })
@@ -151,7 +151,7 @@ function fillSteps() {
         if(!steps.length) {
           for(const step of stepsDefault) {
             await new Step({ ...step }).save().then((res) => {
-  
+
             }).catch(err => {
               console.log(`Step ${step} hasn't been saved because of ${err.message}`)
             })
@@ -349,9 +349,11 @@ function projects() {
 
 function users() {
   User.find({})
-    .then(users => {
+    .then(async (users) => {
       if (!users.length) {
         for(let user of usersDefault) {
+          const group = await Group.findOne({ name: user.group });
+          user.group = group.id;
           new User(user).save().
           then(result => {
             console.log(`User ${result.username} saved!`)
