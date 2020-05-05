@@ -111,7 +111,7 @@ async function updateProjectTasks({newTasksInfo, project, taskId, target, memoqD
             $push: {tasks: {taskId: taskId, service: newTasksInfo.service, memoqProjectId: newTasksInfo.memoqProjectId, 
                 start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, 
                 sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
-                memoqSource: newTasksInfo.source.memoq, memoqTarget: target.memoq, memoqDocs,
+                memoqSource: newTasksInfo.source.memoq, memoqTarget: target.memoq, memoqDocs, memoqFiles: newTasksInfo.memoqFiles,
                 status: "Created", cost: "", sourceFiles: newTasksInfo.translateFiles, refFiles: newTasksInfo.referenceFiles, check: false, 
                 finance: {'Wordcount': {receivables: 0, payables: 0}, 'Price': {receivables: 0, payables: 0}}}}}
             );

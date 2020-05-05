@@ -43,11 +43,13 @@ export const addProjectWordsTasks = async ({dispatch}, payload) => {
     try {
         dispatch('setMemoqProjectMessage', 'memoqProject');
         const memoqProject = await Vue.http.post('/memoqapi/memoq-project', payload);
-        const { tasksInfo } = memoqProject.data;
+        let { tasksInfo } = memoqProject.data;
         dispatch('setMemoqProjectMessage', 'memoqFiles');
+        tasksInfo.memoqFiles = [];
         for(let filePath of tasksInfo.translateFiles) {
             dispatch('incrementFileCounter');
-            await Vue.http.post("/memoqapi/add-project-file", {memoqProjectId: tasksInfo.memoqProjectId, filePath});
+            const addFileResult = await Vue.http.post("/memoqapi/add-project-file", {memoqProjectId: tasksInfo.memoqProjectId, filePath});
+            tasksInfo.memoqFiles.push({name: filePath.split("/").pop(), fileGuid: addFileResult.body});
         }
         dispatch('resetFileCounter');
         dispatch('setMemoqProjectMessage', 'dbTasks');

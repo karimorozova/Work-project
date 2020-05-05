@@ -33,6 +33,7 @@ async function addProjectFile(projectId, filePath) {
         const fileId = await uploadFileToMemoq(filePath);
         await addFilesToMemoq(fileId, filePath);
         await moveMemoqFileToProject(projectId, fileId);
+        return fileId;
     } catch(err) {
         console.log(err);
         console.log("Error in addProjectFile");

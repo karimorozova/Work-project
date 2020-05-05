@@ -85,8 +85,8 @@ router.post('/memoq-project', upload.fields([{name: 'sourceFiles'}, {name: 'refF
 router.post('/add-project-file', async (req, res) => {
     const { memoqProjectId, filePath } = req.body;
     try {
-        await addProjectFile(memoqProjectId, filePath);
-        res.send("done");
+        const fileGuid = await addProjectFile(memoqProjectId, filePath);
+        res.send(fileGuid);
     } catch(err) {
         console.log(err);
         res.status(500).send(err);
