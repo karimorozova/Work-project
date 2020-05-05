@@ -2,6 +2,7 @@ const { xmlHeader, getHeaders } = require("../../configs");
 const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
+const { MemoqProject } = require('../../models');
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
 const headerWithoutAction = getHeaders('IServerProjectService');
@@ -9,18 +10,15 @@ const headerWithoutAction = getHeaders('IServerProjectService');
 async function getMemoqAllProjects() {
     const xml = `${xmlHeader}
             <soapenv:Body>
-                <ns:ListProjects>
-                <ns:Project>2020 01 28 [17] - Big files 4 [2 files]</ns:Project>
+                <ns:ListProjects>                    
                 </ns:ListProjects>
             </soapenv:Body>
             </soapenv:Envelope>`
     const headers = headerWithoutAction('ListProjects');
     try {
         const { response } = await soapRequest({url, headers, xml});
-        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
-        // const base64String = result["s:Envelope"]["s:Body"].ListProjectTranslationDocumentsResponse.ListProjectTranslationDocumentsResult.ServerProjectTranslationDocInfo
-        // return Buffer.from(base64String, 'base64').toString('utf8');
-        return result;
+        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
+        return result.ListProjectsResponse.ListProjectsResult.ServerProjectInfo;
     } catch(err) {
         console.log("Error in getMemoqAllProjects");
         console.log(err);
@@ -459,9 +457,9 @@ async function getMemoqFileId(projectId, docId) {
                 <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
                 <ns:docGuid>${docId}</ns:docGuid>
                 <ns:options>
-                <ns:SegmentedContextEmptyTranslation>true</ns:SegmentedContextEmptyTranslation>
-                <ns:SuppressContext>true</ns:SuppressContext>
-            </ns:options>
+                    <ns:SegmentedContextEmptyTranslation>true</ns:SegmentedContextEmptyTranslation>
+                    <ns:SuppressContext>true</ns:SuppressContext>
+                </ns:options>
             </ns:ExportTranslationDocumentAsRtfBilingual>
             </soapenv:Body>
         </soapenv:Envelope>`
@@ -483,6 +481,44 @@ async function getMemoqFileId(projectId, docId) {
     }
 }
 
+async function updateMemoqProjectsData() {
+    try {
+        let allProjects = await getMemoqAllProjects();
+        for(let project of allProjects) {
+            if(project.Name.indexOf("PngSys") === -1) {
+                const users = await getProjectUsers(project.ServerProjectGuid);
+                const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
+                const memoqProject = getMemoqProjectData(project);
+                await MemoqProject.updateOne(
+                    {serverProjectGuid: project.ServerProjectGuid}, 
+                    {...memoqProject, users, documents}, 
+                    {upsert: true})
+            }
+        }
+    } catch(err) {
+        console.log("Error in updateMemoqProjectsData");
+        console.log(err);
+        throw new Error(err.message);
+    }
+}
+
+function  getMemoqProjectData(project) {
+    return {
+        name: project.Name,
+        creatorUser: project.CreatorUser,
+        client: project.Client,
+        creationTime: new Date(project.CreationTime),
+        deadline: new Date(project.Deadline),
+        serverProjectGuid: project.ServerProjectGuid,
+        domain: typeof project.Domain === 'string' ? project.Domain : "",
+        client: typeof project.Client === 'string' ? project.Client : "",
+        sourceLanguageCode: project.SourceLanguageCode,
+        targetLanguageCodes: typeof project.TargetLanguageCodes === 'string' ? [project.TargetLanguageCodes["a:string"]] : project.TargetLanguageCodes["a:string"],
+        totalWordCount: project.TotalWordCount
+
+    }
+}
+
 module.exports = {
     getMemoqAllProjects,
     moveMemoqFileToProject,
@@ -496,5 +532,6 @@ module.exports = {
     setMemoqDocStatus,
     getMemoqFileId,
     cancelMemoqDocs,
-    setCancelledNameInMemoq
+    setCancelledNameInMemoq,
+    updateMemoqProjectsData
 }
