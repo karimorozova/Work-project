@@ -34,12 +34,11 @@ const MemoqProjectSchema = new mongoose.Schema({
         default : '', 
         trim : true 
     },
-    sourceLanguageCode: {
-        type : String, 
-        default : '', 
-        trim : true 
+    sourceLanguage: {
+        type : Object, 
+        default : {} 
     },
-    targetLanguageCodes: {
+    targetLanguages: {
         type : Array, 
         default : [] 
     },

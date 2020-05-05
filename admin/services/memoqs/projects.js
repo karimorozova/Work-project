@@ -2,7 +2,7 @@ const { xmlHeader, getHeaders } = require("../../configs");
 const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
-const { MemoqProject } = require('../../models');
+const { MemoqProject, Languages } = require('../../models');
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
 const headerWithoutAction = getHeaders('IServerProjectService');
@@ -484,11 +484,12 @@ async function getMemoqFileId(projectId, docId) {
 async function updateMemoqProjectsData() {
     try {
         let allProjects = await getMemoqAllProjects();
+        const languages = await Languages.find({}, {lang: 1, symbol: 1, memoq: 1});
         for(let project of allProjects) {
             if(project.Name.indexOf("PngSys") === -1) {
                 const users = await getProjectUsers(project.ServerProjectGuid);
                 const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
-                const memoqProject = getMemoqProjectData(project);
+                const memoqProject = getMemoqProjectData(project, languages);
                 await MemoqProject.updateOne(
                     {serverProjectGuid: project.ServerProjectGuid}, 
                     {...memoqProject, users, documents}, 
@@ -502,7 +503,13 @@ async function updateMemoqProjectsData() {
     }
 }
 
-function  getMemoqProjectData(project) {
+function  getMemoqProjectData(project, languages) {
+    const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
+    const targetCodes = typeof project.TargetLanguageCodes["a:string"] === 'string' ? [project.TargetLanguageCodes["a:string"]] : project.TargetLanguageCodes["a:string"];
+    const targetLanguages = targetCodes.map(item => {
+        const lang = languages.find(l => l.memoq === item);
+        return lang;
+    })
     return {
         name: project.Name,
         creatorUser: project.CreatorUser,
@@ -512,10 +519,9 @@ function  getMemoqProjectData(project) {
         serverProjectGuid: project.ServerProjectGuid,
         domain: typeof project.Domain === 'string' ? project.Domain : "",
         client: typeof project.Client === 'string' ? project.Client : "",
-        sourceLanguageCode: project.SourceLanguageCode,
-        targetLanguageCodes: typeof project.TargetLanguageCodes === 'string' ? [project.TargetLanguageCodes["a:string"]] : project.TargetLanguageCodes["a:string"],
+        sourceLanguage,
+        targetLanguages,
         totalWordCount: project.TotalWordCount
-
     }
 }
 
