@@ -8,7 +8,7 @@ async function updateProjectMetrics({projectId}) {
         let { steps, tasks } = project;
         let isMetricsExist = true;
         for(let task of tasks) {
-            if(task.service.calculationUnit === 'Words') {
+            if(task.service.calculationUnit === 'Words' && task.status === "Created") {
                 const analysis = await getProjectAnalysis(task.memoqProjectId);
                 if(analysis && analysis.AnalysisResultForLang) {
                     const taskMetrics = getTaskMetrics({task, matrix: project.customer.matrix, analysis});
