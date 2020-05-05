@@ -21,7 +21,7 @@ schedule.scheduleJob('0 */3 * * *', async function() {
     console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
     try {
         await updateMemoqProjectsData();
-        console.log('------ Finish updating memoq projects data ------', `${new Date()} ------`);
+        console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
     } catch(err) {
         console.log(err.message);
     }
