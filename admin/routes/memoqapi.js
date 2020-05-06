@@ -185,9 +185,8 @@ router.get('/download-file', async (req, res) => {
 })
 
 router.post('/other-projects', async (req, res) => {
-  // const { filters } = req.body;
   try {
-    const projects = await getFilteredOtherProjects();
+    const projects = await getFilteredOtherProjects(req.body);
     res.send(projects);
   } catch (err) {
     console.log(err);
