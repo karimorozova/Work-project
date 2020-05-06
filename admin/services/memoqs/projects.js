@@ -487,7 +487,8 @@ async function updateMemoqProjectsData() {
         const languages = await Languages.find({}, {lang: 1, symbol: 1, memoq: 1});
         for(let project of allProjects) {
             if(project.Name.indexOf("PngSys") === -1) {
-                const users = await getProjectUsers(project.ServerProjectGuid);
+                let users = await getProjectUsers(project.ServerProjectGuid);
+                users = getUpdatedUsers(users);
                 const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
                 const memoqProject = getMemoqProjectData(project, languages);
                 await MemoqProject.updateOne(
@@ -500,6 +501,25 @@ async function updateMemoqProjectsData() {
         console.log("Error in updateMemoqProjectsData");
         console.log(err);
         throw new Error(err.message);
+    }
+}
+
+function getUpdatedUsers(users) {
+    if(Array.isArray(users)) { 
+        return users.map(item => {
+            const isPm = item.ProjectRoles["a:ProjectManager"] === "true";
+            const isTerminologist = item.ProjectRoles["a:Terminologist"] === "true";
+            return {
+                ...item,
+                ProjectRoles: { isPm, isTerminologist }
+            }
+        })
+    }
+    const isPm = users.ProjectRoles["a:ProjectManager"] === "true";
+    const isTerminologist = users.ProjectRoles["a:Terminologist"] === "true";
+    return {
+        ...users,
+        ProjectRoles: { isPm, isTerminologist }
     }
 }
 
