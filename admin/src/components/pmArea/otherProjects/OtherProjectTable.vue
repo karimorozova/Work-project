@@ -30,7 +30,7 @@
         template(slot="deadline" slot-scope="{ row }")
             span {{formateDate(row.deadline)}}
         template(slot="projectManager" slot-scope="{ row }")
-            span --              
+            span {{nameOfProjectManager(row)}}           
         
 </template>
 
@@ -82,19 +82,19 @@ export default {
           label: "ROI",
           headerKey: "headerRoi",
           key: "roi",
-          width: "7%"
+          width: "5%"
         },
         {
           label: "Start date",
           headerKey: "headerStartDate",
           key: "startDate",
-          width: "7%"
+          width: "8%"
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          width: "7%"
+          width: "8%"
         },
         {
           label: "Project Manager",
@@ -113,12 +113,15 @@ export default {
     },
     formateDate: time => moment(time).format("DD-MM-YYYY"),
     projectLangs(row) {
-      const targetLanguage = row.targetLanguages.map(item => item.memoq);
-      return `${row.sourceLanguage.memoq} >> ${targetLanguage.reduce(
+      const targetLanguage = row.targetLanguages.map(item => item.symbol);
+      return `${row.sourceLanguage.symbol} >> ${targetLanguage.reduce(
         (prev, cur) => prev + cur + "; ",
         ""
       )}`;
     },
+    nameOfProjectManager(row) {
+      return row.users.find(item => item.ProjectRoles.isPm === true).User.FullName;
+    }
     // bottomScrolled() {
     //   this.$emit("bottomScrolled");
     // }

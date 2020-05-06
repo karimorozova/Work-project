@@ -22,6 +22,7 @@ export default {
       allProjects: [],
       filters: {
         clientFilter: "",
+        pmFilter: "",
         startFilter: "",
         deadlineFilter: ""
       },
@@ -66,6 +67,7 @@ export default {
     allFilters() {
       return {
         clientFilter: this.filters.clientFilter,
+        pmFilter: this.filters.pmFilter,
         startFilter: this.filters.startFilter,
         deadlineFilter: this.filters.deadlineFilter,
         sourceFilter: this.sourceFilter,

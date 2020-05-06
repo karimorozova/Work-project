@@ -1,32 +1,36 @@
 <template lang="pug">
-    .filters
-        .filters__col
-            .filters__item
+    .filters-other
+        .filters-other__col
+            .filters-other__item
                 LabelValue(label="Client Name")
-                    input.filters__text-input(type="text" :value="clientName" @keyup="filterByName")
-            .filters__item
-                LabelValue(label="Source Langs")
-                    .filters__drop-menu.filters_medium-menu
-                        LanguagesSelect(
-                            :selectedLangs="sourceLangs"
-                            @chosenLang="({lang}) => addLang({lang}, 'sourceFilter')")
-        .filters__col
-            .filters__date
+                    input.filters-other__text-input(type="text" :v-model="clientName" id="clientName" @keyup="filterByName")
+            .filters-other__item
+                LabelValue(label="Project Manager")
+                    input.filters-other__text-input(type="text" :v-model="projectManager" id="projectManager" @keyup="filterByName")
+        .filters-other__col
+            .filters-other__date
                 LabelValue(label="Start Date and Time")
-                    Datepicker(@selected="setStart" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
-                img.filters__calendar-icon(src="../../../assets/images/calendar.png" @click="startOpen")
+                    Datepicker(@selected="setStart" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-34" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
+                img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="startOpen")
 
-            .filters__item.filters_flex-end
+            .filters-other__item
                 LabelValue(label="Target Langs")
-                    .filters__drop-menu.filters_medium-menu
+                    .filters-other__drop-menu.filters-other_medium-menu
                         LanguagesSelect(
                             :selectedLangs="targetLangs"
                             @chosenLang="({lang}) => addLang({lang}, 'targetFilter')")
-        .filters__col
-            .filters__date
+        .filters-other__col
+            .filters-other__date
                 LabelValue(label="Deadline")
-                    Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
-                img.filters__calendar-icon(src="../../../assets/images/calendar.png" @click="deadlineOpen")
+                    Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-34" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
+                img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="deadlineOpen")
+            
+            .filters-other__item
+                LabelValue(label="Source Langs")
+                    .filters-other__drop-menu.filters-other_medium-menu
+                        LanguagesSelect(
+                            :selectedLangs="sourceLangs"
+                            @chosenLang="({lang}) => addLang({lang}, 'sourceFilter')")
 </template>
 
 <script>
@@ -39,6 +43,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   props: {
     clientName: { type: String },
+    projectManager: { type: String },
     sourceLangs: { type: Array, default: [] },
     targetLangs: { type: Array, default: [] }
   },
@@ -85,7 +90,9 @@ export default {
       this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval);
       const vm = this;
       function doneTyping() {
-        vm.$emit("setFilter", { option: value, prop: "clientFilter" });
+        e.target.id === "clientName"
+          ? vm.$emit("setFilter", { option: value, prop: "clientFilter" })
+          : vm.$emit("setFilter", { option: value, prop: "pmFilter" });
       }
     }
   },
@@ -97,8 +104,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.filters {
+<style lang="scss" scoped>
+.filters-other {
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -117,20 +124,14 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 21%;
+    width: 25%;
     font-size: 14px;
     height: 80px;
-    &:nth-of-type(3) {
-      width: 25%;
-    }
-    &:last-child {
-      width: 19%;
-    }
   }
   &__drop-menu {
     position: relative;
     width: 200px;
-    height: 28px;
+    height: 32px;
   }
   &_medium-menu {
     width: 166px;
@@ -141,7 +142,7 @@ export default {
   &__text-input {
     padding: 0 5px;
     width: 156px;
-    height: 28px;
+    height: 32px;
     outline: none;
     border: 1px solid #68573e;
     border-radius: 5px;
@@ -156,9 +157,9 @@ export default {
   }
   &__calendar-icon {
     position: absolute;
-    top: 5px;
+    top: 7px;
     right: 5px;
-    width: 18px;
+    width: 20px;
     cursor: pointer;
   }
 }
