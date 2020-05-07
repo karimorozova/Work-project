@@ -1,25 +1,59 @@
 <template lang="pug">
-.project-index 
+.project-info 
+    .project-info__title Project Id: 
+        span.project-info_bold {{ projectId }}
+
     .project-info__all-info
-        OtherProjectDetails(:project="project")
+        OtherProjectDetails(
+          :project="project"
+          :projectName="projectName"
+        )
+    .project-info__all-info
+        OtherTasksAndSteps(
+          :project="project"
+          :projectSteps="projectSteps"
+        )
 </template>
 
 <script>
 import OtherProjectDetails from "./OtherProjectDetails";
+import OtherTasksAndSteps from "./OtherTasksAndSteps";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
     return {
       project: {},
+      projectId: '',
+      projectName: '',
+      projectSteps: []
     };
   },
   methods: {
     ...mapActions(["alertToggle"]),
+    async getProjectSteps(id) {
+      try {
+        const result = await this.$http.get(`/memoqapi/other-project?id=${id}`);
+        this.projectSteps = result.data.documents
+          .map(
+            item =>
+              item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails
+          )
+          .flat();
+      } catch (err) {
+        this.alertToggle({
+          message: "Can't get steps",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     async getProject(id) {
       try {
         const result = await this.$http.get(`/memoqapi/other-project?id=${id}`);
         this.project = result.data;
+        this.projectId = /(.*])\s- /mg.exec(result.data.name)[1]
+        this.projectName = / - (.*)/mg.exec(result.data.name)[1]
       } catch (err) {
         this.alertToggle({
           message: "Can't get project",
@@ -32,10 +66,12 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.getProject(to.params.id);
+      vm.getProjectSteps(to.params.id);
     });
   },
   components: {
     OtherProjectDetails,
+    OtherTasksAndSteps
   }
 };
 </script>

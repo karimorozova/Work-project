@@ -2,7 +2,7 @@
 .project 
     .project__all-info
         .project__info-row
-            input.project__name(type="text" :value="project.name" disabled)
+            input.project__name(type="text" :value="projectName" disabled)
             .project__date
                 LabelValue(label="Start Date & Time" :isRequired="false" customClass="project_margin")
                     input.project__input-text(type="text" :value="formateDate(project.creationTime)" disabled)
@@ -21,13 +21,6 @@
             .project__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
                     span {{ project.serverProjectGuid }}
-        .project__info-row.project_no-margin
-            .project__textarea
-                LabelValue(label="Project Brief" customClass="project_textarea")
-                    textarea.project__text(type="text" rows="10" disabled :value="''")
-            .project__textarea
-                LabelValue(label="Internal Notes" customClass="project_textarea")
-                    textarea.project__text(type="text" rows="10" disabled :value="''")
 </template>
 
 <script>
@@ -38,6 +31,9 @@ export default {
   props: {
     project: {
       type: Object
+    },
+    projectName:{
+      type: String
     }
   },
   data() {
@@ -82,7 +78,7 @@ export default {
     }
   }
   &__name {
-    font-size: 22px;
+    font-size: 29px;
     padding: 0 5px;
     height: 44px;
     width: 33%;
@@ -124,7 +120,7 @@ export default {
     border-radius: 5px;
     padding: 0 5px;
     color: #68573e;
-    font-size: 14px;
+    font-size: 16px;
     outline: none;
     &:focus {
       box-shadow: 0 0 5px #68573e;
