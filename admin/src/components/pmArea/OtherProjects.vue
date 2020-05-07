@@ -8,7 +8,10 @@
             @removeLangFilter="removeLangFilter"
         )
         .other-projects__table
-            OtherProjectTable(:allProjects="allProjects")
+            OtherProjectTable(
+              :allProjects="allProjects"
+              @bottomScrolled="bottomScrolled"
+              )
 </template>
 
 <script>
@@ -20,6 +23,8 @@ export default {
   data() {
     return {
       allProjects: [],
+      isDataRemain: true,
+      lastDate: new Date(),
       filters: {
         clientFilter: "",
         pmFilter: "",
@@ -59,8 +64,18 @@ export default {
         });
       }
     },
-    getSourceFilter() {
-      return this.sourceFilter;
+    async bottomScrolled() {
+      if (this.isDataRemain) {
+        const result = await this.$http.post("/memoqapi/other-projects", {
+          ...this.allFilters,
+          lastDate: this.lastDate
+        });
+        this.isDataRemain = result.body.length === 25;
+        this.lastDate =
+          result.body && result.body.length
+            ? result.body[result.body.length - 1].creationTime
+            : "";
+      }
     }
   },
   computed: {

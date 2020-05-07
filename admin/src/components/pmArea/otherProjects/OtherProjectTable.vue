@@ -120,11 +120,14 @@ export default {
       )}`;
     },
     nameOfProjectManager(row) {
-      return row.users.find(item => item.ProjectRoles.isPm === true).User.FullName;
+      return row.users
+        .filter(item => item.ProjectRoles.isPm === true)
+        .map(item => item.User.FullName)
+        .reduce((prev, cur) => prev + cur + "; ", "");
+    },
+    bottomScrolled() {
+      this.$emit("bottomScrolled");
     }
-    // bottomScrolled() {
-    //   this.$emit("bottomScrolled");
-    // }
   },
   components: {
     DataTable
