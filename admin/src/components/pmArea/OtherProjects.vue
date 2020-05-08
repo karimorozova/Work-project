@@ -1,4 +1,5 @@
 <template lang="pug">
+  .projects
     .other-projects
         OtherProjectFilter(
             :sourceLangs="sourceFilter"

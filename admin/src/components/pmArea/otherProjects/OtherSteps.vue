@@ -11,7 +11,7 @@
             :fields="fields"
             :tableData="projectSteps"
             :activeIndex="activeIndex"
-            :bodyClass="['steps-table-body', {'tbody_visible-overflow': projectSteps.length < 10}]"
+            :bodyClass="['steps-table-body']"
             :tableheadRowClass="projectSteps.length < 10 ? 'tbody_visible-overflow' : ''"
             bodyCellClass="steps-table-cell"
             bodyRowClass="steps-table-row"

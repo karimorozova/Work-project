@@ -12,7 +12,7 @@
             :fields="fields"
             :tableData="project.documents"
             bodyRowClass="steps-table-row"
-            :bodyClass="['steps-table-body', {'tbody_visible-overflow': project.documents.length < 10}]"
+            :bodyClass="['steps-table-body']"
             :tableheadRowClass="project.documents.length < 10 ? 'tbody_visible-overflow' : ''"
         )
            
