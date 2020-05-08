@@ -10,6 +10,7 @@ import VendorsSettings from '@/components/sliders/VendorsSettings'
 import LanguagesSettings from '@/components/sliders/LanguagesSettings'
 import ClientsSettings from '@/components/sliders/ClientsSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
+import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
 import RequestInfo from '@/components/pmArea/RequestInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import Pricelists from '@/components/finance/Pricelists'
@@ -366,6 +367,11 @@ const router = new Router({
                     path: 'request-details/:id',
                     name: 'request-details',
                     component: RequestInfo
+                },
+                {
+                    path: 'other-project-details/:id',
+                    name: 'other-project-details',
+                    component: OtherProjectInfo
                 },
                 {
                     path: 'create-project',

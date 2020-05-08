@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
-const { User } = require('../models');
+const { User, MemoqProject } = require('../models');
 const { downloadCompletedFiles } = require("../projects");
 const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers, getMemoqFileId } = require("../services/memoqs/projects");
 const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
@@ -8,6 +8,7 @@ const { getMemoqTemplates} = require("../services/memoqs/resources");
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
 const { updateProjectMetrics } = require("../projects/metrics");
+const { getFilteredOtherProjects } = require('../services/memoqs/otherProjects');
 
 router.get('/users', async (req, res) => {
     try {
@@ -181,6 +182,27 @@ router.get('/download-file', async (req, res) => {
         console.log(err);
         res.status(500).send(err);
     }
+})
+
+router.post('/other-projects', async (req, res) => {
+  try {
+    const projects = await getFilteredOtherProjects(req.body);
+    res.send(projects);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+})
+
+router.get('/other-project', async (req, res) => {
+  const { id } = req.query;
+  try {
+     const project = await MemoqProject.findOne({ _id: id });
+     res.send(project);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
 })
 
 module.exports = router;

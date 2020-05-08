@@ -47,8 +47,11 @@
       },
       handleBodyScroll(e) {
         const element = e.target;
-        if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-            this.$emit('bottomScrolled');
+        if (
+          element.scrollHeight - element.scrollTop - element.clientHeight <= 5 ||
+          !(element.scrollHeight - element.scrollTop) - element.clientHeight > 6
+        ) {
+          this.$emit("bottomScrolled");
         }
       }
     }
