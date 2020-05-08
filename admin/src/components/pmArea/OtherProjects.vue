@@ -71,8 +71,6 @@ export default {
           ...this.allFilters,
           lastDate: this.lastDate
         });
-        console.log(result.body.length);
-        
         this.allProjects.push(...result.data);
         this.isDataRemain = result.body.length === 25;
         this.lastDate =
