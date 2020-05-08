@@ -17,7 +17,7 @@ let logger = require('morgan');
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const schedule = require('node-schedule');
 
-schedule.scheduleJob('57 * * * *', async function() {
+schedule.scheduleJob('0 */3 * * *', async function() {
     console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
     try {
         await updateMemoqProjectsData();
