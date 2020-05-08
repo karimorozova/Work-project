@@ -113,11 +113,9 @@ export default {
     },
     formateDate: time => moment(time).format("DD-MM-YYYY"),
     projectLangs(row) {
-      const targetLanguage = row.targetLanguages.map(item => item.symbol);
-      return `${row.sourceLanguage.symbol} >> ${targetLanguage.reduce(
-        (prev, cur) => prev + cur + "; ",
-        ""
-      )}`;
+      const targets = row.targetLanguages.filter(item => item)
+        .map(item => item.symbol);
+      return `${row.sourceLanguage.symbol} >> ${targets.reduce((prev, cur) => prev + cur + "; ", "")}`;
     },
     nameOfProjectManager(row) {
       return row.users
