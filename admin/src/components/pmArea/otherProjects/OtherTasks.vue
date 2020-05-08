@@ -12,8 +12,8 @@
             :fields="fields"
             :tableData="project.documents"
             bodyRowClass="steps-table-row"
-            :bodyClass="['steps-table-body']"
-            :tableheadRowClass="project.documents.length < 10 ? 'tbody_visible-overflow' : ''"
+            :bodyClass="['steps-table-body', {'tbody_visible-overflow': project.documents.length < 3}]"
+            :tableheadRowClass="project.documents.length < 3 ? 'tbody_visible-overflow' : ''"
         )
            
             template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
