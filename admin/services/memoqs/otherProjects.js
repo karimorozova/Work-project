@@ -15,18 +15,14 @@ function getFilteredProjectQuery(filters) {
     query.deadline = { $lte: new Date(filters.deadlineFilter) };
   }
   if (filters.pmFilter) {
-    query['$and'] =
-      [
-        {
-          'users.User.FullName':
-            {
-              '$regex': new RegExp(`${filters.pmFilter}`, 'i')
-            }
+    query.users = {
+      '$elemMatch': {
+        'User.FullName': {
+          '$regex': new RegExp(`${filters.pmFilter}`, 'i')
         },
-        {
-          'users.ProjectRoles.isPm': true,
-        }
-      ]
+        'ProjectRoles.isPm': true,
+      }
+    }
   }
   if (filters.sourceFilter && filters.sourceFilter.length) {
     query['sourceLanguage.symbol'] = { '$in': filters.sourceFilter }
@@ -40,8 +36,7 @@ function getFilteredProjectQuery(filters) {
 async function getFilteredOtherProjects(filters) {
   try {
     const filteredProjects = getFilteredProjectQuery(filters);
-    result = await MemoqProject.find(filteredProjects).sort({ creationTime: -1 }).limit(25)
-    return result;
+    return await MemoqProject.find(filteredProjects).sort({ creationTime: -1 }).limit(25);
   } catch (err) {
     console.log(err.message);
     console.log('Error in getFilteredOtherProjects');
