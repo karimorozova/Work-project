@@ -1,5 +1,5 @@
 <template lang="pug">
-.projects-table
+.projects-table 
     DataTable(
         :fields="fields"
         :tableData="allProjects"
