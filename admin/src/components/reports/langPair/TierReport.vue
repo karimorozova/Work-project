@@ -19,18 +19,18 @@
                 .tier__header(slot="headerTarget" slot-scope="{ field }") {{ field.label }}
                 .tier__header(slot="headerAll" slot-scope="{ field }") {{ field.label }}
                     img.tier__icon(
-                        :class="{'tier_rotated': isAllSorted}" 
-                        src="../../../assets/images/open-arrow_white.png" 
+                        :class="{'tier_rotated': isAllSorted}"
+                        src="../../../assets/images/open-arrow_white.png"
                         @click="sortData('allTier', 'isAllSorted')")
                 .tier__header(slot="headerFin" slot-scope="{ field }") {{ field.label }}
                     img.tier__icon(
-                        :class="{'tier_rotated': isFinanceSorted}" 
-                        src="../../../assets/images/open-arrow_white.png" 
+                        :class="{'tier_rotated': isFinanceSorted}"
+                        src="../../../assets/images/open-arrow_white.png"
                         @click="sortData('financeTier', 'isFinanceSorted')")
                 .tier__header(slot="headerGame" slot-scope="{ field }") {{ field.label }}
                     img.tier__icon(
-                        :class="{'tier_rotated': isGamingSorted}" 
-                        src="../../../assets/images/open-arrow_white.png" 
+                        :class="{'tier_rotated': isGamingSorted}"
+                        src="../../../assets/images/open-arrow_white.png"
                         @click="sortData('gameTier', 'isGamingSorted')")
                 .tier__data(slot="target" slot-scope="{ row }") {{ row.target }}
                 template(slot="all" slot-scope="{ row, index }")

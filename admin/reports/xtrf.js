@@ -1,4 +1,4 @@
-const { XtrfTier, XtrfLqa, XtrfReportLang, XtrfPrice, TierLqa } = require("../models");
+const { XtrfTier, XtrfLqa, XtrfReportLang, XtrfPrice, TierLqa, LangTier, Languages } = require("../models");
 
 //// Tier report /////
 
@@ -7,13 +7,13 @@ async function getXtrfTierReport(filters) {
     let start = new Date(today.getFullYear(), today.getMonth() - 6, -1);
     start.setHours(0, 0, 0, 0);
     try {
-        const filterQuery = filters.targetFilter ? {lang: {$in: filters.targetFilter, $ne: 'English [grouped]'}} : {lang: {$ne: 'English [grouped]'}};
-        const languages = await XtrfReportLang.find(filterQuery);
-        let reports = await XtrfTier.find({start: {$gte: start}});
+        const filterQuery = filters.targetFilter ? {lang: {$in: filters.targetFilter}} : {};
+        const languages = await Languages.find();
+        let reports = await LangTier.find();
         let result = getParsedReport(reports, languages);
         if(filters.tierFilter) {
             result = result.filter(item => {
-                return item.allTier.tier === filters.tierFilter 
+                return item.allTier.tier === filters.tierFilter
                     || item.financeTier.tier === filters.tierFilter
                     || item.gameTier.tier === filters.tierFilter
             })
@@ -28,7 +28,7 @@ async function getXtrfTierReport(filters) {
 function getParsedReport(reports, languages) {
     let result = [];
     for(let { lang } of languages) {
-        const langReport = getLangReport(lang, reports);    
+        const langReport = getLangReport(lang, reports);
         result.push(langReport);
     }
     result = result.sort((a,b) => a.target > b.target ? 1 : -1);
@@ -37,34 +37,35 @@ function getParsedReport(reports, languages) {
 
 function getLangReport(lang, reports) {
     let result = {target: lang};
-    result.allTier = getTier(lang, reports, 'All');
+    result.allTier = getTier(lang, reports, 'General');
     result.financeTier = getTier(lang, reports, 'Finance');
-    result.gameTier = getTier(lang, reports, 'Gaming');
+    result.gameTier = getTier(lang, reports, 'iGaming');
     return result;
 }
 
 function getTier(lang, reports, industry) {
     let totalWords = 0;
     let totalClients = 0;
-    const filteredReports = reports.filter(item => item.industry === industry);
+    const filteredReports = industry !== 'General' ?
+      reports.filter(item => item.industry === industry)
+      : reports;
     for(let report of filteredReports) {
-        const targetLang = report.languages.find(item => Object.keys(item)[0] === lang);
+        const targetLang = report.languages[lang];
         const { wordcount, clients } = targetLang ? getClientsWordcount(targetLang) : {wordcount: 0, clients: 0};
         totalWords += wordcount;
         totalClients += clients;
     }
     totalWords = Math.round(totalWords/6);
     totalClients = +(totalClients/6).toFixed(1);
-    return industry === 'All' ? getAllTier(totalWords, totalClients) : getSpecificTier(totalWords, totalClients);
+    return industry === 'General' ? getAllTier(totalWords, totalClients) : getSpecificTier(totalWords, totalClients);
 }
 
 function getClientsWordcount(targetLang) {
-    const clientsWords = targetLang[Object.keys(targetLang)[0]];
-    const wordcount = Object.keys(clientsWords).reduce((acc, cur) => {
-            acc += clientsWords[cur];
+    const wordcount = Object.keys(targetLang).reduce((acc, cur) => {
+            acc += targetLang[cur];
             return acc;
         }, 0)
-    const clients = Object.keys(clientsWords).length;
+    const clients = Object.keys(targetLang).length;
     return { wordcount, clients };
 }
 
@@ -160,14 +161,14 @@ function getIndustriesLqas({lqas, tierLqas, report, reportProp, filters, prop}) 
         }
     })
     return withLqaVendors.filter(item => {
-        let isFit = item.vendor.language.lang === report.target && item.vendor.tqis[prop]; 
+        let isFit = item.vendor.language.lang === report.target && item.vendor.tqis[prop];
         isFit = isFit && filters.tierFilter ? report[reportProp] === filters.tierFilter : isFit;
         if(isFit) {
             const lqaProp = item[`isLqa${filters.lqaFilter}`];
             isFit = filters.lqaFilter ? lqaProp : isFit;
         }
         return isFit;
-    });    
+    });
 }
 
 function getFilteredByIndustry({report, finance, gaming, filters}) {
@@ -197,7 +198,7 @@ async function getFilteredLqas(query) {
     try {
         return await XtrfLqa.aggregate([
             {
-                $lookup: 
+                $lookup:
                 {
                     from: "xtrfvendors",
                     localField: "vendor",
@@ -216,7 +217,7 @@ async function getFilteredLqas(query) {
                 }
             },
             {
-                $lookup: 
+                $lookup:
                 {
                     from: "xtrfreportlangs",
                     localField: "vendor.language",
@@ -245,7 +246,7 @@ async function getLanguagePrices(target) {
     try {
         return await XtrfPrice.aggregate([
             {
-                $lookup: 
+                $lookup:
                     {
                         from: "xtrfreportlangs",
                         localField: "language",
