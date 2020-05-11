@@ -153,6 +153,9 @@
   .reports__table, .all-projects {
     max-height: 600px;
   }
+  .other-all-projects{
+    max-height: calc(90vh - 240px);
+  }
 
   .reports__table {
     margin-bottom: 0;
