@@ -3,7 +3,7 @@
     DataTable(
         :fields="fields"
         :tableData="allProjects"
-        :bodyClass="['all-projects', {'tbody_visible-overflow': allProjects.length < 17}]"
+        :bodyClass="['other-all-projects', {'tbody_visible-overflow': allProjects.length < 17}]"
         :tableheadRowClass="allProjects.length < 17 ? 'tbody_visible-overflow' : ''"
         @onRowClicked="onRowClicked"
         @bottomScrolled="bottomScrolled"
@@ -12,11 +12,14 @@
             span.projects-table__label {{ field.label }}
 
         template(slot="projectId" slot-scope="{ row }")
-            span {{ row.name }}
+            span {{ getProjectIdName(row, "id") }}
+        template(slot="projectName" slot-scope="{ row }")
+            span {{ getProjectIdName(row, "name") }}
         template(slot="clientName" slot-scope="{ row }")
             span {{ row.client }}
         template(slot="languages" slot-scope="{ row }")
-            span {{ projectLangs(row) }}
+            span(v-html="projectLangs(row)") 
+            
         template(slot="receivables" slot-scope="{ row }")
             //- span(v-if="row.finance && row.finance.Price.receivables") &euro;
             //-     span {{ row.finance.Price.receivables }}
@@ -48,10 +51,16 @@ export default {
     return {
       fields: [
         {
-          label: "ID - Project Name",
+          label: "ID",
           headerKey: "headerProjectId",
           key: "projectId",
-          width: "26%"
+          width: "9%"
+        },
+        {
+          label: "Project Name",
+          headerKey: "headerProjectId",
+          key: "projectName",
+          width: "15%"
         },
         {
           label: "Client Name",
@@ -63,26 +72,26 @@ export default {
           label: "Languages",
           headerKey: "headerLanguages",
           key: "languages",
-          width: "19%"
+          width: "10%"
         },
 
         {
           label: "Receivables",
           headerKey: "headerReceivables",
           key: "receivables",
-          width: "7%"
+          width: "8%"
         },
         {
           label: "Payables",
           headerKey: "headerPayables",
           key: "payables",
-          width: "7%"
+          width: "8%"
         },
         {
           label: "ROI",
           headerKey: "headerRoi",
           key: "roi",
-          width: "5%"
+          width: "8%"
         },
         {
           label: "Start date",
@@ -100,12 +109,17 @@ export default {
           label: "Project Manager",
           headerKey: "headerProjectManager",
           key: "projectManager",
-          width: "10%"
+          width: "16%"  
         }
       ]
     };
   },
   methods: {
+    getProjectIdName(row, type) {
+      return type === "id"
+        ? /(.*])\s- /gm.exec(row.name)[1]
+        : / - (.*)/gm.exec(row.name)[1];
+    },
     async onRowClicked({ index }) {
       this.$router.push(
         `/other-project-details/${this.allProjects[index]._id}`
@@ -113,9 +127,12 @@ export default {
     },
     formateDate: time => moment(time).format("DD-MM-YYYY"),
     projectLangs(row) {
-      const targets = row.targetLanguages.filter(item => item)
-        .map(item => item.symbol);
-      return `${row.sourceLanguage.symbol} >> ${targets.reduce((prev, cur) => prev + cur + "; ", "")}`;
+      const targets = row.targetLanguages.filter(item => item).map(item => item.symbol);
+      let languages = "";
+      targets.forEach(element => {
+        languages += `${row.sourceLanguage.symbol} >> ${element}<br>`;
+      });
+      return languages;
     },
     nameOfProjectManager(row) {
       return row.users

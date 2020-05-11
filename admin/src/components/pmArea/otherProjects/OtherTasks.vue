@@ -22,7 +22,11 @@
             template(slot="taskId" slot-scope="{ row }")
                 span.tasks__task-data {{ row.DocumentGuid }}
             template(slot="language" slot-scope="{ row }")
-                span.tasks__task-data {{ `${project.sourceLanguage.memoq}>> ${row.TargetLangCode}` }}
+                span.tasks__task-data {{ `${project.sourceLanguage.symbol} >> ${ getTargetLanguage(row.TargetLangCode)}` }}
+            template(slot="start" slot-scope="{ row }")
+                span.tasks__task-data {{  formateDate(project.creationTime)}}
+            template(slot="deadline" slot-scope="{ row }")
+                span.tasks__task-data {{ formateDate(project.deadline)}}
             template(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="((row.ConfirmedWordCount / row.TotalWordCount) * 100).toFixed(0)")
             template(slot="status" slot-scope="{ row }")
@@ -105,6 +109,10 @@ export default {
     };
   },
   methods: {
+    getTargetLanguage(memoqLang){
+      return this.project.targetLanguages.find(item => item.memoq == memoqLang).symbol
+    },
+    formateDate: time => moment(time).format("DD-MM-YYYY"),
     showTab({ index }) {
       return this.tabs[index] === "Tasks"
         ? true
