@@ -2,6 +2,8 @@
     .request-form
         noscript
             iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-KM2S59F" height="0" width="0" style="display:none;visibility:hidden")
+        noscript
+            script(type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/7518623.js")
         Header
         MainInfo(@showErrors="showErrors" @sendForm="sendForm")
         Footer
@@ -80,6 +82,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="scss">
+    div#hs-eu-cookie-confirmation{
+        display: none!important;
+    }
 </style>
