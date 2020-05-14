@@ -82,7 +82,7 @@ export default {
 </script>
 
 <style lang="scss">
-    div#hs-eu-cookie-confirmation{
-        display: none!important;
-    }
+    // div#hs-eu-cookie-confirmation{
+    //     display: none!important;
+    // }
 </style>
