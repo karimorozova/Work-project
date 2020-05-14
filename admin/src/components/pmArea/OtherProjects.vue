@@ -1,5 +1,5 @@
 <template lang="pug">
-  .projects
+.projects
     .other-projects
         OtherProjectFilter(
             :sourceLangs="sourceFilter"
@@ -110,7 +110,8 @@ export default {
   margin: 50px 20px 20px 20px;
   max-width: 1205px;
   width: calc(100% - 60px);
+  height: calc(100% - 140px);
   box-shadow: 0 0 10px #68573e;
-  padding: 15px;
+  padding: 15px;  
 }
 </style>

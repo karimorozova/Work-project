@@ -24,8 +24,8 @@ export default {
   data() {
     return {
       project: {},
-      projectId: '',
-      projectName: '',
+      projectId: "",
+      projectName: "",
       projectSteps: []
     };
   },
@@ -52,8 +52,8 @@ export default {
       try {
         const result = await this.$http.get(`/memoqapi/other-project?id=${id}`);
         this.project = result.data;
-        this.projectId = /(.*])\s- /mg.exec(result.data.name)[1]
-        this.projectName = / - (.*)/mg.exec(result.data.name)[1]
+        this.projectId = /(.*])\s- /gm.exec(result.data.name)[1];
+        this.projectName = / - (.*)/gm.exec(result.data.name)[1];
       } catch (err) {
         this.alertToggle({
           message: "Can't get project",

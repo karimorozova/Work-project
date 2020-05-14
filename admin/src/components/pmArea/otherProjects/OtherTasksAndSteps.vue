@@ -1,5 +1,5 @@
 <template lang="pug">
-.tasks-steps
+.tasks-steps(v-if="project._id")
     .tasks-steps__tasks-title Tasks and Steps
     .tasks-steps__tables
         OtherTasks(

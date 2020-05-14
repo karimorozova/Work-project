@@ -15,6 +15,7 @@
             :tableheadRowClass="projectSteps.length < 3 ? 'tbody_visible-overflow' : ''"
             bodyCellClass="steps-table-cell"
             bodyRowClass="steps-table-row"
+            v-if="project._id"
         )
 
             template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -22,10 +23,12 @@
 
             template(slot="name" slot-scope="{ row }")
                 span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
-            template(slot="language" slot-scope="{ row }")
-                span.steps__step-data
+            template(slot="language" slot-scope="{ row, index }")
+                span.steps__step-data {{ `${project.sourceLanguage.symbol} >> ${stepsTargetLanguages[index].symbol}` }}
             template(slot="vendor" slot-scope="{ row, index }")
                 span.steps__step-data.steps_no-padding {{ row.UserInfoHeader.FullName }}
+            template(slot="start" slot-scope="{ row, index }")
+                 span.steps__step-data {{row.DocumentAssignmentRole == 0 || index === 0 ? formateDate(project.creationTime) : formateDate(projectSteps[index-1].DeadLine) }}
             template(slot="deadline" slot-scope="{ row, index }")
                  span.steps__step-data {{formateDate(row.DeadLine)}}
 </template>
@@ -48,6 +51,7 @@ export default {
   data() {
     return {
       tabs: ["Tasks", "Steps"],
+      stepsTargetLanguages: [],
       fields: [
         {
           label: "Step",
@@ -102,9 +106,21 @@ export default {
       ]
     };
   },
+  async created() {
+    await this.createdListOfTargetLanguages();
+  },
   methods: {
     formateDate: time => moment(time).format("DD-MM-YYYY"),
     getStepName: num => (num == 0 ? "Transtation" : "Revision"),
+    createdListOfTargetLanguages() {
+      let someArr = [];
+      this.project.targetLanguages.forEach(element => {
+        for (var i = 0; i < 2; i++) {
+          someArr.push(element);
+        }
+      });
+      return (this.stepsTargetLanguages = someArr);
+    },
     showTab({ index }) {
       return this.tabs[index] === "Steps"
         ? true
