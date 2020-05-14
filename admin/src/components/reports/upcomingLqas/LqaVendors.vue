@@ -45,8 +45,8 @@ export default {
         ...mapActions(["alertToggle"]),
         async getReport() {
             try {
-                const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
-                this.reportData = result.body;
+                const result = await this.$http.post("/reportsapi/xtrf-upcoming-lqa-report", { filters: this.filters });
+                this.reportData = result.body
             } catch(err) {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
             }

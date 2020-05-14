@@ -1,4 +1,4 @@
-const { XtrfTier, XtrfLqa, XtrfReportLang, XtrfPrice, TierLqa, LangTier, Languages, MemoqProject } = require("../models");
+const { XtrfPrice, TierLqa, LangTier, Languages, MemoqProject } = require("../models");
 
 //// Tier report /////
 
@@ -8,7 +8,7 @@ async function getXtrfTierReport(filters) {
   start.setHours(0, 0, 0, 0);
   try {
     const filterQuery = filters.targetFilter ? { lang: { $in: filters.targetFilter } } : {};
-    const languages = await Languages.find();
+    const languages = await Languages.find(filterQuery);
     let reports = await LangTier.find();
     let result = getParsedReport(reports, languages);
     if (filters.tierFilter) {
@@ -90,38 +90,25 @@ function getSpecificTier(wordcount, clients) {
 }
 
 //// Lqa report /////
-// result.push({
-//   target: tier.target,
-//   financeReports,
-//   gamingReports,
-// });
 async function getXtrfLqaReport(filters) {
-  // const filterQuery = getFilteringQuery(filters);
+  const filterQuery = getFilteringQuery(filters);
   const { nameFilter, industryFilter, tierFilter } = filters;
   try {
-    const tiers = await getXtrfTierReport(tierFilter ? { tierFilter } : {});
-    const memoqs = await MemoqProject.find({ documents: { $ne: null } });
+    const tiers = await getXtrfTierReport(filters);
+    const memoqs = await MemoqProject.find(filterQuery);
     let result = [];
     for (let tier of tiers) {
-      const financeDocs = getIndustryDocs(tier, memoqs, 'Finance');
-      const gamingDocs = getIndustryDocs(tier, memoqs, 'iGaming');
-      const financeReports = getVendorsWordCount(tier, financeDocs);
-      const gamingReports = getVendorsWordCount(tier, gamingDocs);
-      if (industryFilter === undefined && (financeReports.length || gamingReports.length)) {
+      const financeDocs = industryFilter === 'Finance' || !industryFilter ?
+        getIndustryDocs(tier, memoqs, tierFilter) : [];
+      const gamingDocs = industryFilter === 'iGaming' || !industryFilter ?
+        getIndustryDocs(tier, memoqs, tierFilter) : [];
+      const financeReports = financeDocs.length ? getVendorsWordCount(tier, financeDocs, nameFilter) : [];
+      const gamingReports = gamingDocs.length ? getVendorsWordCount(tier, gamingDocs, nameFilter) : [];
+      if (financeReports.length || gamingReports.length) {
         result.push({
           target: tier.target,
+          tier: tierFilter ? tierFilter : 0,
           financeReports,
-          gamingReports,
-        });
-      }
-      if (industryFilter === 'Finance' && financeReports.length) {
-        result.push({
-          target: tier.target,
-          financeReports,
-        });
-      } else if (industryFilter === 'iGaming' && gamingReports.length) {
-        result.push({
-          target: tier.target,
           gamingReports,
         });
       }
@@ -148,17 +135,19 @@ async function getXtrfLqaReport(filters) {
   }
 }
 
-function getIndustryDocs(tier, arr, industry) {
+function getIndustryDocs(tier, arr, tierFilter) {
   return arr.reduce((acc, cur) => {
+    const reportProp = cur.domain === 'Finance' ? 'financeTier' : 'gameTier';
+    const isTier = +tierFilter === tier[reportProp].tier || !tierFilter;
     const isExist = !!cur.targetLanguages.find(item => item.memoq === tier.memoqSymbol);
-    if (isExist && cur.domain === industry) {
+    if (isExist && isTier) {
       acc = [...acc, ...cur.documents];
     }
     return acc;
   }, []);
 }
 
-function getVendorsWordCount(tier, arr) {
+function getVendorsWordCount(tier, arr, vendorName) {
   return arr.reduce((acc, cur) => {
     if (Object.keys(cur.UserAssignments).length && cur.TargetLangCode === tier.memoqSymbol) {
       const { TranslationDocumentUserRoleAssignmentDetails } = cur.UserAssignments;
@@ -173,6 +162,10 @@ function getVendorsWordCount(tier, arr) {
           wordCount,
           langCode: cur.TargetLangCode,
         });
+        if (vendorName) {
+          const regex = RegExp(`${vendorName}`);
+          acc = acc.filter(item => !!regex.test(item.name));
+        }
       }
     }
     return acc;
@@ -255,63 +248,18 @@ function getFilteringQuery(filters) {
   let query = { documents: { $ne: null } };
   if (filters.nameFilter) {
     query[
-      "documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName"
-      ] = { "$regex": new RegExp(`${filters.nameFilter}`, 'i') };
+      'documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName'
+      ] = { '$regex': new RegExp(`${filters.nameFilter}`, 'i') };
+  }
+  if (filters.industryFilter) {
+    query.domain = { '$regex': new RegExp(`${filters.industryFilter}`, 'i') };
   }
   if (filters.targetLanguage) {
-    query["targetLanguages.lang"] = {
+    query['targetLanguages.lang'] = {
       $in: filters.targetFilter, $ne: 'English [grouped]'
     };
   }
   return query;
-}
-
-async function getFilteredLqas(query) {
-  try {
-    return await XtrfLqa.aggregate([
-      {
-        $lookup:
-          {
-            from: "xtrfvendors",
-            localField: "vendor",
-            foreignField: "_id",
-            as: "vendor"
-          }
-      },
-      {
-        $unwind: {
-          path: "$vendor"
-        }
-      },
-      {
-        $match: {
-          "vendor.name": query.name
-        }
-      },
-      {
-        $lookup:
-          {
-            from: "xtrfreportlangs",
-            localField: "vendor.language",
-            foreignField: "_id",
-            as: "vendor.language"
-          }
-      },
-      {
-        $unwind: {
-          path: "$vendor.language"
-        }
-      },
-      {
-        $match: {
-          "vendor.language.lang": query.language
-        }
-      }
-    ]);
-  } catch (err) {
-    console.log(err);
-    console.log("Error in getFilteredLqas");
-  }
 }
 
 async function getLanguagePrices(target) {
@@ -343,4 +291,55 @@ async function getLanguagePrices(target) {
   }
 }
 
-module.exports = { getXtrfTierReport, getXtrfLqaReport };
+// Upcoming LQA
+async function getXtrfUpcomingReport(filters) {
+  const filterQuery = getFilteringQuery(filters);
+  const { nameFilter, industryFilter, tierFilter } = filters;
+  try {
+    const tiers = await getXtrfTierReport(filters);
+    const memoqs = await MemoqProject.find(filterQuery);
+    let financeReports = {};
+    let gamingReports = {};
+    for (let tier of tiers) {
+      const financeDocs = industryFilter === 'Finance' || !industryFilter ?
+        getIndustryDocs(tier, memoqs, tierFilter) : [];
+      const gamingDocs = industryFilter === 'iGaming' || !industryFilter ?
+        getIndustryDocs(tier, memoqs, tierFilter) : [];
+      const tierNumber = industryFilter === 'Finance' ? tier.financeTier.tier : tier.gameTier.tier;
+      financeReports = financeDocs.length ? { ...financeReports, ...getVendors(tierNumber, financeDocs, nameFilter) } : financeReports;
+      gamingReports = gamingDocs.length ? { ...gamingReports, ...getVendors(tierNumber, gamingDocs, nameFilter) } : gamingReports;
+    }
+    if (Object.keys(financeReports).length && Object.keys(gamingReports).length) {
+      return {
+        financeReports,
+        gamingReports,
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    console.log("Error in getXtrfUpcomingReport");
+  }
+}
+
+function getVendors(tier, arr, vendorName) {
+  return arr.reduce((acc, cur) => {
+    if (Object.keys(cur.UserAssignments).length) {
+      const { TranslationDocumentUserRoleAssignmentDetails } = cur.UserAssignments;
+      const translator = TranslationDocumentUserRoleAssignmentDetails[0];
+      if (translator) {
+        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`)) ) {
+          acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
+            {...acc[translator.UserInfoHeader.FullName],
+              wordCount: acc[translator.UserInfoHeader.FullName].wordCount + +cur.TotalWordCount }
+            : {
+              tier,
+              wordCount: +cur.TotalWordCount,
+            };
+        }
+      }
+    }
+    return acc;
+  }, {});
+}
+
+module.exports = { getXtrfTierReport, getXtrfLqaReport, getXtrfUpcomingReport };
