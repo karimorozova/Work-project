@@ -11,6 +11,7 @@
     .project-info__all-info
         OtherTasksAndSteps(
           :project="project"
+          :projectId="projectId"
           :projectSteps="projectSteps"
         )
 </template>

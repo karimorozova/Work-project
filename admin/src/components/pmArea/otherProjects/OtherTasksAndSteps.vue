@@ -5,6 +5,7 @@
         OtherTasks(
             v-if="isTasksShow"
             :project="project"
+            :projectId="projectId"
              @showTab="showTab"
         )
         OtherSteps(
@@ -24,6 +25,9 @@ export default {
   props: {
     project: {
       type: Object
+    },
+    projectId: {
+      type: String
     },
     projectSteps: {
       type: Array

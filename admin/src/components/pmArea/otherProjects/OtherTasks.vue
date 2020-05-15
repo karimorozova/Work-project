@@ -19,8 +19,8 @@
             template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
                 span.tasks__label {{ field.label }}
 
-            template(slot="taskId" slot-scope="{ row }")
-                span.tasks__task-data {{ row.DocumentGuid }}
+            template(slot="taskId" slot-scope="{ row, index }")
+                span.tasks__task-data {{ formateId(index) }}
             template(slot="language" slot-scope="{ row }")
                 span.tasks__task-data {{ `${project.sourceLanguage.symbol} >> ${ getTargetLanguage(row.TargetLangCode)}` }}
             template(slot="start" slot-scope="{ row }")
@@ -45,6 +45,9 @@ export default {
   props: {
     project: {
       type: Object
+    },
+    projectId: {
+      type: String
     }
   },
   data() {
@@ -109,8 +112,13 @@ export default {
     };
   },
   methods: {
-    getTargetLanguage(memoqLang){
-      return this.project.targetLanguages.find(item => item.memoq == memoqLang).symbol
+    getTargetLanguage(memoqLang) {
+      return this.project.targetLanguages.find(item => item.memoq == memoqLang)
+        .symbol;
+    },
+    formateId(index){
+      let newIndex = index + 1;
+      return newIndex < 10 ?  this.projectId + ' T0' + newIndex :   this.projectId + ' T' + newIndex
     },
     formateDate: time => moment(time).format("DD-MM-YYYY"),
     showTab({ index }) {
