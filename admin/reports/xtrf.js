@@ -139,7 +139,7 @@ function getIndustryDocs(tier, arr, tierFilter) {
   return arr.reduce((acc, cur) => {
     const reportProp = cur.domain === 'Finance' ? 'financeTier' : 'gameTier';
     const isTier = +tierFilter === tier[reportProp].tier || !tierFilter;
-    const isExist = !!cur.targetLanguages.find(item => item.memoq === tier.memoqSymbol);
+    const isExist = !!cur.targetLanguages.find(item => item && item.memoq === tier.memoqSymbol);
     if (isExist && isTier) {
       acc = [...acc, ...cur.documents];
     }
