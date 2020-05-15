@@ -8,7 +8,7 @@
     "build": "API_URL='https://admin.pangea.global' node build/build.js",
     "dev": "API_URL='http://localhost:3001' node build/dev-server.js",
     "start": "node build/dev-server.js",
-    "watch": "API_URL='http://localhost:3001' node build/watch.js",
+    "watch": "cross-env API_URL='http://localhost:3001' node build/watch.js",
     "test:unit": "jest"
   },
   "dependencies": {

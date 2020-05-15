@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const { getReport } = require("../reports/get");
-const { getXtrfTierReport, getXtrfLqaReport } = require("../reports/xtrf");
+const { getXtrfTierReport, getXtrfLqaReport, getXtrfUpcomingReport } = require("../reports/xtrf");
+const { getLangReports } = require("../reports/langReport");
 const  { upload } = require("../utils");
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
-const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa } = require("../models");
+const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, LangTier } = require("../models");
 convertExcel = require('excel-as-json').processFile;
 
 router.get('/languages', async (req, res) => {
@@ -31,11 +32,11 @@ router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, 
             res.status(500).send("Error on saving xtrf tier");
         }
         res.send(data);
-    }); 
+    });
 })
 
 router.post('/xtrf-tier-report', async (req, res) => {
-    const { filters } = req.body; 
+    const { filters } = req.body;
     try {
         const reports = await getXtrfTierReport(filters);
         res.send(reports);
@@ -67,7 +68,7 @@ router.post('/xtrf-lqa', upload.fields([{ name: 'reportFiles' }]), async (req, r
 })
 
 router.post('/xtrf-lqa-report', async (req, res) => {
-    const { filters } = req.body; 
+    const { filters } = req.body;
     try {
         const reports = await getXtrfLqaReport(filters);
         res.send(reports);
@@ -77,8 +78,19 @@ router.post('/xtrf-lqa-report', async (req, res) => {
     }
 })
 
+router.post('/xtrf-upcoming-lqa-report', async (req, res) => {
+  const { filters } = req.body;
+  try {
+    const reports = await getXtrfUpcomingReport(filters);
+    res.send(reports);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on getting upcoming reports");
+  }
+})
+
 router.post('/xtrf-prices', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
-    const { reportFiles } = req.files; 
+    const { reportFiles } = req.files;
     try {
         convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
             if(err) {

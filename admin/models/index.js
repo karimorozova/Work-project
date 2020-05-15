@@ -28,6 +28,7 @@ const Delivery = require('./delivery');
 const TierLqa = require('./tierLqa');
 const LangTest = require('./langTest');
 const MemoqProject = require('./memoqProject');
+const LangTier = require('./langTier');
 
 const Models = {
     Languages,
@@ -59,7 +60,8 @@ const Models = {
     Delivery,
     TierLqa,
     LangTest,
-    MemoqProject
+    MemoqProject,
+    LangTier
 };
 
 module.exports = Models;

@@ -13,8 +13,10 @@ const checkCollections = require("./helpers/dbSetDefault");
 const { checkRoutes } = require("./middleware/index");
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
+const updateVendors = require('./helpers/defaults/vendors.js');
 
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
+const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
 
 schedule.scheduleJob('0 */3 * * *', async function() {
@@ -27,6 +29,15 @@ schedule.scheduleJob('0 */3 * * *', async function() {
     }
 });
 
+schedule.scheduleJob('30 23 * * *', async function() {
+    console.log('------- Start updating lang tier data: ', `${new Date()} -------`);
+    try {
+        await getLangReports();
+        console.log('------- Finish updating lang tier data: ', `${new Date()} --------`);
+    } catch (err) {
+        console.log(err.message);
+    }
+})
 
 const allowedOrigins = [
   "https://admin.pangea.global",
@@ -37,7 +48,7 @@ const allowedOrigins = [
   "http://localhost:8081"
 ];
 
-mongoose.connect(config.mongoDB.url, { 
+mongoose.connect(config.mongoDB.url, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true,

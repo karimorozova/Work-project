@@ -36,7 +36,7 @@ export default {
         },
         async getXtrfLangs() {
             try {
-                const result = await this.$http.get('/reportsapi/languages');
+                 const result = await this.$http.get('/api/languages');
                 this.allXtrfLangs = result.body.map(item => item.lang).filter(item => item !== 'English [grouped]');
                 this.allXtrfLangs.unshift("All");
             } catch(err) {
