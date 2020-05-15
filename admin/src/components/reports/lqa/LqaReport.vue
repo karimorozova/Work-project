@@ -16,12 +16,12 @@
         .lqa__languages
             .lqa__language(v-for="report in reportData")
                 h3.lga__text Target Language: {{ report.target }}
-                .lqa__industry(v-if="report.financeVendors.length")
-                    h4.lqa__text Industry: Finance,  Tier {{ report.finance }}
-                    Table(:vendorsData="report.financeVendors" field="Finance")
-                .lqa__industry(v-if="report.gamingVendors.length")
-                    h4.lqa__text Industry: iGaming,  Tier {{ report.game }}
-                    Table(:vendorsData="report.gamingVendors" field="iGaming")
+                .lqa__industry(v-if="report.financeReports.length")
+                    h4.lqa__text Industry: Finance,  Tier {{ report.tier }}
+                    Table(:vendorsData="report.financeReports" field="Finance")
+                .lqa__industry(v-if="report.gamingReports.length")
+                    h4.lqa__text Industry: iGaming,  Tier {{ report.tier }}
+                    Table(:vendorsData="report.gamingReports" field="iGaming")
             .lqa__form(v-if="isNewVendorForm")
                 NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
 </template>

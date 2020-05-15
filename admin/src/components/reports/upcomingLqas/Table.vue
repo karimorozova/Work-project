@@ -12,11 +12,11 @@
             .lqa-vendors-table__header(slot="headerIndustry" slot-scope="{ field }") {{ field.label }}
             .lqa-vendors-table__header(slot="headerTier" slot-scope="{ field }") {{ field.label }}
             .lqa-vendors-table__header(slot="headerLqa" slot-scope="{ field }") {{ field.label }}
-            .lqa-vendors-table__data(slot="vendor" slot-scope="{ row }") {{ row.vendor.name }}
-            .lqa-vendors-table__data(slot="words" slot-scope="{ row }") {{ presentWordcount(row.wordcounts[row.industry]) }}
+            .lqa-vendors-table__data(slot="vendor" slot-scope="{ row }") {{ row.name }}
+            .lqa-vendors-table__data(slot="words" slot-scope="{ row }") {{ presentWordcount(row.wordCount) }}
             .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industry }}
             .lqa-vendors-table__data(slot="tier" slot-scope="{ row }") {{ row.tier }}
-            .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{ getLqaNumber(row) }}
+            //- .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{ getLqaNumber(row) }}
 </template>
 
 <script>

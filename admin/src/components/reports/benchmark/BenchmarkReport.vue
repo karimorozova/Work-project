@@ -16,12 +16,12 @@
         .benchmark__languages
             .benchmark__language(v-for="report in reportData")
                 h3.benchmark__text Target Language: {{ report.target }}
-                .benchmark__industry(v-if="report.financeVendors.length")
+                .benchmark__industry(v-if="report.financeReports.length")
                     h4.benchmark__text Industry: Finance,  Tier {{ report.finance }}, Benchmark &euro; {{ getPrice(report.prices, 'Finance') }}
-                    Table(:vendorsData="report.financeVendors" :benchmarkPrice="getPrice(report.prices, 'Finance')" field="Finance")
-                .benchmark__industry(v-if="report.gamingVendors.length")
+                    Table(:vendorsData="report.financeReports" :benchmarkPrice="getPrice(report.prices, 'Finance')" field="Finance")
+                .benchmark__industry(v-if="report.gamingReports.length")
                     h4.benchmark__text Industry: iGaming,  Tier {{ report.game }}, Benchmark &euro; {{ getPrice(report.prices, 'iGaming') }}
-                    Table(:vendorsData="report.gamingVendors" :benchmarkPrice="getPrice(report.prices, 'iGaming')" field="iGaming")
+                    Table(:vendorsData="report.gamingReports" :benchmarkPrice="getPrice(report.prices, 'iGaming')" field="iGaming")
         .benchmark__form(v-if="isNewVendorForm")
             NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
 </template>
