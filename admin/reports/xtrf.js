@@ -107,7 +107,7 @@ async function getXtrfLqaReport(filters) {
       if (financeReports.length || gamingReports.length) {
         result.push({
           target: tier.target,
-          tier: tierFilter ? tierFilter : 0,
+          tier: tierFilter ? tierFilter : tier.allTier.tier,
           financeReports,
           gamingReports,
         });
@@ -309,7 +309,7 @@ async function getXtrfUpcomingReport(filters) {
       financeReports = financeDocs.length ? { ...financeReports, ...getVendors(tierNumber, financeDocs, nameFilter) } : financeReports;
       gamingReports = gamingDocs.length ? { ...gamingReports, ...getVendors(tierNumber, gamingDocs, nameFilter) } : gamingReports;
     }
-    if (Object.keys(financeReports).length && Object.keys(gamingReports).length) {
+    if (Object.keys(financeReports).length || Object.keys(gamingReports).length) {
       return {
         financeReports,
         gamingReports,
