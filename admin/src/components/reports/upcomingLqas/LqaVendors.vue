@@ -14,7 +14,7 @@
                 @setTierFilter="(e) => setFilter(e, 'tierFilter')"
                 @setLqaFilter="(e) => setFilter(e, 'lqaFilter')"
             )
-        .lqa-vendors__table
+        .lqa-vendors__table(v-if="Object.keys(this.reportData).length")
             Table(:vendorsData="allVendors" @selectVendor="selectVendor")
         .lqa-vendors__form(v-if="isForm")
             VendorLqaForm(:vendorData="selectedVendor" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
@@ -47,6 +47,7 @@ export default {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-upcoming-lqa-report", { filters: this.filters });
                 this.reportData = result.body
+                
             } catch(err) {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
             }
@@ -76,14 +77,26 @@ export default {
     computed: {
         allVendors() {
             let result = [];
-            if(this.reportData.length) {
-                for(let report of this.reportData) {
-                    let vendors = [...report.financeVendors, ...report.gamingVendors];
-                    vendors = vendors.filter(item => item.isLqa1 || item.isLqa2 || item.isLqa3);
-                    result.push(...vendors);
+            let financeObj = this.reportData.financeReports;
+            let gamingObj = this.reportData.gamingReports
+            changeObject(financeObj, 'Finance');
+            changeObject(gamingObj, 'IGaming');
+            joinArrays(financeObj);
+            joinArrays(gamingObj);
+
+            return result;
+
+            function changeObject(obj, industry){
+                for (let key in obj) {
+                    obj[key].industry = industry;
+                    obj[key].name = key;
+                }
+             }
+            function joinArrays(obj){
+                for (let key in obj) {
+                    result.push(obj[key])
                 }
             }
-            return result;
         },
         filters() {
             let result = {nameFilter: this.nameFilter};
