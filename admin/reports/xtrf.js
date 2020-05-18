@@ -94,26 +94,30 @@ async function getXtrfLqaReport(filters) {
   const filterQuery = getFilteringQuery(filters);
   const { nameFilter, industryFilter, tierFilter } = filters;
   try {
-    const tiers = await getXtrfTierReport(filters);
-    const memoqs = await MemoqProject.find(filterQuery);
-    let result = [];
-    for (let tier of tiers) {
-      const financeDocs = industryFilter === 'Finance' || !industryFilter ?
-        getIndustryDocs(tier, memoqs, tierFilter) : [];
-      const gamingDocs = industryFilter === 'iGaming' || !industryFilter ?
-        getIndustryDocs(tier, memoqs, tierFilter) : [];
-      const financeReports = financeDocs.length ? getVendorsWordCount(tier, financeDocs, nameFilter) : [];
-      const gamingReports = gamingDocs.length ? getVendorsWordCount(tier, gamingDocs, nameFilter) : [];
-      if (financeReports.length || gamingReports.length) {
-        result.push({
-          target: tier.target,
-          tier: tierFilter ? tierFilter : tier.allTier.tier,
-          financeReports,
-          gamingReports,
-        });
-      }
+    let tiers = await getXtrfTierReport(filters);
+    const memoqs = await MemoqProject.find(filterQuery).limit(4);
+    const financeDocs = [];
+    const gamingDocs = [];
+    for (let memoq of memoqs) {
+      financeDocs.push(...getIndustryDocs(tiers, memoq, tierFilter, 'Finance'));
+      gamingDocs.push(...getIndustryDocs(tiers, memoq, tierFilter, 'iGaming'));
     }
-    return result;
+    return tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount)
+      .map(item => {
+        return {
+          tier: item.allTier.tier,
+          target: item.target,
+          finance: {
+            tier: item.financeTier.tier,
+            vendor: getVendorsWordCount(item, financeDocs, nameFilter),
+          },
+          gaming: {
+            tier: item.gameTier.tier,
+            vendor: getVendorsWordCount(item, gamingDocs, nameFilter),
+          },
+        }
+      }).filter(item => item.finance.vendor.length || item.gaming.vendor.length);
+    // FOR FUTURE LQA:
     // let reportsFilter = {target: filterQuery.language};
     // if(filters.tierFilter) {
     //     reportsFilter.tierFilter = filters.tierFilter;
@@ -135,16 +139,18 @@ async function getXtrfLqaReport(filters) {
   }
 }
 
-function getIndustryDocs(tier, arr, tierFilter) {
-  return arr.reduce((acc, cur) => {
-    const reportProp = cur.domain === 'Finance' ? 'financeTier' : 'gameTier';
+function getIndustryDocs(tiers, memoq, tierFilter, industry) {
+  const memoqDocs = [];
+  for (let tier of tiers) {
+    const reportProp = memoq.domain === 'Finance' ? 'financeTier' : 'gameTier';
     const isTier = +tierFilter === tier[reportProp].tier || !tierFilter;
-    const isExist = !!cur.targetLanguages.find(item => item && item.memoq === tier.memoqSymbol);
-    if (isExist && isTier) {
-      acc = [...acc, ...cur.documents];
+    const isExist = !!memoq.targetLanguages.find(item => item && item.memoq === tier.memoqSymbol);
+    const fitsIndustry = memoq.domain === industry;
+    if (isExist && isTier && fitsIndustry) {
+      memoqDocs.push(...memoq.documents);
     }
-    return acc;
-  }, []);
+  }
+  return [...new Set(memoqDocs)];
 }
 
 function getVendorsWordCount(tier, arr, vendorName) {

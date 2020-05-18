@@ -21,7 +21,7 @@ function getLanguageData(projects, languages, industry) {
   let result = {};
   for (let { lang } of languages) {
     const clientsData = filteredProjects.reduce((acc, cur) => {
-      if (!!cur.targetLanguages.find(item => item.lang === lang)) {
+      if (!!cur.targetLanguages.find(item => item && item.lang === lang)) {
         const key = cur.client.replace(/\./g,' ');
         acc[key] = acc[key] ?
           acc[key] + +cur.totalWordCount
