@@ -3,7 +3,7 @@
         .tier__filters
             Filters(
                 :isLqa="false"
-                :languages="allXtrfLangs"
+                :languages="languages"
                 :targetFilter="targetFilter"
                 :tierFilter="tierFilter"
                 @setTierFilter="setTierFilter"
@@ -67,7 +67,11 @@ export default {
             isGamingSorted: false,
             tierFilter: "All",
             targetFilter: ["All"],
-            activeIndex: -1
+            activeIndex: -1,
+            allLangs: [],
+            languages: [],
+            isLanguages: true,
+
         }
     },
     methods: {
@@ -77,6 +81,17 @@ export default {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-tier-report", { filters: this.filters });
                 this.reportData = result.body;
+
+                const languages = await this.$http.get("/api/languages");
+                this.allLangs = languages.data;
+
+                if (this.isLanguages) {
+                    this.languages = [...new Set(languages.data.map(item => item.group))];
+                    this.languages.unshift("All");
+                }
+
+                this.isLanguages = false;
+                
             } catch(err) {
                 this.alertToggle({message: "Error on getting tier report", isShow: true, type: "error"});
             }
@@ -115,7 +130,17 @@ export default {
         filters() {
             let result = {};
             if(this.targetFilter[0] !== 'All') {
-                result.targetFilter = this.targetFilter;
+                let languageArray = [];
+
+                this.targetFilter.forEach(element => {
+                    languageArray.push(
+                        this.allLangs
+                        .filter(item => item.group == element)
+                        .map(item => item.lang)
+                        .join()
+                    );
+                });
+                result.targetFilter = languageArray.toString().split(',');
             }
             if(this.tierFilter !== 'All') {
                 result.tierFilter = +this.tierFilter;
