@@ -12,6 +12,8 @@
                 .languages__header {{ field.label }}
             template(slot="headerName" slot-scope="{ field }")
                 .languages__header {{ field.label }}
+            template(slot="headerGroup" slot-scope="{ field }")
+                .languages__header {{ field.label }}
             template(slot="headerSymbol" slot-scope="{ field }")
                 .languages__header {{ field.label }}
             template(slot="headerIso1" slot-scope="{ field }")
@@ -36,6 +38,8 @@
                         img.languages__file-preview(v-if="imageData" :src="imageData")
             template(slot="name" slot-scope="{ row, index }")
                 .languages__data {{ row.lang }}
+            template(slot="group" slot-scope="{ row, index }")
+                .languages__data {{row.group}}
             template(slot="symbol" slot-scope="{ row, index }")
                 .languages__data {{ row.symbol }}
             template(slot="iso1" slot-scope="{ row, index }")
@@ -70,10 +74,11 @@ export default {
         return {
             fields: [
                 {label: "Icon", headerKey: "headerIcon", key: "icon", width: "12%", padding: "0"},
-                {label: "Name", headerKey: "headerName", key: "name", width: "28%", padding: "0"},
-                {label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "12%", padding: "0"},
-                {label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", width: "12%", padding: "0"},
-                {label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", width: "12%", padding: "0"},
+                {label: "Name", headerKey: "headerName", key: "name", width: "16%", padding: "0"},
+                {label: "Group", headerKey: "headerGroup", key: "group", width: "18%", padding: "0"},
+                {label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "8%", padding: "0"},
+                {label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", width: "11%", padding: "0"},
+                {label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", width: "11%", padding: "0"},
                 {label: "Active", headerKey: "headerActive", key: "active", width: "12%", padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
             ],
@@ -149,7 +154,7 @@ export default {
                 this.cancel();
                 await this.getLanguages();
             }
-        },
+        },  
         closeErrors() {
             this.areErrors = false;
         },
