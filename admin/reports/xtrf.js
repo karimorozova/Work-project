@@ -3,6 +3,7 @@ const { XtrfPrice, TierLqa, LangTier, Languages, MemoqProject } = require("../mo
 //// Tier report /////
 
 async function getXtrfTierReport(filters) {
+  console.log(filters);
   const today = new Date();
   let start = new Date(today.getFullYear(), today.getMonth() - 6, -1);
   start.setHours(0, 0, 0, 0);
@@ -92,10 +93,10 @@ function getSpecificTier(wordcount, clients) {
 //// Lqa report /////
 async function getXtrfLqaReport(filters) {
   const filterQuery = getFilteringQuery(filters);
-  const { nameFilter, industryFilter, tierFilter } = filters;
+  const { nameFilter, tierFilter } = filters;
   try {
     let tiers = await getXtrfTierReport(filters);
-    const memoqs = await MemoqProject.find(filterQuery).limit(4);
+    const memoqs = await MemoqProject.find(filterQuery);
     const financeDocs = [];
     const gamingDocs = [];
     for (let memoq of memoqs) {
@@ -115,7 +116,7 @@ async function getXtrfLqaReport(filters) {
             tier: item.gameTier.tier,
             vendor: getVendorsWordCount(item, gamingDocs, nameFilter),
           },
-        }
+        };
       }).filter(item => item.finance.vendor.length || item.gaming.vendor.length);
     // FOR FUTURE LQA:
     // let reportsFilter = {target: filterQuery.language};
@@ -300,46 +301,44 @@ async function getLanguagePrices(target) {
 // Upcoming LQA
 async function getXtrfUpcomingReport(filters) {
   const filterQuery = getFilteringQuery(filters);
-  const { nameFilter, industryFilter, tierFilter } = filters;
+  const { nameFilter } = filters;
   try {
     const tiers = await getXtrfTierReport(filters);
     const memoqs = await MemoqProject.find(filterQuery);
-    let financeReports = {};
-    let gamingReports = {};
-    for (let tier of tiers) {
-      const financeDocs = industryFilter === 'Finance' || !industryFilter ?
-        getIndustryDocs(tier, memoqs, tierFilter) : [];
-      const gamingDocs = industryFilter === 'iGaming' || !industryFilter ?
-        getIndustryDocs(tier, memoqs, tierFilter) : [];
-      const tierNumber = industryFilter === 'Finance' ? tier.financeTier.tier : tier.gameTier.tier;
-      financeReports = financeDocs.length ? { ...financeReports, ...getVendors(tierNumber, financeDocs, nameFilter) } : financeReports;
-      gamingReports = gamingDocs.length ? { ...gamingReports, ...getVendors(tierNumber, gamingDocs, nameFilter) } : gamingReports;
-    }
-    if (Object.keys(financeReports).length || Object.keys(gamingReports).length) {
-      return {
-        financeReports,
-        gamingReports,
-      }
-    }
+    const financeMemoqs = memoqs.filter(item => item.domain === 'Finance');
+    const gamingMemoqs = memoqs.filter(item => item.domain === 'iGaming');
+    const financeDocs = financeMemoqs.reduce((acc, cur) => [...acc, ...cur.documents], []);
+    const gamingDocs = gamingMemoqs.reduce((acc, cur) => [...acc, ...cur.documents], []);
+    const financeReports = getIndustryReports(tiers, financeDocs, 'Finance', nameFilter);
+    const gamingReports = getIndustryReports(tiers, gamingDocs, 'iGaming', nameFilter);
+    return {
+      financeReports,
+      gamingReports,
+    };
   } catch (err) {
     console.log(err);
     console.log("Error in getXtrfUpcomingReport");
   }
 }
 
-function getVendors(tier, arr, vendorName) {
+function getIndustryReports(tiers, arr, industry, vendorName) {
   return arr.reduce((acc, cur) => {
-    if (Object.keys(cur.UserAssignments).length) {
+    const tier = tiers.find(tier => tier && tier.memoqSymbol === cur.TargetLangCode);
+    if (Object.keys(cur.UserAssignments).length && !!tier) {
       const { TranslationDocumentUserRoleAssignmentDetails } = cur.UserAssignments;
-      const translator = TranslationDocumentUserRoleAssignmentDetails[0];
+      const translator = TranslationDocumentUserRoleAssignmentDetails ?
+        TranslationDocumentUserRoleAssignmentDetails[0] : null;
       if (translator) {
-        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`)) ) {
+        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`))) {
           acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
-            {...acc[translator.UserInfoHeader.FullName],
-              wordCount: acc[translator.UserInfoHeader.FullName].wordCount + +cur.TotalWordCount }
+            {
+              ...acc[translator.UserInfoHeader.FullName],
+              wordCount: acc[translator.UserInfoHeader.FullName].wordCount + +cur.TotalWordCount
+            }
             : {
-              tier,
               wordCount: +cur.TotalWordCount,
+              tier: tier.allTier.tier,
+              industry,
             };
         }
       }
