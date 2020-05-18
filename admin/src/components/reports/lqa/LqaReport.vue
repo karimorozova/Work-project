@@ -11,18 +11,18 @@
                 @setTargetFilter="setTargetFilter"
                 @setIndustryFilter="(e) => setFilter(e, 'industryFilter')"
                 @setTierFilter="(e) => setFilter(e, 'tierFilter')"
-                @showNewVendorForm="showNewVendorForm"
+          
             )
         .lqa__languages
             .lqa__language(v-for="report in reportData")
                 h3.lga__text Target Language: {{ report.target }}
-                .lqa__industry(v-if="report.financeReports.length")
+                .lqa__industry(v-if="report.finance.vendor.length")
                     h4.lqa__text Industry: Finance,  Tier {{ report.tier }}
-                    Table(:vendorsData="report.financeReports" field="Finance")
-                .lqa__industry(v-if="report.gamingReports.length")
+                    Table(:vendorsData="report.finance.vendor" field="Finance")
+                .lqa__industry(v-if="report.gaming.vendor.length")
                     h4.lqa__text Industry: iGaming,  Tier {{ report.tier }}
-                    Table(:vendorsData="report.gamingReports" field="iGaming")
-            .lqa__form(v-if="isNewVendorForm")
+                    Table(:vendorsData="report.gaming.vendor" field="iGaming")
+            .lqa__form(v-if="false")
                 NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
 </template>
 
@@ -55,6 +55,7 @@ export default {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
                 this.reportData = result.body;
+                            
                 if(this.isLanguages) {
                     this.languages = this.reportData.map(item => item.target);
                     this.languages.unshift("All");

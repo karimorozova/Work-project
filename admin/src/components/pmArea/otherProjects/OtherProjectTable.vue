@@ -109,16 +109,24 @@ export default {
           label: "Project Manager",
           headerKey: "headerProjectManager",
           key: "projectManager",
-          width: "16%"  
+          width: "16%"
         }
       ]
     };
   },
   methods: {
     getProjectIdName(row, type) {
-      return type === "id"
-        ? /(.*])\s- /gm.exec(row.name)[1]
-        : / - (.*)/gm.exec(row.name)[1];
+      let id = /(.*])\s- /gm.exec(row.name);
+      let clientName = /(.*)/gm.exec(row.name);
+      if (type === "id") {
+        if (id !== null) {
+          return id[1];
+        }
+      } else {
+        if (clientName !== null) {
+          return clientName[1];
+        }
+      }
     },
     async onRowClicked({ index }) {
       this.$router.push(
@@ -127,7 +135,9 @@ export default {
     },
     formateDate: time => moment(time).format("DD-MM-YYYY"),
     projectLangs(row) {
-      const targets = row.targetLanguages.filter(item => item).map(item => item.symbol);
+      const targets = row.targetLanguages
+        .filter(item => item)
+        .map(item => item.symbol);
       let languages = "";
       targets.forEach(element => {
         languages += `${row.sourceLanguage.symbol} >> ${element}<br>`;
