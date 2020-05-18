@@ -43,8 +43,8 @@
             .report-filters__item.report-filters_width-300(:class="{'report-filters_width-280': !isTarget}")
                 LabelVal(text="Vendor Name:" customClass="new-chart-label")
                     input.report-filters__text(type="text" :value="nameFilter" placeholder="Vendor Name" @keyup="filterByName")
-            .report-filters__item(v-if="isAddVendor")
-                Button(value="Add new XTRF Vendor" customClass="width-191" @clicked="showForm")
+            //- .report-filters__item(v-if="isAddVendor")
+            //-     Button(value="Add new XTRF Vendor" customClass="width-191" @clicked="showForm")
 </template>
 
 <script>
