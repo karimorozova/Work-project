@@ -5,10 +5,10 @@
         .vendor-lqa__main
             .vendor-lqa__item
                 LabelVal(text="Vendor:" customClass="new-chart-label start-justified")
-                    .vendor-lqa__value(v-if="vendorData") {{ vendorData.vendor.name }}
-            .vendor-lqa__item
-                LabelVal(text="Target Language:" customClass="new-chart-label start-justified")
-                    .vendor-lqa__value(v-if="vendorData") {{ vendorData.vendor.language.lang }}
+                    .vendor-lqa__value(v-if="vendorData") {{ vendorData.name }}
+            //- .vendor-lqa__item
+            //-     LabelVal(text="Target Language:" customClass="new-chart-label start-justified")
+            //-         .vendor-lqa__value(v-if="vendorData") {{ vendorData.vendor.language.lang }}
             .vendor-lqa__item
                 LabelVal(text="Industry:" customClass="new-chart-label start-justified")
                     .vendor-lqa__value {{ vendorData.industry }}
