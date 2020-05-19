@@ -98,12 +98,21 @@ async function getXtrfLqaReport(filters) {
     const memoqs = await MemoqProject.find(filterQuery);
     const financeDocs = getIndustryDocs(memoqs, 'Finance')
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-    const financeReports = getVendorsWordCount(tiers, financeDocs, nameFilter, 'Finance');
-    const gamingReports = getVendorsWordCount(tiers, gamingDocs, nameFilter, 'iGaming');
-    return {
-      financeReports,
-      gamingReports
-    }
+    return tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount)
+      .map(item => {
+        return {
+          tier: item.allTier.tier,
+          target: item.target,
+          finance: {
+            tier: item.financeTier.tier,
+            vendor: getLqaWordcount(item, financeDocs, nameFilter),
+          },
+          gaming: {
+            tier: item.gameTier.tier,
+            vendor: getLqaWordcount(item, gamingDocs, nameFilter),
+          },
+        };
+      }).filter(item => Object.keys(item.finance.vendor).length || Object.keys(item.gaming.vendor).length);
     // FOR FUTURE LQA:
     // let reportsFilter = {target: filterQuery.language};
     // if(filters.tierFilter) {
@@ -131,7 +140,32 @@ function getIndustryDocs(arr, industry) {
   return industryMemoq.reduce((acc, cur) => [...acc, ...cur.documents], []);
 }
 
-function getVendorsWordCount(tiers, arr, vendorName, industry) {
+function getLqaWordcount(tier, arr, vendorName) {
+  return arr.reduce((acc, cur) => {
+    if (Object.keys(cur.UserAssignments).length && cur.TargetLangCode === tier.memoqSymbol) {
+      const { TranslationDocumentUserRoleAssignmentDetails } = cur.UserAssignments;
+      const translator = TranslationDocumentUserRoleAssignmentDetails[0];
+      if (translator) {
+        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`))) {
+          acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
+            {
+              ...acc[translator.UserInfoHeader.FullName],
+              wordCount: acc[translator.UserInfoHeader.FullName].wordCount + +cur.TotalWordCount
+            }
+            : {
+              id: translator.UserInfoHeader.UserGuid,
+              name: translator.UserInfoHeader.FullName,
+              wordCount: +cur.TotalWordCount,
+              langCode: cur.TargetLangCode,
+            };
+        }
+      }
+    }
+    return acc;
+  }, []);
+}
+
+function getUpcomingWordcount(tiers, arr, vendorName, industry) {
   return arr.reduce((acc, cur) => {
     const tier = tiers.find(tier => tier && tier.memoqSymbol === cur.TargetLangCode);
     if (Object.keys(cur.UserAssignments).length && !!tier) {
@@ -287,8 +321,8 @@ async function getXtrfUpcomingReport(filters) {
     const memoqs = await MemoqProject.find(filterQuery);
     const financeDocs = getIndustryDocs(memoqs, 'Finance');
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-    const financeReports = getVendorsWordCount(tiers, financeDocs, nameFilter, 'Finance');
-    const gamingReports = getVendorsWordCount(tiers, gamingDocs, nameFilter, 'iGaming');
+    const financeReports = getUpcomingWordcount(tiers, financeDocs, nameFilter, 'Finance');
+    const gamingReports = getUpcomingWordcount(tiers, gamingDocs, nameFilter, 'iGaming');
     return {
       financeReports,
       gamingReports,
