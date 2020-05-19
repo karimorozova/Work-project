@@ -162,7 +162,7 @@ function getLqaWordcount(tier, arr, vendorName) {
       }
     }
     return acc;
-  }, []);
+  }, {});
 }
 
 function getUpcomingWordcount(tiers, arr, vendorName, industry) {
