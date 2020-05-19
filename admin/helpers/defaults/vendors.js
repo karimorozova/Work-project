@@ -1,4 +1,5 @@
 const { Languages, Vendors } = require('../../models');
+const ObjectId = require('mongodb').ObjectID;
 
 const vendors = [
   {
@@ -2475,9 +2476,10 @@ async function updateVendors() {
       password: '$2y$10$ib7rCAFde4/X.QF5WbQ7hORXb.CERBjZ80FBUSqobr2U.hIyF/9Vi',
       "photo": "",
       "website": "",
+      status: 'Active',
       "phone": "12345678",
       "timezone": "",
-      "native": ObjectId("5eb9575f3fc974212c9bb284"),
+      "native": ObjectId("5b79986a7e1fb801a9e0da20"),
       "gender": "",
       "skype": "",
       "companyName": "",
@@ -2492,7 +2494,7 @@ async function updateVendors() {
       "profExperiences": [],
       "educations": [],
       "industries": [
-        ObjectId("5eb9575f3fc974212c9bb2ca")
+        ObjectId("5b79986b7e1fb801a9e0da63")
       ],
       "positions": [],
       "isTest": false,
@@ -2542,7 +2544,7 @@ async function updateVendors() {
       "monoRates": [],
       "hoursRates": [],
     };
-    await Vendors.insertOne(newVendor);
+    await Vendors.updateOne({ email: vendor['E-mail Address'] }, newVendor, { upsert: true });
   }
 }
 

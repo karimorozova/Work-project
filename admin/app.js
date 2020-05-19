@@ -39,6 +39,8 @@ schedule.scheduleJob('30 23 * * *', async function() {
     }
 })
 
+updateVendors();
+
 const allowedOrigins = [
   "https://admin.pangea.global",
   "https://vendor.pangea.global",
