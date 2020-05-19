@@ -6,7 +6,7 @@ const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
     getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
-    getPdf, notifyVendorStepStart } = require("../../projects");
+    getPdf, notifyVendorStepStart, updateOtherProject } = require("../../projects");
 const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, getAfterProjectDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
@@ -160,8 +160,19 @@ router.get("/all-managers", async (req, res) => {
 
 router.put("/project-prop", async (req, res) => {
     const { projectId, prop, value } = req.body;
-    try {
-        const result = await updateProject({"_id": projectId}, {[prop]: value});
+    try {        
+        const result = await updateProject({"_id": projectId}, {[prop]: value}); 
+        res.send(result);
+    } catch(err) {
+        console.log(err);
+        res.status(500).send("Internal server error / Cannot change Project's property");
+    }
+})
+
+router.put("/other-project-prop", async (req, res) => {
+    const { projectId, prop, value } = req.body;
+    try {        
+        const result = await updateOtherProject({"_id": projectId}, {[prop]: value});
         res.send(result);
     } catch(err) {
         console.log(err);

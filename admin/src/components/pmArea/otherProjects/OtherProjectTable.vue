@@ -33,7 +33,9 @@
         template(slot="deadline" slot-scope="{ row }")
             span {{formateDate(row.deadline)}}
         template(slot="projectManager" slot-scope="{ row }")
-            span {{nameOfProjectManager(row)}}           
+            span {{nameOfProjectManager(row)}}
+        template(slot="projectTest" slot-scope="{ row }")
+            input(type="checkbox" id="test" :checked="row.isTest" @click.stop="setTest(row._id)")
         
 </template>
 
@@ -109,12 +111,33 @@ export default {
           label: "Project Manager",
           headerKey: "headerProjectManager",
           key: "projectManager",
-          width: "16%"
+          width: "11%"
+        },
+        {
+          label: "Test",
+          headerKey: "headerTest",
+          key: "projectTest",
+          width: "5%"
         }
-      ]
+      ],
     };
   },
   methods: {
+    async setTest(projectId){
+        await this.setProjectProp({
+            projectId: projectId, 
+            prop: 'isTest', 
+            value: event.target.checked
+        });
+    },
+    async setProjectProp({projectId, prop, value}) {
+        try {
+            const result = await this.$http.put("/pm-manage/other-project-prop", {projectId, prop, value});
+            this.alertToggle({message: "Project type changed", isShow: true, type: "success"})
+        } catch(err) {
+            this.alertToggle({message: "Server Error / Cannot update status Project", isShow: true, type: "error"})
+        }
+    },
     getProjectIdName(row, type) {
       let id = /(.*])\s- /gm.exec(row.name);
       let clientName = /(.*)/gm.exec(row.name);

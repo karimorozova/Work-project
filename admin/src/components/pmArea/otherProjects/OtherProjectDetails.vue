@@ -21,6 +21,9 @@
             .project__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
                     span {{ project.serverProjectGuid }}
+            .project__test
+                  input(type="checkbox" id="test" :checked="project.isTest" @change="setTest(project._id)")
+                  label(for="test") Test
 </template>
 
 <script>
@@ -32,15 +35,32 @@ export default {
     project: {
       type: Object
     },
-    projectName:{
+    projectName: {
       type: String
     }
   },
   data() {
-    return {};
+    return {
+      isTest: false,
+    };
   },
   methods: {
-    formateDate: time => moment(time).format("DD-MM-YYYY HH:mm")
+    formateDate: time => moment(time).format("DD-MM-YYYY HH:mm"),
+    async setTest(projectId){
+        await this.setProjectProp({
+            projectId: projectId, 
+            prop: 'isTest', 
+            value: event.target.checked
+        });
+    },
+    async setProjectProp({projectId, prop, value}) {
+        try {
+            const result = await this.$http.put("/pm-manage/other-project-prop", {projectId, prop, value});
+            this.alertToggle({message: "Project type changed", isShow: true, type: "success"})
+        } catch(err) {
+            this.alertToggle({message: "Server Error / Cannot update status Project", isShow: true, type: "error"})
+        }
+    },
   },
   components: {
     LabelValue

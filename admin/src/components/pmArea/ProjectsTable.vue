@@ -30,8 +30,8 @@
             span.projects-table__label {{ field.label }}
         template(slot="headerProjectManager" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="headerEdit" slot-scope="{ field }")
-            span.projects-table__label
+        template(slot="headerTest" slot-scope="{ field }")
+            span.projects-table__label {{ field.label }}
         template(slot="projectId" slot-scope="{ row }")
             span {{ getId(row) }}
         template(slot="clientName" slot-scope="{ row }")
@@ -55,14 +55,14 @@
         template(slot="deadline" slot-scope="{ row }")
             span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}              
         template(slot="projectManager" slot-scope="{ row }")
-            span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}              
-        template(slot="edit" slot-scope="{ row }" style="{'z-index': 100}")
-            span.projects-table__icon(@click.stop="edit")
-                img.projects-table__edit(src="../../assets/images/edit-icon-qa.png")
+            span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
+        template(slot="projectTest" slot-scope="{ row }")
+            input(type="checkbox" id="test" :checked="row.isTest" @click.stop="setTest(row._id)")
 </template>
 
 <script>
 import DataTable from "../DataTable";
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -84,11 +84,30 @@ export default {
                 {label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%"},
                 {label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%"},
-                {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},
+                {label: "Test", headerKey: "headerTest", key: "projectTest", width: "5%"},
             ],
         }
     },
     methods: {
+        ...mapActions([
+            "alertToggle",
+            "setCurrentProject"
+        ]),
+        async setTest(projectId){
+            await this.setProjectProp({
+                projectId: projectId, 
+                prop: 'isTest', 
+                value: event.target.checked
+            });
+        },
+        async setProjectProp({projectId, prop, value}) {
+            try {
+                const result = await this.$http.put("/pm-manage/project-prop", {projectId, prop, value});
+                this.alertToggle({message: "Project type changed", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Server Error / Cannot update status Project", isShow: true, type: "error"})
+            }
+        },
         async onRowClicked({index}) {
             this.$emit("selectProject", {project: this.allProjects[index]})
         },
@@ -103,9 +122,6 @@ export default {
                 return item.packageSize ? `${item.targetLanguage} / ${item.packageSize}` : `${item.sourceLanguage} >> ${item.targetLanguage}`;
             }).filter((elem, index, self) => self.indexOf(elem) === index);
             return pairs.reduce((prev, cur) => prev + cur + '; ', "");
-        },
-        edit() {
-            console.log("edit");
         },
         bottomScrolled() {
             this.$emit("bottomScrolled");

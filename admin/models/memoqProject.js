@@ -54,6 +54,10 @@ const MemoqProjectSchema = new mongoose.Schema({
     users: {
         type : Array, 
         default : []
+    },
+    isTest:{
+        type: Boolean,
+        default: false
     }
 });
 
