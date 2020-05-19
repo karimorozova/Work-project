@@ -46,6 +46,7 @@ export default {
             industryFilter: "All",
             tierFilter: "All",
             languages: [],
+            allLangs: [],
             isLanguages: true
         }
     },
@@ -55,11 +56,15 @@ export default {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
                 this.reportData = result.body;
-                            
-                if(this.isLanguages) {
-                    this.languages = this.reportData.map(item => item.target);
+                
+                const languages = await this.$http.get("/api/languages");
+                this.allLangs = languages.data;
+
+                if (this.isLanguages) {
+                    this.languages = [...new Set(languages.data.map(item => item.group))];
                     this.languages.unshift("All");
                 }
+
                 this.isLanguages = false;
             } catch(err) {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
@@ -85,14 +90,24 @@ export default {
     }, 
     computed: {
         filters() {
-            let result = {nameFilter: this.nameFilter};
-            if(this.targetFilter[0] !== 'All') {
-                result.targetFilter = this.targetFilter;
+            let result = { nameFilter: this.nameFilter };
+            if (this.targetFilter[0] !== "All") {
+                let languageArray = [];
+
+                this.targetFilter.forEach(element => {
+                    languageArray.push(
+                        this.allLangs
+                        .filter(item => item.group == element)
+                        .map(item => item.lang)
+                        .join()
+                    );
+                });
+                result.targetFilter = languageArray.toString().split(',');
             }
-            if(this.industryFilter !== 'All') {
+            if (this.industryFilter !== "All") {
                 result.industryFilter = this.industryFilter;
             }
-            if(this.tierFilter !== 'All') {
+            if (this.tierFilter !== "All") {
                 result.tierFilter = +this.tierFilter;
             }
             return result;
