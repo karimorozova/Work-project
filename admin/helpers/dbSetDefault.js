@@ -16,7 +16,8 @@ const {
   Instruction,
   CancelReason,
   DiscountChart,
-  TierLqa
+  TierLqa,
+  Units,
 } = require('../models');
 
 const {
@@ -36,7 +37,8 @@ const {
   instructionsDefault,
   cancelReasonsDefault,
   discountChartsDefault,
-  tierLqasDefault
+  tierLqasDefault,
+  unitsDefault,
 } = require('./dbDefaultValue');
 
 async function fillTierLqa() {
@@ -475,6 +477,20 @@ async function fillPricelist() {
   }
 }
 
+async function fillUnits() {
+  try {
+    const units = await Units.find();
+    if (!units.length) {
+      for (let unit of unitsDefault) {
+        await new Units(unit).save();
+      }
+    }
+  } catch (err) {
+    console.log("Error on filling default Units");
+    console.log(err);
+  }
+}
+
 async function checkCollections() {
     await fillTierLqa();
     await fillPackages();
@@ -496,6 +512,7 @@ async function checkCollections() {
     await fillPricelist();
     await fillClientsRates();
     await fillVendorsRates();
+    await fillUnits();
 }
 
 module.exports = checkCollections();

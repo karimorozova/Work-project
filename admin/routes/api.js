@@ -11,6 +11,7 @@ const reqq = require('request');
 const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
 const { createNewRequest } = require("../requests");
+const { getUnits } = require('../units');
 
 router.get('/wordcount', async (req, res) => {
   let link = req.query.web;
@@ -450,6 +451,17 @@ router.get('/pdf-file', async (req, res) => {
         console.log(err);
         res.status(500).send("Error on getting tier lqas");
     }
+})
+
+router.get('/units', async (req, res) => {
+  try {
+    const units = await getUnits();
+    console.log(units);
+    res.send(units);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting units');
+  }
 })
 
 module.exports = router;
