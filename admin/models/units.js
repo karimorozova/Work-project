@@ -9,6 +9,10 @@ const UnitSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: false,
+  },
+  editable: {
+    type: Boolean,
+    default: false,
   }
 });
 

@@ -331,13 +331,13 @@ const tierLqasDefault = [
 
 const unitsDefault = [
   {
-    type: 'CAT Wordcount', active: true
+    type: 'CAT Wordcount', active: true, editable: false,
   },
   {
-    type: 'Packages', active: true
+    type: 'Packages', active: true, editable: false,
   },
   {
-    type: 'Hours', active: true
+    type: 'Hours', active: true, editable: false,
   },
 ]
 

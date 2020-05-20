@@ -3,7 +3,7 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User, ClientRequest, TierLqa } = require('../models');
+const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User, ClientRequest, TierLqa, Units } = require('../models');
 const { getFilteredProjects, getPdf } = require('../projects/');
 const { getFilteredClientRequests } = require('../clientRequests');
 const { getServices } = require('../services/');
@@ -11,7 +11,6 @@ const reqq = require('request');
 const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
 const { createNewRequest } = require("../requests");
-const { getUnits } = require('../units');
 
 router.get('/wordcount', async (req, res) => {
   let link = req.query.web;
@@ -108,7 +107,7 @@ router.get('/services', async (req, res) => {
     const { filter } = req.query;
     let services = await getServices();
     if(filter) {
-        services = services.filter(item => item.active);  
+        services = services.filter(item => item.active);
     }
     res.send(services);
   } catch(err) {
@@ -274,7 +273,7 @@ router.get('/steps', async (req, res) => {
       res.status(500).send("Error on getting steps from DB")
     }
 });
-  
+
 router.post('/step', async (req, res) => {
     const { step } = req.body;
     try {
@@ -334,7 +333,7 @@ router.get('/instructions', async (req, res) => {
         const instructions = await Instruction.find({});
         res.send(instructions);
     } catch(err) {
-        console.log(err);   
+        console.log(err);
         res.status(500).send("Error on getting instructions from DB")
     }
 })
@@ -353,7 +352,7 @@ router.post('/instructions', async (req, res) => {
         res.status(500).send("Error on updating/creating a instruction")
     }
   });
-  
+
 router.delete('/instructions/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -378,7 +377,7 @@ router.get('/reasons', async (req, res) => {
       res.status(500).send("Error on getting reasons from DB")
     }
 });
-  
+
 router.post('/reason', async (req, res) => {
     const { reason } = req.body;
     try {
@@ -393,7 +392,7 @@ router.post('/reason', async (req, res) => {
       res.status(500).send("Error on updating/creating a reason")
     }
 });
-  
+
 router.delete('/reason/:id', async (req, res) => {
     const { id } = req.params;
     if(!id) {
@@ -455,12 +454,40 @@ router.get('/pdf-file', async (req, res) => {
 
 router.get('/units', async (req, res) => {
   try {
-    const units = await getUnits();
-    console.log(units);
+    const units = await Units.find();
     res.send(units);
   } catch (err) {
     console.log(err);
-    res.status(500).send('Error on getting units');
+    res.status(500).send("Error on getting units");
+  }
+})
+
+router.post('/units', async (req, res) => {
+  const { unit } = req.body;
+  try {
+    if (unit._id) {
+      await Units.updateOne({ _id: unit._id }, unit);
+      return res.send("Updated");
+    }
+    await Units.create(unit);
+    res.send('Created')
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on creating unit");
+  }
+})
+
+router.delete('/units/:id', async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.send("Id has not been provided");
+  }
+  try {
+    await Units.deleteOne({ _id: id });
+    res.send("Deleted");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on deleting unit");
   }
 })
 
