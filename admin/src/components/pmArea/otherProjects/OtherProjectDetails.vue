@@ -21,7 +21,7 @@
             .project__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
                     span {{ project.serverProjectGuid }}
-            .project__test
+            .project__test.checkbox
                   input(type="checkbox" id="test" :checked="project.isTest" @change="setTest(project._id)")
                   label(for="test") Test
 </template>
@@ -29,6 +29,7 @@
 <script>
 import LabelValue from "../LabelValue";
 import moment from "moment";
+import { mapActions } from "vuex";
 
 export default {
   props: {
@@ -41,26 +42,39 @@ export default {
   },
   data() {
     return {
-      isTest: false,
+      isTest: false
     };
   },
   methods: {
+    ...mapActions(["alertToggle"]),
     formateDate: time => moment(time).format("DD-MM-YYYY HH:mm"),
-    async setTest(projectId){
-        await this.setProjectProp({
-            projectId: projectId, 
-            prop: 'isTest', 
-            value: event.target.checked
+    async setTest(projectId) {
+      await this.setProjectProp({
+        projectId: projectId,
+        prop: "isTest",
+        value: event.target.checked
+      });
+    },
+    async setProjectProp({ projectId, prop, value }) {
+      try {
+        const result = await this.$http.put("/pm-manage/other-project-prop", {
+          projectId,
+          prop,
+          value
         });
-    },
-    async setProjectProp({projectId, prop, value}) {
-        try {
-            const result = await this.$http.put("/pm-manage/other-project-prop", {projectId, prop, value});
-            this.alertToggle({message: "Project type changed", isShow: true, type: "success"})
-        } catch(err) {
-            this.alertToggle({message: "Server Error / Cannot update status Project", isShow: true, type: "error"})
-        }
-    },
+        this.alertToggle({
+          message: "Project type changed",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: "Server Error / Cannot update status Project",
+          isShow: true,
+          type: "error"
+        });
+      }
+    }
   },
   components: {
     LabelValue
@@ -176,6 +190,59 @@ export default {
   }
   &_no-margin {
     margin-bottom: 0;
+  }
+  &__test{
+    height: 24px;
+  }
+  .checkbox {
+    display: flex;
+    input[type="checkbox"] {
+      opacity: 0;
+      + {
+        label {
+          &::after {
+            content: none;
+          }
+        }
+      }
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
+          }
+        }
+      }
+    }
+    label {
+      position: relative;
+      display: inline-block;
+      padding-left: 22px;
+      padding-top: 4px;
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid;
+        left: 0px;
+        top: 3px;
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+      }
+    }
   }
 }
 </style>
