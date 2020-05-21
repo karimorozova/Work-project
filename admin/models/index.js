@@ -29,6 +29,7 @@ const TierLqa = require('./tierLqa');
 const LangTest = require('./langTest');
 const MemoqProject = require('./memoqProject');
 const LangTier = require('./langTier');
+const Units = require('./units');
 
 const Models = {
     Languages,
@@ -61,7 +62,8 @@ const Models = {
     TierLqa,
     LangTest,
     MemoqProject,
-    LangTier
+    LangTier,
+    Units,
 };
 
 module.exports = Models;

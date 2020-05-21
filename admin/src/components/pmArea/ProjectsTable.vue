@@ -30,8 +30,8 @@
             span.projects-table__label {{ field.label }}
         template(slot="headerProjectManager" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="headerEdit" slot-scope="{ field }")
-            span.projects-table__label
+        template(slot="headerTest" slot-scope="{ field }")
+            span.projects-table__label {{ field.label }}
         template(slot="projectId" slot-scope="{ row }")
             span {{ getId(row) }}
         template(slot="clientName" slot-scope="{ row }")
@@ -55,14 +55,17 @@
         template(slot="deadline" slot-scope="{ row }")
             span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}              
         template(slot="projectManager" slot-scope="{ row }")
-            span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}              
-        template(slot="edit" slot-scope="{ row }" style="{'z-index': 100}")
-            span.projects-table__icon(@click.stop="edit")
-                img.projects-table__edit(src="../../assets/images/edit-icon-qa.png")
+            span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
+        template(slot="projectTest" slot-scope="{ row, index }")
+            .checkbox(@click.stop="")
+                input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
+                label(:for="'test' + (index + 1)")
+
 </template>
 
 <script>
 import DataTable from "../DataTable";
+import { mapActions } from "vuex";
 
 export default {
     props: {
@@ -84,11 +87,30 @@ export default {
                 {label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%"},
                 {label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%"},
-                {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},
+                {label: "Test", headerKey: "headerTest", key: "projectTest", width: "5%"},
             ],
         }
     },
     methods: {
+        ...mapActions([
+            "alertToggle",
+            "setCurrentProject"
+        ]),
+        async setTest(projectId){
+            await this.setProjectProp({
+                projectId: projectId, 
+                prop: 'isTest', 
+                value: event.target.checked
+            });
+        },
+        async setProjectProp({projectId, prop, value}) {
+            try {
+                const result = await this.$http.put("/pm-manage/project-prop", {projectId, prop, value});
+                this.alertToggle({message: "Project type changed", isShow: true, type: "success"})
+            } catch(err) {
+                this.alertToggle({message: "Server Error / Cannot update status Project", isShow: true, type: "error"})
+            }
+        },
         async onRowClicked({index}) {
             this.$emit("selectProject", {project: this.allProjects[index]})
         },
@@ -103,9 +125,6 @@ export default {
                 return item.packageSize ? `${item.targetLanguage} / ${item.packageSize}` : `${item.sourceLanguage} >> ${item.targetLanguage}`;
             }).filter((elem, index, self) => self.indexOf(elem) === index);
             return pairs.reduce((prev, cur) => prev + cur + '; ', "");
-        },
-        edit() {
-            console.log("edit");
         },
         bottomScrolled() {
             this.$emit("bottomScrolled");
@@ -132,6 +151,64 @@ export default {
     }
     &__edit {
         cursor: pointer;
+    }
+    .table-chekbox{
+       height: 22px;
+       width: 18px;
+       position: absolute;
+       z-index: 500;
+    }
+    .checkbox {
+    display: flex;
+    margin-top: -5px;
+    justify-content: center;
+    input[type="checkbox"] {
+      opacity: 0;
+      + {
+        label {
+          &::after {
+            content: none;
+          }
+        }
+      }
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
+          }
+        }
+      }
+    }
+    label {
+      position: relative;
+      display: inline-block;
+      padding-left: 22px;
+      padding-top: 4px;
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid;
+        left: 0px;
+        top: 3px;
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+        }
+        }
     }
 }
 </style>

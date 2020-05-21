@@ -22,6 +22,7 @@ import TablePackages from '@/components/Table/TablePackages'
 import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
+import TableUnits from '@/components/Table/TableUnits'
 import DiscountChart from '@/components/Table/DiscountChart'
 import ChartMatrix from '@/components/Table/ChartMatrix'
 import Instructions from '@/components/Table/Instructions'
@@ -191,7 +192,12 @@ const router = new Router({
                             path: 'users',
                             name: 'users',
                             component: Users
-                        }
+                        },
+                        {
+                            path: 'units',
+                            name: 'units',
+                            component: TableUnits
+                        },
                     ]
                 },
                 {

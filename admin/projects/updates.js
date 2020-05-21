@@ -1,4 +1,4 @@
-const { Projects, User } = require('../models');
+const { Projects, User, MemoqProject } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor, notifyVendorStepStart } = require('./emails');
 const { notifyManagerProjectStarts } = require('../utils');
@@ -6,7 +6,7 @@ const { pmMail } = require('../utils/mailtopm');
 const { getUpdatedProjectFinance } = require('./porjectFinance');
 const { setMemoqTranlsators, getProjectTranslationDocs } = require('../services/memoqs/projects');
 const { downloadMemoqFile } = require('../services/memoqs/files');
-
+ 
 async function updateProjectProgress(project, isCatTool) {
     let { steps, tasks } = project;
     try {
@@ -405,6 +405,9 @@ function getTasksAfterReopen({steps, tasks}) {
     }
     return updatedTasks;
 }
+async function updateOtherProject(query, update) {
+   return await MemoqProject.findOneAndUpdate(query, update, {new: false})
+}
 
 module.exports = { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, downloadCompletedFiles,
-    updateProjectProgress, updateWithApprovedTasks, getAfterReopenSteps, updateNonWordsTaskTargetFiles };
+    updateProjectProgress, updateWithApprovedTasks, getAfterReopenSteps, updateNonWordsTaskTargetFiles, updateOtherProject };

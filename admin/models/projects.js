@@ -176,7 +176,11 @@ const ProjectsSchema = new mongoose.Schema({
   isInvoice: {
     type: Boolean,
     default: false
-  } 
+  },
+  isTest:{
+    type: Boolean,
+    default: false
+  }
 },{ minimize: false, strict: false });
 
 const Projects = mongoose.model('Projects', ProjectsSchema);

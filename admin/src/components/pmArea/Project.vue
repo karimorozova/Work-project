@@ -38,6 +38,9 @@
             .project__number
                 LabelValue(label="Client Project Number" customClass="project_margin")
                     input.project__input-text(type="text" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
+            .project__test.checkbox
+                  input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
+                  label(for="test") Test
         .project__info-row.project_no-margin
             .project__textarea
                 LabelValue(label="Project Brief" customClass="project_textarea")
@@ -73,6 +76,7 @@ export default {
     },
     data() {
         return {
+            isTest: false,
             selectedIndustry: "",
             industries: [],
             disabled: {
@@ -87,7 +91,7 @@ export default {
             isRequiredField: true,
             errors: [],
             areErrorsExist: false,
-            clients: []
+            clients: [],
         }
     },
     methods: {
@@ -109,6 +113,13 @@ export default {
             if(prop === 'startDate' && this.project.tasks.length) return;
             await this.setProjectDate({date, projectId: this.project._id});
         },
+        async setTest(e){
+            if(!this.project._id){
+                this.isTest = e.target.checked
+            }else{
+                await this.setProjectProp({prop: 'isTest', value: e.target.checked});
+            }
+        },
         async setClientNumber(e) {
             const { value } = e.target;
             if(!this.project._id) {
@@ -120,6 +131,7 @@ export default {
             try {
                 const result = await this.$http.put("/pm-manage/project-prop", {projectId: this.project._id, prop, value});
                 await this.setCurrentProject(result.body);
+                this.alertToggle({message: "Project updated", isShow: true, type: "success"})
             } catch(err) {
                 this.alertToggle({message: "Server Error / Cannot update Project", isShow: true, type: "error"})
             }
@@ -162,6 +174,7 @@ export default {
             this.project.industry = this.selectedIndustry._id;
             const customer = {...this.project.customer};
             this.project.customer = customer._id;
+            this.project.isTest = this.isTest;
             try {
                 const newProject = await this.$http.post("/pm-manage/new-project", this.project);
                 this.$emit('projectCreated', {project: newProject.body, customer: customer});
@@ -222,9 +235,13 @@ export default {
         Button,
         ValidationErrors
     },
-    created() {
+    async created() {
+        const { id } = this.$route.params;
+        const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+        await this.setCurrentProject(curProject.body);
         this.getCustomers();
         this.getIndustries();
+
     }
 }
 </script>
@@ -336,6 +353,61 @@ export default {
     &_no-margin {
         margin-bottom: 0;
     }
+    &__test{
+        height: 24px;
+    }
+    .checkbox {
+        display: flex;
+        input[type="checkbox"] {
+        opacity: 0;
+        + {
+            label {
+            &::after {
+                content: none;
+            }
+            }
+        }
+        &:checked {
+            + {
+            label {
+                &::after {
+                content: "";
+                }
+            }
+            }
+        }
+        }
+        label {
+        position: relative;
+        display: inline-block;
+        padding-left: 22px;
+        padding-top: 4px;
+        &::before {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 16px;
+            width: 16px;
+            border: 1px solid;
+            left: 0px;
+            top: 3px;
+        }
+        &::after {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 5px;
+            width: 9px;
+            border-left: 2px solid;
+            border-bottom: 2px solid;
+            transform: rotate(-45deg);
+            left: 4px;
+            top: 7px;
+        }
+        }
+    }
+
+
 }
 
 </style>

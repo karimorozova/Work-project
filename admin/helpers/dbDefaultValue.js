@@ -329,6 +329,18 @@ const tierLqasDefault = [
     {category: "3", lqa1: "1000", lqa2: "5000", lqa3: "10000"}
 ]
 
+const unitsDefault = [
+  {
+    type: 'CAT Wordcount', active: true, editable: false,
+  },
+  {
+    type: 'Packages', active: true, editable: false,
+  },
+  {
+    type: 'Hours', active: true, editable: false,
+  },
+]
+
 const defaultValue = {
     languagesDefault,
     requestsDefault,
@@ -347,7 +359,8 @@ const defaultValue = {
     instructionsDefault,
     cancelReasonsDefault,
     discountChartsDefault,
-    tierLqasDefault
+    tierLqasDefault,
+    unitsDefault
 };
 
 module.exports = defaultValue;
