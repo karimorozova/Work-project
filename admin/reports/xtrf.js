@@ -19,6 +19,7 @@ async function getXtrfTierReport(filters, grouped = false) {
       });
     }
     const groupedLangs = getGroupedLangs(result, 'group');
+    console.log(groupedLangs);
     return grouped ? groupedLangs : result;
   } catch (err) {
     console.log(err);
@@ -43,14 +44,17 @@ function getGroupedLangs(array, key) {
     [curr]: grouped[curr].reduce((prevLang, currLang) => {
       return ({
         allTier: {
+          tier: currLang.allTier.tier,
           wordcount: prevLang.allTier.wordcount + currLang.allTier.wordcount,
           clients: Math.ceil(prevLang.allTier.clients + currLang.allTier.clients),
         },
         financeTier: {
+          tier: currLang.financeTier.tier,
           wordcount: prevLang.financeTier.wordcount + currLang.financeTier.wordcount,
           clients: Math.ceil(prevLang.financeTier.clients + currLang.financeTier.clients),
         },
         gameTier: {
+          tier: currLang.gameTier.tier,
           wordcount: prevLang.gameTier.wordcount + currLang.gameTier.wordcount,
           clients: Math.ceil(prevLang.gameTier.clients + currLang.gameTier.clients),
         }
