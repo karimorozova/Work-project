@@ -6,6 +6,10 @@ const UnitSchema = new mongoose.Schema({
     default: '',
     trim: true,
   },
+  steps: {
+    type: Array,
+    default: [],
+  },
   active: {
     type: Boolean,
     default: false,
