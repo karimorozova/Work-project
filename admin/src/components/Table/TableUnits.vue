@@ -26,20 +26,8 @@
                 .units__editing-data(v-else)
                     input.units__input(type="text" v-model="currentUnit")
 
-            //- template(slot="steps" slot-scope="{ row, index }")
-            //-     .units__data(v-if="currentActive !== index") {{ presentTargets(row.targets) }}
-            //-     .units__drop-menu(v-else)
-            //-         SelectMulti(
-            //-             :isTableDropMenu="isTableDropMenu"
-            //-             placeholder="Select"
-            //-             :hasSearch="true"
-            //-             :options="serviceData" 
-            //-             :selectedOptions="selectedServices" 
-            //-             @chooseOptions="setServices"   
-            //-         )   
-
             template(slot="steps" slot-scope="{ row, index }")
-                .units__data(v-if="currentActive !== index") --
+                .units__data(v-if="currentActive !== index") {{ presentServices(row.steps) }}
                 .units__drop-menu(v-else)
                     SelectMulti(
                         :isTableDropMenu="isTableDropMenu"
@@ -77,14 +65,14 @@ export default {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "30%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "Steps",
           headerKey: "headerSteps",
           key: "steps",
-          width: "30%",
+          width: "40%",
           padding: "0"
         },
         {
@@ -102,7 +90,7 @@ export default {
           padding: "0"
         }
       ],
-      targets: [],
+      steps: [],
       currentServices: [],
       units: [],
       currentUnit: "",
@@ -119,23 +107,23 @@ export default {
       alertToggle: "alertToggle"
     }),
 
-    presentTargets(targets) {
-      if (!targets.length) return "";
-      return targets.reduce((acc, cur) => acc + `${cur.title}; `, "");
+    presentServices(services) {
+      if (!services.length) return "";
+      return services.reduce((acc, cur) => acc + `${cur.title}; `, "");
     },
     setServices({ option }) {
       const position = this.selectedServices.indexOf(option);
       if (position !== -1) {
         this.currentServices.splice(position, 1);
       } else {
-        const title = this.targets.find(item => item.title === option);
+        const title = this.steps.find(item => item.title === option);
         this.currentServices.push(title);
       }
     },
     async getServices() {
       try {
         const result = await this.$http.get("/api/services");
-        this.targets = result.body;
+        this.steps = result.body;
       } catch (err) {
         this.alertToggle({
           message: "Erorr on getting Services",
@@ -164,6 +152,7 @@ export default {
       if (this.currentActive !== -1) {
         return this.isEditing();
       }
+      this.currentServices = [];
       this.units.push({
         active: true,
         type: "",
@@ -174,6 +163,7 @@ export default {
     setEditionData(index) {
       this.currentActive = index;
       this.currentUnit = this.units[index].type;
+      this.currentServices = Array.from(this.units[index].steps);
     },
     closeErrors() {
       this.areErrors = false;
@@ -202,6 +192,32 @@ export default {
         this.isDeleting = true;
       }
     },
+    async saveChangesConst(index) {
+      this.errors = [];
+      const id = this.units[index]._id;
+      try {
+        const result = await this.$http.post("/api/units", {
+          unit: {
+            _id: id,
+            type: this.units[index].type,
+            active: true,
+            steps: this.currentServices
+          }
+        });
+        this.alertToggle({
+          message: "Saved only Steps",
+          isShow: true,
+          type: "success"
+        });
+        this.getUnits();
+      } catch (error) {
+        this.alertToggle({
+          message: "Erorr on saving Unit Steps info",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     async saveChanges(index) {
       this.errors = [];
       const id = this.units[index]._id;
@@ -210,7 +226,8 @@ export default {
           unit: {
             _id: id,
             type: this.currentUnit,
-            active: this.units[index].active
+            active: this.units[index].active,
+            steps: this.currentServices
           }
         });
         this.alertToggle({ message: "Saved", isShow: true, type: "success" });
@@ -233,12 +250,15 @@ export default {
       this.errors = [];
       if (!this.currentUnit || !this.isUnique(index))
         this.errors.push("Unit should not be empty and be unique!");
-      if (!editable) this.errors.push("This Unit cannot be edited.");
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
-      await this.saveChanges(index);
+      if (!editable) {
+        await this.saveChangesConst(index);
+      } else {
+        await this.saveChanges(index);
+      }
       this.cancel();
     },
     async deleteUnit() {
@@ -284,7 +304,7 @@ export default {
   },
   computed: {
     serviceData() {
-      return this.targets.map(item => item.title);
+      return this.steps.map(item => item.title);
     },
     selectedServices() {
       return this.currentServices.length
@@ -314,6 +334,7 @@ export default {
   width: calc(100% - 190px);
   &__data {
     @extend %table-data;
+    overflow-x: hidden;
   }
   &__editing-data {
     @extend %table-data;
