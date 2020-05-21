@@ -80,7 +80,7 @@ export default {
             this.activeIndex = -1;
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-tier-report", { filters: this.filters });
-                this.reportData = result.body;
+                this.reportData = Object.values(result.body);
 
                 const languages = await this.$http.get("/api/languages");
                 this.allLangs = languages.data;
@@ -89,7 +89,6 @@ export default {
                     this.languages = [...new Set(languages.data.map(item => item.group))];
                     this.languages.unshift("All");
                 }
-
                 this.isLanguages = false;
                 
             } catch(err) {

@@ -55,7 +55,11 @@ export default {
         async getReport() {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
-                this.reportData = result.body;
+                let temporaryStorage = [];
+                for (let variable of result.body) {
+                  temporaryStorage.push(Object.values(variable)[0]);                  
+                }
+                this.reportData = temporaryStorage;
                 
                 const languages = await this.$http.get("/api/languages");
                 this.allLangs = languages.data;

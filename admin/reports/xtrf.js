@@ -19,7 +19,6 @@ async function getXtrfTierReport(filters, grouped = false) {
       });
     }
     const groupedLangs = getGroupedLangs(result, 'group');
-    console.log(groupedLangs);
     return grouped ? groupedLangs : result;
   } catch (err) {
     console.log(err);
@@ -43,6 +42,7 @@ function getGroupedLangs(array, key) {
     ...prev,
     [curr]: grouped[curr].reduce((prevLang, currLang) => {
       return ({
+        target: curr,
         allTier: {
           tier: currLang.allTier.tier,
           wordcount: prevLang.allTier.wordcount + currLang.allTier.wordcount,
@@ -150,6 +150,7 @@ async function getXtrfLqaReport(filters) {
       .reduce((acc, cur) => {
         acc.push({
           [cur.group]: {
+            target : cur.group,
             tier: cur.allTier.tier,
             finance: {
               tier: cur.financeTier.tier,
