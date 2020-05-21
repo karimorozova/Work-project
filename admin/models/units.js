@@ -12,7 +12,7 @@ const UnitSchema = new mongoose.Schema({
   },
   editable: {
     type: Boolean,
-    default: false,
+    default: true,
   }
 });
 
