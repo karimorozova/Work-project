@@ -38,7 +38,7 @@ router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, 
 router.post('/xtrf-tier-report', async (req, res) => {
     const { filters } = req.body;
     try {
-        const reports = await getXtrfTierReport(filters);
+        const reports = await getXtrfTierReport(filters, true);
         res.send(reports);
     } catch(err) {
         console.log(err);
