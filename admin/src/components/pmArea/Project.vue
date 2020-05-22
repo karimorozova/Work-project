@@ -237,11 +237,12 @@ export default {
     },
     async created() {
         const { id } = this.$route.params;
-        const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
-        await this.setCurrentProject(curProject.body);
+        if (Object.keys(id).length !== 0) {
+            const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+            await this.setCurrentProject(curProject.body);
+        }
         this.getCustomers();
         this.getIndustries();
-
     }
 }
 </script>
