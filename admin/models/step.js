@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
 
 const StepSchema = new mongoose.Schema({
-    title: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    title: {
+        type : String,
+        default : '',
+        trim : true
     },
     calculationUnit: {
-        type: String,
-        default: 'Words',
-        trim : true
+        type: Array,
+        default: [],
     },
     isStage1: {
         type: Boolean
@@ -24,8 +23,8 @@ const StepSchema = new mongoose.Schema({
         type: Boolean
     },
     symbol: {
-        type : String, 
-        default : '', 
+        type : String,
+        default : '',
         trim : true
     }
 });
