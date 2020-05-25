@@ -152,7 +152,21 @@ function fillSteps() {
       .then(async steps => {
         if(!steps.length) {
           for(const step of stepsDefault) {
-            await new Step({ ...step }).save().then((res) => {
+            let calculationUnit;
+            const { title } = step;
+            switch (title) {
+              default:
+              case 'Translation' || 'Revising' || 'Editing':
+                calculationUnit = await Units.findOne({ type: 'CAT Wordcount' });
+                break
+              case 'QA' || 'Graphic Design':
+                calculationUnit = await Units.findOne({ type: 'Hours' });
+                break
+              case 'Copywriting' || 'Proofreading':
+                calculationUnit = await Units.findOne({ type: 'Packages' })
+                break
+            }
+            await new Step({ ...step, calculationUnit }).save().then((res) => {
 
             }).catch(err => {
               console.log(`Step ${step} hasn't been saved because of ${err.message}`)
@@ -499,6 +513,7 @@ async function checkCollections() {
     await fillDiscountCharts();
     await fillLeadSources();
     await fillGroups();
+    await fillUnits();
     await fillSteps();
     await timeZones();
     await languages();
@@ -512,7 +527,6 @@ async function checkCollections() {
     await fillPricelist();
     await fillClientsRates();
     await fillVendorsRates();
-    await fillUnits();
 }
 
 module.exports = checkCollections();
