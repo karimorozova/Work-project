@@ -38,9 +38,6 @@
                 .steps__data.steps_centered(slot="stage2" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
                     img.steps__checkbox(v-if="isSelected('isStage2', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage2')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index,'isStage2')" :class="{'steps_opacity': currentActive === index}")
-                //- .steps__data.steps_centered(slot="editor" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
-                //-     img.steps__checkbox(v-if="isSelected('isEditor', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isEditor')" :class="{'steps_opacity': currentActive === index}")
-                //-     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isEditor')" :class="{'steps_opacity': currentActive === index}")
                 .steps__data.steps_centered(slot="active" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
                     img.steps__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
@@ -71,7 +68,6 @@ export default {
                 {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: Math.floor(850*0.28), padding: "0"},
                 {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: Math.floor(850*0.12), padding: "0"},
                 {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: Math.floor(850*0.12), padding: "0"},
-                // {label: "Editor", headerKey: "headerEditor", key: "editor", width: Math.floor(850*0.12), padding: "0"},
                 {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(850*0.12), padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
             ],
@@ -91,6 +87,7 @@ export default {
         presentUnits(units) {
             if (!units.length) return "";
             return units.reduce((acc, cur) => acc + `${cur.type}; `, "");
+            // return units.filter(item => item.active).reduce((acc, cur) => acc + `${cur.type}; `, "");
         },
         setUnits({ option }) {
             const position = this.selectedUnits.indexOf(option);
@@ -104,7 +101,7 @@ export default {
         async getUnits(){
             try {
                 const result  = await this.$http.get('/api/units');
-                this.units = result.body;                
+                this.units = result.body;
             } catch (err) {
                 this.alertToggle({message: "Erorr on getting Units", isShow: true, type: "error"});
             }
@@ -202,6 +199,7 @@ export default {
         },
         selectedUnits() {
             return this.currentUnits.length
+            // ? this.currentUnits.filter(item => item.active).map(item => item.type)
             ? this.currentUnits.map(item => item.type)
             : [];
     }

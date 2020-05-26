@@ -14,8 +14,6 @@
                     .services__header {{ field.label }}
                 template(slot="headerLangForm" slot-scope="{ field }")
                     .services__header {{ field.label }}
-                //- template(slot="headerUnit" slot-scope="{ field }")
-                //-     .services__header {{ field.label }}
                 template(slot="headerStep1" slot-scope="{ field }")
                     .services__header {{ field.label }}
                 template(slot="headerStep2" slot-scope="{ field }")
@@ -44,15 +42,7 @@
                             @chooseOption="setLangForm"
                             @scrollDrop="scrollDrop"
                         )
-                //- template(slot="calculationUnit" slot-scope="{ row, index }")
-                //-     .services__data(v-if="currentActive !== index") {{ row.calculationUnit }}
-                //-     .services__drop-menu(v-else)
-                //-         SelectSingle(
-                //-             :selectedOption="currentUnit"
-                //-             :options="units"
-                //-             @chooseOption="setUnit"
-                //-             @scrollDrop="scrollDrop"
-                //-         )
+
                 template(slot="step1" slot-scope="{ row, index }")
                     .services__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage1') }}
                     .services__drop-menu(v-else)
@@ -103,7 +93,6 @@ export default {
                 {label: "Icon", headerKey: "headerIcon", key: "icon", width: Math.floor(920*0.10), padding: "0"},
                 {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(920*0.18), padding: "0"},
                 {label: "Language Form", headerKey: "headerLangForm", key: "languageForm", width: Math.floor(920*0.14), padding: "0"},
-                // {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: Math.floor(920*0.14), padding: "0"},
                 {label: "Step 1", headerKey: "headerStep1", key: "step1", width: Math.floor(920*0.19), padding: "0"},
                 {label: "Step 2", headerKey: "headerStep2", key: "step2", width: Math.floor(920*0.19), padding: "0"},
                 {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(920*0.08), padding: "0"},
@@ -111,11 +100,9 @@ export default {
             ],
             services: [],
             langForms: ["Mono", "Duo"],
-            // units: ["Hours", "Packages", "Words"],
             currentActive: -1,
             currentTitle: "",
             currentLangForm: "",
-            // currentUnit: "",
             currentStep1: "",
             currentStep2: "",
             iconFile: [],
@@ -173,7 +160,6 @@ export default {
             this.errors = [];
             if(!this.currentTitle || !this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!");
             if(!this.currentLangForm) this.errors.push("Please, select language form.");
-            // if(!this.currentUnit) this.errors.push("Please, select calculation unit.");
             if(!this.currentStep1) this.errors.push("Please, select Step 1.");
             if(this.errors.length) {
                 this.areErrors = true;
@@ -231,7 +217,6 @@ export default {
             newData.append("active", this.services[index].active);
             newData.append("icon", this.iconFile[0]);
             newData.append("languageForm", this.currentLangForm);
-            // newData.append("calculationUnit", this.currentUnit);
             newData.append("steps", JSON.stringify(steps));
             newData.append("symbol", symbol);
             newData.append("projectType", this.services[index].projectType);
@@ -250,8 +235,6 @@ export default {
             this.currentActive = index;
             this.currentTitle= this.services[index].title;
             this.currentLangForm = this.services[index].languageForm;
-            // this.currentUnit = this.services[index].calculationUnit;
-            // this.$emit("setUnitFilter", {unit: this.currentUnit});
             this.setCurrentEditableSteps(index);
         },
         setCurrentEditableSteps(index) {
@@ -270,7 +253,6 @@ export default {
             this.currentActive = -1;
             this.currentTitle = "";
             this.currentLangForm = "",
-            // this.currentUnit = "";
             this.currentStep1 = "";
             this.currentStep2 = "";
             this.imageData = "";
@@ -280,12 +262,6 @@ export default {
         setLangForm({option}) {
             this.currentLangForm = option;
         },
-        // setUnit({option}) {
-        //     this.currentUnit = option;
-        //     this.currentStep1 = "";
-        //     this.currentStep2 = "";
-        //     this.$emit("setUnitFilter", {unit: option});
-        // },
         setStep({option}, prop) {
             this[prop] = option;
         },
