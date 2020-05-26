@@ -11,6 +11,8 @@ const reqq = require('request');
 const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
 const { createNewRequest } = require("../requests");
+const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('../units');
+const { insertStepsIntoUnits, deleteStepsFromUnits, changeStepsInUnits } = require('../steps');
 
 router.get('/wordcount', async (req, res) => {
   let link = req.query.web;
@@ -278,10 +280,11 @@ router.post('/step', async (req, res) => {
     const { step } = req.body;
     try {
       if(step._id) {
-        await Step.updateOne({"_id": step._id}, step);
+        await changeStepsInUnits(step)
         return res.send('Updated');
       }
-      await Step.create(step);
+      const { _id } = await Step.create(step);
+      await insertStepsIntoUnits(step, _id);
       res.send('New step saved.');
     } catch(err) {
       console.log(err);
@@ -466,10 +469,11 @@ router.post('/units', async (req, res) => {
   const { unit } = req.body;
   try {
     if (unit._id) {
-      await Units.updateOne({ _id: unit._id }, unit);
+      await changeUnitsInSteps(unit);
       return res.send("Updated");
     }
-    await Units.create(unit);
+    const { _id } = await Units.create(unit);
+    await insertUnitIntoStep(unit, _id);
     res.send('Created')
   } catch (err) {
     console.log(err);
@@ -484,6 +488,7 @@ router.delete('/units/:id', async (req, res) => {
   }
   try {
     await Units.deleteOne({ _id: id });
+    await deleteUnitFromStep(id);
     res.send("Deleted");
   } catch (err) {
     console.log(err);

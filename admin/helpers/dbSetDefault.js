@@ -40,6 +40,7 @@ const {
   tierLqasDefault,
   unitsDefault,
 } = require('./dbDefaultValue');
+const ObjectId = require('mongodb').ObjectID;
 
 async function fillTierLqa() {
     try {
@@ -156,13 +157,25 @@ function fillSteps() {
             const { title } = step;
             switch (title) {
               default:
-              case 'Translation' || 'Revising' || 'Editing':
+              case 'Translation':
                 calculationUnit = await Units.findOne({ type: 'CAT Wordcount' });
                 break
-              case 'QA' || 'Graphic Design':
+              case 'Revising':
+                calculationUnit = await Units.findOne({ type: 'CAT Wordcount' });
+                break
+              case 'Editing':
+                calculationUnit = await Units.findOne({ type: 'CAT Wordcount' });
+                break
+              case 'QA':
                 calculationUnit = await Units.findOne({ type: 'Hours' });
                 break
-              case 'Copywriting' || 'Proofreading':
+              case 'Graphic Design':
+                calculationUnit = await Units.findOne({ type: 'Hours' });
+                break
+              case 'Copywriting':
+                calculationUnit = await Units.findOne({ type: 'Packages' })
+                break
+              case 'Proofreading':
                 calculationUnit = await Units.findOne({ type: 'Packages' })
                 break
             }
@@ -505,6 +518,33 @@ async function fillUnits() {
   }
 }
 
+async function fillUnitSteps() {
+  try {
+    const units = await Units.find();
+    for (let unit of units) {
+      let steps;
+      const { type } = unit;
+      switch (type) {
+        default:
+        case 'Cat Wordcount':
+          unit.steps = await Step.find({ $or: [{ title: 'Translation' }, { title: 'Revising' }, { title: 'Editing' }] });
+          break
+        case 'Hours':
+          unit.steps = await Step.find({ $or: [{ title: 'QA' }, { title: 'Graphic Design' }] });
+          break
+        case 'Packages':
+          unit.steps = await Step.find({ $or: [{ title: 'Copywriting' }, { title: 'Proofreading' }] });
+          break
+      }
+      await Units.updateOne({ _id: ObjectId(unit._id) }, unit, { upsert: true });
+    }
+    console.log('Units are saved!');
+  } catch (err) {
+    console.log(err)
+    console.log('Error on fillUnitSteps');
+  }
+}
+
 async function checkCollections() {
     await fillTierLqa();
     await fillPackages();
@@ -515,6 +555,7 @@ async function checkCollections() {
     await fillGroups();
     await fillUnits();
     await fillSteps();
+    await fillUnitSteps();
     await timeZones();
     await languages();
     await industries();
