@@ -28,6 +28,7 @@
                 :start="stepsDates[count-1].start"
                 :deadline="stepsDates[count-1].deadline"
                 @setDate="(e) => setDate(e, count)"
+                :service="service"
             )
         transition(name="fade")
             .workflow__error(v-if="isError")
