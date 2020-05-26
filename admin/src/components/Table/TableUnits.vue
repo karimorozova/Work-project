@@ -122,8 +122,8 @@ export default {
     },
     async getServices() {
       try {
-        const result = await this.$http.get("/api/services");
-        this.steps = result.body;
+        const result = await this.$http.get("/api/steps");
+        this.steps = result.body.filter(item => item.isActive);
       } catch (err) {
         this.alertToggle({
           message: "Erorr on getting Services",
