@@ -12,7 +12,7 @@ const { getAllCountries } = require('../helpers/countries');
 const { updateLanguage } = require('../settings');
 const { createNewRequest } = require("../requests");
 const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('../units');
-const { insertStepsIntoUnits, deleteStepsFromUnits, changeStepsInUnits } = require('../steps');
+const { insertStepsIntoUnits, changeStepsInUnits } = require('../steps');
 
 router.get('/wordcount', async (req, res) => {
   let link = req.query.web;
@@ -303,13 +303,13 @@ router.get('/packages', async (req, res) => {
 });
 
 router.post('/package', async (req, res) => {
-  const { package } = req.body;
+  const { pack } = req.body;
   try {
-    if(package._id) {
-      await Package.updateOne({"_id": package._id}, package);
+    if(pack._id) {
+      await Package.updateOne({"_id": pack._id}, pack);
       return res.send('Updated');
     }
-    await Package.create(package);
+    await Package.create(pack);
     res.send('New package saved.');
   } catch(err) {
     console.log(err);
