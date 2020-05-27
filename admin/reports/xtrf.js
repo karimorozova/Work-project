@@ -146,27 +146,47 @@ async function getXtrfLqaReport(filters) {
     const memoqs = await MemoqProject.find(filterQuery);
     const financeDocs = getIndustryDocs(memoqs, 'Finance');
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-    return tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount)
-      .reduce((acc, cur) => {
-        acc.push({
-          [cur.group]: {
-            target : cur.group,
-            tier: cur.allTier.tier,
+    const reports = tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount);
+    const groupedReports = groupByKey(reports, 'group');
+    return Object.keys(groupedReports).reduce((acc, curr) => {
+      acc.push(groupedReports[curr].reduce((prevLang, curLang) => {
+        prevLang[curLang.group] = prevLang[curLang.group] ?
+          {
+            ...prevLang[curLang.group],
             finance: {
-              tier: cur.financeTier.tier,
-              vendor: getLqaWordcount(cur, financeDocs, nameFilter),
+              tier: curLang.financeTier.tier,
+              vendor: {
+                ...prevLang[curLang.group].finance.vendor,
+                ...getLqaWordcount(curLang, financeDocs, nameFilter),
+              },
             },
             gaming: {
-              tier: cur.gameTier.tier,
-              vendor: getLqaWordcount(cur, gamingDocs, nameFilter),
+              tier: curLang.gameTier.tier,
+              vendor: {
+                ...prevLang[curLang.group].gaming.vendor,
+                ...getLqaWordcount(curLang, gamingDocs, nameFilter),
+              }
             }
-          }})
-        return acc;
-      }, []).filter(item => {
-        const financeVendor = Object.values(item)[0].finance.vendor;
-        const gamingVendor = Object.values(item)[0].gaming.vendor;
-        return Object.keys(financeVendor).length || Object.keys(gamingVendor).length
-      });
+          } : {
+            target: curLang.group,
+            tier: curLang.allTier.tier,
+            finance: {
+              tier: curLang.financeTier.tier,
+              vendor: getLqaWordcount(curLang, financeDocs, nameFilter),
+            },
+            gaming: {
+              tier: curLang.gameTier.tier,
+              vendor: getLqaWordcount(curLang, gamingDocs, nameFilter),
+            }
+          }
+        return prevLang;
+      }, {}))
+      return acc;
+    }, []).filter(item => {
+      const financeVendor = Object.values(item)[0].finance.vendor;
+      const gamingVendor = Object.values(item)[0].gaming.vendor;
+      return Object.keys(financeVendor).length || Object.keys(gamingVendor).length;
+    });
     // FOR FUTURE LQA:
     // let reportsFilter = {target: filterQuery.language};
     // if(filters.tierFilter) {
