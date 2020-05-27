@@ -88,6 +88,8 @@ export default {
         getDataForTasks(dataForTasks) {
             let tasksData = new FormData();
             const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : "";
+
+            tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits));
             tasksData.append('customerName', this.currentProject.customer.name);
             tasksData.append('template', dataForTasks.template.id);
             tasksData.append('workflow', dataForTasks.workflow.id);
@@ -100,41 +102,80 @@ export default {
             tasksData.append('industry', this.currentProject.industry.name.replace('&','and'));
             tasksData.append('packageSize', dataForTasks.packageSize);
             tasksData.append('quantity', dataForTasks.quantity);
+
             return tasksData;
         },
         async addTasks(dataForTasks) {
             let tasksData = this.getDataForTasks(dataForTasks);
-            if(dataForTasks.service.calculationUnit === 'Hours') {
-                const steps = [...dataForTasks.service.steps];
-                const length = +dataForTasks.workflow.name.split(" ")[0];
-                for(let i = 0; i < length; i++) {
-                    tasksData.append(`${steps[i].step.symbol}-hours`, dataForTasks[`${steps[i].step.symbol}-hours`])
-                    tasksData.append(`${steps[i].step.symbol}-quantity`, dataForTasks[`${steps[i].step.symbol}-quantity`])
-                }
+            
+            // if(dataForTasks.service.calculationUnit === 'Hours') {
+            //     const steps = [...dataForTasks.service.steps];
+            //     const length = +dataForTasks.workflow.name.split(" ")[0];
+            //     for(let i = 0; i < length; i++) {
+            //         tasksData.append(`${steps[i].step.symbol}-hours`, dataForTasks[`${steps[i].step.symbol}-hours`])
+            //         tasksData.append(`${steps[i].step.symbol}-quantity`, dataForTasks[`${steps[i].step.symbol}-quantity`])
+            //     }
+            // }
+            
+            for (const iterator of dataForTasks.stepsAndUnits) {
+                if(iterator.unit == 'Hours'){
+                    const length = +dataForTasks.workflow.name.split(" ")[0];
+                    // const steps = [...dataForTasks.service.steps];
+                    const newSteps = dataForTasks.stepsAndUnits;
+                    // console.log(steps);
+                    // console.log(newSteps);
+                    
+                    
+                     for(let i = 0; i < length; i++) {
+                        // console.log(`${newSteps[i].step}-hours`, dataForTasks[`${newSteps[i].step}-hours`]);
+                        // console.log(`${newSteps[i].step}-quantity`, dataForTasks[`${newSteps[i].step}-quantity`]);
+                         
+                        tasksData.append(`${newSteps[i].step}-hours`, dataForTasks[`${newSteps[i].step}-hours`])
+                        tasksData.append(`${newSteps[i].step}-quantity`, dataForTasks[`${newSteps[i].step}-quantity`])
+                    }                    
+                }                
             }
+
             const { sourceFiles, refFiles } = dataForTasks;
+
             if(sourceFiles && sourceFiles.length) {
                 this.translateFilesAmount = sourceFiles.length;
                 for(let file of sourceFiles) {
                     tasksData.append('sourceFiles', file)
                 }
             }
+
             if(refFiles && refFiles.length) {
                 for(let file of refFiles) {
                     tasksData.append('refFiles', file)
                 }
             }
+
             try {
-                if(dataForTasks.service.calculationUnit === 'Words') {
-                    const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
-                    const { creatorUserId } = memoqCreatorUser.data;
-                    if(!creatorUserId) throw new Error("No such user in memoq");
-                    tasksData.append('creatorUserId', creatorUserId);
-                    this.isInfo = true;
-                    await this.addProjectWordsTasks(tasksData);
-                } else {
-                    await this.addProjectTasks(tasksData);
+                for (const iterator of dataForTasks.stepsAndUnits) {
+                    if(iterator.unit == 'CAT Wordcount'){
+                        const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
+                        const { creatorUserId } = memoqCreatorUser.data;
+                        if(!creatorUserId) throw new Error("No such user in memoq");
+                        tasksData.append('creatorUserId', creatorUserId);
+                        this.isInfo = true;
+                        await this.addProjectWordsTasks(tasksData);
+                    }else{
+                        await this.addProjectTasks(tasksData);
+                    }
                 }
+
+                // if(dataForTasks.service.calculationUnit === 'Words') {
+                //     const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
+                //     const { creatorUserId } = memoqCreatorUser.data;
+                //     if(!creatorUserId) throw new Error("No such user in memoq");
+                //     tasksData.append('creatorUserId', creatorUserId);
+                //     this.isInfo = true;
+                //     await this.addProjectWordsTasks(tasksData);
+                // } else {
+                //     await this.addProjectTasks(tasksData);
+                // }
+
                 this.isTaskData = false;
                 this.clearTasksData();
             } catch(err) {

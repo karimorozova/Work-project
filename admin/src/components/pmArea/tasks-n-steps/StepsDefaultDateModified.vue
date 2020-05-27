@@ -44,7 +44,6 @@
                   @invalidDate="invalidDateWarn"
               )
           img.steps-date__image(src="../../../assets/images/calendar.png" @click="showDeadlineCalendar")
-
   .steps-date-wrapper
     .steps-date__picker
         .steps-date__input-wrapper
@@ -58,8 +57,6 @@
                         placeholder="Select"
                         @chooseOption="setUnit"
                     )
-         
-
 </template>
 
 <script>
@@ -104,6 +101,7 @@ import { mapGetters, mapActions} from "vuex";
     methods: {
         setUnit({ option }) {
           this.currentUnit = this.units.find(item => item.type === option);
+          this.sendUnit();
         },
         async getUnits(){
           try {
@@ -142,6 +140,13 @@ import { mapGetters, mapActions} from "vuex";
         },
         setDate(e, prop) {
             this.$emit("setDate", { date: new Date(e), prop })
+        },
+        sendUnit() {
+          this.$emit('sendUnit', {
+            stepCounter : this.stepCounter,
+            step: this.setSteps[0].steps[this.stepCounter-1].step.title,
+            unit: this.currentUnit.type,
+          })
         },
         invalidDateWarn({message}) {
             console.log(message);

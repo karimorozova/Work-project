@@ -28,6 +28,7 @@
                 :start="stepsDates[count-1].start"
                 :deadline="stepsDates[count-1].deadline"
                 @setDate="(e) => setDate(e, count)"
+                @sendUnit="pushStepAndUnit"
                 :service="service"
             )
         transition(name="fade")
@@ -53,7 +54,8 @@ export default {
             stepsDates: [{ start: new Date(), deadline: "" }, { start: "", deadline: new Date() }],
             asteriskStyle: {"top": "-2px"},
             positionStyle: {"margin-top": "3px"},
-            isError: false
+            isError: false,
+            stepsAndUnits:[],
         }
     },
     methods: {
@@ -75,7 +77,7 @@ export default {
                     this.stepsDates[count].deadline = date;
                 }
             }
-            this.setDataValue({prop: "stepsDates", value: this.stepsDates});
+            this.setDataValue({prop: "stepsDates", value: this.stepsDates});            
         },
         setService({option}) {
             const value = this.services.find(item => item.title === option);
@@ -109,6 +111,20 @@ export default {
                 { start: "", deadline: this.currentProject.deadline }
             ]
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});
+        },
+        pushStepAndUnit (data) {
+            if(!this.stepsAndUnits.length){
+                this.stepsAndUnits.push(data)
+            }
+            this.stepsAndUnits.forEach((element, index, array) => {
+                if(element.step == data.step){
+                    this.stepsAndUnits[index].unit = data.unit
+                }
+                if(array.map(element => element.step ).indexOf(data.step) == -1){
+                    this.stepsAndUnits.push(data)
+                }                
+            })
+            this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnits})
         }
     },
     computed: {
@@ -136,6 +152,7 @@ export default {
     },
     mounted() {
         this.setDefaultStepDates();
+     
     },
     components: {
         SelectSingle,
