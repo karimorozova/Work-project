@@ -107,7 +107,61 @@ export default {
         },
         async addTasks(dataForTasks) {
             let tasksData = this.getDataForTasks(dataForTasks);
-            
+            const { sourceFiles, refFiles } = dataForTasks;
+
+            if(sourceFiles && sourceFiles.length) {
+                this.translateFilesAmount = sourceFiles.length;
+                for(let file of sourceFiles) tasksData.append('sourceFiles', file)
+            }
+            if(refFiles && refFiles.length) {
+                for(let file of refFiles) tasksData.append('refFiles', file)
+            }
+
+            if(dataForTasks.stepsAndUnits == undefined){
+                 try {
+                    await this.addProjectTasks(tasksData);
+                    this.isTaskData = false;
+                    this.clearTasksData();
+                } catch (err) {
+                    this.alertToggle({message: err.message, isShow: true, type: "error"});
+                }finally{
+                    this.isInfo = false;
+                }
+            }else{
+                const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))];
+
+                for (const iterator of calculationUnit) {
+                    if(iterator == 'CAT Wordcount'){
+                        try {
+                            const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
+                            const { creatorUserId } = memoqCreatorUser.data;
+                            if(!creatorUserId) throw new Error("No such user in memoq");
+                            tasksData.append('creatorUserId', creatorUserId);
+                            this.isInfo = true;
+                        } catch (err) {
+                            this.alertToggle({message: err.message, isShow: true, type: "error"});
+                        }
+                    }
+                    if(iterator == 'Hours'){
+                        const length = +dataForTasks.workflow.name.split(" ")[0];
+                        const newSteps = dataForTasks.stepsAndUnits;
+                        for(let i = 0; i < length; i++) {
+                            tasksData.append(`${newSteps[i].step}-hours`, dataForTasks[`${newSteps[i].step}-hours`])
+                            tasksData.append(`${newSteps[i].step}-quantity`, dataForTasks[`${newSteps[i].step}-quantity`])
+                        }
+                    }
+                    try {
+                        await this.addProjectTasks(tasksData);
+                        this.isTaskData = false;
+                        this.clearTasksData();
+                    } catch (err) {
+                        this.alertToggle({message: err.message, isShow: true, type: "error"});
+                    }finally{
+                        this.isInfo = false;
+                    }
+                }
+            }
+
             // if(dataForTasks.service.calculationUnit === 'Hours') {
             //     const steps = [...dataForTasks.service.steps];
             //     const length = +dataForTasks.workflow.name.split(" ")[0];
@@ -116,55 +170,19 @@ export default {
             //         tasksData.append(`${steps[i].step.symbol}-quantity`, dataForTasks[`${steps[i].step.symbol}-quantity`])
             //     }
             // }
-            
-            for (const iterator of dataForTasks.stepsAndUnits) {
-                if(iterator.unit == 'Hours'){
-                    const length = +dataForTasks.workflow.name.split(" ")[0];
-                    // const steps = [...dataForTasks.service.steps];
-                    const newSteps = dataForTasks.stepsAndUnits;
-                    // console.log(steps);
-                    // console.log(newSteps);
-                    
-                    
-                     for(let i = 0; i < length; i++) {
-                        // console.log(`${newSteps[i].step}-hours`, dataForTasks[`${newSteps[i].step}-hours`]);
-                        // console.log(`${newSteps[i].step}-quantity`, dataForTasks[`${newSteps[i].step}-quantity`]);
-                         
-                        tasksData.append(`${newSteps[i].step}-hours`, dataForTasks[`${newSteps[i].step}-hours`])
-                        tasksData.append(`${newSteps[i].step}-quantity`, dataForTasks[`${newSteps[i].step}-quantity`])
-                    }                    
-                }                
-            }
-
-            const { sourceFiles, refFiles } = dataForTasks;
-
-            if(sourceFiles && sourceFiles.length) {
-                this.translateFilesAmount = sourceFiles.length;
-                for(let file of sourceFiles) {
-                    tasksData.append('sourceFiles', file)
-                }
-            }
-
-            if(refFiles && refFiles.length) {
-                for(let file of refFiles) {
-                    tasksData.append('refFiles', file)
-                }
-            }
-
-            try {
-                for (const iterator of dataForTasks.stepsAndUnits) {
-                    if(iterator.unit == 'CAT Wordcount'){
-                        const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
-                        const { creatorUserId } = memoqCreatorUser.data;
-                        if(!creatorUserId) throw new Error("No such user in memoq");
-                        tasksData.append('creatorUserId', creatorUserId);
-                        this.isInfo = true;
-                        await this.addProjectWordsTasks(tasksData);
-                    }else{
-                        await this.addProjectTasks(tasksData);
-                    }
-                }
-
+            // try {
+                // for (const iterator of dataForTasks.stepsAndUnits) {
+                //     if(iterator.unit == 'CAT Wordcount'){
+                //         const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
+                //         const { creatorUserId } = memoqCreatorUser.data;
+                //         if(!creatorUserId) throw new Error("No such user in memoq");
+                //         tasksData.append('creatorUserId', creatorUserId);
+                //         this.isInfo = true;
+                        // await this.addProjectWordsTasks(tasksData);
+                    // }else{
+                        // await this.addProjectTasks(tasksData);
+                    // }
+                // }
                 // if(dataForTasks.service.calculationUnit === 'Words') {
                 //     const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
                 //     const { creatorUserId } = memoqCreatorUser.data;
@@ -176,13 +194,13 @@ export default {
                 //     await this.addProjectTasks(tasksData);
                 // }
 
-                this.isTaskData = false;
-                this.clearTasksData();
-            } catch(err) {
-                this.alertToggle({message: err.message, isShow: true, type: "error"});
-            } finally {
-                this.isInfo = false;
-            }
+            //     this.isTaskData = false;
+            //     this.clearTasksData();
+            // } catch(err) {
+            //     this.alertToggle({message: err.message, isShow: true, type: "error"});
+            // } finally {
+            //     this.isInfo = false;
+            // }
         },
         appendHoursStepsInfo(dataForTasks) {
                 const steps = [...dataForTasks.service.steps];
