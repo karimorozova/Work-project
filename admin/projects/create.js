@@ -34,7 +34,6 @@ async function createTasks({tasksInfo, refFiles}) {
         const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
         const allInfo = {...tasksInfo, taskRefFiles, stepsDates, project};
         for (let step of stepsAndUnits) {
-          console.log(step);
           step.unit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);
         }
     } catch(err) {

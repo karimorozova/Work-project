@@ -3,11 +3,11 @@ const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance, 
+const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
     getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
     getPdf, notifyVendorStepStart, updateOtherProject } = require("../../projects");
-const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact, 
+const { upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact,
     stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, getAfterProjectDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const  { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
@@ -119,7 +119,7 @@ router.post('/update-progress', async (req, res) => {
 
 router.post('/update-matrix', async (req, res) => {
     const { projectId, taskId, step, key, value, prop } = req.body;
-    const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' } 
+    const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' }
     : {rate: step.vendorRate, costName: 'payables'};
     try {
         let project = await getProject({"_id": projectId});
@@ -160,8 +160,8 @@ router.get("/all-managers", async (req, res) => {
 
 router.put("/project-prop", async (req, res) => {
     const { projectId, prop, value } = req.body;
-    try {        
-        const result = await updateProject({"_id": projectId}, {[prop]: value}); 
+    try {
+        const result = await updateProject({"_id": projectId}, {[prop]: value});
         res.send(result);
     } catch(err) {
         console.log(err);
@@ -171,7 +171,7 @@ router.put("/project-prop", async (req, res) => {
 
 router.put("/other-project-prop", async (req, res) => {
     const { projectId, prop, value } = req.body;
-    try {        
+    try {
         const result = await updateOtherProject({"_id": projectId}, {[prop]: value});
         res.send(result);
     } catch(err) {
@@ -181,7 +181,7 @@ router.put("/other-project-prop", async (req, res) => {
 })
 
 router.put("/project-status", async (req, res) => {
-    const { id, status, reason} = req.body;    
+    const { id, status, reason} = req.body;
     try {
         const result = await updateProjectStatus(id, status, reason);
         res.send(result);
@@ -192,7 +192,7 @@ router.put("/project-status", async (req, res) => {
 })
 
 router.put("/send-cancel-message", async (req, res) => {
-    const { id, message} = req.body;    
+    const { id, message} = req.body;
     try {
         const project = await getProject({"_id": id});
             await notifyClientProjectCancelled(project, message);
@@ -358,7 +358,7 @@ router.post('/step-payables', async (req, res) => {
 
 router.post("/cancel-tasks", async (req, res) => {
     const { tasks, projectId } = req.body;
-    try { 
+    try {
         const project = await getProject({"_id": projectId});
         const updatedProject = await getProjectAfterCancelTasks(tasks, project);
         const wordsCancelledTasks = tasks.filter(item => item.service.calculationUnit === 'Words');
@@ -373,7 +373,7 @@ router.post("/cancel-tasks", async (req, res) => {
 })
 
 router.post("/send-task-cancel-message", async (req, res) => {
-    const { id, message} = req.body;    
+    const { id, message} = req.body;
     try {
         const project = await getProject({"_id": id});
         await notifyClientTasksCancelled(project, message);
@@ -442,8 +442,8 @@ router.post("/change-manager", async (req, res) => {
 router.post("/approve-instruction", async (req, res) => {
     const { taskId, projectId, instruction } = req.body;
     try {
-        await Delivery.updateOne({projectId, "tasks.taskId": taskId, "tasks.instructions.text": instruction.text}, 
-            {"tasks.$[i].instructions.$[j].isChecked": !instruction.isChecked}, 
+        await Delivery.updateOne({projectId, "tasks.taskId": taskId, "tasks.instructions.text": instruction.text},
+            {"tasks.$[i].instructions.$[j].isChecked": !instruction.isChecked},
             {arrayFilters: [{"i.taskId": taskId}, {"j.text": instruction.text}]});
         res.send("done");
     } catch(err) {
@@ -455,8 +455,8 @@ router.post("/approve-instruction", async (req, res) => {
 router.post("/approve-files", async (req, res) => {
     const { taskId, isFileApproved, paths } = req.body;
     try {
-        await Delivery.updateOne({"tasks.taskId": taskId, "tasks.files.path": {$in: paths}}, 
-            {"tasks.$[i].files.$[j].isFileApproved": isFileApproved}, 
+        await Delivery.updateOne({"tasks.taskId": taskId, "tasks.files.path": {$in: paths}},
+            {"tasks.$[i].files.$[j].isFileApproved": isFileApproved},
             {arrayFilters: [{"i.taskId": taskId}, {"j.path": {$in: paths}}]});
         res.send("done");
     } catch(err) {
@@ -471,13 +471,13 @@ router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) =
         const files = req.files["targetFile"];
         const newPath = await manageDeliveryFile({fileData, file: files[0]});
         if(fileData.path) {
-            await Delivery.updateOne({"tasks.taskId": fileData.taskId, "tasks.files.path": fileData.path}, 
+            await Delivery.updateOne({"tasks.taskId": fileData.taskId, "tasks.files.path": fileData.path},
                 {"tasks.$[i].files.$[j]": {
                     isFileApproved: false, isOriginal: false, fileName: files[0].filename, path: newPath
-                }}, 
+                }},
                 {arrayFilters: [{"i.taskId": fileData.taskId}, {"j.path": fileData.path}]});
         } else {
-            await Delivery.updateOne({"tasks.taskId": fileData.taskId}, 
+            await Delivery.updateOne({"tasks.taskId": fileData.taskId},
                 {$push: {"tasks.$.files": {isFileApproved: true, isOriginal: false, fileName: files[0].filename, path: newPath}}});
         }
         res.send("uploaded");
@@ -490,8 +490,8 @@ router.post("/target", upload.fields([{name: "targetFile"}]), async (req, res) =
 router.post("/remove-dr-file", async (req, res) => {
     const { taskId, path, isOriginal } = req.body;
     try {
-        await Delivery.updateOne({"tasks.taskId": taskId, "tasks.files.path": path}, 
-            {$pull: {"tasks.$[i].files": { path }}}, 
+        await Delivery.updateOne({"tasks.taskId": taskId, "tasks.files.path": path},
+            {$pull: {"tasks.$[i].files": { path }}},
             {arrayFilters: [{"i.taskId": taskId}]});
         if(!isOriginal) {
             fs.unlink(`./dist${path}`, (err) => {
@@ -604,7 +604,7 @@ router.post("/deliver", async (req, res) => {
         console.log(err);
         res.status(500).send("Error on delivering tasks");
     }
-}) 
+})
 
 router.post("/project-delivery", async (req, res) => {
     const { _id, message } = req.body;
@@ -738,7 +738,7 @@ router.post("/project-value", async (req, res) => {
 
 router.post("/request-tasks", async (req, res) => {
     const { dataForTasks, request, isWords } = req.body;
-    const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request; 
+    const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request;
     try {
         const updatedProject =  await createProject(project);
         const newProject = await createTasksFromRequest({project: updatedProject, dataForTasks, isWords});
@@ -773,8 +773,8 @@ function getAccManagerAndContact(project) {
 router.post("/making-cancel-message", async (req, res) => {
     const { accManager, contact } = getAccManagerAndContact(req.body);
     try {
-        const message = req.body.status === "Cancelled Halfway" ? 
-            await projectMiddleCancelledMessage({ ...req.body, accManager, contact }) 
+        const message = req.body.status === "Cancelled Halfway" ?
+            await projectMiddleCancelledMessage({ ...req.body, accManager, contact })
             : await projectCancelledMessage({ ...req.body, accManager, contact })
         res.send({ message });
     } catch (err) {
@@ -797,7 +797,7 @@ router.post("/making-delivery-message", async (req, res) => {
 router.post("/making-tasks-cancel-message", async (req, res) => {
     const { project , tasks, reason, isPay } = req.body;
     const { accManager, contact } = getAccManagerAndContact(project);
-    try { 
+    try {
         const message = await tasksMiddleCancelledMessage({ project, tasks, accManager, contact, reason, isPay });
         res.send({ message });
     } catch (err) {

@@ -150,16 +150,16 @@ export default {
                             tasksData.append(`${newSteps[i].step}-quantity`, dataForTasks[`${newSteps[i].step}-quantity`])
                         }
                     }
-                    try {
-                        await this.addProjectTasks(tasksData);
-                        this.isTaskData = false;
-                        this.clearTasksData();
-                    } catch (err) {
-                        this.alertToggle({message: err.message, isShow: true, type: "error"});
-                    }finally{
-                        this.isInfo = false;
-                    }
                 }
+              try {
+                await this.addProjectTasks(tasksData);
+                this.isTaskData = false;
+                this.clearTasksData();
+              } catch (err) {
+                this.alertToggle({message: err.message, isShow: true, type: "error"});
+              }finally{
+                this.isInfo = false;
+              }
             }
 
             // if(dataForTasks.service.calculationUnit === 'Hours') {
@@ -207,7 +207,7 @@ export default {
                 const length = +dataForTasks.workflow.name.split(" ")[0];
                 for(let i = 0; i < length; i++) {
 
-                    if(!dataForTasks[`${steps[i].step.symbol}-quantity`] 
+                    if(!dataForTasks[`${steps[i].step.symbol}-quantity`]
                      || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
                         this.errors.push("Please, set Hours and Quantity for all service steps.");
                         return;
