@@ -2,7 +2,7 @@ const { Projects } = require("../models");
 const { getProject, updateProject } = require("./getProjects");
 const { storeFiles } = require("./files");
 const { getFinanceDataForPackages } = require("../сalculations/packages");
-const { getHoursStepFinanceData } = require("../сalculations/hours"); 
+const { getHoursStepFinanceData } = require("../сalculations/hours");
 const moment = require("moment");
 const fs = require("fs");
 
@@ -26,13 +26,17 @@ async function createProject(project) {
 }
 
 async function createTasks({tasksInfo, refFiles}) {
-    const { calculationUnit } = tasksInfo.service;
+    // const { calculationUnit } = tasksInfo.service;
     try {
+        const stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits);
         const stepsDates = JSON.parse(tasksInfo.stepsDates);
         const project = await getProject({"_id": tasksInfo.projectId});
         const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
         const allInfo = {...tasksInfo, taskRefFiles, stepsDates, project};
-        return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);  
+        for (let step of stepsAndUnits) {
+          console.log(step);
+          step.unit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);
+        }
     } catch(err) {
         console.log(err);
         console.log("Error in createTasks");
@@ -42,7 +46,7 @@ async function createTasks({tasksInfo, refFiles}) {
 /// Creating tasks using info from client request start ///
 
 async function createTasksFromRequest({project, dataForTasks, isWords}) {
-    const { calculationUnit } = dataForTasks.service;
+    const stepsAndUnits = JSON.parse(dataForTasks.stepsAndUnits);
     let newTasksInfo = {...dataForTasks};
     const sourceFiles = getModifiedFiles(project.sourceFiles);
     const refFiles = getModifiedFiles(project.refFiles);
@@ -54,7 +58,9 @@ async function createTasksFromRequest({project, dataForTasks, isWords}) {
         } else {
             const taskRefFiles = await storeFiles(refFiles, project.id);
             const allInfo = {...dataForTasks, taskRefFiles, project};
-            return calculationUnit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);
+          for (let step of stepsAndUnits) {
+            step.unit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);
+          }
         }
     } catch(err) {
         console.log(err);
@@ -77,7 +83,7 @@ function getModifiedFiles(files) {
 
 /// Creating tasks for wordcount unit services start ///
 
-async function createTasksWithWordsUnit(newTasksInfo, docs) {    
+async function createTasksWithWordsUnit(newTasksInfo, docs) {
     try {
         const project = await Projects.findOne({"_id": newTasksInfo.projectId});
         await addTasksToProject({newTasksInfo, project, docs});
@@ -92,7 +98,7 @@ async function addTasksToProject({newTasksInfo, project, docs}) {
     try {
         let tasksLength = project.tasks.length + 1;
         for(let target of newTasksInfo.targets) {
-            let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
+            let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
             let taskId = project.projectId + ` ${idNumber}`;
             const memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === target.memoq) : [docs];
             await updateProjectTasks({newTasksInfo, project, taskId, target, memoqDocs})
@@ -106,13 +112,13 @@ async function addTasksToProject({newTasksInfo, project, docs}) {
 
 async function updateProjectTasks({newTasksInfo, project, taskId, target, memoqDocs}) {
     try {
-        await Projects.updateOne({"_id": project._id}, 
-            {$set: {isMetricsExist: false}, 
-            $push: {tasks: {taskId: taskId, service: newTasksInfo.service, memoqProjectId: newTasksInfo.memoqProjectId, 
-                start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates, 
-                sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol, 
+        await Projects.updateOne({"_id": project._id},
+            {$set: {isMetricsExist: false},
+            $push: {tasks: {taskId: taskId, service: newTasksInfo.service, memoqProjectId: newTasksInfo.memoqProjectId,
+                start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates,
+                sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol,
                 memoqSource: newTasksInfo.source.memoq, memoqTarget: target.memoq, memoqDocs, memoqFiles: newTasksInfo.memoqFiles,
-                status: "Created", cost: "", sourceFiles: newTasksInfo.translateFiles, refFiles: newTasksInfo.referenceFiles, check: false, 
+                status: "Created", cost: "", sourceFiles: newTasksInfo.translateFiles, refFiles: newTasksInfo.referenceFiles, check: false,
                 finance: {'Wordcount': {receivables: 0, payables: 0}, 'Price': {receivables: 0, payables: 0}}}}}
             );
     } catch(err) {
@@ -131,7 +137,7 @@ async function createTasksWithHoursUnit(allInfo) {
         let tasksWithoutFinance = getTasksForHours({...allInfo, projectId: project.projectId});
         const steps = await getStepsForHours({...allInfo, tasks: tasksWithoutFinance});
         const tasks = tasksWithoutFinance.map(item => getHoursTaskWithFinance(item, steps));
-        const projectFinance = getProjectFinance(tasks, project.finance); 
+        const projectFinance = getProjectFinance(tasks, project.finance);
         return updateProject({"_id": project.id}, { finance: projectFinance, $push: {tasks: tasks, steps: steps} });
     } catch(err) {
         console.log(err);
@@ -149,7 +155,7 @@ function getHoursTaskWithFinance(task, steps) {
         acc += +cur.finance.Price.payables;
         return acc;
     }, 0).toFixed(2)
-    return {...task, 
+    return {...task,
         finance: {Price: {receivables, payables}, Wordcount: {receivables: "", payables: ""}}
     }
 }
@@ -256,7 +262,7 @@ function getTasksForPackages(tasksInfo) {
     let tasks = [];
     let tasksLength = tasksInfo.project.tasks.length + 1;
     for(let i = 0; i < quantity; i++) {
-        const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`; 
+        const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
         const taskId = projectId + ` ${idNumber}`;
         tasks.push({
             taskId,
