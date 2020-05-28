@@ -137,6 +137,26 @@ function getSpecificTier(wordcount, clients) {
   return { tier, wordcount, clients };
 }
 
+function getLqaAllTier(wordcount) {
+  let tier = 2;
+  if (wordcount > 100000) {
+    tier = 1;
+  } else if(wordcount < 5000) {
+    tier = 3;
+  }
+  return tier;
+}
+
+function getLqaSpecificTier(wordcount) {
+  let tier = 2;
+  if (wordcount > 60000) {
+    tier = 1;
+  } else if (wordcount < 2500) {
+    tier = 3;
+  }
+  return tier;
+}
+
 //// Lqa report /////
 async function getXtrfLqaReport(filters) {
   const filterQuery = getFilteringQuery(filters);
@@ -147,46 +167,70 @@ async function getXtrfLqaReport(filters) {
     const financeDocs = getIndustryDocs(memoqs, 'Finance');
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
     const reports = tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount);
-    const groupedReports = groupByKey(reports, 'group');
-    return Object.keys(groupedReports).reduce((acc, curr) => {
-      acc.push(groupedReports[curr].reduce((prevLang, curLang) => {
+    const calculatedTiers = [];
+    calculatedTiers.push(tiers.reduce((acc, curr) => {
+      acc[curr.group] = acc[curr.group] ?
+        {
+          ...acc[curr.group],
+          allTier: {
+            wordcount: acc[curr.group].allTier.wordcount + curr.allTier.wordcount,
+          },
+          financeTier: {
+            wordcount: acc[curr.group].financeTier.wordcount + curr.financeTier.wordcount,
+          },
+          gameTier: {
+            wordcount: acc[curr.group].gameTier.wordcount + curr.gameTier.wordcount,
+          }
+        } : {
+          group: curr.group,
+          memoqSymbol: curr.memoqSymbol,
+          allTier: {
+            wordcount: curr.allTier.wordcount,
+          },
+          financeTier: {
+            wordcount: curr.financeTier.wordcount,
+          },
+          gameTier: {
+            wordcount: curr.gameTier.wordcount,
+          }
+        };
+      return acc;
+    }, {}))
+    return calculatedTiers.reduce((acc, curr) => {
+      acc.push(Object.values(curr).reduce((prevLang, curLang) => {
         prevLang[curLang.group] = prevLang[curLang.group] ?
           {
             ...prevLang[curLang.group],
             finance: {
-              tier: curLang.financeTier.tier,
               vendor: {
                 ...prevLang[curLang.group].finance.vendor,
                 ...getLqaWordcount(curLang, financeDocs, nameFilter),
               },
-            },
-            gaming: {
-              tier: curLang.gameTier.tier,
-              vendor: {
+              gaming: {
                 ...prevLang[curLang.group].gaming.vendor,
                 ...getLqaWordcount(curLang, gamingDocs, nameFilter),
               }
             }
           } : {
             target: curLang.group,
-            tier: curLang.allTier.tier,
+            tier: getLqaAllTier(curLang.allTier.wordcount),
             finance: {
-              tier: curLang.financeTier.tier,
+              tier: getLqaSpecificTier(curLang.financeTier.wordcount),
               vendor: getLqaWordcount(curLang, financeDocs, nameFilter),
             },
             gaming: {
-              tier: curLang.gameTier.tier,
+              tier: getLqaSpecificTier(curLang.gameTier.wordcount),
               vendor: getLqaWordcount(curLang, gamingDocs, nameFilter),
             }
           }
-        return prevLang;
-      }, {}))
+          return prevLang;
+      }, {}));
       return acc;
-    }, []).filter(item => {
-      const financeVendor = Object.values(item)[0].finance.vendor;
-      const gamingVendor = Object.values(item)[0].gaming.vendor;
-      return Object.keys(financeVendor).length || Object.keys(gamingVendor).length;
-    });
+    }, []).map(item => Object.values(item).filter(elem => {
+      let financeVendor = elem.finance.vendor;
+      let gameVendor = elem.gaming.vendor;
+      return Object.keys(financeVendor).length > 0 || Object.keys(gameVendor).length > 0;
+    }));
     // FOR FUTURE LQA:
     // let reportsFilter = {target: filterQuery.language};
     // if(filters.tierFilter) {
