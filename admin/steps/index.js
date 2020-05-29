@@ -1,17 +1,15 @@
 const { Units, Step } = require('../models');
-const ObjectId = require('mongodb').ObjectID;
 
 async function insertStepsIntoUnits(step, stepId) {
   const { calculationUnit, ...stepData } = step;
   try {
     for (let { _id } of calculationUnit) {
-      const unit = await Units.findOne({ _id: ObjectId(_id) });
+      const unit = await Units.findOne({ _id });
       unit.steps.push({
-        _id: stepId,
-        calculationUnit: [ObjectId(_id)],
+        _id: stepId.toString(),
         ...stepData
-      })
-      await Units.updateOne({ _id: ObjectId(_id) }, unit, { upsert: true });
+      });
+      await Units.updateOne({ _id }, unit, { upsert: true });
     }
   } catch (err) {
     console.log(err);
@@ -24,9 +22,8 @@ async function deleteStepsFromUnits(stepId) {
     const units = await Units.find();
     for (let unit of units) {
       const { steps } = unit;
-      const filteredSteps = steps.filter(step => step._id.toString() !== stepId);
-      unit.steps = filteredSteps;
-      await Units.updateOne({ _id: ObjectId(unit._id) }, unit, { upsert: true });
+      unit.steps = steps.filter(step => step._id !== stepId);
+      await Units.updateOne({ _id: unit._id }, unit, { upsert: true });
     }
   } catch (err) {
     console.log(err);
@@ -35,19 +32,44 @@ async function deleteStepsFromUnits(stepId) {
 }
 
 async function changeStepsInUnits(stepToUpdate) {
-  const { _id } = stepToUpdate;
+  const { _id, ...step } = stepToUpdate;
   try {
-    const step = await Step.findOne({ _id: ObjectId(_id) });
-    if (stepToUpdate.calculationUnit.length > step.calculationUnit.length) {
-      await insertStepsIntoUnits(stepToUpdate, _id);
-    } else if (stepToUpdate.calculationUnit.length < step.calculationUnit.length) {
+    const units = await Units.find({ 'steps._id': _id });
+    if (!step.calculationUnit.length) {
       await deleteStepsFromUnits(_id);
     }
-    await Step.updateOne({ _id: step._id }, stepToUpdate);
+    for (let { _id: id } of step.calculationUnit) {
+      const redundantUnits = units.filter(item => item._id !== id);
+      if (redundantUnits.length) {
+        for (let unit of redundantUnits) {
+          unit.steps = unit.steps.filter(step => step._id !== _id);
+          await Units.updateOne({ _id: unit._id }, unit);
+        }
+      }
+    }
+    if (step.calculationUnit.length) {
+      for (let { _id: id } of step.calculationUnit) {
+        const unit = await Units.findOne({ _id: id });
+        const isExists = unit.steps.find(item => item._id === _id);
+        if (!isExists) {
+          unit.steps.push({
+            _id,
+            title: step.title,
+            symbol: step.symbol,
+            isStage1: step.isStage1,
+            isStage2: step.isStage2,
+            isEditor: step.isEditor,
+            isActive: step.isActive,
+          });
+        }
+        await Units.updateOne({ _id: id }, unit);
+      }
+    }
+    return await Step.updateOne({ _id }, step, { upsert: true });
   } catch (err) {
     console.log(err);
     console.log('Error in changeStepsInUnits');
   }
 }
 
-module.exports = { insertStepsIntoUnits, deleteStepsFromUnits, changeStepsInUnits }
+module.exports = { insertStepsIntoUnits, deleteStepsFromUnits, changeStepsInUnits };

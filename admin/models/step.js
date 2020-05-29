@@ -8,7 +8,7 @@ const StepSchema = new mongoose.Schema({
     },
     calculationUnit: {
         type: Array,
-        default: [],
+        default: () => [],
     },
     isStage1: {
         type: Boolean

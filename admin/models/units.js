@@ -8,7 +8,7 @@ const UnitSchema = new mongoose.Schema({
   },
   steps: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   active: {
     type: Boolean,
