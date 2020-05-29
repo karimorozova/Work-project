@@ -21,7 +21,7 @@
                     @chooseOption="setWorkflow"
                     :positionStyle="positionStyle"
                 )
-        .workflow__default-dates(v-if="selectedWorkflow.id !== 2890")
+        .workflow__default-dates(v-if="selectedWorkflow.id == 2917")
             StepsDefaultDateModified(
                 v-for="count in stepsCounter"
                 :stepCounter="count"
@@ -31,6 +31,18 @@
                 @sendUnit="pushStepAndUnit"
                 :service="service"
             )
+
+        .workflow__default-dates(v-if="selectedWorkflow.id == 2890")
+            StepsDefaultDateModified(
+                v-for="count in 1"
+                :stepCounter="count"
+                :start="stepsDates[0].start"
+                :deadline="stepsDates[0].deadline"
+                @setDate="(e) => setDate(e, count)"
+                @sendUnit="pushStepAndUnit"
+                :service="service"
+            )
+
         transition(name="fade")
             .workflow__error(v-if="isError")
                 p.workflow__error-message The Service has no Steps! Please, check the Settings.
@@ -77,7 +89,11 @@ export default {
                     this.stepsDates[count].deadline = date;
                 }
             }
-            this.setDataValue({prop: "stepsDates", value: this.stepsDates});            
+            if(this.selectedWorkflow.id == 2890){
+                this.setDataValue({prop: "stepsDates", value: this.stepsDates[0]});
+            }else{
+                this.setDataValue({prop: "stepsDates", value: this.stepsDates});
+            }
         },
         setService({option}) {
             const value = this.services.find(item => item.title === option);
@@ -95,8 +111,13 @@ export default {
         setWorkflow({option}) {
             const value = this.workflowSteps.find(item => item.name === option);
             this.setDataValue({prop: "workflow", value});
+
             if(value.id === 2890) {
                 let stepDates = {...this.stepsDates[0], deadline: this.currentProject.deadline};
+                this.stepsDates = [
+                    { start: this.currentProject.startDate, deadline: this.currentProject.deadline },
+                    { start: "", deadline: "" }
+                ]
                 this.setDataValue({prop: "stepsDates", value: [stepDates]});
             } else {
                 this.setDefaultStepDates();
