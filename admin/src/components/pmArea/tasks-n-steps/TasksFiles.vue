@@ -1,7 +1,7 @@
 <template lang="pug">
     .tasks-files
         .tasks-files__main
-            .tasks-files__item(v-if="isWords")
+            .tasks-files__item(v-if="true")
                 span.tasks-files__label Source file:
                 .tasks-files__upload-file
                     FilesUpload(

@@ -47,7 +47,7 @@
   .steps-date-wrapper
     .steps-date__picker
         .steps-date__input-wrapper
-          .steps-date__label Unit
+          .steps-date__label Unit *
           .steps-date__datepicker-wrapper
             .steps-date__input
               .steps-date__drop-menu(v-if="steps")
@@ -195,7 +195,7 @@ import { mapGetters, mapActions} from "vuex";
     },
     components: {
         Datepicker,
-        SelectSingle
+        SelectSingle,
     }
 }
 </script>

@@ -107,34 +107,58 @@ export default {
         },
         async addTasks(dataForTasks) {
             let tasksData = this.getDataForTasks(dataForTasks);
+            const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))];
+
             const { sourceFiles, refFiles } = dataForTasks;
 
             if(sourceFiles && sourceFiles.length) {
                 this.translateFilesAmount = sourceFiles.length;
-                for(let file of sourceFiles) tasksData.append('sourceFiles', file)
-            }
-            if(refFiles && refFiles.length) {
-                for(let file of refFiles) tasksData.append('refFiles', file)
+                for(let file of sourceFiles){
+                    tasksData.append('sourceFiles', file);
+                }
             }
 
-            if(dataForTasks.stepsAndUnits == undefined){
-                 try {
-                    await this.addProjectTasks(tasksData);
-                    this.isTaskData = false;
-                    this.clearTasksData();
-                } catch (err) {
-                    this.alertToggle({message: err.message, isShow: true, type: "error"});
-                }finally{
-                    this.isInfo = false;
+            if(refFiles && refFiles.length) {
+                for(let file of refFiles){
+                    tasksData.append('refFiles', file);
                 }
-            }else{
-                const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))];
+            }
+
+            // if(dataForTasks.stepsAndUnits == undefined){
+
+            // if( calculationUnit.includes('CAT Wordcount')){
+
+            //     try {
+            //         await this.addProjectWordsTasks(tasksData);
+            //             this.isTaskData = false;
+            //             this.clearTasksData();
+            //         } catch (err) {
+            //             this.alertToggle({message: err.message, isShow: true, type: "error"});
+            //         }finally{
+            //             this.isInfo = false;
+            //         }
+            //    } else{
+            //     try {
+            //         await this.addProjectTasks(tasksData);
+            //             this.isTaskData = false;
+            //             this.clearTasksData();
+            //         } catch (err) {
+            //             this.alertToggle({message: err.message, isShow: true, type: "error"});
+            //         }finally{
+            //             this.isInfo = false;
+            //         }
+            //    }
+
+            // }else{
+
+
 
                 for (const iterator of calculationUnit) {
                     if(iterator == 'CAT Wordcount'){
                         try {
                             const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
                             const { creatorUserId } = memoqCreatorUser.data;
+
                             if(!creatorUserId) throw new Error("No such user in memoq");
                             tasksData.append('creatorUserId', creatorUserId);
                             this.isInfo = true;
@@ -151,16 +175,33 @@ export default {
                         }
                     }
                 }
-              try {
-                await this.addProjectTasks(tasksData);
-                this.isTaskData = false;
-                this.clearTasksData();
-              } catch (err) {
-                this.alertToggle({message: err.message, isShow: true, type: "error"});
-              }finally{
-                this.isInfo = false;
-              }
-            }
+
+               if( calculationUnit.includes('CAT Wordcount')){
+                try {
+                        await this.addProjectWordsTasks(tasksData);
+                        this.isTaskData = false;
+                        this.clearTasksData();
+                    } catch (err) {
+                        this.alertToggle({message: err.message, isShow: true, type: "error"});
+                    }finally{
+                        this.isInfo = false;
+                    }
+               } else{
+                try {
+                    await this.addProjectTasks(tasksData);
+                        this.isTaskData = false;
+                        this.clearTasksData();
+                    } catch (err) {
+                        this.alertToggle({message: err.message, isShow: true, type: "error"});
+                    }finally{
+                        this.isInfo = false;
+                    }
+               }
+
+
+
+
+            // }
 
             // if(dataForTasks.service.calculationUnit === 'Hours') {
             //     const steps = [...dataForTasks.service.steps];

@@ -7,6 +7,7 @@
             .tasks-data__item-title File Preparation
             .tasks-data__langs
                 TasksLangs(v-if="isMonoService")
+
                 TasksLangsDuo(v-if="!isMonoService"
                     :calculationUnit="currentUnit"
                     :sourceLanguages="sourceLanguages"
@@ -14,13 +15,19 @@
                     @setTargets="setTargets"
                     :isRequest="isRequest"
                 )
-            .tasks-data__service-steps(v-if="currentUnit === 'Hours'")
-                HoursServiceSteps(:steps="tasksData.service.steps")
+            //- .tasks-data__service-steps(v-if="currentUnit === 'Hours'")
+            .tasks-data__service-steps()
+                //- HoursServiceSteps(:steps="tasksData.service.steps")
+                HoursServiceSteps()
+
+            //- .tasks-data__files()
             .tasks-data__files(v-if="currentProject.status !== 'Requested'")
                 TasksFiles(:service="tasksData.service")
             .tasks-data__files.tasks-data_m-bottom-40(v-else)
                 TasksFilesRequested
-            .tasks-data__template(v-if="currentUnit === 'Words'")
+
+            //- .tasks-data__template(v-if="currentUnit === 'Words'")
+            .tasks-data__template()
                 .tasks-data__drop-menu
                     label.tasks-data__menu-title Template
                     SelectSingle(
@@ -29,6 +36,7 @@
                         placeholder="Template"
                         @chooseOption="setTemplate"
                     )
+
     .tasks-data__add-tasks(v-if="isProject && isButton")
         Button(value="Add tasks" @clicked="checkForErrors")
     .tasks-data__buttons(v-if="isRequest && isButton")
@@ -111,11 +119,12 @@ export default {
                 this.errors = this.checkRequestErrors();
             }
             if(!this.isMonoService && !source) this.errors.push("Please, select Source language.");
-            if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
+            // if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
+            // if(!this.tasksData.stepsDates.length) this.errors.push("Please, select Unit.")
             if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
             this.isRequest ? this.checkRequestFies() : this.checkFiles(sourceFiles, refFiles);
             this.checkHoursSteps();
-            if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
+            // if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
             if(this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).");
             if (this.errors.length) {
                 return this.$emit("showErrors", { errors: this.errors });
