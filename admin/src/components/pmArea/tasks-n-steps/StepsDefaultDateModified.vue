@@ -47,7 +47,8 @@
   .steps-date-wrapper
     .steps-date__picker
         .steps-date__input-wrapper
-          .steps-date__label Unit *
+          .steps-date__label Unit
+            span.steps-date__label-red *
           .steps-date__datepicker-wrapper
             .steps-date__input
               .steps-date__drop-menu(v-if="steps")
@@ -81,7 +82,10 @@ import { mapGetters, mapActions} from "vuex";
         service:{
           type: String,
           default: ''
-        }
+        },
+        workflowId:{
+          type: Number,
+        },
     },
     data() {
         return {
@@ -99,6 +103,9 @@ import { mapGetters, mapActions} from "vuex";
         }
     },
     methods: {
+        ...mapActions({
+            setDataValue: "setTasksDataValue"
+        }),
         setUnit({ option }) {
           this.currentUnit = this.units.find(item => item.type === option);
           this.sendUnit();
@@ -142,11 +149,11 @@ import { mapGetters, mapActions} from "vuex";
             this.$emit("setDate", { date: new Date(e), prop })
         },
         sendUnit() {
-          this.$emit('sendUnit', {
-            stepCounter : this.stepCounter,
-            step: this.setSteps[0].steps[this.stepCounter-1].step.title,
-            unit: this.currentUnit.type,
-          })
+            this.$emit('sendUnit', {
+              stepCounter : this.stepCounter,
+              step: this.setSteps[0].steps[this.stepCounter-1].step.title,
+              unit: this.currentUnit.type,
+            })
         },
         invalidDateWarn({message}) {
             console.log(message);
@@ -154,7 +161,7 @@ import { mapGetters, mapActions} from "vuex";
     },
     mounted(){
       this.getServiceSteps();
-      this.getUnits();
+      this.getUnits();      
     },
     computed: {
         setSteps(){
@@ -249,6 +256,11 @@ import { mapGetters, mapActions} from "vuex";
     }
     &__label {
         padding: 5px 0;
+        &-red{
+          color: red;
+          font-size: 14px;
+          margin-right: 15px;
+        }
     }
     &__image {
         position: absolute;
