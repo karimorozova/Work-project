@@ -11,8 +11,8 @@ function isVendorMatches({rates, packageSize, source, target, step, industryId})
     return rates.find(item => {
         if(item.target.symbol === target.symbol && isAnotherPartEqual(packageSize, source, item)) {
             return hasActiveRateValue({
-                    step, 
-                    pair: item, 
+                    step,
+                    pair: item,
                     stepIndustry: industryId
                 });
         }
@@ -30,7 +30,7 @@ function getVendorRate({vendor, ratesProp, packageSize, source, target, industry
     })
     let { min, value } = ratePair ? ratePair.rates[step._id] : {min: 0, value: 0};
     value = multiplier ? +(value*multiplier).toFixed(2) : value;
-    const payables = value > min ? value : min;            
+    const payables = value > min ? value : min;
     return {vendor, vendorRate: ratePair ? ratePair.rates[step._id] : "", payables};
 }
 

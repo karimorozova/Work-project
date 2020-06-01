@@ -18,9 +18,10 @@ async function getFinanceDataForPackages({project, service, packageSize, target}
 
 async function getReceivables({project, packageSize, target, step, industryId}) {
     try {
-        const client = await getClient({"_id": project.customer.id});
+      const clientId = Object.keys(project.customer)[0] === 'id' ? project.customer.id : project.customer.toString();
+        const client = await getClient({"_id": clientId});
         const ratePair = client.monoRates.find(item => {
-            return item.target.symbol === target.symbol && item.packageSize === packageSize 
+            return item.target.symbol === target.symbol && item.packageSize === packageSize
             && hasActiveRateValue({step, pair: item, stepIndustry: industryId})
         })
         if(ratePair) {
@@ -58,11 +59,11 @@ async function getAfterPackagesPayablesUpdated({project, step}) {
     try {
         const vendor = await getVendor({"_id": step.vendor._id});
         const { vendorRate, payables } = getVendorRate({
-            vendor, 
-            packageSize: step.packageSize, 
-            ratesProp: 'monoRates', 
-            target: {symbol: step.targetLanguage}, 
-            industryId: project.industry.id, 
+            vendor,
+            packageSize: step.packageSize,
+            ratesProp: 'monoRates',
+            target: {symbol: step.targetLanguage},
+            industryId: project.industry.id,
             step: step.serviceStep
         });
         const updatedSteps = getUpdatedSteps({steps, payables, vendorRate, step});
