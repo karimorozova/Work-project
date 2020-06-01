@@ -23,6 +23,7 @@
                 )
         .workflow__default-dates(v-if="selectedWorkflow.id == 2917")
             StepsDefaultDateModified(
+                :workflowId="2917"
                 v-for="count in stepsCounter"
                 :stepCounter="count"
                 :start="stepsDates[count-1].start"
@@ -34,6 +35,7 @@
 
         .workflow__default-dates(v-if="selectedWorkflow.id == 2890")
             StepsDefaultDateModified(
+                :workflowId="2890"
                 v-for="count in 1"
                 :stepCounter="count"
                 :start="stepsDates[0].start"
@@ -68,6 +70,7 @@ export default {
             positionStyle: {"margin-top": "3px"},
             isError: false,
             stepsAndUnits:[],
+            stepsAndUnitsMono:[],
         }
     },
     methods: {
@@ -96,6 +99,7 @@ export default {
             }
         },
         setService({option}) {
+            this.setDataValue({prop: "stepsAndUnits", value: null})
             const value = this.services.find(item => item.title === option);
             if(!value.steps.length) {
                 return this.showError();
@@ -111,7 +115,7 @@ export default {
         setWorkflow({option}) {
             const value = this.workflowSteps.find(item => item.name === option);
             this.setDataValue({prop: "workflow", value});
-
+            this.setDataValue({prop: "stepsAndUnits", value: null})
             if(value.id === 2890) {
                 let stepDates = {...this.stepsDates[0], deadline: this.currentProject.deadline};
                 this.stepsDates = [
@@ -134,18 +138,33 @@ export default {
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});
         },
         pushStepAndUnit (data) {
-            if(!this.stepsAndUnits.length){
-                this.stepsAndUnits.push(data)
-            }
-            this.stepsAndUnits.forEach((element, index, array) => {
-                if(element.step == data.step){
-                    this.stepsAndUnits[index].unit = data.unit
+            if(this.selectedWorkflow.id == 2890 && this.tasksData.service.languageForm == "Mono"){
+                if(!this.stepsAndUnitsMono.length){
+                    this.stepsAndUnitsMono.push(data)
                 }
-                if(array.map(element => element.step ).indexOf(data.step) == -1){
+                this.stepsAndUnitsMono.forEach((element, index)=>{
+                    element.step == data.step ? this.stepsAndUnitsMono[index].unit = data.unit : false
+                })
+                this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnitsMono})
+            }
+            if(this.tasksData.service.languageForm !== "Mono"){
+                if(!this.stepsAndUnits.length){
                     this.stepsAndUnits.push(data)
-                }                
-            })
-            this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnits})
+                }
+                this.stepsAndUnits.forEach((element, index, array) => {
+                    if(element.step == data.step){
+                        this.stepsAndUnits[index].unit = data.unit
+                    }
+                    if(array.map(element => element.step ).indexOf(data.step) == -1){
+                        this.stepsAndUnits.push(data)
+                    }                
+                }) 
+                if(this.selectedWorkflow.id == 2890  && this.tasksData.service.languageForm !== "Mono"){
+                    this.setDataValue({prop: "stepsAndUnits", value: [this.stepsAndUnits[0]]})
+                }else{
+                    this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnits})
+                }
+            }
         }
     },
     computed: {
@@ -173,7 +192,6 @@ export default {
     },
     mounted() {
         this.setDefaultStepDates();
-     
     },
     components: {
         SelectSingle,
