@@ -113,7 +113,8 @@ async function updateProjectTasks({newTasksInfo, project, taskId, target, memoqD
     try {
         await Projects.updateOne({"_id": project._id},
             {$set: {isMetricsExist: false},
-            $push: {tasks: {taskId: taskId, service: newTasksInfo.service, memoqProjectId: newTasksInfo.memoqProjectId,
+            $push: {tasks: {taskId: taskId, service: { ...newTasksInfo.service,
+                  calculationUnit: newTasksInfo.stepsAndUnits }, memoqProjectId: newTasksInfo.memoqProjectId,
                 start: project.startDate, deadline: project.deadline, stepsDates: newTasksInfo.stepsDates,
                 sourceLanguage: newTasksInfo.source.symbol, targetLanguage: target.symbol,
                 memoqSource: newTasksInfo.source.memoq, memoqTarget: target.memoq, memoqDocs, memoqFiles: newTasksInfo.memoqFiles,
@@ -160,7 +161,7 @@ function getHoursTaskWithFinance(task, steps) {
 }
 
 function getTasksForHours(tasksInfo) {
-    const { projectId, service, targets, source, stepsDates, taskRefFiles } = tasksInfo;
+    const { stepsAndUnits, projectId, service, targets, source, stepsDates, taskRefFiles } = tasksInfo;
     let tasks = [];
     let tasksLength = tasksInfo.project.tasks.length + 1;
     for(let i = 0; i < targets.length; i++) {
@@ -171,7 +172,10 @@ function getTasksForHours(tasksInfo) {
             targetLanguage: targets[i].symbol,
             sourceLanguage: source.symbol,
             refFiles: taskRefFiles,
-            service,
+            service: {
+              ...service,
+              calculationUnit: stepsAndUnits,
+            },
             projectId,
             start: stepsDates[0].start,
             deadline: stepsDates[stepsDates.length-1].deadline,
@@ -257,7 +261,7 @@ async function createTasksWithPackagesUnit(allInfo) {
 }
 
 function getTasksForPackages(tasksInfo) {
-    const { projectId, service, targets, packageSize, quantity, stepsDates, taskRefFiles, finance } = tasksInfo;
+    const { stepsAndUnits, projectId, service, targets, packageSize, quantity, stepsDates, taskRefFiles, finance } = tasksInfo;
     let tasks = [];
     let tasksLength = tasksInfo.project.tasks.length + 1;
     for(let i = 0; i < quantity; i++) {
@@ -268,7 +272,10 @@ function getTasksForPackages(tasksInfo) {
             targetLanguage: targets[0].symbol,
             packageSize,
             refFiles: taskRefFiles,
-            service,
+            service: {
+              ...service,
+              calculationUnit: stepsAndUnits,
+            },
             projectId,
             start: stepsDates[0].start || tasksInfo.project.startDate,
             deadline: stepsDates[0].deadline || tasksInfo.project.deadline,
