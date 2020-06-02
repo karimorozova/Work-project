@@ -8,7 +8,9 @@ async function updateProjectMetrics({projectId}) {
         let { steps, tasks } = project;
         let isMetricsExist = true;
         for(let task of tasks) {
-            if(task.service.calculationUnit === 'Words' && task.status === "Created") {
+          const stepUnits = JSON.parse(task.stepsAndUnits);
+          const isIncludesWordCount = stepUnits.find(item => item.unit === 'CAT Wordcount');
+            if(!!isIncludesWordCount && task.status === "Created") {
                 const analysis = await getProjectAnalysis(task.memoqProjectId);
                 if(analysis && analysis.AnalysisResultForLang) {
                     const taskMetrics = getTaskMetrics({task, matrix: project.customer.matrix, analysis});
@@ -71,7 +73,7 @@ async function getProjectWithUpdatedFinance(project) {
         return {...projectToUpdate, tasks, steps};
     } catch(err) {
         console.log(err);
-        console.log("Error in getProjectWithUpdatedFinance");        
+        console.log("Error in getProjectWithUpdatedFinance");
     }
 }
 
