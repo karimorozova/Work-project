@@ -22,7 +22,13 @@
 
             .tasks-data__service-steps
                 //- JobSettings(:steps="tasksData.service.steps")
-                JobSettings(:tasksData="tasksData")
+                JobSettings(
+                    v-if="tasksData.stepsAndUnits.length"
+                    :tasksData="tasksData"
+                    v-for="(step , index) in sortedJobs"
+                    :currentJob="step"
+                    :currentIndex="index"
+                    )
 
 
             //- .tasks-data__template(v-if="currentUnit === 'Words'")
@@ -200,7 +206,6 @@ export default {
         setServiceForm() {
             this.isMonoService = this.tasksData.service.languageForm === "Mono";
         },
-
         async getMemoqTemplates() {
             try {
                 const result = await this.$http.get("/memoqapi/templates");
@@ -219,6 +224,11 @@ export default {
             languages: "getAllLanguages",
             tasksData: "getTasksData"
         }),
+        sortedJobs(){
+            if(this.tasksData.stepsAndUnits){
+                return this.tasksData.stepsAndUnits.sort((a , b) => a.stepCounter - b.stepCounter )
+            }
+        },
 
         // allTemplates() {
         //     return this.templates.map(item => item.name);
