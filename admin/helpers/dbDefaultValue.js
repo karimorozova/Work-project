@@ -64,7 +64,7 @@ const usersDefault = [
       "photo": ""
     },
     {
-      "email" : "sakis@pangea-langs.com",
+      "email" : "sakis@pangea.global",
       "username" : "sakis.k",
       "group" : "Project Managers",
       "firstName" : "Sakis",
@@ -88,7 +88,7 @@ const usersDefault = [
       "photo": ""
     },
     {
-      "email" : "arans@pangea-langs.com",
+      "email" : "arans@pangea.global",
       "username" : "aran.s",
       "group" : "Vendor Managers",
       "firstName" : "Aran",

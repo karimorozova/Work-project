@@ -18,7 +18,7 @@ async function getFinanceDataForPackages({project, service, packageSize, target}
 
 async function getReceivables({project, packageSize, target, step, industryId}) {
     try {
-      const clientId = Object.keys(project.customer)[0] === 'id' ? project.customer.id : project.customer.toString();
+      const clientId = project.customer.id || project.customer.toString();
         const client = await getClient({"_id": clientId});
         const ratePair = client.monoRates.find(item => {
             return item.target.symbol === target.symbol && item.packageSize === packageSize

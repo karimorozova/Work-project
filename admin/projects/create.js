@@ -82,7 +82,7 @@ function getModifiedFiles(files) {
 
 /// Creating tasks for wordcount unit services start ///
 
-async function createTasksWithWordsUnit(newTasksInfo, docs) {
+async function createTaskWithCommonUnits(newTasksInfo, docs) {
   try {
     const project = await Projects.findOne({ "_id": newTasksInfo.projectId });
     await addTasksToProject({ newTasksInfo, project, docs });
@@ -299,12 +299,13 @@ function getTasksForPackages(tasksInfo) {
   const { stepsAndUnits, projectId, service, targets, packageSize, quantity, stepsDates, taskRefFiles, finance } = tasksInfo;
   let tasks = [];
   let tasksLength = tasksInfo.project.tasks.length + 1;
-  for (let i = 0; i < quantity; i++) {
+  for (let i = 0; i < stepsDates.length; i++) {
     const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
     const taskId = projectId + ` ${idNumber}`;
     tasks.push({
       taskId,
       targetLanguage: targets[0].symbol,
+      quantity,
       packageSize,
       refFiles: taskRefFiles,
       service: {
@@ -365,4 +366,4 @@ function getProjectFinance(tasks, projectFinance) {
   };
 }
 
-module.exports = { createProject, createTasks, createTasksFromRequest, createTasksWithWordsUnit };
+module.exports = { createProject, createTasks, createTasksFromRequest, createTaskWithCommonUnits };

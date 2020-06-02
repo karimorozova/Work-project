@@ -3,7 +3,7 @@ const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-const { getProject, createProject, createTasks, createTasksWithWordsUnit, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
+const { getProject, createProject, createTasks, createTaskWithCommonUnits, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
     manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
     getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
     getPdf, notifyVendorStepStart, updateOtherProject } = require("../../projects");
@@ -86,7 +86,7 @@ router.post('/project-tasks', upload.fields([{name: 'sourceFiles'}, {name: 'refF
 router.post("/project-words-tasks", async (req, res) => {
     const { tasksInfo, docs } = req.body;
     try {
-        const result = await createTasksWithWordsUnit(tasksInfo, docs);
+        const result = await createTaskWithCommonUnits(tasksInfo, docs);
         res.send(result);
     } catch(err) {
         console.log(err);
