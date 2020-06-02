@@ -1,30 +1,30 @@
 <template lang="pug">
     .hours-steps
-        .hours-steps__step(v-if="tasksData.stepsAndUnits.length" v-for="(step , index) in sortedJobs")
-            .hours-steps__block(v-if="step.unit !== 'Packages' &&  step.unit !== 'CAT Wordcount'")
-                .hours-steps__title Step {{step.stepCounter}} - {{step.step}}
+        .hours-steps__step
+            .hours-steps__block(v-if="currentJob.unit !== 'Packages' &&  currentJob.unit !== 'CAT Wordcount'")
+                .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
                 .hours-steps__main
                     .hours-steps__item
-                        LabelVal(:text="step.unit")
-                            input.hours-steps__input(type="number" min="1" max="1000" placeholder="Hours" @change="(e) => setHours(e, step.step)" @input="setLimit" @keydown="removeNonDigit")
+                        LabelVal(:text="currentJob.unit")
+                            input.hours-steps__input(type="number" min="1" max="1000" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)" @input="setLimit" @keydown="removeNonDigit")
                             .tasks-langs__item
-            .hours-steps__block(v-if="step.unit == 'CAT Wordcount'")
-                .hours-steps__title Step {{step.stepCounter}} - {{step.step}}
-                .hours-steps__main
+            .hours-steps__block(v-if="currentJob.unit == 'CAT Wordcount'")
+                .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
+                .hours-steps__main(v-if="tasksData.stepsAndUnits")
                     .hours-steps__sub-title Template
-                    .hours-steps__drop-menu
+                    .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
                         SelectSingle(
-                            :selectedOption="selectedTemplate"
+                            :selectedOption="selectedTemplate.name"
                             :options="allTemplates"
                             placeholder="Template"
                             @chooseOption="setTemplate"
                         )
-            .hours-steps__block(v-if="step.unit == 'Packages'")
-                .hours-steps__title Step {{step.stepCounter}} - {{step.step}}
+            .hours-steps__block(v-if="currentJob.unit == 'Packages'")
+                .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
                 .hours-steps__packages
                     .hours-steps__packages-item
                         .hours-steps__packages-title Quantity
-                            input.hours-steps__input(type="number" min="1" max="1000" @change="(e) => setQuantity(e, step.step)" @input="setLimit" @keydown="removeNonDigit")
+                            input.hours-steps__input(type="number" min="1" max="1000" @change="(e) => setQuantity(e, currentJob.step)" @input="setLimit" @keydown="removeNonDigit")
                     .hours-steps__packages-item
                         .hours-steps__sub-title Template
                         .hours-steps__drop-menu
@@ -33,7 +33,7 @@
                                 :options="packages"
                                 :selectedOption="selectedPackage"
                                 @chooseOption="setPackage"
-                            )                                    
+                            )          
 </template>
 
 <script>
@@ -45,9 +45,11 @@ import SelectSingle from "@/components/SelectSingle";
 export default {
     mixins: [taskData],
     props: {
-        tasksData: {
-            type: Object,
-            default: {}
+        currentJob: {
+            type: Object
+        },
+        currentIndex:{
+            type: Number
         }
     },
     data(){
@@ -55,7 +57,8 @@ export default {
             templates: [],
             packages: [],
             selectedPackage: "",
-    }
+            selectedTemplate: "",
+        }
     },
     methods: {
         async getPackages(){
@@ -71,27 +74,64 @@ export default {
             alertToggle: "alertToggle"
         }),
         setQuantity(e, step) {
-            this.setDataValue({prop: "quantity", value: e.target.value});
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].quantity = e.target.value;
+
+            let filedsForDelete = ['template','hours'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
         },
         setHours(e, step) {
-            this.setDataValue({prop: `${step}-hours`, value: +e.target.value});
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].hours = e.target.value;
+
+            let filedsForDelete = ['quantity','packageSize','template'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
         },
         setTemplate({ option }) {
             const value = this.templates.find(item => item.name === option);
-            this.setDataValue({prop: "template", value});
+            this.selectedTemplate = value;
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].template = value;
+
+            let filedsForDelete = ['quantity','packageSize','hours'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
         },
         setPackage({option}) {
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].packageSize = option;
             this.selectedPackage = option;
-            this.setDataValue({prop: "packageSize", value: option});
+
+            let filedsForDelete = ['template','hours'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
         },
         async getMemoqTemplates() {
             try {
                 const result = await this.$http.get("/memoqapi/templates");
                 this.templates = result.data || [];                
-                if(this.templates.length) {
-                    const defTemplate = this.templates.find(item => item.name === '2 Steps');
-                    this.setTasksDataValue({prop: "template", value: defTemplate || this.templates[0]});
-                }
+                // if(this.templates.length) {
+                //     const defTemplate = this.templates.find(item => item.name === '2 Steps');
+                //     this.setDataValue({prop: "template", value: defTemplate || this.templates[0]});
+                // }
             } catch(err) { 
             }
         }
@@ -101,24 +141,9 @@ export default {
         this.getMemoqTemplates();
     },
     computed: {
-        sortedJobs(){
-            if(this.tasksData.stepsAndUnits){
-                return this.tasksData.stepsAndUnits.sort((a , b) => a.stepCounter - b.stepCounter )
-            }
-        },
         ...mapGetters({
-            // tasksData: "getTasksData"
-        }),
-        serviceSteps() {
-            let result = [...this.tasksData.service.steps];
-            if(this.tasksData.workflow.name === '1 Step' && result.length > 1) {
-                result.pop();
-            }
-            return result;
-        },
-        selectedTemplate() {
-            return this.tasksData.template ? this.tasksData.template.name : "";
-        },       
+            tasksData: "getTasksData"
+        }),     
         allTemplates() {
             return this.templates.map(item => item.name);
         },

@@ -50,10 +50,10 @@
           .steps-date__label Unit
             span.steps-date__label-red *
           .steps-date__datepicker-wrapper
-            .steps-date__input
-              .steps-date__drop-menu(v-if="steps")
+            .steps-date__input(v-if="steps")
+              .steps-date__drop-menu(v-if="tasksData.stepsAndUnits[stepCounter-1]")
                     SelectSingle(
-                        :selectedOption="currentUnit.type"
+                        :selectedOption="tasksData.stepsAndUnits[stepCounter-1].unit"
                         :options="optionUnits"
                         placeholder="Select"
                         @chooseOption="setUnit"
@@ -86,6 +86,9 @@ import { mapGetters, mapActions} from "vuex";
         workflowId:{
           type: Number,
         },
+        tasksData:{
+          type: Object
+        }
     },
     data() {
         return {
@@ -98,7 +101,7 @@ import { mapGetters, mapActions} from "vuex";
             isReadonly: false,
             services: null,
             units: null,
-            currentUnit:'',
+            currentUnit: '',
             steps: null,
         }
     },
@@ -157,7 +160,7 @@ import { mapGetters, mapActions} from "vuex";
         },
         invalidDateWarn({message}) {
             console.log(message);
-        }
+        },
     },
     mounted(){
       this.getServiceSteps();

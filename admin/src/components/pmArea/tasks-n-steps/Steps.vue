@@ -55,22 +55,24 @@
                 span.steps__step-data.steps_no-padding {{ row.name }}
             template(slot="language" slot-scope="{ row }")
                 span.steps__step-data {{ getStepPair(row) }}
-            template(slot="vendor" slot-scope="{ row, index }")
-                .steps__vendor-menu(v-if="isVendorSelect(row.status)")
-                    PersonSelect(
-                        :persons="extendedVendors(index)"
-                        :selectedPerson="vendorName(row.vendor)"
-                        :isExtended="isAllShow"
-                        :isAdditionalShow="isAdditionalShow"
-                        @setPerson="(person) => setVendor(person, index)"
-                        @togglePersonsData="toggleVendors"
-                        @scrollDrop="scrollDrop"
-                    )
-                span.steps_no-padding(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
-                    .steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")
-                        img.steps__replace-icon(src="../../../assets/images/replace_person.png" @click="showReassignment(index)")
-                        .steps__tooltip Reassign Vendor
-                    span.steps__step-no-select(v-if="!row.vendor") No Vendor
+
+            //- template(slot="vendor" slot-scope="{ row, index }")
+            //-     .steps__vendor-menu(v-if="isVendorSelect(row.status)")
+            //-         PersonSelect(
+            //-             :persons="extendedVendors(index)"
+            //-             :selectedPerson="vendorName(row.vendor)"
+            //-             :isExtended="isAllShow"
+            //-             :isAdditionalShow="isAdditionalShow"
+            //-             @setPerson="(person) => setVendor(person, index)"
+            //-             @togglePersonsData="toggleVendors"
+            //-             @scrollDrop="scrollDrop"
+            //-         )
+            //-     span.steps_no-padding(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
+            //-         .steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")
+            //-             img.steps__replace-icon(src="../../../assets/images/replace_person.png" @click="showReassignment(index)")
+            //-             .steps__tooltip Reassign Vendor
+            //-         span.steps__step-no-select(v-if="!row.vendor") No Vendor
+
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
                     @selected="(e) => changeDate(e, 'start', index)" 
@@ -102,6 +104,7 @@
                 span.steps__money(v-if="isEuro(row, 'receivables')") &euro;
                 span.steps__step-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ getTotalReceivables(row) }}
                 span.steps__step-data(v-if="row.finance.Price.halfReceivables") {{ row.finance.Price.halfReceivables }}
+
             template(slot="payables" slot-scope="{ row }")
                 span.steps__money(v-if="isEuro(row, 'payables')") &euro;                
                 span.steps__step-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ getTotalPayables(row) }}
