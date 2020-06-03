@@ -8,79 +8,79 @@ const VendorSchema = new mongoose.Schema({
         default: "",
         trim: true
     },
-    firstName: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    firstName: {
+        type : String,
+        default : '',
+        trim : true
     },
     website: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    status: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    status: {
+        type : String,
+        default : '',
+        trim : true
     },
     surname: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    email: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    email: {
+        type : String,
+        default : '',
+        trim : true
     },
     phone: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
     timezone: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    native: { 
+    native: {
         type : Schema.Types.ObjectId, ref: 'Language',
         default: null
     },
     gender: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    skype: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    skype: {
+        type : String,
+        default : '',
+        trim : true
     },
     companyName: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    linkedin: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    linkedin: {
+        type : String,
+        default : '',
+        trim : true
     },
     whatsapp: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
-    basicRate: { 
-        type : String, 
-        default : '', 
-        trim : true 
+    basicRate: {
+        type : String,
+        default : '',
+        trim : true
     },
     tqi: {
         type: String,
         default: '',
-        trim : true 
+        trim : true
     },
     experienceYears: {
         type: String,
@@ -106,7 +106,7 @@ const VendorSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
-    qualifications: [{ 
+    qualifications: [{
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
         },
@@ -138,28 +138,12 @@ const VendorSchema = new mongoose.Schema({
         default: []
     },
     assessments: [{
-        step: {
-            type: Schema.Types.ObjectId, ref: 'Step'
-        },
-        langsData: [{
-            source: {
-                type: Schema.Types.ObjectId, ref: 'Language',
-            },
-            target: {
-                type: Schema.Types.ObjectId, ref: 'Language'
-            },
-            industries: [{
-                industry: {
-                    type: Schema.Types.ObjectId, ref: 'Industries'
-                },
-                tqi: {},
-                lqa1: {},
-                lqa2: {},
-                lqa3: {}
-            }]
-        }]
+      TQI: [],
+      LQA1: {},
+      LQA2: {},
+      LQA3: {},
     }],
-    wordsRates: [{ 
+    wordsRates: [{
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
         },
@@ -174,7 +158,7 @@ const VendorSchema = new mongoose.Schema({
             default: {}
         }
     }],
-    hoursRates: [{ 
+    hoursRates: [{
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
         },
@@ -189,7 +173,7 @@ const VendorSchema = new mongoose.Schema({
             default: {}
         }
     }],
-    monoRates: [{ 
+    monoRates: [{
         target: {
             type: Schema.Types.ObjectId, ref: 'Language'
         },
@@ -197,7 +181,7 @@ const VendorSchema = new mongoose.Schema({
             type: String,
             trim: true
         },
-        industries: [{    
+        industries: [{
             type: Schema.Types.ObjectId, ref: 'Industries'
         }],
         rates: {
@@ -282,7 +266,7 @@ VendorSchema.pre('save', function (next) {
         next();
     })
 });
-  
+
 
 const Vendors = mongoose.model('Vendors', VendorSchema);
 
