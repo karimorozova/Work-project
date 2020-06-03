@@ -17,7 +17,13 @@
         .lqa-vendors__table(v-if="Object.keys(this.reportData).length")
             Table(:vendorsData="allVendors" @selectVendor="selectVendor")
         .lqa-vendors__form(v-if="isForm")
-            VendorLqaForm(:vendorData="selectedVendor" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
+            VendorLqaForm(
+                :vendorData="selectedVendor"
+                :languages="languages"
+                @closeForm="closeForm"
+                @saveVendorLqa="saveVendorLqa"
+                :uploadForm="true"
+            )
 </template>
 
 <script>
@@ -38,7 +44,8 @@ export default {
             tierFilter: "All",
             lqaFilter: "All",
             isForm: false,
-            selectedVendor: null
+            selectedVendor: null,
+            languages: null,
         }
     },
     methods: {
@@ -46,17 +53,24 @@ export default {
         async getReport() {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-upcoming-lqa-report", { filters: this.filters });
-                this.reportData = result.body
-                
+                this.reportData = result.body 
             } catch(err) {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
+            }
+        },
+        async getLanguages(){
+            try {
+                const languages = await this.$http.get("/api/languages");
+                this.languages = languages.data;
+            } catch (error) {
+                this.alertToggle({message: "Error on getting Languages", isShow: true, type: "error"});
             }
         },
         async setFilter({value}, prop) {
             this[prop] = value;
             await this.getReport();
         },
-        selectVendor({vendor}) {
+        selectVendor({vendor}) {           
             this.selectedVendor = vendor;
             this.isForm = true;
         },
@@ -65,7 +79,8 @@ export default {
         },
         async saveVendorLqa({vendorData}) {
             try {
-                await this.$http.post("/reportsapi/xtrf-vendor-lqa", { vendorData });
+                console.log(vendorData);
+                // await this.$http.post("/reportsapi/xtrf-vendor-lqa", { vendorData });
                 await this.getReport();
             } catch(err) {
                 this.alertToggle({message: "Error on updating Vendor's LQA", isShow: true, type: "error"});
@@ -119,24 +134,23 @@ export default {
     },
     mounted() {
         this.getReport();
+        this.getLanguages();
     }
 }
 </script>
 
 <style lang="scss" scoped>
-
 .lqa-vendors {
-    box-sizing: border-box;
-    padding: 40px 40px 0 40px;
-    position: relative;
-    &__form {
-        width: 70%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-    }
+  box-sizing: border-box;
+  padding: 40px 40px 0 40px;
+  position: relative;
+  &__form {
+    width: 70%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 }
-
 </style>

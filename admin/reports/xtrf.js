@@ -2,7 +2,7 @@ const { XtrfPrice, TierLqa, LangTier, Languages, MemoqProject } = require("../mo
 
 //// Tier report /////
 
-async function getXtrfTierReport(filters) {
+async function getXtrfTierReport(filters, grouped = false) {
   const today = new Date();
   let start = new Date(today.getFullYear(), today.getMonth() - 6, -1);
   start.setHours(0, 0, 0, 0);
@@ -18,7 +18,8 @@ async function getXtrfTierReport(filters) {
           || item.gameTier.tier === filters.tierFilter;
       });
     }
-    return result;
+    const groupedLangs = getGroupedLangs(result, 'group');
+    return grouped ? groupedLangs : result;
   } catch (err) {
     console.log(err);
     console.log("Error in getXtrfTierReport");
@@ -27,16 +28,63 @@ async function getXtrfTierReport(filters) {
 
 function getParsedReport(reports, languages) {
   let result = [];
-  for (let { lang, memoq } of languages) {
-    const langReport = getLangReport(lang, memoq, reports);
+  for (let { lang, memoq, group } of languages) {
+    const langReport = getLangReport(lang, memoq, group, reports);
     result.push(langReport);
   }
   result = result.sort((a, b) => a.target > b.target ? 1 : -1);
   return result;
 }
 
-function getLangReport(lang, memoq, reports) {
-  let result = { target: lang, memoqSymbol: memoq };
+function getGroupedLangs(array, key) {
+  const grouped = groupByKey(array, key);
+  return Object.keys(grouped).reduce((prev, curr) => ({
+    ...prev,
+    [curr]: grouped[curr].reduce((prevLang, currLang) => {
+      return ({
+        target: curr,
+        allTier: {
+          tier: currLang.allTier.tier,
+          wordcount: prevLang.allTier.wordcount + currLang.allTier.wordcount,
+          clients: Math.ceil(prevLang.allTier.clients + currLang.allTier.clients),
+        },
+        financeTier: {
+          tier: currLang.financeTier.tier,
+          wordcount: prevLang.financeTier.wordcount + currLang.financeTier.wordcount,
+          clients: Math.ceil(prevLang.financeTier.clients + currLang.financeTier.clients),
+        },
+        gameTier: {
+          tier: currLang.gameTier.tier,
+          wordcount: prevLang.gameTier.wordcount + currLang.gameTier.wordcount,
+          clients: Math.ceil(prevLang.gameTier.clients + currLang.gameTier.clients),
+        }
+      });
+    }, {
+      allTier: {
+        wordcount: 0,
+        clients: 0
+      },
+      financeTier: {
+        wordcount: 0,
+        clients: 0
+      },
+      gameTier: {
+        wordcount: 0,
+        clients: 0
+      }
+    })
+  }), {});
+}
+
+function groupByKey(array, key) {
+  return array.reduce((result, currentValue) => {
+    (result[currentValue[key]] = result[currentValue[key]] || []).push(currentValue);
+    return result;
+  }, {});
+}
+
+function getLangReport(lang, memoq, group, reports) {
+  let result = { target: lang, memoqSymbol: memoq, group };
   result.allTier = getTier(lang, reports, 'General');
   result.financeTier = getTier(lang, reports, 'Finance');
   result.gameTier = getTier(lang, reports, 'iGaming');
@@ -94,25 +142,51 @@ async function getXtrfLqaReport(filters) {
   const filterQuery = getFilteringQuery(filters);
   const { nameFilter } = filters;
   try {
-    let tiers = await getXtrfTierReport(filters);
+    const tiers = await getXtrfTierReport(filters);
     const memoqs = await MemoqProject.find(filterQuery);
-    const financeDocs = getIndustryDocs(memoqs, 'Finance')
+    const financeDocs = getIndustryDocs(memoqs, 'Finance');
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-    return tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount)
-      .map(item => {
-        return {
-          tier: item.allTier.tier,
-          target: item.target,
-          finance: {
-            tier: item.financeTier.tier,
-            vendor: getLqaWordcount(item, financeDocs, nameFilter),
-          },
-          gaming: {
-            tier: item.gameTier.tier,
-            vendor: getLqaWordcount(item, gamingDocs, nameFilter),
-          },
-        };
-      }).filter(item => Object.keys(item.finance.vendor).length || Object.keys(item.gaming.vendor).length);
+    const reports = tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount);
+    const groupedReports = groupByKey(reports, 'group');
+    return Object.keys(groupedReports).reduce((acc, curr) => {
+      acc.push(groupedReports[curr].reduce((prevLang, curLang) => {
+        prevLang[curLang.group] = prevLang[curLang.group] ?
+          {
+            ...prevLang[curLang.group],
+            finance: {
+              tier: curLang.financeTier.tier,
+              vendor: {
+                ...prevLang[curLang.group].finance.vendor,
+                ...getLqaWordcount(curLang, financeDocs, nameFilter),
+              },
+            },
+            gaming: {
+              tier: curLang.gameTier.tier,
+              vendor: {
+                ...prevLang[curLang.group].gaming.vendor,
+                ...getLqaWordcount(curLang, gamingDocs, nameFilter),
+              }
+            }
+          } : {
+            target: curLang.group,
+            tier: curLang.allTier.tier,
+            finance: {
+              tier: curLang.financeTier.tier,
+              vendor: getLqaWordcount(curLang, financeDocs, nameFilter),
+            },
+            gaming: {
+              tier: curLang.gameTier.tier,
+              vendor: getLqaWordcount(curLang, gamingDocs, nameFilter),
+            }
+          }
+        return prevLang;
+      }, {}))
+      return acc;
+    }, []).filter(item => {
+      const financeVendor = Object.values(item)[0].finance.vendor;
+      const gamingVendor = Object.values(item)[0].gaming.vendor;
+      return Object.keys(financeVendor).length || Object.keys(gamingVendor).length;
+    });
     // FOR FUTURE LQA:
     // let reportsFilter = {target: filterQuery.language};
     // if(filters.tierFilter) {

@@ -22,7 +22,8 @@ export default {
       openQuotes: true,
       sidebarLinks: [
           {title: "Languages"}, {title: "Services"}, {title: "Industries"}, {title: "Lead Sources"}, {title: "Packages"}, 
-          {title: "Pricelists"}, {title: "Cancellation Reasons"}, {title: "Discount Chart"}, {title: "Instructions"}, {title: "LQA"}
+          {title: "Pricelists"}, {title: "Cancellation Reasons"}, {title: "Discount Chart"}, {title: "Instructions"}, {title: "LQA"},
+          {title: "Units"}
           ],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
@@ -35,6 +36,9 @@ export default {
       switch(title) {
         case "Languages": 
           this.$router.push("/settings/langs");
+          break;
+        case "Units": 
+          this.$router.push("/settings/units");
           break;
         case "Services":
           this.$router.push("/settings/services");

@@ -2451,8 +2451,8 @@ const vendorsTqiAdder = async () => {
   const vendorsTqi = vendors.reduce((acc, curr) => {
     const name = curr['Legal Name'].split(' ');
     const firstName = name[0];
-    const surname = name[2] ? `${name[1]} ${name[2]}` : name[1];
     acc.push({
+      firstName,
       assessments: [{
         TQI: curr.TQI ? curr.TQI : [],
         LQA1: curr.LQA1 ? curr.LQA1 : {},
