@@ -94,6 +94,20 @@
       .steps-table-row, .rates-matrix-row {
         cursor: default;
       }
+
+      .setting-table-body {
+        max-height: 400px;
+      }
+      .settings-table-row{
+        cursor: default;
+      }
+      .settings-table-cell{
+        background-color: white!important;
+        &:hover{
+          background-color: white!important;
+        }
+      }
+      
       .delivery_no-hover-change {
         cursor: default;
         &:hover {
