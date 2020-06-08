@@ -1,0 +1,73 @@
+<template lang="pug">
+.chips
+    .chip(v-for="(chip,index) in chips") {{chip}}
+        span.closebtn(@click="deleteDataInput(index)") &times;
+    input(type="text" :placeholder="placeholder" id="myInput" ref="myInput" v-on:keyup.enter="getDataInput")
+
+</template>
+<script>
+export default {
+  props: {
+    chips: {
+      type: Array
+    },
+    placeholder:{
+        type: String,
+        default: '...'
+    }
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    getDataInput() {
+      this.$emit("setChips", { data: event.target.value });
+      this.$refs.myInput.value = "";
+    },
+    deleteDataInput(index) {
+      this.$emit("deleteChips", { index });
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+.chips {
+  display: flex;
+  .chip {
+    display: inline-flex;
+    padding: 0 10px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 8px;
+    margin-right: 5px;
+    border: 1px solid #67573e;
+  }
+  .closebtn {
+    padding-left: 10px;
+    color: #c7c0b7;
+    font-weight: bold;
+    float: right;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .closebtn:hover {
+    color: #67573e;
+  }
+}
+input::placeholder {
+  color: #c7c0b7;
+  font-size: 14px;
+}
+#myInput {
+  height: 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  width: 65px;
+  border: 1px solid #67573e;
+}
+#myInput:focus {
+  outline: none;
+}
+</style>
