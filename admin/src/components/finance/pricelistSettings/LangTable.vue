@@ -35,19 +35,19 @@
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentTargetLang" disabled)
 
-      template(slot="usd" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          span(id="usd") {{row.usd}}
-          label(for="usd") &#36;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceUSD")
-
       template(slot="eur" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="eur") {{row.eur}}
           label(for="eur") &euro;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPriceEUR")
+
+      template(slot="usd" slot-scope="{ row, index }")
+        .price__data(v-if="currentActive !== index")
+          span(id="usd") {{row.usd}}
+          label(for="usd") &#36;
+        .price__editing-data(v-else)
+          input.price__data-input(type="number" v-model="currentBasicPriceUSD")
 
       template(slot="gbp" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
@@ -92,16 +92,16 @@ export default {
           padding: "0"
         },
         {
-          label: "Basic price (USD)",
-          headerKey: "headerBasicPriceUSD",
-          key: "usd",
+          label: "Basic price (Euro)",
+          headerKey: "headerBasicPriceEUR",
+          key: "eur",
           width: "15%",
           padding: "0"
         },
         {
-          label: "Basic price (Euro)",
-          headerKey: "headerBasicPriceEUR",
-          key: "eur",
+          label: "Basic price (USD)",
+          headerKey: "headerBasicPriceUSD",
+          key: "usd",
           width: "15%",
           padding: "0"
         },

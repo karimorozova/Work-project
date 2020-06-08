@@ -48,19 +48,19 @@
             .price__editing-data(v-else)
                 input.price__data-input(type="number" v-model="currentMultiplier")
 
-        template(slot="usd" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="usd") {{row.usd}}
-                label(for="usd") &#36;
-            .price__editing-data(v-else)
-                input.price__data-input(type="number" v-model="currentMinPriceUSD")
-
         template(slot="eur" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 span(id="eur") {{row.eur}}
                 label(for="eur") &euro;
             .price__editing-data(v-else)
                 input.price__data-input(type="number" v-model="currentMinPriceEUR")
+
+        template(slot="usd" slot-scope="{ row, index }")
+            .price__data(v-if="currentActive !== index")
+                span(id="usd") {{row.usd}}
+                label(for="usd") &#36;
+            .price__editing-data(v-else)
+                input.price__data-input(type="number" v-model="currentMinPriceUSD")
 
         template(slot="gbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
@@ -121,16 +121,16 @@ export default {
           padding: "0"
         },
         {
-          label: "Min price (USD)",
-          headerKey: "headerMinPriceUSD",
-          key: "usd",
+          label: "Min price (EUR)",
+          headerKey: "headerMinPriceEUR",
+          key: "eur",
           width: "12.5%",
           padding: "0"
         },
         {
-          label: "Min price (EUR)",
-          headerKey: "headerMinPriceEUR",
-          key: "eur",
+          label: "Min price (USD)",
+          headerKey: "headerMinPriceUSD",
+          key: "usd",
           width: "12.5%",
           padding: "0"
         },

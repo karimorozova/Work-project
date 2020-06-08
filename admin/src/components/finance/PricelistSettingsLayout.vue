@@ -1,5 +1,7 @@
 <template lang="pug">
 .priceLayout
+    .priceLayout__currency
+        CurrencyRatio
     .priceLayout__setting
         LangTable(
             :languages="languages"
@@ -23,6 +25,7 @@ import LangTable from "./pricelistSettings/LangTable";
 import IndustryTable from "./pricelistSettings/IndustryTable";
 import StepTable from "./pricelistSettings/StepTable";
 import ResultTable from "./pricelistSettings/ResultTable";
+import CurrencyRatio from "./pricelistSettings/CurrencyRatio";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -101,7 +104,8 @@ export default {
     LangTable,
     IndustryTable,
     StepTable,
-    ResultTable
+    ResultTable,
+    CurrencyRatio
   }
 };
 </script>

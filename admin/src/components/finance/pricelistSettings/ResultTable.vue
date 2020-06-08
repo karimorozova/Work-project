@@ -35,15 +35,6 @@
         template(slot="industry" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.industry }}
 
-        template(slot="usd" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="usd") {{row.usd}}
-                label(for="usd") &#36;
-        template(slot="minUsd" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="minUsd") {{row.minUsd}}
-                label(for="minUsd") &#36;
-
         template(slot="eur" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 span(id="eur") {{row.eur}}
@@ -52,6 +43,15 @@
             .price__data(v-if="currentActive !== index")
                 span(id="minEur") {{row.minEur}}
                 label(for="minEur") &euro;
+
+        template(slot="usd" slot-scope="{ row, index }")
+            .price__data(v-if="currentActive !== index")
+                span(id="usd") {{row.usd}}
+                label(for="usd") &#36;
+        template(slot="minUsd" slot-scope="{ row, index }")
+            .price__data(v-if="currentActive !== index")
+                span(id="minUsd") {{row.minUsd}}
+                label(for="minUsd") &#36;
 
         template(slot="gbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
@@ -121,20 +121,6 @@ export default {
           padding: "0"
         },
         {
-          label: "Price (USD)",
-          headerKey: "headerPriceUSD",
-          key: "usd",
-          width: "9%",
-          padding: "0"
-        },
-        {
-          label: "Min Price (USD)",
-          headerKey: "headerMinPriceUSD",
-          key: "minUsd",
-          width: "9%",
-          padding: "0"
-        },
-        {
           label: "Price (EUR)",
           headerKey: "headerPriceEUR",
           key: "eur",
@@ -145,6 +131,20 @@ export default {
           label: "Min Price (EUR)",
           headerKey: "headerMinPriceEUR",
           key: "minEur",
+          width: "9%",
+          padding: "0"
+        },
+        {
+          label: "Price (USD)",
+          headerKey: "headerPriceUSD",
+          key: "usd",
+          width: "9%",
+          padding: "0"
+        },
+        {
+          label: "Min Price (USD)",
+          headerKey: "headerMinPriceUSD",
+          key: "minUsd",
           width: "9%",
           padding: "0"
         },
