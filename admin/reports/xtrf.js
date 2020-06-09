@@ -1,4 +1,4 @@
-const { XtrfPrice, TierLqa, LangTier, Languages, MemoqProject } = require("../models");
+const { XtrfPrice, TierLqa, LangTier, Languages, MemoqProject, Vendors } = require("../models");
 
 //// Tier report /////
 
@@ -160,13 +160,19 @@ function getLqaSpecificTier(wordcount) {
 //// Lqa report /////
 async function getXtrfLqaReport(filters) {
   const filterQuery = getFilteringQuery(filters);
+  const vendroFilterQuery = getVendorsQuery(filters);
   const { nameFilter } = filters;
   try {
     const tiers = await getXtrfTierReport(filters);
+    const vendors = await Vendors.find(vendroFilterQuery);
+    for (let vendor of vendors) {
+      const { wordCountInfo } = vendor;
+      console.log(wordCountInfo);
+    }
     const memoqs = await MemoqProject.find(filterQuery);
     const financeDocs = getIndustryDocs(memoqs, 'Finance');
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-    const reports = tiers.filter(item => item.financeTier.wordcount || item.gameTier.wordcount);
+    const otherDocs = getIndustryDocs(memoqs, 'Other');
     const calculatedTiers = [];
     calculatedTiers.push(tiers.reduce((acc, curr) => {
       acc[curr.group] = acc[curr.group] ?
@@ -384,7 +390,7 @@ function getFilteredByIndustry({ report, finance, gaming, filters }) {
 }
 
 function getFilteringQuery(filters) {
-  let query = { documents: { $ne: null } };
+  let query = { $and: [ { documents: { $ne: null }, creationTime: { $gte: new Date('2020-04-01T00:00:00Z') } }] };
   if (filters.nameFilter) {
     query[
       'documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName'
@@ -394,9 +400,22 @@ function getFilteringQuery(filters) {
     query.domain = { '$regex': new RegExp(`${filters.industryFilter}`, 'i') };
   }
   if (filters.targetLanguage) {
-    query['targetLanguages.lang'] = {
-      $in: filters.targetFilter, $ne: 'English [grouped]'
-    };
+    query['targetLanguages.lang'] = { $in: filters.targetLanguage };
+  }
+  return query;
+}
+
+function getVendorsQuery(filters) {
+  let query = { $and: [{ status: 'Active' }, {wordCountInfo: { $ne: [] }}] };
+
+  if (filters.nameFilter) {
+    query.firstName = { '$regex': new RegExp(`${filters.nameFilter}`, 'i') };
+  }
+  if (filters.industryFilter) {
+    query['wordCountInfo.industry.name'] = { '$regex': new RegExp(`${filters.industryFilter}`, 'i') };
+  }
+  if (filters.targetLanguage) {
+    query['wordCountInfo.targetLanguage.group'] = { $in: filters.targetLanguage };
   }
   return query;
 }
