@@ -147,6 +147,32 @@ const VendorSchema = new mongoose.Schema({
       LQA2: {},
       LQA3: {},
     }],
+    wordCountInfo: [{
+        industry: {
+          id: {
+            type: Schema.Types.ObjectId, ref: 'Industries'
+          },
+          name: {
+            type: String,
+            default: '',
+            trim: true,
+          }
+        },
+        targetLanguage: {
+          id: {
+            type: Schema.Types.ObjectId, ref: 'Language',
+          },
+          group: {
+            type: String,
+            default: '',
+            trim: true,
+          }
+        },
+        wordCount: {
+          type: Number,
+          default: 0,
+        }
+      }],
     wordsRates: [{
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
