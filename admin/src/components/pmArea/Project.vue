@@ -207,6 +207,15 @@ export default {
                 this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
             }
         },
+        async getProjectData(){
+            const { id } = this.$route.params;
+            if(id !== undefined){
+                   const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
+                   await this.setCurrentProject(curProject.body);
+            }else{
+                return;
+            }
+        }
     },
     computed: {
         industriesList() {
@@ -225,7 +234,7 @@ export default {
         },
         disabledPicker() {
             return !!(this.project._id && this.project.tasks && this.project.tasks.length);
-        }
+        },
     },
     components: {
         SelectSingle,
@@ -236,12 +245,9 @@ export default {
         ValidationErrors
     },
     async created() {
-        const { id } = this.$route.params;
-        const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
-        await this.setCurrentProject(curProject.body);
+        await this.getProjectData();
         this.getCustomers();
         this.getIndustries();
-
     }
 }
 </script>

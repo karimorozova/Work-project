@@ -6,6 +6,7 @@
   "author": "wellyes",
   "scripts": {
     "build": "API_URL='https://admin.pangea.global' node build/build.js",
+    "build-test": "API_URL='http://95.216.165.38' node build/build.js",
     "dev": "API_URL='http://localhost:3001' node build/dev-server.js",
     "start": "node build/dev-server.js",
     "watch": "cross-env API_URL='http://localhost:3001' node build/watch.js",

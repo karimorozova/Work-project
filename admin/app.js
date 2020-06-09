@@ -44,7 +44,8 @@ const allowedOrigins = [
   "https://portal.pangea.global",
   "http://localhost:3000",
   "http://localhost:3002",
-  "http://localhost:8081"
+  "http://localhost:8081",
+  "http://95.216.165.38"
 ];
 
 mongoose.connect(config.mongoDB.url, {
