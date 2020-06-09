@@ -29,6 +29,7 @@ export default {
                 status: "",
                 website: "",
                 contract: "",
+                isTest: false,
                 nda: "",
                 accountManager: "",
                 salesManager: "",

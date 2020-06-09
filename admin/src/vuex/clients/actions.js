@@ -85,3 +85,16 @@ export const updateClientRate = async ({commit, dispatch}, payload) => {
         commit("endRequest");
     }
 }
+
+export const updateClientStatus = async ({ commit, dispatch }, payload) => {
+    commit("startRequest");
+    try {
+        const result = await Vue.http.post("/clientsapi/update-client-status", payload);
+        const client = result.body;        
+        commit('setCurrentVendor', client);
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
+    }
+}

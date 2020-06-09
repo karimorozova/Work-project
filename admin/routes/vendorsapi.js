@@ -293,6 +293,18 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
     }
 })
 
+router.post('/update-vendor-status', async (req, res) => {
+    const { id, isTest } = req.body
+    try {
+       await Vendors.updateOne({"_id": id}, {"isTest": isTest});
+       const vendor = await getVendor({ "_id": id });
+       res.send(vendor);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on updating Vendor status");
+    }
+})
+
 router.delete('/deletevendor/:id', async (req, res) => {
     const { id } = req.params;
     try {

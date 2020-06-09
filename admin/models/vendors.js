@@ -106,6 +106,10 @@ const VendorSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
+    isTest:{
+        type: Boolean,
+        default: false
+    },
     qualifications: [{
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',
