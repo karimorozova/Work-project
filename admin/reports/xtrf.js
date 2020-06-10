@@ -147,11 +147,15 @@ function getLqaAllTier(wordcount) {
   return tier;
 }
 
-function getLqaSpecificTier(wordcount) {
+function getLqaSpecificTier(vendors) {
+  let wordCount = 0;
+  for (let vendor of vendors) {
+    wordCount += vendor.wordCount;
+  }
   let tier = 2;
-  if (wordcount > 60000) {
+  if (wordCount > 60000) {
     tier = 1;
-  } else if (wordcount < 2500) {
+  } else if (wordCount < 2500) {
     tier = 3;
   }
   return tier;
@@ -164,7 +168,7 @@ async function getXtrfLqaReport(filters) {
   const { nameFilter } = filters;
   try {
     const tiers = await getXtrfTierReport(filters);
-    const vendors = await Vendors.find(vendroFilterQuery);
+    const vendors = await Vendors.find(vendroFilterQuery, { _id: 0, firstName: 1, surname: 1, wordCountInfo: 1, assessments: 1 });
     const memoqs = await MemoqProject.find(filterQuery);
     const financeDocs = getIndustryDocs(memoqs, 'Finance');
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
@@ -203,40 +207,88 @@ async function getXtrfLqaReport(filters) {
     }, []);
     const memoqVendors = calculatedTiers.map(tier => ({
       target: tier.group,
-      tier: getLqaAllTier(tier.allTier.wordcount),
       finance: {
-        tier: getLqaSpecificTier(tier.financeTier.wordcount),
         vendors: [ ...Object.values(getLqaWordcount(tier, financeDocs, nameFilter)) ],
       },
       gaming: {
-        tier: getLqaSpecificTier(tier.gameTier.wordcount),
         vendors: [ ...Object.values(getLqaWordcount(tier, gamingDocs, nameFilter)) ],
+      },
+      other: {
+        vendors: [],
       }
     }));
-    console.log('before');
-    for (let vendor of memoqVendors) {
-      // console.log(vendor.finance);
-    }
-    for (let { firstName, surname, wordCountInfo } of vendors) {
+    for (let { firstName, surname, wordCountInfo, assessments } of vendors) {
       for (let { industry, targetLanguage: { group }, wordCount } of wordCountInfo) {
+        const name = surname ? `${firstName} ${surname}` : firstName;
+        const memoqIndex = memoqVendors.findIndex(item => item.target === group);
+        const memoqDoc = memoqVendors[memoqIndex];
         if (industry.name.toString() === 'Finance') {
-          const financeMemoq = memoqVendors.filter((item, index) => item.target === group && { index, doc: item });
-          console.log(financeMemoq);
-          // const vendorIndex = financeMemoq.doc.vendors.findIndex(vendor => vendor.name === (surname ? `${firstName} ${surname}` : firstName));
-          // memoqVendors[financeMemoq.index] = !!vendorIndex
-          //   ? memoqVendors[financeMemoq.index].finance.vendors[vendorIndex].wordCount + wordCount
-          //   : memoqVendors[financeMemoq.index].finance.vendors.push({
-          //     name: surname ? `${firstName} ${surname}` : firstName,
-          //     wordCount,
-          //   })
+          const financeVendorIndex = memoqDoc.finance.vendors.findIndex(vendor => vendor.name === name);
+          if (financeVendorIndex !== -1) {
+            const updatedVendor = {
+              ...memoqDoc.finance.vendors[financeVendorIndex],
+              wordCount: memoqDoc.finance.vendors[financeVendorIndex].wordCount + wordCount,
+            }
+            memoqDoc.finance.vendors.splice(financeVendorIndex, 1, updatedVendor);
+          } else {
+            memoqDoc.finance.vendors.push({
+              name,
+              wordCount,
+              assessments: assessments.length ? [getVendorAssessment(assessments, 'Finance')] : []
+            })
+          }
+          memoqVendors.splice(memoqIndex, 1, memoqDoc);
+        } else if (industry.name.toString() === 'iGaming (Casino, Slot games, Gambling, etc.)') {
+          const gamingVendorIndex = memoqDoc.gaming.vendors.findIndex(vendor => vendor.name === name);
+          if (gamingVendorIndex !== -1) {
+            const updatedVendor = {
+              ...memoqDoc.gaming.vendors[gamingVendorIndex],
+              wordCount: memoqDoc.gaming.vendors[gamingVendorIndex].wordCount + wordCount,
+              assessments,
+            }
+            memoqDoc.gaming.vendors.splice(gamingVendorIndex, 1, updatedVendor);
+          } else {
+            memoqDoc.gaming.vendors.push({
+              name,
+              wordCount,
+              assessments: assessments.length ?
+                [getVendorAssessment(assessments, 'iGaming (Casino, Slot games, Gambling, etc.)')] : [],
+            })
+          }
+          memoqVendors.splice(memoqIndex, 1, memoqDoc);
+        } else if (industry.name.toString() === 'Other') {
+          const otherVendorIndex = memoqDoc.other.vendors.findIndex(vendor => vendor.name === name);
+          if (otherVendorIndex !== -1) {
+            const updatedVendor = {
+              ...memoqDoc.other.vendors[otherVendorIndex],
+              wordCount: memoqDoc.other.vendors[otherVendorIndex].wordCount + wordCount,
+            }
+            memoqDoc.other.vendors.splice(otherVendorIndex, 1, updatedVendor);
+          } else {
+            memoqDoc.other.vendors.push({
+              name,
+              wordCount,
+            })
+          }
+          memoqVendors.splice(memoqIndex, 1, memoqDoc);
         }
       }
     }
-    console.log('after');
-    for (let vendor of memoqVendors) {
-      // console.log(vendor.finance);
-    }
-    // console.log(memoqVendors);
+    return memoqVendors.map(vendor => ({
+      target: vendor.target,
+      finance: {
+        tier: getLqaSpecificTier(vendor.finance.vendors),
+        ...vendor.finance,
+      },
+      gaming: {
+        tier: getLqaSpecificTier(vendor.gaming.vendors),
+        ...vendor.gaming,
+      },
+      other: {
+        tier: getLqaSpecificTier(vendor.other.vendors),
+        ...vendor.other
+      }
+    })).filter(vendor => vendor.finance.vendors.length || vendor.gaming.vendors.length || vendor.other.vendors.length);
     // FOR FUTURE LQA:
     // let reportsFilter = {target: filterQuery.language};
     // if(filters.tierFilter) {
@@ -257,6 +309,31 @@ async function getXtrfLqaReport(filters) {
     console.log(err);
     console.log("Error in getXtrfLqaReport");
   }
+}
+
+function getVendorAssessment(assessments, queryIndustry) {
+  const result = {
+    TQI: [],
+  };
+  for (let item of assessments) {
+    if (item.TQI.length) {
+      for (let { industry, score } of item.TQI) {
+        if (industry === queryIndustry) {
+          result.TQI.push({
+            score,
+          });
+        }
+      }
+    }
+    if (!!item.LQA1 && item.LQA1.industry === queryIndustry) {
+      result.lqa1Score = item.LQA1.score;
+    } else if (!!item.LQA2 && item.LQA2.industry === queryIndustry) {
+      result.lqa2Score = item.LQA2.score;
+    } else if (!!item.LQA3 && item.LQA3.industry === queryIndustry) {
+      result.lqa3Score = item.LQA3.score;
+    }
+  }
+  return result;
 }
 
 function getIndustryDocs(arr, industry) {
