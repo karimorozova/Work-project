@@ -45,6 +45,9 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3002",
   "http://localhost:8081",
+  "http://testadmin.pangea.global",
+  "http://testvendor.pangea.global",
+  "http://testportal.pangea.global",
   "http://95.216.165.38"
 ];
 
