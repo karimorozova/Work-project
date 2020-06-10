@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "API_URL='http://localhost:3001' nuxt",
     "build": "API_URL='https://admin.pangea.global' nuxt build",
+    "build-test": "API_URL='http://95.216.165.38' nuxt build",
     "start": "nuxt start",
     "generate": "API_URL='https://admin.pangea.global' nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
