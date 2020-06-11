@@ -1,7 +1,7 @@
 const { Units, Step } = require('../models');
 
 async function insertUnitIntoStep(unit, unitId) {
-  const { type, active, steps } = unit;
+  const { type, active, steps, sizes } = unit;
   try {
     for (let { _id } of steps) {
       const step = await Step.findOne({ _id });
@@ -10,6 +10,7 @@ async function insertUnitIntoStep(unit, unitId) {
         type,
         active,
         editable: true,
+        sizes,
       })
       await Step.updateOne({ _id }, step, { upsert: true });
     }
@@ -59,6 +60,7 @@ async function changeUnitsInSteps(unitToUpdate) {
             type: unit.type,
             active: unit.active,
             editable: true,
+            sizes: unit.sizes,
           })
         }
         await Step.updateOne({ _id: id }, step);

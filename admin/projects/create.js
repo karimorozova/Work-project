@@ -122,7 +122,7 @@ async function updateProjectTasks(taskData) {
   const { newTasksInfo, project, memoqDocs } = taskData;
   try {
     const units = JSON.parse(newTasksInfo.stepsAndUnits);
-    const allInfo = { ...newTasksInfo, project, taskRefFiles: memoqDocs, stepsDates: newTasksInfo.stepsDates };
+    const allInfo = { ...newTasksInfo, units, project, taskRefFiles: memoqDocs, stepsDates: newTasksInfo.stepsDates };
     for (let { unit } of units) {
       if (newTasksInfo.stepsAndUnits.length === 2 && unit === 'Hours') {
         const tasksWithoutFinance = getTasksForHours({ ...allInfo, projectId: project.projectId });
@@ -143,10 +143,13 @@ async function updateProjectTasks(taskData) {
       }
     }
     const tasks = getWordCountTasks(taskData);
+    const steps = units.length === 2 ?
+      await getStepsForDuoStepWords({ ...allInfo, tasks })
+      : await getStepsForMonoStepWords({ ...allInfo, tasks });
     await Projects.updateOne({ "_id": project._id },
       {
         $set: { isMetricsExist: false },
-        $push: { tasks }
+        $push: { tasks, steps }
       }
     );
   } catch (err) {
@@ -157,8 +160,10 @@ async function updateProjectTasks(taskData) {
 
 function getWordCountTasks(taskData) {
   const { project, newTasksInfo, memoqDocs } = taskData;
-  const { service, stepsAndUnits, memoqProjectId,
-    stepsDates, source, targets, memoqFiles, translateFiles, referenceFiles } = newTasksInfo;
+  const {
+    service, stepsAndUnits, memoqProjectId,
+    stepsDates, source, targets, memoqFiles, translateFiles, referenceFiles
+  } = newTasksInfo;
   const tasks = [];
   let tasksLength = project.tasks.length + 1;
   for (let i = 0; i < targets.length; i++) {
@@ -190,6 +195,71 @@ function getWordCountTasks(taskData) {
     tasksLength++;
   }
   return tasks;
+}
+
+function getStepsForDuoStepWords({ vendor, units, tasks, clientRate, vendorRate }) {
+  let counter = 1;
+  const steps = [];
+  for (let i = 0; i < tasks.length; i++) {
+    const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
+    const stepId = `${tasks[i].taskId} ${stepsIdCounter}`;
+    steps.push(
+      {
+        ...tasks[i],
+        stepId,
+        serviceStep: tasks[i].service.steps[0].step,
+        name: tasks[i].service.steps[0].step.title,
+        calculationUnit: tasks[i].service.calculationUnit,
+        template: units[i].template,
+        vendor,
+        progress: 0,
+        clientRate,
+        vendorRate,
+        check: false,
+        vendorsClickedOffer: [],
+        isVendorRead: false,
+      },
+      {
+        ...tasks[i],
+        stepId: stepId + '.1',
+        serviceStep: tasks[i].service.steps[1].step,
+        name: tasks[i].service.steps[1].title,
+        calculationUnit: tasks[i].service.calculationUnit,
+        template: units[i].template,
+        vendor,
+        progress: 0,
+        clientRate,
+        vendorRate,
+        check: false,
+        vendorsClickedOffer: [],
+        isVendorRead: false,
+      }
+    );
+    counter++;
+  }
+  return steps;
+}
+
+function getStepsForMonoStepWords({ vendor, units, tasks, clientRate, vendorRate }) {
+  const steps = [];
+  for (let i = 0; i < tasks.length; i++) {
+    steps.push({
+      ...tasks[i],
+      stepId: `${tasks[i].taskId} S01`,
+      serviceStep: tasks[i].service.steps[0].step,
+      name: tasks[i].service.steps[0].step.title,
+      calculationUnit: tasks[i].service.calculationUnit,
+      template: units[i].template,
+      vendor,
+      progress: 0,
+      clientRate,
+      vendorRate,
+      check: false,
+      vendorsClickedOffer: [],
+      isVendorRead: false,
+    });
+  }
+  return steps;
 }
 
 /// Creating tasks for wordcount unit services end ///
@@ -450,8 +520,8 @@ function getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate }) {
         isVendorRead: false,
       }
     );
+    counter++;
   }
-  counter++;
   return steps;
 }
 
