@@ -49,15 +49,22 @@
         .steps-date__input-wrapper
           .steps-date__label Unit
             span.steps-date__label-red *
-          .steps-date__datepicker-wrapper
-            .steps-date__input(v-if="steps")
-              .steps-date__drop-menu(v-if="tasksData.stepsAndUnits[stepCounter-1]")
+          .steps-date__datepicker-wrapper(v-if="steps")
+            .steps-date__input(v-if="tasksData.stepsAndUnits[stepCounter-1]")
+              .steps-date__drop-menu(v-if="tasksData.stepsAndUnits[stepCounter-1].size == null || !tasksData.stepsAndUnits[stepCounter-1].size")
                     SelectSingle(
                         :selectedOption="tasksData.stepsAndUnits[stepCounter-1].unit"
                         :options="optionUnits"
                         placeholder="Select"
                         @chooseOption="setUnit"
                     )
+              .steps-date__drop-menu(v-else)
+                  SelectSingle(
+                      :selectedOption="`${tasksData.stepsAndUnits[stepCounter-1].unit} / ${tasksData.stepsAndUnits[stepCounter-1].size}`"
+                      :options="optionUnits"
+                      placeholder="Select"
+                      @chooseOption="setUnit"
+                  )
 </template>
 
 <script>
@@ -102,6 +109,7 @@ import { mapGetters, mapActions} from "vuex";
             services: null,
             units: null,
             currentUnit: '',
+            currentSize: '',
             steps: null,
         }
     },
@@ -110,8 +118,24 @@ import { mapGetters, mapActions} from "vuex";
             setDataValue: "setTasksDataValue"
         }),
         setUnit({ option }) {
-          this.currentUnit = this.units.find(item => item.type === option);
-          this.sendUnit();
+          let currentStepsUnits = this.tasksData.stepsAndUnits[this.stepCounter-1];
+          let currentOption = /(\/)/gm.test(option)
+            ? /(.*\D)\s\/\s(\d.*)/gm.exec(option)
+            : /(.*\D.*)/gm.exec(option);
+
+          if(currentOption.length == 2){
+            currentStepsUnits.size = null
+            this.setDataValue({prop: "stepsAndUnits", value: currentStepsUnits})
+            this.setParams(currentOption[1])
+          }else{
+            currentStepsUnits.size = currentOption[2]
+            this.setDataValue({prop: "stepsAndUnits", value: currentStepsUnits})
+            this.setParams(currentOption[1])
+          }
+        },
+        setParams(option){
+            this.currentUnit = this.units.find(item => item.type === option)
+            this.sendUnit();
         },
         async getUnits(){
           try {
@@ -156,6 +180,7 @@ import { mapGetters, mapActions} from "vuex";
               stepCounter : this.stepCounter,
               step: this.setSteps[0].steps[this.stepCounter-1].step.title,
               unit: this.currentUnit.type,
+              size: this.tasksData.stepsAndUnits[this.stepCounter-1].size
             })
         },
         invalidDateWarn({message}) {
@@ -175,9 +200,20 @@ import { mapGetters, mapActions} from "vuex";
         optionUnits() {
           const currentStep = this.setSteps[0].steps[this.stepCounter - 1].step
             .title;
-          return this.steps
+          const currentUnits = this.steps
             .filter(item => item.title == currentStep)[0]
             .calculationUnit.map(item => item.type);
+
+          let result = [];
+          
+          for (const unit of currentUnits) {
+            let currentSizes = this.units.find(item => item.type == unit).sizes;
+            currentSizes.unshift('-1');
+              for (const size of currentSizes) {
+                size == '-1' ? result.push(unit) : result.push(`${unit} / ${size}`)
+              }
+          }
+          return result;
         },
         disabledStart() {
             let result = {

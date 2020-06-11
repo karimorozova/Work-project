@@ -127,12 +127,9 @@ export default {
         async getMemoqTemplates() {
             try {
                 const result = await this.$http.get("/memoqapi/templates");
-                this.templates = result.data || [];                
-                // if(this.templates.length) {
-                //     const defTemplate = this.templates.find(item => item.name === '2 Steps');
-                //     this.setDataValue({prop: "template", value: defTemplate || this.templates[0]});
-                // }
-            } catch(err) { 
+                this.templates = result.data || [];
+            } catch(err) {
+                this.alertToggle({message: "Error on getting templates", isShow: true, type: "error"});
             }
         }
     },

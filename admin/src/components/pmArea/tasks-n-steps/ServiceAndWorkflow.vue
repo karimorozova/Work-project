@@ -45,7 +45,6 @@
                 @sendUnit="pushStepAndUnit"
                 :service="service"
                 :tasksData="tasksData"
-
             )
 
         transition(name="fade")
@@ -109,14 +108,14 @@ export default {
                 let firstUnit = returnUnit(0);
                 let secondStep = returnUnit(1);
                 defaultStepsAndUnits = [
-                    {step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1},
-                    {step: currentSteps.steps[1].step.title, unit: secondStep, stepCounter: 2}
+                    {step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1, size: null},
+                    {step: currentSteps.steps[1].step.title, unit: secondStep, stepCounter: 2, size: null}
                 ]
                 this.stepsAndUnits = defaultStepsAndUnits;
             }else{
                 let firstUnit = returnUnit(0);
                 defaultStepsAndUnits = [
-                    {step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1}
+                    {step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1, size: null}
                 ]
                 this.stepsAndUnitsMono = defaultStepsAndUnits;
             }
@@ -164,7 +163,6 @@ export default {
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});
         },
         pushStepAndUnit (data) {
-
             if(this.selectedWorkflow.id == 2890 && this.tasksData.service.languageForm == "Mono"){
                 if(!this.stepsAndUnitsMono.length){
                     this.stepsAndUnitsMono.push(data)

@@ -21,7 +21,6 @@
                 TasksFilesRequested
 
             .tasks-data__service-steps
-                //- JobSettings(:steps="tasksData.service.steps")
                 JobSettings(
                     v-if="tasksData.stepsAndUnits.length"
                     :tasksData="tasksData"
@@ -29,20 +28,6 @@
                     :currentJob="step"
                     :currentIndex="index"
                     )
-
-
-            //- .tasks-data__template(v-if="currentUnit === 'Words'")
-
-            //- .tasks-data__template()
-            //-     .tasks-data__drop-menu
-            //-         label.tasks-data__menu-title Template
-            //-         SelectSingle(
-            //-             :selectedOption="selectedTemplate"
-            //-             :options="allTemplates"
-            //-             placeholder="Template"
-            //-             @chooseOption="setTemplate"
-            //-         )
-
 
     .tasks-data__add-tasks(v-if="isProject && isButton")
         Button(value="Add tasks" @clicked="checkForErrors")
@@ -90,15 +75,6 @@ export default {
             this.setTasksDataValue({prop: "targets", value: []});
             this.sourceLanguages = [value.symbol];
         },
-
-
-
-        // setTemplate({ option }) {
-        //     const value = this.templates.find(item => item.name === option);
-        //     this.setTasksDataValue({prop: "template", value});
-        // },
-
-
         setTargets({ targets }) {
             this.setTasksDataValue({prop: "targets", value: targets});
             this.targetLanguages = [...targets];
@@ -229,15 +205,6 @@ export default {
                 return this.tasksData.stepsAndUnits.sort((a , b) => a.stepCounter - b.stepCounter )
             }
         },
-
-        // allTemplates() {
-        //     return this.templates.map(item => item.name);
-        // },
-        // selectedTemplate() {
-        //     return this.tasksData.template ? this.tasksData.template.name : "";
-        // },
-
-
         isMonoService() {
             if(this.currentProject.status === 'Requested') {
                 return this.currentProject.service.languageForm === "Mono";
