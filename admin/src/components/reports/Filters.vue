@@ -69,7 +69,7 @@ export default {
         return {
             typingTimer: "",
             doneTypingInterval: 800,
-            industries: ["All", "Finance", "iGaming"],
+            industries: ["All", "Finance", "iGaming", "Other"],
             tiers: {"All": "All", "Tier 1": "1", "Tier 2": "2", "Tier 3": "3"},
             lqas: ["All", "1", "2", "3"]
         }

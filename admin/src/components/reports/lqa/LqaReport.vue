@@ -16,12 +16,15 @@
         .lqa__languages
             .lqa__language(v-for="report in reportData")
                 h3.lga__text Target Language: {{ report.target }}
-                .lqa__industry(v-if="Object.keys(report.finance.vendor).length")
-                    h4.lqa__text Industry: Finance,  Tier {{ report.tier }}
-                    Table(:vendorsData="Object.values(report.finance.vendor)" field="Finance")
-                .lqa__industry(v-if="Object.keys(report.gaming.vendor).length")
-                    h4.lqa__text Industry: iGaming,  Tier {{ report.tier }}
-                    Table(:vendorsData="Object.values(report.gaming.vendor)" field="iGaming")
+                .lqa__industry(v-if="report.finance.vendors.length")
+                    h4.lqa__text Industry: Finance
+                    Table(:vendorsData="report.finance.vendors" field="Finance" :tier="String(report.finance.tier)")
+                .lqa__industry(v-if="report.gaming.vendors.length")
+                    h4.lqa__text Industry: iGaming
+                    Table(:vendorsData="report.gaming.vendors" field="iGaming" :tier="String(report.gaming.tier)")
+                .lqa__industry(v-if="report.other.length")
+                    h4.lqa__text Industry: Others
+                    Table(:vendorsData="report.other.vendors" field="Others" :tier="String(report.other.tier)")
             .lqa__form(v-if="false")
                 NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
 </template>
@@ -55,12 +58,7 @@ export default {
         async getReport() {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
-                let temporaryStorage = [];
-                for (let variable of result.body) {
-                  temporaryStorage.push(Object.values(variable)[0]);                  
-                }
-                this.reportData = temporaryStorage;
-                
+                this.reportData = result.data;
                 const languages = await this.$http.get("/api/languages");
                 this.allLangs = languages.data;
 
