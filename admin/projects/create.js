@@ -123,23 +123,25 @@ async function updateProjectTasks(taskData) {
   try {
     const units = JSON.parse(newTasksInfo.stepsAndUnits);
     const allInfo = { ...newTasksInfo, units, project, taskRefFiles: memoqDocs, stepsDates: newTasksInfo.stepsDates };
-    for (let { unit } of units) {
-      if (newTasksInfo.stepsAndUnits.length === 2 && unit === 'Hours') {
-        const tasksWithoutFinance = getTasksForHours({ ...allInfo, projectId: project.projectId });
-        const steps = await getStepsForDuoStepHours({ ...allInfo, tasks: tasksWithoutFinance });
-        const tasks = tasksWithoutFinance.map(item => getHoursTaskWithFinance(item, steps));
-        const projectFinance = getProjectFinance(tasks, project.finance);
-        await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
-      } else if (newTasksInfo.stepsAndUnits.length === 2 && unit === 'Packages') {
-        const { service, targets, packageSize } = newTasksInfo;
-        const { vendor, vendorRate, clientRate, payables, receivables } = await getFinanceDataForPackages({
-          project, service, packageSize, target: targets[0]
-        });
-        const finance = { Wordcount: { receivables: '', payables: '' }, Price: { receivables, payables } };
-        const tasks = getTasksForPackages({ ...allInfo, projectId: project.projectId, finance });
-        const steps = getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate });
-        const projectFinance = getProjectFinance(tasks, project.finance);
-        await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
+    if (units.length === 2) {
+      for (let { unit } of units) {
+        if (unit === 'Hours') {
+          const tasksWithoutFinance = getTasksForHours({ ...allInfo, projectId: project.projectId });
+          const steps = await getStepsForDuoStepHours({ ...allInfo, tasks: tasksWithoutFinance });
+          const tasks = tasksWithoutFinance.map(item => getHoursTaskWithFinance(item, steps));
+          const projectFinance = getProjectFinance(tasks, project.finance);
+          await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
+        } else if (unit === 'Packages') {
+          const { service, targets, packageSize } = newTasksInfo;
+          const { vendor, vendorRate, clientRate, payables, receivables } = await getFinanceDataForPackages({
+            project, service, packageSize, target: targets[0]
+          });
+          const finance = { Wordcount: { receivables: '', payables: '' }, Price: { receivables, payables } };
+          const tasks = getTasksForPackages({ ...allInfo, projectId: project.projectId, finance });
+          const steps = getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate });
+          const projectFinance = getProjectFinance(tasks, project.finance);
+          await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
+        }
       }
     }
     const tasks = getWordCountTasks(taskData);
@@ -210,7 +212,6 @@ function getStepsForDuoStepWords({ vendor, units, tasks, clientRate, vendorRate 
         serviceStep: tasks[i].service.steps[0].step,
         name: tasks[i].service.steps[0].step.title,
         calculationUnit: tasks[i].service.calculationUnit,
-        template: units[i].template,
         vendor,
         progress: 0,
         clientRate,
@@ -225,7 +226,6 @@ function getStepsForDuoStepWords({ vendor, units, tasks, clientRate, vendorRate 
         serviceStep: tasks[i].service.steps[1].step,
         name: tasks[i].service.steps[1].title,
         calculationUnit: tasks[i].service.calculationUnit,
-        template: units[i].template,
         vendor,
         progress: 0,
         clientRate,
@@ -391,6 +391,7 @@ async function getStepsForDuoStepHours(stepsInfo) {
     );
     counter++;
   }
+  console.log(steps);
   return steps;
 }
 
