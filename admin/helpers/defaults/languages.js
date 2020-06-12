@@ -505,7 +505,7 @@ const languagesDefault = [
     "memoq": "spa-MX"
   },
   {
-    "lang": "Spanish (Columbia)",
+    "lang": "Spanish (Columbian)",
     "symbol": "ES-CO",
     "xtm": "es_CO",
     "iso1": "es-CO",
