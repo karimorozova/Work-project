@@ -22,7 +22,7 @@
                 .lqa__industry(v-if="report.gaming.vendors.length")
                     h4.lqa__text Industry: iGaming
                     Table(:vendorsData="report.gaming.vendors" field="iGaming" :tier="String(report.gaming.tier)")
-                .lqa__industry(v-if="report.other.length")
+                .lqa__industry(v-if="report.other.vendors.length")
                     h4.lqa__text Industry: Others
                     Table(:vendorsData="report.other.vendors" field="Others" :tier="String(report.other.tier)")
             .lqa__form(v-if="false")
@@ -145,6 +145,9 @@ h3, h4 {
         max-height: 680px;
         overflow-y: auto;
         margin-top: 40px;
+    }
+    &__language{
+        padding-top: 20px;
     }
     &__form {
         position: absolute;
