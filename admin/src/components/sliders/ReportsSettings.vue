@@ -60,12 +60,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .reports {
     display: flex;
     width: 100%;
     box-sizing: border-box;
     min-height: 94vh;
+    &__sidebar {
+        box-shadow: -10px 0 10px 10px $brown-shadow;
+    }
     &__table {
         width: 100%;
     }

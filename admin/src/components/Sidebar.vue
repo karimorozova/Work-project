@@ -1,10 +1,18 @@
 <template lang="pug">
 .sidebar
-    .sidebar__links
+    .sidebar__links(v-if="!isMultiLinks")
         span.sidebar__title(v-if="title") {{ title }}
         .sidebar__inner
         .sidebar__item(v-for="(link, index) in links" @click="onLinkClick(index)" :class="{linkClass, 'sidebar_active-link': activeIndex === index}")
             .sidebar__link {{ link.title }}
+            .sidebar__counter(v-if="link.counter" :class="counterClass") 
+                span.sidebar__ {{ link.counter }}
+
+    .sidebar__links(v-if="isMultiLinks" v-for="item in multiLinks")
+        span.sidebar__title {{ item.title }}
+        .sidebar__inner
+        .sidebar__item(v-for="(link, index) in item.links" @click="onLinkClickMulti(link.arrayIndex, index)" :class="{linkClass, 'sidebar_active-link': multiActiveIndex[0] === link.arrayIndex && multiActiveIndex[1] === index}")
+            .sidebar__link() {{ link.title }}
             .sidebar__counter(v-if="link.counter" :class="counterClass") 
                 span.sidebar__ {{ link.counter }}
 </template>
@@ -27,11 +35,24 @@ export default {
         activeIndex: {
             type: Number,
             default: -1
+        },
+        isMultiLinks:{
+            type: Boolean,
+            default: false
+        },
+        multiLinks:{
+            type: Array,
+        },
+        multiActiveIndex:{
+            type: Array,
         }
     },
     methods: {
         onLinkClick(index) {
             this.$emit("onLinkClick", {index})
+        },
+        onLinkClickMulti(arrayIndex, index) {
+            this.$emit("onLinkClickMulti", {arrayIndex, index})
         }
     }
 }
@@ -41,11 +62,9 @@ export default {
 @import "../assets/scss/colors.scss";
 
 .sidebar {
-    min-height: 100%;
     background-color: #fff;
     width: 175px;
     min-width: 175px;
-    box-shadow: 7px 1px 10px $brown-shadow;
     display: flex;
     flex-direction: column;
     color: $main-color;
@@ -53,7 +72,6 @@ export default {
     transition: all 1s;
     position: relative;
     &__links {
-        position: fixed;
         width: 175px;
     }
     &__title {

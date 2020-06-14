@@ -1,11 +1,13 @@
 <template lang="pug">
 .projects-area
-    Sidebar( 
-        title="PROJECTS" 
-        :links="sidebarLinks"
-        :activeIndex="currentIndex"
-        @onLinkClick="toggleLink"
-    )
+    .projects-area__sidebar
+        Sidebar( 
+            title="PROJECTS" 
+            :links="sidebarLinks"
+            :activeIndex="currentIndex"
+            @onLinkClick="toggleLink"
+        )
+  
     router-view
 </template>
 
@@ -60,11 +62,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../assets/scss/colors.scss";
 
 .projects-area {
     min-height: 94vh;
     display: flex;
     width: 100%;
+    &__sidebar {
+        box-shadow: -10px 0 10px 10px $brown-shadow;
+    }
+    
 }
 
 </style>
