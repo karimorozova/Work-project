@@ -1,5 +1,6 @@
 <template lang="pug">
     .lqa-table(v-if="vendorsData")
+        h4.lqa-table__text Tier: {{tier}}
         DataTable(
             :fields="fields"
             :tableData="vendorsData"
@@ -16,10 +17,25 @@
             .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.name }}
             .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ presentWordcount(row.wordCount) }}
 
-            //- .lqa-table__header(slot="tqi" slot-scope="{ row }") {{ row.vendor.tqis[field] }}
-            //- .lqa-table__header(slot="lqa1" slot-scope="{ row }") {{ row.vendor.lqa1s[field] }}
-            //- .lqa-table__header(slot="lqa2" slot-scope="{ row }") {{ row.vendor.lqa2s[field] }}
-            //- .lqa-table__header(slot="lqa3" slot-scope="{ row }") {{ row.vendor.lqa3s[field] }}
+            .lqa-table__header(slot="tqi" slot-scope="{ row }")
+                span(v-if="row.assessments")
+                    span(v-if="row.assessments[0]")
+                        span(v-if="row.assessments[0].TQI.length") {{ row.assessments[0].TQI[0].score }}
+
+            .lqa-table__header(slot="lqa1" slot-scope="{ row }")
+                span(v-if="row.assessments")
+                    span(v-if="row.assessments[0]")
+                        span(v-if="row.assessments[0].LQA1") {{ row.assessments[0].LQA1.score }}
+
+            .lqa-table__header(slot="lqa2" slot-scope="{ row }")
+                span(v-if="row.assessments")
+                    span(v-if="row.assessments[0]")
+                        span(v-if="row.assessments[0].LQA2") {{ row.assessments[0].LQA2.score }}
+
+            .lqa-table__header(slot="lqa3" slot-scope="{ row }")
+                span(v-if="row.assessments")
+                    span(v-if="row.assessments[0]")
+                        span(v-if="row.assessments[0].LQA3") {{ row.assessments[0].LQA3.score }}
 </template>
 
 <script>
@@ -28,7 +44,11 @@ import DataTable from "@/components/DataTable";
 export default {
     props: {
         vendorsData: {type: Array, default: () => []},
-        field: {type: String}
+        field: {type: String},
+        tier:{
+            type: String,
+            default: '-',
+        }
     },
     data() {
         return {
@@ -61,6 +81,9 @@ export default {
 .lqa-table {
     max-width: 1030px;
     margin: 10px 0 20px;
+    &__text{
+        margin: 10px 0 5px;
+    }
 }
 
 </style>
