@@ -25,6 +25,8 @@
             span.vendors-table__header-label {{ field.label }}
         template(slot="headerTqi" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
+        template(slot="headerTest" slot-scope="{ field }")
+            span.vendors-table__header-label {{ field.label }}
         template(slot="headerIcons" slot-scope="{ field }")
             span.vendors-table__header-label {{ field.label }}
         template(slot="vendorName" slot-scope="{ row }")
@@ -73,6 +75,10 @@
                 input.vendors-table__input(type="text" v-model="currentTqi" @click.stop="stopPropagation")
             .vendors-table__no-drop(v-else)
                 span.vendors-table__data {{ row.tqi }}
+        template(slot="test" slot-scope="{ row, index }")
+            .checkbox(@click.stop="")
+                input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
+                label(:for="'test' + (index + 1)")
         template(slot="icons" slot-scope="{ row, index }")
             span.vendors-table__icons
                 img.vendors-table__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'vendors-table_opacity': isIconClass(index, key)}")
@@ -128,10 +134,11 @@ export default {
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "8%", padding: "0"},
                 {label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "14%", cellClass: "vendors-table_scroll-y"},
                 {label: "Mono Language", headerKey: "headerMonoLanguage", key: "monoLanguage", width: "14%", cellClass: "vendors-table_scroll-y"},
-                {label: "Native Language", headerKey: "headerNative", key: "native", width: "14%", padding: "0"},
-                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "14%", padding: "0"},
+                {label: "Native Language", headerKey: "headerNative", key: "native", width: "12%", padding: "0"},
+                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "12%", padding: "0"},
                 {label: "Basic Rate", headerKey: "headerBasicRate", key: "basicRate", width: "7%", padding: "0"},
                 {label: "TQI", headerKey: "headerTqi", key: "tqi", width: "6%", padding: "0"},
+                {label: "Test", headerKey: "headerTest", key: "test", width: "4%", padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: "11%", padding: "3px"},        
             ],
             icons: {
@@ -159,8 +166,25 @@ export default {
             updateCurrentVendor: "updateCurrentVendor",
             storeCurrentVendor: "storeCurrentVendor",
             updateIndustry: "updateIndustry",
-            deleteCurrentVendor: "deleteCurrentVendor"
+            deleteCurrentVendor: "deleteCurrentVendor",
+            updateVendorStatus: "updateVendorStatus"
         }),
+        async setTest(vendorId){
+            const vendor = {
+                id: vendorId,
+                isTest: event.target.checked
+            }
+            try {
+                await this.updateVendorStatus(vendor);
+                this.alertToggle({message: "Vendor status updated", isShow: true, type: "success"});
+            } catch (err) {
+                this.alertToggle({
+                    message: "Server error / Cannot update Vendor status",
+                    isShow: true,
+                    type: "error"
+                });
+            }
+        },
         bottomScrolled() {
             this.$emit("bottomScrolled");
         },
@@ -421,6 +445,57 @@ export default {
     }
     &_flex-wrap {
         flex-wrap: wrap;
+    }
+    .checkbox {
+    display: inline-flex;
+    align-items: center;
+    input[type="checkbox"] {
+      opacity: 0;
+      + {
+        label {
+          &::after {
+            content: none;
+          }
+        }
+      }
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
+          }
+        }
+      }
+    }
+    label {
+      position: relative;
+      display: inline-block;
+      padding-left: 22px;
+      padding-top: 7px;
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid;
+        left: 0px;
+        top: 3px;
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+        }
+        }
     }
 }
 </style>

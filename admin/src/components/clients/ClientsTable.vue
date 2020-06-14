@@ -18,6 +18,8 @@
             span.clients-table__header-title {{ field.label }}
         template(slot="headerLead" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
+        template(slot="headerTest" slot-scope="{ field }")
+            span.clients-table__header-title {{ field.label }}
         template(slot="headericons" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
         template(slot="name" slot-scope="{ row, index }")
@@ -57,6 +59,10 @@
                     @scrollDrop="scrollDrop"
                 )
             .clients-table__data-cell(v-else) {{ row.leadSource }}
+        template(slot="test" slot-scope="{ row, index }")
+            .checkbox(@click.stop="")
+                input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
+                label(:for="'test' + (index + 1)")
         template(slot="icons" slot-scope="{ row, index }")
             .clients-table__icons
                 img.clients-table__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'clients-table_opacity': isIconClass(index, key)}")
@@ -103,11 +109,12 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Company Name", headerKey: "headerName", key: "name", width: "17%", padding: "0"},
+                {label: "Company Name", headerKey: "headerName", key: "name", width: "16%", padding: "0"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0"},
-                {label: "Website", headerKey: "headerWeb", key: "web", width: "20%", padding: "0"},
-                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "21%", padding: "0"},
+                {label: "Website", headerKey: "headerWeb", key: "web", width: "19%", padding: "0"},
+                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "19%", padding: "0"},
                 {label: "Lead Source", headerKey: "headerLead", key: "lead", width: "16%", padding: "0"},
+                {label: "Test", headerKey: "headerTest", key: "test", width: "4%", padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: "14%", padding: "0"}
             ],
             icons: {
@@ -131,6 +138,22 @@ export default {
         }
     },
     methods: {
+        async setTest(clientId){            
+            const client = {
+                id: clientId,
+                isTest: event.target.checked
+            }
+            try {
+                await this.updateClientStatus(client);
+                this.alertToggle({message: "Client status updated", isShow: true, type: "success"});
+            } catch (err) {
+                this.alertToggle({
+                    message: "Server error / Cannot update Client status",
+                    isShow: true,
+                    type: "error"
+                });
+            }
+        },
         isScrollDrop(drop, elem) {
             return drop && elem.clientHeight >= 600;
         },
@@ -254,7 +277,8 @@ export default {
         ...mapActions([
             "alertToggle",
             "storeClient",
-            "removeClient"
+            "removeClient",
+            "updateClientStatus"
         ])
     },
     computed: {
@@ -390,6 +414,57 @@ export default {
         font-weight: 700;
         z-index: 10;
         background-color: $white;
+    }
+    .checkbox {
+        display: inline-flex;
+        align-items: center;
+        input[type="checkbox"] {
+        opacity: 0;
+        + {
+            label {
+            &::after {
+                content: none;
+            }
+            }
+        }
+        &:checked {
+            + {
+            label {
+                &::after {
+                content: "";
+                }
+            }
+            }
+        }
+        }
+        label {
+        position: relative;
+        display: inline-block;
+        padding-left: 22px;
+        padding-top: 7px;
+        &::before {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 16px;
+            width: 16px;
+            border: 1px solid;
+            left: 0px;
+            top: 3px;
+        }
+        &::after {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 5px;
+            width: 9px;
+            border-left: 2px solid;
+            border-bottom: 2px solid;
+            transform: rotate(-45deg);
+            left: 4px;
+            top: 7px;
+            }
+        }
     }
 }
 </style>

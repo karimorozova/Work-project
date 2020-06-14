@@ -18,6 +18,11 @@
                     Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.status}")
                     ClientStatusSelect(:selectedStatus="currentClient.status" @chosenStatus="setStatus")
+            .block-item
+                label Test:
+                .block-item__check-item.checkbox
+                    input(type="checkbox" id="test" :checked="currentClient.isTest" @change="setTest")
+                    label(for="test")            
         .general-info__block
             .block-item
                 label.block-item__label Contract:
@@ -70,7 +75,25 @@ export default {
     methods: {
         ...mapActions([
             "storeClientProperty",
+            "updateClientStatus",
+            "alertToggle",
         ]),
+        async setTest(){
+            const client = {
+                id: this.currentClient._id,
+                isTest: event.target.checked
+            };
+        try {
+            await this.updateClientStatus(client);
+                this.alertToggle({message: "Client status updated", isShow: true, type: "success"});
+            } catch (err) {
+                this.alertToggle({
+                    message: "Server error / Cannot update Client status",
+                    isShow: true,
+                    type: "error"
+                });
+            }
+        },
         changeProperty(e, prop) {
             this.storeClientProperty({prop, value: e.target.value});
         },
@@ -145,6 +168,9 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    &__check-item{
+        width: 190px;
+    }
     &__label {
         margin-bottom: 0;
     }
@@ -175,6 +201,60 @@ export default {
     }
     ::-webkit-input-placeholder {
         opacity: 0.5;
+    }
+    #test{
+        width: 0;
+    }
+    .checkbox {
+        display: flex;
+        height: 28px;
+        input[type="checkbox"] {
+        opacity: 0;
+        + {
+            label {
+            &::after {
+                content: none;
+            }
+            }
+        }
+        &:checked {
+            + {
+            label {
+                &::after {
+                content: "";
+                }
+            }
+            }
+        }
+        }
+        label {
+        position: relative;
+        display: inline-block;
+        padding-left: 22px;
+        padding-top: 4px;
+        &::before {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 16px;
+            width: 16px;
+            border: 1px solid;
+            left: 0px;
+            top: 3px;
+        }
+        &::after {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 5px;
+            width: 9px;
+            border-left: 2px solid;
+            border-bottom: 2px solid;
+            transform: rotate(-45deg);
+            left: 4px;
+            top: 7px;
+        }
+      }
     }
 }
 .contract, .nda {

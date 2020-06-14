@@ -75,6 +75,10 @@ const ClientSchema = new mongoose.Schema({
         default: '',
         trim : true
     },
+    isTest:{
+        type: Boolean,
+        default: false
+    },
     wordsRates: [{ 
         source: {
             type: Schema.Types.ObjectId, ref: 'Language',

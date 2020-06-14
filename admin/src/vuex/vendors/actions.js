@@ -113,6 +113,21 @@ export const updateCurrentVendor = async ({ commit, state }, payload) => {
     }
 }
 
+export const updateVendorStatus = async ({ commit, dispatch, state }, payload) => {
+    commit("startRequest");
+    try {
+        const result = await Vue.http.post("/vendorsapi/update-vendor-status", payload);
+        const updatedVendor = result.body;        
+        const index = state.filteredVendors.findIndex(item => item._id === updatedVendor._id);
+        state.filteredVendors.splice(index, 1, updatedVendor);
+        commit('setCurrentVendor', updatedVendor);
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
+    }
+}
+
 export const setVendorsMatrixData = async ({ commit, dispatch, state }, payload) => {
     commit("startRequest");
     try {

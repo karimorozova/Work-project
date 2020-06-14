@@ -177,4 +177,16 @@ router.get('/any-doc', async (req, res) => {
     }
 })
 
+router.post('/update-client-status', async (req, res) => {
+    const { id, isTest } = req.body    
+    try {
+       await Clients.updateOne({"_id": id}, {"isTest": isTest});
+       const client = await getClient({"_id": id})
+       res.send(client);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error on updating Client status");
+    }
+})
+
 module.exports = router;

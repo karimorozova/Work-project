@@ -53,6 +53,11 @@
                                 placeholder="Gender"
                                 @chooseOption="updateGender"
                             )
+                    .block-item
+                        label Test:
+                        .block-item__check-item.checkbox
+                          input(type="checkbox" id="test" :checked="currentVendor.isTest" @change="setTest")
+                          label(for="test")
                 .gen-info__block
                     .block-item
                         label Company Name:
@@ -167,6 +172,22 @@ export default {
     };
   },
   methods: {
+    async setTest(){
+      const vendor = {
+          id: this.currentVendor._id,
+          isTest: event.target.checked
+      };
+      try {
+          await this.updateVendorStatus(vendor);
+          this.alertToggle({message: "Vendor status updated", isShow: true, type: "success"});
+        } catch (err) {
+          this.alertToggle({
+              message: "Server error / Cannot update Vendor status",
+              isShow: true,
+              type: "error"
+          });
+        }
+    },
     closePreview() {
       this.isEditAndSend = false;
     },
@@ -370,7 +391,9 @@ export default {
       deleteCurrentVendor: "deleteCurrentVendor",
       storeCurrentVendor: "storeCurrentVendor",
       updateIndustry: "updateIndustry",
-      getDuoCombinations: "getVendorDuoCombinations"
+      getDuoCombinations: "getVendorDuoCombinations",
+      updateVendorStatus: "updateVendorStatus"
+
     })
   },
   beforeDestroy() {
@@ -492,6 +515,9 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  &__check-item{
+    width: 190px;
+  }
   &__label {
     margin-bottom: 0;
   }
@@ -531,6 +557,60 @@ export default {
     box-shadow: 0 0 5px red;
     border-radius: 5px;
   }
+  #test{
+    width: 0;
+  }
+  .checkbox {
+        display: flex;
+        height: 28px;
+        input[type="checkbox"] {
+        opacity: 0;
+        + {
+            label {
+            &::after {
+                content: none;
+            }
+            }
+        }
+        &:checked {
+            + {
+            label {
+                &::after {
+                content: "";
+                }
+            }
+            }
+        }
+        }
+        label {
+        position: relative;
+        display: inline-block;
+        padding-left: 22px;
+        padding-top: 4px;
+        &::before {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 16px;
+            width: 16px;
+            border: 1px solid;
+            left: 0px;
+            top: 3px;
+        }
+        &::after {
+            position: absolute;
+            content: "";
+            display: inline-block;
+            height: 5px;
+            width: 9px;
+            border-left: 2px solid;
+            border-bottom: 2px solid;
+            transform: rotate(-45deg);
+            left: 4px;
+            top: 7px;
+        }
+      }
+    }
 }
 
 .buttons {

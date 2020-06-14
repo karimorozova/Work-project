@@ -58,7 +58,7 @@
             span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
         template(slot="projectTest" slot-scope="{ row, index }")
             .checkbox(@click.stop="")
-                input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
+                input(type="checkbox" class="test" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
                 label(:for="'test' + (index + 1)")
 
 </template>
@@ -157,6 +157,9 @@ export default {
        width: 18px;
        position: absolute;
        z-index: 500;
+    }
+    .test{
+        width: 0;
     }
     .checkbox {
     display: flex;
