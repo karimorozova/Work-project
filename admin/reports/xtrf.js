@@ -384,7 +384,7 @@ function getLqaWordcount(tier, arr, vendorName) {
       const { TranslationDocumentUserRoleAssignmentDetails } = cur.UserAssignments;
       const translator = TranslationDocumentUserRoleAssignmentDetails[0];
       if (translator) {
-        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`))) {
+        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`, `i`))) {
           acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
             {
               ...acc[translator.UserInfoHeader.FullName],
@@ -409,7 +409,7 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
       const translator = TranslationDocumentUserRoleAssignmentDetails[0];
       const reportProp = industry === 'Finance' ? 'financeTier' : 'gameTier';
       if (translator) {
-        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`))) {
+        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`, `i`))) {
           acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
             {
               ...acc[translator.UserInfoHeader.FullName],
@@ -434,7 +434,7 @@ function getFilteringQuery(filters) {
   if (filters.nameFilter) {
     query[
       'documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName'
-      ] = { '$regex': new RegExp(`${filters.nameFilter}`, 'i') };
+      ] = { '$regex': new RegExp(`${filters.nameFilter}`, 'gi') };
   }
   if (filters.industryFilter) {
     query.domain = { '$regex': new RegExp(`${filters.industryFilter}`, 'i') };
