@@ -15,16 +15,20 @@
             )
         .lqa__languages
             .lqa__language(v-for="report in reportData")
-                h3.lga__text Target Language: {{ report.target }}
-                .lqa__industry(v-if="report.finance.vendors.length")
-                    h4.lqa__text Industry: Finance
-                    Table(:vendorsData="report.finance.vendors" field="Finance" :tier="String(report.finance.tier)")
-                .lqa__industry(v-if="report.gaming.vendors.length")
-                    h4.lqa__text Industry: iGaming
-                    Table(:vendorsData="report.gaming.vendors" field="iGaming" :tier="String(report.gaming.tier)")
-                .lqa__industry(v-if="report.other.vendors.length")
-                    h4.lqa__text Industry: Others
-                    Table(:vendorsData="report.other.vendors" field="Others" :tier="String(report.other.tier)")
+                div(v-if="report !== null")
+                    h3.lga__text Target Language: {{ report.target }}
+                    .lqa__group-industries(v-if="report.finance")
+                        .lqa__industry(v-if="report.finance.vendors.length")
+                            h4.lqa__text Industry: Finance
+                            Table(:vendorsData="report.finance.vendors" field="Finance" :tier="String(report.finance.tier)")
+                    .lqa__group-industries(v-if="report.gaming")
+                        .lqa__industry(v-if="report.gaming.vendors.length")
+                            h4.lqa__text Industry: iGaming
+                            Table(:vendorsData="report.gaming.vendors" field="iGaming" :tier="String(report.gaming.tier)")
+                    .lqa__group-industries(v-if="report.other")
+                        .lqa__industry(v-if="report.other.vendors.length")
+                            h4.lqa__text Industry: Others
+                            Table(:vendorsData="report.other.vendors" field="Others" :tier="String(report.other.tier)")
             .lqa__form(v-if="false")
                 NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
 </template>
@@ -59,6 +63,7 @@ export default {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
                 this.reportData = result.data;
+                
                 const languages = await this.$http.get("/api/languages");
                 this.allLangs = languages.data;
 
