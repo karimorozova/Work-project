@@ -53,7 +53,16 @@ export default {
         async getReport() {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-upcoming-lqa-report", { filters: this.filters });
-                this.reportData = result.body 
+                if(this.filters.tierFilter){
+                     this.reportData = {
+                       financeReports: Object.values(result.body.financeReports)
+                         .filter(item => item.tier === this.filters.tierFilter),
+                       gamingReports : Object.values(result.body.gamingReports)
+                         .filter(item => item.tier === this.filters.tierFilter)
+                     };
+                }else{
+                    this.reportData = result.body
+                }
             } catch(err) {
                 this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
             }
@@ -104,7 +113,6 @@ export default {
             function changeObject(obj, industry){
                 for (let key in obj) {
                     obj[key].industry = industry;
-                    obj[key].name = key;
                 }
              }
             function joinArrays(obj){
