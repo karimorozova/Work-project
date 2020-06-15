@@ -165,7 +165,7 @@ function getLqaSpecificTier(vendors) {
 async function getXtrfLqaReport(filters) {
   const filterQuery = getFilteringQuery(filters);
   const vendorFilterQuery = await getVendorsQuery(filters);
-  const { nameFilter, industryFilter, targetFilter } = filters;
+  const { nameFilter, industryFilter, targetFilter, tierFilter } = filters;
   try {
     const tiers = await getXtrfTierReport(filters);
     const vendors = await Vendors.find(vendorFilterQuery);
@@ -288,7 +288,7 @@ async function getXtrfLqaReport(filters) {
         tier: getLqaSpecificTier(vendor.other.vendors),
         ...vendor.other
       }
-    })).filter(vendor => vendor.finance.vendors.length || vendor.gaming.vendors.length || vendor.other.vendors.length);
+    }))
     if (industryFilter) {
       if (industryFilter === 'Finance') {
         result = result.map(vendor => ({
@@ -325,23 +325,23 @@ async function getXtrfLqaReport(filters) {
       }
       result = filteredReport;
     }
-    return result
-    // FOR FUTURE LQA:
-    // let reportsFilter = {target: filterQuery.language};
-    // if(filters.tierFilter) {
-    //     reportsFilter.tierFilter = filters.tierFilter;
-    // }
-    // let reports = await getXtrfTierReport(reportsFilter);
-    // reports = reports.filter(item => item.financeTier.wordcount || item.gameTier.wordcount)
-    //     .map(item => {
-    //         return {
-    //             target: item.target,
-    //             finance: item.financeTier.tier,
-    //             game: item.gameTier.tier
-    //         }
-    //     });
-    // const lqas = await getFilteredLqas(filterQuery);
-    // return await getFilteredLqaReports({reports, lqas, filters});
+    if (tierFilter) {
+     result = result.map(item => {
+       if (item.finance && item.finance.tier !== tierFilter) {
+         delete item.finance;
+       }
+       if (item.gaming && item.gaming.tier !== tierFilter) {
+         delete item.gaming;
+       }
+       if (item.other && item.other.tier !== tierFilter) {
+         delete item.other;
+       }
+       return item;
+     }).filter(item => Object.keys(item).length !== 1);
+    }
+    return result.filter(vendor => (vendor.finance && vendor.finance.vendors.length)
+      || (vendor.gaming && vendor.gaming.vendors.length)
+      || (vendors.other && vendor.other.vendors.length));
   } catch (err) {
     console.log(err);
     console.log("Error in getXtrfLqaReport");
@@ -384,7 +384,7 @@ function getLqaWordcount(tier, arr, vendorName) {
       const { TranslationDocumentUserRoleAssignmentDetails } = cur.UserAssignments;
       const translator = TranslationDocumentUserRoleAssignmentDetails[0];
       if (translator) {
-        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`))) {
+        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`, `i`))) {
           acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
             {
               ...acc[translator.UserInfoHeader.FullName],
@@ -409,7 +409,7 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
       const translator = TranslationDocumentUserRoleAssignmentDetails[0];
       const reportProp = industry === 'Finance' ? 'financeTier' : 'gameTier';
       if (translator) {
-        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`))) {
+        if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`, `i`))) {
           acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
             {
               ...acc[translator.UserInfoHeader.FullName],
@@ -429,78 +429,6 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
   }, {});
 }
 
-async function getFilteredLqaReports({ reports, lqas, filters }) {
-  let result = [];
-  try {
-    const tierLqas = await TierLqa.find();
-    for (let report of reports) {
-      let finance = getIndustriesLqas({ lqas, tierLqas, report, reportProp: "finance", filters, prop: "Finance" });
-      let gaming = getIndustriesLqas({ lqas, tierLqas, report, reportProp: "game", filters, prop: "iGaming" });
-      if (finance.length || gaming.length) {
-        let price = await getLanguagePrices(report.target);
-        const prices = price.length ? price[0].prices : null;
-        if (!filters.industryFilter) {
-          result.push({
-            ...report,
-            prices,
-            financeVendors: finance,
-            gamingVendors: gaming
-          });
-        } else {
-          let filteredReport = getFilteredByIndustry({ report, finance, gaming, filters });
-          result = filteredReport ? [...result, { ...filteredReport, prices }] : result;
-        }
-      }
-    }
-    return result;
-  } catch (err) {
-    console.log(err);
-    console.log("Error in getFilteredLqaReports");
-  }
-}
-
-function getIndustriesLqas({ lqas, tierLqas, report, reportProp, filters, prop }) {
-  const tierLqaWords = tierLqas.find(item => item.category == report[reportProp]);
-  const withLqaVendors = lqas.map(item => {
-    const isLqa1 = +item.wordcounts[prop] >= +tierLqaWords.lqa1 && !item.vendor.lqa1s[prop];
-    const isLqa2 = +item.wordcounts[prop] >= +tierLqaWords.lqa2 && !isLqa1 && !item.vendor.lqa2s[prop];
-    const isLqa3 = +item.wordcounts[prop] >= +tierLqaWords.lqa3 && !isLqa1 && !isLqa2 && !item.vendor.lqa3s[prop];
-    return {
-      ...item,
-      tier: report[reportProp],
-      industry: prop,
-      isLqa1,
-      isLqa2,
-      isLqa3
-    };
-  });
-  return withLqaVendors.filter(item => {
-    let isFit = item.vendor.language.lang === report.target && item.vendor.tqis[prop];
-    isFit = isFit && filters.tierFilter ? report[reportProp] === filters.tierFilter : isFit;
-    if (isFit) {
-      const lqaProp = item[`isLqa${filters.lqaFilter}`];
-      isFit = filters.lqaFilter ? lqaProp : isFit;
-    }
-    return isFit;
-  });
-}
-
-function getFilteredByIndustry({ report, finance, gaming, filters }) {
-  if (filters.industryFilter === 'Finance' && finance.length) {
-    return {
-      ...report,
-      financeVendors: finance,
-      gamingVendors: []
-    };
-  } else if (filters.industryFilter === 'iGaming' && gaming.length) {
-    return {
-      ...report,
-      financeVendors: [],
-      gamingVendors: gaming
-    };
-  }
-}
-
 function getFilteringQuery(filters) {
   let query = { $and: [{ documents: { $ne: null }, creationTime: { $gte: new Date('2020-04-01T00:00:00Z') } }] };
   if (filters.nameFilter) {
@@ -508,12 +436,12 @@ function getFilteringQuery(filters) {
       'documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName'
       ] = { '$regex': new RegExp(`${filters.nameFilter}`, 'i') };
   }
-  // if (filters.industryFilter) {
-  //   query.domain = { '$regex': new RegExp(`${filters.industryFilter}`, 'i') };
-  // }
-  // if (filters.targetFilter) {
-  //   query['targetLanguages.lang'] = { $in: filters.targetFilter };
-  // }
+  if (filters.industryFilter) {
+    query.domain = { '$regex': new RegExp(`${filters.industryFilter}`, 'i') };
+  }
+  if (filters.targetFilter) {
+    query['targetLanguages.lang'] = { $in: filters.targetFilter };
+  }
   return query;
 }
 
@@ -525,34 +453,6 @@ async function getVendorsQuery(filters) {
   return query;
 }
 
-async function getLanguagePrices(target) {
-  try {
-    return await XtrfPrice.aggregate([
-      {
-        $lookup:
-          {
-            from: "xtrfreportlangs",
-            localField: "language",
-            foreignField: "_id",
-            as: "language"
-          }
-      },
-      {
-        $unwind: {
-          path: "$language"
-        }
-      },
-      {
-        $match: {
-          "language.lang": target
-        }
-      }
-    ]);
-  } catch (err) {
-    console.log(err);
-    console.log("Error in getLanguagePrices");
-  }
-}
 
 // Upcoming LQA
 async function getXtrfUpcomingReport(filters) {
@@ -563,8 +463,12 @@ async function getXtrfUpcomingReport(filters) {
     const memoqs = await MemoqProject.find(filterQuery);
     const financeDocs = getIndustryDocs(memoqs, 'Finance');
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-    const financeReports = getUpcomingWordcount(tiers, financeDocs, nameFilter, 'Finance');
-    const gamingReports = getUpcomingWordcount(tiers, gamingDocs, nameFilter, 'iGaming');
+    let financeReports = getUpcomingWordcount(tiers, financeDocs, nameFilter, 'Finance');
+    let gamingReports = getUpcomingWordcount(tiers, gamingDocs, nameFilter, 'iGaming');
+    if (filters.tierFilter) {
+      Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
+      Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
+    }
     return {
       financeReports,
       gamingReports,
