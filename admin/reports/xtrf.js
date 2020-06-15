@@ -434,7 +434,7 @@ function getFilteringQuery(filters) {
   if (filters.nameFilter) {
     query[
       'documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName'
-      ] = { '$regex': new RegExp(`${filters.nameFilter}`, 'gi') };
+      ] = { '$regex': new RegExp(`${filters.nameFilter}`, 'i') };
   }
   if (filters.industryFilter) {
     query.domain = { '$regex': new RegExp(`${filters.industryFilter}`, 'i') };
