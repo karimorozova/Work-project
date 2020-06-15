@@ -124,13 +124,13 @@ async function updateProjectTasks(taskData) {
     const units = JSON.parse(newTasksInfo.stepsAndUnits);
     const allInfo = { ...newTasksInfo, units, project, taskRefFiles: memoqDocs, stepsDates: newTasksInfo.stepsDates };
     for (let { unit } of units) {
-      if (newTasksInfo.stepsAndUnits.length === 2 && unit === 'Hours') {
+      if (unit === 'Hours') {
         const tasksWithoutFinance = getTasksForHours({ ...allInfo, projectId: project.projectId });
         const steps = await getStepsForDuoStepHours({ ...allInfo, tasks: tasksWithoutFinance });
         const tasks = tasksWithoutFinance.map(item => getHoursTaskWithFinance(item, steps));
         const projectFinance = getProjectFinance(tasks, project.finance);
         await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
-      } else if (newTasksInfo.stepsAndUnits.length === 2 && unit === 'Packages') {
+      } else if (unit === 'Packages') {
         const { service, targets, packageSize } = newTasksInfo;
         const { vendor, vendorRate, clientRate, payables, receivables } = await getFinanceDataForPackages({
           project, service, packageSize, target: targets[0]
