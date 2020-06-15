@@ -22,3 +22,5 @@ mongo
 *.ntvs*
 *.njsproj
 *.sln
+
+admin/src/assets/images/CATEGORIES/clients.png
