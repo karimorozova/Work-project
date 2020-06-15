@@ -10,7 +10,7 @@ async function insertUnitIntoStep(unit, unitId) {
         type,
         active,
         editable: true,
-        sizes,
+        // sizes,
       })
       await Step.updateOne({ _id }, step, { upsert: true });
     }
@@ -60,7 +60,7 @@ async function changeUnitsInSteps(unitToUpdate) {
             type: unit.type,
             active: unit.active,
             editable: true,
-            sizes: unit.sizes,
+            // sizes: unit.sizes,
           })
         }
         await Step.updateOne({ _id: id }, step);

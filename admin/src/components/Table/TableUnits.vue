@@ -291,6 +291,8 @@ export default {
         this.errors.push("Size should be number!");
       if(this.currentSizes.map(item => item == '').includes(true))
         this.errors.push("Size cannot be empty!");
+      if(this.currentSizes.filter( (item, index, array) => index !== array.indexOf(item) || index !== array.lastIndexOf(item)).length)
+        this.errors.push("Size should be unique!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
