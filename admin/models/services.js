@@ -19,7 +19,7 @@ const ServicesSchema = new mongoose.Schema({
     formType: {
         type: String,
         default: '',
-        trim: true 
+        trim: true
     },
     icon: {
         type: String,
@@ -35,9 +35,8 @@ const ServicesSchema = new mongoose.Schema({
         default: false
     },
     calculationUnit: {
-        type: String,
-        default: 'Words',
-        trim: true
+        type: Array,
+        default: [],
     },
     languageForm: {
         type: String,
@@ -72,7 +71,7 @@ const ServicesSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }    
+    }
 });
 
 const Services = mongoose.model('Services', ServicesSchema);

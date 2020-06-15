@@ -6,18 +6,21 @@ const { pmMail } = require('../utils/mailtopm');
 const { getUpdatedProjectFinance } = require('./porjectFinance');
 const { setMemoqTranlsators, getProjectTranslationDocs } = require('../services/memoqs/projects');
 const { downloadMemoqFile } = require('../services/memoqs/files');
- 
+
 async function updateProjectProgress(project, isCatTool) {
     let { steps, tasks } = project;
     try {
         for(let task of tasks) {
-            if(task.service.calculationUnit === 'Words' && isCatTool) {
-                const docs = await getProjectTranslationDocs(task.memoqProjectId);
-                task.memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === task.memoqTarget) : [docs];
-                steps = updateWordcountStepsProgress({steps, task});
-            } else if(!isCatTool) {
-                steps = updateStepsProgress(task, steps);
+          const units = JSON.parse(task.service.calculationUnit);
+          for (let { unit } of units) {
+            if (unit === 'CAT Wordcount' && isCatTool) {
+              const docs = await getProjectTranslationDocs(task.memoqProjectId);
+              task.memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === task.memoqTarget) : [docs];
+              steps = updateWordcountStepsProgress({ steps, task });
+            } else if (!isCatTool) {
+              steps = updateStepsProgress(task, steps);
             }
+          }
         }
         return await updateProject({"_id": project.id}, { steps, tasks });
     } catch(err) {
@@ -32,7 +35,7 @@ async function getProjectAfterCancelTasks(tasks, project) {
         const Price = getUpdatedProjectFinance(changedTasks);
         const notifySteps = stepIdentify.length ? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1) : changedSteps;
         await stepCancelNotifyVendor(notifySteps);
-        return await updateProject({"_id": project.id}, 
+        return await updateProject({"_id": project.id},
             {tasks: changedTasks, steps: changedSteps, finance: {...project.finance, Price}});
     } catch(err) {
         console.log(err);
@@ -193,7 +196,7 @@ function updateStepsStatuses({projectSteps, tasks, status, stepIdentify}) {
 function isPrevStep({tasks, projectSteps, step}) {
     const stepTask = tasks.find(item => item.taskId === step.taskId);
     const sameSteps = projectSteps.filter(item => {
-        return item.taskId === stepTask.taskId 
+        return item.taskId === stepTask.taskId
                 && item.stepId !== step.stepId
                 && item.status !== "Completed"
     });
@@ -226,7 +229,7 @@ async function updateProjectStatus(id, status, reason) {
             await stepCancelNotifyVendor(notifySteps);
         }
         return await updateProject(
-                {"_id": id}, 
+                {"_id": id},
                 { status: projectStatus, reason: reason, isPriceUpdated: false, finance: {...project.finance, Price}, tasks: changedTasks, steps: changedSteps}
             );
     } catch(err) {
@@ -308,8 +311,8 @@ function getApprovedStepStatus(stepTask, step) {
 
 function getProjectNewStatus(changedTasks, status) {
     const notFullyCancelledTask = changedTasks.find(item => {
-        return item.status === "Cancelled Halfway" || 
-            item.status === "Ready for Delivery" || 
+        return item.status === "Cancelled Halfway" ||
+            item.status === "Ready for Delivery" ||
             item.status === "Delivered"
     })
     return notFullyCancelledTask ? "Cancelled Halfway" : status;

@@ -1,0 +1,229 @@
+<template lang="pug">
+    .hours-steps
+        .hours-steps__step
+            .hours-steps__block(v-if="currentJob.unit !== 'Packages' &&  currentJob.unit !== 'CAT Wordcount'")
+                .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
+                .hours-steps__main
+                    .hours-steps__item
+                        LabelVal(:text="currentJob.unit")
+                            input.hours-steps__input(type="number" min="1" max="1000" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)" @input="setLimit" @keydown="removeNonDigit")
+                            .tasks-langs__item
+            .hours-steps__block(v-if="currentJob.unit == 'CAT Wordcount'")
+                .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
+                .hours-steps__main(v-if="tasksData.stepsAndUnits")
+                    .hours-steps__sub-title Template
+                    .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
+                        SelectSingle(
+                            :selectedOption="selectedTemplate.name"
+                            :options="allTemplates"
+                            placeholder="Template"
+                            @chooseOption="setTemplate"
+                        )
+            .hours-steps__block(v-if="currentJob.unit == 'Packages'")
+                .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
+                .hours-steps__packages
+                    .hours-steps__packages-item
+                        .hours-steps__packages-title Quantity
+                            input.hours-steps__input(type="number" min="1" max="1000" @change="(e) => setQuantity(e, currentJob.step)" @input="setLimit" @keydown="removeNonDigit")
+                    .hours-steps__packages-item
+                        .hours-steps__sub-title Template
+                        .hours-steps__drop-menu
+                            SelectSingle(
+                                placeholder="Package"
+                                :options="packages"
+                                :selectedOption="selectedPackage"
+                                @chooseOption="setPackage"
+                            )          
+</template>
+
+<script>
+import LabelVal from "@/components/LabelVal";
+import { mapGetters, mapActions } from 'vuex';
+import taskData from "@/mixins/taskData";
+import SelectSingle from "@/components/SelectSingle";
+
+export default {
+    mixins: [taskData],
+    props: {
+        currentJob: {
+            type: Object
+        },
+        currentIndex:{
+            type: Number
+        }
+    },
+    data(){
+        return {
+            templates: [],
+            packages: [],
+            selectedPackage: "",
+            selectedTemplate: "",
+        }
+    },
+    methods: {
+        async getPackages(){
+            try {
+                const result = await this.$http.get('/api/packages');
+                this.packages = result.data.map(item => item.size);
+            } catch (err) {
+                this.alertToggle({message: "Error on getting packages", isShow: true, type: "error"});
+            }
+        },
+        ...mapActions({
+            setDataValue: "setTasksDataValue",
+            alertToggle: "alertToggle"
+        }),
+        setQuantity(e, step) {
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].quantity = e.target.value;
+
+            let filedsForDelete = ['template','hours'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
+        },
+        setHours(e, step) {
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].hours = e.target.value;
+
+            let filedsForDelete = ['quantity','packageSize','template'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
+        },
+        setTemplate({ option }) {
+            const value = this.templates.find(item => item.name === option);
+            this.selectedTemplate = value;
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].template = value;
+
+            let filedsForDelete = ['quantity','packageSize','hours'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
+        },
+        setPackage({option}) {
+            let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+            oldStepsAndUnits[this.currentIndex].packageSize = option;
+            this.selectedPackage = option;
+
+            let filedsForDelete = ['template','hours'];
+            for (const iterator of filedsForDelete) {
+                oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+                ? delete oldStepsAndUnits[this.currentIndex][iterator]
+                : false
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
+        },
+        async getMemoqTemplates() {
+            try {
+                const result = await this.$http.get("/memoqapi/templates");
+                this.templates = result.data || [];
+            } catch(err) {
+                this.alertToggle({message: "Error on getting templates", isShow: true, type: "error"});
+            }
+        }
+    },
+    created(){
+        this.getPackages();
+        this.getMemoqTemplates();
+    },
+    computed: {
+        ...mapGetters({
+            tasksData: "getTasksData"
+        }),     
+        allTemplates() {
+            return this.templates.map(item => item.name);
+        },
+    },
+    components: {
+        LabelVal,
+        SelectSingle
+    }    
+}
+</script>
+
+<style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
+
+.hours-steps {
+    &__block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+        border: 1px solid $main-color;
+        box-sizing: border-box;
+        background-color: $active-background;
+        padding: 12px 20px 0;
+
+    }
+    &__packages{
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        &-item{
+            display: flex;
+        }
+        &-title{
+            width: 150px;
+        }
+    }
+    &__title {
+        position: relative;
+        max-width: 100%;
+        margin: 10px 0 5px;
+        text-align: center;
+        font-size: 18px;
+    }
+    &__sub-title{
+        margin-top: 6px;
+        margin-right: 10px;
+    }
+    &__main {
+        display: flex;
+        width: 100%;
+        margin: 7px 0;
+        justify-content: center;
+    }
+    &__drop-menu {
+      position: relative;
+      border-radius: 6px;
+      height: 29px;
+      background: #fff;
+      margin-bottom: 15px;
+      width: 191px;
+    }
+
+    &__input {
+        color: $main-color;
+        width: 75px;
+        margin-left: 10px;
+        outline: none;
+        border: 1px solid $main-color;
+        border-radius: 5px;
+        box-sizing: border-box;
+        padding-left: 5px;
+        transition: all 0.2s;   
+        height: 29px;
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none; 
+            margin: 0;
+        }
+    }
+    &__stage {
+        opacity: 0.8;
+    }
+}
+
+</style>

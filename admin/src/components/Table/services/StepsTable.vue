@@ -19,25 +19,25 @@
                     .steps__data(v-if="currentActive !== index") {{ row.title }}
                     .steps__editing-data(v-else)
                         input.steps__input(type="text" v-model="currentStep.title")
+  
                 template(slot="calculationUnit" slot-scope="{ row, index }")
-                    .steps__data(v-if="currentActive !== index") {{ row.calculationUnit }}
+                    .steps__data(v-if="currentActive !== index") {{ presentUnits(row.calculationUnit) }}
                     .steps__drop-menu(v-else)
-                        SelectSingle(
+                        SelectMulti(
                             :isTableDropMenu="true"
-                            :selectedOption="currentStep.calculationUnit"
-                            :options="units"
-                            @chooseOption="setUnit"
-                            @scrollDrop="scrollDrop"
+                            placeholder="Select"
+                            :hasSearch="true"
+                            :options="unitData" 
+                            :selectedOptions="selectedUnits" 
+                            @chooseOptions="setUnits"
                         )
+                        
                 .steps__data.steps_centered(slot="stage1" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
                     img.steps__checkbox(v-if="isSelected('isStage1', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
                 .steps__data.steps_centered(slot="stage2" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
                     img.steps__checkbox(v-if="isSelected('isStage2', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage2')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index,'isStage2')" :class="{'steps_opacity': currentActive === index}")
-                .steps__data.steps_centered(slot="editor" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
-                    img.steps__checkbox(v-if="isSelected('isEditor', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isEditor')" :class="{'steps_opacity': currentActive === index}")
-                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isEditor')" :class="{'steps_opacity': currentActive === index}")
                 .steps__data.steps_centered(slot="active" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
                     img.steps__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import SelectMulti from "../../SelectMulti";
 import SettingsTable from "../SettingsTable";
 import SelectSingle from "@/components/SelectSingle";
 import Add from "@/components/Add";
@@ -64,25 +65,47 @@ export default {
         return {
             fields: [
                 {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(850*0.20), padding: "0"},
-                {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: Math.floor(850*0.16), padding: "0"},
+                {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: Math.floor(850*0.28), padding: "0"},
                 {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: Math.floor(850*0.12), padding: "0"},
                 {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: Math.floor(850*0.12), padding: "0"},
-                {label: "Editor", headerKey: "headerEditor", key: "editor", width: Math.floor(850*0.12), padding: "0"},
                 {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(850*0.12), padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
             ],
-            units: ["Words", "Hours", "Packages"],
+            units: [],
             errors: [],
             areErrors: false,
             currentActive: -1,
             currentStep: "",
-            tableWidth: 850
+            tableWidth: 850,
+            currentUnits: [],
         }
     },
     methods: {
         ...mapActions({
             alertToggle: "alertToggle"
         }),
+        presentUnits(units) {
+            if (!units.length) return "";
+            return units.reduce((acc, cur) => acc + `${cur.type}; `, "");
+            // return units.filter(item => item.active).reduce((acc, cur) => acc + `${cur.type}; `, "");
+        },
+        setUnits({ option }) {
+            const position = this.selectedUnits.indexOf(option);
+            if (position !== -1) {
+                this.currentUnits.splice(position, 1);
+            } else {
+                const title = this.units.find(item => item.type === option);
+                this.currentUnits.push(title);
+            }
+        },
+        async getUnits(){
+            try {
+                const result  = await this.$http.get('/api/units');
+                this.units = result.body;
+            } catch (err) {
+                this.alertToggle({message: "Erorr on getting Units", isShow: true, type: "error"});
+            }
+        },
         closeErrors() {
             this.areErrors = false;
         },
@@ -97,9 +120,10 @@ export default {
             if(this.currentActive !== -1) {
                 return this.isEditing();
             }
+            this.currentUnits = [];
             this.currentStep = {
                 title: "",
-                calculationUnit: "",
+                calculationUnit: [],
                 isStage1: false,
                 isStage2: false,
                 isEditor: false,
@@ -127,6 +151,7 @@ export default {
                 case 'edit':
                     this.currentActive = index;
                     this.currentStep = {...this.steps[index]};
+                    this.currentUnits = Array.from(this.steps[index].calculationUnit);
                     break;
                 case 'cancel':
                     this.currentActive = -1;
@@ -142,7 +167,7 @@ export default {
             this.errors = [];
             const isNotUnique = this.steps.find((item, ind) => ind !== index && item.title === this.currentStep.title.trim());
             if(!this.currentStep.title || isNotUnique) this.errors.push("Step title should be unique and not empty");
-            if(!this.currentStep.calculationUnit) this.errors.push("Please, select calculation unit.");
+            if(!this.currentUnits.length) this.errors.push("Please, select calculation unit.");
             if(!this.currentStep.isStage1 && !this.currentStep.isStage2) this.errors.push("Please, set at least one stage.");
             if(this.errors.length) {
                 return this.areErrors = true;
@@ -153,6 +178,7 @@ export default {
         async saveChanges(index) {
             try {
                 this.currentStep.symbol = this.currentStep.title.toLowerCase().trim().replace(/ /g,"_");
+                this.currentStep.calculationUnit = this.currentUnits;
                 await this.$http.post("/api/step", { step: this.currentStep });
                 this.$emit("updateSteps");
                 this.alertToggle({message: "Information saved", isShow: true, type: "success"});
@@ -167,12 +193,25 @@ export default {
         manageIcons() {
             const { "delete": del, ...result } = this.icons;
             return result;
-        }
+        },
+        unitData() {
+            return this.units.map(item => item.type);
+        },
+        selectedUnits() {
+            return this.currentUnits.length
+            // ? this.currentUnits.filter(item => item.active).map(item => item.type)
+            ? this.currentUnits.map(item => item.type)
+            : [];
+    }
+    },
+    created(){
+        this.getUnits();
     },
     components: {
         SettingsTable,
         SelectSingle,
-        Add
+        Add,
+        SelectMulti
     },
     beforeDestroy() {
         this.$emit("setStepsWithId");
@@ -204,6 +243,7 @@ export default {
     }
     &__drop-menu {
         position: relative;
+        box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__checkbox {
         width: 22px;

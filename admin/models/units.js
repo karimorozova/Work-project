@@ -8,7 +8,7 @@ const UnitSchema = new mongoose.Schema({
   },
   steps: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   active: {
     type: Boolean,
@@ -17,7 +17,11 @@ const UnitSchema = new mongoose.Schema({
   editable: {
     type: Boolean,
     default: true,
-  }
+  },
+  sizes:{
+    type: Array,
+    default: () => [],
+  },
 });
 
 const Units = mongoose.model('Units', UnitSchema);

@@ -21,14 +21,32 @@
                     @chooseOption="setWorkflow"
                     :positionStyle="positionStyle"
                 )
-        .workflow__default-dates(v-if="selectedWorkflow.id !== 2890")
+        .workflow__default-dates(v-if="selectedWorkflow.id == 2917")
             StepsDefaultDateModified(
+                :workflowId="2917"
                 v-for="count in stepsCounter"
                 :stepCounter="count"
                 :start="stepsDates[count-1].start"
                 :deadline="stepsDates[count-1].deadline"
                 @setDate="(e) => setDate(e, count)"
+                @sendUnit="pushStepAndUnit"
+                :service="service"
+                :tasksData="tasksData"
             )
+
+        .workflow__default-dates(v-if="selectedWorkflow.id == 2890")
+            StepsDefaultDateModified(
+                :workflowId="2890"
+                v-for="count in 1"
+                :stepCounter="count"
+                :start="stepsDates[0].start"
+                :deadline="stepsDates[0].deadline"
+                @setDate="(e) => setDate(e, count)"
+                @sendUnit="pushStepAndUnit"
+                :service="service"
+                :tasksData="tasksData"
+            )
+
         transition(name="fade")
             .workflow__error(v-if="isError")
                 p.workflow__error-message The Service has no Steps! Please, check the Settings.
@@ -52,7 +70,9 @@ export default {
             stepsDates: [{ start: new Date(), deadline: "" }, { start: "", deadline: new Date() }],
             asteriskStyle: {"top": "-2px"},
             positionStyle: {"margin-top": "3px"},
-            isError: false
+            isError: false,
+            stepsAndUnits:[],
+            stepsAndUnitsMono:[],
         }
     },
     methods: {
@@ -74,9 +94,37 @@ export default {
                     this.stepsDates[count].deadline = date;
                 }
             }
-            this.setDataValue({prop: "stepsDates", value: this.stepsDates});
+            if(this.selectedWorkflow.id == 2890){
+                this.setDataValue({prop: "stepsDates", value: this.stepsDates[0]});
+            }else{
+                this.setDataValue({prop: "stepsDates", value: this.stepsDates});
+            }
         },
-        setService({option}) {
+        async setDefaultStepsAndUnits(option){
+            let defaultStepsAndUnits;
+            const currentSteps = this.services.find(item => item.title == this.service);
+            const steps = await this.$http.get("/api/steps");      
+            if(option == "2 Steps"){
+                let firstUnit = returnUnit(0);
+                let secondStep = returnUnit(1);
+                defaultStepsAndUnits = [
+                    {step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1, size: null},
+                    {step: currentSteps.steps[1].step.title, unit: secondStep, stepCounter: 2, size: null}
+                ]
+                this.stepsAndUnits = defaultStepsAndUnits;
+            }else{
+                let firstUnit = returnUnit(0);
+                defaultStepsAndUnits = [
+                    {step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1, size: null}
+                ]
+                this.stepsAndUnitsMono = defaultStepsAndUnits;
+            }
+            this.setDataValue({prop: "stepsAndUnits", value: defaultStepsAndUnits})
+            function returnUnit(index){
+                return steps.data.find(item =>item.title == currentSteps.steps[index].step.title).calculationUnit[0].type;
+            }
+        },
+        async setService({option}) {
             const value = this.services.find(item => item.title === option);
             if(!value.steps.length) {
                 return this.showError();
@@ -89,11 +137,16 @@ export default {
                 this.setWorkflow({option: '2 Steps'});
             }
         },
-        setWorkflow({option}) {
+        async setWorkflow({option}) {
             const value = this.workflowSteps.find(item => item.name === option);
+            await this.setDefaultStepsAndUnits(option);
             this.setDataValue({prop: "workflow", value});
             if(value.id === 2890) {
                 let stepDates = {...this.stepsDates[0], deadline: this.currentProject.deadline};
+                this.stepsDates = [
+                    { start: this.currentProject.startDate, deadline: this.currentProject.deadline },
+                    { start: "", deadline: "" }
+                ]
                 this.setDataValue({prop: "stepsDates", value: [stepDates]});
             } else {
                 this.setDefaultStepDates();
@@ -108,6 +161,35 @@ export default {
                 { start: "", deadline: this.currentProject.deadline }
             ]
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});
+        },
+        pushStepAndUnit (data) {
+            if(this.selectedWorkflow.id == 2890 && this.tasksData.service.languageForm == "Mono"){
+                if(!this.stepsAndUnitsMono.length){
+                    this.stepsAndUnitsMono.push(data)
+                }
+                this.stepsAndUnitsMono.forEach((element, index)=>{
+                    element.step == data.step ? this.stepsAndUnitsMono[index].unit = data.unit : false
+                })
+                this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnitsMono})
+            }
+            if(this.tasksData.service.languageForm !== "Mono"){
+                if(!this.stepsAndUnits.length){
+                    this.stepsAndUnits.push(data)
+                }
+                this.stepsAndUnits.forEach((element, index, array) => {
+                    if(element.step == data.step){
+                        this.stepsAndUnits[index].unit = data.unit
+                    }
+                    if(array.map(element => element.step ).indexOf(data.step) == -1){
+                        this.stepsAndUnits.push(data)
+                    }                
+                }) 
+                if(this.selectedWorkflow.id == 2890  && this.tasksData.service.languageForm !== "Mono"){
+                    this.setDataValue({prop: "stepsAndUnits", value: [this.stepsAndUnits[0]]})
+                }else{
+                    this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnits})
+                }
+            }
         }
     },
     computed: {

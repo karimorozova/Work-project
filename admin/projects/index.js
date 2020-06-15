@@ -5,7 +5,7 @@ const { getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateW
 const { stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, notifyManagerStepStarted, notifyStepDecisionMade,
     sendClientDeliveries, notifyDeliverablesDownloaded, notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
     notifyVendorStepStart } = require('./emails');
-const  { createProject, createTasks, createTasksWithWordsUnit, createTasksFromRequest } = require('./create');
+const  { createProject, createTasks, createTaskWithCommonUnits, createTasksFromRequest } = require('./create');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 const { getProjectAfterFinanceUpdated } = require('./porjectFinance');
 
@@ -36,7 +36,7 @@ module.exports = {
     getProjectAfterFinanceUpdated,
     updateNonWordsTaskTargetFiles,
     createTasksFromRequest,
-    createTasksWithWordsUnit,
+    createTaskWithCommonUnits,
     downloadCompletedFiles,
     notifyProjectDelivery,
     notifyManagerStepStarted,

@@ -64,7 +64,7 @@ const usersDefault = [
       "photo": ""
     },
     {
-      "email" : "sakis@pangea-langs.com",
+      "email" : "sakis@pangea.global",
       "username" : "sakis.k",
       "group" : "Project Managers",
       "firstName" : "Sakis",
@@ -88,7 +88,7 @@ const usersDefault = [
       "photo": ""
     },
     {
-      "email" : "arans@pangea-langs.com",
+      "email" : "arans@pangea.global",
       "username" : "aran.s",
       "group" : "Vendor Managers",
       "firstName" : "Aran",
@@ -130,13 +130,13 @@ const leadSourcesDefault = ["Advertising", "Friend", "Landing Pages", "Internet"
 const groupsDefault = ["Administrators", "Account Managers", "Developers", "Project Managers", "Sales", "Vendor Managers"]
 
 const stepsDefault = [
-    {title: "Translation", symbol: "translation", isStage1: true, isStage2: false, isEditor: true, isActive: true, calculationUnit: "Words"},
-    {title: "Revising", symbol: "revising", isStage1: false, isStage2: true, isEditor: true, isActive: true, calculationUnit: "Words"},
-    {title: "Editing", symbol: "editing", isStage1: true, isStage2: false, isEditor: true, isActive: true, calculationUnit: "Words"},
-    {title: "QA", symbol: "qa", isStage1: true, isStage2: true, isEditor: true, isActive: true, calculationUnit: "Hours"},
-    {title: "Copywriting", symbol: "copywriting", isStage1: true, isStage2: false, isEditor: true, isActive: true, calculationUnit: "Packages"},
-    {title: "Proofreading", symbol: "proofreading", isStage1: true, isStage2: true, isEditor: true, isActive: true, calculationUnit: "Packages"},
-    {title: "Graphic Design", symbol: "graphic_design", isStage1: true, isStage2: true, isEditor: false, isActive: true, calculationUnit: "Hours"},
+    {title: "Translation", symbol: "translation", isStage1: true, isStage2: false, isEditor: true, isActive: true},
+    {title: "Revising", symbol: "revising", isStage1: false, isStage2: true, isEditor: true, isActive: true},
+    {title: "Editing", symbol: "editing", isStage1: true, isStage2: false, isEditor: true, isActive: true},
+    {title: "QA", symbol: "qa", isStage1: true, isStage2: true, isEditor: true, isActive: true},
+    {title: "Copywriting", symbol: "copywriting", isStage1: true, isStage2: false, isEditor: true, isActive: true},
+    {title: "Proofreading", symbol: "proofreading", isStage1: true, isStage2: true, isEditor: true, isActive: true},
+    {title: "Graphic Design", symbol: "graphic_design", isStage1: true, isStage2: true, isEditor: false, isActive: true},
 ]
 
 const servicesDefault = [

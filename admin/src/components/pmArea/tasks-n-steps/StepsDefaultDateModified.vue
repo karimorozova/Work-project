@@ -1,6 +1,9 @@
 <template lang="pug">
 .steps-date
   .steps-date-wrapper
+    .steps-date__header
+      .steps-date__title(v-if="steps") Step {{ stepCounter }} - {{setSteps[0].steps[stepCounter-1].step.title}} 
+  .steps-date-wrapper 
     .steps-date__picker
       .steps-date__input-wrapper
         .steps-date__label Start date
@@ -41,16 +44,38 @@
                   @invalidDate="invalidDateWarn"
               )
           img.steps-date__image(src="../../../assets/images/calendar.png" @click="showDeadlineCalendar")
-  .steps-date__title Step {{ stepCounter }}
-
+  .steps-date-wrapper
+    .steps-date__picker
+        .steps-date__input-wrapper
+          .steps-date__label Unit
+            span.steps-date__label-red *
+          .steps-date__datepicker-wrapper(v-if="steps")
+            .steps-date__input(v-if="tasksData.stepsAndUnits[stepCounter-1]")
+              .steps-date__drop-menu(v-if="tasksData.stepsAndUnits[stepCounter-1].size == null || !tasksData.stepsAndUnits[stepCounter-1].size")
+                    SelectSingle(
+                        :selectedOption="tasksData.stepsAndUnits[stepCounter-1].unit"
+                        :options="optionUnits"
+                        placeholder="Select"
+                        @chooseOption="setUnit"
+                    )
+              .steps-date__drop-menu(v-else)
+                  SelectSingle(
+                      :selectedOption="`${tasksData.stepsAndUnits[stepCounter-1].unit} / ${tasksData.stepsAndUnits[stepCounter-1].size}`"
+                      :options="optionUnits"
+                      placeholder="Select"
+                      @chooseOption="setUnit"
+                  )
 </template>
 
 <script>
 import Datepicker from "../../Datepicker";
+import SelectSingle from "@/components/SelectSingle";
+import scrollDrop from "@/mixins/scrollDrop";
 import moment from "moment";
 import { mapGetters, mapActions} from "vuex";
 
   export default {
+    mixins: [scrollDrop],
     props: {
         stepCounter: {
             type: Number
@@ -60,6 +85,16 @@ import { mapGetters, mapActions} from "vuex";
         },
         deadline: {
             type: [Date, String]
+        },
+        service:{
+          type: String,
+          default: ''
+        },
+        workflowId:{
+          type: Number,
+        },
+        tasksData:{
+          type: Object
         }
     },
     data() {
@@ -70,10 +105,64 @@ import { mapGetters, mapActions} from "vuex";
             disabled: {
                 to: moment().add(-1, 'day').endOf('day').toDate()
             },
-            isReadonly: false
+            isReadonly: false,
+            services: null,
+            units: null,
+            currentUnit: '',
+            currentSize: '',
+            steps: null,
         }
     },
     methods: {
+        ...mapActions({
+            setDataValue: "setTasksDataValue"
+        }),
+        setUnit({ option }) {
+          let currentStepsUnits = this.tasksData.stepsAndUnits[this.stepCounter-1];
+          let currentOption = /(\/)/gm.test(option)
+            ? /(.*\D)\s\/\s(\d.*)/gm.exec(option)
+            : /(.*\D.*)/gm.exec(option);
+
+          if(currentOption.length == 2){
+            currentStepsUnits.size = null
+            this.setDataValue({prop: "stepsAndUnits", value: currentStepsUnits})
+            this.setParams(currentOption[1])
+          }else{
+            currentStepsUnits.size = currentOption[2]
+            this.setDataValue({prop: "stepsAndUnits", value: currentStepsUnits})
+            this.setParams(currentOption[1])
+          }
+        },
+        setParams(option){
+            this.currentUnit = this.units.find(item => item.type === option)
+            this.sendUnit();
+        },
+        async getUnits(){
+          try {
+            const result = await this.$http.get("/api/units");
+            this.units = result.body.filter(item => item.active);
+          } catch (err) {
+            this.alertToggle({
+              message: "Erorr on getting Units",
+              isShow: true,
+              type: "error"
+            });
+          }
+        },
+        async getServiceSteps(){
+          try {
+            const services = await this.$http.get("/api/services");
+            const steps = await this.$http.get("/api/steps")
+            this.services = services.body;
+            this.steps = steps.body;
+          } catch (err) {
+            this.alertToggle({
+              message: "Erorr on getting Services or Steps",
+              isShow: true,
+              type: "error"
+            });
+          }
+        },
         customFormatter(date) {
             return moment(date).format('DD-MM-YYYY, HH:mm');
         },
@@ -86,11 +175,46 @@ import { mapGetters, mapActions} from "vuex";
         setDate(e, prop) {
             this.$emit("setDate", { date: new Date(e), prop })
         },
+        sendUnit() {
+            this.$emit('sendUnit', {
+              stepCounter : this.stepCounter,
+              step: this.setSteps[0].steps[this.stepCounter-1].step.title,
+              unit: this.currentUnit.type,
+              size: this.tasksData.stepsAndUnits[this.stepCounter-1].size
+            })
+        },
         invalidDateWarn({message}) {
             console.log(message);
-        }
+        },
+    },
+    mounted(){
+      this.getServiceSteps();
+      this.getUnits();      
     },
     computed: {
+        setSteps(){
+          if(this.services){
+            return this.services.filter(item => item.title == this.service);
+          }
+        },
+        optionUnits() {
+          const currentStep = this.setSteps[0].steps[this.stepCounter - 1].step
+            .title;
+          const currentUnits = this.steps
+            .filter(item => item.title == currentStep)[0]
+            .calculationUnit.map(item => item.type);
+
+          let result = [];
+          
+          for (const unit of currentUnits) {
+            let currentSizes = this.units.find(item => item.type == unit).sizes;
+            currentSizes.unshift('-1');
+              for (const size of currentSizes) {
+                size == '-1' ? result.push(unit) : result.push(`${unit} / ${size}`)
+              }
+          }
+          return result;
+        },
         disabledStart() {
             let result = {
                 to: moment().add(-1, 'day').endOf('day').toDate()
@@ -116,7 +240,8 @@ import { mapGetters, mapActions} from "vuex";
         }
     },
     components: {
-        Datepicker
+        Datepicker,
+        SelectSingle,
     }
 }
 </script>
@@ -127,9 +252,20 @@ import { mapGetters, mapActions} from "vuex";
   padding: 12px 20px 0;
   background-color: $active-background;
   border: 1px solid $brown-border;
-  width: 452px;
   margin-bottom: 50px;
   position: relative;
+    &__drop-menu {
+      position: relative; 
+      width: 191px;
+      border-radius: 6px;
+      height: 29px;
+      background: #fff;
+      margin-bottom: 15px;
+    }
+    &__header{
+      width: 100%;
+      text-align: center;
+    }
     &-wrapper{
       display: flex;
       align-items: center;
@@ -143,14 +279,13 @@ import { mapGetters, mapActions} from "vuex";
       display: flex;
       flex-direction: column;
       position:relative;
-      align-items: center;
     }
     &__title {
       position: relative;
-      max-width: 48px;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0.8;
+      max-width: 100%;
+      margin: 10px 0 5px;
+      text-align: center;
+      font-size: 18px;
     }
     &__picker {
         display: flex;
@@ -159,10 +294,12 @@ import { mapGetters, mapActions} from "vuex";
         position: relative;
     }
     &__label {
-        background-color: #fff;
-        position: relative;
-        bottom: 22px;
-        padding: 0 5px;
+        padding: 5px 0;
+        &-red{
+          color: red;
+          font-size: 14px;
+          margin-right: 15px;
+        }
     }
     &__image {
         position: absolute;

@@ -16,6 +16,8 @@
                 .units__header {{ field.label }}
             template(slot="headerSteps" slot-scope="{ field }")
                 .units__header {{ field.label }}
+            template(slot="headerSizes" slot-scope="{ field }")
+                .units__header {{ field.label }}
             template(slot="headerActive" slot-scope="{ field }")
                 .units__header {{ field.label }}
             template(slot="headerIcons" slot-scope="{ field }")
@@ -36,7 +38,17 @@
                         :options="serviceData" 
                         :selectedOptions="selectedServices" 
                         @chooseOptions="setServices"   
-                    ) 
+                    )
+
+            template(slot="sizes" slot-scope="{ row, index }")
+                .units__data-chips(v-if="currentActive !== index" v-html="formatSizes(row.sizes)")
+                .units__editing-chips(v-else)
+                      Chips(
+                        :chips="currentSizes"
+                        @setChips="setChips"
+                        @deleteChips="deleteChips"
+                        :placeholder="'Add size...'"
+                      )
 
             template(slot="active" slot-scope="{ row, index }")
                 .units__data.units_centered(:class="{'units_active': currentActive === index}")
@@ -51,6 +63,7 @@
 
 <script>
 import SettingsTable from "./SettingsTable";
+import Chips from "../Chips";
 import Add from "../Add";
 import { mapGetters, mapActions } from "vuex";
 import crudIcons from "@/mixins/crudIcons";
@@ -65,33 +78,41 @@ export default {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "20%",
+          width: "14%",
           padding: "0"
         },
         {
           label: "Steps",
           headerKey: "headerSteps",
           key: "steps",
-          width: "40%",
+          width: "32%",
+          padding: "0"
+        },
+        {
+          label: "Sizes",
+          headerKey: "headerSizes",
+          key: "sizes",
+          width: "32%",
           padding: "0"
         },
         {
           label: "Active",
           headerKey: "headerActive",
           key: "active",
-          width: "20%",
+          width: "8%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "20%",
+          width: "14%",
           padding: "0"
         }
       ],
       steps: [],
       currentServices: [],
+      currentSizes: [],
       units: [],
       currentUnit: "",
       areErrors: false,
@@ -106,7 +127,19 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-
+    setChips({ data }) {
+      this.currentSizes.push(data);
+    },
+    deleteChips({ index }) {
+      this.currentSizes.splice(index, 1);
+    },
+    formatSizes(array) {
+      let sizes = "";
+      array.forEach(element => {
+        sizes += `<span style="display:inline-flex;padding:0 10px;height:20px;font-size:14px;line-height:20px;border-radius:8px;margin-right:5px;border:1px solid #67573e" class="test">${element}</span>`;
+      });
+      return sizes;
+    },
     presentServices(services) {
       if (!services.length) return "";
       return services.reduce((acc, cur) => acc + `${cur.title}; `, "");
@@ -122,7 +155,7 @@ export default {
     },
     async getServices() {
       try {
-        const result = await this.$http.get("/api/services");
+        const result = await this.$http.get("/api/steps");
         this.steps = result.body;
       } catch (err) {
         this.alertToggle({
@@ -156,12 +189,14 @@ export default {
       this.units.push({
         active: true,
         type: "",
-        editable: true
+        editable: true,
+        sizes: []
       });
       this.setEditionData(this.units.length - 1);
     },
     setEditionData(index) {
       this.currentActive = index;
+      this.currentSizes = this.units[index].sizes;
       this.currentUnit = this.units[index].type;
       this.currentServices = Array.from(this.units[index].steps);
     },
@@ -201,7 +236,8 @@ export default {
             _id: id,
             type: this.units[index].type,
             active: true,
-            steps: this.currentServices
+            steps: this.currentServices,
+            sizes: this.currentSizes
           }
         });
         this.alertToggle({
@@ -227,7 +263,8 @@ export default {
             _id: id,
             type: this.currentUnit,
             active: this.units[index].active,
-            steps: this.currentServices
+            steps: this.currentServices,
+            sizes: this.currentSizes
           }
         });
         this.alertToggle({ message: "Saved", isShow: true, type: "success" });
@@ -250,6 +287,12 @@ export default {
       this.errors = [];
       if (!this.currentUnit || !this.isUnique(index))
         this.errors.push("Unit should not be empty and be unique!");
+      if(this.currentSizes.map(item => Math.sign(item)).includes(NaN))
+        this.errors.push("Size should be number!");
+      if(this.currentSizes.map(item => item == '').includes(true))
+        this.errors.push("Size cannot be empty!");
+      if(this.currentSizes.filter( (item, index, array) => index !== array.indexOf(item) || index !== array.lastIndexOf(item)).length)
+        this.errors.push("Size should be unique!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -315,7 +358,8 @@ export default {
   components: {
     SettingsTable,
     Add,
-    SelectMulti
+    SelectMulti,
+    Chips
   },
   mounted() {
     this.getUnits();
@@ -330,8 +374,8 @@ export default {
 
 .units {
   @extend %setting-table;
-  max-width: 933px;
-  width: calc(100% - 190px);
+  max-width: 1200px;
+  width: calc(100% - 100px);
   &__data {
     @extend %table-data;
     overflow-x: hidden;
@@ -339,6 +383,15 @@ export default {
   &__editing-data {
     @extend %table-data;
     box-shadow: inset 0 0 7px $brown-shadow;
+  }
+  &__data-chips {
+    @extend %table-data;
+    overflow-y: hidden;
+  }
+  &__editing-chips {
+    @extend %table-data;
+    box-shadow: inset 0 0 7px $brown-shadow;
+    overflow-y: hidden;
   }
   &__input {
     @extend %table-text-input;

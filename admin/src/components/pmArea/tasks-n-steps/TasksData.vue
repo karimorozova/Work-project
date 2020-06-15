@@ -7,6 +7,7 @@
             .tasks-data__item-title File Preparation
             .tasks-data__langs
                 TasksLangs(v-if="isMonoService")
+
                 TasksLangsDuo(v-if="!isMonoService"
                     :calculationUnit="currentUnit"
                     :sourceLanguages="sourceLanguages"
@@ -14,21 +15,20 @@
                     @setTargets="setTargets"
                     :isRequest="isRequest"
                 )
-            .tasks-data__service-steps(v-if="currentUnit === 'Hours'")
-                HoursServiceSteps(:steps="tasksData.service.steps")
             .tasks-data__files(v-if="currentProject.status !== 'Requested'")
-                TasksFiles(:service="tasksData.service")
+                TasksFiles(:tasksData="tasksData")
             .tasks-data__files.tasks-data_m-bottom-40(v-else)
                 TasksFilesRequested
-            .tasks-data__template(v-if="currentUnit === 'Words'")
-                .tasks-data__drop-menu
-                    label.tasks-data__menu-title Template
-                    SelectSingle(
-                        :selectedOption="selectedTemplate"
-                        :options="allTemplates"
-                        placeholder="Template"
-                        @chooseOption="setTemplate"
+
+            .tasks-data__service-steps
+                JobSettings(
+                    v-if="tasksData.stepsAndUnits.length"
+                    :tasksData="tasksData"
+                    v-for="(step , index) in sortedJobs"
+                    :currentJob="step"
+                    :currentIndex="index"
                     )
+
     .tasks-data__add-tasks(v-if="isProject && isButton")
         Button(value="Add tasks" @clicked="checkForErrors")
     .tasks-data__buttons(v-if="isRequest && isButton")
@@ -44,7 +44,7 @@ import TasksLangs from "./TasksLangs";
 import TasksLangsDuo from "./TasksLangsDuo";
 import TasksFiles from "./TasksFiles";
 import TasksFilesRequested from "./TasksFilesRequested";
-import HoursServiceSteps from "./HoursServiceSteps";
+import JobSettings from "./JobSettings";
 import SelectSingle from "../../SelectSingle";
 import ServiceAndWorkflow from "./ServiceAndWorkflow";
 import Button from "../../Button";
@@ -74,10 +74,6 @@ export default {
             this.setTasksDataValue({prop: "source", value});
             this.setTasksDataValue({prop: "targets", value: []});
             this.sourceLanguages = [value.symbol];
-        },
-        setTemplate({ option }) {
-            const value = this.templates.find(item => item.name === option);
-            this.setTasksDataValue({prop: "template", value});
         },
         setTargets({ targets }) {
             this.setTasksDataValue({prop: "targets", value: targets});
@@ -111,11 +107,12 @@ export default {
                 this.errors = this.checkRequestErrors();
             }
             if(!this.isMonoService && !source) this.errors.push("Please, select Source language.");
-            if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
+            // if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
+            if(this.tasksData.stepsAndUnits == null) this.errors.push("Please, select Unit.")
             if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
             this.isRequest ? this.checkRequestFies() : this.checkFiles(sourceFiles, refFiles);
             this.checkHoursSteps();
-            if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
+            // if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
             if(this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).");
             if (this.errors.length) {
                 return this.$emit("showErrors", { errors: this.errors });
@@ -195,6 +192,7 @@ export default {
                 }
             } catch(err) { }
         }
+
     },
     computed: {
         ...mapGetters({
@@ -202,11 +200,10 @@ export default {
             languages: "getAllLanguages",
             tasksData: "getTasksData"
         }),
-        allTemplates() {
-            return this.templates.map(item => item.name);
-        },
-        selectedTemplate() {
-            return this.tasksData.template ? this.tasksData.template.name : "";
+        sortedJobs(){
+            if(this.tasksData.stepsAndUnits){
+                return this.tasksData.stepsAndUnits.sort((a , b) => a.stepCounter - b.stepCounter )
+            }
         },
         isMonoService() {
             if(this.currentProject.status === 'Requested') {
@@ -239,7 +236,7 @@ export default {
         TasksLangsDuo,
         TasksFiles,
         TasksFilesRequested,
-        HoursServiceSteps,
+        JobSettings,
         SelectSingle,
         Button,
         ServiceAndWorkflow,

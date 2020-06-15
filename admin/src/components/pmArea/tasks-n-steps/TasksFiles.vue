@@ -1,7 +1,7 @@
 <template lang="pug">
     .tasks-files
         .tasks-files__main
-            .tasks-files__item(v-if="isWords")
+            .tasks-files__item(v-if="isWordcount")
                 span.tasks-files__label Source file:
                 .tasks-files__upload-file
                     FilesUpload(
@@ -11,7 +11,8 @@
                         @uploadFiles="uploadSourceFiles"
                         @deleteFile="(e) => deleteFile(e, 'sourceFiles')")
             .tasks-files__item
-                span.tasks-files__label Reference file:
+                span Reference file:
+                span.tasks-files__label-red *
                 .tasks-files__upload-file
                     FilesUpload(
                         buttonValue="Reference Files"
@@ -28,7 +29,7 @@ import { mapActions } from "vuex";
 
 export default {
     props: {
-        service: {
+        tasksData: {
             type: Object
         }
     },
@@ -117,8 +118,12 @@ export default {
         FilesUpload,
     },
     computed: {
-        isWords() {
-            return this.service ? this.service.calculationUnit === 'Words' : false;
+        isWordcount() {
+            return this.tasksData.stepsAndUnits
+                ? this.tasksData.stepsAndUnits
+                    .map(item => item.unit)
+                    .includes("CAT Wordcount")
+                : false;
         }
     }
 }
@@ -135,12 +140,17 @@ export default {
 
     &__label {
         margin-right: 15px;
+        &-red{
+            color: red;
+            font-size: 14px;
+            margin-right: 15px;
+        }
     }
 
     &__main {
         display: flex;
         align-items: center;
-        margin-bottom: 40px;
+        margin-bottom: 50px;
         justify-content: space-between;
     }
 

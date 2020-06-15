@@ -11,9 +11,10 @@
                 :selectedLangs="selectedLang ? [selectedLang.symbol] : []"
                 @chosenLang="setLanguage"
             )
-    .tasks-langs__item
-        .tasks-langs__title Package:
-            Asterisk(:customStyle="asteriskStyle")
+
+    //- .tasks-langs__item
+    //-     .tasks-langs__title Package:
+    //-         Asterisk(:customStyle="asteriskStyle")
         .tasks-langs__drop-menu
             SelectSingle(
                 placeholder="Package"
@@ -21,11 +22,12 @@
                 :selectedOption="selectedPackage"
                 @chooseOption="setPackage"
             )
-    .tasks-langs__item
-        .tasks-langs__title Quantity:
-            Asterisk(:customStyle="asteriskStyle")
-        .tasks-langs__input
-            input.tasks-langs__quantity(type="number" min="1" max="20" @change="setQuantity" @input="setLimit" @keydown="removeNonDigit")
+    //- .tasks-langs__item
+    //-     .tasks-langs__title Quantity:
+    //-         Asterisk(:customStyle="asteriskStyle")
+    //-     .tasks-langs__input
+    //-         input.tasks-langs__quantity(type="number" min="1" max="20" @change="setQuantity" @input="setLimit" @keydown="removeNonDigit")
+    
 </template>
 
 <script>
@@ -40,9 +42,9 @@ export default {
     data() {
         return {
             targets: [],
-            packages: [],
+            // packages: [],
             selectedLang: null,
-            selectedPackage: "",
+            // selectedPackage: "",
             languagePairs: [],
             asteriskStyle: {top: '-4px'},
         }
@@ -56,16 +58,16 @@ export default {
         setLanguage({lang}) {
             this.selectedLang = lang;
             this.setDataValue({prop: "targets", value: [lang]});
-            this.setPackage({option: ""});
-            this.setPossiblePairPackages(lang.symbol);
+            // this.setPackage({option: ""});
+            // this.setPossiblePairPackages(lang.symbol);
         },
-        setPackage({option}) {
-            this.selectedPackage = option;
-            this.setDataValue({prop: "packageSize", value: option});
-        },
-        setQuantity(e) {
-            this.setDataValue({prop: "quantity", value: e.target.value});
-        },
+        // setPackage({option}) {
+        //     this.selectedPackage = option;
+        //     this.setDataValue({prop: "packageSize", value: option});
+        // },
+        // setQuantity(e) {
+        //     this.setDataValue({prop: "quantity", value: e.target.value});
+        // },
         async getAvailableLanguages() {
             try {
                 const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);
@@ -86,29 +88,29 @@ export default {
                 } else if(this.targets.length === 1) {
                     this.setLanguage({lang: this.targets[0]});
                 }                
-                this.setDefaultPackages(englishPair);
+                // this.setDefaultPackages(englishPair);
             }
         },
-        setDefaultPackages(eng) {
-            if(!eng || this.currentProject.status === 'Requested') {
-                this.packages = this.languagePairs.map(pair => pair.packageSize).filter((item, index, self) => {
-                    return self.indexOf(item) === index;
-                });
-                if(this.currentProject.status === 'Requested') {
-                    this.setPackage({option: this.currentProject.packageSize.size});
-                } else if(this.packages.length === 1) {
-                    this.setPackage({option: this.packages[0]});
-                }
-            } else {
-                this.setPossiblePairPackages(eng.symbol);
-            }
-        },
-        setPossiblePairPackages(symbol) {
-            this.packages = this.languagePairs.filter(item => item.target.symbol === symbol).map(pair => pair.packageSize);
-            if(this.packages.length === 1) {
-                this.setPackage({option: this.packages[0]});
-            }
-        }
+        // setDefaultPackages(eng) {
+            // if(!eng || this.currentProject.status === 'Requested') {
+            //     this.packages = this.languagePairs.map(pair => pair.packageSize).filter((item, index, self) => {
+            //         return self.indexOf(item) === index;
+            //     });
+                // if(this.currentProject.status === 'Requested') {
+                //     this.setPackage({option: this.currentProject.packageSize.size});
+                // } else if(this.packages.length === 1) {
+                //     this.setPackage({option: this.packages[0]});
+                // }
+            // } else {
+                // this.setPossiblePairPackages(eng.symbol);
+            // }
+        // },
+        // setPossiblePairPackages(symbol) {
+            // this.packages = this.languagePairs.filter(item => item.target.symbol === symbol).map(pair => pair.packageSize);
+            // if(this.packages.length === 1) {
+            //     this.setPackage({option: this.packages[0]});
+            // }
+        // }
     },
     computed: {
         ...mapGetters({
