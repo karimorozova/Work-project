@@ -289,6 +289,8 @@ export default {
         this.errors.push("Unit should not be empty and be unique!");
       if(this.currentSizes.map(item => Math.sign(item)).includes(NaN))
         this.errors.push("Size should be number!");
+      if(this.currentSizes.map(item => item == '').includes(true))
+        this.errors.push("Size cannot be empty!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
