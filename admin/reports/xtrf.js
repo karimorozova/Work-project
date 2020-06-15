@@ -327,13 +327,13 @@ async function getXtrfLqaReport(filters) {
     }
     if (tierFilter) {
      result = result.map(item => {
-       if (item.finance.tier !== tierFilter) {
+       if (item.finance && item.finance.tier !== tierFilter) {
          delete item.finance;
        }
-       if (item.gaming.tier !== tierFilter) {
+       if (item.gaming && item.gaming.tier !== tierFilter) {
          delete item.gaming;
        }
-       if (item.other.tier !== tierFilter) {
+       if (item.other && item.other.tier !== tierFilter) {
          delete item.other;
        }
        return item;
@@ -466,8 +466,8 @@ async function getXtrfUpcomingReport(filters) {
     let financeReports = getUpcomingWordcount(tiers, financeDocs, nameFilter, 'Finance');
     let gamingReports = getUpcomingWordcount(tiers, gamingDocs, nameFilter, 'iGaming');
     if (filters.tierFilter) {
-      financeReports = Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
-      gamingReports = Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
+      Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
+      Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
     }
     return {
       financeReports,
