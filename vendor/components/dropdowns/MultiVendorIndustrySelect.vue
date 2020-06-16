@@ -187,7 +187,7 @@ export default {
     border-radius: 5px;
     width: 100%;
     overflow-x: hidden;
-    z-index: 6;
+    z-index: 60;
     box-sizing: border-box;
     .drop {
         font-size: 14px;

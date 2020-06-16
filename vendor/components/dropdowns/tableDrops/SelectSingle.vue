@@ -76,7 +76,7 @@ export default {
         background-color: white;
         border: 1px solid #67573E;
         border-top: none;
-        z-index: 6;
+        z-index: 60;
         &__item {
             align-items: center;
             padding: 3px;

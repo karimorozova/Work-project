@@ -111,7 +111,7 @@ export default {
         overflow-x: hidden;
         flex-direction: column;
         background-color: white;
-        z-index: 6;
+        z-index: 60;
         &__item {
             padding: 5px;
             border-bottom: .5px solid #BFB09D;
