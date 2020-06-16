@@ -124,16 +124,10 @@ async function updateProjectTasks(taskData) {
     const units = JSON.parse(newTasksInfo.stepsAndUnits);
     const allInfo = { ...newTasksInfo, units, project, taskRefFiles: memoqDocs, stepsDates: newTasksInfo.stepsDates };
     const tasks = getWordCountTasks(taskData);
-    const isOnlyWords = units.length === 2 ?
-      units[0].unit === 'CAT Wordcount' && units[1].unit === 'CAT Wordcount'
-      : false;
-    const steps = isOnlyWords ?
-      await getStepsForDuoStepWords({ ...allInfo, tasks })
-      : await getStepsForMonoStepWords({ ...allInfo, tasks });
     await Projects.updateOne({ "_id": project._id },
       {
         $set: { isMetricsExist: false },
-        $push: { tasks, steps }
+        $push: { tasks }
       }
     );
     if (units.length === 2) {
@@ -148,7 +142,7 @@ async function updateProjectTasks(taskData) {
           const { service, targets, packageSize } = newTasksInfo;
           const { vendor, vendorRate, clientRate, payables, receivables } = await getFinanceDataForPackages({
             project, service, packageSize, target: targets[0]
-          });
+          }, true);
           const finance = { Wordcount: { receivables: '', payables: '' }, Price: { receivables, payables } };
           const tasks = getTasksForPackages({ ...allInfo, projectId: project.projectId, finance });
           const steps = getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate }, true);
@@ -180,7 +174,6 @@ function getWordCountTasks(taskData) {
         ...service,
         calculationUnit: stepsAndUnits
       },
-      stepsAndUnits,
       memoqProjectId: memoqProjectId,
       start: project.startDate,
       deadline: project.deadline,
@@ -214,7 +207,7 @@ function getStepsForDuoStepWords({ vendor, units, tasks, clientRate, vendorRate 
         stepId,
         serviceStep: tasks[i].service.steps[0].step,
         name: tasks[i].service.steps[0].step.title,
-        calculationUnit: tasks[i].service.calculationUnit,
+        calculationUnit: tasks[i].service.calculationUnit[0],
         template: units[0].template,
         vendor,
         progress: 0,
@@ -229,7 +222,7 @@ function getStepsForDuoStepWords({ vendor, units, tasks, clientRate, vendorRate 
         stepId: stepId + '.1',
         serviceStep: tasks[i].service.steps[1].step,
         name: tasks[i].service.steps[1].step.title,
-        calculationUnit: tasks[i].service.calculationUnit,
+        calculationUnit: tasks[i].service.calculationUnit[1],
         template: units[1].template,
         vendor,
         progress: 0,
@@ -452,7 +445,7 @@ async function createTasksWithPackagesUnit(allInfo) {
       getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate })
       : getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate });
     const projectFinance = getProjectFinance(tasks, project.finance);
-    return updateProject({ "_id": project.id }, { finance: projectFinance, $push: { tasks: task, steps: steps } });
+    return updateProject({ "_id": project.id }, { finance: projectFinance, $push: { tasks: tasks, steps: steps } });
   } catch (err) {
     console.log(err);
     console.log("Error in createTasksWithPackagesUnit");
@@ -535,15 +528,14 @@ function getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate }) {
 function getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate }, common = false) {
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
-    const stepUnits = JSON.parse(tasks[i].service.calculationUnit);
+    const stepUnits = tasks[i].service.calculationUnit;
     steps.push({
       ...tasks[i],
       stepId: `${tasks[i].taskId} S01`,
-      serviceStep: tasks[i].service.steps[common ? 1 : 0].step,
-      name: tasks[i].service.steps[common ? 1 : 0].step.title,
-      packageSize: common ? stepUnits[1].packageSize : stepUnits[0].packageSize,
-      quantity: common ? stepUnits[1].quantity : stepUnits[0].quantity,
-      calculationUnit: tasks[i].service.calculationUnit,
+      name: stepUnits[0].packageSize ? stepUnits[0].step : stepUnits[1].step,
+      packageSize: stepUnits[0].packageSize ? stepUnits[0].packageSize : stepUnits[1].packageSize,
+      quantity: stepUnits[0].quantity ? stepUnits[0].quantity : stepUnits[1].quantity,
+      // calculationUnit: tasks[i].service.calculationUnit,
       vendor,
       progress: 0,
       clientRate,

@@ -3,12 +3,12 @@ const { getClient } = require('../clients/getClients');
 const { hasActiveRateValue, getVendorRate, isVendorMatches, getUpdatedSteps, getUpdatedTasks } = require('./general');
 const { getProjectAfterFinanceUpdated } = require("../projects/porjectFinance");
 
-async function getFinanceDataForPackages({project, service, packageSize, target}) {
+async function getFinanceDataForPackages({project, service, packageSize, target}, common = false) {
     const { step } = service.steps[0];
     const industryId = project.industry.id;
     try {
         const { vendor, vendorRate, payables } = await getVendorWithPayables({packageSize, target, step, industryId});
-        const { receivables, clientRate } = await getReceivables({project, packageSize, target, step, industryId});
+        const { receivables, clientRate } = await getReceivables({project, packageSize, target, step, industryId}, common);
         return  { vendor, vendorRate, clientRate, payables, receivables };
     } catch(err) {
         console.log(err);
@@ -16,9 +16,9 @@ async function getFinanceDataForPackages({project, service, packageSize, target}
     }
 }
 
-async function getReceivables({project, packageSize, target, step, industryId}) {
+async function getReceivables({project, packageSize, target, step, industryId}, common = false) {
     try {
-      const clientId = project.customer.toString() || project.customer.id;
+      const clientId = common ? project.customer.toString() : project.customer.id;
         const client = await getClient({"_id": clientId});
         const ratePair = client.monoRates.find(item => {
             return item.target.symbol === target.symbol && item.packageSize === packageSize
