@@ -1,6 +1,6 @@
 function hasActiveRateValue({step, rate, stepIndustry}) {
     const stepId = step.serviceStep ? step.serviceStep._id : step._id;
-    const index = rate.industries.findIndex(item => item.id === stepIndustry);
+    const index = rate && rate.industries.findIndex(item => item.id === stepIndustry);
     if(index !== -1 /* && */ || rate.rates[stepId]) {
       return true;
         // return rate.rates[stepId].active && rate.rates[stepId].value > 0;

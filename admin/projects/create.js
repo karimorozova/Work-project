@@ -68,7 +68,7 @@ async function createTasksFromRequest({ project, dataForTasks, isWords }) {
       return { project, newTasksInfo };
     } else {
       const taskRefFiles = await storeFiles(refFiles, project.id);
-      const allInfo = { ...dataForTasks, taskRefFiles, project };
+      const allInfo = { ...dataForTasks, taskRefFiles, project, stepsAndUnits };
       for (let step of stepsAndUnits) {
         step.unit === 'Hours' ? await createTasksWithHoursUnit(allInfo) : await createTasksWithPackagesUnit(allInfo);
       }
@@ -134,7 +134,7 @@ async function updateProjectTasks(taskData) {
       for (let { unit } of units) {
         if (unit === 'Hours') {
           const tasksWithoutFinance = getTasksForHours({ ...allInfo, projectId: project.projectId });
-          const steps = await getStepsForMonoStepHours({ ...allInfo, tasks: tasksWithoutFinance }, true);
+          const steps = await getStepsForMonoStepHours({ ...allInfo, tasks: tasksWithoutFinance });
           const tasks = tasksWithoutFinance.map(item => getHoursTaskWithFinance(item, steps));
           const projectFinance = getProjectFinance(tasks, project.finance);
           await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
@@ -145,7 +145,7 @@ async function updateProjectTasks(taskData) {
           }, true);
           const finance = { Wordcount: { receivables: '', payables: '' }, Price: { receivables, payables } };
           const tasks = getTasksForPackages({ ...allInfo, projectId: project.projectId, finance });
-          const steps = getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate }, true);
+          const steps = getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate });
           const projectFinance = getProjectFinance(tasks, project.finance);
           await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
         }
@@ -194,71 +194,71 @@ function getWordCountTasks(taskData) {
   }
   return tasks;
 }
-
-function getStepsForDuoStepWords({ vendor, units, tasks, clientRate, vendorRate }) {
-  let counter = 1;
-  const steps = [];
-  for (let i = 0; i < tasks.length; i++) {
-    const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
-    const stepId = `${tasks[i].taskId} ${stepsIdCounter}`;
-    steps.push(
-      {
-        ...tasks[i],
-        stepId,
-        serviceStep: tasks[i].service.steps[0].step,
-        name: tasks[i].service.steps[0].step.title,
-        calculationUnit: tasks[i].service.calculationUnit[0],
-        template: units[0].template,
-        vendor,
-        progress: 0,
-        clientRate,
-        vendorRate,
-        check: false,
-        vendorsClickedOffer: [],
-        isVendorRead: false,
-      },
-      {
-        ...tasks[i],
-        stepId: stepId + '.1',
-        serviceStep: tasks[i].service.steps[1].step,
-        name: tasks[i].service.steps[1].step.title,
-        calculationUnit: tasks[i].service.calculationUnit[1],
-        template: units[1].template,
-        vendor,
-        progress: 0,
-        clientRate,
-        vendorRate,
-        check: false,
-        vendorsClickedOffer: [],
-        isVendorRead: false,
-      }
-    );
-    counter++;
-  }
-  return steps;
-}
-
-function getStepsForMonoStepWords({ vendor, units, tasks, clientRate, vendorRate }) {
-  const steps = [];
-  for (let i = 0; i < tasks.length; i++) {
-    steps.push({
-      ...tasks[i],
-      stepId: `${tasks[i].taskId} S01`,
-      serviceStep: tasks[i].service.steps[0].step,
-      name: tasks[i].service.steps[0].step.title,
-      calculationUnit: tasks[i].service.calculationUnit,
-      template: units[0].unit === 'CAT Wordcount' ? units[0].template : units[1].template,
-      vendor: vendor || null,
-      progress: 0,
-      clientRate: clientRate || null,
-      vendorRate: vendorRate || null,
-      check: false,
-      vendorsClickedOffer: [],
-      isVendorRead: false,
-    });
-  }
-  return steps;
-}
+//
+// function getStepsForDuoStepWords({ vendor, units, tasks, clientRate, vendorRate }) {
+//   let counter = 1;
+//   const steps = [];
+//   for (let i = 0; i < tasks.length; i++) {
+//     const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
+//     const stepId = `${tasks[i].taskId} ${stepsIdCounter}`;
+//     steps.push(
+//       {
+//         ...tasks[i],
+//         stepId,
+//         serviceStep: tasks[i].service.steps[0].step,
+//         name: tasks[i].service.steps[0].step.title,
+//         calculationUnit: tasks[i].service.calculationUnit[0],
+//         template: units[0].template,
+//         vendor,
+//         progress: 0,
+//         clientRate,
+//         vendorRate,
+//         check: false,
+//         vendorsClickedOffer: [],
+//         isVendorRead: false,
+//       },
+//       {
+//         ...tasks[i],
+//         stepId: stepId + '.1',
+//         serviceStep: tasks[i].service.steps[1].step,
+//         name: tasks[i].service.steps[1].step.title,
+//         calculationUnit: tasks[i].service.calculationUnit[1],
+//         template: units[1].template,
+//         vendor,
+//         progress: 0,
+//         clientRate,
+//         vendorRate,
+//         check: false,
+//         vendorsClickedOffer: [],
+//         isVendorRead: false,
+//       }
+//     );
+//     counter++;
+//   }
+//   return steps;
+// }
+//
+// function getStepsForMonoStepWords({ vendor, units, tasks, clientRate, vendorRate }) {
+//   const steps = [];
+//   for (let i = 0; i < tasks.length; i++) {
+//     steps.push({
+//       ...tasks[i],
+//       stepId: `${tasks[i].taskId} S01`,
+//       serviceStep: tasks[i].service.steps[0].step,
+//       name: tasks[i].service.steps[0].step.title,
+//       calculationUnit: tasks[i].service.calculationUnit,
+//       template: units[0].unit === 'CAT Wordcount' ? units[0].template : units[1].template,
+//       vendor: vendor || null,
+//       progress: 0,
+//       clientRate: clientRate || null,
+//       vendorRate: vendorRate || null,
+//       check: false,
+//       vendorsClickedOffer: [],
+//       isVendorRead: false,
+//     });
+//   }
+//   return steps;
+// }
 
 /// Creating tasks for wordcount unit services end ///
 
@@ -273,7 +273,7 @@ async function createTasksWithHoursUnit(allInfo) {
       : await getStepsForMonoStepHours({ ...allInfo, tasks: tasksWithoutFinance });
     const tasks = tasksWithoutFinance.map(item => getHoursTaskWithFinance(item, steps));
     const projectFinance = getProjectFinance(tasks, project.finance);
-    return updateProject({ "_id": project.id }, { finance: projectFinance, $push: { tasks: tasks, steps: steps } });
+    // return updateProject({ "_id": project.id }, { finance: projectFinance, $push: { tasks: tasks, steps: steps } });
   } catch (err) {
     console.log(err);
     console.log("Error in createTasksWithHoursUnit");
@@ -392,18 +392,17 @@ async function getStepsForDuoStepHours(stepsInfo) {
   return steps;
 }
 
-async function getStepsForMonoStepHours(stepsInfo, common = false) {
+async function getStepsForMonoStepHours(stepsInfo) {
   let { tasks } = stepsInfo;
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
-    const task = tasks[i];
-    const serviceStep = common ? task.service.steps[1].step : task.service.steps[0].step;
-    const stepsAndUnits = JSON.parse(task.stepsAndUnits);
-    const stepUnit = common ? stepsAndUnits[1] : stepsAndUnits[0];
-    const hours = stepUnit.hours;
-    const quantity = stepUnit.quantity;
+    const task = tasks[i]
+    const serviceStep = task.service.steps.find(({ step }) => step.calculationUnit[0].type === 'Hours');
+    // calculation unit's length is always - 1;
+    const hours = task.service.calculationUnit[0].hours;
+    const size = task.service.calculationUnit[0].size || null;
     const financeData = await getHoursStepFinanceData({
-      task, serviceStep, project: stepsInfo.project, multiplier: hours * quantity
+      task, serviceStep, project: stepsInfo.project, multiplier: hours * size || 1
     });
     steps.push({
       ...tasks[i],
@@ -413,8 +412,8 @@ async function getStepsForMonoStepHours(stepsInfo, common = false) {
       vendor: financeData.vendor || null,
       vendorRate: financeData.vendorRate,
       clientRate: financeData.clientRate,
-      hours: stepUnit.hours,
-      size: stepUnit.size || null,
+      hours,
+      size,
       finance: {
         Price: { receivables: financeData.receivables, payables: financeData.payables },
         Wordcount: { receivables: "", payables: "" }
@@ -425,7 +424,6 @@ async function getStepsForMonoStepHours(stepsInfo, common = false) {
       isVendorRead: false
     });
   }
-  console.log(steps);
   return steps;
 }
 
@@ -494,7 +492,7 @@ function getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate }) {
         name: tasks[i].service.steps[0].step.title,
         packageSize: tasks[i].service.calculationUnit[0].packageSize,
         quantity: tasks[i].service.calculationUnit[0].quantity,
-        calculationUnit: tasks[i].service.calculationUnit,
+        calculationUnit: tasks[i].service.calculationUnit[0],
         vendor,
         progress: 0,
         clientRate,
@@ -510,7 +508,7 @@ function getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate }) {
         name: tasks[i].service.steps[1].step.title,
         packageSize: tasks[i].service.calculationUnit[1].packageSize,
         quantity: tasks[i].service.calculationUnit[1].quantity,
-        calculationUnit: tasks[i].service.calculationUnit,
+        calculationUnit: tasks[i].service.calculationUnit[1],
         vendor,
         progress: 0,
         clientRate,
@@ -525,7 +523,7 @@ function getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate }) {
   return steps;
 }
 
-function getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate }, common = false) {
+function getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate }) {
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
     const stepUnits = tasks[i].service.calculationUnit;
