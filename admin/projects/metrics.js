@@ -8,7 +8,7 @@ async function updateProjectMetrics({projectId}) {
         let { steps, tasks } = project;
         let isMetricsExist = true;
         for(let task of tasks) {
-          const stepUnits = JSON.parse(task.stepsAndUnits);
+          const stepUnits = JSON.parse(task.service.calculationUnit);
           const isIncludesWordCount = stepUnits.find(item => item.unit === 'CAT Wordcount');
             if(!!isIncludesWordCount && task.status === "Created") {
                 const analysis = await getProjectAnalysis(task.memoqProjectId);
@@ -61,7 +61,8 @@ async function getProjectWithUpdatedFinance(project) {
     let { tasks, steps } = projectToUpdate;
     try {
         for(let step of steps) {
-            if(!step.finance.Price.receivables && step.serviceStep.calculationUnit === 'Words') {
+          const parsedStep = JSON.parse(JSON.stringify(step));
+            if(!step.finance.Price.receivables && parsedStep.stepUnit.unit === 'CAT Wordcount') {
                 let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
                 const receivables = step.finance.Price.receivables ? {rate: step.clientRate, cost: +step.finance.Price.receivables}
                 : await receivablesCalc({task: tasks[taskIndex], project: projectToUpdate, step});
@@ -88,10 +89,12 @@ function getTaskSteps(steps, task) {
         if(!existedStep) {
             let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
             const serviceStep = {...serviceSteps[`stage${i+1}`], memoqAssignmentRole: i};
+            const stepUnit = JSON.parse(task.service.calculationUnit);
             updatedSteps.push({
                 stepId: `${task.taskId} ${stepsIdCounter}`,
                 taskId: task.taskId,
                 serviceStep,
+                stepUnit: stepUnit[i],
                 name: serviceStep.title,
                 sourceLanguage: task.sourceLanguage,
                 targetLanguage: task.targetLanguage,
