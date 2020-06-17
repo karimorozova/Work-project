@@ -3,15 +3,26 @@
         .hours-steps__step
             .hours-steps__block(v-if="currentJob.unit !== 'Packages' &&  currentJob.unit !== 'CAT Wordcount'")
                 .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
-                .hours-steps__main
-                    .hours-steps__item
-                        LabelVal(:text="currentJob.unit")
-                            input.hours-steps__input(type="number" min="1" max="1000" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)" @input="setLimit" @keydown="removeNonDigit")
-                            .tasks-langs__item
+                .hours-steps__packages
+                    .hours-steps__packages-item
+                        .hours-steps__packages-title Hours
+                            input.hours-steps__input(type="number" min="1" max="1000" :value="currentJob.hours ? currentJob.hours : null" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)" @input="setLimit")
+                    .hours-steps__packages-item
+                        .hours-steps__packages-item
+                            .hours-steps__sub-title Size
+                            .hours-steps__drop-menu
+                                SelectSingle(
+                                    placeholder="Select"
+                                    :options="getSizes"
+                                    :selectedOption="currentJobSize"
+                                    @chooseOption="setSize"
+                                )
+
             .hours-steps__block(v-if="currentJob.unit == 'CAT Wordcount'")
                 .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
                 .hours-steps__main(v-if="tasksData.stepsAndUnits")
-                    .hours-steps__sub-title Template
+                    .hours-steps__label Template
+                        span.hours-steps__label-red *
                     .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
                         SelectSingle(
                             :selectedOption="selectedTemplate.name"
@@ -19,21 +30,22 @@
                             placeholder="Template"
                             @chooseOption="setTemplate"
                         )
+
             .hours-steps__block(v-if="currentJob.unit == 'Packages'")
                 .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
                 .hours-steps__packages
                     .hours-steps__packages-item
                         .hours-steps__packages-title Quantity
-                            input.hours-steps__input(type="number" min="1" max="1000" @change="(e) => setQuantity(e, currentJob.step)" @input="setLimit" @keydown="removeNonDigit")
+                            input.hours-steps__input(type="number" min="1" max="1000" :value="currentJob.quantity ? currentJob.quantity : null"  @change="(e) => setQuantity(e, currentJob.step)" @input="setLimit" )
                     .hours-steps__packages-item
-                        .hours-steps__sub-title Template
+                        .hours-steps__sub-title Size
                         .hours-steps__drop-menu
                             SelectSingle(
-                                placeholder="Package"
-                                :options="packages"
-                                :selectedOption="selectedPackage"
-                                @chooseOption="setPackage"
-                            )          
+                                placeholder="Select"
+                                :options="getSizes"
+                                :selectedOption="currentJobSize"
+                                @chooseOption="setSize"
+                            )
 </template>
 
 <script>
@@ -55,18 +67,18 @@ export default {
     data(){
         return {
             templates: [],
-            packages: [],
-            selectedPackage: "",
+            selectedSizes: "",
             selectedTemplate: "",
+            units: null,
         }
     },
     methods: {
-        async getPackages(){
+        async getUnits(){
             try {
-                const result = await this.$http.get('/api/packages');
-                this.packages = result.data.map(item => item.size);
+                const result = await this.$http.get('/api/units');
+                this.units = result.data;
             } catch (err) {
-                this.alertToggle({message: "Error on getting packages", isShow: true, type: "error"});
+                this.alertToggle({message: "Error on getting units", isShow: true, type: "error"});
             }
         },
         ...mapActions({
@@ -76,7 +88,7 @@ export default {
         setQuantity(e, step) {
             let oldStepsAndUnits = this.tasksData.stepsAndUnits;
             oldStepsAndUnits[this.currentIndex].quantity = e.target.value;
-
+            
             let filedsForDelete = ['template','hours'];
             for (const iterator of filedsForDelete) {
                 oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
@@ -89,7 +101,7 @@ export default {
             let oldStepsAndUnits = this.tasksData.stepsAndUnits;
             oldStepsAndUnits[this.currentIndex].hours = e.target.value;
 
-            let filedsForDelete = ['quantity','packageSize','template'];
+            let filedsForDelete = ['quantity','template'];
             for (const iterator of filedsForDelete) {
                 oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
                 ? delete oldStepsAndUnits[this.currentIndex][iterator]
@@ -102,8 +114,9 @@ export default {
             this.selectedTemplate = value;
             let oldStepsAndUnits = this.tasksData.stepsAndUnits;
             oldStepsAndUnits[this.currentIndex].template = value;
+            oldStepsAndUnits[this.currentIndex].size = null;
 
-            let filedsForDelete = ['quantity','packageSize','hours'];
+            let filedsForDelete = ['quantity','hours'];
             for (const iterator of filedsForDelete) {
                 oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
                 ? delete oldStepsAndUnits[this.currentIndex][iterator]
@@ -111,12 +124,12 @@ export default {
             }
             this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
         },
-        setPackage({option}) {
+        setSize({option}) {            
             let oldStepsAndUnits = this.tasksData.stepsAndUnits;
-            oldStepsAndUnits[this.currentIndex].packageSize = option;
-            this.selectedPackage = option;
+            oldStepsAndUnits[this.currentIndex].size = option;
+            this.selectedSizes = option;
 
-            let filedsForDelete = ['template','hours'];
+            let filedsForDelete = ['template'];
             for (const iterator of filedsForDelete) {
                 oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
                 ? delete oldStepsAndUnits[this.currentIndex][iterator]
@@ -133,14 +146,28 @@ export default {
             }
         }
     },
-    created(){
-        this.getPackages();
+    async created(){
         this.getMemoqTemplates();
+        await this.getUnits();
     },
     computed: {
         ...mapGetters({
             tasksData: "getTasksData"
-        }),     
+        }),
+        getSizes(){
+            if(this.units){
+                if(this.currentJob.unit !== 'CAT Wordcount'){
+                   return this.units.filter(item => item.type == this.currentJob.unit)[0].sizes
+                }
+            }
+        },
+        currentJobSize(){
+            if(this.units){
+                let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+                oldStepsAndUnits[this.currentIndex].size = this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
+                return this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null
+            }
+        },
         allTemplates() {
             return this.templates.map(item => item.name);
         },
@@ -166,6 +193,14 @@ export default {
         background-color: $active-background;
         padding: 12px 20px 0;
 
+    }
+    &__label{
+        padding: 5px 0;
+        &-red{
+          color: red;
+          font-size: 14px;
+          margin-right: 15px;
+        }
     }
     &__packages{
         display: flex;

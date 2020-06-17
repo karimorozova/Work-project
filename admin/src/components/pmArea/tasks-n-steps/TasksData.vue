@@ -20,14 +20,23 @@
             .tasks-data__files.tasks-data_m-bottom-40(v-else)
                 TasksFilesRequested
 
-            .tasks-data__service-steps
+            .tasks-data__service-steps(v-if="countCATWordcount == 2")
+                JobSettings(
+                    v-if="tasksData.stepsAndUnits.length"
+                    :tasksData="tasksData"
+                    v-for="(step , index) in [sortedJobs[0]]"
+                    :currentJob="step"
+                    :currentIndex="index"
+                    )
+            .tasks-data__service-steps(v-else)
                 JobSettings(
                     v-if="tasksData.stepsAndUnits.length"
                     :tasksData="tasksData"
                     v-for="(step , index) in sortedJobs"
                     :currentJob="step"
                     :currentIndex="index"
-                    )
+                    )            
+            
 
     .tasks-data__add-tasks(v-if="isProject && isButton")
         Button(value="Add tasks" @clicked="checkForErrors")
@@ -107,13 +116,20 @@ export default {
                 this.errors = this.checkRequestErrors();
             }
             if(!this.isMonoService && !source) this.errors.push("Please, select Source language.");
-            // if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
             if(this.tasksData.stepsAndUnits == null) this.errors.push("Please, select Unit.")
             if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
             this.isRequest ? this.checkRequestFies() : this.checkFiles(sourceFiles, refFiles);
-            this.checkHoursSteps();
-            // if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
             if(this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).");
+            if(this.countCATWordcount >= 1){
+                let isCATWordcount = [];
+                this.tasksData.stepsAndUnits.forEach(element => { isCATWordcount.push(element.hasOwnProperty('template')) })
+                if(!isCATWordcount.includes(true)){
+                    this.errors.push("Please, select Template.");
+                }
+            }
+            // this.checkHoursSteps();
+            // if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
+            // if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
             if (this.errors.length) {
                 return this.$emit("showErrors", { errors: this.errors });
             }
@@ -142,19 +158,19 @@ export default {
                 if(!refFiles || !refFiles.length) this.errors.push("Please, upload Reference file(s).");
             }
         },
-        checkHoursSteps() {
-            if(this.currentUnit === 'Hours') {
-                const steps = [...this.tasksData.service.steps];
-                const length = +this.tasksData.workflow.name.split(" ")[0];
-                for(let i = 0; i < length; i++) {
-                    if(!this.tasksData[`${steps[i].step.symbol}-quantity`] 
-                     || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
-                        this.errors.push("Please, set Hours and Quantity for all service steps.");
-                        return;
-                    }
-                }
-            }
-        },
+        // checkHoursSteps() {
+        //     if(this.currentUnit === 'Hours') {
+        //         const steps = [...this.tasksData.service.steps];
+        //         const length = +this.tasksData.workflow.name.split(" ")[0];
+        //         for(let i = 0; i < length; i++) {
+        //             if(!this.tasksData[`${steps[i].step.symbol}-quantity`] 
+        //              || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
+        //                 this.errors.push("Please, set Hours and Quantity for all service steps.");
+        //                 return;
+        //             }
+        //         }
+        //     }
+        // },
         async assignManager() {
             await this.setRequestValue({
                 id: this.currentProject._id,
@@ -200,6 +216,11 @@ export default {
             languages: "getAllLanguages",
             tasksData: "getTasksData"
         }),
+        countCATWordcount(){
+            if(this.tasksData.stepsAndUnits){
+                 return this.tasksData.stepsAndUnits.filter(item => item.unit == 'CAT Wordcount' ).length
+            }  
+        },
         sortedJobs(){
             if(this.tasksData.stepsAndUnits){
                 return this.tasksData.stepsAndUnits.sort((a , b) => a.stepCounter - b.stepCounter )
