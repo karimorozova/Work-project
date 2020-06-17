@@ -2,6 +2,7 @@ const { getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
 const { hasActiveRateValue } = require('./general');
+const { Vendors } = require('../models');
 
 function setTaskMetrics({metrics, matrix, prop}) {
     let taskMetrics = {...metrics};
@@ -16,7 +17,7 @@ async function receivablesCalc({task, project, step}) {
         if(step.serviceStep.symbol !== "translation") {
             const { cost, rate } = await calcProofingStep({step, task, project, words: task.metrics.totalWords});
             return {cost, rate};
-        } 
+        }
         const metrics = task.metrics;
         const rate = await getCustomerRate({step, industryId: project.industry.id, customerId: project.customer.id, task});;
         const cost = calcCost(metrics, 'client', rate).toFixed(2);
@@ -58,8 +59,8 @@ function payablesCalc({metrics, project, step}) {
 
 function getStepPayables({rate, metrics, step}) {
     let { finance } = step;
-    const rateValue = rate ? rate.value : 0; 
-    const payables = step.serviceStep.symbol !== "translation" ? 
+    const rateValue = rate ? rate.value : 0;
+    const payables = step.serviceStep.symbol !== "translation" ?
         +(metrics.totalWords*rateValue) : calcCost(metrics, 'vendor', rate);
     finance.Price.payables = +(payables.toFixed(2));
     finance.Wordcount.payables = step.serviceStep.symbol !== "translation" ? +metrics.totalWords : calculatePayableWords(metrics);
@@ -150,19 +151,21 @@ async function setDefaultStepVendors(project, memoqUsers) {
         let { steps, tasks } = project;
         const activeVendors = await getVendors({status: 'Active'});
         for(let i = 0; i < steps.length; i++) {
-            if(steps[i].serviceStep.calculationUnit === 'Words' && !steps[i].vendor) {
-                let taskIndex = tasks.findIndex(item => item.taskId === steps[i].taskId);
+          let step = JSON.parse(JSON.stringify(steps[i]))
+            if(step.stepUnit.unit === 'CAT Wordcount' && !step.vendor) {
+                let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
                 let matchedVendors = getMatchedVendors({activeVendors, steps, index: i, project, memoqUsers});
                 if(matchedVendors.length === 1) {
-                    steps[i].vendor = matchedVendors[0];
-                    tasks[taskIndex].metrics = steps[i].serviceStep.symbol !== "translation" ? tasks[taskIndex].metrics
-                        : setTaskMetrics({metrics: tasks[taskIndex].metrics, matrix: matchedVendors[0].matrix, prop: 'vendor'});          
-                    steps[i] = payablesCalc({metrics: tasks[taskIndex].metrics, project, step: steps[i]._doc});
-                    tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+steps[i].finance.Price.payables).toFixed(2);
+                  step.vendor = matchedVendors[0];
+                    tasks[taskIndex].metrics = step.serviceStep.symbol !== "translation" ? tasks[taskIndex].metrics
+                        : setTaskMetrics({metrics: tasks[taskIndex].metrics, matrix: matchedVendors[0].matrix, prop: 'vendor'});
+                    step = payablesCalc({metrics: tasks[taskIndex].metrics, project, step });
+                    tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables+step.finance.Price.payables).toFixed(2);
                     const taskSteps = steps.filter(item => item.taskId === tasks[taskIndex].taskId && item.finance.Wordcount.payables);
                     tasks[taskIndex].finance.Wordcount.payables = taskSteps.reduce((acc, cur) => acc + +cur.finance.Wordcount.payables, 0);
                 }
             }
+        steps[i] = step
         }
         return { steps, tasks };
     } catch(err) {
@@ -175,6 +178,15 @@ function getMatchedVendors({activeVendors, steps, index, project, memoqUsers}) {
     const step = steps[index];
     const memoqEmails = memoqUsers.map(item => item.email);
     let availableVendors = activeVendors.filter(item => memoqEmails.indexOf(item.email) !== -1);
+    let temporaryVendors = []
+
+    for (const vendor of availableVendors) {
+
+        temporaryVendors.push(getVendorsWordRates({vendor, step}))
+    }
+
+    
+    return [temporaryVendors.filter(item => item)[0]];
     if(!availableVendors.length) return [];
     if(index > 0 && step.taskId === steps[index-1].taskId) {
         availableVendors = availableVendors.filter(item => {
@@ -194,13 +206,17 @@ function getMatchedVendors({activeVendors, steps, index, project, memoqUsers}) {
     return matchedVendors;
 }
 
+function getVendorsWordRates({vendor, step, project}){
+    return vendor.wordsRates.length !== 0 ? vendor : false;
+}
+
 function checkForLanguages({vendor, step, project}) {
     return vendor.wordsRates.find(item => {
-        if(item.source && item.source.symbol === step.sourceLanguage && 
-            item.target.symbol === step.targetLanguage) {
+        if(item.source && item.source.symbol === step.sourceLanguage &&
+            item.target && item.target.symbol === step.targetLanguage) {
                 return hasActiveRateValue({
-                        step, 
-                        pair: item, 
+                        step,
+                        rate: item,
                         stepIndustry: project.industry.id
                     });
         }
@@ -240,5 +256,5 @@ function getProjectFinanceData(project, prop) {
     },{})
 }
 
-module.exports = { receivablesCalc, payablesCalc, setDefaultStepVendors, 
+module.exports = { receivablesCalc, payablesCalc, setDefaultStepVendors,
     updateProjectCosts, calcCost, setTaskMetrics, getAfterWordcountPayablesUpdated };

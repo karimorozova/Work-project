@@ -91,7 +91,9 @@ export default {
 
             tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits));
             tasksData.append('customerName', this.currentProject.customer.name);
-            tasksData.append('template', dataForTasks.template.id);
+            if(dataForTasks.stepsAndUnits.find(item => item.template)){
+                tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id);
+            }
             tasksData.append('workflow', dataForTasks.workflow.id);
             tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates));
             tasksData.append('service', JSON.stringify(dataForTasks.service));
@@ -167,18 +169,18 @@ export default {
                 this.isInfo = false;
             }
         },
-        appendHoursStepsInfo(dataForTasks) {
-                const steps = [...dataForTasks.service.steps];
-                const length = +dataForTasks.workflow.name.split(" ")[0];
-                for(let i = 0; i < length; i++) {
+        // appendHoursStepsInfo(dataForTasks) {
+        //         const steps = [...dataForTasks.service.steps];
+        //         const length = +dataForTasks.workflow.name.split(" ")[0];
+        //         for(let i = 0; i < length; i++) {
 
-                    if(!dataForTasks[`${steps[i].step.symbol}-quantity`] 
-                     || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
-                        this.errors.push("Please, set Hours and Quantity for all service steps.");
-                        return;
-                    }
-                }
-        },
+        //             if(!dataForTasks[`${steps[i].step.symbol}-quantity`] 
+        //              || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
+        //                 this.errors.push("Please, set Hours and Quantity for all service steps.");
+        //                 return;
+        //             }
+        //         }
+        // },
         getMetrics() {
             this.$emit("getMetrics");
         },
