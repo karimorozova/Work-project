@@ -57,18 +57,16 @@
                 span.steps__step-data {{ getStepPair(row) }}
 
             template(slot="vendor" slot-scope="{ row, index }")
-                span(v-if="row.vendor")
-                    .steps__vendor-menu(v-if="isVendorSelect(row.status)")
-                        PersonSelect(
-                            :persons="extendedVendors(index)"
-                            :selectedPerson="vendorName(row.vendor)"
-                            :isExtended="isAllShow"
-                            :isAdditionalShow="isAdditionalShow"
-                            @setPerson="(person) => setVendor(person, index)"
-                            @togglePersonsData="toggleVendors"
-                            @scrollDrop="scrollDrop"
-                        )
-                span(v-else) null
+                .steps__vendor-menu(v-if="isVendorSelect(row.status)")
+                    PersonSelect(
+                        :persons="extendedVendors(index)"
+                        :selectedPerson="vendorName(row.vendor)"
+                        :isExtended="isAllShow"
+                        :isAdditionalShow="isAdditionalShow"
+                        @setPerson="(person) => setVendor(person, index)"
+                        @togglePersonsData="toggleVendors"
+                        @scrollDrop="scrollDrop"
+                    )
 
                 span.steps_no-padding(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
                     .steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")

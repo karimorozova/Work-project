@@ -2,6 +2,7 @@ const { getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
 const { hasActiveRateValue } = require('./general');
+const { Vendors } = require('../models');
 
 function setTaskMetrics({metrics, matrix, prop}) {
     let taskMetrics = {...metrics};
@@ -177,6 +178,15 @@ function getMatchedVendors({activeVendors, steps, index, project, memoqUsers}) {
     const step = steps[index];
     const memoqEmails = memoqUsers.map(item => item.email);
     let availableVendors = activeVendors.filter(item => memoqEmails.indexOf(item.email) !== -1);
+    let temporaryVendors = []
+
+    for (const vendor of availableVendors) {
+
+        temporaryVendors.push(getVendorsWordRates({vendor, step}))
+    }
+
+    
+    return [temporaryVendors.filter(item => item)[0]];
     if(!availableVendors.length) return [];
     if(index > 0 && step.taskId === steps[index-1].taskId) {
         availableVendors = availableVendors.filter(item => {
@@ -194,6 +204,10 @@ function getMatchedVendors({activeVendors, steps, index, project, memoqUsers}) {
         }
     }
     return matchedVendors;
+}
+
+function getVendorsWordRates({vendor, step, project}){
+    return vendor.wordsRates.length !== 0 ? vendor : false;
 }
 
 function checkForLanguages({vendor, step, project}) {

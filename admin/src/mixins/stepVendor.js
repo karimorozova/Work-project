@@ -1,6 +1,6 @@
 export default {
     methods: {
-        extendedVendors(index) {
+        extendedVendors(index) {            
             const allSteps = this.currentProject.steps;
             const step = index >= 0 ? allSteps[index] : this.step;
             const sameTaskSteps = allSteps.filter(item => item.stepId !== step.stepId && item.taskId === step.taskId);
@@ -11,6 +11,7 @@ export default {
             }
             result = result.filter(item => item.status === 'Active' && this.checkForLanguagePair(item, index));
             return result;
+
         },
         isMainGroup() {
             return this.userGroup.name === 'Administrators' || this.userGroup.name === 'Developers';
@@ -26,6 +27,9 @@ export default {
         },
         isVendorMatchesForDuoRate({ratesProp, step, vendor}) {
             return vendor[ratesProp].find(item => {
+
+                item.source == undefined ? item.source = {symbol: 'EN-GB'}  : false
+                
                 if(item.source.symbol === step.sourceLanguage && 
                     item.target.symbol === step.targetLanguage) {
                     return this.hasRateValue({
