@@ -1,4 +1,5 @@
 const { XtrfPrice, TierLqa, LangTier, Languages, MemoqProject, Vendors } = require("../models");
+const { getMemoqUsers } = require("../services/memoqs/users");
 
 //// Tier report /////
 
@@ -228,14 +229,14 @@ async function getXtrfLqaReport(filters) {
             const updatedVendor = {
               ...memoqDoc.finance.vendors[financeVendorIndex],
               wordCount: memoqDoc.finance.vendors[financeVendorIndex].wordCount + wordCount,
-            }
+            };
             memoqDoc.finance.vendors.splice(financeVendorIndex, 1, updatedVendor);
           } else {
             memoqDoc.finance.vendors.push({
               name,
               wordCount,
               assessments: assessments.length ? [getVendorAssessment(assessments, 'Finance')] : []
-            })
+            });
           }
           memoqVendors.splice(memoqIndex, 1, memoqDoc);
         } else if (!!memoqDoc && industry.name.toString() === 'iGaming (Casino, Slot games, Gambling, etc.)') {
@@ -245,7 +246,7 @@ async function getXtrfLqaReport(filters) {
               ...memoqDoc.gaming.vendors[gamingVendorIndex],
               wordCount: memoqDoc.gaming.vendors[gamingVendorIndex].wordCount + wordCount,
               assessments,
-            }
+            };
             memoqDoc.gaming.vendors.splice(gamingVendorIndex, 1, updatedVendor);
           } else {
             memoqDoc.gaming.vendors.push({
@@ -253,7 +254,7 @@ async function getXtrfLqaReport(filters) {
               wordCount,
               assessments: assessments.length ?
                 [getVendorAssessment(assessments, 'iGaming (Casino, Slot games, Gambling, etc.)')] : [],
-            })
+            });
           }
           memoqVendors.splice(memoqIndex, 1, memoqDoc);
         } else if (!!memoqDoc && industry.name.toString() === 'Other') {
@@ -262,13 +263,13 @@ async function getXtrfLqaReport(filters) {
             const updatedVendor = {
               ...memoqDoc.other.vendors[otherVendorIndex],
               wordCount: memoqDoc.other.vendors[otherVendorIndex].wordCount + wordCount,
-            }
+            };
             memoqDoc.other.vendors.splice(otherVendorIndex, 1, updatedVendor);
           } else {
             memoqDoc.other.vendors.push({
               name,
               wordCount,
-            })
+            });
           }
           memoqVendors.splice(memoqIndex, 1, memoqDoc);
         }
@@ -288,7 +289,7 @@ async function getXtrfLqaReport(filters) {
         tier: getLqaSpecificTier(vendor.other.vendors),
         ...vendor.other
       }
-    }))
+    }));
     if (industryFilter) {
       if (industryFilter === 'Finance') {
         result = result.map(vendor => ({
@@ -314,10 +315,10 @@ async function getXtrfLqaReport(filters) {
       }
     }
     if (targetFilter) {
-      const langGroupObjects = await Languages.find({lang: { $in: targetFilter }});
+      const langGroupObjects = await Languages.find({ lang: { $in: targetFilter } });
       const langGroups = [];
       for (let { group } of langGroupObjects) {
-        langGroups.push(group)
+        langGroups.push(group);
       }
       const filteredReport = [];
       for (let group of [...new Set(langGroups)]) {
@@ -326,22 +327,22 @@ async function getXtrfLqaReport(filters) {
       result = filteredReport;
     }
     if (tierFilter) {
-     result = result.map(item => {
-       if (item.finance && item.finance.tier !== tierFilter) {
-         delete item.finance;
-       }
-       if (item.gaming && item.gaming.tier !== tierFilter) {
-         delete item.gaming;
-       }
-       if (item.other && item.other.tier !== tierFilter) {
-         delete item.other;
-       }
-       return item;
-     }).filter(item => Object.keys(item).length !== 1);
+      result = result.map(item => {
+        if (item.finance && item.finance.tier !== tierFilter) {
+          delete item.finance;
+        }
+        if (item.gaming && item.gaming.tier !== tierFilter) {
+          delete item.gaming;
+        }
+        if (item.other && item.other.tier !== tierFilter) {
+          delete item.other;
+        }
+        return item;
+      }).filter(item => Object.keys(item).length !== 1);
     }
     return result.filter(vendor => (vendor.finance && vendor.finance.vendors.length)
       || (vendor.gaming && vendor.gaming.vendors.length)
-      || (vendors.other && vendor.other.vendors.length));
+      || (vendor.other && vendor.other.vendors.length));
   } catch (err) {
     console.log(err);
     console.log("Error in getXtrfLqaReport");
@@ -407,7 +408,6 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
     if (Object.keys(cur.UserAssignments).length && !!tier) {
       const { TranslationDocumentUserRoleAssignmentDetails } = cur.UserAssignments;
       const translator = TranslationDocumentUserRoleAssignmentDetails[0];
-      const reportProp = industry === 'Finance' ? 'financeTier' : 'gameTier';
       if (translator) {
         if (!vendorName || vendorName && translator.UserInfoHeader.FullName.match(RegExp(`${vendorName}`, `i`))) {
           acc[translator.UserInfoHeader.FullName] = acc[translator.UserInfoHeader.FullName] ?
@@ -419,7 +419,6 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
               id: translator.UserInfoHeader.UserGuid,
               name: translator.UserInfoHeader.FullName,
               wordCount: +cur.TotalWordCount,
-              tier: tier[reportProp].tier,
               langCode: cur.TargetLangCode,
             };
         }
@@ -453,6 +452,54 @@ async function getVendorsQuery(filters) {
   return query;
 }
 
+function isEmpty(obj) {
+  for(let key in obj) {
+    if(obj.hasOwnProperty(key))
+      return false;
+  }
+  return true;
+}
+
+function setLQA(vendor, { LQA1, LQA2, LQA3 }) {
+  // const { tier } = getSpecificTier(vendor.wordCount);
+  // const vendorLqa = await TierLqa.findOne({ category: tier });
+  if (!isEmpty(LQA1) && !isEmpty(LQA2) && !isEmpty(LQA3)) {
+    return {
+      ...vendor,
+      LQA: 'passed',
+    }
+  } else if (!isEmpty(LQA1) && !isEmpty(LQA2)) {
+    return {
+      ...vendor,
+      LQA: 3,
+    }
+  } else if (!isEmpty(LQA1)) {
+    return {
+      ...vendor,
+      LQA: 2,
+    }
+  }
+  return {
+    ...vendor,
+    LQA: 1,
+  }
+}
+
+async function getVendorLqa(obj) {
+  const vendors = await Vendors.find({ assessments: { $gt: [] } });
+  const memoqUsers = await getMemoqUsers();
+  return Object.values(obj).map(vendor => {
+    const neededVendor = memoqUsers.find(user => user.id === vendor.id);
+    const dbVendor = vendors.find(vendor => vendor.email === neededVendor.email);
+    if (dbVendor) {
+      return setLQA(vendor, dbVendor.assessments[0]);
+    }
+    return {
+      ...vendor,
+      LQA: 0,
+    };
+  });
+}
 
 // Upcoming LQA
 async function getXtrfUpcomingReport(filters) {
@@ -469,9 +516,11 @@ async function getXtrfUpcomingReport(filters) {
       Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
       Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
     }
+    const finance = await getVendorLqa(financeReports);
+    const gaming = await getVendorLqa(gamingReports);
     return {
-      financeReports,
-      gamingReports,
+      finance: finance.filter(vendor => vendor.LQA !== 'passed'),
+      gaming: gaming.filter(vendor => vendor.LQA !== 'passed'),
     };
   } catch (err) {
     console.log(err);
