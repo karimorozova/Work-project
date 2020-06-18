@@ -1,6 +1,5 @@
 <template lang="pug">
     .dashboard
-        | {{jobs}}
         .jobs_block
             h3 Upcoming Jobs
             .jobs
