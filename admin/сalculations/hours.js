@@ -11,7 +11,6 @@ async function getHoursStepFinanceData({task, serviceStep, project, multiplier})
         const { vendor, vendorRate, payables } = await getVendorWithPayables({
             source, target, step: serviceStep, industryId, multiplier
         });
-        // console.log(vendor, vendorRate, payables);
         const { receivables, clientRate } = await getReceivables({
             project, source, target, step: serviceStep, industryId, multiplier
         });
