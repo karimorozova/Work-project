@@ -152,7 +152,7 @@ async function setDefaultStepVendors(project, memoqUsers) {
         const activeVendors = await getVendors({status: 'Active'});
         for(let i = 0; i < steps.length; i++) {
           let step = JSON.parse(JSON.stringify(steps[i]))
-            if(step.stepUnit.unit === 'CAT Wordcount' && !step.vendor) {
+            if(step.serviceStep.unit === 'CAT Wordcount' && !step.vendor) {
                 let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
                 let matchedVendors = getMatchedVendors({activeVendors, steps, index: i, project, memoqUsers});
                 if(matchedVendors.length === 1) {
@@ -185,7 +185,7 @@ function getMatchedVendors({activeVendors, steps, index, project, memoqUsers}) {
         temporaryVendors.push(getVendorsWordRates({vendor, step}))
     }
 
-    
+
     return [temporaryVendors.filter(item => item)[0]];
     if(!availableVendors.length) return [];
     if(index > 0 && step.taskId === steps[index-1].taskId) {

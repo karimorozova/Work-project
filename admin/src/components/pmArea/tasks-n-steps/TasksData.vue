@@ -147,11 +147,12 @@ export default {
         },
         checkRequestFies() {
             const { sourceFiles, refFiles } = this.currentProject;
-            if(this.currentUnit === 'Words' && !sourceFiles.length) this.errors.push("Please, upload Source file(s).");
-            if(this.currentUnit !== 'Words' && !refFiles.length) this.errors.push("Please, upload Reference file(s).");
+            
+            if(this.currentUnit === 'CAT Wordcount' && !sourceFiles.length) this.errors.push("Please, upload Source file(s).");
+            if(this.currentUnit !== 'CAT Wordcount' && !refFiles.length) this.errors.push("Please, upload Reference file(s).");
         },
         checkFiles(sourceFiles, refFiles) {
-            if(this.currentUnit === 'Words') {
+            if(this.currentUnit === 'CAT Wordcount') {
                 if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).");
                 if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) this.errors.push("Reference file cannot be the same as Source!");
             } else {
@@ -240,7 +241,12 @@ export default {
             return forbiddenStatuses.indexOf(this.currentProject.status) === -1;
         },
         currentUnit() {
-            return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
+            // return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
+            if(this.tasksData.stepsAndUnits){
+                return this.tasksData.stepsAndUnits.find(item => item.unit == 'CAT Wordcount')
+                        ? this.tasksData.stepsAndUnits.find(item => item.unit == 'CAT Wordcount').unit
+                        : ""
+            }
         },
         areAllFilesApproved() {
             const allFiles = [ ...this.currentProject.sourceFiles, ...this.currentProject.refFiles];
