@@ -30,6 +30,10 @@ const ServicesSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    isRequestQuote: {
+        type: Boolean,
+        default: false
+    },
     crud: {
         type: Boolean,
         default: false
