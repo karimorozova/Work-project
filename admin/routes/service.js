@@ -7,7 +7,7 @@ router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) =>
   const { title, languageForm, calculationUnit, steps, active, isRequestQuote, symbol, sortIndex, projectType } = req.body;
   const  { id } = req.params;
   const isActive = active === "true" ? true : false;
-  const isRequestQuote = isRequestQuote === "true" ? true : false;
+  isRequestQuote === "true" ? true : false;
   const iconFile = req.files["icon"];
   const serviceSteps = JSON.parse(steps);
 
