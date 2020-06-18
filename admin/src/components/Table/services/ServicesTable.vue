@@ -18,6 +18,8 @@
                     .services__header {{ field.label }}
                 template(slot="headerStep2" slot-scope="{ field }")
                     .services__header {{ field.label }}
+                template(slot="headerIsRequestQuote" slot-scope="{ field }")
+                    .services__header {{ field.label }}
                 template(slot="headerActive" slot-scope="{ field }")
                     .services__header {{ field.label }}
                 template(slot="headerIcons" slot-scope="{ field }")
@@ -61,6 +63,11 @@
                             @chooseOption="(e) => setStep(e, 'currentStep2')"
                             @scrollDrop="scrollDrop"
                         )
+                template(slot="isRequestQuote" slot-scope="{ row, index }")
+                    .services__data.services_centered(:class="{'services_active': currentActive === index}")
+                        img.services__checkbox(v-if="row.isRequestQuote" src="../../../assets/images/selected-checkbox.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
+                        img.services__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
+
                 template(slot="active" slot-scope="{ row, index }")
                     .services__data.services_centered(:class="{'services_active': currentActive === index}")
                         img.services__checkbox(v-if="row.active" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
@@ -90,11 +97,12 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Icon", headerKey: "headerIcon", key: "icon", width: Math.floor(920*0.10), padding: "0"},
-                {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(920*0.18), padding: "0"},
+                {label: "Icon", headerKey: "headerIcon", key: "icon", width: Math.floor(920*0.08), padding: "0"},
+                {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(920*0.16), padding: "0"},
                 {label: "Language Form", headerKey: "headerLangForm", key: "languageForm", width: Math.floor(920*0.14), padding: "0"},
-                {label: "Step 1", headerKey: "headerStep1", key: "step1", width: Math.floor(920*0.19), padding: "0"},
-                {label: "Step 2", headerKey: "headerStep2", key: "step2", width: Math.floor(920*0.19), padding: "0"},
+                {label: "Step 1", headerKey: "headerStep1", key: "step1", width: Math.floor(920*0.17), padding: "0"},
+                {label: "Step 2", headerKey: "headerStep2", key: "step2", width: Math.floor(920*0.17), padding: "0"},
+                {label: "Request Quote", headerKey: "headerIsRequestQuote", key: "isRequestQuote", width: Math.floor(920*0.08), padding: "0"},
                 {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(920*0.08), padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
             ],
@@ -138,6 +146,10 @@ export default {
         toggleActive(index) {
             if(this.currentActive !== index) return;
             this.services[index].active = !this.services[index].active;
+        },
+        toggleActiveRequestQuote(index) {
+            if(this.currentActive !== index) return;
+            this.services[index].isRequestQuote = !this.services[index].isRequestQuote;
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
@@ -215,6 +227,7 @@ export default {
             const newData = new FormData();
             newData.append("title", this.currentTitle);
             newData.append("active", this.services[index].active);
+            newData.append("isRequestQuote", this.services[index].isRequestQuote);
             newData.append("icon", this.iconFile[0]);
             newData.append("languageForm", this.currentLangForm);
             newData.append("steps", JSON.stringify(steps));
@@ -275,6 +288,7 @@ export default {
                 languageForm: "",
                 calculationUnit: "",
                 active: false,
+                isRequestQuote: false,
                 sortIndex: this.services.length + 1,
                 symbol: "",
                 projectType: "regular",

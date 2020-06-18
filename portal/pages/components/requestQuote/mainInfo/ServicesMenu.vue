@@ -42,7 +42,7 @@ export default {
         async getServices() {
             try {
                 const result = await this.$axios.get("/api/services?filter=active");
-                this.services = result.data.filter(item => item.active);
+                this.services = result.data.filter(item => item.active && item.isRequestQuote);
             } catch(err) {
                 console.log(err);
             }

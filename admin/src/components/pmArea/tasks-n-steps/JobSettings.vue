@@ -5,7 +5,7 @@
                 .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
                 .hours-steps__packages
                     .hours-steps__packages-item
-                        .hours-steps__packages-title Hours
+                        .hours-steps__packages-title {{currentJob.unit}}
                             input.hours-steps__input(type="number" min="1" max="1000" :value="currentJob.hours ? currentJob.hours : null" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)" @input="setLimit")
                     .hours-steps__packages-item
                         .hours-steps__packages-item
