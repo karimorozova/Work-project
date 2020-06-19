@@ -4,10 +4,10 @@ const { Services } = require('../models');
 const { createNewService, updateService, deleteServiceIcon } = require('../settings');
 
 router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {
-  const { title, languageForm, calculationUnit, steps, active, isRequestQuote, symbol, sortIndex, projectType } = req.body;
+  const { title, languageForm, calculationUnit, steps, active, isRequestQuote: isQuoteRequested, symbol, sortIndex, projectType } = req.body;
   const  { id } = req.params;
-  const isActive = active === "true" ? true : false;
-  const isRequestQuote = isRequestQuote === "true" ? true : false;
+  const isActive = active === "true";
+  const isRequestQuote = isQuoteRequested === "true";
   const iconFile = req.files["icon"];
   const serviceSteps = JSON.parse(steps);
 
