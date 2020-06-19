@@ -86,13 +86,7 @@ export default {
   },
   computed: {
     lqa() {
-      if(this.vendorData.isTqi) return "tqi";
-      let result = "lqa1";
-      if (this.vendorData) {
-        result =
-          !this.vendorData.isLqa1 && this.vendorData.isLqa2 ? "lqa2" : result;
-        result = result !== "lqa2" && this.vendorData.isLqa3 ? "lqa3" : result;
-      }
+      let result = "lqa" + this.vendorData.LQA;
       return result;
     }
   },

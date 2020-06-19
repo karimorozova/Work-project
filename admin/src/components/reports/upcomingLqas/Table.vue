@@ -16,7 +16,7 @@
             .lqa-vendors-table__data(slot="words" slot-scope="{ row }") {{ presentWordcount(row.wordCount) }}
             .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industry }}
             .lqa-vendors-table__data(slot="tier" slot-scope="{ row }") {{ row.tier }}
-            //- .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{ getLqaNumber(row) }}
+            .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{  row.LQA }}
 </template>
 
 <script>
@@ -38,12 +38,12 @@ export default {
         }
     },
     methods: {
-        getLqaNumber(row) {
-            let result = 1;
-            if(row.isLqa2) result = 2;
-            result = row.isLqa3 ? 3 : result;
-            return result;
-        },
+        // getLqaNumber(row) {
+        //     let result = 1;
+        //     if(row.isLqa2) result = 2;
+        //     result = row.isLqa3 ? 3 : result;
+        //     return result;
+        // },
         presentWordcount(words) {
             if(words.toString().indexOf(".") !== -1) {
                 return words.toFixed(2);

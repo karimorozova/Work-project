@@ -148,6 +148,16 @@ function getLqaAllTier(wordcount) {
   return tier;
 }
 
+function getLqaSpecificTierForVendor(vendor) {
+  let tier = 2;
+  if (vendor.wordCount > 60000) {
+    tier = 1;
+  } else if (vendor.wordCount < 2500) {
+    tier = 3
+  }
+  return tier;
+}
+
 function getLqaSpecificTier(vendors) {
   let wordCount = 0;
   for (let vendor of vendors) {
@@ -491,12 +501,13 @@ async function getVendorLqa(obj) {
   return Object.values(obj).map(vendor => {
     const neededVendor = memoqUsers.find(user => user.id === vendor.id);
     const dbVendor = vendors.find(vendor => vendor.email === neededVendor.email);
+    vendor.tier = getLqaSpecificTierForVendor(vendor);
     if (dbVendor) {
       return setLQA(vendor, dbVendor.assessments[0]);
     }
     return {
       ...vendor,
-      LQA: 0,
+      LQA: 1,
     };
   });
 }
@@ -512,15 +523,19 @@ async function getXtrfUpcomingReport(filters) {
     const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
     let financeReports = getUpcomingWordcount(tiers, financeDocs, nameFilter, 'Finance');
     let gamingReports = getUpcomingWordcount(tiers, gamingDocs, nameFilter, 'iGaming');
+    financeReports = await getVendorLqa(financeReports);
+    gamingReports = await getVendorLqa(gamingReports);
     if (filters.tierFilter) {
       Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
       Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
     }
-    const finance = await getVendorLqa(financeReports);
-    const gaming = await getVendorLqa(gamingReports);
+    if (filters.lqaFilter) {
+      financeReports = financeReports.filter(item => item.LQA === +filters.lqaFilter);
+      gamingReports = gamingReports.filter(item => item.LQA === +filters.lqaFilter);
+    }
     return {
-      finance: finance.filter(vendor => vendor.LQA !== 'passed'),
-      gaming: gaming.filter(vendor => vendor.LQA !== 'passed'),
+      financeReports: financeReports.filter(vendor => vendor.LQA !== 'passed'),
+      gamingReports: gamingReports.filter(vendor => vendor.LQA !== 'passed'),
     };
   } catch (err) {
     console.log(err);
