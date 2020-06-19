@@ -516,11 +516,11 @@ async function getXtrfUpcomingReport(filters) {
       Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
       Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
     }
-    const finance = await getVendorLqa(financeReports);
-    const gaming = await getVendorLqa(gamingReports);
+    financeReports = await getVendorLqa(financeReports);
+    gamingReports = await getVendorLqa(gamingReports);
     return {
-      finance: finance.filter(vendor => vendor.LQA !== 'passed'),
-      gaming: gaming.filter(vendor => vendor.LQA !== 'passed'),
+      financeReports: financeReports.filter(vendor => vendor.LQA !== 'passed'),
+      gamingReports: gamingReports.filter(vendor => vendor.LQA !== 'passed'),
     };
   } catch (err) {
     console.log(err);
