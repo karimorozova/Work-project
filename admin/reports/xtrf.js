@@ -507,7 +507,7 @@ async function getVendorLqa(obj) {
     }
     return {
       ...vendor,
-      LQA: 0,
+      LQA: 1,
     };
   });
 }
