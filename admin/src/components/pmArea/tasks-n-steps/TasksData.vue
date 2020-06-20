@@ -115,6 +115,11 @@ export default {
             if(this.isRequest) {
                 this.errors = this.checkRequestErrors();
             }
+            if(this.tasksData.workflow.id == 2917){
+                if(this.tasksData.stepsDates[0].deadline == '' || this.tasksData.stepsDates[1].start == ''){
+                    this.errors.push("Please, select tasks deadline.")
+                }
+            }
             if(!this.isMonoService && !source) this.errors.push("Please, select Source language.");
             if(this.tasksData.stepsAndUnits == null) this.errors.push("Please, select Unit.")
             if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
