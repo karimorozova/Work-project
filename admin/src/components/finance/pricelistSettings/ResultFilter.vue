@@ -2,6 +2,7 @@
 .priceFilter
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="source"
             :options="sources"
             placeholder="Source"
@@ -9,6 +10,7 @@
         )
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="target"
             :options="targets"
             placeholder="Target"
@@ -16,6 +18,7 @@
         )
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="step"
             :options="steps"
             placeholder="Step"
@@ -23,6 +26,7 @@
         )
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="unit"
             :options="units"
             placeholder="Unit"
@@ -30,6 +34,7 @@
         )
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="industry"
             :options="industries"
             placeholder="Industry"

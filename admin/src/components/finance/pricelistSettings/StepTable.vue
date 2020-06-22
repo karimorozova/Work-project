@@ -6,7 +6,7 @@
       :size="sizeStepFilter"
       :steps="steps"
       :units="units"
-      :sizes="['test']"
+      :sizes="sizes"
       @setFilter="setFilter"
     )
     DataTable(
@@ -50,21 +50,21 @@
 
         template(slot="eur" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="eur") {{row.eur}}
+                span(id="eur") {{row.euroMinPrice}}
                 label(for="eur") &euro;
             .price__editing-data(v-else)
                 input.price__data-input(type="number" v-model="currentMinPriceEUR")
 
         template(slot="usd" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="usd") {{row.usd}}
+                span(id="usd") {{row.usdMinPrice}}
                 label(for="usd") &#36;
             .price__editing-data(v-else)
                 input.price__data-input(type="number" v-model="currentMinPriceUSD")
 
         template(slot="gbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="gbp") {{row.gbp}}
+                span(id="gbp") {{row.gbpMinPrice}}
                 label(for="gbp") &pound;
             .price__editing-data(v-else)
                 input.price__data-input(type="number" v-model="currentMinPriceGBP")
@@ -86,6 +86,9 @@ export default {
       type: Array
     },
     units: {
+      type: Array
+    },
+    sizes: {
       type: Array
     }
   },
@@ -150,15 +153,15 @@ export default {
         }
       ],
       dataArray: [
-        {
-          step: "SomeStep",
-          unit: "Package",
-          size: 200,
-          multiplier: 100,
-          usd: 1,
-          eur: 2,
-          gbp: 3
-        }
+        // {
+        //   step: "SomeStep",
+        //   unit: "Package",
+        //   size: 200,
+        //   multiplier: 100,
+        //   usd: 1,
+        //   eur: 2,
+        //   gbp: 3
+        // }
       ],
 
       currentStep: "",
@@ -179,6 +182,9 @@ export default {
       deleteIndex: -1,
       currentActive: -1
     };
+  },
+  created(){
+    this.getSteps();
   },
   methods: {
     ...mapActions({
@@ -208,9 +214,9 @@ export default {
       this.currentUnit = this.dataArray[index].unit;
       this.currentSize = this.dataArray[index].size;
       this.currentMultiplier = this.dataArray[index].multiplier;
-      this.currentMinPriceUSD = this.dataArray[index].usd;
-      this.currentMinPriceEUR = this.dataArray[index].eur;
-      this.currentMinPriceGBP = this.dataArray[index].gbp;
+      this.currentMinPriceUSD = this.dataArray[index].usdMinPrice;
+      this.currentMinPriceEUR = this.dataArray[index].euroMinPrice;
+      this.currentMinPriceGBP = this.dataArray[index].gbpMinPrice;
     },
     manageCancelEdition() {
       // this.vendorTests = this.vendorTests.filter(item => item._id);
@@ -232,15 +238,45 @@ export default {
       }
       await this.manageSaveClick(index);
     },
+    async getSteps(){      
+      try {
+        const result = await this.$http.post('/pricelists/step-multipliers');
+        this.dataArray = result.data;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Steps",
+          isShow: true,
+          type: "error"
+        });       
+      }
+    },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
+      const id = this.dataArray[index]._id;
       try {
-        alert("try");
-        // await this.saveLangTest({ testData, file: this.currentFile });
-        // await this.getTests();
+        await this.$http.post('/pricelists/step-multipliers-update', {
+          stepMultiplier : {
+            _id: id,
+            multiplier: this.currentMultiplier,
+            usdMinPrice: this.currentMinPriceUSD,
+            euroMinPrice: this.currentMinPriceEUR,
+            gbpMinPrice: this.currentMinPriceGBP,
+          }
+        })
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        }); 
+        this.setDefaults();
       } catch (err) {
+        this.alertToggle({
+          message: "Error on saving Steps",
+          isShow: true,
+          type: "error"
+        });  
       } finally {
-        // this.setDefaults();
+        this.getSteps();
       }
     },
     closeErrors() {
