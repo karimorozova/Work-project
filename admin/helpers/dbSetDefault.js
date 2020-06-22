@@ -19,7 +19,8 @@ const {
   TierLqa,
   Units,
   CurrencyRatio,
-  StepMultiplier
+  StepMultiplier,
+  IndustryMultiplier
 } = require('../models');
 
 const {
@@ -571,7 +572,7 @@ async function fillStepMultipliers() {
   try {
     const stepMultipliers = await StepMultiplier.find();
     if (!stepMultipliers.length) {
-      const units = await Units.find();
+      const units = await Units.find({ active: true });
       const combinations = [];
       for (let { _id, sizes, steps } of units) {
         if (sizes.length) {
@@ -603,6 +604,24 @@ async function fillStepMultipliers() {
   }
 }
 
+async function fillIndustryMultipliers() {
+  try {
+    const industryMultipliers = await IndustryMultiplier.find();
+    if (!industryMultipliers.length) {
+      const industries = await Industries.find({ active: true });
+      for (let { _id } of industries) {
+        await IndustryMultiplier.create({
+          industry: _id.toString()
+        })
+      }
+      console.log('Industry multipliers are saved!');
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error on filling industry multipliers');
+  }
+}
+
 async function checkCollections() {
   await fillTierLqa();
   await fillPackages();
@@ -628,6 +647,7 @@ async function checkCollections() {
   await fillVendorsRates();
   await fillCurrencyRatio();
   await fillStepMultipliers();
+  await fillIndustryMultipliers();
 }
 
 module.exports = checkCollections();

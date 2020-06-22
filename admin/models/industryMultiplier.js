@@ -7,7 +7,7 @@ const IndustryMultiplierSchema = new Schema({
   },
   multiplier: {
     type: Number,
-    default: 0,
+    default: 100,
   }
 });
 

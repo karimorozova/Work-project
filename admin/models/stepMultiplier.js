@@ -23,7 +23,7 @@ const StepMultiplierSchema = new Schema({
     type: Number,
     default: 1,
   },
-  bgpMinPrice: {
+  gbpMinPrice: {
     type: Number,
     default: 1,
   }
