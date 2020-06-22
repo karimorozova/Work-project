@@ -18,7 +18,8 @@ const {
   DiscountChart,
   TierLqa,
   Units,
-  CurrencyRatio
+  CurrencyRatio,
+  StepMultiplier
 } = require('../models');
 
 const {
@@ -564,7 +565,42 @@ async function fillCurrencyRatio() {
     console.log(err);
     console.log('Error on filling currency ratios');
   }
+}
 
+async function fillStepMultipliers() {
+  try {
+    const stepMultipliers = await StepMultiplier.find();
+    if (!stepMultipliers.length) {
+      const units = await Units.find();
+      const combinations = [];
+      for (let { _id, sizes, steps } of units) {
+        if (sizes.length) {
+          sizes.forEach(size => {
+            steps.forEach(step => {
+              combinations.push({
+                step: step._id,
+                unit: _id.toString(),
+                size: +size,
+              })
+            })
+          })
+        } else {
+          steps.forEach(step => combinations.push({
+            step: step._id,
+            unit: _id.toString(),
+            size: 1
+          }))
+        }
+      }
+      for (let combination of combinations) {
+        await StepMultiplier.create(combination)
+      }
+      console.log('Step multipliers are saved!');
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error on filling step multipliers');
+  }
 }
 
 async function checkCollections() {
@@ -591,6 +627,7 @@ async function checkCollections() {
   await fillClientsRates();
   await fillVendorsRates();
   await fillCurrencyRatio();
+  await fillStepMultipliers();
 }
 
 module.exports = checkCollections();

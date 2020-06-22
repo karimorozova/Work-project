@@ -13,7 +13,6 @@ const checkCollections = require("./helpers/dbSetDefault");
 const { checkRoutes } = require("./middleware/index");
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
-const { getLanguagesRatio } = require('./helpers/defaults/languagesRatio');
 
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
@@ -39,7 +38,6 @@ schedule.scheduleJob('30 23 * * *', async function() {
     }
 })
 
-// getLanguagesRatio()
 
 const allowedOrigins = [
   "https://admin.pangea.global",

@@ -11,7 +11,7 @@ const getLanguagesRatio = async () => {
       const { lang } = await Languages.findOne({ _id: pair.source });
       const { lang: targetLang } = await Languages.findOne({ _id: pair.target });
       monoLanguagesInUse.push(targetLang);
-      duoLanguagesInUse.push(lang, targetLang);
+      duoLanguagesInUse.push(`${lang} > ${targetLang}`);
     }
   }
   const uniqueMonoLangs = Array.from(new Set(monoLanguagesInUse));

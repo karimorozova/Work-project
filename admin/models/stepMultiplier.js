@@ -8,21 +8,24 @@ const StepMultiplierSchema = new Schema({
   unit: {
     type: Schema.Types.ObjectId, ref: 'Units',
   },
+  size: {
+    type: Number,
+  },
   multiplier: {
     type: Number,
-    default: 0,
+    default: 100,
   },
   euroMinPrice: {
     type: Number,
-    default: 0,
+    default: 1,
   },
   usdMinPrice: {
     type: Number,
-    default: 0,
+    default: 1,
   },
   bgpMinPrice: {
     type: Number,
-    default: 0,
+    default: 1,
   }
 });
 
