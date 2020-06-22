@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const { StepMultiplier, IndustryMultiplier } = require('../../models');
+const { getFilteredStepMultiplier } = require('../../multipliers');
 
-router.get('/step-multipliers', async (req, res) => {
+router.post('/step-multipliers', async (req, res) => {
   try {
-    const stepMultipliers = await StepMultiplier.find();
+    const stepMultipliers = await getFilteredStepMultiplier(req.body);
     res.send(stepMultipliers);
   } catch (err) {
     console.log(err);
