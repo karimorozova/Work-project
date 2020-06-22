@@ -2,7 +2,8 @@
     .tasks-files
         .tasks-files__main
             .tasks-files__item(v-if="isWordcount")
-                span.tasks-files__label Source file:
+                span Source file:
+                span.tasks-files__label-red *
                 .tasks-files__upload-file
                     FilesUpload(
                         buttonValue="Source Files *"

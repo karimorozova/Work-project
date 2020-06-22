@@ -7,6 +7,7 @@
     .steps-date__picker
       .steps-date__input-wrapper
         .steps-date__label Start date
+          span.steps-date__label-red *
         .steps-date__datepicker-wrapper
           .steps-date__input
               Datepicker(
@@ -27,6 +28,7 @@
     .steps-date__picker
       .steps-date__input-wrapper
         .steps-date__label Deadline
+          span.steps-date__label-red *
         .steps-date__datepicker-wrapper
           .steps-date__input
               Datepicker(
@@ -109,7 +111,7 @@ import { mapGetters, mapActions} from "vuex";
         ...mapActions({
             setDataValue: "setTasksDataValue"
         }),
-        setUnit({ option }) {
+        setUnit({ option }) {    
             this.currentUnit = this.units.find(item => item.type === option);
             this.sendUnit();
         },
@@ -155,7 +157,7 @@ import { mapGetters, mapActions} from "vuex";
         setDate(e, prop) {
             this.$emit("setDate", { date: new Date(e), prop })
         },
-        sendUnit() {
+        sendUnit() {          
             this.$emit('sendUnit', {
               stepCounter : this.stepCounter,
               step: this.setSteps[0].steps[this.stepCounter-1].step.title,
