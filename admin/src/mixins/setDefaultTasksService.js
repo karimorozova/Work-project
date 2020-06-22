@@ -14,10 +14,7 @@ export default {
             } catch(err) {
                 this.alertToggle({message: "Error on getting services from DB", isShow: true, type: "error"});
             }
-            const service = this.services.find(item => {
-                const serviceSymbol = this.currentProject.service ? this.currentProject.service.symbol : 'tr';
-                return item.symbol === serviceSymbol;
-            });
+            const service = this.services.find(item => item);
             this.service = service.title;
             const option = service.steps.length === 1 ? '1 Step' : '2 Steps';
             this.setWorkflow({option});

@@ -163,7 +163,7 @@ export default {
             this.setDataValue({prop: "stepsDates", value: this.stepsDates});
         },
         pushStepAndUnit (data) {
-            if(this.selectedWorkflow.id == 2890 && this.tasksData.service.languageForm == "Mono"){
+            if(this.selectedWorkflow.id == 2890){
                 if(!this.stepsAndUnitsMono.length){
                     this.stepsAndUnitsMono.push(data)
                 }
@@ -172,7 +172,7 @@ export default {
                 })
                 this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnitsMono})
             }
-            if(this.tasksData.service.languageForm !== "Mono"){
+            if(this.selectedWorkflow.id == 2917){
                 if(!this.stepsAndUnits.length){
                     this.stepsAndUnits.push(data)
                 }
@@ -183,12 +183,8 @@ export default {
                     if(array.map(element => element.step ).indexOf(data.step) == -1){
                         this.stepsAndUnits.push(data)
                     }                
-                }) 
-                if(this.selectedWorkflow.id == 2890  && this.tasksData.service.languageForm !== "Mono"){
-                    this.setDataValue({prop: "stepsAndUnits", value: [this.stepsAndUnits[0]]})
-                }else{
-                    this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnits})
-                }
+                })
+                this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnits})
             }
         }
     },

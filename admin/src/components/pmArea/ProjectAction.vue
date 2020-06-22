@@ -119,7 +119,7 @@ export default {
       this.isEditAndSend = true;
     },
     async getCancelMessage() {
-      if (this.project.status === "In progress") {
+      if (this.project.status === "In progress" || this.project.status === "Draft") {
         await this.setStatus("Cancelled", this.selectedReason);
       }
       try {
