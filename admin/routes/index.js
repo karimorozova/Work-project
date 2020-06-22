@@ -29,7 +29,7 @@ router.use('/pm-manage', pmareaRouter);
 router.use('/prices', requiresLogin, pricelistsRouter);
 router.use('/rates-manage', requiresLogin, pricelistsRatesRouter);
 router.use('/currency', requiresLogin, currencyRatioRouter);
-router.use('/pricelists', multipliers);
+router.use('/pricelists', requiresLogin, multipliers);
 router.use('/portal', portalRouter);
 router.use('/industry', industryRouter);
 router.use('/service', serviceRouter);
