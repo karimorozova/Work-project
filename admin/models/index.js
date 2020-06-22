@@ -33,6 +33,7 @@ const Units = require('./units');
 const BasicPrice = require('./basicPrice');
 const StepMultiplier = require('./stepMultiplier');
 const IndustryMultiplier = require('./industryMultiplier');
+const CurrencyRatio = require('./currencyRatio');
 
 const Models = {
     Languages,
@@ -42,7 +43,7 @@ const Models = {
     Services,
     Reports,
     Industries,
-    PriceList: Pricelist,
+    Pricelist,
     Timezones,
     LeadSource,
     Group,
@@ -70,6 +71,7 @@ const Models = {
     BasicPrice,
     StepMultiplier,
     IndustryMultiplier,
+    CurrencyRatio
 };
 
 module.exports = Models;

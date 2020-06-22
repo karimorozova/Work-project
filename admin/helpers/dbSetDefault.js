@@ -18,6 +18,7 @@ const {
   DiscountChart,
   TierLqa,
   Units,
+  CurrencyRatio
 } = require('../models');
 
 const {
@@ -41,6 +42,7 @@ const {
   unitsDefault,
 } = require('./dbDefaultValue');
 const ObjectId = require('mongodb').ObjectID;
+const { Converter } = require('easy-currencies');
 
 async function fillTierLqa() {
   try {
@@ -545,6 +547,26 @@ async function fillUnitSteps() {
   }
 }
 
+async function fillCurrencyRatio() {
+  try {
+    const converter = new Converter();
+    const currencyRatios = await CurrencyRatio.find();
+    if (!currencyRatios.length) {
+      const usdRatio = await converter.convert(1, 'EUR', 'USD');
+      const gbpRatio = await converter.convert(1, 'EUR', 'GBP');
+      await CurrencyRatio.create({
+        USD: usdRatio.toFixed(2),
+        GBP: gbpRatio.toFixed(2),
+      });
+      console.log('Currency ratios are saved!');
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error on filling currency ratios');
+  }
+
+}
+
 async function checkCollections() {
   await fillTierLqa();
   await fillPackages();
@@ -568,6 +590,7 @@ async function checkCollections() {
   await fillPricelist();
   await fillClientsRates();
   await fillVendorsRates();
+  await fillCurrencyRatio();
 }
 
 module.exports = checkCollections();
