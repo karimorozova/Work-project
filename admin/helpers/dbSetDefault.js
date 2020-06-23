@@ -579,16 +579,16 @@ async function fillStepMultipliers() {
           sizes.forEach(size => {
             steps.forEach(step => {
               combinations.push({
-                step: step._id,
-                unit: _id.toString(),
+                step: ObjectId(step._id),
+                unit: _id,
                 size: +size,
               })
             })
           })
         } else {
           steps.forEach(step => combinations.push({
-            step: step._id,
-            unit: _id.toString(),
+            step: ObjectId(step._id),
+            unit: _id,
             size: 1
           }))
         }
@@ -611,7 +611,7 @@ async function fillIndustryMultipliers() {
       const industries = await Industries.find({ active: true });
       for (let { _id } of industries) {
         await IndustryMultiplier.create({
-          industry: _id.toString()
+          industry: _id,
         })
       }
       console.log('Industry multipliers are saved!');
