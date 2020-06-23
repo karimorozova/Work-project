@@ -20,7 +20,8 @@ const {
   Units,
   CurrencyRatio,
   StepMultiplier,
-  IndustryMultiplier
+  IndustryMultiplier,
+  BasicPrice
 } = require('../models');
 
 const {
@@ -622,6 +623,43 @@ async function fillIndustryMultipliers() {
   }
 }
 
+async function fillBasicPrices() {
+  try {
+    const basicPrices = await BasicPrice.find();
+    if (!basicPrices.length) {
+      const vendors = await Vendors.find({ languagePairs: { $gt: [] } });
+      const duoLanguagesInUse = [];
+      for (let { languagePairs } of vendors) {
+        for (let pair of languagePairs) {
+          const { lang } = await Languages.findOne({ _id: pair.source });
+          const { lang: targetLang } = await Languages.findOne({ _id: pair.target });
+          duoLanguagesInUse.push(`${lang} > ${targetLang}`);
+        }
+      }
+      const uniqueDuoLangs = Array.from(new Set(duoLanguagesInUse));
+      const result = [];
+      for (let uniquePair of uniqueDuoLangs) {
+        const splicedString = uniquePair.split(' > ');
+        const type = splicedString[0] === splicedString[1] ? 'Mono' : 'Duo';
+        const sourceLang = await Languages.findOne({ lang: splicedString[0] });
+        const targetLang = await Languages.findOne({ lang: splicedString[1] });
+        result.push({
+          type,
+          sourceLanguage: sourceLang._id,
+          targetLanguage: targetLang._id,
+        })
+      }
+      for (let res of result) {
+        await BasicPrice.create(res);
+      }
+      console.log('Basic prices are saved!');
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error on filling basic prices');
+  }
+}
+
 async function checkCollections() {
   await fillTierLqa();
   await fillPackages();
@@ -648,6 +686,7 @@ async function checkCollections() {
   await fillCurrencyRatio();
   await fillStepMultipliers();
   await fillIndustryMultipliers();
+  await fillBasicPrices();
 }
 
 module.exports = checkCollections();
