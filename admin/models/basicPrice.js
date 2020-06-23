@@ -21,7 +21,7 @@ const BasicPriceSchema = new Schema({
     type: Number,
     default: 1,
   },
-  bgpBasicPrice: {
+  gbpBasicPrice: {
     type: Number,
     default: 1,
   }
