@@ -6,7 +6,7 @@
             :selectedOption="step"
             :options="steps"
             placeholder="Step"
-            @chooseOption="(e) => setValue(e, 'stepStepFilter')"
+            @chooseOption="(e) => setValue(e, 'stepFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
@@ -14,7 +14,7 @@
             :selectedOption="unit"
             :options="units"
             placeholder="Unit"
-            @chooseOption="(e) => setValue(e, 'unitStepFilter')"
+            @chooseOption="(e) => setValue(e, 'unitFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
@@ -22,7 +22,7 @@
             :selectedOption="size"
             :options="sizes"
             placeholder="Size"
-            @chooseOption="(e) => setValue(e, 'sizeStepFilter')"
+            @chooseOption="(e) => setValue(e, 'sizeFilter')"
         )
 </template>
 <script>

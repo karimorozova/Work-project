@@ -26,32 +26,32 @@
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLang }}
+        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentSourceLang" disabled)
 
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLang }}
+        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentTargetLang" disabled)
 
       template(slot="eur" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.eur}}
+          span(id="eur") {{row.euroBasicPrice}}
           label(for="eur") &euro;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPriceEUR")
 
       template(slot="usd" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="usd") {{row.usd}}
+          span(id="usd") {{row.usdBasicPrice}}
           label(for="usd") &#36;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPriceUSD")
 
       template(slot="gbp" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="gbp") {{row.gbp}}
+          span(id="gbp") {{row.gbpBasicPrice}}
           label(for="gbp") &pound;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPriceGBP")
@@ -122,11 +122,11 @@ export default {
       ],
       dataArray: [
         {
-          sourceLang: "someLang",
-          targetLang: "someLang2",
-          usd: 1,
-          eur: 0.9,
-          gbp: 0.8
+          // sourceLang: "someLang",
+          // targetLang: "someLang2",
+          // usd: 1,
+          // eur: 0.9,
+          // gbp: 0.8
         }
       ],
       currentSourceLang: "",
@@ -145,6 +145,9 @@ export default {
       deleteIndex: -1,
       currentActive: -1
     };
+  },
+  created(){
+    this.getLangs();
   },
   methods: {
     ...mapActions({
@@ -170,11 +173,11 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      (this.currentSourceLang = this.dataArray[index].sourceLang),
-        (this.currentTargetLang = this.dataArray[index].targetLang),
-        (this.currentBasicPriceUSD = this.dataArray[index].usd);
-      this.currentBasicPriceEUR = this.dataArray[index].eur;
-      this.currentBasicPriceGBP = this.dataArray[index].gbp;
+      (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
+        (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
+        (this.currentBasicPriceUSD = this.dataArray[index].usdBasicPrice);
+      this.currentBasicPriceEUR = this.dataArray[index].euroBasicPrice;
+      this.currentBasicPriceGBP = this.dataArray[index].gbpBasicPrice;
     },
     manageCancelEdition() {
       // this.vendorTests = this.vendorTests.filter(item => item._id);
@@ -196,13 +199,45 @@ export default {
       }
       await this.manageSaveClick(index);
     },
+    async getLangs(filters, count = 0){
+      try {
+        const result = await this.$http.post('/pricelists/basic-prices',{
+          filters,
+          countFilter: count
+        });
+        this.dataArray = result.data;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Languages",
+          isShow: true,
+          type: "error"
+        });       
+      }
+    },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
+      const id = this.dataArray[index]._id;
       try {
-        alert("try");
-        // await this.saveLangTest({ testData, file: this.currentFile });
-        // await this.getTests();
+        const result = await this.$http.post('/pricelists/basic-prices-update', {
+          basicPrice : {
+            _id: id,
+            usdBasicPrice: this.currentMinPriceUSD,
+            euroBasicPrice: this.currentMinPriceEUR,
+            gbpBasicPrice: this.currentMinPriceGBP,
+          }
+        })
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        });
+        this.setDefaults();
       } catch (err) {
+        this.alertToggle({
+          message: "Error on saving Steps",
+          isShow: true,
+          type: "error"
+        }); 
       } finally {
         // this.setDefaults();
       }
