@@ -18,6 +18,9 @@ const {
   DiscountChart,
   TierLqa,
   Units,
+  CurrencyRatio,
+  StepMultiplier,
+  IndustryMultiplier
 } = require('../models');
 
 const {
@@ -41,6 +44,7 @@ const {
   unitsDefault,
 } = require('./dbDefaultValue');
 const ObjectId = require('mongodb').ObjectID;
+const { Converter } = require('easy-currencies');
 
 async function fillTierLqa() {
   try {
@@ -545,6 +549,79 @@ async function fillUnitSteps() {
   }
 }
 
+async function fillCurrencyRatio() {
+  try {
+    const converter = new Converter();
+    const currencyRatios = await CurrencyRatio.find();
+    if (!currencyRatios.length) {
+      const usdRatio = await converter.convert(1, 'EUR', 'USD');
+      const gbpRatio = await converter.convert(1, 'EUR', 'GBP');
+      await CurrencyRatio.create({
+        USD: usdRatio.toFixed(2),
+        GBP: gbpRatio.toFixed(2),
+      });
+      console.log('Currency ratios are saved!');
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error on filling currency ratios');
+  }
+}
+
+async function fillStepMultipliers() {
+  try {
+    const stepMultipliers = await StepMultiplier.find();
+    if (!stepMultipliers.length) {
+      const units = await Units.find({ active: true });
+      const combinations = [];
+      for (let { _id, sizes, steps } of units) {
+        if (sizes.length) {
+          sizes.forEach(size => {
+            steps.forEach(step => {
+              combinations.push({
+                step: ObjectId(step._id),
+                unit: _id,
+                size: +size,
+              })
+            })
+          })
+        } else {
+          steps.forEach(step => combinations.push({
+            step: ObjectId(step._id),
+            unit: _id,
+            size: 1
+          }))
+        }
+      }
+      for (let combination of combinations) {
+        await StepMultiplier.create(combination)
+      }
+      console.log('Step multipliers are saved!');
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error on filling step multipliers');
+  }
+}
+
+async function fillIndustryMultipliers() {
+  try {
+    const industryMultipliers = await IndustryMultiplier.find();
+    if (!industryMultipliers.length) {
+      const industries = await Industries.find({ active: true });
+      for (let { _id } of industries) {
+        await IndustryMultiplier.create({
+          industry: _id,
+        })
+      }
+      console.log('Industry multipliers are saved!');
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error on filling industry multipliers');
+  }
+}
+
 async function checkCollections() {
   await fillTierLqa();
   await fillPackages();
@@ -568,6 +645,9 @@ async function checkCollections() {
   await fillPricelist();
   await fillClientsRates();
   await fillVendorsRates();
+  await fillCurrencyRatio();
+  await fillStepMultipliers();
+  await fillIndustryMultipliers();
 }
 
 module.exports = checkCollections();

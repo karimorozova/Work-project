@@ -24,6 +24,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
     return {
+      currencyId: null,
       currencyUsd: null,
       currencyGbp: null
     };
@@ -32,12 +33,45 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-    saveCurrency() {
-      console.log(this.currencyUsd);
-      console.log(this.currencyGbp);
+    async getCurrency() {
       try {
-      } catch (err) {}
+        const result = await this.$http.get("/currency/currency-ratio");
+        this.currencyId = result.data._id;
+        this.currencyUsd = result.data.USD;
+        this.currencyGbp = result.data.GBP;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting currency",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async saveCurrency() {
+      try {
+        const result = await this.$http.post("/currency/currency-ratio", {
+          currencyRatio: {
+            _id: this.currencyId,
+            USD: this.currencyUsd,
+            GBP: this.currencyGbp
+          }
+        });
+        this.alertToggle({
+          message: "Currency saved",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on updating currency",
+          isShow: true,
+          type: "error"
+        });
+      }
     }
+  },
+  created() {
+    this.getCurrency();
   }
 };
 </script>
@@ -47,25 +81,25 @@ export default {
   padding-left: 20px;
   display: flex;
   align-items: center;
-  &__input{
-      &-symbol{
-          margin-left: 4px;
-      }
+  &__input {
+    &-symbol {
+      margin-left: 4px;
+    }
   }
   &__button {
     cursor: pointer;
     height: 20px;
     margin-left: 2px;
   }
-  &__element{
-      margin-left: 10px;
+  &__element {
+    margin-left: 10px;
   }
 }
 input {
   color: #67573e;
   height: 22px;
   border-radius: 5px;
-  width: 30px;
+  width: 35px;
   border: 1px solid #67573e;
 }
 input {

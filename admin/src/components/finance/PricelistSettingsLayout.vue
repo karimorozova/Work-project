@@ -9,6 +9,7 @@
         StepTable(
             :steps="steps"
             :units="units"
+            :sizes="sizes"
         )
         IndustryTable
     .priceLayout__result
@@ -34,6 +35,7 @@ export default {
       languages: null,
       steps: null,
       units: null,
+      sizes: null,
       industries: null,
     };
   },
@@ -72,6 +74,7 @@ export default {
         const result = await this.$http.get("/api/units");
         let formatUnits = result.data;
         this.units = formatUnits.map(item => item.type);
+        this.sizes = [... new Set(formatUnits.map(item => item.sizes).flat())];
       } catch (err) {
         this.alertToggle({
           message: "Cannot get Units",

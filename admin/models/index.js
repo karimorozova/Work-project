@@ -30,6 +30,10 @@ const LangTest = require('./langTest');
 const MemoqProject = require('./memoqProject');
 const LangTier = require('./langTier');
 const Units = require('./units');
+const BasicPrice = require('./basicPrice');
+const StepMultiplier = require('./stepMultiplier');
+const IndustryMultiplier = require('./industryMultiplier');
+const CurrencyRatio = require('./currencyRatio');
 
 const Models = {
     Languages,
@@ -64,6 +68,10 @@ const Models = {
     MemoqProject,
     LangTier,
     Units,
+    BasicPrice,
+    StepMultiplier,
+    IndustryMultiplier,
+    CurrencyRatio
 };
 
 module.exports = Models;

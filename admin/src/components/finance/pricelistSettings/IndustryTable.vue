@@ -13,7 +13,6 @@
         :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="settings-table-row"
         bodyCellClass="settings-table-cell"
-
     )
     
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -67,7 +66,7 @@ export default {
           padding: "0"
         }
       ],
-      dataArray: [{ industry: "SomeIndustry", multiplier: 100 }],
+      dataArray: [],
 
       currentIndustry: "",
       currentMultiplier: "",
@@ -79,10 +78,25 @@ export default {
       currentActive: -1
     };
   },
+  created(){
+    this.getIndustries();
+  },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    async getIndustries(){      
+      try {
+        const result = await this.$http.get('/pricelists/industry-multipliers');
+        this.dataArray = result.data;        
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Industries",
+          isShow: true,
+          type: "error"
+        });       
+      }
+    },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();
@@ -107,34 +121,47 @@ export default {
       this.currentMultiplier = this.dataArray[index].multiplier;
     },
     manageCancelEdition() {
-      // this.vendorTests = this.vendorTests.filter(item => item._id);
       this.setDefaults();
       this.isDeleting = false;
     },
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.currentTest = "";
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      //   if (!this.currentTest) this.errors.push("Test should not be empty!");
+      if (this.currentMultiplier == '') return;
       if (this.errors.length) {
         this.areErrors = true;
         return;
-      }
+      }      
       await this.manageSaveClick(index);
     },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       try {
-        alert("try");
-        // await this.saveLangTest({ testData, file: this.currentFile });
-        // await this.getTests();
+        const id = this.dataArray[index]._id;
+        await this.$http.post('/pricelists/industry-multipliers', {
+          industryMultiplier: {
+            _id: id,
+            multiplier: this.currentMultiplier
+          }
+        })
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        }); 
+        this.setDefaults();
       } catch (err) {
-      } finally {
-        // this.setDefaults();
+        this.alertToggle({
+          message: "Error on getting Industry",
+          isShow: true,
+          type: "error"
+        });  
+        } finally {
+        this.getIndustries();
       }
     },
     closeErrors() {
