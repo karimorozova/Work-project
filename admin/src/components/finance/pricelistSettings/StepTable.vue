@@ -219,7 +219,6 @@ export default {
       this.currentMinPriceGBP = this.dataArray[index].gbpMinPrice;
     },
     manageCancelEdition() {
-      // this.vendorTests = this.vendorTests.filter(item => item._id);
       this.setDefaults();
       this.isDeleting = false;
     },
@@ -231,7 +230,10 @@ export default {
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      // if (!this.currentTest) this.errors.push("Test should not be empty!");
+      if(this.currentMultiplier == "") return;
+      if(this.currentMinPriceUSD == "") return;
+      if(this.currentMinPriceEUR == "") return;
+      if(this.currentMinPriceGBP == "") return;
       if (this.errors.length) {
         this.areErrors = true;
         return;
