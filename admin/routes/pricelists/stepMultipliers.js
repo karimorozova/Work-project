@@ -25,7 +25,7 @@ router.post('/step-multipliers-update', async (req, res) => {
 
 router.get('/industry-multipliers', async (req, res) => {
   try {
-    const industryMultipliers = await IndustryMultiplier.find();
+    const industryMultipliers = await IndustryMultiplier.find().populate('industry');
     res.send(industryMultipliers);
   } catch (err) {
     console.log(err);
@@ -34,7 +34,7 @@ router.get('/industry-multipliers', async (req, res) => {
 })
 
 router.post('/industry-multipliers', async (req, res) => {
-  const { industryMultiplier } = req.body;  
+  const { industryMultiplier } = req.body;
   try {
     await IndustryMultiplier.findOneAndUpdate({ _id: industryMultiplier._id }, industryMultiplier);
     res.send('Saved');

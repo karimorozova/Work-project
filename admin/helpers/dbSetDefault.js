@@ -587,7 +587,7 @@ async function fillStepMultipliers() {
           })
         } else {
           steps.forEach(step => combinations.push({
-            step: ObjectId(step._id),
+            step: step._id,
             unit: _id,
             size: 1
           }))

@@ -39,9 +39,14 @@ const getFilteredStepMultiplierQuery = async (filters) => {
 }
 
 const getFilteredStepMultiplier = async (filters) => {
+  const { countFilter } = filters;
   try {
     const query = await getFilteredStepMultiplierQuery(filters);
-    return await StepMultiplier.find(query).limit(25);
+    const stepMultipliers = await StepMultiplier.find(query).skip(countFilter).limit(25);
+    return StepMultiplier.populate(stepMultipliers, [
+      'step',
+      'unit'
+    ]);
   } catch (err) {
     console.log(err);
     console.log('Error in getFilteredStepMultiplier');
