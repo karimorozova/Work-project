@@ -19,7 +19,7 @@ const vendorsapiRouter = require('./vendorsapi');
 const projectsRouter = require('./projectsapi');
 const settingsUpdate = require('./settings/updates');
 const memoqapiRouter = require('./memoqapi');
-const multipliers = require('./pricelists/stepMultipliers');
+const multipliers = require('./pricelists/multipliers');
 
 router.use('/', admin);
 router.use('/api', apiRouter);

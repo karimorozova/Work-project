@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { StepMultiplier, IndustryMultiplier } = require('../../models');
-const { getFilteredStepMultiplier } = require('../../multipliers');
+const { StepMultiplier, IndustryMultiplier, BasicPrice } = require('../../models');
+const { getFilteredStepMultiplier, getFilteredBasicPrices } = require('../../multipliers');
 
 router.post('/step-multipliers', async (req, res) => {
   try {
@@ -41,6 +41,27 @@ router.post('/industry-multipliers', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating industry multipliers');
+  }
+})
+
+router.post('/basic-prices', async (req, res) => {
+  try {
+    const basicPrices = await getFilteredBasicPrices(req.body);
+    res.send(basicPrices)
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting basic prices')
+  }
+})
+
+router.post('/basic-prices-update', async (req, res) => {
+  const { basicPrice } = req.body;
+  try {
+    await BasicPrice.findOneAndUpdate({ _id: basicPrice._id }, basicPrice);
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating basic-prices');
   }
 })
 
