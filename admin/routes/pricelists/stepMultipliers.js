@@ -12,7 +12,7 @@ router.post('/step-multipliers', async (req, res) => {
   }
 })
 
-router.post('/step-multipliers/:id', async (req, res) => {
+router.post('/step-multipliers-update', async (req, res) => {
   const { stepMultiplier } = req.body;
   try {
     await StepMultiplier.findOneAndUpdate({ _id: stepMultiplier._id }, stepMultiplier);
@@ -33,8 +33,8 @@ router.get('/industry-multipliers', async (req, res) => {
   }
 })
 
-router.post('/industry-multipliers/:id', async (req, res) => {
-  const { industryMultiplier } = req.body;
+router.post('/industry-multipliers', async (req, res) => {
+  const { industryMultiplier } = req.body;  
   try {
     await IndustryMultiplier.findOneAndUpdate({ _id: industryMultiplier._id }, industryMultiplier);
     res.send('Saved');

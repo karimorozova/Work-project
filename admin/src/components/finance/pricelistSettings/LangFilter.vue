@@ -2,7 +2,7 @@
 .priceFilter
     .priceFilter__drop-menu
         SelectSingle(
-            :hasSerch="true"
+            :hasSearch="true"
             :selectedOption="source"
             :options="sources"
             placeholder="Source"
@@ -10,7 +10,7 @@
         )
     .priceFilter__drop-menu
         SelectSingle(
-            :hasSerch="true"
+            :hasSearch="true"
             :selectedOption="target"
             :options="targets"
             placeholder="Target"

@@ -2,6 +2,7 @@
 .priceFilter
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="step"
             :options="steps"
             placeholder="Step"
@@ -9,6 +10,7 @@
         )
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="unit"
             :options="units"
             placeholder="Unit"
@@ -16,6 +18,7 @@
         )
     .priceFilter__drop-menu
         SelectSingle(
+            :hasSearch="true"
             :selectedOption="size"
             :options="sizes"
             placeholder="Size"
