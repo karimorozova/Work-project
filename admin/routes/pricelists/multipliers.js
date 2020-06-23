@@ -3,8 +3,9 @@ const { StepMultiplier, IndustryMultiplier, BasicPrice } = require('../../models
 const { getFilteredStepMultiplier, getFilteredBasicPrices } = require('../../multipliers');
 
 router.post('/step-multipliers', async (req, res) => {
+  const { filters } = req.body
   try {
-    const stepMultipliers = await getFilteredStepMultiplier(req.body);
+    const stepMultipliers = await getFilteredStepMultiplier(filters);
     res.send(stepMultipliers);
   } catch (err) {
     console.log(err);
@@ -16,7 +17,8 @@ router.post('/step-multipliers-update', async (req, res) => {
   const { stepMultiplier } = req.body;
   try {
     await StepMultiplier.findOneAndUpdate({ _id: stepMultiplier._id }, stepMultiplier);
-    res.send('Saved');
+    const updatedStep = await StepMultiplier.findOne({ _id: stepMultiplier._id });
+    res.send(updatedStep);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating step multipliers');
@@ -45,8 +47,9 @@ router.post('/industry-multipliers', async (req, res) => {
 })
 
 router.post('/basic-prices', async (req, res) => {
+  const { filters } = req.body;
   try {
-    const basicPrices = await getFilteredBasicPrices(req.body);
+    const basicPrices = await getFilteredBasicPrices(filters);
     res.send(basicPrices)
   } catch (err) {
     console.log(err);
@@ -58,7 +61,8 @@ router.post('/basic-prices-update', async (req, res) => {
   const { basicPrice } = req.body;
   try {
     await BasicPrice.findOneAndUpdate({ _id: basicPrice._id }, basicPrice);
-    res.send('Saved');
+    const updatedBasicPrice = await BasicPrice.findOne({ _id: basicPrice._id });
+    res.send(updatedBasicPrice);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating basic-prices');

@@ -1,12 +1,14 @@
-const { BasicPrice } = require('../models');
+const { BasicPrice, Languages } = require('../models');
 
 const getFilteredBasicPriceQuery = async (filters) => {
   let query = {};
   if (filters.sourceFilter) {
-    query.sourceLanguage = { _id: filters.sourceFilter };
+    const lang = await Languages.findOne({ lang: filters.sourceFilter });
+    query.sourceLanguage = { _id: lang._id };
   }
   if (filters.targetFilter) {
-    query.targetLanguage = { _id: filters.targetFilter };
+    const lang = await Languages.findOne({ lang: filters.targetFilter });
+    query.targetFilter = { _id: lang._id };
   }
   if (filters.typeFilter) {
     query.type = { type: filters.typeFilter };
