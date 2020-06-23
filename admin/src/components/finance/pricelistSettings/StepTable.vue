@@ -153,18 +153,7 @@ export default {
           padding: "0"
         }
       ],
-      dataArray: [
-        // {
-        //   step: "SomeStep",
-        //   unit: "Package",
-        //   size: 200,
-        //   multiplier: 100,
-        //   usd: 1,
-        //   eur: 2,
-        //   gbp: 3
-        // }
-      ],
-
+      dataArray: [],
       currentStep: "",
       currentUnit: "",
       currentSize: "",
@@ -182,11 +171,11 @@ export default {
       isDeleting: false,
       deleteIndex: -1,
       currentActive: -1,
-      isDataRemain: true,
+      isDataRemain: true
     };
   },
-  created(){
-    this.getSteps();
+  created() {
+    this.getSteps(this.allFilters);
   },
   methods: {
     ...mapActions({
@@ -210,8 +199,8 @@ export default {
           await this.checkErrors(index);
       }
     },
-    async bottomScrolled(){
-      if (this.isDataRemain) {        
+    async bottomScrolled() {
+      if (this.isDataRemain) {
         const result = await this.$http.post("/pricelists/step-multipliers", {
           ...this.allFilters,
           countFilter: this.dataArray.length
@@ -242,19 +231,19 @@ export default {
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      if(this.currentMultiplier == "") return;
-      if(this.currentMinPriceUSD == "") return;
-      if(this.currentMinPriceEUR == "") return;
-      if(this.currentMinPriceGBP == "") return;
+      if (this.currentMultiplier == "") return;
+      if (this.currentMinPriceUSD == "") return;
+      if (this.currentMinPriceEUR == "") return;
+      if (this.currentMinPriceGBP == "") return;
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
       await this.manageSaveClick(index);
     },
-    async getSteps(filters, count = 0){
+    async getSteps(filters, count = 0) {
       try {
-        const result = await this.$http.post('/pricelists/step-multipliers',{
+        const result = await this.$http.post("/pricelists/step-multipliers", {
           filters,
           countFilter: count
         });
@@ -264,36 +253,38 @@ export default {
           message: "Error on getting Steps",
           isShow: true,
           type: "error"
-        });       
+        });
       }
     },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
       try {
-        const result = await this.$http.post('/pricelists/step-multipliers-update', {
-          stepMultiplier : {
-            _id: id,
-            multiplier: this.currentMultiplier,
-            usdMinPrice: this.currentMinPriceUSD,
-            euroMinPrice: this.currentMinPriceEUR,
-            gbpMinPrice: this.currentMinPriceGBP,
+        const result = await this.$http.post(
+          "/pricelists/step-multipliers-update",
+          {
+            stepMultiplier: {
+              _id: id,
+              multiplier: this.currentMultiplier,
+              usdMinPrice: this.currentMinPriceUSD,
+              euroMinPrice: this.currentMinPriceEUR,
+              gbpMinPrice: this.currentMinPriceGBP
+            }
           }
-        })
+        );
         this.alertToggle({
           message: "Saved successfully",
           isShow: true,
           type: "success"
-        }); 
+        });
         this.setDefaults();
+        this.dataArray[index] = result.data;
       } catch (err) {
         this.alertToggle({
           message: "Error on saving Steps",
           isShow: true,
           type: "error"
-        });  
-      } finally {
-        // this.getSteps();
+        });
       }
     },
     closeErrors() {
