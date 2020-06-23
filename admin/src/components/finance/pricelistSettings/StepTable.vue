@@ -244,7 +244,7 @@ export default {
     async getSteps(filters, count = 0) {
       try {
         const result = await this.$http.post("/pricelists/step-multipliers", {
-          filters,
+          ...filters,
           countFilter: count
         });
         this.dataArray = result.data;
@@ -301,11 +301,16 @@ export default {
       return result;
     },
     allFilters() {
-      return {
+      let result = {
         stepFilter: this.stepFilter,
         unitFilter: this.unitFilter,
         sizeFilter: this.sizeFilter
       };
+      if(this.stepFilter == "All") result.stepFilter = '';
+      if(this.unitFilter == "All") result.unitFilter = '';
+      if(this.sizeFilter == "All") result.sizeFilter = '';
+
+      return result;
     }
   },
   components: {

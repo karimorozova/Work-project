@@ -3,9 +3,8 @@ const { StepMultiplier, IndustryMultiplier, BasicPrice } = require('../../models
 const { getFilteredStepMultiplier, getFilteredBasicPrices } = require('../../multipliers');
 
 router.post('/step-multipliers', async (req, res) => {
-  const { filters } = req.body
   try {
-    const stepMultipliers = await getFilteredStepMultiplier(filters);
+    const stepMultipliers = await getFilteredStepMultiplier(req.body);
     res.send(stepMultipliers);
   } catch (err) {
     console.log(err);
@@ -17,7 +16,7 @@ router.post('/step-multipliers-update', async (req, res) => {
   const { stepMultiplier } = req.body;
   try {
     await StepMultiplier.findOneAndUpdate({ _id: stepMultiplier._id }, stepMultiplier);
-    const updatedStep = await StepMultiplier.findOne({ _id: stepMultiplier._id });
+    const updatedStep = await StepMultiplier.findOne({ _id: stepMultiplier._id }).populate('step').populate('unit');
     res.send(updatedStep);
   } catch (err) {
     console.log(err);
@@ -47,9 +46,8 @@ router.post('/industry-multipliers', async (req, res) => {
 })
 
 router.post('/basic-prices', async (req, res) => {
-  const { filters } = req.body;
   try {
-    const basicPrices = await getFilteredBasicPrices(filters);
+    const basicPrices = await getFilteredBasicPrices(req.body);
     res.send(basicPrices)
   } catch (err) {
     console.log(err);
@@ -61,7 +59,8 @@ router.post('/basic-prices-update', async (req, res) => {
   const { basicPrice } = req.body;
   try {
     await BasicPrice.findOneAndUpdate({ _id: basicPrice._id }, basicPrice);
-    const updatedBasicPrice = await BasicPrice.findOne({ _id: basicPrice._id });
+    const updatedBasicPrice = await BasicPrice.findOne({ _id: basicPrice._id })
+    .populate('sourceLanguage').populate('targetLanguage');
     res.send(updatedBasicPrice);
   } catch (err) {
     console.log(err);

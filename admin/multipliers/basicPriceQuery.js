@@ -8,10 +8,10 @@ const getFilteredBasicPriceQuery = async (filters) => {
   }
   if (filters.targetFilter) {
     const lang = await Languages.findOne({ lang: filters.targetFilter });
-    query.targetFilter = { _id: lang._id };
+    query.targetLanguage = { _id: lang._id };
   }
   if (filters.typeFilter) {
-    query.type = { type: filters.typeFilter };
+    query.type = filters.typeFilter;
   }
   return query;
 }

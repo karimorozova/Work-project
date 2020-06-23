@@ -206,7 +206,7 @@ export default {
     async getLangs(filters, count = 0) {
       try {
         const result = await this.$http.post("/pricelists/basic-prices", {
-          filters,
+          ...filters,
           countFilter: count
         });
         this.dataArray = result.data;
@@ -262,11 +262,16 @@ export default {
       return result;
     },
     allFilters() {
-      return {
+      let result = {
         typeFilter: this.typeFilter,
         sourceFilter: this.sourceFilter,
         targetFilter: this.targetFilter
       };
+      if(this.typeFilter == "All") result.typeFilter = '';
+      if(this.sourceFilter == "All") result.sourceFilter = '';
+      if(this.targetFilter == "All") result.targetFilter = '';
+
+      return result;
     }
   },
   components: {
