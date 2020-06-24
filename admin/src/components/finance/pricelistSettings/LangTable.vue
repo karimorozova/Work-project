@@ -1,9 +1,9 @@
 <template lang="pug">
 .price
     LangFilter(
-      :source="sourceLangFilter"
-      :target="targetLangFilter"
-      :form="formLangFilter"
+      :source="sourceFilter"
+      :target="targetFilter"
+      :form="typeFilter"
       :sources="languages"
       :targets="languages"
       @setFilter="setFilter"
@@ -21,37 +21,38 @@
         :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="settings-table-row"
         bodyCellClass="settings-table-cell"
+        @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLang }}
+        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentSourceLang" disabled)
 
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLang }}
+        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentTargetLang" disabled)
 
       template(slot="eur" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.eur}}
+          span(id="eur") {{row.euroBasicPrice}}
           label(for="eur") &euro;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPriceEUR")
 
       template(slot="usd" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="usd") {{row.usd}}
+          span(id="usd") {{row.usdBasicPrice}}
           label(for="usd") &#36;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPriceUSD")
 
       template(slot="gbp" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="gbp") {{row.gbp}}
+          span(id="gbp") {{row.gbpBasicPrice}}
           label(for="gbp") &pound;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPriceGBP")
@@ -120,31 +121,27 @@ export default {
           padding: "0"
         }
       ],
-      dataArray: [
-        {
-          sourceLang: "someLang",
-          targetLang: "someLang2",
-          usd: 1,
-          eur: 0.9,
-          gbp: 0.8
-        }
-      ],
+      dataArray: [],
       currentSourceLang: "",
       currentTargetLang: "",
       currentBasicPriceUSD: "",
       currentBasicPriceEUR: "",
       currentBasicPriceGBP: "",
 
-      formLangFilter: "",
-      sourceLangFilter: "",
-      targetLangFilter: "",
+      typeFilter: "",
+      sourceFilter: "",
+      targetFilter: "",
 
       areErrors: false,
       errors: [],
       isDeleting: false,
       deleteIndex: -1,
-      currentActive: -1
+      currentActive: -1,
+      isDataRemain: true
     };
+  },
+  created() {
+    this.getLangs(this.allFilters);
   },
   methods: {
     ...mapActions({
@@ -170,53 +167,110 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      (this.currentSourceLang = this.dataArray[index].sourceLang),
-        (this.currentTargetLang = this.dataArray[index].targetLang),
-        (this.currentBasicPriceUSD = this.dataArray[index].usd);
-      this.currentBasicPriceEUR = this.dataArray[index].eur;
-      this.currentBasicPriceGBP = this.dataArray[index].gbp;
+      (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
+        (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
+        (this.currentBasicPriceUSD = this.dataArray[index].usdBasicPrice);
+      this.currentBasicPriceEUR = this.dataArray[index].euroBasicPrice;
+      this.currentBasicPriceGBP = this.dataArray[index].gbpBasicPrice;
     },
     manageCancelEdition() {
-      // this.vendorTests = this.vendorTests.filter(item => item._id);
       this.setDefaults();
       this.isDeleting = false;
     },
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.currentTest = "";
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      //   if (!this.currentTest) this.errors.push("Test should not be empty!");
+      if (this.currentBasicPriceUSD == "") return;
+      if (this.currentBasicPriceEUR == "") return;
+      if (this.currentBasicPriceGBP == "") return;
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
       await this.manageSaveClick(index);
     },
+    async bottomScrolled() {
+      if (this.isDataRemain) {
+        const result = await this.$http.post("/pricelists/basic-prices", {
+          ...this.allFilters,
+          countFilter: this.dataArray.length
+        });
+        this.dataArray.push(...result.data);
+        this.isDataRemain = result.body.length === 25;
+      }
+    },
+    async getLangs(filters, count = 0) {
+      try {
+        const result = await this.$http.post("/pricelists/basic-prices", {
+          ...filters,
+          countFilter: count
+        });
+        this.dataArray = result.data;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Languages",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
+      const id = this.dataArray[index]._id;
       try {
-        alert("try");
-        // await this.saveLangTest({ testData, file: this.currentFile });
-        // await this.getTests();
+        const result = await this.$http.post(
+          "/pricelists/basic-prices-update",
+          {
+            basicPrice: {
+              _id: id,
+              usdBasicPrice: this.currentBasicPriceUSD,
+              euroBasicPrice: this.currentBasicPriceEUR,
+              gbpBasicPrice: this.currentBasicPriceGBP
+            }
+          }
+        );
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        });
+        this.setDefaults();
+        this.dataArray[index] = result.data;
       } catch (err) {
-      } finally {
-        // this.setDefaults();
+        this.alertToggle({
+          message: "Error on saving Steps",
+          isShow: true,
+          type: "error"
+        });
       }
     },
     closeErrors() {
       this.areErrors = false;
     },
-    setFilter({ option, prop }) {
+    async setFilter({ option, prop }) {
       this[prop] = option;
+      await this.getLangs(this.allFilters);
     }
   },
   computed: {
     manageIcons() {
       const { delete: del, ...result } = this.icons;
+      return result;
+    },
+    allFilters() {
+      let result = {
+        typeFilter: this.typeFilter,
+        sourceFilter: this.sourceFilter,
+        targetFilter: this.targetFilter
+      };
+      if(this.typeFilter == "All") result.typeFilter = '';
+      if(this.sourceFilter == "All") result.sourceFilter = '';
+      if(this.targetFilter == "All") result.targetFilter = '';
+
       return result;
     }
   },

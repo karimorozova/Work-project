@@ -19,7 +19,7 @@
             .price-title {{ field.label }}
             
         template(slot="industry" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.industry }}
+            .price__data(v-if="currentActive !== index") {{ row.industry.name }}
             .price__data(v-else)
                 input.price__data-input(type="text" v-model="currentIndustry" disabled)
 
@@ -117,7 +117,7 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentIndustry = this.dataArray[index].industry;
+      this.currentIndustry = this.dataArray[index].industry.name;
       this.currentMultiplier = this.dataArray[index].multiplier;
     },
     manageCancelEdition() {

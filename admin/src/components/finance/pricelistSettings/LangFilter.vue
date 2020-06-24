@@ -6,7 +6,7 @@
             :selectedOption="source"
             :options="sources"
             placeholder="Source"
-            @chooseOption="(e) => setValue(e, 'sourceLangFilter')"
+            @chooseOption="(e) => setValue(e, 'sourceFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
@@ -14,14 +14,14 @@
             :selectedOption="target"
             :options="targets"
             placeholder="Target"
-            @chooseOption="(e) => setValue(e, 'targetLangFilter')"
+            @chooseOption="(e) => setValue(e, 'targetFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
             :selectedOption="form"
             :options="forms"
             placeholder="Form"
-            @chooseOption="(e) => setValue(e, 'formLangFilter')"
+            @chooseOption="(e) => setValue(e, 'typeFilter')"
         )
 </template>
 <script>
@@ -46,7 +46,7 @@ export default {
   },
   data() {
     return {
-      forms: ["Mono", "Duo"]
+      forms: ["All", "Mono", "Duo"]
     };
   },
   methods: {

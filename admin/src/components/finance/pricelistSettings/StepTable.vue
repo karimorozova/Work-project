@@ -1,9 +1,9 @@
 <template lang="pug">
 .price
     StepFilter(
-      :step="stepStepFilter"
-      :unit="unitStepFilter"
-      :size="sizeStepFilter"
+      :step="stepFilter"
+      :unit="unitFilter"
+      :size="sizeFilter"
       :steps="steps"
       :units="units"
       :sizes="sizes"
@@ -21,18 +21,19 @@
         :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 10}]"
         :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="settings-table-row"
-        bodyCellClass="settings-table-cell"        
+        bodyCellClass="settings-table-cell"
+        @bottomScrolled="bottomScrolled"
     )
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .price-title {{ field.label }}
             
         template(slot="step" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.step }}
+            .price__data(v-if="currentActive !== index") {{ row.step.title }}
             .price__data(v-else)
                 input.price__data-input(type="text" v-model="currentStep" disabled)
 
         template(slot="unit" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.unit }}
+            .price__data(v-if="currentActive !== index") {{ row.unit.type }}
             .price__data(v-else)
                 input.price__data-input(type="text" v-model="currentUnit" disabled) 
 
@@ -152,18 +153,7 @@ export default {
           padding: "0"
         }
       ],
-      dataArray: [
-        // {
-        //   step: "SomeStep",
-        //   unit: "Package",
-        //   size: 200,
-        //   multiplier: 100,
-        //   usd: 1,
-        //   eur: 2,
-        //   gbp: 3
-        // }
-      ],
-
+      dataArray: [],
       currentStep: "",
       currentUnit: "",
       currentSize: "",
@@ -172,19 +162,20 @@ export default {
       currentMinPriceEUR: "",
       currentMinPriceGBP: "",
 
-      stepStepFilter: "",
-      unitStepFilter: "",
-      sizeStepFilter: "",
+      stepFilter: "",
+      unitFilter: "",
+      sizeFilter: "",
 
       areErrors: false,
       errors: [],
       isDeleting: false,
       deleteIndex: -1,
-      currentActive: -1
+      currentActive: -1,
+      isDataRemain: true
     };
   },
-  created(){
-    this.getSteps();
+  created() {
+    this.getSteps(this.allFilters);
   },
   methods: {
     ...mapActions({
@@ -208,10 +199,20 @@ export default {
           await this.checkErrors(index);
       }
     },
+    async bottomScrolled() {
+      if (this.isDataRemain) {
+        const result = await this.$http.post("/pricelists/step-multipliers", {
+          ...this.allFilters,
+          countFilter: this.dataArray.length
+        });
+        this.dataArray.push(...result.data);
+        this.isDataRemain = result.body.length === 25;
+      }
+    },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentStep = this.dataArray[index].step;
-      this.currentUnit = this.dataArray[index].unit;
+      this.currentStep = this.dataArray[index].step.title;
+      this.currentUnit = this.dataArray[index].unit.type;
       this.currentSize = this.dataArray[index].size;
       this.currentMultiplier = this.dataArray[index].multiplier;
       this.currentMinPriceUSD = this.dataArray[index].usdMinPrice;
@@ -230,67 +231,85 @@ export default {
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      if(this.currentMultiplier == "") return;
-      if(this.currentMinPriceUSD == "") return;
-      if(this.currentMinPriceEUR == "") return;
-      if(this.currentMinPriceGBP == "") return;
+      if (this.currentMultiplier == "") return;
+      if (this.currentMinPriceUSD == "") return;
+      if (this.currentMinPriceEUR == "") return;
+      if (this.currentMinPriceGBP == "") return;
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
       await this.manageSaveClick(index);
     },
-    async getSteps(){      
+    async getSteps(filters, count = 0) {
       try {
-        const result = await this.$http.post('/pricelists/step-multipliers');
+        const result = await this.$http.post("/pricelists/step-multipliers", {
+          ...filters,
+          countFilter: count
+        });
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Steps",
           isShow: true,
           type: "error"
-        });       
+        });
       }
     },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
       try {
-        await this.$http.post('/pricelists/step-multipliers-update', {
-          stepMultiplier : {
-            _id: id,
-            multiplier: this.currentMultiplier,
-            usdMinPrice: this.currentMinPriceUSD,
-            euroMinPrice: this.currentMinPriceEUR,
-            gbpMinPrice: this.currentMinPriceGBP,
+        const result = await this.$http.post(
+          "/pricelists/step-multipliers-update",
+          {
+            stepMultiplier: {
+              _id: id,
+              multiplier: this.currentMultiplier,
+              usdMinPrice: this.currentMinPriceUSD,
+              euroMinPrice: this.currentMinPriceEUR,
+              gbpMinPrice: this.currentMinPriceGBP
+            }
           }
-        })
+        );
         this.alertToggle({
           message: "Saved successfully",
           isShow: true,
           type: "success"
-        }); 
+        });
         this.setDefaults();
+        this.dataArray[index] = result.data;
       } catch (err) {
         this.alertToggle({
           message: "Error on saving Steps",
           isShow: true,
           type: "error"
-        });  
-      } finally {
-        this.getSteps();
+        });
       }
     },
     closeErrors() {
       this.areErrors = false;
     },
-    setFilter({ option, prop }) {
+    async setFilter({ option, prop }) {
       this[prop] = option;
+      await this.getSteps(this.allFilters);
     }
   },
   computed: {
     manageIcons() {
       const { delete: del, ...result } = this.icons;
+      return result;
+    },
+    allFilters() {
+      let result = {
+        stepFilter: this.stepFilter,
+        unitFilter: this.unitFilter,
+        sizeFilter: this.sizeFilter
+      };
+      if(this.stepFilter == "All") result.stepFilter = '';
+      if(this.unitFilter == "All") result.unitFilter = '';
+      if(this.sizeFilter == "All") result.sizeFilter = '';
+
       return result;
     }
   },

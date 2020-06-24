@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { StepMultiplier, IndustryMultiplier } = require('../../models');
-const { getFilteredStepMultiplier } = require('../../multipliers');
+const { StepMultiplier, IndustryMultiplier, BasicPrice } = require('../../models');
+const { getFilteredStepMultiplier, getFilteredBasicPrices } = require('../../multipliers');
 
 router.post('/step-multipliers', async (req, res) => {
   try {
@@ -16,7 +16,8 @@ router.post('/step-multipliers-update', async (req, res) => {
   const { stepMultiplier } = req.body;
   try {
     await StepMultiplier.findOneAndUpdate({ _id: stepMultiplier._id }, stepMultiplier);
-    res.send('Saved');
+    const updatedStep = await StepMultiplier.findOne({ _id: stepMultiplier._id }).populate('step').populate('unit');
+    res.send(updatedStep);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating step multipliers');
@@ -25,7 +26,7 @@ router.post('/step-multipliers-update', async (req, res) => {
 
 router.get('/industry-multipliers', async (req, res) => {
   try {
-    const industryMultipliers = await IndustryMultiplier.find();
+    const industryMultipliers = await IndustryMultiplier.find().populate('industry');
     res.send(industryMultipliers);
   } catch (err) {
     console.log(err);
@@ -34,13 +35,36 @@ router.get('/industry-multipliers', async (req, res) => {
 })
 
 router.post('/industry-multipliers', async (req, res) => {
-  const { industryMultiplier } = req.body;  
+  const { industryMultiplier } = req.body;
   try {
     await IndustryMultiplier.findOneAndUpdate({ _id: industryMultiplier._id }, industryMultiplier);
     res.send('Saved');
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating industry multipliers');
+  }
+})
+
+router.post('/basic-prices', async (req, res) => {
+  try {
+    const basicPrices = await getFilteredBasicPrices(req.body);
+    res.send(basicPrices)
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting basic prices')
+  }
+})
+
+router.post('/basic-prices-update', async (req, res) => {
+  const { basicPrice } = req.body;
+  try {
+    await BasicPrice.findOneAndUpdate({ _id: basicPrice._id }, basicPrice);
+    const updatedBasicPrice = await BasicPrice.findOne({ _id: basicPrice._id })
+    .populate('sourceLanguage').populate('targetLanguage');
+    res.send(updatedBasicPrice);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating basic-prices');
   }
 })
 

@@ -15,15 +15,15 @@ const BasicPriceSchema = new Schema({
   },
   euroBasicPrice: {
     type: Number,
-    default: 0,
+    default: 1,
   },
   usdBasicPrice: {
     type: Number,
-    default: 0,
+    default: 1,
   },
-  bgpBasicPrice: {
+  gbpBasicPrice: {
     type: Number,
-    default: 0,
+    default: 1,
   }
 }, { minimize: false });
 

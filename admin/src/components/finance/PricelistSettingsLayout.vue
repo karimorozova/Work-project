@@ -36,7 +36,7 @@ export default {
       steps: null,
       units: null,
       sizes: null,
-      industries: null,
+      industries: null
     };
   },
   methods: {
@@ -48,6 +48,7 @@ export default {
         const result = await this.$http.get("/api/languages");
         let formatLanguages = result.data;
         this.languages = formatLanguages.map(item => item.lang);
+        this.languages.unshift("All");
       } catch (err) {
         this.alertToggle({
           message: "Cannot get Languages",
@@ -61,6 +62,7 @@ export default {
         const result = await this.$http.get("/api/steps");
         let formatSteps = result.data;
         this.steps = formatSteps.map(item => item.title);
+        this.steps.unshift("All");
       } catch (err) {
         this.alertToggle({
           message: "Cannot get Steps",
@@ -74,7 +76,9 @@ export default {
         const result = await this.$http.get("/api/units");
         let formatUnits = result.data;
         this.units = formatUnits.map(item => item.type);
-        this.sizes = [... new Set(formatUnits.map(item => item.sizes).flat())];
+        this.units.unshift("All");
+        this.sizes = [...new Set(formatUnits.map(item => item.sizes).flat())];
+        this.sizes.unshift("All");
       } catch (err) {
         this.alertToggle({
           message: "Cannot get Units",
@@ -88,6 +92,7 @@ export default {
         const result = await this.$http.get("/api/industries");
         let formatIndustries = result.data;
         this.industries = formatIndustries.map(item => item.name);
+        this.industries.unshift("All");
       } catch (err) {
         this.alertToggle({
           message: "Cannot get Industries",
