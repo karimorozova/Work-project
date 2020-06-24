@@ -71,6 +71,9 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   mixins: [crudIcons],
   props: {
+    priceId:{
+      type: String
+    },
     languages: {
       type: Array
     }
@@ -141,7 +144,7 @@ export default {
     };
   },
   created() {
-    this.getLangs(this.allFilters);
+    // this.getLangs(this.allFilters);
   },
   methods: {
     ...mapActions({

@@ -91,7 +91,10 @@ export default {
     },
     sizes: {
       type: Array
-    }
+    },
+    priceId:{
+      type: String
+    },
   },
   data() {
     return {
@@ -175,7 +178,7 @@ export default {
     };
   },
   created() {
-    this.getSteps(this.allFilters);
+    // this.getSteps(this.allFilters);
   },
   methods: {
     ...mapActions({
