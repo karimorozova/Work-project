@@ -78,4 +78,17 @@ router.post('/basic-prices-update/:id', async (req, res) => {
   }
 })
 
+
+router.post('/delete-sync', async (req, res) => {
+  const { key , id } = req.body;
+  console.log(key , id);
+  
+  try {
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on sync deleting');
+  }
+
+})
+
 module.exports = router;
