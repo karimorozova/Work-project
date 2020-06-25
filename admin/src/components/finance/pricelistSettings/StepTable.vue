@@ -9,6 +9,7 @@
       :sizes="sizes"
       @setFilter="setFilter"
     )
+    div(v-if="!dataArray.length") Nothing found...
     DataTable(
         :fields="fields"
         :tableData="dataArray"
@@ -159,6 +160,8 @@ export default {
       dataArray: [],
       currentStep: "",
       currentUnit: "",
+      currentStepObj: "",
+      currentUnitObj: "",
       currentSize: "",
       currentMultiplier: "",
       currentMinPriceUSD: "",
@@ -214,6 +217,8 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
+      this.currentStepObj = this.dataArray[index].step;
+      this.currentUnitObj = this.dataArray[index].unit;
       this.currentStep = this.dataArray[index].step.title;
       this.currentUnit = this.dataArray[index].unit.type;
       this.currentSize = this.dataArray[index].size;
@@ -268,6 +273,9 @@ export default {
           {
             stepMultiplier: {
               _id: id,
+              step:this.currentStepObj,
+              unit:this.currentUnitObj,
+              size: this.currentSize,
               multiplier: this.currentMultiplier,
               usdMinPrice: this.currentMinPriceUSD,
               euroMinPrice: this.currentMinPriceEUR,

@@ -35,15 +35,10 @@ const updateBasicPrices = async (basicPriceToUpdate, priceListId) => {
     const basicPriceIndex = basicPricesTable.findIndex(basicPrice => (
       basicPrice._id.toString() === basicPriceToUpdate._id
     ));
-    basicPricesTable.splice(basicPriceIndex, 1, {
-      type: basicPricesTable[basicPriceIndex].type,
-      sourceLanguage: basicPricesTable[basicPriceIndex].sourceLanguage,
-      targetLanguage: basicPricesTable[basicPriceIndex].targetLanguage,
-      euroBasicPrice: basicPriceToUpdate.euroBasicPrice,
-      usdBasicPrice: basicPriceToUpdate.usdBasicPrice,
-      gbpBasicPrice: basicPriceToUpdate.gbpBasicPrice
-    });
-    // await Pricelist.updateOne({ _id: priceListId }, basicPricesTable);
+
+    await basicPricesTable.splice(basicPriceIndex, 1, basicPriceToUpdate)
+
+    await Pricelist.updateOne({ _id: priceListId }, {basicPricesTable});
   } catch (err) {
     console.log(err);
     console.log('Error in updateBasicPrices');

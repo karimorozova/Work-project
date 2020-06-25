@@ -8,6 +8,7 @@
       :targets="languages"
       @setFilter="setFilter"
     )
+    div(v-if="!dataArray.length") Nothing found...
     DataTable(
         :fields="fields"
         :tableData="dataArray"
@@ -71,7 +72,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   mixins: [crudIcons],
   props: {
-    priceId:{
+    priceId: {
       type: String
     },
     languages: {
@@ -127,6 +128,8 @@ export default {
       dataArray: [],
       currentSourceLang: "",
       currentTargetLang: "",
+      currentSourceLangObj: "",
+      currentTargetLangObj: "",
       currentBasicPriceUSD: "",
       currentBasicPriceEUR: "",
       currentBasicPriceGBP: "",
@@ -170,6 +173,8 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
+      (this.currentSourceLangObj = this.dataArray[index].sourceLanguage),
+      (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
       (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
         (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
         (this.currentBasicPriceUSD = this.dataArray[index].usdBasicPrice);
@@ -198,20 +203,26 @@ export default {
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
-        const result = await this.$http.post("/pricelists/basic-prices/" + this.priceId, {
-          ...this.allFilters,
-          countFilter: this.dataArray.length
-        });
+        const result = await this.$http.post(
+          "/pricelists/basic-prices/" + this.priceId,
+          {
+            ...this.allFilters,
+            countFilter: this.dataArray.length
+          }
+        );
         this.dataArray.push(...result.data);
         this.isDataRemain = result.body.length === 25;
       }
     },
     async getLangs(filters, count = 0) {
       try {
-        const result = await this.$http.post("/pricelists/basic-prices/" + this.priceId, {
-          ...filters,
-          countFilter: count
-        });
+        const result = await this.$http.post(
+          "/pricelists/basic-prices/" + this.priceId,
+          {
+            ...filters,
+            countFilter: count
+          }
+        );
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
@@ -230,6 +241,9 @@ export default {
           {
             basicPrice: {
               _id: id,
+              type: this.dataArray[index].type,
+              sourceLanguage :this.currentSourceLangObj,
+              targetLanguage :this.currentTargetLangObj,
               usdBasicPrice: this.currentBasicPriceUSD,
               euroBasicPrice: this.currentBasicPriceEUR,
               gbpBasicPrice: this.currentBasicPriceGBP
@@ -270,9 +284,9 @@ export default {
         sourceFilter: this.sourceFilter,
         targetFilter: this.targetFilter
       };
-      if(this.typeFilter == "All") result.typeFilter = '';
-      if(this.sourceFilter == "All") result.sourceFilter = '';
-      if(this.targetFilter == "All") result.targetFilter = '';
+      if (this.typeFilter == "All") result.typeFilter = "";
+      if (this.sourceFilter == "All") result.sourceFilter = "";
+      if (this.targetFilter == "All") result.targetFilter = "";
 
       return result;
     }

@@ -51,7 +51,7 @@ const updateStepMultipliers = async (stepToUpdate, priceListId) => {
       .populate('stepMultipliersTable.step').populate('stepMultipliersTable.unit');
     const stepToUpdateIndex = stepMultipliersTable.findIndex(step => step._id.toString() === stepToUpdate._id)
     stepMultipliersTable.splice(stepToUpdateIndex, 1, stepToUpdate);
-    await Pricelist.updateOne({ _id: priceListId }, { stepMultipliersTable })
+    await Pricelist.updateOne({ _id: priceListId }, {stepMultipliersTable})
   } catch (err) {
     console.log(err);
     console.log('Error in updateStepMultipliers');

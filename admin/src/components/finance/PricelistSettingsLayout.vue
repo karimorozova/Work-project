@@ -1,7 +1,7 @@
 <template lang="pug">
 .layout
   .title
-    .title__title {{this.pricelists.find(i => i._id == priceId).name}}
+    .title__title(v-if="this.pricelists") {{this.pricelists.find(i => i._id == priceId).name}}
     .title__return
         Button(value="Back" @clicked="goBack")
   .priceLayout

@@ -75,6 +75,7 @@ export default {
 
       currentIndustry: "",
       currentMultiplier: "",
+      currentIndustryObj: null,
 
       areErrors: false,
       errors: [],
@@ -122,6 +123,7 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
+      this.currentIndustryObj = this.dataArray[index].industry
       this.currentIndustry = this.dataArray[index].industry.name;
       this.currentMultiplier = this.dataArray[index].multiplier;
     },
@@ -147,9 +149,10 @@ export default {
       if (this.currentActive === -1) return;
       try {
         const id = this.dataArray[index]._id;
-        await this.$http.post("/pricelists/industry-multipliers/" + this.priceId, {
+        const result = await this.$http.post("/pricelists/industry-multipliers/" + this.priceId, {
           industryMultiplier: {
             _id: id,
+            industry: this.currentIndustryObj,
             multiplier: this.currentMultiplier
           }
         });
@@ -159,14 +162,13 @@ export default {
           type: "success"
         });
         this.setDefaults();
+        this.dataArray[index] = result.data
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Industry",
           isShow: true,
           type: "error"
         });
-      } finally {
-        this.getIndustries();
       }
     },
     closeErrors() {
