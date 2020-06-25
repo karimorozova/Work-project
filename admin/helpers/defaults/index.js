@@ -1,4 +1,10 @@
 const languagesDefault = require('./languages');
-const { getDefaultPriceLists } = require('./defaultPriceLists');
+const { getDefaultBasicPrices, getDefaultStepMultipliers,
+  getDefaultIndustryMultipliers, getDefaultPriceLists } = require('./defaultPriceLists');
 
-module.exports = { languagesDefault, getDefaultPriceLists };
+module.exports = {
+  languagesDefault,
+  getDefaultBasicPrices,
+  getDefaultStepMultipliers,
+  getDefaultIndustryMultipliers,
+  getDefaultPriceLists };

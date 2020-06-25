@@ -1,8 +1,9 @@
 const router = require('express').Router();
-const { StepMultiplier, IndustryMultiplier, BasicPrice } = require('../../models');
+const { Pricelist } = require('../../models');
 const { getFilteredStepMultiplier, getFilteredBasicPrices } = require('../../multipliers');
 
-router.post('/step-multipliers', async (req, res) => {
+router.post('/step-multipliers/:id', async (req, res) => {
+  const { _id } = req.params;
   try {
     const stepMultipliers = await getFilteredStepMultiplier(req.body);
     res.send(stepMultipliers);
@@ -12,11 +13,13 @@ router.post('/step-multipliers', async (req, res) => {
   }
 })
 
-router.post('/step-multipliers-update', async (req, res) => {
-  const { stepMultiplier } = req.body;
+router.post('/step-multipliers-update/:id', async (req, res) => {
+  const { stepMultiplier: stepMultiplierTable } = req.body;
+  const { _id } = req.params;
   try {
-    await StepMultiplier.findOneAndUpdate({ _id: stepMultiplier._id }, stepMultiplier);
-    const updatedStep = await StepMultiplier.findOne({ _id: stepMultiplier._id }).populate('step').populate('unit');
+    // await StepMultiplier.findOneAndUpdate({ _id: stepMultiplier._id }, stepMultiplier);
+    // const updatedStep = await StepMultiplier.findOne({ _id: stepMultiplier._id }).populate('step').populate('unit');
+    await Pricelist.findOneAndUpdate({ _id })
     res.send(updatedStep);
   } catch (err) {
     console.log(err);
@@ -24,7 +27,8 @@ router.post('/step-multipliers-update', async (req, res) => {
   }
 })
 
-router.get('/industry-multipliers', async (req, res) => {
+router.get('/industry-multipliers/:id', async (req, res) => {
+  const { _id } = req.params;
   try {
     const industryMultipliers = await IndustryMultiplier.find().populate('industry');
     res.send(industryMultipliers);
@@ -34,8 +38,9 @@ router.get('/industry-multipliers', async (req, res) => {
   }
 })
 
-router.post('/industry-multipliers', async (req, res) => {
+router.post('/industry-multipliers/:id', async (req, res) => {
   const { industryMultiplier } = req.body;
+  const { _id } = req.params;
   try {
     await IndustryMultiplier.findOneAndUpdate({ _id: industryMultiplier._id }, industryMultiplier);
     res.send('Saved');
@@ -45,7 +50,8 @@ router.post('/industry-multipliers', async (req, res) => {
   }
 })
 
-router.post('/basic-prices', async (req, res) => {
+router.post('/basic-prices/:id', async (req, res) => {
+  const { _id } = req.params;
   try {
     const basicPrices = await getFilteredBasicPrices(req.body);
     res.send(basicPrices)
@@ -55,7 +61,8 @@ router.post('/basic-prices', async (req, res) => {
   }
 })
 
-router.post('/basic-prices-update', async (req, res) => {
+router.post('/basic-prices-update/:id', async (req, res) => {
+  const { _id } = req.params;
   const { basicPrice } = req.body;
   try {
     await BasicPrice.findOneAndUpdate({ _id: basicPrice._id }, basicPrice);
