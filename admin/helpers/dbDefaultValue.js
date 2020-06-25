@@ -1,4 +1,4 @@
-const languagesDefault = require('./defaults/index');
+const { languagesDefault } = require('./defaults/index');
 
 const requestsDefault = [];
 

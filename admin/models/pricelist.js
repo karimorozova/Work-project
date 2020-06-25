@@ -2,66 +2,80 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const PricelistSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        trim: true
+  name: {
+    type: String,
+    trim: true
+  },
+  isClientDefault: {
+    type: Boolean
+  },
+  isVendorDefault: {
+    type: Boolean
+  },
+  isActive: {
+    type: Boolean
+  },
+  basicPricesTable: [{
+    type: {
+      type: String,
+      trim: true
     },
-    isClientDefault: {
-        type: Boolean
+    sourceLanguage: {
+      type: Schema.Types.ObjectId, ref: 'Language',
     },
-    isVendorDefault: {
-        type: Boolean
+    targetLanguage: {
+      type: Schema.Types.ObjectId, ref: 'Language',
     },
-    isActive: {
-        type: Boolean
+    euroBasicPrice: {
+      type: Number,
+      default: 1,
     },
-    wordsRates: [{ 
-        source: {
-            type: Schema.Types.ObjectId, ref: 'Language',
-        },
-        target: {
-            type: Schema.Types.ObjectId, ref: 'Language'
-        },
-        industries: [{
-            type: Schema.Types.ObjectId, ref: 'Industries'
-        }],
-        rates: {
-            type: Object,
-            default: {}
-        }
-    }],
-    hoursRates: [{ 
-        source: {
-            type: Schema.Types.ObjectId, ref: 'Language',
-        },
-        target: {
-            type: Schema.Types.ObjectId, ref: 'Language'
-        },
-        industries: [{
-            type: Schema.Types.ObjectId, ref: 'Industries'
-        }],
-        rates: {
-            type: Object,
-            default: {}
-        }
-    }],
-    monoRates: [{ 
-        target: {
-            type: Schema.Types.ObjectId, ref: 'Language'
-        },
-        packageSize: {
-            type: String,
-            trim: true
-        },
-        industries: [{    
-            type: Schema.Types.ObjectId, ref: 'Industries'
-        }],
-        rates: {
-            type: Object,
-            default: {}
-        }
-    }]
-},{ minimize: false });
+    usdBasicPrice: {
+      type: Number,
+      default: 1,
+    },
+    gbpBasicPrice: {
+      type: Number,
+      default: 1,
+    }
+  }],
+  stepMultipliersTable: [{
+    step: {
+      type: Schema.Types.ObjectId, ref: 'Step',
+    },
+    unit: {
+      type: Schema.Types.ObjectId, ref: 'Units',
+    },
+    size: {
+      type: Number,
+    },
+    multiplier: {
+      type: Number,
+      default: 100,
+    },
+    euroMinPrice: {
+      type: Number,
+      default: 1,
+    },
+    usdMinPrice: {
+      type: Number,
+      default: 1,
+    },
+    gbpMinPrice: {
+      type: Number,
+      default: 1,
+    }
+  }],
+  industryMultipliersTable: [{
+    industry: {
+      type: Schema.Types.ObjectId, ref: 'Industries',
+    },
+    multiplier: {
+      type: Number,
+      default: 100,
+    }
+  }],
+}, { minimize: false });
 
 const Pricelist = mongoose.model('Pricelist', PricelistSchema);
 

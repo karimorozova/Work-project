@@ -1,3 +1,4 @@
 const languagesDefault = require('./languages');
+const { getDefaultPriceLists } = require('./defaultPriceLists');
 
-module.exports = languagesDefault;
+module.exports = { languagesDefault, getDefaultPriceLists };

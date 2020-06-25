@@ -19,9 +19,6 @@ const {
   TierLqa,
   Units,
   CurrencyRatio,
-  StepMultiplier,
-  IndustryMultiplier,
-  BasicPrice
 } = require('../models');
 
 const {
@@ -46,6 +43,7 @@ const {
 } = require('./dbDefaultValue');
 const ObjectId = require('mongodb').ObjectID;
 const { Converter } = require('easy-currencies');
+const { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers } = require('./defaults');
 
 async function fillTierLqa() {
   try {
@@ -486,28 +484,6 @@ function getMonoCombinations({ languages, industries, steps }) {
   return combinations;
 }
 
-async function fillPricelist() {
-  try {
-    const industries = await Industries.find();
-    const { wordsRates, hoursRates, monoRates } = await getRates(industries);
-    let pricelists = await Pricelist.find();
-    if (!pricelists.length) {
-      await Pricelist.create({
-        name: 'Basic',
-        isClientDefault: true,
-        isVendorDefault: true,
-        isActive: true,
-        monoRates,
-        wordsRates,
-        hoursRates
-      });
-    }
-  } catch (err) {
-    console.log(err);
-    console.log("Error in fillPricelist");
-  }
-}
-
 async function fillUnits() {
   try {
     const units = await Units.find();
@@ -569,94 +545,27 @@ async function fillCurrencyRatio() {
   }
 }
 
-async function fillStepMultipliers() {
+async function fillPricelist() {
   try {
-    const stepMultipliers = await StepMultiplier.find();
-    if (!stepMultipliers.length) {
-      const units = await Units.find({ active: true });
-      const combinations = [];
-      for (let { _id, sizes, steps } of units) {
-        if (sizes.length) {
-          sizes.forEach(size => {
-            steps.forEach(step => {
-              combinations.push({
-                step: ObjectId(step._id),
-                unit: _id,
-                size: +size,
-              })
-            })
-          })
-        } else {
-          steps.forEach(step => combinations.push({
-            step: step._id,
-            unit: _id,
-            size: 1
-          }))
-        }
-      }
-      for (let combination of combinations) {
-        await StepMultiplier.create(combination)
-      }
-      console.log('Step multipliers are saved!');
+    const pricelists = await Pricelist.find();
+    if (!pricelists.length) {
+      const defaultBasicPrices = await getDefaultBasicPrices();
+      const defaultStepMultipliers = await getDefaultStepMultipliers();
+      const defaultIndustryMultipliers = await getDefaultIndustryMultipliers();
+      await Pricelist.create({
+        name: 'Default',
+        isClientDefault: true,
+        isVendorDefault: true,
+        isActive: true,
+        basicPricesTable: defaultBasicPrices,
+        stepMultipliersTable: defaultStepMultipliers,
+        industryMultipliersTable: defaultIndustryMultipliers,
+      });
+      console.log('Pricelists are saved!');
     }
   } catch (err) {
     console.log(err);
-    console.log('Error on filling step multipliers');
-  }
-}
-
-async function fillIndustryMultipliers() {
-  try {
-    const industryMultipliers = await IndustryMultiplier.find();
-    if (!industryMultipliers.length) {
-      const industries = await Industries.find({ active: true });
-      for (let { _id } of industries) {
-        await IndustryMultiplier.create({
-          industry: _id,
-        })
-      }
-      console.log('Industry multipliers are saved!');
-    }
-  } catch (err) {
-    console.log(err);
-    console.log('Error on filling industry multipliers');
-  }
-}
-
-async function fillBasicPrices() {
-  try {
-    const basicPrices = await BasicPrice.find();
-    if (!basicPrices.length) {
-      const vendors = await Vendors.find({ languagePairs: { $gt: [] } });
-      const duoLanguagesInUse = [];
-      for (let { languagePairs } of vendors) {
-        for (let pair of languagePairs) {
-          const { lang } = await Languages.findOne({ _id: pair.source });
-          const { lang: targetLang } = await Languages.findOne({ _id: pair.target });
-          duoLanguagesInUse.push(`${lang} > ${targetLang}`);
-        }
-      }
-      const uniqueDuoLangs = Array.from(new Set(duoLanguagesInUse));
-      const result = [];
-      for (let uniquePair of uniqueDuoLangs) {
-        const splicedString = uniquePair.split(' > ');
-        const type = splicedString[0] === splicedString[1] ? 'Mono' : 'Duo';
-        const sourceLang = await Languages.findOne({ lang: splicedString[0] });
-        const targetLang = await Languages.findOne({ lang: splicedString[1] });
-        result.push({
-          type,
-          sourceLanguage: sourceLang._id,
-          targetLanguage: targetLang._id,
-        })
-      }
-      for (let res of result) {
-        await BasicPrice.create(res);
-      }
-      console.log('Basic prices are saved!');
-    }
-  } catch (err) {
-    console.log(err);
-    console.log('Error on filling basic prices');
+    console.log('Error on filling pricelist');
   }
 }
 
@@ -684,9 +593,6 @@ async function checkCollections() {
   await fillClientsRates();
   await fillVendorsRates();
   await fillCurrencyRatio();
-  await fillStepMultipliers();
-  await fillIndustryMultipliers();
-  await fillBasicPrices();
 }
 
 module.exports = checkCollections();
