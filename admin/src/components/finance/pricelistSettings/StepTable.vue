@@ -264,7 +264,7 @@ export default {
       const id = this.dataArray[index]._id;
       try {
         const result = await this.$http.post(
-          "/pricelists/step-multipliers-update" + this.priceId,
+          "/pricelists/step-multipliers-update/" + this.priceId,
           {
             stepMultiplier: {
               _id: id,

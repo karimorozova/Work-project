@@ -92,7 +92,7 @@ export default {
     }),
     async getIndustries() {
       try {
-        const result = await this.$http.get("/pricelists/industry-multipliers" + this.priceId);
+        const result = await this.$http.get("/pricelists/industry-multipliers/" + this.priceId);
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
@@ -147,7 +147,7 @@ export default {
       if (this.currentActive === -1) return;
       try {
         const id = this.dataArray[index]._id;
-        await this.$http.post("/pricelists/industry-multipliers" + this.priceId, {
+        await this.$http.post("/pricelists/industry-multipliers/" + this.priceId, {
           industryMultiplier: {
             _id: id,
             multiplier: this.currentMultiplier

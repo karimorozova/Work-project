@@ -208,7 +208,7 @@ export default {
     },
     async getLangs(filters, count = 0) {
       try {
-        const result = await this.$http.post("/pricelists/basic-prices" + this.priceId, {
+        const result = await this.$http.post("/pricelists/basic-prices/" + this.priceId, {
           ...filters,
           countFilter: count
         });
@@ -226,7 +226,7 @@ export default {
       const id = this.dataArray[index]._id;
       try {
         const result = await this.$http.post(
-          "/pricelists/basic-prices-update" + this.priceId,
+          "/pricelists/basic-prices-update/" + this.priceId,
           {
             basicPrice: {
               _id: id,
