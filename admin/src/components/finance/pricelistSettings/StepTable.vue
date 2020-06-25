@@ -178,7 +178,7 @@ export default {
     };
   },
   created() {
-    // this.getSteps(this.allFilters);
+    this.getSteps(this.allFilters);
   },
   methods: {
     ...mapActions({
@@ -204,7 +204,7 @@ export default {
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
-        const result = await this.$http.post("/pricelists/step-multipliers", {
+        const result = await this.$http.post("/pricelists/step-multipliers/" + this.priceId, {
           ...this.allFilters,
           countFilter: this.dataArray.length
         });
@@ -246,7 +246,7 @@ export default {
     },
     async getSteps(filters, count = 0) {
       try {
-        const result = await this.$http.post("/pricelists/step-multipliers", {
+        const result = await this.$http.post("/pricelists/step-multipliers/" + this.priceId , {
           ...filters,
           countFilter: count
         });
@@ -264,7 +264,7 @@ export default {
       const id = this.dataArray[index]._id;
       try {
         const result = await this.$http.post(
-          "/pricelists/step-multipliers-update",
+          "/pricelists/step-multipliers-update" + this.priceId,
           {
             stepMultiplier: {
               _id: id,

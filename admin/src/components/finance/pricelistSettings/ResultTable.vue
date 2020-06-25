@@ -168,19 +168,19 @@ export default {
       ],
 
       dataArray: [
-        {
-          sourceLanguage: "Eng",
-          targetLanguage: "Fr",
-          step: "someStep",
-          unit: "someUnit",
-          industry: "someIndustry",
-          usd: 10,
-          minUsd: 20,
-          eur: 10,
-          minEur: 20,
-          gbp: 10,
-          minGbp: 20
-        }
+        // {
+        //   sourceLanguage: "Eng",
+        //   targetLanguage: "Fr",
+        //   step: "someStep",
+        //   unit: "someUnit",
+        //   industry: "someIndustry",
+        //   usd: 10,
+        //   minUsd: 20,
+        //   eur: 10,
+        //   minEur: 20,
+        //   gbp: 10,
+        //   minGbp: 20
+        // }
       ],
       sourceResultFilter: "",
       targetResultFilter: "",

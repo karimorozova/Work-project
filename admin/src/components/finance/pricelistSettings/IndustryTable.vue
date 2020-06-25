@@ -41,10 +41,10 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
   mixins: [crudIcons],
-  props:{
-    priceId:{
+  props: {
+    priceId: {
       type: String
-    },
+    }
   },
   data() {
     return {
@@ -83,23 +83,23 @@ export default {
       currentActive: -1
     };
   },
-  created(){
-    // this.getIndustries();
+  created() {
+    this.getIndustries();
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-    async getIndustries(){      
+    async getIndustries() {
       try {
-        const result = await this.$http.get('/pricelists/industry-multipliers');
-        this.dataArray = result.data;        
+        const result = await this.$http.get("/pricelists/industry-multipliers" + this.priceId);
+        this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Industries",
           isShow: true,
           type: "error"
-        });       
+        });
       }
     },
     async makeAction(index, key) {
@@ -136,36 +136,36 @@ export default {
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      if (this.currentMultiplier == '') return;
+      if (this.currentMultiplier == "") return;
       if (this.errors.length) {
         this.areErrors = true;
         return;
-      }      
+      }
       await this.manageSaveClick(index);
     },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       try {
         const id = this.dataArray[index]._id;
-        await this.$http.post('/pricelists/industry-multipliers', {
+        await this.$http.post("/pricelists/industry-multipliers" + this.priceId, {
           industryMultiplier: {
             _id: id,
             multiplier: this.currentMultiplier
           }
-        })
+        });
         this.alertToggle({
           message: "Saved successfully",
           isShow: true,
           type: "success"
-        }); 
+        });
         this.setDefaults();
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Industry",
           isShow: true,
           type: "error"
-        });  
-        } finally {
+        });
+      } finally {
         this.getIndustries();
       }
     },
