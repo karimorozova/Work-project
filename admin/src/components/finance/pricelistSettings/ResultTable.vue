@@ -25,9 +25,9 @@
             .price-title {{ field.label }}
             
         template(slot="sourceLang" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.sourceLang }}
+            .price__data(v-if="currentActive !== index") {{ row.sourceLanguage }}
         template(slot="targetLang" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.targetLang }}
+            .price__data(v-if="currentActive !== index") {{ row.targetLanguage }}
         template(slot="step" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.step }}
         template(slot="unit" slot-scope="{ row, index }")
@@ -80,7 +80,10 @@ export default {
     },
     steps: {
       type: Array
-    }
+    },
+    priceId:{
+      type: String
+    },
   },
   data() {
     return {
@@ -166,8 +169,8 @@ export default {
 
       dataArray: [
         {
-          sourceLang: "Eng",
-          targetLang: "Fr",
+          sourceLanguage: "Eng",
+          targetLanguage: "Fr",
           step: "someStep",
           unit: "someUnit",
           industry: "someIndustry",
@@ -183,7 +186,8 @@ export default {
       targetResultFilter: "",
       stepResultFilter: "",
       unitResultFilter: "",
-      industryResultFilter: ""
+      industryResultFilter: "",
+      isDataRemain: true,
     };
   },
   methods: {
@@ -192,9 +196,55 @@ export default {
     }),
     setFilter({ option, prop }) {
       this[prop] = option;
+      this.getPricelist(this.allFilters)
+    },
+    async bottomScrolled() {
+      if (this.isDataRemain) {
+        const result = await this.$http.post("/pricelists/", {
+          ...this.allFilters,
+          countFilter: this.dataArray.length
+        });
+        this.dataArray.push(...result.data);
+        this.isDataRemain = result.body.length === 25;
+      }
+    },
+    async getPricelist(filters, count = 0) {
+      try {
+        const result = await this.$http.post("/pricelists/", {
+          ...filters,
+          countFilter: count
+        });
+        this.dataArray = result.data;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Pricelist",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+  },
+  created(){
+    // this.getPricelist(this.allFilters)
+  },
+  computed: {
+    allFilters() {
+      let result = {
+        sourceResultFilter: this.sourceResultFilter,
+        targetResultFilter: this.targetResultFilter,
+        stepResultFilter: this.stepResultFilter,
+        unitResultFilter: this.unitResultFilter,
+        industryResultFilter: this.industryResultFilter,
+      };
+      if(this.sourceResultFilter == "All") result.sourceResultFilter = '';
+      if(this.targetResultFilter == "All") result.targetResultFilter = '';
+      if(this.stepResultFilter == "All") result.stepResultFilter = '';
+      if(this.unitResultFilter == "All") result.unitResultFilter = '';
+      if(this.industryResultFilter == "All") result.industryResultFilter = '';
+
+      return result;
     }
   },
-  computed: {},
   components: {
     DataTable,
     ResultFilter

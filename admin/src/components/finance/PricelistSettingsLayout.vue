@@ -1,24 +1,34 @@
 <template lang="pug">
-.priceLayout
-    .priceLayout__currency
-        CurrencyRatio
-    .priceLayout__setting
-        LangTable(
-            :languages="languages"
-        )
-        StepTable(
-            :steps="steps"
-            :units="units"
-            :sizes="sizes"
-        )
-        IndustryTable
-    .priceLayout__result
-        ResultTable(
-            :languages="languages"
-            :steps="steps"
-            :units="units"
-            :industries="industries"
-        )
+.layout
+  .title
+    .title__title {{this.pricelists.find(i => i._id == priceId).name}}
+    .title__return
+        Button(value="Back" @clicked="goBack")
+  .priceLayout
+      .priceLayout__currency
+          CurrencyRatio
+      .priceLayout__setting
+          LangTable(
+              :priceId="priceId"
+              :languages="languages"
+          )
+          StepTable(
+              :priceId="priceId"
+              :steps="steps"
+              :units="units"
+              :sizes="sizes"  
+          )
+          IndustryTable(
+              :priceId="priceId"
+          )
+      .priceLayout__result
+          ResultTable(
+              :priceId="priceId"
+              :languages="languages"
+              :steps="steps"
+              :units="units"
+              :industries="industries"
+          )
 
 </template>
 <script>
@@ -27,11 +37,14 @@ import IndustryTable from "./pricelistSettings/IndustryTable";
 import StepTable from "./pricelistSettings/StepTable";
 import ResultTable from "./pricelistSettings/ResultTable";
 import CurrencyRatio from "./pricelistSettings/CurrencyRatio";
+import Button from "../Button";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
     return {
+      priceId: null,
+      pricelists: null,
       languages: null,
       steps: null,
       units: null,
@@ -43,6 +56,18 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    async getPricelists() {
+      try {
+        const result = await this.$http.get("/prices/pricelists");
+        this.pricelists = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting pricelists.",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     async getDefaultLanguages() {
       try {
         const result = await this.$http.get("/api/languages");
@@ -56,6 +81,9 @@ export default {
           type: "error"
         });
       }
+    },
+    goBack() {
+      this.$router.go(-1);
     },
     async getDefaultSteps() {
       try {
@@ -103,6 +131,8 @@ export default {
     }
   },
   created() {
+    this.priceId = this.$route.params.id;
+    this.getPricelists();
     this.getDefaultLanguages();
     this.getDefaultSteps();
     this.getDefaultUnits();
@@ -113,11 +143,24 @@ export default {
     IndustryTable,
     StepTable,
     ResultTable,
-    CurrencyRatio
+    CurrencyRatio,
+    Button
   }
 };
 </script>
 <style lang="scss" scoped>
+.title {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  align-items: flex-end;
+
+  &__title{
+    display: flex;
+    align-items: flex-end;
+    font-size: 28px;
+  }
+}
 .priceLayout {
   width: calc(100%);
   box-shadow: 0 0 10px #67573e;

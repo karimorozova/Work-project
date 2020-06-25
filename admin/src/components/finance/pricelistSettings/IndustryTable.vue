@@ -41,6 +41,11 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
   mixins: [crudIcons],
+  props:{
+    priceId:{
+      type: String
+    },
+  },
   data() {
     return {
       fields: [
@@ -79,7 +84,7 @@ export default {
     };
   },
   created(){
-    this.getIndustries();
+    // this.getIndustries();
   },
   methods: {
     ...mapActions({

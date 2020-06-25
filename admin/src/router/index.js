@@ -13,8 +13,9 @@ import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
 import RequestInfo from '@/components/pmArea/RequestInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
-import Pricelists from '@/components/finance/PricelistSettingsLayout'
-import PricelistRates from '@/components/finance/PricelistRates'
+import Pricelists from '@/components/finance/Pricelists'
+// import PricelistRates from '@/components/finance/PricelistRates'
+import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayout'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
 import TableGroups from '@/components/Table/TableGroups'
@@ -183,10 +184,15 @@ const router = new Router({
                             name: 'tiers-lqas',
                             component: TierLqas
                         },
+                        // {
+                        //     path: 'rates',
+                        //     name: 'rates',
+                        //     component: PricelistRates
+                        // },
                         {
-                            path: 'rates',
-                            name: 'rates',
-                            component: PricelistRates
+                            path: 'pricelist/:id',
+                            name: 'pricelist',
+                            component: PricelistSettingsLayout
                         },
                         {
                             path: 'users',
