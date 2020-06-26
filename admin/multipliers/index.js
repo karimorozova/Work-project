@@ -1,7 +1,14 @@
-const { getFilteredStepMultiplier } = require('./stepMultipiersQuery');
-const { getFilteredBasicPrices } = require('./basicPriceQuery');
+const { getFilteredStepMultiplier, updateStepMultipliers } = require('./stepMultipiers');
+const { getFilteredBasicPrices, updateBasicPrices } = require('./basicPrice');
+const { updateIndustryMultipliers } = require('./industryMultipliers');
+const { getPricelistCombinations, addNewMultiplier } = require('./pricelist');
 
 module.exports = {
+  getFilteredBasicPrices,
+  updateBasicPrices,
   getFilteredStepMultiplier,
-  getFilteredBasicPrices
+  updateStepMultipliers,
+  updateIndustryMultipliers,
+  getPricelistCombinations,
+  addNewMultiplier
 }

@@ -9,6 +9,7 @@
       :sizes="sizes"
       @setFilter="setFilter"
     )
+    div(v-if="!dataArray.length") Nothing found...
     DataTable(
         :fields="fields"
         :tableData="dataArray"
@@ -54,21 +55,21 @@
                 span(id="eur") {{row.euroMinPrice}}
                 label(for="eur") &euro;
             .price__editing-data(v-else)
-                input.price__data-input(type="number" v-model="currentMinPriceEUR")
+                input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
 
         template(slot="usd" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 span(id="usd") {{row.usdMinPrice}}
                 label(for="usd") &#36;
-            .price__editing-data(v-else)
-                input.price__data-input(type="number" v-model="currentMinPriceUSD")
+            .price__data(v-else)
+                input.price__data-input(type="number" v-model="currentMinPriceUSD" disabled)
 
         template(slot="gbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 span(id="gbp") {{row.gbpMinPrice}}
                 label(for="gbp") &pound;
-            .price__editing-data(v-else)
-                input.price__data-input(type="number" v-model="currentMinPriceGBP")
+            .price__data(v-else)
+                input.price__data-input(type="number" v-model="currentMinPriceGBP" disabled)
 
         template(slot="icons" slot-scope="{ row, index }")
             .price__icons
@@ -91,6 +92,15 @@ export default {
     },
     sizes: {
       type: Array
+    },
+    priceId: {
+      type: String
+    },
+    currency: {
+      type: Object
+    },
+    isRefresh: {
+      type: Boolean
     }
   },
   data() {
@@ -156,6 +166,8 @@ export default {
       dataArray: [],
       currentStep: "",
       currentUnit: "",
+      currentStepObj: "",
+      currentUnitObj: "",
       currentSize: "",
       currentMultiplier: "",
       currentMinPriceUSD: "",
@@ -201,16 +213,21 @@ export default {
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
-        const result = await this.$http.post("/pricelists/step-multipliers", {
-          ...this.allFilters,
-          countFilter: this.dataArray.length
-        });
+        const result = await this.$http.post(
+          "/pricelists/step-multipliers/" + this.priceId,
+          {
+            ...this.allFilters,
+            countFilter: this.dataArray.length
+          }
+        );
         this.dataArray.push(...result.data);
         this.isDataRemain = result.body.length === 25;
       }
     },
     setEditingData(index) {
       this.currentActive = index;
+      this.currentStepObj = this.dataArray[index].step;
+      this.currentUnitObj = this.dataArray[index].unit;
       this.currentStep = this.dataArray[index].step.title;
       this.currentUnit = this.dataArray[index].unit.type;
       this.currentSize = this.dataArray[index].size;
@@ -243,10 +260,13 @@ export default {
     },
     async getSteps(filters, count = 0) {
       try {
-        const result = await this.$http.post("/pricelists/step-multipliers", {
-          ...filters,
-          countFilter: count
-        });
+        const result = await this.$http.post(
+          "/pricelists/step-multipliers/" + this.priceId,
+          {
+            ...filters,
+            countFilter: count
+          }
+        );
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
@@ -261,10 +281,13 @@ export default {
       const id = this.dataArray[index]._id;
       try {
         const result = await this.$http.post(
-          "/pricelists/step-multipliers-update",
+          "/pricelists/step-multipliers-update/" + this.priceId,
           {
             stepMultiplier: {
               _id: id,
+              step: this.currentStepObj,
+              unit: this.currentUnitObj,
+              size: this.currentSize,
               multiplier: this.currentMultiplier,
               usdMinPrice: this.currentMinPriceUSD,
               euroMinPrice: this.currentMinPriceEUR,
@@ -295,7 +318,22 @@ export default {
       await this.getSteps(this.allFilters);
     }
   },
+  watch: {
+    isRefresh() {
+      if (this.isRefresh) {
+        this.getSteps(this.allFilters);
+      }
+    }
+  },
   computed: {
+    currentRatio() {
+      this.currentMinPriceUSD = (
+        this.currentMinPriceEUR * this.currency.usd
+      ).toFixed(2);
+      this.currentMinPriceGBP = (
+        this.currentMinPriceEUR * this.currency.gbp
+      ).toFixed(2);
+    },
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
@@ -306,9 +344,9 @@ export default {
         unitFilter: this.unitFilter,
         sizeFilter: this.sizeFilter
       };
-      if(this.stepFilter == "All") result.stepFilter = '';
-      if(this.unitFilter == "All") result.unitFilter = '';
-      if(this.sizeFilter == "All") result.sizeFilter = '';
+      if (this.stepFilter == "All") result.stepFilter = "";
+      if (this.unitFilter == "All") result.unitFilter = "";
+      if (this.sizeFilter == "All") result.sizeFilter = "";
 
       return result;
     }

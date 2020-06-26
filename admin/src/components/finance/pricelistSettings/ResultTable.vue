@@ -25,15 +25,15 @@
             .price-title {{ field.label }}
             
         template(slot="sourceLang" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.sourceLang }}
+            .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
         template(slot="targetLang" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.targetLang }}
+            .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
         template(slot="step" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.step }}
+            .price__data(v-if="currentActive !== index") {{ row.step.title }}
         template(slot="unit" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.unit }}
+            .price__data(v-if="currentActive !== index") {{ row.unit.type }}
         template(slot="industry" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.industry }}
+            .price__data(v-if="currentActive !== index") {{ row.industry.name }}
 
         template(slot="eur" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
@@ -80,6 +80,9 @@ export default {
     },
     steps: {
       type: Array
+    },
+    priceId: {
+      type: String
     }
   },
   data() {
@@ -165,25 +168,26 @@ export default {
       ],
 
       dataArray: [
-        {
-          sourceLang: "Eng",
-          targetLang: "Fr",
-          step: "someStep",
-          unit: "someUnit",
-          industry: "someIndustry",
-          usd: 10,
-          minUsd: 20,
-          eur: 10,
-          minEur: 20,
-          gbp: 10,
-          minGbp: 20
-        }
+        // {
+        //   sourceLanguage: "Eng",
+        //   targetLanguage: "Fr",
+        //   step: "someStep",
+        //   unit: "someUnit",
+        //   industry: "someIndustry",
+        //   usd: 10,
+        //   minUsd: 20,
+        //   eur: 10,
+        //   minEur: 20,
+        //   gbp: 10,
+        //   minGbp: 20
+        // }
       ],
       sourceResultFilter: "",
       targetResultFilter: "",
       stepResultFilter: "",
       unitResultFilter: "",
-      industryResultFilter: ""
+      industryResultFilter: "",
+      isDataRemain: true
     };
   },
   methods: {
@@ -192,9 +196,58 @@ export default {
     }),
     setFilter({ option, prop }) {
       this[prop] = option;
+      this.getPricelist(this.allFilters);
+    },
+    async bottomScrolled() {
+      if (this.isDataRemain) {
+        const result = await this.$http.post("/pricelists/pricelist/" + this.priceId, {
+          ...this.allFilters,
+          countFilter: this.dataArray.length
+        });
+        this.dataArray.push(...result.data);
+        this.isDataRemain = result.body.length === 25;
+      }
+    },
+    async getPricelist(filters, count = 0) {
+      try {
+        const result = await this.$http.post(
+          "/pricelists/pricelist/" + this.priceId,
+          {
+            ...filters,
+            countFilter: count
+          }
+        );        
+        this.dataArray = result.data;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Pricelist",
+          isShow: true,
+          type: "error"
+        });
+      }
     }
   },
-  computed: {},
+  created() {
+    this.getPricelist(this.allFilters);
+  },
+  computed: {
+    allFilters() {
+      let result = {
+        sourceResultFilter: this.sourceResultFilter,
+        targetResultFilter: this.targetResultFilter,
+        stepResultFilter: this.stepResultFilter,
+        unitResultFilter: this.unitResultFilter,
+        industryResultFilter: this.industryResultFilter
+      };
+      if (this.sourceResultFilter == "All") result.sourceResultFilter = "";
+      if (this.targetResultFilter == "All") result.targetResultFilter = "";
+      if (this.stepResultFilter == "All") result.stepResultFilter = "";
+      if (this.unitResultFilter == "All") result.unitResultFilter = "";
+      if (this.industryResultFilter == "All") result.industryResultFilter = "";
+
+      return result;
+    }
+  },
   components: {
     DataTable,
     ResultFilter

@@ -16,7 +16,7 @@
             template(slot="headerIcons" slot-scope="{ field }")
                 .pricelists__head-title {{ field.label }}
             template(slot="name" slot-scope="{ row, index }")
-                .pricelists__data.pricelists_pointer(v-if="currentActive !== index" @click="showRates(index)")
+                .pricelists__data.pricelists_pointer(v-if="currentActive !== index" @click="showPriceSettings(row._id)")
                     .pricelists__rates-link {{ row.name }}
                 .pricelists__editing-data(v-else)
                     input.pricelists__text(type="text" v-model="currentName")
@@ -82,15 +82,18 @@ export default {
         }
     },
     methods: {
-        showRates(index) {
-            this.storeCurrentPrice(this.pricelists[index]);
-            this.storePriceRates({prop: 'monoRates', value: [...this.pricelists[index].monoRates]});
-            this.storePriceRates({prop: 'wordsRates', value: [...this.pricelists[index].wordsRates]});
-            this.storePriceRates({prop: 'hoursRates', value: [...this.pricelists[index].hoursRates]});
-            this.sortRates('monoRates');
-            this.sortRates('wordsRates');
-            this.sortRates('hoursRates');
-            this.$router.push("/settings/rates");
+        // showRates(index) {
+        //     this.storeCurrentPrice(this.pricelists[index]);
+        //     this.storePriceRates({prop: 'monoRates', value: [...this.pricelists[index].monoRates]});
+        //     this.storePriceRates({prop: 'wordsRates', value: [...this.pricelists[index].wordsRates]});
+        //     this.storePriceRates({prop: 'hoursRates', value: [...this.pricelists[index].hoursRates]});
+        //     this.sortRates('monoRates');
+        //     this.sortRates('wordsRates');
+        //     this.sortRates('hoursRates');
+        //     this.$router.push("/settings/rates");
+        // },
+        showPriceSettings(id){
+           this.$router.push(`/settings/pricelist/${id}`);
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {

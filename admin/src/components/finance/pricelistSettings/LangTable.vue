@@ -8,6 +8,7 @@
       :targets="languages"
       @setFilter="setFilter"
     )
+    div(v-if="!dataArray.length") Nothing found...
     DataTable(
         :fields="fields"
         :tableData="dataArray"
@@ -41,21 +42,21 @@
           span(id="eur") {{row.euroBasicPrice}}
           label(for="eur") &euro;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceEUR")
+          input.price__data-input(type="number" :onchange="currentRatio" v-model="currentBasicPriceEUR")
 
       template(slot="usd" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="usd") {{row.usdBasicPrice}}
           label(for="usd") &#36;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceUSD")
+        .price__data(v-else)
+          input.price__data-input(type="number" v-model="currentBasicPriceUSD" disabled)
 
       template(slot="gbp" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="gbp") {{row.gbpBasicPrice}}
           label(for="gbp") &pound;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceGBP")
+        .price__data(v-else)
+          input.price__data-input(type="number" v-model="currentBasicPriceGBP" disabled)
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
@@ -71,8 +72,17 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   mixins: [crudIcons],
   props: {
+    priceId: {
+      type: String
+    },
     languages: {
       type: Array
+    },
+    currency: {
+      type: Object
+    },
+    isRefresh: {
+      type: Boolean
     }
   },
   data() {
@@ -124,6 +134,8 @@ export default {
       dataArray: [],
       currentSourceLang: "",
       currentTargetLang: "",
+      currentSourceLangObj: "",
+      currentTargetLangObj: "",
       currentBasicPriceUSD: "",
       currentBasicPriceEUR: "",
       currentBasicPriceGBP: "",
@@ -167,7 +179,9 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
+      (this.currentSourceLangObj = this.dataArray[index].sourceLanguage),
+        (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
+        (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
         (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
         (this.currentBasicPriceUSD = this.dataArray[index].usdBasicPrice);
       this.currentBasicPriceEUR = this.dataArray[index].euroBasicPrice;
@@ -195,20 +209,26 @@ export default {
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
-        const result = await this.$http.post("/pricelists/basic-prices", {
-          ...this.allFilters,
-          countFilter: this.dataArray.length
-        });
+        const result = await this.$http.post(
+          "/pricelists/basic-prices/" + this.priceId,
+          {
+            ...this.allFilters,
+            countFilter: this.dataArray.length
+          }
+        );
         this.dataArray.push(...result.data);
         this.isDataRemain = result.body.length === 25;
       }
     },
     async getLangs(filters, count = 0) {
       try {
-        const result = await this.$http.post("/pricelists/basic-prices", {
-          ...filters,
-          countFilter: count
-        });
+        const result = await this.$http.post(
+          "/pricelists/basic-prices/" + this.priceId,
+          {
+            ...filters,
+            countFilter: count
+          }
+        );
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
@@ -223,10 +243,13 @@ export default {
       const id = this.dataArray[index]._id;
       try {
         const result = await this.$http.post(
-          "/pricelists/basic-prices-update",
+          "/pricelists/basic-prices-update/" + this.priceId,
           {
             basicPrice: {
               _id: id,
+              type: this.dataArray[index].type,
+              sourceLanguage: this.currentSourceLangObj,
+              targetLanguage: this.currentTargetLangObj,
               usdBasicPrice: this.currentBasicPriceUSD,
               euroBasicPrice: this.currentBasicPriceEUR,
               gbpBasicPrice: this.currentBasicPriceGBP
@@ -256,7 +279,22 @@ export default {
       await this.getLangs(this.allFilters);
     }
   },
+  watch: {
+    isRefresh() {
+      if (this.isRefresh) {
+        this.getLangs(this.allFilters);
+      }
+    }
+  },
   computed: {
+    currentRatio() {
+      this.currentBasicPriceUSD = (
+        this.currentBasicPriceEUR * this.currency.usd
+      ).toFixed(2);
+      this.currentBasicPriceGBP = (
+        this.currentBasicPriceEUR * this.currency.gbp
+      ).toFixed(2);
+    },
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
@@ -267,9 +305,9 @@ export default {
         sourceFilter: this.sourceFilter,
         targetFilter: this.targetFilter
       };
-      if(this.typeFilter == "All") result.typeFilter = '';
-      if(this.sourceFilter == "All") result.sourceFilter = '';
-      if(this.targetFilter == "All") result.targetFilter = '';
+      if (this.typeFilter == "All") result.typeFilter = "";
+      if (this.sourceFilter == "All") result.sourceFilter = "";
+      if (this.targetFilter == "All") result.targetFilter = "";
 
       return result;
     }
