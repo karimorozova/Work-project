@@ -61,40 +61,7 @@ const getDefaultIndustryMultipliers = async () => {
   }
   return defaultIndustryMultipliers;
 };
-const getDefaultPriceLists = async () => {
-  const defaultBasicPrices = await getDefaultBasicPrices();
-  const defaultStepMultipliers = await getDefaultStepMultipliers();
-  const defaultIndustryMultipliers = await getDefaultIndustryMultipliers();
-  const combinations = [];
-  defaultStepMultipliers.forEach(({ step, unit }) => {
-    defaultBasicPrices.forEach(({ sourceLanguage, targetLanguage }) => {
-      defaultIndustryMultipliers.forEach(({ industry }) => {
-        combinations.push(
-          `${sourceLanguage} > ${targetLanguage} > ${step} > ${unit} > ${industry}`
-        )
-      })
-    })
-  })
-  const uniqueCombos = Array.from(new Set(combinations));
-  const defaultPriceLists = [];
-  for (let uniqueItem of uniqueCombos) {
-    const splicedString = uniqueItem.split(' > ');
-    defaultPriceLists.push({
-      sourceLanguage: ObjectId(splicedString[0]),
-      targetLanguage: ObjectId(splicedString[1]),
-      step: ObjectId(splicedString[2]),
-      unit: ObjectId(splicedString[3]),
-      industry: ObjectId(splicedString[4]),
-    })
-  }
-  return {
-    defaultBasicPrices,
-    defaultStepMultipliers,
-    defaultIndustryMultipliers,
-    defaultPriceLists
-  }
-};
 
 
 
-module.exports = { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers, getDefaultPriceLists }
+module.exports = { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers }

@@ -5,7 +5,9 @@ const {
   getFilteredBasicPrices,
   updateStepMultipliers,
   updateIndustryMultipliers,
-  updateBasicPrices
+  updateBasicPrices,
+  getPricelistCombinations,
+  addNewMultiplier
 } = require('../../multipliers');
 
 router.post('/step-multipliers/:id', async (req, res) => {
@@ -78,17 +80,37 @@ router.post('/basic-prices-update/:id', async (req, res) => {
   }
 })
 
+router.post('/pricelist', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const pricelist = await getPricelistCombinations(id, req.body);
+    res.send(pricelist);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting pricelist');
+  }
+})
+
+router.post('/add-new-multiplier', async (req, res) => {
+  const { key, id } = req.params;
+  try {
+    await addNewMultiplier(key, id);
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on adding new multiplier');
+  }
+})
 
 router.post('/delete-sync', async (req, res) => {
   const { key , id } = req.body;
   console.log(key , id);
-  
+
   try {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on sync deleting');
   }
-
 })
 
 module.exports = router;
