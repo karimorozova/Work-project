@@ -28,7 +28,6 @@ const getPricelistCombinations = async (priceListId, filters) => {
       industry: splicedString[4],
     })
   }
-  console.log(uniqueCombos);
   return priceListCombinations;
 };
 
