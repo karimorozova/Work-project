@@ -80,11 +80,11 @@ router.post('/basic-prices-update/:id', async (req, res) => {
   }
 })
 
-router.post('/pricelist', async (req, res) => {
+router.post('/pricelist/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const pricelist = await getPricelistCombinations(id, req.body);
-    res.send(pricelist);
+    res.send(pricelist.splice(0,150));
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on getting pricelist');

@@ -25,15 +25,15 @@
             .price-title {{ field.label }}
             
         template(slot="sourceLang" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.sourceLanguage }}
+            .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
         template(slot="targetLang" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.targetLanguage }}
+            .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
         template(slot="step" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.step }}
+            .price__data(v-if="currentActive !== index") {{ row.step.title }}
         template(slot="unit" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.unit }}
+            .price__data(v-if="currentActive !== index") {{ row.unit.type }}
         template(slot="industry" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.industry }}
+            .price__data(v-if="currentActive !== index") {{ row.industry.name }}
 
         template(slot="eur" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
@@ -81,9 +81,9 @@ export default {
     steps: {
       type: Array
     },
-    priceId:{
+    priceId: {
       type: String
-    },
+    }
   },
   data() {
     return {
@@ -187,7 +187,7 @@ export default {
       stepResultFilter: "",
       unitResultFilter: "",
       industryResultFilter: "",
-      isDataRemain: true,
+      isDataRemain: true
     };
   },
   methods: {
@@ -196,11 +196,11 @@ export default {
     }),
     setFilter({ option, prop }) {
       this[prop] = option;
-      this.getPricelist(this.allFilters)
+      this.getPricelist(this.allFilters);
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
-        const result = await this.$http.post("/pricelists/", {
+        const result = await this.$http.post("/pricelists/pricelist/" + this.priceId, {
           ...this.allFilters,
           countFilter: this.dataArray.length
         });
@@ -210,10 +210,13 @@ export default {
     },
     async getPricelist(filters, count = 0) {
       try {
-        const result = await this.$http.post("/pricelists/", {
-          ...filters,
-          countFilter: count
-        });
+        const result = await this.$http.post(
+          "/pricelists/pricelist/" + this.priceId,
+          {
+            ...filters,
+            countFilter: count
+          }
+        );        
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
@@ -222,10 +225,10 @@ export default {
           type: "error"
         });
       }
-    },
+    }
   },
-  created(){
-    // this.getPricelist(this.allFilters)
+  created() {
+    this.getPricelist(this.allFilters);
   },
   computed: {
     allFilters() {
@@ -234,13 +237,13 @@ export default {
         targetResultFilter: this.targetResultFilter,
         stepResultFilter: this.stepResultFilter,
         unitResultFilter: this.unitResultFilter,
-        industryResultFilter: this.industryResultFilter,
+        industryResultFilter: this.industryResultFilter
       };
-      if(this.sourceResultFilter == "All") result.sourceResultFilter = '';
-      if(this.targetResultFilter == "All") result.targetResultFilter = '';
-      if(this.stepResultFilter == "All") result.stepResultFilter = '';
-      if(this.unitResultFilter == "All") result.unitResultFilter = '';
-      if(this.industryResultFilter == "All") result.industryResultFilter = '';
+      if (this.sourceResultFilter == "All") result.sourceResultFilter = "";
+      if (this.targetResultFilter == "All") result.targetResultFilter = "";
+      if (this.stepResultFilter == "All") result.stepResultFilter = "";
+      if (this.unitResultFilter == "All") result.unitResultFilter = "";
+      if (this.industryResultFilter == "All") result.industryResultFilter = "";
 
       return result;
     }

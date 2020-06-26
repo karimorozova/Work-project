@@ -1,6 +1,7 @@
 const { Pricelist, Step, Units, Vendors, Industries } = require('../models');
-const { getFilteredBasicPrices, getFilteredStepMultiplier } = require('./index');
-
+const { getFilteredBasicPrices  } = require('./basicPrice');
+const { getFilteredStepMultiplier } = require('./stepMultipiers');
+ 
 const getPricelistCombinations = async (priceListId, filters) => {
   const basicPricesTable = await getFilteredBasicPrices(filters, priceListId);
   const stepMultipliersTable = await getFilteredStepMultiplier(filters, priceListId);
@@ -20,13 +21,14 @@ const getPricelistCombinations = async (priceListId, filters) => {
   for (let uniqueItem of uniqueCombos) {
     const splicedString = uniqueItem.split(' > ');
     priceListCombinations.push({
-      sourceLanguage: ObjectId(splicedString[0]),
-      targetLanguage: ObjectId(splicedString[1]),
-      step: ObjectId(splicedString[2]),
-      unit: ObjectId(splicedString[3]),
-      industry: ObjectId(splicedString[4]),
+      sourceLanguage: splicedString[0],
+      targetLanguage: splicedString[1],
+      step: splicedString[2],
+      unit: splicedString[3],
+      industry: splicedString[4],
     })
   }
+  console.log(uniqueCombos);
   return priceListCombinations;
 };
 

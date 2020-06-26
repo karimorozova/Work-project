@@ -6,17 +6,24 @@
         Button(value="Back" @clicked="goBack")
   .priceLayout
       .priceLayout__currency
-          CurrencyRatio
+          CurrencyRatio(
+            @refreshPage="getAllData"
+          )
       .priceLayout__setting
           LangTable(
               :priceId="priceId"
               :languages="languages"
+              :currency="currencyRatioObj"
+              :isRefresh="isRefresh"
           )
           StepTable(
               :priceId="priceId"
               :steps="steps"
               :units="units"
-              :sizes="sizes"  
+              :sizes="sizes"
+              :currency="currencyRatioObj"
+              :isRefresh="isRefresh"
+
           )
           IndustryTable(
               :priceId="priceId"
@@ -49,13 +56,30 @@ export default {
       steps: null,
       units: null,
       sizes: null,
-      industries: null
+      industries: null,
+      currencyRatioObj: null,
+      isRefresh: false,
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    async getCurrency() {
+      try {
+        const result = await this.$http.get("/currency/currency-ratio");
+        this.currencyRatioObj = {
+          usd: result.data.USD,
+          gbp: result.data.GBP,
+        }
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting currency",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     async getPricelists() {
       try {
         const result = await this.$http.get("/prices/pricelists");
@@ -128,10 +152,17 @@ export default {
           type: "error"
         });
       }
+    },
+    getAllData(){
+      this.isRefresh = true;
+      setTimeout(() => {
+        this.isRefresh = false;
+      }, 2000);
     }
   },
   created() {
     this.priceId = this.$route.params.id;
+    this.getCurrency();
     this.getPricelists();
     this.getDefaultLanguages();
     this.getDefaultSteps();

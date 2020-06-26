@@ -12,9 +12,14 @@
         .ratio__input
             input(type="number" v-model="currencyGbp")
             span.ratio__input-symbol &pound;
-    .ratio__element
-        .ratio__button(@click="saveCurrency")
+    .ratio__element(v-if="defaultUsd == currencyUsd && defaultGbp == currencyGbp")
+        .ratio__button
+          .ratio__no-active
             img(src="../../../assets/images/Other/save-icon-qa-form.png")
+    .ratio__element(v-else)
+        .ratio__button(@click="saveCurrency(); refreshPage();")
+            img(src="../../../assets/images/Other/save-icon-qa-form.png")
+            
 
 
 </template>
@@ -26,19 +31,25 @@ export default {
     return {
       currencyId: null,
       currencyUsd: null,
-      currencyGbp: null
+      currencyGbp: null,
+
+      defaultUsd: null, 
+      defaultGbp: null,
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    refreshPage(){
+      this.$emit('refreshPage')
+    },
     async getCurrency() {
       try {
         const result = await this.$http.get("/currency/currency-ratio");
         this.currencyId = result.data._id;
-        this.currencyUsd = result.data.USD;
-        this.currencyGbp = result.data.GBP;
+        this.currencyUsd = this.defaultUsd = result.data.USD;
+        this.currencyGbp = this.defaultGbp = result.data.GBP;
       } catch (err) {
         this.alertToggle({
           message: "Error on getting currency",
@@ -81,6 +92,10 @@ export default {
   padding-left: 20px;
   display: flex;
   align-items: center;
+  &__no-active{
+    opacity: 0.5;
+    cursor: default;
+  }
   &__input {
     &-symbol {
       margin-left: 4px;

@@ -42,21 +42,21 @@
           span(id="eur") {{row.euroBasicPrice}}
           label(for="eur") &euro;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceEUR")
+          input.price__data-input(type="number" :onchange="currentRatio" v-model="currentBasicPriceEUR")
 
       template(slot="usd" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="usd") {{row.usdBasicPrice}}
           label(for="usd") &#36;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceUSD")
+        .price__data(v-else)
+          input.price__data-input(type="number" v-model="currentBasicPriceUSD" disabled)
 
       template(slot="gbp" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="gbp") {{row.gbpBasicPrice}}
           label(for="gbp") &pound;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceGBP")
+        .price__data(v-else)
+          input.price__data-input(type="number" v-model="currentBasicPriceGBP" disabled)
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
@@ -77,6 +77,12 @@ export default {
     },
     languages: {
       type: Array
+    },
+    currency: {
+      type: Object
+    },
+    isRefresh: {
+      type: Boolean
     }
   },
   data() {
@@ -174,8 +180,8 @@ export default {
     setEditingData(index) {
       this.currentActive = index;
       (this.currentSourceLangObj = this.dataArray[index].sourceLanguage),
-      (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
-      (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
+        (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
+        (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
         (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
         (this.currentBasicPriceUSD = this.dataArray[index].usdBasicPrice);
       this.currentBasicPriceEUR = this.dataArray[index].euroBasicPrice;
@@ -242,8 +248,8 @@ export default {
             basicPrice: {
               _id: id,
               type: this.dataArray[index].type,
-              sourceLanguage :this.currentSourceLangObj,
-              targetLanguage :this.currentTargetLangObj,
+              sourceLanguage: this.currentSourceLangObj,
+              targetLanguage: this.currentTargetLangObj,
               usdBasicPrice: this.currentBasicPriceUSD,
               euroBasicPrice: this.currentBasicPriceEUR,
               gbpBasicPrice: this.currentBasicPriceGBP
@@ -273,7 +279,22 @@ export default {
       await this.getLangs(this.allFilters);
     }
   },
+  watch: {
+    isRefresh() {
+      if (this.isRefresh) {
+        this.getLangs(this.allFilters);
+      }
+    }
+  },
   computed: {
+    currentRatio() {
+      this.currentBasicPriceUSD = (
+        this.currentBasicPriceEUR * this.currency.usd
+      ).toFixed(2);
+      this.currentBasicPriceGBP = (
+        this.currentBasicPriceEUR * this.currency.gbp
+      ).toFixed(2);
+    },
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
