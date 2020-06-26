@@ -84,7 +84,7 @@ router.post('/pricelist/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const pricelist = await getPricelistCombinations(id, req.body);
-    res.send(pricelist.splice(0,150));
+    res.send(pricelist);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on getting pricelist');

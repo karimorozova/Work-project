@@ -1,34 +1,27 @@
 const { Pricelist, Step, Units, Vendors, Industries } = require('../models');
 const { getFilteredBasicPrices  } = require('./basicPrice');
 const { getFilteredStepMultiplier } = require('./stepMultipiers');
- 
+
 const getPricelistCombinations = async (priceListId, filters) => {
+  const { countFilter } = filters;
   const basicPricesTable = await getFilteredBasicPrices(filters, priceListId);
   const stepMultipliersTable = await getFilteredStepMultiplier(filters, priceListId);
-  const { industryMultipliersTable } = await Pricelist.findOne({ _id: priceListId });
-  const combinations = [];
+  const industries = await Industries.find();
+  const priceListCombinations = [];
   stepMultipliersTable.forEach(({ step, unit }) => {
     basicPricesTable.forEach(({ sourceLanguage, targetLanguage }) => {
-      industryMultipliersTable.forEach(({ industry }) => {
-        combinations.push(
-          `${sourceLanguage} > ${targetLanguage} > ${step} > ${unit} > ${industry}`
-        )
+      industries.forEach(industry => {
+        priceListCombinations.push({
+          sourceLanguage,
+          targetLanguage,
+          step,
+          unit,
+          industry,
+        })
       })
     })
   })
-  const uniqueCombos = Array.from(new Set(combinations));
-  const priceListCombinations = [];
-  for (let uniqueItem of uniqueCombos) {
-    const splicedString = uniqueItem.split(' > ');
-    priceListCombinations.push({
-      sourceLanguage: splicedString[0],
-      targetLanguage: splicedString[1],
-      step: splicedString[2],
-      unit: splicedString[3],
-      industry: splicedString[4],
-    })
-  }
-  return priceListCombinations;
+  return priceListCombinations.splice(countFilter, 25);
 };
 
 const addNewMultiplier = async (key, newMultiplierId) => {
