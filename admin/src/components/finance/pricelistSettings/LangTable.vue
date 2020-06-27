@@ -8,7 +8,6 @@
       :targets="languages"
       @setFilter="setFilter"
     )
-    div(v-if="!dataArray.length") Nothing found...
     DataTable(
         :fields="fields"
         :tableData="dataArray"
@@ -61,7 +60,7 @@
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
-
+    .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 import DataTable from "../../DataTable";

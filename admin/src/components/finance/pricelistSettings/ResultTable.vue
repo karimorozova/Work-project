@@ -20,6 +20,7 @@
         :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="settings-table-row"
         bodyCellClass="settings-table-cell"
+        @bottomScrolled="bottomScrolled"
     )
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .price-title {{ field.label }}
@@ -216,7 +217,8 @@ export default {
             ...filters,
             countFilter: count
           }
-        );        
+        );
+        console.log(result.data)
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
