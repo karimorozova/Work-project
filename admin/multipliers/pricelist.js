@@ -29,8 +29,43 @@ const getPricelistCombinations = async (priceListId, filters) => {
       })
     })
   });
+  const groupedPriceLists = groupPriceList(priceListCombinations);
+  console.log(groupedPriceLists);
   return priceListCombinations.splice(countFilter, 25);
 };
+
+const groupPriceList = (arr) => {
+  const groupedCombos = [];
+  arr.reduce((acc, curr) => {
+    const pattern = {
+      sourceLanguage: acc.sourceLanguage.lang,
+      targetLanguage: acc.targetLanguage.lang,
+      step: acc.step.title,
+      unit: acc.unit.type,
+      industry: 'All',
+      eurPrice: acc.eurPrice,
+      euroMinPrice: acc.euroMinPrice,
+      usdPrice: acc.usdPrice,
+      usdMinPrice: acc.usdMinPrice,
+      gbpPrice: acc.gbpPrice,
+      gbpMinPrice: acc.gbpMinPrice,
+    };
+    if (pattern.eurPrice === curr.eurPrice &&
+      pattern.euroMinPrice === curr.euroMinPrice &&
+      pattern.usdPrice === curr.usdPrice &&
+      pattern.usdMinPrice === curr.usdMinPrice &&
+      pattern.gbpPrice === curr.gbpPrice &&
+      pattern.gbpMinPrice === curr.gbpMinPrice) {
+      groupedCombos.push(pattern)
+    } else {
+      const exceptionsArr = [];
+      exceptionsArr.push([...exceptionsArr, curr.industry]);
+      groupedCombos.push({ ...pattern, industry: `All Except (${[...exceptionsArr]})` })
+    }
+     return acc;
+  });
+  return groupedCombos;
+}
 
 const addNewMultiplier = async (key, newMultiplierId) => {
   try {

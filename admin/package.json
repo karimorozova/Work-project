@@ -56,6 +56,7 @@
     "request": "^2.87.0",
     "sass-loader": "^6.0.7",
     "translate": "^1.0.2",
+    "underscore": "^1.10.2",
     "unirest": "^0.6.0",
     "vue": "^2.5.2",
     "vue-click-outside": "^1.0.7",
