@@ -1,18 +1,18 @@
-const { Pricelist, Step, Units, Vendors, Industries, CurrencyRatio } = require('../models');
+const { Pricelist, Step, Units, Vendors, Languages, Industries, CurrencyRatio } = require('../models');
 const { getFilteredBasicPrices  } = require('./basicPrice');
 const { getFilteredStepMultiplier } = require('./stepMultipiers');
-
 const getPercentage = (number, percentage) => (number / 100) * percentage;
 
 const getPricelistCombinations = async (priceListId, filters) => {
-  const { countFilter } = filters;
+  const { countFilter, industryFilter } = filters;
   const basicPricesTable = await getFilteredBasicPrices(filters, priceListId, false);
   const stepMultipliersTable = await getFilteredStepMultiplier(filters, priceListId, false);
   const { industryMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { industryMultipliersTable: 1 }).populate('industryMultipliersTable.industry');
+  const industryMultipliers = industryFilter ? industryMultipliersTable.filter(({ industry }) => industry.name === industryFilter) : industryMultipliersTable;
   const priceListCombinations = [];
   stepMultipliersTable.forEach(({ step, unit, multiplier: stepMultiplierValue, euroMinPrice, usdMinPrice, gbpMinPrice }) => {
     basicPricesTable.forEach(({ sourceLanguage, targetLanguage, euroBasicPrice, usdBasicPrice, gbpBasicPrice }) => {
-      industryMultipliersTable.forEach(({ industry, multiplier: industryMultiplierValue }) => {
+      industryMultipliers.forEach(({ industry, multiplier: industryMultiplierValue }) => {
         priceListCombinations.push({
           sourceLanguage,
           targetLanguage,
@@ -56,7 +56,8 @@ const addNewMultiplier = async (key, newMultiplierId) => {
           await Pricelist.updateOne({ _id }, { industryMultipliersTable });
         }
         break;
-      // case 'LanguagePair':
+      case 'LanguagePair':
+        newMultiplier = await Languages.findOne({ _id: newMultiplierId })
     }
   } catch (err) {
     console.log(err);
