@@ -1,4 +1,5 @@
 const { Pricelist } = require("../models");
+const { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers } = require('../helpers/defaults/defaultPriceLists')
 
 async function saveNewPricelist(pricelist) {
     let { name, isActive, isClientDefault, isVendorDefault, basicPricesTable,
@@ -10,7 +11,9 @@ async function saveNewPricelist(pricelist) {
             industryMultipliersTable = donorPricelist.industryMultipliersTable
             stepMultipliersTable = donorPricelist.stepMultipliersTable
         }else{
-            //from helpers
+            basicPricesTable = await getDefaultBasicPrices()
+            industryMultipliersTable = await getDefaultIndustryMultipliers()
+            stepMultipliersTable = await getDefaultStepMultipliers()
         }
         return await Pricelist.create({
             name, isClientDefault, isVendorDefault, isActive, basicPricesTable, industryMultipliersTable, stepMultipliersTable
