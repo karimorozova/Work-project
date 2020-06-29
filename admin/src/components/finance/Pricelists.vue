@@ -146,12 +146,16 @@ export default {
             }
         },
         async addPriceCopy(index) {
+            console.log(this.pricelists[index]);
+            
             const name = this.setCopyPriceName(index);
             const pricelist = {
                 name,
-                copyName: this.pricelists[index].name,
                 isDefault: false,
-                isActive: false
+                isActive: false,
+                basicPricesTable: this.pricelists[index].basicPricesTable,
+                industryMultipliersTable: this.pricelists[index].industryMultipliersTable,
+                stepMultipliersTable: this.pricelists[index].stepMultipliersTable,
             }
             try {
                 await this.$http.post("/prices/new-pricelist", { pricelist });

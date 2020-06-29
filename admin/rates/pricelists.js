@@ -1,12 +1,19 @@
 const { Pricelist } = require("../models");
 
 async function saveNewPricelist(pricelist) {
-    const { name, isActive, isClientDefault, isVendorDefault, copyName } = pricelist;
+    let { name, isActive, isClientDefault, isVendorDefault, basicPricesTable,
+         industryMultipliersTable, stepMultipliersTable, copyName } = pricelist;
     try {
-        const donorPricelist = copyName ? await Pricelist.findOne({"name": copyName}) : "";
-        const { monoRates = [], wordsRates = [], hoursRates = [] } = donorPricelist ? donorPricelist : {};
+        if(copyName !== ''){
+            const donorPricelist = await Pricelist.findOne({"name": copyName});
+            basicPricesTable = donorPricelist.basicPricesTable
+            industryMultipliersTable = donorPricelist.industryMultipliersTable
+            stepMultipliersTable = donorPricelist.stepMultipliersTable
+        }else{
+            //from helpers
+        }
         return await Pricelist.create({
-            name, isClientDefault, isVendorDefault, isActive, monoRates, wordsRates, hoursRates
+            name, isClientDefault, isVendorDefault, isActive, basicPricesTable, industryMultipliersTable, stepMultipliersTable
         });
     } catch(err) {
         console.log(err);
