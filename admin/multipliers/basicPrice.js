@@ -1,6 +1,6 @@
 const { Pricelist, Languages } = require('../models');
 
-const getFilteredBasicPrice = async (filteredBasicPrices, filters) => {
+const getFilteredBasicPrice = async (filteredBasicPrices, filters, needToSplice) => {
   const { countFilter } = filters;
   if (filters.sourceFilter) {
     const lang = await Languages.findOne({ lang: filters.sourceFilter });
@@ -15,13 +15,13 @@ const getFilteredBasicPrice = async (filteredBasicPrices, filters) => {
   if (filters.typeFilter) {
     filteredBasicPrices = filteredBasicPrices.filter(({ type }) => type === filters.typeFilter);
   }
-  return filteredBasicPrices.splice(countFilter, 25);
+  return needToSplice ? filteredBasicPrices.splice(countFilter, 25) : filteredBasicPrices;
 }
-const getFilteredBasicPrices = async (filters, priceListId) => {
+const getFilteredBasicPrices = async (filters, priceListId, needToSplice = true) => {
   try {
     const { basicPricesTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, basicPricesTable: 1 })
       .populate('basicPricesTable.sourceLanguage').populate('basicPricesTable.targetLanguage');
-    return await getFilteredBasicPrice(basicPricesTable, filters);
+    return await getFilteredBasicPrice(basicPricesTable, filters, needToSplice);
   } catch (err) {
     console.log(err);
     console.log('Error in getFilteredBasicPrices');
@@ -45,4 +45,37 @@ const updateBasicPrices = async (basicPriceToUpdate, priceListId) => {
   }
 }
 
-module.exports = { getFilteredBasicPrices, updateBasicPrices };
+const updateBasicPriceValue = async ({ USD, GBP }) => {
+  try {
+    const pricelists = await Pricelist.find();
+    for (let { basicPricesTable, _id } of pricelists) {
+      let updatedBasicPrices = [];
+      for (let {
+        euroBasicPrice,
+        usdBasicPrice,
+        gbpBasicPrice,
+        _id: basicPriceId,
+        type,
+        sourceLanguage,
+        targetLanguage } of basicPricesTable ) {
+        usdBasicPrice *= Number(USD);
+        gbpBasicPrice *= Number(GBP);
+        updatedBasicPrices.push({
+          euroBasicPrice,
+          usdBasicPrice,
+          gbpBasicPrice,
+          _id: basicPriceId,
+          type,
+          sourceLanguage,
+          targetLanguage
+        })
+      }
+      await Pricelist.updateOne({ _id }, { basicPricesTable: updatedBasicPrices });
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error in updateBasicPriceValue');
+  }
+}
+
+module.exports = { getFilteredBasicPrices, updateBasicPrices, updateBasicPriceValue };

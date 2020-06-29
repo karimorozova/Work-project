@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { CurrencyRatio } = require('../../models');
-
+const { updateBasicPriceValue, updateStepPriceValue } = require('../../multipliers');
 router.get('/currency-ratio', async (req, res) => {
   try {
     const currencyRatios = await CurrencyRatio.findOne();
@@ -15,6 +15,8 @@ router.post('/currency-ratio', async (req, res) => {
   const { currencyRatio } = req.body;
   try {
     await CurrencyRatio.findOneAndUpdate({ _id: currencyRatio._id }, currencyRatio);
+    await updateBasicPriceValue(currencyRatio);
+    await updateStepPriceValue(currencyRatio);
     res.send('Saved');
   } catch (err) {
     console.log(err);

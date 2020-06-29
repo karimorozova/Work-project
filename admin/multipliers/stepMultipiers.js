@@ -1,7 +1,7 @@
 const { Pricelist, Step, Units } = require('../models');
 const ObjectId = require('mongodb').ObjectID;
 
-const getFilteredStepMultipliers = async (stepMultipliersTable, filters) => {
+const getFilteredStepMultipliers = async (stepMultipliersTable, filters, needToSplice) => {
   const { countFilter } = filters;
   if (filters.stepFilter) {
     const steps = await Step.find({ title: filters.stepFilter });
@@ -30,14 +30,14 @@ const getFilteredStepMultipliers = async (stepMultipliersTable, filters) => {
   if (filters.sizeFilter) {
     stepMultipliersTable = stepMultipliersTable.filter(({ size }) => size === +filters.sizeFilter)
   }
-  return stepMultipliersTable.splice(countFilter, 25);
+  return needToSplice ? stepMultipliersTable.splice(countFilter, 25) : stepMultipliersTable;
 };
 
-const getFilteredStepMultiplier = async (filters, priceListId) => {
+const getFilteredStepMultiplier = async (filters, priceListId, needToSplice = true) => {
   try {
     const { stepMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, stepMultipliersTable: 1 })
       .populate('stepMultipliersTable.step').populate('stepMultipliersTable.unit');
-    return await getFilteredStepMultipliers(stepMultipliersTable, filters);
+    return await getFilteredStepMultipliers(stepMultipliersTable, filters, needToSplice);
   } catch (err) {
     console.log(err);
     console.log('Error in getFilteredStepMultiplier');
@@ -58,4 +58,30 @@ const updateStepMultipliers = async (stepToUpdate, priceListId) => {
   }
 }
 
-module.exports = { getFilteredStepMultiplier, updateStepMultipliers };
+const updateStepPriceValue = async ({ USD, GBP }) => {
+  try {
+    const pricelists = await Pricelist.find();
+    for (let { stepMultipliersTable, _id } of pricelists) {
+      let updatedStepPrices = [];
+      for ( let { euroMinPrice, usdMinPrice, gbpMinPrice, _id: stepMultipliersId, step, unit, size } of stepMultipliersTable ) {
+        usdMinPrice *= Number(USD);
+        gbpMinPrice *= Number(GBP);
+        updatedStepPrices.push({
+          euroMinPrice,
+          usdMinPrice,
+          gbpMinPrice,
+          _id: stepMultipliersId,
+          step,
+          unit,
+          size
+        })
+      }
+      await Pricelist.updateOne({ _id }, { stepMultipliersTable: updatedStepPrices });
+    }
+  } catch (err) {
+    console.log(err);
+    console.log('Error in updateStepPriceValue');
+  }
+}
+
+module.exports = { getFilteredStepMultiplier, updateStepMultipliers, updateStepPriceValue };
