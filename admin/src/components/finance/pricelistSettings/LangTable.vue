@@ -250,7 +250,7 @@ export default {
               sourceLanguage: this.currentSourceLangObj,
               targetLanguage: this.currentTargetLangObj,
               usdBasicPrice: this.currentBasicPriceUSD,
-              euroBasicPrice: this.currentBasicPriceEUR,
+              euroBasicPrice: parseFloat(this.currentBasicPriceEUR).toFixed(2),
               gbpBasicPrice: this.currentBasicPriceGBP
             }
           }

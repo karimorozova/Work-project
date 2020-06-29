@@ -139,6 +139,7 @@ export default {
       if (this.currentActive === -1) return;
       this.errors = [];
       if (this.currentMultiplier == "") return;
+      if (Math.sign(this.currentMultiplier) == -1) return;
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -153,7 +154,7 @@ export default {
           industryMultiplier: {
             _id: id,
             industry: this.currentIndustryObj,
-            multiplier: this.currentMultiplier
+            multiplier: parseFloat(this.currentMultiplier).toFixed(0)
           }
         });
         this.alertToggle({

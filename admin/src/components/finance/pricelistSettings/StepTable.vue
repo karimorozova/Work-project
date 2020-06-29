@@ -249,6 +249,7 @@ export default {
       if (this.currentActive === -1) return;
       this.errors = [];
       if (this.currentMultiplier == "") return;
+      if (Math.sign(this.currentMultiplier) == -1) return;
       if (this.currentMinPriceUSD == "") return;
       if (this.currentMinPriceEUR == "") return;
       if (this.currentMinPriceGBP == "") return;
@@ -288,9 +289,9 @@ export default {
               step: this.currentStepObj,
               unit: this.currentUnitObj,
               size: this.currentSize,
-              multiplier: this.currentMultiplier,
+              multiplier: parseFloat(this.currentMultiplier).toFixed(0),
               usdMinPrice: this.currentMinPriceUSD,
-              euroMinPrice: this.currentMinPriceEUR,
+              euroMinPrice: parseFloat(this.currentMinPriceEUR).toFixed(2),
               gbpMinPrice: this.currentMinPriceGBP
             }
           }

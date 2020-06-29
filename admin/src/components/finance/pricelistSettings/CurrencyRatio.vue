@@ -67,6 +67,7 @@ export default {
             GBP: this.currencyGbp
           }
         });
+        this.getCurrency();
         this.alertToggle({
           message: "Currency saved",
           isShow: true,

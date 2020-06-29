@@ -61,7 +61,8 @@
         template(slot="minGbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 span(id="minGbp") {{row.minGbp}}
-                label(for="minGbp") &pound;                                                        
+                label(for="minGbp") &pound;         
+    .price__empty(v-if="!dataArray.length") Nothing found...                                               
 </template>
 <script>
 import DataTable from "../../DataTable";
@@ -218,7 +219,7 @@ export default {
             countFilter: count
           }
         );
-        console.log(result.data)
+        // console.log(result.data)
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
