@@ -3,7 +3,8 @@ const ObjectId = require('mongodb').ObjectID;
 
 const getDefaultBasicPrices = async () => {
   const vendors = await Vendors.find({ languagePairs: { $gt: [] } });
-  const { USD, GBP } = await CurrencyRatio.find()[0];
+  const currencyRatio = await CurrencyRatio.find();
+  const {USD,GBP} = currencyRatio[0];
   const duoLanguagesInUse = [];
   for (let { languagePairs } of vendors) {
     for (let pair of languagePairs) {
@@ -33,7 +34,8 @@ const getDefaultBasicPrices = async () => {
 
 const getDefaultStepMultipliers = async () => {
   const units = await Units.find({ active: true });
-  const { USD, GBP } = await CurrencyRatio.find()[0];
+  const currencyRatio = await CurrencyRatio.find();
+  const {USD,GBP} = currencyRatio[0];
   const defaultStepMultipliers = [];
   for (let { _id, sizes, steps } of units) {
     if (sizes.length) {
