@@ -6,7 +6,7 @@
             :selectedOption="source"
             :options="sources"
             placeholder="Source"
-            @chooseOption="(e) => setValue(e, 'sourceResultFilter')"
+            @chooseOption="(e) => setValue(e, 'sourceFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
@@ -14,7 +14,7 @@
             :selectedOption="target"
             :options="targets"
             placeholder="Target"
-            @chooseOption="(e) => setValue(e, 'targetResultFilter')"
+            @chooseOption="(e) => setValue(e, 'targetFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
@@ -22,7 +22,7 @@
             :selectedOption="step"
             :options="steps"
             placeholder="Step"
-            @chooseOption="(e) => setValue(e, 'stepResultFilter')"
+            @chooseOption="(e) => setValue(e, 'stepFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
@@ -30,7 +30,7 @@
             :selectedOption="unit"
             :options="units"
             placeholder="Unit"
-            @chooseOption="(e) => setValue(e, 'unitResultFilter')"
+            @chooseOption="(e) => setValue(e, 'unitFilter')"
         )
     .priceFilter__drop-menu
         SelectSingle(
@@ -38,7 +38,7 @@
             :selectedOption="industry"
             :options="industries"
             placeholder="Industry"
-            @chooseOption="(e) => setValue(e, 'industryResultFilter')"
+            @chooseOption="(e) => setValue(e, 'industryFilter')"
         )
 </template>
 <script>

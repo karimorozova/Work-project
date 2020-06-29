@@ -8,25 +8,26 @@
       .priceLayout__currency
           CurrencyRatio(
             @refreshPage="getAllData"
+            @refreshResultTable="refreshResultTable"
           )
       .priceLayout__setting
           LangTable(
               :priceId="priceId"
               :languages="languages"
-              :currency="currencyRatioObj"
               :isRefresh="isRefresh"
+              @refreshResultTable="refreshResultTable"
           )
           StepTable(
               :priceId="priceId"
               :steps="steps"
               :units="units"
               :sizes="sizes"
-              :currency="currencyRatioObj"
               :isRefresh="isRefresh"
-
+              @refreshResultTable="refreshResultTable"
           )
           IndustryTable(
               :priceId="priceId"
+              @refreshResultTable="refreshResultTable"
           )
       .priceLayout__result
           ResultTable(
@@ -35,6 +36,7 @@
               :steps="steps"
               :units="units"
               :industries="industries"
+              :isRefreshResultTable="isRefreshResultTable"
           )
 
 </template>
@@ -59,27 +61,13 @@ export default {
       industries: null,
       currencyRatioObj: null,
       isRefresh: false,
+      isRefreshResultTable: false,
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-    async getCurrency() {
-      try {
-        const result = await this.$http.get("/currency/currency-ratio");
-        this.currencyRatioObj = {
-          usd: result.data.USD,
-          gbp: result.data.GBP,
-        }
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on getting currency",
-          isShow: true,
-          type: "error"
-        });
-      }
-    },
     async getPricelists() {
       try {
         const result = await this.$http.get("/prices/pricelists");
@@ -153,6 +141,12 @@ export default {
         });
       }
     },
+    refreshResultTable(){
+      this.isRefreshResultTable = true;
+      setTimeout(() => {
+        this.isRefreshResultTable = false;
+      }, 2000);
+    },
     getAllData(){
       this.isRefresh = true;
       setTimeout(() => {
@@ -162,7 +156,6 @@ export default {
   },
   created() {
     this.priceId = this.$route.params.id;
-    this.getCurrency();
     this.getPricelists();
     this.getDefaultLanguages();
     this.getDefaultSteps();

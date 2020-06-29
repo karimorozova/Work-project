@@ -1,11 +1,11 @@
 <template lang="pug">
 .price 
     ResultFilter(
-      :source="sourceResultFilter"
-      :target="targetResultFilter"
-      :step="stepResultFilter"
-      :unit="unitResultFilter"
-      :industry="industryResultFilter"
+      :source="sourceFilter"
+      :target="targetFilter"
+      :step="stepFilter"
+      :unit="unitFilter"
+      :industry="industryFilter"
       :targets="languages"
       :sources="languages"
       :steps="steps"
@@ -34,33 +34,33 @@
         template(slot="unit" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.unit.type }}
         template(slot="industry" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.industry.name }}
+            .price__data(v-if="currentActive !== index") {{ row.industry }}
 
         template(slot="eur" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="eur") {{row.eur}}
+                span(id="eur") {{row.eurPrice}}
                 label(for="eur") &euro;
         template(slot="minEur" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="minEur") {{row.minEur}}
+                span(id="minEur") {{row.euroMinPrice}}
                 label(for="minEur") &euro;
 
         template(slot="usd" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="usd") {{row.usd}}
+                span(id="usd") {{row.usdPrice}}
                 label(for="usd") &#36;
         template(slot="minUsd" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="minUsd") {{row.minUsd}}
+                span(id="minUsd") {{row.usdMinPrice}}
                 label(for="minUsd") &#36;
 
         template(slot="gbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="gbp") {{row.gbp}}
+                span(id="gbp") {{row.gbpPrice}}
                 label(for="gbp") &pound;
         template(slot="minGbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="minGbp") {{row.minGbp}}
+                span(id="minGbp") {{row.gbpMinPrice}}
                 label(for="minGbp") &pound;         
     .price__empty(v-if="!dataArray.length") Nothing found...                                               
 </template>
@@ -85,6 +85,9 @@ export default {
     },
     priceId: {
       type: String
+    },
+    isRefreshResultTable: {
+      type: Boolean
     }
   },
   data() {
@@ -169,26 +172,12 @@ export default {
         }
       ],
 
-      dataArray: [
-        // {
-        //   sourceLanguage: "Eng",
-        //   targetLanguage: "Fr",
-        //   step: "someStep",
-        //   unit: "someUnit",
-        //   industry: "someIndustry",
-        //   usd: 10,
-        //   minUsd: 20,
-        //   eur: 10,
-        //   minEur: 20,
-        //   gbp: 10,
-        //   minGbp: 20
-        // }
-      ],
-      sourceResultFilter: "",
-      targetResultFilter: "",
-      stepResultFilter: "",
-      unitResultFilter: "",
-      industryResultFilter: "",
+      dataArray: [],
+      sourceFilter: "",
+      targetFilter: "",
+      stepFilter: "",
+      unitFilter: "",
+      industryFilter: "",
       isDataRemain: true
     };
   },
@@ -202,10 +191,13 @@ export default {
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
-        const result = await this.$http.post("/pricelists/pricelist/" + this.priceId, {
-          ...this.allFilters,
-          countFilter: this.dataArray.length
-        });
+        const result = await this.$http.post(
+          "/pricelists/pricelist/" + this.priceId,
+          {
+            ...this.allFilters,
+            countFilter: this.dataArray.length
+          }
+        );
         this.dataArray.push(...result.data);
         this.isDataRemain = result.body.length === 25;
       }
@@ -219,7 +211,6 @@ export default {
             countFilter: count
           }
         );
-        // console.log(result.data)
         this.dataArray = result.data;
       } catch (err) {
         this.alertToggle({
@@ -230,23 +221,30 @@ export default {
       }
     }
   },
+  watch: {
+    async isRefreshResultTable() {
+      if (this.isRefreshResultTable) {
+        this.getPricelist(this.allFilters);
+      }
+    }
+  },
   created() {
     this.getPricelist(this.allFilters);
   },
   computed: {
     allFilters() {
       let result = {
-        sourceResultFilter: this.sourceResultFilter,
-        targetResultFilter: this.targetResultFilter,
-        stepResultFilter: this.stepResultFilter,
-        unitResultFilter: this.unitResultFilter,
-        industryResultFilter: this.industryResultFilter
+        sourceFilter: this.sourceFilter,
+        targetFilter: this.targetFilter,
+        stepFilter: this.stepFilter,
+        unitFilter: this.unitFilter,
+        industryFilter: this.industryFilter
       };
-      if (this.sourceResultFilter == "All") result.sourceResultFilter = "";
-      if (this.targetResultFilter == "All") result.targetResultFilter = "";
-      if (this.stepResultFilter == "All") result.stepResultFilter = "";
-      if (this.unitResultFilter == "All") result.unitResultFilter = "";
-      if (this.industryResultFilter == "All") result.industryResultFilter = "";
+      if (this.sourceFilter == "All") result.sourceFilter = "";
+      if (this.targetFilter == "All") result.targetFilter = "";
+      if (this.stepFilter == "All") result.stepFilter = "";
+      if (this.unitFilter == "All") result.unitFilter = "";
+      if (this.industryFilter == "All") result.industryFilter = "";
 
       return result;
     }

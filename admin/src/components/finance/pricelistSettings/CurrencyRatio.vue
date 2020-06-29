@@ -44,6 +44,9 @@ export default {
     refreshPage(){
       this.$emit('refreshPage')
     },
+    refreshResultTable(){
+      this.$emit('refreshResultTable')
+    },
     async getCurrency() {
       try {
         const result = await this.$http.get("/currency/currency-ratio");
@@ -68,6 +71,7 @@ export default {
           }
         });
         this.getCurrency();
+        this.refreshResultTable()
         this.alertToggle({
           message: "Currency saved",
           isShow: true,

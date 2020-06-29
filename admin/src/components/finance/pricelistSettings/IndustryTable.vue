@@ -146,6 +146,9 @@ export default {
       }
       await this.manageSaveClick(index);
     },
+    refreshResultTable(){
+      this.$emit('refreshResultTable')
+    },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       try {
@@ -164,6 +167,7 @@ export default {
         });
         this.setDefaults();
         this.dataArray[index] = result.data
+        this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Industry",

@@ -77,9 +77,6 @@ export default {
     languages: {
       type: Array
     },
-    currency: {
-      type: Object
-    },
     isRefresh: {
       type: Boolean
     }
@@ -138,6 +135,7 @@ export default {
       currentBasicPriceUSD: "",
       currentBasicPriceEUR: "",
       currentBasicPriceGBP: "",
+      currency: {},
 
       typeFilter: "",
       sourceFilter: "",
@@ -152,6 +150,7 @@ export default {
     };
   },
   created() {
+    this.getCurrency();
     this.getLangs(this.allFilters);
   },
   methods: {
@@ -237,6 +236,9 @@ export default {
         });
       }
     },
+    refreshResultTable(){
+      this.$emit('refreshResultTable')
+    },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
@@ -262,6 +264,7 @@ export default {
         });
         this.setDefaults();
         this.dataArray[index] = result.data;
+        this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
           message: "Error on saving Steps",
@@ -276,11 +279,24 @@ export default {
     async setFilter({ option, prop }) {
       this[prop] = option;
       await this.getLangs(this.allFilters);
+    },
+    async getCurrency() {
+      try {
+        const result = await this.$http.get("/currency/currency-ratio");
+        this.currency = result.data;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting currency",
+          isShow: true,
+          type: "error"
+        });
+      }
     }
   },
   watch: {
-    isRefresh() {
+    async isRefresh() {
       if (this.isRefresh) {
+        await this.getCurrency();
         this.getLangs(this.allFilters);
       }
     }
@@ -288,10 +304,10 @@ export default {
   computed: {
     currentRatio() {
       this.currentBasicPriceUSD = (
-        this.currentBasicPriceEUR * this.currency.usd
+        this.currentBasicPriceEUR * this.currency.USD
       ).toFixed(2);
       this.currentBasicPriceGBP = (
-        this.currentBasicPriceEUR * this.currency.gbp
+        this.currentBasicPriceEUR * this.currency.GBP
       ).toFixed(2);
     },
     manageIcons() {
