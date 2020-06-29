@@ -58,8 +58,8 @@ const updateBasicPriceValue = async ({ USD, GBP }) => {
         type,
         sourceLanguage,
         targetLanguage } of basicPricesTable ) {
-        usdBasicPrice *= Number(USD);
-        gbpBasicPrice *= Number(GBP);
+        usdBasicPrice = euroBasicPrice * Number(USD);
+        gbpBasicPrice = euroBasicPrice * Number(GBP);
         updatedBasicPrices.push({
           euroBasicPrice,
           usdBasicPrice,

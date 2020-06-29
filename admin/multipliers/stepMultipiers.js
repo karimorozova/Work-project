@@ -64,8 +64,8 @@ const updateStepPriceValue = async ({ USD, GBP }) => {
     for (let { stepMultipliersTable, _id } of pricelists) {
       let updatedStepPrices = [];
       for ( let { euroMinPrice, usdMinPrice, gbpMinPrice, _id: stepMultipliersId, step, unit, size } of stepMultipliersTable ) {
-        usdMinPrice *= Number(USD);
-        gbpMinPrice *= Number(GBP);
+        usdMinPrice = euroMinPrice * Number(USD);
+        gbpMinPrice = euroMinPrice * Number(GBP);
         updatedStepPrices.push({
           euroMinPrice,
           usdMinPrice,
