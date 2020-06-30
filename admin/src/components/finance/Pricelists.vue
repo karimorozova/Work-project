@@ -145,12 +145,11 @@ export default {
                 this.alertToggle({message: "Error on saving pricelist.", isShow: true, type: "error"});
             }
         },
-        async addPriceCopy(index) {
-            console.log(this.pricelists[index]);
-            
+        async addPriceCopy(index) {            
             const name = this.setCopyPriceName(index);
             const pricelist = {
                 name,
+                copyName: this.pricelists[index].name,
                 isDefault: false,
                 isActive: false,
                 basicPricesTable: this.pricelists[index].basicPricesTable,

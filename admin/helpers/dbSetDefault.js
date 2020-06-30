@@ -589,10 +589,10 @@ async function checkCollections() {
   await requests();
   await projects();
   await users();
+  await fillCurrencyRatio();
   await fillPricelist();
   await fillClientsRates();
   await fillVendorsRates();
-  await fillCurrencyRatio();
 }
 
 module.exports = checkCollections();
