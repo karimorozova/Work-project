@@ -474,7 +474,7 @@ router.post('/units', async (req, res) => {
     }
     const { _id } = await Units.create(unit);
     await insertUnitIntoStep(unit, _id);
-    res.send('Created')
+    res.send(_id)
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on creating unit");

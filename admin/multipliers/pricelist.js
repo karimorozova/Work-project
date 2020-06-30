@@ -70,17 +70,21 @@ const groupPriceList = (arr) => {
 const addNewMultiplier = async (key, newMultiplierId) => {
   try {
     const pricelists = await Pricelist.find();
-    const currencyRatio = await CurrencyRatio.find()[0];
+    const currencyRatio = await CurrencyRatio.find();
     let newMultiplier;
     let newMultiplierCombinations = [];
     switch (key) {
       default:
       case 'Step':
         newMultiplier = await Step.findOne({ _id: newMultiplierId });
-        newMultiplierCombinations = await getMultiplierCombinations(newMultiplier, 'Step', currencyRatio);
+        newMultiplierCombinations = await getMultiplierCombinations(newMultiplier, 'Step', currencyRatio[0]);
         for (let { _id, stepMultipliersTable } of pricelists) {
           await Pricelist.updateOne({ _id }, { stepMultipliersTable: [...stepMultipliersTable, ...newMultiplierCombinations] })
         }
+        break;
+      case 'Unit':
+        newMultiplier = await Units.findOne({ _id: newMultiplierId });
+        newMultiplierCombinations = await getMultiplierCombinations(newMultiplier, 'Unit', currencyRatio[0]);
         break;
       case 'Industry':
         newMultiplier = await Industries.findOne({ _id: newMultiplierId });
@@ -128,6 +132,34 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
           })
         }
       }
+    }
+  }
+  if (key === 'Unit') {
+    const { _id, sizes, steps } = newMultiplier;
+    if (sizes.length) {
+      sizes.forEach(size => {
+        steps.forEach(step => {
+          combinations.push({
+            euroMinPrice: 1,
+            usdMinPrice: USD,
+            gbpMinPrice: GBP,
+            step: step._id,
+            unit: _id,
+            size,
+          })
+        })
+      })
+    } else {
+      steps.forEach(step => {
+        combinations.push({
+          euroMinPrice: 1,
+          usdMinPrice: USD,
+          gbpMinPrice: GBP,
+          step: step._id,
+          unit: _id,
+          size: 1
+        })
+      })
     }
   }
   return combinations
