@@ -18,15 +18,15 @@
         @closeErrors="closeErrors"
         @notApprove="setDefaults"
         @closeModal="setDefaults"
-        :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 10}]"
-        :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
+        :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
         bodyRowClass="settings-table-row"
         bodyCellClass="settings-table-cell"
         @bottomScrolled="bottomScrolled"
     )
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .price-title {{ field.label }}
-            
+
         template(slot="step" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.step.title }}
             .price__data(v-else)
@@ -35,7 +35,7 @@
         template(slot="unit" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.unit.type }}
             .price__data(v-else)
-                input.price__data-input(type="text" v-model="currentUnit" disabled) 
+                input.price__data-input(type="text" v-model="currentUnit" disabled)
 
         template(slot="size" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.size }}

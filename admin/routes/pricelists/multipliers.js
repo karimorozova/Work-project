@@ -7,7 +7,8 @@ const {
   updateIndustryMultipliers,
   updateBasicPrices,
   getPricelistCombinations,
-  addNewMultiplier
+  addNewMultiplier,
+  updateMultiplier
 } = require('../../multipliers');
 
 router.post('/step-multipliers/:id', async (req, res) => {
