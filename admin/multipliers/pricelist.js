@@ -44,10 +44,10 @@ const groupPriceList = (arr) => {
   // });
   // lodash.forEach(source, function(value, key) {
   //   source[key] = lodash.groupBy(source[key], function(item) {
-  //     return item.targetLanguage.lang;      
+  //     return item.targetLanguage.lang;
   //   });
   // });
-  
+
   // console.log(source['English'].Arabic);
   // // console.log(Object.keys(source));
   // console.log(Object.values(source));
@@ -90,6 +90,9 @@ const addNewMultiplier = async (key, newMultiplierId) => {
       case 'Unit':
         newMultiplier = await Units.findOne({ _id: newMultiplierId });
         newMultiplierCombinations = await getMultiplierCombinations(newMultiplier, 'Unit', currencyRatio[0]);
+        for (let { _id, stepMultipliersTable } of pricelists) {
+          await Pricelist.updateOne({ _id }, { stepMultipliersTable: [...stepMultipliersTable, ...newMultiplierCombinations] });
+        }
         break;
       case 'Industry':
         newMultiplier = await Industries.findOne({ _id: newMultiplierId });
