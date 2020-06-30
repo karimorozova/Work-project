@@ -178,7 +178,13 @@ export default {
         },
         async createNew(newData) {
             try {
-                await this.$http.post(`/industry/industry/new`, newData);
+               const result = await this.$http.post(`/industry/industry/new`, newData);
+                if(result.data !== 'Updated'){
+                    await this.$http.post('/pricelists/add-new-multiplier',{
+                        key: 'Industry',
+                        id: result.data,
+                    });
+                }
             } catch(err) {
                 this.alertToggle({message: "Erorr on saving Industry info", isShow: true, type: "error"});
             }

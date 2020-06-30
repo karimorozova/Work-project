@@ -11,11 +11,12 @@ router.post("/industry/:id", upload.fields([{ name: "icon" }, { name: "generic" 
   const genericFile = req.files["generic"];
   try {
     if(id === "new") {
-      await createNewIndustry({name, active: isActive, iconFile, genericFile});
+      const id = await createNewIndustry({name, active: isActive, iconFile, genericFile});
+      res.send(id)
     } else {
       await updateIndustry({id, name, active: isActive, iconFile, genericFile});
+      res.send('Updated');
     }
-    res.send('Saved');
   } catch(err) {
     console.log(err);
     res.status(500).send('Something wrong on Industry creating/updating');

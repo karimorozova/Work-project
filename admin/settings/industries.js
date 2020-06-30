@@ -6,7 +6,8 @@ async function createNewIndustry(obj) {
     try {
         const { icon, generic } = await getFilesInfo(obj);
         const { name, active } = obj;
-        await Industries.create({icon, name, generic, active});
+        const { id } = await Industries.create({icon, name, generic, active});
+        return id;
     } catch(err) {
         console.log(err);
         console.log("Error in createNewIndustry function");

@@ -285,7 +285,7 @@ router.post('/step', async (req, res) => {
       }
       const { _id } = await Step.create(step);
       await insertStepsIntoUnits(step, _id);
-      res.send('New step saved.');
+      res.send(_id);
     } catch(err) {
       console.log(err);
       res.status(500).send("Error on updating/creating a step")

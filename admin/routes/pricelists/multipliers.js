@@ -92,7 +92,7 @@ router.post('/pricelist/:id', async (req, res) => {
 })
 
 router.post('/add-new-multiplier', async (req, res) => {
-  const { key, id } = req.params;
+  const { key, id } = req.body;
   try {
     await addNewMultiplier(key, id);
     res.send('Saved');

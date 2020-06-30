@@ -1,5 +1,5 @@
 <template lang="pug">
-.units
+.units 
     .units__table
         SettingsTable(
             :fields="fields"
@@ -269,6 +269,12 @@ export default {
         });
         this.alertToggle({ message: "Saved", isShow: true, type: "success" });
         this.getUnits();
+        if(result.data !== 'Updated'){
+          await this.$http.post('/pricelists/add-new-multiplier', {
+            key: 'Unit',
+            id: result.data,
+          });
+        }
       } catch (error) {
         this.alertToggle({
           message: "Erorr on saving Unit info",
@@ -350,9 +356,9 @@ export default {
       return this.steps.map(item => item.title);
     },
     selectedServices() {
-      return this.currentServices.length
-        ? this.currentServices.map(item => item.title)
-        : [];
+        return this.currentServices.length
+          ? this.currentServices.map(item => item.title)
+          : [];
     }
   },
   components: {

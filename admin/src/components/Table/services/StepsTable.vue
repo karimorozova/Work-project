@@ -179,7 +179,13 @@ export default {
             try {
                 this.currentStep.symbol = this.currentStep.title.toLowerCase().trim().replace(/ /g,"_");
                 this.currentStep.calculationUnit = this.currentUnits;
-                await this.$http.post("/api/step", { step: this.currentStep });
+                const result = await this.$http.post("/api/step", { step: this.currentStep });
+                if(result.data !== "Updated"){
+                    await this.$http.post('/pricelists/add-new-multiplier', {
+                        key: 'Step',
+                        id: result.data,
+                    });
+                }
                 this.$emit("updateSteps");
                 this.alertToggle({message: "Information saved", isShow: true, type: "success"});
             } catch(err) {
@@ -199,7 +205,6 @@ export default {
         },
         selectedUnits() {
             return this.currentUnits.length
-            // ? this.currentUnits.filter(item => item.active).map(item => item.type)
             ? this.currentUnits.map(item => item.type)
             : [];
     }
