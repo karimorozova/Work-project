@@ -257,6 +257,7 @@ export default {
     async saveChanges(index) {
       this.errors = [];
       const id = this.units[index]._id;
+      let oldUnit = this.units[index];
       try {
         const result = await this.$http.post("/api/units", {
           unit: {
@@ -273,6 +274,11 @@ export default {
           await this.$http.post('/pricelists/add-new-multiplier', {
             key: 'Unit',
             id: result.data,
+          });
+        }else{
+          await this.$http.post('/pricelists/update-multiplier', {
+            key: 'Unit',
+            oldMultiplier: oldUnit,
           });
         }
       } catch (error) {

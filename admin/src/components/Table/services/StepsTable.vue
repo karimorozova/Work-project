@@ -177,16 +177,22 @@ export default {
         },
         async saveChanges(index) {
             try {
+                let oldStep = this.steps[index];
                 this.currentStep.symbol = this.currentStep.title.toLowerCase().trim().replace(/ /g,"_");
                 this.currentStep.calculationUnit = this.currentUnits;
                 const result = await this.$http.post("/api/step", { step: this.currentStep });
+                this.$emit("updateSteps");
                 if(result.data !== "Updated"){
                     await this.$http.post('/pricelists/add-new-multiplier', {
                         key: 'Step',
                         id: result.data,
                     });
+                }else{
+                    await this.$http.post('/pricelists/update-multiplier', {
+                        key: 'Step',
+                        oldMultiplier: oldStep,
+                    });
                 }
-                this.$emit("updateSteps");
                 this.alertToggle({message: "Information saved", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Error on savind step", isShow: true, type: "error"});

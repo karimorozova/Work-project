@@ -102,6 +102,17 @@ router.post('/add-new-multiplier', async (req, res) => {
   }
 })
 
+router.post('/update-multiplier', async (req, res) => {
+  const { oldMultiplier, key } = req.body;
+  try {
+    await updateMultiplier(key, oldMultiplier);
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on adding new multiplier');
+  }
+})
+
 router.post('/delete-sync', async (req, res) => {
   const { key , id } = req.body;
   console.log(key , id);
