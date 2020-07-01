@@ -31,46 +31,72 @@ const getPricelistCombinations = async (priceListId, filters) => {
     });
   });
 
-  // const groupedPriceLists = groupPriceList(priceListCombinations);
-  // console.log(groupedPriceLists);
+  const groupedPriceLists = groupPriceList(priceListCombinations);
+  return groupedPriceLists.splice(countFilter, 25)
 
-  return priceListCombinations.splice(countFilter, 25);
+  // return priceListCombinations.splice(countFilter, 25);
 };
 
 const groupPriceList = (arr) => {
 
-  // source = lodash.groupBy(arr, function(item) {
-  //   return item.sourceLanguage.lang;
-  // });
-  // lodash.forEach(source, function(value, key) {
-  //   source[key] = lodash.groupBy(source[key], function(item) {
-  //     return item.targetLanguage.lang;
-  //   });
-  // });
+  let result = [];
+  source = lodash.groupBy(arr, function(item) {
+    return item.sourceLanguage.lang;
+  });
 
-  // console.log(source['English'].Arabic);
-  // // console.log(Object.keys(source));
-  // console.log(Object.values(source));
+  lodash.forEach(source, function (value, target) {
+    source[target] = lodash.groupBy(source[target], function (item) {
+      return item.targetLanguage.lang;
+    });
+    lodash.forEach(source[target], function (value, step) {
+      source[target][step] = lodash.groupBy(source[target][step], function (item) {
+        return item.step.title;
+      });
+      lodash.forEach(source[target][step], function (value, unit) {
+        source[target][step][unit] = lodash.groupBy(source[target][step][unit], function (item) {
+          return item.unit.type;
+        });
+        for (const key in source[target][step][unit]) {
+          if (source[target][step][unit].hasOwnProperty(key)) {
+            const elements = source[target][step][unit][key];
+            let currentArray = [];
+            elements.reduce(function(previousValue, currentValue, index, array){
 
-  // arr.reduce((acc, curr) => {
-
-  // const pattern = {
-  //   sourceLanguage: acc.sourceLanguage.lang,
-  //   targetLanguage: acc.targetLanguage.lang,
-  //   step: acc.step.title,
-  //   unit: acc.unit.type,
-  //   // industry: 'All',
-  //   eurPrice: acc.eurPrice,
-  //   euroMinPrice: acc.euroMinPrice,
-  //   usdPrice: acc.usdPrice,
-  //   usdMinPrice: acc.usdMinPrice,
-  //   gbpPrice: acc.gbpPrice,
-  //   gbpMinPrice: acc.gbpMinPrice,
-  // };
-  // });
-
-  // return groupedCombos;
-};
+              if(previousValue.eurPrice !== currentValue.eurPrice){
+                if( !currentArray.find(
+                  item => item.sourceLanguage == currentValue.sourceLanguage &&
+                    item.targetLanguage == currentValue.targetLanguage &&
+                    item.step == currentValue.step &&
+                    item.unit == currentValue.unit &&
+                    item.industry == 'All'
+                  )){
+                    currentArray.push({
+                      sourceLanguage: currentValue.sourceLanguage,
+                      targetLanguage: currentValue.targetLanguage,
+                      step: currentValue.step,
+                      unit: currentValue.unit,
+                      industry: 'All',
+                      eurPrice: currentValue.eurPrice,
+                      euroMinPrice: currentValue.euroMinPrice,
+                      usdPrice: currentValue.usdPrice,
+                      usdMinPrice: currentValue.usdMinPrice,
+                      gbpPrice: currentValue.gbpPrice,
+                      gbpMinPrice: currentValue.gbpMinPrice,
+                  })
+                }
+              }else{
+                currentArray.push(currentValue)
+              }
+              return previousValue    
+            })
+            result.push(...currentArray)
+          }
+        }
+      })
+    })
+  })
+  return result ;
+}
 
 const addNewMultiplier = async (key, newMultiplierId) => {
   try {
