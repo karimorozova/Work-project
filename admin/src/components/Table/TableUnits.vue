@@ -1,5 +1,5 @@
 <template lang="pug">
-.units 
+.units
     .units__table
         SettingsTable(
             :fields="fields"
@@ -35,9 +35,9 @@
                         :isTableDropMenu="isTableDropMenu"
                         placeholder="Select"
                         :hasSearch="true"
-                        :options="serviceData" 
-                        :selectedOptions="selectedServices" 
-                        @chooseOptions="setServices"   
+                        :options="serviceData"
+                        :selectedOptions="selectedServices"
+                        @chooseOptions="setServices"
                     )
 
             template(slot="sizes" slot-scope="{ row, index }")
@@ -230,6 +230,7 @@ export default {
     async saveChangesConst(index) {
       this.errors = [];
       const id = this.units[index]._id;
+      let oldUnit = this.units[index];
       try {
         const result = await this.$http.post("/api/units", {
           unit: {
@@ -246,6 +247,17 @@ export default {
           type: "success"
         });
         this.getUnits();
+        if(result.data !== 'Updated'){
+          await this.$http.post('/pricelists/add-new-multiplier', {
+            key: 'Unit',
+            id: result.data,
+          });
+        }else{
+          await this.$http.post('/pricelists/update-multiplier', {
+            key: 'Unit',
+            oldMultiplier: oldUnit,
+          });
+        }
       } catch (error) {
         this.alertToggle({
           message: "Erorr on saving Unit Steps info",

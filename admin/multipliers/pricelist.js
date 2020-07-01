@@ -113,32 +113,51 @@ const addNewMultiplier = async (key, newMultiplierId) => {
 };
 
 const updateMultiplier = async (key, oldMultiplier) => {
-  console.log(key, oldMultiplier);
-  // switch (key) {
-  //   default:
-  //   case 'Step':
-  //     const oldStep = oldMultiplier;
-  //     const updatedStep = await Step.findOne({ _id: oldStep._id });
-  //     const { difference, itemsToReplace, itemsToDelete } = getDifference(oldStep.calculationUnit, updatedStep.calculationUnit);
-  //     await checkDifference(difference, itemsToReplace, itemsToDelete, oldStep);
-  //     break;
-  //   case 'Unit':
-  //     const oldUnit = oldMultiplier;
-  //     const updatedUnit = await Units.findOne({ _id: oldUnit._id });
-  //     const deletedSteps = arrayComparer(oldUnit.steps, updatedUnit.steps);
-  //     const addedSteps = arrayComparer(updatedUnit.steps, oldUnit.steps);
-  //     if (deletedSteps.length) {
-  //       for (let { _id } of deletedSteps) {
-  //         const neededStep = await Step.findOne({ _id });
-  //         const {}
-  //       }
-  //     }
-  // }
+  const pricelists = await Pricelist.find();
+  switch (key) {
+    default:
+    case 'Step':
+      const oldStep = oldMultiplier;
+      const updatedStep = await Step.findOne({ _id: oldStep._id });
+      const { difference, itemsToReplace, itemsToDelete } =
+        getDifference(oldStep.calculationUnit, updatedStep.calculationUnit);
+      await checkDifference(difference, itemsToReplace, itemsToDelete, oldStep);
+      break;
+    case 'Unit':
+      const oldUnit = oldMultiplier;
+      const updatedUnit = await Units.findOne({ _id: oldUnit._id });
+      const deletedSteps = arrayComparer(oldUnit.steps, updatedUnit.steps, 'title');
+      const addedSteps = arrayComparer(updatedUnit.steps, oldUnit.steps, 'title');
+      if (deletedSteps.length) {
+        for (let { _id: stepId } of deletedSteps) {
+            for (let { _id, stepMultipliersTable } of pricelists) {
+              stepMultipliersTable = stepMultipliersTable.filter(item => `${item.step} ${item.unit}` !== `${stepId} ${oldUnit._id}`);
+              await Pricelist.updateOne({ _id }, { stepMultipliersTable });
+            }
+        }
+      }
+      if (addedSteps.length) {
+        for (let { _id } of addedSteps) {
+          for (let oldStep of oldUnit.steps) {
+            const neededStep = await Step.findOne({ _id });
+            const { difference, itemsToReplace, itemsToDelete } =
+              getDifference(oldStep.calculationUnit, neededStep.calculationUnit);
+            // console.log('from added: ', difference);
+            // console.log('====================================');
+            // console.log(itemsToReplace);
+            // console.log('====================================');
+            // console.log(itemsToDelete);
+            // console.log('====================================');
+            // await checkDifference(difference, itemsToReplace, itemsToDelete, oldStep);
+          }
+        }
+      }
+  }
 };
 
 const getDifference = (oldCondition, newCondition) => {
-  let itemsToReplace = arrayComparer(newCondition, oldCondition);
-  let itemsToDelete = arrayComparer(oldCondition, newCondition);
+  let itemsToReplace = arrayComparer(newCondition, oldCondition, 'type');
+  let itemsToDelete = arrayComparer(oldCondition, newCondition, 'type');
   if (oldCondition.length > newCondition.length) {
     if (itemsToReplace.length) {
       return { difference: 'Deleted and replaced', itemsToReplace, itemsToDelete };
@@ -158,8 +177,8 @@ const getDifference = (oldCondition, newCondition) => {
   }
 };
 
-const arrayComparer = (oldCondition, newCondition) => oldCondition.filter(({ type: typeFromOld }) => (
-  !newCondition.some(({ type: typeFromChanged }) => typeFromOld === typeFromChanged))
+const arrayComparer = (oldCondition, newCondition, key) => oldCondition.filter(({ [key]: keyFromOld }) => (
+  !newCondition.some(({ [key]: keyFromChanged }) => keyFromOld === keyFromChanged))
 );
 
 const checkDifference = async (difference, itemsToReplace, itemsToDelete, oldStep) => {

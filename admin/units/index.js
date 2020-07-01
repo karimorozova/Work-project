@@ -7,10 +7,11 @@ async function insertUnitIntoStep(unit, unitId) {
       const step = await Step.findOne({ _id });
       step.calculationUnit.push({
         _id: unitId.toString(),
+        steps,
         type,
         active,
         editable: true,
-        // sizes,
+        sizes,
       })
       await Step.updateOne({ _id }, step, { upsert: true });
     }
@@ -57,10 +58,11 @@ async function changeUnitsInSteps(unitToUpdate) {
         if (!isExists) {
           step.calculationUnit.push({
             _id,
+            steps: unit.steps,
             type: unit.type,
             active: unit.active,
             editable: true,
-            // sizes: unit.sizes,
+            sizes: unit.sizes,
           })
         }
         await Step.updateOne({ _id: id }, step);
