@@ -113,25 +113,116 @@ const addNewMultiplier = async (key, newMultiplierId) => {
 };
 
 const updateMultiplier = async (key, oldMultiplier) => {
+  console.log(key, oldMultiplier);
+  // switch (key) {
+  //   default:
+  //   case 'Step':
+  //     const oldStep = oldMultiplier;
+  //     const updatedStep = await Step.findOne({ _id: oldStep._id });
+  //     const { difference, itemsToReplace, itemsToDelete } = getDifference(oldStep.calculationUnit, updatedStep.calculationUnit);
+  //     await checkDifference(difference, itemsToReplace, itemsToDelete, oldStep);
+  //     break;
+  //   case 'Unit':
+  //     const oldUnit = oldMultiplier;
+  //     const updatedUnit = await Units.findOne({ _id: oldUnit._id });
+  //     const deletedSteps = arrayComparer(oldUnit.steps, updatedUnit.steps);
+  //     const addedSteps = arrayComparer(updatedUnit.steps, oldUnit.steps);
+  //     if (deletedSteps.length) {
+  //       for (let { _id } of deletedSteps) {
+  //         const neededStep = await Step.findOne({ _id });
+  //         const {}
+  //       }
+  //     }
+  // }
+};
+
+const getDifference = (oldCondition, newCondition) => {
+  let itemsToReplace = arrayComparer(newCondition, oldCondition);
+  let itemsToDelete = arrayComparer(oldCondition, newCondition);
+  if (oldCondition.length > newCondition.length) {
+    if (itemsToReplace.length) {
+      return { difference: 'Deleted and replaced', itemsToReplace, itemsToDelete };
+    } else {
+      return { difference: 'Just deleted', itemsToDelete };
+    }
+  } else if (oldCondition.length === newCondition.length) {
+    if (itemsToReplace.length) {
+      return { difference: 'Just replaced', itemsToReplace, itemsToDelete };
+    }
+  } else if (newCondition.length > oldCondition.length) {
+    if (itemsToReplace.length && itemsToDelete.length === 0) {
+      return { difference: 'Just added', itemsToReplace };
+    } else {
+      return { difference: 'Added and replaced', itemsToReplace, itemsToDelete };
+    }
+  }
+};
+
+const arrayComparer = (oldCondition, newCondition) => oldCondition.filter(({ type: typeFromOld }) => (
+  !newCondition.some(({ type: typeFromChanged }) => typeFromOld === typeFromChanged))
+);
+
+const checkDifference = async (difference, itemsToReplace, itemsToDelete, oldStep) => {
   const pricelists = await Pricelist.find();
   const currencyRatio = await CurrencyRatio.find();
   const { USD, GBP } = currencyRatio[0];
-  let updatedStepMultipliersTable = [];
-  switch (key) {
+  switch (difference) {
     default:
-    case 'Step':
-      const updatedStep = await Step.findOne({ _id: oldMultiplier._id });
-      const { difference, differentItem } = checkDifference(oldMultiplier.calculationUnit, updatedStep.calculationUnit);
-      if (difference === 'Added') {
-        const newMultiplierCombinations = [];
-        const { sizes, _id: unitId } = differentItem;
+    case 'Deleted and replaced' || 'Just replaced' || 'Added and replaced':
+      for (let { _id, stepMultipliersTable } of pricelists) {
+        for (let itemToReplace of itemsToReplace) {
+          const { _id, sizes } = await Units.findOne({ _id: itemToReplace._id });
+          if (sizes.length) {
+            for (let i = 0; i < sizes.length; i += 1) {
+              itemToReplace = {
+                usdMinPrice: USD,
+                gbpMinPrice: GBP,
+                step: oldStep._id,
+                unit: _id,
+                size: sizes[i],
+              };
+              stepMultipliersTable.push(itemToReplace);
+            }
+          } else {
+            itemToReplace = {
+              usdMinPrice: USD,
+              gbpMinPrice: GBP,
+              step: oldStep._id,
+              unit: _id,
+              size: 1
+            };
+            stepMultipliersTable.push(itemToReplace);
+          }
+        }
+        for (let itemToDelete of itemsToDelete) {
+          stepMultipliersTable = stepMultipliersTable.filter(item => (
+            `${item.step} ${item.unit}` !== `${oldStep._id} ${itemToDelete._id}`
+          ));
+        }
+        await Pricelist.updateOne({ _id }, { stepMultipliersTable });
+      }
+      break;
+    case 'Just deleted':
+      for (let { _id, stepMultipliersTable } of pricelists) {
+        for (let itemToDelete of itemsToDelete) {
+          stepMultipliersTable = stepMultipliersTable.filter(item => (
+            `${item.step} ${item.unit}` !== `${oldStep._id} ${itemToDelete._id}`
+          ));
+        }
+        await Pricelist.updateOne({ _id }, { stepMultipliersTable });
+      }
+      break;
+    case 'Just added':
+      const newMultiplierCombinations = [];
+      for (let itemToReplace of itemsToReplace) {
+        const { sizes, _id: unitId } = itemToReplace;
         if (sizes.length) {
           sizes.forEach(size => {
             newMultiplierCombinations.push({
               euroMinPrice: 1,
               usdMinPrice: USD,
               gbpMinPrice: GBP,
-              step: oldMultiplier._id,
+              step: oldStep._id,
               unit: unitId,
               size,
             });
@@ -141,7 +232,7 @@ const updateMultiplier = async (key, oldMultiplier) => {
             euroMinPrice: 1,
             usdMinPrice: USD,
             gbpMinPrice: GBP,
-            step: oldMultiplier._id,
+            step: oldStep._id,
             unit: unitId,
             size: 1
           });
@@ -150,78 +241,9 @@ const updateMultiplier = async (key, oldMultiplier) => {
           await Pricelist.updateOne({ _id }, { stepMultipliersTable: [...stepMultipliersTable, ...newMultiplierCombinations] });
         }
       }
-       if (difference === 'Deleted') {
-        for (let { _id, stepMultipliersTable } of pricelists) {
-          for (let deletedItem of differentItem) {
-            stepMultipliersTable =  stepMultipliersTable.filter(item => `${item.step} ${item.unit}` !== `${item.step} ${deletedItem._id}`);
-          }
-          await Pricelist.updateOne({ _id }, { stepMultipliersTable });
-        }
-      }
-
-      if (difference === 'Changed') {
-        if (differentItem.deletedItems.length) {
-          for (let { _id, stepMultipliersTable } of pricelists) {
-            for (let item of stepMultipliersTable) {
-              for (let deletedItem of differentItem.deletedItems) {
-
-
-                // if (item.unit !== deletedItem._id && item.step === oldMultiplier) {
-                //   console.log(item);
-                //   console.log('--------------------------------------------');
-                //   updatedStepMultipliersTable.push(item);
-                // }
-
-              }
-              for (let changedItem of differentItem.newItems) {
-                if (changedItem.steps.length > 1) {
-                  for (let unit of changedItem.steps) {
-                    updatedStepMultipliersTable.push({
-                      euroMinPrice: 1,
-                      usdMinPrice: USD,
-                      gbpMinPrice: GBP,
-                      step: changedItem._id,
-                      unit: unit._id
-                    })
-                  }
-                } else {
-                  updatedStepMultipliersTable.push({
-                    euroMinPrice: 1,
-                    usdMinPrice: USD,
-                    gbpMinPrice: GBP,
-                    step: changedItem._id,
-                    unit: changedItem.steps[0]._id
-                  });
-                }
-              }
-            }
-            await Pricelist.updateOne({ _id }, { stepMultipliersTable: updatedStepMultipliersTable });
-          }
-        }
-      }
+      break;
   }
 };
-
-const checkDifference = (oldCondition, newCondition) => {
-  if (oldCondition.length === newCondition.length) {
-    const differentItem = arrayComparer(newCondition, oldCondition);
-    if (differentItem) {
-      const deletedItems = arrayComparer(oldCondition, newCondition);
-      return { difference: 'Changed', differentItem: { newItems: differentItem, deletedItems } };
-    } else {
-      return { difference: 'No differences' };
-    }
-  } else if (oldCondition.length < newCondition.length) {
-    return { difference: 'Added', differentItem: newCondition[newCondition.length - 1] };
-  } else if (oldCondition.length > newCondition.length) {
-    const differentItems = arrayComparer(oldCondition, newCondition);
-    return { difference: 'Deleted', differentItem: differentItems};
-  }
-};
-
-const arrayComparer = (oldCondition, newCondition) => oldCondition.filter(({ type: typeFromOld }) => (
-  !newCondition.some(({ type: typeFromChanged }) => typeFromOld === typeFromChanged))
-);
 
 
 const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
