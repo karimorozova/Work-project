@@ -500,7 +500,7 @@ async function fillUnits() {
 
 async function fillUnitSteps() {
   const units = await Units.find();
-  if (!units[0].steps.length) {
+  if (!units.length) {
     try {
       for (let unit of units) {
         const { type } = unit;

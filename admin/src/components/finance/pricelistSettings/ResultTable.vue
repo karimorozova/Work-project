@@ -32,7 +32,7 @@
         template(slot="step" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.step.title }}
         template(slot="unit" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.unit.type }}
+            .price__data(v-if="currentActive !== index") {{ row.unit.type }} / {{row.size}}
         template(slot="industry" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.industry }}
 
@@ -60,8 +60,8 @@
                 label(for="gbp") &pound;
         template(slot="minGbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
-                span(id="minGbp") {{row.gbpMinPrice}}
-                label(for="minGbp") &pound;         
+                span(id="minGbp") {{row.gbpMinPrice}} 
+                label(for="minGbp") &pound;    
     .price__empty(v-if="!dataArray.length") Nothing found...                                               
 </template>
 <script>
