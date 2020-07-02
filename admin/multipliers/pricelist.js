@@ -6,44 +6,45 @@ const getPercentage = (number, percentage) => (number / 100) * percentage;
 
 const getPricelistCombinations = async (priceListId, filters) => {
   const { countFilter, industryFilter } = filters;
+  const getAllIndustries = await Industries.find();
   const basicPricesTable = await getFilteredBasicPrices(filters, priceListId, false);
   const stepMultipliersTable = await getFilteredStepMultiplier(filters, priceListId, false);
   const { industryMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { industryMultipliersTable: 1 }).populate('industryMultipliersTable.industry');
   const industryMultipliers = industryFilter ? industryMultipliersTable.filter(({ industry }) => industry.name === industryFilter) : industryMultipliersTable;
   const priceListCombinations = [];
-  stepMultipliersTable.forEach(({ step, unit, multiplier: stepMultiplierValue, euroMinPrice, usdMinPrice, gbpMinPrice }) => {
-    basicPricesTable.forEach(({ sourceLanguage, targetLanguage, euroBasicPrice, usdBasicPrice, gbpBasicPrice }) => {
-      industryMultipliers.forEach(({ industry, multiplier: industryMultiplierValue }) => {
-        priceListCombinations.push({
-          sourceLanguage,
-          targetLanguage,
-          step,
-          unit,
-          industry: industry.name,
-          eurPrice: +(getPercentage(euroBasicPrice, stepMultiplierValue) + getPercentage(euroBasicPrice, industryMultiplierValue)).toFixed(2),
-          euroMinPrice,
-          usdPrice: +(getPercentage(usdBasicPrice, stepMultiplierValue) + getPercentage(usdBasicPrice, industryMultiplierValue)).toFixed(2),
-          usdMinPrice,
-          gbpPrice: +(getPercentage(gbpBasicPrice, stepMultiplierValue) + getPercentage(gbpBasicPrice, industryMultiplierValue)).toFixed(2),
-          gbpMinPrice
+  stepMultipliersTable.forEach(({ step, unit, size, multiplier: stepMultiplierValue, euroMinPrice, usdMinPrice, gbpMinPrice }) => {
+      basicPricesTable.forEach(({ sourceLanguage, targetLanguage, euroBasicPrice, usdBasicPrice, gbpBasicPrice }) => {
+        industryMultipliers.forEach(({ industry, multiplier: industryMultiplierValue }) => {
+          priceListCombinations.push({
+            sourceLanguage,
+            targetLanguage,
+            step,
+            unit,
+            size,
+            industry: industry.name,
+            eurPrice: +(getPercentage(euroBasicPrice, stepMultiplierValue) + getPercentage(euroBasicPrice, industryMultiplierValue)).toFixed(2),
+            euroMinPrice,
+            usdPrice: +(getPercentage(usdBasicPrice, stepMultiplierValue) + getPercentage(usdBasicPrice, industryMultiplierValue)).toFixed(2),
+            usdMinPrice,
+            gbpPrice: +(getPercentage(gbpBasicPrice, stepMultiplierValue) + getPercentage(gbpBasicPrice, industryMultiplierValue)).toFixed(2),
+            gbpMinPrice,
+            isGrouped: false,
+          });
         });
       });
-    });
   });
 
-  const groupedPriceLists = groupPriceList(priceListCombinations);
+  const groupedPriceLists = groupPriceList(priceListCombinations, getAllIndustries);
   return groupedPriceLists.splice(countFilter, 25)
 
   // return priceListCombinations.splice(countFilter, 25);
 };
 
-const groupPriceList = (arr) => {
-
+const groupPriceList = (arr, allIndustries) => {
   let result = [];
-  source = lodash.groupBy(arr, function(item) {
+  source = lodash.groupBy(arr, function (item) {
     return item.sourceLanguage.lang;
   });
-
   lodash.forEach(source, function (value, target) {
     source[target] = lodash.groupBy(source[target], function (item) {
       return item.targetLanguage.lang;
@@ -52,50 +53,157 @@ const groupPriceList = (arr) => {
       source[target][step] = lodash.groupBy(source[target][step], function (item) {
         return item.step.title;
       });
-      lodash.forEach(source[target][step], function (value, unit) {
-        source[target][step][unit] = lodash.groupBy(source[target][step][unit], function (item) {
-          return item.unit.type;
+      lodash.forEach(source[target][step], function (value, size) {
+        source[target][step][size] = lodash.groupBy(source[target][step][size], function (item) {
+          return item.size;
         });
-        for (const key in source[target][step][unit]) {
-          if (source[target][step][unit].hasOwnProperty(key)) {
-            const elements = source[target][step][unit][key];
-            let currentArray = [];
-            elements.reduce(function(previousValue, currentValue, index, array){
-
-              if(previousValue.eurPrice !== currentValue.eurPrice){
-                if( !currentArray.find(
-                  item => item.sourceLanguage == currentValue.sourceLanguage &&
-                    item.targetLanguage == currentValue.targetLanguage &&
-                    item.step == currentValue.step &&
-                    item.unit == currentValue.unit &&
-                    item.industry == 'All'
-                  )){
-                    currentArray.push({
-                      sourceLanguage: currentValue.sourceLanguage,
-                      targetLanguage: currentValue.targetLanguage,
-                      step: currentValue.step,
-                      unit: currentValue.unit,
-                      industry: 'All',
-                      eurPrice: currentValue.eurPrice,
-                      euroMinPrice: currentValue.euroMinPrice,
-                      usdPrice: currentValue.usdPrice,
-                      usdMinPrice: currentValue.usdMinPrice,
-                      gbpPrice: currentValue.gbpPrice,
-                      gbpMinPrice: currentValue.gbpMinPrice,
-                  })
+        lodash.forEach(source[target][step][size], function (value, unit) {
+          source[target][step][size][unit] = lodash.groupBy(source[target][step][size][unit], function (item) {
+            return item.unit.type;
+          });
+          for (const key in source[target][step][size][unit]) { 
+            if (source[target][step][size][unit].hasOwnProperty(key)) {
+              const elements = source[target][step][size][unit][key];
+              let currentArray = [];
+              
+              const counter = elements.reduce(function (acc, cur) {
+                if (!acc.hasOwnProperty(cur.eurPrice)) {
+                  acc[cur.eurPrice] = 0;
                 }
-              }else{
-                currentArray.push(currentValue)
+                acc[cur.eurPrice]++;                
+                return acc;
+              }, {});
+
+              let groupedResult = Object.keys(counter).map(function (elem) {
+                return {sum: counter[elem], eurPrice: elem};
+              });
+
+              groupedResult.forEach(element => {
+                let count = element.sum;
+                element = elements.find(item => item.eurPrice == element.eurPrice)
+                // element.forEach(key => {
+                //   key.count = count
+                // })
+                // currentArray.push(...element)
+
+                element.count = count;
+                currentArray.push(element)
+              })
+              let max = 0;
+              for (let i = 0; i < currentArray.length; i++) {
+                if(max < currentArray[i].count){
+                  max = currentArray[i].count;
+                }
               }
-              return previousValue    
-            })
-            result.push(...currentArray)
+              currentArray = currentArray.map(item => {
+                if(item.count == max){
+                  item.industry = 'All'
+                }
+                return item;
+              })
+
+              // currentArray.find(item => Math.max.apply(null,item.count) )
+
+              // var counter = elements.reduce(function (acc, cur) {
+              //   if (!acc.hasOwnProperty(cur.eurPrice)) {
+              //     acc[cur.eurPrice] = {
+              //       eurPrice: 0,
+              //     };
+              //   }
+              //   acc[cur.eurPrice].eurPrice ++
+              //   // acc[cur.eurPrice]++;                
+              //   return acc;
+              // }, {});
+
+              // for (let i = 0; i < elements.length; i++) {
+              //   const currentValue = elements[i]
+              //   const nextValue = elements[i + 1] == undefined ? elements[0] : elements[i + 1];
+              //   // const afterNextValue = elements[i + 2] == undefined ? elements[1] : elements[i + 2];
+
+              //   // console.log('-----------------------------------');
+              //   // console.log(currentValue.sourceLanguage.lang, '------', i);
+              //   // console.log('cur',currentValue.eurPrice, currentValue.industry, currentValue.step.title, currentValue.unit.type);
+              //   // console.log('next',nextValue.eurPrice, nextValue.industry, nextValue.step.title, nextValue.unit.type);
+              //   // console.log('afterNextValue',afterNextValue.eurPrice, afterNextValue.industry, afterNextValue.step.title, afterNextValue.unit.type);
+                
+
+              //   if (currentValue.eurPrice == nextValue.eurPrice) {
+              //     if (!currentArray.find(
+              //       item => item.sourceLanguage == currentValue.sourceLanguage &&
+              //         item.targetLanguage == currentValue.targetLanguage &&
+              //         item.step == currentValue.step &&
+              //         item.unit == currentValue.unit &&
+              //         item.isGrouped === true 
+              //     )) {
+              //       currentArray.push({
+              //         sourceLanguage: currentValue.sourceLanguage,
+              //         targetLanguage: currentValue.targetLanguage,
+              //         step: currentValue.step,
+              //         unit: currentValue.unit,
+              //         industry: 'All',
+              //         size: currentValue.size,
+              //         eurPrice: currentValue.eurPrice,
+              //         euroMinPrice: currentValue.euroMinPrice,
+              //         usdPrice: currentValue.usdPrice,
+              //         usdMinPrice: currentValue.usdMinPrice,
+              //         gbpPrice: currentValue.gbpPrice,
+              //         gbpMinPrice: currentValue.gbpMinPrice,
+              //         isGrouped: true,
+              //       })
+              //     }
+              //   } else {
+              //     const isLast = currentArray.find(item => item.isGrouped === true)
+              //     if (isLast) {
+              //       if (isLast.eurPrice !== currentValue.eurPrice) {
+              //         currentArray.push(currentValue)
+              //       }
+              //     }else{
+              //       currentArray.push(currentValue)
+              //     }
+              //   }
+              // }
+
+
+              let exceptionsCounter = 0;
+              let exceptions = [];
+              currentArray.forEach(element => {
+                element.industry !== 'All' && exceptions.push(element.industry)
+                element.industry !== 'All' && exceptionsCounter++
+              })              
+
+              currentArray.forEach((element) => {
+                let allExeptions = '';                
+                if(exceptions.length){
+                  for (const industry of exceptions) {
+                    allExeptions += ' ' + industry + ', ';
+                  }
+                }
+                if(element.industry == 'All'){
+                  element.industry = allExeptions.length ? `All, except: ${allExeptions}` : 'All';
+                }
+              });
+              
+
+              // let defaultCurrentArray = []
+              // if(Math.ceil(allIndustries.length / 2) < exceptionsCounter){
+              //   for (let i = 0; i < elements.length; i++) {
+              //     defaultCurrentArray.push(elements[i])
+              //   }
+              //   result.push(...defaultCurrentArray)
+              // }else{
+              //   result.push(...currentArray)
+              // }
+              // console.log(currentArray.length);
+              
+              result.push(...currentArray)
+
+            }
           }
-        }
+        })
       })
     })
   })
-  return result ;
+  return result;
 }
 
 const addNewMultiplier = async (key, newMultiplierId) => {
