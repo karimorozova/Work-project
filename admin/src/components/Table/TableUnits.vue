@@ -114,6 +114,7 @@ export default {
       currentServices: [],
       currentSizes: [],
       units: [],
+      oldUnits: [],
       currentUnit: "",
       areErrors: false,
       errors: [],
@@ -159,7 +160,7 @@ export default {
         this.steps = result.body;
       } catch (err) {
         this.alertToggle({
-          message: "Erorr on getting Services",
+          message: "Error on getting Services",
           isShow: true,
           type: "error"
         });
@@ -171,7 +172,7 @@ export default {
         this.units = result.body;
       } catch (err) {
         this.alertToggle({
-          message: "Erorr on getting Units",
+          message: "Error on getting Units",
           isShow: true,
           type: "error"
         });
@@ -230,7 +231,7 @@ export default {
     async saveChangesConst(index) {
       this.errors = [];
       const id = this.units[index]._id;
-      let oldUnit = this.units[index];
+      let oldUnit = this.oldUnits[index];
       try {
         const result = await this.$http.post("/api/units", {
           unit: {
@@ -260,7 +261,7 @@ export default {
         }
       } catch (error) {
         this.alertToggle({
-          message: "Erorr on saving Unit Steps info",
+          message: "Error on saving Unit Steps info",
           isShow: true,
           type: "error"
         });
@@ -269,7 +270,7 @@ export default {
     async saveChanges(index) {
       this.errors = [];
       const id = this.units[index]._id;
-      let oldUnit = this.units[index];
+      let oldUnit = this.oldUnits[index];
       try {
         const result = await this.$http.post("/api/units", {
           unit: {
@@ -295,7 +296,7 @@ export default {
         }
       } catch (error) {
         this.alertToggle({
-          message: "Erorr on saving Unit info",
+          message: "Error on saving Unit info",
           isShow: true,
           type: "error"
         });
@@ -349,7 +350,7 @@ export default {
         });
       } catch (err) {
         this.alertToggle({
-          message: "Erorr on removing Unit",
+          message: "Error on removing Unit",
           isShow: true,
           type: "error"
         });
@@ -384,6 +385,18 @@ export default {
     Add,
     SelectMulti,
     Chips
+  },
+  async created() {
+      try {
+        const result = await this.$http.get("/api/units");
+        this.oldUnits = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Units",
+          isShow: true,
+          type: "error"
+        });
+      }
   },
   mounted() {
     this.getUnits();
