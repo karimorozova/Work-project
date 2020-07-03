@@ -61,16 +61,16 @@ const groupPriceList = (arr, allIndustries) => {
           source[target][step][size][unit] = lodash.groupBy(source[target][step][size][unit], function (item) {
             return item.unit.type;
           });
-          for (const key in source[target][step][size][unit]) { 
+          for (const key in source[target][step][size][unit]) {
             if (source[target][step][size][unit].hasOwnProperty(key)) {
               const elements = source[target][step][size][unit][key];
               let currentArray = [];
-              
+
               const counter = elements.reduce(function (acc, cur) {
                 if (!acc.hasOwnProperty(cur.eurPrice)) {
                   acc[cur.eurPrice] = 0;
                 }
-                acc[cur.eurPrice]++;                
+                acc[cur.eurPrice]++;
                 return acc;
               }, {});
 
@@ -111,7 +111,7 @@ const groupPriceList = (arr, allIndustries) => {
               //     };
               //   }
               //   acc[cur.eurPrice].eurPrice ++
-              //   // acc[cur.eurPrice]++;                
+              //   // acc[cur.eurPrice]++;
               //   return acc;
               // }, {});
 
@@ -125,7 +125,7 @@ const groupPriceList = (arr, allIndustries) => {
               //   // console.log('cur',currentValue.eurPrice, currentValue.industry, currentValue.step.title, currentValue.unit.type);
               //   // console.log('next',nextValue.eurPrice, nextValue.industry, nextValue.step.title, nextValue.unit.type);
               //   // console.log('afterNextValue',afterNextValue.eurPrice, afterNextValue.industry, afterNextValue.step.title, afterNextValue.unit.type);
-                
+
 
               //   if (currentValue.eurPrice == nextValue.eurPrice) {
               //     if (!currentArray.find(
@@ -133,7 +133,7 @@ const groupPriceList = (arr, allIndustries) => {
               //         item.targetLanguage == currentValue.targetLanguage &&
               //         item.step == currentValue.step &&
               //         item.unit == currentValue.unit &&
-              //         item.isGrouped === true 
+              //         item.isGrouped === true
               //     )) {
               //       currentArray.push({
               //         sourceLanguage: currentValue.sourceLanguage,
@@ -169,10 +169,10 @@ const groupPriceList = (arr, allIndustries) => {
               currentArray.forEach(element => {
                 element.industry !== 'All' && exceptions.push(element.industry)
                 element.industry !== 'All' && exceptionsCounter++
-              })              
+              })
 
               currentArray.forEach((element) => {
-                let allExeptions = '';                
+                let allExeptions = '';
                 if(exceptions.length){
                   for (const industry of exceptions) {
                     allExeptions += ' ' + industry + ', ';
@@ -182,7 +182,7 @@ const groupPriceList = (arr, allIndustries) => {
                   element.industry = allExeptions.length ? `All, except: ${allExeptions}` : 'All';
                 }
               });
-              
+
 
               // let defaultCurrentArray = []
               // if(Math.ceil(allIndustries.length / 2) < exceptionsCounter){
@@ -194,7 +194,7 @@ const groupPriceList = (arr, allIndustries) => {
               //   result.push(...currentArray)
               // }
               // console.log(currentArray.length);
-              
+
               result.push(...currentArray)
 
             }
@@ -289,10 +289,10 @@ const addNewMultiplier = async (key, newMultiplierId) => {
 //   for (let { _id } of addedSteps) {
 //     for (let oldStep of oldUnit.steps) {
 //       const neededStep = await Step.findOne({ _id });
-//       const { difference, itemsToReplace, itemsToDelete } =
+//       const { stepDifference, itemsToReplace, itemsToDelete } =
 //         getDifference(oldStep.calculationUnit, neededStep.calculationUnit);
-//       console.log('difference: ', difference);
-//       // await checkDifference(difference, itemsToReplace, itemsToDelete, oldStep);
+//       console.log('stepDifference: ', stepDifference);
+//       // await checkDifference(stepDifference, itemsToReplace, itemsToDelete, oldStep);
 //     }
 //   }
 // }
@@ -305,24 +305,34 @@ const updateMultiplier = async (key, oldMultiplier) => {
     case 'Step':
       const oldStep = oldMultiplier;
       const updatedStep = await Step.findOne({ _id: oldStep._id });
-      const { difference, itemsToReplace, itemsToDelete } =
+      const { unitDifference, itemsToReplace, itemsToDelete } =
         getStepDifference(oldStep.calculationUnit, updatedStep.calculationUnit);
-      await checkStepDifference(difference, itemsToReplace, itemsToDelete, oldStep);
+      await checkStepDifference(unitDifference, itemsToReplace, itemsToDelete, oldStep);
       break;
     case 'Unit':
       const oldUnit = oldMultiplier;
       const updatedUnit = await Units.findOne({ _id: oldUnit._id });
-      const deletedSteps = arrayComparer(oldUnit.steps, updatedUnit.steps, 'title');
-      if (deletedSteps.length) {
-        for (let { _id, stepMultipliersTable } of pricelists) {
-          for (let { _id: stepId } of deletedSteps) {
-            stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit}` !== `${stepId} ${oldUnit._id}`)
-            );
-            await Pricelist.updateOne({ _id }, { stepMultipliersTable });
-          }
-        }
-      }
+      const { stepDifference, unitItemsToReplace, unitItemsToDelete } =
+        getUnitDifference(oldUnit.steps, updatedUnit.steps);
+      await checkUnitDifference(stepDifference, unitItemsToReplace, unitItemsToDelete, oldUnit);
+      //  { stepDifference, itemsToReplace, itemsToDelete } =
+      // getUnitDifference(oldUnit.steps, updatedUnit.steps);
+
+      // const deletedSteps = arrayComparer(oldUnit.steps, updatedUnit.steps, 'title');
+      // const addedSteps = arrayComparer(updatedUnit.steps, oldUnit.steps, 'title');
+      // if (deletedSteps.length) {
+      //   for (let { _id, stepMultipliersTable } of pricelists) {
+      //     for (let { _id: stepId } of deletedSteps) {
+      //       stepMultipliersTable = stepMultipliersTable.filter(item => (
+      //         `${item.step} ${item.unit}` !== `${stepId} ${oldUnit._id}`)
+      //       );
+      //       await Pricelist.updateOne({ _id }, { stepMultipliersTable });
+      //     }
+      //   }
+      // }
+      // if (addedSteps.length) {
+      //
+      // }
   }
 };
 
@@ -336,31 +346,46 @@ const updateMultiplier = async (key, oldMultiplier) => {
   добавили степы и сайзы - добавляем юниту нужные степы и создаем комбинации с сайзами
  */
 
-const getUnitDifference = (oldUnit, updatedUnit) => {
-  const addedSteps = arrayComparer(updatedUnit.steps, oldUnit.steps, 'title');
-  if (oldUnit.steps.length < updatedUnit.steps.length) {
-
+const getUnitDifference = (oldSteps, updatedSteps) => {
+  const itemsToReplace = arrayComparer(updatedSteps, oldSteps, 'title');
+  const itemsToDelete = arrayComparer(oldSteps, updatedSteps, 'title');
+  if (oldSteps.length > updatedSteps.length && itemsToReplace.length) {
+    if (itemsToReplace.length) {
+      return { stepDifference: 'Deleted and replaced', itemsToReplace, itemsToDelete };
+    } else {
+      return { stepDifference: 'Just deleted', itemsToDelete };
+    }
+  } else if (oldSteps.length === updatedSteps.length && itemsToReplace.length) {
+    return { stepDifference: 'Just replaced', itemsToReplace, itemsToDelete };
+  } else if (oldSteps.length > updatedSteps.length) {
+    if (itemsToReplace.length && itemsToDelete.length === 0) {
+      return { stepDifference: 'Just added', itemsToReplace };
+    } else {
+      return { stepDifference: 'Added and replaced', itemsToReplace, itemsToDelete };
+    }
   }
 }
 
-const getStepDifference = (oldStep, updatedStep) => {
-  let itemsToReplace = arrayComparer(updatedStep, oldStep, 'type');
-  let itemsToDelete = arrayComparer(oldStep, updatedStep, 'type');
-  if (oldStep.length > updatedStep.length) {
+const checkUnitDifference = async (unitDifference, unitItemsToReplace, unitItemsToDelete, oldUnit) => {}
+
+const getStepDifference = (oldUnits, updatedUnits) => {
+  let itemsToReplace = arrayComparer(updatedUnits, oldUnits, 'type');
+  let itemsToDelete = arrayComparer(oldUnits, updatedUnits, 'type');
+  if (oldUnits.length > updatedUnits.length) {
     if (itemsToReplace.length) {
-      return { difference: 'Deleted and replaced', itemsToReplace, itemsToDelete };
+      return { unitDifference: 'Deleted and replaced', itemsToReplace, itemsToDelete };
     } else {
-      return { difference: 'Just deleted', itemsToDelete };
+      return { unitDifference: 'Just deleted', itemsToDelete };
     }
-  } else if (oldStep.length === updatedStep.length) {
+  } else if (oldUnits.length === updatedUnits.length) {
     if (itemsToReplace.length) {
-      return { difference: 'Just replaced', itemsToReplace, itemsToDelete };
+      return { unitDifference: 'Just replaced', itemsToReplace, itemsToDelete };
     }
-  } else if (updatedStep.length > oldStep.length) {
+  } else if (updatedUnits.length > oldUnits.length) {
     if (itemsToReplace.length && itemsToDelete.length === 0) {
-      return { difference: 'Just added', itemsToReplace };
+      return { unitDifference: 'Just added', itemsToReplace };
     } else {
-      return { difference: 'Added and replaced', itemsToReplace, itemsToDelete };
+      return { unitDifference: 'Added and replaced', itemsToReplace, itemsToDelete };
     }
   }
 };
@@ -369,11 +394,11 @@ const arrayComparer = (oldCondition, newCondition, key) => oldCondition.filter((
   !newCondition.some(({ [key]: keyFromChanged }) => keyFromOld === keyFromChanged))
 );
 
-const checkStepDifference = async (difference, itemsToReplace, itemsToDelete, oldStep) => {
+const checkStepDifference = async (unitDifference, itemsToReplace, itemsToDelete, oldStep) => {
   const pricelists = await Pricelist.find();
   const currencyRatio = await CurrencyRatio.find();
   const { USD, GBP } = currencyRatio[0];
-  switch (difference) {
+  switch (unitDifference) {
     default:
     case 'Deleted and replaced' || 'Just replaced' || 'Added and replaced':
       for (let { _id, stepMultipliersTable } of pricelists) {
