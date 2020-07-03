@@ -37,7 +37,6 @@ const getPricelistCombinations = async (priceListId, filters) => {
   const groupedPriceLists = groupPriceList(priceListCombinations, getAllIndustries);
   return groupedPriceLists.splice(countFilter, 25)
 
-  // return priceListCombinations.splice(countFilter, 25);
 };
 
 const groupPriceList = (arr, allIndustries) => {
@@ -64,7 +63,10 @@ const groupPriceList = (arr, allIndustries) => {
           for (const key in source[target][step][size][unit]) { 
             if (source[target][step][size][unit].hasOwnProperty(key)) {
               const elements = source[target][step][size][unit][key];
+
               let currentArray = [];
+              let exceptionsCounter = 0;
+              let bigGroupCount = 0;
               
               const counter = elements.reduce(function (acc, cur) {
                 if (!acc.hasOwnProperty(cur.eurPrice)) {
@@ -78,7 +80,6 @@ const groupPriceList = (arr, allIndustries) => {
                 return {sum: counter[elem], eurPrice: elem};
               });
               
-              let bigGroupCount = 0;
               for (let i = 0; i < groupedResult.length; i++) {
                 if(bigGroupCount < groupedResult[i].sum){
                   bigGroupCount = groupedResult[i].sum;
@@ -97,7 +98,6 @@ const groupPriceList = (arr, allIndustries) => {
                 let anotherAmmount = groupedResult.filter(item => item.sum !== bigGroupCount).map(item => item.eurPrice)
 
                 anotherAmmount.forEach(element => {
-                  
                   let childElements = elements.filter(item => item.eurPrice == element)
                   for (let i = 0; i < childElements.length; i++) {
                     childElements[i].count = 0;
@@ -112,13 +112,12 @@ const groupPriceList = (arr, allIndustries) => {
                   return item;
                 })
                 
-                let exceptionsCounter = 0;
                 let exceptions = [];
                 currentArray.forEach(element => {
                   element.industry !== 'All' && exceptions.push(element.industry)
                   element.industry !== 'All' && exceptionsCounter++
-                })              
-  
+                })
+                
                 currentArray.forEach((element) => {
                   let allExeptions = '';                
                   if(exceptions.length){
