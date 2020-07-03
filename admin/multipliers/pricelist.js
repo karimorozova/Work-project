@@ -41,6 +41,8 @@ const getPricelistCombinations = async (priceListId, filters) => {
 
 const groupPriceList = (arr, allIndustries) => {
   let result = [];
+  const defaultElements = [];
+
   source = lodash.groupBy(arr, function (item) {
     return item.sourceLanguage.lang;
   });
@@ -60,14 +62,14 @@ const groupPriceList = (arr, allIndustries) => {
           source[target][step][size][unit] = lodash.groupBy(source[target][step][size][unit], function (item) {
             return item.unit.type;
           });
-          for (const key in source[target][step][size][unit]) {
+          for (const key in source[target][step][size][unit]) { 
             if (source[target][step][size][unit].hasOwnProperty(key)) {
               const elements = source[target][step][size][unit][key];
-
-              let currentArray = [];
               let exceptionsCounter = 0;
+              let currentArray = [];
               let bigGroupCount = 0;
-
+              let exceptions = [];
+              
               const counter = elements.reduce(function (acc, cur) {
                 if (!acc.hasOwnProperty(cur.eurPrice)) {
                   acc[cur.eurPrice] = 0;
@@ -79,7 +81,7 @@ const groupPriceList = (arr, allIndustries) => {
               let groupedResult = Object.keys(counter).map(function (elem) {
                 return {sum: counter[elem], eurPrice: elem};
               });
-
+              
               for (let i = 0; i < groupedResult.length; i++) {
                 if(bigGroupCount < groupedResult[i].sum){
                   bigGroupCount = groupedResult[i].sum;
@@ -89,10 +91,10 @@ const groupPriceList = (arr, allIndustries) => {
               let ifDoubleBiggest = groupedResult.filter(item => item.sum == bigGroupCount);
 
               if(ifDoubleBiggest.length > 1){
-                currentArray.push(...elements)
+                currentArray.push(elements)
               }else{
                 let findBigGroupData = elements.find(item => item.eurPrice == groupedResult.find(i => i.sum == bigGroupCount).eurPrice)
-                findBigGroupData.count = groupedResult.find(item => item.sum == bigGroupCount).sum
+                findBigGroupData.count = groupedResult.find(item => item.sum == bigGroupCount).sum                
                 currentArray.push(findBigGroupData)
 
                 let anotherAmmount = groupedResult.filter(item => item.sum !== bigGroupCount).map(item => item.eurPrice)
@@ -105,30 +107,42 @@ const groupPriceList = (arr, allIndustries) => {
                   }
                 })
 
-                currentArray = currentArray.map(item => {
-                  if(item.count == bigGroupCount){
-                    item.industry = 'All'
-                  }
-                  return item;
-                })
+                let countElentsInGroup;
+                let allCountElements = allIndustries.filter(item => item.active).length
 
-                let exceptions = [];
-                currentArray.forEach(element => {
-                  element.industry !== 'All' && exceptions.push(element.industry)
-                  element.industry !== 'All' && exceptionsCounter++
-                })
-
-                currentArray.forEach((element) => {
-                  let allExeptions = '';
-                  if(exceptions.length){
-                    for (const industry of exceptions) {
-                      allExeptions += ' ' + industry + ', ';
-                    }
-                  }
-                  if(element.industry == 'All'){
-                    element.industry = allExeptions.length ? `All, except: ${allExeptions}` : 'All';
+                currentArray.filter(item => {
+                  if (item.count == bigGroupCount) {
+                    countElentsInGroup = item.count
                   }
                 });
+
+                if(allCountElements * 0.65 > countElentsInGroup){
+                  currentArray.push(...elements)
+                }else{
+                  currentArray = currentArray.map(item => {
+                    if(item.count == bigGroupCount){
+                      item.industry = 'All'
+                    }
+                    return item;
+                  })
+  
+                  currentArray.forEach(element => {
+                    element.industry !== 'All' && exceptions.push(element.industry)
+                    element.industry !== 'All' && exceptionsCounter++
+                  })
+                  
+                  currentArray.forEach((element) => {
+                    let allExeptions = '';                
+                    if(exceptions.length){
+                      for (const industry of exceptions) {
+                        allExeptions += ' ' + industry + ', ';
+                      }
+                    }
+                    if(element.industry == 'All'){
+                      element.industry = allExeptions.length ? `All, except: ${allExeptions}` : 'All';
+                    }
+                  });
+                }
               }
 
               result.push(...currentArray)
