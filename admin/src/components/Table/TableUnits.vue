@@ -258,6 +258,7 @@ export default {
             key: 'Unit',
             oldMultiplier: oldUnit,
           });
+          this.getOldData();
         }
       } catch (error) {
         this.alertToggle({
@@ -293,6 +294,7 @@ export default {
             key: 'Unit',
             oldMultiplier: oldUnit,
           });
+          this.getOldData();
         }
       } catch (error) {
         this.alertToggle({
@@ -358,6 +360,18 @@ export default {
       this.cancel();
       this.getUnits();
     },
+    async getOldData() {
+      try {
+        const result = await this.$http.get("/api/units");
+        this.oldUnits = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on getting Units",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     isUnique(index) {
       const duplicateIndex = this.units.findIndex((item, ind) => {
         if (
@@ -387,16 +401,7 @@ export default {
     Chips
   },
   async created() {
-      try {
-        const result = await this.$http.get("/api/units");
-        this.oldUnits = result.body;
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on getting Units",
-          isShow: true,
-          type: "error"
-        });
-      }
+    await this.getOldData()
   },
   mounted() {
     this.getUnits();
