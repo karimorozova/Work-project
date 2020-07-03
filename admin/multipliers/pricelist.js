@@ -49,7 +49,6 @@ const multiplyPrices = (basicPrice, firstPercentMultiplier, secondPercentMultipl
     return +(getPercentage(basicPrice, firstPercentMultiplier) + getPercentage(basicPrice, secondPercentMultiplier)).toFixed(2);
   }
 };
-
 const groupPriceList = (arr, allIndustries) => {
   let result = [];
   const defaultElements = [];
@@ -90,11 +89,11 @@ const groupPriceList = (arr, allIndustries) => {
               }, {});
 
               let groupedResult = Object.keys(counter).map(function (elem) {
-                return { sum: counter[elem], eurPrice: elem };
+                return {sum: counter[elem], eurPrice: elem};
               });
               
               for (let i = 0; i < groupedResult.length; i++) {
-                if (bigGroupCount < groupedResult[i].sum) {
+                if(bigGroupCount < groupedResult[i].sum){
                   bigGroupCount = groupedResult[i].sum;
                 }
               }
@@ -107,22 +106,16 @@ const groupPriceList = (arr, allIndustries) => {
                 let findBigGroupData = elements.find(item => item.eurPrice == groupedResult.find(i => i.sum == bigGroupCount).eurPrice)
                 findBigGroupData.count = groupedResult.find(item => item.sum == bigGroupCount).sum                
                 currentArray.push(findBigGroupData)
-              if (ifDoubleBiggest.length > 1) {
-                currentArray.push(...elements);
-              } else {
-                let findBigGroupData = elements.find(item => item.eurPrice == groupedResult.find(i => i.sum == bigGroupCount).eurPrice);
-                findBigGroupData.count = groupedResult.find(item => item.sum == bigGroupCount).sum;
-                currentArray.push(findBigGroupData);
 
-                let anotherAmmount = groupedResult.filter(item => item.sum !== bigGroupCount).map(item => item.eurPrice);
+                let anotherAmmount = groupedResult.filter(item => item.sum !== bigGroupCount).map(item => item.eurPrice)
 
                 anotherAmmount.forEach(element => {
-                  let childElements = elements.filter(item => item.eurPrice == element);
+                  let childElements = elements.filter(item => item.eurPrice == element)
                   for (let i = 0; i < childElements.length; i++) {
                     childElements[i].count = 0;
-                    currentArray.push(childElements[i]);
+                    currentArray.push(childElements[i])
                   }
-                });
+                })
 
                 let countElentsInGroup;
                 let allCountElements = allIndustries.filter(item => item.active).length
@@ -130,12 +123,7 @@ const groupPriceList = (arr, allIndustries) => {
                 currentArray.filter(item => {
                   if (item.count == bigGroupCount) {
                     countElentsInGroup = item.count
-                currentArray = currentArray.map(item => {
-                  if (item.count == bigGroupCount) {
-                    item.industry = 'All';
                   }
-                });
-                  return item;
                 });
 
                 if(allCountElements * 0.65 > countElentsInGroup){
@@ -144,17 +132,6 @@ const groupPriceList = (arr, allIndustries) => {
                   currentArray = currentArray.map(item => {
                     if(item.count == bigGroupCount){
                       item.industry = 'All'
-                let exceptions = [];
-                currentArray.forEach(element => {
-                  element.industry !== 'All' && exceptions.push(element.industry);
-                  element.industry !== 'All' && exceptionsCounter++;
-                });
-
-                currentArray.forEach((element) => {
-                  let allExeptions = '';
-                  if (exceptions.length) {
-                    for (const industry of exceptions) {
-                      allExeptions += ' ' + industry + ', ';
                     }
                     return item;
                   })
@@ -176,22 +153,16 @@ const groupPriceList = (arr, allIndustries) => {
                     }
                   });
                 }
-                  }
-                  if (element.industry == 'All') {
-                    element.industry = allExeptions.length ? `All, except: ${allExeptions}` : 'All';
-                  }
-                });
               }
-
-              result.push(...currentArray);
+              result.push(...currentArray)
             }
           }
-        });
-      });
-    });
-  });
+        })
+      })
+    })
+  })
   return result;
-};
+}
 
 const addNewMultiplier = async (key, newMultiplierId) => {
   try {
