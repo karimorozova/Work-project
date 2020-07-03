@@ -280,7 +280,7 @@ export default {
   }
   &__data,
   &__editing-data {
-    height: 32px;
+    min-height: 32px;
     padding: 0 5px;
     display: flex;
     align-items: center;
