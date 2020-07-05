@@ -160,12 +160,12 @@ export default {
                 if(!id) {
                     await this.createNew(newData);
                 } else {
-                    await this.updateIndustry(id, newData);
+                    await this.updateIndustry(id, newData, index);
                 }
                 await this.getIndustries();
                 this.alertToggle({message: "Saved", isShow: true, type: "success"});
             } catch(err) {
-                this.alertToggle({message: "Erorr on saving Industry info", isShow: true, type: "error"});
+                this.alertToggle({message: "Error on saving Industry info", isShow: true, type: "error"});
             }
         },
         collectData(index) {
@@ -186,14 +186,20 @@ export default {
                     });
                 }
             } catch(err) {
-                this.alertToggle({message: "Erorr on saving Industry info", isShow: true, type: "error"});
+                this.alertToggle({message: "Error on saving Industry info", isShow: true, type: "error"});
             }
         },
-        async updateIndustry(id, newData) {
+        async updateIndustry(id, newData, index) {
+            const oldIndustry = this.industries[index];
+            oldIndustry.active = !oldIndustry.active;
             try {
                 await this.$http.post(`/industry/industry/${id}`, newData)
+                await this.$http.post('/pricelists/update-multiplier', {
+                  key: 'Industry',
+                  oldMultiplier: oldIndustry
+                })
             } catch(err) {
-                this.alertToggle({message: "Erorr on saving Industry info", isShow: true, type: "error"});
+                this.alertToggle({message: "Error on saving Industry info", isShow: true, type: "error"});
             }
         },
         async deleteIndustry() {
@@ -205,10 +211,10 @@ export default {
                 this.industries.splice(index, 1);
                 this.alertToggle({message: "Industry removed", isShow: true, type: "success"});
             } catch(err) {
-                this.alertToggle({message: "Erorr on removing Industry", isShow: true, type: "error"});
+                this.alertToggle({message: "Error on removing Industry", isShow: true, type: "error"});
             }
             this.cancel();
-        }, 
+        },
         cancel() {
             this.currentActive = -1;
             this.imageData = "";
@@ -233,7 +239,7 @@ export default {
                 const allIndustries = await this.$http.get("/api/industries");
                 this.industries = allIndustries.body;
             } catch(err) {
-                this.alertToggle({message: "Erorr on getting Industries", isShow: true, type: "error"});    
+                this.alertToggle({message: "Error on getting Industries", isShow: true, type: "error"});
             }
         },
         activeClasses(index) {

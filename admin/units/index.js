@@ -1,4 +1,4 @@
-const { Units, Step } = require('../models');
+const { Units, Step, Pricelist } = require('../models');
 
 async function insertUnitIntoStep(unit, unitId) {
   const { type, active, steps, sizes } = unit;
@@ -24,10 +24,15 @@ async function insertUnitIntoStep(unit, unitId) {
 async function deleteUnitFromStep(unitId) {
   try {
     const steps = await Step.find();
+    const pricelists = await Pricelist.find();
     for (let step of steps) {
       const { calculationUnit } = step;
       step.calculationUnit = calculationUnit.filter(unit => unit._id.toString() !== unitId);
       await Step.updateOne({ _id: step._id }, step, { upsert: true });
+      for (let { _id, stepMultipliersTable } of pricelists) {
+        stepMultipliersTable = stepMultipliersTable.filter(item => item.unit.toString() !== unitId);
+        await Pricelist.updateOne({ _id }, { stepMultipliersTable });
+      }
     }
   } catch (err) {
     console.log(err);
