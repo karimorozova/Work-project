@@ -37,8 +37,6 @@ schedule.scheduleJob('30 23 * * *', async function() {
     }
 })
 
-fillClientRates();
-
 const allowedOrigins = [
   "https://admin.pangea.global",
   "https://vendor.pangea.global",

@@ -8,6 +8,9 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  nativeLanguage: {
+    type: Schema.Types.ObjectID, ref: 'Language'
+  },
   website: {
     type: String,
     default: '',
@@ -28,6 +31,19 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  timeZone: {
+    type: Schema.Types.ObjectID, ref: 'Timezones'
+  },
+  documents: [{
+    fileName: {
+      type: String,
+      trim: true,
+    },
+    category: {
+      type: String,
+      trim: true,
+    }
+  }],
   accountManager: {
     type: Object,
     default: {}
@@ -41,6 +57,16 @@ const ClientSchema = new mongoose.Schema({
     default: {}
   },
   leadSource: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  leadGeneration: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  salesStage: {
     type: String,
     default: '',
     trim: true
@@ -65,19 +91,56 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
-  vat: {
-    type: String,
-    default: '',
-    trim: true
-  },
-  address: {
-    type: String,
-    default: '',
-    trim: true
-  },
   isTest: {
     type: Boolean,
     default: false
+  },
+  billingInfo: {
+    officialCompanyName: {
+      type: String,
+      trim: true
+    },
+    contactName: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      trim: true
+    },
+    vat: {
+      type: Boolean,
+      default: false
+    },
+    dueDate: {
+      type: String,
+      trim: true
+    },
+    address: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    invoiceSending: {
+      type: Boolean,
+      default: false,
+    },
+    paymentType: {
+      type: String,
+      trim: true,
+    },
+    startingBalance: {
+      type: Number,
+      default: 0
+    },
+    balance: {
+      type: Number,
+      default: 0
+    },
+    minimumBalance: {
+      type: Number,
+      default: 0
+    }
   },
   languagePairs: [{
     source: {
@@ -223,6 +286,28 @@ const ClientSchema = new mongoose.Schema({
       repeat85: { text: "85-94%", rate: 0.7 },
       repeat95: { text: "95-99%", rate: 0.4 },
       noMatch: { text: "No match", rate: 1 }
+    }
+  },
+  otherInfo: {
+    firstContactDate: {
+      type: String,
+      trim: true
+    },
+    firstQuoteDate: {
+      type: String,
+      trim: true
+    },
+    lastQuoteDate: {
+      type: String,
+      trim: true
+    },
+    firstProjectDate: {
+      type: String,
+      trim: true
+    },
+    lastProjectDate: {
+      type: String,
+      trim: true
     }
   }
 }, { minimize: false });

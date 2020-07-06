@@ -2,7 +2,17 @@ const router = require('express').Router();
 const { upload, clientMail } = require('../utils');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
-const { getClient, getClients, updateClientRates, getClientAfterUpdate, importRates, updateClientInfo, getClientAfterCombinationsUpdated} = require('../clients');
+const {
+  getClient,
+  getClients,
+  updateClientRates,
+  getClientAfterUpdate,
+  importRates,
+  updateClientInfo,
+  getClientAfterCombinationsUpdated,
+  updateClientService,
+  deleteClientService
+} = require('../clients');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -44,7 +54,7 @@ router.post('/remove-rate', async (req, res) => {
     const { clientId, rateId, prop } = req.body;
     try {
         const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
-            $pull: {[prop]: {'_id': rateId}}    
+            $pull: {[prop]: {'_id': rateId}}
         })
         res.send(updatedClient);
     } catch(err) {
@@ -57,7 +67,7 @@ router.post('/remove-rates', async (req, res) => {
     const { clientId, checkedIds, prop } = req.body;
     try {
         const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
-            $pull: {[prop]: {'_id': {$in: checkedIds}}}    
+            $pull: {[prop]: {'_id': {$in: checkedIds}}}
         })
         res.send(updatedClient);
     } catch(err) {
@@ -178,7 +188,7 @@ router.get('/any-doc', async (req, res) => {
 })
 
 router.post('/update-client-status', async (req, res) => {
-    const { id, isTest } = req.body    
+    const { id, isTest } = req.body
     try {
        await Clients.updateOne({"_id": id}, {"isTest": isTest});
        const client = await getClient({"_id": id})
@@ -187,6 +197,28 @@ router.post('/update-client-status', async (req, res) => {
         console.log(err);
         res.status(500).send("Error on updating Client status");
     }
+})
+
+router.post('/services', async (req, res) => {
+  const { clientId, currentData } = req.body;
+  try {
+    await updateClientService(clientId, currentData);
+    res.send('Updated');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on saving Client services');
+  }
+})
+
+router.delete('/services', async (req, res) => {
+  const { clientId, serviceId } = req.body;
+  try {
+    await deleteClientService(clientId, serviceId);
+    res.send('Deleted');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on deleting Client services');
+  }
 })
 
 module.exports = router;
