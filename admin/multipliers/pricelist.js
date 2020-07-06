@@ -2,7 +2,7 @@ const { Pricelist, Step, Units, Vendors, Languages, Industries, CurrencyRatio } 
 const { getFilteredBasicPrices } = require('./basicPrice');
 const { getFilteredStepMultiplier } = require('./stepMultipiers');
 const lodash = require('lodash');
-const getPercentage = (number, percentage) => (number / 100) * percentage;
+const getPercentage = (number, percentage) => number * ( percentage / 100 );
 
 const getPricelistCombinations = async (priceListId, filters) => {
   const { countFilter, industryFilter } = filters;
@@ -39,19 +39,14 @@ const getPricelistCombinations = async (priceListId, filters) => {
 
   const groupedPriceLists = groupPriceList(priceListCombinations, getAllIndustries);
   return groupedPriceLists.splice(countFilter, 25);
-
 };
 
-const multiplyPrices = (basicPrice, firstPercentMultiplier, secondPercentMultiplier) => {
-  if (firstPercentMultiplier === 100 && secondPercentMultiplier === 100) {
-    return basicPrice;
-  } else {
-    return +(getPercentage(basicPrice, firstPercentMultiplier) * getPercentage(basicPrice, secondPercentMultiplier)).toFixed(3);
-  }
-};
+const multiplyPrices = (basicPrice, firstPercentMultiplier, secondPercentMultiplier) => (
+   +(getPercentage(basicPrice, firstPercentMultiplier) * (secondPercentMultiplier / 100)).toFixed(2)
+);
+
 const groupPriceList = (arr, allIndustries) => {
   let result = [];
-  const defaultElements = [];
 
   source = lodash.groupBy(arr, function (item) {
     return item.sourceLanguage.lang;
