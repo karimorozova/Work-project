@@ -252,7 +252,7 @@ export default {
               sourceLanguage: this.currentSourceLangObj,
               targetLanguage: this.currentTargetLangObj,
               usdBasicPrice: this.currentBasicPriceUSD,
-              euroBasicPrice: parseFloat(this.currentBasicPriceEUR).toFixed(2),
+              euroBasicPrice: parseFloat(this.currentBasicPriceEUR).toFixed(3),
               gbpBasicPrice: this.currentBasicPriceGBP
             }
           }
@@ -305,10 +305,10 @@ export default {
     currentRatio() {
       this.currentBasicPriceUSD = (
         this.currentBasicPriceEUR * this.currency.USD
-      ).toFixed(2);
+      ).toFixed(3);
       this.currentBasicPriceGBP = (
         this.currentBasicPriceEUR * this.currency.GBP
-      ).toFixed(2);
+      ).toFixed(3);
     },
     manageIcons() {
       const { delete: del, ...result } = this.icons;

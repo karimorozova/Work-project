@@ -46,7 +46,7 @@ const multiplyPrices = (basicPrice, firstPercentMultiplier, secondPercentMultipl
   if (firstPercentMultiplier === 100 && secondPercentMultiplier === 100) {
     return basicPrice;
   } else {
-    return +(getPercentage(basicPrice, firstPercentMultiplier) + getPercentage(basicPrice, secondPercentMultiplier)).toFixed(2);
+    return +(getPercentage(basicPrice, firstPercentMultiplier) * getPercentage(basicPrice, secondPercentMultiplier)).toFixed(3);
   }
 };
 const groupPriceList = (arr, allIndustries) => {
