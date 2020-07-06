@@ -136,6 +136,66 @@ const ClientSchema = new mongoose.Schema({
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
+  services: [{
+    sourceLanguage: {
+      type: Schema.Types.ObjectId, ref: 'Language',
+    },
+    targetLanguage: {
+      type: Schema.Types.ObjectId, ref: 'Language',
+    },
+    service: {
+      type: Schema.Types.ObjectId, ref: 'Services',
+    },
+    industry: {
+      type: Schema.Types.ObjectId, ref: 'Industries',
+    }
+  }],
+  rates: {
+    basicPricesTable: [{
+      type: {
+        type: String,
+        trim: true
+      },
+      sourceLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      targetLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      basicPrice: {
+        type: Number,
+        default: 1,
+      }
+    }],
+    stepMultipliersTable: [{
+      step: {
+        type: Schema.Types.ObjectId, ref: 'Step',
+      },
+      unit: {
+        type: Schema.Types.ObjectId, ref: 'Units',
+      },
+      size: {
+        type: Number,
+      },
+      multiplier: {
+        type: Number,
+        default: 100,
+      },
+      minPrice: {
+        type: Number,
+        default: 1,
+      }
+    }],
+    industryMultipliersTable: [{
+      industry: {
+        type: Schema.Types.ObjectId, ref: 'Industries',
+      },
+      multiplier: {
+        type: Number,
+        default: 100,
+      }
+    }],
+  },
   contacts: [{
     country: "",
     timezone: "",
