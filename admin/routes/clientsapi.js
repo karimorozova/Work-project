@@ -210,8 +210,8 @@ router.post('/services', async (req, res) => {
   }
 })
 
-router.delete('/services', async (req, res) => {
-  const { clientId, serviceId } = req.body;
+router.delete('/services/:clientId/:serviceId', async (req, res) => {
+  const { clientId, serviceId } = req.params;
   try {
     await deleteClientService(clientId, serviceId);
     res.send('Deleted');

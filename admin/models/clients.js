@@ -225,7 +225,7 @@ const ClientSchema = new mongoose.Schema({
       targetLanguage: {
         type: Schema.Types.ObjectId, ref: 'Language',
       },
-      basicPrice: {
+      euroBasicPrice: {
         type: Number,
         default: 1,
       }
@@ -244,7 +244,7 @@ const ClientSchema = new mongoose.Schema({
         type: Number,
         default: 100,
       },
-      minPrice: {
+      euroMinPrice: {
         type: Number,
         default: 1,
       }

@@ -48,7 +48,7 @@ const fillClientRates = async () => {
       type: 'Duo',
       sourceLanguage,
       targetLanguage,
-      basicPrice: 1
+      euroBasicPrice: 1
     };
     await Clients.updateOne({ _id },
       {

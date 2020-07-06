@@ -1,6 +1,6 @@
 <template lang="pug">
 .validation(:class="{'validation_absolute': isAbsolute}")
-    .validation__errors(:style="customStyles")
+    div(:class='errorsClass' :style="customStyles")
         .validation__messages
             .validation__errors-title Errors:
             li.validation__error(v-for="error in errors") {{ error }}
@@ -19,6 +19,10 @@ export default {
         isAbsolute: {
             type: Boolean,
             default: false
+        },
+        errorsClass: {
+            type: String,
+            default: 'validation__errors'
         }
     },
     methods: {
@@ -68,7 +72,17 @@ export default {
         cursor: pointer;
     }
 }
-
+.validation__errors-client-services{
+    position: relative;
+    margin-top: 15px;
+    border-radius: 15px;
+    width: 320px;
+    padding: 20px;
+    border: 1px solid #bfb09d;
+    background-color: #fff;
+    box-sizing: border-box;
+    z-index: 50;
+}
 .validation_absolute {
     .validation__errors {
         position: absolute;

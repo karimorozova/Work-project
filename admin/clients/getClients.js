@@ -11,7 +11,11 @@ async function getClient(obj) {
             .populate("hoursRates.target")
             .populate("hoursRates.industries")
             .populate("monoRates.target")
-            .populate("monoRates.industries");
+            .populate("monoRates.industries")
+            .populate('services.sourceLanguage')
+            .populate('services.targetLanguage')
+            .populate('services.industry')
+            .populate('services.service');
     return client;
 }
 
