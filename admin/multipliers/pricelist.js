@@ -199,6 +199,8 @@ const addNewMultiplier = async (key, newMultiplierId) => {
   }
 };
 
+//TODO: Add sizes replacement if they are not empty,
+// if you add size for existing combination, you should replace them with actual size, and delete the default ones
 const updateMultiplier = async (key, oldMultiplier) => {
   switch (key) {
     default:

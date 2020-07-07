@@ -1,33 +1,33 @@
 <template lang="pug">
 .services
 
-    .services__titles(v-if="clientServices.length")
-        .services__title Source Lang
-        .services__title Target Lang
-        .services__title Services
-        .services__title Industry
-    .services__titles(v-else)
-      | No services...
-      
-    .services__rows(v-for="(clientService,index) in clientServices" :key="clientService.id")
+  .services__titles(v-if="clientServices.length")
+    .services__title Source Lang
+    .services__title Target Lang
+    .services__title Services
+    .services__title Industry
+  .services__titles(v-else)
+    | No services...
+
+  .services__rows(v-for="(clientService,index) in clientServices" :key="clientService.id")
+    .services__drop-item(@click="setChoosenIndex(index)")
+      SelectSingle(
+        placeholder="Select"
+        :hasSearch="true"
+        :selectedOption="clientServices[index].sourceLanguage.lang"
+        :options="langData"
+        @chooseOption="setSource"
+        @scrollDrop="scrollDrop"
+      )
         .services__drop-item(@click="setChoosenIndex(index)")
-            SelectSingle(
-                placeholder="Select"
-                :hasSearch="true"
-                :selectedOption="clientServices[index].sourceLanguage.lang"
-                :options="langData"
-                @chooseOption="setSource"
-                @scrollDrop="scrollDrop"
-            )
-        .services__drop-item(@click="setChoosenIndex(index)")
-            SelectSingle(
-                placeholder="Select"
-                :hasSearch="true"
-                :selectedOption="clientServices[index].targetLanguage.lang"
-                :options="langData"
-                @chooseOption="setTarget"
-                @scrollDrop="scrollDrop"
-            )
+          SelectSingle(
+            placeholder="Select"
+            :hasSearch="true"
+            :selectedOption="clientServices[index].targetLanguage.lang"
+            :options="langData"
+            @chooseOption="setTarget"
+            @scrollDrop="scrollDrop"
+          )
         .services__drop-item(@click="setChoosenIndex(index)")
             SelectSingle(
                 placeholder="Select"
@@ -243,17 +243,17 @@ export default {
   },
   computed: {
     industryData() {
-      if(this.clientServices){
+      if (this.clientServices) {
         return this.industries.map(item => item.name);
       }
     },
     langData() {
-      if(this.clientServices){
+      if (this.clientServices) {
         return this.languages.map(item => item.lang);
       }
     },
     servicesData() {
-      if(this.clientServices){
+      if (this.clientServices) {
         return this.services.map(item => item.title);
       }
     }

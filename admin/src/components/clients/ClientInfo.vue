@@ -34,14 +34,17 @@
         .lang-table(v-if="currentClient._id")
           LangTable(
             :tableData="currentClient.rates.basicPricesTable"
+            :clientId="currentClient._id"
           )
         .industry-table(v-if="currentClient._id")
           IndustryTable(
             :tableData="currentClient.rates.industryMultipliersTable"
+            :clientId="currentClient._id"
           )
       .step-table(v-if="currentClient._id")
         StepTable(
           :tableData="currentClient.rates.stepMultipliersTable"
+          :clientId="currentClient._id"
         )
       .result-table(v-if="currentClient._id")
         ResultTable(

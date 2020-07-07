@@ -44,6 +44,9 @@ export default {
   props: {
     tableData: {
       type: Array
+    },
+    clientId: {
+      type: String
     }
   },
   data() {
@@ -92,7 +95,6 @@ export default {
       alertToggle: "alertToggle"
     }),
     async getIndustries() {
-      
       this.dataArray = this.tableData;
     },
     async makeAction(index, key) {
@@ -115,7 +117,7 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentIndustryObj = this.dataArray[index].industry
+      this.currentIndustryObj = this.dataArray[index].industry;
       this.currentIndustry = this.dataArray[index].industry.name;
       this.currentMultiplier = this.dataArray[index].multiplier;
     },
@@ -138,27 +140,31 @@ export default {
       }
       await this.manageSaveClick(index);
     },
-    refreshResultTable(){
-      this.$emit('refreshResultTable')
+    refreshResultTable() {
+      this.$emit("refreshResultTable");
     },
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       try {
         const id = this.dataArray[index]._id;
-        const result = await this.$http.post("/pricelists/industry-multipliers/" + this.priceId, {
-          industryMultiplier: {
-            _id: id,
-            industry: this.currentIndustryObj,
-            multiplier: parseFloat(this.currentMultiplier).toFixed(0)
+        const result = await this.$http.post(
+          "/clientsapi/rates/" + this.clientId,
+          {
+            itemIdentifier: "Industry Multipliers Table",
+            updatedItem: {
+              _id: id,
+              industry: this.currentIndustryObj,
+              multiplier: parseFloat(this.currentMultiplier).toFixed(0)
+            }
           }
-        });
+        );
         this.alertToggle({
           message: "Saved successfully",
           isShow: true,
           type: "success"
         });
         this.setDefaults();
-        this.dataArray[index] = result.data
+        this.dataArray[index] = result.data;
         this.refreshResultTable();
       } catch (err) {
         this.alertToggle({

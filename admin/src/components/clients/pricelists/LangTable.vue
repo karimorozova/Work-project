@@ -49,6 +49,9 @@ export default {
   props: {
     tableData: {
       type: Array
+    },
+    clientId: {
+      type: String
     }
   },
   data() {
@@ -156,9 +159,10 @@ export default {
       const id = this.dataArray[index]._id;
       try {
         const result = await this.$http.post(
-          "/pricelists/basic-prices-update/" + this.priceId,
+          "/clientsapi/rates/" + this.clientId,
           {
-            basicPrice: {
+            itemIdentifier: "Basic Price Table",
+            updatedItem: {
               _id: id,
               type: this.dataArray[index].type,
               sourceLanguage: this.currentSourceLangObj,
@@ -167,17 +171,22 @@ export default {
             }
           }
         );
+        // this.manageCancelEdition();
+        const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
+        console.log(updatedData);
+        console.log(index);
+        
         this.alertToggle({
           message: "Saved successfully",
           isShow: true,
           type: "success"
         });
         this.setDefaults();
-        this.dataArray[index] = result.data;
-        this.refreshResultTable();
+        // this.dataArray[index] = result.data;
+        // this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
-          message: "Error on saving Steps",
+          message: "Error on saving Languages pricelist",
           isShow: true,
           type: "error"
         });

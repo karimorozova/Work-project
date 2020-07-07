@@ -39,44 +39,6 @@ router.get('/clients-every', async (req, res) => {
   }
 });
 
-// router.post('/rates', async (req, res) => {
-//     const { clientId, ...rateInfo } = req.body;
-//     try {
-//         const client = await getClient({"_id": clientId});
-//         const updatedClient = await updateClientRates(client, rateInfo);
-//         res.send(updatedClient);
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).send("Error on updating rates of Client");
-//     }
-// })
-
-// router.post('/remove-rate', async (req, res) => {
-//     const { clientId, rateId, prop } = req.body;
-//     try {
-//         const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
-//             $pull: {[prop]: {'_id': rateId}}
-//         })
-//         res.send(updatedClient);
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).send("Error on deleting rate of Client");
-//     }
-// })
-//
-// router.post('/remove-rates', async (req, res) => {
-//     const { clientId, checkedIds, prop } = req.body;
-//     try {
-//         const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
-//             $pull: {[prop]: {'_id': {$in: checkedIds}}}
-//         })
-//         res.send(updatedClient);
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).send("Error on deleting rate of Client");
-//     }
-// })
-
 router.post('/combination', async (req, res) => {
   const { step, rate } = req.body;
   try {
@@ -212,9 +174,10 @@ router.get('/rates/:id', async (req, res) => {
 });
 
 router.post('/rates/:id', async (req, res) => {
-  const { _id: clientId, updatedRate } = req.body;
-  try {
-    await updateClientRates(clientId, updatedRate);
+  const { id: clientId } = req.params;
+  const { itemIdentifier, updatedItem } = req.body;
+  try { 
+    await updateClientRates(clientId, itemIdentifier, updatedItem);
     res.send('Updated');
   } catch (err) {
     console.log(err);
