@@ -171,18 +171,14 @@ export default {
             }
           }
         );
-        // this.manageCancelEdition();
-        const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
-        console.log(updatedData);
-        console.log(index);
-        
         this.alertToggle({
           message: "Saved successfully",
           isShow: true,
           type: "success"
         });
+        const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
+        this.dataArray[index] = updatedData.body.basicPricesTable[index];
         this.setDefaults();
-        // this.dataArray[index] = result.data;
         // this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
@@ -195,14 +191,6 @@ export default {
     closeErrors() {
       this.areErrors = false;
     }
-  },
-  watch: {
-    // async isRefresh() {
-    //   if (this.isRefresh) {
-    //     await this.getCurrency();
-    //     this.getLangs(this.allFilters);
-    //   }
-    // }
   },
   computed: {
     manageIcons() {

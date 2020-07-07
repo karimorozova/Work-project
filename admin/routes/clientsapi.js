@@ -163,7 +163,7 @@ router.post('/update-client-status', async (req, res) => {
 })
 
 router.get('/rates/:id', async (req, res) => {
-  const { _id: clientId } = req.body;
+  const { id: clientId } = req.params;
   try {
     const { rates } = await Clients.findOne({ _id: clientId });
     res.send(rates);

@@ -19,54 +19,54 @@
         @chooseOption="setSource"
         @scrollDrop="scrollDrop"
       )
-        .services__drop-item(@click="setChoosenIndex(index)")
-          SelectSingle(
+    .services__drop-item(@click="setChoosenIndex(index)")
+      SelectSingle(
+        placeholder="Select"
+        :hasSearch="true"
+        :selectedOption="clientServices[index].targetLanguage.lang"
+        :options="langData"
+        @chooseOption="setTarget"
+        @scrollDrop="scrollDrop"
+      )
+    .services__drop-item(@click="setChoosenIndex(index)")
+        SelectSingle(
             placeholder="Select"
             :hasSearch="true"
-            :selectedOption="clientServices[index].targetLanguage.lang"
-            :options="langData"
-            @chooseOption="setTarget"
+            :selectedOption="clientServices[index].service.title"
+            :options="servicesData"
+            @chooseOption="setService"
             @scrollDrop="scrollDrop"
-          )
-        .services__drop-item(@click="setChoosenIndex(index)")
-            SelectSingle(
-                placeholder="Select"
-                :hasSearch="true"
-                :selectedOption="clientServices[index].service.title"
-                :options="servicesData"
-                @chooseOption="setService"
-                @scrollDrop="scrollDrop"
-            )
-        .services__drop-item(@click="setChoosenIndex(index)")
-            SelectSingle(
-                placeholder="Select"
-                :hasSearch="true"
-                :selectedOption="clientServices[index].industry.name"
-                :options="industryData"
-                @chooseOption="setIndustry"
-                @scrollDrop="scrollDrop"
-            )
-        .services__delete(v-if="allFieldsFilled(index)")
-            i.fa.fa-times(aria-hidden='true' @click="isDeleted = true; deleteIndex = index")
-
-    .services__delete-approve(v-if="isDeleted" v-click-outside="closeModal")
-        ApproveModal(
-            text="Are you sure?"
-            approveValue="Yes"
-            notApproveValue="Cancel"
-            @approve="approveAction"
-            @notApprove="closeModal"
-            @close="closeModal"
         )
+    .services__drop-item(@click="setChoosenIndex(index)")
+        SelectSingle(
+            placeholder="Select"
+            :hasSearch="true"
+            :selectedOption="clientServices[index].industry.name"
+            :options="industryData"
+            @chooseOption="setIndustry"
+            @scrollDrop="scrollDrop"
+        )
+    .services__delete(v-if="allFieldsFilled(index)")
+        i.fa.fa-times(aria-hidden='true' @click="isDeleted = true; deleteIndex = index")
 
-    .services__add
-        Add(@add="addData")
+  .services__delete-approve(v-if="isDeleted" v-click-outside="closeModal")
+      ApproveModal(
+          text="Are you sure?"
+          approveValue="Yes"
+          notApproveValue="Cancel"
+          @approve="approveAction"
+          @notApprove="closeModal"
+          @close="closeModal"
+      )
 
-    ValidationErrors(v-if="areErrors"
-        :errors="errors"
-        :errorsClass="'validation__errors-client-services'"
-        @closeErrors="closeErrorsBlock"
-    )
+  .services__add
+      Add(@add="addData")
+
+  ValidationErrors(v-if="areErrors"
+      :errors="errors"
+      :errorsClass="'validation__errors-client-services'"
+      @closeErrors="closeErrorsBlock"
+  )
 
 </template>
 

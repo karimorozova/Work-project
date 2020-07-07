@@ -52,9 +52,9 @@
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
-  import DataTable from "../../DataTable";
-  import crudIcons from "@/mixins/crudIcons";
-  import { mapGetters, mapActions } from "vuex";
+import DataTable from "../../DataTable";
+import crudIcons from "@/mixins/crudIcons";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   mixins: [crudIcons],
@@ -203,112 +203,115 @@ export default {
               euroMinPrice: parseFloat(this.currentMinPriceEUR).toFixed(3)
             }
           }
-          );
-          this.alertToggle({
-            message: "Saved successfully",
-            isShow: true,
-            type: "success"
-          });
-          this.setDefaults();
-          this.dataArray[index] = result.data;
-          this.refreshResultTable();
-        } catch (err) {
-          this.alertToggle({
-            message: "Error on saving Steps",
-            isShow: true,
-            type: "error"
-          });
-        }
-      },
-      closeErrors() {
-        this.areErrors = false;
-      },
-      async setFilter({ option, prop }) {
-        this[prop] = option;
-        await this.getSteps(this.allFilters);
+        );
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        });
+        const updatedData = await this.$http.get(
+          "/clientsapi/rates/" + this.clientId
+        );
+        this.dataArray[index] = updatedData.body.stepMultipliersTable[index];
+        this.setDefaults();
+        // this.refreshResultTable();
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on saving Steps",
+          isShow: true,
+          type: "error"
+        });
       }
     },
-    watch: {
-      // async isRefresh() {
-      //   if (this.isRefresh) {
-      //     await this.getCurrency();
-      //     this.getSteps(this.allFilters);
-      //   }
-      // }
+    closeErrors() {
+      this.areErrors = false;
     },
-    computed: {
-      manageIcons() {
-        const { delete: del, ...result } = this.icons;
-        return result;
-      },
-    },
-    components: {
-      DataTable
+    async setFilter({ option, prop }) {
+      this[prop] = option;
+      await this.getSteps(this.allFilters);
     }
-  };
+  },
+  watch: {
+    // async isRefresh() {
+    //   if (this.isRefresh) {
+    //     await this.getCurrency();
+    //     this.getSteps(this.allFilters);
+    //   }
+    // }
+  },
+  computed: {
+    manageIcons() {
+      const { delete: del, ...result } = this.icons;
+      return result;
+    }
+  },
+  components: {
+    DataTable
+  }
+};
 </script>
 <style lang="scss" scoped>
-  @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
+@import "../../../assets/scss/colors.scss";
+@import "../../../assets/styles/settingsTable";
 
-  .price {
-    @extend %setting-table;
-    background-color: #fff;
-    padding: 0 20px;
-    box-shadow: none;
+.price {
+  @extend %setting-table;
+  background-color: #fff;
+  padding: 0 20px;
+  box-shadow: none;
 
-    input[disabled] {
-      background: white;
-    }
+  input[disabled] {
+    background: white;
+  }
 
-    input {
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-    }
-
-    label {
-      margin-left: 3px;
-    }
-
-    &__data,
-    &__editing-data {
-      height: 32px;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-    }
-
-    &__editing-data {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
-    &__data-input {
-      box-sizing: border-box;
-      width: 100%;
-      border: none;
-      outline: none;
-      color: $main-color;
-    }
-
-    &__icons {
-      padding-top: 3px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    &__icon {
-      cursor: pointer;
-      opacity: 0.5;
-      margin-right: 8px;
-    }
-
-    &_opacity {
-      opacity: 1;
+  input {
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
   }
+
+  label {
+    margin-left: 3px;
+  }
+
+  &__data,
+  &__editing-data {
+    height: 32px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  &__editing-data {
+    box-shadow: inset 0 0 7px $brown-shadow;
+  }
+
+  &__data-input {
+    box-sizing: border-box;
+    width: 100%;
+    border: none;
+    outline: none;
+    color: $main-color;
+  }
+
+  &__icons {
+    padding-top: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    cursor: pointer;
+    opacity: 0.5;
+    margin-right: 8px;
+  }
+
+  &_opacity {
+    opacity: 1;
+  }
+}
 </style>

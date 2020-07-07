@@ -32,4 +32,49 @@ const replaceOldItem = (arr, replacementItem) => {
 
 const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id.toString() === searchItemId);
 
-module.exports = { updateClientRates };
+
+//TODO: Add source-language existence check
+const addNewRateComponents = async (clientId, newObj) => {
+  const { sourceLanguage, targetLanguage, service, industry } = newObj;
+  const client = await Clients.findOne({ _id: clientId });
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  basicPricesTable.push({
+    type: 'Duo',
+    sourceLanguage: sourceLanguage._id,
+    targetLanguage: targetLanguage._id
+  });
+  stepMultipliersTable.push(...getStepMultipliersCombinations(service));
+  industryMultipliersTable.push({
+    industry: industry._id
+  });
+};
+
+//TODO: Add clients currencies for combinations
+const getStepMultipliersCombinations = (step) => {
+  const { calculationUnit } = step;
+  if (!calculationUnit.length) {
+    return [];
+  } else {
+    const stepUnitSizeCombinations = [];
+    for (let { _id, sizes } of calculationUnit) {
+      if (sizes.length) {
+        sizes.forEach(size => {
+          stepUnitSizeCombinations.push({
+            step: step._id,
+            unit: _id,
+            size
+          });
+        });
+      } else {
+        stepUnitSizeCombinations.push({
+          step: step._id,
+          unit: _id,
+          size: 1
+        });
+      }
+    }
+    return stepUnitSizeCombinations;
+  }
+};
+
+module.exports = { updateClientRates, addNewRateComponents };
