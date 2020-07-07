@@ -145,17 +145,17 @@
         this.getPricelist(this.allFilters);
       },
       async bottomScrolled() {
-        // if (this.isDataRemain) {
-        //   const result = await this.$http.post(
-        //     "/pricelists/pricelist/" + this.priceId,
-        //     {
-        //       ...this.allFilters,
-        //       countFilter: this.dataArray.length
-        //     }
-        //   );
-        //   this.dataArray.push(...result.data);
-        //   this.isDataRemain = result.body.length === 25;
-        // }
+        if (this.isDataRemain) {
+          const result = await this.$http.post(
+            "/clientsapi/rates/rate-combinations/" + this.clientId,
+            {
+              ...this.allFilters,
+              countFilter: this.dataArray.length
+            }
+          );
+          this.dataArray.push(...result.data);
+          this.isDataRemain = result.body.length === 25;
+        }
       },
       async getPricelist(filters, count = 0) {
         try {
@@ -177,11 +177,11 @@
       }
     },
     watch: {
-      // async isRefreshResultTable() {
-      //   if (this.isRefreshResultTable) {
-      //     this.getPricelist(this.allFilters);
-      //   }
-      // }
+      async isRefreshResultTable() {
+        if (this.isRefreshResultTable) {
+          this.getPricelist(this.allFilters);
+        }
+      }
     },
     created() {
       this.getPricelist(this.allFilters);

@@ -179,7 +179,7 @@ export default {
         const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
         this.dataArray[index] = updatedData.body.basicPricesTable[index];
         this.setDefaults();
-        // this.refreshResultTable();
+        this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
           message: "Error on saving Languages pricelist",

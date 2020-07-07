@@ -35,16 +35,19 @@
           LangTable(
             :tableData="currentClient.rates.basicPricesTable"
             :clientId="currentClient._id"
+            @refreshResultTable="refreshResultTable"
           )
         .industry-table(v-if="currentClient._id")
           IndustryTable(
             :tableData="currentClient.rates.industryMultipliersTable"
             :clientId="currentClient._id"
+            @refreshResultTable="refreshResultTable"
           )
       .step-table(v-if="currentClient._id")
         StepTable(
           :tableData="currentClient.rates.stepMultipliersTable"
           :clientId="currentClient._id"
+            @refreshResultTable="refreshResultTable"
         )
       .result-table(v-if="currentClient._id")
         ResultTable(
@@ -123,10 +126,17 @@ export default {
       errors: [],
       billErrors: [],
       isLeadEmpty: "",
-      isSaveClicked: false
+      isSaveClicked: false,
+      isRefreshResultTable: false,
     };
   },
   methods: {
+    refreshResultTable() {
+      this.isRefreshResultTable = true;
+      setTimeout(() => {
+        this.isRefreshResultTable = false;
+      }, 2000);
+    },
     loadFile({ files, prop }) {
       this.$emit("loadFile", { files, prop });
     },

@@ -214,7 +214,7 @@ export default {
         );
         this.dataArray[index] = updatedData.body.stepMultipliersTable[index];
         this.setDefaults();
-        // this.refreshResultTable();
+        this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
           message: "Error on saving Steps",

@@ -168,7 +168,7 @@ export default {
         );
         this.dataArray[index] = updatedData.body.industryMultipliersTable[index];
         this.setDefaults();
-        // this.refreshResultTable();
+        this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Industry",
