@@ -8,89 +8,117 @@
         .button
             Button(value="Delete" @clicked="deleteClient")
     .title General Information
-    .client-info__gen-info
-        General(
-            :isSaveClicked="isSaveClicked"
-            @loadFile="loadFile")
-    .title Contact Details
-    .client-info__contacts-info
-        ContactsInfo(
-            :client="currentClient"
-            @contactDetails="contactDetails" 
-            @saveContactUpdates="saveContactUpdates"
-            @setLeadContact="setLeadContact"
-            @newContact="addNewContact"
-            @approveDelete="approveContactDelete")
-    .title(v-if="currentClient._id") Services
-    .client-info__services
-        ClientServices(
-            :languages="languages"
-            :industries="industries"
-            :services="services"
-        )
-
-
-    //- .title(v-if="currentClient._id") Rates    
-    //- .client-info__rates(v-if="currentClient._id")
-    //-     ClientRates(:client="currentClient"
-    //-         @setMatrixData="setMatrixData")
-    .title Sales Information
-    .client-info__sales
-        ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
-    .title Billing Informations
-    .client-info__billing
-        ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
-    .delete-approve(v-if="isApproveModal")
-        p Are you sure you want to delete?
-        input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-        input.button(type="button" value="Delete" @click="approveClientDelete")
-    ValidationErrors(v-if="areErrorsExist"
-        :errors="errors"
-        @closeErrors="closeErrorsBlock"
+  .client-info__gen-info
+    General(
+      :isSaveClicked="isSaveClicked"
+      @loadFile="loadFile")
+  .title Contact Details
+  .client-info__contacts-info
+    ContactsInfo(
+      :client="currentClient"
+      @contactDetails="contactDetails"
+      @saveContactUpdates="saveContactUpdates"
+      @setLeadContact="setLeadContact"
+      @newContact="addNewContact"
+      @approveDelete="approveContactDelete")
+.title(v-if="currentClient._id") Services
+.client-info__services
+  ClientServices(
+    :languages="languages"
+    :industries="industries"
+    :services="services"
+  )
+.title(v-if="currentClient._id") Rates
+.client-info__rates
+  .client-info__tables-row
+    .lang-table(v-if="currentClient._id")
+      LangTable(
+        :tableData="currentClient.rates.basicPricesTable"
+      )
+    .industry-table(v-if="currentClient._id")
+      IndustryTable(
+        :tableData="currentClient.rates.industryMultipliersTable"
+      )
+  .step-table(v-if="currentClient._id")
+    StepTable(
+      :tableData="currentClient.rates.stepMultipliersTable"
     )
+  .result-table(v-if="currentClient._id")
+    ResultTable(
+      :clientId="currentClient._id"
+      :languages="languages.map(i => i.lang)"
+      :steps="steps.map(i => i.title)"
+      :units="units.map(i => i.type)"
+      :industries="industries.map(i => i.name)"
+      :isRefreshResultTable="isRefreshResultTable"
+    )
+//- .title(v-if="currentClient._id") Rates
+//- .client-info__rates(v-if="currentClient._id")
+//-     ClientRates(:client="currentClient"
+//-         @setMatrixData="setMatrixData")
+.title Sales Information
+.client-info__sales
+  ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
+.title Billing Informations
+.client-info__billing
+  ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
+  .delete-approve(v-if="isApproveModal")
+    p Are you sure you want to delete?
+    input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
+    input.button(type="button" value="Delete" @click="approveClientDelete")
+  ValidationErrors(v-if="areErrorsExist"
+    :errors="errors"
+    @closeErrors="closeErrorsBlock"
+  )
 </template>
 
 <script>
-import ClientServices from "./ClientServices";
-import General from "./clientInfo/General";
-import Button from "../Button";
-import ValidationErrors from "../ValidationErrors";
-import ContactsInfo from "./ContactsInfo";
-// import ClientRates from './ClientRates';
-import ClientSalesInfo from "./ClientSalesInfo";
-import ClientBillInfo from "./ClientBillInfo";
-import { mapGetters, mapActions } from "vuex";
+  import ClientServices from "./ClientServices";
+  import General from "./clientInfo/General";
+  import Button from "../Button";
+  import ValidationErrors from "../ValidationErrors";
+  import ContactsInfo from "./ContactsInfo";
+  // import ClientRates from './ClientRates';
+  import ClientSalesInfo from "./ClientSalesInfo";
+  import ClientBillInfo from "./ClientBillInfo";
+  import IndustryTable from "./pricelists/IndustryTable";
+  import StepTable from "./pricelists/StepTable";
+  import LangTable from "./pricelists/LangTable";
+  import ResultTable from "./pricelists/ResultTable";
+  import { mapGetters, mapActions } from "vuex";
 
-export default {
-  props: {
-    contactsPhotos: {
-      type: Array,
-      default: () => []
+  export default {
+    props: {
+      contactsPhotos: {
+        type: Array,
+        default: () => []
+      },
+      contractFiles: {
+        type: Array,
+        default: () => []
+      },
+      ndaFiles: {
+        type: Array,
+        default: () => []
+      }
     },
-    contractFiles: {
-      type: Array,
-      default: () => []
-    },
-    ndaFiles: {
-      type: Array,
-      default: () => []
-    }
-  },
-  data() {
-    return {
-      languages: [],
-      industries: [],
-      services: [],
+    data() {
+      return {
+        languages: [],
+        industries: [],
+        services: [],
+        units: [],
+        steps: [],
 
-      isApproveModal: false,
-      clientShow: true,
-      contactShow: false,
-      contactInd: 0,
-      newContact: false,
-      fromRoute: "/clients",
-      areErrorsExist: false,
-      errors: [],
-      billErrors: [],
+        isApproveModal: false,
+        clientShow: true,
+        contactShow: false,
+        contactInd: 0,
+        newContact: false,
+        fromRoute: "/clients",
+        areErrorsExist: false,
+        errors: [],
+        billErrors: [],
       isLeadEmpty: "",
       isSaveClicked: false
     };
@@ -357,6 +385,30 @@ export default {
           type: "error"
         });
       }
+    },
+    async getUnits() {
+      try {
+        const result = await this.$http.get("/api/units");
+        this.units = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Units",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getSteps() {
+      try {
+        const result = await this.$http.get("/api/steps");
+        this.steps = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Steps",
+          isShow: true,
+          type: "error"
+        });
+      }
     }
   },
   computed: {
@@ -371,12 +423,18 @@ export default {
     Button,
     ValidationErrors,
     ContactsInfo,
-    // ClientRates,
+    IndustryTable,
     ClientSalesInfo,
-    ClientBillInfo
+    ClientBillInfo,
+    StepTable,
+    LangTable,
+    ResultTable
   },
   created() {
-    this.getLangs(), this.getIndustries();
+    this.getLangs();
+    this.getUnits();
+    this.getSteps();
+    this.getIndustries();
     this.getServices();
     this.getClientInfo();
   },
@@ -411,11 +469,25 @@ export default {
     overflow: overlay;
     position: relative;
   }
+
   &__rates {
     padding: 10px;
   }
+
   &_error-shadow {
     box-shadow: 0 0 5px $red;
+  }
+
+  &__tables-row {
+    display: flex;
+
+    .lang-table {
+      width: 60%;
+    }
+
+    .industry-table {
+      width: 40%;
+    }
   }
 }
 

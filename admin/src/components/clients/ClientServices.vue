@@ -1,31 +1,33 @@
 <template lang="pug">
 .services
 
-    .services__titles
-        .services__title Source Lang
-        .services__title Target Lang
-        .services__title Services
-        .services__title Industry
+  .services__titles(v-if="clientServices.length")
+    .services__title Source Lang
+    .services__title Target Lang
+    .services__title Services
+    .services__title Industry
+  .services__titles(v-else)
+    | No services...
 
-    .services__rows(v-for="(clientService,index) in clientServices" :key="clientService.id")
+  .services__rows(v-for="(clientService,index) in clientServices" :key="clientService.id")
+    .services__drop-item(@click="setChoosenIndex(index)")
+      SelectSingle(
+        placeholder="Select"
+        :hasSearch="true"
+        :selectedOption="clientServices[index].sourceLanguage.lang"
+        :options="langData"
+        @chooseOption="setSource"
+        @scrollDrop="scrollDrop"
+      )
         .services__drop-item(@click="setChoosenIndex(index)")
-            SelectSingle(
-                placeholder="Select"
-                :hasSearch="true"
-                :selectedOption="clientServices[index].sourceLanguage.lang"
-                :options="langData"
-                @chooseOption="setSource"
-                @scrollDrop="scrollDrop"
-            )
-        .services__drop-item(@click="setChoosenIndex(index)")
-            SelectSingle(
-                placeholder="Select"
-                :hasSearch="true"
-                :selectedOption="clientServices[index].targetLanguage.lang"
-                :options="langData"
-                @chooseOption="setTarget"
-                @scrollDrop="scrollDrop"
-            )
+          SelectSingle(
+            placeholder="Select"
+            :hasSearch="true"
+            :selectedOption="clientServices[index].targetLanguage.lang"
+            :options="langData"
+            @chooseOption="setTarget"
+            @scrollDrop="scrollDrop"
+          )
         .services__drop-item(@click="setChoosenIndex(index)")
             SelectSingle(
                 placeholder="Select"
@@ -149,19 +151,22 @@ export default {
       this.checkAllFields(i);
     },
     addData() {
-      let i = this.clientServices.length - 1;
-      if (
-        !(
-          this.clientServices[i].sourceLanguage.hasOwnProperty("lang") &&
-          this.clientServices[i].targetLanguage.hasOwnProperty("lang") &&
-          this.clientServices[i].service.hasOwnProperty("title") &&
-          this.clientServices[i].industry.hasOwnProperty("name")
-        )
-      ) {
-        this.errors = [];
-        this.errors.push("Fill in the previous field!");
-        return (this.areErrors = true);
+      if (this.clientServices.length) {
+        let i = this.clientServices.length - 1;
+        if (
+          !(
+            this.clientServices[i].sourceLanguage.hasOwnProperty("lang") &&
+            this.clientServices[i].targetLanguage.hasOwnProperty("lang") &&
+            this.clientServices[i].service.hasOwnProperty("title") &&
+            this.clientServices[i].industry.hasOwnProperty("name")
+          )
+        ) {
+          this.errors = [];
+          this.errors.push("Fill in the previous field!");
+          return (this.areErrors = true);
+        }
       }
+
       this.clientServices.push({
         sourceLanguage: {},
         targetLanguage: {},
@@ -216,14 +221,18 @@ export default {
         });
       }
     },
-    allFieldsFilled(index){
-      return ( this.clientServices[index].sourceLanguage.hasOwnProperty("lang") &&
-        this.clientServices[index].targetLanguage.hasOwnProperty("lang") &&
-        this.clientServices[index].service.hasOwnProperty("title") &&
-        this.clientServices[index].industry.hasOwnProperty("name"))
+    allFieldsFilled(index) {
+      if (this.clientServices.length) {
+        return (
+          this.clientServices[index].sourceLanguage.hasOwnProperty("lang") &&
+          this.clientServices[index].targetLanguage.hasOwnProperty("lang") &&
+          this.clientServices[index].service.hasOwnProperty("title") &&
+          this.clientServices[index].industry.hasOwnProperty("name")
+        );
+      }
     },
     checkAllFields(index) {
-      let flag = this.allFieldsFilled(index)
+      let flag = this.allFieldsFilled(index);
       if (flag) {
         this.saveData(index);
       }
@@ -234,13 +243,19 @@ export default {
   },
   computed: {
     industryData() {
-      return this.industries.map(item => item.name);
+      if (this.clientServices) {
+        return this.industries.map(item => item.name);
+      }
     },
     langData() {
-      return this.languages.map(item => item.lang);
+      if (this.clientServices) {
+        return this.languages.map(item => item.lang);
+      }
     },
     servicesData() {
-      return this.services.map(item => item.title);
+      if (this.clientServices) {
+        return this.services.map(item => item.title);
+      }
     }
   },
   created() {
