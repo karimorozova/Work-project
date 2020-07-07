@@ -28,8 +28,30 @@
             :industries="industries"
             :services="services"
         )
-
-
+    .title(v-if="currentClient._id") Rates
+    .client-info__rates
+      .client-info__tables-row
+        .lang-table(v-if="currentClient._id")
+          LangTable(
+            :tableData="currentClient.rates.basicPricesTable"
+          )
+        .industry-table(v-if="currentClient._id")
+          IndustryTable(
+            :tableData="currentClient.rates.industryMultipliersTable"
+          )
+      .step-table(v-if="currentClient._id")
+        StepTable(
+          :tableData="currentClient.rates.stepMultipliersTable"
+        )
+      .result-table(v-if="currentClient._id")
+        ResultTable(
+              :clientId="currentClient._id"
+              :languages="languages.map(i => i.lang)"
+              :steps="steps.map(i => i.title)"
+              :units="units.map(i => i.type)"
+              :industries="industries.map(i => i.name)"
+              :isRefreshResultTable="isRefreshResultTable"
+        )
     //- .title(v-if="currentClient._id") Rates    
     //- .client-info__rates(v-if="currentClient._id")
     //-     ClientRates(:client="currentClient"
@@ -59,6 +81,10 @@ import ContactsInfo from "./ContactsInfo";
 // import ClientRates from './ClientRates';
 import ClientSalesInfo from "./ClientSalesInfo";
 import ClientBillInfo from "./ClientBillInfo";
+import IndustryTable from "./pricelists/IndustryTable";
+import StepTable from "./pricelists/StepTable";
+import LangTable from "./pricelists/LangTable";
+import ResultTable from "./pricelists/ResultTable";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -81,6 +107,8 @@ export default {
       languages: [],
       industries: [],
       services: [],
+      units: [],
+      steps: [],
 
       isApproveModal: false,
       clientShow: true,
@@ -357,6 +385,30 @@ export default {
           type: "error"
         });
       }
+    },
+    async getUnits() {
+      try {
+        const result = await this.$http.get("/api/units");
+        this.units = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Units",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getSteps() {
+      try {
+        const result = await this.$http.get("/api/steps");
+        this.steps = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Steps",
+          isShow: true,
+          type: "error"
+        });
+      }
     }
   },
   computed: {
@@ -371,12 +423,18 @@ export default {
     Button,
     ValidationErrors,
     ContactsInfo,
-    // ClientRates,
+    IndustryTable,
     ClientSalesInfo,
-    ClientBillInfo
+    ClientBillInfo,
+    StepTable,
+    LangTable,
+    ResultTable
   },
   created() {
-    this.getLangs(), this.getIndustries();
+    this.getLangs();
+    this.getUnits();
+    this.getSteps();
+    this.getIndustries();
     this.getServices();
     this.getClientInfo();
   },
@@ -416,6 +474,15 @@ export default {
   }
   &_error-shadow {
     box-shadow: 0 0 5px $red;
+  }
+  &__tables-row {
+    display: flex;
+    .lang-table {
+      width: 60%;
+    }
+    .industry-table {
+      width: 40%;
+    }
   }
 }
 

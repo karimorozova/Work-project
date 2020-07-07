@@ -4,9 +4,11 @@ const { getPercentage, multiplyPrices } = require('../multipliers');
 const getRateCombinations = async (clientId, filters) => {
   const { countFilter, industryFilter } = filters;
   const client = await Clients.findOne({ _id: clientId })
-    .populate('rates.basicPricesTable')
-    .populate('rates.stepMultipliersTable')
-    .populate('rates.industryMultipliersTable');
+    .populate('rates.industryMultipliersTable.industry')
+    .populate('rates.stepMultipliersTable.step')
+    .populate('rates.stepMultipliersTable.unit')
+    .populate('rates.basicPricesTable.sourceLanguage')
+    .populate('rates.basicPricesTable.targetLanguage');
   // const { clientCurrencies } = client;
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
   const industryMultipliers = industryFilter ?
@@ -30,7 +32,7 @@ const getRateCombinations = async (clientId, filters) => {
       });
     });
   });
-  // if (industryFilter) {
+
   return priceListCombinations.splice(countFilter, 25);
   // }
 };

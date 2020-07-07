@@ -211,7 +211,7 @@ router.get('/rates/:id', async (req, res) => {
   }
 });
 
-routes.post('/rates/:id', async (req, res) => {
+router.post('/rates/:id', async (req, res) => {
   const { _id: clientId, updatedRate } = req.body;
   try {
     await updateClientRates(clientId, updatedRate);
