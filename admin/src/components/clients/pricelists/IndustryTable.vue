@@ -163,9 +163,12 @@ export default {
           isShow: true,
           type: "success"
         });
+        const updatedData = await this.$http.get(
+          "/clientsapi/rates/" + this.clientId
+        );
+        this.dataArray[index] = updatedData.body.industryMultipliersTable[index];
         this.setDefaults();
-        this.dataArray[index] = result.data;
-        this.refreshResultTable();
+        // this.refreshResultTable();
       } catch (err) {
         this.alertToggle({
           message: "Error on getting Industry",

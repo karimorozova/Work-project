@@ -51,6 +51,7 @@ const addNewRateComponents = async (clientId, newObj) => {
 
 //TODO: Add clients currencies for combinations
 const getStepMultipliersCombinations = (step) => {
+
   const { calculationUnit } = step;
   if (!calculationUnit.length) {
     return [];

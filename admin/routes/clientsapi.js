@@ -165,7 +165,12 @@ router.post('/update-client-status', async (req, res) => {
 router.get('/rates/:id', async (req, res) => {
   const { id: clientId } = req.params;
   try {
-    const { rates } = await Clients.findOne({ _id: clientId });
+    const { rates } = await Clients.findOne({ _id: clientId })
+        .populate('rates.industryMultipliersTable.industry')
+        .populate('rates.stepMultipliersTable.step')
+        .populate('rates.stepMultipliersTable.unit')
+        .populate('rates.basicPricesTable.sourceLanguage')
+        .populate('rates.basicPricesTable.targetLanguage');
     res.send(rates);
   } catch (err) {
     console.log(err);
