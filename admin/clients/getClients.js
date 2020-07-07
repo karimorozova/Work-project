@@ -15,7 +15,13 @@ async function getClient(obj) {
             .populate('services.sourceLanguage')
             .populate('services.targetLanguage')
             .populate('services.industry')
+            .populate('rates.industryMultipliersTable.industry')
+            .populate('rates.stepMultipliersTable.step')
+            .populate('rates.stepMultipliersTable.unit')
+            .populate('rates.basicPricesTable.sourceLanguage')
+            .populate('rates.basicPricesTable.targetLanguage')
             .populate('services.service');
+
     return client;
 }
 
