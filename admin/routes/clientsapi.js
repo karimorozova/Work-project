@@ -13,6 +13,7 @@ const {
   updateClientService,
   deleteClientService
 } = require('../clients');
+const { getRateCombinations } = require('../rates');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -28,63 +29,63 @@ router.get('/client', async (req, res) => {
         }
 })
 
-router.get('/clients-every', async (req,res) => {
-    try {
-        const clients = await getClients({});
-        res.send(clients);
-    }  catch(err) {
-            console.log(err);
-            res.status(500).send("Error on getting Client");
-        }
-})
+router.get('/clients-every', async (req, res) => {
+  try {
+    const clients = await getClients({});
+    res.send(clients);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on getting Client");
+  }
+});
 
-router.post('/rates', async (req, res) => {
-    const { clientId, ...rateInfo } = req.body;
-    try {
-        const client = await getClient({"_id": clientId});
-        const updatedClient = await updateClientRates(client, rateInfo);
-        res.send(updatedClient);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on updating rates of Client");
-    }
-})
+// router.post('/rates', async (req, res) => {
+//     const { clientId, ...rateInfo } = req.body;
+//     try {
+//         const client = await getClient({"_id": clientId});
+//         const updatedClient = await updateClientRates(client, rateInfo);
+//         res.send(updatedClient);
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).send("Error on updating rates of Client");
+//     }
+// })
 
-router.post('/remove-rate', async (req, res) => {
-    const { clientId, rateId, prop } = req.body;
-    try {
-        const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
-            $pull: {[prop]: {'_id': rateId}}
-        })
-        res.send(updatedClient);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on deleting rate of Client");
-    }
-})
-
-router.post('/remove-rates', async (req, res) => {
-    const { clientId, checkedIds, prop } = req.body;
-    try {
-        const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
-            $pull: {[prop]: {'_id': {$in: checkedIds}}}
-        })
-        res.send(updatedClient);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on deleting rate of Client");
-    }
-})
+// router.post('/remove-rate', async (req, res) => {
+//     const { clientId, rateId, prop } = req.body;
+//     try {
+//         const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
+//             $pull: {[prop]: {'_id': rateId}}
+//         })
+//         res.send(updatedClient);
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).send("Error on deleting rate of Client");
+//     }
+// })
+//
+// router.post('/remove-rates', async (req, res) => {
+//     const { clientId, checkedIds, prop } = req.body;
+//     try {
+//         const updatedClient = await getClientAfterUpdate({"_id": clientId}, {
+//             $pull: {[prop]: {'_id': {$in: checkedIds}}}
+//         })
+//         res.send(updatedClient);
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).send("Error on deleting rate of Client");
+//     }
+// })
 
 router.post('/combination', async (req, res) => {
-    const { step, rate } = req.body;
-    try {
-        const project = await getProject({"steps._id": step._id});
-        const updatedClient = await getClientAfterCombinationsUpdated({project, step, rate});
-        res.send(updatedClient);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on adding combination for Client");
+  const { step, rate } = req.body;
+  try {
+    const project = await getProject({ "steps._id": step._id });
+    const updatedClient = await getClientAfterCombinationsUpdated({ project, step, rate });
+    res.send(updatedClient);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on adding combination for Client");
     }
 })
 
@@ -188,16 +189,49 @@ router.get('/any-doc', async (req, res) => {
 })
 
 router.post('/update-client-status', async (req, res) => {
-    const { id, isTest } = req.body
-    try {
-       await Clients.updateOne({"_id": id}, {"isTest": isTest});
-       const client = await getClient({"_id": id})
-       res.send(client);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Error on updating Client status");
-    }
+  const { id, isTest } = req.body;
+  try {
+    await Clients.updateOne({ "_id": id }, { "isTest": isTest });
+    const client = await getClient({ "_id": id });
+    res.send(client);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on updating Client status");
+  }
 })
+
+router.get('/rates/:id', async (req, res) => {
+  const { _id: clientId } = req.body;
+  try {
+    const { rates } = await Clients.findOne({ _id: clientId });
+    res.send(rates);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting client rates');
+  }
+});
+
+routes.post('/rates/:id', async (req, res) => {
+  const { _id: clientId, updatedRate } = req.body;
+  try {
+    await updateClientRates(clientId, updatedRate);
+    res.send('Updated');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on editing client rates');
+  }
+});
+
+router.post('/rates/rate-combinations/:id', async (req, res) => {
+  const { id: clientId } = req.params;
+  try {
+    const rateCombinations = await getRateCombinations(clientId, req.body);
+    res.send(rateCombinations);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting client rate\'s combinations');
+  }
+});
 
 router.post('/services', async (req, res) => {
   const { clientId, currentData } = req.body;

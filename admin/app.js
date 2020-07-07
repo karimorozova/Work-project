@@ -17,7 +17,7 @@ const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
 const { fillClientRates } = require('./helpers/defaults/clientRates');
-fillClientRates();
+// fillClientRates();
 schedule.scheduleJob('0 */3 * * *', async function() {
     console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
     try {

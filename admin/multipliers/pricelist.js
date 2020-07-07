@@ -768,4 +768,4 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
   return combinations;
 };
 
-module.exports = { getPricelistCombinations, addNewMultiplier, updateMultiplier };
+module.exports = { getPricelistCombinations, addNewMultiplier, updateMultiplier, getPercentage, multiplyPrices };
