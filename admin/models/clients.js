@@ -9,7 +9,7 @@ const ClientSchema = new mongoose.Schema({
     trim: true
   },
   nativeLanguage: {
-    type: Schema.Types.ObjectID, ref: 'Language'
+    type: Schema.Types.ObjectId, ref: 'Language'
   },
   website: {
     type: String,
@@ -32,7 +32,7 @@ const ClientSchema = new mongoose.Schema({
     trim: true
   },
   timeZone: {
-    type: Schema.Types.ObjectID, ref: 'Timezones'
+    type: Schema.Types.ObjectId, ref: 'Timezones'
   },
   documents: [{
     fileName: {
