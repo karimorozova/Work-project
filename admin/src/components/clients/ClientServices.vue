@@ -311,7 +311,7 @@ export default {
   }
   .fa-times {
     font-size: 28px;
-    padding-top: 2px;
+    padding-top: 1px;
   }
 }
 </style>

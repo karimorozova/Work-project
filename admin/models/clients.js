@@ -32,18 +32,12 @@ const ClientSchema = new mongoose.Schema({
     trim: true
   },
   timeZone: {
-    type: Schema.Types.ObjectId, ref: 'Timezones'
+    type: Schema.Types.ObjectId, ref: 'Timezones',
   },
-  documents: [{
-    fileName: {
-      type: String,
-      trim: true,
-    },
-    category: {
-      type: String,
-      trim: true,
-    }
-  }],
+  documents: {
+    type: Array,
+    default: []
+  },
   accountManager: {
     type: Object,
     default: {}

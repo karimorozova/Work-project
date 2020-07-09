@@ -15,6 +15,7 @@ export const removeClient = ({commit, rootState}, payload) => {
 }
 export const storeCurrentClient = ({commit}, payload) => commit('setCurrentClient', payload);
 export const storeClientProperty = ({commit}, payload) => commit('setClientProperty', payload);
+export const storeClientDocuments = ({commit}, payload) => commit('setClientDocuments', payload);
 export const storeClientContact = ({commit}, payload) => commit('addContact', payload);
 export const updateClientContact = ({commit}, payload) => commit('updateContact', payload);
 export const updateLeadContact = ({commit}, payload) => commit('setLeadContact', payload);

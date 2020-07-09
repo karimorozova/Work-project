@@ -11,22 +11,22 @@
         .general-info__block
             .block-item
                 label.block-item__label.block-item_relative Time Zone:
-                .block-item__drop.block-item_medium-index(v-if="currentClient._id")
+                .block-item__drop.block-item_medium-index
                     SelectSingle(
                         :hasSearch="true"
                         placeholder="Select"
-                        :selectedOption="currentClient.timeZone.zone"
+                        :selectedOption="currentClient.hasOwnProperty('timeZone') ? currentClient.timeZone.zone : currentZone"
                         :options="timezoneData"
                         @chooseOption="setTimezone"
                         @scrollDrop="scrollDrop"
                     )
             .block-item
                 label.block-item__label.block-item_relative Native Language: 
-                .block-item__drop(v-if="currentClient._id")
+                .block-item__drop
                     SelectSingle(
                         :hasSearch="true"
                         placeholder="Select"
-                        :selectedOption="currentClient.nativeLanguage.lang"
+                        :selectedOption="currentClient.hasOwnProperty('nativeLanguage') ? currentClient.nativeLanguage.lang : currentLanguage"
                         :options="languageData"
                         @chooseOption="setLanguage"
                         @scrollDrop="scrollDrop"
@@ -57,7 +57,9 @@ export default {
   },
   data() {
     return {
-      asteriskStyle: { top: "-4px" }
+      asteriskStyle: { top: "-4px" },
+      currentZone: "",
+      currentLanguage: ""
     };
   },
   methods: {
@@ -66,12 +68,14 @@ export default {
       this.storeClientProperty({ prop, value: e.target.value });
     },
     setLanguage({ option }) {
+      this.currentLanguage = option;
       const lang = this.languages.find(item => item.lang == option);
       this.storeClientProperty({ prop: "nativeLanguage", value: lang });
     },
     setTimezone({ option }) {
+      this.currentZone = option;
       const timezone = this.timezones.find(item => item.zone == option);
-        this.storeClientProperty({ prop: "timeZone", value: timezone });
+      this.storeClientProperty({ prop: "timeZone", value: timezone });
     }
   },
   computed: {

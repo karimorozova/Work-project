@@ -1,12 +1,15 @@
 export const mutations = {
     setCurrentClient(state, payload) {
         state.currentClient = payload;
+        state.clientDocuments = payload.documents
     },
     setClientProperty(state, payload) {
-        
-        console.log(payload);
-        
+        console.log('scp',payload);
         state.currentClient[payload.prop] = payload.value;
+    },
+    setClientDocuments(state, payload) {
+        console.log('ff',payload);
+        state.clientDocuments = payload;
     },
     addContact(state, payload) {
         state.currentClient.contacts.push(payload);

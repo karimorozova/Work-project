@@ -67,6 +67,12 @@
                 :industries="industries.map(i => i.name)"
                 :isRefreshResultTable="isRefreshResultTable"
           )
+
+      .title Documents
+      .client-info__documents
+          ClientDocuments(
+          )
+
       //- .title(v-if="currentClient._id") Rates    
       //- .client-info__rates(v-if="currentClient._id")
       //-     ClientRates(:client="currentClient"
@@ -92,6 +98,7 @@
 </template>
 
 <script>
+import ClientDocuments from './ClientDocuments';
 import ClientServices from "./ClientServices";
 import OldGeneral from "./clientInfo/OldGeneral";
 import General from "./clientInfo/General";
@@ -293,10 +300,22 @@ export default {
       await this.updateClient();
     },
     async updateClient() {
+
       let sendData = new FormData();
       let dataForClient = this.currentClient;
-      dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
-      dataForClient.timeZone = this.currentClient.timeZone._id;
+      dataForClient.documents = this.clientDocuments;
+
+      console.log('doc', this.clientDocuments);
+      console.log('update',dataForClient);
+
+      if(this.currentClient.hasOwnProperty('nativeLanguage')){
+        dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
+      }
+      if( this.currentClient.hasOwnProperty('timeZone')  ){
+        dataForClient.timeZone = this.currentClient.timeZone._id;
+      }
+            
+
       sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
         sendData.append("photos", this.contactsPhotos[i]);
@@ -307,6 +326,7 @@ export default {
       for (let i = 0; i < this.ndaFiles.length; i++) {
         sendData.append("nda", this.ndaFiles[i]);
       }
+
       try {
         const result = await this.$http.post(
           "/clientsapi/update-client",
@@ -458,7 +478,9 @@ export default {
   computed: {
     ...mapGetters({
       allClients: "getClients",
-      currentClient: "getCurrentClient"
+      currentClient: "getCurrentClient",
+      clientDocuments: 'getClientDocuments'
+
     })
   },
   components: {
@@ -474,7 +496,8 @@ export default {
     StepTable,
     LangTable,
     ResultTable,
-    SideGeneral
+    SideGeneral,
+    ClientDocuments,
   },
   created() {
     this.getLangs();
@@ -513,6 +536,7 @@ export default {
   &__contacts-info,
   &__rates,
   &__sales,
+  &__documents,
   &__billing {
     margin: 20px 10px 40px 10px;
     padding: 40px;
