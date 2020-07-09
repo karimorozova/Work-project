@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import ClientDocuments from './ClientDocuments';
+import ClientDocuments from "./ClientDocuments";
 import ClientServices from "./ClientServices";
 import OldGeneral from "./clientInfo/OldGeneral";
 import General from "./clientInfo/General";
@@ -300,21 +300,19 @@ export default {
       await this.updateClient();
     },
     async updateClient() {
-
       let sendData = new FormData();
       let dataForClient = this.currentClient;
       dataForClient.documents = this.clientDocuments;
 
-      console.log('doc', this.clientDocuments);
-      console.log('update',dataForClient);
-
-      if(this.currentClient.hasOwnProperty('nativeLanguage')){
+      console.log("doc", this.clientDocuments);
+      console.log("update", dataForClient);
+      
+      if (this.currentClient.hasOwnProperty("nativeLanguage")) {
         dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
       }
-      if( this.currentClient.hasOwnProperty('timeZone')  ){
+      if (this.currentClient.hasOwnProperty("timeZone")) {
         dataForClient.timeZone = this.currentClient.timeZone._id;
       }
-            
 
       sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
@@ -479,8 +477,7 @@ export default {
     ...mapGetters({
       allClients: "getClients",
       currentClient: "getCurrentClient",
-      clientDocuments: 'getClientDocuments'
-
+      clientDocuments: "getClientDocuments"
     })
   },
   components: {
@@ -497,7 +494,7 @@ export default {
     LangTable,
     ResultTable,
     SideGeneral,
-    ClientDocuments,
+    ClientDocuments
   },
   created() {
     this.getLangs();

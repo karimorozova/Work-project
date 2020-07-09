@@ -21,7 +21,7 @@ const getRateCombinations = async (clientId, filters) => {
     industryMultipliersTable.filter(({ industry }) => industry.name === industryFilter)
     : industryMultipliersTable;
   const priceListCombinations = [];
-  stepMultipliersTable.forEach(({ step, unit, size, multiplier: stepMultiplierValue, euroMinPrice }) => {
+  stepMultipliersTable.forEach(({ step, serviceId, unit, size, multiplier: stepMultiplierValue, euroMinPrice }) => {
     basicPricesTable.forEach(({ sourceLanguage, targetLanguage, euroBasicPrice }) => {
       industryMultipliersTable.forEach(({ industry, multiplier: industryMultiplierValue }) => {
         priceListCombinations.push({
@@ -34,6 +34,7 @@ const getRateCombinations = async (clientId, filters) => {
           eurPrice: multiplyPrices(euroBasicPrice, stepMultiplierValue, industryMultiplierValue),
           euroMinPrice,
           isGrouped: false,
+          serviceId: serviceId,
         });
       });
     });

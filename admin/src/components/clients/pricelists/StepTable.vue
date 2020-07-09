@@ -18,7 +18,7 @@
         .price-title {{ field.label }}
 
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }}
+        .price__data(v-if="currentActive !== index") {{ row.step.title }} ({{ getServiceName(row.serviceId) }})
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentStep" disabled)
 
@@ -70,7 +70,7 @@ export default {
     return {
       fields: [
         {
-          label: "Step",
+          label: "Step / Service",
           headerKey: "headerStep",
           key: "step",
           width: "21%",
@@ -133,6 +133,9 @@ export default {
     this.getSteps();
   },
   methods: {
+    getServiceName(id) {
+       return this.currentClient.services.find(item => item._id == id).service.title;
+    },
     ...mapActions({
       alertToggle: "alertToggle"
     }),
@@ -231,19 +234,14 @@ export default {
       await this.getSteps(this.allFilters);
     }
   },
-  watch: {
-    // async isRefresh() {
-    //   if (this.isRefresh) {
-    //     await this.getCurrency();
-    //     this.getSteps(this.allFilters);
-    //   }
-    // }
-  },
   computed: {
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
-    }
+    },
+    ...mapGetters({
+      currentClient: "getCurrentClient",
+    })
   },
   components: {
     DataTable

@@ -1,5 +1,5 @@
 <template lang="pug">
-.price(v-if="dataArray.length")
+.price
     DataTable(
         :fields="fields"
         :tableData="dataArray"
@@ -33,6 +33,8 @@
         template(slot="icons" slot-scope="{ row, index }")
             .price__icons
                 img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+    .price__empty(v-if="!dataArray.length") Nothing found...
+
 </template>
 <script>
 import DataTable from "../../DataTable";

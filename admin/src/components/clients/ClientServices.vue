@@ -231,10 +231,24 @@ export default {
         );
       }
     },
+    checkForUnique(index){
+      return this.clientServices.filter(item => (
+              item.sourceLanguage.lang == this.clientServices[index].sourceLanguage.lang &&
+              item.targetLanguage.lang == this.clientServices[index].targetLanguage.lang &&
+              item.service.title == this.clientServices[index].service.title &&
+              item.industry.name == this.clientServices[index].industry.name 
+        ));
+    },
     checkAllFields(index) {
-      let flag = this.allFieldsFilled(index);
-      if (flag) {
-        this.saveData(index);
+      let isfield = this.allFieldsFilled(index);
+      if (isfield) {
+        if(this.checkForUnique(index).length > 1){
+          this.errors = [];
+          this.errors.push("All fields must be unique!");
+          return (this.areErrors = true);
+        }else{
+          this.saveData(index);
+        }
       }
     }
   },
