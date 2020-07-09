@@ -19,19 +19,19 @@
                     .steps__data(v-if="currentActive !== index") {{ row.title }}
                     .steps__editing-data(v-else)
                         input.steps__input(type="text" v-model="currentStep.title")
-  
+
                 template(slot="calculationUnit" slot-scope="{ row, index }")
                     .steps__data(v-if="currentActive !== index") {{ presentUnits(row.calculationUnit) }}
                     .steps__drop-menu(v-else)
                         SelectMulti(
-                            :isTableDropMenu="true"
-                            placeholder="Select"
-                            :hasSearch="true"
-                            :options="unitData" 
-                            :selectedOptions="selectedUnits" 
-                            @chooseOptions="setUnits"
+                          :isTableDropMenu="true"
+                          placeholder="Select"
+                          :hasSearch="true"
+                          :options="unitData"
+                          :selectedOptions="selectedUnits"
+                          @chooseOptions="setUnits"
                         )
-                        
+
                 .steps__data.steps_centered(slot="stage1" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
                     img.steps__checkbox(v-if="isSelected('isStage1', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
                     img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
@@ -130,8 +130,8 @@ export default {
                 isActive: true,
                 symbol: ""
             }
-            this.steps.push(this.currentStep);
-            this.currentActive = this.steps.length - 1; 
+          this.steps.push(this.currentStep);
+          this.currentActive = this.steps.length - 1;
         },
         isSelected(rowProp, index) {
             if(this.currentActive === index) {
@@ -187,11 +187,15 @@ export default {
                         key: 'Step',
                         id: result.data,
                     });
-                }else{
-                    await this.$http.post('/pricelists/update-multiplier', {
-                        key: 'Step',
-                        oldMultiplier: oldStep,
-                    });
+                }else {
+                  await this.$http.post('/pricelists/update-multiplier', {
+                    key: 'Step',
+                    oldMultiplier: oldStep,
+                  });
+                  await this.$http.post('/clientsapi/rates', {
+                    key: 'Step',
+                    oldMultiplier: oldStep
+                  });
                 }
                 this.alertToggle({message: "Information saved", isShow: true, type: "success"});
             } catch(err) {

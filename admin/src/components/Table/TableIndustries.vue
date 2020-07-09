@@ -193,11 +193,15 @@ export default {
             const oldIndustry = this.industries[index];
             oldIndustry.active = !oldIndustry.active;
             try {
-                await this.$http.post(`/industry/industry/${id}`, newData)
-                await this.$http.post('/pricelists/update-multiplier', {
-                  key: 'Industry',
-                  oldMultiplier: oldIndustry
-                })
+              await this.$http.post(`/industry/industry/${id}`, newData);
+              await this.$http.post('/pricelists/update-multiplier', {
+                key: 'Industry',
+                oldMultiplier: oldIndustry
+              });
+              await this.$http.post('/clientsapi/rates', {
+                key: 'Industry',
+                oldMultiplier: oldIndustry
+              });
             } catch(err) {
                 this.alertToggle({message: "Error on saving Industry info", isShow: true, type: "error"});
             }

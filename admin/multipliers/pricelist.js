@@ -515,6 +515,9 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
       for (let { _id, stepMultipliersTable } of pricelists) {
         for (let size of newSizes) {
           for (let step of updatedSteps) {
+            // stepMultipliersTable = stepMultipliersTable.filter(item => (
+            //   `${item.step} ${item.unit} ${item.size}` !== `${item.step} ${item.unit} ${1}`
+            // ));
             stepMultipliersTable.push({
               euroMinPrice: 1,
               usdMinPrice: USD,
@@ -770,4 +773,13 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
   return combinations;
 };
 
-module.exports = { getPricelistCombinations, addNewMultiplier, updateMultiplier, getPercentage, multiplyPrices };
+module.exports = {
+  getPricelistCombinations,
+  getMultipliersDifference,
+  addNewMultiplier,
+  updateMultiplier,
+  getPercentage,
+  multiplyPrices,
+  getSizeDifference,
+  activityChange
+};
