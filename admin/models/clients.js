@@ -219,6 +219,10 @@ const ClientSchema = new mongoose.Schema({
         type: String,
         trim: true
       },
+      serviceId: {
+        type: String,
+        trim: true,
+      },
       sourceLanguage: {
         type: Schema.Types.ObjectId, ref: 'Language',
       },
@@ -231,6 +235,10 @@ const ClientSchema = new mongoose.Schema({
       }
     }],
     stepMultipliersTable: [{
+      serviceId: {
+        type: String,
+        trim: true,
+      },
       step: {
         type: Schema.Types.ObjectId, ref: 'Step',
       },
@@ -250,6 +258,10 @@ const ClientSchema = new mongoose.Schema({
       }
     }],
     industryMultipliersTable: [{
+      serviceId: {
+        type: String,
+        trim: true,
+      },
       industry: {
         type: Schema.Types.ObjectId, ref: 'Industries',
       },

@@ -1,4 +1,6 @@
 const { Clients, Step } = require('../models');
+const ObjectId = require('mongodb').ObjectID;
+const _ = require('lodash');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
@@ -34,18 +36,20 @@ const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id
 
 
 //TODO: Add source-language existence check
-const addNewRateComponents = async (clientId, newObj) => {
+const addNewRateComponents = async (clientId, newObj, serviceId) => {
   const { sourceLanguage, targetLanguage, service, industry } = newObj;
   const client = await Clients.findOne({ _id: clientId });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
   basicPricesTable.push({
+    serviceId: serviceId.toString(),
     type: 'Duo',
     sourceLanguage: sourceLanguage._id,
     targetLanguage: targetLanguage._id
   });
-  const stepMultipliersCombinations = await getStepMultipliersCombinations(service);
+  const stepMultipliersCombinations = await getStepMultipliersCombinations(service, serviceId);
   stepMultipliersTable.push(...stepMultipliersCombinations);
   industryMultipliersTable.push({
+    serviceId: serviceId.toString(),
     industry: industry._id
   });
   await Clients.updateOne({ _id: clientId },
@@ -54,7 +58,7 @@ const addNewRateComponents = async (clientId, newObj) => {
 };
 
 //TODO: Add clients currencies for combinations
-const getStepMultipliersCombinations = async ({ steps }) => {
+const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
   const stepUnitSizeCombinations = [];
   for (let { step } of steps) {
     const { calculationUnit } = await Step.findOne({ _id: step });
@@ -65,6 +69,7 @@ const getStepMultipliersCombinations = async ({ steps }) => {
         if (sizes.length) {
           sizes.forEach(size => {
             stepUnitSizeCombinations.push({
+              serviceId: serviceId.toString(),
               step: step._id,
               unit: _id,
               size
@@ -72,6 +77,7 @@ const getStepMultipliersCombinations = async ({ steps }) => {
           });
         } else {
           stepUnitSizeCombinations.push({
+            serviceId: serviceId.toString(),
             step: step._id,
             unit: _id,
             size: 1
@@ -83,4 +89,52 @@ const getStepMultipliersCombinations = async ({ steps }) => {
   return stepUnitSizeCombinations;
 };
 
-module.exports = { updateClientRates, addNewRateComponents };
+const syncClientRatesAndServices = async (clientId, changedData, oldData) => {
+  const client = await Clients.findOne({ _id: clientId });
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  const neededBasicPriceIndex = basicPricesTable.findIndex(item => item.serviceId === changedData._id);
+  const neededIndustryIndex = industryMultipliersTable.findIndex(item => item.serviceId === changedData._id);
+  const difference = getObjDifferences(changedData, oldData);
+  if (difference.sourceLanguage) {
+    client.rates.basicPricesTable[neededBasicPriceIndex].sourceLanguage = ObjectId(difference.sourceLanguage);
+  } else if (difference.targetLanguage) {
+    client.rates.basicPricesTable[neededBasicPriceIndex].targetLanguage = ObjectId(difference.targetLanguage);
+  } else if (difference.service) {
+    stepMultipliersTable = stepMultipliersTable.filter(item => item.serviceId !== changedData._id);
+    const stepMultipliersCombinations = await getStepMultipliersCombinations(changedData.service, oldData._id);
+    stepMultipliersTable.push(...stepMultipliersCombinations);
+    client.rates.stepMultipliersTable = stepMultipliersTable;
+  } else {
+    client.rates.industryMultipliersTable[neededIndustryIndex].industry = ObjectId(difference.industry);
+  }
+  await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+};
+
+const getObjDifferences = (obj1, obj2) => {
+  let diffs = {};
+  let key;
+  const compare = (item1, item2, key) => {
+    item1 = item1._id ? item1._id : item1;
+    if (item1.toString() !== item2.toString()) {
+      diffs[key] = item1.toString();
+    }
+  };
+  for (key in obj1) {
+    if (obj1.hasOwnProperty(key)) {
+      compare(obj1[key], obj2[key], key);
+    }
+  }
+  return diffs;
+};
+
+const deleteClientRates = async (clientId, serviceId) => {
+  const client = await Clients.findOne({ _id: clientId });
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  basicPricesTable = basicPricesTable.filter(item => item.serviceId !== serviceId);
+  stepMultipliersTable = stepMultipliersTable.filter(item => item.serviceId !== serviceId);
+  industryMultipliersTable = industryMultipliersTable.filter(item => item.serviceId !== serviceId);
+  client.rates = { basicPricesTable, stepMultipliersTable, industryMultipliersTable };
+  await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+};
+
+module.exports = { updateClientRates, addNewRateComponents, syncClientRatesAndServices, deleteClientRates };
