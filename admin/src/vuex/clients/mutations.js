@@ -3,6 +3,9 @@ export const mutations = {
         state.currentClient = payload;
     },
     setClientProperty(state, payload) {
+        
+        console.log(payload);
+        
         state.currentClient[payload.prop] = payload.value;
     },
     addContact(state, payload) {

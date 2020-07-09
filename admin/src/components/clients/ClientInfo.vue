@@ -1,86 +1,101 @@
 <template lang="pug">
-.client-info
-    .buttons
-        .button
-            Button(value="Save" @clicked="checkForErrors")
-        .button
-            Button(value="Cancel" @clicked="cancel")
-        .button
-            Button(value="Delete" @clicked="deleteClient")
-    .title General Information
-    .client-info__gen-info
-        General(
-            :isSaveClicked="isSaveClicked"
-            @loadFile="loadFile")
-    .title Contact Details
-    .client-info__contacts-info
-        ContactsInfo(
-            :client="currentClient"
-            @contactDetails="contactDetails" 
-            @saveContactUpdates="saveContactUpdates"
-            @setLeadContact="setLeadContact"
-            @newContact="addNewContact"
-            @approveDelete="approveContactDelete")
-    .title(v-if="currentClient._id") Services
-    .client-info__services
-        ClientServices(
-            :languages="languages"
-            :industries="industries"
-            :services="services"
-        )
-    .title(v-if="currentClient._id") Rates
-    .client-info__rates
-      .client-info__tables-row
-        .lang-table(v-if="currentClient._id")
-          LangTable(
-            :tableData="currentClient.rates.basicPricesTable"
-            :clientId="currentClient._id"
-            @refreshResultTable="refreshResultTable"
+.client-layout
+  .client-info
+      .buttons
+          .button
+              Button(value="Save" @clicked="checkForErrors")
+          .button
+              Button(value="Cancel" @clicked="cancel")
+          .button
+              Button(value="Delete" @clicked="deleteClient")
+      .title General Information
+      .client-info__gen-info
+          General(
+              :isSaveClicked="isSaveClicked"
+              :languages="languages"
+              :timezones="timezones"
           )
-        .industry-table(v-if="currentClient._id")
-          IndustryTable(
-            :tableData="currentClient.rates.industryMultipliersTable"
-            :clientId="currentClient._id"
-            @refreshResultTable="refreshResultTable"
+      .title General Information - old ver.
+      .client-info__gen-info
+          OldGeneral(
+              :isSaveClicked="isSaveClicked"
+              @loadFile="loadFile"
           )
-      .step-table(v-if="currentClient._id")
-        StepTable(
-          :tableData="currentClient.rates.stepMultipliersTable"
-          :clientId="currentClient._id"
-            @refreshResultTable="refreshResultTable"
-        )
-      .result-table(v-if="currentClient._id")
-        ResultTable(
+      .title Contact Details
+      .client-info__contacts-info
+          ContactsInfo(
+              :client="currentClient"
+              @contactDetails="contactDetails" 
+              @saveContactUpdates="saveContactUpdates"
+              @setLeadContact="setLeadContact"
+              @newContact="addNewContact"
+              @approveDelete="approveContactDelete")
+      .title(v-if="currentClient._id") Services
+      .client-info__services
+          ClientServices(
+              :languages="languages"
+              :industries="industries"
+              :services="services"
+          )
+      .title(v-if="currentClient._id") Rates
+      .client-info__rates
+        .client-info__tables-row
+          .lang-table(v-if="currentClient._id")
+            LangTable(
+              :tableData="currentClient.rates.basicPricesTable"
               :clientId="currentClient._id"
-              :languages="languages.map(i => i.lang)"
-              :steps="steps.map(i => i.title)"
-              :units="units.map(i => i.type)"
-              :industries="industries.map(i => i.name)"
-              :isRefreshResultTable="isRefreshResultTable"
-        )
-    //- .title(v-if="currentClient._id") Rates    
-    //- .client-info__rates(v-if="currentClient._id")
-    //-     ClientRates(:client="currentClient"
-    //-         @setMatrixData="setMatrixData")
-    .title Sales Information
-    .client-info__sales
-        ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
-    .title Billing Informations
-    .client-info__billing
-        ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
-    .delete-approve(v-if="isApproveModal")
-        p Are you sure you want to delete?
-        input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-        input.button(type="button" value="Delete" @click="approveClientDelete")
-    ValidationErrors(v-if="areErrorsExist"
-        :errors="errors"
-        @closeErrors="closeErrorsBlock"
+              @refreshResultTable="refreshResultTable"
+            )
+          .industry-table(v-if="currentClient._id")
+            IndustryTable(
+              :tableData="currentClient.rates.industryMultipliersTable"
+              :clientId="currentClient._id"
+              @refreshResultTable="refreshResultTable"
+            )
+        .step-table(v-if="currentClient._id")
+          StepTable(
+            :tableData="currentClient.rates.stepMultipliersTable"
+            :clientId="currentClient._id"
+              @refreshResultTable="refreshResultTable"
+          )
+        .result-table(v-if="currentClient._id")
+          ResultTable(
+                :clientId="currentClient._id"
+                :languages="languages.map(i => i.lang)"
+                :steps="steps.map(i => i.title)"
+                :units="units.map(i => i.type)"
+                :industries="industries.map(i => i.name)"
+                :isRefreshResultTable="isRefreshResultTable"
+          )
+      //- .title(v-if="currentClient._id") Rates    
+      //- .client-info__rates(v-if="currentClient._id")
+      //-     ClientRates(:client="currentClient"
+      //-         @setMatrixData="setMatrixData")
+      .title Sales Information
+      .client-info__sales
+          ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
+      .title Billing Informations
+      .client-info__billing
+          ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
+      .delete-approve(v-if="isApproveModal")
+          p Are you sure you want to delete?
+          input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
+          input.button(type="button" value="Delete" @click="approveClientDelete")
+      ValidationErrors(v-if="areErrorsExist"
+          :errors="errors"
+          @closeErrors="closeErrorsBlock"
+      )
+  .slient-subinfo
+    SideGeneral(
+      :isSaveClicked="isSaveClicked"
     )
 </template>
 
 <script>
 import ClientServices from "./ClientServices";
+import OldGeneral from "./clientInfo/OldGeneral";
 import General from "./clientInfo/General";
+import SideGeneral from "./clientInfo/SideGeneral";
 import Button from "../Button";
 import ValidationErrors from "../ValidationErrors";
 import ContactsInfo from "./ContactsInfo";
@@ -115,6 +130,7 @@ export default {
       services: [],
       units: [],
       steps: [],
+      timezones: [],
 
       isApproveModal: false,
       clientShow: true,
@@ -127,7 +143,7 @@ export default {
       billErrors: [],
       isLeadEmpty: "",
       isSaveClicked: false,
-      isRefreshResultTable: false,
+      isRefreshResultTable: false
     };
   },
   methods: {
@@ -244,8 +260,8 @@ export default {
       const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
       if (!this.currentClient.name)
         this.errors.push("Company name cannot be empty.");
-      if (!this.currentClient.industries.length)
-        this.errors.push("Please, choose at least one industry.");
+      // if (!this.currentClient.industries.length)
+      //   this.errors.push("Please, choose at least one industry.");
       if (!this.currentClient.contacts.length)
         this.errors.push("Please, add at least one contact.");
       if (!this.contactLeadError())
@@ -278,7 +294,10 @@ export default {
     },
     async updateClient() {
       let sendData = new FormData();
-      sendData.append("client", JSON.stringify(this.currentClient));
+      let dataForClient = this.currentClient;
+      dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
+      dataForClient.timeZone = this.currentClient.timeZone._id;
+      sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
         sendData.append("photos", this.contactsPhotos[i]);
       }
@@ -422,6 +441,18 @@ export default {
           type: "error"
         });
       }
+    },
+    async getTimezones() {
+      try {
+        const result = await this.$http.get("/api/timezones");
+        this.timezones = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Timezones",
+          isShow: true,
+          type: "error"
+        });
+      }
     }
   },
   computed: {
@@ -433,6 +464,7 @@ export default {
   components: {
     ClientServices,
     General,
+    OldGeneral,
     Button,
     ValidationErrors,
     ContactsInfo,
@@ -441,7 +473,8 @@ export default {
     ClientBillInfo,
     StepTable,
     LangTable,
-    ResultTable
+    ResultTable,
+    SideGeneral
   },
   created() {
     this.getLangs();
@@ -449,6 +482,7 @@ export default {
     this.getSteps();
     this.getIndustries();
     this.getServices();
+    this.getTimezones();
     this.getClientInfo();
   },
   beforeRouteEnter(to, from, next) {
@@ -461,7 +495,15 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
-
+.client-layout {
+  display: flex;
+}
+.slient-subinfo {
+  margin-top: 120px;
+  width: 390px;
+  height: 270px;
+  box-shadow: 0 0 10px #67573e9d;
+}
 .client-info {
   padding: 40px;
   width: 1020px;

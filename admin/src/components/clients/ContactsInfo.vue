@@ -239,19 +239,21 @@ export default {
     border: none;
     outline: none;
     margin: 2px;
-    padding: 3px 0 3px 5px;
     position: relative;
     &_opacity {
         opacity: 0.5;
     }
-    &__data-cell {
-        padding: 5px 0 5px 3px;
+    &__data-cell, &__info__input {
         overflow-x: hidden;
+        height: 32px;
+        padding: 0 5px;
+        align-items: center;
+        display: flex;
     }
     &__radio {
         display: flex;
         justify-content: center;
-        padding-top: 5px 
+        padding-top: 8px;
     }
     &__icons {
         padding-top: 3px;
@@ -264,9 +266,13 @@ export default {
         cursor: pointer;
     }
     &__active {
-        padding: 5px 0 5px 3px;
+        height: 32px;
+        overflow-x: hidden;
+        padding: 0 5px;
+        align-items: center;
+        display: flex;
         box-shadow: inset 0 0 5px $brown-shadow;
-        box-sizing: border-box;
+        // box-sizing: border-box;
     }
     &__input {
         width: 100%;
@@ -358,8 +364,8 @@ export default {
 }
 
 .add-button {
-    width: 190px;
-    height: 26px;
+    width: 168px;
+    height: 33px;
     color: $white;
     font-size: 14px;
     border-radius: 10px;
@@ -367,6 +373,13 @@ export default {
     background-color: $orange;
     border: 1px solid $orange;
     cursor: pointer;
+}
+
+.add-button:active, .add-button:focus{
+    transform: scale(.98);
+     outline: none!important;
+     outline-color: none;
+    border: none;
 }
 
 input {
