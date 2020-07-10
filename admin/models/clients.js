@@ -144,6 +144,12 @@ const ClientSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, ref: 'Language'
     }
   }],
+  sourceLanguages: [{
+    type: Schema.Types.ObjectId, ref: 'Language'
+  }],
+  targetLanguages: [{
+    type: Schema.Types.ObjectId, ref: 'Language'
+  }],
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
