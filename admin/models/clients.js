@@ -144,52 +144,6 @@ const ClientSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, ref: 'Language'
     }
   }],
-  wordsRates: [{
-    source: {
-      type: Schema.Types.ObjectId, ref: 'Language',
-    },
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
-  }],
-  hoursRates: [{
-    source: {
-      type: Schema.Types.ObjectId, ref: 'Language',
-    },
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
-  }],
-  monoRates: [{
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    packageSize: {
-      type: String,
-      trim: true
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
-  }],
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
@@ -226,6 +180,10 @@ const ClientSchema = new mongoose.Schema({
       euroBasicPrice: {
         type: Number,
         default: 1,
+      },
+      altered: {
+        type: Boolean,
+        default: false,
       }
     }],
     stepMultipliersTable: [{
@@ -253,6 +211,10 @@ const ClientSchema = new mongoose.Schema({
       defaultSize: {
         type: Boolean,
         default: false
+      },
+      altered: {
+        type: Boolean,
+        default: false,
       }
     }],
     industryMultipliersTable: [{
@@ -266,6 +228,10 @@ const ClientSchema = new mongoose.Schema({
       multiplier: {
         type: Number,
         default: 100,
+      },
+      altered: {
+        type: Boolean,
+        default: false,
       }
     }],
   },
