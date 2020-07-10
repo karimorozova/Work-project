@@ -64,6 +64,10 @@ const PricelistSchema = new mongoose.Schema({
     gbpMinPrice: {
       type: Number,
       default: 1,
+    },
+    defaultSize: {
+      type: Boolean,
+      default: false
     }
   }],
   industryMultipliersTable: [{

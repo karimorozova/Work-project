@@ -80,7 +80,8 @@ const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
             serviceId: serviceId.toString(),
             step: step._id,
             unit: _id,
-            size: 1
+            size: 1,
+            defaultSize: true,
           });
         }
       }

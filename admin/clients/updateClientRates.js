@@ -71,7 +71,8 @@ const checkStepDifference = async ({ difference, itemsToReplace, itemsToDelete }
               serviceId: serviceId.toString(),
               step: oldStep._id,
               unit: _id,
-              size: 1
+              size: 1,
+              defaultSize: true
             };
             stepMultipliersTable.push(unitToReplace);
           }
@@ -82,7 +83,7 @@ const checkStepDifference = async ({ difference, itemsToReplace, itemsToDelete }
           ));
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit} ${item.size}` !== `${oldStep._id} ${unitToDelete._id} ${1}`
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
         }
@@ -122,14 +123,15 @@ const checkStepDifference = async ({ difference, itemsToReplace, itemsToDelete }
             serviceId: serviceId.toString(),
             step: oldStep._id,
             unit: unitId,
-            size: 1
+            size: 1,
+            defaultSize: true
           });
         }
         for (let { _id: clientId, rates } of clients) {
           let { stepMultipliersTable } = rates;
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit} ${item.size}` !== `${oldStep._id} ${unitId} ${1}`
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
           rates.stepMultipliersTable = [...stepMultipliersTable, newMultiplierCombinations];
@@ -170,7 +172,8 @@ const checkUnitDifference = async ({ difference, itemsToReplace, itemsToDelete }
                   serviceId: serviceId.toString(),
                   step: stepId,
                   unit: unitId,
-                  size: 1
+                  size: 1,
+                  defaultSize: true
                 };
                 stepMultipliersTable.push(stepToReplace);
               }
@@ -182,7 +185,7 @@ const checkUnitDifference = async ({ difference, itemsToReplace, itemsToDelete }
             ));
             if (deleteSize) {
               stepMultipliersTable = stepMultipliersTable.filter(item => (
-                `${item.step} ${item.unit} ${item.size}` !== `${item.step} ${item.unit} ${1}`
+                `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
               ));
             }
           }
@@ -241,7 +244,8 @@ const checkUnitDifference = async ({ difference, itemsToReplace, itemsToDelete }
                 serviceId: serviceId.toString(),
                 step: _id,
                 unit: neededUnit._id,
-                size: 1
+                size: 1,
+                defaultSize: true
               });
             }
           }
@@ -250,7 +254,7 @@ const checkUnitDifference = async ({ difference, itemsToReplace, itemsToDelete }
           let { stepMultipliersTable } = rates;
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit} ${item.size}` !== `${_id} ${oldUnit._id} ${1}`
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
           rates.stepMultipliersTable = [...stepMultipliersTable, ...newMultiplierCombinations];
@@ -272,9 +276,9 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
         for (let size of newSizes) {
           for (let step of updatedSteps) {
             const serviceIds = await getServiceId(services, step);
-            // stepMultipliersTable = stepMultipliersTable.filter(item => (
-            //   `${item.step} ${item.unit} ${item.size}` !== `${item.step} ${item.unit} ${1}`
-            // ));
+            stepMultipliersTable = stepMultipliersTable.filter(item => (
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
+            ));
             for (let id of serviceIds) {
               stepMultipliersTable.push({
                 serviceId: id.toString(),
@@ -292,20 +296,21 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
     case 'Just deleted':
       for (let { _id: clientId, rates, services } of clients) {
         let { stepMultipliersTable } = rates;
-        for (let size of deletedSizes) {
-          for (let step of updatedSteps) {
-            const serviceIds = await getServiceId(services, step);
+        for (let step of updatedSteps) {
+          const serviceIds = await getServiceId(services, step);
+          for (let size of deletedSizes) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
               `${item.step} ${item.unit} ${item.size}` !== `${step._id} ${oldUnit._id} ${size}`
             ));
-            for (let id of serviceIds) {
-              stepMultipliersTable.push({
-                serviceId: id.toString(),
-                step: step._id,
-                unit: oldUnit._id,
-                size: 1
-              });
-            }
+          }
+          for (let id of serviceIds) {
+            stepMultipliersTable.push({
+              serviceId: id.toString(),
+              step: step._id,
+              unit: oldUnit._id,
+              size: 1,
+              defaultSize: true
+            });
           }
         }
         rates.stepMultipliersTable = stepMultipliersTable;
@@ -320,6 +325,9 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
           for (let size of deletedSizes) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
               `${item.step} ${item.unit} ${item.size}` !== `${step._id} ${oldUnit._id} ${size}`
+            ));
+            stepMultipliersTable = stepMultipliersTable.filter(item => (
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
           for (let id of serviceIds) {

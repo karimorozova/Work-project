@@ -296,7 +296,8 @@ const updateActiveUnits = async (activityStatus, unitId) => {
             gbpMinPrice: GBP,
             step: _id,
             unit: neededUnit._id,
-            size: 1
+            size: 1,
+            defaultSize: true,
           });
         }
       }
@@ -354,7 +355,8 @@ const updateActiveSteps = async (activityStatus, stepId) => {
             gbpMinPrice: GBP,
             step: stepId,
             unit: _id,
-            size: 1
+            size: 1,
+            defaultSize: true,
           });
         }
       }
@@ -416,7 +418,8 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
                   gbpMinPrice: GBP,
                   step: stepId,
                   unit: unitId,
-                  size: 1
+                  size: 1,
+                  defaultSize: true,
                 };
                 stepMultipliersTable.push(stepToReplace);
               }
@@ -429,7 +432,7 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
           ));
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit} ${item.size}` !== `${item.step} ${item.unit} ${1}`
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
         }
@@ -486,14 +489,15 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
               gbpMinPrice: GBP,
               step: _id,
               unit: neededUnit._id,
-              size: 1
+              size: 1,
+              defaultSize: true
             });
           }
         }
         for (let { _id, stepMultipliersTable } of pricelists) {
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit} ${item.size}` !== `${_id} ${oldUnit._id} ${1}`
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
           await Pricelist.updateOne({ _id },
@@ -515,9 +519,9 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
       for (let { _id, stepMultipliersTable } of pricelists) {
         for (let size of newSizes) {
           for (let step of updatedSteps) {
-            // stepMultipliersTable = stepMultipliersTable.filter(item => (
-            //   `${item.step} ${item.unit} ${item.size}` !== `${item.step} ${item.unit} ${1}`
-            // ));
+            stepMultipliersTable = stepMultipliersTable.filter(item => (
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
+            ));
             stepMultipliersTable.push({
               euroMinPrice: 1,
               usdMinPrice: USD,
@@ -549,6 +553,9 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
           for (let size of deletedSizes) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
               `${item.step} ${item.unit} ${item.size}` !== `${step._id} ${oldUnit._id} ${size}`
+            ));
+            stepMultipliersTable = stepMultipliersTable.filter(item => (
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
           for (let size of newSizes) {
@@ -642,7 +649,8 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
               gbpMinPrice: GBP,
               step: oldStep._id,
               unit: _id,
-              size: 1
+              size: 1,
+              defaultSize: true
             };
             stepMultipliersTable.push(unitToReplace);
           }
@@ -653,7 +661,7 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
           ));
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit} ${item.size}` !== `${oldStep._id} ${unitToDelete._id} ${1}`
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
         }
@@ -694,13 +702,14 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
             gbpMinPrice: GBP,
             step: oldStep._id,
             unit: unitId,
-            size: 1
+            size: 1,
+            defaultSize: true,
           });
         }
         for (let { _id, stepMultipliersTable } of pricelists) {
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
-              `${item.step} ${item.unit} ${item.size}` !== `${oldStep._id} ${unitId} ${1}`
+              `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
           }
           await Pricelist.updateOne({ _id },

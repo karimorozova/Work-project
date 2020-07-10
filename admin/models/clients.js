@@ -249,6 +249,10 @@ const ClientSchema = new mongoose.Schema({
       euroMinPrice: {
         type: Number,
         default: 1,
+      },
+      defaultSize: {
+        type: Boolean,
+        default: false
       }
     }],
     industryMultipliersTable: [{
