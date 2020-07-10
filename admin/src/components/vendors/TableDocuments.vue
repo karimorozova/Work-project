@@ -18,7 +18,7 @@
 
             template(slot="fileName" slot-scope="{ row, index }")
                 .documents__editing-data(v-if="currentActive === index && currentFile") 
-                    span.documents__input {{ currentFile.name }}
+                    span.documents__input {{ currentFile.name }} sdfsdf
                 .documents__data(v-else)
                     a( :href="domain + row.path" ) {{ row.fileName }}
 

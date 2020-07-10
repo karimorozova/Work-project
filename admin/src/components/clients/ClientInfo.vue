@@ -91,13 +91,20 @@
           :errors="errors"
           @closeErrors="closeErrorsBlock"
       )
-  .slient-subinfo
-    SideGeneral(
-      :isSaveClicked="isSaveClicked"
-    )
+  .client-subinfo
+    .client-subinfo__general
+      SideGeneral(
+        :isSaveClicked="isSaveClicked"
+      )
+    .client-subinfo__date
+      OtherClientInformation(
+
+      )
+    
 </template>
 
 <script>
+import OtherClientInformation from "./OtherClientInformation";
 import ClientDocuments from "./ClientDocuments";
 import ClientServices from "./ClientServices";
 import OldGeneral from "./clientInfo/OldGeneral";
@@ -138,6 +145,7 @@ export default {
       units: [],
       steps: [],
       timezones: [],
+      currentDocuments: [],
 
       isApproveModal: false,
       clientShow: true,
@@ -304,9 +312,13 @@ export default {
       let dataForClient = this.currentClient;
       dataForClient.documents = this.clientDocuments;
 
+      console.log('14',this.clientDocuments);
+      console.log('14',dataForClient.documents);
+      
+
       console.log("doc", this.clientDocuments);
       console.log("update", dataForClient);
-      
+
       if (this.currentClient.hasOwnProperty("nativeLanguage")) {
         dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
       }
@@ -494,7 +506,8 @@ export default {
     LangTable,
     ResultTable,
     SideGeneral,
-    ClientDocuments
+    ClientDocuments,
+    OtherClientInformation
   },
   created() {
     this.getLangs();
@@ -518,11 +531,19 @@ export default {
 .client-layout {
   display: flex;
 }
-.slient-subinfo {
-  margin-top: 120px;
-  width: 390px;
-  height: 270px;
-  box-shadow: 0 0 10px #67573e9d;
+.client-subinfo {
+  &__general {
+    margin-top: 120px;
+    width: 390px;
+    height: 270px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
+  &__date {
+    margin-top: 40px;
+    width: 390px;
+    height: 270px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
 }
 .client-info {
   padding: 40px;
@@ -539,6 +560,9 @@ export default {
     padding: 40px;
     box-shadow: 0 0 10px #67573e9d;
     box-sizing: border-box;
+  }
+  &__documents {
+    position: relative;
   }
   &__services {
     max-height: 500px;

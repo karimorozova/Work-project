@@ -1,5 +1,6 @@
 const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
+const { Clients } = require('../models')
 const { getClientAfterUpdate } = require('./getClients');
 
 async function updateClientInfo({clientId, client, files}) {
@@ -49,6 +50,84 @@ async function attachPhotos({photoFiles, contacts, clientId}) {
     }
 }
 
+async function removeClientDoc({clientId, fileName, path, category}) {
+    try {
+        const client = await Clients.findOne({_id: clientId});
+        const { documents } = client; 
+        const neededFileIndex =  documents.findIndex(item => item.category == category)
+        documents[neededFileIndex].fileName = '';
+        documents[neededFileIndex].path = '';
+
+        // console.log({clientId, fileName, path, category});
+        
+        await removeOldClientFile(path, "");
+        return await getClientAfterUpdate({_id: clientId}, { documents });
+
+    } catch(err) {
+        console.log(err);
+        console.log("Error in removeClientDoc");
+    }
+}
+
+async function saveClientDocumentDefault({clientId, category}) {
+    try {
+        const client = await Clients.findOne({_id: clientId});
+        let { documents } = client;
+        const newDoc = {fileName: '', path: `${new Date().getTime()}`, category};
+        documents.push(newDoc);
+        return await getClientAfterUpdate({"_id": clientId}, { documents });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in saveVendorDocumentDefault");
+    }
+}
+
+async function saveClientDocument({clientId, file, category, oldFilePath, oldName, oldCategory}) {
+    try {
+        if(!file) {
+            return await getClientAfterUpdate(
+                {_id: clientId, "documents.category": oldCategory, "documents.fileName": oldName},
+                {"documents.$.category": category}
+            )
+        }
+        const client = await Clients.findOne({_id: clientId});
+        let { documents } = client;
+        const namePrefix = category.slice(0, 3).toLowerCase();
+        const newPath = `/clientsDocs/${clientId}/${namePrefix}-${file.filename}`;
+        await moveFile(file, `./dist${newPath}`);
+        const newDoc = {fileName: file.filename, path: newPath, category};
+    
+        if(oldFilePath) {
+            await removeOldClientFile(oldFilePath, newPath);
+            const index = documents.findIndex(item => item.path === oldFilePath && item.category === category);
+            documents.splice(index, 1, newDoc)
+        } else {
+           const indexToUpdate =  documents.findIndex(item => item.category == category)
+           documents[indexToUpdate].fileName = newDoc.fileName
+           documents[indexToUpdate].path = newDoc.path
+        }
+
+        return await getClientAfterUpdate({"_id": clientId}, { documents });
+    } catch(err) {
+        console.log(err);
+        console.log("Error in saveVendorDocument");
+    }
+}
+
+function removeOldClientFile(oldPath, newPath) {
+    if(oldPath === newPath || !oldPath) return;
+    return new Promise((resolve, reject) => {
+        fs.unlink(`./dist${oldPath}`, (err) => {
+            if (err) {
+                console.log(err);
+                console.log("Error in removeOldClientFile");
+                reject(err);
+            }
+        });
+        resolve("removed");
+    })
+}
+
 async function attachNdaContract({newContract, newNda, oldContract, oldNda, clientId}) {
     let contract = "";
     let nda = "";
@@ -81,4 +160,4 @@ async function attachNdaContract({newContract, newNda, oldContract, oldNda, clie
     }
 }
 
-module.exports = { updateClientInfo }
+module.exports = { updateClientInfo , saveClientDocumentDefault , saveClientDocument , removeClientDoc }

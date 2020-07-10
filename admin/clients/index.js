@@ -1,6 +1,6 @@
 const { getClient, getClients, getClientAfterUpdate, gerFilteredClients } = require('./getClients');
 const { updateClientRates, deleteClientRates } = require('./clientRates');
-const { updateClientInfo } = require('./info');
+const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info');
 const { getAfterTaskStatusUpdate } = require('./projects');
 const { updateClientService, deleteClientService } = require('./clientService');
 const { updateRates } = require('./updateClientRates');
@@ -13,9 +13,12 @@ const clients = {
   getClientAfterUpdate,
   updateClientInfo,
   getAfterTaskStatusUpdate,
+  saveClientDocument,
   updateClientService,
   deleteClientService,
-  updateRates
+  updateRates,
+  removeClientDoc,
+  saveClientDocumentDefault
 };
 
 module.exports = clients;

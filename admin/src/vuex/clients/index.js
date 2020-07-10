@@ -4,7 +4,6 @@ import { mutations } from './mutations';
 
 const state = {
     currentClient: {},
-    clientDocuments: [],
 }
 
 export const clients = {

@@ -248,13 +248,13 @@ function isDefaultValue(entity) {
 async function fillClientsRates() {
   try {
     let clients = await Clients.find().populate('industries');
-    for (let client of clients) {
-      const combinations = [...client.monoRates, ...client.wordsRates, ...client.hoursRates];
-      if (!combinations.length && isDefaultValue(client)) {
-        const { monoRates, wordsRates, hoursRates } = await getRates(client.industries);
-        await Clients.updateOne({ name: client.name }, { monoRates, wordsRates, hoursRates });
-      }
-    }
+    // for (let client of clients) {
+      // const combinations = [...client.monoRates, ...client.wordsRates, ...client.hoursRates];
+      // if (!combinations.length && isDefaultValue(client)) {
+      //   const { monoRates, wordsRates, hoursRates } = await getRates(client.industries);
+      //   await Clients.updateOne({ name: client.name }, { monoRates, wordsRates, hoursRates });
+      // }
+    // }
   } catch (err) {
     console.log(err);
     console.log("Error on filling clients language combinations");

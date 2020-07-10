@@ -1,6 +1,5 @@
 <template lang="pug">
 .documents
-    | {{ documentsData }}
     .documents__table
         SettingsTable(
             :fields="fields"
@@ -41,12 +40,11 @@
 import SettingsTable from "../Table/SettingsTable";
 import SelectSingle from "../SelectSingle";
 import Add from "../Add";
-import scrollDrop from "@/mixins/scrollDrop";
 import crudIcons from "@/mixins/crudIcons";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  mixins: [scrollDrop, crudIcons],
+  mixins: [crudIcons],
   props: {},
   data() {
     return {
@@ -94,8 +92,7 @@ export default {
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
-      storeClientProperty: "storeClientProperty",
-      storeClientDocuments: "storeClientDocuments"
+      storeClientProperty: "storeClientProperty"
     }),
 
     async makeAction(index, key) {
@@ -121,9 +118,6 @@ export default {
       this.currentCategory = this.documentsData[index].category;
     },
     manageCancelEdition(index) {
-      if (!this.documentsData[index].path) {
-        this.documentsData.pop();
-      }
       this.setDefaults();
     },
     setDefaults() {
@@ -146,10 +140,6 @@ export default {
         (doc.fileName == "" && !this.currentFile)
       )
         this.errors.push("Upload a file to save!");
-      if (this.isSameExist(index))
-        this.errors.push(
-          "There is a duplication of the file for chosen category!"
-        );
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -157,41 +147,10 @@ export default {
         await this.manageSaveClick(index);
       }
     },
-    scrollDrop(index) {
-      let fillingСategory = this.documentsData.filter(function(item) {
-        return item.fileName !== "";
-      });
 
-      this.categories = [
-        ...new Set(fillingСategory.map(item => item.category))
-      ];
-
-      const { category } = this.documentsData[index];
-      let countCategories = this.documentsData.filter(
-        item => item.category == category
-      );
-      if (countCategories.length <= 1 && this.documentsData.length == 3) {
-        this.errors = [];
-        this.errors.push("Сannot update category!");
-        this.areErrors = true;
-      } else {
-        false;
-      }
-    },
-    isSameExist(index) {
-      const { fileName, category } = this.documentsData[index];
-      const isSame = this.documentsData.find((item, i) => {
-        return (
-          item.fileName === fileName &&
-          i !== index &&
-          item.category === category
-        );
-      });
-      return !!isSame;
-    },
     async manageSaveClick(index) {
       let formData = new FormData();
-      formData.append("vendorId", this.vendorId);
+      formData.append("clientId", this.currentClient._id);
       formData.append("category", this.currentCategory);
       formData.append("documentFile", this.currentFile);
 
@@ -204,7 +163,10 @@ export default {
         }
       }
       try {
-        const result = await this.storeDocuments(formData);
+        const result = await this.$http.post(
+          "/clientsapi/client-document",
+          formData
+        );
         this.alertToggle({
           message: "Document saved",
           isShow: true,
@@ -212,8 +174,7 @@ export default {
         });
       } catch (err) {
       } finally {
-        this.$emit("refreshDocuments");
-        this.setDefaults();
+        this.refreshDocuments();
       }
     },
     async manageDeleteClick(index) {
@@ -221,27 +182,16 @@ export default {
         this.documentsData.pop();
         return this.setDefaults();
       }
-      if (this.checkDelete(index)) {
-        this.deleteIndex = index;
-        this.isDeleting = true;
-      } else {
-        this.errors = [];
-        this.errors.push("Сannot delete category!");
-        this.areErrors = true;
-        return;
-      }
-    },
-    checkDelete(index) {
-      const { category } = this.documentsData[index];
-      let countCategories = this.documentsData.filter(
-        item => item.category == category
-      );
-      return countCategories.length > 1 ? true : false;
+      this.deleteIndex = index;
+      this.isDeleting = true;
     },
     async deleteData() {
       const docFile = this.documentsData[this.deleteIndex];
       try {
-        await this.deleteDocument({ docFile, vendorId: this.vendorId });
+        const result = await this.$http.post("/clientsapi/remove-client-doc", {
+          docFile,
+          clientId: this.$route.params.id
+        });
         this.alertToggle({
           message: "Document removed",
           isShow: true,
@@ -249,51 +199,61 @@ export default {
         });
       } catch (err) {
       } finally {
-        this.$emit("refreshDocuments");
-        this.setDefaults();
+        this.refreshDocuments();
       }
     },
     closeErrors() {
       this.areErrors = false;
     },
+    async refreshDocuments() {
+      const client = await this.$http.get(
+        `/clientsapi/client?id=${this.$route.params.id}`
+      );
+      this.documentsData = client.data.documents;
+      this.setDefaults();
+    },
     async setDocumentsDefaults(category) {
-      let defaultDocument = { vendorId: this.vendorId, category: category };
+      let defaultDocument = {
+        clientId: this.$route.params.id,
+        category: category
+      };
       try {
-        const result = await this.storeDocumentsDefault(defaultDocument);
+        const result = this.$http.post(
+          "/clientsapi/client-document-default",
+          defaultDocument
+        );
       } catch (err) {
+        this.alertToggle({
+          message: "Error in creating default documents",
+          isShow: true,
+          type: "error"
+        });
       } finally {
-        this.$emit("refreshDocuments");
-        this.setDefaults();
+        this.refreshDocuments();
       }
     }
   },
   computed: {
     ...mapGetters({
-      currentClient: "getCurrentClient",
-      clientDocuments: "getClientDocuments"
+      currentClient: "getCurrentClient"
     })
-  },
-  watch: {
-    clientDocuments: {
-      handler(data) {
-        if (data) {
-          if (!data.length) {
-            this.documentsData = this.defaultDocuments;
-            this.storeClientDocuments(this.defaultDocuments);
-          } else {
-            this.documentsData = data;
-          }
-        }
-      },
-      immediate: true
-    }
   },
   components: {
     SettingsTable,
     SelectSingle,
     Add
   },
-  async created() {},
+  async created() {
+    const client = await this.$http.get(
+      `/clientsapi/client?id=${this.$route.params.id}`
+    );
+    if (!client.data.documents.length) {
+      await this.setDocumentsDefaults("NDA");
+      await this.setDocumentsDefaults("Contract");
+    } else {
+      this.documentsData = client.data.documents;
+    }
+  },
   mounted() {
     this.domain = __WEBPACK__API_URL__;
   }
