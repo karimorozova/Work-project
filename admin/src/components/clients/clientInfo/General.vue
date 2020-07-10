@@ -8,6 +8,12 @@
             .block-item
                 label.block-item__label Website:
                 input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
+            .block-item
+                label.block-item__label.block-item_relative Industry:
+                    Asterisk(:customStyle="asteriskStyle")
+                .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
+                    MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")
+        
         .general-info__block
             .block-item
                 label.block-item__label.block-item_relative Time Zone:
@@ -36,6 +42,7 @@
 <script>
 import Asterisk from "@/components/Asterisk";
 import ClientStatusSelect from "../ClientStatusSelect";
+import MultiClientIndustrySelect from "../MultiClientIndustrySelect";
 import AMSelect from "../AMSelect";
 import scrollDrop from "@/mixins/scrollDrop";
 import SelectSingle from "../../SelectSingle";
@@ -67,6 +74,16 @@ export default {
     changeProperty(e, prop) {
       this.storeClientProperty({ prop, value: e.target.value });
     },
+    setIndustries({ industry }) {
+      let industries = [...this.currentClient.industries];
+      const position = industries.findIndex(item => item._id === industry._id);
+      if (position !== -1) {
+        industries.splice(position, 1);
+      } else {
+        industries.push(industry);
+      }
+      this.storeClientProperty({ prop: "industries", value: industries });
+    },
     setLanguage({ option }) {
       this.currentLanguage = option;
       const lang = this.languages.find(item => item.lang == option);
@@ -91,12 +108,25 @@ export default {
       if (this.timezones) {
         return this.timezones.map(item => item.zone);
       }
+    },
+    selectedIndNames() {
+      let result = [];
+      if (
+        this.currentClient.industries &&
+        this.currentClient.industries.length
+      ) {
+        for (let industry of this.currentClient.industries) {
+          result.push(industry.name);
+        }
+      }
+      return result;
     }
   },
   components: {
     Asterisk,
     ClientStatusSelect,
     AMSelect,
+    MultiClientIndustrySelect,
     SelectSingle
   }
 };

@@ -310,14 +310,8 @@ export default {
     async updateClient() {
       let sendData = new FormData();
       let dataForClient = this.currentClient;
-      dataForClient.documents = this.clientDocuments;
 
-      console.log('14',this.clientDocuments);
-      console.log('14',dataForClient.documents);
-      
-
-      console.log("doc", this.clientDocuments);
-      console.log("update", dataForClient);
+      console.log("aftersave", this.clientDocuments);
 
       if (this.currentClient.hasOwnProperty("nativeLanguage")) {
         dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
@@ -489,7 +483,6 @@ export default {
     ...mapGetters({
       allClients: "getClients",
       currentClient: "getCurrentClient",
-      clientDocuments: "getClientDocuments"
     })
   },
   components: {

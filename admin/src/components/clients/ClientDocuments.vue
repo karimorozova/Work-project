@@ -231,7 +231,7 @@ export default {
       } finally {
         this.refreshDocuments();
       }
-    }
+    },
   },
   computed: {
     ...mapGetters({
@@ -247,11 +247,24 @@ export default {
     const client = await this.$http.get(
       `/clientsapi/client?id=${this.$route.params.id}`
     );
-    if (!client.data.documents.length) {
-      await this.setDocumentsDefaults("NDA");
-      await this.setDocumentsDefaults("Contract");
-    } else {
-      this.documentsData = client.data.documents;
+    let documents = client.data.documents;
+
+    switch (documents.length) {
+      case 1:
+        let category = documents[0].category;
+        category == "NDA"
+          ? await this.setDocumentsDefaults("Contract")
+          : await this.setDocumentsDefaults("NDA");
+        break;
+
+      case 0:
+        await this.setDocumentsDefaults("NDA");
+        await this.setDocumentsDefaults("Contract");
+        break;
+
+      default:
+        this.documentsData = client.data.documents;
+        break;
     }
   },
   mounted() {
