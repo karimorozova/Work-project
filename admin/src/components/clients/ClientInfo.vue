@@ -311,7 +311,7 @@ export default {
       let sendData = new FormData();
       let dataForClient = this.currentClient;
 
-      console.log("aftersave", this.clientDocuments);
+      console.log("aftersave", this.currentClient);
 
       if (this.currentClient.hasOwnProperty("nativeLanguage")) {
         dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;

@@ -12,8 +12,7 @@
                 label.block-item__label.block-item_relative Industry:
                     Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
-                    MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")
-        
+                    MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")              
         .general-info__block
             .block-item
                 label.block-item__label.block-item_relative Time Zone:
@@ -24,7 +23,6 @@
                         :selectedOption="currentClient.hasOwnProperty('timeZone') ? currentClient.timeZone.zone : currentZone"
                         :options="timezoneData"
                         @chooseOption="setTimezone"
-                        @scrollDrop="scrollDrop"
                     )
             .block-item
                 label.block-item__label.block-item_relative Native Language: 
@@ -35,7 +33,26 @@
                         :selectedOption="currentClient.hasOwnProperty('nativeLanguage') ? currentClient.nativeLanguage.lang : currentLanguage"
                         :options="languageData"
                         @chooseOption="setLanguage"
-                        @scrollDrop="scrollDrop"
+                    )
+            .block-item
+                label.block-item__label.block-item_relative Source Languages:
+                .block-item__drop
+                    SelectMulti(
+                      placeholder="Select"
+                      :hasSearch="true"
+                      :selectedOptions="currentClient.hasOwnProperty('sourceLanguages') ? makeStringLanguage(currentClient.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
+                      :options="languageData"
+                      @chooseOptions="setSource"
+                    )
+            .block-item
+                label.block-item__label.block-item_relative Target Languages:
+                .block-item__drop
+                    SelectMulti(
+                      placeholder="Select"
+                      :hasSearch="true"
+                      :selectedOptions="currentClient.hasOwnProperty('targetLanguages') ? makeStringLanguage(currentClient.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
+                      :options="languageData"
+                      @chooseOptions="setTarget"
                     )
 </template>
 
@@ -46,6 +63,7 @@ import MultiClientIndustrySelect from "../MultiClientIndustrySelect";
 import AMSelect from "../AMSelect";
 import scrollDrop from "@/mixins/scrollDrop";
 import SelectSingle from "../../SelectSingle";
+import SelectMulti from "../../SelectMulti";
 
 import { mapGetters, mapActions } from "vuex";
 
@@ -66,13 +84,18 @@ export default {
     return {
       asteriskStyle: { top: "-4px" },
       currentZone: "",
-      currentLanguage: ""
+      currentLanguage: "",
+      currentSourceLanguages: [],
+      currentTargetLanguages: []
     };
   },
   methods: {
     ...mapActions(["storeClientProperty", "updateClientStatus", "alertToggle"]),
     changeProperty(e, prop) {
       this.storeClientProperty({ prop, value: e.target.value });
+    },
+    makeStringLanguage(langArray) {
+      return langArray.map(item => item.lang);
     },
     setIndustries({ industry }) {
       let industries = [...this.currentClient.industries];
@@ -93,7 +116,58 @@ export default {
       this.currentZone = option;
       const timezone = this.timezones.find(item => item.zone == option);
       this.storeClientProperty({ prop: "timeZone", value: timezone });
-    }
+    },
+    setTarget({ option }) {
+      if(this.currentClient.hasOwnProperty('targetLanguages')){
+        if(this.currentClient.targetLanguages.length){
+          this.currentTargetLanguages = this.currentClient.targetLanguages
+        }
+      }
+      const position = this.currentTargetLanguages
+        .map(item => item.lang)
+        .indexOf(option);
+
+      if (position !== -1) {
+        this.currentTargetLanguages.splice(position, 1);
+        this.storeClientProperty({
+          prop: "targetLanguages",
+          value: this.currentTargetLanguages
+        });
+      } else {
+        const lang = this.languages.find(item => item.lang === option);
+        this.currentTargetLanguages.push(lang);
+        this.storeClientProperty({
+          prop: "targetLanguages",
+          value: this.currentTargetLanguages
+        });
+      }
+    },
+    setSource({ option }) {
+      if(this.currentClient.hasOwnProperty('sourceLanguages')){
+        if(this.currentClient.sourceLanguages.length){
+          this.currentSourceLanguages = this.currentClient.sourceLanguages
+        }
+      }
+      const position = this.currentSourceLanguages
+        .map(item => item.lang)
+        .indexOf(option);
+
+      if (position !== -1) {
+        this.currentSourceLanguages.splice(position, 1);
+        this.storeClientProperty({
+          prop: "sourceLanguages",
+          value: this.currentSourceLanguages
+        });
+      } else {
+        const lang = this.languages.find(item => item.lang === option);
+        this.currentSourceLanguages.push(lang);
+        this.storeClientProperty({
+          prop: "sourceLanguages",
+          value: this.currentSourceLanguages
+        });
+      }
+    },
+    selectedSource() {}
   },
   computed: {
     ...mapGetters({
@@ -127,7 +201,8 @@ export default {
     ClientStatusSelect,
     AMSelect,
     MultiClientIndustrySelect,
-    SelectSingle
+    SelectSingle,
+    SelectMulti
   }
 };
 </script>
@@ -140,7 +215,7 @@ export default {
   display: flex;
   justify-content: space-between;
   &__block {
-    width: 35%;
+    width: 38%;
   }
   &_error-shadow {
     box-shadow: 0 0 5px $red;
