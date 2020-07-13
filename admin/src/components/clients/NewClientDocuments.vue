@@ -10,16 +10,17 @@
         )
 
             template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-                .documents__head-title {{ field.label }}
+                .documents__head-title  {{ field.label }}
 
             template(slot="fileName" slot-scope="{ row, index }")
-                span.documents__input {{ documentsData[index].file.name  }}
+                .documents__data {{ documentsData[index].file.name  }}
 
             template(slot="category" slot-scope="{ row, index }") 
                 .documents__data {{row.category}}
 
             template(slot="icons" slot-scope="{ row, index }") 
                 .documents__icons
+                    img.documents__icon(v-if="!documentsData[index].file.name" :style="{cursor: 'default'}" :class="'documents_opacity'" src="../../assets/images/red-info-icon.png")
                     .documents__upload
                         input.documents__load-file(type="file" :ref="'file' + (index)" @change="uploadDocument(index)")
 
@@ -126,7 +127,6 @@ export default {
   &__icons {
     @extend %table-icons;
     height: 32px;
-    justify-content: flex-end;
   }
   &__icon {
     @extend %table-icon;

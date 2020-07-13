@@ -15,12 +15,12 @@
               :languages="languages"
               :timezones="timezones"
           )
-      .title General Information - old ver.
-      .client-info__gen-info
-          OldGeneral(
-              :isSaveClicked="isSaveClicked"
-              @loadFile="loadFile"
-          )
+      //- .title General Information - old ver.
+      //- .client-info__gen-info
+      //-     OldGeneral(
+      //-         :isSaveClicked="isSaveClicked"
+      //-         @loadFile="loadFile"
+      //-     )
       .title Contact Details
       .client-info__contacts-info
           ContactsInfo(

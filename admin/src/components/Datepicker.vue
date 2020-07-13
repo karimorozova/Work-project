@@ -1136,6 +1136,16 @@ export default {
   padding-left: 5px;
   outline: none;
 }
+
+.datepicker-custom-client {
+  border-radius: 5px;
+  border: 1px solid #68573E;
+  height: 30px;
+  color: #68573E;
+  outline: none;
+  padding-left: 5px;
+  width: 100%;
+}
 .datepicker-custom-mod{
   width: 192px;
 }

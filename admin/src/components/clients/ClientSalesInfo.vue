@@ -5,15 +5,27 @@
                 Asterisk(:customStyle="{top: '-4px'}")
             .lead-info__menu(:class="{'sales-info_error-shadow': !client.leadSource && isEmpty}")
                 ClientLeadsourceSelect(:selectedLeadsource="client.leadSource" @chosenLeadsource="chosenLeadsource")
-        .status-info
-            label.lead-info__label Sales comission status:
-            .status-info__data    
-                span {{ client.salesComission }}
+        .lead-info
+            label.lead-info__label.lead-info_relative Lead Generator:
+            .lead-info__menu
+                SelectSingle(
+                    placeholder="Select"
+                    :hasSearch="true"
+                    :selectedOption="currentClient.hasOwnProperty('leadGeneration') ? currentClient.leadGeneration : leadGeneration"
+                    :options="['test','test2']"
+                    @chooseOption="setGenerator"
+                )
+        //- .status-info
+        //-     label.lead-info__label Sales comission status:
+        //-     .status-info__data    
+        //-         span {{ client.salesComission }}
 </template>
 
 <script>
 import ClientLeadsourceSelect from './ClientLeadsourceSelect';
+import SelectSingle from '../SelectSingle';
 import Asterisk from "../Asterisk";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
@@ -26,17 +38,30 @@ export default {
     },
     data() {
         return {
-
+            leadGeneration: '',
         }
     },
     methods: {
+        ...mapActions({
+            storeClientProperty: "storeClientProperty"
+        }),       
         chosenLeadsource({leadSource}) {
             this.$emit("setLeadSource", { leadSource });
-        }
+        },
+        setGenerator({option}){
+            this.leadGeneration = option;
+            this.storeClientProperty({ prop: "leadGeneration", value: this.leadGeneration });
+        },
+    },
+    computed: {
+        ...mapGetters({
+            currentClient: "getCurrentClient"
+        })
     },
     components: {
         ClientLeadsourceSelect,
-        Asterisk
+        Asterisk,
+        SelectSingle
     }
 }
 </script>
@@ -45,7 +70,6 @@ export default {
 
 .sales-info {
     width: 40%;
-    font-size: 14px;
     display: flex;
     flex-direction: column;
     &_error-shadow {
@@ -71,12 +95,12 @@ export default {
     }
 }
 .lead-info {
-    margin-bottom: 30px;
+    height: 50px;
     &__menu {
         display: flex;
         justify-content: flex-start;
         position: relative;
-        width: 191px;
+        width: 190px;
         height: 28px;
     }
     
