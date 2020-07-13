@@ -237,7 +237,7 @@ const ClientSchema = new mongoose.Schema({
     }],
   },
   contacts: [{
-    name: {
+    firstName: {
       type: String,
       trim: true
     },
@@ -248,6 +248,9 @@ const ClientSchema = new mongoose.Schema({
     email: {
       type: String,
       trim: true
+    },
+    password: {
+      type: String,
     },
     gender: {
       type: String,
@@ -260,6 +263,9 @@ const ClientSchema = new mongoose.Schema({
     phone: {
       type: String,
       trim: true
+    },
+    photo: {
+      type: String,
     },
     whatsApp: {
       type: String,
@@ -284,6 +290,10 @@ const ClientSchema = new mongoose.Schema({
     notes: {
       type: String,
     },
+    leadContact: {
+      type: Boolean,
+      default: false
+    }
   }],
   matrix: {
     type: Object,
