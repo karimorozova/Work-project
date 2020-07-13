@@ -8,12 +8,12 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
-  // nativeLanguage: {
-  //   type: Schema.Types.ObjectId, ref: 'Language'
-  // },
-  // defaultPricelist: {
-  //   type: Schema.Types.ObjectId, ref: 'Pricelist'
-  // },
+  nativeLanguage: {
+    type: Schema.Types.ObjectId, ref: 'Language'
+  },
+  defaultPricelist: {
+    type: Schema.Types.ObjectId, ref: 'Pricelist'
+  },
   website: {
     type: String,
     default: '',
@@ -25,8 +25,7 @@ const ClientSchema = new mongoose.Schema({
     trim: true
   },
   timeZone: {
-    type: String
-    //   type: Schema.Types.ObjectId, ref: 'Timezones',
+    type: Schema.Types.ObjectId, ref: 'Timezones',
   },
   documents: {
     type: Array,
@@ -275,9 +274,8 @@ const ClientSchema = new mongoose.Schema({
       trim: true
     },
     timeZone: {
-      type: String
-      // type: Schema.Types.ObjectId,
-      // ref: 'Timezones'
+      type: Schema.Types.ObjectId,
+      ref: 'Timezones'
     },
     notes: {
       type: String,
