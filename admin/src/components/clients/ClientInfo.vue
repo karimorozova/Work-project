@@ -31,11 +31,14 @@
               @newContact="addNewContact"
               @approveDelete="approveContactDelete")
       .title(v-if="currentClient._id") Services
-      .client-info__services
+      .client-info__services(v-if="this.currentClient.sourceLanguages && this.currentClient.targetLanguages && this.currentClient.industries")
           ClientServices(
               :languages="languages"
+              :sourceLanguages="this.currentClient.sourceLanguages.map(i => i.lang)"
+              :targetLanguages="this.currentClient.targetLanguages.map(i => i.lang)"
               :industries="industries"
               :services="services"
+              :clientIndustries="this.currentClient.industries.map(i => i.name)"
           )
       .title(v-if="currentClient._id") Rates
       .client-info__rates
@@ -97,9 +100,9 @@
         :isSaveClicked="isSaveClicked"
       )
     .client-subinfo__date
-      OtherClientInformation(
+      //- OtherClientInformation(
 
-      )
+      //- )
     
 </template>
 
@@ -275,8 +278,12 @@ export default {
       const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
       if (!this.currentClient.name)
         this.errors.push("Company name cannot be empty.");
-      // if (!this.currentClient.industries.length)
-      //   this.errors.push("Please, choose at least one industry.");
+      if (!this.currentClient.industries.length)
+        this.errors.push("Please, choose at least one industry.");
+      if (!this.currentClient.sourceLanguages.length)
+        this.errors.push("Please, choose source language.");
+      if (!this.currentClient.targetLanguages.length)
+        this.errors.push("Please, choose target language.");
       if (!this.currentClient.contacts.length)
         this.errors.push("Please, add at least one contact.");
       if (!this.contactLeadError())
@@ -482,7 +489,7 @@ export default {
   computed: {
     ...mapGetters({
       allClients: "getClients",
-      currentClient: "getCurrentClient",
+      currentClient: "getCurrentClient"
     })
   },
   components: {

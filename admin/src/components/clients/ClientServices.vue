@@ -15,7 +15,7 @@
         placeholder="Select"
         :hasSearch="true"
         :selectedOption="clientServices[index].sourceLanguage.lang"
-        :options="langData"
+        :options="sourceLanguages"
         @chooseOption="setSource"
         @scrollDrop="scrollDrop"
       )
@@ -24,7 +24,7 @@
         placeholder="Select"
         :hasSearch="true"
         :selectedOption="clientServices[index].targetLanguage.lang"
-        :options="langData"
+        :options="targetLanguages"
         @chooseOption="setTarget"
         @scrollDrop="scrollDrop"
       )
@@ -42,7 +42,7 @@
             placeholder="Select"
             :hasSearch="true"
             :selectedOption="clientServices[index].industry.name"
-            :options="industryData"
+            :options="clientIndustries"
             @chooseOption="setIndustry"
             @scrollDrop="scrollDrop"
         )
@@ -83,10 +83,19 @@ export default {
   mixins: [scrollDrop],
 
   props: {
-    languages: {
+    clientIndustries: {
+      type: Array
+    },
+    sourceLanguages: {
+      type: Array
+    },
+    targetLanguages: {
       type: Array
     },
     industries: {
+      type: Array
+    },
+    languages: {
       type: Array
     },
     services: {
@@ -231,22 +240,25 @@ export default {
         );
       }
     },
-    checkForUnique(index){
-      return this.clientServices.filter(item => (
-              item.sourceLanguage.lang == this.clientServices[index].sourceLanguage.lang &&
-              item.targetLanguage.lang == this.clientServices[index].targetLanguage.lang &&
-              item.service.title == this.clientServices[index].service.title &&
-              item.industry.name == this.clientServices[index].industry.name 
-        ));
+    checkForUnique(index) {
+      return this.clientServices.filter(
+        item =>
+          item.sourceLanguage.lang ==
+            this.clientServices[index].sourceLanguage.lang &&
+          item.targetLanguage.lang ==
+            this.clientServices[index].targetLanguage.lang &&
+          item.service.title == this.clientServices[index].service.title &&
+          item.industry.name == this.clientServices[index].industry.name
+      );
     },
     checkAllFields(index) {
       let isfield = this.allFieldsFilled(index);
       if (isfield) {
-        if(this.checkForUnique(index).length > 1){
+        if (this.checkForUnique(index).length > 1) {
           this.errors = [];
           this.errors.push("All fields must be unique!");
           return (this.areErrors = true);
-        }else{
+        } else {
           this.saveData(index);
         }
       }
@@ -256,16 +268,6 @@ export default {
     ClickOutside
   },
   computed: {
-    industryData() {
-      if (this.clientServices) {
-        return this.industries.map(item => item.name);
-      }
-    },
-    langData() {
-      if (this.clientServices) {
-        return this.languages.map(item => item.lang);
-      }
-    },
     servicesData() {
       if (this.clientServices) {
         return this.services.map(item => item.title);

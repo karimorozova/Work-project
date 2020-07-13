@@ -36,6 +36,7 @@
                     )
             .block-item
                 label.block-item__label.block-item_relative Source Languages:
+                    Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop
                     SelectMulti(
                       placeholder="Select"
@@ -46,6 +47,7 @@
                     )
             .block-item
                 label.block-item__label.block-item_relative Target Languages:
+                    Asterisk(:customStyle="asteriskStyle")
                 .block-item__drop
                     SelectMulti(
                       placeholder="Select"
