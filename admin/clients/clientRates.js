@@ -1,102 +1,141 @@
-const { getClientAfterUpdate, getClient } = require("./getClients");
-const { manageMonoPairRates, manageDuoPairRates, fillEmptyRates, fillNonEmptyMonoRates, fillNonEmptyDuoRates, getRateInfoFromStepFinance } = require("../rates/ratesmanage");
+const { Clients, Step } = require('../models');
+const ObjectId = require('mongodb').ObjectID;
+const _ = require('lodash');
 
-async function updateClientRates(client, rateInfo) {
-    const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
-    try {
-        let updatedRates = [];
-        if(prop === 'monoRates') {
-            updatedRates = await manageMonoPairRates({
-                stepsIds, packageSize, industries, target, rates, currentRates: client[prop], entity: client
+const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
+  const client = await Clients.findOne({ _id: clientId });
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  switch (itemIdentifier) {
+    default:
+    case 'Basic Price Table':
+      const updatedBasicPriceTable = replaceOldItem(basicPricesTable, updatedItem);
+      client.rates.basicPricesTable = updatedBasicPriceTable;
+      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      break;
+    case 'Step Multipliers Table':
+      const updatedStepMultipliersTable = replaceOldItem(stepMultipliersTable, updatedItem);
+      client.rates.stepMultipliersTable = updatedStepMultipliersTable;
+      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      break;
+    case 'Industry Multipliers Table':
+      const updatedIndustryMultipliersTable = replaceOldItem(industryMultipliersTable, updatedItem);
+      client.rates.industryMultipliersTable = updatedIndustryMultipliersTable;
+      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      break;
+  }
+};
+
+const replaceOldItem = (arr, replacementItem) => {
+  const { _id } = replacementItem;
+  const itemToUpdateIndex = findIndexToReplace(arr, _id);
+  arr.splice(itemToUpdateIndex, 1, replacementItem);
+  return arr;
+};
+
+const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id.toString() === searchItemId);
+
+
+//TODO: Add source-language existence check
+const addNewRateComponents = async (clientId, newObj, serviceId) => {
+  const { sourceLanguage, targetLanguage, service, industry } = newObj;
+  const client = await Clients.findOne({ _id: clientId });
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  basicPricesTable.push({
+    serviceId: serviceId.toString(),
+    type: 'Duo',
+    sourceLanguage: sourceLanguage._id,
+    targetLanguage: targetLanguage._id
+  });
+  const stepMultipliersCombinations = await getStepMultipliersCombinations(service, serviceId);
+  stepMultipliersTable.push(...stepMultipliersCombinations);
+  industryMultipliersTable.push({
+    serviceId: serviceId.toString(),
+    industry: industry._id
+  });
+  await Clients.updateOne({ _id: clientId },
+    { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable } }
+  );
+};
+
+//TODO: Add clients currencies for combinations
+const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
+  const stepUnitSizeCombinations = [];
+  for (let { step } of steps) {
+    const { calculationUnit } = await Step.findOne({ _id: step });
+    if (!calculationUnit.length) {
+      return [];
+    } else {
+      for (let { _id, sizes } of calculationUnit) {
+        if (sizes.length) {
+          sizes.forEach(size => {
+            stepUnitSizeCombinations.push({
+              serviceId: serviceId.toString(),
+              step: step._id,
+              unit: _id,
+              size
             });
+          });
         } else {
-            updatedRates = await manageDuoPairRates({
-                stepsIds, source, target, industries, rates, currentRates: client[prop], entity: client
-            });
+          stepUnitSizeCombinations.push({
+            serviceId: serviceId.toString(),
+            step: step._id,
+            unit: _id,
+            size: 1,
+            defaultSize: true,
+          });
         }
-        return await getClientAfterUpdate({"_id": client.id}, {[prop]: updatedRates});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in updateClientRates");
+      }
     }
-}
+  }
+  return stepUnitSizeCombinations;
+};
 
-async function importRates({clientId, ratesData, prop}) {
-    try {
-        if(prop === 'monoRates') {
-            return await getAfterImportMono(clientId, ratesData);
-        }
-        return await getAfterImportDuo({clientId, ratesData, prop});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in importRates");
+const syncClientRatesAndServices = async (clientId, changedData, oldData) => {
+  const client = await Clients.findOne({ _id: clientId });
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  const neededBasicPriceIndex = basicPricesTable.findIndex(item => item.serviceId === changedData._id);
+  const neededIndustryIndex = industryMultipliersTable.findIndex(item => item.serviceId === changedData._id);
+  const difference = getObjDifferences(changedData, oldData);
+  if (difference.sourceLanguage) {
+    client.rates.basicPricesTable[neededBasicPriceIndex].sourceLanguage = ObjectId(difference.sourceLanguage);
+  } else if (difference.targetLanguage) {
+    client.rates.basicPricesTable[neededBasicPriceIndex].targetLanguage = ObjectId(difference.targetLanguage);
+  } else if (difference.service) {
+    stepMultipliersTable = stepMultipliersTable.filter(item => item.serviceId !== changedData._id);
+    const stepMultipliersCombinations = await getStepMultipliersCombinations(changedData.service, oldData._id);
+    stepMultipliersTable.push(...stepMultipliersCombinations);
+    client.rates.stepMultipliersTable = stepMultipliersTable;
+  } else {
+    client.rates.industryMultipliersTable[neededIndustryIndex].industry = ObjectId(difference.industry);
+  }
+  await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+};
+
+const getObjDifferences = (obj1, obj2) => {
+  let diffs = {};
+  let key;
+  const compare = (item1, item2, key) => {
+    item1 = item1._id ? item1._id : item1;
+    if (item1.toString() !== item2.toString()) {
+      diffs[key] = item1.toString();
     }
-}
-
-/// Mono rates manage start ///
-
-async function getAfterImportMono(clientId, ratesData) {
-    let { copyRates, industries, stepsIds, packages, targets } = ratesData;
-    const isAllIndustries = industries[0] === 'All'
-    try {
-        const client = await getClient({"_id": clientId});
-        if(isAllIndustries) {
-            industries = client.industries;
-        }
-        const targetsIds = targets.map(item => item._id);
-        const allAvailablePairs = copyRates.filter(item => packages.indexOf(item.packageSize) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
-        let monoRates = client.monoRates.length ? [...client.monoRates] : [];
-        if(!monoRates.length) {
-            monoRates = fillEmptyRates({allAvailablePairs, stepsIds, industries});
-        } else {
-            monoRates = fillNonEmptyMonoRates({allAvailablePairs, stepsIds, industries, monoRates, isAllIndustries});
-        }
-        return await getClientAfterUpdate({"_id": clientId}, { monoRates });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getAfterImportMono");
+  };
+  for (key in obj1) {
+    if (obj1.hasOwnProperty(key)) {
+      compare(obj1[key], obj2[key], key);
     }
-}
+  }
+  return diffs;
+};
 
-/// Mono rates manage end ///
+const deleteClientRates = async (clientId, serviceId) => {
+  const client = await Clients.findOne({ _id: clientId });
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  basicPricesTable = basicPricesTable.filter(item => item.serviceId !== serviceId);
+  stepMultipliersTable = stepMultipliersTable.filter(item => item.serviceId !== serviceId);
+  industryMultipliersTable = industryMultipliersTable.filter(item => item.serviceId !== serviceId);
+  client.rates = { basicPricesTable, stepMultipliersTable, industryMultipliersTable };
+  await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+};
 
-/// Duo rates manage start ///
-
-async function getAfterImportDuo({clientId, ratesData, prop}) {
-    let { copyRates, industries, stepsIds, sources, targets } = ratesData;
-    const isAllIndustries = industries[0] === 'All'
-    try {
-        const client = await getClient({"_id": clientId});
-        if(isAllIndustries) {
-            industries = client.industries;
-        }
-        const sourcesIds = sources.map(item => item._id);
-        const targetsIds = targets.map(item => item._id);
-        const allAvailablePairs = copyRates.filter(item => sourcesIds.indexOf(item.source._id) !== -1 && targetsIds.indexOf(item.target._id)!== -1);
-        let duoRates = client[prop].length ? [...client[prop]] : [];
-        if(!duoRates.length) {
-            duoRates = fillEmptyRates({allAvailablePairs, stepsIds, industries});
-        } else {
-            duoRates = fillNonEmptyDuoRates({allAvailablePairs, stepsIds, industries, duoRates, isAllIndustries});
-        }
-        return await getClientAfterUpdate({"_id": clientId}, { [prop]: duoRates });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getAfterImportDuo");
-    }
-}
-
-/// Duo rates manage end ///
-
-async function getClientAfterCombinationsUpdated({project, step, rate}) {
-    try {
-        const rateInfo = await getRateInfoFromStepFinance({project, step, rate});
-        const client = await getClient({"_id": project.customer.id});
-        return await updateClientRates(client, rateInfo);
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getClientAfterCombinationsUpdated");
-    }
-}
-
-module.exports= { updateClientRates, importRates, getClientAfterCombinationsUpdated };
+module.exports = { updateClientRates, addNewRateComponents, syncClientRatesAndServices, deleteClientRates };

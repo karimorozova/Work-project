@@ -8,6 +8,9 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  nativeLanguage: {
+    type: Schema.Types.ObjectId, ref: 'Language'
+  },
   website: {
     type: String,
     default: '',
@@ -28,6 +31,13 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  timeZone: {
+    type: Schema.Types.ObjectId, ref: 'Timezones',
+  },
+  documents: {
+    type: Array,
+    default: []
+  },
   accountManager: {
     type: Object,
     default: {}
@@ -41,6 +51,16 @@ const ClientSchema = new mongoose.Schema({
     default: {}
   },
   leadSource: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  leadGeneration: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  salesStage: {
     type: String,
     default: '',
     trim: true
@@ -65,19 +85,56 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
-  vat: {
-    type: String,
-    default: '',
-    trim: true
-  },
-  address: {
-    type: String,
-    default: '',
-    trim: true
-  },
   isTest: {
     type: Boolean,
     default: false
+  },
+  billingInfo: {
+    officialCompanyName: {
+      type: String,
+      trim: true
+    },
+    contactName: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      trim: true
+    },
+    vat: {
+      type: Boolean,
+      default: false
+    },
+    dueDate: {
+      type: String,
+      trim: true
+    },
+    address: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    invoiceSending: {
+      type: Boolean,
+      default: false,
+    },
+    paymentType: {
+      type: String,
+      trim: true,
+    },
+    startingBalance: {
+      type: Number,
+      default: 0
+    },
+    balance: {
+      type: Number,
+      default: 0
+    },
+    minimumBalance: {
+      type: Number,
+      default: 0
+    }
   },
   languagePairs: [{
     source: {
@@ -87,51 +144,11 @@ const ClientSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, ref: 'Language'
     }
   }],
-  wordsRates: [{
-    source: {
-      type: Schema.Types.ObjectId, ref: 'Language',
-    },
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
+  sourceLanguages: [{
+    type: Schema.Types.ObjectId, ref: 'Language'
   }],
-  hoursRates: [{
-    source: {
-      type: Schema.Types.ObjectId, ref: 'Language',
-    },
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
-  }],
-  monoRates: [{
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    packageSize: {
-      type: String,
-      trim: true
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
+  targetLanguages: [{
+    type: Schema.Types.ObjectId, ref: 'Language'
   }],
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
@@ -156,18 +173,30 @@ const ClientSchema = new mongoose.Schema({
         type: String,
         trim: true
       },
+      serviceId: {
+        type: String,
+        trim: true,
+      },
       sourceLanguage: {
         type: Schema.Types.ObjectId, ref: 'Language',
       },
       targetLanguage: {
         type: Schema.Types.ObjectId, ref: 'Language',
       },
-      basicPrice: {
+      euroBasicPrice: {
         type: Number,
         default: 1,
+      },
+      altered: {
+        type: Boolean,
+        default: false,
       }
     }],
     stepMultipliersTable: [{
+      serviceId: {
+        type: String,
+        trim: true,
+      },
       step: {
         type: Schema.Types.ObjectId, ref: 'Step',
       },
@@ -181,18 +210,34 @@ const ClientSchema = new mongoose.Schema({
         type: Number,
         default: 100,
       },
-      minPrice: {
+      euroMinPrice: {
         type: Number,
         default: 1,
+      },
+      defaultSize: {
+        type: Boolean,
+        default: false
+      },
+      altered: {
+        type: Boolean,
+        default: false,
       }
     }],
     industryMultipliersTable: [{
+      serviceId: {
+        type: String,
+        trim: true,
+      },
       industry: {
         type: Schema.Types.ObjectId, ref: 'Industries',
       },
       multiplier: {
         type: Number,
         default: 100,
+      },
+      altered: {
+        type: Boolean,
+        default: false,
       }
     }],
   },
@@ -223,6 +268,28 @@ const ClientSchema = new mongoose.Schema({
       repeat85: { text: "85-94%", rate: 0.7 },
       repeat95: { text: "95-99%", rate: 0.4 },
       noMatch: { text: "No match", rate: 1 }
+    }
+  },
+  otherInfo: {
+    firstContactDate: {
+      type: String,
+      trim: true
+    },
+    firstQuoteDate: {
+      type: String,
+      trim: true
+    },
+    lastQuoteDate: {
+      type: String,
+      trim: true
+    },
+    firstProjectDate: {
+      type: String,
+      trim: true
+    },
+    lastProjectDate: {
+      type: String,
+      trim: true
     }
   }
 }, { minimize: false });

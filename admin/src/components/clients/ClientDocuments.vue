@@ -1,5 +1,5 @@
 <template lang="pug">
-.documents 
+.documents
     .documents__table
         SettingsTable(
             :fields="fields"
@@ -18,21 +18,12 @@
 
             template(slot="fileName" slot-scope="{ row, index }")
                 .documents__editing-data(v-if="currentActive === index && currentFile") 
-                    span.documents__input {{ currentFile.name }} sdfsdf
+                    span.documents__input {{ currentFile.name }}
                 .documents__data(v-else)
                     a( :href="domain + row.path" ) {{ row.fileName }}
 
             template(slot="category" slot-scope="{ row, index }") 
-                .documents__data(v-if="currentActive !== index") {{row.category}}
-                .documents__drop-menu(v-else)
-                    SelectSingle(
-                        :isTableDropMenu="isTableDropMenu"
-                        placeholder="Select"
-                        :selectedOption="currentCategory"
-                        :options="categories"
-                        @chooseOption="setCategory"
-                        @scrollDrop="scrollDrop(index)"
-                    )
+                .documents__data {{row.category}}
 
             template(slot="icons" slot-scope="{ row, index }") 
                 .documents__icons
@@ -43,28 +34,18 @@
                     .documents__upload(v-if="currentActive !== index" :class="'documents_opacity-half'")
                         input.documents__load-file(type="file" disabled="disabled")
 
-    Add(@add="addData" v-if="documentsData.filter(item => item.fileName !== '').length > 0")
 
 </template>
 <script>
 import SettingsTable from "../Table/SettingsTable";
-import { mapGetters, mapActions } from "vuex";
 import SelectSingle from "../SelectSingle";
 import Add from "../Add";
-import scrollDrop from "@/mixins/scrollDrop";
 import crudIcons from "@/mixins/crudIcons";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
-  mixins: [scrollDrop, crudIcons],
-  props: {
-    ["documentsData"]: {
-      type: Array,
-      default: () => []
-    },
-    vendorId: {
-      type: String
-    }
-  },
+  mixins: [crudIcons],
+  props: {},
   data() {
     return {
       fields: [
@@ -90,25 +71,28 @@ export default {
           padding: "0"
         }
       ],
-      categories: ["NDA", "Contract", "Resume"],
       currentCategory: "",
       currentFile: "",
 
+      documentsData: [],
       areErrors: false,
       errors: [],
       isDeleting: false,
       deleteIndex: -1,
       isTableDropMenu: true,
       currentActive: -1,
-      domain: "http://localhost:3001"
+      domain: "http://localhost:3001",
+
+      defaultDocuments: [
+        { fileName: "", path: "", category: "NDA" },
+        { fileName: "", path: "", category: "Contract" }
+      ]
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
-      storeDocuments: "storeCurrentVendorDocuments",
-      deleteDocument: "deleteCurrentVendorDocument",
-      storeDocumentsDefault: "storeCurrentVendorDocumentsDefault"
+      storeClientProperty: "storeClientProperty"
     }),
 
     async makeAction(index, key) {
@@ -134,9 +118,6 @@ export default {
       this.currentCategory = this.documentsData[index].category;
     },
     manageCancelEdition(index) {
-      if (!this.documentsData[index].path) {
-        this.documentsData.pop();
-      }
       this.setDefaults();
     },
     setDefaults() {
@@ -144,17 +125,6 @@ export default {
       this.isDeleting = false;
       this.currentCategory = "";
       this.currentFile = "";
-    },
-    addData() {
-      if (this.currentActive !== -1) {
-        return this.isEditing();
-      }
-      this.documentsData.push({
-        category: "",
-        fileName: "",
-        path: ""
-      });
-      this.setEditingData(this.documentsData.length - 1);
     },
     uploadDocument() {
       this.currentFile = this.$refs.file.files[0];
@@ -170,10 +140,6 @@ export default {
         (doc.fileName == "" && !this.currentFile)
       )
         this.errors.push("Upload a file to save!");
-      if (this.isSameExist(index))
-        this.errors.push(
-          "There is a duplication of the file for chosen category!"
-        );
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -181,39 +147,10 @@ export default {
         await this.manageSaveClick(index);
       }
     },
-    scrollDrop(index) {
-      let fillingСategory = this.documentsData.filter(function(item) {
-        return item.fileName !== "";
-      });
 
-      this.categories = [...new Set(fillingСategory.map(item => item.category))];
-
-      const { category } = this.documentsData[index];
-      let countCategories = this.documentsData.filter(
-        item => item.category == category
-      );
-      if (countCategories.length <= 1 && this.documentsData.length == 3) {
-        this.errors = [];
-        this.errors.push("Сannot update category!");
-        this.areErrors = true;
-      } else {
-        false;
-      }
-    },
-    isSameExist(index) {
-      const { fileName, category } = this.documentsData[index];
-      const isSame = this.documentsData.find((item, i) => {
-        return (
-          item.fileName === fileName &&
-          i !== index &&
-          item.category === category
-        );
-      });
-      return !!isSame;
-    },
     async manageSaveClick(index) {
       let formData = new FormData();
-      formData.append("vendorId", this.vendorId);
+      formData.append("clientId", this.currentClient._id);
       formData.append("category", this.currentCategory);
       formData.append("documentFile", this.currentFile);
 
@@ -226,7 +163,10 @@ export default {
         }
       }
       try {
-        const result = await this.storeDocuments(formData);
+        const result = await this.$http.post(
+          "/clientsapi/client-document",
+          formData
+        );
         this.alertToggle({
           message: "Document saved",
           isShow: true,
@@ -234,8 +174,7 @@ export default {
         });
       } catch (err) {
       } finally {
-        this.$emit("refreshDocuments");
-        this.setDefaults();
+        this.refreshDocuments();
       }
     },
     async manageDeleteClick(index) {
@@ -243,27 +182,16 @@ export default {
         this.documentsData.pop();
         return this.setDefaults();
       }
-      if (this.checkDelete(index)) {
-        this.deleteIndex = index;
-        this.isDeleting = true;
-      } else {
-        this.errors = [];
-        this.errors.push("Сannot delete category!");
-        this.areErrors = true;
-        return;
-      }
-    },
-    checkDelete(index) {
-      const { category } = this.documentsData[index];
-      let countCategories = this.documentsData.filter(
-        item => item.category == category
-      );
-      return countCategories.length > 1 ? true : false;
+      this.deleteIndex = index;
+      this.isDeleting = true;
     },
     async deleteData() {
       const docFile = this.documentsData[this.deleteIndex];
       try {
-        await this.deleteDocument({ docFile, vendorId: this.vendorId });
+        const result = await this.$http.post("/clientsapi/remove-client-doc", {
+          docFile,
+          clientId: this.$route.params.id
+        });
         this.alertToggle({
           message: "Document removed",
           isShow: true,
@@ -271,26 +199,44 @@ export default {
         });
       } catch (err) {
       } finally {
-        this.$emit("refreshDocuments");
-        this.setDefaults();
+        this.refreshDocuments();
       }
     },
     closeErrors() {
       this.areErrors = false;
     },
-    setCategory({ option }) {
-      this.currentCategory = this.categories.find(item => item === option);
+    async refreshDocuments() {
+      const client = await this.$http.get(
+        `/clientsapi/client?id=${this.$route.params.id}`
+      );
+      this.documentsData = client.data.documents;
+      this.setDefaults();
     },
     async setDocumentsDefaults(category) {
-      let defaultDocument = { vendorId: this.vendorId, category: category };
+      let defaultDocument = {
+        clientId: this.$route.params.id,
+        category: category
+      };
       try {
-        const result = await this.storeDocumentsDefault(defaultDocument);
+        const result = this.$http.post(
+          "/clientsapi/client-document-default",
+          defaultDocument
+        );
       } catch (err) {
+        this.alertToggle({
+          message: "Error in creating default documents",
+          isShow: true,
+          type: "error"
+        });
       } finally {
-        this.$emit("refreshDocuments");
-        this.setDefaults();
+        this.refreshDocuments();
       }
-    }
+    },
+  },
+  computed: {
+    ...mapGetters({
+      currentClient: "getCurrentClient"
+    })
   },
   components: {
     SettingsTable,
@@ -298,13 +244,27 @@ export default {
     Add
   },
   async created() {
-    const vendor = await this.$http.get(
-      `/vendorsapi/vendor?id=${this.$route.params.id}`
+    const client = await this.$http.get(
+      `/clientsapi/client?id=${this.$route.params.id}`
     );
-    if (vendor.data.documents.length == 0) {
-      await this.setDocumentsDefaults("NDA");
-      await this.setDocumentsDefaults("Contract");
-      await this.setDocumentsDefaults("Resume");
+    let documents = client.data.documents;
+
+    switch (documents.length) {
+      case 1:
+        let category = documents[0].category;
+        category == "NDA"
+          ? await this.setDocumentsDefaults("Contract")
+          : await this.setDocumentsDefaults("NDA");
+        break;
+
+      case 0:
+        await this.setDocumentsDefaults("NDA");
+        await this.setDocumentsDefaults("Contract");
+        break;
+
+      default:
+        this.documentsData = client.data.documents;
+        break;
     }
   },
   mounted() {
@@ -317,11 +277,6 @@ export default {
 @import "../../assets/styles/settingsTable";
 
 .documents {
-  @extend %setting-table;
-  margin: 20px 10px 40px;
-  width: 960px;
-  box-shadow: 0 0 15px #67573e9d;
-
   &__upload {
     position: relative;
     background: url("../../assets/images/Other/upload-icon.png");

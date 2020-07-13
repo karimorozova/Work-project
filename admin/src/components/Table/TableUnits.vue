@@ -258,6 +258,10 @@ export default {
             key: 'Unit',
             oldMultiplier: oldUnit,
           });
+          await this.$http.post('/clientsapi/rates', {
+            key: 'Unit',
+            oldMultiplier: oldUnit,
+          });
           this.getOldData();
         }
       } catch (error) {
@@ -289,8 +293,12 @@ export default {
             key: 'Unit',
             id: result.data,
           });
-        }else{
+        }else {
           await this.$http.post('/pricelists/update-multiplier', {
+            key: 'Unit',
+            oldMultiplier: oldUnit,
+          });
+          await this.$http.post('/clientsapi/rates', {
             key: 'Unit',
             oldMultiplier: oldUnit,
           });

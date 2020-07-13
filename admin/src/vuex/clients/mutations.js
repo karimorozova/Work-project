@@ -1,8 +1,10 @@
 export const mutations = {
     setCurrentClient(state, payload) {
         state.currentClient = payload;
+        state.clientDocuments = payload.documents
     },
     setClientProperty(state, payload) {
+        console.log('all',payload);
         state.currentClient[payload.prop] = payload.value;
     },
     addContact(state, payload) {

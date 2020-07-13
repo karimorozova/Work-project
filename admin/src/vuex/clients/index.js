@@ -3,7 +3,7 @@ import * as getters from './getters';
 import { mutations } from './mutations';
 
 const state = {
-    currentClient: {}
+    currentClient: {},
 }
 
 export const clients = {

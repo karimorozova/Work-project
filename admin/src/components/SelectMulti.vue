@@ -96,7 +96,7 @@ export default {
 
     .drop {
         width: 100%;
-        max-height: 100px;
+        max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;
