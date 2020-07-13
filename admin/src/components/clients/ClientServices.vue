@@ -49,7 +49,7 @@
     .services__delete(v-if="allFieldsFilled(index)")
         i.fa.fa-times(aria-hidden='true' @click="isDeleted = true; deleteIndex = index")
 
-  .services__delete-approve(v-if="isDeleted" v-click-outside="closeModal")
+  .services__delete-approve(v-if="isDeleted")
       ApproveModal(
           text="Are you sure?"
           approveValue="Yes"
@@ -312,6 +312,7 @@ export default {
   &__delete {
     width: 40px;
     margin-left: 35px;
+    cursor: pointer;
   }
   &__delete-approve {
     position: absolute;
