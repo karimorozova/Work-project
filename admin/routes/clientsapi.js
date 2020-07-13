@@ -84,12 +84,12 @@ router.post('/update-client', upload.any(), async (req, res) => {
   let client = JSON.parse(req.body.client);
   let clientId = client._id;
   try {
-    // if (!client._id) {
-    //   let result = await Clients.create(client);
-    //   clientId = result.id;
-    // }
-    // const result = await updateClientInfo({ clientId, client, files: req.files });
-    // res.send({ client: result });
+    if (!client._id) {
+      let result = await Clients.create(client);
+      clientId = result.id;
+    }
+    const result = await updateClientInfo({ clientId, client, files: req.files });
+    res.send({ client: result });
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on updating/creating Client");
