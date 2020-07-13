@@ -122,11 +122,14 @@ export default {
       return (this.isDeleted = false);
     },
     async getClientInfo() {
-      const client = await this.$http.get(
-        `/clientsapi/client?id=${this.$route.params.id}`
-      );
-      this.storeCurrentClient(client.body);
-      this.clientServices = client.body.services;
+      if(!this.currentClient._id){
+        const client = await this.$http.get(
+          `/clientsapi/client?id=${this.$route.params.id}`
+        );
+        this.clientServices = client.body.services;
+      }else{
+        this.clientServices = this.currentClient.services;
+      }
     },
     setChoosenIndex(index) {
       this.currentIndex = index;
@@ -268,6 +271,9 @@ export default {
     ClickOutside
   },
   computed: {
+    ...mapGetters({
+      currentClient: "getCurrentClient"
+    }),
     servicesData() {
       if (this.clientServices) {
         return this.services.map(item => item.title);

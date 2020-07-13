@@ -30,6 +30,7 @@
               @setLeadContact="setLeadContact"
               @newContact="addNewContact"
               @approveDelete="approveContactDelete")
+
       .title(v-if="currentClient._id") Services
       .client-info__services(v-if="this.currentClient.sourceLanguages && this.currentClient.targetLanguages && this.currentClient.industries")
           ClientServices(
@@ -100,9 +101,9 @@
         :isSaveClicked="isSaveClicked"
       )
     .client-subinfo__date
-      //- OtherClientInformation(
+      OtherClientInformation(
 
-      //- )
+      )
     
 </template>
 
@@ -510,13 +511,13 @@ export default {
     OtherClientInformation
   },
   created() {
+    this.getClientInfo();
     this.getLangs();
     this.getUnits();
     this.getSteps();
     this.getIndustries();
     this.getServices();
     this.getTimezones();
-    this.getClientInfo();
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {

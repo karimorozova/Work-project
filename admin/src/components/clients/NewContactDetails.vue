@@ -1,10 +1,12 @@
 <template lang="pug">
     .contact-wrap
         .contact-wrap__buttons
-            input.button(type="button" value="Save" @click="checkForErrors")
-            input.button(type="button" value="Cancel" @click="cancel")
-        .title 
-            span Contact Details
+            .title 
+                span Contact Details
+            .buttons
+                input.button(type="button" value="Save" @click="checkForErrors")
+                input.button(type="button" value="Cancel" @click="cancel")
+
         .details
             .details__item
                 .photo-wrap(v-if="!contact.photo")
@@ -87,20 +89,22 @@ export default {
     mixins: [photoPreview],
     data() {
         return {
-            contact: {
-                country: "",
-                timezone: "",
+            contact:{
                 firstName: "",
                 surname: "",
                 email: "",
                 password: "12345",
                 gender: "",
+                position: "",
                 phone: "",
                 photo: "",
+                whatsApp: "",
                 skype: "",
-                position: "",
+                linkedIn: "",
+                country: "",
+                timeZone: "",
                 notes: "",
-                leadContact: false
+                leadContact: false,
             },
             imageExist: false,
             areErrorsExist: false,
@@ -223,18 +227,19 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .contact-wrap {
-    font-size: 14px;
     position: relative;
     padding: 40px;
+    width: 750px;
     label {
         margin-bottom: 0;
     }
     &__buttons {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
         margin-left: 10px;
-        width: 900px;
+        margin-right: 10px;
+        padding-bottom: 15px;
     }
     &_error-shadow {
         box-shadow: 0 0 5px $red;
@@ -242,7 +247,7 @@ export default {
 }
 
 .title {
-    font-size: 22px;
+    font-size: 26px;
 }
 
 .button {
@@ -261,9 +266,8 @@ export default {
 }
 
 .details {
-    margin: 40px auto;
-    box-shadow: 0 0 15px rgba(103, 87, 62, 0.5);
-    max-width: 570px;
+    margin: 20px 10px 40px;
+    box-shadow: 0 0 10px rgba(103, 87, 62, 0.5);
     display: flex;
     flex-direction: column;
     padding: 40px;

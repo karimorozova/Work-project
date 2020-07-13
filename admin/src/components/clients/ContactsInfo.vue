@@ -14,6 +14,8 @@
                     span.contacts-info__header-title {{ field.label }}
                 template(slot="headerEmail" slot-scope="{ field }")
                     span.contacts-info__header-title {{ field.label }}
+                template(slot="headerPhone" slot-scope="{ field }")
+                    span.contacts-info__header-title {{ field.label }}
                 template(slot="headerPosition" slot-scope="{ field }")
                     span.contacts-info__header-title {{ field.label }}
                 template(slot="headerNotes" slot-scope="{ field }")
@@ -24,21 +26,31 @@
                     span.contacts-info__header-title {{ field.label }}
                 template(slot="name" slot-scope="{ row }")
                     .contacts-info__data-cell {{ getFullName(row) }}
+
                 template(slot="email" slot-scope="{ row, index }")
                     .contacts-info__active(v-if="currentEditingIndex === index")
                         input.contacts-info__input(type="text" v-model="currentEmail")
                     .contacts-info__data-cell(v-else) {{ row.email }}
+
                 template(slot="position" slot-scope="{ row, index }")
                     .contacts-info__active(v-if="currentEditingIndex === index")
                         input.contacts-info__input(type="text" v-model="currentPosition")
                     .contacts-info__data-cell(v-else) {{ row.position }}
+
+                template(slot="phone" slot-scope="{ row, index }")
+                    .contacts-info__active(v-if="currentEditingIndex === index")
+                        input.contacts-info__input(type="text" v-model="currentPhone")
+                    .contacts-info__data-cell(v-else) {{ row.phone }}
+
                 template(slot="notes" slot-scope="{ row, index }")
                     .contacts-info__active(v-if="currentEditingIndex === index")
                         input.contacts-info__input(type="text" v-model="currentNotes")
                     .contacts-info__data-cell(v-else) {{ row.notes }}
+                    
                 template(slot="lead" slot-scope="{ row, index }")
                     .contacts-info__radio
                         CustomRadio(:isChecked="row.leadContact" @toggleRadio="setLeadContact(index)")
+
                 template(slot="icons" slot-scope="{ row, index }")
                     .contacts-info__icons
                         img.contacts-info__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :class="{'contacts-info_opacity': isIconClass(index, key)}")
@@ -73,12 +85,13 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Full Name", headerKey: "headerName", key: "name", width: "17%", padding: "0"},
-                {label: "Email", headerKey: "headerEmail", key: "email", width: "16%", padding: "0"},
-                {label: "Position", headerKey: "headerPosition", key: "position", width: "20%", padding: "0"},
-                {label: "Notes", headerKey: "headerNotes", key: "notes", width: "21%", padding: "0"},
-                {label: "Lead Contact", headerKey: "headerLead", key: "lead", width: "12%", padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: "14%", padding: "0"}
+                {label: "Full Name", headerKey: "headerName", key: "name", width: "15%", padding: "0"},
+                {label: "Email", headerKey: "headerEmail", key: "email", width: "17.5%", padding: "0"},
+                {label: "Phone number", headerKey: "headerPhone", key: "phone", width: "17.5%", padding: "0"},
+                {label: "Position", headerKey: "headerPosition", key: "position", width: "13.5%", padding: "0"},
+                {label: "Notes", headerKey: "headerNotes", key: "notes", width: "13.5%", padding: "0"},
+                {label: "Lead Contact", headerKey: "headerLead", key: "lead", width: "10%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "13%", padding: "0"}
             ],
             icons: {
                 save: {name: 'save', active: false, icon: require('../../assets/images/Other/save-icon-qa-form.png')},
@@ -90,6 +103,7 @@ export default {
             isErrorShow: false,
             isDeleteMessageShow: false,
             currentEmail: "",
+            currentPhone: "",
             oldEmail: "",
             currentPosition: "",
             currentNotes: "",
@@ -132,6 +146,7 @@ export default {
             this.oldEmail = this.client.contacts[index].email;
             this.currentPosition = this.client.contacts[index].position;
             this.currentNotes = this.client.contacts[index].notes;
+            this.currentPhone = this.client.contacts[index].phone;
         },
         setCurrentDefaults() {
             this.currentEditingIndex = -1;
@@ -139,6 +154,7 @@ export default {
             this.oldEmail = "";
             this.currentPosition = "";
             this.currentNotes = "";
+            this.currentPhone = "";
         },
         makeAction(index, key) {
             if(this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
@@ -195,7 +211,8 @@ export default {
                 ...this.client.contacts[index],
                 email: this.currentEmail,
                 position: this.currentPosition,
-                notes: this.currentNotes
+                notes: this.currentNotes,
+                phone: this.currentPhone
             }
             this.$emit("saveContactUpdates", { index, contact });
             this.setCurrentDefaults();
@@ -365,7 +382,7 @@ export default {
 
 .add-button {
     width: 168px;
-    height: 33px;
+    height: 35px;
     color: $white;
     font-size: 14px;
     border-radius: 10px;
