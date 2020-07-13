@@ -11,6 +11,9 @@ const ClientSchema = new mongoose.Schema({
   nativeLanguage: {
     type: Schema.Types.ObjectId, ref: 'Language'
   },
+  defaultPricelist: {
+    type: Schema.Types.ObjectId, ref: 'Pricelist'
+  },
   website: {
     type: String,
     default: '',
@@ -136,14 +139,6 @@ const ClientSchema = new mongoose.Schema({
       default: 0
     }
   },
-  languagePairs: [{
-    source: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    }
-  }],
   sourceLanguages: [{
     type: Schema.Types.ObjectId, ref: 'Language'
   }],
@@ -242,19 +237,53 @@ const ClientSchema = new mongoose.Schema({
     }],
   },
   contacts: [{
-    country: "",
-    timezone: "",
-    firstName: "",
-    surname: "",
-    email: "",
-    password: "",
-    gender: "",
-    phone: "",
-    photo: "",
-    skype: "",
-    position: "",
-    notes: "",
-    leadContact: false
+    name: {
+      type: String,
+      trim: true
+    },
+    surname: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      trim: true
+    },
+    gender: {
+      type: String,
+      trim: true
+    },
+    position: {
+      type: String,
+      trim: true
+    },
+    phone: {
+      type: String,
+      trim: true
+    },
+    whatsApp: {
+      type: String,
+      trim: true
+    },
+    skype: {
+      type: String,
+      trim: true
+    },
+    linkedIn: {
+      type: String,
+      trim: true
+    },
+    country: {
+      type: String,
+      trim: true
+    },
+    timeZone: {
+      type: Schema.Types.ObjectId,
+      ref: 'Timezones'
+    },
+    notes: {
+      type: String,
+    },
   }],
   matrix: {
     type: Object,

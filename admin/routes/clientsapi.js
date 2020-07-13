@@ -97,13 +97,23 @@ router.post('/update-client', upload.any(), async (req, res) => {
 });
 
 router.get('/get-contract', async (req, res) => {
-  const path = req.query.path;
-  res.send(`${apiUrl}${path}`);
+  const { path } = req.query;
+  try {
+    res.send(`${apiUrl}${path}`);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting contract');
+  }
 });
 
 router.get('/get-nda', async (req, res) => {
-  const path = req.query.path;
-  res.send(`${apiUrl}${path}`);
+  const { path } = req.query;
+  try {
+    res.send(`${apiUrl}${path}`);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting NDA');
+  }
 });
 
 router.delete('/deleteclient/:id', async (req, res) => {
