@@ -21,6 +21,11 @@
                 @saveContactUpdates="saveContactUpdates"
                 @newContact="addNewContact"
                 @approveDelete="approveContactDelete")
+        .title Documents
+        .new-client-info__documents
+            NewClientDocuments(
+                @uploadFiles="uploadFiles"
+            )
         .title Sales Information
         .new-client-info__sales
             ClientSalesInfo(:client="client" @setLeadSource="setLeadSource" :isEmpty="isLeadEmpty")
@@ -34,6 +39,7 @@
 </template>
 
 <script>
+import NewClientDocuments from './NewClientDocuments';
 import NewGeneral from "./clientInfo/NewGeneral";
 import Button from "../Button";
 import ValidationErrors from "../ValidationErrors";
@@ -72,6 +78,7 @@ export default {
             contactInd: 0,
             contractFile: [],
             ndaFile: [],
+            documentsFiles: [],
         }
     },
     methods: {
@@ -146,18 +153,18 @@ export default {
                 return
             }
             await this.saveClient();
-        }, 
+        },
+        uploadFiles(data){
+            this.documentsFiles = data;
+        },
         async saveClient() {            
             let sendData = new FormData();
             sendData.append('client', JSON.stringify(this.client));
             for(let i = 0; i < this.contactsPhotos.length; i++) {
                 sendData.append('photos', this.contactsPhotos[i]);
             }
-            for(let i = 0; i < this.contractFiles.length; i++) {
-                sendData.append('contract', this.contractFiles[i]);
-            }
-            for(let i = 0; i < this.ndaFiles.length; i++) {
-                sendData.append('nda', this.ndaFiles[i]);
+            for (const document of this.documentsFiles) {
+                sendData.append(document.category, document.file)
             }
             try {
                 const result = await this.$http.post('/clientsapi/update-client', sendData);
@@ -194,7 +201,8 @@ export default {
         ValidationErrors,
         ContactsInfo,
         ClientSalesInfo,
-        ClientBillInfo
+        ClientBillInfo,
+        NewClientDocuments
     }
 }
 </script>
@@ -206,7 +214,7 @@ export default {
     position: relative;
     padding: 40px;
     width: 1020px;
-    &__gen-info, &__contacts-info, &__sales, &__billing {
+    &__gen-info, &__documents, &__contacts-info, &__sales, &__billing {
         margin: 20px 10px 40px 10px;
         padding: 40px;
         box-shadow: 0 0 15px #67573e9d;
