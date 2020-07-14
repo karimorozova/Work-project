@@ -17,7 +17,7 @@ const {
   saveClientDocument,
   removeClientDoc,
 } = require('../clients');
-const { getRateCombinations } = require('../rates');
+const { getRatePricelist } = require('../rates');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -218,8 +218,8 @@ router.post('/rates', async (req, res) => {
 router.post('/rates/rate-combinations/:id', async (req, res) => {
   const { id: clientId } = req.params;
   try {
-    const rateCombinations = await getRateCombinations(clientId, req.body);
-    res.send(rateCombinations);
+    const ratePricelist = await getRatePricelist(clientId, req.body);
+    res.send(ratePricelist);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on getting client rate\'s combinations');

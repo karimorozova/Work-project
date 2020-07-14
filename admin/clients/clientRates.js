@@ -1,5 +1,6 @@
-const { Clients, Step } = require('../models');
+const { Clients, Step, Units, Industries } = require('../models');
 const ObjectId = require('mongodb').ObjectID;
+const { multiplyPrices } = require('../multipliers');
 const _ = require('lodash');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
@@ -39,7 +40,7 @@ const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id
 const addNewRateComponents = async (clientId, newObj, serviceId) => {
   const { sourceLanguage, targetLanguage, service, industry } = newObj;
   const client = await Clients.findOne({ _id: clientId });
-  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates;
   basicPricesTable.push({
     serviceId: serviceId.toString(),
     type: 'Duo',
@@ -52,9 +53,15 @@ const addNewRateComponents = async (clientId, newObj, serviceId) => {
     serviceId: serviceId.toString(),
     industry: industry._id
   });
-  const pricelistTable = getPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable);
+  const priceListCombinations = await getPricelistCombinations(
+    basicPricesTable,
+    stepMultipliersTable,
+    industryMultipliersTable,
+    newObj
+  );
+  pricelistTable.push(...priceListCombinations);
   await Clients.updateOne({ _id: clientId },
-    { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable } }
+    { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
   );
 };
 
@@ -91,26 +98,26 @@ const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
   return stepUnitSizeCombinations;
 };
 
-const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, industryMultipliersTable) => {
+const getPricelistCombinations = async (basicPricesTable, stepMultipliersTable, industryMultipliersTable, newObj) => {
   const priceListCombinations = [];
-  stepMultipliersTable.forEach(({ step, serviceId, unit, size, multiplier: stepMultiplierValue, euroMinPrice }) => {
-    basicPricesTable.forEach(({ sourceLanguage, targetLanguage, euroBasicPrice }) => {
-      industryMultipliersTable.forEach(({ industry, multiplier: industryMultiplierValue }) => {
+  for (let { step, unit, size, multiplier: stepMultiplierValue } of stepMultipliersTable) {
+    for (let { basicPrice } of basicPricesTable) {
+      for (let { multiplier: industryMultiplierValue } of industryMultipliersTable) {
+        const { title } = await Step.findOne({ _id: step });
+        const { type } = await Units.findOne({ _id: unit });
         priceListCombinations.push({
-          sourceLanguage,
-          targetLanguage,
-          step,
-          unit,
+          sourceLanguage: newObj.sourceLanguage.lang,
+          targetLanguage: newObj.targetLanguage.lang,
+          step: title,
+          unit: type,
           size,
-          industry: industry.name,
-          eurPrice: multiplyPrices(euroBasicPrice, stepMultiplierValue, industryMultiplierValue),
-          euroMinPrice,
-          isGrouped: false,
-          serviceId: serviceId,
+          industry: newObj.industry.name,
+          price: multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue),
         });
-      });
-    });
-  });
+      }
+    }
+  }
+  return priceListCombinations;
 };
 
 const syncClientRatesAndServices = async (clientId, changedData, oldData) => {
