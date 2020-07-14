@@ -52,8 +52,14 @@
                 label Phone:
                 input.non-personal(type="text" placeholder="Phone number" :value="contact.phone" @input="setPhone" ref="phone")
             .details__item
+                label WhatsApp:
+                input.non-personal(type="text" placeholder="WhatsApp" v-model="contact.whatsApp")
+            .details__item
                 label Skype:
                 input.non-personal(type="text" placeholder="Skype name" v-model="contact.skype")
+            .details__item
+                label LinkedIn:
+                input.non-personal(type="text" placeholder="LinkedIn" v-model="contact.linkedIn")
             .details__item
                 label Country:
                 .details__drop-menu
@@ -117,6 +123,7 @@ export default {
         }
     },
     methods: {
+        
         openGenders() {
             this.genderDropped = !this.genderDropped;
         },
