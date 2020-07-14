@@ -14,6 +14,19 @@ const ClientSchema = new mongoose.Schema({
   defaultPricelist: {
     type: Schema.Types.ObjectId, ref: 'Pricelist'
   },
+  currency: {
+    type: String,
+    default: 'EUR',
+    trim: true,
+  },
+  minPrice: {
+    type: Number,
+    default: 0,
+  },
+  ignoreMinPrice: {
+    type: Boolean,
+    default: false
+  },
   website: {
     type: String,
     default: '',
@@ -168,13 +181,18 @@ const ClientSchema = new mongoose.Schema({
       targetLanguage: {
         type: Schema.Types.ObjectId, ref: 'Language',
       },
-      euroBasicPrice: {
+      basicPrice: {
         type: Number,
         default: 1,
       },
       altered: {
         type: Boolean,
         default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
       }
     }],
     stepMultipliersTable: [{
@@ -195,10 +213,6 @@ const ClientSchema = new mongoose.Schema({
         type: Number,
         default: 100,
       },
-      euroMinPrice: {
-        type: Number,
-        default: 1,
-      },
       defaultSize: {
         type: Boolean,
         default: false
@@ -206,6 +220,11 @@ const ClientSchema = new mongoose.Schema({
       altered: {
         type: Boolean,
         default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
       }
     }],
     industryMultipliersTable: [{
@@ -223,8 +242,48 @@ const ClientSchema = new mongoose.Schema({
       altered: {
         type: Boolean,
         default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
       }
     }],
+    pricelistTable: [{
+      sourceLanguage: {
+        type: String,
+        trim: true
+      },
+      targetLanguage: {
+        type: String,
+        trim: true
+      },
+      step: {
+        type: String,
+        trim: true
+      },
+      unit: {
+        type: String,
+        trim: true,
+      },
+      industry: {
+        type: String,
+        trim: true
+      },
+      price: {
+        type: Number,
+        default: 0
+      },
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      }
+    }]
   },
   contacts: [{
     firstName: {

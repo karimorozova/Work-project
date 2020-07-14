@@ -52,6 +52,7 @@ const addNewRateComponents = async (clientId, newObj, serviceId) => {
     serviceId: serviceId.toString(),
     industry: industry._id
   });
+  const pricelistTable = getPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable);
   await Clients.updateOne({ _id: clientId },
     { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable } }
   );
@@ -88,6 +89,28 @@ const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
     }
   }
   return stepUnitSizeCombinations;
+};
+
+const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, industryMultipliersTable) => {
+  const priceListCombinations = [];
+  stepMultipliersTable.forEach(({ step, serviceId, unit, size, multiplier: stepMultiplierValue, euroMinPrice }) => {
+    basicPricesTable.forEach(({ sourceLanguage, targetLanguage, euroBasicPrice }) => {
+      industryMultipliersTable.forEach(({ industry, multiplier: industryMultiplierValue }) => {
+        priceListCombinations.push({
+          sourceLanguage,
+          targetLanguage,
+          step,
+          unit,
+          size,
+          industry: industry.name,
+          eurPrice: multiplyPrices(euroBasicPrice, stepMultiplierValue, industryMultiplierValue),
+          euroMinPrice,
+          isGrouped: false,
+          serviceId: serviceId,
+        });
+      });
+    });
+  });
 };
 
 const syncClientRatesAndServices = async (clientId, changedData, oldData) => {
