@@ -273,9 +273,9 @@ const ClientSchema = new mongoose.Schema({
       type: String,
       trim: true
     },
-    timeZone: {
-      type: Schema.Types.ObjectId,
-      ref: 'Timezones'
+    timezone: {
+      type: String,
+      default: ''
     },
     notes: {
       type: String,
