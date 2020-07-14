@@ -215,6 +215,17 @@ router.post('/rates', async (req, res) => {
   }
 });
 
+router.post('/rates/change-pricelist:id', async (req, res) => {
+  const { id: clientId } = req.params;
+  try {
+    await changeClientPricelist(clientId, req.body);
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on changing pricelist');
+  }
+});
+
 router.post('/rates/rate-combinations/:id', async (req, res) => {
   const { id: clientId } = req.params;
   try {
@@ -251,41 +262,41 @@ router.delete('/services/:clientId/:serviceId', async (req, res) => {
 router.post('/client-document-default', async (req, res) => {
   const { clientId, category } = req.body;
   try {
-      const updatedClient = await saveClientDocumentDefault({
-          clientId, category
-      });
-      res.send(updatedClient);
+    const updatedClient = await saveClientDocumentDefault({
+      clientId, category
+    });
+    res.send(updatedClient);
   } catch (err) {
-      console.log(err);
-      res.status(500).send("Error on adding client documents");
+    console.log(err);
+    res.status(500).send("Error on adding client documents");
   }
-})
+});
 
 router.post('/client-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
   const { clientId, category, oldFilePath, oldName, oldCategory } = req.body;
   const files = req.files["documentFile"] || [];
   try {
-      const updatedClient = await saveClientDocument({
-          clientId, file: files[0], category, oldFilePath, oldName, oldCategory
-      });
-      res.send(updatedClient);
+    const updatedClient = await saveClientDocument({
+      clientId, file: files[0], category, oldFilePath, oldName, oldCategory
+    });
+    res.send(updatedClient);
   } catch (err) {
-      console.log(err);
-      res.status(500).send("Error on adding client document");
+    console.log(err);
+    res.status(500).send("Error on adding client document");
   }
-})
+});
 
 router.post('/remove-client-doc', async (req, res) => {
   const { clientId, docFile } = req.body;
   try {
-      const updatedVendor = await removeClientDoc({
-        clientId, ...docFile
-      });
-      res.send(updatedVendor);
+    const updatedVendor = await removeClientDoc({
+      clientId, ...docFile
+    });
+    res.send(updatedVendor);
   } catch (err) {
-      console.log(err);
-      res.status(500).send("Error on removing client document");
+    console.log(err);
+    res.status(500).send("Error on removing client document");
   }
-})
+});
 
 module.exports = router;
