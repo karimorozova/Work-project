@@ -16,8 +16,8 @@
     DataTable(
       :fields="fields"
       :tableData="dataArray"
-      :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 10}]"
-      :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 6}]"
+      :tableheadRowClass="dataArray.length < 6 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
       bodyCellClass="settings-table-cell"
       @bottomScrolled="bottomScrolled"
@@ -26,33 +26,50 @@
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
+        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentSourceLanguage" disabled)
+      
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
+        .price__data(v-if="currentActive !== index") {{ row.targetLanguage }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentTargetLanguage" disabled)
+      
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }} / ({{ getServiceName(row.serviceId) }})
+        .price__data(v-if="currentActive !== index") {{ row.step }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentStep" disabled)
+      
       template(slot="unit" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.unit.type }} / {{row.size}}
+        .price__data(v-if="currentActive !== index") {{ row.unit }} / {{row.size}}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentUnit" disabled)
+      
       template(slot="industry" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.industry }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentIndustry" disabled)
 
-      template(slot="eur" slot-scope="{ row, index }")
+      template(slot="price" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.eurPrice}}
-          label(for="eur") &euro;
-      template(slot="minEur" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          span(id="minEur") {{row.euroMinPrice}}
-          label(for="minEur") &euro;
+          span(id="currencyType") {{row.price}}
+          label(for="currencyType") ??&euro;
+        .price__editing-data(v-else)
+          input.price__data-input(type="number" v-model="currentPrice")
+      template(slot="icons" slot-scope="{ row, index }")
+        .price__icons
+          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
 
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 import DataTable from "../../DataTable";
 import ResultFilter from "./ResultFilter";
+import crudIcons from "@/mixins/crudIcons";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+  mixins: [crudIcons],
   props: {
     languages: {
       type: Array
@@ -91,7 +108,7 @@ export default {
           padding: "0"
         },
         {
-          label: "Step / Service",
+          label: "Step",
           headerKey: "headerStep",
           key: "step",
           width: "15%",
@@ -112,36 +129,114 @@ export default {
           padding: "0"
         },
         {
-          label: "Price (EUR)",
-          headerKey: "headerPriceEUR",
-          key: "eur",
-          width: "12.5%",
+          label: "Price",
+          headerKey: "headerPrice",
+          key: "price",
+          width: "10%",
           padding: "0"
         },
         {
-          label: "Min Price (EUR)",
-          headerKey: "headerMinPriceEUR",
-          key: "minEur",
-          width: "12.5%",
+          label: "",
+          headerKey: "headerIcons",
+          key: "icons",
+          width: "15%",
           padding: "0"
         }
       ],
 
       dataArray: [],
+      currentSourceLanguage: "",
+      currentTargetLanguage: "",
+      currentStep: "",
+      currentUnit: "",
+      currentIndustry: "",
+      currentPrice: "",
+
       sourceFilter: "",
       targetFilter: "",
       stepFilter: "",
       unitFilter: "",
       industryFilter: "",
-      isDataRemain: true
+      isDataRemain: true,
+      currentActive: -1
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-    getServiceName(id) {
-       return this.currentClient.services.find(item => item._id == id).service.title;
+    async makeAction(index, key) {
+      if (this.currentActive !== -1 && this.currentActive !== index) {
+        return this.isEditing();
+      }
+      switch (key) {
+        case "edit":
+          this.setEditingData(index);
+          break;
+        case "cancel":
+          this.manageCancelEdition();
+          break;
+        case "delete":
+          alert("delete");
+          break;
+        default:
+          await this.checkErrors(index);
+      }
+    },
+    setEditingData(index) {
+      this.currentActive = index;
+      this.currentSourceLanguage = this.dataArray[index].sourceLanguage;
+      this.currentTargetLanguage = this.dataArray[index].targetLanguage;
+      this.currentStep = this.dataArray[index].step;
+      this.currentUnit = this.dataArray[index].unit;
+      this.currentIndustry = this.dataArray[index].industry;
+      this.currentPrice = this.dataArray[index].price;
+    },
+    async checkErrors(index) {
+      if (this.currentActive === -1) return;
+      if (this.currentPrice == "") return;
+      await this.manageSaveClick(index);
+    },
+
+    async manageSaveClick(index) {
+      if (this.currentActive === -1) return;
+      const id = this.dataArray[index]._id;
+
+      try {
+        const result = await this.$http.post(
+          "/clientsapi/rates/change-pricelist/" + this.clientId,
+          {
+              _id: id,
+              price: parseFloat(this.currentPrice).toFixed(3),
+              altered: true,
+              notification: 'Price disconnected from function'
+          }
+        );
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        });
+
+        const updatedData = await this.$http.get(
+          "/clientsapi/rates/" + this.clientId
+        );
+        this.dataArray[index] = updatedData.body.pricelistTable[index];
+
+        this.setDefaults();
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on saving Result pricelist",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    manageCancelEdition() {
+      this.setDefaults();
+    },
+    setDefaults() {
+      this.currentActive = -1;
     },
     setFilter({ option, prop }) {
       this[prop] = option;
@@ -207,6 +302,10 @@ export default {
       if (this.unitFilter == "All") result.unitFilter = "";
       if (this.industryFilter == "All") result.industryFilter = "";
 
+      return result;
+    },
+    manageIcons() {
+      const { delete: del, ...result } = this.icons;
       return result;
     }
   },

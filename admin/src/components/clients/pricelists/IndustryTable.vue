@@ -156,7 +156,8 @@ export default {
             updatedItem: {
               _id: id,
               industry: this.currentIndustryObj,
-              multiplier: parseFloat(this.currentMultiplier).toFixed(0)
+              multiplier: parseFloat(this.currentMultiplier).toFixed(0),
+              altered: true,
             }
           }
         );

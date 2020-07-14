@@ -29,10 +29,10 @@
 
       template(slot="eur" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.euroBasicPrice}}
-          label(for="eur") &euro;
+          span(id="currencyType") {{row.basicPrice}}
+          label(for="currencyType") ??=&euro;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceEUR")
+          input.price__data-input(type="number" v-model="currentBasicPrice")
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
@@ -91,7 +91,7 @@ export default {
       currentTargetLang: "",
       currentSourceLangObj: "",
       currentTargetLangObj: "",
-      currentBasicPriceEUR: "",
+      currentBasicPrice: "",
       currency: {},
 
       areErrors: false,
@@ -133,7 +133,7 @@ export default {
         (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
         (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
         (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
-        (this.currentBasicPriceEUR = this.dataArray[index].euroBasicPrice);
+        (this.currentBasicPrice = this.dataArray[index].basicPrice);
     },
     manageCancelEdition() {
       this.setDefaults();
@@ -145,7 +145,7 @@ export default {
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
-      if (this.currentBasicPriceEUR == "") return;
+      if (this.currentBasicPrice == "") return;
       await this.manageSaveClick(index);
     },
     async getLangs() {
@@ -167,7 +167,8 @@ export default {
               type: this.dataArray[index].type,
               sourceLanguage: this.currentSourceLangObj,
               targetLanguage: this.currentTargetLangObj,
-              euroBasicPrice: parseFloat(this.currentBasicPriceEUR).toFixed(3)
+              basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
+              altered: true,
             }
           }
         );

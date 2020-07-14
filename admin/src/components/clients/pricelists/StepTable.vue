@@ -18,7 +18,7 @@
         .price-title {{ field.label }}
 
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }} ({{ getServiceName(row.serviceId) }})
+        .price__data(v-if="currentActive !== index") {{ row.step.title }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentStep" disabled)
 
@@ -39,12 +39,12 @@
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentMultiplier")
 
-      template(slot="eur" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.euroMinPrice}}
-          label(for="eur") &euro;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
+      //- template(slot="eur" slot-scope="{ row, index }")
+      //-   .price__data(v-if="currentActive !== index")
+      //-     span(id="eur") {{row.euroMinPrice}}
+      //-     label(for="eur") &euro;
+      //-   .price__editing-data(v-else)
+      //-     input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
@@ -73,42 +73,35 @@ export default {
           label: "Step / Service",
           headerKey: "headerStep",
           key: "step",
-          width: "21%",
+          width: "25%",
           padding: "0"
         },
         {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "21%",
+          width: "25%",
           padding: "0"
         },
         {
           label: "Size",
           headerKey: "headerSize",
           key: "size",
-          width: "10%",
+          width: "12%",
           padding: "0"
         },
         {
           label: "Multiplier (%)",
           headerKey: "headerMultiplier",
           key: "multiplier",
-          width: "12%",
-          padding: "0"
-        },
-        {
-          label: "Min price (EUR)",
-          headerKey: "headerMinPriceEUR",
-          key: "eur",
-          width: "15%",
+          width: "13%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "21%",
+          width: "25%",
           padding: "0"
         }
       ],
@@ -119,7 +112,7 @@ export default {
       currentUnitObj: "",
       currentSize: "",
       currentMultiplier: "",
-      currentMinPriceEUR: "",
+      // currentMinPriceEUR: "",
 
       areErrors: false,
       errors: [],
@@ -133,9 +126,9 @@ export default {
     this.getSteps();
   },
   methods: {
-    getServiceName(id) {
-       return this.currentClient.services.find(item => item._id == id).service.title;
-    },
+    // getServiceName(id) {
+    //    return this.currentClient.services.find(item => item._id == id).service.title;
+    // },
     ...mapActions({
       alertToggle: "alertToggle"
     }),
@@ -165,7 +158,7 @@ export default {
       this.currentUnit = this.dataArray[index].unit.type;
       this.currentSize = this.dataArray[index].size;
       this.currentMultiplier = this.dataArray[index].multiplier;
-      this.currentMinPriceEUR = this.dataArray[index].euroMinPrice;
+      // this.currentMinPriceEUR = this.dataArray[index].euroMinPrice;
     },
     manageCancelEdition() {
       this.setDefaults();
@@ -174,13 +167,12 @@ export default {
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.currentTest = "";
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       if (this.currentMultiplier == "") return;
       if (Math.sign(this.currentMultiplier) == -1) return;
-      if (this.currentMinPriceEUR == "") return;
+      // if (this.currentMinPriceEUR == "") return;
       await this.manageSaveClick(index);
     },
     async getSteps() {
@@ -203,7 +195,7 @@ export default {
               unit: this.currentUnitObj,
               size: this.currentSize,
               multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-              euroMinPrice: parseFloat(this.currentMinPriceEUR).toFixed(3)
+              altered: true,
             }
           }
         );
@@ -229,10 +221,10 @@ export default {
     closeErrors() {
       this.areErrors = false;
     },
-    async setFilter({ option, prop }) {
-      this[prop] = option;
-      await this.getSteps(this.allFilters);
-    }
+    // async setFilter({ option, prop }) {
+    //   this[prop] = option;
+    //   await this.getSteps();
+    // }
   },
   computed: {
     manageIcons() {
@@ -255,7 +247,7 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 0 30px;
+  padding: 20px 15px 0;
   box-shadow: none;
 
   input[disabled] {

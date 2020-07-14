@@ -50,18 +50,19 @@
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
             )
+          .step-table(v-if="currentClient._id")
+            StepTable(
+              :tableData="currentClient.rates.stepMultipliersTable"
+              :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+            )
           .industry-table(v-if="currentClient._id")
             IndustryTable(
               :tableData="currentClient.rates.industryMultipliersTable"
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
             )
-        .step-table(v-if="currentClient._id")
-          StepTable(
-            :tableData="currentClient.rates.stepMultipliersTable"
-            :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-          )
+
         .result-table(v-if="currentClient._id")
           ResultTable(
                 :clientId="currentClient._id"
@@ -579,9 +580,12 @@ export default {
   &__tables-row {
     display: flex;
     .lang-table {
-      width: 60%;
+      width: 40%;
     }
     .industry-table {
+      width: 30%;
+    }
+    .step-table{
       width: 40%;
     }
   }
