@@ -266,6 +266,9 @@ const ClientSchema = new mongoose.Schema({
         type: String,
         trim: true,
       },
+      size: {
+        type: Number,
+      },
       industry: {
         type: String,
         trim: true
