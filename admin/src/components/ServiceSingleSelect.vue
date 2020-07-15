@@ -92,7 +92,7 @@ export default {
     overflow: hidden;
     .selected {
         border-right: 1px solid #BFB09D;
-        width: 82%;
+        width: 80%;
         padding: 0 5px;
         font-size: 14px;
         opacity: 0.7;
@@ -102,7 +102,7 @@ export default {
         align-items: center;
     }
     .arrow-button {
-        width: 18%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;

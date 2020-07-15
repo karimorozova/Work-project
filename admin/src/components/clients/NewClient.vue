@@ -42,11 +42,14 @@ export default {
                 address: "",
                 languageCombinations: [],
                 industries: [],
-                nativeLanguage:'',
+                nativeLanguage: '',
                 timeZone: '',
                 contacts: [],
                 sourceLanguages: [],
                 targetLanguages: [],
+                currency: '',
+                defaultPricelist: '',
+
             },
             isNewClient: true
         }

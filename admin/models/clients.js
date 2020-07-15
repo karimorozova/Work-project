@@ -9,10 +9,10 @@ const ClientSchema = new mongoose.Schema({
     trim: true
   },
   nativeLanguage: {
-    type: Schema.Types.ObjectId, ref: 'Language'
+    type: Schema.Types.ObjectId, ref: 'Language',
   },
   defaultPricelist: {
-    type: Schema.Types.ObjectId, ref: 'Pricelist'
+    type: Schema.Types.ObjectId, ref: 'Pricelist',
   },
   currency: {
     type: String,

@@ -23,6 +23,13 @@
                 @saveContactUpdates="saveContactUpdates"
                 @newContact="addNewContact"
                 @approveDelete="approveContactDelete")
+        .title Rates Parameters
+        .new-client-info__rates
+            NewRates(
+                :client="client"
+                :isSaveClicked="isSaveClicked"
+            )
+
         .title Documents
         .new-client-info__documents
             NewClientDocuments(
@@ -47,6 +54,7 @@
 </template>
 
 <script>
+import NewRates from './clientInfo/NewRates';
 import NewClientDocuments from './NewClientDocuments';
 import NewGeneral from './clientInfo/NewGeneral'
 import Button from "../Button";
@@ -177,6 +185,8 @@ export default {
             if(!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.');
             if(!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.');
             if(!this.client.contacts.length) this.errors.push('Please, add at least one contact.');
+            if(!this.client.currency.length) this.errors.push('Please, add currency.');
+            if(this.client.defaultPricelist == '') this.errors.push('Please, add pricelist.');
             if(!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.');
             if(!this.client.status) this.errors.push('Please, choose status.');
             if(!this.client.leadSource) {
@@ -200,6 +210,14 @@ export default {
         },
         async saveClient() {            
             let sendData = new FormData();
+
+            if(this.client.timeZone == ''){
+                this.client.timeZone = null
+            } 
+            if(this.client.nativeLanguage == ''){
+                this.client.nativeLanguage = null
+            }
+            
             sendData.append('client', JSON.stringify(this.client));
             for(let i = 0; i < this.contactsPhotos.length; i++) {
                 sendData.append('photos', this.contactsPhotos[i]);
@@ -245,6 +263,7 @@ export default {
         ClientBillInfo,
         NewClientDocuments,
         NewSideGeneral,
+        NewRates
     }
 }
 </script>
@@ -272,10 +291,10 @@ export default {
     position: relative;
     padding: 40px;
     width: 1020px;
-    &__gen-info, &__documents, &__contacts-info, &__sales, &__billing {
+    &__gen-info, &__rates, &__documents, &__contacts-info, &__sales, &__billing {
         margin: 20px 10px 40px 10px;
         padding: 40px;
-        box-shadow: 0 0 15px #67573e9d;
+        box-shadow: 0 0 10px #67573e9d;
         box-sizing: border-box;
     }
     &_error-shadow {

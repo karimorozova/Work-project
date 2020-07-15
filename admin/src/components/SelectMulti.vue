@@ -180,7 +180,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        border-left: 0.5px solid #68573E;
+        border-left: 0.5px solid #bfb09d;
         img {
             padding-right: 2px;
         }
@@ -191,7 +191,7 @@ export default {
             width: 24%;
         }
         .rates-filters__item & {
-            width: 18%;
+            width: 20%;
         }
     }
     .rates-filters__item & {
