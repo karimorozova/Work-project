@@ -17,8 +17,7 @@ const {
   saveClientDocument,
   removeClientDoc,
 } = require('../clients');
-const { getRatePricelist, changeClientPricelist } = require('../rates');
-const { getClientRates } = require('../rates');
+const { getRatePricelist, changeClientPricelist, bindClientRates, getClientRates } = require('../rates');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -197,6 +196,17 @@ router.post('/rates/:id', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on editing client rates');
+  }
+});
+
+router.post('/rates/bind-rates', async (req, res) => {
+  const { id: clientId } = req.params;
+  const { defaultPricelistId, objToBind, key } = req.body;
+  try {
+    await bindClientRates(clientId, defaultPricelistId, objToBind, key);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on binding multipliers');
   }
 });
 
