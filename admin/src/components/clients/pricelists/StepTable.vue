@@ -181,6 +181,7 @@ export default {
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
+      const serviceId = this.dataArray[index].serviceId
       try {
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
@@ -188,6 +189,7 @@ export default {
             itemIdentifier: "Step Multipliers Table",
             updatedItem: {
               _id: id,
+              serviceId,
               step: this.currentStepObj,
               unit: this.currentUnitObj,
               size: this.currentSize,

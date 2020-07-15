@@ -167,6 +167,7 @@ export default {
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
+      const serviceId = this.dataArray[index].serviceId
       try {
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
@@ -174,6 +175,7 @@ export default {
             itemIdentifier: "Basic Price Table",
             updatedItem: {
               _id: id,
+              serviceId,
               type: this.dataArray[index].type,
               sourceLanguage: this.currentSourceLangObj,
               targetLanguage: this.currentTargetLangObj,

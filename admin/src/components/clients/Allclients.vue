@@ -223,16 +223,22 @@ label {
 
 .add-button {
     margin-top: 20px;
-    width: 190px;
-    height: 26px;
-    color: white;
+    width: 168px;
+    height: 34px;
+    color: #fff;
     font-size: 14px;
     border-radius: 10px;
-    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
     box-shadow: 0 3px 5px rgba(0,0,0,.4);
     background-color: #D15F45;
     border: 1px solid #D15F45;
     cursor: pointer;
+}
+
+.add-button:active, .add-button:focus{
+    transform: scale(.98);
+     outline: none!important;
+     outline-color: none;
+    border: none;
 }
 
 </style>

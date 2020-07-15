@@ -159,12 +159,14 @@ export default {
       if (this.currentActive === -1) return;
       try {
         const id = this.dataArray[index]._id;
+        const serviceId = this.dataArray[index].serviceId;
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
           {
             itemIdentifier: "Industry Multipliers Table",
             updatedItem: {
               _id: id,
+              serviceId,
               industry: this.currentIndustryObj,
               multiplier: parseFloat(this.currentMultiplier).toFixed(0),
               altered: true
