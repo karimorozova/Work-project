@@ -47,6 +47,9 @@ export default {
                 contacts: [],
                 sourceLanguages: [],
                 targetLanguages: [],
+                currency: '',
+                defaultPricelist: '',
+
             },
             isNewClient: true
         }
