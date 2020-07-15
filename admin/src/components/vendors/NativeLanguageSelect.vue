@@ -106,7 +106,7 @@ export default {
     }
     .selected {
         border-right: 1px solid $light-brown;
-        width: 82%;
+        width: 80%;
         padding: 3px 5px;
         font-size: 14px;
         max-height: 28px;
@@ -120,7 +120,7 @@ export default {
         }
     }
     .arrow-button {
-        width: 18%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;

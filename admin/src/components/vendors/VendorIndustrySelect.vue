@@ -105,7 +105,7 @@ export default {
         box-shadow: inset 0 0 6px rgba(103, 87, 62, 0.75);
     }
     .selected {
-        width: 82%;
+        width: 80%;
         padding: 0 5px;
         font-size: 14px;
         max-height: 28px;
@@ -141,8 +141,8 @@ export default {
         opacity: 0.5;
     }
     .arrow-button {
-        border-left: 1px solid #68573E;
-        width: 18%;
+        border-left: 1px solid #bfb09d;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;

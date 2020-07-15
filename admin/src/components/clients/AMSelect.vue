@@ -80,7 +80,7 @@ export default {
     overflow: hidden;
     .selected {
         border-right: 1px solid #BFB09D;
-        width: 82%;
+        width: 80%;
         padding: 0 5px;
         font-size: 14px;
         max-height: 28px;
@@ -94,7 +94,7 @@ export default {
         opacity: 0.5;
     }
     .arrow-button {
-        width: 18%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;
