@@ -9,7 +9,7 @@
           .button
               Button(value="Delete" @clicked="deleteClient")
       .title General Information
-      .client-info__gen-info
+      .client-info__gen-info(v-if="currentClient._id")
           General(
               :isSaveClicked="isSaveClicked"
               :languages="languages"
@@ -22,7 +22,7 @@
       //-         @loadFile="loadFile"
       //-     )
       .title Contact Details
-      .client-info__contacts-info
+      .client-info__contacts-info(v-if="currentClient._id")
           ContactsInfo(
               :client="currentClient"
               @contactDetails="contactDetails" 
@@ -42,7 +42,8 @@
               :clientIndustries="this.currentClient.industries.map(i => i.name)"
           )
       .title(v-if="currentClient._id") Rates
-      .client-info__rates
+      .client-info__rates(v-if="currentClient._id")
+        RatesParameters
         .client-info__tables-row
           .lang-table(v-if="currentClient._id")
             LangTable(
@@ -74,7 +75,7 @@
           )
 
       .title Documents
-      .client-info__documents
+      .client-info__documents(v-if="currentClient._id")
           ClientDocuments
 
       //- .title(v-if="currentClient._id") Rates    
@@ -82,10 +83,10 @@
       //-     ClientRates(:client="currentClient"
       //-         @setMatrixData="setMatrixData")
       .title Sales Information
-      .client-info__sales
+      .client-info__sales(v-if="currentClient._id")
           ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
       .title Billing Informations
-      .client-info__billing
+      .client-info__billing(v-if="currentClient._id")
           ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
       .delete-approve(v-if="isApproveModal")
           p Are you sure you want to delete?
@@ -108,6 +109,7 @@
 </template>
 
 <script>
+import RatesParameters from "./pricelists/RatesParameters";
 import OtherClientInformation from "./OtherClientInformation";
 import ClientDocuments from "./ClientDocuments";
 import ClientServices from "./ClientServices";
@@ -321,13 +323,6 @@ export default {
 
       console.log("aftersave", this.currentClient);
 
-      if (this.currentClient.hasOwnProperty("nativeLanguage")) {
-        dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
-      }
-      if (this.currentClient.hasOwnProperty("timeZone")) {
-        dataForClient.timeZone = this.currentClient.timeZone._id;
-      }
-
       sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
         sendData.append("photos", this.contactsPhotos[i]);
@@ -508,7 +503,8 @@ export default {
     ResultTable,
     SideGeneral,
     ClientDocuments,
-    OtherClientInformation
+    OtherClientInformation,
+    RatesParameters
   },
   created() {
     this.getClientInfo();
@@ -584,7 +580,7 @@ export default {
     .industry-table {
       width: 30%;
     }
-    .step-table{
+    .step-table {
       width: 40%;
     }
   }

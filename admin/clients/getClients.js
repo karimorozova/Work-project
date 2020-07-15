@@ -24,6 +24,7 @@ async function getClient(obj) {
             .populate('rates.basicPricesTable.sourceLanguage')
             .populate('rates.basicPricesTable.targetLanguage')
             .populate('timeZone')
+            .populate('defaultPricelist')
             .populate('services.service');
 
     return client;
@@ -52,6 +53,7 @@ async function getClients(obj) {
             .populate('rates.basicPricesTable.sourceLanguage')
             .populate('rates.basicPricesTable.targetLanguage')
             .populate('timeZone')
+            .populate('defaultPricelist')
             .populate('services.service');
     return clients;
 }
@@ -78,6 +80,7 @@ async function getClientAfterUpdate(query, update) {
             .populate('rates.stepMultipliersTable.unit')
             .populate('rates.basicPricesTable.sourceLanguage')
             .populate('rates.basicPricesTable.targetLanguage')
+            .populate('defaultPricelist')
             .populate('timeZone')
             .populate('services.service');
 }
