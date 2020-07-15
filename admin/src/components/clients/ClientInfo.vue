@@ -75,8 +75,7 @@
 
       .title Documents
       .client-info__documents
-          ClientDocuments(
-          )
+          ClientDocuments
 
       //- .title(v-if="currentClient._id") Rates    
       //- .client-info__rates(v-if="currentClient._id")

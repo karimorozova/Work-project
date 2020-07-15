@@ -39,16 +39,19 @@
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentMultiplier")
 
-      //- template(slot="eur" slot-scope="{ row, index }")
-      //-   .price__data(v-if="currentActive !== index")
-      //-     span(id="eur") {{row.euroMinPrice}}
-      //-     label(for="eur") &euro;
-      //-   .price__editing-data(v-else)
-      //-     input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
-
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+          span(v-if="row.altered")
+            .price__icons-link
+              i.fa.fa-link(aria-hidden='true')
+          span(v-else)
+            .price__icons-link-opacity
+              i.fa.fa-link(aria-hidden='true')
+    
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
@@ -70,7 +73,7 @@ export default {
     return {
       fields: [
         {
-          label: "Step / Service",
+          label: "Step",
           headerKey: "headerStep",
           key: "step",
           width: "25%",
@@ -112,7 +115,6 @@ export default {
       currentUnitObj: "",
       currentSize: "",
       currentMultiplier: "",
-      // currentMinPriceEUR: "",
 
       areErrors: false,
       errors: [],
@@ -126,9 +128,6 @@ export default {
     this.getSteps();
   },
   methods: {
-    // getServiceName(id) {
-    //    return this.currentClient.services.find(item => item._id == id).service.title;
-    // },
     ...mapActions({
       alertToggle: "alertToggle"
     }),
@@ -158,7 +157,6 @@ export default {
       this.currentUnit = this.dataArray[index].unit.type;
       this.currentSize = this.dataArray[index].size;
       this.currentMultiplier = this.dataArray[index].multiplier;
-      // this.currentMinPriceEUR = this.dataArray[index].euroMinPrice;
     },
     manageCancelEdition() {
       this.setDefaults();
@@ -172,7 +170,6 @@ export default {
       if (this.currentActive === -1) return;
       if (this.currentMultiplier == "") return;
       if (Math.sign(this.currentMultiplier) == -1) return;
-      // if (this.currentMinPriceEUR == "") return;
       await this.manageSaveClick(index);
     },
     async getSteps() {
@@ -195,7 +192,7 @@ export default {
               unit: this.currentUnitObj,
               size: this.currentSize,
               multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-              altered: true,
+              altered: true
             }
           }
         );
@@ -220,11 +217,7 @@ export default {
     },
     closeErrors() {
       this.areErrors = false;
-    },
-    // async setFilter({ option, prop }) {
-    //   this[prop] = option;
-    //   await this.getSteps();
-    // }
+    }
   },
   computed: {
     manageIcons() {
@@ -232,7 +225,7 @@ export default {
       return result;
     },
     ...mapGetters({
-      currentClient: "getCurrentClient",
+      currentClient: "getCurrentClient"
     })
   },
   components: {
@@ -292,6 +285,21 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    &-info {
+      margin-top: 3px;
+      margin-right: 8px;
+    }
+    &-link {
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+    &-link-opacity {
+      cursor: default;
+      font-size: 18px;
+      margin-top: 4px;
+      opacity: 0.5;
+    }
   }
 
   &__icon {
@@ -302,6 +310,43 @@ export default {
 
   &_opacity {
     opacity: 1;
+  }
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  .tooltiptext {
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent transparent;
+    }
+  }
+  &:hover {
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 </style>

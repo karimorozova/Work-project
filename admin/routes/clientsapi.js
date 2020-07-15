@@ -217,9 +217,6 @@ router.post('/rates', async (req, res) => {
 
 router.post('/rates/change-pricelist/:id', async (req, res) => {
   const { id: clientId } = req.params;
-  console.log(req.body);
-  console.log(req.params);
-  
   try {
     await changeClientPricelist(clientId, req.body);
     res.send('Saved');
