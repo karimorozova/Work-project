@@ -1,4 +1,5 @@
 <template lang="pug">
+.client-layout
     .new-client-info(v-if="clientShow")
         .buttons
             .button
@@ -6,18 +7,13 @@
             .button
                 Button(value="Cancel" @clicked="cancel")
         .title General Information
-        //- .new-client-info__gen-info
-            //- NewGeneral(
-            //-     :client="client"
-            //-     :isSaveClicked="isSaveClicked"
-            //-     @loadFile="loadFile"
-            //- )`
-        //- .new-client-info__gen-info
-        //-     General(
-        //-         :isSaveClicked="isSaveClicked"
-        //-         :languages="languages"
-        //-         :timezones="timezones"
-        //-     )
+        .new-client-info__gen-info
+            NewGeneral(
+                :client="client"
+                :isSaveClicked="isSaveClicked"
+                :languages="languages"
+                :timezones="timezones"
+            )
         .title Contact Details
         .new-client-info__contacts-info(:class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
             ContactsInfo(
@@ -42,17 +38,23 @@
             :errors="errors"
             @closeErrors="closeErrorsBlock"
         )
+    .new-client-subinfo
+        .new-client-subinfo__general
+            NewSideGeneral(
+                :client="client"
+                :isSaveClicked="isSaveClicked"
+            )
 </template>
 
 <script>
 import NewClientDocuments from './NewClientDocuments';
-// import NewGeneral from "./clientInfo/NewGeneral";
-import General from './clientInfo/General'
+import NewGeneral from './clientInfo/NewGeneral'
 import Button from "../Button";
 import ValidationErrors from "../ValidationErrors";
 import ContactsInfo from './ContactsInfo';
 import ClientSalesInfo from './ClientSalesInfo';
 import ClientBillInfo from './ClientBillInfo';
+import NewSideGeneral from './clientInfo/NewSideGeneral'
 import { mapGetters, mapActions} from "vuex";
 
 export default {
@@ -172,6 +174,8 @@ export default {
             const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
             if(!this.client.name) this.errors.push('Company name cannot be empty.');
             if(!this.client.industries.length) this.errors.push('Please, choose at least one industry.');
+            if(!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.');
+            if(!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.');
             if(!this.client.contacts.length) this.errors.push('Please, add at least one contact.');
             if(!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.');
             if(!this.client.status) this.errors.push('Please, choose status.');
@@ -233,21 +237,37 @@ export default {
         },
     },
     components: {
-        // NewGeneral,
+        NewGeneral,
         Button,
         ValidationErrors,
         ContactsInfo,
         ClientSalesInfo,
         ClientBillInfo,
         NewClientDocuments,
-        General
+        NewSideGeneral,
     }
 }
 </script>
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
-
+.client-layout {
+  display: flex;
+}
+.new-client-subinfo {
+  &__general {
+    margin-top: 120px;
+    width: 390px;
+    height: 270px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
+  &__date {
+    margin-top: 40px;
+    width: 390px;
+    height: 270px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
+}
 .new-client-info {
     position: relative;
     padding: 40px;
