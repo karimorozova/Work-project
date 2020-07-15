@@ -42,7 +42,7 @@ export default {
                 address: "",
                 languageCombinations: [],
                 industries: [],
-                nativeLanguage:'',
+                nativeLanguage: '',
                 timeZone: '',
                 contacts: [],
                 sourceLanguages: [],

@@ -195,11 +195,11 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentSourceLanguage = this.dataArray[index].sourceLanguage;
-      this.currentTargetLanguage = this.dataArray[index].targetLanguage;
-      this.currentStep = this.dataArray[index].step;
-      this.currentUnit = this.dataArray[index].unit;
-      this.currentIndustry = this.dataArray[index].industry;
+      this.currentSourceLanguage = this.dataArray[index].sourceLanguage.lang;
+      this.currentTargetLanguage = this.dataArray[index].targetLanguage.lang;
+      this.currentStep = this.dataArray[index].step.title;
+      this.currentUnit = this.dataArray[index].unit.type;
+      this.currentIndustry = this.dataArray[index].industry.name;
       this.currentPrice = this.dataArray[index].price;
     },
     async checkErrors(index) {

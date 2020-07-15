@@ -200,6 +200,14 @@ export default {
         },
         async saveClient() {            
             let sendData = new FormData();
+
+            if(this.client.timeZone == ''){
+                this.client.timeZone = null
+            } 
+            if(this.client.nativeLanguage == ''){
+                this.client.nativeLanguage = null
+            }
+            
             sendData.append('client', JSON.stringify(this.client));
             for(let i = 0; i < this.contactsPhotos.length; i++) {
                 sendData.append('photos', this.contactsPhotos[i]);
