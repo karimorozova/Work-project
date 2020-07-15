@@ -5,23 +5,48 @@ const _ = require('lodash');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
-  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates;
+  let updatedPricelistTable;
   switch (itemIdentifier) {
     default:
     case 'Basic Price Table':
       const updatedBasicPriceTable = replaceOldItem(basicPricesTable, updatedItem);
+      updatedPricelistTable = changePricelistTable(
+        basicPricesTable,
+        stepMultipliersTable,
+        industryMultipliersTable,
+        pricelistTable,
+        updatedItem,
+        itemIdentifier
+      );
       client.rates.basicPricesTable = updatedBasicPriceTable;
-      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      // await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Step Multipliers Table':
       const updatedStepMultipliersTable = replaceOldItem(stepMultipliersTable, updatedItem);
+      updatedPricelistTable = changePricelistTable(
+        basicPricesTable,
+        stepMultipliersTable,
+        industryMultipliersTable,
+        pricelistTable,
+        updatedItem,
+        itemIdentifier
+      );
       client.rates.stepMultipliersTable = updatedStepMultipliersTable;
-      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      // await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Industry Multipliers Table':
       const updatedIndustryMultipliersTable = replaceOldItem(industryMultipliersTable, updatedItem);
+      updatedPricelistTable = changePricelistTable(
+        basicPricesTable,
+        stepMultipliersTable,
+        industryMultipliersTable,
+        pricelistTable,
+        updatedItem,
+        itemIdentifier
+      );
       client.rates.industryMultipliersTable = updatedIndustryMultipliersTable;
-      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      // await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
   }
 };
@@ -35,6 +60,52 @@ const replaceOldItem = (arr, replacementItem) => {
 
 const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id.toString() === searchItemId);
 
+// const defaultItems = [];
+// defaultItems.push({
+//   altered: item.altered,
+//   serviceId: item.serviceId,
+//   notification: item.notification,
+//   _id: ObjectId(item._id),
+//   sourceLanguage: item.sourceLanguage,
+//   targetLanguage: item.targetLanguage,
+//   step: item.step,
+//   unit: item.unit,
+//   size: item.size,
+//   industry: item.industry,
+// });
+
+// const changePricelistTable = (
+//   basicPricesTable,
+//   stepMultipliersTable,
+//   industryMultipliersTable,
+//   pricelistTable,
+//   updatedItem,
+//   key) => {
+//   let changedPricelistTable = [];
+//   for (let item of pricelistTable) {
+//     if (!item.altered && item.serviceId === updatedItem.serviceId) {
+//       const neededBasicPriceItem = basicPricesTable.find(item => item.serviceId === updatedItem.serviceId);
+//       const neededStepMultipliersItems = stepMultipliersTable.find(step => step.step.)
+//       const neededIndustryItem = industryMultipliersTable.find(item => item.serviceId === updatedItem.serviceId);
+//       switch (key) {
+//         default:
+//         case 'Basic Price Table':
+//           item.basicPrice = multiplyPrices(updatedItem)
+//           changedPricelistTable.push()
+//           break;
+//         case 'Step Multipliers Table':
+//
+//           break;
+//         case 'Industry Multipliers Table':
+//           break;
+//       }
+//     } else {
+//       changedPricelistTable.push(item);
+//     }
+//   }
+//   // console.log('CHANGED PRICELIst TABLE', changedPricelistTable);
+//   return changedPricelistTable;
+// };
 
 //TODO: Add source-language existence check
 const addNewRateComponents = async (clientId, newObj, serviceId) => {
@@ -57,7 +128,6 @@ const addNewRateComponents = async (clientId, newObj, serviceId) => {
     basicPricesTable,
     stepMultipliersTable,
     industryMultipliersTable,
-    newObj
   );
   pricelistTable.push(...priceListCombinations);
   await Clients.updateOne({ _id: clientId },
@@ -98,20 +168,19 @@ const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
   return stepUnitSizeCombinations;
 };
 
-const getPricelistCombinations = async (basicPricesTable, stepMultipliersTable, industryMultipliersTable, newObj) => {
+const getPricelistCombinations = async (basicPricesTable, stepMultipliersTable, industryMultipliersTable) => {
   const priceListCombinations = [];
-  for (let { step, unit, size, multiplier: stepMultiplierValue } of stepMultipliersTable) {
-    for (let { basicPrice } of basicPricesTable) {
-      for (let { multiplier: industryMultiplierValue } of industryMultipliersTable) {
-        const { title } = await Step.findOne({ _id: step });
-        const { type } = await Units.findOne({ _id: unit });
+  for (let { step, serviceId, unit, size, multiplier: stepMultiplierValue } of stepMultipliersTable) {
+    for (let { sourceLanguage, targetLanguage, basicPrice } of basicPricesTable) {
+      for (let { industry, multiplier: industryMultiplierValue } of industryMultipliersTable) {
         priceListCombinations.push({
-          sourceLanguage: newObj.sourceLanguage.lang,
-          targetLanguage: newObj.targetLanguage.lang,
-          step: title,
-          unit: type,
+          serviceId: serviceId.toString(),
+          sourceLanguage,
+          targetLanguage,
+          step,
+          unit,
           size,
-          industry: newObj.industry.name,
+          industry,
           price: multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue),
         });
       }
@@ -160,11 +229,12 @@ const getObjDifferences = (obj1, obj2) => {
 
 const deleteClientRates = async (clientId, serviceId) => {
   const client = await Clients.findOne({ _id: clientId });
-  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = client.rates;
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates;
   basicPricesTable = basicPricesTable.filter(item => item.serviceId !== serviceId);
   stepMultipliersTable = stepMultipliersTable.filter(item => item.serviceId !== serviceId);
   industryMultipliersTable = industryMultipliersTable.filter(item => item.serviceId !== serviceId);
-  client.rates = { basicPricesTable, stepMultipliersTable, industryMultipliersTable };
+  pricelistTable = pricelistTable.filter(item => item.serviceId !== serviceId);
+  client.rates = { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable };
   await Clients.updateOne({ _id: clientId }, { rates: client.rates });
 };
 

@@ -1,29 +1,29 @@
-const { Clients } = require('../models');
+const { getClientRates } = require('./getPrices');
 
 const getFilteredPricelist = (pricelistTable, filters) => {
   const { sourceFilter, targetFilter, stepFilter, unitFilter, industryFilter } = filters;
   if (sourceFilter) {
-    pricelistTable = pricelistTable.filter(item => item.sourceLanguage === sourceFilter);
+    pricelistTable = pricelistTable.filter(item => item.sourceLanguage.lang === sourceFilter);
   }
   if (targetFilter) {
-    pricelistTable = pricelistTable.filter(item => item.targetLanguage === targetFilter);
+    pricelistTable = pricelistTable.filter(item => item.targetLanguage.lang === targetFilter);
   }
   if (stepFilter) {
-    pricelistTable = pricelistTable.filter(item => item.step === stepFilter);
+    pricelistTable = pricelistTable.filter(item => item.step.title === stepFilter);
   }
   if (unitFilter) {
-    pricelistTable = pricelistTable.filter(item => item.unit === unitFilter);
+    pricelistTable = pricelistTable.filter(item => item.unit.type === unitFilter);
   }
   if (industryFilter) {
-    pricelistTable = pricelistTable.filter(item => item.industry === industryFilter);
+    pricelistTable = pricelistTable.filter(item => item.industry.name === industryFilter);
   }
   return pricelistTable;
 };
 
 const getRatePricelist = async (clientId, filters) => {
   const { countFilter } = filters;
-  const client = await Clients.findOne({ _id: clientId });
-  const { pricelistTable } = client.rates;
+  const { rates } = await getClientRates({ _id: clientId });
+  const { pricelistTable } = rates;
   if (pricelistTable.length) {
     const filteredPricelistTable = getFilteredPricelist(pricelistTable, filters);
     return filteredPricelistTable.splice(countFilter, 25);

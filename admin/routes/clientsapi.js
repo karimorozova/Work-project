@@ -17,7 +17,8 @@ const {
   saveClientDocument,
   removeClientDoc,
 } = require('../clients');
-const { getRatePricelist , changeClientPricelist } = require('../rates');
+const { getRatePricelist, changeClientPricelist } = require('../rates');
+const { getClientRates } = require('../rates');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -179,12 +180,7 @@ router.post('/update-client-status', async (req, res) => {
 router.get('/rates/:id', async (req, res) => {
   const { id: clientId } = req.params;
   try {
-    const { rates } = await Clients.findOne({ _id: clientId })
-      .populate('rates.industryMultipliersTable.industry')
-      .populate('rates.stepMultipliersTable.step')
-      .populate('rates.stepMultipliersTable.unit')
-      .populate('rates.basicPricesTable.sourceLanguage')
-      .populate('rates.basicPricesTable.targetLanguage');
+    const { rates } = await getClientRates({ _id: clientId });
     res.send(rates);
   } catch (err) {
     console.log(err);
@@ -217,9 +213,6 @@ router.post('/rates', async (req, res) => {
 
 router.post('/rates/change-pricelist/:id', async (req, res) => {
   const { id: clientId } = req.params;
-  console.log(req.body);
-  console.log(req.params);
-  
   try {
     await changeClientPricelist(clientId, req.body);
     res.send('Saved');

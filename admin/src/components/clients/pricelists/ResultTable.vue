@@ -26,27 +26,27 @@
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage }}
+        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
         .price__data(v-else)
           input.price__data-input( type="text" v-model="currentSourceLanguage" disabled)
-      
+
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage }}
+        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
         .price__data(v-else)
           input.price__data-input( type="text" v-model="currentTargetLanguage" disabled)
-      
+
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step }}
+        .price__data(v-if="currentActive !== index") {{ row.step.title }}
         .price__data(v-else)
           input.price__data-input( type="text" v-model="currentStep" disabled)
-      
+
       template(slot="unit" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.unit }} / {{row.size}}
+        .price__data(v-if="currentActive !== index") {{ row.unit.type }} / {{row.size}}
         .price__data(v-else)
           input.price__data-input( type="text" v-model="currentUnit" disabled)
-      
+
       template(slot="industry" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.industry }}
+        .price__data(v-if="currentActive !== index") {{ row.industry.name }}
         .price__data(v-else)
           input.price__data-input( type="text" v-model="currentIndustry" disabled)
 

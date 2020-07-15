@@ -250,32 +250,31 @@ const ClientSchema = new mongoose.Schema({
       }
     }],
     pricelistTable: [{
-      sourceLanguage: {
-        type: String,
-        trim: true
-      },
-      targetLanguage: {
-        type: String,
-        trim: true
-      },
-      step: {
-        type: String,
-        trim: true
-      },
-      unit: {
+      serviceId: {
         type: String,
         trim: true,
+      },
+      sourceLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      targetLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      step: {
+        type: Schema.Types.ObjectId, ref: 'Step',
+      },
+      unit: {
+        type: Schema.Types.ObjectId, ref: 'Units',
       },
       size: {
         type: Number,
       },
       industry: {
-        type: String,
-        trim: true
+        type: Schema.Types.ObjectId, ref: 'Industries',
       },
       price: {
         type: Number,
-        default: 0
+        default: 1
       },
       altered: {
         type: Boolean,

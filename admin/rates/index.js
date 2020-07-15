@@ -1,4 +1,4 @@
-const { getPricelist, getPricelists, getUpdatedPricelist } = require("./getPrices");
+const { getPricelist, getPricelists, getUpdatedPricelist, getClientRates } = require("./getPrices");
 const { saveNewPricelist, deletePricelist } = require("./pricelists");
 const { getAfterRatesSaved, getAfterRatesImported } = require("./ratesmanage");
 const { getRatePricelist } = require('./getPricelist');
@@ -13,5 +13,6 @@ module.exports = {
   getPricelists,
   getUpdatedPricelist,
   getRatePricelist,
-  changeClientPricelist
+  changeClientPricelist,
+  getClientRates
 };
