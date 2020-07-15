@@ -20,7 +20,8 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
         itemIdentifier
       );
       client.rates.basicPricesTable = updatedBasicPriceTable;
-      // await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      client.rates.pricelistTable = updatedPricelistTable;
+      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Step Multipliers Table':
       const updatedStepMultipliersTable = replaceOldItem(stepMultipliersTable, updatedItem);
@@ -33,7 +34,8 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
         itemIdentifier
       );
       client.rates.stepMultipliersTable = updatedStepMultipliersTable;
-      // await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      client.rates.pricelistTable = updatedPricelistTable;
+      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Industry Multipliers Table':
       const updatedIndustryMultipliersTable = replaceOldItem(industryMultipliersTable, updatedItem);
@@ -46,7 +48,8 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
         itemIdentifier
       );
       client.rates.industryMultipliersTable = updatedIndustryMultipliersTable;
-      // await Clients.updateOne({ _id: clientId }, { rates: client.rates });
+      client.rates.pricelistTable = updatedPricelistTable;
+      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
   }
 };
@@ -60,52 +63,59 @@ const replaceOldItem = (arr, replacementItem) => {
 
 const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id.toString() === searchItemId);
 
-// const defaultItems = [];
-// defaultItems.push({
-//   altered: item.altered,
-//   serviceId: item.serviceId,
-//   notification: item.notification,
-//   _id: ObjectId(item._id),
-//   sourceLanguage: item.sourceLanguage,
-//   targetLanguage: item.targetLanguage,
-//   step: item.step,
-//   unit: item.unit,
-//   size: item.size,
-//   industry: item.industry,
-// });
-
-// const changePricelistTable = (
-//   basicPricesTable,
-//   stepMultipliersTable,
-//   industryMultipliersTable,
-//   pricelistTable,
-//   updatedItem,
-//   key) => {
-//   let changedPricelistTable = [];
-//   for (let item of pricelistTable) {
-//     if (!item.altered && item.serviceId === updatedItem.serviceId) {
-//       const neededBasicPriceItem = basicPricesTable.find(item => item.serviceId === updatedItem.serviceId);
-//       const neededStepMultipliersItems = stepMultipliersTable.find(step => step.step.)
-//       const neededIndustryItem = industryMultipliersTable.find(item => item.serviceId === updatedItem.serviceId);
-//       switch (key) {
-//         default:
-//         case 'Basic Price Table':
-//           item.basicPrice = multiplyPrices(updatedItem)
-//           changedPricelistTable.push()
-//           break;
-//         case 'Step Multipliers Table':
-//
-//           break;
-//         case 'Industry Multipliers Table':
-//           break;
-//       }
-//     } else {
-//       changedPricelistTable.push(item);
-//     }
-//   }
-//   // console.log('CHANGED PRICELIst TABLE', changedPricelistTable);
-//   return changedPricelistTable;
-// };
+const changePricelistTable = (
+  basicPricesTable,
+  stepMultipliersTable,
+  industryMultipliersTable,
+  pricelistTable,
+  updatedItem,
+  key) => {
+  let changedPricelistTable = [];
+  for (let item of pricelistTable) {
+    if (!item.altered && item.serviceId === updatedItem.serviceId) {
+      const neededBasicPriceItem = basicPricesTable.find(basicPrice => basicPrice.serviceId === updatedItem.serviceId);
+      const neededStepMultipliersItem = stepMultipliersTable.find(({ step, unit, serviceId, size }) => (
+        step.toString() === item.step.toString() &&
+        unit.toString() === item.unit.toString() &&
+        serviceId === item.serviceId &&
+        size === item.size
+      ));
+      const neededIndustryItem = industryMultipliersTable.find(industry => industry.serviceId === updatedItem.serviceId);
+      console.log(neededIndustryItem);
+      switch (key) {
+        default:
+        case 'Basic Price Table':
+          item.price = multiplyPrices(
+            updatedItem.basicPrice, neededStepMultipliersItem.multiplier, neededIndustryItem.multiplier
+          );
+          changedPricelistTable.push(item);
+          break;
+        case 'Step Multipliers Table':
+          const neededPricelistItem = item.step.toString() === updatedItem.step._id &&
+          item.unit.toString() === updatedItem.unit._id &&
+          item.serviceId === updatedItem.serviceId &&
+          item.size === updatedItem.size ? item : undefined;
+          if (neededPricelistItem) {
+            item.price = multiplyPrices(
+              neededBasicPriceItem.basicPrice, updatedItem.multiplier, neededIndustryItem.multiplier);
+            changedPricelistTable.push(item);
+          } else {
+            changedPricelistTable.push(item);
+          }
+          break;
+        case 'Industry Multipliers Table':
+          item.price = multiplyPrices(
+            neededBasicPriceItem.basicPrice, neededStepMultipliersItem.multiplier, updatedItem.multiplier
+          );
+          changedPricelistTable.push(item);
+          break;
+      }
+    } else {
+      changedPricelistTable.push(item);
+    }
+  }
+  return changedPricelistTable;
+};
 
 //TODO: Add source-language existence check
 const addNewRateComponents = async (clientId, newObj, serviceId) => {
@@ -128,6 +138,7 @@ const addNewRateComponents = async (clientId, newObj, serviceId) => {
     basicPricesTable,
     stepMultipliersTable,
     industryMultipliersTable,
+    serviceId
   );
   pricelistTable.push(...priceListCombinations);
   await Clients.updateOne({ _id: clientId },
@@ -168,11 +179,18 @@ const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
   return stepUnitSizeCombinations;
 };
 
-const getPricelistCombinations = async (basicPricesTable, stepMultipliersTable, industryMultipliersTable) => {
+const getPricelistCombinations = async (basicPricesTable, stepMultipliersTable, industryMultipliersTable, serviceId) => {
   const priceListCombinations = [];
-  for (let { step, serviceId, unit, size, multiplier: stepMultiplierValue } of stepMultipliersTable) {
-    for (let { sourceLanguage, targetLanguage, basicPrice } of basicPricesTable) {
-      for (let { industry, multiplier: industryMultiplierValue } of industryMultipliersTable) {
+  const newBasicPriceItems = basicPricesTable.filter(item => item.serviceId.toString() === serviceId.toString());
+  const newStepMultiplierItems = stepMultipliersTable.filter(item => (
+    item.serviceId.toString() === serviceId.toString()
+  ));
+  const newIndustryMultiplierItems = industryMultipliersTable.filter(item => (
+    item.serviceId.toString() === serviceId.toString()
+  ));
+  for (let { step, serviceId, unit, size, multiplier: stepMultiplierValue } of newStepMultiplierItems) {
+    for (let { sourceLanguage, targetLanguage, basicPrice } of newBasicPriceItems) {
+      for (let { industry, multiplier: industryMultiplierValue } of newIndustryMultiplierItems) {
         priceListCombinations.push({
           serviceId: serviceId.toString(),
           sourceLanguage,
