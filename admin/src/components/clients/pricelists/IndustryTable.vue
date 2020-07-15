@@ -31,8 +31,18 @@
                 input.price__data-input(type="number" v-model="currentMultiplier")
 
         template(slot="icons" slot-scope="{ row, index }")
-            .price__icons
-                img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+          .price__icons
+            .tooltip(v-if="row.altered")
+              span#myTooltip.tooltiptext {{ row.notification }}
+              img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
+            img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+            span(v-if="row.altered")
+              .price__icons-link
+                i.fa.fa-link(aria-hidden='true')
+            span(v-else)
+              .price__icons-link-opacity
+                i.fa.fa-link(aria-hidden='true')
+    
     .price__empty(v-if="!dataArray.length") Nothing found...
 
 </template>
@@ -149,15 +159,17 @@ export default {
       if (this.currentActive === -1) return;
       try {
         const id = this.dataArray[index]._id;
+        const serviceId = this.dataArray[index].serviceId;
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
           {
             itemIdentifier: "Industry Multipliers Table",
             updatedItem: {
               _id: id,
+              serviceId,
               industry: this.currentIndustryObj,
               multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-              altered: true,
+              altered: true
             }
           }
         );
@@ -169,7 +181,8 @@ export default {
         const updatedData = await this.$http.get(
           "/clientsapi/rates/" + this.clientId
         );
-        this.dataArray[index] = updatedData.body.industryMultipliersTable[index];
+        this.dataArray[index] =
+          updatedData.body.industryMultipliersTable[index];
         this.setDefaults();
         this.refreshResultTable();
       } catch (err) {
@@ -241,6 +254,21 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    &-info {
+      margin-top: 3px;
+      margin-right: 8px;
+    }
+    &-link {
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+    &-link-opacity {
+      cursor: default;
+      font-size: 18px;
+      margin-top: 4px;
+      opacity: 0.5;
+    }
   }
   &__icon {
     cursor: pointer;
@@ -249,6 +277,43 @@ export default {
   }
   &_opacity {
     opacity: 1;
+  }
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  .tooltiptext {
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent transparent;
+    }
+  }
+  &:hover {
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 </style>

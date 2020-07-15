@@ -56,9 +56,19 @@
           label(for="currencyType") ??&euro;
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentPrice")
+
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+          span(v-if="row.altered")
+            .price__icons-link
+              i.fa.fa-link(aria-hidden='true')
+          span(v-else)
+            .price__icons-link-opacity
+              i.fa.fa-link(aria-hidden='true')
 
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
@@ -206,10 +216,10 @@ export default {
         const result = await this.$http.post(
           "/clientsapi/rates/change-pricelist/" + this.clientId,
           {
-              _id: id,
-              price: parseFloat(this.currentPrice).toFixed(3),
-              altered: true,
-              notification: 'Price disconnected from function'
+            _id: id,
+            price: parseFloat(this.currentPrice).toFixed(3),
+            altered: true,
+            notification: "Price disconnected from function"
           }
         );
         this.alertToggle({
@@ -367,6 +377,21 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    &-info {
+      margin-top: 3px;
+      margin-right: 8px;
+    }
+    &-link {
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+    &-link-opacity {
+      cursor: default;
+      font-size: 18px;
+      margin-top: 4px;
+      opacity: 0.5;
+    }
   }
 
   &__icon {
@@ -377,6 +402,43 @@ export default {
 
   &_opacity {
     opacity: 1;
+  }
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  .tooltiptext {
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent transparent;
+    }
+  }
+  &:hover {
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 </style>

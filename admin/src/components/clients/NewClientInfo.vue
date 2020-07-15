@@ -6,12 +6,18 @@
             .button
                 Button(value="Cancel" @clicked="cancel")
         .title General Information
-        .new-client-info__gen-info
-            NewGeneral(
-                :client="client"
-                :isSaveClicked="isSaveClicked"
-                @loadFile="loadFile"
-            )
+        //- .new-client-info__gen-info
+            //- NewGeneral(
+            //-     :client="client"
+            //-     :isSaveClicked="isSaveClicked"
+            //-     @loadFile="loadFile"
+            //- )`
+        //- .new-client-info__gen-info
+        //-     General(
+        //-         :isSaveClicked="isSaveClicked"
+        //-         :languages="languages"
+        //-         :timezones="timezones"
+        //-     )
         .title Contact Details
         .new-client-info__contacts-info(:class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
             ContactsInfo(
@@ -40,7 +46,8 @@
 
 <script>
 import NewClientDocuments from './NewClientDocuments';
-import NewGeneral from "./clientInfo/NewGeneral";
+// import NewGeneral from "./clientInfo/NewGeneral";
+import General from './clientInfo/General'
 import Button from "../Button";
 import ValidationErrors from "../ValidationErrors";
 import ContactsInfo from './ContactsInfo';
@@ -68,6 +75,8 @@ export default {
     },
     data() {
         return {
+            timezones: [],
+            languages: [],
             errors: [],
             areErrorsExist: false,
             isSaveClicked: false,
@@ -81,7 +90,35 @@ export default {
             documentsFiles: [],
         }
     },
+    created(){
+        this.getLangs();
+        this.getTimezones();
+    },
     methods: {
+        async getLangs() {
+            try {
+            const result = await this.$http.get("/api/languages");
+            this.languages = Array.from(result.body);
+            } catch (err) {
+            this.alertToggle({
+                message: "Error in Languages",
+                isShow: true,
+                type: "error"
+            });
+            }
+        },
+        async getTimezones() {
+            try {
+            const result = await this.$http.get("/api/timezones");
+            this.timezones = result.body;
+            } catch (err) {
+            this.alertToggle({
+                message: "Error in Timezones",
+                isShow: true,
+                type: "error"
+            });
+            }
+        },
         loadFile({files, prop}) {
             this.$emit("loadFile", {files, prop});
         },
@@ -196,13 +233,14 @@ export default {
         },
     },
     components: {
-        NewGeneral,
+        // NewGeneral,
         Button,
         ValidationErrors,
         ContactsInfo,
         ClientSalesInfo,
         ClientBillInfo,
-        NewClientDocuments
+        NewClientDocuments,
+        General
     }
 }
 </script>
