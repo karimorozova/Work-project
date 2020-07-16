@@ -116,30 +116,68 @@ const changePricelistTable = (
   return changedPricelistTable;
 };
 
+const unifyServiceItems = (currServices, newService) => {
+  const { sourceLanguage, targetLanguages, services: newServices, industries: newIndustries } = newService;
+  const { langPairs, services, industries } = currServices;
+  for (let { _id } of targetLanguages) {
+    langPairs.push({
+      source: sourceLanguage._id,
+      target: _id
+    });
+  }
+  for (let { _id } of newServices) {
+    services.push(_id);
+  }
+  for (let { _id } of newIndustries) {
+    industries.push(_id);
+  }
+  return {
+    langPairs,
+    services,
+    industries
+  };
+};
+
+const syncUnifiedServiceItems = (currServices, updatedService) => {
+
+};
+
 //TODO: Add source-language existence check
-const addNewRateComponents = async (clientId, newObj, serviceId) => {
-  const { sourceLanguage, targetLanguage, service, industry } = newObj;
-  const client = await Clients.findOne({ _id: clientId });
+const addNewRateComponents = async (clientId, newService, serviceId) => {
+  const { servicesForUnification } = await Clients.findOne({ _id: clientId });
+  const { sourceLanguage, targetLanguages, services: newServices, industries: newIndustries } = newService;
+  const { services, industries } = servicesForUnification;
+  const newUniqueServices = newServices.filter(item => !services.includes(item._id));
+  const newUniqueIndustries = newIndustries.filter(item => !industries.includes(item._id));
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates;
-  basicPricesTable.push({
-    serviceId: serviceId.toString(),
-    type: 'Duo',
-    sourceLanguage: sourceLanguage._id,
-    targetLanguage: targetLanguage._id
-  });
-  const stepMultipliersCombinations = await getStepMultipliersCombinations(service, serviceId);
-  stepMultipliersTable.push(...stepMultipliersCombinations);
-  industryMultipliersTable.push({
-    serviceId: serviceId.toString(),
-    industry: industry._id
-  });
-  const priceListCombinations = getPricelistCombinations(
-    basicPricesTable,
-    stepMultipliersTable,
-    industryMultipliersTable,
-    serviceId
-  );
-  pricelistTable.push(...priceListCombinations);
+  for (let { _id } of targetLanguages) {
+    basicPricesTable.push({
+      serviceId: serviceId.toString(),
+      type: 'Duo',
+      sourceLanguage: sourceLanguage._id,
+      targetLanguage: _id
+    });
+  }
+  if (newUniqueServices.length) {
+    for (let service of newUniqueServices) {
+      stepMultipliersTable.push(await getStepMultipliersCombinations(service, serviceId));
+    }
+  }
+  if (newUniqueIndustries.length) {
+    for (let { _id } of newUniqueIndustries) {
+      industryMultipliersTable.push({
+        serviceId: serviceId.toString(),
+        industry: _id
+      });
+    }
+  }
+  pricelistTable.push(
+    ...getPricelistCombinations(
+      basicPricesTable,
+      stepMultipliersTable,
+      industryMultipliersTable,
+      serviceId
+    ));
   await Clients.updateOne({ _id: clientId },
     { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
   );
@@ -299,14 +337,11 @@ const deleteClientRates = async (clientId, serviceId) => {
   await Clients.updateOne({ _id: clientId }, { rates: client.rates });
 };
 
-const checkForDuplicates = () => {
-
-};
-
 module.exports = {
   updateClientRates,
   addNewRateComponents,
   syncClientRatesAndServices,
   deleteClientRates,
-  checkForDuplicates
+  unifyServiceItems,
+  syncUnifiedServiceItems
 };

@@ -151,7 +151,7 @@ const ClientSchema = new mongoose.Schema({
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
-  servicesForRates: {
+  servicesForUnification: {
     langPairs: [
       {
         source: {
@@ -162,41 +162,26 @@ const ClientSchema = new mongoose.Schema({
         }
       }
     ],
-    services: {
-      type: Array,
-      items: [
-        { type: Schema.Types.ObjectId, ref: 'Services' }
-      ]
-    },
-    industries: {
-      type: Array,
-      items: [
-        { type: Schema.Types.ObjectId, ref: 'Industries' }
-      ]
-    }
+    services: [
+      { type: Schema.Types.ObjectId, ref: 'Services' }
+    ],
+    industries: [
+      { type: Schema.Types.ObjectId, ref: 'Industries' }
+    ]
   },
   services: [{
     sourceLanguage: {
       type: Schema.Types.ObjectId, ref: 'Language',
     },
-    targetLanguage: {
-      type: Array,
-      items: [
-        { type: Schema.Types.ObjectId, ref: 'Language', }
-      ]
-    },
-    service: {
-      type: Array,
-      items: [
-        { type: Schema.Types.ObjectId, ref: 'Services', }
-      ]
-    },
-    industry: {
-      type: Array,
-      items: [
-        { type: Schema.Types.ObjectId, ref: 'Industries', }
-      ]
-    }
+    targetLanguages: [
+      { type: Schema.Types.ObjectId, ref: 'Language', }
+    ],
+    services: [
+      { type: Schema.Types.ObjectId, ref: 'Services', }
+    ],
+    industries: [
+      { type: Schema.Types.ObjectId, ref: 'Industries', }
+    ]
   }],
   rates: {
     basicPricesTable: [{

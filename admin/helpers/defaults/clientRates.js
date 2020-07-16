@@ -23,9 +23,9 @@ const ObjectId = require('mongodb').ObjectID;
 const fillClientRates = async () => {
   const clients = await Clients.find({ services: { $ne: [] } })
     .populate('services.sourceLanguage')
-    .populate('services.targetLanguage')
-    .populate('services.service')
-    .populate('services.industry');
+    .populate('services.targetLanguages')
+    .populate('services.services')
+    .populate('services.industries');
   const { stepMultipliersTable } = await Pricelist.findOne()
     .populate('stepMultipliersTable.step')
     .populate('stepMultipliersTable.unit');
