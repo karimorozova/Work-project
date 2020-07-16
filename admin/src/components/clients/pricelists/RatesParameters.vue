@@ -70,7 +70,7 @@ export default {
     }
     &__input {
       margin-left: 10px;
-      font-size: 18px;
+      font-size: 16px;
       .ratio__input {
         margin-top: -3px;
         &-symbol {

@@ -245,10 +245,6 @@ export default {
   padding: 20px 0 0;
   box-shadow: none;
 
-  input[disabled] {
-    box-shadow: none;
-  }
-
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
