@@ -19,11 +19,12 @@ const updateClientService = async (clientId, dataToUpdate) => {
       await Clients.updateOne({ _id: clientId }, { services });
     } else {
       services.push(dataToUpdate);
-      servicesForUnification = unifyServiceItems(servicesForUnification, dataToUpdate);
-      await Clients.updateOne({ _id: clientId }, { services, servicesForUnification });
+      await Clients.updateOne({ _id: clientId }, { services });
       const updatedClient = await Clients.findOne({ _id: clientId });
       const { _id } = updatedClient.services[services.length - 1];
       await addNewRateComponents(clientId, _id);
+      servicesForUnification = unifyServiceItems(servicesForUnification, dataToUpdate);
+      await Clients.updateOne({ _id: clientId }, { servicesForUnification });
     }
   } catch (err) {
     console.log(err);
