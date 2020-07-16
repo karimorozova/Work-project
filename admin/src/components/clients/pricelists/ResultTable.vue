@@ -53,7 +53,10 @@
       template(slot="price" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="currencyType") {{row.price}}
-          label(for="currencyType") ??&euro;
+          label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
+          label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
+          label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
+
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentPrice")
 
@@ -332,7 +335,7 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 30px;
+  padding: 20px 0px;
   box-shadow: none;
 
   input[disabled] {

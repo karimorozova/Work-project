@@ -76,35 +76,35 @@ export default {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "25%",
+          width: "22%",
           padding: "0"
         },
         {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "25%",
+          width: "22%",
           padding: "0"
         },
         {
           label: "Size",
           headerKey: "headerSize",
           key: "size",
-          width: "12%",
+          width: "10%",
           padding: "0"
         },
         {
           label: "Multiplier (%)",
           headerKey: "headerMultiplier",
           key: "multiplier",
-          width: "13%",
+          width: "12%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "25%",
+          width: "34%",
           padding: "0"
         }
       ],
@@ -242,7 +242,7 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 15px 0;
+  padding: 20px 0 0;
   box-shadow: none;
 
   input[disabled] {

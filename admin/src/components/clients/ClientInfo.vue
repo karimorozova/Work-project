@@ -8,7 +8,7 @@
               Button(value="Cancel" @clicked="cancel")
           .button
               Button(value="Delete" @clicked="deleteClient")
-      .title General Information
+      .title(v-if="currentClient._id") General Information
       .client-info__gen-info(v-if="currentClient._id")
           General(
               :isSaveClicked="isSaveClicked"
@@ -21,7 +21,7 @@
       //-         :isSaveClicked="isSaveClicked"
       //-         @loadFile="loadFile"
       //-     )
-      .title Contact Details
+      .title(v-if="currentClient._id") Contact Details
       .client-info__contacts-info(v-if="currentClient._id")
           ContactsInfo(
               :client="currentClient"
@@ -74,7 +74,7 @@
                 :isRefreshResultTable="isRefreshResultTable"
           )
 
-      .title Documents
+      .title(v-if="currentClient._id") Documents
       .client-info__documents(v-if="currentClient._id")
           ClientDocuments
 
@@ -82,7 +82,7 @@
       //- .client-info__rates(v-if="currentClient._id")
       //-     ClientRates(:client="currentClient"
       //-         @setMatrixData="setMatrixData")
-      .title Sales Information
+      .title(v-if="currentClient._id") Sales Information
       .client-info__sales(v-if="currentClient._id")
           ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
       .title Billing Informations
@@ -97,11 +97,11 @@
           @closeErrors="closeErrorsBlock"
       )
   .client-subinfo
-    .client-subinfo__general
+    .client-subinfo__general(v-if="currentClient._id")
       SideGeneral(
         :isSaveClicked="isSaveClicked"
       )
-    .client-subinfo__date
+    .client-subinfo__date(v-if="currentClient._id")
       OtherClientInformation(
 
       )
@@ -575,13 +575,13 @@ export default {
   &__tables-row {
     display: flex;
     .lang-table {
-      width: 40%;
+      width: 33%;
     }
     .industry-table {
-      width: 30%;
+      width: 24%;
     }
     .step-table {
-      width: 40%;
+      width: 43%;
     }
   }
 }

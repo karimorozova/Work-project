@@ -19,9 +19,12 @@
             .price-title {{ field.label }}
             
         template(slot="industry" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index") {{ row.industry.name }}
+            .price__data(v-if="currentActive !== index")
+                img.price__main-icon(:src="row.industry.icon")
             .price__data(v-else)
-                input.price__data-input(type="text" v-model="currentIndustry" disabled)
+                img.price__main-icon(:src="row.industry.icon")
+
+                //- input.price__data-input(type="text" v-model="currentIndustry" disabled)
 
         template(slot="multiplier" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
@@ -68,21 +71,21 @@ export default {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
-          width: "40%",
+          width: "17%",
           padding: "0"
         },
         {
           label: "Multiplier (%)",
           headerKey: "headerMultiplier",
           key: "multiplier",
-          width: "30%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "30%",
+          width: "63%",
           padding: "0"
         }
       ],
@@ -130,7 +133,7 @@ export default {
     setEditingData(index) {
       this.currentActive = index;
       this.currentIndustryObj = this.dataArray[index].industry;
-      this.currentIndustry = this.dataArray[index].industry.name;
+      this.currentIndustry = this.dataArray[index].industry.icon;
       this.currentMultiplier = this.dataArray[index].multiplier;
     },
     manageCancelEdition() {
@@ -215,7 +218,7 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 30px 20px 15px;
+  padding: 20px 0px 20px 5px;
   box-shadow: none;
 
   input[disabled] {
@@ -248,6 +251,10 @@ export default {
     border: none;
     outline: none;
     color: $main-color;
+  }
+  &__main-icon {
+    width: 22px;
+    height: 22px;
   }
   &__icons {
     padding-top: 3px;

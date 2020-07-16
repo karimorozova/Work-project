@@ -18,19 +18,22 @@
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
+        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.iso1 }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentSourceLang" disabled)
 
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
+        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.iso1 }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentTargetLang" disabled)
 
-      template(slot="eur" slot-scope="{ row, index }")
+      template(slot="price" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="currencyType") {{row.basicPrice}}
-          label(for="currencyType") &euro;
+          label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
+          label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
+          label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
+          
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPrice")
 
@@ -71,28 +74,28 @@ export default {
           label: "Source Lang",
           headerKey: "headerSourceLang",
           key: "sourceLang",
-          width: "25%",
+          width: "18%",
           padding: "0"
         },
         {
           label: "Target Lang",
           headerKey: "headerTargetLang",
           key: "targetLang",
-          width: "25%",
+          width: "18%",
           padding: "0"
         },
         {
-          label: "Basic price (Euro)",
+          label: "Basic price",
           headerKey: "headerBasicPriceEUR",
-          key: "eur",
-          width: "25%",
+          key: "price",
+          width: "18%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "25%",
+          width: "46%",
           padding: "0"
         }
       ],
@@ -141,8 +144,8 @@ export default {
       this.currentActive = index;
       (this.currentSourceLangObj = this.dataArray[index].sourceLanguage),
         (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
-        (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
-        (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
+        (this.currentSourceLang = this.dataArray[index].sourceLanguage.iso1),
+        (this.currentTargetLang = this.dataArray[index].targetLanguage.iso1),
         (this.currentBasicPrice = this.dataArray[index].basicPrice);
     },
     manageCancelEdition() {
@@ -167,7 +170,7 @@ export default {
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
-      const serviceId = this.dataArray[index].serviceId
+      const serviceId = this.dataArray[index].serviceId;
       try {
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
@@ -211,7 +214,10 @@ export default {
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
-    }
+    },
+    ...mapGetters({
+      currentClient: "getCurrentClient"
+    })
   },
   components: {
     DataTable
@@ -225,7 +231,7 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 15px 20px 30px;
+  padding: 20px 5px 20px 0px;
   box-shadow: none;
 
   input[disabled] {
@@ -291,41 +297,40 @@ export default {
 }
 
 .tooltip {
-	position: relative;
-	display: inline-block;
-	.tooltiptext {
-		font-size: 14px;
-		visibility: hidden;
-		width: 140px;
-		background-color: #67573E;
-		color: #fff;
-		text-align: center;
-		border-radius: 6px;
-		padding: 5px;
-		position: absolute;
-		z-index: 1;
-		bottom: 150%;
-		left: 50%;
-		margin-left: -75px;
-		opacity: 0;
-		transition: opacity 0.3s;
-		&::after {
-			content: "";
-			position: absolute;
-			top: 100%;
-			left: 50%;
-			margin-left: -5px;
-			border-width: 5px;
-			border-style: solid;
-			border-color: #67573E transparent transparent transparent;
-		}
-	}
-	&:hover {
-		.tooltiptext {
-			visibility: visible;
-			opacity: 1;
-		}
-	}
+  position: relative;
+  display: inline-block;
+  .tooltiptext {
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent transparent;
+    }
+  }
+  &:hover {
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
 }
-
 </style>
