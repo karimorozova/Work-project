@@ -151,18 +151,51 @@ const ClientSchema = new mongoose.Schema({
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
+  servicesForRates: {
+    langPairs: [
+      {
+        source: {
+          type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        target: {
+          type: Schema.Types.ObjectId, ref: 'Language'
+        }
+      }
+    ],
+    services: {
+      type: Array,
+      items: [
+        { type: Schema.Types.ObjectId, ref: 'Services' }
+      ]
+    },
+    industries: {
+      type: Array,
+      items: [
+        { type: Schema.Types.ObjectId, ref: 'Industries' }
+      ]
+    }
+  },
   services: [{
     sourceLanguage: {
       type: Schema.Types.ObjectId, ref: 'Language',
     },
     targetLanguage: {
-      type: Schema.Types.ObjectId, ref: 'Language',
+      type: Array,
+      items: [
+        { type: Schema.Types.ObjectId, ref: 'Language', }
+      ]
     },
     service: {
-      type: Schema.Types.ObjectId, ref: 'Services',
+      type: Array,
+      items: [
+        { type: Schema.Types.ObjectId, ref: 'Services', }
+      ]
     },
     industry: {
-      type: Schema.Types.ObjectId, ref: 'Industries',
+      type: Array,
+      items: [
+        { type: Schema.Types.ObjectId, ref: 'Industries', }
+      ]
     }
   }],
   rates: {
