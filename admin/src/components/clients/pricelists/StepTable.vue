@@ -181,7 +181,7 @@ export default {
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
-      const serviceId = this.dataArray[index].serviceId
+      const serviceId = this.dataArray[index].serviceId;
       try {
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
@@ -246,7 +246,7 @@ export default {
   box-shadow: none;
 
   input[disabled] {
-    background: white;
+    box-shadow: none;
   }
 
   input {
@@ -275,11 +275,12 @@ export default {
   }
 
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
 
   &__icons {

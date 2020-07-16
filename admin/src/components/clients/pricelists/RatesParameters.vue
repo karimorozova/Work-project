@@ -61,7 +61,6 @@ export default {
 .rates {
   margin: 25px 30px 10px 0px;
   display: flex;
-  justify-content: center;
   .rates-item {
     min-width: 100px;
     margin-right: 40px;

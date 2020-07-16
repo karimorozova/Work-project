@@ -385,9 +385,7 @@ export default {
   padding: 20px 10px;
   box-shadow: none;
 
-  input[disabled] {
-    background: white;
-  }
+ 
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -406,15 +404,18 @@ export default {
     align-items: center;
     box-sizing: border-box;
   }
+
   &__editing-data {
     box-shadow: inset 0 0 7px $brown-shadow;
   }
+
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
   &__icons {
     padding-top: 3px;

@@ -235,8 +235,9 @@ export default {
   box-shadow: none;
 
   input[disabled] {
-    background: white;
+    box-shadow: none;
   }
+
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -259,11 +260,12 @@ export default {
     box-shadow: inset 0 0 7px $brown-shadow;
   }
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
   &__icons {
     padding-top: 3px;

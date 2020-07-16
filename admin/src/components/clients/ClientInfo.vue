@@ -35,8 +35,8 @@
       .client-info__services(v-if="this.currentClient.sourceLanguages && this.currentClient.targetLanguages && this.currentClient.industries")
           ClientServices(
               :languages="languages"
-              :sourceLanguages="this.currentClient.sourceLanguages.map(i => i.lang)"
-              :targetLanguages="this.currentClient.targetLanguages.map(i => i.lang)"
+              :sourceLanguagesClient="this.currentClient.sourceLanguages.map(i => i.lang)"
+              :targetLanguagesClient="this.currentClient.targetLanguages.map(i => i.lang)"
               :industries="industries"
               :services="services"
               :clientIndustries="this.currentClient.industries.map(i => i.name)"
@@ -85,7 +85,7 @@
       .title(v-if="currentClient._id") Sales Information
       .client-info__sales(v-if="currentClient._id")
           ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
-      .title Billing Informations
+      .title(v-if="currentClient._id") Billing Informations
       .client-info__billing(v-if="currentClient._id")
           ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
       .delete-approve(v-if="isApproveModal")

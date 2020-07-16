@@ -32,7 +32,7 @@
 
       template(slot="targetLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
-        .price__data(v-else)
+        .price__data(v-else) 
           input.price__data-input( type="text" v-model="currentTargetLanguage" disabled)
 
       template(slot="step" slot-scope="{ row, index }")
@@ -339,7 +339,7 @@ export default {
   box-shadow: none;
 
   input[disabled] {
-    background: white;
+    box-shadow: none;
   }
 
   input {
@@ -368,11 +368,12 @@ export default {
   }
 
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
 
   &__icons {

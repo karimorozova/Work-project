@@ -11,14 +11,23 @@ const {
 const updateClientService = async (clientId, dataToUpdate) => {
   try {
     let { services, servicesForUnification } = await Clients.findOne({ _id: clientId });
+
+    const dataForSave = {
+      sourceLanguage: ObjectId(dataToUpdate.sourceLanguage._id),
+      targetLanguages: dataToUpdate.targetLanguages.map(item => ObjectId(item._id)),
+      services: dataToUpdate.services.map(item => ObjectId(item._id)),
+      industries: dataToUpdate.industries.map(item => ObjectId(item._id)),
+    }
+
     if (dataToUpdate._id) {
       const neededServiceIndex = services.findIndex(service => service._id.toString() === dataToUpdate._id);
       servicesForUnification = syncUnifiedServiceItems(syncUnifiedServiceItems, dataToUpdate);
       // await syncClientRatesAndServices(clientId, dataToUpdate, services[neededServiceIndex]);
-      services.splice(neededServiceIndex, 1, dataToUpdate);
+      services.splice(neededServiceIndex, 1, dataForSave);
       await Clients.updateOne({ _id: clientId }, { services });
+
     } else {
-      services.push(dataToUpdate);
+      services.push(dataForSave);
       await Clients.updateOne({ _id: clientId }, { services });
       const updatedClient = await Clients.findOne({ _id: clientId });
       const { _id } = updatedClient.services[services.length - 1];
