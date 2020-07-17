@@ -4,8 +4,10 @@ export const mutations = {
         state.clientDocuments = payload.documents
     },
     setClientProperty(state, payload) {
-        console.log('all',payload);
         state.currentClient[payload.prop] = payload.value;
+    },
+    storeClientBillingInfoProperty(state,payload){
+        state.currentClient.billingInfo[payload.prop] = payload.value;
     },
     addContact(state, payload) {
         state.currentClient.contacts.push(payload);

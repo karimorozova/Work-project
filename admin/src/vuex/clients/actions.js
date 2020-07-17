@@ -18,6 +18,7 @@ export const storeClientProperty = ({commit}, payload) => commit('setClientPrope
 export const storeClientContact = ({commit}, payload) => commit('addContact', payload);
 export const updateClientContact = ({commit}, payload) => commit('updateContact', payload);
 export const updateLeadContact = ({commit}, payload) => commit('setLeadContact', payload);
+export const storeClientBillingInfoProperty = ({commit}, payload) => commit('storeClientBillingInfoProperty', payload)
 
 export const saveClientRates = async ({commit, dispatch, state}, payload) => {
     commit("startRequest");
