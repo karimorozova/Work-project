@@ -9,10 +9,23 @@ const ClientSchema = new mongoose.Schema({
     trim: true
   },
   nativeLanguage: {
-    type: Schema.Types.ObjectId, ref: 'Language'
+    type: Schema.Types.ObjectId, ref: 'Language',
   },
   defaultPricelist: {
-    type: Schema.Types.ObjectId, ref: 'Pricelist'
+    type: Schema.Types.ObjectId, ref: 'Pricelist',
+  },
+  currency: {
+    type: String,
+    default: 'EUR',
+    trim: true,
+  },
+  minPrice: {
+    type: Number,
+    default: 0,
+  },
+  ignoreMinPrice: {
+    type: Boolean,
+    default: false
   },
   website: {
     type: String,
@@ -138,19 +151,37 @@ const ClientSchema = new mongoose.Schema({
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
+  servicesForUnification: {
+    langPairs: [
+      {
+        source: {
+          type: Schema.Types.ObjectId, ref: 'Language'
+        },
+        target: {
+          type: Schema.Types.ObjectId, ref: 'Language'
+        }
+      }
+    ],
+    services: [
+      { type: Schema.Types.ObjectId, ref: 'Services' }
+    ],
+    industries: [
+      { type: Schema.Types.ObjectId, ref: 'Industries' }
+    ]
+  },
   services: [{
     sourceLanguage: {
       type: Schema.Types.ObjectId, ref: 'Language',
     },
-    targetLanguage: {
-      type: Schema.Types.ObjectId, ref: 'Language',
-    },
-    service: {
-      type: Schema.Types.ObjectId, ref: 'Services',
-    },
-    industry: {
-      type: Schema.Types.ObjectId, ref: 'Industries',
-    }
+    targetLanguages: [
+      { type: Schema.Types.ObjectId, ref: 'Language', }
+    ],
+    services: [
+      { type: Schema.Types.ObjectId, ref: 'Services', }
+    ],
+    industries: [
+      { type: Schema.Types.ObjectId, ref: 'Industries', }
+    ]
   }],
   rates: {
     basicPricesTable: [{
@@ -168,13 +199,18 @@ const ClientSchema = new mongoose.Schema({
       targetLanguage: {
         type: Schema.Types.ObjectId, ref: 'Language',
       },
-      euroBasicPrice: {
+      basicPrice: {
         type: Number,
         default: 1,
       },
       altered: {
         type: Boolean,
         default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
       }
     }],
     stepMultipliersTable: [{
@@ -195,10 +231,6 @@ const ClientSchema = new mongoose.Schema({
         type: Number,
         default: 100,
       },
-      euroMinPrice: {
-        type: Number,
-        default: 1,
-      },
       defaultSize: {
         type: Boolean,
         default: false
@@ -206,6 +238,11 @@ const ClientSchema = new mongoose.Schema({
       altered: {
         type: Boolean,
         default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
       }
     }],
     industryMultipliersTable: [{
@@ -223,8 +260,50 @@ const ClientSchema = new mongoose.Schema({
       altered: {
         type: Boolean,
         default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
       }
     }],
+    pricelistTable: [{
+      serviceId: {
+        type: String,
+        trim: true,
+      },
+      sourceLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      targetLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      step: {
+        type: Schema.Types.ObjectId, ref: 'Step',
+      },
+      unit: {
+        type: Schema.Types.ObjectId, ref: 'Units',
+      },
+      size: {
+        type: Number,
+      },
+      industry: {
+        type: Schema.Types.ObjectId, ref: 'Industries',
+      },
+      price: {
+        type: Number,
+        default: 1
+      },
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      }
+    }]
   },
   contacts: [{
     firstName: {

@@ -49,26 +49,26 @@
             .price__editing-data(v-else)
                 input.price__data-input(type="number" v-model="currentMultiplier")
 
-        template(slot="eur" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="eur") {{row.euroMinPrice}}
-                label(for="eur") &euro;
-            .price__editing-data(v-else)
-                input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
+        //- template(slot="eur" slot-scope="{ row, index }")
+        //-     .price__data(v-if="currentActive !== index")
+        //-         span(id="eur") {{row.euroMinPrice}}
+        //-         label(for="eur") &euro;
+        //-     .price__editing-data(v-else)
+        //-         input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
 
-        template(slot="usd" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="usd") {{row.usdMinPrice}}
-                label(for="usd") &#36;
-            .price__data(v-else)
-                input.price__data-input(type="number" v-model="currentMinPriceUSD" disabled)
+        //- template(slot="usd" slot-scope="{ row, index }")
+        //-     .price__data(v-if="currentActive !== index")
+        //-         span(id="usd") {{row.usdMinPrice}}
+        //-         label(for="usd") &#36;
+        //-     .price__data(v-else)
+        //-         input.price__data-input(type="number" v-model="currentMinPriceUSD" disabled)
 
-        template(slot="gbp" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="gbp") {{row.gbpMinPrice}}
-                label(for="gbp") &pound;
-            .price__data(v-else)
-                input.price__data-input(type="number" v-model="currentMinPriceGBP" disabled)
+        //- template(slot="gbp" slot-scope="{ row, index }")
+        //-     .price__data(v-if="currentActive !== index")
+        //-         span(id="gbp") {{row.gbpMinPrice}}
+        //-         label(for="gbp") &pound;
+        //-     .price__data(v-else)
+        //-         input.price__data-input(type="number" v-model="currentMinPriceGBP" disabled)
 
         template(slot="icons" slot-scope="{ row, index }")
             .price__icons
@@ -107,56 +107,56 @@ export default {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "15%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "12.5%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "Size",
           headerKey: "headerSize",
           key: "size",
-          width: "8%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "Multiplier (%)",
           headerKey: "headerMultiplier",
           key: "multiplier",
-          width: "10%",
+          width: "20%",
           padding: "0"
         },
-        {
-          label: "Min price (EUR)",
-          headerKey: "headerMinPriceEUR",
-          key: "eur",
-          width: "12.5%",
-          padding: "0"
-        },
-        {
-          label: "Min price (USD)",
-          headerKey: "headerMinPriceUSD",
-          key: "usd",
-          width: "12.5%",
-          padding: "0"
-        },
-        {
-          label: "Min price (GBP)",
-          headerKey: "headerMinPriceGBP",
-          key: "gbp",
-          width: "12.5%",
-          padding: "0"
-        },
+        // {
+        //   label: "Min price (EUR)",
+        //   headerKey: "headerMinPriceEUR",
+        //   key: "eur",
+        //   width: "12.5%",
+        //   padding: "0"
+        // },
+        // {
+        //   label: "Min price (USD)",
+        //   headerKey: "headerMinPriceUSD",
+        //   key: "usd",
+        //   width: "12.5%",
+        //   padding: "0"
+        // },
+        // {
+        //   label: "Min price (GBP)",
+        //   headerKey: "headerMinPriceGBP",
+        //   key: "gbp",
+        //   width: "12.5%",
+        //   padding: "0"
+        // },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "17%",
+          width: "20%",
           padding: "0"
         }
       ],
@@ -385,9 +385,7 @@ export default {
   padding: 20px 10px;
   box-shadow: none;
 
-  input[disabled] {
-    background: white;
-  }
+ 
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -406,15 +404,18 @@ export default {
     align-items: center;
     box-sizing: border-box;
   }
+
   &__editing-data {
     box-shadow: inset 0 0 7px $brown-shadow;
   }
+
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
   &__icons {
     padding-top: 3px;

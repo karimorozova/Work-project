@@ -16,8 +16,8 @@
     DataTable(
       :fields="fields"
       :tableData="dataArray"
-      :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 10}]"
-      :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 6}]"
+      :tableheadRowClass="dataArray.length < 6 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
       bodyCellClass="settings-table-cell"
       @bottomScrolled="bottomScrolled"
@@ -27,32 +27,62 @@
 
       template(slot="sourceLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentSourceLanguage" disabled)
+
       template(slot="targetLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
+        .price__data(v-else) 
+          input.price__data-input( type="text" v-model="currentTargetLanguage" disabled)
+
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }} / ({{ getServiceName(row.serviceId) }})
+        .price__data(v-if="currentActive !== index") {{ row.step.title }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentStep" disabled)
+
       template(slot="unit" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.unit.type }} / {{row.size}}
-      template(slot="industry" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.industry }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentUnit" disabled)
 
-      template(slot="eur" slot-scope="{ row, index }")
+      template(slot="industry" slot-scope="{ row, index }")
+        .price__data(v-if="currentActive !== index") {{ row.industry.name }}
+        .price__data(v-else)
+          input.price__data-input( type="text" v-model="currentIndustry" disabled)
+
+      template(slot="price" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.eurPrice}}
-          label(for="eur") &euro;
-      template(slot="minEur" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          span(id="minEur") {{row.euroMinPrice}}
-          label(for="minEur") &euro;
+          span(id="currencyType") {{row.price}}
+          label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
+          label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
+          label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
+
+        .price__editing-data(v-else)
+          input.price__data-input(type="number" v-model="currentPrice")
+
+      template(slot="icons" slot-scope="{ row, index }")
+        .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
+          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+          span(v-if="row.altered")
+            .price__icons-link
+              i.fa.fa-link(aria-hidden='true')
+          span(v-else)
+            .price__icons-link-opacity
+              i.fa.fa-link(aria-hidden='true')
 
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 import DataTable from "../../DataTable";
 import ResultFilter from "./ResultFilter";
+import crudIcons from "@/mixins/crudIcons";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+  mixins: [crudIcons],
   props: {
     languages: {
       type: Array
@@ -91,7 +121,7 @@ export default {
           padding: "0"
         },
         {
-          label: "Step / Service",
+          label: "Step",
           headerKey: "headerStep",
           key: "step",
           width: "15%",
@@ -112,36 +142,114 @@ export default {
           padding: "0"
         },
         {
-          label: "Price (EUR)",
-          headerKey: "headerPriceEUR",
-          key: "eur",
-          width: "12.5%",
+          label: "Price",
+          headerKey: "headerPrice",
+          key: "price",
+          width: "10%",
           padding: "0"
         },
         {
-          label: "Min Price (EUR)",
-          headerKey: "headerMinPriceEUR",
-          key: "minEur",
-          width: "12.5%",
+          label: "",
+          headerKey: "headerIcons",
+          key: "icons",
+          width: "15%",
           padding: "0"
         }
       ],
 
       dataArray: [],
+      currentSourceLanguage: "",
+      currentTargetLanguage: "",
+      currentStep: "",
+      currentUnit: "",
+      currentIndustry: "",
+      currentPrice: "",
+
       sourceFilter: "",
       targetFilter: "",
       stepFilter: "",
       unitFilter: "",
       industryFilter: "",
-      isDataRemain: true
+      isDataRemain: true,
+      currentActive: -1
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-    getServiceName(id) {
-       return this.currentClient.services.find(item => item._id == id).service.title;
+    async makeAction(index, key) {
+      if (this.currentActive !== -1 && this.currentActive !== index) {
+        return this.isEditing();
+      }
+      switch (key) {
+        case "edit":
+          this.setEditingData(index);
+          break;
+        case "cancel":
+          this.manageCancelEdition();
+          break;
+        case "delete":
+          alert("delete");
+          break;
+        default:
+          await this.checkErrors(index);
+      }
+    },
+    setEditingData(index) {
+      this.currentActive = index;
+      this.currentSourceLanguage = this.dataArray[index].sourceLanguage.lang;
+      this.currentTargetLanguage = this.dataArray[index].targetLanguage.lang;
+      this.currentStep = this.dataArray[index].step.title;
+      this.currentUnit = this.dataArray[index].unit.type;
+      this.currentIndustry = this.dataArray[index].industry.name;
+      this.currentPrice = this.dataArray[index].price;
+    },
+    async checkErrors(index) {
+      if (this.currentActive === -1) return;
+      if (this.currentPrice == "") return;
+      await this.manageSaveClick(index);
+    },
+
+    async manageSaveClick(index) {
+      if (this.currentActive === -1) return;
+      const id = this.dataArray[index]._id;
+
+      try {
+        const result = await this.$http.post(
+          "/clientsapi/rates/change-pricelist/" + this.clientId,
+          {
+            _id: id,
+            price: parseFloat(this.currentPrice).toFixed(3),
+            altered: true,
+            notification: "Price disconnected from function"
+          }
+        );
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        });
+
+        const updatedData = await this.$http.get(
+          "/clientsapi/rates/" + this.clientId
+        );
+        this.dataArray[index] = updatedData.body.pricelistTable[index];
+
+        this.setDefaults();
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on saving Result pricelist",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    manageCancelEdition() {
+      this.setDefaults();
+    },
+    setDefaults() {
+      this.currentActive = -1;
     },
     setFilter({ option, prop }) {
       this[prop] = option;
@@ -208,6 +316,10 @@ export default {
       if (this.industryFilter == "All") result.industryFilter = "";
 
       return result;
+    },
+    manageIcons() {
+      const { delete: del, ...result } = this.icons;
+      return result;
     }
   },
   components: {
@@ -223,11 +335,11 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 30px;
+  padding: 20px 0px;
   box-shadow: none;
 
   input[disabled] {
-    background: white;
+    box-shadow: none;
   }
 
   input {
@@ -256,11 +368,12 @@ export default {
   }
 
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
 
   &__icons {
@@ -268,6 +381,21 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    &-info {
+      margin-top: 3px;
+      margin-right: 8px;
+    }
+    &-link {
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+    &-link-opacity {
+      cursor: default;
+      font-size: 18px;
+      margin-top: 4px;
+      opacity: 0.5;
+    }
   }
 
   &__icon {
@@ -278,6 +406,43 @@ export default {
 
   &_opacity {
     opacity: 1;
+  }
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  .tooltiptext {
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent transparent;
+    }
+  }
+  &:hover {
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 </style>

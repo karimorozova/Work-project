@@ -1,0 +1,160 @@
+<template lang="pug">
+    .general-info
+            .block-item
+                label.block-item__label Status:
+                    span.require *
+                .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !client.status}")
+                    ClientStatusSelect(:selectedStatus="client.status" @chosenStatus="setStatus")
+            .block-item
+                label.block-item__label Test:
+                .block-item__check-item.checkbox
+                    input(type="checkbox" id="test" :checked="client.isTest" @change="setTest")
+                    label(for="test")
+            .block-item
+                label.block-item__label Account Manager:
+                    span.require *
+                .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.accountManager}")
+                    AMSelect(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
+            .block-item
+                label.block-item__label Sales Manager:
+                    span.require *
+                .block-item__drop.block-item_medium-index(:class="{'general-info_error-shadow': isSaveClicked && !client.salesManager}")
+                    AMSelect(:selectedManager="client.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')" group="Sales")
+            .block-item
+                label.block-item__label Project Manager:
+                    span.require *
+                .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.projectManager}")
+                    AMSelect(:selectedManager="client.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
+</template>
+
+<script>
+import MultiClientIndustrySelect from "../MultiClientIndustrySelect";
+import ClientStatusSelect from "../ClientStatusSelect";
+import AMSelect from "../AMSelect";
+
+export default {
+  props: {
+    client: {
+      type: Object
+    },
+    isSaveClicked: {
+      type: Boolean
+    }
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    setManager({ manager }, prop) {
+      this.client[prop] = manager;
+    },
+    setTest() {
+      this.client.isTest = event.target.checked;
+    },
+    setStatus({ status }) {
+      this.client.status = status;
+    }
+  },
+  components: {
+    ClientStatusSelect,
+    AMSelect
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+@import "../../../assets/scss/colors.scss";
+.general-info {
+  padding: 20px;
+  &_error-shadow {
+    box-shadow: 0 0 5px $red;
+    height: 31px;
+  }
+  .block-item:last-child {
+    height: 30px;
+  }
+  .block-item {
+    display: flex;
+    height: 50px;
+
+    &__last {
+      height: 30px;
+    }
+    &_maxhigh-index {
+      z-index: 12;
+    }
+    &_high-index {
+      z-index: 10;
+    }
+    &_medium-index {
+      z-index: 8;
+    }
+    &__label {
+      width: 160px;
+      padding-top: 6px;
+    }
+    &__drop {
+      position: relative;
+      width: 190px;
+    }
+  }
+  .require {
+    font-size: 14px;
+    color: red;
+    margin-left: 2px;
+  }
+  #test {
+    width: 0;
+  }
+  .checkbox {
+    display: flex;
+    height: 28px;
+    input[type="checkbox"] {
+      opacity: 0;
+      + {
+        label {
+          &::after {
+            content: none;
+          }
+        }
+      }
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
+          }
+        }
+      }
+    }
+    label {
+      position: relative;
+      display: inline-block;
+      margin-top: 4px;
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid;
+        left: 0px;
+        top: 3px;
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+      }
+    }
+  }
+}
+</style>

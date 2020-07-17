@@ -20,7 +20,7 @@
                     SelectSingle(
                         :hasSearch="true"
                         placeholder="Select"
-                        :selectedOption="currentClient.hasOwnProperty('timeZone') ? currentClient.timeZone.zone : currentZone"
+                        :selectedOption="currentClient.hasOwnProperty('timeZone') && currentClient.timeZone !== null  ? currentClient.timeZone.zone : currentZone"
                         :options="timezoneData"
                         @chooseOption="setTimezone"
                     )
@@ -30,7 +30,7 @@
                     SelectSingle(
                         :hasSearch="true"
                         placeholder="Select"
-                        :selectedOption="currentClient.hasOwnProperty('nativeLanguage') ? currentClient.nativeLanguage.lang : currentLanguage"
+                        :selectedOption="currentClient.hasOwnProperty('nativeLanguage') && currentClient.nativeLanguage !== null  ? currentClient.nativeLanguage.lang : currentLanguage"
                         :options="languageData"
                         @chooseOption="setLanguage"
                     )

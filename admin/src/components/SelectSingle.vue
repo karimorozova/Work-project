@@ -225,7 +225,7 @@ export default {
             width: 83%;
         }
         .block-item__drop-menu & {
-            width: 82%;
+            width: 80%;
         }
     }
     .no-choice {
@@ -236,7 +236,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        border-left: 0.5px solid #68573E;
+        border-left: 0.5px solid #bfb09d;
         cursor: pointer;
         img {
             padding-right: 2px;
@@ -251,7 +251,7 @@ export default {
             width: 17%;
         }
         .block-item__drop-menu & {
-            width: 18%;
+            width: 20%;
             border-left: 1px solid #bfb09d;
         }
     }

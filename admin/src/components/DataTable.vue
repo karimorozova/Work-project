@@ -108,12 +108,12 @@
       .settings-table-row{
         cursor: default;
       }
-      .settings-table-cell{
-        background-color: white!important;
-        &:hover{
-          background-color: white!important;
-        }
-      }
+      // .settings-table-cell{
+      //   background-color: white!important;
+      //   &:hover{
+      //     background-color: white!important;
+      //   }
+      // }
       
       .delivery_no-hover-change {
         cursor: default;

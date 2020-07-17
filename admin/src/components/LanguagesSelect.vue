@@ -153,8 +153,8 @@ export default {
         height: 28px;
     }
     .selected {
-        border-right: 1px solid #67573E;
-        width: 82%;
+        border-right: 1px solid #bfb09d;
+        width: 80%;
         padding: 0 5px;
         font-size: 14px;
         opacity: 0.7;
@@ -172,13 +172,13 @@ export default {
         }
     }
     .arrow-button {
-        width: 18%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
         .all-projects__filters & {
-            border-left: 1px solid #68573E;
+            border-left: 1px solid #bfb09d;
             width: 24%;
         }
         img {

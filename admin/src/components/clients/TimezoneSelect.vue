@@ -148,7 +148,7 @@ export default {
         overflow: auto;
         position: relative;
         .block-item & {
-            width: 82%;
+            width: 80%;
         }
     }
     .no-country {
@@ -167,7 +167,7 @@ export default {
             transform: rotate(180deg);
         }
         .block-item & {
-            width: 18%;
+            width: 20%;
         }
     }
 }

@@ -116,8 +116,8 @@ export default {
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        border-right: 1px solid #67573E;
-        width: 82%;
+        border-right: 1px solid #bfb09d;
+        width: 80%;
         padding: 0 5px;
         font-size: 14px;
         height: 32px;
@@ -130,7 +130,7 @@ export default {
         }
     }
     .arrow-button {
-        width: 18%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;

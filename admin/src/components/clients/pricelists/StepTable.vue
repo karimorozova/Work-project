@@ -18,7 +18,7 @@
         .price-title {{ field.label }}
 
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }} ({{ getServiceName(row.serviceId) }})
+        .price__data(v-if="currentActive !== index") {{ row.step.title }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentStep" disabled)
 
@@ -39,16 +39,19 @@
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentMultiplier")
 
-      template(slot="eur" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.euroMinPrice}}
-          label(for="eur") &euro;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
-
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+          span(v-if="row.altered")
+            .price__icons-link
+              i.fa.fa-link(aria-hidden='true')
+          span(v-else)
+            .price__icons-link-opacity
+              i.fa.fa-link(aria-hidden='true')
+    
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
@@ -70,17 +73,17 @@ export default {
     return {
       fields: [
         {
-          label: "Step / Service",
+          label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "21%",
+          width: "22%",
           padding: "0"
         },
         {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "21%",
+          width: "22%",
           padding: "0"
         },
         {
@@ -98,17 +101,10 @@ export default {
           padding: "0"
         },
         {
-          label: "Min price (EUR)",
-          headerKey: "headerMinPriceEUR",
-          key: "eur",
-          width: "15%",
-          padding: "0"
-        },
-        {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "21%",
+          width: "34%",
           padding: "0"
         }
       ],
@@ -119,7 +115,6 @@ export default {
       currentUnitObj: "",
       currentSize: "",
       currentMultiplier: "",
-      currentMinPriceEUR: "",
 
       areErrors: false,
       errors: [],
@@ -133,9 +128,6 @@ export default {
     this.getSteps();
   },
   methods: {
-    getServiceName(id) {
-       return this.currentClient.services.find(item => item._id == id).service.title;
-    },
     ...mapActions({
       alertToggle: "alertToggle"
     }),
@@ -165,7 +157,6 @@ export default {
       this.currentUnit = this.dataArray[index].unit.type;
       this.currentSize = this.dataArray[index].size;
       this.currentMultiplier = this.dataArray[index].multiplier;
-      this.currentMinPriceEUR = this.dataArray[index].euroMinPrice;
     },
     manageCancelEdition() {
       this.setDefaults();
@@ -174,13 +165,11 @@ export default {
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.currentTest = "";
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       if (this.currentMultiplier == "") return;
       if (Math.sign(this.currentMultiplier) == -1) return;
-      if (this.currentMinPriceEUR == "") return;
       await this.manageSaveClick(index);
     },
     async getSteps() {
@@ -192,6 +181,7 @@ export default {
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
+      const serviceId = this.dataArray[index].serviceId;
       try {
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
@@ -199,11 +189,12 @@ export default {
             itemIdentifier: "Step Multipliers Table",
             updatedItem: {
               _id: id,
+              serviceId,
               step: this.currentStepObj,
               unit: this.currentUnitObj,
               size: this.currentSize,
               multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-              euroMinPrice: parseFloat(this.currentMinPriceEUR).toFixed(3)
+              altered: true
             }
           }
         );
@@ -228,10 +219,6 @@ export default {
     },
     closeErrors() {
       this.areErrors = false;
-    },
-    async setFilter({ option, prop }) {
-      this[prop] = option;
-      await this.getSteps(this.allFilters);
     }
   },
   computed: {
@@ -240,7 +227,7 @@ export default {
       return result;
     },
     ...mapGetters({
-      currentClient: "getCurrentClient",
+      currentClient: "getCurrentClient"
     })
   },
   components: {
@@ -255,12 +242,8 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 0 30px;
+  padding: 20px 0 0;
   box-shadow: none;
-
-  input[disabled] {
-    background: white;
-  }
 
   input {
     &::-webkit-inner-spin-button,
@@ -288,11 +271,12 @@ export default {
   }
 
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
 
   &__icons {
@@ -300,6 +284,21 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    &-info {
+      margin-top: 3px;
+      margin-right: 8px;
+    }
+    &-link {
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+    &-link-opacity {
+      cursor: default;
+      font-size: 18px;
+      margin-top: 4px;
+      opacity: 0.5;
+    }
   }
 
   &__icon {
@@ -310,6 +309,43 @@ export default {
 
   &_opacity {
     opacity: 1;
+  }
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  .tooltiptext {
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent transparent;
+    }
+  }
+  &:hover {
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 </style>

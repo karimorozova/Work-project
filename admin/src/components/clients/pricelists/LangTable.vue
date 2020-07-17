@@ -18,25 +18,38 @@
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
+        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.iso1 }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentSourceLang" disabled)
 
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
+        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.iso1 }}
         .price__data(v-else)
           input.price__data-input(type="text" v-model="currentTargetLang" disabled)
 
-      template(slot="eur" slot-scope="{ row, index }")
+      template(slot="price" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="eur") {{row.euroBasicPrice}}
-          label(for="eur") &euro;
+          span(id="currencyType") {{row.basicPrice}}
+          label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
+          label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
+          label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
+          
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceEUR")
+          input.price__data-input(type="number" v-model="currentBasicPrice")
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+          span(v-if="row.altered")
+            .price__icons-link
+              i.fa.fa-link(aria-hidden='true')
+          span(v-else)
+            .price__icons-link-opacity
+              i.fa.fa-link(aria-hidden='true')
+            
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
@@ -61,28 +74,28 @@ export default {
           label: "Source Lang",
           headerKey: "headerSourceLang",
           key: "sourceLang",
-          width: "25%",
+          width: "18%",
           padding: "0"
         },
         {
           label: "Target Lang",
           headerKey: "headerTargetLang",
           key: "targetLang",
-          width: "25%",
+          width: "18%",
           padding: "0"
         },
         {
-          label: "Basic price (Euro)",
+          label: "Basic price",
           headerKey: "headerBasicPriceEUR",
-          key: "eur",
-          width: "25%",
+          key: "price",
+          width: "18%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "25%",
+          width: "46%",
           padding: "0"
         }
       ],
@@ -91,7 +104,7 @@ export default {
       currentTargetLang: "",
       currentSourceLangObj: "",
       currentTargetLangObj: "",
-      currentBasicPriceEUR: "",
+      currentBasicPrice: "",
       currency: {},
 
       areErrors: false,
@@ -131,9 +144,9 @@ export default {
       this.currentActive = index;
       (this.currentSourceLangObj = this.dataArray[index].sourceLanguage),
         (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
-        (this.currentSourceLang = this.dataArray[index].sourceLanguage.lang),
-        (this.currentTargetLang = this.dataArray[index].targetLanguage.lang),
-        (this.currentBasicPriceEUR = this.dataArray[index].euroBasicPrice);
+        (this.currentSourceLang = this.dataArray[index].sourceLanguage.iso1),
+        (this.currentTargetLang = this.dataArray[index].targetLanguage.iso1),
+        (this.currentBasicPrice = this.dataArray[index].basicPrice);
     },
     manageCancelEdition() {
       this.setDefaults();
@@ -145,7 +158,7 @@ export default {
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
-      if (this.currentBasicPriceEUR == "") return;
+      if (this.currentBasicPrice == "") return;
       await this.manageSaveClick(index);
     },
     async getLangs() {
@@ -157,6 +170,7 @@ export default {
     async manageSaveClick(index) {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
+      const serviceId = this.dataArray[index].serviceId;
       try {
         const result = await this.$http.post(
           "/clientsapi/rates/" + this.clientId,
@@ -164,10 +178,12 @@ export default {
             itemIdentifier: "Basic Price Table",
             updatedItem: {
               _id: id,
+              serviceId,
               type: this.dataArray[index].type,
               sourceLanguage: this.currentSourceLangObj,
               targetLanguage: this.currentTargetLangObj,
-              euroBasicPrice: parseFloat(this.currentBasicPriceEUR).toFixed(3)
+              basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
+              altered: true
             }
           }
         );
@@ -176,7 +192,9 @@ export default {
           isShow: true,
           type: "success"
         });
-        const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
+        const updatedData = await this.$http.get(
+          "/clientsapi/rates/" + this.clientId
+        );
         this.dataArray[index] = updatedData.body.basicPricesTable[index];
         this.setDefaults();
         this.refreshResultTable();
@@ -196,7 +214,10 @@ export default {
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
-    }
+    },
+    ...mapGetters({
+      currentClient: "getCurrentClient"
+    })
   },
   components: {
     DataTable
@@ -210,12 +231,13 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 15px 20px 30px;
+  padding: 20px 5px 20px 0px;
   box-shadow: none;
 
   input[disabled] {
-    background: white;
+    box-shadow: none;
   }
+
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -238,17 +260,33 @@ export default {
     box-shadow: inset 0 0 7px $brown-shadow;
   }
   &__data-input {
-    box-sizing: border-box;
     width: 100%;
     border: none;
     outline: none;
     color: $main-color;
+    padding: 0 2px;
+    background-color: transparent;
   }
   &__icons {
     padding-top: 3px;
     display: flex;
     justify-content: center;
     align-items: center;
+    &-info {
+      margin-top: 3px;
+      margin-right: 8px;
+    }
+    &-link {
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+    &-link-opacity {
+      cursor: default;
+      font-size: 18px;
+      margin-top: 4px;
+      opacity: 0.5;
+    }
   }
   &__icon {
     cursor: pointer;
@@ -257,6 +295,44 @@ export default {
   }
   &_opacity {
     opacity: 1;
+  }
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  .tooltiptext {
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent transparent;
+    }
+  }
+  &:hover {
+    .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 </style>

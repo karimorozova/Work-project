@@ -61,7 +61,7 @@ export default {
     justify-content: space-between;
     overflow: hidden;
     .selected {
-        width: 82%;
+        width: 80%;
         padding: 0 5px;
         font-size: 14px;
         max-height: 28px;
@@ -94,7 +94,7 @@ export default {
     }
     .arrow-button {
         border-left: 1px solid $main-color;
-        width: 18%;
+        width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;

@@ -8,8 +8,8 @@
               Button(value="Cancel" @clicked="cancel")
           .button
               Button(value="Delete" @clicked="deleteClient")
-      .title General Information
-      .client-info__gen-info
+      .title(v-if="currentClient._id") General Information
+      .client-info__gen-info(v-if="currentClient._id")
           General(
               :isSaveClicked="isSaveClicked"
               :languages="languages"
@@ -21,8 +21,8 @@
       //-         :isSaveClicked="isSaveClicked"
       //-         @loadFile="loadFile"
       //-     )
-      .title Contact Details
-      .client-info__contacts-info
+      .title(v-if="currentClient._id") Contact Details
+      .client-info__contacts-info(v-if="currentClient._id")
           ContactsInfo(
               :client="currentClient"
               @contactDetails="contactDetails" 
@@ -35,14 +35,15 @@
       .client-info__services(v-if="this.currentClient.sourceLanguages && this.currentClient.targetLanguages && this.currentClient.industries")
           ClientServices(
               :languages="languages"
-              :sourceLanguages="this.currentClient.sourceLanguages.map(i => i.lang)"
-              :targetLanguages="this.currentClient.targetLanguages.map(i => i.lang)"
+              :sourceLanguagesClient="this.currentClient.sourceLanguages.map(i => i.lang)"
+              :targetLanguagesClient="this.currentClient.targetLanguages.map(i => i.lang)"
               :industries="industries"
               :services="services"
               :clientIndustries="this.currentClient.industries.map(i => i.name)"
           )
       .title(v-if="currentClient._id") Rates
-      .client-info__rates
+      .client-info__rates(v-if="currentClient._id")
+        RatesParameters
         .client-info__tables-row
           .lang-table(v-if="currentClient._id")
             LangTable(
@@ -50,18 +51,19 @@
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
             )
+          .step-table(v-if="currentClient._id")
+            StepTable(
+              :tableData="currentClient.rates.stepMultipliersTable"
+              :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+            )
           .industry-table(v-if="currentClient._id")
             IndustryTable(
               :tableData="currentClient.rates.industryMultipliersTable"
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
             )
-        .step-table(v-if="currentClient._id")
-          StepTable(
-            :tableData="currentClient.rates.stepMultipliersTable"
-            :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-          )
+
         .result-table(v-if="currentClient._id")
           ResultTable(
                 :clientId="currentClient._id"
@@ -72,20 +74,19 @@
                 :isRefreshResultTable="isRefreshResultTable"
           )
 
-      .title Documents
-      .client-info__documents
-          ClientDocuments(
-          )
+      .title(v-if="currentClient._id") Documents
+      .client-info__documents(v-if="currentClient._id")
+          ClientDocuments
 
       //- .title(v-if="currentClient._id") Rates    
       //- .client-info__rates(v-if="currentClient._id")
       //-     ClientRates(:client="currentClient"
       //-         @setMatrixData="setMatrixData")
-      .title Sales Information
-      .client-info__sales
+      .title(v-if="currentClient._id") Sales Information
+      .client-info__sales(v-if="currentClient._id")
           ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
-      .title Billing Informations
-      .client-info__billing
+      .title(v-if="currentClient._id") Billing Informations
+      .client-info__billing(v-if="currentClient._id")
           ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
       .delete-approve(v-if="isApproveModal")
           p Are you sure you want to delete?
@@ -96,11 +97,11 @@
           @closeErrors="closeErrorsBlock"
       )
   .client-subinfo
-    .client-subinfo__general
+    .client-subinfo__general(v-if="currentClient._id")
       SideGeneral(
         :isSaveClicked="isSaveClicked"
       )
-    .client-subinfo__date
+    .client-subinfo__date(v-if="currentClient._id")
       OtherClientInformation(
 
       )
@@ -108,6 +109,7 @@
 </template>
 
 <script>
+import RatesParameters from "./pricelists/RatesParameters";
 import OtherClientInformation from "./OtherClientInformation";
 import ClientDocuments from "./ClientDocuments";
 import ClientServices from "./ClientServices";
@@ -321,13 +323,6 @@ export default {
 
       console.log("aftersave", this.currentClient);
 
-      if (this.currentClient.hasOwnProperty("nativeLanguage")) {
-        dataForClient.nativeLanguage = this.currentClient.nativeLanguage._id;
-      }
-      if (this.currentClient.hasOwnProperty("timeZone")) {
-        dataForClient.timeZone = this.currentClient.timeZone._id;
-      }
-
       sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
         sendData.append("photos", this.contactsPhotos[i]);
@@ -508,7 +503,8 @@ export default {
     ResultTable,
     SideGeneral,
     ClientDocuments,
-    OtherClientInformation
+    OtherClientInformation,
+    RatesParameters
   },
   created() {
     this.getClientInfo();
@@ -579,10 +575,13 @@ export default {
   &__tables-row {
     display: flex;
     .lang-table {
-      width: 60%;
+      width: 33%;
     }
     .industry-table {
-      width: 40%;
+      width: 24%;
+    }
+    .step-table {
+      width: 43%;
     }
   }
 }
