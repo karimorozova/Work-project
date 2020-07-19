@@ -9,13 +9,20 @@
       @closeErrors="closeErrors"
       @notApprove="setDefaults"
       @closeModal="setDefaults"
-      :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 5}]"
-      :tableheadRowClass="dataArray.length < 5 ? 'tbody_visible-overflow' : ''"
-      bodyRowClass="settings-table-row"
-      bodyCellClass="settings-table-cell"
+      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
+      :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="client-pricelist-table-row"
+      bodyCellClass="client-pricelist-table-cell"
+      :clientPricetable="true"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .price-title {{ field.label }}
+
+      template(slot="icon" slot-scope="{ row, index }")
+        .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
 
       template(slot="step" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.step.title }}
@@ -41,9 +48,6 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link
@@ -73,6 +77,13 @@ export default {
     return {
       fields: [
         {
+          label: "",
+          headerKey: "headerIcon",
+          key: "icon",
+          width: "8%",
+          padding: "0"
+        },
+        {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
@@ -94,7 +105,7 @@ export default {
           padding: "0"
         },
         {
-          label: "Multiplier (%)",
+          label: "%",
           headerKey: "headerMultiplier",
           key: "multiplier",
           width: "12%",
@@ -104,7 +115,7 @@ export default {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "34%",
+          width: "26%",
           padding: "0"
         }
       ],
@@ -285,8 +296,7 @@ export default {
     justify-content: center;
     align-items: center;
     &-info {
-      margin-top: 3px;
-      margin-right: 8px;
+      margin-top: 4px;
     }
     &-link {
       cursor: pointer;
@@ -304,7 +314,7 @@ export default {
   &__icon {
     cursor: pointer;
     opacity: 0.5;
-    margin-right: 8px;
+    margin-right: 4px;
   }
 
   &_opacity {

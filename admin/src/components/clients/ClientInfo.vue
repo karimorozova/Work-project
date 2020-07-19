@@ -581,10 +581,10 @@ export default {
       width: 33%;
     }
     .industry-table {
-      width: 24%;
+      width: 26%;
     }
     .step-table {
-      width: 43%;
+      width: 42%;
     }
   }
 }
