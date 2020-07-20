@@ -9,13 +9,20 @@
         @closeErrors="closeErrors"
         @notApprove="setDefaults"
         @closeModal="setDefaults"
-        :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
+        :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
         :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
-        bodyRowClass="settings-table-row"
-        bodyCellClass="settings-table-cell"
+        bodyRowClass="client-pricelist-table-row"
+        bodyCellClass="client-pricelist-table-cell"
+        :clientPricetable="true"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .price-title {{ field.label }}
+      
+      template(slot="icon" slot-scope="{ row, index }")
+        .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")        
 
       template(slot="sourceLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.iso1 }}
@@ -39,9 +46,6 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link
@@ -71,31 +75,38 @@ export default {
     return {
       fields: [
         {
+          label: "",
+          headerKey: "headerIcon",
+          key: "icon",
+          width: "10%",
+          padding: "0"
+        },
+        {
           label: "Source Lang",
           headerKey: "headerSourceLang",
           key: "sourceLang",
-          width: "18%",
+          width: "19%",
           padding: "0"
         },
         {
           label: "Target Lang",
           headerKey: "headerTargetLang",
           key: "targetLang",
-          width: "18%",
+          width: "19%",
           padding: "0"
         },
         {
           label: "Basic price",
           headerKey: "headerBasicPriceEUR",
           key: "price",
-          width: "18%",
+          width: "19%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "46%",
+          width: "33%",
           padding: "0"
         }
       ],
@@ -272,9 +283,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-right: 4px;
     &-info {
-      margin-top: 3px;
-      margin-right: 8px;
+      margin-top: 4px;
     }
     &-link {
       cursor: pointer;
@@ -291,7 +302,7 @@ export default {
   &__icon {
     cursor: pointer;
     opacity: 0.5;
-    margin-right: 8px;
+    margin-right: 4px;
   }
   &_opacity {
     opacity: 1;

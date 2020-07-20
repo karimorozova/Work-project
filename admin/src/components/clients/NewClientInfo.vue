@@ -148,7 +148,7 @@ export default {
             this.client.leadSource = leadSource;
         },
         setBillInfo({prop, value}) {
-            this.client[prop] = value;
+            this.client.billingInfo[prop] = value;
         },
         contactDetails({contactIndex}) {
             this.$router.push({name: "_contact", params: {index: contactIndex}});
@@ -193,7 +193,7 @@ export default {
                 this.errors.push('Please, choose lead source.');
                 this.isLeadEmpty = true;
             }
-            if(!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) {
+            if(!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
                 this.errors.push('Please provide a valid email.');
                 this.billErrors.push('email');
             }

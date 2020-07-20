@@ -16,14 +16,21 @@
     DataTable(
       :fields="fields"
       :tableData="dataArray"
-      :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 6}]"
-      :tableheadRowClass="dataArray.length < 6 ? 'tbody_visible-overflow' : ''"
-      bodyRowClass="settings-table-row"
-      bodyCellClass="settings-table-cell"
       @bottomScrolled="bottomScrolled"
+      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
+      :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="client-pricelist-table-row"
+      bodyCellClass="client-pricelist-table-cell"
+      :clientPricetable="true"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .price-title {{ field.label }}
+
+      template(slot="icon" slot-scope="{ row, index }")
+        .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
 
       template(slot="sourceLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
@@ -62,9 +69,6 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link
@@ -106,6 +110,13 @@ export default {
   data() {
     return {
       fields: [
+        {
+          label: "",
+          headerKey: "headerIcon",
+          key: "icon",
+          width: "5%",
+          padding: "0"
+        },
         {
           label: "Source Language",
           headerKey: "headerLanguageSource",
@@ -152,7 +163,7 @@ export default {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "15%",
+          width: "10%",
           padding: "0"
         }
       ],
@@ -382,8 +393,7 @@ export default {
     justify-content: center;
     align-items: center;
     &-info {
-      margin-top: 3px;
-      margin-right: 8px;
+      margin-top: 4px;
     }
     &-link {
       cursor: pointer;
@@ -401,7 +411,7 @@ export default {
   &__icon {
     cursor: pointer;
     opacity: 0.5;
-    margin-right: 8px;
+    margin-right: 4px;
   }
 
   &_opacity {

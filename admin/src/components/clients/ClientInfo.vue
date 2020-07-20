@@ -260,7 +260,9 @@ export default {
       this.storeClientProperty({ prop: "leadSource", value: leadSource });
     },
     changeBillingProp({ prop, value }) {
-      this.storeClientProperty({ prop, value });
+      console.log({ prop, value });
+      
+      this.storeClientBillingInfoProperty({ prop: prop, value });
     },
     contactDetails({ contactIndex }) {
       this.$router.push({ name: "contact", params: { index: contactIndex } });
@@ -407,7 +409,8 @@ export default {
       storeClientContact: "storeClientContact",
       updateClientContact: "updateClientContact",
       updateLeadContact: "updateLeadContact",
-      deleteClientContact: "deleteClientContact"
+      deleteClientContact: "deleteClientContact",
+      storeClientBillingInfoProperty: 'storeClientBillingInfoProperty'
     }),
     async getLangs() {
       try {
@@ -578,10 +581,10 @@ export default {
       width: 33%;
     }
     .industry-table {
-      width: 24%;
+      width: 26%;
     }
     .step-table {
-      width: 43%;
+      width: 42%;
     }
   }
 }

@@ -255,7 +255,6 @@ export default {
     font-weight: normal;
     border: none;
     outline: none;
-    margin: 2px;
     position: relative;
     &_opacity {
         opacity: 0.5;
