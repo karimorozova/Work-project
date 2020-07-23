@@ -50,9 +50,7 @@ export default {
         box-shadow: -10px 0 10px 10px $brown-shadow;
     }
     &__all {
-        padding-top: 20px;
         max-width: 1200px;
-        width: calc(100% - 60px);
     }
 }
 

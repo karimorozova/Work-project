@@ -25,13 +25,11 @@ export default {
 .action {
   min-height: 60px;
   margin-bottom: 40px;
-  width: 309px;
   background: #fff;
-  box-shadow: 0 0 15px #67573e9d;
   padding: 20px;
 
   &__title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     border-bottom: 1px solid #67573e;
     padding-bottom: 5px;

@@ -33,7 +33,6 @@ export default {
         height: 33px;
         color: $white;
         font-size: 14px;
-        font-weight: 700;
         border-radius: 10px;
         box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
         background-color: $orange;

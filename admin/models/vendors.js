@@ -110,6 +110,12 @@ const VendorSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  professionalLevel:{
+    type: String
+  },
+  notes: {
+    type: String
+  },
   qualifications: [{
     source: {
       type: Schema.Types.ObjectId, ref: 'Language',
