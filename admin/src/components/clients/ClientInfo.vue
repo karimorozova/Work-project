@@ -509,7 +509,7 @@ export default {
     box-shadow: 0 0 10px #67573e9d;
   }
   &__date {
-    margin-top: 40px;
+    margin-top: 85px;
     width: 390px;
     height: 270px;
     box-shadow: 0 0 10px #67573e9d;

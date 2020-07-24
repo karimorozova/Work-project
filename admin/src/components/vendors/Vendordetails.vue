@@ -102,6 +102,39 @@
         //- .rates(v-if="currentVendor._id")
             VendorRates(:vendor="currentVendor"
                 @updateVendor="updateVendor")
+
+        .title Rates
+          .vendor-info__rates(v-if="currentVendor._id")
+            .vendor-info__tables-row
+              .lang-table(v-if="currentVendor._id && languages.length")
+                LangTable(
+                  :tableData="[{altered: true, basicPrice: 1, notification: 'notification', sourceLanguage: this.languages[0], targetLanguage: this.languages[0]}]"
+                  :vendorId="currentVendor._id"
+                  @refreshResultTable="refreshResultTable"
+                )
+              .step-table(v-if="currentVendor._id && steps.length && units.length")
+                StepTable(
+                  :tableData="[{multiplier : 3, defaultSize : false, altered : true, notification : 'notification' ,step : steps[0], unit : units[0], size : 1}]"
+                  :vendorId="currentVendor._id"
+                  @refreshResultTable="refreshResultTable"
+                )
+              .industry-table(v-if="currentVendor._id && industries.length")
+                IndustryTable(
+                  :tableData="[{multiplier : 1, altered : true, notification : 'notification', industry : industries[0]}]"
+                  :vendorId="currentVendor._id"
+                  @refreshResultTable="refreshResultTable"
+                )
+            .result-table(v-if="currentVendor._id")
+              ResultTable(
+                    :vendorId="currentVendor._id"
+                    :languages="languages.map(i => i.lang)"
+                    :steps="steps.map(i => i.title)"
+                    :units="units.map(i => i.type)"
+                    :industries="industries.map(i => i.name)"
+                    :isRefreshResultTable="isRefreshResultTable"
+              )
+
+
         .title Notes & Comments
           .vendor-info__notes-block
             .vendor-info__notes
@@ -148,6 +181,10 @@
 </template>
 
 <script>
+import ResultTable from './pricelists/ResultTable';
+import IndustryTable from './pricelists/IndustryTable';
+import StepTable from './pricelists/StepTable';
+import LangTable from "./pricelists/LangTable";
 import CKEditor from "ckeditor4-vue";
 import VendorPreview from "./VendorPreview";
 import VendorAction from "./VendorAction";
@@ -176,6 +213,13 @@ export default {
   mixins: [photoPreview],
   data() {
     return {
+      languages: [],
+      industries: [],
+      services: [],
+      units: [],
+      steps: [],
+
+      isRefreshResultTable: false,
       vendorId: "",
       educationData: [],
       professionalExperienceData: [],
@@ -211,6 +255,22 @@ export default {
     };
   },
   methods: {
+    refreshResultTable() {
+      this.isRefreshResultTable = true;
+      setTimeout(() => {
+        this.isRefreshResultTable = false;
+      }, 2000);
+    },
+    ...mapActions({
+      alertToggle: "alertToggle",
+      updateVendorProp: "updateVendorProp",
+      updateCurrentVendor: "updateCurrentVendor",
+      deleteCurrentVendor: "deleteCurrentVendor",
+      storeCurrentVendor: "storeCurrentVendor",
+      updateIndustry: "updateIndustry",
+      getDuoCombinations: "getVendorDuoCombinations",
+      updateVendorStatus: "updateVendorStatus"
+    }),
     async setTest() {
       const vendor = {
         id: this.currentVendor._id,
@@ -431,19 +491,66 @@ export default {
         });
       }
     },
-    ...mapActions({
-      alertToggle: "alertToggle",
-      updateVendorProp: "updateVendorProp",
-      updateCurrentVendor: "updateCurrentVendor",
-      deleteCurrentVendor: "deleteCurrentVendor",
-      storeCurrentVendor: "storeCurrentVendor",
-      updateIndustry: "updateIndustry",
-      getDuoCombinations: "getVendorDuoCombinations",
-      updateVendorStatus: "updateVendorStatus"
-    })
-  },
-  beforeDestroy() {
-    this.storeCurrentVendor({});
+    async getLangs() {
+      try {
+        const result = await this.$http.get("/api/languages");
+        this.languages = Array.from(result.body);
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Languages",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getIndustries() {
+      try {
+        const result = await this.$http.get("/api/industries");
+        this.industries = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Industries",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getServices() {
+      try {
+        const result = await this.$http.get("/api/services");
+        this.services = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Services",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getUnits() {
+      try {
+        const result = await this.$http.get("/api/units");
+        this.units = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Units",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getSteps() {
+      try {
+        const result = await this.$http.get("/api/steps");
+        this.steps = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Steps",
+          isShow: true,
+          type: "error"
+        });
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -482,16 +589,28 @@ export default {
     Addseverallangs,
     AvailablePairs,
     SelectSingle,
-    ckeditor: CKEditor.component
+    ckeditor: CKEditor.component,
+    LangTable,
+    StepTable,
+    IndustryTable,
+    ResultTable
   },
   directives: {
     ClickOutside
   },
   created() {
     this.getVendor();
+    this.getLangs();
+    this.getUnits();
+    this.getSteps();
+    this.getIndustries();
+    this.getServices();
   },
   mounted() {
     this.oldEmail = this.currentVendor.email;
+  },
+  beforeDestroy() {
+    this.storeCurrentVendor({});
   }
 };
 </script>
@@ -561,10 +680,6 @@ export default {
     margin: 20px 10px 50px 10px;
     width: 100%;
   }
-  // &__notes {
-  //   display: flex;
-  // }
-
   &__preview {
     position: absolute;
     top: 0;
@@ -573,13 +688,31 @@ export default {
     right: 0;
     z-index: 100;
   }
+  &__rates {
+    box-sizing: border-box;
+    margin: 20px 10px 40px 10px;
+    padding: 10px;
+    box-shadow: 0 0 10px #67573e9d;
+    font-size: 16px;
+  }
+  &__tables-row {
+    display: flex;
+    .lang-table {
+      width: 33%;
+    }
+    .industry-table {
+      width: 26%;
+    }
+    .step-table {
+      width: 42%;
+    }
+  }
 }
 
 .title {
   font-size: 22px;
 }
-.gen-info,
-.rates {
+.gen-info {
   box-sizing: border-box;
   margin: 20px 10px 40px 10px;
   padding: 40px;
@@ -596,10 +729,6 @@ export default {
       text-align: center;
     }
   }
-}
-
-.rates {
-  padding: 10px;
 }
 
 .block-item {

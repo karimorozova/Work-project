@@ -59,7 +59,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .rates {
-  margin: 25px 30px 10px 0px;
+  margin: 25px 30px 10px 32px;
   display: flex;
   .rates-item {
     min-width: 100px;

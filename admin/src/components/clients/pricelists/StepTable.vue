@@ -263,7 +263,9 @@ export default {
       margin: 0;
     }
   }
-
+  &__empty{
+    margin-left: 8%;
+  }
   label {
     margin-left: 3px;
   }

@@ -1,48 +1,50 @@
 <template lang="pug">
-.price
+  .price
     DataTable(
-        :fields="fields"
-        :tableData="dataArray"
-        :errors="errors"
-        :areErrors="areErrors"
-        :isApproveModal="isDeleting"
-        @closeErrors="closeErrors"
-        @notApprove="setDefaults"
-        @closeModal="setDefaults"
-        :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
-        :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
-        bodyRowClass="client-pricelist-table-row"
-        bodyCellClass="client-pricelist-table-cell"
-        :clientPricetable="true"
+      :fields="fields"
+      :tableData="dataArray"
+      :errors="errors"
+      :areErrors="areErrors"
+      :isApproveModal="isDeleting"
+      @closeErrors="closeErrors"
+      @notApprove="setDefaults"
+      @closeModal="setDefaults"
+      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
+      :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="client-pricelist-table-row"
+      bodyCellClass="client-pricelist-table-cell"
+      :clientPricetable="true"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .price-title {{ field.label }}
-      
+
       template(slot="icon" slot-scope="{ row, index }")
         .price__icons
           .tooltip(v-if="row.altered")
             span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")        
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
 
-      template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.iso1 }}
+      template(slot="step" slot-scope="{ row, index }")
+        .price__data(v-if="currentActive !== index") {{ row.step.title }}
         .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentSourceLang" disabled)
+          input.price__data-input(type="text" v-model="currentStep" disabled)
 
-      template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.iso1 }}
+      template(slot="unit" slot-scope="{ row, index }")
+        .price__data(v-if="currentActive !== index") {{ row.unit.type }}
         .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentTargetLang" disabled)
+          input.price__data-input(type="text" v-model="currentUnit" disabled)
 
-      template(slot="price" slot-scope="{ row, index }")
+      template(slot="size" slot-scope="{ row, index }")
+        .price__data(v-if="currentActive !== index") {{ row.size }}
+        .price__data(v-else)
+          input.price__data-input(type="text" v-model="currentSize" disabled)
+
+      template(slot="multiplier" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
-          span(id="currencyType") {{row.basicPrice}}
-          label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
-          label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
-          label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
-          
+          span(id="multiplier") {{row.multiplier}}
+          label(for="multiplier") &#37;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPrice")
+          input.price__data-input(type="number" v-model="currentMultiplier")
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
@@ -53,7 +55,7 @@
           span(v-else)
             .price__icons-link-opacity
               i.fa.fa-link(aria-hidden='true')
-            
+    
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
@@ -67,7 +69,7 @@ export default {
     tableData: {
       type: Array
     },
-    clientId: {
+    vendorId: {
       type: String
     }
   },
@@ -78,45 +80,52 @@ export default {
           label: "",
           headerKey: "headerIcon",
           key: "icon",
+          width: "8%",
+          padding: "0"
+        },
+        {
+          label: "Step",
+          headerKey: "headerStep",
+          key: "step",
+          width: "22%",
+          padding: "0"
+        },
+        {
+          label: "Unit",
+          headerKey: "headerUnit",
+          key: "unit",
+          width: "22%",
+          padding: "0"
+        },
+        {
+          label: "Size",
+          headerKey: "headerSize",
+          key: "size",
           width: "10%",
           padding: "0"
         },
         {
-          label: "Source Lang",
-          headerKey: "headerSourceLang",
-          key: "sourceLang",
-          width: "19%",
-          padding: "0"
-        },
-        {
-          label: "Target Lang",
-          headerKey: "headerTargetLang",
-          key: "targetLang",
-          width: "19%",
-          padding: "0"
-        },
-        {
-          label: "Basic price",
-          headerKey: "headerBasicPriceEUR",
-          key: "price",
-          width: "19%",
+          label: "%",
+          headerKey: "headerMultiplier",
+          key: "multiplier",
+          width: "12%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "33%",
+          width: "26%",
           padding: "0"
         }
       ],
       dataArray: [],
-      currentSourceLang: "",
-      currentTargetLang: "",
-      currentSourceLangObj: "",
-      currentTargetLangObj: "",
-      currentBasicPrice: "",
-      currency: {},
+      currentStep: "",
+      currentUnit: "",
+      currentStepObj: "",
+      currentUnitObj: "",
+      currentSize: "",
+      currentMultiplier: "",
 
       areErrors: false,
       errors: [],
@@ -127,7 +136,7 @@ export default {
     };
   },
   created() {
-    this.getLangs();
+    this.getSteps();
   },
   methods: {
     ...mapActions({
@@ -153,11 +162,12 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      (this.currentSourceLangObj = this.dataArray[index].sourceLanguage),
-        (this.currentTargetLangObj = this.dataArray[index].targetLanguage),
-        (this.currentSourceLang = this.dataArray[index].sourceLanguage.iso1),
-        (this.currentTargetLang = this.dataArray[index].targetLanguage.iso1),
-        (this.currentBasicPrice = this.dataArray[index].basicPrice);
+      this.currentStepObj = this.dataArray[index].step;
+      this.currentUnitObj = this.dataArray[index].unit;
+      this.currentStep = this.dataArray[index].step.title;
+      this.currentUnit = this.dataArray[index].unit.type;
+      this.currentSize = this.dataArray[index].size;
+      this.currentMultiplier = this.dataArray[index].multiplier;
     },
     manageCancelEdition() {
       this.setDefaults();
@@ -169,54 +179,55 @@ export default {
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
-      if (this.currentBasicPrice == "") return;
+      if (this.currentMultiplier == "") return;
+      if (Math.sign(this.currentMultiplier) == -1) return;
       await this.manageSaveClick(index);
     },
-    async getLangs() {
+    async getSteps() {
       this.dataArray = this.tableData;
     },
     refreshResultTable() {
       this.$emit("refreshResultTable");
     },
-    async manageSaveClick(index) {
-      if (this.currentActive === -1) return;
-      const id = this.dataArray[index]._id;
-      const serviceId = this.dataArray[index].serviceId;
-      try {
-        const result = await this.$http.post(
-          "/clientsapi/rates/" + this.clientId,
-          {
-            itemIdentifier: "Basic Price Table",
-            updatedItem: {
-              _id: id,
-              serviceId,
-              type: this.dataArray[index].type,
-              sourceLanguage: this.currentSourceLangObj,
-              targetLanguage: this.currentTargetLangObj,
-              basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
-              altered: true
-            }
-          }
-        );
-        this.alertToggle({
-          message: "Saved successfully",
-          isShow: true,
-          type: "success"
-        });
-        const updatedData = await this.$http.get(
-          "/clientsapi/rates/" + this.clientId
-        );
-        this.dataArray[index] = updatedData.body.basicPricesTable[index];
-        this.setDefaults();
-        this.refreshResultTable();
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on saving Languages pricelist",
-          isShow: true,
-          type: "error"
-        });
-      }
-    },
+    // async manageSaveClick(index) {
+    //   if (this.currentActive === -1) return;
+    //   const id = this.dataArray[index]._id;
+    //   const serviceId = this.dataArray[index].serviceId;
+    //   try {
+    //     const result = await this.$http.post(
+    //       "/clientsapi/rates/" + this.clientId,
+    //       {
+    //         itemIdentifier: "Step Multipliers Table",
+    //         updatedItem: {
+    //           _id: id,
+    //           serviceId,
+    //           step: this.currentStepObj,
+    //           unit: this.currentUnitObj,
+    //           size: this.currentSize,
+    //           multiplier: parseFloat(this.currentMultiplier).toFixed(0),
+    //           altered: true
+    //         }
+    //       }
+    //     );
+    //     this.alertToggle({
+    //       message: "Saved successfully",
+    //       isShow: true,
+    //       type: "success"
+    //     });
+    //     const updatedData = await this.$http.get(
+    //       "/clientsapi/rates/" + this.clientId
+    //     );
+    //     this.dataArray[index] = updatedData.body.stepMultipliersTable[index];
+    //     this.setDefaults();
+    //     this.refreshResultTable();
+    //   } catch (err) {
+    //     this.alertToggle({
+    //       message: "Error on saving Steps",
+    //       isShow: true,
+    //       type: "error"
+    //     });
+    //   }
+    // },
     closeErrors() {
       this.areErrors = false;
     }
@@ -242,16 +253,8 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 5px 20px 0px;
+  padding: 20px 0 0;
   box-shadow: none;
-
-  input[disabled] {
-    box-shadow: none;
-  }
-
-  &__empty{
-    margin-left: 10%;
-  }
 
   input {
     &::-webkit-inner-spin-button,
@@ -260,8 +263,13 @@ export default {
       margin: 0;
     }
   }
+
   label {
     margin-left: 3px;
+  }
+  &__empty{
+    font-size: 16px;
+    margin-left: 32px;
   }
   &__data,
   &__editing-data {
@@ -271,9 +279,11 @@ export default {
     align-items: center;
     box-sizing: border-box;
   }
+
   &__editing-data {
     box-shadow: inset 0 0 7px $brown-shadow;
   }
+
   &__data-input {
     width: 100%;
     border: none;
@@ -282,12 +292,12 @@ export default {
     padding: 0 2px;
     background-color: transparent;
   }
+
   &__icons {
     padding-top: 3px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 4px;
     &-info {
       margin-top: 4px;
     }
@@ -303,16 +313,17 @@ export default {
       opacity: 0.5;
     }
   }
+
   &__icon {
     cursor: pointer;
     opacity: 0.5;
     margin-right: 4px;
   }
+
   &_opacity {
     opacity: 1;
   }
 }
-
 .tooltip {
   position: relative;
   display: inline-block;

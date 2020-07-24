@@ -91,7 +91,7 @@
   .priceFilter {
     display: flex;
     margin-left: 3.2%;
-
+    
     &__drop-menu {
       position: relative;
       width: 120px;

@@ -231,7 +231,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 26px;
   &__check-item {
     width: 190px;
   }
