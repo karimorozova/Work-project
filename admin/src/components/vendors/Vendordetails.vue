@@ -82,6 +82,15 @@
 
         .vendor-info__preview(v-if="isEditAndSend")
             VendorPreview(@closePreview="closePreview" :previewDropMenu="true" :templates="templatesWysiwyg" :message="'<p>Message...</p>'" @send="sendQuote")
+        
+        .title Competencies
+        .vendor-info__competencies(v-if="currentVendor.industries")
+          VendorCompetencies(
+            :languages="languages"
+            :services="services"
+            :industries="industries"
+            :vendorIndustries="currentVendor.industries.map(i => i.name)"
+          )
 
         .title Qualifications
             TableQualifications(:qualificationData="qualificationData" :assessmentData="assessmentData" :currentVendor="currentVendor" :vendorIndustries="currentVendor.industries" @refreshQualifications="setDetailsTablesData")
@@ -161,7 +170,7 @@
             SelectSingle(
               :options="['level1','level2']"
               placeholder="Level"
-              :selectedOption="currentVendor.professionalLevel"
+              :selectedOption="optionProfessionalLevel"
               @chooseOption="updateProfessionalLevel"
             )
         .block-item-subinfo
@@ -181,9 +190,10 @@
 </template>
 
 <script>
-import ResultTable from './pricelists/ResultTable';
-import IndustryTable from './pricelists/IndustryTable';
-import StepTable from './pricelists/StepTable';
+import VendorCompetencies from "./VendorCompetencies";
+import ResultTable from "./pricelists/ResultTable";
+import IndustryTable from "./pricelists/IndustryTable";
+import StepTable from "./pricelists/StepTable";
 import LangTable from "./pricelists/LangTable";
 import CKEditor from "ckeditor4-vue";
 import VendorPreview from "./VendorPreview";
@@ -567,9 +577,15 @@ export default {
         }
       }
       return result;
+    },
+    optionProfessionalLevel() {
+      return this.currentVendor.hasOwnProperty("professionalLevel")
+        ? this.currentVendor.professionalLevel
+        : "";
     }
   },
   components: {
+    VendorCompetencies,
     VendorPreview,
     VendorCandidate,
     VendorAction,
@@ -673,6 +689,13 @@ export default {
   padding: 40px;
   position: relative;
   width: 1020px;
+  &__competencies {
+    box-sizing: border-box;
+    margin: 20px 10px 40px 10px;
+    padding: 40px;
+    box-shadow: 0 0 10px #67573e9d;
+    position: relative;
+  }
   &__notes-block {
     display: flex;
   }

@@ -23,6 +23,10 @@ async function getVendor(query) {
             .populate("assessments.langsData.source")
             .populate("assessments.langsData.target")
             .populate("assessments.langsData.industries.industry")
+            .populate('competencies.sourceLanguage')
+            .populate('competencies.targetLanguages')
+            .populate('competencies.industries')
+            .populate('competencies.services')
     return vendor;
 }
 
@@ -48,6 +52,10 @@ async function getVendors(query) {
             .populate("assessments.langsData.source")
             .populate("assessments.langsData.target")
             .populate("assessments.langsData.industries.industry")
+            .populate('competencies.sourceLanguage')
+            .populate('competencies.targetLanguages')
+            .populate('competencies.industries')
+            .populate('competencies.services')
     return vendors;
 }
 
@@ -73,6 +81,10 @@ async function getVendorAfterUpdate(query, update) {
             .populate("assessments.langsData.source")
             .populate("assessments.langsData.target")
             .populate("assessments.langsData.industries.industry")
+            .populate('competencies.sourceLanguage')
+            .populate('competencies.targetLanguages')
+            .populate('competencies.industries')
+            .populate('competencies.services')
 }
 
 async function getFilteredVendors(filters) {

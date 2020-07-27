@@ -268,19 +268,19 @@ export default {
       this[prop] = option;
       this.getPricelist(this.allFilters);
     },
-    // async bottomScrolled() {
-    //   if (this.isDataRemain) {
-    //     const result = await this.$http.post(
-    //       "/clientsapi/rates/rate-combinations/" + this.clientId,
-    //       {
-    //         ...this.allFilters,
-    //         countFilter: this.dataArray.length
-    //       }
-    //     );
-    //     this.dataArray.push(...result.data);
-    //     this.isDataRemain = result.body.length === 25;
-    //   }
-    // },
+    async bottomScrolled() {
+      if (this.isDataRemain) {
+        const result = await this.$http.post(
+          "/clientsapi/rates/rate-combinations/" + this.clientId,
+          {
+            ...this.allFilters,
+            countFilter: this.dataArray.length
+          }
+        );
+        this.dataArray.push(...result.data);
+        this.isDataRemain = result.body.length === 25;
+      }
+    },
     // async getPricelist(filters, count = 0) {
     //   try {
     //     const result = await this.$http.post(

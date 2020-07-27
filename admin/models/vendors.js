@@ -8,6 +8,11 @@ const VendorSchema = new mongoose.Schema({
     default: "",
     trim: true
   },
+  currency: {
+    type: String,
+    default: 'EUR',
+    trim: true,
+  },
   firstName: {
     type: String,
     default: '',
@@ -110,12 +115,28 @@ const VendorSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  professionalLevel:{
-    type: String
+  professionalLevel: {
+    type: String,
+    default: '',
+    trim: true
   },
   notes: {
     type: String
   },
+  competencies: [{
+    sourceLanguage: {
+      type: Schema.Types.ObjectId, ref: 'Language',
+    },
+    targetLanguages: [
+      { type: Schema.Types.ObjectId, ref: 'Language', }
+    ],
+    services: [
+      { type: Schema.Types.ObjectId, ref: 'Services', }
+    ],
+    industries: [
+      { type: Schema.Types.ObjectId, ref: 'Industries', }
+    ]
+  }],
   qualifications: [{
     source: {
       type: Schema.Types.ObjectId, ref: 'Language',
@@ -152,7 +173,9 @@ const VendorSchema = new mongoose.Schema({
     LQA1: {},
     LQA2: {},
     LQA3: {},
-  }], wordCountInfo: [{
+  }],
+  
+  wordCountInfo: [{
     industry: {
       id: {
         type: Schema.Types.ObjectId, ref: 'Industries'
@@ -225,6 +248,7 @@ const VendorSchema = new mongoose.Schema({
       default: {}
     }
   }],
+
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
