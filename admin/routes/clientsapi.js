@@ -278,7 +278,7 @@ router.post('/client-document-default', async (req, res) => {
   }
 });
 
-router.post('/client-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
+router.post('/client-document',  upload.fields([{ name: 'documentFile' }]), async (req, res) => {
   const { clientId, category, oldFilePath, oldName, oldCategory } = req.body;
   const files = req.files["documentFile"] || [];
   try {

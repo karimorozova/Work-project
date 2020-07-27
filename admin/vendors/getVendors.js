@@ -26,7 +26,7 @@ async function getVendor(query) {
             .populate('competencies.sourceLanguage')
             .populate('competencies.targetLanguages')
             .populate('competencies.industries')
-            .populate('competencies.services')
+            .populate('competencies.steps');
     return vendor;
 }
 
@@ -55,7 +55,7 @@ async function getVendors(query) {
             .populate('competencies.sourceLanguage')
             .populate('competencies.targetLanguages')
             .populate('competencies.industries')
-            .populate('competencies.services')
+            .populate('competencies.steps');
     return vendors;
 }
 
@@ -84,7 +84,7 @@ async function getVendorAfterUpdate(query, update) {
             .populate('competencies.sourceLanguage')
             .populate('competencies.targetLanguages')
             .populate('competencies.industries')
-            .populate('competencies.services')
+            .populate('competencies.steps');
 }
 
 async function getFilteredVendors(filters) {

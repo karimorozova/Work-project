@@ -87,7 +87,7 @@
         .vendor-info__competencies(v-if="currentVendor.industries")
           VendorCompetencies(
             :languages="languages"
-            :services="services"
+            :steps="steps"
             :industries="industries"
             :vendorIndustries="currentVendor.industries.map(i => i.name)"
           )

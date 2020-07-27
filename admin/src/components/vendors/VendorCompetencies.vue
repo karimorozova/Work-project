@@ -40,16 +40,16 @@
                   @chooseOptions="setTargets"   
                 )
                 
-          template(slot="service" slot-scope="{ row, index }")
-            .competencies__data(v-if="currentActive !== index") {{ presentArrays(row.services, 'title') }}
+          template(slot="step" slot-scope="{ row, index }")
+            .competencies__data(v-if="currentActive !== index") {{ presentArrays(row.steps, 'title') }}
             .competencies__drop-menu(v-else)
                 SelectMulti(
                   :isTableDropMenu="isTableDropMenu"
                   placeholder="Select"
                   :hasSearch="true"
-                  :selectedOptions="currentServices.map(i => i.title)"
-                  :options="services.map(i => i.title)"
-                  @chooseOptions="setServices"   
+                  :selectedOptions="currentSteps.map(i => i.title)"
+                  :options="steps.map(i => i.title)"
+                  @chooseOptions="setSteps"   
                 )
 
           template(slot="industry" slot-scope="{ row, index }")
@@ -89,7 +89,7 @@ export default {
     languages: {
       type: Array
     },
-    services: {
+    steps: {
       type: Array
     },
     industries: {
@@ -114,9 +114,9 @@ export default {
           padding: "0"
         },
         {
-          label: "Services",
+          label: "Steps",
           headerKey: "headerService",
-          key: "service",
+          key: "step",
           width: "20%",
           padding: "0"
         },
@@ -141,7 +141,7 @@ export default {
       currentSource: "",
       currentTargets: [],
       currentIndustries: [],
-      currentServices: [],
+      currentSteps: [],
 
       currentActive: -1,
       areErrors: false,
@@ -184,15 +184,15 @@ export default {
         this.currentTargets.push(lang);
       }
     },
-    setServices({ option }) {
-      const position = this.currentServices
+    setSteps({ option }) {
+      const position = this.currentSteps
         .map(item => item.title)
         .indexOf(option);
       if (position !== -1) {
-        this.currentServices.splice(position, 1);
+        this.currentSteps.splice(position, 1);
       } else {
-        const service = this.services.find(item => item.title === option);
-        this.currentServices.push(service);
+        const service = this.steps.find(item => item.title === option);
+        this.currentSteps.push(service);
       }
     },
 
@@ -224,7 +224,7 @@ export default {
       this.currentIndustries = Array.from(
         this.competenciesData[index].industries
       );
-      this.currentServices = Array.from(this.competenciesData[index].services);
+      this.currentSteps = Array.from(this.competenciesData[index].steps);
     },
 
     manageCancelEdition(index) {
@@ -240,7 +240,7 @@ export default {
       this.currentSource = "";
       this.currentTargets = [];
       this.currentIndustries = [];
-      this.currentServices = [];
+      this.currentSteps = [];
     },
 
     async checkErrors(index) {
@@ -250,14 +250,14 @@ export default {
       //   `/clientsapi/client?id=${this.$route.params.id}`
       // );
 
-      // const listServicesExceptTheCurrent = client.body.services;
-      // const arraysOfTheSame = listServicesExceptTheCurrent.filter(
+      // const liststepsExceptTheCurrent = client.body.steps;
+      // const arraysOfTheSame = liststepsExceptTheCurrent.filter(
       //   item => item.sourceLanguage.lang === this.currentSource.lang
       // );
 
       // if (this.competenciesData[index]._id != null) {
       //   const oldCurrentSource =
-      //     listServicesExceptTheCurrent[index].sourceLanguage.lang;
+      //     liststepsExceptTheCurrent[index].sourceLanguage.lang;
       //   if (
       //     oldCurrentSource !== this.currentSource.lang &&
       //     arraysOfTheSame.length
@@ -275,8 +275,8 @@ export default {
         this.errors.push("Target should not be empty!");
       if (!this.currentIndustries.length)
         this.errors.push("Industry should not be empty!");
-      if (!this.currentServices.length)
-        this.errors.push("Service should not be empty!");
+      if (!this.currentSteps.length)
+        this.errors.push("Steps should not be empty!");
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -292,7 +292,7 @@ export default {
           _id: id,
           sourceLanguage: this.currentSource,
           targetLanguages: this.currentTargets,
-          services: this.currentServices,
+          steps: this.currentSteps,
           industries: this.currentIndustries
         };
         const result = this.$http.post("/vendorsapi/competencies", {
@@ -311,48 +311,48 @@ export default {
           type: "error"
         });
       } finally {
+        this.setDefaults();
         const vendor = await this.$http.get(
           `/vendorsapi/vendor?id=${this.$route.params.id}`
         );
-        this.competenciesData = vendor.body.competencies;
-        this.setDefaults();
+        this.competenciesData = vendor.data.competencies;
       }
     },
 
-    // async manageDeleteClick(index) {
-    //   if (!this.competencies[index]._id) {
-    //     this.competencies.splice(index, 1);
-    //     this.setDefaults();
-    //     return;
-    //   }
-    //   this.deleteIndex = index;
-    //   this.isDeleting = true;
-    // },
+    async manageDeleteClick(index) {
+      if (!this.competenciesData[index]._id) {
+        this.competenciesData.splice(index, 1);
+        this.setDefaults();
+        return;
+      }
+      this.deleteIndex = index;
+      this.isDeleting = true;
+    },
 
     closeModal() {
       return (this.isDeleting = false);
     },
 
     async deleteCompetencies() {
-      // try {
-      //   let currentData = this.competenciesData[this.deleteIndex];
-      //   const result = this.$http.delete(
-      //     `/clientsapi/services/${this.$route.params.id}/${currentData._id}`
-      //   );
-      //   this.competenciesData.splice(this.deleteIndex, 1);
-      //   this.closeModal();
-      //   this.alertToggle({
-      //     message: "Competencies are deleted",
-      //     isShow: true,
-      //     type: "success"
-      //   });
-      // } catch (err) {
-      //   this.alertToggle({
-      //     message: "Error in save Competencies",
-      //     isShow: true,
-      //     type: "error"
-      //   });
-      // }
+      try {
+        let currentData = this.competenciesData[this.deleteIndex];
+        const result = this.$http.delete(
+          `/vendorsapi/competencies/${this.$route.params.id}/${currentData._id}`
+        );
+        this.competenciesData.splice(this.deleteIndex, 1);
+        this.closeModal();
+        this.alertToggle({
+          message: "Competencies are deleted",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in save Competencies",
+          isShow: true,
+          type: "error"
+        });
+      }
     },
 
     addData() {
@@ -362,7 +362,7 @@ export default {
       this.competenciesData.push({
         sourceLanguage: "",
         targetLanguages: [],
-        services: [],
+        steps: [],
         industries: []
       });
       this.setEditingData(this.competenciesData.length - 1);
