@@ -127,15 +127,16 @@ const VendorSchema = new mongoose.Schema({
     sourceLanguage: {
       type: Schema.Types.ObjectId, ref: 'Language',
     },
-    targetLanguages: [
-      { type: Schema.Types.ObjectId, ref: 'Language', }
-    ],
-    steps: [
-      { type: Schema.Types.ObjectId, ref: 'Step', }
-    ],
-    industries: [
-      { type: Schema.Types.ObjectId, ref: 'Industries', }
-    ]
+    targetLanguage: { 
+      type: Schema.Types.ObjectId, ref: 'Language', 
+    },
+    step: { 
+      type: Schema.Types.ObjectId, ref: 'Step', 
+    },
+    industry: { 
+      type: Schema.Types.ObjectId, ref: 'Industries', 
+    }
+
   }],
   qualifications: [{
     source: {
@@ -174,7 +175,7 @@ const VendorSchema = new mongoose.Schema({
     LQA2: {},
     LQA3: {},
   }],
-  
+
   wordCountInfo: [{
     industry: {
       id: {
