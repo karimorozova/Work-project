@@ -5,8 +5,8 @@ async function getLangTest(obj) {
         return await LangTest.findOne(obj)
             .populate("source")
             .populate("targets")
-            .populate("industry")
-            .populate("step")
+            .populate("industries")
+            .populate("steps")
     } catch(err) {
         console.log(err);
         console.log("Error in getLangTest")
@@ -18,8 +18,8 @@ async function getLangTests(obj) {
         return await LangTest.find(obj)
             .populate("source")
             .populate("targets")
-            .populate("industry")
-            .populate("step")
+            .populate("industries")
+            .populate("steps")
     } catch(err) {
         console.log(err);
         console.log("Error in getLangTests")
@@ -31,8 +31,8 @@ async function getUpdatedTest(query, update) {
         return await LangTest.findOneAndUpdate(query, update, {new: true})
             .populate("source")
             .populate("targets")
-            .populate("industry")
-            .populate("step")
+            .populate("industries")
+            .populate("steps")
     } catch(err) {
         console.log(err);
         console.log("Error in getUpdatedTest")
