@@ -1,11 +1,12 @@
 const { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors } = require("./getVendors");
 const { updateVendorRates, deleteRate, importRates, getVendorAfterCombinationsUpdated } = require("./vendorRates");
-const { saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, saveHashedPassword, getPhotoLink, 
-    removeOldVendorFile, updateVendorEducation, removeVendorEdu, updateVendorAssessment} = require("./info");
+const { saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, saveHashedPassword, getPhotoLink,
+    removeOldVendorFile, updateVendorEducation, removeVendorEdu, updateVendorAssessment } = require("./info");
 const { getJobs, updateStepProp } = require("./jobs");
 const { manageNewApplication } = require("./application");
 const { notifyTestStatus } = require("./testEmails");
 const { updateVendorCompetencies, deleteVendorCompetencies } = require('./competencies')
+const { saveQualifications } = require('./qualifications')
 
 module.exports = {
     getVendor,
@@ -21,7 +22,7 @@ module.exports = {
     saveHashedPassword,
     getPhotoLink,
     removeOldVendorFile,
-    getJobs, 
+    getJobs,
     updateStepProp,
     getVendorAfterCombinationsUpdated,
     manageNewApplication,
@@ -31,4 +32,5 @@ module.exports = {
     notifyTestStatus,
     updateVendorCompetencies,
     deleteVendorCompetencies,
+    saveQualifications,
 }

@@ -275,8 +275,6 @@ export default {
     },
     isMatch(item) {
         return (this.currentSource.lang === "NA" || this.currentSource.lang === item.source.lang)
-            // && this.currentSteps._id === item.step._id
-            // && this.currentIndustries._id === item.industry._id
     },
     async manageSaveClick(index) {
         if (this.currentActive === -1) return;
@@ -450,6 +448,7 @@ export default {
   &__data {
     @extend %table-data;
     overflow-x: hidden;
+    display: grid;
   }
   &__editing-data {
     @extend %table-data;

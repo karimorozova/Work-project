@@ -1,96 +1,100 @@
 <template lang="pug">
 .qualifications
   .qualifications__preview(v-if="isEditAndSend")
-        VendorPreview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
+    VendorPreview(@closePreview="closePreview", :message="previewMessage", @send="sendMessage")
   .qualifications__form(v-if="isForm")
-        VendorLqa(:vendorData="lqaData" @closeForm="closeForm"  @saveVendorLqa="saveVendorLqa")
+    VendorLqa(:vendorData="lqaData", @closeForm="closeForm", @saveVendorLqa="saveVendorLqa")
   .qualifications__table
-      SettingsTable(
-          :fields="fields"
-          :tableData="qualificationData"
-          :errors="errors"
-          :areErrors="areErrors"
-          :isApproveModal="isDeleting" 
-          @closeErrors="closeErrors"
-          @approve="deleteData"
-          @notApprove="setDefaults"
-          @closeModal="setDefaults"
-      )
+    SettingsTable(
+      :fields="fields",
+      :tableData="qualificationData",
+      :errors="errors",
+      :areErrors="areErrors",
+      :isApproveModal="isDeleting",
+      @closeErrors="closeErrors",
+      @approve="deleteData",
+      @notApprove="setDefaults",
+      @closeModal="setDefaults"
+    )
+      template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+        .qualifications__head-title {{ field.label }}
 
-          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-              .qualifications__head-title {{ field.label }}
+      template(slot="source", slot-scope="{ row, index }")
+        .qualifications__data(v-if="currentActive !== index")
+          span.qualifications__source(v-if="row.source") {{ row.source.lang }}
+        //- .qualifications__drop-menu(v-else)
+        //-   SelectSingle(
+        //-     :isTableDropMenu="isTableDropMenu",
+        //-     placeholder="Select",
+        //-     :hasSearch="true",
+        //-     :selectedOption="currentSource.lang",
+        //-     :options="sourceData",
+        //-     @chooseOption="setSource",
+        //-     @scrollDrop="scrollDrop"
+        //-   )
 
-          template(slot="source" slot-scope="{ row, index }")
-              .qualifications__data(v-if="currentActive !== index")
-                span.qualifications__source(v-if="row.source") {{ row.source.lang }}
-              .qualifications__drop-menu(v-else)
-                  SelectSingle(
-                      :isTableDropMenu="isTableDropMenu"
-                      placeholder="Select"
-                      :hasSearch="true"
-                      :selectedOption="currentSource.lang"
-                      :options="sourceData"
-                      @chooseOption="setSource"
-                      @scrollDrop="scrollDrop"
-                  )
+      template(slot="target", slot-scope="{ row, index }")
+        .qualifications__data(v-if="currentActive !== index") {{ row.target.lang }}
+        //- .qualifications__drop-menu(v-else)
+        //-   SelectSingle(
+        //-     :isTableDropMenu="isTableDropMenu",
+        //-     placeholder="Select",
+        //-     :hasSearch="true",
+        //-     :selectedOption="currentTarget.lang",
+        //-     :options="targetData",
+        //-     @chooseOption="setTarget",
+        //-     @scrollDrop="scrollDrop"
+        //-   )
 
-          template(slot="target" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.target.lang }}
-            .qualifications__drop-menu(v-else)
-                SelectSingle(
-                    :isTableDropMenu="isTableDropMenu"
-                    placeholder="Select"
-                    :hasSearch="true"
-                    :selectedOption="currentTarget.lang"
-                    :options="targetData"
-                    @chooseOption="setTarget"
-                    @scrollDrop="scrollDrop"
-                )
+      template(slot="industry", slot-scope="{ row, index }")
+        .qualifications__data(v-if="currentActive !== index") {{ row.industry.name }}
+        //- .qualifications__drop-menu(v-else)
+        //-   SelectSingle(
+        //-     :isTableDropMenu="isTableDropMenu",
+        //-     placeholder="Select",
+        //-     :hasSearch="true",
+        //-     :selectedOption="currentIndustry.name",
+        //-     :options="industryData",
+        //-     @chooseOption="setIndustry",
+        //-     @scrollDrop="scrollDrop"
+        //-   )
 
-          template(slot="industry" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.industry.name }}
-            .qualifications__drop-menu(v-else)
-                SelectSingle(
-                    :isTableDropMenu="isTableDropMenu"
-                    placeholder="Select"
-                    :hasSearch="true"
-                    :selectedOption="currentIndustry.name"
-                    :options="industryData"
-                    @chooseOption="setIndustry"
-                    @scrollDrop="scrollDrop"
-                )
+      template(slot="step", slot-scope="{ row, index }")
+        .qualifications__data(v-if="currentActive !== index") {{ presentArrays(row.steps, 'title') }}
+        //- .qualifications__drop-menu(v-else)
+        //-   SelectSingle(
+        //-     :isTableDropMenu="isTableDropMenu",
+        //-     placeholder="Select",
+        //-     :hasSearch="true",
+        //-     :selectedOption="currentStep.title",
+        //-     :options="stepsData",
+        //-     @chooseOption="setStep",
+        //-     @scrollDrop="scrollDrop"
+        //-   )
 
-          template(slot="step" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.step.title }}
-            .qualifications__drop-menu(v-else)
-                SelectSingle(
-                    :isTableDropMenu="isTableDropMenu"
-                    placeholder="Select"
-                    :hasSearch="true"
-                    :selectedOption="currentStep.title"
-                    :options="stepsData"
-                    @chooseOption="setStep"
-                    @scrollDrop="scrollDrop"
-                )
+      template(slot="status", slot-scope="{ row, index }")
+        .qualifications__data(v-if="currentActive !== index") {{ row.status }}
+        .qualifications__drop-menu(v-else)
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentStatus",
+            :options="statuses",
+            @chooseOption="setStatus",
+            @scrollDrop="scrollDrop"
+          )
 
-          template(slot="status" slot-scope="{ row, index }")
-            .qualifications__data(v-if="currentActive !== index") {{ row.status }}
-            .qualifications__drop-menu(v-else)
-                SelectSingle(
-                    :isTableDropMenu="isTableDropMenu"
-                    placeholder="Select"
-                    :hasSearch="true"
-                    :selectedOption="currentStatus"
-                    :options="statuses"
-                    @chooseOption="setStatus"
-                    @scrollDrop="scrollDrop"
-                )
+      template(slot="icons", slot-scope="{ row, index }")
+        .qualifications__icons
+          img.qualifications__icon(
+            v-for="(icon, key) in icons",
+            :src="icon.icon",
+            @click="makeAction(index, key)",
+            :class="{ qualifications_opacity: isActive(key, index) }"
+          )
 
-          template(slot="icons" slot-scope="{ row, index }")
-              .qualifications__icons
-                  img.qualifications__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'qualifications_opacity': isActive(key, index)}")
-  
-  Add(@add="addData")
+  //- Add(@add="addData")
 </template>
 
 <script>
@@ -108,19 +112,19 @@ export default {
   props: {
     qualificationData: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     assessmentData: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     currentVendor: {
-      type: Object
+      type: Object,
     },
     vendorIndustries: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -130,47 +134,47 @@ export default {
           headerKey: "headerSource",
           key: "source",
           width: "17%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Target",
           headerKey: "headerTarget",
           key: "target",
           width: "17%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
           width: "17%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
           width: "17%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Test Status",
           headerKey: "headerStatus",
           key: "status",
           width: "17%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
           width: "15%",
-          padding: "0"
-        }
+          padding: "0",
+        },
       ],
       vendorTests: [],
       lqaData: {
-        isTqi: true
+        isTqi: true,
       },
       sources: [],
       targets: [],
@@ -189,7 +193,7 @@ export default {
       isTableDropMenu: true,
       currentActive: -1,
       isForm: false,
-      isEditAndSend: false
+      isEditAndSend: false,
     };
   },
   methods: {
@@ -197,8 +201,14 @@ export default {
       alertToggle: "alertToggle",
       storeQualification: "storeCurrentVendorQualification",
       deleteQualification: "deleteCurrentVendorQualification",
-      storeAssessment: "storeCurrentVendorAssessment"
+      storeAssessment: "storeCurrentVendorAssessment",
     }),
+
+    presentArrays(Arr, key) {
+      if (!Arr.length) return "";
+      return Arr.reduce((acc, cur) => acc + `${cur[key]}; `, "");
+    },
+
     closePreview() {
       this.isEditAndSend = false;
     },
@@ -260,10 +270,8 @@ export default {
       this.errors = [];
       if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTarget) this.errors.push("Target should not be empty!");
-      if (!this.currentIndustry)
-        this.errors.push("Industry should not be empty!");
-      if (!this.currentStatus)
-        this.errors.push("Step status should not be empty!");
+      if (!this.currentIndustry) this.errors.push("Industry should not be empty!");
+      if (!this.currentStatus) this.errors.push("Step status should not be empty!");
       if (!this.currentStep) this.errors.push("Step should not be empty!");
       if (!this.errors.length && !this.getAvailableTest())
         this.errors.push("There is no test available for such data!");
@@ -282,7 +290,7 @@ export default {
           ...this.currentVendor,
           industry: this.currentIndustry,
           target: this.currentTarget,
-          source: this.currentSource
+          source: this.currentSource,
         });
         this.previewMessage = template.body.message;
         this.openPreview();
@@ -292,8 +300,8 @@ export default {
     },
     getAvailableTest() {
       if (!this.vendorTests.length) return null;
-      return this.vendorTests.find(item => {
-        const targetIds = item.targets.map(t => t._id);
+      return this.vendorTests.find((item) => {
+        const targetIds = item.targets.map((t) => t._id);
         if (
           targetIds.indexOf(this.currentTarget._id) !== 1 &&
           this.currentStep._id === item.step._id &&
@@ -305,10 +313,7 @@ export default {
       });
     },
     isSourceMatch(source) {
-      return (
-        (!source && this.currentSource.lang === "NA") ||
-        source._id === this.currentSource._id
-      );
+      return (!source && this.currentSource.lang === "NA") || source._id === this.currentSource._id;
     },
     handleLqa() {
       this.lqaData = {
@@ -317,44 +322,44 @@ export default {
           industry: this.currentIndustry.name,
           sourceLang: this.currentSource.lang,
           targetLang: this.currentTarget.lang,
-          step: this.currentStep.title
-        }
+          step: this.currentStep.title,
+        },
       };
       this.openForm();
     },
-    checkSuchData() {
-      if (this.assessmentData.length == 0) {
-        return true;
-      } else {
-        const getStep = this.assessmentData.find(
-          value => value.step._id == this.currentStep._id
-        );
-        if (getStep) {
-          const getTarget = getStep.langsData.find(
-            value => value.target._id == this.currentTarget._id
-          );
-          const getSource = getStep.langsData.find(
-            value => value.source._id == this.currentSource._id
-          );
-          if (getTarget && getSource) {
-            const getIndustry = getSource.industries.find(
-              value => value.industry._id == this.currentIndustry._id
-            );
-            if (getIndustry) {
-              this.errors.push("Such information already exists!");
-              this.areErrors = true;
-              return false;
-            } else {
-              return true;
-            }
-          } else {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      }
-    },
+    // checkSuchData() {
+    //   if (this.assessmentData.length == 0) {
+    //     return true;
+    //   } else {
+    //     const getStep = this.assessmentData.find(
+    //       value => value.step._id == this.currentStep._id
+    //     );
+    //     if (getStep) {
+    //       const getTarget = getStep.langsData.find(
+    //         value => value.target._id == this.currentTarget._id
+    //       );
+    //       const getSource = getStep.langsData.find(
+    //         value => value.source._id == this.currentSource._id
+    //       );
+    //       if (getTarget && getSource) {
+    //         const getIndustry = getSource.industries.find(
+    //           value => value.industry._id == this.currentIndustry._id
+    //         );
+    //         if (getIndustry) {
+    //           this.errors.push("Such information already exists!");
+    //           this.areErrors = true;
+    //           return false;
+    //         } else {
+    //           return true;
+    //         }
+    //       } else {
+    //         return true;
+    //       }
+    //     } else {
+    //       return true;
+    //     }
+    //   }
+    // },
     async saveVendorLqa({ vendorData }) {
       const { file, grade } = vendorData;
       let assessment = {
@@ -364,7 +369,7 @@ export default {
         tqi: { fileName: "", path: "", grade },
         lqa1: {},
         lqa2: {},
-        lqa3: {}
+        lqa3: {},
       };
       if (this.currentSource.lang !== "NA") {
         assessment.source = this.currentSource;
@@ -387,7 +392,7 @@ export default {
         target: this.currentTarget,
         industry: this.currentIndustry,
         step: this.currentStep,
-        status: this.currentStatus
+        status: this.currentStatus,
       };
       if (this.currentSource.lang !== "NA") {
         qualification.source = this.currentSource;
@@ -399,12 +404,12 @@ export default {
           index,
           qualification,
           testPath: test ? test.path : "",
-          message: message ? message : ""
+          message: message ? message : "",
         });
         this.alertToggle({
           message: "Qualification saved",
           isShow: true,
-          type: "success"
+          type: "success",
         });
       } catch (err) {
       } finally {
@@ -419,49 +424,49 @@ export default {
       try {
         await this.deleteQualification({
           vendorId: this.currentVendor._id,
-          index: this.deleteIndex
+          index: this.deleteIndex,
         });
         this.alertToggle({
           message: "Qualification removed",
           isShow: true,
-          type: "success"
+          type: "success",
         });
       } catch (err) {
       } finally {
         this.manageCancelEdition();
       }
     },
-    addData() {
-      if (this.currentActive !== -1) {
-        return this.isEditing();
-      }
-      this.qualificationData.push({
-        source: "",
-        target: "",
-        industry: "",
-        status: "",
-        step: ""
-      });
-      this.setEditingData(this.qualificationData.length - 1);
-    },
-    async getLangs() {
-      try {
-        const result = await this.$http.get("/api/languages");
-        this.sources = Array.from(result.body);
-        this.targets = Array.from(result.body);
-        this.sources.unshift({ lang: "NA" });
-      } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
-      }
-    },
-    async getSteps() {
-      try {
-        const result = await this.$http.get("/api/steps");
-        this.steps = result.body;
-      } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
-      }
-    },
+    // addData() {
+    //   if (this.currentActive !== -1) {
+    //     return this.isEditing();
+    //   }
+    //   this.qualificationData.push({
+    //     source: "",
+    //     target: "",
+    //     industry: "",
+    //     status: "",
+    //     step: ""
+    //   });
+    //   this.setEditingData(this.qualificationData.length - 1);
+    // },
+    // async getLangs() {
+    //   try {
+    //     const result = await this.$http.get("/api/languages");
+    //     this.sources = Array.from(result.body);
+    //     this.targets = Array.from(result.body);
+    //     this.sources.unshift({ lang: "NA" });
+    //   } catch (err) {
+    //     this.alertToggle({ message: err.message, isShow: true, type: "error" });
+    //   }
+    // },
+    // async getSteps() {
+    //   try {
+    //     const result = await this.$http.get("/api/steps");
+    //     this.steps = result.body;
+    //   } catch (err) {
+    //     this.alertToggle({ message: err.message, isShow: true, type: "error" });
+    //   }
+    // },
     setStatuses() {
       let result = ["NA", "Sample Requested"];
       if (!!this.getAvailableTest()) {
@@ -481,23 +486,23 @@ export default {
       }
       return result;
     },
-    setSource({ option }) {
-      this.currentSource = this.sources.find(item => item.lang === option);
-    },
-    setTarget({ option }) {
-      this.currentTarget = this.targets.find(item => item.lang === option);
-    },
-    setIndustry({ option }) {
-      this.currentIndustry = this.vendorIndustries.find(
-        item => item.name === option
-      );
-    },
+    // setSource({ option }) {
+    //   this.currentSource = this.sources.find(item => item.lang === option);
+    // },
+    // setTarget({ option }) {
+    //   this.currentTarget = this.targets.find(item => item.lang === option);
+    // },
+    // setIndustry({ option }) {
+    //   this.currentIndustry = this.vendorIndustries.find(
+    //     item => item.name === option
+    //   );
+    // },
     setStatus({ option }) {
       this.currentStatus = option;
     },
-    setStep({ option }) {
-      this.currentStep = this.steps.find(item => item.title === option);
-    },
+    // setStep({ option }) {
+    //   this.currentStep = this.steps.find(item => item.title === option);
+    // },
     closeErrors() {
       this.areErrors = false;
     },
@@ -507,27 +512,22 @@ export default {
     openForm() {
       this.isForm = true;
     },
-    async getTests() {
-      try {
-        const result = await this.$http.get("/vendorsapi/lang-tests");
-        this.vendorTests = result.body;
-      } catch (err) {
-        this.alertToggle({ message: "Error on getting tests", isShow: true });
-      }
-    }
+    // async getTests() {
+    //   try {
+    //     const result = await this.$http.get("/vendorsapi/lang-tests");
+    //     this.vendorTests = result.body;
+    //   } catch (err) {
+    //     this.alertToggle({ message: "Error on getting tests", isShow: true });
+    //   }
+    // }
   },
   computed: {
     ...mapGetters({
-      currentVendorQualifications: "getCurrentVendorQualifications"
+      currentVendorQualifications: "getCurrentVendorQualifications",
     }),
     statuses() {
       let result = ["NA", "Sample Requested"];
-      if (
-        !this.currentSource ||
-        !this.currentTarget ||
-        !this.currentStep ||
-        !this.currentIndustry
-      ) {
+      if (!this.currentSource || !this.currentTarget || !this.currentStep || !this.currentIndustry) {
         return result;
       }
       if (this.currentIndex !== -1) {
@@ -535,32 +535,32 @@ export default {
       }
       return result;
     },
-    sourceData() {
-      return this.sources.map(item => item.lang);
-    },
-    targetData() {
-      return this.targets.map(item => item.lang);
-    },
-    industryData() {
-      return this.vendorIndustries.map(item => item.name);
-    },
-    stepsData() {
-      return this.steps.map(item => item.title);
-    }
+    // sourceData() {
+    //   return this.sources.map(item => item.lang);
+    // },
+    // targetData() {
+    //   return this.targets.map(item => item.lang);
+    // },
+    // industryData() {
+    //   return this.vendorIndustries.map(item => item.name);
+    // },
+    // stepsData() {
+    //   return this.steps.map(item => item.title);
+    // }
   },
   components: {
     VendorPreview,
     SettingsTable,
     SelectSingle,
     VendorLqa,
-    Add
+    Add,
   },
   created() {
-    this.getTests();
-    this.getLangs();
-    this.getSteps();
+    // this.getTests();
+    // this.getLangs();
+    // this.getSteps();
   },
-  mounted() {}
+  mounted() {},
 };
 </script>
 
@@ -571,8 +571,9 @@ export default {
 .qualifications {
   @extend %setting-table;
   margin: 20px 10px 40px;
-  width: 960px;
-  box-shadow: 0 0 15px #67573e9d;
+  width: 920px;
+  box-shadow: 0 0 10px #67573e9d;
+  padding: 40px;
 
   &__data {
     @extend %table-data;

@@ -48,27 +48,6 @@
             @chooseOptions="setTargets"
           )
 
-      template(slot="step", slot-scope="{ row, index }")
-        .competencies__data(v-if="currentActive !== index") {{ row.step.title }}
-        .competencies__drop-menu(v-if="currentActive == index && !newRow")
-          SelectSingle(
-            :isTableDropMenu="isTableDropMenu",
-            placeholder="Select",
-            :hasSearch="true",
-            :selectedOption="currentSteps.title",
-            :options="steps.map((i) => i.title)",
-            @chooseOption="setStep"
-          )
-        .competencies__drop-menu(v-if="currentActive == index && newRow")
-          SelectMulti(
-            :isTableDropMenu="isTableDropMenu",
-            placeholder="Select",
-            :hasSearch="true",
-            :selectedOptions="currentSteps.map((i) => i.title)",
-            :options="steps.map((i) => i.title)",
-            @chooseOptions="setSteps"
-          )
-
       template(slot="industry", slot-scope="{ row, index }")
         .competencies__data(v-if="currentActive !== index") {{ row.industry.name }}
         .competencies__drop-menu(v-if="currentActive == index && !newRow")
@@ -88,6 +67,27 @@
             :selectedOptions="currentIndustries.map((i) => i.name)",
             :options="vendorIndustries",
             @chooseOptions="setIndustries"
+          )
+
+      template(slot="step", slot-scope="{ row, index }")
+        .competencies__data(v-if="currentActive !== index") {{ row.step.title }}
+        .competencies__drop-menu(v-if="currentActive == index && !newRow")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentSteps.title",
+            :options="steps.map((i) => i.title)",
+            @chooseOption="setStep"
+          )
+        .competencies__drop-menu(v-if="currentActive == index && newRow")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentSteps.map((i) => i.title)",
+            :options="steps.map((i) => i.title)",
+            @chooseOptions="setSteps"
           )
 
       template(slot="icons", slot-scope="{ row, index }")
@@ -144,20 +144,19 @@ export default {
           padding: "0",
         },
         {
-          label: "Step",
-          headerKey: "headerStep",
-          key: "step",
-          width: "20%",
-          padding: "0",
-        },
-        {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
           width: "20%",
           padding: "0",
         },
-
+        {
+          label: "Step",
+          headerKey: "headerStep",
+          key: "step",
+          width: "20%",
+          padding: "0",
+        },
         {
           label: "",
           headerKey: "headerIcons",

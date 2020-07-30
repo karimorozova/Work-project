@@ -1,5 +1,6 @@
 const { Vendors } = require('../models');
 const ObjectId = require('mongodb').ObjectID;
+const { saveQualifications } = require('./qualifications')
 
 const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
   try {
@@ -16,6 +17,7 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
         ))
       competencies.push(...combinationsWithoutRepetitions);
       await Vendors.updateOne({ _id: vendorId }, { competencies });
+      saveQualifications(combinationsWithoutRepetitions, vendorId);
     }
   } catch (err) {
     console.log(err);
