@@ -62,7 +62,7 @@ export default {
     tableData: {
       type: Array
     },
-    clientId: {
+    vendorId: {
       type: String
     }
   },
@@ -167,44 +167,44 @@ export default {
     refreshResultTable() {
       this.$emit("refreshResultTable");
     },
-    async manageSaveClick(index) {
-      if (this.currentActive === -1) return;
-      try {
-        const id = this.dataArray[index]._id;
-        const serviceId = this.dataArray[index].serviceId;
-        const result = await this.$http.post(
-          "/clientsapi/rates/" + this.clientId,
-          {
-            itemIdentifier: "Industry Multipliers Table",
-            updatedItem: {
-              _id: id,
-              serviceId,
-              industry: this.currentIndustryObj,
-              multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-              altered: true
-            }
-          }
-        );
-        this.alertToggle({
-          message: "Saved successfully",
-          isShow: true,
-          type: "success"
-        });
-        const updatedData = await this.$http.get(
-          "/clientsapi/rates/" + this.clientId
-        );
-        this.dataArray[index] =
-          updatedData.body.industryMultipliersTable[index];
-        this.setDefaults();
-        this.refreshResultTable();
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on getting Industry",
-          isShow: true,
-          type: "error"
-        });
-      }
-    },
+    // async manageSaveClick(index) {
+    //   if (this.currentActive === -1) return;
+    //   try {
+    //     const id = this.dataArray[index]._id;
+    //     const serviceId = this.dataArray[index].serviceId;
+    //     const result = await this.$http.post(
+    //       "/clientsapi/rates/" + this.clientId,
+    //       {
+    //         itemIdentifier: "Industry Multipliers Table",
+    //         updatedItem: {
+    //           _id: id,
+    //           serviceId,
+    //           industry: this.currentIndustryObj,
+    //           multiplier: parseFloat(this.currentMultiplier).toFixed(0),
+    //           altered: true
+    //         }
+    //       }
+    //     );
+    //     this.alertToggle({
+    //       message: "Saved successfully",
+    //       isShow: true,
+    //       type: "success"
+    //     });
+    //     const updatedData = await this.$http.get(
+    //       "/clientsapi/rates/" + this.clientId
+    //     );
+    //     this.dataArray[index] =
+    //       updatedData.body.industryMultipliersTable[index];
+    //     this.setDefaults();
+    //     this.refreshResultTable();
+    //   } catch (err) {
+    //     this.alertToggle({
+    //       message: "Error on getting Industry",
+    //       isShow: true,
+    //       type: "error"
+    //     });
+    //   }
+    // },
     closeErrors() {
       this.areErrors = false;
     }
@@ -230,14 +230,13 @@ export default {
   padding: 20px 0px 20px 5px;
   box-shadow: none;
 
-  &__empty{
-    margin-left: 13%;
-  }
-  
   input[disabled] {
     box-shadow: none;
   }
-
+  &__empty{
+    font-size: 16px;
+    margin-left: 32px;
+  }
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {

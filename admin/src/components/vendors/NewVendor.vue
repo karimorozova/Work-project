@@ -51,11 +51,6 @@
                             placeholder="Gender"
                             @chooseOption="updateGender"
                         )
-                .block-item
-                    label Test:
-                    .block-item__check-item.checkbox
-                        input(type="checkbox" id="test" :checked="vendor.isTest" @change="setTest")
-                        label(for="test")
             .gen-info__block
                 .block-item
                     label Company Name:
@@ -73,11 +68,6 @@
                     label WhatsApp:
                     input.block-item__input-field(type="text" placeholder="WhatsApp" :value="vendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
                 .block-item
-                    label.block-item__label.block-item_relative Vendor Status:
-                        Asterisk(:customStyle="asteriskStyle")
-                    .block-item__drop-menu.block-item_high-index(:class="{'block-item_error-shadow': !vendor.status && isSaveClicked}")
-                        VendorStatusSelect(isAllExist="no" :selectedStatus="vendor.status" @chosenStatus="chosenStatus")
-                .block-item
                     label.block-item__label.block-item_relative Industries:
                         Asterisk(:customStyle="asteriskStyle")
                     .block-item__drop-menu(:class="{'block-item_error-shadow': !vendor.industries.length && isSaveClicked}")
@@ -86,6 +76,29 @@
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete" @click="approveVendorDelete")
+
+    .vendor-subinfo
+      .vendor-subinfo__general
+        .block-item-subinfo
+          label.block-item-subinfo__label Vendor Status:
+            span.require *
+          .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.status}")
+            VendorStatusSelect(isAllExist="no" :selectedStatus="vendor.status" @chosenStatus="chosenStatus")
+        .block-item-subinfo
+          label.block-item-subinfo__label Professional level:
+          .block-item-subinfo__drop.block-item-subinfo_high-index
+            SelectSingle(
+              :options="['level1','level2']"
+              placeholder="Level"
+              :selectedOption="vendor.professionalLevel"
+              @chooseOption="chooseProfessionalLevel"
+            )
+        .block-item-subinfo
+            label.block-item-subinfo__label Test:
+            .block-item-subinfo__check-item.checkbox
+                input(type="checkbox" id="test" :checked="vendor.isTest" @change="setTest")
+                label(for="test")
+
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrors"
@@ -103,411 +116,476 @@ import SelectSingle from "../SelectSingle";
 import Asterisk from "../Asterisk";
 import TimezoneSelect from "../clients/TimezoneSelect";
 import { mapGetters, mapActions } from "vuex";
-import photoPreview from '@/mixins/photoPreview';
+import photoPreview from "@/mixins/photoPreview";
 
 export default {
-    mixins: [photoPreview],
-    data() {
-        return {
-            areErrorsExist: false,
-            isSaveClicked: false,
-            vendorShow: true,
-            imageExist: false,
-            timezones: [],
-            approveShow: false,
-            photoFile: [],
-            genders: ["Male", "Female"],
-            asteriskStyle: {"top": "-4px"},
-            errors: [],
-            vendor: {
-                basicRate: "",
-                companyName: "",
-                email: "",
-                firstName: "",
-                surname: "",
-                gender: "",
-                linkedin: "",
-                native: null,
-                phone: "",
-                photo: "",
-                skype: "",
-                status: "",
-                timezone: "",
-                tqi: "",
-                website: "",
-                whatsapp: "",
-                languageCombinations: [],
-                languagePairs: [],
-                industries: [],
-                test: false,
-                position: [],
-                isTest: false,
-            },
-            isFileError: false,
+  mixins: [photoPreview],
+  data() {
+    return {
+      areErrorsExist: false,
+      isSaveClicked: false,
+      vendorShow: true,
+      imageExist: false,
+      timezones: [],
+      approveShow: false,
+      photoFile: [],
+      genders: ["Male", "Female"],
+      asteriskStyle: { top: "0px" },
+      errors: [],
+      vendor: {
+        basicRate: "",
+        companyName: "",
+        email: "",
+        firstName: "",
+        surname: "",
+        gender: "",
+        linkedin: "",
+        native: null,
+        phone: "",
+        photo: "",
+        skype: "",
+        status: "",
+        timezone: "",
+        tqi: "",
+        website: "",
+        whatsapp: "",
+        languageCombinations: [],
+        languagePairs: [],
+        industries: [],
+        test: false,
+        position: [],
+        isTest: false,
+        professionalLevel: ""
+      },
+      isFileError: false
+    };
+  },
+  methods: {
+    setTest() {
+      this.vendor.isTest = event.target.checked;
+    },
+    closeErrors() {
+      this.areErrorsExist = false;
+    },
+    checkEmail() {
+      const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+      return (
+        !this.vendor.email ||
+        !emailValidRegex.test(this.vendor.email.toLowerCase())
+      );
+    },
+    setPhone(e) {
+      const { value } = e.target;
+      const regex = /^[0-9]+$/;
+      const characters = value.split("").filter(item => regex.test(item));
+      const clearedValue = characters.join("");
+      this.vendor.phone =
+        clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
+      this.$refs.phone.value = this.vendor.phone;
+    },
+    async checkForErrors() {
+      const textReg = /^[-\sa-zA-Z]+$/;
+      this.errors = [];
+      if (!this.vendor.firstName || !textReg.test(this.vendor.firstName))
+        this.errors.push("Please, enter valid first name.");
+      if (this.vendor.surname && !textReg.test(this.vendor.surname))
+        this.errors.push("Please, enter valid surname.");
+      if (!this.vendor.industries.length)
+        this.errors.push("Please, choose at least one industry.");
+      if (!this.vendor.status) this.errors.push("Please, choose status.");
+      if (this.checkEmail()) {
+        this.errors.push("Please provide a valid email.");
+      }
+      if (this.errors.length) {
+        this.areErrorsExist = true;
+        this.isSaveClicked = true;
+        return;
+      }
+      await this.saveVendor();
+    },
+    async saveVendor() {
+      let sendData = new FormData();
+      sendData.append("vendor", JSON.stringify(this.vendor));
+      sendData.append("photo", this.photoFile[0]);
+      try {
+        await this.saveNewVendor(sendData);
+        this.alertToggle({
+          message: "New Vendor saved",
+          isShow: true,
+          type: "success"
+        });
+        this.$router.push(`/vendors/details/${this.currentVendor._id}`);
+      } catch (err) {
+        this.alertToggle({
+          message: "Server error / Cannot update Vendor info",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    updateProp(e, prop) {
+      const value = e.target.value;
+      this.vendor[prop] = value;
+    },
+    updateGender({ option }) {
+      this.vendor.gender = option;
+    },
+    setTimezone(data) {
+      this.vendor.timezone = data;
+    },
+    setNative({ lang }) {
+      this.vendor.native = lang;
+    },
+    chooseProfessionalLevel({ option }) {
+      this.vendor.professionalLevel = option;
+    },
+    chosenStatus({ option }) {
+      this.vendor.status = option;
+    },
+    cancel() {
+      this.$router.go(-1);
+    },
+    chosenInd({ industry }) {
+      const index = this.vendor.industries.findIndex(
+        item => item._id === industry._id
+      );
+      if (index !== -1) {
+        return this.vendor.industries.splice(index, 1);
+      }
+      this.vendor.industries.push(industry);
+    },
+    ...mapActions({
+      alertToggle: "alertToggle",
+      saveNewVendor: "saveNewVendor"
+    })
+  },
+  computed: {
+    ...mapGetters({
+      currentVendor: "getCurrentVendor"
+    }),
+    selectedIndNames() {
+      let result = [];
+      if (this.vendor.industries.length) {
+        for (let ind of this.vendor.industries) {
+          result.push(ind.name);
         }
-    },
-    methods: {
-        setTest(){
-            this.vendor.isTest = event.target.checked;
-        },
-        closeErrors() {
-            this.areErrorsExist = false;
-        },
-        checkEmail() {
-            const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;            
-            return !this.vendor.email || !emailValidRegex.test(this.vendor.email.toLowerCase())
-        },
-        setPhone(e) {
-            const { value } = e.target;
-            const regex = /^[0-9]+$/;
-            const characters = value.split("").filter(item => regex.test(item));
-            const clearedValue = characters.join("");
-            this.vendor.phone = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
-            this.$refs.phone.value = this.vendor.phone;
-        },
-        async checkForErrors() {
-            const textReg = /^[-\sa-zA-Z]+$/;
-            this.errors = [];
-            if(!this.vendor.firstName || !textReg.test(this.vendor.firstName)) this.errors.push('Please, enter valid first name.');
-            if(this.vendor.surname && !textReg.test(this.vendor.surname)) this.errors.push('Please, enter valid surname.');
-            if(!this.vendor.industries.length) this.errors.push('Please, choose at least one industry.');
-            if(!this.vendor.status) this.errors.push('Please, choose status.');
-            if(this.checkEmail()) {
-                this.errors.push('Please provide a valid email.');
-            }
-            if(this.errors.length) {
-                this.areErrorsExist = true;
-                this.isSaveClicked = true;
-                return
-            }
-            await this.saveVendor();
-        }, 
-        async saveVendor() {            
-            let sendData = new FormData();
-            sendData.append('vendor', JSON.stringify(this.vendor));
-            sendData.append('photo', this.photoFile[0]);
-            try {
-                await this.saveNewVendor(sendData);
-                this.alertToggle({message: "New Vendor saved", isShow: true, type: "success"});
-                this.$router.push(`/vendors/details/${this.currentVendor._id}`);
-            } catch(err) {
-                this.alertToggle({message: "Server error / Cannot update Vendor info", isShow: true, type: "error"})
-            }
-        },
-        updateProp(e, prop) {
-            const value = e.target.value;
-            this.vendor[prop] = value;
-        },
-        updateGender({option}) {
-            this.vendor.gender = option;
-        },
-        setTimezone(data) {
-            this.vendor.timezone = data;
-        },
-        setNative({lang}) {
-            this.vendor.native = lang;
-        },
-        chosenStatus({option}) {
-            this.vendor.status = option;
-        },
-        cancel() {
-            this.$router.go(-1);
-        },
-        chosenInd({industry}) {
-            const index = this.vendor.industries.findIndex(item => item._id === industry._id);
-            if(index !== -1) {
-                return this.vendor.industries.splice(index, 1);
-            }
-            this.vendor.industries.push(industry);
-        },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            saveNewVendor: "saveNewVendor"
-        })
-    },
-    computed: {
-        ...mapGetters({
-            currentVendor: "getCurrentVendor"
-        }),
-        selectedIndNames() {
-            let result = [];
-            if(this.vendor.industries.length) {
-                for(let ind of this.vendor.industries) {
-                    result.push(ind.name);
-                }
-            }
-            return result;
-        },
-    },
-    components: {
-        VendorLeadsourceSelect,
-        VendorStatusSelect,
-        MultiVendorIndustrySelect,
-        NativeLanguageSelect,
-        TimezoneSelect,
-        ValidationErrors,
-        SelectSingle,
-        Asterisk
-    },
-    directives: {
-        ClickOutside
-    },
-}
+      }
+      return result;
+    }
+  },
+  components: {
+    VendorLeadsourceSelect,
+    VendorStatusSelect,
+    MultiVendorIndustrySelect,
+    NativeLanguageSelect,
+    TimezoneSelect,
+    ValidationErrors,
+    SelectSingle,
+    Asterisk
+  },
+  directives: {
+    ClickOutside
+  }
+};
 </script>
 
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss"; 
-
+@import "../../assets/scss/colors.scss";
 .vendor-wrap {
+  display: flex;
+}
+.vendor-subinfo {
+  &__general {
+    padding: 20px;
+    margin-top: 120px;
+    width: 350px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
+}
+.block-item-subinfo {
+  display: flex;
+  height: 50px;
+  &__error-shadow{
+    height: 30px;
+  }
+  &__check-item {
+    width: 190px;
+  }
+  &__last {
+    height: 30px;
+  }
+  &_maxhigh-index {
+    z-index: 12;
+  }
+  &_high-index {
+    z-index: 10;
+  }
+  &__label {
+    width: 160px;
+    padding-top: 6px;
+  }
+  &__drop {
     position: relative;
-    width: 100%;
-    display: flex;
-    min-height: 94vh;
+    width: 190px;
+  }
+}
+.block-item-subinfo:last-child {
+  height: 30px;
+}
+.vendor-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  min-height: 94vh;
 }
 
 .vendor-info {
-    padding: 40px;
-    box-sizing: border-box;
+  padding: 40px;
+  box-sizing: border-box;
 }
 
 .title {
-    font-size: 22px;
+  font-size: 22px;
 }
-.gen-info, .rates {
-    box-sizing: border-box;
-    margin: 20px 10px 40px 10px;
-    padding: 20px;
-    box-shadow: 0 0 15px #67573e9d;
-    width: 900px;
+.gen-info,
+.rates {
+  box-sizing: border-box;
+  margin: 20px 10px 40px 10px;
+  padding: 40px;
+  box-shadow: 0 0 10px #67573e9d;
+  width: 1000px;
 }
 
 .gen-info {
-    display: flex;
-    justify-content: space-between;
-    &__block {
-        width: 36%;
-        &:first-child {
-            width: 22%;
-            text-align: center;
-        }
+  display: flex;
+  justify-content: space-between;
+  &__block {
+    width: 35%;
+    &:first-child {
+      width: 22%;
+      text-align: center;
     }
-    
+  }
 }
 
 .rates {
-    padding: 10px;
+  padding: 10px;
+}
+
+.require {
+  font-size: 14px;
+  color: red;
+  margin-left: 2px;
 }
 
 .block-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  &__check-item {
+    width: 190px;
+  }
+  &__label {
+    margin-bottom: 0;
+  }
+  &_relative {
+    position: relative;
+  }
+  &__drop-menu {
+    position: relative;
+    width: 191px;
+    height: 28px;
+    box-sizing: border-box;
+  }
+  &_high-index {
+    z-index: 10;
+  }
+  &_medium-index {
+    z-index: 8;
+  }
+  label {
+    margin-bottom: 0;
+  }
+  input {
     font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    &__check-item{
-        width: 190px;
-    }
-    &__label {
-        margin-bottom: 0;
-    }
-    &_relative {
-        position: relative;
-    }
-    &__drop-menu {
-        position: relative;
-        width: 191px;
-        height: 28px;
-        box-sizing: border-box;
-    }
-    &_high-index {
-        z-index: 10;
-    }
-    &_medium-index {
-        z-index: 8;
-    }
-    label {
-        margin-bottom: 0;
-    }
-    input {
-        font-size: 14px;
-        color: #67573e;
-        border: 1px solid #67573e;
-        border-radius: 5px;
-        padding: 0 5px;
-        outline: none;
-        width: 191px;
-        height: 30px;
-        box-sizing: border-box;
-    }
-    ::-webkit-input-placeholder {
-        opacity: 0.5;
-    }
-    &_error-shadow {
-        box-shadow: 0 0 5px red;
-        border-radius: 5px;
-    }
-    #test{
-        width: 0;
-    }
-    .checkbox {
-            display: flex;
-            height: 28px;
-            input[type="checkbox"] {
-            opacity: 0;
-            + {
-                label {
-                &::after {
-                    content: none;
-                }
-                }
-            }
-            &:checked {
-                + {
-                label {
-                    &::after {
-                    content: "";
-                    }
-                }
-                }
-            }
-            }
-            label {
-            position: relative;
-            display: inline-block;
-            padding-left: 22px;
-            padding-top: 4px;
-            &::before {
-                position: absolute;
-                content: "";
-                display: inline-block;
-                height: 16px;
-                width: 16px;
-                border: 1px solid;
-                left: 0px;
-                top: 3px;
-            }
-            &::after {
-                position: absolute;
-                content: "";
-                display: inline-block;
-                height: 5px;
-                width: 9px;
-                border-left: 2px solid;
-                border-bottom: 2px solid;
-                transform: rotate(-45deg);
-                left: 4px;
-                top: 7px;
-            }
-            }
-        }
+    color: #67573e;
+    border: 1px solid #67573e;
+    border-radius: 5px;
+    padding: 0 5px;
+    outline: none;
+    width: 191px;
+    height: 30px;
+    box-sizing: border-box;
+  }
+  ::-webkit-input-placeholder {
+    opacity: 0.5;
+  }
+  &_error-shadow {
+    box-shadow: 0 0 5px red;
+    border-radius: 5px;
+  }
 }
-
+#test {
+  width: 0;
+}
+.checkbox {
+  display: flex;
+  height: 28px;
+  input[type="checkbox"] {
+    opacity: 0;
+    + {
+      label {
+        &::after {
+          content: none;
+        }
+      }
+    }
+    &:checked {
+      + {
+        label {
+          &::after {
+            content: "";
+          }
+        }
+      }
+    }
+  }
+  label {
+    position: relative;
+    display: inline-block;
+    padding-left: 22px;
+    padding-top: 4px;
+    &::before {
+      position: absolute;
+      content: "";
+      display: inline-block;
+      height: 16px;
+      width: 16px;
+      border: 1px solid;
+      left: 0px;
+      top: 3px;
+    }
+    &::after {
+      position: absolute;
+      content: "";
+      display: inline-block;
+      height: 5px;
+      width: 9px;
+      border-left: 2px solid;
+      border-bottom: 2px solid;
+      transform: rotate(-45deg);
+      left: 4px;
+      top: 7px;
+    }
+  }
+}
 .buttons {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-left: 10px;
-    width: 900px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-left: 10px;
+  width: 1000px;
 }
 
 .button {
-    margin-left: 30px;
-    width: 138px;
-    height: 33px;
-    color: white;
-    font-size: 14px;
-    border-radius: 10px;
-    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    background-color: #D15F45;
-    border: 1px solid #D15F45;
-    cursor: pointer;
-    outline: none;
-    .delete-approve & {
-        margin-left: 0;
-    }
+  margin-left: 30px;
+  width: 138px;
+  height: 35px;
+  color: white;
+  font-size: 14px;
+  border-radius: 10px;
+  -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+  background-color: #d15f45;
+  border: 1px solid #d15f45;
+  cursor: pointer;
+  outline: none;
+  .delete-approve & {
+    margin-left: 0;
+  }
 }
 
 .photo-wrap {
-    width: 180px;
-    height: 157px;
-    border: 1px solid #67573E;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .photo-image {
-        max-width: 100%;
-        max-height: 100%;
-    }
+  width: 195px;
+  height: 160px;
+  border: 1px solid #67573e;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .photo-image {
+    max-width: 100%;
+    max-height: 100%;
+  }
 }
 
 .photo-file {
-    position: absolute;
-    top: -25px;
-    left: -100px;
-    height: 180px;
-    background-color: transparent;
-    outline: none;
-    border: none;
-    z-index: 5;
-    cursor: pointer;
+  position: absolute;
+  top: -25px;
+  left: -100px;
+  height: 180px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  z-index: 5;
+  cursor: pointer;
 }
 
 .photo-text {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    &__message {
-        font-size: 18px;
-        opacity: 0.5;
-        width: 50%;
-        text-align: center;
-    }
-    &__error-message {
-        position: absolute;
-        bottom: 30%;
-        z-index: 10;
-        background-color: $white;
-        padding: 3px;
-        box-sizing: border-box;
-        color: $orange;
-    }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  &__message {
+    font-size: 18px;
+    opacity: 0.5;
+    width: 50%;
+    text-align: center;
+  }
+  &__error-message {
+    position: absolute;
+    bottom: 30%;
+    z-index: 10;
+    background-color: $white;
+    padding: 3px;
+    box-sizing: border-box;
+    color: $orange;
+  }
 }
 
-.photo-extensions, .photo-size {
-    display: block;
-    font-size: 12px;
-    margin-top: 10px;
+.photo-extensions,
+.photo-size {
+  display: block;
+  font-size: 12px;
+  margin-top: 10px;
 }
 
 .delete-approve {
-    position: absolute;
-    width: 332px;
-    height: 270px;
-    top: 10%;
-    left: 50%;
-    margin-left: -166px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 10px #67573E;
-    background-color: #FFF;
-    z-index: 20;
-    p {
-        font-size: 21px;
-        width: 50%;
-        text-align: center;
-    }
-    .approve-block {
-        margin-bottom: 15px;
-    }
+  position: absolute;
+  width: 332px;
+  height: 270px;
+  top: 10%;
+  left: 50%;
+  margin-left: -166px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 10px #67573e;
+  background-color: #fff;
+  z-index: 20;
+  p {
+    font-size: 21px;
+    width: 50%;
+    text-align: center;
+  }
+  .approve-block {
+    margin-bottom: 15px;
+  }
 }
-
 </style>

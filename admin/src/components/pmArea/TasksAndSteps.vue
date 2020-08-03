@@ -108,8 +108,6 @@ export default {
             return tasksData;
         },
         async addTasks(dataForTasks) {
-            console.log(dataForTasks);
-            
             let tasksData = this.getDataForTasks(dataForTasks);
             const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))];
             const { sourceFiles, refFiles } = dataForTasks;

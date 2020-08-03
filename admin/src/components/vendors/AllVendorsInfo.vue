@@ -151,13 +151,11 @@ export default {
 
 .all-vendors {
   position: relative;
-  margin-top: 40px;
   width: 100%;
     &__table {
+        margin: 40px 40px 40px 20px;
         padding: 20px;
         box-sizing: border-box;
-        max-width: 1200px;
-        width: calc(100% - 80px);
         min-height: 150px;
         box-shadow: 0 0 10px $brown-shadow;
     }
@@ -167,18 +165,20 @@ export default {
         margin-bottom: 20px;
     }
     &__add-vendor {
-        width: 190px;
-        height: 26px;
+        width: 168px;
+        height: 34px;
         color: $white;
         font-size: 14px;
         border-radius: 10px;
-        -webkit-box-shadow: 0 3px 5px $brown-shadow;
-        box-shadow: 0 3px 5px $brown-shadow;
-        background-color: $orange;
-        border: 1px solid $orange;
+        box-shadow: 0 3px 5px rgba(0,0,0,.4);
+        background-color: #D15F45;
+        border: 1px solid #D15F45;
         cursor: pointer;
-        &:hover {
-            box-shadow: 0 0 10px $brown-shadow;
+        &:active, &:focus {
+            transform: scale(.98);
+            outline: none!important;
+            outline-color: none;
+            border: none;
         }
     }
 }

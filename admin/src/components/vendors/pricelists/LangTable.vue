@@ -37,9 +37,9 @@
       template(slot="price" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index")
           span(id="currencyType") {{row.basicPrice}}
-          label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
-          label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
-          label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
+          //- label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
+          //- label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
+          //- label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
           
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPrice")
@@ -67,7 +67,7 @@ export default {
     tableData: {
       type: Array
     },
-    clientId: {
+    vendorId: {
       type: String
     }
   },
@@ -178,45 +178,45 @@ export default {
     refreshResultTable() {
       this.$emit("refreshResultTable");
     },
-    async manageSaveClick(index) {
-      if (this.currentActive === -1) return;
-      const id = this.dataArray[index]._id;
-      const serviceId = this.dataArray[index].serviceId;
-      try {
-        const result = await this.$http.post(
-          "/clientsapi/rates/" + this.clientId,
-          {
-            itemIdentifier: "Basic Price Table",
-            updatedItem: {
-              _id: id,
-              serviceId,
-              type: this.dataArray[index].type,
-              sourceLanguage: this.currentSourceLangObj,
-              targetLanguage: this.currentTargetLangObj,
-              basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
-              altered: true
-            }
-          }
-        );
-        this.alertToggle({
-          message: "Saved successfully",
-          isShow: true,
-          type: "success"
-        });
-        const updatedData = await this.$http.get(
-          "/clientsapi/rates/" + this.clientId
-        );
-        this.dataArray[index] = updatedData.body.basicPricesTable[index];
-        this.setDefaults();
-        this.refreshResultTable();
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on saving Languages pricelist",
-          isShow: true,
-          type: "error"
-        });
-      }
-    },
+    // async manageSaveClick(index) {
+    //   if (this.currentActive === -1) return;
+    //   const id = this.dataArray[index]._id;
+    //   const serviceId = this.dataArray[index].serviceId;
+    //   try {
+    //     const result = await this.$http.post(
+    //       "/clientsapi/rates/" + this.clientId,
+    //       {
+    //         itemIdentifier: "Basic Price Table",
+    //         updatedItem: {
+    //           _id: id,
+    //           serviceId,
+    //           type: this.dataArray[index].type,
+    //           sourceLanguage: this.currentSourceLangObj,
+    //           targetLanguage: this.currentTargetLangObj,
+    //           basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
+    //           altered: true
+    //         }
+    //       }
+    //     );
+    //     this.alertToggle({
+    //       message: "Saved successfully",
+    //       isShow: true,
+    //       type: "success"
+    //     });
+    //     const updatedData = await this.$http.get(
+    //       "/clientsapi/rates/" + this.clientId
+    //     );
+    //     this.dataArray[index] = updatedData.body.basicPricesTable[index];
+    //     this.setDefaults();
+    //     this.refreshResultTable();
+    //   } catch (err) {
+    //     this.alertToggle({
+    //       message: "Error on saving Languages pricelist",
+    //       isShow: true,
+    //       type: "error"
+    //     });
+    //   }
+    // },
     closeErrors() {
       this.areErrors = false;
     }
@@ -226,9 +226,9 @@ export default {
       const { delete: del, ...result } = this.icons;
       return result;
     },
-    ...mapGetters({
-      currentClient: "getCurrentClient"
-    })
+    // ...mapGetters({
+    //   currentClient: "getCurrentClient"
+    // })
   },
   components: {
     DataTable
@@ -245,12 +245,13 @@ export default {
   padding: 20px 5px 20px 0px;
   box-shadow: none;
 
-  input[disabled] {
-    box-shadow: none;
+  &__empty{
+    font-size: 16px;
+    margin-left: 32px;
   }
 
-  &__empty{
-    margin-left: 10%;
+  input[disabled] {
+    box-shadow: none;
   }
 
   input {

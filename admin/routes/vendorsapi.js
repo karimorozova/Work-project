@@ -5,7 +5,7 @@ const fse = require('fs-extra');
 const { updateProject, getProject } = require('../projects');
 const { getVendor, getVendorAfterUpdate, getFilteredVendors, updateVendorRates, updateVendorEducation,
     importRates, getVendorAfterCombinationsUpdated, saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, 
-    removeVendorEdu, updateVendorAssessment, notifyTestStatus } = require('../vendors');
+    removeVendorEdu, updateVendorAssessment, notifyTestStatus, updateVendorCompetencies, deleteVendorCompetencies } = require('../vendors');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
 const { testSentMessage } = require("../emailMessages/candidateCommunication");
@@ -173,6 +173,28 @@ router.post('/filtered-vendors', async (req, res) => {
         res.status(500).send("Error on getting filtered Vendors");
     }
 })
+
+router.post('/competencies', async (req, res) => {
+    const { vendorId, currentData } = req.body;
+    try {
+      await updateVendorCompetencies(vendorId, currentData);
+      res.send('Updated');
+    } catch (err) {
+      console.log(err);
+      res.status(500).send('Error on saving Vendor Competencies');
+    }
+});
+
+router.delete('/competencies/:vendorId/:competenceId', async (req, res) => {
+    const { vendorId, competenceId } = req.params;
+    try {
+      await deleteVendorCompetencies(vendorId, competenceId);
+      res.send('Deleted');
+    } catch (err) {
+      console.log(err);
+      res.status(500).send('Error on deleting Vendor Competencies');
+    }
+});
 
 router.get('/vendor', async (req, res) => {
     const id = req.query.id;

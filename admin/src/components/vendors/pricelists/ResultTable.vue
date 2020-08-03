@@ -100,7 +100,7 @@ export default {
     steps: {
       type: Array
     },
-    clientId: {
+    vendorId: {
       type: String
     },
     isRefreshResultTable: {
@@ -168,7 +168,9 @@ export default {
         }
       ],
 
-      dataArray: [],
+      dataArray: [
+
+      ],
       currentSourceLanguage: "",
       currentTargetLanguage: "",
       currentStep: "",
@@ -222,40 +224,40 @@ export default {
       await this.manageSaveClick(index);
     },
 
-    async manageSaveClick(index) {
-      if (this.currentActive === -1) return;
-      const id = this.dataArray[index]._id;
+    // async manageSaveClick(index) {
+    //   if (this.currentActive === -1) return;
+    //   const id = this.dataArray[index]._id;
 
-      try {
-        const result = await this.$http.post(
-          "/clientsapi/rates/change-pricelist/" + this.clientId,
-          {
-            _id: id,
-            price: parseFloat(this.currentPrice).toFixed(3),
-            altered: true,
-            notification: "Price disconnected from function"
-          }
-        );
-        this.alertToggle({
-          message: "Saved successfully",
-          isShow: true,
-          type: "success"
-        });
+    //   try {
+    //     const result = await this.$http.post(
+    //       "/clientsapi/rates/change-pricelist/" + this.clientId,
+    //       {
+    //         _id: id,
+    //         price: parseFloat(this.currentPrice).toFixed(3),
+    //         altered: true,
+    //         notification: "Price disconnected from function"
+    //       }
+    //     );
+    //     this.alertToggle({
+    //       message: "Saved successfully",
+    //       isShow: true,
+    //       type: "success"
+    //     });
 
-        const updatedData = await this.$http.get(
-          "/clientsapi/rates/" + this.clientId
-        );
-        this.dataArray[index] = updatedData.body.pricelistTable[index];
+    //     const updatedData = await this.$http.get(
+    //       "/clientsapi/rates/" + this.clientId
+    //     );
+    //     this.dataArray[index] = updatedData.body.pricelistTable[index];
 
-        this.setDefaults();
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on saving Result pricelist",
-          isShow: true,
-          type: "error"
-        });
-      }
-    },
+    //     this.setDefaults();
+    //   } catch (err) {
+    //     this.alertToggle({
+    //       message: "Error on saving Result pricelist",
+    //       isShow: true,
+    //       type: "error"
+    //     });
+    //   }
+    // },
     manageCancelEdition() {
       this.setDefaults();
     },
@@ -279,24 +281,24 @@ export default {
         this.isDataRemain = result.body.length === 25;
       }
     },
-    async getPricelist(filters, count = 0) {
-      try {
-        const result = await this.$http.post(
-          "/clientsapi/rates/rate-combinations/" + this.clientId,
-          {
-            ...filters,
-            countFilter: count
-          }
-        );
-        this.dataArray = result.data;
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on getting Pricelist",
-          isShow: true,
-          type: "error"
-        });
-      }
-    }
+    // async getPricelist(filters, count = 0) {
+    //   try {
+    //     const result = await this.$http.post(
+    //       "/clientsapi/rates/rate-combinations/" + this.clientId,
+    //       {
+    //         ...filters,
+    //         countFilter: count
+    //       }
+    //     );
+    //     this.dataArray = result.data;
+    //   } catch (err) {
+    //     this.alertToggle({
+    //       message: "Error on getting Pricelist",
+    //       isShow: true,
+    //       type: "error"
+    //     });
+    //   }
+    // }
   },
   watch: {
     async isRefreshResultTable() {
@@ -306,12 +308,12 @@ export default {
     }
   },
   created() {
-    this.getPricelist(this.allFilters);
+    // this.getPricelist(this.allFilters);
   },
   computed: {
-    ...mapGetters({
-      currentClient: "getCurrentClient"
-    }),
+    // ...mapGetters({
+    //   currentClient: "getCurrentClient"
+    // }),
     allFilters() {
       let result = {
         sourceFilter: this.sourceFilter,
@@ -352,9 +354,6 @@ export default {
   input[disabled] {
     box-shadow: none;
   }
-  &__empty{
-    margin-left: 3.2%;
-  }
 
   input {
     &::-webkit-inner-spin-button,
@@ -363,7 +362,10 @@ export default {
       margin: 0;
     }
   }
-
+  &__empty{
+    margin-left: 3.2%;
+    font-size: 16px;
+  }
   label {
     margin-left: 3px;
   }

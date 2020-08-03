@@ -40,28 +40,32 @@
             .price__data(v-if="currentActive !== index")
                 span(id="eur") {{row.eurPrice}}
                 label(for="eur") &euro;
-        template(slot="minEur" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="minEur") {{row.euroMinPrice}}
-                label(for="minEur") &euro;
+
+        //- template(slot="minEur" slot-scope="{ row, index }")
+        //-     .price__data(v-if="currentActive !== index")
+        //-         span(id="minEur") {{row.euroMinPrice}}
+        //-         label(for="minEur") &euro;
 
         template(slot="usd" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 span(id="usd") {{row.usdPrice}}
                 label(for="usd") &#36;
-        template(slot="minUsd" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="minUsd") {{row.usdMinPrice}}
-                label(for="minUsd") &#36;
+
+        //- template(slot="minUsd" slot-scope="{ row, index }")
+        //-     .price__data(v-if="currentActive !== index")
+        //-         span(id="minUsd") {{row.usdMinPrice}}
+        //-         label(for="minUsd") &#36;
 
         template(slot="gbp" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 span(id="gbp") {{row.gbpPrice}}
                 label(for="gbp") &pound;
-        template(slot="minGbp" slot-scope="{ row, index }")
-            .price__data(v-if="currentActive !== index")
-                span(id="minGbp") {{row.gbpMinPrice}} 
-                label(for="minGbp") &pound;    
+
+        //- template(slot="minGbp" slot-scope="{ row, index }")
+        //-     .price__data(v-if="currentActive !== index")
+        //-         span(id="minGbp") {{row.gbpMinPrice}} 
+        //-         label(for="minGbp") &pound;   
+
     .price__empty(v-if="!dataArray.length") Nothing found...                                               
 </template>
 <script>
@@ -97,79 +101,79 @@ export default {
           label: "Source Language",
           headerKey: "headerLanguageSource",
           key: "sourceLang",
-          width: "9%",
+          width: "12.5%",
           padding: "0"
         },
         {
           label: "Target Language",
           headerKey: "headerLanguageTarget",
           key: "targetLang",
-          width: "9%",
+          width: "12.5%",
           padding: "0"
         },
         {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "9%",
+          width: "12.5%",
           padding: "0"
         },
         {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "9%",
+          width: "12.5%",
           padding: "0"
         },
         {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
-          width: "10%",
+          width: "12.5%",
           padding: "0"
         },
         {
           label: "Price (EUR)",
           headerKey: "headerPriceEUR",
           key: "eur",
-          width: "9%",
+          width: "12.5%",
           padding: "0"
         },
-        {
-          label: "Min Price (EUR)",
-          headerKey: "headerMinPriceEUR",
-          key: "minEur",
-          width: "9%",
-          padding: "0"
-        },
+        // {
+        //   label: "Min Price (EUR)",
+        //   headerKey: "headerMinPriceEUR",
+        //   key: "minEur",
+        //   width: "12.5%",
+        //   padding: "0"
+        // },
         {
           label: "Price (USD)",
           headerKey: "headerPriceUSD",
           key: "usd",
-          width: "9%",
+          width: "12.5%",
           padding: "0"
         },
-        {
-          label: "Min Price (USD)",
-          headerKey: "headerMinPriceUSD",
-          key: "minUsd",
-          width: "9%",
-          padding: "0"
-        },
+        // {
+        //   label: "Min Price (USD)",
+        //   headerKey: "headerMinPriceUSD",
+        //   key: "minUsd",
+        //   width: "12.5%",
+        //   padding: "0"
+        // },
         {
           label: "Price (GBP)",
           headerKey: "headerPriceGBP",
           key: "gbp",
-          width: "9%",
+          width: "12.5%",
           padding: "0"
         },
-        {
-          label: "Min Price (GBP)",
-          headerKey: "headerMinPriceGBP",
-          key: "minGbp",
-          width: "9%",
-          padding: "0"
-        }
+        // {
+        //   label: "Min Price (GBP)",
+        //   headerKey: "headerMinPriceGBP",
+        //   key: "minGbp",
+        //   width: "12.5%",
+        //   padding: "0"
+        // }
       ],
 
       dataArray: [],

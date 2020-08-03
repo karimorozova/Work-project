@@ -25,7 +25,6 @@ export default {
             contractFiles: [],
             client: {
                 name: "",
-                officialName: "",
                 status: "",
                 website: "",
                 contract: "",
@@ -36,9 +35,6 @@ export default {
                 projectManager: "",
                 leadSource: "",
                 salesComission: "",
-                contactName: "",
-                email: "",
-                vat: "",
                 address: "",
                 languageCombinations: [],
                 industries: [],
@@ -49,6 +45,19 @@ export default {
                 targetLanguages: [],
                 currency: '',
                 defaultPricelist: '',
+                billingInfo: {
+                    officialCompanyName: '',
+                    contactName: '',
+                    email: '',
+                    vat: false,
+                    dueDate: '',
+                    address: '',
+                    invoiceSending: false,
+                    paymentType: '',
+                    startingBalance: '',
+                    balance: '',
+                    minimumBalance: '',
+                }
 
             },
             isNewClient: true

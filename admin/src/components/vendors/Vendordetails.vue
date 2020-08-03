@@ -53,11 +53,6 @@
                                 placeholder="Gender"
                                 @chooseOption="updateGender"
                             )
-                    .block-item
-                        label Test:
-                        .block-item__check-item.checkbox
-                          input(type="checkbox" id="test" :checked="currentVendor.isTest" @change="setTest")
-                          label(for="test")
                 .gen-info__block
                     .block-item
                         label Company Name:
@@ -75,22 +70,28 @@
                         label WhatsApp:
                         input.block-item__input-filed(type="text" placeholder="WhatsApp" :value="currentVendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
                     .block-item
-                        label.block-item__label.block-item_relative Vendor Status:
-                            Asterisk(:customStyle="asteriskStyle")
-                        .block-item__drop-menu.block-item_high-index(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.status}")
-                            VendorStatusSelect(isAllExist="no" :selectedStatus="currentVendor.status" @chosenStatus="chosenStatus")
-                    .block-item
                         label Industries:
+                            span.require *
                         .block-item__drop-menu(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length}")
                             MultiVendorIndustrySelect(:selectedInd="currentVendor.industries || []" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
             
-            .right-informational-block
-                VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
-                VendorAction(@openPreview="openPreview")
+
+            //- .right-informational-block
+            //-     VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
+            //-     VendorAction(@openPreview="openPreview")
 
         .vendor-info__preview(v-if="isEditAndSend")
-            VendorPreview(@closePreview="closePreview" :message="'<p>Message...</p>'" @send="sendQuote")
-         
+            VendorPreview(@closePreview="closePreview" :previewDropMenu="true" :templates="templatesWysiwyg" :message="'<p>Message...</p>'" @send="sendQuote")
+        
+        .title Competencies
+        .vendor-info__competencies(v-if="currentVendor.industries")
+          VendorCompetencies(
+            :languages="languages"
+            :steps="steps"
+            :industries="industries"
+            :vendorIndustries="currentVendor.industries.map(i => i.name)"
+          )
+
         .title Qualifications
             TableQualifications(:qualificationData="qualificationData" :assessmentData="assessmentData" :currentVendor="currentVendor" :vendorIndustries="currentVendor.industries" @refreshQualifications="setDetailsTablesData")
 
@@ -106,14 +107,81 @@
         .title Education 
             TableEducation(:educationData="educationData" :vendorId="vendorId" @refreshEducations="setDetailsTablesData")
 
-        .title(v-if="currentVendor._id") Rates    
-        .rates(v-if="currentVendor._id")
+        //- .title(v-if="currentVendor._id") Rates    
+        //- .rates(v-if="currentVendor._id")
             VendorRates(:vendor="currentVendor"
                 @updateVendor="updateVendor")
+
+        .title Rates
+          .vendor-info__rates(v-if="currentVendor._id")
+            .vendor-info__tables-row
+              .lang-table(v-if="currentVendor._id && languages.length")
+                LangTable(
+                  :tableData="[{altered: true, basicPrice: 1, notification: 'notification', sourceLanguage: this.languages[0], targetLanguage: this.languages[0]}]"
+                  :vendorId="currentVendor._id"
+                  @refreshResultTable="refreshResultTable"
+                )
+              .step-table(v-if="currentVendor._id && steps.length && units.length")
+                StepTable(
+                  :tableData="[{multiplier : 3, defaultSize : false, altered : true, notification : 'notification' ,step : steps[0], unit : units[0], size : 1}]"
+                  :vendorId="currentVendor._id"
+                  @refreshResultTable="refreshResultTable"
+                )
+              .industry-table(v-if="currentVendor._id && industries.length")
+                IndustryTable(
+                  :tableData="[{multiplier : 1, altered : true, notification : 'notification', industry : industries[0]}]"
+                  :vendorId="currentVendor._id"
+                  @refreshResultTable="refreshResultTable"
+                )
+            .result-table(v-if="currentVendor._id")
+              ResultTable(
+                    :vendorId="currentVendor._id"
+                    :languages="languages.map(i => i.lang)"
+                    :steps="steps.map(i => i.title)"
+                    :units="units.map(i => i.type)"
+                    :industries="industries.map(i => i.name)"
+                    :isRefreshResultTable="isRefreshResultTable"
+              )
+
+
+        .title Notes & Comments
+          .vendor-info__notes-block
+            .vendor-info__notes
+              VendorCandidate(:candidateData='currentVendor')
+            .vendor-info__editor(v-if="currentVendor._id")
+              ckeditor(v-model="currentVendor.notes" :config="editorConfig")
+
+
         .delete-approve(v-if="isApproveModal")
             p Are you sure you want to delete?
             input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
             input.button(type="button" value="Delete" @click="approveVendorDelete")
+
+    .vendor-subinfo
+      .vendor-subinfo__general
+        .block-item-subinfo
+          label.block-item-subinfo__label Vendor Status:
+            span.require *
+          .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(:class="{'block-item-subinfo_error-shadow': isSaveClicked && !currentVendor.status}")
+            VendorStatusSelect(isAllExist="no" :selectedStatus="currentVendor.status" @chosenStatus="chosenStatus")
+        .block-item-subinfo
+          label.block-item-subinfo__label Professional level:
+          .block-item-subinfo__drop.block-item-subinfo_high-index
+            SelectSingle(
+              :options="['level1','level2']"
+              placeholder="Level"
+              :selectedOption="optionProfessionalLevel"
+              @chooseOption="updateProfessionalLevel"
+            )
+        .block-item-subinfo
+            label.block-item-subinfo__label Test:
+            .block-item-subinfo__check-item.checkbox
+              input(type="checkbox" id="test" :checked="currentVendor.isTest" @change="setTest")
+              label(for="test")
+
+      .vendor-subinfo__action
+        VendorAction(@openPreview="openPreview")
+
 
     ValidationErrors(v-if="areErrorsExist"
         :errors="errors"
@@ -122,6 +190,12 @@
 </template>
 
 <script>
+import VendorCompetencies from "./VendorCompetencies";
+import ResultTable from "./pricelists/ResultTable";
+import IndustryTable from "./pricelists/IndustryTable";
+import StepTable from "./pricelists/StepTable";
+import LangTable from "./pricelists/LangTable";
+import CKEditor from "ckeditor4-vue";
 import VendorPreview from "./VendorPreview";
 import VendorAction from "./VendorAction";
 import VendorCandidate from "./VendorCandidate";
@@ -149,6 +223,13 @@ export default {
   mixins: [photoPreview],
   data() {
     return {
+      languages: [],
+      industries: [],
+      services: [],
+      units: [],
+      steps: [],
+
+      isRefreshResultTable: false,
       vendorId: "",
       educationData: [],
       professionalExperienceData: [],
@@ -160,7 +241,7 @@ export default {
       vendorShow: true,
       imageExist: false,
       isApproveModal: false,
-      asteriskStyle: { top: "-4px" },
+      asteriskStyle: { top: "0px" },
       photoFile: [],
       genders: ["Male", "Female"],
       errors: [],
@@ -168,25 +249,57 @@ export default {
       addSeveralPriceId: "",
       oldEmail: "",
       isFileError: false,
-      isEditAndSend: false
+      isEditAndSend: false,
+      editorConfig: {
+        allowedContent: true,
+        uiColor: "#F4F0EE",
+        resize_minHeigh: "130",
+        height: 167
+      },
+      templatesWysiwyg: [
+        {
+          title: "tempate",
+          message: "<p>test message</p>"
+        }
+      ]
     };
   },
   methods: {
-    async setTest(){
+    refreshResultTable() {
+      this.isRefreshResultTable = true;
+      setTimeout(() => {
+        this.isRefreshResultTable = false;
+      }, 2000);
+    },
+    ...mapActions({
+      alertToggle: "alertToggle",
+      updateVendorProp: "updateVendorProp",
+      updateCurrentVendor: "updateCurrentVendor",
+      deleteCurrentVendor: "deleteCurrentVendor",
+      storeCurrentVendor: "storeCurrentVendor",
+      updateIndustry: "updateIndustry",
+      getDuoCombinations: "getVendorDuoCombinations",
+      updateVendorStatus: "updateVendorStatus"
+    }),
+    async setTest() {
       const vendor = {
-          id: this.currentVendor._id,
-          isTest: event.target.checked
+        id: this.currentVendor._id,
+        isTest: event.target.checked
       };
       try {
-          await this.updateVendorStatus(vendor);
-          this.alertToggle({message: "Vendor status updated", isShow: true, type: "success"});
-        } catch (err) {
-          this.alertToggle({
-              message: "Server error / Cannot update Vendor status",
-              isShow: true,
-              type: "error"
-          });
-        }
+        await this.updateVendorStatus(vendor);
+        this.alertToggle({
+          message: "Vendor status updated",
+          isShow: true,
+          type: "success"
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: "Server error / Cannot update Vendor status",
+          isShow: true,
+          type: "error"
+        });
+      }
     },
     closePreview() {
       this.isEditAndSend = false;
@@ -288,6 +401,7 @@ export default {
       let sendData = new FormData();
       sendData.append("vendor", JSON.stringify(this.currentVendor));
       sendData.append("photo", this.photoFile[0]);
+      console.log(this.currentVendor);
       try {
         await this.updateCurrentVendor(sendData);
         this.oldEmail = this.currentVendor.email;
@@ -310,6 +424,9 @@ export default {
     },
     updateGender({ option }) {
       this.updateVendorProp({ prop: "gender", value: option });
+    },
+    updateProfessionalLevel({ option }) {
+      this.updateVendorProp({ prop: "professionalLevel", value: option });
     },
     setTimezone(data) {
       this.updateVendorProp({ prop: "timezone", value: data });
@@ -384,20 +501,66 @@ export default {
         });
       }
     },
-    ...mapActions({
-      alertToggle: "alertToggle",
-      updateVendorProp: "updateVendorProp",
-      updateCurrentVendor: "updateCurrentVendor",
-      deleteCurrentVendor: "deleteCurrentVendor",
-      storeCurrentVendor: "storeCurrentVendor",
-      updateIndustry: "updateIndustry",
-      getDuoCombinations: "getVendorDuoCombinations",
-      updateVendorStatus: "updateVendorStatus"
-
-    })
-  },
-  beforeDestroy() {
-    this.storeCurrentVendor({});
+    async getLangs() {
+      try {
+        const result = await this.$http.get("/api/languages");
+        this.languages = Array.from(result.body);
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Languages",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getIndustries() {
+      try {
+        const result = await this.$http.get("/api/industries");
+        this.industries = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Industries",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getServices() {
+      try {
+        const result = await this.$http.get("/api/services");
+        this.services = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Services",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getUnits() {
+      try {
+        const result = await this.$http.get("/api/units");
+        this.units = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Units",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
+    async getSteps() {
+      try {
+        const result = await this.$http.get("/api/steps");
+        this.steps = result.body;
+      } catch (err) {
+        this.alertToggle({
+          message: "Error in Steps",
+          isShow: true,
+          type: "error"
+        });
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -414,9 +577,15 @@ export default {
         }
       }
       return result;
+    },
+    optionProfessionalLevel() {
+      return this.currentVendor.hasOwnProperty("professionalLevel")
+        ? this.currentVendor.professionalLevel
+        : "";
     }
   },
   components: {
+    VendorCompetencies,
     VendorPreview,
     VendorCandidate,
     VendorAction,
@@ -435,16 +604,29 @@ export default {
     Asterisk,
     Addseverallangs,
     AvailablePairs,
-    SelectSingle
+    SelectSingle,
+    ckeditor: CKEditor.component,
+    LangTable,
+    StepTable,
+    IndustryTable,
+    ResultTable
   },
   directives: {
     ClickOutside
   },
   created() {
     this.getVendor();
+    this.getLangs();
+    this.getUnits();
+    this.getSteps();
+    this.getIndustries();
+    this.getServices();
   },
   mounted() {
     this.oldEmail = this.currentVendor.email;
+  },
+  beforeDestroy() {
+    this.storeCurrentVendor({});
   }
 };
 </script>
@@ -453,25 +635,74 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
 
-.vendor-details {
-  .right-informational-block {
-    position: absolute;
-    top: 118px;
-    left: 1070px;
+.block-item-subinfo {
+  display: flex;
+  height: 50px;
+  &__error-shadow {
+    height: 30px;
+  }
+  &__check-item {
+    width: 190px;
+  }
+  &__last {
+    height: 30px;
+  }
+  &_maxhigh-index {
+    z-index: 12;
+  }
+  &_high-index {
+    z-index: 10;
+  }
+  &__label {
+    width: 160px;
+    padding-top: 6px;
+  }
+  &__drop {
+    position: relative;
+    width: 190px;
   }
 }
-
+.block-item-subinfo:last-child {
+  height: 30px;
+}
 .vendor-wrap {
   position: relative;
   width: 100%;
   display: flex;
 }
 
+.vendor-subinfo {
+  &__general {
+    padding: 20px;
+    margin-top: 120px;
+    width: 350px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
+  &__action {
+    margin-top: 40px;
+    width: 390px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
+}
+
 .vendor-info {
   padding: 40px;
   position: relative;
   width: 1020px;
-
+  &__competencies {
+    box-sizing: border-box;
+    margin: 20px 10px 40px 10px;
+    padding: 40px;
+    box-shadow: 0 0 10px #67573e9d;
+    position: relative;
+  }
+  &__notes-block {
+    display: flex;
+  }
+  &__editor {
+    margin: 20px 10px 50px 10px;
+    width: 100%;
+  }
   &__preview {
     position: absolute;
     top: 0;
@@ -480,44 +711,55 @@ export default {
     right: 0;
     z-index: 100;
   }
+  &__rates {
+    box-sizing: border-box;
+    margin: 20px 10px 40px 10px;
+    padding: 10px;
+    box-shadow: 0 0 10px #67573e9d;
+    font-size: 16px;
+  }
+  &__tables-row {
+    display: flex;
+    .lang-table {
+      width: 33%;
+    }
+    .industry-table {
+      width: 26%;
+    }
+    .step-table {
+      width: 42%;
+    }
+  }
 }
 
 .title {
   font-size: 22px;
 }
-.gen-info,
-.rates {
+.gen-info {
   box-sizing: border-box;
   margin: 20px 10px 40px 10px;
-  padding: 20px;
-  box-shadow: 0 0 15px #67573e9d;
+  padding: 40px;
+  box-shadow: 0 0 10px #67573e9d;
 }
 
 .gen-info {
   display: flex;
   justify-content: space-between;
   &__block {
-    width: 32%;
+    width: 35%;
     &:first-child {
-      width: 20%;
+      width: 22%;
       text-align: center;
     }
   }
 }
 
-.rates {
-  padding: 10px;
-}
-
 .block-item {
-  font-size: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  &__check-item{
-    width: 190px;
-  }
+
   &__label {
     margin-bottom: 0;
   }
@@ -557,62 +799,61 @@ export default {
     box-shadow: 0 0 5px red;
     border-radius: 5px;
   }
-  #test{
-    width: 0;
-  }
-  .checkbox {
-        display: flex;
-        height: 28px;
-        input[type="checkbox"] {
-        opacity: 0;
-        + {
-            label {
-            &::after {
-                content: none;
-            }
-            }
-        }
-        &:checked {
-            + {
-            label {
-                &::after {
-                content: "";
-                }
-            }
-            }
-        }
-        }
-        label {
-        position: relative;
-        display: inline-block;
-        padding-left: 22px;
-        padding-top: 4px;
-        &::before {
-            position: absolute;
-            content: "";
-            display: inline-block;
-            height: 16px;
-            width: 16px;
-            border: 1px solid;
-            left: 0px;
-            top: 3px;
-        }
+}
+#test {
+  width: 0;
+}
+.checkbox {
+  display: flex;
+  height: 28px;
+  input[type="checkbox"] {
+    opacity: 0;
+    + {
+      label {
         &::after {
-            position: absolute;
-            content: "";
-            display: inline-block;
-            height: 5px;
-            width: 9px;
-            border-left: 2px solid;
-            border-bottom: 2px solid;
-            transform: rotate(-45deg);
-            left: 4px;
-            top: 7px;
+          content: none;
         }
       }
     }
+    &:checked {
+      + {
+        label {
+          &::after {
+            content: "";
+          }
+        }
+      }
+    }
+  }
+  label {
+    position: relative;
+    display: inline-block;
+    padding-left: 22px;
+    padding-top: 4px;
+    &::before {
+      position: absolute;
+      content: "";
+      display: inline-block;
+      height: 16px;
+      width: 16px;
+      border: 1px solid;
+      left: 0px;
+      top: 3px;
+    }
+    &::after {
+      position: absolute;
+      content: "";
+      display: inline-block;
+      height: 5px;
+      width: 9px;
+      border-left: 2px solid;
+      border-bottom: 2px solid;
+      transform: rotate(-45deg);
+      left: 4px;
+      top: 7px;
+    }
+  }
 }
-
 .buttons {
   display: flex;
   justify-content: flex-end;
@@ -625,7 +866,7 @@ export default {
 .button {
   margin-left: 30px;
   width: 138px;
-  height: 33px;
+  height: 35px;
   color: white;
   font-size: 14px;
   border-radius: 10px;
@@ -641,8 +882,8 @@ export default {
 }
 
 .photo-wrap {
-  width: 180px;
-  height: 157px;
+  width: 195px;
+  height: 160px;
   border: 1px solid #67573e;
   position: relative;
   overflow: hidden;
@@ -697,7 +938,11 @@ export default {
   font-size: 12px;
   margin-top: 10px;
 }
-
+.require {
+  font-size: 14px;
+  color: red;
+  margin-left: 2px;
+}
 .delete-approve {
   position: absolute;
   width: 332px;

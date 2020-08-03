@@ -15,12 +15,6 @@
               :languages="languages"
               :timezones="timezones"
           )
-      //- .title General Information - old ver.
-      //- .client-info__gen-info
-      //-     OldGeneral(
-      //-         :isSaveClicked="isSaveClicked"
-      //-         @loadFile="loadFile"
-      //-     )
       .title(v-if="currentClient._id") Contact Details
       .client-info__contacts-info(v-if="currentClient._id")
           ContactsInfo(
@@ -77,11 +71,6 @@
       .title(v-if="currentClient._id") Documents
       .client-info__documents(v-if="currentClient._id")
           ClientDocuments
-
-      //- .title(v-if="currentClient._id") Rates    
-      //- .client-info__rates(v-if="currentClient._id")
-      //-     ClientRates(:client="currentClient"
-      //-         @setMatrixData="setMatrixData")
       .title(v-if="currentClient._id") Sales Information
       .client-info__sales(v-if="currentClient._id")
           ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
@@ -119,7 +108,6 @@ import SideGeneral from "./clientInfo/SideGeneral";
 import Button from "../Button";
 import ValidationErrors from "../ValidationErrors";
 import ContactsInfo from "./ContactsInfo";
-// import ClientRates from './ClientRates';
 import ClientSalesInfo from "./ClientSalesInfo";
 import ClientBillInfo from "./ClientBillInfo";
 import IndustryTable from "./pricelists/IndustryTable";
@@ -177,20 +165,6 @@ export default {
     loadFile({ files, prop }) {
       this.$emit("loadFile", { files, prop });
     },
-    // async setMatrixData({value, key}) {
-    //     let matrix = {...this.currentClient.matrix};
-    //     matrix[key].rate = value;
-    //     try {
-    //         const result = await this.$http.post("/clientsapi/update-matrix", { id: this.currentClient._id, matrix });
-    //         const { updatedClient } = result.body;
-    //         await this.storeCurrentClient(updatedClient);
-    //         await this.storeClient(updatedClient);
-    //         this.storeClientProperty({prop: "matrix", value: matrix});
-    //         this.alertToggle({message: "Matrix has been updated", isShow: true, type: "success"});
-    //     } catch(err) {
-    //         this.alertToggle({message: "Internal server error on updating matrix", isShow: true, type: "error"});
-    //     }
-    // },
     cancel() {
       if (
         this.fromRoute === "/new-client" ||
@@ -260,7 +234,7 @@ export default {
       this.storeClientProperty({ prop: "leadSource", value: leadSource });
     },
     changeBillingProp({ prop, value }) {
-      this.storeClientProperty({ prop, value });
+      this.storeClientBillingInfoProperty({ prop: prop, value });
     },
     contactDetails({ contactIndex }) {
       this.$router.push({ name: "contact", params: { index: contactIndex } });
@@ -320,8 +294,6 @@ export default {
     async updateClient() {
       let sendData = new FormData();
       let dataForClient = this.currentClient;
-
-      console.log("aftersave", this.currentClient);
 
       sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
@@ -407,7 +379,8 @@ export default {
       storeClientContact: "storeClientContact",
       updateClientContact: "updateClientContact",
       updateLeadContact: "updateLeadContact",
-      deleteClientContact: "deleteClientContact"
+      deleteClientContact: "deleteClientContact",
+      storeClientBillingInfoProperty: 'storeClientBillingInfoProperty'
     }),
     async getLangs() {
       try {
@@ -536,7 +509,7 @@ export default {
     box-shadow: 0 0 10px #67573e9d;
   }
   &__date {
-    margin-top: 40px;
+    margin-top: 85px;
     width: 390px;
     height: 270px;
     box-shadow: 0 0 10px #67573e9d;
@@ -578,10 +551,10 @@ export default {
       width: 33%;
     }
     .industry-table {
-      width: 24%;
+      width: 26%;
     }
     .step-table {
-      width: 43%;
+      width: 42%;
     }
   }
 }

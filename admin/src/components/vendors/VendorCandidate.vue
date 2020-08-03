@@ -29,15 +29,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .candidate {
-  min-height: 209px;
-  margin-bottom: 30px;
-  width: 309px;
+  margin: 20px 10px 40px;
+  width: 300px;
   background: #fff;
-  box-shadow: 0 0 15px #67573e9d;
-  padding: 20px;
+  box-shadow: 0 0 10px #67573e9d;
+  padding: 40px;
 
   &__title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     border-bottom: 1px solid #67573e;
     padding-bottom: 5px;
@@ -48,12 +47,11 @@ export default {
 
     &-key {
       width: 150px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 16px;
     }
     &-value {
       width: 150px;
-      font-size: 14px;
+      font-size: 16px;
       p {
         display: block;
         margin-top: 3px;

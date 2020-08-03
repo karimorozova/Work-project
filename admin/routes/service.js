@@ -6,6 +6,7 @@ const { createNewService, updateService, deleteServiceIcon } = require('../setti
 
 router.post("/service/:id", upload.fields([{name: "icon"}]), async (req, res) => {
   const { title, languageForm, calculationUnit, steps, active, isRequestQuote: isQuoteRequested, symbol, sortIndex, projectType } = req.body;
+  const isRequestQuote = isQuoteRequested
   const  { id } = req.params;
   const isActive = active === "true" ? true : false;
   isRequestQuote === "true" ? true : false;

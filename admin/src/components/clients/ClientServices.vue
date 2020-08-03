@@ -255,6 +255,31 @@ export default {
 
     async checkErrors(index) {
       this.errors = [];
+
+      const client = await this.$http.get(
+        `/clientsapi/client?id=${this.$route.params.id}`
+      );
+
+      const listServicesExceptTheCurrent = client.body.services;
+      const arraysOfTheSame = listServicesExceptTheCurrent.filter(
+        item => item.sourceLanguage.lang === this.currentSource.lang
+      );
+
+      if (this.clientServices[index]._id != null) {
+        const oldCurrentSource =
+          listServicesExceptTheCurrent[index].sourceLanguage.lang;
+        if (
+          oldCurrentSource !== this.currentSource.lang &&
+          arraysOfTheSame.length
+        ) {
+          this.errors.push("Target language cannot be the same");
+        }
+      } else {
+        if (arraysOfTheSame.length) {
+          this.errors.push("Target language cannot be the same");
+        }
+      };
+
       if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTargets.length)
         this.errors.push("Target should not be empty!");

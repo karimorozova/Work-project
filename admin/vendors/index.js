@@ -5,6 +5,7 @@ const { saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, saveHash
 const { getJobs, updateStepProp } = require("./jobs");
 const { manageNewApplication } = require("./application");
 const { notifyTestStatus } = require("./testEmails");
+const { updateVendorCompetencies, deleteVendorCompetencies } = require('./competencies')
 
 module.exports = {
     getVendor,
@@ -27,5 +28,7 @@ module.exports = {
     updateVendorEducation,
     removeVendorEdu,
     updateVendorAssessment,
-    notifyTestStatus
+    notifyTestStatus,
+    updateVendorCompetencies,
+    deleteVendorCompetencies,
 }

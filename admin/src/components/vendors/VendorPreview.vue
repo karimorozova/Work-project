@@ -3,7 +3,7 @@ div
   .preview
       span.preview__close(@click="closePreview") +
       .preview__header
-          .preview__drop-menu
+          .preview__drop-menu(v-if="previewDropMenu")
               SelectSingle(
                   placeholder="Choose Email Template"
                   :selectedOption="currentTemplate.title"
@@ -31,8 +31,12 @@ export default {
     message: {
       type: String
     },
-    templates:{
+    templates: {
       type: Array
+    },
+    previewDropMenu: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -41,6 +45,7 @@ export default {
       currentTemplate: "",
       editorData: this.message,
       editorConfig: {
+        uiColor: "#F4F0EE",
         allowedContent: true
       }
     };
@@ -54,23 +59,26 @@ export default {
     },
     setTemplate({ option }) {
       this.currentTemplate = this.templates.find(item => item.title === option);
-    },
+    }
   },
   mounted() {
-    document.body.style.overflow = "hidden"    
+    document.body.style.overflow = "hidden";
   },
   destroyed() {
-    document.body.style.overflow = "auto"
+    document.body.style.overflow = "auto";
   },
-  watch:{
-     currentTemplate: function (val, oldVal) {
-      this.editorData = val.message
-    },
+  watch: {
+    currentTemplate: {
+      handler(val) {
+        this.editorData = val.message
+      },
+      deep: true
+    }
   },
-  computed:{
+  computed: {
     templatesData() {
-        return this.templates.map(item => item.title)
-    },
+      return this.templates.map(item => item.title);
+    }
   },
   components: {
     Button,
@@ -82,16 +90,16 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
-.background{
+.background {
   position: fixed;
-    z-index: 100;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    opacity: 0.5;
-    overflow: hidden;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.5;
+  overflow: hidden;
 }
 .preview {
   position: fixed;

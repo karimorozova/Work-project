@@ -76,21 +76,6 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
-  officialName: {
-    type: String,
-    default: '',
-    trim: true
-  },
-  contactName: {
-    type: String,
-    default: '',
-    trim: true
-  },
-  email: {
-    type: String,
-    default: '',
-    trim: true
-  },
   isTest: {
     type: Boolean,
     default: false
