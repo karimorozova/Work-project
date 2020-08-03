@@ -6,8 +6,6 @@
         :errors="errors"
         :areErrors="areErrors" 
         :isApproveModal="isDeleting"
-        :bodyClass="'vendor__education-body'"
-        :headerClass="'vendor__education-header'"
         @closeErrors="closeErrors"
         @approve="deleteData"
         @notApprove="setDefaults"
@@ -107,7 +105,7 @@ export default {
           label: "Duration",
           headerKey: "headerDuration",
           key: "duration",
-          width: "20%",
+          width: "18%",
           padding: "0"
         },
         {
@@ -121,7 +119,7 @@ export default {
           label: "Major / Department",
           headerKey: "headerDepartment",
           key: "department",
-          width: "14%",
+          width: "16%",
           padding: "0"
         },
         {
@@ -370,8 +368,9 @@ export default {
 .education {
   @extend %setting-table;
   margin: 20px 10px 40px;
-  width: 960px;
-  box-shadow: 0 0 15px #67573e9d;
+  width: 920px;
+  box-shadow: 0 0 10px #67573e9d;
+  padding: 40px;
 
   &__data {
     @extend %table-data;

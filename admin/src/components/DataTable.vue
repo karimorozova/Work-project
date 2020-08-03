@@ -1,31 +1,26 @@
 <template lang="pug">
-  .table(v-if="!clientPricetable")
-
+  .table
     .table__thead(:class="tableheadClass")
       .table__head-row(:class="tableheadRowClass")
-        .table__thead-cell(v-for="field of fields" :style="{width: field.width}" :class="headCellClass")
+        .table__thead-cell(
+          v-for="field of fields" 
+          :style="{width: field.width}" 
+          :class="headCellClass"
+        )
           slot(:name="field.headerKey" :field="field")
 
     .table__tbody(:class="bodyClass" @scroll="handleBodyScroll")
-      .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
-        .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}" :class="[bodyCellClass, field.cellClass]")
+      .table__body-row(
+        v-for="(row, index) of tableData" 
+        @click="onClick(index)" 
+        :class="bodyRowClass"
+      )
+        .table__tbody-cell(
+          v-for="field of fields" 
+          :style="{width: field.width, padding: field.padding}" 
+          :class="[bodyCellClass, field.cellClass]"
+        )
           slot(:name="field.key" :row="row" :index="index")
-
-  .table(v-else)
-
-    .table__thead-icon(:class="tableheadClass")
-      .table__head-row(:class="tableheadRowClass")
-        .table__thead-cell-white(:style="{width: pricelistHeaders.firstField[0].width}" :class="'pricelist-icon-header'")
-        .table__thead-cell-icon(v-for="field of pricelistHeaders.otherFields" :style="{width: field.width}" :class="headCellClass")
-          slot(:name="field.headerKey" :field="field")
-
-    .table__tbody-icon(:class="bodyClass" @scroll="handleBodyScroll")
-      .table__body-row(v-for="(row, index) of tableData" @click="onClick(index)" :class="bodyRowClass")
-        .table__tbody-cell(v-for="field of pricelistHeaders.firstField" :style="{width: field.width, padding: field.padding}" :class="'pricelist-icon-body'")
-          slot(:name="field.key" :row="row" :index="index")
-        .table__tbody-cell(v-for="field of pricelistHeaders.otherFields" :style="{width: field.width, padding: field.padding}" :class="[bodyCellClass, field.cellClass]")
-          slot(:name="field.key" :row="row" :index="index")
-
 
 </template>
 
@@ -33,36 +28,32 @@
 export default {
   props: {
     fields: {
-      type: Array
+      type: Array,
     },
     tableData: {
-      type: Array
+      type: Array,
     },
     activeIndex: {
-      type: Number
+      type: Number,
     },
     headCellClass: {
-      type: String
+      type: String,
     },
     bodyClass: {
-      type: [String, Array]
+      type: [String, Array],
     },
     bodyRowClass: {
-      type: String
+      type: String,
     },
     bodyCellClass: {
-      type: String
+      type: String,
     },
     tableheadClass: {
-      type: String
+      type: [String, Array],
     },
     tableheadRowClass: {
-      type: String
+      type: [String, Array],
     },
-    clientPricetable: {
-      type: Boolean,
-      default: false
-    }
   },
   methods: {
     onClick(index) {
@@ -70,36 +61,11 @@ export default {
     },
     handleBodyScroll(e) {
       const element = e.target;
-      if (
-        Math.ceil(element.scrollHeight - element.scrollTop) ===
-        element.clientHeight
-      ) {
+      if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
         this.$emit("bottomScrolled");
       }
-    }
-  },
-  computed: {
-    pricelistHeaders() {
-      if (this.clientPricetable) {
-        let firstField = [this.fields.shift()];
-        let otherFields = this.fields;
-        return {
-          firstField,
-          otherFields
-        };
-      }
     },
-    pricelistData() {
-      if (this.clientPricetable) {
-        let firstField = [this.tableData.shift()];
-        let otherFields = this.tableData;
-        return {
-          firstField,
-          otherFields
-        };
-      }
-    }
-  }
+  },
 };
 </script>
 
@@ -114,59 +80,6 @@ export default {
     .table__head-row {
       background-color: $thead-background;
       color: $white;
-    }
-  }
-  &__thead-icon {
-    border: none;
-    .table__head-row {
-      background-color: $thead-background;
-      color: $white;
-    }
-  }
-  &__tbody-icon {
-    max-height: 180px;
-    overflow-y: scroll;
-    margin-bottom: 20px;
-
-    .table__body-row {
-      cursor: pointer;
-      &:nth-of-type(odd) {
-        .table__tbody-cell {
-          background-color: $table-row-zebra-background;
-        }
-      }
-      &:hover {
-        .table__tbody-cell {
-          background-color: $cell-background;
-        }
-      }
-    }
-    .steps-table-row,
-    .rates-matrix-row {
-      cursor: default;
-    }
-
-    .setting-table-body {
-      max-height: 400px;
-    }
-    .settings-table-row {
-      cursor: default;
-    }
-
-    .client-pricelist-table-body {
-      max-height: 400px;
-      border: none !important;
-    }
-    .client-pricelist-table-row {
-      cursor: default;
-    }
-    .delivery_no-hover-change {
-      cursor: default;
-      &:hover {
-        .table__tbody-cell {
-          background-color: $table-row-zebra-background;
-        }
-      }
     }
   }
   &__tbody {
@@ -357,5 +270,8 @@ export default {
 }
 .table__thead-cell-icon:nth-child(2) {
   border-left: 0.5px solid #938676;
+}
+.client-pricelist-table-head {
+  height: 45px;
 }
 </style>

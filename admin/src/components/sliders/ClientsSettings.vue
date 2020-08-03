@@ -17,6 +17,7 @@ import Sidebar from '../Sidebar';
 import defaultSidebarLinks from "@/mixins/defaultSidebarLinks";
 import { mapGetters, mapActions } from "vuex";
 
+
 export default {
     mixins: [defaultSidebarLinks],
     data() {
@@ -28,8 +29,8 @@ export default {
                 {title: "Inactive", routeName: "inactive-clients"},
                 {title: "Potential", routeName: "potential-clients"}
             ],
-            currentIndex: 0,
-            defaultRouteName: "clients"
+            currentIndex: -1,
+            defaultRouteName: "active-clients",
         }
     },
     components: {

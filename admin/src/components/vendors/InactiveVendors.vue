@@ -19,8 +19,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .inactive-vendors {
-    padding: 20px;
-    width: calc(100% - 150px);
+    max-width: 1200px;
 }
 
 </style>

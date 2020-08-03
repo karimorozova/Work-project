@@ -206,7 +206,7 @@ const router = new Router({
                     component: VendorsSettings,
                     children: [
                         {
-                            path: '',
+                            path: 'all',
                             name: 'all-vendors',
                             props: true,
                             component: AllVendorsTable

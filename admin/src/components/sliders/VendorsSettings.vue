@@ -2,10 +2,10 @@
 .vendors
   .vendors__sidebar
     Sidebar(
-        @onLinkClickMulti="toggleLink"
-        :isMultiLinks="true"
-        :multiLinks="sidebarLinksMulti"
-        :multiActiveIndex="currentIndex"
+      @onLinkClickMulti="toggleLink",
+      :isMultiLinks="true",
+      :multiLinks="sidebarLinksMulti",
+      :multiActiveIndex="currentIndex"
     )
   .vendors__all
     router-view
@@ -23,8 +23,8 @@ export default {
           links: [
             { arrayIndex: 0, title: "All", routeName: "all-vendors" },
             { arrayIndex: 0, title: "Active", routeName: "active-vendors" },
-            { arrayIndex: 0, title: "Inactive", routeName: "inactive-vendors" }
-          ]
+            { arrayIndex: 0, title: "Inactive", routeName: "inactive-vendors" },
+          ],
         },
         {
           title: "CANDIDATES",
@@ -32,14 +32,14 @@ export default {
             {
               arrayIndex: 1,
               title: "Potential",
-              routeName: "potential-vendors"
+              routeName: "potential-vendors",
             },
-            { arrayIndex: 1, title: "Tests", routeName: "tests-vendors" }
-          ]
-        }
+            { arrayIndex: 1, title: "Tests", routeName: "tests-vendors" },
+          ],
+        },
       ],
-      currentIndex: [0, 0],
-      defaultRouteName: "vendors"
+      currentIndex: [0, 1],
+      defaultRouteName: "active-vendors",
     };
   },
   methods: {
@@ -47,13 +47,27 @@ export default {
       this.currentIndex = [arrayIndex, index];
       const { routeName } = this.sidebarLinksMulti[arrayIndex].links[index];
       this.$router.push({ name: routeName });
-    }
+    },
+    setDefaultActiveLink() {
+      const { name } = this.$route;
+      if (name === this.defaultRouteName) return (this.currentIndex = [0, 1]);
+
+      let indexesSideBar = [];
+      this.sidebarLinksMulti.forEach((title) => {
+        const currentSideBar = title.links.filter((item) => item.routeName === name);
+        const currentSideBarIndex = title.links.findIndex((item) => item.routeName === name);
+        if (currentSideBar.length) indexesSideBar = [currentSideBar[0].arrayIndex, currentSideBarIndex];
+      });
+
+      this.currentIndex = indexesSideBar;
+    },
   },
   components: {
-    Sidebar
+    Sidebar,
   },
-  mounted() {},
-  updated() {}
+  mounted() {
+    this.setDefaultActiveLink();
+  },
 };
 </script>
 

@@ -220,7 +220,7 @@ export default {
       this.currentSteps = this.qualificationData[index].steps;
     },
     manageCancelEdition(index) {
-      // this.$emit("refreshQualifications");
+      this.$emit("refreshQualifications");
       this.setDefaults();
     },
     setDefaults() {
@@ -378,7 +378,7 @@ export default {
         });
       } catch (err) {
       } finally {
-        this.manageCancelEdition();
+        this.manageCancelEdition(); 
       }
     },
 

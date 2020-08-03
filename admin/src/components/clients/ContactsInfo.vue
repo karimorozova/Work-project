@@ -1,7 +1,5 @@
 <template lang="pug">
     .contacts-info
-        .contacts-info__add-contact
-            input.add-button(type="button" value="Add new contact" @click="addContact")
         .contacts-info__table
             DataTable(
                 :fields="fields"
@@ -67,12 +65,14 @@
             :customStyles="errorsStyle"
             @closeErrors="closeValidErrorsBlock"
         )
+
+        Add(@add="addContact")
 </template>
 
 <script>
 import DataTable from "../DataTable";
 import CustomRadio from "../CustomRadio";
-import Button from "../Button";
+import Add from "../Add";
 import ValidationErrors from "../ValidationErrors";
 import { mapGetters, mapActions } from 'vuex';
 
@@ -241,7 +241,7 @@ export default {
     components: {
         DataTable,
         CustomRadio,
-        Button,
+        Add,
         ValidationErrors
     }
 }
@@ -288,7 +288,6 @@ export default {
         align-items: center;
         display: flex;
         box-shadow: inset 0 0 5px $brown-shadow;
-        // box-sizing: border-box;
     }
     &__input {
         width: 100%;
@@ -357,9 +356,6 @@ export default {
             margin-bottom: 15px;
         }
     }
-    &__button {
-        margin-bottom: 5px;
-    }
     &__cancel-edition {
         cursor: pointer;
         position: absolute;
@@ -377,25 +373,6 @@ export default {
 
 .editing {
     box-shadow: inset 0 0 8px $brown-shadow;
-}
-
-.add-button {
-    width: 168px;
-    height: 35px;
-    color: $white;
-    font-size: 14px;
-    border-radius: 10px;
-    box-shadow: 0 3px 5px $brown-shadow;
-    background-color: $orange;
-    border: 1px solid $orange;
-    cursor: pointer;
-}
-
-.add-button:active, .add-button:focus{
-    transform: scale(.98);
-     outline: none!important;
-     outline-color: none;
-    border: none;
 }
 
 input {

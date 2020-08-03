@@ -338,6 +338,7 @@ export default {
         const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
         this.competenciesData = vendor.data.competencies;
         this.newRow = false;
+        this.$emit("updateQualifications");
       }
     },
 

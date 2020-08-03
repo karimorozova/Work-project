@@ -158,40 +158,6 @@ export default {
     justify-content: center;
     align-items: center;
   }
-
-  .vendor {
-
-    &__experience {
-      &-body {
-        max-height: 215px;
-        overflow-y: scroll;
-      }
-      &-header {
-        padding-right: 13px;
-        background: #938676;
-      }
-    }
-    &__education {
-      &-body {
-        max-height: 215px;
-        overflow-y: scroll;
-      }
-      &-header {
-        padding-right: 13px;
-        background: #938676;
-      }
-    }
-    &__assessment {
-      &-body {
-        max-height: 215px;
-        overflow-y: scroll;
-      }
-      &-header {
-        padding-right: 13px;
-        background: #938676;
-      }
-    }
-  }
 }
 
 .tbody_visible-overflow {

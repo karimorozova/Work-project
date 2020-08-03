@@ -66,13 +66,13 @@ export default {
                     imgBrown: require("../assets/images/CATEGORIES/VENDORS.png"),
                     imgWhite: require("../assets/images/CATEGORIES/VENDORS2.png"),
                     active: false,
-                    path: "/vendors"
+                    path: "/vendors/active"
                 },
                 {
                     title: "CLIENTS",
                     imgBrown: require("../assets/images/CATEGORIES/clients.png"),
                     active: false,
-                    path: "/clients"
+                    path: "/clients/active"
                 },
                 {
                     title: "PROJECTS",
