@@ -790,5 +790,6 @@ module.exports = {
   getPercentage,
   multiplyPrices,
   getSizeDifference,
-  activityChange
+  activityChange,
+  arrayComparer
 };

@@ -9,7 +9,7 @@
           :isApproveModal="isDeleting"
           @closeErrors="closeErrors"
           @approve="deleteService"
-          @notApprove="setDefaults" 
+          @notApprove="setDefaults"
           @closeModal="setDefaults"
         )
 
@@ -32,15 +32,15 @@
           template(slot="targets" slot-scope="{ row, index }")
             .clientService__data(v-if="currentActive !== index") {{ presentArrays(row.targetLanguages, 'lang') }}
             .clientService__drop-menu(v-else)
-                SelectMulti(
-                  :isTableDropMenu="isTableDropMenu"
-                  placeholder="Select"
-                  :hasSearch="true"
-                  :selectedOptions="currentTargets.map(i => i.lang)"
-                  :options="targetLanguagesClient" 
-                  @chooseOptions="setTargets"   
-                )
-                
+              SelectMulti(
+                :isTableDropMenu="isTableDropMenu"
+                placeholder="Select"
+                :hasSearch="true"
+                :selectedOptions="currentTargets.map(i => i.lang)"
+                :options="targetLanguagesClient"
+                @chooseOptions="setTargets"
+              )
+
           template(slot="service" slot-scope="{ row, index }")
             .clientService__data(v-if="currentActive !== index") {{ presentArrays(row.services, 'title') }}
             .clientService__drop-menu(v-else)
@@ -50,7 +50,7 @@
                   :hasSearch="true"
                   :selectedOptions="currentServices.map(i => i.title)"
                   :options="services.map(i => i.title)"
-                  @chooseOptions="setServices"   
+                  @chooseOptions="setServices"
                 )
 
           template(slot="industry" slot-scope="{ row, index }")
@@ -62,9 +62,9 @@
                     :hasSearch="true"
                     :selectedOptions="currentIndustries.map(i => i.name)"
                     :options="clientIndustries"
-                    @chooseOptions="setIndustries"   
+                    @chooseOptions="setIndustries"
                   )
-                  
+
           template(slot="icons" slot-scope="{ row, index }")
             .clientService__icons
               img.clientService__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'clientService_opacity': isActive(key, index)}")
@@ -273,6 +273,7 @@ export default {
       if (this.currentActive === -1) return;
       try {
         const id = this.clientServices[index]._id;
+        const oldData = this.clientServices[index];
         const currentData = {
           _id: id,
           sourceLanguage: this.currentSource,
@@ -282,7 +283,8 @@ export default {
         };
         const result = this.$http.post("/clientsapi/services", {
           clientId: this.$route.params.id,
-          currentData
+          currentData,
+          oldData
         });
         this.alertToggle({
           message: "Services are saved",

@@ -1,1 +1,0 @@
-const { Clients } = require('../../models');

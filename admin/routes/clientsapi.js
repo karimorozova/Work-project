@@ -244,9 +244,9 @@ router.post('/rates/rate-combinations/:id', async (req, res) => {
 });
 
 router.post('/services', async (req, res) => {
-  const { clientId, currentData } = req.body;
+  const { clientId, currentData, oldData } = req.body;
   try {
-    await updateClientService(clientId, currentData);
+    await updateClientService(clientId, currentData, oldData);
     res.send('Updated');
   } catch (err) {
     console.log(err);
