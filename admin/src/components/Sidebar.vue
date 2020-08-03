@@ -44,7 +44,7 @@ export default {
             type: Array,
         },
         multiActiveIndex:{
-            type: Array,
+            type: [Array, Number]
         }
     },
     methods: {

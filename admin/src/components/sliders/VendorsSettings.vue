@@ -38,7 +38,7 @@ export default {
           ],
         },
       ],
-      currentIndex: [0, 1],
+      currentIndex: -1,
       defaultRouteName: "active-vendors",
     };
   },
@@ -61,17 +61,18 @@ export default {
       this.currentIndex = indexesSideBar;
     },
     goToRoute() {
-      console.log('dd');
-      console.log(this.currentIndex);
-      if(!this.currentIndex.length){
-         this.currentIndex = [0,1];
-      }
-      if (this.currentIndex !== -1) {
+      if (!this.currentIndex.length) {
+        this.currentIndex = [0, 1];
+      }else{
         const { routeName } = this.sidebarLinksMulti[this.currentIndex[0]].links[this.currentIndex[1]];
-        console.log(routeName);
         this.$router.push({ name: routeName });
       }
     },
+  },
+  watch: {
+    $route(to, from) {
+      if(to.name === 'active-vendors') this.currentIndex = [0, 1];
+    }
   },
   components: {
     Sidebar,
@@ -80,6 +81,7 @@ export default {
     this.setDefaultActiveLink();
     this.goToRoute();
   },
+
 };
 </script>
 
