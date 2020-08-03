@@ -18,7 +18,7 @@ async function getVendor(query) {
             .populate("qualifications.source")
             .populate("qualifications.target")
             .populate("qualifications.industry")
-            .populate("qualifications.step")
+            .populate("qualifications.steps")
             .populate("assessments.step")
             .populate("assessments.langsData.source")
             .populate("assessments.langsData.target")
@@ -47,7 +47,7 @@ async function getVendors(query) {
             .populate("qualifications.source")
             .populate("qualifications.target")
             .populate("qualifications.industry")
-            .populate("qualifications.step")
+            .populate("qualifications.steps")
             .populate("assessments.step")
             .populate("assessments.langsData.source")
             .populate("assessments.langsData.target")
@@ -76,7 +76,7 @@ async function getVendorAfterUpdate(query, update) {
             .populate("qualifications.source")
             .populate("qualifications.target")
             .populate("qualifications.industry")
-            .populate("qualifications.step")
+            .populate("qualifications.steps")
             .populate("assessments.step")
             .populate("assessments.langsData.source")
             .populate("assessments.langsData.target")
@@ -111,7 +111,7 @@ async function getFilteredVendors(filters) {
             "qualifications.source",
             "qualifications.target",
             "qualifications.industry",
-            "qualifications.step",
+            "qualifications.steps",
             "assessments.step",
             "assessments.langsData.source",
             "assessments.langsData.target",

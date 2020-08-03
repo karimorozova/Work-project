@@ -6,7 +6,7 @@
     .assessment__subtitle Download and check file 
     .assessment__subtitle Make sure to convert all doc file into PDF
     .assessment__item(v-for="(stepData, stepIndex ) in assessmentData")
-        .assessment__step {{ stepData.step.title }}
+        //- .assessment__step {{ stepData.step }}
         .assessment__language(v-for="(langsData, langsIndex) in stepData.langsData")
             .assessment__pair {{ getPair(langsData) }}
             .assessment__table
@@ -111,6 +111,7 @@ export default {
       currentField: "lqa1",
       lqaData: {},
       isForm: false,
+
 
       currentActive: -1,
       areErrors: false,

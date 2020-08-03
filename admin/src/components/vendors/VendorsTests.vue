@@ -52,29 +52,27 @@
                 )
 
           template(slot="industry" slot-scope="{ row, index }")
-            .vendorTests__data(v-if="currentActive !== index") {{ row.industry.name }}
+            .vendorTests__data(v-if="currentActive !== index") {{ presentArrays(row.industries,'name') }}
             .vendorTests__drop-menu(v-else)
-                SelectSingle(
-                    :isTableDropMenu="isTableDropMenu"
-                    placeholder="Select"
-                    :hasSearch="true"
-                    :selectedOption="currentIndustry.name"
-                    :options="industryData"
-                    @chooseOption="setIndustry"
-                    @scrollDrop="scrollDrop"
+                SelectMulti(
+                  :isTableDropMenu="isTableDropMenu",
+                  placeholder="Select",
+                  :hasSearch="true",
+                  :selectedOptions="currentIndustries.map((i) => i.name)",
+                  :options="industryData",
+                  @chooseOptions="setIndustries"
                 )
 
           template(slot="step" slot-scope="{ row, index }")
-            .vendorTests__data(v-if="currentActive !== index") {{ row.step.title }}
+            .vendorTests__data(v-if="currentActive !== index") {{ presentArrays(row.steps,'title') }}
             .vendorTests__drop-menu(v-else)
-                SelectSingle(
-                    :isTableDropMenu="isTableDropMenu"
-                    placeholder="Select"
-                    :hasSearch="true"
-                    :selectedOption="currentStep.title"
-                    :options="stepsData"
-                    @chooseOption="setStep"
-                    @scrollDrop="scrollDrop"
+                SelectMulti(
+                  :isTableDropMenu="isTableDropMenu",
+                  placeholder="Select",
+                  :hasSearch="true",
+                  :selectedOptions="currentSteps.map((i) => i.title)",
+                  :options="stepsData",
+                  @chooseOptions="setSteps"
                 )
 
           template(slot="icons" slot-scope="{ row, index }")
@@ -122,21 +120,21 @@ export default {
           padding: "0"
         },
         {
-          label: "Target",
+          label: "Targets",
           headerKey: "headerTarget",
           key: "targets",
           width: "191px",
           padding: "0"
         },
         {
-          label: "Industry",
+          label: "Industries",
           headerKey: "headerIndustry",
           key: "industry",
           width: "161px",
           padding: "0"
         },
         {
-          label: "Step",
+          label: "Steps",
           headerKey: "headerStep",
           key: "step",
           width: "161px",
@@ -155,8 +153,8 @@ export default {
       currentActive: -1,
       currentFile: "",
       currentSource: "",
-      currentIndustry: "",
-      currentStep: "",
+      currentIndustries: [],
+      currentSteps: [],
       currentTargets: [],
 
       industries: [],
@@ -179,6 +177,10 @@ export default {
         "removeLangTest",
         "alertToggle"
     ]),
+    presentArrays(Arr, key) {
+      if (!Arr.length) return "";
+      return Arr.reduce((acc, cur) => acc + `${cur[key]}; `, "");
+    },
     presentSource(source) {
         return source ? source.lang : "NA";
     },
@@ -226,8 +228,8 @@ export default {
       this.currentActive = index;
       this.currentSource = this.vendorTests[index].source || {lang: "NA"};
       this.currentTargets = Array.from(this.vendorTests[index].targets);
-      this.currentIndustry = this.vendorTests[index].industry;
-      this.currentStep = this.vendorTests[index].step;
+      this.currentIndustries = this.vendorTests[index].industries;
+      this.currentSteps = this.vendorTests[index].steps;
     },
     manageCancelEdition() {
         this.vendorTests = this.vendorTests.filter(item => item._id);
@@ -239,8 +241,8 @@ export default {
       this.isDeleting = false;
       this.currentFile = "";
       this.currentSource = "";
-      this.currentIndustry = "";
-      this.currentStep = "";
+      this.currentIndustries = [];
+      this.currentSteps = [];
       this.currentTargets = [];
     },
 
@@ -248,8 +250,8 @@ export default {
       this.errors = [];
       if(!this.currentSource) this.errors.push("Source should not be empty!")
       if(this.selectedTargets.length == 0) this.errors.push("Target should not be empty!")
-      if(!this.currentIndustry) this.errors.push("Industry should not be empty!")
-      if(!this.currentStep) this.errors.push("Step should not be empty!")
+      if(!this.currentIndustries.length) this.errors.push("Industries should not be empty!")
+      if(!this.currentSteps.length) this.errors.push("Steps should not be empty!")
       if(!this.vendorTests[index]._id && !this.currentFile) this.errors.push("File should not be empty!")
       if(!this.errors.length && this.isNotUnique(index)) this.errors.push("A test with entered data is already exists!")
       
@@ -273,8 +275,6 @@ export default {
     },
     isMatch(item) {
         return (this.currentSource.lang === "NA" || this.currentSource.lang === item.source.lang)
-            && this.currentStep._id === item.step._id
-            && this.currentIndustry._id === item.industry._id
     },
     async manageSaveClick(index) {
         if (this.currentActive === -1) return;
@@ -283,8 +283,8 @@ export default {
             : this.currentTargets;
         let testData = {
             targets,
-            industry: this.currentIndustry,
-            step: this.currentStep,
+            industries: this.currentIndustries,
+            steps: this.currentSteps,
             index,
             oldPath: this.vendorTests[index].path || "",
             _id: this.vendorTests[index]._id || ""
@@ -333,8 +333,8 @@ export default {
         uploadDate: "",
         source: "",
         targets: [],
-        industry: "",
-        step: ""
+        industries: [],
+        steps: [],
       });
       this.setEditingData(this.vendorTests.length - 1);
     },
@@ -372,11 +372,23 @@ export default {
     setSource({ option }) {
       this.currentSource = this.sources.find(item => item.lang === option);
     },
-    setIndustry({ option }) {
-      this.currentIndustry = this.industries.find(item => item.name === option);
+    setIndustries({ option }) {
+      const position = this.currentIndustries.map((item) => item.name).indexOf(option);
+      if (position !== -1) {
+        this.currentIndustries.splice(position, 1);
+      } else {
+        const industry = this.industries.find((item) => item.name === option);
+        this.currentIndustries.push(industry);
+      }
     },
-    setStep({ option }) {
-      this.currentStep = this.steps.find(item => item.title === option);
+    setSteps({ option }) {
+      const position = this.currentSteps.map((item) => item.title).indexOf(option);
+      if (position !== -1) {
+        this.currentSteps.splice(position, 1);
+      } else {
+        const service = this.steps.find((item) => item.title === option);
+        this.currentSteps.push(service);
+      }
     },
     uploadDocument(e) {
       this.currentFile = this.$refs.file.files[0];
@@ -436,6 +448,7 @@ export default {
   &__data {
     @extend %table-data;
     overflow-x: hidden;
+    display: grid;
   }
   &__editing-data {
     @extend %table-data;

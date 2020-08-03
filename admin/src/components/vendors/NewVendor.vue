@@ -425,6 +425,7 @@ export default {
   &_error-shadow {
     box-shadow: 0 0 5px red;
     border-radius: 5px;
+    height: 31px;
   }
 }
 #test {

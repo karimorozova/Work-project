@@ -22,12 +22,12 @@ const LangTestSchema = new mongoose.Schema({
         type: Date,
         default: new Date()
     },
-    industry: {
+    industries: [{
         type: Schema.Types.ObjectId, ref: 'Industries'
-    },
-    step: {
+    }],
+    steps: [{
         type: Schema.Types.ObjectId, ref: 'Step'
-    }
+    }]
 });
 
 const LangTest = mongoose.model('LangTest', LangTestSchema);
