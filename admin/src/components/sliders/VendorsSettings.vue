@@ -50,7 +50,6 @@ export default {
     },
     setDefaultActiveLink() {
       const { name } = this.$route;
-      if (name === this.defaultRouteName) return (this.currentIndex = [0, 1]);
 
       let indexesSideBar = [];
       this.sidebarLinksMulti.forEach((title) => {
@@ -61,12 +60,19 @@ export default {
 
       this.currentIndex = indexesSideBar;
     },
+    goToRoute() {
+      if (this.currentIndex !== -1) {
+        const { routeName } = this.sidebarLinksMulti[this.currentIndex[0]].links[this.currentIndex[1]];
+        this.$router.push({ name: routeName });
+      }
+    },
   },
   components: {
     Sidebar,
   },
   mounted() {
     this.setDefaultActiveLink();
+    this.goToRoute();
   },
 };
 </script>
