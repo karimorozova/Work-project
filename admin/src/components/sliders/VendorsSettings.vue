@@ -63,6 +63,7 @@ export default {
     goToRoute() {
       console.log('dd');
       console.log(this.currentIndex);
+      if(!this.currentIndex.length) this.currentIndex[0,1];
       if (this.currentIndex !== -1 && this.currentIndex.length) {
         const { routeName } = this.sidebarLinksMulti[this.currentIndex[0]].links[this.currentIndex[1]];
         console.log(routeName);
