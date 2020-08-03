@@ -61,8 +61,11 @@ export default {
       this.currentIndex = indexesSideBar;
     },
     goToRoute() {
-      if (this.currentIndex !== -1) {
+      console.log('dd');
+      console.log(this.currentIndex);
+      if (this.currentIndex !== -1 && this.currentIndex.length) {
         const { routeName } = this.sidebarLinksMulti[this.currentIndex[0]].links[this.currentIndex[1]];
+        console.log(routeName);
         this.$router.push({ name: routeName });
       }
     },
