@@ -20,57 +20,13 @@
         .qualifications__head-title {{ field.label }}
 
       template(slot="source", slot-scope="{ row, index }")
-        .qualifications__data(v-if="currentActive !== index")
-          span.qualifications__source(v-if="row.source") {{ row.source.lang }}
-        //- .qualifications__drop-menu(v-else)
-        //-   SelectSingle(
-        //-     :isTableDropMenu="isTableDropMenu",
-        //-     placeholder="Select",
-        //-     :hasSearch="true",
-        //-     :selectedOption="currentSource.lang",
-        //-     :options="sourceData",
-        //-     @chooseOption="setSource",
-        //-     @scrollDrop="scrollDrop"
-        //-   )
-
+        .qualifications__data {{ row.source.lang }}
       template(slot="target", slot-scope="{ row, index }")
-        .qualifications__data(v-if="currentActive !== index") {{ row.target.lang }}
-        //- .qualifications__drop-menu(v-else)
-        //-   SelectSingle(
-        //-     :isTableDropMenu="isTableDropMenu",
-        //-     placeholder="Select",
-        //-     :hasSearch="true",
-        //-     :selectedOption="currentTarget.lang",
-        //-     :options="targetData",
-        //-     @chooseOption="setTarget",
-        //-     @scrollDrop="scrollDrop"
-        //-   )
-
+        .qualifications__data {{ row.target.lang }}
       template(slot="industry", slot-scope="{ row, index }")
-        .qualifications__data(v-if="currentActive !== index") {{ row.industry.name }}
-        //- .qualifications__drop-menu(v-else)
-        //-   SelectSingle(
-        //-     :isTableDropMenu="isTableDropMenu",
-        //-     placeholder="Select",
-        //-     :hasSearch="true",
-        //-     :selectedOption="currentIndustry.name",
-        //-     :options="industryData",
-        //-     @chooseOption="setIndustry",
-        //-     @scrollDrop="scrollDrop"
-        //-   )
-
+        .qualifications__data {{ row.industry.name }}
       template(slot="step", slot-scope="{ row, index }")
-        .qualifications__data(v-if="currentActive !== index") {{ presentArrays(row.steps, 'title') }}
-        //- .qualifications__drop-menu(v-else)
-        //-   SelectSingle(
-        //-     :isTableDropMenu="isTableDropMenu",
-        //-     placeholder="Select",
-        //-     :hasSearch="true",
-        //-     :selectedOption="currentStep.title",
-        //-     :options="stepsData",
-        //-     @chooseOption="setStep",
-        //-     @scrollDrop="scrollDrop"
-        //-   )
+        .qualifications__data {{ presentArrays(row.steps, 'title') }}
 
       template(slot="status", slot-scope="{ row, index }")
         .qualifications__data(v-if="currentActive !== index") {{ row.status }}
@@ -78,12 +34,18 @@
           SelectSingle(
             :isTableDropMenu="isTableDropMenu",
             placeholder="Select",
-            :hasSearch="true",
             :selectedOption="currentStatus",
-            :options="statuses",
-            @chooseOption="setStatus",
-            @scrollDrop="scrollDrop"
+            :options="TestWorkflowStatuses",
+            @chooseOption="setStatus"
           )
+      template(slot="progress", slot-scope="{ row, index }")
+        .progress-line
+          .progress-line__body(v-for="stage in 4")
+            .progress-line__bar(v-if="stage <= setStatusStage(row.status)", :style="{ background: '#2cb42c' }")
+            .progress-line__bar(v-else)
+
+      template(slot="tqi", slot-scope="{ row, index }")
+        .qualifications__data -1
 
       template(slot="icons", slot-scope="{ row, index }")
         .qualifications__icons
@@ -93,8 +55,6 @@
             @click="makeAction(index, key)",
             :class="{ qualifications_opacity: isActive(key, index) }"
           )
-
-  //- Add(@add="addData")
 </template>
 
 <script>
@@ -102,7 +62,6 @@ import VendorPreview from "./VendorPreview";
 import { mapGetters, mapActions } from "vuex";
 import SettingsTable from "../Table/SettingsTable";
 import SelectSingle from "../SelectSingle";
-import Add from "../Add";
 import scrollDrop from "@/mixins/scrollDrop";
 import crudIcons from "@/mixins/crudIcons";
 import VendorLqa from "./VendorLqa";
@@ -121,10 +80,6 @@ export default {
     currentVendor: {
       type: Object,
     },
-    vendorIndustries: {
-      type: Array,
-      default: () => [],
-    },
   },
   data() {
     return {
@@ -133,59 +88,74 @@ export default {
           label: "Source",
           headerKey: "headerSource",
           key: "source",
-          width: "17%",
+          width: "14%",
           padding: "0",
         },
         {
           label: "Target",
           headerKey: "headerTarget",
           key: "target",
-          width: "17%",
+          width: "14%",
           padding: "0",
         },
         {
           label: "Industry",
           headerKey: "headerIndustry",
           key: "industry",
-          width: "17%",
+          width: "14%",
           padding: "0",
         },
         {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "17%",
+          width: "16%",
           padding: "0",
         },
         {
           label: "Test Status",
           headerKey: "headerStatus",
           key: "status",
-          width: "17%",
+          width: "13%",
+          padding: "0",
+        },
+        {
+          label: "Progress",
+          headerKey: "headerProgress",
+          key: "progress",
+          width: "13%",
+          padding: "0",
+        },
+        {
+          label: "TQI",
+          headerKey: "headerTQI",
+          key: "tqi",
+          width: "4%",
           padding: "0",
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "15%",
+          width: "13%",
           padding: "0",
         },
       ],
-      vendorTests: [],
       lqaData: {
         isTqi: true,
       },
-      sources: [],
       targets: [],
-      steps: [],
+      vendorTests: [],
+
       currentSource: "",
       currentTarget: "",
       currentIndustry: "",
-      currentStep: "",
+      currentSteps: [],
       currentStatus: "",
       currentIndex: "",
+
       previewMessage: "",
+
       areErrors: false,
       errors: [],
       isDeleting: false,
@@ -194,6 +164,7 @@ export default {
       currentActive: -1,
       isForm: false,
       isEditAndSend: false,
+      statusStage: -1,
     };
   },
   methods: {
@@ -203,7 +174,6 @@ export default {
       deleteQualification: "deleteCurrentVendorQualification",
       storeAssessment: "storeCurrentVendorAssessment",
     }),
-
     presentArrays(Arr, key) {
       if (!Arr.length) return "";
       return Arr.reduce((acc, cur) => acc + `${cur[key]}; `, "");
@@ -222,9 +192,6 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: "error" });
       }
       this.closePreview();
-    },
-    getQualifications() {
-      this.qualificationData = this.currentVendorQualifications;
     },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
@@ -250,35 +217,35 @@ export default {
       this.currentTarget = this.qualificationData[index].target;
       this.currentIndustry = this.qualificationData[index].industry;
       this.currentStatus = this.qualificationData[index].status;
-      this.currentStep = this.qualificationData[index].step;
+      this.currentSteps = this.qualificationData[index].steps;
     },
     manageCancelEdition(index) {
-      this.$emit("refreshQualifications");
+      // this.$emit("refreshQualifications");
       this.setDefaults();
     },
     setDefaults() {
       this.currentActive = -1;
       this.isDeleting = false;
-      this.currentSource = "";
+      this.currentSource = [];
       this.currentTarget = "";
       this.currentIndustry = "";
       this.currentStatus = "";
-      this.currentStep = "";
+      this.currentSteps = [];
     },
+
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
-      if (!this.currentSource) this.errors.push("Source should not be empty!");
-      if (!this.currentTarget) this.errors.push("Target should not be empty!");
-      if (!this.currentIndustry) this.errors.push("Industry should not be empty!");
-      if (!this.currentStatus) this.errors.push("Step status should not be empty!");
-      if (!this.currentStep) this.errors.push("Step should not be empty!");
-      if (!this.errors.length && !this.getAvailableTest())
-        this.errors.push("There is no test available for such data!");
+      if (!this.currentStatus) this.errors.push("Status should not be empty!");
+
+      // if (!this.errors.length && !this.getAvailableTest())
+      // this.errors.push("There is no test available for such data!");
+
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
+
       if (this.currentStatus === "Passed") {
         if (this.checkSuchData()) {
           this.handleLqa();
@@ -298,23 +265,18 @@ export default {
         await this.manageSaveClick(index);
       }
     },
+
     getAvailableTest() {
       if (!this.vendorTests.length) return null;
-      return this.vendorTests.find((item) => {
-        const targetIds = item.targets.map((t) => t._id);
-        if (
-          targetIds.indexOf(this.currentTarget._id) !== 1 &&
-          this.currentStep._id === item.step._id &&
-          this.currentIndustry._id === item.industry._id
-        ) {
-          return this.isSourceMatch(item.source);
-        }
-        return false;
-      });
+      const currentTest = this.vendorTests.find(
+        (test) =>
+          test.source._id.toString() == this.currentSource._id.toString() &&
+          test.targets.map((target) => target._id.toString()).includes(this.currentTarget._id.toString()) &&
+          test.industries.map((industry) => industry._id.toString()).includes(this.currentIndustry._id.toString())
+      );
+      return currentTest;
     },
-    isSourceMatch(source) {
-      return (!source && this.currentSource.lang === "NA") || source._id === this.currentSource._id;
-    },
+
     handleLqa() {
       this.lqaData = {
         vendor: {
@@ -322,58 +284,61 @@ export default {
           industry: this.currentIndustry.name,
           sourceLang: this.currentSource.lang,
           targetLang: this.currentTarget.lang,
-          step: this.currentStep.title,
+          step: this.presentArrays(this.currentSteps, "title"),
         },
       };
       this.openForm();
     },
-    // checkSuchData() {
-    //   if (this.assessmentData.length == 0) {
-    //     return true;
-    //   } else {
-    //     const getStep = this.assessmentData.find(
-    //       value => value.step._id == this.currentStep._id
-    //     );
-    //     if (getStep) {
-    //       const getTarget = getStep.langsData.find(
-    //         value => value.target._id == this.currentTarget._id
-    //       );
-    //       const getSource = getStep.langsData.find(
-    //         value => value.source._id == this.currentSource._id
-    //       );
-    //       if (getTarget && getSource) {
-    //         const getIndustry = getSource.industries.find(
-    //           value => value.industry._id == this.currentIndustry._id
-    //         );
-    //         if (getIndustry) {
-    //           this.errors.push("Such information already exists!");
-    //           this.areErrors = true;
-    //           return false;
-    //         } else {
-    //           return true;
-    //         }
-    //       } else {
-    //         return true;
-    //       }
-    //     } else {
-    //       return true;
-    //     }
-    //   }
-    // },
+
+    checkSuchData() {
+      return true;
+      // if (this.assessmentData.length == 0) {
+      //   return true;
+      // } else {
+      //   const getStep = this.assessmentData.find(
+      //     value => value.step._id == this.currentStep._id
+      //   );
+      //   if (getStep) {
+      //     const getTarget = getStep.langsData.find(
+      //       value => value.target._id == this.currentTarget._id
+      //     );
+      //     const getSource = getStep.langsData.find(
+      //       value => value.source._id == this.currentSource._id
+      //     );
+      //     if (getTarget && getSource) {
+      //       const getIndustry = getSource.industries.find(
+      //         value => value.industry._id == this.currentIndustry._id
+      //       );
+      //       if (getIndustry) {
+      //         this.errors.push("Such information already exists!");
+      //         this.areErrors = true;
+      //         return false;
+      //       } else {
+      //         return true;
+      //       }
+      //     } else {
+      //       return true;
+      //     }
+      //   } else {
+      //     return true;
+      //   }
+      // }
+    },
+
     async saveVendorLqa({ vendorData }) {
+      console.log(vendorData);
       const { file, grade } = vendorData;
       let assessment = {
-        step: this.currentStep,
+        step: this.currentSteps[0],
         target: this.currentTarget,
         industry: this.currentIndustry,
+        source: this.currentSource,
         tqi: { fileName: "", path: "", grade },
         lqa1: {},
         lqa2: {},
         lqa3: {},
       };
-      if (this.currentSource.lang !== "NA") {
-        assessment.source = this.currentSource;
-      }
+
       let formData = new FormData();
       formData.append("vendorId", this.currentVendor._id);
       formData.append("assessment", JSON.stringify(assessment));
@@ -381,22 +346,22 @@ export default {
 
       try {
         await this.storeAssessment(formData);
-        await this.manageSaveClick(this.currentActive);
+        // await this.manageSaveClick(this.currentActive);
       } catch (err) {
       } finally {
         this.closeForm();
       }
     },
+
     async manageSaveClick(index, message) {
       let qualification = {
         target: this.currentTarget,
         industry: this.currentIndustry,
-        step: this.currentStep,
+        steps: this.currentSteps,
         status: this.currentStatus,
+        source: this.currentSource,
       };
-      if (this.currentSource.lang !== "NA") {
-        qualification.source = this.currentSource;
-      }
+
       const test = this.getAvailableTest();
       try {
         await this.storeQualification({
@@ -416,6 +381,7 @@ export default {
         this.manageCancelEdition();
       }
     },
+
     async manageDeleteClick(index) {
       this.deleteIndex = index;
       this.isDeleting = true;
@@ -436,73 +402,10 @@ export default {
         this.manageCancelEdition();
       }
     },
-    // addData() {
-    //   if (this.currentActive !== -1) {
-    //     return this.isEditing();
-    //   }
-    //   this.qualificationData.push({
-    //     source: "",
-    //     target: "",
-    //     industry: "",
-    //     status: "",
-    //     step: ""
-    //   });
-    //   this.setEditingData(this.qualificationData.length - 1);
-    // },
-    // async getLangs() {
-    //   try {
-    //     const result = await this.$http.get("/api/languages");
-    //     this.sources = Array.from(result.body);
-    //     this.targets = Array.from(result.body);
-    //     this.sources.unshift({ lang: "NA" });
-    //   } catch (err) {
-    //     this.alertToggle({ message: err.message, isShow: true, type: "error" });
-    //   }
-    // },
-    // async getSteps() {
-    //   try {
-    //     const result = await this.$http.get("/api/steps");
-    //     this.steps = result.body;
-    //   } catch (err) {
-    //     this.alertToggle({ message: err.message, isShow: true, type: "error" });
-    //   }
-    // },
-    setStatuses() {
-      let result = ["NA", "Sample Requested"];
-      if (!!this.getAvailableTest()) {
-        result = ["NA", "Sample Requested", "Test Sent"];
-      }
-      switch (this.currentStatus) {
-        case "NA":
-          result = ["NA"];
-          break;
-        case "Sample Requested":
-        case "Test Sent":
-          result = ["Received"];
-          break;
-        case "Received":
-          result = ["Passed", "Not Passed"];
-          break;
-      }
-      return result;
-    },
-    // setSource({ option }) {
-    //   this.currentSource = this.sources.find(item => item.lang === option);
-    // },
-    // setTarget({ option }) {
-    //   this.currentTarget = this.targets.find(item => item.lang === option);
-    // },
-    // setIndustry({ option }) {
-    //   this.currentIndustry = this.vendorIndustries.find(
-    //     item => item.name === option
-    //   );
-    // },
+
     setStatus({ option }) {
       this.currentStatus = option;
     },
-    // setStep({ option }) {
-    //   this.currentStep = this.steps.find(item => item.title === option);
-    // },
     closeErrors() {
       this.areErrors = false;
     },
@@ -512,53 +415,66 @@ export default {
     openForm() {
       this.isForm = true;
     },
-    // async getTests() {
-    //   try {
-    //     const result = await this.$http.get("/vendorsapi/lang-tests");
-    //     this.vendorTests = result.body;
-    //   } catch (err) {
-    //     this.alertToggle({ message: "Error on getting tests", isShow: true });
-    //   }
-    // }
+    async getTests() {
+      try {
+        const result = await this.$http.get("/vendorsapi/lang-tests");
+        this.vendorTests = result.body;
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting tests", isShow: true });
+      }
+    },
+    setStatusStage(status) {
+      switch (status) {
+        case "Test Sent":
+          return 2;
+          break;
+        case "Test Received":
+          return 3;
+          break;
+        case "Passed":
+        case "Not Passed":
+          return 4;
+          break;
+        default:
+          return 1;
+      }
+    },
   },
   computed: {
     ...mapGetters({
       currentVendorQualifications: "getCurrentVendorQualifications",
     }),
-    statuses() {
-      let result = ["NA", "Sample Requested"];
-      if (!this.currentSource || !this.currentTarget || !this.currentStep || !this.currentIndustry) {
-        return result;
-      }
-      if (this.currentIndex !== -1) {
-        result = this.setStatuses();
+    TestWorkflowStatuses() {
+      let result = [];
+      switch (this.qualificationData[this.currentActive].status) {
+        case "Created":
+        case "Re-Test":
+          result.push("Test Sent");
+          break;
+        case "Test Sent":
+          result.push("Test Received");
+          break;
+        case "Test Received":
+          result.push("Passed", "Not Passed");
+          break;
+        case "Passed":
+          result.push("Not Passed");
+          break;
+        case "Not Passed":
+          result.push("Re-Test");
+          break;
       }
       return result;
-    },
-    // sourceData() {
-    //   return this.sources.map(item => item.lang);
-    // },
-    // targetData() {
-    //   return this.targets.map(item => item.lang);
-    // },
-    // industryData() {
-    //   return this.vendorIndustries.map(item => item.name);
-    // },
-    // stepsData() {
-    //   return this.steps.map(item => item.title);
-    // }
+    }
   },
   components: {
     VendorPreview,
     SettingsTable,
     SelectSingle,
     VendorLqa,
-    Add,
   },
   created() {
-    // this.getTests();
-    // this.getLangs();
-    // this.getSteps();
+    this.getTests();
   },
   mounted() {},
 };
@@ -608,6 +524,20 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
+  }
+}
+.progress-line {
+  display: flex;
+  height: 32px;
+  align-items: center;
+  padding: 0 5px;
+  &__body {
+    width: 25%;
+  }
+  &__bar {
+    height: 5px;
+    margin: 0 1px;
+    background: #ccc;
   }
 }
 </style>

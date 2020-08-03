@@ -127,14 +127,14 @@ const VendorSchema = new mongoose.Schema({
     sourceLanguage: {
       type: Schema.Types.ObjectId, ref: 'Language',
     },
-    targetLanguage: { 
-      type: Schema.Types.ObjectId, ref: 'Language', 
+    targetLanguage: {
+      type: Schema.Types.ObjectId, ref: 'Language',
     },
-    step: { 
-      type: Schema.Types.ObjectId, ref: 'Step', 
+    step: {
+      type: Schema.Types.ObjectId, ref: 'Step',
     },
-    industry: { 
-      type: Schema.Types.ObjectId, ref: 'Industries', 
+    industry: {
+      type: Schema.Types.ObjectId, ref: 'Industries',
     }
 
   }],
@@ -153,10 +153,9 @@ const VendorSchema = new mongoose.Schema({
     }],
     status: {
       type: String,
-      default: 'Yes',
+      default: 'Created',
       trim: true
     },
-    competenciesIds: [],
   }],
   documents: {
     type: Array,
@@ -171,12 +170,27 @@ const VendorSchema = new mongoose.Schema({
     default: []
   },
   assessments: [{
-    TQI: [],
-    LQA1: {},
-    LQA2: {},
-    LQA3: {},
+    step: {
+      type: Schema.Types.ObjectId, ref: 'Step'
+    },
+    langsData: [{
+      source: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      target: {
+        type: Schema.Types.ObjectId, ref: 'Language'
+      },
+      industries: [{
+        industry: {
+          type: Schema.Types.ObjectId, ref: 'Industries'
+        },
+        tqi: {},
+        lqa1: {},
+        lqa2: {},
+        lqa3: {}
+      }]
+    }],
   }],
-
   wordCountInfo: [{
     industry: {
       id: {

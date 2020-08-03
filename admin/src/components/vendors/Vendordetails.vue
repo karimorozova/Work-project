@@ -92,8 +92,13 @@
             :vendorIndustries="currentVendor.industries.map(i => i.name)"
           )
 
-        .title Qualifications
-            TableQualifications(:qualificationData="qualificationData" :assessmentData="assessmentData" :currentVendor="currentVendor" :vendorIndustries="currentVendor.industries" @refreshQualifications="setDetailsTablesData")
+        .title(v-if="currentVendor._id") Qualifications
+            TableQualifications(
+              :qualificationData="qualificationData" 
+              :assessmentData="assessmentData" 
+              :currentVendor="currentVendor" 
+              @refreshQualifications="setDetailsTablesData"
+            )
 
         .title Documents
             TableDocuments(:documentsData="documentsData" :vendorId="vendorId" @refreshDocuments="setDetailsTablesData")
