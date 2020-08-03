@@ -10,7 +10,7 @@ const {
 
 const updateClientService = async (clientId, dataToUpdate, oldData) => {
   try {
-    let { services, servicesForUnification, rates } = await Clients.findOne({ _id: clientId });
+    let { services, rates } = await Clients.findOne({ _id: clientId });
     const dataForSave = {
       sourceLanguage: ObjectId(dataToUpdate.sourceLanguage._id),
       targetLanguages: dataToUpdate.targetLanguages.map(item => ObjectId(item._id)),
@@ -19,14 +19,14 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
     };
     if (dataToUpdate._id) {
       const neededServiceIndex = services.findIndex(service => service._id.toString() === dataToUpdate._id);
-      const {
-        changedServiceForUnificationObj,
-        differences
-      } = getChangedUnificationServices(servicesForUnification, dataToUpdate, oldData);
+      // const {
+      //   changedServiceForUnificationObj,
+      //   differences
+      // } = getChangedUnificationServices(servicesForUnification, dataToUpdate, oldData);
 
-      servicesForUnification = changedServiceForUnificationObj;
+      // servicesForUnification = changedServiceForUnificationObj;
 
-      await syncClientRatesAndServices(clientId, differences, dataToUpdate);
+      // await syncClientRatesAndServices(clientId, differences, dataToUpdate);
       services.splice(neededServiceIndex, 1, dataForSave);
     } else {
       services.push(dataForSave);
@@ -34,9 +34,9 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
       const updatedClient = await Clients.findOne({ _id: clientId });
       const { _id } = updatedClient.services[services.length - 1];
       await addNewRateComponents(clientId, dataToUpdate, _id);
-      servicesForUnification = unifyServiceItems(servicesForUnification, dataToUpdate);
+      // servicesForUnification = unifyServiceItems(servicesForUnification, dataToUpdate);
     }
-    await Clients.updateOne({ _id: clientId }, { services, servicesForUnification });
+    // await Clients.updateOne({ _id: clientId }, { services });
   } catch (err) {
     console.log(err);
     console.log('Error in updateClientService');

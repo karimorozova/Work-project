@@ -244,12 +244,10 @@ const compareNewAndOldServices = (newCondition, oldCondition) => {
 
 //TODO: Add source-language existence check
 const addNewRateComponents = async (clientId, newService, serviceId) => {
-  const { rates, servicesForUnification } = await Clients.findOne({ _id: clientId });
-  const { sourceLanguage, targetLanguages, services: newServices, industries: newIndustries } = newService;
-  const { services, industries } = servicesForUnification;
-  const newUniqueServices = newServices.filter(item => !services.includes(item._id));
-  const newUniqueIndustries = newIndustries.filter(item => !industries.includes(item._id));
+  const { rates } = await Clients.findOne({ _id: clientId });
+  const { sourceLanguage, targetLanguages } = newService;
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
+  const { uniqueServiceSteps, uniqueIndustries } = await getUniqueServiceItems(newService, rates);
   for (let { _id } of targetLanguages) {
     basicPricesTable.push({
       serviceId: serviceId.toString(),
@@ -258,78 +256,109 @@ const addNewRateComponents = async (clientId, newService, serviceId) => {
       targetLanguage: _id
     });
   }
-  // if (newUniqueServices.length) {
-  //   for (let service of newUniqueServices) {
-  //     stepMultipliersTable.push(...await getStepMultipliersCombinations(service, serviceId));
-  //   }
-  // }
-  // if (newUniqueIndustries.length) {
-  //   for (let { _id } of newUniqueIndustries) {
-  //     industryMultipliersTable.push({
-  //       serviceId: serviceId.toString(),
-  //       industry: _id
-  //     });
-  //   }
-  // }
-  // pricelistTable.push(
-  //   ...getPricelistCombinations(
-  //     basicPricesTable,
-  //     stepMultipliersTable,
-  //     industryMultipliersTable,
-  //     serviceId
-  //   ));
+  if (uniqueServiceSteps.length) {
+    for (let service of uniqueServiceSteps) {
+      stepMultipliersTable.push(...await getStepMultipliersCombinations(service, serviceId));
+    }
+  }
+  if (uniqueIndustries.length) {
+    for (let { _id } of uniqueIndustries) {
+      industryMultipliersTable.push({
+        serviceId: serviceId.toString(),
+        industry: _id
+      });
+    }
+  }
+  pricelistTable.push(...await getPricelistCombinations(
+    basicPricesTable,
+    stepMultipliersTable,
+    industryMultipliersTable,
+    pricelistTable
+  ));
   await Clients.updateOne({ _id: clientId },
     { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
   );
 };
 
+const getUniqueServiceItems = async (newService, rates) => {
+  const { services: newServices, industries: newIndustries } = newService;
+  const { stepMultipliersTable, industryMultipliersTable } = rates;
+  const newStepUnitCombination = getStepUnitCombinations(newServices);
+  const currentIndustries = industryMultipliersTable.map(item => item.industry);
+  const currentStepUnitCombinations = stepMultipliersTable.map(({ step, unit }) => `${step} - ${unit}`);
+  let uniqueServiceStepsCombinations = newStepUnitCombination.length ?
+    newStepUnitCombination.filter(item => !currentStepUnitCombinations.includes(item))
+    : [];
+  const uniqueServiceSteps = [];
+  if (uniqueServiceStepsCombinations.length) {
+    uniqueServiceStepsCombinations = uniqueServiceStepsCombinations.map(item => item.split(' ')[0]);
+    for (let id of uniqueServiceStepsCombinations) {
+      const neededStep = await Step.findOne({ _id: ObjectId(id) });
+      uniqueServiceSteps.push(neededStep);
+    }
+  }
+  const uniqueIndustries = newIndustries.filter(industry => !currentIndustries.includes(industry._id));
+  return {
+    uniqueServiceSteps,
+    uniqueIndustries
+  };
+};
+
+const getStepUnitCombinations = (newServices) => {
+  const stepUnitCombinations = [];
+  for (let { steps } of newServices) {
+    for (let { step } of steps) {
+      const { _id, calculationUnit } = step;
+      for (let { _id: unitId } of calculationUnit) {
+        stepUnitCombinations.push(`${_id} - ${unitId}`);
+      }
+    }
+  }
+  return Array.from(new Set(stepUnitCombinations));
+};
+
 //TODO: Add clients currencies for combinations
-const getStepMultipliersCombinations = async ({ steps }, serviceId) => {
+const getStepMultipliersCombinations = async ({ _id }, serviceId) => {
   const stepUnitSizeCombinations = [];
-  for (let { step } of steps) {
-    const { calculationUnit } = await Step.findOne({ _id: step });
-    if (!calculationUnit.length) {
-      return [];
-    } else {
-      for (let { _id, sizes } of calculationUnit) {
-        if (sizes.length) {
-          sizes.forEach(size => {
-            stepUnitSizeCombinations.push({
-              serviceId: serviceId.toString(),
-              step: step._id,
-              unit: _id,
-              size
-            });
-          });
-        } else {
+  const { calculationUnit } = await Step.findOne({ _id });
+  if (!calculationUnit.length) {
+    return [];
+  } else {
+    for (let { _id: unitId, sizes } of calculationUnit) {
+      if (sizes.length) {
+        sizes.forEach(size => {
           stepUnitSizeCombinations.push({
             serviceId: serviceId.toString(),
-            step: step._id,
-            unit: _id,
-            size: 1,
-            defaultSize: true,
+            step: _id,
+            unit: unitId,
+            size
           });
-        }
+        });
+      } else {
+        stepUnitSizeCombinations.push({
+          serviceId: serviceId.toString(),
+          step: _id,
+          unit: unitId,
+          size: 1,
+          defaultSize: true,
+        });
       }
     }
   }
   return stepUnitSizeCombinations;
 };
 
-const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, industryMultipliersTable, serviceId) => {
-  const priceListCombinations = [];
-  const newBasicPriceItems = basicPricesTable.filter(item => item.serviceId.toString() === serviceId.toString());
-  const newStepMultiplierItems = stepMultipliersTable.filter(item => (
-    item.serviceId.toString() === serviceId.toString()
-  ));
-  const newIndustryMultiplierItems = industryMultipliersTable.filter(item => (
-    item.serviceId.toString() === serviceId.toString()
-  ));
-  for (let { step, serviceId, unit, size, multiplier: stepMultiplierValue } of newStepMultiplierItems) {
-    for (let { sourceLanguage, targetLanguage, basicPrice } of newBasicPriceItems) {
-      for (let { industry, multiplier: industryMultiplierValue } of newIndustryMultiplierItems) {
-        priceListCombinations.push({
-          serviceId: serviceId.toString(),
+const getPricelistCombinations = async (
+  basicPricesTable,
+  stepMultipliersTable,
+  industryMultipliersTable,
+  oldPricelistTable
+) => {
+  const allPricelistCombinations = [];
+  for (let { step, unit, size, multiplier: stepMultiplierValue } of stepMultipliersTable) {
+    for (let { sourceLanguage, targetLanguage, basicPrice } of basicPricesTable) {
+      for (let { industry, multiplier: industryMultiplierValue } of industryMultipliersTable) {
+        allPricelistCombinations.push({
           sourceLanguage,
           targetLanguage,
           step,
@@ -341,12 +370,16 @@ const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, indust
       }
     }
   }
-  return priceListCombinations;
+  const newPricelistCombinations = compareTwoPricelists(oldPricelistTable, allPricelistCombinations)
+  return newPricelistCombinations;
 };
 
-const updateRatesBasicPriceTable = (langArray, key) => {
-
-};
+const compareTwoPricelists = (oldPricelistTable, allPricelistCombinations) => {
+  const oldIdKeys = oldPricelistTable.map(({ sourceLanguage, targetLanguage, step, unit, size }) => (
+    `${sourceLanguage}-${targetLanguage}-${step}-${unit}-${size}`
+  ));
+  const newIdKeys = allPricelistCombinations.filter(item => {})
+}
 
 const syncClientRatesAndServices = async (clientId, differences, newService) => {
   const {
@@ -357,25 +390,26 @@ const syncClientRatesAndServices = async (clientId, differences, newService) => 
     newIndustries,
     deletedIndustries
   } = differences;
-  const { rates } = await Clients.findOne({ _id: clientId });
-  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-  if (newTargetLanguages.length) {
-    for (let { _id } of newTargetLanguages) {
-      basicPricesTable.push({
-        serviceId: ObjectId(newServices._id),
-        type: newService.sourceLanguage.toString() === _id ? 'Mono' : 'Duo',
-        sourceLanguage: newService.sourceLanguage,
-        targetLanguage: ObjectId(_id),
-      });
-    }
-  }
-  if (deletedTargetLanguages.length) {
-    for (let { _id } of deletedTargetLanguages) {
-      basicPricesTable = basicPricesTable.filter(({ targetLanguage }) => (
-        targetLanguage.toString() !== _id
-      ));
-    }
-  }
+  console.log(differences);
+  // const { rates } = await Clients.findOne({ _id: clientId });
+  // let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
+  // if (newTargetLanguages.length) {
+  //   for (let { _id } of newTargetLanguages) {
+  //     basicPricesTable.push({
+  //       serviceId: ObjectId(newServices._id),
+  //       type: newService.sourceLanguage.toString() === _id ? 'Mono' : 'Duo',
+  //       sourceLanguage: newService.sourceLanguage,
+  //       targetLanguage: ObjectId(_id),
+  //     });
+  //   }
+  // }
+  // if (deletedTargetLanguages.length) {
+  //   for (let { _id } of deletedTargetLanguages) {
+  //     basicPricesTable = basicPricesTable.filter(({ targetLanguage }) => (
+  //       targetLanguage.toString() !== _id
+  //     ));
+  //   }
+  // }
   // const neededBasicPriceIndex = basicPricesTable.findIndex(item => item.serviceId === changedData._id);
   // const neededIndustryIndex = industryMultipliersTable.findIndex(item => item.serviceId === changedData._id);
   // const difference = getObjDifferences(changedData, oldData);
@@ -425,15 +459,15 @@ const syncClientRatesAndServices = async (clientId, differences, newService) => 
   //     client.rates.industryMultipliersTable[neededIndustryIndex].industry = ObjectId(difference.industry);
   //   }
   // }
-  await Clients.updateOne({ _id: clientId }, {
-    rates:
-      {
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
-        pricelistTable
-      }
-  });
+  // await Clients.updateOne({ _id: clientId }, {
+  //   rates:
+  //     {
+  //       basicPricesTable,
+  //       stepMultipliersTable,
+  //       industryMultipliersTable,
+  //       pricelistTable
+  //     }
+  // });
 };
 
 const doesHaveSameLanguagePair = (arr, sourceLanguageId, targetLanguageId) => {

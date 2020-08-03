@@ -136,24 +136,6 @@ const ClientSchema = new mongoose.Schema({
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
-  servicesForUnification: {
-    langPairs: [
-      {
-        source: {
-          type: Schema.Types.ObjectId, ref: 'Language'
-        },
-        target: {
-          type: Schema.Types.ObjectId, ref: 'Language'
-        }
-      }
-    ],
-    services: [
-      { type: Schema.Types.ObjectId, ref: 'Services' }
-    ],
-    industries: [
-      { type: Schema.Types.ObjectId, ref: 'Industries' }
-    ]
-  },
   services: [{
     sourceLanguage: {
       type: Schema.Types.ObjectId, ref: 'Language',
