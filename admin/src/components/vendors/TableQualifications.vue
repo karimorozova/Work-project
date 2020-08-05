@@ -40,7 +40,7 @@
           )
       template(slot="progress", slot-scope="{ row, index }")
         .progress-line
-          .progress-line__body(v-for="stage in 4")
+          .progress-line__body(v-for="stage in 5")
             .progress-line__bar(v-if="stage <= setStatusStage(row.status)", :style="{ background: '#2cb42c' }")
             .progress-line__bar(v-else)
 
@@ -346,7 +346,7 @@ export default {
 
       try {
         await this.storeAssessment(formData);
-        // await this.manageSaveClick(this.currentActive);
+        await this.manageSaveClick(this.currentActive);
       } catch (err) {
       } finally {
         this.closeForm();
@@ -378,7 +378,7 @@ export default {
         });
       } catch (err) {
       } finally {
-        this.manageCancelEdition(); 
+        this.manageCancelEdition();
       }
     },
 
@@ -431,9 +431,12 @@ export default {
         case "Test Received":
           return 3;
           break;
+        case "Test In Review":
+          return 4;
+          break;
         case "Passed":
         case "Not Passed":
-          return 4;
+          return 5;
           break;
         default:
           return 1;
@@ -455,6 +458,9 @@ export default {
           result.push("Test Received");
           break;
         case "Test Received":
+          result.push("Test In Review");
+          break;
+        case "Test In Review":
           result.push("Passed", "Not Passed");
           break;
         case "Passed":
@@ -465,7 +471,7 @@ export default {
           break;
       }
       return result;
-    }
+    },
   },
   components: {
     VendorPreview,
