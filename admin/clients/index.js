@@ -10,6 +10,7 @@ const clients = {
   getClients,
   gerFilteredClients,
   updateClientRates,
+  deleteClientRates,
   getClientAfterUpdate,
   updateClientInfo,
   getAfterTaskStatusUpdate,
