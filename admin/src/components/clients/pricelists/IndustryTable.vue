@@ -14,10 +14,10 @@
         bodyRowClass="client-pricelist-table-row"
         bodyCellClass="client-pricelist-table-cell"
     )
-    
+
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .price-title {{ field.label }}
- 
+
         template(slot="industry" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index")
                 img.price__main-icon(:src="row.industry.icon")
@@ -43,7 +43,7 @@
             span(v-else)
               .price__icons-link-opacity
                 i.fa.fa-link(aria-hidden='true')
-    
+
     .price__empty(v-if="!dataArray.length") Nothing found...
 
 </template>
@@ -109,7 +109,7 @@ export default {
     }),
     async getRowPrice(index){
       try {
-        const result = await this.$http.post("/clientsapi/sync-cost/" + this.clientId, {
+        const result = await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
             tableKey: "Industry Multipliers Table",
             row: this.dataArray[index]
           })

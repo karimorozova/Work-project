@@ -179,14 +179,14 @@ const getNeededCurrency = (basicPriceObj, clientCurrency) => {
 };
 
 const getNeededLangPair = (arr, sourceLangId, targetLangId) => (
-  arr.basicPricesTable.find(item => (
+  arr.find(item => (
     item.sourceLanguage.toString() === sourceLangId._id.toString() &&
     item.targetLanguage.toString() === targetLangId.toString()
   )));
 
 const getNeededStepRow = (arr, step, unit, size) => (
-  arr.stepMultipliersTable.find(item => (
-    `${item.step} ${item.unit} ${item.size}` === `${step} ${unit} ${size}`
+  arr.find(item => (
+    `${item.step} ${item.unit} ${item.size}` === `${step._id} ${unit._id} ${size}`
   ))
 );
 

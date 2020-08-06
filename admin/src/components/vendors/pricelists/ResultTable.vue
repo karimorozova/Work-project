@@ -33,7 +33,7 @@
 
       template(slot="targetLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
-        .price__data(v-else) 
+        .price__data(v-else)
           input.price__data-input( type="text" v-model="currentTargetLanguage" disabled)
 
       template(slot="step" slot-scope="{ row, index }")
@@ -155,7 +155,7 @@ export default {
           key: "icons",
           width: "15%",
           padding: "0"
-        } 
+        }
       ],
 
       dataArray: [

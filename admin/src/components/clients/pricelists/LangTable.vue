@@ -33,7 +33,7 @@
           label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
           label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
           label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
-          
+
         .price__editing-data(v-else)
           input.price__data-input(type="number" v-model="currentBasicPrice")
 
@@ -49,7 +49,7 @@
           span(v-else)
             .price__icons-link-opacity
               i.fa.fa-link(aria-hidden='true')
-            
+
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
@@ -124,7 +124,7 @@ export default {
     }),
     async getRowPrice(index){
       try {
-        const result = await this.$http.post("/clientsapi/sync-cost/" + this.clientId, {
+        const result = await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
             tableKey: "Basic Prices Table",
             row: this.dataArray[index]
           })

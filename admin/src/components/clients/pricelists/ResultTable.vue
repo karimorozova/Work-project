@@ -32,7 +32,7 @@
 
       template(slot="targetLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
-        .price__data(v-else) 
+        .price__data(v-else)
           input.price__data-input( type="text" v-model="currentTargetLanguage" disabled)
 
       template(slot="step" slot-scope="{ row, index }")
@@ -67,7 +67,7 @@
             img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
-            .price__icons-link
+            .price__icons-link(@click="getRowPrice(index)")
               i.fa.fa-link(aria-hidden='true')
           span(v-else)
             .price__icons-link-opacity
@@ -180,7 +180,7 @@ export default {
     }),
     async getRowPrice(index){
       try {
-        const result = await this.$http.post("/clientsapi/sync-cost/" + this.clientId, {
+        const result = await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
             tableKey: "Pricelist Table",
             row: this.dataArray[index]
           })

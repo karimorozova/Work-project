@@ -51,7 +51,7 @@
           span(v-else)
             .price__icons-link-opacity
               i.fa.fa-link(aria-hidden='true')
-    
+
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
@@ -133,7 +133,7 @@ export default {
     }),
     async getRowPrice(index){
       try {
-        const result = await this.$http.post("/clientsapi/sync-cost/" + this.clientId, {
+        const result = await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
             tableKey: "Step Multipliers Table",
             row: this.dataArray[index]
           })
@@ -299,9 +299,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-   &-info { 
-     margin-top:  4px; 
-     margin-right: 3px;    
+   &-info {
+     margin-top:  4px;
+     margin-right: 3px;
   }
     &-link {
       cursor: pointer;
