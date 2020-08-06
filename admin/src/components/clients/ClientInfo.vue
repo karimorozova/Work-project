@@ -34,6 +34,7 @@
               :industries="industries"
               :services="services"
               :clientIndustries="this.currentClient.industries.map(i => i.name)"
+              @updateRates="updateRates"
           )
       .title(v-if="currentClient._id") Rates
       .client-info__rates(v-if="currentClient._id")
@@ -44,18 +45,21 @@
               :tableData="currentClient.rates.basicPricesTable"
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
+              :refresh="isRefreshAfterServiceUpdate"
             )
           .step-table(v-if="currentClient._id")
             StepTable(
               :tableData="currentClient.rates.stepMultipliersTable"
               :clientId="currentClient._id"
-                @refreshResultTable="refreshResultTable"
+              @refreshResultTable="refreshResultTable"
+              :refresh="isRefreshAfterServiceUpdate"
             )
           .industry-table(v-if="currentClient._id")
             IndustryTable(
               :tableData="currentClient.rates.industryMultipliersTable"
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
+              :refresh="isRefreshAfterServiceUpdate"
             )
 
         .result-table(v-if="currentClient._id")
@@ -66,6 +70,8 @@
                 :units="units.map(i => i.type)"
                 :industries="industries.map(i => i.name)"
                 :isRefreshResultTable="isRefreshResultTable"
+                :refresh="isRefreshAfterServiceUpdate"
+
           )
 
       .title(v-if="currentClient._id") Documents
@@ -152,7 +158,8 @@ export default {
       billErrors: [],
       isLeadEmpty: "",
       isSaveClicked: false,
-      isRefreshResultTable: false
+      isRefreshResultTable: false,
+      isRefreshAfterServiceUpdate: false
     };
   },
   methods: {
@@ -160,6 +167,12 @@ export default {
       this.isRefreshResultTable = true;
       setTimeout(() => {
         this.isRefreshResultTable = false;
+      }, 2000);
+    },
+    updateRates(action){
+      this.isRefreshAfterServiceUpdate = action;
+      setTimeout(() => {
+        this.isRefreshAfterServiceUpdate = !action;
       }, 2000);
     },
     loadFile({ files, prop }) {

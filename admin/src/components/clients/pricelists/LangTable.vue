@@ -65,6 +65,9 @@ export default {
     },
     clientId: {
       type: String
+    },
+    refresh: {
+      type: Boolean
     }
   },
   data() {
@@ -231,6 +234,13 @@ export default {
     ...mapGetters({
       currentClient: "getCurrentClient"
     })
+  },
+  watch: {
+    async refresh() {
+      if (this.refresh) {
+        this.dataArray =  this.currentClient.rates.basicPricesTable;
+      }
+    }
   },
   components: {
     DataTable
