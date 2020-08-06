@@ -22,11 +22,9 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
     } else {
       services.push(dataForSave);
       await Clients.updateOne({ _id: clientId }, { services });
-      const updatedClient = await Clients.findOne({ _id: clientId });
-      const { _id } = updatedClient.services[services.length - 1];
       await addNewRateComponents(clientId, dataToUpdate);
     }
-    // await Clients.updateOne({ _id: clientId }, { services });
+    await Clients.updateOne({ _id: clientId }, { services });
   } catch (err) {
     console.log(err);
     console.log('Error in updateClientService');

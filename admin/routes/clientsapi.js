@@ -232,6 +232,17 @@ router.post('/rates/change-pricelist/:id', async (req, res) => {
   }
 });
 
+router.post('/rates/sync-cost/:id', async (req, res) => {
+  const { id: clientId, tableKey, row } = req.params;
+  try {
+    await syncClientRatesCost(clientId, tableKey, row);
+    res.send('Synced');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on syncing client\'s rates');
+  }
+});
+
 router.post('/rates/rate-combinations/:id', async (req, res) => {
   const { id: clientId } = req.params;
   try {
@@ -278,7 +289,7 @@ router.post('/client-document-default', async (req, res) => {
   }
 });
 
-router.post('/client-document',  upload.fields([{ name: 'documentFile' }]), async (req, res) => {
+router.post('/client-document', upload.fields([{ name: 'documentFile' }]), async (req, res) => {
   const { clientId, category, oldFilePath, oldName, oldCategory } = req.body;
   const files = req.files["documentFile"] || [];
   try {
