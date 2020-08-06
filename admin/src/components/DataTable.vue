@@ -272,6 +272,6 @@ export default {
   border-left: 0.5px solid #938676;
 }
 .client-pricelist-table-head {
-  height: 45px;
+  height: auto;
 }
 </style>

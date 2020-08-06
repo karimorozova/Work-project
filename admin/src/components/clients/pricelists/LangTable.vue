@@ -71,21 +71,21 @@ export default {
     return {
       fields: [
         {
-          label: "Source Lang",
+          label: "Source",
           headerKey: "headerSourceLang",
           key: "sourceLang",
           width: "20%",
           padding: "0"
         },
         {
-          label: "Target Lang",
+          label: "Target",
           headerKey: "headerTargetLang",
           key: "targetLang",
           width: "20%",
           padding: "0"
         },
         {
-          label: "Basic price",
+          label: "B.Price",
           headerKey: "headerBasicPriceEUR",
           key: "price",
           width: "20%",
