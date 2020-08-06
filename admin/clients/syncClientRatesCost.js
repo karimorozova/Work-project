@@ -28,7 +28,7 @@ const syncClientRatesCost = async (clientId, tableKey, row) => {
 
 const synchronizeBasicPrice = async (row, basicPricesTable, rates, clientId, currency) => {
   const { _id, sourceLanguage, targetLanguage, basicPrice } = row;
-  const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage);
+  const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage._id);
   const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : basicPrice;
   const neededRowIndex = rates.basicPricesTable.findIndex(item => item._id.toString() === _id.toString());
   const oldPrice = rates.basicPricesTable[neededRowIndex].basicPrice;

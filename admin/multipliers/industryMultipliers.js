@@ -6,8 +6,9 @@ const updateIndustryMultipliers = async (industryToUpdate, priceListId) => {
     const industryMultiplierIndex = industryMultipliersTable.findIndex(industry => (
       industry._id.toString() === industryToUpdate._id
     ));
+    industryToUpdate.altered = true;
     industryMultipliersTable.splice(industryMultiplierIndex, 1, industryToUpdate);
-    
+
     await Pricelist.updateOne({ _id: priceListId }, {industryMultipliersTable});
   } catch (err) {
     console.log(err);

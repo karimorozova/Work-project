@@ -37,6 +37,10 @@ const PricelistSchema = new mongoose.Schema({
     gbpBasicPrice: {
       type: Number,
       default: 1,
+    },
+    altered: {
+      type: Boolean,
+      default: false
     }
   }],
   stepMultipliersTable: [{
@@ -68,6 +72,10 @@ const PricelistSchema = new mongoose.Schema({
     defaultSize: {
       type: Boolean,
       default: false
+    },
+    altered: {
+      type: Boolean,
+      default: false
     }
   }],
   industryMultipliersTable: [{
@@ -77,6 +85,10 @@ const PricelistSchema = new mongoose.Schema({
     multiplier: {
       type: Number,
       default: 100,
+    },
+    altered: {
+      type: Boolean,
+      default: false
     }
   }],
 }, { minimize: false });

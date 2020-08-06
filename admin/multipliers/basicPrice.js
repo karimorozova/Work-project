@@ -35,9 +35,8 @@ const updateBasicPrices = async (basicPriceToUpdate, priceListId) => {
     const basicPriceIndex = basicPricesTable.findIndex(basicPrice => (
       basicPrice._id.toString() === basicPriceToUpdate._id
     ));
-
+    basicPriceToUpdate.altered = true;
     await basicPricesTable.splice(basicPriceIndex, 1, basicPriceToUpdate)
-
     await Pricelist.updateOne({ _id: priceListId }, {basicPricesTable});
   } catch (err) {
     console.log(err);

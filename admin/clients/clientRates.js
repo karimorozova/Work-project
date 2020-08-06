@@ -9,15 +9,17 @@ const {
   filterRedundantSteps,
   filterRedundantIndustries
 } = require('./editClientRates');
+const { tableKeys } = require('../enums/ratesTableKeys');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
+  const boundPricelist = await Pricelist.findOne({ _id: client.defaultPricelist });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates;
   let updatedPricelistTable;
   switch (itemIdentifier) {
     default:
     case 'Basic Price Table':
-      const updatedBasicPriceTable = replaceOldItem(basicPricesTable, updatedItem);
+      const updatedBasicPriceTable = replaceOldItem(basicPricesTable, updatedItem, boundPricelist, tableKeys.basicPricesTable);
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
         stepMultipliersTable,
@@ -31,7 +33,7 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Step Multipliers Table':
-      const updatedStepMultipliersTable = replaceOldItem(stepMultipliersTable, updatedItem);
+      const updatedStepMultipliersTable = replaceOldItem(stepMultipliersTable, updatedItem, boundPricelist, tableKeys.stepMultipliersTable);
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
         stepMultipliersTable,
@@ -45,7 +47,7 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Industry Multipliers Table':
-      const updatedIndustryMultipliersTable = replaceOldItem(industryMultipliersTable, updatedItem);
+      const updatedIndustryMultipliersTable = replaceOldItem(industryMultipliersTable, updatedItem, boundPricelist, tableKeys.industryMultipliersTable);
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
         stepMultipliersTable,
@@ -61,8 +63,34 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   }
 };
 
-const replaceOldItem = (arr, replacementItem) => {
+const replaceOldItem = (arr, replacementItem, boundPricelist, key) => {
   const { _id } = replacementItem;
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = boundPricelist;
+  let altered;
+  switch (key) {
+    default:
+    case tableKeys.basicPricesTable:
+      const { sourceLanguage, targetLanguage } = replacementItem;
+      const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage._id);
+      altered = neededLangPair ? neededLangPair.altered : false;
+      break;
+    case tableKeys.stepMultipliersTable:
+      const { step, unit, size } = replacementItem;
+      const neededStepRow = getNeededStepRow(stepMultipliersTable, step, unit, size);
+      altered = !!neededStepRow.altered;
+      break;
+    case tableKeys.industryMultipliersTable:
+      const { industry } = replacementItem;
+      const neededIndustryRow = industryMultipliersTable.find(item => (
+        item.industry.toString() === industry._id.toString()
+      ));
+      altered = !!neededIndustryRow.altered;
+  }
+  if (altered) {
+    replacementItem.notification = 'Pricelist data has been updated';
+  } else {
+    replacementItem.notification = 'Client data is different from pricelist';
+  }
   const itemToUpdateIndex = findIndexToReplace(arr, _id);
   arr.splice(itemToUpdateIndex, 1, replacementItem);
   return arr;
@@ -178,9 +206,9 @@ const getNeededCurrency = (basicPriceObj, clientCurrency) => {
   }
 };
 
-const getNeededLangPair = (arr, sourceLangId, targetLangId) => (
+const getNeededLangPair = (arr, sourceLang, targetLangId) => (
   arr.find(item => (
-    item.sourceLanguage.toString() === sourceLangId._id.toString() &&
+    item.sourceLanguage.toString() === sourceLang._id.toString() &&
     item.targetLanguage.toString() === targetLangId.toString()
   )));
 
@@ -237,7 +265,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
     for (let { _id: unitId, sizes } of calculationUnit) {
       if (sizes.length) {
         sizes.forEach(size => {
-          const { multiplier } = getNeededStepRow(stepMultipliersTable, _id, unitId, size)
+          const { multiplier } = getNeededStepRow(stepMultipliersTable, _id, unitId, size);
           stepUnitSizeCombinations.push({
             step: _id,
             unit: unitId,

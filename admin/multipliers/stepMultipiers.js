@@ -50,6 +50,7 @@ const updateStepMultipliers = async (stepToUpdate, priceListId) => {
     let { stepMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, stepMultipliersTable: 1 })
       .populate('stepMultipliersTable.step').populate('stepMultipliersTable.unit');
     const stepToUpdateIndex = stepMultipliersTable.findIndex(step => step._id.toString() === stepToUpdate._id)
+    stepToUpdate.altered = true;
     stepMultipliersTable.splice(stepToUpdateIndex, 1, stepToUpdate);
     await Pricelist.updateOne({ _id: priceListId }, {stepMultipliersTable})
   } catch (err) {
