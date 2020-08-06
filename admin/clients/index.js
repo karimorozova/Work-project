@@ -4,6 +4,7 @@ const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeC
 const { getAfterTaskStatusUpdate } = require('./projects');
 const { updateClientService, deleteClientService } = require('./clientService');
 const { updateRates } = require('./updateClientRates');
+const { syncClientRatesCost } = require('./syncClientRatesCost');
 
 const clients = {
   getClient,
@@ -19,7 +20,8 @@ const clients = {
   deleteClientService,
   updateRates,
   removeClientDoc,
-  saveClientDocumentDefault
+  saveClientDocumentDefault,
+  syncClientRatesCost
 };
 
 module.exports = clients;

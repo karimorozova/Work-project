@@ -16,6 +16,7 @@ const {
   saveClientDocumentDefault,
   saveClientDocument,
   removeClientDoc,
+  syncClientRatesCost
 } = require('../clients');
 const { getRatePricelist, changeClientPricelist, bindClientRates, getClientRates } = require('../rates');
 const { Clients } = require('../models');
