@@ -178,6 +178,19 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    async getRowPrice(index){
+      try {
+        const result = await this.$http.post("/clientsapi/sync-cost/" + this.clientId, {
+            tableKey: "Pricelist Table",
+            row: this.dataArray[index]
+          })
+      } catch (err) {
+        this.alertToggle({message: "Impossibly update price", isShow: true, type: "error" });
+      }finally{
+        this.refreshResultTable();
+        this.dataArray =  this.currentClient.rates.pricelistTable;
+      }
+    },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();

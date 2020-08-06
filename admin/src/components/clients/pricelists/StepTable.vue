@@ -46,7 +46,7 @@
             img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
-            .price__icons-link
+            .price__icons-link(@click="getRowPrice(index)")
               i.fa.fa-link(aria-hidden='true')
           span(v-else)
             .price__icons-link-opacity
@@ -131,6 +131,19 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    async getRowPrice(index){
+      try {
+        const result = await this.$http.post("/clientsapi/sync-cost/" + this.clientId, {
+            tableKey: "Step Multipliers Table",
+            row: this.dataArray[index]
+          })
+      } catch (err) {
+        this.alertToggle({message: "Impossibly update price", isShow: true, type: "error" });
+      }finally{
+        this.refreshResultTable();
+        this.dataArray =  this.currentClient.rates.stepMultipliersTable;
+      }
+    },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();

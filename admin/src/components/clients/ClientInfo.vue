@@ -272,8 +272,8 @@ export default {
         this.isLeadEmpty = true;
       }
       if (
-        !this.currentClient.email ||
-        !emailValidRegex.test(this.currentClient.email.toLowerCase())
+        !this.currentClient.billingInfo.email ||
+        !emailValidRegex.test(this.currentClient.billingInfo.email.toLowerCase())
       ) {
         this.errors.push("Please provide a valid email.");
         this.billErrors.push("email");
