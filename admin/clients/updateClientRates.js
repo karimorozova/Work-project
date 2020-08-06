@@ -1,4 +1,4 @@
-const { Units, Clients, Services } = require('../models');
+const { Units, Clients, Services, Step } = require('../models');
 const { getMultipliersDifference, getSizeDifference, activityChange } = require('../multipliers/pricelist');
 
 const updateRates = async (key, oldMultiplier) => {
