@@ -328,6 +328,7 @@ export default {
         );
         this.clientServices = client.body.services;
         this.setDefaults();
+        this.$emit('updateRates', true);
       }
     },
 
@@ -364,6 +365,8 @@ export default {
           isShow: true,
           type: "error"
         });
+      }finally{
+        this.$emit('updateRates', true);
       }
     },
 

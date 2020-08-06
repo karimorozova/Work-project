@@ -101,6 +101,9 @@ export default {
     },
     isRefreshResultTable: {
       type: Boolean
+    },
+    refresh: {
+      type: Boolean
     }
   },
   data() {
@@ -303,6 +306,11 @@ export default {
   watch: {
     async isRefreshResultTable() {
       if (this.isRefreshResultTable) {
+        this.getPricelist(this.allFilters);
+      }
+    },
+    async refresh() {
+      if (this.refresh) {
         this.getPricelist(this.allFilters);
       }
     }

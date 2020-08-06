@@ -60,6 +60,9 @@ export default {
     },
     clientId: {
       type: String
+    },
+    refresh: {
+      type: Boolean
     }
   },
   data() {
@@ -215,6 +218,13 @@ export default {
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
+    }
+  },
+  watch: {
+    async refresh() {
+      if (this.refresh) {
+        this.dataArray =  this.currentClient.rates.industryMultipliersTable;
+      }
     }
   },
   components: {

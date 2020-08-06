@@ -67,6 +67,9 @@ export default {
     },
     clientId: {
       type: String
+    },
+    refresh: {
+      type: Boolean
     }
   },
   data() {
@@ -245,7 +248,14 @@ export default {
   },
   components: {
     DataTable
-  }
+  },
+  watch: {
+    async refresh() {
+      if (this.refresh) {
+        this.dataArray = this.currentClient.rates.stepMultipliersTable;
+      }
+    }
+  },
 };
 </script>
 <style lang="scss" scoped>
