@@ -94,24 +94,24 @@ const recalculateFromNewMultiplier = (row, newMultiplier, pricelistTable, key) =
   switch (key) {
     default:
     case tableKeys.stepMultipliersTable:
-      pricelistTable.map(item => {
+      pricelistTable = pricelistTable.map(item => {
         if (
-          item.step.toString() === row.step.toString() &&
-          item.unit.toString() === row.unit.toString() &&
+          item.step.toString() === row.step._id.toString() &&
+          item.unit.toString() === row.unit._id.toString() &&
           item.size === Number(row.size)) {
           item.price /= row.multiplier;
           item.price *= newMultiplier;
-          return item;
         }
+        return item;
       });
       break;
     case tableKeys.industryMultipliersTable:
       pricelistTable.map(item => {
-        if (item.industry.toString() === row.industry.toString()) {
+        if (item.industry.toString() === row.industry._id.toString()) {
           item.price /= row.multiplier;
           item.price *= newMultiplier;
-          return item;
         }
+        return item;
       });
   }
   return pricelistTable;
