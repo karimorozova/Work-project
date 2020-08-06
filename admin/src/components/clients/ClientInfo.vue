@@ -540,7 +540,7 @@ export default {
     position: relative;
   }
   &__rates {
-    padding: 10px;
+    padding: 40px;
   }
   &_error-shadow {
     box-shadow: 0 0 5px $red;

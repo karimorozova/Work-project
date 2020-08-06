@@ -7,9 +7,6 @@ export default {
         },
         setDefaultActiveLink() {
             const { name } = this.$route;
-            if(name === this.defaultRouteName) {
-                return this.currentIndex = 0;
-            }
             this.currentIndex = this.sidebarLinks.findIndex(item => item.routeName === name);
         },
         goToRoute() {

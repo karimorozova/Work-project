@@ -319,8 +319,9 @@ export default {
 .documents {
   @extend %setting-table;
   margin: 20px 10px 40px;
-  width: 960px;
-  box-shadow: 0 0 15px #67573e9d;
+  width: 920px;
+  padding: 40px;
+  box-shadow: 0 0 10px #67573e9d;
 
   &__upload {
     position: relative;

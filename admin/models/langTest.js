@@ -2,21 +2,36 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const LangTestSchema = new mongoose.Schema({
-    source: { 
-        type : Schema.Types.ObjectId, ref: 'Language'
+    evaluationName: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    evaluationType: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    languageType: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    source: {
+        type: Schema.Types.ObjectId, ref: 'Language'
     },
     targets: [{
-        type : Schema.Types.ObjectId, ref: 'Language'
+        type: Schema.Types.ObjectId, ref: 'Language'
     }],
     fileName: {
-        type : String, 
-        default : '', 
-        trim : true
+        type: String,
+        default: '',
+        trim: true
     },
     path: {
-        type : String, 
-        default : '', 
-        trim : true
+        type: String,
+        default: '',
+        trim: true
     },
     uploadDate: {
         type: Date,

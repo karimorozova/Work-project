@@ -443,7 +443,7 @@ export default {
 .vendorTests {
   @extend %setting-table;
   width: 1160px;
-  margin: 60px 20px 40px 20px;
+  margin: 40px 20px 40px 20px;
   box-shadow: 0 0 10px $brown-shadow;
   &__data {
     @extend %table-data;

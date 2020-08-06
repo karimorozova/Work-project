@@ -90,7 +90,6 @@
 <style lang="scss" scoped>
   .priceFilter {
     display: flex;
-    margin-left: 3.2%;
     
     &__drop-menu {
       position: relative;

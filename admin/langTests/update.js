@@ -6,7 +6,7 @@ const fs = require('fs');
 async function  updateLangTest(langTest, testFile) {
     const { _id, oldPath, ...testData } = langTest;
     let path = oldPath;
-    let { fileName } = testData;
+    let { fileName, evaluationType } = testData;
     try {
         if(testFile) { 
             path = `/langTestsFiles/${testFile.filename.replace(/\s+/g, '_')}`;
@@ -14,8 +14,13 @@ async function  updateLangTest(langTest, testFile) {
             await moveFile(testFile, `./dist${path}`);
         }
         if(_id) {
-            await getUpdatedTest({ _id }, {...testData, fileName, path});
-            return await removeOldFile(oldPath, path);
+            if(evaluationType === "Sample" && path){
+                await getUpdatedTest({ _id }, {...testData, fileName: "", path: ""});
+                return await removeOldFile(path, "");
+            }else{
+                await getUpdatedTest({ _id }, {...testData, fileName, path});
+                return await removeOldFile(oldPath, path);
+            }
         }
         await LangTest.create({...testData, fileName, path});
     } catch(err) {

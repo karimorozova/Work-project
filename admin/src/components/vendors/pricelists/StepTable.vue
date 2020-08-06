@@ -10,19 +10,13 @@
       @notApprove="setDefaults"
       @closeModal="setDefaults"
       :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
-      :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
+      :tableheadRowClass="['client-pricelist-table-head', {'tbody_visible-overflow': dataArray.length < 3}]"
       bodyRowClass="client-pricelist-table-row"
       bodyCellClass="client-pricelist-table-cell"
       :clientPricetable="true"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .price-title {{ field.label }}
-
-      template(slot="icon" slot-scope="{ row, index }")
-        .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
 
       template(slot="step" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.step.title }}
@@ -48,6 +42,9 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link
@@ -77,24 +74,17 @@ export default {
     return {
       fields: [
         {
-          label: "",
-          headerKey: "headerIcon",
-          key: "icon",
-          width: "8%",
-          padding: "0"
-        },
-        {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "22%",
+          width: "23%",
           padding: "0"
         },
         {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
-          width: "22%",
+          width: "23%",
           padding: "0"
         },
         {
@@ -108,14 +98,14 @@ export default {
           label: "%",
           headerKey: "headerMultiplier",
           key: "multiplier",
-          width: "12%",
+          width: "13%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "26%",
+          width: "31%",
           padding: "0"
         }
       ],
@@ -269,7 +259,6 @@ export default {
   }
   &__empty{
     font-size: 16px;
-    margin-left: 32px;
   }
   &__data,
   &__editing-data {
@@ -298,9 +287,10 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    &-info {
-      margin-top: 4px;
-    }
+   &-info {   
+     margin-top:  4px; 
+     margin-right: 3px;    
+  }
     &-link {
       cursor: pointer;
       font-size: 18px;

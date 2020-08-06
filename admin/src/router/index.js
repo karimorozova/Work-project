@@ -57,7 +57,7 @@ import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
-import VendorsTests from '@/components/vendors/VendorsTests'
+import VendorsCandidatesTests from '@/components/vendors/VendorsCandidatesTests'
 import Xtrf from '@/components/reports/Xtrf'
 import { store } from '../vuex/store'
 
@@ -206,7 +206,7 @@ const router = new Router({
                     component: VendorsSettings,
                     children: [
                         {
-                            path: '',
+                            path: 'all',
                             name: 'all-vendors',
                             props: true,
                             component: AllVendorsTable
@@ -233,7 +233,7 @@ const router = new Router({
                             path: 'tests',
                             name: 'tests-vendors',
                             props: true,
-                            component: VendorsTests
+                            component: VendorsCandidatesTests
                         },
                         {
                             path: 'details/:id',

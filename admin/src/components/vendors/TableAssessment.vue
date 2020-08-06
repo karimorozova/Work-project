@@ -208,8 +208,9 @@ export default {
 .assessment {
   @extend %setting-table;
   margin: 20px 10px 40px;
-  width: 960px;
-  box-shadow: 0 0 15px #67573e9d;
+  width: 920px;
+  box-shadow: 0 0 10px #67573e9d;
+  padding: 40px;
 
   &__subtitle {
     font-size: 14px;

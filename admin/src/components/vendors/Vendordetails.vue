@@ -90,6 +90,7 @@
             :steps="steps"
             :industries="industries"
             :vendorIndustries="currentVendor.industries.map(i => i.name)"
+            @updateQualifications="updateQualifications"
           )
 
         .title(v-if="currentVendor._id") Qualifications
@@ -270,6 +271,9 @@ export default {
     };
   },
   methods: {
+    updateQualifications(){
+      console.log('need update qua');
+    },
     refreshResultTable() {
       this.isRefreshResultTable = true;
       setTimeout(() => {
@@ -719,7 +723,7 @@ export default {
   &__rates {
     box-sizing: border-box;
     margin: 20px 10px 40px 10px;
-    padding: 10px;
+    padding: 40px;
     box-shadow: 0 0 10px #67573e9d;
     font-size: 16px;
   }

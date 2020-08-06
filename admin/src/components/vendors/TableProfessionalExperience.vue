@@ -6,8 +6,6 @@
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
-      :bodyClass="'vendor__experience-body'"
-      :headerClass="'vendor__experience-header'"
       @closeErrors="closeErrors"
       @approve="deleteExperience"
       @notApprove="setDefaults"
@@ -323,9 +321,10 @@ export default {
 
 .experience {
   @extend %setting-table;
-  width: 960px;
+  width: 920px;
   margin: 20px 10px 40px;
-  box-shadow: 0 0 15px #67573e9d;
+  padding: 40px;
+  box-shadow: 0 0 10px #67573e9d;
 
   &__data {
     @extend %table-data;

@@ -21,16 +21,9 @@
       :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="client-pricelist-table-row"
       bodyCellClass="client-pricelist-table-cell"
-      :clientPricetable="true"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .price-title {{ field.label }}
-
-      template(slot="icon" slot-scope="{ row, index }")
-        .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
 
       template(slot="sourceLang" slot-scope="{ row, index }")
         .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
@@ -69,6 +62,9 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
+          .tooltip(v-if="row.altered")
+            span#myTooltip.tooltiptext {{ row.notification }}
+            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link
@@ -111,13 +107,6 @@ export default {
     return {
       fields: [
         {
-          label: "",
-          headerKey: "headerIcon",
-          key: "icon",
-          width: "3.2%",
-          padding: "0"
-        },
-        {
           label: "Source Language",
           headerKey: "headerLanguageSource",
           key: "sourceLang",
@@ -156,14 +145,14 @@ export default {
           label: "Price",
           headerKey: "headerPrice",
           key: "price",
-          width: "9%",
+          width: "10%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "12.8%",
+          width: "15%",
           padding: "0"
         }
       ],
@@ -352,9 +341,6 @@ export default {
   input[disabled] {
     box-shadow: none;
   }
-  &__empty{
-    margin-left: 3.2%;
-  }
 
   input {
     &::-webkit-inner-spin-button,
@@ -395,9 +381,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    &-info {
-      margin-top: 4px;
-    }
+   &-info {   margin-top:  4px; margin-right: 3px;    }
     &-link {
       cursor: pointer;
       font-size: 18px;
