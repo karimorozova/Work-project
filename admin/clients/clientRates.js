@@ -184,6 +184,12 @@ const getNeededLangPair = (arr, sourceLangId, targetLangId) => (
     item.targetLanguage.toString() === targetLangId.toString()
   )));
 
+const getNeededStepRow = (arr, step, unit, size) => (
+  arr.stepMultipliersTable.find(item => (
+    `${item.step} ${item.unit} ${item.size}` === `${step} ${unit} ${size}`
+  ))
+);
+
 const getUniqueServiceItems = async (newService, rates) => {
   const { services: newServices, industries: newIndustries } = newService;
   const { stepMultipliersTable, industryMultipliersTable } = rates;
@@ -231,9 +237,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
     for (let { _id: unitId, sizes } of calculationUnit) {
       if (sizes.length) {
         sizes.forEach(size => {
-          const { multiplier } = stepMultipliersTable.find(({ step, unit, size }) => (
-            `${step} ${unit} ${size}` === `${_id} ${unitId} ${size}`
-          ));
+          const { multiplier } = getNeededStepRow(stepMultipliersTable, _id, unitId, size)
           stepUnitSizeCombinations.push({
             step: _id,
             unit: unitId,
@@ -242,7 +246,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
           });
         });
       } else {
-        const { multiplier } = stepMultipliersTable.find(({ step, unit, size }) => (
+        const { multiplier } = stepMultipliersTable.find(({ step, unit }) => (
           `${step} ${unit}` === `${_id} ${unitId}`
         ));
         stepUnitSizeCombinations.push({
@@ -388,5 +392,6 @@ module.exports = {
   getServiceDifferences,
   deleteClientRates,
   getNeededCurrency,
-  getNeededLangPair
+  getNeededLangPair,
+  getNeededStepRow
 };

@@ -233,7 +233,8 @@ router.post('/rates/change-pricelist/:id', async (req, res) => {
 });
 
 router.post('/rates/sync-cost/:id', async (req, res) => {
-  const { id: clientId, tableKey, row } = req.params;
+  const { id: clientId } = req.params;
+  const { tableKey, row } = req.body;
   try {
     await syncClientRatesCost(clientId, tableKey, row);
     res.send('Synced');
