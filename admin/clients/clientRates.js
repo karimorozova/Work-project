@@ -131,7 +131,7 @@ const addNewRateComponents = async (clientId, newService) => {
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
   const { uniqueServiceSteps, uniqueIndustries } = await getUniqueServiceItems(newService, rates);
   for (let { _id } of targetLanguages) {
-    const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage._id, _id);
+    const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage, _id);
     const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : 1;
     basicPricesTable.push({
       type: sourceLanguage._id.toString() === _id ? 'Mono' : 'Duo',
