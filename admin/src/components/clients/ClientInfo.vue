@@ -548,8 +548,6 @@ export default {
     position: relative;
   }
   &__services {
-    max-height: 500px;
-    overflow: overlay;
     position: relative;
   }
   &__rates {
