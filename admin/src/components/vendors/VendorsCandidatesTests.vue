@@ -304,11 +304,56 @@ export default {
       if (!this.currentIndex && this.currentEvaluationType === "Test") {
         if (!this.currentFile) this.errors.push("File should not be empty!");
       }
+      if (this.isTestSame()) this.errors.push("Such a test already exists");
+      if (this.isSameTestName()) this.errors.push("This evaluation name already exists");
       if (this.errors.length) {
         this.areErrors = true;
         return;
       }
       await this.sendSaveTest();
+    },
+    isSameTestName() {
+      const allVendorsTests = this.vendorTests.filter((test) =>
+        this.currentIndex ? test._id !== this.vendorTests[this.currentIndex]._id : true
+      );
+      return allVendorsTests.map((test) => test.evaluationName).includes(this.currentEvaluationName);
+    },
+    searchSame(type) {
+      let result = false;
+      const allVendorsTests = this.vendorTests.filter((test) =>
+        test.evaluationType === type && this.currentIndex ? test._id !== this.vendorTests[this.currentIndex]._id : true
+      );
+      allVendorsTests.length
+        ? allVendorsTests.forEach((element) => {
+            const source = element.source.lang === this.currentSource.lang;
+            if (source) {
+              const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets;
+              const target = element.targets.find((target) =>
+                currentTargetForSearch.some((currentTarget) => target.lang === currentTarget.lang)
+              );
+              const industry = element.industries.find((industry) =>
+                this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)
+              );
+              const step = element.steps.find((steps) =>
+                this.currentSteps.some((currentStep) => steps.title === currentStep.title)
+              );
+              result =
+                ((source == Object.keys(target !== undefined ? target : {}).length > 0) ==
+                  Object.keys(industry !== undefined ? industry : {}).length > 0) ==
+                Object.keys(step !== undefined ? step : {}).length > 0;
+            } else {
+              result = false;
+            }
+          })
+        : (result = false);
+      return result;
+    },
+    isTestSame() {
+      if (this.currentEvaluationType === "Test") {
+        return this.searchSame("Test");
+      } else {
+        return this.searchSame("Sample");
+      }
     },
     async sendSaveTest() {
       const targets =
