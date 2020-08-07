@@ -261,10 +261,6 @@ export default {
     box-shadow: none;
   }
 
-  &__empty{
-    margin-left: 10%;
-  }
-
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {

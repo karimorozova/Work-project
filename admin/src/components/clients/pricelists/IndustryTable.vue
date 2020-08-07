@@ -218,7 +218,10 @@ export default {
     manageIcons() {
       const { delete: del, ...result } = this.icons;
       return result;
-    }
+    },
+    ...mapGetters({
+      currentClient: "getCurrentClient"
+    })
   },
   watch: {
     async refresh() {
