@@ -31,22 +31,22 @@ const synchronizeBasicPrice = async (row, basicPricesTable, rates, clientId, cur
   const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage._id);
   const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : basicPrice;
   const neededRowIndex = rates.basicPricesTable.findIndex(item => item._id.toString() === _id.toString());
-  const oldPrice = rates.basicPricesTable[neededRowIndex].basicPrice;
   rates.basicPricesTable[neededRowIndex].basicPrice = boundBasicPrice;
   rates.basicPricesTable[neededRowIndex].altered = false;
   rates.basicPricesTable[neededRowIndex].notification = '';
-  rates.pricelistTable = recalculateFromNewPrice(row, oldPrice, rates.pricelistTable);
+  rates.pricelistTable = recalculateFromNewPrice(row, boundBasicPrice, rates.pricelistTable);
   await Clients.updateOne({ _id: clientId }, { rates });
 };
 
 const recalculateFromNewPrice = (row, oldPrice, pricelistTable) => {
   const { sourceLanguage, targetLanguage, basicPrice: newPrice } = row;
-  pricelistTable.map(item => {
-    if (item.sourceLanguage.toString() === sourceLanguage.toString() &&
-      item.targetLanguage.toString() === targetLanguage.toString()) {
-      item.price /= oldPrice;
-      item.price *= newPrice;
+  pricelistTable = pricelistTable.map(item => {
+    if (item.sourceLanguage.toString() === sourceLanguage._id.toString() &&
+      item.targetLanguage.toString() === targetLanguage._id.toString()) {
+      item.price /= newPrice;
+      item.price *= oldPrice;
     }
+    return item
   });
   return pricelistTable;
 };
@@ -55,11 +55,11 @@ const synchronizeStepMultiplier = async (row, stepMultipliersTable, rates, clien
   const { _id, step, unit, size } = row;
   const neededStepMultiplierRow = getNeededStepRow(stepMultipliersTable, step, unit, size);
   const neededRowIndex = rates.stepMultipliersTable.findIndex(item => item._id.toString() === _id.toString());
-  const newMultiplier = neededStepMultiplierRow.multiplier;
+  const oldMultiplier = neededStepMultiplierRow.multiplier;
   rates.stepMultipliersTable[neededRowIndex].multiplier = neededStepMultiplierRow.multiplier;
   rates.stepMultipliersTable[neededRowIndex].altered = false;
   rates.stepMultipliersTable[neededRowIndex].notification = '';
-  rates.pricelistTable = recalculateFromNewMultiplier(row, newMultiplier, rates.pricelistTable, tableKeys.stepMultipliersTable);
+  rates.pricelistTable = recalculateFromNewMultiplier(row, oldMultiplier, rates.pricelistTable, tableKeys.stepMultipliersTable);
   await Clients.updateOne({ _id: clientId }, { rates });
 };
 
@@ -67,11 +67,11 @@ const synchronizeIndustryMultiplier = async (row, industryMultipliersTable, rate
   const { _id, industry } = row;
   const neededIndustryMultiplierRow = industryMultipliersTable.find(item => item.industry.toString() === industry._id.toString());
   const neededRowIndex = rates.industryMultipliersTable.findIndex(item => item._id.toString() === _id.toString());
-  const newMultiplier = neededIndustryMultiplierRow.multiplier;
+  const oldMultiplier = neededIndustryMultiplierRow.multiplier;
   rates.industryMultipliersTable[neededRowIndex].multiplier = neededIndustryMultiplierRow.multiplier;
   rates.industryMultipliersTable[neededRowIndex].altered = false;
   rates.industryMultipliersTable[neededRowIndex].notification = '';
-  rates.pricelistTable = recalculateFromNewMultiplier(row, newMultiplier, rates.pricelistTable, tableKeys.industryMultipliersTable);
+  rates.pricelistTable = recalculateFromNewMultiplier(row, oldMultiplier, rates.pricelistTable, tableKeys.industryMultipliersTable);
   await Clients.updateOne({ _id: clientId }, { rates });
 };
 
@@ -90,7 +90,7 @@ const synchronizePricelistTable = async (row, rates, clientId) => {
   rates.pricelistTable[neededPricelistRowIndex].notification = '';
   await Clients.updateOne({ _id: clientId }, { rates });
 };
-const recalculateFromNewMultiplier = (row, newMultiplier, pricelistTable, key) => {
+const recalculateFromNewMultiplier = (row, oldMultiplier, pricelistTable, key) => {
   switch (key) {
     default:
     case tableKeys.stepMultipliersTable:
@@ -100,7 +100,7 @@ const recalculateFromNewMultiplier = (row, newMultiplier, pricelistTable, key) =
           item.unit.toString() === row.unit._id.toString() &&
           item.size === Number(row.size)) {
           item.price /= row.multiplier;
-          item.price *= newMultiplier;
+          item.price *= oldMultiplier;
         }
         return item;
       });
@@ -109,7 +109,7 @@ const recalculateFromNewMultiplier = (row, newMultiplier, pricelistTable, key) =
       pricelistTable.map(item => {
         if (item.industry.toString() === row.industry._id.toString()) {
           item.price /= row.multiplier;
-          item.price *= newMultiplier;
+          item.price *= oldMultiplier;
         }
         return item;
       });
@@ -118,5 +118,7 @@ const recalculateFromNewMultiplier = (row, newMultiplier, pricelistTable, key) =
 };
 
 module.exports = {
-  syncClientRatesCost
+  syncClientRatesCost,
+  recalculateFromNewPrice,
+  recalculateFromNewMultiplier
 };

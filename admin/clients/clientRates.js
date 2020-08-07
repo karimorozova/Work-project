@@ -19,6 +19,8 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   switch (itemIdentifier) {
     default:
     case 'Basic Price Table':
+      const { basicPrice } = basicPricesTable.find(item => item._id.toString() === updatedItem._id.toString());
+      if (basicPrice === Number(updatedItem.basicPrice)) return;
       const updatedBasicPriceTable = replaceOldItem(basicPricesTable, updatedItem, boundPricelist, tableKeys.basicPricesTable);
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
@@ -33,6 +35,8 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Step Multipliers Table':
+      const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
+      if (stepMultiplier === Number(updatedItem.multiplier)) return;
       const updatedStepMultipliersTable = replaceOldItem(stepMultipliersTable, updatedItem, boundPricelist, tableKeys.stepMultipliersTable);
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
@@ -47,6 +51,8 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case 'Industry Multipliers Table':
+      const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
+      if (industryMultiplier === Number(updatedItem.multiplier)) return;
       const updatedIndustryMultipliersTable = replaceOldItem(industryMultipliersTable, updatedItem, boundPricelist, tableKeys.industryMultipliersTable);
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
@@ -107,7 +113,7 @@ const changePricelistTable = (
   key) => {
   let changedPricelistTable = [];
   for (let item of pricelistTable) {
-    if (!item.altered && item.serviceId === updatedItem.serviceId) {
+    if (!item.altered) {
       const neededBasicPriceItem = basicPricesTable.find(basicPrice => basicPrice.serviceId === updatedItem.serviceId);
       const neededStepMultipliersItem = stepMultipliersTable.find(({ step, unit, serviceId, size }) => (
         step.toString() === item.step.toString() &&
@@ -230,7 +236,7 @@ const getUniqueServiceItems = async (newService, rates) => {
   const uniqueServiceSteps = [];
   if (uniqueServiceStepsCombinations.length) {
     uniqueServiceStepsCombinations = uniqueServiceStepsCombinations.map(item => item.split(' ')[0]);
-    uniqueServiceStepsCombinations = Array.from(new Set(uniqueServiceStepsCombinations))
+    uniqueServiceStepsCombinations = Array.from(new Set(uniqueServiceStepsCombinations));
     for (let id of uniqueServiceStepsCombinations) {
       const neededStep = await Step.findOne({ _id: id });
       uniqueServiceSteps.push(neededStep);
@@ -268,7 +274,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
         sizes.forEach(size => {
           const neededStepRow = stepMultipliersTable.find(item => (
             `${item.step} ${item.unit} ${item.size}` === `${_id} ${unitId} ${size}`
-          ))
+          ));
           const multiplier = neededStepRow ? neededStepRow.multiplier : 100;
           stepUnitSizeCombinations.push({
             step: _id,

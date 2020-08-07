@@ -6,6 +6,8 @@ const changeClientPricelist = async (clientId, pricelistItem) => {
     const client = await Clients.findOne({ _id: clientId });
     const { pricelistTable } = client.rates;
     const neededRowIndex = pricelistTable.findIndex(item => item._id.toString() === rowId);
+    const { price: oldPrice } = pricelistTable[neededRowIndex];
+    if (oldPrice === Number(price)) return;
     pricelistTable[neededRowIndex].price = price;
     pricelistTable[neededRowIndex].altered = altered;
     pricelistTable[neededRowIndex].notification = notification;
