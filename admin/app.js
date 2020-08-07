@@ -1,3 +1,5 @@
+import { requestInfo } from '../portal/store/actions/services';
+
 require('dotenv').config();
 const express = require("express");
 const app = express();
@@ -16,25 +18,28 @@ let logger = require('morgan');
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
-schedule.scheduleJob('0 */3 * * *', async function() {
-    console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
-    try {
-        await updateMemoqProjectsData();
-        console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
-    } catch(err) {
-        console.log(err.message);
-    }
+const { setDefaultPricelist } = require('./helpers/defaults/setDefaultPricelist');
+schedule.scheduleJob('0 */3 * * *', async function () {
+  console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
+  try {
+    await updateMemoqProjectsData();
+    console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
+  } catch (err) {
+    console.log(err.message);
+  }
 });
 
-schedule.scheduleJob('30 23 * * *', async function() {
-    console.log('------- Start updating lang tier data: ', `${new Date()} -------`);
-    try {
-        await getLangReports();
-        console.log('------- Finish updating lang tier data: ', `${new Date()} --------`);
-    } catch (err) {
-        console.log(err.message);
-    }
-})
+schedule.scheduleJob('30 23 * * *', async function () {
+  console.log('------- Start updating lang tier data: ', `${new Date()} -------`);
+  try {
+    await getLangReports();
+    console.log('------- Finish updating lang tier data: ', `${new Date()} --------`);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+setDefaultPricelist();
 
 const allowedOrigins = [
   "https://admin.pangea.global",
@@ -50,10 +55,10 @@ const allowedOrigins = [
 ];
 
 mongoose.connect(config.mongoDB.url, {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-    useCreateIndex: true
+  useNewUrlParser: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true,
+  useCreateIndex: true
 });
 
 app.use(logger('dev'));
@@ -69,8 +74,8 @@ app.use(
 );
 
 app.use(express.static("dist"));
-app.use(bodyParser.json({limit: '50mb', extended: true}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({ limit: '50mb', extended: true }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
