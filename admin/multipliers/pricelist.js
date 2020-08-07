@@ -214,7 +214,7 @@ const updateMultiplier = async (key, oldMultiplier) => {
         await updateActiveSteps(isStepActivityChanged, oldStep._id);
       }
       if (unitDifferences) {
-        await checkStepDifference(unitDifferences, oldStep._id);
+        await checkStepDifference(unitDifferences, oldStep);
       }
       break;
     case 'Unit':
@@ -624,13 +624,13 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
   const pricelists = await Pricelist.find();
   const currencyRatio = await CurrencyRatio.find();
   const { USD, GBP } = currencyRatio[0];
-  const { difference, itemsToReplace, itemsToDelete } = unitDifferences;
+  const { difference, itemsToAdd, itemsToDelete } = unitDifferences;
   switch (difference) {
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace || differenceOperationType.AddAndReplace:
       for (let { _id, stepMultipliersTable } of pricelists) {
         let deleteSize;
-        for (let unitToReplace of itemsToReplace) {
+        for (let unitToReplace of itemsToAdd) {
           const { _id, sizes } = await Units.findOne({ _id: unitToReplace._id });
           if (sizes.length) {
             deleteSize = true;
@@ -681,7 +681,7 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
       break;
     case differenceOperationType.JustAdd:
       const newMultiplierCombinations = [];
-      for (let unitToReplace of itemsToReplace) {
+      for (let unitToReplace of itemsToAdd) {
         const { sizes, _id: unitId } = unitToReplace;
         let deleteSize;
         if (sizes.length) {

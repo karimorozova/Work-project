@@ -230,8 +230,9 @@ const getUniqueServiceItems = async (newService, rates) => {
   const uniqueServiceSteps = [];
   if (uniqueServiceStepsCombinations.length) {
     uniqueServiceStepsCombinations = uniqueServiceStepsCombinations.map(item => item.split(' ')[0]);
+    uniqueServiceStepsCombinations = Array.from(new Set(uniqueServiceStepsCombinations))
     for (let id of uniqueServiceStepsCombinations) {
-      const neededStep = await Step.findOne({ _id: ObjectId(id) });
+      const neededStep = await Step.findOne({ _id: id });
       uniqueServiceSteps.push(neededStep);
     }
   }
