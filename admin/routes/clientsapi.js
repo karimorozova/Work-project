@@ -260,7 +260,8 @@ router.post('/services', async (req, res) => {
   const { clientId, currentData, oldData } = req.body;
   try {
     await updateClientService(clientId, currentData, oldData);
-    res.send('Updated');
+    const result = await getClient({ _id: clientId })
+    res.send(result.services);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on saving Client services');

@@ -311,6 +311,9 @@ export default {
           currentData,
           oldData
         });
+        result.then((data) => {    
+         this.clientServices = data.body;
+        });
         this.alertToggle({
           message: "Services are saved",
           isShow: true,
@@ -323,10 +326,6 @@ export default {
           type: "error"
         });
       } finally {
-        const client = await this.$http.get(
-          `/clientsapi/client?id=${this.$route.params.id}`
-        );
-        this.clientServices = client.body.services;
         this.setDefaults();
         this.$emit('updateRates', true);
       }

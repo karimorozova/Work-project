@@ -149,7 +149,8 @@ export default {
         this.alertToggle({ message: "Impossibly update price", isShow: true, type: "error" });
       } finally {
         this.refreshResultTable();
-        this.dataArray = this.currentClient.rates.stepMultipliersTable;
+        const client = await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);
+        this.dataArray = client.data.rates.stepMultipliersTable;
       }
     },
     async makeAction(index, key) {

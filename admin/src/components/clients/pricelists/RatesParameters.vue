@@ -84,7 +84,7 @@ export default {
   .checkbox {
     display: flex;
     height: 20px;
-    margin-top: -1px;
+    margin-top: -3px;
 
     input[type="checkbox"] {
       opacity: 0;

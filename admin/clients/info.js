@@ -7,34 +7,9 @@ async function updateClientInfo({ clientId, client, files }) {
   const { contacts } = client;
   let updatingClient = { ...client };
   const photoFiles = files.filter(item => item.fieldname === 'photos');
-  const newContract = files.find(item => item.fieldname === 'Contract');
-  const newNda = files.find(item => item.fieldname === 'NDA');
   try {
     if (photoFiles.length) {
       updatingClient.contacts = await attachPhotos({ photoFiles, contacts, clientId });
-    }
-    const { contract, nda } = await attachNdaContract({
-      newContract, newNda, oldContract: client.contract, oldNda: client.nda, clientId
-    });
-    updatingClient.documents = [
-      {
-        fileName: '',
-        path: '',
-        category: 'NDA'
-      },
-      {
-        fileName: '',
-        path: '',
-        category: 'Contract'
-      }
-    ];
-    if (nda) {
-      updatingClient.documents[0].fileName = newNda.originalname;
-      updatingClient.documents[0].path = nda;
-    }
-    if (contract) {
-      updatingClient.documents[1].fileName = newContract.originalname;
-      updatingClient.documents[1].path = contract;
     }
     return await getClientAfterUpdate({ "_id": clientId }, updatingClient);
   } catch (err) {

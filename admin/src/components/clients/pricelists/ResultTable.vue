@@ -190,8 +190,7 @@ export default {
       } catch (err) {
         this.alertToggle({message: "Impossibly update price", isShow: true, type: "error" });
       }finally{
-        this.refreshResultTable();
-        this.dataArray =  this.currentClient.rates.pricelistTable;
+        this.getPricelist(this.allFilters);
       }
     },
     async makeAction(index, key) {

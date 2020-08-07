@@ -307,23 +307,21 @@ export default {
     async updateClient() {
       let sendData = new FormData();
       let dataForClient = this.currentClient;
+      this.getClientDocumentInfo().then((result) => 
+        (dataForClient.documents = result.data.documents));
 
       sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
         sendData.append("photos", this.contactsPhotos[i]);
       }
-      for (let i = 0; i < this.contractFiles.length; i++) {
-        sendData.append("contract", this.contractFiles[i]);
-      }
-      for (let i = 0; i < this.ndaFiles.length; i++) {
-        sendData.append("nda", this.ndaFiles[i]);
-      }
 
+      console.log('data', dataForClient);
       try {
         const result = await this.$http.post(
           "/clientsapi/update-client",
           sendData
         );
+        console.log('res body', result.body);
         const { client } = result.body;
         await this.storeClient(client);
         await this.storeCurrentClient(client);
@@ -374,6 +372,9 @@ export default {
     },
     setLeadContact({ index }) {
       this.updateLeadContact(index);
+    },
+    async getClientDocumentInfo(){
+      return await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);
     },
     async getClientInfo() {
       if (!this.currentClient._id) {
