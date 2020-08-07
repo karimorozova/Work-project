@@ -226,7 +226,8 @@ export default {
   watch: {
     async refresh() {
       if (this.refresh) {
-        this.dataArray =  this.currentClient.rates.industryMultipliersTable;
+        const client = await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);
+        this.dataArray =  client.data.rates.industryMultipliersTable;
       }
     }
   },
