@@ -134,8 +134,6 @@ const updateVendorIndustry = async (oldIndustryId, newIndustry, vendor) => {
   }
 };
 
-  function pushNewIndustries
-
 const checkForDuplicates = (arr, newItemId, oldItemId, key) => {
   const itemsForCheck = arr
     .filter(item => item[key].toString() !== oldItemId.toString())
