@@ -61,6 +61,7 @@ const updateClientStepMultipliers = async (serviceStepDifference, clientId, serv
       break;
   }
 };
+
 const updateClientIndustryMultipliers = async (industryDifference, clientId, serviceId) => {
   const { difference, itemsToAdd, itemsToDelete } = industryDifference;
   const client = await Clients.findOne({ _id: clientId });
@@ -260,5 +261,6 @@ module.exports = {
   updateClientStepMultipliers,
   updateClientIndustryMultipliers,
   filterRedundantSteps,
-  filterRedundantIndustries
+  filterRedundantIndustries,
+  generateNewStepCombinations
 };

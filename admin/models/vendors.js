@@ -217,54 +217,6 @@ const VendorSchema = new mongoose.Schema({
       default: 0,
     }
   }],
-
-  wordsRates: [{
-    source: {
-      type: Schema.Types.ObjectId, ref: 'Language',
-    },
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
-  }],
-  hoursRates: [{
-    source: {
-      type: Schema.Types.ObjectId, ref: 'Language',
-    },
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
-  }],
-  monoRates: [{
-    target: {
-      type: Schema.Types.ObjectId, ref: 'Language'
-    },
-    packageSize: {
-      type: String,
-      trim: true
-    },
-    industries: [{
-      type: Schema.Types.ObjectId, ref: 'Industries'
-    }],
-    rates: {
-      type: Object,
-      default: {}
-    }
-  }],
-
   industries: [
     { type: Schema.Types.ObjectId, ref: 'Industries' }
   ],
@@ -276,6 +228,112 @@ const VendorSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, ref: 'Language'
     }
   }],
+  rates: {
+    basicPricesTable: [{
+      type: {
+        type: String,
+        trim: true
+      },
+      sourceLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      targetLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      basicPrice: {
+        type: Number,
+        default: 1,
+      },
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      }
+    }],
+    stepMultipliersTable: [{
+      step: {
+        type: Schema.Types.ObjectId, ref: 'Step',
+      },
+      unit: {
+        type: Schema.Types.ObjectId, ref: 'Units',
+      },
+      size: {
+        type: Number,
+      },
+      multiplier: {
+        type: Number,
+        default: 100,
+      },
+      defaultSize: {
+        type: Boolean,
+        default: false
+      },
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      }
+    }],
+    industryMultipliersTable: [{
+      industry: {
+        type: Schema.Types.ObjectId, ref: 'Industries',
+      },
+      multiplier: {
+        type: Number,
+        default: 100,
+      },
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      }
+    }],
+    pricelistTable: [{
+      sourceLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      targetLanguage: {
+        type: Schema.Types.ObjectId, ref: 'Language',
+      },
+      step: {
+        type: Schema.Types.ObjectId, ref: 'Step',
+      },
+      unit: {
+        type: Schema.Types.ObjectId, ref: 'Units',
+      },
+      size: {
+        type: Number,
+      },
+      industry: {
+        type: Schema.Types.ObjectId, ref: 'Industries',
+      },
+      price: {
+        type: Number,
+        default: 1
+      },
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      }
+    }]
+  },
   positions: {
     type: Array,
     default: []

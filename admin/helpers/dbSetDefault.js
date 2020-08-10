@@ -241,26 +241,6 @@ function clients() {
     });
 }
 
-function isDefaultValue(entity) {
-  return entity.name ? entity.name.indexOf('default') !== -1 : entity.firstName.indexOf('default') !== -1;
-}
-
-async function fillClientsRates() {
-  try {
-    let clients = await Clients.find().populate('industries');
-    // for (let client of clients) {
-      // const combinations = [...client.monoRates, ...client.wordsRates, ...client.hoursRates];
-      // if (!combinations.length && isDefaultValue(client)) {
-      //   const { monoRates, wordsRates, hoursRates } = await getRates(client.industries);
-      //   await Clients.updateOne({ name: client.name }, { monoRates, wordsRates, hoursRates });
-      // }
-    // }
-  } catch (err) {
-    console.log(err);
-    console.log("Error on filling clients language combinations");
-  }
-}
-
 function vendors() {
   return Vendors.find({})
     .then(async vendors => {
@@ -287,22 +267,6 @@ function vendors() {
     .catch(err => {
       console.log("Something wrong with DB" + err.message);
     });
-}
-
-async function fillVendorsRates() {
-  try {
-    let vendors = await Vendors.find().populate('industries');
-    for (let vendor of vendors) {
-      const combinations = [...vendor.monoRates, ...vendor.wordsRates, ...vendor.hoursRates];
-      if (!combinations.length && isDefaultValue(vendor)) {
-        const { monoRates, wordsRates, hoursRates } = await getRates(vendor.industries);
-        await Vendors.updateOne({ firstName: vendor.firstName }, { monoRates, wordsRates, hoursRates });
-      }
-    }
-  } catch (err) {
-    console.log(err);
-    console.log("Error on filling clients language combinations");
-  }
 }
 
 function languages() {
@@ -354,11 +318,11 @@ function projects() {
           proj.customer = customer[0]._id;
           for (let lang of languages) {
             var language = JSON.stringify(lang);
-            if (lang.lang == proj.sourceLanguage.lang) {
+            if (lang.lang === proj.sourceLanguage.lang) {
               proj.sourceLanguage = JSON.parse(language);
             }
             for (let ind in proj.targetLanguages) {
-              if (lang.lang == proj.targetLanguages[ind].lang) {
+              if (lang.lang === proj.targetLanguages[ind].lang) {
                 proj.targetLanguages[ind] = JSON.parse(language);
                 console.log(proj.targetLanguages[ind]);
               }
@@ -591,8 +555,6 @@ async function checkCollections() {
   await users();
   await fillCurrencyRatio();
   await fillPricelist();
-  await fillClientsRates();
-  await fillVendorsRates();
 }
 
 module.exports = checkCollections();

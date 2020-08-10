@@ -77,7 +77,7 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key) => {
     default:
     case tableKeys.basicPricesTable:
       const { sourceLanguage, targetLanguage } = replacementItem;
-      const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage._id);
+      const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
       altered = neededLangPair ? neededLangPair.altered : false;
       break;
     case tableKeys.stepMultipliersTable:
@@ -165,7 +165,7 @@ const addNewRateComponents = async (clientId, newService) => {
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
   const { uniqueServiceSteps, uniqueIndustries } = await getUniqueServiceItems(newService, rates);
   for (let { _id } of targetLanguages) {
-    const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage, _id);
+    const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage._id, _id);
     const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : 1;
     basicPricesTable.push({
       type: sourceLanguage._id.toString() === _id ? 'Mono' : 'Duo',
@@ -212,9 +212,9 @@ const getNeededCurrency = (basicPriceObj, clientCurrency) => {
   }
 };
 
-const getNeededLangPair = (arr, sourceLang, targetLangId) => (
+const getNeededLangPair = (arr, sourceLangId, targetLangId) => (
   arr.find(item => (
-    item.sourceLanguage.toString() === sourceLang._id.toString() &&
+    item.sourceLanguage.toString() === sourceLangId.toString() &&
     item.targetLanguage.toString() === targetLangId.toString()
   )));
 
@@ -430,7 +430,10 @@ module.exports = {
   addNewRateComponents,
   getServiceDifferences,
   deleteClientRates,
+  getStepMultipliersCombinations,
   getNeededCurrency,
   getNeededLangPair,
-  getNeededStepRow
+  getNeededStepRow,
+  getPricelistCombinations,
+  getObjDifferences
 };

@@ -28,7 +28,7 @@ const syncClientRatesCost = async (clientId, tableKey, row) => {
 
 const synchronizeBasicPrice = async (row, basicPricesTable, rates, clientId, currency) => {
   const { _id, sourceLanguage, targetLanguage, basicPrice } = row;
-  const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage._id);
+  const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
   const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : basicPrice;
   const neededRowIndex = rates.basicPricesTable.findIndex(item => item._id.toString() === _id.toString());
   rates.basicPricesTable[neededRowIndex].basicPrice = boundBasicPrice;
@@ -78,7 +78,7 @@ const synchronizeIndustryMultiplier = async (row, industryMultipliersTable, rate
 const synchronizePricelistTable = async (row, rates, clientId) => {
   const { _id, sourceLanguage, targetLanguage, step, unit, size, industry } = row;
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-  const { basicPrice } = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage._id);
+  const { basicPrice } = getNeededLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
   const { multiplier: stepMultiplierValue } = getNeededStepRow(stepMultipliersTable, step, unit, size);
   const { multiplier: industryMultiplierValue } = industryMultipliersTable.find(item => (
     item.industry.toString() === industry._id.toString()
