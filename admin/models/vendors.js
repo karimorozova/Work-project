@@ -169,6 +169,14 @@ const VendorSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
+  tqi:{
+    type: Number,
+    default: 0,
+  },
+  testType:{
+    type: String,
+    default: '',
+  },
   assessments: [{
     step: {
       type: Schema.Types.ObjectId, ref: 'Step'
