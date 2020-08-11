@@ -302,9 +302,10 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
           });
         });
       } else {
-        const { multiplier } = stepMultipliersTable.find(({ step, unit }) => (
+        const neededStepRow = stepMultipliersTable.find(({ step, unit }) => (
           `${step} ${unit}` === `${_id} ${unitId}`
         ));
+        const multiplier = neededStepRow ? neededStepRow.multiplier : 100;
         stepUnitSizeCombinations.push({
           step: _id,
           unit: unitId,

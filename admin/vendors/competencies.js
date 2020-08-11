@@ -20,9 +20,9 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
           `${x.sourceLanguage}/${x.targetLanguage}/${x.industry}/${x.step}` !==
           `${y.sourceLanguage}/${y.targetLanguage}/${y.industry}/${y.step}`
         ));
-      await createRateCombinations(combinationsWithoutRepetitions, vendorId);
+      await createRateCombinations(dataToUpdate, vendorId);
       competencies.push(...combinationsWithoutRepetitions);
-      await Vendors.updateOne({ _id: vendorId }, { competencies });
+      // await Vendors.updateOne({ _id: vendorId }, { competencies });
       await saveQualifications(combinationsWithoutRepetitions, vendorId);
     }
   } catch (err) {

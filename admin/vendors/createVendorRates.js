@@ -20,32 +20,27 @@ const createRateCombinations = async (listForRates, vendorId) => {
   const pricelistTable = await getPricelistCombinations(
     newLangPairsArr, newStepsArr, newIndustriesArr, oldPricelistTable
   );
-  await Vendors.updateOne({ _id: vendorId }, {
-    rates: {
-      basicPricesTable: newLangPairsArr,
-      stepMultipliersTable: newStepsArr,
-      industryMultipliersTable: newIndustriesArr,
-      pricelistTable
-    }
-  });
+  console.log(newLangPairsArr);
+  // await Vendors.updateOne({ _id: vendorId }, {
+  //   rates: {
+  //     basicPricesTable: newLangPairsArr,
+  //     stepMultipliersTable: newStepsArr,
+  //     industryMultipliersTable: newIndustriesArr,
+  //     pricelistTable
+  //   }
+  // });
 };
 
 const splitRatesArr = (ratesArr) => {
-  const langPairs = [];
-  const steps = [];
-  const industries = [];
-  for (let { sourceLanguage, targetLanguage, step, industry } of ratesArr) {
-    langPairs.push({
-      sourceLanguage,
-      targetLanguage
-    });
-    steps.push(step);
-    industries.push(industry);
-  }
+  const { sourceLanguage, targetLanguage: targetLanguages, step: steps, industry: industries } = ratesArr;
+  const langPairs = targetLanguages.map(item => ({
+    sourceLanguage,
+    targetLanguage: item
+  }));
   return {
-    langPairs: _.uniqBy(langPairs, (item) => item.sourceLanguage + item.targetLanguage),
-    steps: Array.from(new Set(steps)),
-    industries: Array.from(new Set(industries)),
+    langPairs: _.uniqBy(langPairs, item => item.sourceLanguage + item.targetLanguage),
+    steps: _.uniqBy(steps, item => item._id),
+    industries: _.uniqBy(industries, item => item._id),
   };
 };
 
@@ -58,17 +53,18 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
     const similarLangPair = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage);
     const boundBasicPrice = similarLangPair ? getNeededCurrency(similarLangPair, vendorCurrency) : 1;
     newLangPairsArr.push({
-      type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
-      sourceLanguage,
-      targetLanguage,
+      type: sourceLanguage._id.toString() === targetLanguage._id.toString() ? 'Mono' : 'Duo',
+      sourceLanguage: sourceLanguage._id,
+      targetLanguage: targetLanguage._id,
       basicPrice: boundBasicPrice
     });
   }
   for (let step of steps) {
-    newStepsArr.push(...await getStepMultipliersCombinations({ _id: step }, { stepMultipliersTable }));
+    newStepsArr.push(...await getStepMultipliersCombinations({ _id: step }, { stepMultipliersTable: stepMultipliersTable }));
   }
   const newIndustriesArr = [...industries.map(industry => {
-    const { multiplier } = industryMultipliersTable.find(item => item.industry.toString() === industry.toString());
+    const neededIndustryRow = industryMultipliersTable.find(item => item.industry.toString() === industry.toString());
+    const multiplier = neededIndustryRow ? neededIndustryRow.multiplier : 100;
     return {
       industry,
       multiplier

@@ -34,6 +34,7 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
 const updateVendorLangPairs = async (oldSourceId, newSourceLangId, newTargetId, vendor, defaultPricelist) => {
   const { _id, rates } = vendor;
   let updatedRates = rates;
+  console.log('BEFORE', updatedRates);
   if (newSourceLangId) {
     updatedRates.basicPricesTable = changeId(updatedRates.basicPricesTable, oldSourceId, newSourceLangId, 'sourceLanguage');
     updatedRates.pricelistTable = changeId(updatedRates.pricelistTable, oldSourceId, newSourceLangId, 'sourceLanguage');
@@ -69,8 +70,9 @@ const updateVendorLangPairs = async (oldSourceId, newSourceLangId, newTargetId, 
       'price'
     );
   }
+  console.log('AFTER', updatedRates.basicPricesTable);
 
-  await Vendors.updateOne({ _id }, { rates: updatedRates });
+  // await Vendors.updateOne({ _id }, { rates: updatedRates });
 
   function changeId(arr, idToSearch, idForReplace, key) {
     return arr.map(item => {
@@ -125,7 +127,7 @@ const updateVendorStep = async (oldStepId, newStep, vendor, defaultPricelist) =>
     return await Vendors.updateOne({ _id }, { rates });
   }
 
-  await Vendors.updateOne({ _id }, { rates: updatedRates });
+  // await Vendors.updateOne({ _id }, { rates: updatedRates });
 
   function deleteRedundantSteps(rates, oldStepId) {
     return {
@@ -187,7 +189,7 @@ const updateVendorIndustry = async (oldIndustryId, newIndustry, vendor, defaultP
   updatedRates = deleteRedundantIndustries(updatedRates, oldIndustryId);
   updatedRates = pushNewIndustryCombinations(updatedRates, newIndustry._id);
 
-  await Vendors.updateOne({ _id }, { rates: updatedRates });
+  // await Vendors.updateOne({ _id }, { rates: updatedRates });
 
   function deleteRedundantIndustries(rates, oldIndustryId) {
     return {
@@ -257,7 +259,7 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
       );
       vendor.rates.basicPricesTable = updatedBasicPricesTable;
       vendor.rates.pricelistTable = updatedPricelistTable;
-      await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
+      // await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
       break;
     case table.stepMultipliersTable:
       const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
@@ -279,7 +281,7 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
       );
       vendor.rates.stepMultipliersTable = updatedStepMultipliersTable;
       vendor.rates.pricelistTable = updatedPricelistTable;
-      await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
+      // await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
       break;
     case tableKeys.industryMultipliersTable:
       const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());

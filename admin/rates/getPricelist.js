@@ -1,4 +1,5 @@
 const { getClientRates } = require('./getPrices');
+const { getVendor } = require('../vendors');
 
 const getFilteredPricelist = (pricelistTable, filters) => {
   const { sourceFilter, targetFilter, stepFilter, unitFilter, industryFilter } = filters;
@@ -20,9 +21,9 @@ const getFilteredPricelist = (pricelistTable, filters) => {
   return pricelistTable;
 };
 
-const getRatePricelist = async (clientId, filters) => {
+const getRatePricelist = async (personId, filters, fromVendor = false) => {
   const { countFilter } = filters;
-  const { rates } = await getClientRates({ _id: clientId });
+  const { rates } = fromVendor ? await getVendor({ _id: personId }) : await getClientRates({ _id: personId });
   const { pricelistTable } = rates;
   if (pricelistTable.length) {
     const filteredPricelistTable = getFilteredPricelist(pricelistTable, filters);

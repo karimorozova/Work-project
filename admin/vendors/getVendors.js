@@ -5,14 +5,6 @@ async function getVendor(query) {
     const vendor = await Vendors.findOne(query)
             .populate("native")
             .populate("industries")
-            .populate("wordsRates.source")
-            .populate("wordsRates.target")
-            .populate("wordsRates.industries")
-            .populate("hoursRates.source")
-            .populate("hoursRates.target")
-            .populate("hoursRates.industries")
-            .populate("monoRates.target")
-            .populate("monoRates.industries")
             .populate("languagePairs.source")
             .populate("languagePairs.target")
             .populate("qualifications.source")
@@ -26,7 +18,12 @@ async function getVendor(query) {
             .populate('competencies.sourceLanguage')
             .populate('competencies.targetLanguage')
             .populate('competencies.industry')
-            .populate('competencies.step');
+            .populate('competencies.step')
+            .populate('rates.basicPricesTable.sourceLanguage')
+            .populate('rates.basicPricesTable.targetLanguage')
+            .populate('rates.stepMultipliersTable.step')
+            .populate('rates.stepMultipliersTable.unit')
+            .populate('rates.industryMultipliersTable.industry');
     return vendor;
 }
 
@@ -34,14 +31,6 @@ async function getVendors(query) {
     const vendors = await Vendors.find(query)
             .populate("native")
             .populate("industries")
-            .populate("wordsRates.source")
-            .populate("wordsRates.target")
-            .populate("wordsRates.industries")
-            .populate("hoursRates.source")
-            .populate("hoursRates.target")
-            .populate("hoursRates.industries")
-            .populate("monoRates.target")
-            .populate("monoRates.industries")
             .populate("languagePairs.source")
             .populate("languagePairs.target")
             .populate("qualifications.source")
@@ -63,14 +52,6 @@ async function getVendorAfterUpdate(query, update) {
     return await Vendors.findOneAndUpdate(query, update, {new: true})
             .populate("native")
             .populate("industries")
-            .populate("wordsRates.source")
-            .populate("wordsRates.target")
-            .populate("wordsRates.industries")
-            .populate("hoursRates.source")
-            .populate("hoursRates.target")
-            .populate("hoursRates.industries")
-            .populate("monoRates.target")
-            .populate("monoRates.industries")
             .populate("languagePairs.source")
             .populate("languagePairs.target")
             .populate("qualifications.source")
@@ -94,18 +75,10 @@ async function getFilteredVendors(filters) {
             {$addFields: {"name" : {$concat : [ "$firstName", " ", "$surname" ]}}},
             {$match: query},
         ]).sort({_id: 1}).limit(25)
-        
+
         return Vendors.populate(vendors, [
             "native",
             "industries",
-            "wordsRates.source",
-            "wordsRates.target",
-            "wordsRates.industries",
-            "hoursRates.source",
-            "hoursRates.target",
-            "hoursRates.industries",
-            "monoRates.industries",
-            "monoRates.target",
             "languagePairs.source",
             "languagePairs.target",
             "qualifications.source",

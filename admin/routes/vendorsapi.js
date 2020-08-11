@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
+const { getRatePricelist } = require('../rates');
 const { updateProject, getProject } = require('../projects');
 const {
   getVendor,
@@ -350,6 +351,17 @@ router.post('/rates/:id', async (req, res) => {
   }
 });
 
+router.post('/rates/change-pricelist/:id', async (req, res) => {
+  const { id: vendorId } = req.params;
+  try {
+    await changeVendorPricelist(vendorId, req.body);
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on changing pricelist');
+  }
+});
+
 router.post('/rates/sync-cost/:id', async (req, res) => {
   const { id: vendorId } = req.params;
   const { tableKey, row } = req.body;
@@ -359,6 +371,17 @@ router.post('/rates/sync-cost/:id', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on syncing vendor\'s rates');
+  }
+});
+
+router.post('/rates/rate-combinations/:id', async (req, res) => {
+  const { id: vendorId } = req.params;
+  try {
+    const ratePricelist = await getRatePricelist(vendorId, req.body, true);
+    res.send(ratePricelist);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting vendor rate\'s combinations');
   }
 });
 

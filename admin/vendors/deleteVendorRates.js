@@ -6,11 +6,11 @@ const deleteVendorRates = async (vendorId, competenceToDelete) => {
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = vendor.rates;
   let { sourceLanguage, targetLanguage, step, industry } = competenceToDelete;
   basicPricesTable = basicPricesTable.filter(item => (
-    `${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
+    `${item.sourceLanguage} ${item.targetLanguage}` !== `${sourceLanguage} ${targetLanguage}`
   ));
-  stepMultipliersTable = stepMultipliersTable.filter(item => item.step.toString() === step.toString());
-  industryMultipliersTable = industryMultipliersTable.filter(item => item.industry.toString() === industry.toString());
-  pricelistTable = getPricelistCombinations(
+  stepMultipliersTable = stepMultipliersTable.filter(item => item.step.toString() !== step.toString());
+  industryMultipliersTable = industryMultipliersTable.filter(item => item.industry.toString() !== industry.toString());
+  pricelistTable = await getPricelistCombinations(
     basicPricesTable,
     stepMultipliersTable,
     industryMultipliersTable,
