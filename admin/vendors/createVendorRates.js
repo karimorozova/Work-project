@@ -12,7 +12,7 @@ const createRateCombinations = async (listForRates, vendorId) => {
   const { pricelistTable: oldPricelistTable } = vendor.rates;
   const { langPairs, steps, industries } = splitRatesArr(listForRates);
   const defaultPricelist = await Pricelist.findOne({ isDefault: true });
-  const {
+  let {
     newLangPairsArr,
     newStepsArr,
     newIndustriesArr
@@ -20,15 +20,14 @@ const createRateCombinations = async (listForRates, vendorId) => {
   const pricelistTable = await getPricelistCombinations(
     newLangPairsArr, newStepsArr, newIndustriesArr, oldPricelistTable
   );
-  console.log(newLangPairsArr);
-  // await Vendors.updateOne({ _id: vendorId }, {
-  //   rates: {
-  //     basicPricesTable: newLangPairsArr,
-  //     stepMultipliersTable: newStepsArr,
-  //     industryMultipliersTable: newIndustriesArr,
-  //     pricelistTable
-  //   }
-  // });
+  await Vendors.updateOne({ _id: vendorId }, {
+    rates: {
+      basicPricesTable: newLangPairsArr,
+      stepMultipliersTable: newStepsArr,
+      industryMultipliersTable: newIndustriesArr,
+      pricelistTable
+    }
+  });
 };
 
 const splitRatesArr = (ratesArr) => {
@@ -38,7 +37,7 @@ const splitRatesArr = (ratesArr) => {
     targetLanguage: item
   }));
   return {
-    langPairs: _.uniqBy(langPairs, item => item.sourceLanguage + item.targetLanguage),
+    langPairs: _.uniqBy(langPairs, item => item.sourceLanguage._id + item.targetLanguage._id),
     steps: _.uniqBy(steps, item => item._id),
     industries: _.uniqBy(industries, item => item._id),
   };
@@ -66,13 +65,13 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
     const neededIndustryRow = industryMultipliersTable.find(item => item.industry.toString() === industry.toString());
     const multiplier = neededIndustryRow ? neededIndustryRow.multiplier : 100;
     return {
-      industry,
+      industry: industry._id,
       multiplier
     };
   })];
   return {
     newLangPairsArr,
-    newStepsArr,
+    newStepsArr: newStepsArr.map(item => ({ ...item, step: item.step._id })),
     newIndustriesArr
   };
 };
