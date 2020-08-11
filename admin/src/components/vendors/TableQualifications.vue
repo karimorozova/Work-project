@@ -31,13 +31,23 @@
       template(slot="status", slot-scope="{ row, index }")
         .qualifications__data(v-if="currentActive !== index") {{ row.status }}
         .qualifications__drop-menu(v-else)
-          SelectSingle(
-            :isTableDropMenu="isTableDropMenu",
-            placeholder="Select",
-            :selectedOption="currentStatus",
-            :options="TestWorkflowStatuses",
-            @chooseOption="setStatus"
-          )
+          .drop-type(v-if="row.testType === 'Test'")
+            SelectSingle(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :selectedOption="currentStatus",
+              :options="TestWorkflowStatusesTest",
+              @chooseOption="setStatus"
+            )
+          .drop-type(v-else)
+            SelectSingle(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :selectedOption="currentStatus",
+              :options="TestWorkflowStatusesSample",
+              @chooseOption="setStatus"
+            )
+
       template(slot="progress", slot-scope="{ row, index }")
         .progress-line
           .progress-line__body(v-for="stage in 5")
@@ -45,7 +55,7 @@
             .progress-line__bar(v-else)
 
       template(slot="tqi", slot-scope="{ row, index }")
-        .qualifications__data -1
+        .qualifications__data {{ row.tqi }}
 
       template(slot="icons", slot-scope="{ row, index }")
         .qualifications__icons
@@ -109,21 +119,21 @@ export default {
           label: "Step",
           headerKey: "headerStep",
           key: "step",
-          width: "16%",
+          width: "14%",
           padding: "0",
         },
         {
           label: "Test Status",
           headerKey: "headerStatus",
           key: "status",
-          width: "13%",
+          width: "14%",
           padding: "0",
         },
         {
           label: "Progress",
           headerKey: "headerProgress",
           key: "progress",
-          width: "13%",
+          width: "14%",
           padding: "0",
         },
         {
@@ -153,6 +163,7 @@ export default {
       currentSteps: [],
       currentStatus: "",
       currentIndex: "",
+      currentTqi: null,
 
       previewMessage: "",
 
@@ -218,6 +229,7 @@ export default {
       this.currentIndustry = this.qualificationData[index].industry;
       this.currentStatus = this.qualificationData[index].status;
       this.currentSteps = this.qualificationData[index].steps;
+      this.currentTqi = this.qualificationData[index].tqi;
     },
     manageCancelEdition(index) {
       this.$emit("refreshQualifications");
@@ -230,6 +242,7 @@ export default {
       this.currentTarget = "";
       this.currentIndustry = "";
       this.currentStatus = "";
+      this.currentTqi = null;
       this.currentSteps = [];
     },
 
@@ -326,7 +339,6 @@ export default {
     },
 
     async saveVendorLqa({ vendorData }) {
-      console.log(vendorData);
       const { file, grade } = vendorData;
       let assessment = {
         step: this.currentSteps[0],
@@ -344,6 +356,8 @@ export default {
       formData.append("assessment", JSON.stringify(assessment));
       formData.append("assessmentFile", file);
 
+      this.currentTqi = vendorData.grade;
+
       try {
         await this.storeAssessment(formData);
         await this.manageSaveClick(this.currentActive);
@@ -354,12 +368,18 @@ export default {
     },
 
     async manageSaveClick(index, message) {
+      const tqi =
+        this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
+          ? 0
+          : this.currentTqi;
+          
       let qualification = {
         target: this.currentTarget,
         industry: this.currentIndustry,
         steps: this.currentSteps,
         status: this.currentStatus,
         source: this.currentSource,
+        tqi: tqi,
       };
 
       const test = this.getAvailableTest();
@@ -426,12 +446,15 @@ export default {
     setStatusStage(status) {
       switch (status) {
         case "Test Sent":
+        case "Sample Requested":
           return 2;
           break;
         case "Test Received":
+        case "Sample Received":
           return 3;
           break;
         case "Test In Review":
+        case "Sample In Review":
           return 4;
           break;
         case "Passed":
@@ -447,7 +470,32 @@ export default {
     ...mapGetters({
       currentVendorQualifications: "getCurrentVendorQualifications",
     }),
-    TestWorkflowStatuses() {
+    TestWorkflowStatusesSample() {
+      let result = [];
+      switch (this.qualificationData[this.currentActive].status) {
+        case "Created":
+        case "Re-Test":
+          result.push("Sample Requested");
+          break;
+        case "Sample Requested":
+          result.push("Sample Received");
+          break;
+        case "Sample Received":
+          result.push("Sample In Review");
+          break;
+        case "Sample In Review":
+          result.push("Passed", "Not Passed");
+          break;
+        case "Passed":
+          result.push("Not Passed");
+          break;
+        case "Not Passed":
+          result.push("Re-Test");
+          break;
+      }
+      return result;
+    },
+    TestWorkflowStatusesTest() {
       let result = [];
       switch (this.qualificationData[this.currentActive].status) {
         case "Created":
