@@ -15,7 +15,9 @@ const {
   updateVendorAssessment,
   notifyTestStatus,
   updateVendorCompetencies,
-  deleteVendorCompetencies
+  deleteVendorCompetencies,
+  updateVendorsRatePrices,
+  syncVendorRatesCost
 } = require('../vendors');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
@@ -323,6 +325,40 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on updating Vendor");
+  }
+});
+
+router.get('/rates/:id', async (req, res) => {
+  const { _id: vendorId } = req.params;
+  try {
+    const { rates } = await Vendors.findOne({ _id: vendorId });
+    res.send(rates);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting vendor\'s rates');
+  }
+});
+
+router.post('/rates/:id', async (req, res) => {
+  const { _id: vendorId } = req.params;
+  const { itemIdentifier, updatedItem } = req.body;
+  try {
+    await updateVendorsRatePrices(vendorId, itemIdentifier, updatedItem);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating vendor\'s rates');
+  }
+});
+
+router.post('/rates/sync-cost/:id', async (req, res) => {
+  const { id: vendorId } = req.params;
+  const { tableKey, row } = req.body;
+  try {
+    await syncVendorRatesCost(vendorId, tableKey, row);
+    res.send('Synced');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on syncing vendor\'s rates');
   }
 });
 

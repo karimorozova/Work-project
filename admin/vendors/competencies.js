@@ -2,14 +2,16 @@ const { Vendors } = require('../models');
 const { getVendor } = require('./getVendors');
 const ObjectId = require('mongodb').ObjectID;
 const { saveQualifications } = require('./qualifications');
-const { updateVendorRates } = require('./updateVendorRates')
+const { updateVendorRatesFromCompetence } = require('./updateVendorRates');
+const { deleteVendorRates } = require('./deleteVendorRates');
+const { createRateCombinations } = require('./createVendorRates');
 
 const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
   try {
     let { competencies } = await getVendor({ _id: vendorId });
     if (dataToUpdate._id) {
       const neededServiceIndex = competencies.findIndex(item => item._id.toString() === dataToUpdate._id);
-      await updateVendorRates(vendorId, dataToUpdate, competencies[neededServiceIndex]);
+      await updateVendorRatesFromCompetence(vendorId, dataToUpdate, competencies[neededServiceIndex]);
       competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
       await Vendors.updateOne({ _id: vendorId }, { competencies });
     } else {
@@ -18,6 +20,7 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
           `${x.sourceLanguage}/${x.targetLanguage}/${x.industry}/${x.step}` !==
           `${y.sourceLanguage}/${y.targetLanguage}/${y.industry}/${y.step}`
         ));
+      await createRateCombinations(combinationsWithoutRepetitions, vendorId);
       competencies.push(...combinationsWithoutRepetitions);
       await Vendors.updateOne({ _id: vendorId }, { competencies });
       await saveQualifications(combinationsWithoutRepetitions, vendorId);
@@ -64,6 +67,7 @@ const deleteVendorCompetencies = async (vendorId, competenceId) => {
   try {
     const { competencies } = await Vendors.findOne({ _id: vendorId });
     const neededIndex = competencies.findIndex(item => item._id.toString() === competenceId);
+    await deleteVendorRates(vendorId, competencies[neededIndex]);
     competencies.splice(neededIndex, 1);
     await Vendors.updateOne({ _id: vendorId }, { competencies });
   } catch (err) {

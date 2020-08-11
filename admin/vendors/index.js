@@ -8,6 +8,8 @@ const { manageNewApplication } = require("./application");
 const { notifyTestStatus } = require("./testEmails");
 const { updateVendorCompetencies, deleteVendorCompetencies } = require('./competencies');
 const { saveQualifications } = require('./qualifications');
+const { updateVendorsRatePrices } = require('./updateVendorRates');
+const { syncVendorRatesCost } = require('./syncVendorRatesCost');
 
 module.exports = {
   getVendor,
@@ -30,4 +32,6 @@ module.exports = {
   updateVendorCompetencies,
   deleteVendorCompetencies,
   saveQualifications,
+  updateVendorsRatePrices,
+  syncVendorRatesCost,
 };

@@ -120,5 +120,9 @@ const recalculateFromNewMultiplier = (row, oldMultiplier, pricelistTable, key) =
 module.exports = {
   syncClientRatesCost,
   recalculateFromNewPrice,
-  recalculateFromNewMultiplier
+  recalculateFromNewMultiplier,
+  synchronizeBasicPrice,
+  synchronizeStepMultiplier,
+  synchronizeIndustryMultiplier,
+  synchronizePricelistTable
 };

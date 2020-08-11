@@ -1,5 +1,4 @@
 const { Clients, Step, Services, Pricelist } = require('../models');
-const ObjectId = require('mongodb').ObjectID;
 const _ = require('lodash');
 const { multiplyPrices, getArrayDifference } = require('../multipliers');
 const {
@@ -9,7 +8,7 @@ const {
   filterRedundantSteps,
   filterRedundantIndustries
 } = require('./editClientRates');
-const { tableKeys } = require('../enums/ratesTableKeys');
+const { tableKeys } = require('../enums');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
@@ -18,10 +17,16 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   let updatedPricelistTable;
   switch (itemIdentifier) {
     default:
-    case 'Basic Price Table':
+    case tableKeys.basicPricesTable:
       const { basicPrice } = basicPricesTable.find(item => item._id.toString() === updatedItem._id.toString());
       if (basicPrice === Number(updatedItem.basicPrice)) return;
-      const updatedBasicPriceTable = replaceOldItem(basicPricesTable, updatedItem, boundPricelist, tableKeys.basicPricesTable);
+      const updatedBasicPriceTable = replaceOldItem(
+        basicPricesTable,
+        updatedItem,
+        boundPricelist,
+        tableKeys.basicPricesTable,
+        'Client'
+      );
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
         stepMultipliersTable,
@@ -34,10 +39,16 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       client.rates.pricelistTable = updatedPricelistTable;
       await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
-    case 'Step Multipliers Table':
+    case tableKeys.stepMultipliersTable:
       const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
       if (stepMultiplier === Number(updatedItem.multiplier)) return;
-      const updatedStepMultipliersTable = replaceOldItem(stepMultipliersTable, updatedItem, boundPricelist, tableKeys.stepMultipliersTable);
+      const updatedStepMultipliersTable = replaceOldItem(
+        stepMultipliersTable,
+        updatedItem,
+        boundPricelist,
+        tableKeys.stepMultipliersTable,
+        'Client'
+      );
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
         stepMultipliersTable,
@@ -50,10 +61,16 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       client.rates.pricelistTable = updatedPricelistTable;
       await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
-    case 'Industry Multipliers Table':
+    case tableKeys.industryMultipliersTable:
       const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
       if (industryMultiplier === Number(updatedItem.multiplier)) return;
-      const updatedIndustryMultipliersTable = replaceOldItem(industryMultipliersTable, updatedItem, boundPricelist, tableKeys.industryMultipliersTable);
+      const updatedIndustryMultipliersTable = replaceOldItem(
+        industryMultipliersTable,
+        updatedItem,
+        boundPricelist,
+        tableKeys.industryMultipliersTable,
+        'Client'
+      );
       updatedPricelistTable = changePricelistTable(
         basicPricesTable,
         stepMultipliersTable,
@@ -69,7 +86,7 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   }
 };
 
-const replaceOldItem = (arr, replacementItem, boundPricelist, key) => {
+const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) => {
   const { _id } = replacementItem;
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = boundPricelist;
   let altered;
@@ -95,7 +112,7 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key) => {
   if (altered) {
     replacementItem.notification = 'Pricelist data has been updated';
   } else {
-    replacementItem.notification = 'Client data is different from pricelist';
+    replacementItem.notification = `${personKey}'s data is different from pricelist`;
   }
   const itemToUpdateIndex = findIndexToReplace(arr, _id);
   arr.splice(itemToUpdateIndex, 1, replacementItem);
@@ -124,13 +141,13 @@ const changePricelistTable = (
       const neededIndustryItem = industryMultipliersTable.find(industry => industry.serviceId === updatedItem.serviceId);
       switch (key) {
         default:
-        case 'Basic Price Table':
+        case tableKeys.basicPricesTable:
           item.price = multiplyPrices(
             updatedItem.basicPrice, neededStepMultipliersItem.multiplier, neededIndustryItem.multiplier
           );
           changedPricelistTable.push(item);
           break;
-        case 'Step Multipliers Table':
+        case tableKeys.stepMultipliersTable:
           const neededPricelistItem = item.step.toString() === updatedItem.step._id &&
           item.unit.toString() === updatedItem.unit._id &&
           item.serviceId === updatedItem.serviceId &&
@@ -143,7 +160,7 @@ const changePricelistTable = (
             changedPricelistTable.push(item);
           }
           break;
-        case 'Industry Multipliers Table':
+        case tableKeys.industryMultipliersTable:
           item.price = multiplyPrices(
             neededBasicPriceItem.basicPrice, neededStepMultipliersItem.multiplier, updatedItem.multiplier
           );
@@ -269,7 +286,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
   if (!calculationUnit.length) {
     return [];
   } else {
-    for (let { _id: unitId} of calculationUnit) {
+    for (let { _id: unitId } of calculationUnit) {
       const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
       if (sizes.length) {
         sizes.forEach(size => {
@@ -435,5 +452,7 @@ module.exports = {
   getNeededLangPair,
   getNeededStepRow,
   getPricelistCombinations,
-  getObjDifferences
+  getObjDifferences,
+  replaceOldItem,
+  changePricelistTable
 };

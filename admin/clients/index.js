@@ -6,13 +6,21 @@ const {
   getNeededStepRow,
   getNeededCurrency,
   getStepMultipliersCombinations,
-  getPricelistCombinations
+  getPricelistCombinations,
+  replaceOldItem,
+  changePricelistTable
 } = require('./clientRates');
 const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info');
 const { getAfterTaskStatusUpdate } = require('./projects');
 const { updateClientService, deleteClientService } = require('./clientService');
 const { updateRates } = require('./updateClientRates');
-const { syncClientRatesCost } = require('./syncClientRatesCost');
+const {
+  syncClientRatesCost,
+  synchronizeBasicPrice,
+  synchronizeStepMultiplier,
+  synchronizeIndustryMultiplier,
+  synchronizePricelistTable
+} = require('./syncClientRatesCost');
 
 const clients = {
   getClient,
@@ -34,7 +42,13 @@ const clients = {
   getNeededStepRow,
   getNeededCurrency,
   getStepMultipliersCombinations,
-  getPricelistCombinations
+  getPricelistCombinations,
+  replaceOldItem,
+  changePricelistTable,
+  synchronizeBasicPrice,
+  synchronizeStepMultiplier,
+  synchronizeIndustryMultiplier,
+  synchronizePricelistTable
 };
 
 module.exports = clients;
