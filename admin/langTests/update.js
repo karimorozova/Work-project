@@ -4,8 +4,6 @@ const { getUpdatedTest } = require('./get');
 const fs = require('fs');
 
 async function  updateLangTest(langTest, testFile) {
-    console.log(langTest._id);
-
     const { _id, oldPath, ...testData } = langTest;
     let path = oldPath;
     let { fileName, evaluationType } = testData;
