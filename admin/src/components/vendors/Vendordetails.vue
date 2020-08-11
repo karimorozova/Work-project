@@ -1,198 +1,267 @@
 <template lang="pug">
 .vendor-wrap
-    .vendor-info
-        .buttons
-            input.button(type="button" value="Save" @click="checkForErrors")
-            input.button(type="button" value="Cancel" @click="cancel")
-            input.button(type="button" value="Delete" @click="deleteVendor")
-        .title General Information
-        .vendor-details
-            .gen-info
-                .gen-info__block
-                    .photo-wrap(v-if="!currentVendor.photo")
-                        input.photo-file(type="file" @change="previewPhoto")
-                        .photo-text(v-if="!imageExist")
-                            p.photo-text__message(v-if="!isFileError") upload your photo
-                                span.photo-extensions *.jpg/jpeg/png
-                                span.photo-size <= 2MB
-                        img.photo-image(v-if="imageExist")
-                        p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
-                    .photo-wrap(v-if="currentVendor.photo")
-                        input.photo-file(type="file" @change="previewPhoto")                       
-                        img.photo-image(:src="currentVendor.photo")
-                    label.job-title Job title
-                .gen-info__block
-                    .block-item
-                        label.block-item__label.block-item_relative First Name:
-                            Asterisk(:customStyle="asteriskStyle")
-                        input.block-item__input-filed(:class="{'block-item_error-shadow': !currentVendor.firstName && isSaveClicked}" type="text" placeholder="First Name" :value="currentVendor.firstName" @change="(e) => updateProp(e,'firstName')")
-                    .block-item
-                        label Surname:
-                        input.block-item__input-filed(type="text" placeholder="Surname" :value="currentVendor.surname" @change="(e) => updateProp(e,'surname')")
-                    .block-item
-                        label.block-item__label.block-item_relative Email:
-                            Asterisk(:customStyle="asteriskStyle")
-                        input.block-item__input-filed(:class="{'block-item_error-shadow': validateEmail() && isSaveClicked}" type="text" placeholder="Email" :value="currentVendor.email" @change="(e) => updateProp(e,'email')")
-                    .block-item
-                        label Phone:
-                        input.block-item__input-filed(type="text" placeholder="Phone" :value="currentVendor.phone" @input="setPhone" ref="phone")
-                    .block-item
-                        label Time Zone:
-                        .block-item__drop-menu.block-item_high-index
-                            TimezoneSelect(:timezoneSelected="currentVendor.timezone" @chosenZone="setTimezone")
-                    .block-item
-                        label.block-item__label.block-item_relative Native Language:
-                        .block-item__drop-menu.block-item_medium-index(:class="{'block-item_error-shadow': !currentVendor.native && isSaveClicked}")
-                            NativeLanguageSelect(:selectedLang="currentVendor.native" @chosenLang="setNative")
-                    .block-item
-                        label Gender:
-                        .block-item__drop-menu
-                            SelectSingle(
-                                :options="genders"
-                                :selectedOption="currentVendor.gender"
-                                placeholder="Gender"
-                                @chooseOption="updateGender"
-                            )
-                .gen-info__block
-                    .block-item
-                        label Company Name:
-                        input.block-item__input-filed(type="text" placeholder="Company Name" :value="currentVendor.companyName" @change="(e) => updateProp(e,'companyName')")
-                    .block-item
-                        label Website:
-                        input.block-item__input-filed(type="text" placeholder="Website" :value="currentVendor.website" @change="(e) => updateProp(e,'website')")
-                    .block-item
-                        label Skype:
-                        input.block-item__input-filed(type="text" placeholder="Skype" :value="currentVendor.skype" @change="(e) => updateProp(e,'skype')")
-                    .block-item
-                        label Linkedin:
-                        input.block-item__input-filed(type="text" placeholder="Linkedin" :value="currentVendor.linkedin" @change="(e) => updateProp(e,'linkedin')")
-                    .block-item
-                        label WhatsApp:
-                        input.block-item__input-filed(type="text" placeholder="WhatsApp" :value="currentVendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
-                    .block-item
-                        label Industries:
-                            span.require *
-                        .block-item__drop-menu(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length}")
-                            MultiVendorIndustrySelect(:selectedInd="currentVendor.industries || []" :filteredIndustries="selectedIndNames" @chosenInd="chosenInd")
-            
-
-            //- .right-informational-block
-            //-     VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
-            //-     VendorAction(@openPreview="openPreview")
-
-        .vendor-info__preview(v-if="isEditAndSend")
-            VendorPreview(@closePreview="closePreview" :previewDropMenu="true" :templates="templatesWysiwyg" :message="'<p>Message...</p>'" @send="sendQuote")
-        
-        .title Competencies
-        .vendor-info__competencies(v-if="currentVendor.industries")
-          VendorCompetencies(
-            :languages="languages"
-            :steps="steps"
-            :industries="industries"
-            :vendorIndustries="currentVendor.industries.map(i => i.name)"
-            @updateQualifications="updateQualifications"
-          )
-
-        .title(v-if="currentVendor._id") Qualifications
-            TableQualifications(
-              :qualificationData="qualificationData" 
-              :assessmentData="assessmentData" 
-              :currentVendor="currentVendor" 
-              @refreshQualifications="setDetailsTablesData"
+  .vendor-info
+    .buttons
+      input.button(type="button", value="Save", @click="checkForErrors")
+      input.button(type="button", value="Cancel", @click="cancel")
+      input.button(type="button", value="Delete", @click="deleteVendor")
+    .title General Information
+    .vendor-details
+      .gen-info
+        .gen-info__block
+          .photo-wrap(v-if="!currentVendor.photo")
+            input.photo-file(type="file", @change="previewPhoto")
+            .photo-text(v-if="!imageExist")
+              p.photo-text__message(v-if="!isFileError") upload your photo
+                span.photo-extensions *.jpg/jpeg/png
+                span.photo-size <= 2MB
+            img.photo-image(v-if="imageExist")
+            p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
+          .photo-wrap(v-if="currentVendor.photo")
+            input.photo-file(type="file", @change="previewPhoto") 
+            img.photo-image(:src="currentVendor.photo")
+          label.job-title Job title
+        .gen-info__block
+          .block-item
+            label.block-item__label.block-item_relative First Name:
+              Asterisk(:customStyle="asteriskStyle")
+            input.block-item__input-filed(
+              :class="{ 'block-item_error-shadow': !currentVendor.firstName && isSaveClicked }",
+              type="text",
+              placeholder="First Name",
+              :value="currentVendor.firstName",
+              @change="(e) => updateProp(e, 'firstName')"
             )
-
-        .title Documents
-            TableDocuments(:documentsData="documentsData" :vendorId="vendorId" @refreshDocuments="setDetailsTablesData")
-
-        .title Assessment
-            TableAssessment(:assessmentData="assessmentData" :currentVendor="currentVendor" @refreshAssessment="setDetailsTablesData")
-        
-        .title Professional experience
-            TableProfessionalExperience(:professionalExperienceData="professionalExperienceData" :vendorId="vendorId" @refreshProfExperiences="setDetailsTablesData")
-
-        .title Education 
-            TableEducation(:educationData="educationData" :vendorId="vendorId" @refreshEducations="setDetailsTablesData")
-
-        //- .title(v-if="currentVendor._id") Rates    
-        //- .rates(v-if="currentVendor._id")
-            VendorRates(:vendor="currentVendor"
-                @updateVendor="updateVendor")
-
-        .title Rates
-          .vendor-info__rates(v-if="currentVendor._id")
-            .vendor-info__tables-row
-              .lang-table(v-if="currentVendor._id && languages.length")
-                LangTable(
-                  :tableData="[{altered: true, basicPrice: 1, notification: 'notification', sourceLanguage: this.languages[0], targetLanguage: this.languages[0]}]"
-                  :vendorId="currentVendor._id"
-                  @refreshResultTable="refreshResultTable"
-                )
-              .step-table(v-if="currentVendor._id && steps.length && units.length")
-                StepTable(
-                  :tableData="[{multiplier : 3, defaultSize : false, altered : true, notification : 'notification' ,step : steps[0], unit : units[0], size : 1}]"
-                  :vendorId="currentVendor._id"
-                  @refreshResultTable="refreshResultTable"
-                )
-              .industry-table(v-if="currentVendor._id && industries.length")
-                IndustryTable(
-                  :tableData="[{multiplier : 1, altered : true, notification : 'notification', industry : industries[0]}]"
-                  :vendorId="currentVendor._id"
-                  @refreshResultTable="refreshResultTable"
-                )
-            .result-table(v-if="currentVendor._id")
-              ResultTable(
-                    :vendorId="currentVendor._id"
-                    :languages="languages.map(i => i.lang)"
-                    :steps="steps.map(i => i.title)"
-                    :units="units.map(i => i.type)"
-                    :industries="industries.map(i => i.name)"
-                    :isRefreshResultTable="isRefreshResultTable"
+          .block-item
+            label Surname:
+            input.block-item__input-filed(
+              type="text",
+              placeholder="Surname",
+              :value="currentVendor.surname",
+              @change="(e) => updateProp(e, 'surname')"
+            )
+          .block-item
+            label.block-item__label.block-item_relative Email:
+              Asterisk(:customStyle="asteriskStyle")
+            input.block-item__input-filed(
+              :class="{ 'block-item_error-shadow': validateEmail() && isSaveClicked }",
+              type="text",
+              placeholder="Email",
+              :value="currentVendor.email",
+              @change="(e) => updateProp(e, 'email')"
+            )
+          .block-item
+            label Phone:
+            input.block-item__input-filed(
+              type="text",
+              placeholder="Phone",
+              :value="currentVendor.phone",
+              @input="setPhone",
+              ref="phone"
+            )
+          .block-item
+            label Time Zone:
+            .block-item__drop-menu.block-item_high-index
+              TimezoneSelect(:timezoneSelected="currentVendor.timezone", @chosenZone="setTimezone")
+          .block-item
+            label.block-item__label.block-item_relative Native Language:
+            .block-item__drop-menu.block-item_medium-index(
+              :class="{ 'block-item_error-shadow': !currentVendor.native && isSaveClicked }"
+            )
+              NativeLanguageSelect(:selectedLang="currentVendor.native", @chosenLang="setNative")
+          .block-item
+            label Gender:
+            .block-item__drop-menu
+              SelectSingle(
+                :options="genders",
+                :selectedOption="currentVendor.gender",
+                placeholder="Gender",
+                @chooseOption="updateGender"
+              )
+        .gen-info__block
+          .block-item
+            label Company Name:
+            input.block-item__input-filed(
+              type="text",
+              placeholder="Company Name",
+              :value="currentVendor.companyName",
+              @change="(e) => updateProp(e, 'companyName')"
+            )
+          .block-item
+            label Website:
+            input.block-item__input-filed(
+              type="text",
+              placeholder="Website",
+              :value="currentVendor.website",
+              @change="(e) => updateProp(e, 'website')"
+            )
+          .block-item
+            label Skype:
+            input.block-item__input-filed(
+              type="text",
+              placeholder="Skype",
+              :value="currentVendor.skype",
+              @change="(e) => updateProp(e, 'skype')"
+            )
+          .block-item
+            label Linkedin:
+            input.block-item__input-filed(
+              type="text",
+              placeholder="Linkedin",
+              :value="currentVendor.linkedin",
+              @change="(e) => updateProp(e, 'linkedin')"
+            )
+          .block-item
+            label WhatsApp:
+            input.block-item__input-filed(
+              type="text",
+              placeholder="WhatsApp",
+              :value="currentVendor.whatsapp",
+              @change="(e) => updateProp(e, 'whatsapp')"
+            )
+          .block-item
+            label Industries:
+              span.require *
+            .block-item__drop-menu(
+              :class="{ 'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length }"
+            )
+              MultiVendorIndustrySelect(
+                :selectedInd="currentVendor.industries || []",
+                :filteredIndustries="selectedIndNames",
+                @chosenInd="chosenInd"
               )
 
+      //- .right-informational-block
+      //-     VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
+      //-     VendorAction(@openPreview="openPreview")
 
-        .title Notes & Comments
-          .vendor-info__notes-block
-            .vendor-info__notes
-              VendorCandidate(:candidateData='currentVendor')
-            .vendor-info__editor(v-if="currentVendor._id")
-              ckeditor(v-model="currentVendor.notes" :config="editorConfig")
+    .vendor-info__preview(v-if="isEditAndSend")
+      VendorPreview(
+        @closePreview="closePreview",
+        :previewDropMenu="true",
+        :templates="templatesWysiwyg",
+        :message="'<p>Message...</p>'",
+        @send="sendQuote"
+      )
 
+    .title Competencies
+    .vendor-info__competencies(v-if="currentVendor.industries")
+      VendorCompetencies(
+        :languages="languages",
+        :steps="steps",
+        :industries="industries",
+        :vendorIndustries="currentVendor.industries.map((i) => i.name)",
+        @updateQualifications="updateQualifications"
+      )
 
-        .delete-approve(v-if="isApproveModal")
-            p Are you sure you want to delete?
-            input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-            input.button(type="button" value="Delete" @click="approveVendorDelete")
+    .title(v-if="currentVendor._id") Qualifications
+      TableQualifications(
+        :qualificationData="qualificationData",
+        :assessmentData="assessmentData",
+        :currentVendor="currentVendor",
+        @refreshQualifications="setDetailsTablesData"
+      )
 
-    .vendor-subinfo
-      .vendor-subinfo__general
-        .block-item-subinfo
-          label.block-item-subinfo__label Vendor Status:
-            span.require *
-          .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(:class="{'block-item-subinfo_error-shadow': isSaveClicked && !currentVendor.status}")
-            VendorStatusSelect(isAllExist="no" :selectedStatus="currentVendor.status" @chosenStatus="chosenStatus")
-        .block-item-subinfo
-          label.block-item-subinfo__label Professional level:
-          .block-item-subinfo__drop.block-item-subinfo_high-index
-            SelectSingle(
-              :options="['level1','level2']"
-              placeholder="Level"
-              :selectedOption="optionProfessionalLevel"
-              @chooseOption="updateProfessionalLevel"
+    .title Documents
+      TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
+
+    .title Assessment
+      TableAssessment(
+        :assessmentData="assessmentData",
+        :currentVendor="currentVendor",
+        @refreshAssessment="setDetailsTablesData"
+      )
+
+    .title Professional experience
+      TableProfessionalExperience(
+        :professionalExperienceData="professionalExperienceData",
+        :vendorId="vendorId",
+        @refreshProfExperiences="setDetailsTablesData"
+      )
+
+    .title Education
+      TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
+
+    //- .title(v-if="currentVendor._id") Rates    
+    //- .rates(v-if="currentVendor._id")
+      VendorRates(:vendor="currentVendor"
+          @updateVendor="updateVendor")
+
+    .title Rates
+      .vendor-info__rates(v-if="currentVendor._id")
+        .vendor-info__tables-row
+          .lang-table(v-if="currentVendor._id && languages.length")
+            LangTable(
+              :tableData="currentVendor.rates.basicPricesTable",
+              :vendorId="currentVendor._id",
+              @refreshResultTable="refreshResultTable"
+              :refresh="isRefreshAfterServiceUpdate"
             )
-        .block-item-subinfo
-            label.block-item-subinfo__label Test:
-            .block-item-subinfo__check-item.checkbox
-              input(type="checkbox" id="test" :checked="currentVendor.isTest" @change="setTest")
-              label(for="test")
+          .step-table(v-if="currentVendor._id && steps.length && units.length")
+            StepTable(
+              :tableData="currentVendor.rates.stepMultipliersTable",
+              :vendorId="currentVendor._id",
+              @refreshResultTable="refreshResultTable"
+              :refresh="isRefreshAfterServiceUpdate"
+            )
+          .industry-table(v-if="currentVendor._id && industries.length")
+            IndustryTable(
+              :tableData="currentVendor.rates.industryMultipliersTable",
+              :vendorId="currentVendor._id",
+              @refreshResultTable="refreshResultTable"
+              :refresh="isRefreshAfterServiceUpdate"
+            )
+        .result-table(v-if="currentVendor._id")
+          ResultTable(
+            :vendorId="currentVendor._id",
+            :languages="languages.map((i) => i.lang)",
+            :steps="steps.map((i) => i.title)",
+            :units="units.map((i) => i.type)",
+            :industries="industries.map((i) => i.name)",
+            :isRefreshResultTable="isRefreshResultTable",
+            :refresh="isRefreshAfterServiceUpdate"
+          )
 
-      .vendor-subinfo__action
-        VendorAction(@openPreview="openPreview")
+    .title Notes & Comments
+      .vendor-info__notes-block
+        .vendor-info__notes
+          VendorCandidate(:candidateData="currentVendor")
+        .vendor-info__editor(v-if="currentVendor._id")
+          ckeditor(v-model="currentVendor.notes", :config="editorConfig")
 
+    .delete-approve(v-if="isApproveModal")
+      p Are you sure you want to delete?
+      input.button.approve-block(type="button", value="Cancel", @click="cancelApprove")
+      input.button(type="button", value="Delete", @click="approveVendorDelete")
 
-    ValidationErrors(v-if="areErrorsExist"
-        :errors="errors"
-        @closeErrors="closeErrors"
-    )
+  .vendor-subinfo
+    .vendor-subinfo__general
+      .block-item-subinfo
+        label.block-item-subinfo__label Vendor Status:
+          span.require *
+        .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(
+          :class="{ 'block-item-subinfo_error-shadow': isSaveClicked && !currentVendor.status }"
+        )
+          VendorStatusSelect(isAllExist="no", :selectedStatus="currentVendor.status", @chosenStatus="chosenStatus")
+      .block-item-subinfo
+        label.block-item-subinfo__label Professional level:
+        .block-item-subinfo__drop.block-item-subinfo_high-index
+          SelectSingle(
+            :options="['level1', 'level2']",
+            placeholder="Level",
+            :selectedOption="optionProfessionalLevel",
+            @chooseOption="updateProfessionalLevel"
+          )
+      .block-item-subinfo
+        label.block-item-subinfo__label Test:
+        .block-item-subinfo__check-item.checkbox
+          input#test(type="checkbox", :checked="currentVendor.isTest", @change="setTest")
+          label(for="test")
+
+    .vendor-subinfo__action
+      VendorAction(@openPreview="openPreview")
+
+  ValidationErrors(v-if="areErrorsExist", :errors="errors", @closeErrors="closeErrors")
 </template>
 
 <script>
@@ -235,6 +304,7 @@ export default {
       units: [],
       steps: [],
 
+      isRefreshAfterServiceUpdate: false,
       isRefreshResultTable: false,
       vendorId: "",
       educationData: [],
@@ -260,24 +330,30 @@ export default {
         allowedContent: true,
         uiColor: "#F4F0EE",
         resize_minHeigh: "130",
-        height: 167
+        height: 167,
       },
       templatesWysiwyg: [
         {
           title: "tempate",
-          message: "<p>test message</p>"
-        }
-      ]
+          message: "<p>test message</p>",
+        },
+      ],
     };
   },
   methods: {
-    updateQualifications(){
-      console.log('need update qua');
+    updateQualifications() {
+      console.log("need update qua");
     },
     refreshResultTable() {
       this.isRefreshResultTable = true;
       setTimeout(() => {
         this.isRefreshResultTable = false;
+      }, 2000);
+    },
+    updateRates(action){
+      this.isRefreshAfterServiceUpdate = action;
+      setTimeout(() => {
+        this.isRefreshAfterServiceUpdate = !action;
       }, 2000);
     },
     ...mapActions({
@@ -288,25 +364,25 @@ export default {
       storeCurrentVendor: "storeCurrentVendor",
       updateIndustry: "updateIndustry",
       getDuoCombinations: "getVendorDuoCombinations",
-      updateVendorStatus: "updateVendorStatus"
+      updateVendorStatus: "updateVendorStatus",
     }),
     async setTest() {
       const vendor = {
         id: this.currentVendor._id,
-        isTest: event.target.checked
+        isTest: event.target.checked,
       };
       try {
         await this.updateVendorStatus(vendor);
         this.alertToggle({
           message: "Vendor status updated",
           isShow: true,
-          type: "success"
+          type: "success",
         });
       } catch (err) {
         this.alertToggle({
           message: "Server error / Cannot update Vendor status",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -338,18 +414,14 @@ export default {
     },
     validateEmail() {
       const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-      return (
-        !this.currentVendor.email ||
-        !emailValidRegex.test(this.currentVendor.email.toLowerCase())
-      );
+      return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase());
     },
     setPhone(e) {
       const { value } = e.target;
       const regex = /^[0-9]+$/;
-      const characters = value.split("").filter(item => regex.test(item));
+      const characters = value.split("").filter((item) => regex.test(item));
       const clearedValue = characters.join("");
-      const phoneValue =
-        clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
+      const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
       this.$refs.phone.value = phoneValue;
       this.updateVendorProp({ prop: "phone", value: phoneValue });
     },
@@ -357,24 +429,16 @@ export default {
       if (this.validateEmail()) {
         return this.errors.push("Please provide a valid email.");
       }
-      if (
-        this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()
-      ) {
+      if (this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
         try {
-          const result = await this.$http.get(
-            `/vendors/application/unique-email?email=${this.currentVendor.email}`
-          );
+          const result = await this.$http.get(`/vendors/application/unique-email?email=${this.currentVendor.email}`);
           const isUnique = !result.data;
-          isUnique
-            ? ""
-            : this.errors.push(
-                "The email you've entered is already used in our system!"
-              );
+          isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
         } catch (err) {
           this.alertToggle({
             message: "Error on email uniqueness checking",
             isShow: true,
-            type: "error"
+            type: "error",
           });
         }
       }
@@ -383,20 +447,12 @@ export default {
       const textReg = /^[-\sa-zA-Z]+$/;
       try {
         this.errors = [];
-        if (
-          !this.currentVendor.firstName ||
-          !textReg.test(this.currentVendor.firstName)
-        )
+        if (!this.currentVendor.firstName || !textReg.test(this.currentVendor.firstName))
           this.errors.push("Please, enter valid first name.");
-        if (
-          this.currentVendor.surname &&
-          !textReg.test(this.currentVendor.surname)
-        )
+        if (this.currentVendor.surname && !textReg.test(this.currentVendor.surname))
           this.errors.push("Please, enter valid surname.");
-        if (!this.currentVendor.industries.length)
-          this.errors.push("Please, choose at least one industry.");
-        if (!this.currentVendor.status)
-          this.errors.push("Please, choose status.");
+        if (!this.currentVendor.industries.length) this.errors.push("Please, choose at least one industry.");
+        if (!this.currentVendor.status) this.errors.push("Please, choose status.");
         await this.checkEmail();
         if (this.errors.length) {
           this.areErrorsExist = true;
@@ -417,13 +473,13 @@ export default {
         this.alertToggle({
           message: "Vendor info updated",
           isShow: true,
-          type: "success"
+          type: "success",
         });
       } catch (err) {
         this.alertToggle({
           message: "Server error / Cannot update Vendor info",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -455,28 +511,26 @@ export default {
         return this.cancel();
       }
       try {
-        const isAssigned = await this.$http.get(
-          `/vendorsapi/any-step?id=${this.currentVendor._id}`
-        );
+        const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${this.currentVendor._id}`);
         if (isAssigned.body) {
           return this.alertToggle({
             message: "The vendor was assigned to a step and cannot be deleted.",
             isShow: true,
-            type: "error"
+            type: "error",
           });
         }
         await this.deleteCurrentVendor({ id: this.currentVendor._id });
         this.alertToggle({
           message: "Vendor removed",
           isShow: true,
-          type: "success"
+          type: "success",
         });
         this.$router.go(-1);
       } catch (err) {
         this.alertToggle({
           message: "Server error / Cannot delete the Vendor",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -485,9 +539,7 @@ export default {
     },
     setDetailsTablesData() {
       this.educationData = Array.from(this.currentVendor.educations);
-      this.professionalExperienceData = Array.from(
-        this.currentVendor.profExperiences
-      );
+      this.professionalExperienceData = Array.from(this.currentVendor.profExperiences);
       this.qualificationData = Array.from(this.currentVendor.qualifications);
       this.documentsData = Array.from(this.currentVendor.documents);
       this.assessmentData = Array.from(this.currentVendor.assessments);
@@ -506,7 +558,7 @@ export default {
         this.alertToggle({
           message: "Error on getting Vendor's info",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -518,7 +570,7 @@ export default {
         this.alertToggle({
           message: "Error in Languages",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -530,7 +582,7 @@ export default {
         this.alertToggle({
           message: "Error in Industries",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -542,7 +594,7 @@ export default {
         this.alertToggle({
           message: "Error in Services",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -554,7 +606,7 @@ export default {
         this.alertToggle({
           message: "Error in Units",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -566,21 +618,18 @@ export default {
         this.alertToggle({
           message: "Error in Steps",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      currentVendor: "getCurrentVendor"
+      currentVendor: "getCurrentVendor",
     }),
     selectedIndNames() {
       let result = [];
-      if (
-        this.currentVendor.industries &&
-        this.currentVendor.industries.length
-      ) {
+      if (this.currentVendor.industries && this.currentVendor.industries.length) {
         for (let ind of this.currentVendor.industries) {
           result.push(ind.name);
         }
@@ -588,10 +637,8 @@ export default {
       return result;
     },
     optionProfessionalLevel() {
-      return this.currentVendor.hasOwnProperty("professionalLevel")
-        ? this.currentVendor.professionalLevel
-        : "";
-    }
+      return this.currentVendor.hasOwnProperty("professionalLevel") ? this.currentVendor.professionalLevel : "";
+    },
   },
   components: {
     VendorCompetencies,
@@ -618,10 +665,10 @@ export default {
     LangTable,
     StepTable,
     IndustryTable,
-    ResultTable
+    ResultTable,
   },
   directives: {
-    ClickOutside
+    ClickOutside,
   },
   created() {
     this.getVendor();
@@ -636,7 +683,7 @@ export default {
   },
   beforeDestroy() {
     this.storeCurrentVendor({});
-  }
+  },
 };
 </script>
 

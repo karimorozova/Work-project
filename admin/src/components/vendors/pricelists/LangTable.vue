@@ -1,57 +1,61 @@
 <template lang="pug">
 .price
-    DataTable(
-        :fields="fields"
-        :tableData="dataArray"
-        :errors="errors"
-        :areErrors="areErrors"
-        :isApproveModal="isDeleting"
-        @closeErrors="closeErrors"
-        @notApprove="setDefaults"
-        @closeModal="setDefaults"
-        :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
-        :tableheadRowClass="['client-pricelist-table-head', {'tbody_visible-overflow': dataArray.length < 3}]"
-        bodyRowClass="client-pricelist-table-row"
-        bodyCellClass="client-pricelist-table-cell"
-        :clientPricetable="true"
-    )
-      template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title {{ field.label }}
-  
-      template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.iso1 }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentSourceLang" disabled)
+  DataTable(
+    :fields="fields",
+    :tableData="dataArray",
+    :errors="errors",
+    :areErrors="areErrors",
+    :isApproveModal="isDeleting",
+    @closeErrors="closeErrors",
+    @notApprove="setDefaults",
+    @closeModal="setDefaults",
+    :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 3 }]",
+    :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 3 }]",
+    bodyRowClass="client-pricelist-table-row",
+    bodyCellClass="client-pricelist-table-cell"
+  )
+    template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+      .price-title {{ field.label }}
 
-      template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.iso1 }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentTargetLang" disabled)
+    template(slot="sourceLang", slot-scope="{ row, index }")
+      .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.iso1 }}
+      .price__data(v-else)
+        input.price__data-input(type="text", v-model="currentSourceLang", disabled)
 
-      template(slot="price" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          span(id="currencyType") {{row.basicPrice}}
-          //- label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
-          //- label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
-          //- label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
-          
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPrice")
+    template(slot="targetLang", slot-scope="{ row, index }")
+      .price__data(v-if="currentActive !== index") {{ row.targetLanguage.iso1 }}
+      .price__data(v-else)
+        input.price__data-input(type="text", v-model="currentTargetLang", disabled)
 
-      template(slot="icons" slot-scope="{ row, index }")
-        .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")     
-          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
-          span(v-if="row.altered")
-            .price__icons-link
-              i.fa.fa-link(aria-hidden='true')
-          span(v-else)
-            .price__icons-link-opacity
-              i.fa.fa-link(aria-hidden='true')
-            
-    .price__empty(v-if="!dataArray.length") Nothing found...
+    template(slot="price", slot-scope="{ row, index }")
+      .price__data(v-if="currentActive !== index")
+        span#currencyType {{ row.basicPrice }}
+        label(for="currencyType" v-if="currentVendor.currency === 'EUR'" ) &euro;
+        label(for="currencyType" v-if="currentVendor.currency === 'USD'" ) &#36;
+        label(for="currencyType" v-if="currentVendor.currency === 'GBP'" ) &pound;
+
+      .price__editing-data(v-else)
+        input.price__data-input(type="number", v-model="currentBasicPrice")
+
+    template(slot="icons", slot-scope="{ row, index }")
+      .price__icons
+        .tooltip(v-if="row.altered")
+          span#myTooltip.tooltiptext {{ row.notification }}
+          img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png") 
+        img.price__icon(
+          v-for="(icon, key) in manageIcons",
+          :src="icon.icon",
+          @click="makeAction(index, key)",
+          :class="{ price_opacity: isActive(key, index) }"
+        )
+        span(v-if="row.altered")
+          .price__icons-link(@click="getRowPrice(index)")
+            i.fa.fa-link(aria-hidden="true")
+        span(v-else)
+          .price__icons-link-opacity
+            i.fa.fa-link(aria-hidden="true")
+
+  .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 import DataTable from "../../DataTable";
@@ -62,10 +66,13 @@ export default {
   mixins: [crudIcons],
   props: {
     tableData: {
-      type: Array
+      type: Array,
     },
     vendorId: {
-      type: String
+      type: String,
+    },
+    refresh: {
+      type: Boolean
     }
   },
   data() {
@@ -76,29 +83,29 @@ export default {
           headerKey: "headerSourceLang",
           key: "sourceLang",
           width: "20%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Target",
           headerKey: "headerTargetLang",
           key: "targetLang",
           width: "20%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "B.Price",
           headerKey: "headerBasicPriceEUR",
           key: "price",
           width: "20%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
           width: "40%",
-          padding: "0"
-        }
+          padding: "0",
+        },
       ],
       dataArray: [],
       currentSourceLang: "",
@@ -113,7 +120,7 @@ export default {
       isDeleting: false,
       deleteIndex: -1,
       currentActive: -1,
-      isDataRemain: true
+      isDataRemain: true,
     };
   },
   created() {
@@ -121,8 +128,22 @@ export default {
   },
   methods: {
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
     }),
+    async getRowPrice(index){
+      try {
+        const result = await this.$http.post("/vendorsapi/rates/sync-cost/" + this.vendorId, {
+            tableKey: "Basic Prices Table",
+            row: this.dataArray[index]
+          })
+      } catch (err) {
+        this.alertToggle({message: "Impossibly update price", isShow: true, type: "error" });
+      }finally{
+        this.refreshResultTable();
+        const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
+        this.dataArray =  vendor.data.rates.basicPricesTable;
+      }
+    },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();
@@ -168,47 +189,53 @@ export default {
     refreshResultTable() {
       this.$emit("refreshResultTable");
     },
-    // async manageSaveClick(index) {
-    //   if (this.currentActive === -1) return;
-    //   const id = this.dataArray[index]._id;
-    //   const serviceId = this.dataArray[index].serviceId;
-    //   try {
-    //     const result = await this.$http.post(
-    //       "/clientsapi/rates/" + this.clientId,
-    //       {
-    //         itemIdentifier: "Basic Price Table",
-    //         updatedItem: {
-    //           _id: id,
-    //           serviceId,
-    //           type: this.dataArray[index].type,
-    //           sourceLanguage: this.currentSourceLangObj,
-    //           targetLanguage: this.currentTargetLangObj,
-    //           basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
-    //           altered: true
-    //         }
-    //       }
-    //     );
-    //     this.alertToggle({
-    //       message: "Saved successfully",
-    //       isShow: true,
-    //       type: "success"
-    //     });
-    //     const updatedData = await this.$http.get(
-    //       "/clientsapi/rates/" + this.clientId
-    //     );
-    //     this.dataArray[index] = updatedData.body.basicPricesTable[index];
-    //     this.setDefaults();
-    //     this.refreshResultTable();
-    //   } catch (err) {
-    //     this.alertToggle({
-    //       message: "Error on saving Languages pricelist",
-    //       isShow: true,
-    //       type: "error"
-    //     });
-    //   }
-    // },
+    async manageSaveClick(index) {
+      if (this.currentActive === -1) return;
+      const id = this.dataArray[index]._id;
+      try {
+        const result = await this.$http.post(
+          "/vendorsapi/rates/" + this.vendorId,
+          {
+            itemIdentifier: "Basic Price Table",
+            updatedItem: {
+              _id: id,
+              type: this.dataArray[index].type,
+              sourceLanguage: this.currentSourceLangObj,
+              targetLanguage: this.currentTargetLangObj,
+              basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
+              altered: true
+            }
+          }
+        );
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        });
+        const updatedData = await this.$http.get(
+          "/vendorsapi/rates/" + this.vendorId
+        );
+        this.dataArray[index] = updatedData.body.basicPricesTable[index];
+        this.setDefaults();
+        this.refreshResultTable();
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on saving Languages pricelist",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     closeErrors() {
       this.areErrors = false;
+    },
+  },
+  watch: {
+    async refresh() {
+      if (this.refresh) {
+        const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
+        this.dataArray =  vendor.data.rates.basicPricesTable;
+      }
     }
   },
   computed: {
@@ -216,13 +243,13 @@ export default {
       const { delete: del, ...result } = this.icons;
       return result;
     },
-    // ...mapGetters({
-    //   currentClient: "getCurrentClient"
-    // })
+    ...mapGetters({
+      currentVendor: "getCurrentVendor",
+    }),
   },
   components: {
-    DataTable
-  }
+    DataTable,
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -235,7 +262,7 @@ export default {
   padding: 20px 5px 20px 0px;
   box-shadow: none;
 
-  &__empty{
+  &__empty {
     font-size: 16px;
   }
 
@@ -278,7 +305,10 @@ export default {
     justify-content: center;
     align-items: center;
     margin-right: 4px;
-   &-info {   margin-top:  4px; margin-right: 3px;    }
+    &-info {
+      margin-top: 4px;
+      margin-right: 3px;
+    }
     &-link {
       cursor: pointer;
       font-size: 18px;
