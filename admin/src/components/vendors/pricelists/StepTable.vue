@@ -1,59 +1,63 @@
 <template lang="pug">
-  .price
-    DataTable(
-      :fields="fields"
-      :tableData="dataArray"
-      :errors="errors"
-      :areErrors="areErrors"
-      :isApproveModal="isDeleting"
-      @closeErrors="closeErrors"
-      @notApprove="setDefaults"
-      @closeModal="setDefaults"
-      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
-      :tableheadRowClass="['client-pricelist-table-head', {'tbody_visible-overflow': dataArray.length < 3}]"
-      bodyRowClass="client-pricelist-table-row"
-      bodyCellClass="client-pricelist-table-cell"
-      :clientPricetable="true"
-    )
-      template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title {{ field.label }}
+.price
+  DataTable(
+    :fields="fields",
+    :tableData="dataArray",
+    :errors="errors",
+    :areErrors="areErrors",
+    :isApproveModal="isDeleting",
+    @closeErrors="closeErrors",
+    @notApprove="setDefaults",
+    @closeModal="setDefaults",
+    :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 3 }]",
+    :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 3 }]",
+    bodyRowClass="client-pricelist-table-row",
+    bodyCellClass="client-pricelist-table-cell",
+  )
+    template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+      .price-title {{ field.label }}
 
-      template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentStep" disabled)
+    template(slot="step", slot-scope="{ row, index }")
+      .price__data(v-if="currentActive !== index") {{ row.step.title }}
+      .price__data(v-else)
+        input.price__data-input(type="text", v-model="currentStep", disabled)
 
-      template(slot="unit" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.unit.type }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentUnit" disabled)
+    template(slot="unit", slot-scope="{ row, index }")
+      .price__data(v-if="currentActive !== index") {{ row.unit.type }}
+      .price__data(v-else)
+        input.price__data-input(type="text", v-model="currentUnit", disabled)
 
-      template(slot="size" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.size }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentSize" disabled)
+    template(slot="size", slot-scope="{ row, index }")
+      .price__data(v-if="currentActive !== index") {{ row.size }}
+      .price__data(v-else)
+        input.price__data-input(type="text", v-model="currentSize", disabled)
 
-      template(slot="multiplier" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          span(id="multiplier") {{row.multiplier}}
-          label(for="multiplier") &#37;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentMultiplier")
+    template(slot="multiplier", slot-scope="{ row, index }")
+      .price__data(v-if="currentActive !== index")
+        span#multiplier {{ row.multiplier }}
+        label(for="multiplier") &#37;
+      .price__editing-data(v-else)
+        input.price__data-input(type="number", v-model="currentMultiplier")
 
-      template(slot="icons" slot-scope="{ row, index }")
-        .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
-          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
-          span(v-if="row.altered")
-            .price__icons-link
-              i.fa.fa-link(aria-hidden='true')
-          span(v-else)
-            .price__icons-link-opacity
-              i.fa.fa-link(aria-hidden='true')
-    
-    .price__empty(v-if="!dataArray.length") Nothing found...
+    template(slot="icons", slot-scope="{ row, index }")
+      .price__icons
+        .tooltip(v-if="row.altered")
+          span#myTooltip.tooltiptext {{ row.notification }}
+          img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png")
+        img.price__icon(
+          v-for="(icon, key) in manageIcons",
+          :src="icon.icon",
+          @click="makeAction(index, key)",
+          :class="{ price_opacity: isActive(key, index) }"
+        )
+        span(v-if="row.altered")
+          .price__icons-link(@click="getRowPrice(index)")
+            i.fa.fa-link(aria-hidden="true")
+        span(v-else)
+          .price__icons-link-opacity
+            i.fa.fa-link(aria-hidden="true")
+
+  .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 import DataTable from "../../DataTable";
@@ -64,11 +68,14 @@ export default {
   mixins: [crudIcons],
   props: {
     tableData: {
-      type: Array
+      type: Array,
     },
     vendorId: {
-      type: String
-    }
+      type: String,
+    },
+    refresh: {
+      type: Boolean,
+    },
   },
   data() {
     return {
@@ -78,36 +85,36 @@ export default {
           headerKey: "headerStep",
           key: "step",
           width: "23%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Unit",
           headerKey: "headerUnit",
           key: "unit",
           width: "23%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Size",
           headerKey: "headerSize",
           key: "size",
           width: "10%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "%",
           headerKey: "headerMultiplier",
           key: "multiplier",
           width: "13%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
           width: "31%",
-          padding: "0"
-        }
+          padding: "0",
+        },
       ],
       dataArray: [],
       currentStep: "",
@@ -122,7 +129,7 @@ export default {
       isDeleting: false,
       deleteIndex: -1,
       currentActive: -1,
-      isDataRemain: true
+      isDataRemain: true,
     };
   },
   created() {
@@ -130,8 +137,22 @@ export default {
   },
   methods: {
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
     }),
+    async getRowPrice(index) {
+      try {
+        const result = await this.$http.post("/vendorsapi/rates/sync-cost/" + this.vendorId, {
+          tableKey: "Step Multipliers Table",
+          row: this.dataArray[index],
+        });
+      } catch (err) {
+        this.alertToggle({ message: "Impossibly update price", isShow: true, type: "error" });
+      } finally {
+        this.refreshResultTable();
+        const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
+        this.dataArray = vendor.data.rates.stepMultipliersTable;
+      }
+    },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();
@@ -179,47 +200,51 @@ export default {
     refreshResultTable() {
       this.$emit("refreshResultTable");
     },
-    // async manageSaveClick(index) {
-    //   if (this.currentActive === -1) return;
-    //   const id = this.dataArray[index]._id;
-    //   const serviceId = this.dataArray[index].serviceId;
-    //   try {
-    //     const result = await this.$http.post(
-    //       "/clientsapi/rates/" + this.clientId,
-    //       {
-    //         itemIdentifier: "Step Multipliers Table",
-    //         updatedItem: {
-    //           _id: id,
-    //           serviceId,
-    //           step: this.currentStepObj,
-    //           unit: this.currentUnitObj,
-    //           size: this.currentSize,
-    //           multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-    //           altered: true
-    //         }
-    //       }
-    //     );
-    //     this.alertToggle({
-    //       message: "Saved successfully",
-    //       isShow: true,
-    //       type: "success"
-    //     });
-    //     const updatedData = await this.$http.get(
-    //       "/clientsapi/rates/" + this.clientId
-    //     );
-    //     this.dataArray[index] = updatedData.body.stepMultipliersTable[index];
-    //     this.setDefaults();
-    //     this.refreshResultTable();
-    //   } catch (err) {
-    //     this.alertToggle({
-    //       message: "Error on saving Steps",
-    //       isShow: true,
-    //       type: "error"
-    //     });
-    //   }
-    // },
+    async manageSaveClick(index) {
+      if (this.currentActive === -1) return;
+      const id = this.dataArray[index]._id;
+      try {
+        const result = await this.$http.post(
+          "/vendorsapi/rates/" + this.vendorId,
+          {
+            itemIdentifier: "Step Multipliers Table",
+            updatedItem: {
+              _id: id,
+              step: this.currentStepObj,
+              unit: this.currentUnitObj,
+              size: this.currentSize,
+              multiplier: parseFloat(this.currentMultiplier).toFixed(0),
+              altered: true
+            }
+          }
+        );
+        this.alertToggle({
+          message: "Saved successfully",
+          isShow: true,
+          type: "success"
+        });
+        const updatedData = await this.$http.get(
+          "/vendorsapi/rates/" + this.vendorId
+        );
+        this.dataArray[index] = updatedData.body.stepMultipliersTable[index];
+        this.setDefaults();
+        this.refreshResultTable();
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on saving Steps",
+          isShow: true,
+          type: "error"
+        });
+      }
+    },
     closeErrors() {
       this.areErrors = false;
+    },
+  },
+  async refresh() {
+    if (this.refresh) {
+      const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
+      this.dataArray = vendor.data.rates.stepMultipliersTable;
     }
   },
   computed: {
@@ -227,13 +252,10 @@ export default {
       const { delete: del, ...result } = this.icons;
       return result;
     },
-    ...mapGetters({
-      currentClient: "getCurrentClient"
-    })
   },
   components: {
-    DataTable
-  }
+    DataTable,
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -257,7 +279,7 @@ export default {
   label {
     margin-left: 3px;
   }
-  &__empty{
+  &__empty {
     font-size: 16px;
   }
   &__data,
@@ -287,10 +309,10 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-   &-info {   
-     margin-top:  4px; 
-     margin-right: 3px;    
-  }
+    &-info {
+      margin-top: 4px;
+      margin-right: 3px;
+    }
     &-link {
       cursor: pointer;
       font-size: 18px;
