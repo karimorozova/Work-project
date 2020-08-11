@@ -90,6 +90,10 @@ export default {
     currentVendor: {
       type: Object,
     },
+    refresh: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -372,7 +376,7 @@ export default {
         this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
           ? 0
           : this.currentTqi;
-          
+
       let qualification = {
         target: this.currentTarget,
         industry: this.currentIndustry,
@@ -463,6 +467,13 @@ export default {
           break;
         default:
           return 1;
+      }
+    },
+  },
+  watch: {
+    async refresh() {
+      if (this.refresh) {
+        this.$emit("refreshQualifications");
       }
     },
   },

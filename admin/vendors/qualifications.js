@@ -58,7 +58,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
     { _id: vendorId },
     { qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests) }
   );
-  await createRateCombinations(listForRates, vendorId);
+  // await createRateCombinations(listForRates, vendorId);
 
   function qualificationsArrayAdditions(qualificationsArray, testsArray) {
     let finalQualifivationArray = [];

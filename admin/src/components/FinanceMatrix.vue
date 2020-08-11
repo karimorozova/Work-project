@@ -7,6 +7,7 @@
             bodyRowClass="rates-matrix-row"
             :bodyClass="['rates-matrix-body', 'tbody_visible-overflow']"
             tableheadRowClass="tbody_visible-overflow"
+            bodyCellClass="matrix-table"
         )
             template(slot="headerText" slot-scope="{ field }")
                 span.finance-matrix__text {{ field.label }}
@@ -15,7 +16,11 @@
             template(slot="text" slot-scope="{ row }")
                 span.finance-matrix__text {{ row.text }}
             template(slot="rate" slot-scope="{ row }")
-                input.finance-matrix__rate(type="number" min="0" max ="100" :value="row.rate*100" @change="(e) => setMatrixData(e, row.key)")
+                input.finance-matrix__rate(
+                    type="number" min="0" max ="100" 
+                    :value="row.rate" 
+                    @change="(e) => setMatrixData(e, row.key)"
+                )
                 span.finance-matrix__percent %
 </template>
 
@@ -38,7 +43,7 @@ export default {
     },
     methods: {
         setMatrixData(e, key) {
-            this.$emit("setMatrixData", {value: e.target.value/100, key});
+            this.$emit("setMatrixData", {value: e.target.value, key});
         }
     },
     components: {
@@ -59,11 +64,13 @@ export default {
 .finance-matrix {
     margin-top: 5px;
     &__rate {
-        width: 22px;
-        padding-left: 2px;
-        color: $main-color;
+    color: #67573e;
+    border: none;
+    width: 94%;
+    background: inherit;
+    outline: none;
         &::-webkit-inner-spin-button,
-        &::-webkit-outer-spin-button, {
+        &::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }

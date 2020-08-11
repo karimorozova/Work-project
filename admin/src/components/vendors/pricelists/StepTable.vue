@@ -12,7 +12,7 @@
     :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 3 }]",
     :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 3 }]",
     bodyRowClass="client-pricelist-table-row",
-    bodyCellClass="client-pricelist-table-cell",
+    bodyCellClass="client-pricelist-table-cell"
   )
     template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
       .price-title {{ field.label }}
@@ -204,28 +204,23 @@ export default {
       if (this.currentActive === -1) return;
       const id = this.dataArray[index]._id;
       try {
-        const result = await this.$http.post(
-          "/vendorsapi/rates/" + this.vendorId,
-          {
-            itemIdentifier: "Step Multipliers Table",
-            updatedItem: {
-              _id: id,
-              step: this.currentStepObj,
-              unit: this.currentUnitObj,
-              size: this.currentSize,
-              multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-              altered: true
-            }
-          }
-        );
+        const result = await this.$http.post("/vendorsapi/rates/" + this.vendorId, {
+          itemIdentifier: "Step Multipliers Table",
+          updatedItem: {
+            _id: id,
+            step: this.currentStepObj,
+            unit: this.currentUnitObj,
+            size: this.currentSize,
+            multiplier: parseFloat(this.currentMultiplier).toFixed(0),
+            altered: true,
+          },
+        });
         this.alertToggle({
           message: "Saved successfully",
           isShow: true,
-          type: "success"
+          type: "success",
         });
-        const updatedData = await this.$http.get(
-          "/vendorsapi/rates/" + this.vendorId
-        );
+        const updatedData = await this.$http.get("/vendorsapi/rates/" + this.vendorId);
         this.dataArray[index] = updatedData.body.stepMultipliersTable[index];
         this.setDefaults();
         this.refreshResultTable();
@@ -233,7 +228,7 @@ export default {
         this.alertToggle({
           message: "Error on saving Steps",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -241,11 +236,13 @@ export default {
       this.areErrors = false;
     },
   },
-  async refresh() {
-    if (this.refresh) {
-      const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
-      this.dataArray = vendor.data.rates.stepMultipliersTable;
-    }
+  watch: {
+    async refresh() {
+      if (this.refresh) {
+        const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
+        this.dataArray = vendor.data.rates.stepMultipliersTable;
+      }
+    },
   },
   computed: {
     manageIcons() {

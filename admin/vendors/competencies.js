@@ -11,7 +11,7 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
     let { competencies } = await getVendor({ _id: vendorId });
     if (dataToUpdate._id) {
       const neededServiceIndex = competencies.findIndex(item => item._id.toString() === dataToUpdate._id);
-      await updateVendorRatesFromCompetence(vendorId, dataToUpdate, competencies[neededServiceIndex]);
+      // await updateVendorRatesFromCompetence(vendorId, dataToUpdate, competencies[neededServiceIndex]);
       competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
       await Vendors.updateOne({ _id: vendorId }, { competencies });
     } else {
@@ -20,10 +20,10 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
           `${x.sourceLanguage}/${x.targetLanguage}/${x.industry}/${x.step}` !==
           `${y.sourceLanguage}/${y.targetLanguage}/${y.industry}/${y.step}`
         ));
-      await createRateCombinations(dataToUpdate, vendorId);
-      competencies.push(...combinationsWithoutRepetitions);
-      // await Vendors.updateOne({ _id: vendorId }, { competencies });
-      await saveQualifications(combinationsWithoutRepetitions, vendorId);
+        competencies.push(...combinationsWithoutRepetitions);
+        await Vendors.updateOne({ _id: vendorId }, { competencies });
+        await saveQualifications(combinationsWithoutRepetitions, vendorId);
+        // await createRateCombinations(dataToUpdate, vendorId);
     }
   } catch (err) {
     console.log(err);
