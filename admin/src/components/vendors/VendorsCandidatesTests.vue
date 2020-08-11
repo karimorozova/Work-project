@@ -253,7 +253,7 @@ export default {
       currentEvaluationType: "",
       currentLanguageType: "",
       currentEvaluationName: "",
-      currentIndex: "",
+      currentIndex: -1,
 
       industries: [],
       sources: [],
@@ -301,7 +301,7 @@ export default {
       if (!this.currentEvaluationType) this.errors.push("Evaluation type should not be empty");
       if (!this.currentLanguageType) this.errors.push("Language type should not be empty");
       if (!this.currentEvaluationName) this.errors.push("Evaluation name should not be empty");
-      if (!this.currentIndex && this.currentEvaluationType === "Test") {
+      if (this.currentIndex == -1 && this.currentEvaluationType === "Test") {
         if (!this.currentFile) this.errors.push("File should not be empty!");
       }
       if (this.isTestSame()) this.errors.push("Such a test already exists");
@@ -314,38 +314,35 @@ export default {
     },
     isSameTestName() {
       const allVendorsTests = this.vendorTests.filter((test) =>
-        this.currentIndex ? test._id !== this.vendorTests[this.currentIndex]._id : true
+        this.currentIndex >= 0 ? test._id !== this.vendorTests[this.currentIndex]._id : false
       );
       return allVendorsTests.map((test) => test.evaluationName).includes(this.currentEvaluationName);
     },
     searchSame(type) {
       let result = false;
       const allVendorsTests = this.vendorTests.filter((test) =>
-        test.evaluationType === type && this.currentIndex ? test._id !== this.vendorTests[this.currentIndex]._id : true
+        test.evaluationType === type && this.currentIndex >= 0 ? test._id !== this.vendorTests[this.currentIndex]._id : false
       );
       allVendorsTests.length
         ? allVendorsTests.forEach((element) => {
             const source = element.source.lang === this.currentSource.lang;
-            if (source) {
-              const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets;
-              const target = element.targets.find((target) =>
-                currentTargetForSearch.some((currentTarget) => target.lang === currentTarget.lang)
-              );
-              const industry = element.industries.find((industry) =>
-                this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)
-              );
-              const step = element.steps.find((steps) =>
-                this.currentSteps.some((currentStep) => steps.title === currentStep.title)
-              );
-              result =
-                ((source == Object.keys(target !== undefined ? target : {}).length > 0) ==
-                  Object.keys(industry !== undefined ? industry : {}).length > 0) ==
-                Object.keys(step !== undefined ? step : {}).length > 0;
-            } else {
-              result = false;
-            }
+            const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets;
+            const target = element.targets.find((target) =>
+              currentTargetForSearch.some((currentTarget) => target.lang === currentTarget.lang)
+            );
+            const industry = element.industries.find((industry) =>
+              this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)
+            );
+            const step = element.steps.find((steps) =>
+              this.currentSteps.some((currentStep) => steps.title === currentStep.title)
+            );
+            result =
+              ((source && Object.keys(target !== undefined ? target : {}).length > 0) &&
+                Object.keys(industry !== undefined ? industry : {}).length > 0) &&
+              Object.keys(step !== undefined ? step : {}).length > 0;
           })
         : (result = false);
+
       return result;
     },
     isTestSame() {
@@ -368,10 +365,10 @@ export default {
         source: this.currentSource,
         industries: this.currentIndustries,
         steps: this.currentSteps,
-        index: this.currentIndex ? this.currentIndex : "",
-        oldPath: this.currentIndex ? this.vendorTests[this.currentIndex].path : "",
-        fileName: this.currentIndex ? this.vendorTests[this.currentIndex].fileName : "",
-        _id: this.currentIndex ? this.vendorTests[this.currentIndex]._id : "",
+        index: this.currentIndex >= 0  ? this.currentIndex : "",
+        oldPath: this.currentIndex >= 0  ? this.vendorTests[this.currentIndex].path : "",
+        fileName: this.currentIndex >= 0  ? this.vendorTests[this.currentIndex].fileName : "",
+        _id: this.currentIndex >= 0  ? this.vendorTests[this.currentIndex]._id : "",
       };
       try {
         await this.saveLangTest({ testData, file: this.currentFile });

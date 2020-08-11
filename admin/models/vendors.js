@@ -156,6 +156,14 @@ const VendorSchema = new mongoose.Schema({
       default: 'Created',
       trim: true
     },
+    tqi:{
+      type: Number,
+      default: 0,
+    },
+    testType:{
+      type: String,
+      default: '',
+    },
   }],
   documents: {
     type: Array,
@@ -168,14 +176,6 @@ const VendorSchema = new mongoose.Schema({
   educations: {
     type: Array,
     default: []
-  },
-  tqi:{
-    type: Number,
-    default: 0,
-  },
-  testType:{
-    type: String,
-    default: '',
   },
   assessments: [{
     step: {
