@@ -53,11 +53,12 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       }
     }
   });
-
+  
   await Vendors.updateOne(
     { _id: vendorId },
     { qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests) }
   );
+
   // await createRateCombinations(listForRates, vendorId);
 
   function qualificationsArrayAdditions(qualificationsArray, testsArray) {
@@ -71,10 +72,14 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
           qualification.steps.some((currentStep) => step.toString() === currentStep.toString())
         )
       );
-      let currentQualification = {}
-      Object.assign(currentQualification, qualification.toJSON());
-      currentQualification.testType = currentTest.evaluationType === 'Test' ? 'Test' : 'Sample';
-      finalQualifivationArray.push(currentQualification)
+      if(!qualification.hasOwnProperty('testType') || qualification.testType == ''){
+        let currentQualification = {}
+        Object.assign(currentQualification, qualification.toJSON());
+        currentQualification.testType = currentTest.evaluationType === 'Test' ? 'Test' : 'Sample';
+        finalQualifivationArray.push(currentQualification)
+      }else{
+        finalQualifivationArray.push(qualification.toJSON());
+      }
     });
     return finalQualifivationArray;
   }

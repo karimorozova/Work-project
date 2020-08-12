@@ -39,7 +39,7 @@
               :options="TestWorkflowStatusesTest",
               @chooseOption="setStatus"
             )
-          .drop-type(v-else)
+          .drop-type(v-if="row.testType === 'Sample'")
             SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
@@ -168,6 +168,7 @@ export default {
       currentStatus: "",
       currentIndex: "",
       currentTqi: null,
+      currentTestType: "",
 
       previewMessage: "",
 
@@ -235,6 +236,7 @@ export default {
       this.currentStatus = this.qualificationData[index].status;
       this.currentSteps = this.qualificationData[index].steps;
       this.currentTqi = this.qualificationData[index].tqi;
+      this.currentTestType = this.qualificationData[index].testType;
     },
     manageCancelEdition(index) {
       this.$emit("refreshQualifications");
@@ -384,6 +386,7 @@ export default {
         steps: this.currentSteps,
         status: this.currentStatus,
         source: this.currentSource,
+        testType: this.currentTestType,
         tqi: tqi,
       };
 
