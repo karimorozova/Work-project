@@ -350,8 +350,6 @@ export default {
       setVendorsMatrixData: "setVendorsMatrixData",
     }),
     async updateQualifications() {
-        const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
-        await this.storeCurrentVendor(vendor.body);
         this.isRefreshQualificationTable = true;
         setTimeout(() => {
           this.isRefreshQualificationTable = false;

@@ -185,6 +185,7 @@ export default {
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
+      storeCurrentVendor: "storeCurrentVendor",
     }),
 
     presentArrays(Arr, key) {

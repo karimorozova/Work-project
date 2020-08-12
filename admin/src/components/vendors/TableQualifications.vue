@@ -188,6 +188,7 @@ export default {
       storeQualification: "storeCurrentVendorQualification",
       deleteQualification: "deleteCurrentVendorQualification",
       storeAssessment: "storeCurrentVendorAssessment",
+      storeCurrentVendor: "storeCurrentVendor",
     }),
     presentArrays(Arr, key) {
       if (!Arr.length) return "";
@@ -473,7 +474,14 @@ export default {
   watch: {
     async refresh() {
       if (this.refresh) {
-        this.$emit("refreshQualifications");
+        try {
+          const id = this.$route.params.id;
+          const vendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
+          await this.storeCurrentVendor(vendor.body);
+        } catch (err) {
+        }finally{
+          this.$emit("refreshQualifications");
+        }
       }
     },
   },
