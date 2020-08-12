@@ -100,6 +100,7 @@ export default {
   box-shadow: 0 0 5px $brown-shadow;
   background-color: $white;
   max-width: 300px;
+  font-size: 18px;
   &__buttons {
     margin-top: 10px;
     display: flex;

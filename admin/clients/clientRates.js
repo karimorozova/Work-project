@@ -100,7 +100,7 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) =>
     case tableKeys.stepMultipliersTable:
       const { step, unit, size } = replacementItem;
       const neededStepRow = getNeededStepRow(stepMultipliersTable, step, unit, size);
-      altered = !!neededStepRow.altered;
+      altered = neededStepRow ? neededStepRow.altered : false;
       break;
     case tableKeys.industryMultipliersTable:
       const { industry } = replacementItem;

@@ -22,6 +22,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
   })
 
   let listQualificationsForSave = qualifications;
+
   listCompetenciesForSave.forEach(element => {
     if (!listQualificationsForSave.length) {
       listQualificationsForSave.push({
@@ -32,9 +33,9 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       });
     } else {
       const findIndex = listQualificationsForSave.findIndex(qualification =>
-        qualification.source.toString() === element.sourceLanguage &&
-        qualification.target.toString() === element.targetLanguage &&
-        qualification.industry.toString() === element.industry
+          qualification.source.toString() === element.sourceLanguage.toString() &&
+          qualification.target.toString() === element.targetLanguage.toString() &&
+          qualification.industry.toString() === element.industry.toString()
       );
       if (findIndex === -1) {
         listQualificationsForSave.push({
@@ -53,7 +54,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       }
     }
   });
-  
+
   await Vendors.updateOne(
     { _id: vendorId },
     { qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests) }
