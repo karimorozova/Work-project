@@ -192,7 +192,8 @@ router.post('/competencies', async (req, res) => {
   const { vendorId, currentData } = req.body;
   try {
     await updateVendorCompetencies(vendorId, currentData);
-    res.send('Updated');
+    const vendor = await getVendor({ "_id": vendorId });
+    res.send(vendor);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on saving Vendor Competencies');

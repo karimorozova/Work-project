@@ -322,6 +322,9 @@ export default {
           vendorId: this.$route.params.id,
           currentData,
         });
+        result.then((result) => {
+          this.competenciesData = result.data.competencies;
+        });
         this.alertToggle({
           message: "Competencies are saved",
           isShow: true,
@@ -335,8 +338,6 @@ export default {
         });
       } finally {
         this.setDefaults();
-        const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
-        this.competenciesData = vendor.data.competencies;
         this.newRow = false;
         this.$emit("updateQualifications");
       }
