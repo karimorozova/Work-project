@@ -274,4 +274,13 @@ export default {
 .client-pricelist-table-head {
   height: auto;
 }
+.matrix-table{
+  box-sizing: border-box;
+  font-size: 14px;
+  padding: 0 0 0 5px;
+  height: 34px;
+  line-height: 34px;
+  border: 1px solid #938676;
+  border-right: none;
+}
 </style>

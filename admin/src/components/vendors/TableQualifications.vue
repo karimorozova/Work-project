@@ -39,7 +39,7 @@
               :options="TestWorkflowStatusesTest",
               @chooseOption="setStatus"
             )
-          .drop-type(v-else)
+          .drop-type(v-if="row.testType === 'Sample'")
             SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
@@ -89,6 +89,10 @@ export default {
     },
     currentVendor: {
       type: Object,
+    },
+    refresh: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -164,6 +168,7 @@ export default {
       currentStatus: "",
       currentIndex: "",
       currentTqi: null,
+      currentTestType: "",
 
       previewMessage: "",
 
@@ -184,6 +189,7 @@ export default {
       storeQualification: "storeCurrentVendorQualification",
       deleteQualification: "deleteCurrentVendorQualification",
       storeAssessment: "storeCurrentVendorAssessment",
+      storeCurrentVendor: "storeCurrentVendor",
     }),
     presentArrays(Arr, key) {
       if (!Arr.length) return "";
@@ -230,6 +236,7 @@ export default {
       this.currentStatus = this.qualificationData[index].status;
       this.currentSteps = this.qualificationData[index].steps;
       this.currentTqi = this.qualificationData[index].tqi;
+      this.currentTestType = this.qualificationData[index].testType;
     },
     manageCancelEdition(index) {
       this.$emit("refreshQualifications");
@@ -372,13 +379,14 @@ export default {
         this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
           ? 0
           : this.currentTqi;
-          
+
       let qualification = {
         target: this.currentTarget,
         industry: this.currentIndustry,
         steps: this.currentSteps,
         status: this.currentStatus,
         source: this.currentSource,
+        testType: this.currentTestType,
         tqi: tqi,
       };
 
@@ -463,6 +471,20 @@ export default {
           break;
         default:
           return 1;
+      }
+    },
+  },
+  watch: {
+    async refresh() {
+      if (this.refresh) {
+        try {
+          const id = this.$route.params.id;
+          const vendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
+          await this.storeCurrentVendor(vendor.body);
+        } catch (err) {
+        }finally{
+          this.$emit("refreshQualifications");
+        }
       }
     },
   },

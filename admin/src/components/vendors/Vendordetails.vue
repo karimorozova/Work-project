@@ -18,7 +18,7 @@
             img.photo-image(v-if="imageExist")
             p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
           .photo-wrap(v-if="currentVendor.photo")
-            input.photo-file(type="file", @change="previewPhoto")
+            input.photo-file(type="file", @change="previewPhoto") 
             img.photo-image(:src="currentVendor.photo")
           label.job-title Job title
         .gen-info__block
@@ -131,10 +131,6 @@
                 @chosenInd="chosenInd"
               )
 
-      //- .right-informational-block
-      //-     VendorCandidate(:candidateData='currentVendor' v-if="currentVendor.status === 'Potential'")
-      //-     VendorAction(@openPreview="openPreview")
-
     .vendor-info__preview(v-if="isEditAndSend")
       VendorPreview(
         @closePreview="closePreview",
@@ -160,32 +156,28 @@
         :assessmentData="assessmentData",
         :currentVendor="currentVendor",
         @refreshQualifications="setDetailsTablesData"
+        :refresh="isRefreshQualificationTable"
       )
 
     .title Documents
-      //TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
+      TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
 
     .title Assessment
-      //TableAssessment(
-        //:assessmentData="assessmentData",
-        //:currentVendor="currentVendor",
-        //@refreshAssessment="setDetailsTablesData"
-      //)
+      TableAssessment(
+        :assessmentData="assessmentData",
+        :currentVendor="currentVendor",
+        @refreshAssessment="setDetailsTablesData"
+      )
 
     .title Professional experience
-      //TableProfessionalExperience(
-        //:professionalExperienceData="professionalExperienceData",
-        //:vendorId="vendorId",
-        //@refreshProfExperiences="setDetailsTablesData"
-      //)
+      TableProfessionalExperience(
+        :professionalExperienceData="professionalExperienceData",
+        :vendorId="vendorId",
+        @refreshProfExperiences="setDetailsTablesData"
+      )
 
     .title Education
-      //TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
-
-    //- .title(v-if="currentVendor._id") Rates
-    //- .rates(v-if="currentVendor._id")
-      VendorRates(:vendor="currentVendor"
-          @updateVendor="updateVendor")
+      TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
 
     .title Rates
       .vendor-info__rates(v-if="currentVendor._id")
@@ -194,21 +186,21 @@
             LangTable(
               :tableData="currentVendor.rates.basicPricesTable",
               :vendorId="currentVendor._id",
-              @refreshResultTable="refreshResultTable"
+              @refreshResultTable="refreshResultTable",
               :refresh="isRefreshAfterServiceUpdate"
             )
           .step-table(v-if="currentVendor._id && steps.length && units.length")
             StepTable(
               :tableData="currentVendor.rates.stepMultipliersTable",
               :vendorId="currentVendor._id",
-              @refreshResultTable="refreshResultTable"
+              @refreshResultTable="refreshResultTable",
               :refresh="isRefreshAfterServiceUpdate"
             )
           .industry-table(v-if="currentVendor._id && industries.length")
             IndustryTable(
               :tableData="currentVendor.rates.industryMultipliersTable",
               :vendorId="currentVendor._id",
-              @refreshResultTable="refreshResultTable"
+              @refreshResultTable="refreshResultTable",
               :refresh="isRefreshAfterServiceUpdate"
             )
         .result-table(v-if="currentVendor._id")
@@ -221,6 +213,10 @@
             :isRefreshResultTable="isRefreshResultTable",
             :refresh="isRefreshAfterServiceUpdate"
           )
+
+    .title Discount Chart
+      .vendor-info__drop-matrix(v-if="currentVendor._id")
+        FinanceMatrix(:entity="currentVendor", @setMatrixData="setMatrixData")
 
     .title Notes & Comments
       .vendor-info__notes-block
@@ -265,6 +261,8 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+import FinanceMatrix from "../FinanceMatrix";
 import VendorCompetencies from "./VendorCompetencies";
 import ResultTable from "./pricelists/ResultTable";
 import IndustryTable from "./pricelists/IndustryTable";
@@ -288,10 +286,8 @@ import TimezoneSelect from "../clients/TimezoneSelect";
 import ValidationErrors from "../ValidationErrors";
 import SelectSingle from "../SelectSingle";
 import Asterisk from "../Asterisk";
-import VendorRates from "./VendorRates";
 import Addseverallangs from "../finance/Addseverallangs";
 import AvailablePairs from "../finance/pricelists/AvailablePairs";
-import { mapGetters, mapActions } from "vuex";
 import photoPreview from "@/mixins/photoPreview";
 
 export default {
@@ -304,6 +300,7 @@ export default {
       units: [],
       steps: [],
 
+      isRefreshQualificationTable: false,
       isRefreshAfterServiceUpdate: false,
       isRefreshResultTable: false,
       vendorId: "",
@@ -341,21 +338,6 @@ export default {
     };
   },
   methods: {
-    updateQualifications() {
-      console.log("need update qua");
-    },
-    refreshResultTable() {
-      this.isRefreshResultTable = true;
-      setTimeout(() => {
-        this.isRefreshResultTable = false;
-      }, 2000);
-    },
-    updateRates(action){
-      this.isRefreshAfterServiceUpdate = action;
-      setTimeout(() => {
-        this.isRefreshAfterServiceUpdate = !action;
-      }, 2000);
-    },
     ...mapActions({
       alertToggle: "alertToggle",
       updateVendorProp: "updateVendorProp",
@@ -365,7 +347,34 @@ export default {
       updateIndustry: "updateIndustry",
       getDuoCombinations: "getVendorDuoCombinations",
       updateVendorStatus: "updateVendorStatus",
+      setVendorsMatrixData: "setVendorsMatrixData",
     }),
+    async updateQualifications() {
+        this.isRefreshQualificationTable = true;
+        setTimeout(() => {
+          this.isRefreshQualificationTable = false;
+        }, 2000);
+    },
+    async setMatrixData({ value, key }) {
+      try {
+        await this.setVendorsMatrixData({ value, key });
+        this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" });
+      } catch (err) {
+        this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" });
+      }
+    },
+    refreshResultTable() {
+      this.isRefreshResultTable = true;
+      setTimeout(() => {
+        this.isRefreshResultTable = false;
+      }, 2000);
+    },
+    updateRates(action) {
+      this.isRefreshAfterServiceUpdate = action;
+      setTimeout(() => {
+        this.isRefreshAfterServiceUpdate = !action;
+      }, 2000);
+    },
     async setTest() {
       const vendor = {
         id: this.currentVendor._id,
@@ -466,7 +475,6 @@ export default {
       let sendData = new FormData();
       sendData.append("vendor", JSON.stringify(this.currentVendor));
       sendData.append("photo", this.photoFile[0]);
-      console.log(this.currentVendor);
       try {
         await this.updateCurrentVendor(sendData);
         this.oldEmail = this.currentVendor.email;
@@ -656,7 +664,6 @@ export default {
     NativeLanguageSelect,
     TimezoneSelect,
     ValidationErrors,
-    VendorRates,
     Asterisk,
     Addseverallangs,
     AvailablePairs,
@@ -666,6 +673,7 @@ export default {
     StepTable,
     IndustryTable,
     ResultTable,
+    FinanceMatrix,
   },
   directives: {
     ClickOutside,
@@ -746,6 +754,13 @@ export default {
   position: relative;
   width: 1020px;
   &__competencies {
+    box-sizing: border-box;
+    margin: 20px 10px 40px 10px;
+    padding: 40px;
+    box-shadow: 0 0 10px #67573e9d;
+    position: relative;
+  }
+  &__drop-matrix {
     box-sizing: border-box;
     margin: 20px 10px 40px 10px;
     padding: 40px;

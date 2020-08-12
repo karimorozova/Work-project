@@ -544,6 +544,9 @@ export default {
       return this.currentTargets.length ? this.currentTargets.map((item) => item.lang) : [];
     },
   },
+  mounted(){
+    this.domain = __WEBPACK__API_URL__;
+  },
   created() {
     this.getTests();
     this.getLangs();
