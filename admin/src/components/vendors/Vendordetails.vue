@@ -18,7 +18,7 @@
             img.photo-image(v-if="imageExist")
             p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
           .photo-wrap(v-if="currentVendor.photo")
-            input.photo-file(type="file", @change="previewPhoto") 
+            input.photo-file(type="file", @change="previewPhoto")
             img.photo-image(:src="currentVendor.photo")
           label.job-title Job title
         .gen-info__block
@@ -163,26 +163,26 @@
       )
 
     .title Documents
-      TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
+      //TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
 
     .title Assessment
-      TableAssessment(
-        :assessmentData="assessmentData",
-        :currentVendor="currentVendor",
-        @refreshAssessment="setDetailsTablesData"
-      )
+      //TableAssessment(
+        //:assessmentData="assessmentData",
+        //:currentVendor="currentVendor",
+        //@refreshAssessment="setDetailsTablesData"
+      //)
 
     .title Professional experience
-      TableProfessionalExperience(
-        :professionalExperienceData="professionalExperienceData",
-        :vendorId="vendorId",
-        @refreshProfExperiences="setDetailsTablesData"
-      )
+      //TableProfessionalExperience(
+        //:professionalExperienceData="professionalExperienceData",
+        //:vendorId="vendorId",
+        //@refreshProfExperiences="setDetailsTablesData"
+      //)
 
     .title Education
-      TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
+      //TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
 
-    //- .title(v-if="currentVendor._id") Rates    
+    //- .title(v-if="currentVendor._id") Rates
     //- .rates(v-if="currentVendor._id")
       VendorRates(:vendor="currentVendor"
           @updateVendor="updateVendor")

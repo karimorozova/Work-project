@@ -10,10 +10,11 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const targetLangDifference = compareIds(newData.targetLanguage, oldData.targetLanguage);
   const stepDifference = compareIds(newData.step, oldData.step);
   const industryDifference = compareIds(newData.industry, oldData.industry);
-  if (sourceLangDifference.lang || targetLangDifference) {
+  if (sourceLangDifference || targetLangDifference) {
     await updateVendorLangPairs(
       oldData.sourceLanguage._id,
-      sourceLangDifference._id,
+      oldData.targetLanguage._id,
+      sourceLangDifference,
       targetLangDifference._id,
       vendor,
       defaultPricelist
@@ -31,30 +32,43 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   }
 };
 
-const updateVendorLangPairs = async (oldSourceId, newSourceLangId, newTargetId, vendor, defaultPricelist) => {
-  const { _id, rates } = vendor;
+const updateVendorLangPairs = async (oldSourceId, oldTargetId, newSourceLang, newTargetId, vendor, defaultPricelist) => {
+  const { _id, rates, competencies } = vendor;
   let updatedRates = rates;
-  console.log('BEFORE', updatedRates);
-  if (newSourceLangId) {
-    updatedRates.basicPricesTable = changeId(updatedRates.basicPricesTable, oldSourceId, newSourceLangId, 'sourceLanguage');
-    updatedRates.pricelistTable = changeId(updatedRates.pricelistTable, oldSourceId, newSourceLangId, 'sourceLanguage');
+  if (newSourceLang) {
+    updatedRates.basicPricesTable = changeOrPush(
+      competencies,
+      updatedRates.basicPricesTable,
+      oldSourceId,
+      oldTargetId,
+      newSourceLang._id,
+      tableKeys.basicPricesTable
+    );
+    updatedRates.pricelistTable = changeOrPush(
+      competencies,
+      updatedRates.pricelistTable,
+      oldSourceId,
+      oldTargetId,
+      newSourceLang._id,
+      tableKeys.pricelistTable
+    );
     updatedRates.basicPricesTable = syncDefaultPricelistSourcePrices(
       updatedRates.basicPricesTable,
-      newSourceLangId,
+      newSourceLang._id,
       defaultPricelist,
       'basicPrice'
     );
     updatedRates.pricelistTable = syncDefaultPricelistSourcePrices(
       updatedRates.pricelistTable,
-      newSourceLangId,
+      newSourceLang._id,
       defaultPricelist,
       'price'
     );
   }
   if (newTargetId) {
-    oldSourceId = newSourceLangId ? newSourceLangId : oldSourceId;
-    updatedRates.basicPricesTable = replaceByLangPair(updatedRates.basicPricesTable, oldSourceId, newTargetId);
-    updatedRates.pricelistTable = replaceByLangPair(updatedRates.pricelistTable, oldSourceId, newTargetId);
+    oldSourceId = newSourceLang ? newSourceLang._id : oldSourceId;
+    updatedRates.basicPricesTable = replaceByLangPair(updatedRates.basicPricesTable, oldSourceId, oldTargetId, newTargetId);
+    updatedRates.pricelistTable = replaceByLangPair(updatedRates.pricelistTable, oldSourceId, oldTargetId, newTargetId);
     updatedRates.basicPricesTable = syncDefaultPricelistTargetPrices(
       updatedRates.basicPricesTable,
       newTargetId,
@@ -69,51 +83,73 @@ const updateVendorLangPairs = async (oldSourceId, newSourceLangId, newTargetId, 
       defaultPricelist,
       'price'
     );
-  }
-  console.log('AFTER', updatedRates.basicPricesTable);
 
-  // await Vendors.updateOne({ _id }, { rates: updatedRates });
+    await Vendors.updateOne({ _id }, { rates: updatedRates });
 
-  function changeId(arr, idToSearch, idForReplace, key) {
-    return arr.map(item => {
-      if (item[key].toString() === idToSearch.toString()) {
-        item[key] = idForReplace;
+    function changeOrPush(competencies, arr, idToSearch, targetLangId, idForReplace, tableKey) {
+      const sameSourceIds = competencies.filter(item => item.sourceLanguage.toString() === idToSearch.toString());
+      if (sameSourceIds.length > 2) {
+        const defaultBasicPrice = findSameBasicPriceInDefault(defaultPricelist, idToSearch, targetLangId);
+        const itemToPush = tableKey === tableKeys.pricelistTable ?
+          {
+            type: idToSearch.toString() === targetLangId.toString() ? 'Mono' : 'Duo',
+            sourceLanguage: idToSearch,
+            targetLanguage: targetLangId,
+            basicPrice: defaultBasicPrice ? defaultBasicPrice : 1
+          } :
+          {
+            sourceLanguage: idToSearch,
+
+          };
+        arr.push({});
       }
-      return item;
-    });
+      return arr.map(item => {
+        if (item.sourceLanguage.toString() === idToSearch.toString()) {
+          item.sourceLanguage = idForReplace;
+        }
+        return item;
+      });
+    }
+
+    function replaceByLangPair(arr, sourceLangId, oldTargetId, newTargetLangId) {
+      return arr.map(item => {
+        if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${oldTargetId}`) {
+          item.targetLanguage = newTargetLangId;
+        }
+        return item;
+      });
+    }
+
+    function syncDefaultPricelistSourcePrices(arr, newSourceLangId, defaultPricelist, priceKey) {
+      return arr.map(item => {
+        const defaultItem = defaultPricelist.basicPricesTable.find(item => (
+          item.sourceLanguage.toString() === newSourceLangId
+        ));
+        if (item.sourceLanguage.toString() === newSourceLangId && !!defaultItem) {
+          item[priceKey] = defaultItem[priceKey];
+        }
+        return item;
+      });
+    }
+
+    function syncDefaultPricelistTargetPrices(arr, newTargetLangId, sourceLangId, defaultPricelist, priceKey) {
+      return arr.map(item => {
+        const defaultItem = defaultPricelist.basicPricesTable.find(({ sourceLanguage, targetLanguage }) => (
+          `${sourceLanguage} ${targetLanguage}` === `${sourceLangId} ${newTargetLangId}`
+        ));
+        if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${newTargetLangId}` && !!defaultItem) {
+          item[priceKey] = defaultItem[priceKey];
+        }
+        return item;
+      });
+    }
   }
 
-  function replaceByLangPair(arr, sourceLangId, targetLangId) {
-    return arr.map(item => {
-      if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${targetLangId}`) {
-        item.targetLanguage = targetLangId;
-      }
-      return item;
-    });
-  }
-
-  function syncDefaultPricelistSourcePrices(arr, newSourceLangId, defaultPricelist, priceKey) {
-    return arr.map(item => {
-      const defaultItem = defaultPricelist.find(item => (
-        item.sourceLanguage.toString() === newSourceLangId
-      ));
-      if (item.sourceLanguage.toString() === newSourceLangId && !!defaultItem) {
-        item[priceKey] = defaultItem[priceKey];
-      }
-      return item;
-    });
-  }
-
-  function syncDefaultPricelistTargetPrices(arr, newTargetLangId, sourceLangId, defaultPricelist, priceKey) {
-    return arr.map(item => {
-      const defaultItem = defaultPricelist.find(({ sourceLanguage, targetLanguage }) => (
-        `${sourceLanguage} ${targetLanguage}` === `${sourceLangId} ${newTargetLangId}`
-      ));
-      if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${newTargetLangId}` && !!defaultItem) {
-        item[priceKey] = defaultItem[priceKey];
-      }
-      return item;
-    });
+  function findSameBasicPriceInDefault(defaultPricelist, sourceLanguage, targetLanguage) {
+    const { basicPrice } = defaultPricelist.basicPricesTable.find(item => (
+      `${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
+    ));
+    return basicPrice;
   }
 };
 
@@ -127,7 +163,7 @@ const updateVendorStep = async (oldStepId, newStep, vendor, defaultPricelist) =>
     return await Vendors.updateOne({ _id }, { rates });
   }
 
-  // await Vendors.updateOne({ _id }, { rates: updatedRates });
+  await Vendors.updateOne({ _id }, { rates: updatedRates });
 
   function deleteRedundantSteps(rates, oldStepId) {
     return {
@@ -189,7 +225,7 @@ const updateVendorIndustry = async (oldIndustryId, newIndustry, vendor, defaultP
   updatedRates = deleteRedundantIndustries(updatedRates, oldIndustryId);
   updatedRates = pushNewIndustryCombinations(updatedRates, newIndustry._id);
 
-  // await Vendors.updateOne({ _id }, { rates: updatedRates });
+  await Vendors.updateOne({ _id }, { rates: updatedRates });
 
   function deleteRedundantIndustries(rates, oldIndustryId) {
     return {
@@ -259,7 +295,7 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
       );
       vendor.rates.basicPricesTable = updatedBasicPricesTable;
       vendor.rates.pricelistTable = updatedPricelistTable;
-      // await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
+      await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
       break;
     case table.stepMultipliersTable:
       const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
@@ -281,7 +317,7 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
       );
       vendor.rates.stepMultipliersTable = updatedStepMultipliersTable;
       vendor.rates.pricelistTable = updatedPricelistTable;
-      // await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
+      await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
       break;
     case tableKeys.industryMultipliersTable:
       const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
