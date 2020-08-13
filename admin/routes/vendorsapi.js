@@ -18,7 +18,8 @@ const {
   updateVendorCompetencies,
   deleteVendorCompetencies,
   updateVendorsRatePrices,
-  syncVendorRatesCost
+  syncVendorRatesCost,
+  createRateRowFromQualification
 } = require('../vendors');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
@@ -346,7 +347,7 @@ router.post('/rates/:id', async (req, res) => {
   const { itemIdentifier, updatedItem } = req.body;
   try {
     await updateVendorsRatePrices(vendorId, itemIdentifier, updatedItem);
-    res.send('Saved')
+    res.send('Saved');
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating vendor\'s rates');
@@ -384,6 +385,18 @@ router.post('/rates/rate-combinations/:id', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on getting vendor rate\'s combinations');
+  }
+});
+
+router.post('/qualification-rates/:id', async (req, res) => {
+  const { id: vendorId } = req.params;
+  try {
+    const { qualification } = req.body;
+    await createRateRowFromQualification(vendorId, qualification);
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on generating rates from passed qualification test');
   }
 });
 

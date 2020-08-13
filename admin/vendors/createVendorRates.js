@@ -111,9 +111,39 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
       }
     }
     return occurrences;
-  };
+  }
+};
+
+const createRateRowFromQualification = async (vendorId, qualification) => {
+  const vendor = await Vendors.findOne({ _id: vendorId });
+  const defaultPricelist = await Pricelist.findOne({ isDefault: true });
+  const { pricelistTable: oldPricelistTable } = vendor.rates;
+  let { source, target, steps, industry } = qualification;
+  const langPairs = [{
+    sourceLanguage: source,
+    targetLanguage: target,
+  }];
+  steps = steps.map(item => item._id);
+  const industries = [industry._id];
+  let {
+    basicPricesTable,
+    stepMultipliersTable,
+    industryMultipliersTable
+  } = await combineVendorRates(langPairs, steps, industries, defaultPricelist, vendor);
+  const pricelistTable = await getPricelistCombinations(
+    basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable
+  );
+  await Vendors.updateOne({ _id: vendorId }, {
+    rates: {
+      basicPricesTable,
+      stepMultipliersTable,
+      industryMultipliersTable,
+      pricelistTable,
+    }
+  });
 };
 
 module.exports = {
-  createRateCombinations
+  createRateCombinations,
+  createRateRowFromQualification
 };
