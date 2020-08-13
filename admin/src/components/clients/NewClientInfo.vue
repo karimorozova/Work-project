@@ -193,8 +193,11 @@ export default {
                 this.errors.push('Please, choose lead source.');
                 this.isLeadEmpty = true;
             }
+            if(!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) {
+                this.errors.push('Please provide a valid email in General Information.');
+            }
             if(!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
-                this.errors.push('Please provide a valid email.');
+                this.errors.push('Please provide a valid email in Billing Informations.');
                 this.billErrors.push('email');
             }
             if(!this.client.accountManager || !this.client.salesManager || !this.client.projectManager) this.errors.push('All managers should be assigned.');

@@ -6,6 +6,13 @@
                     Asterisk(:customStyle="asteriskStyle")
                 input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'general-info_error-shadow': !currentClient.name && isSaveClicked}")
             .block-item
+                label.block-item__label.block-item_relative Official Company Name:
+                input(type="text" placeholder="Official Company Name" :value="currentClient.officialCompanyName" @change="(e) => changeProperty(e, 'officialCompanyName')")
+            .block-item
+                label.block-item__label.block-item_relative Email:
+                    Asterisk(:customStyle="asteriskStyle")
+                input(type="text" placeholder="Email" :value="currentClient.email" @change="(e) => changeProperty(e, 'email')" :class="{'general-info_error-shadow': !currentClient.email && isSaveClicked}")
+            .block-item
                 label.block-item__label Website:
                 input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
             .block-item
@@ -217,7 +224,7 @@ export default {
   display: flex;
   justify-content: space-between;
   &__block {
-    width: 38%;
+    width: 40%;
   }
   &_error-shadow {
     box-shadow: 0 0 5px $red;

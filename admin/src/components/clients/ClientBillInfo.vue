@@ -1,13 +1,22 @@
 <template lang="pug">
+  .all-billing-info
+    .same-info
+      .same-info__row
+        .same-info__block
+          .same-info__block-title Same as in General Information:
+          .same-info__block-checkbox
+            span.checkbox#same-checkbox
+              input(type="checkbox" id="same" :checked="isSame" @change="setSame")
+              label(for="same")
     .billing-info
         .names-info
             .names-info__item
-                label.names-info__label Official Company Name:
-                input(type="text" :value="client.billingInfo.officialCompanyName" @change="(e) => changeProperty(e, 'officialCompanyName')")
-
-            .names-info__item
                 label.names-info__label Contact Name:
                 input(type="text" :value="client.billingInfo.contactName" @change="(e) => changeProperty(e, 'contactName')")
+
+            .names-info__item
+                label.names-info__label Official Company Name:
+                input(type="text" :value="client.billingInfo.officialCompanyName" @change="(e) => changeProperty(e, 'officialCompanyName')")
 
             .names-info__item
                 label.names-info__label.names-info_asterisk Email:
@@ -67,6 +76,8 @@
 
 <script>
 import SelectSingle from "../SelectSingle";
+import { mapGetters } from "vuex";
+
 export default {
   props: {
     client: {
@@ -78,7 +89,9 @@ export default {
     }
   },
   data() {
-    return {};
+    return {
+      isSame: false,
+    };
   },
   methods: {
     changeProperty(e, prop) {
@@ -89,6 +102,23 @@ export default {
         prop: "invoiceSending",
         value: event.target.checked
       });
+    },
+    isSetSame(currentEnum){
+      this.client.billingInfo.contactName = currentEnum.name
+      this.client.billingInfo.officialCompanyName = currentEnum.officialCompanyName
+      this.client.billingInfo.email = currentEnum.email
+    },
+    setSame(e){
+      this.isSame = event.target.checked
+      if(this.isSame){
+        if(Object.keys(this.currentClient).length == 0){
+          this.isSetSame(this.client);
+        }else{
+          this.isSetSame(this.currentClient);
+        }
+      }else{
+        this.client.billingInfo.contactName = this.client.billingInfo.officialCompanyName = this.client.billingInfo.email = "";
+      }
     },
     setVAT(e) {
       this.$emit("changeProperty", {
@@ -103,6 +133,11 @@ export default {
       });
     }
   },
+  computed: {
+    ...mapGetters({
+      currentClient: "getCurrentClient"
+    })
+  },
   components: {
     SelectSingle
   }
@@ -110,6 +145,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.same-info{
+  &__row {
+    height: 55px;
+  }
+  &__block {
+    display: flex;
+    border-bottom: 1px solid #938676;
+    padding-bottom: 10px;
+    &-title {
+      margin-right: 5px;
+    }
+  }
+}
 .billing-info {
   display: flex;
   justify-content: space-between;
@@ -190,60 +238,63 @@ export default {
       font-size: 14px;
     }
   }
-  .checkbox {
-    display: flex;
-    height: 28px;
-    width: 191px;
-    input[type="checkbox"] {
-      opacity: 0;
+}
+.checkbox {
+  display: flex;
+  height: 28px;
+  width: 191px;
+  input[type="checkbox"] {
+    opacity: 0;
+    + {
+      label {
+        &::after {
+          content: none;
+        }
+      }
+    }
+    &:checked {
       + {
         label {
           &::after {
-            content: none;
-          }
-        }
-      }
-      &:checked {
-        + {
-          label {
-            &::after {
-              content: "";
-            }
+            content: "";
           }
         }
       }
     }
-    label {
-      position: relative;
+  }
+  label {
+    position: relative;
+    display: inline-block;
+    margin-top: 4px;
+    &::before {
+      position: absolute;
+      content: "";
       display: inline-block;
-      margin-top: 4px;
-      &::before {
-        position: absolute;
-        content: "";
-        display: inline-block;
-        height: 16px;
-        width: 16px;
-        border: 1px solid;
-        left: 0px;
-        top: 3px;
-      }
-      &::after {
-        position: absolute;
-        content: "";
-        display: inline-block;
-        height: 5px;
-        width: 9px;
-        border-left: 2px solid;
-        border-bottom: 2px solid;
-        transform: rotate(-45deg);
-        left: 4px;
-        top: 7px;
-      }
+      height: 16px;
+      width: 16px;
+      border: 1px solid;
+      left: 0px;
+      top: 3px;
+    }
+    &::after {
+      position: absolute;
+      content: "";
+      display: inline-block;
+      height: 5px;
+      width: 9px;
+      border-left: 2px solid;
+      border-bottom: 2px solid;
+      transform: rotate(-45deg);
+      left: 4px;
+      top: 7px;
     }
   }
 }
 #dueDate {
   width: 70px;
+}
+#same-checkbox{
+  margin-top: -6px;
 }
 #vat,
 #invoiceSending {

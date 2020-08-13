@@ -6,6 +6,13 @@
                     Asterisk(:customStyle="asteriskStyle")
                 input(type="text" placeholder="Company Name" v-model="client.name" :class="{'general-info_error-shadow': !client.name && isSaveClicked}")
             .block-item
+                label.block-item__label.block-item_relative Official Company Name:
+                input(type="text" placeholder="Official Company Name" v-model="client.officialCompanyName")
+            .block-item
+                label.block-item__label.block-item_relative Email:
+                    Asterisk(:customStyle="asteriskStyle")
+                input(type="text" placeholder="Email" v-model="client.email" :class="{'general-info_error-shadow': !client.email && isSaveClicked}")
+            .block-item
                 label.block-item__label Website:
                 input(type="text" placeholder="Website" v-model="client.website")
             .block-item

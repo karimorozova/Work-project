@@ -285,10 +285,16 @@ export default {
         this.isLeadEmpty = true;
       }
       if (
+        !this.currentClient.email ||
+        !emailValidRegex.test(this.currentClient.email.toLowerCase())
+      ) {
+        this.errors.push("Please provide a valid email in General Informations.");
+      }
+      if (
         !this.currentClient.billingInfo.email ||
         !emailValidRegex.test(this.currentClient.billingInfo.email.toLowerCase())
       ) {
-        this.errors.push("Please provide a valid email.");
+        this.errors.push("Please provide a valid email in Billing Informations.");
         this.billErrors.push("email");
       }
       if (

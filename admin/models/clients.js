@@ -8,6 +8,15 @@ const ClientSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  officialCompanyName: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  email: {
+    type: String,
+    trim: true
+  },
   nativeLanguage: {
     type: Schema.Types.ObjectId, ref: 'Language',
   },
