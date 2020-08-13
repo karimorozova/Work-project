@@ -6,7 +6,11 @@ const {
 const { getJobs, updateStepProp } = require("./jobs");
 const { manageNewApplication } = require("./application");
 const { notifyTestStatus } = require("./testEmails");
-const { updateVendorCompetencies, deleteVendorCompetencies } = require('./competencies');
+const { 
+  updateVendorCompetencies, 
+  deleteVendorCompetencies, 
+  generateCompetenciesCombinations 
+} = require('./competencies');
 const { saveQualifications } = require('./qualifications');
 const { updateVendorsRatePrices } = require('./updateVendorRates');
 const { syncVendorRatesCost } = require('./syncVendorRatesCost');
@@ -35,5 +39,6 @@ module.exports = {
   saveQualifications,
   updateVendorsRatePrices,
   syncVendorRatesCost,
-  createRateRowFromQualification
+  createRateRowFromQualification,
+  generateCompetenciesCombinations
 };

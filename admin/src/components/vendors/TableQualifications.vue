@@ -269,7 +269,6 @@ export default {
       if (this.currentStatus === "Passed") {
         if (this.checkSuchData()) {
           this.handleLqa();
-          await this.sendToRates();
         } else {
           return;
         }
@@ -368,6 +367,7 @@ export default {
 
       try {
         await this.storeAssessment(formData);
+        await this.sendToRates();
         await this.manageSaveClick(this.currentActive);
       } catch (err) {
       } finally {
@@ -439,9 +439,7 @@ export default {
         steps: this.currentSteps,
         industry: this.currentIndustry,
       };
-      await this.$http.post(
-        '/vendorsapi/qualification-rates/' + this.currentVendor._id,
-        {
+      await this.$http.post('/vendorsapi/qualification-rates/' + this.currentVendor._id, {
           qualification,
         });
     },
