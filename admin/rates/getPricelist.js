@@ -23,7 +23,8 @@ const getFilteredPricelist = (pricelistTable, filters) => {
 
 const getRatePricelist = async (personId, filters, fromVendor = false) => {
   const { countFilter } = filters;
-  const { rates } = fromVendor ? await getVendor({ _id: personId }) : await getClientRates({ _id: personId });
+  const neededQuery = fromVendor ? getVendor : getClientRates;
+  const { rates } = await neededQuery({ _id: personId });
   const { pricelistTable } = rates;
   if (pricelistTable.length) {
     const filteredPricelistTable = getFilteredPricelist(pricelistTable, filters);

@@ -271,7 +271,7 @@ const checkForDuplicates = (arr, newItemId, oldItemId, key) => {
 
 const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
-  const defaultPricelist = await Pricelist.findOne({ defaultPricelist: true });
+  const defaultPricelist = await Pricelist.findOne({ isDefault: true });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = vendor.rates;
   let updatedPricelistTable;
   switch (itemIdentifier) {
@@ -297,7 +297,7 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
       vendor.rates.pricelistTable = updatedPricelistTable;
       await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
       break;
-    case table.stepMultipliersTable:
+    case tableKeys.stepMultipliersTable:
       const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
       if (stepMultiplier === Number(updatedItem.multiplier)) return;
       const updatedStepMultipliersTable = replaceOldItem(
@@ -339,7 +339,7 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
       );
       vendor.rates.industryMultipliersTable = updatedIndustryMultipliersTable;
       vendor.rates.pricelistTable = updatedPricelistTable;
-      await Clients.updateOne({ _id: vendorId }, { rates: vendor.rates });
+      await Vendors.updateOne({ _id: vendorId }, { rates: vendor.rates });
       break;
   }
 };

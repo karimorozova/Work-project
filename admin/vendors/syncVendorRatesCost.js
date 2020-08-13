@@ -13,20 +13,20 @@ const syncVendorRatesCost = async (vendorId, tableKey, row) => {
     basicPricesTable,
     stepMultipliersTable,
     industryMultipliersTable,
-  } = await Pricelist.findOne({ defaultPricelist: true });
+  } = await Pricelist.findOne({ isDefault: true });
   switch (tableKey) {
     default:
     case tableKeys.basicPricesTable:
-      await synchronizeBasicPrice(row, basicPricesTable, rates, vendorId, currency);
+      await synchronizeBasicPrice(row, basicPricesTable, rates, vendorId, currency, true);
       break;
     case tableKeys.stepMultipliersTable:
-      await synchronizeStepMultiplier(row, stepMultipliersTable, rates, vendorId);
+      await synchronizeStepMultiplier(row, stepMultipliersTable, rates, vendorId, true);
       break;
     case tableKeys.industryMultipliersTable:
-      await synchronizeIndustryMultiplier(row, industryMultipliersTable, rates, vendorId);
+      await synchronizeIndustryMultiplier(row, industryMultipliersTable, rates, vendorId, true);
       break;
     case tableKeys.pricelistTable:
-      await synchronizePricelistTable(row, rates, vendorId);
+      await synchronizePricelistTable(row, rates, vendorId, true);
   }
 };
 

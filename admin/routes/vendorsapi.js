@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
-const { getRatePricelist } = require('../rates');
+const { getRatePricelist, changeMainRatePricelist } = require('../rates');
 const { updateProject, getProject } = require('../projects');
 const {
   getVendor,
@@ -331,9 +331,9 @@ router.post('/update-vendor', upload.fields([{ name: 'photo' }]), async (req, re
 });
 
 router.get('/rates/:id', async (req, res) => {
-  const { _id: vendorId } = req.params;
+  const { id: vendorId } = req.params;
   try {
-    const { rates } = await Vendors.findOne({ _id: vendorId });
+    const { rates } = await getVendor({ _id: vendorId });
     res.send(rates);
   } catch (err) {
     console.log(err);
@@ -342,10 +342,11 @@ router.get('/rates/:id', async (req, res) => {
 });
 
 router.post('/rates/:id', async (req, res) => {
-  const { _id: vendorId } = req.params;
+  const { id: vendorId } = req.params;
   const { itemIdentifier, updatedItem } = req.body;
   try {
     await updateVendorsRatePrices(vendorId, itemIdentifier, updatedItem);
+    res.send('Saved')
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating vendor\'s rates');
@@ -355,7 +356,7 @@ router.post('/rates/:id', async (req, res) => {
 router.post('/rates/change-pricelist/:id', async (req, res) => {
   const { id: vendorId } = req.params;
   try {
-    await changeVendorPricelist(vendorId, req.body);
+    await changeMainRatePricelist(vendorId, req.body, true);
     res.send('Saved');
   } catch (err) {
     console.log(err);
