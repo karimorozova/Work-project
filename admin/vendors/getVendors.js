@@ -23,8 +23,15 @@ async function getVendor(query) {
             .populate('rates.basicPricesTable.targetLanguage')
             .populate('rates.stepMultipliersTable.step')
             .populate('rates.stepMultipliersTable.unit')
-            .populate('rates.industryMultipliersTable.industry');
-    return vendor;
+            .populate('rates.industryMultipliersTable.industry')
+            .populate('rates.pricelistTable.sourceLanguage')
+            .populate('rates.pricelistTable.targetLanguage')
+            .populate('rates.pricelistTable.step')
+            .populate('rates.pricelistTable.unit')
+            .populate('rates.pricelistTable.industry');
+
+
+  return vendor;
 }
 
 async function getVendors(query) {

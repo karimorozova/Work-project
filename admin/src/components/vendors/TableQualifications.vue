@@ -1,70 +1,70 @@
 <template lang="pug">
-.qualifications
-  .qualifications__preview(v-if="isEditAndSend")
-    VendorPreview(@closePreview="closePreview", :message="previewMessage", @send="sendMessage")
-  .qualifications__form(v-if="isForm")
-    VendorLqa(:vendorData="lqaData", @closeForm="closeForm", @saveVendorLqa="saveVendorLqa")
-  .qualifications__table
-    SettingsTable(
-      :fields="fields",
-      :tableData="qualificationData",
-      :errors="errors",
-      :areErrors="areErrors",
-      :isApproveModal="isDeleting",
-      @closeErrors="closeErrors",
-      @approve="deleteData",
-      @notApprove="setDefaults",
-      @closeModal="setDefaults"
-    )
-      template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-        .qualifications__head-title {{ field.label }}
+  .qualifications
+    .qualifications__preview(v-if="isEditAndSend")
+      VendorPreview(@closePreview="closePreview", :message="previewMessage", @send="sendMessage")
+    .qualifications__form(v-if="isForm")
+      VendorLqa(:vendorData="lqaData", @closeForm="closeForm", @saveVendorLqa="saveVendorLqa")
+    .qualifications__table
+      SettingsTable(
+        :fields="fields",
+        :tableData="qualificationData",
+        :errors="errors",
+        :areErrors="areErrors",
+        :isApproveModal="isDeleting",
+        @closeErrors="closeErrors",
+        @approve="deleteData",
+        @notApprove="setDefaults",
+        @closeModal="setDefaults"
+      )
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          .qualifications__head-title {{ field.label }}
 
-      template(slot="source", slot-scope="{ row, index }")
-        .qualifications__data {{ row.source.lang }}
-      template(slot="target", slot-scope="{ row, index }")
-        .qualifications__data {{ row.target.lang }}
-      template(slot="industry", slot-scope="{ row, index }")
-        .qualifications__data {{ row.industry.name }}
-      template(slot="step", slot-scope="{ row, index }")
-        .qualifications__data {{ presentArrays(row.steps, 'title') }}
+        template(slot="source", slot-scope="{ row, index }")
+          .qualifications__data {{ row.source.lang }}
+        template(slot="target", slot-scope="{ row, index }")
+          .qualifications__data {{ row.target.lang }}
+        template(slot="industry", slot-scope="{ row, index }")
+          .qualifications__data {{ row.industry.name }}
+        template(slot="step", slot-scope="{ row, index }")
+          .qualifications__data {{ presentArrays(row.steps, 'title') }}
 
-      template(slot="status", slot-scope="{ row, index }")
-        .qualifications__data(v-if="currentActive !== index") {{ row.status }}
-        .qualifications__drop-menu(v-else)
-          .drop-type(v-if="row.testType === 'Test'")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :selectedOption="currentStatus",
-              :options="TestWorkflowStatusesTest",
-              @chooseOption="setStatus"
+        template(slot="status", slot-scope="{ row, index }")
+          .qualifications__data(v-if="currentActive !== index") {{ row.status }}
+          .qualifications__drop-menu(v-else)
+            .drop-type(v-if="row.testType === 'Test'")
+              SelectSingle(
+                :isTableDropMenu="isTableDropMenu",
+                placeholder="Select",
+                :selectedOption="currentStatus",
+                :options="TestWorkflowStatusesTest",
+                @chooseOption="setStatus"
+              )
+            .drop-type(v-if="row.testType === 'Sample'")
+              SelectSingle(
+                :isTableDropMenu="isTableDropMenu",
+                placeholder="Select",
+                :selectedOption="currentStatus",
+                :options="TestWorkflowStatusesSample",
+                @chooseOption="setStatus"
+              )
+
+        template(slot="progress", slot-scope="{ row, index }")
+          .progress-line
+            .progress-line__body(v-for="stage in 5")
+              .progress-line__bar(v-if="stage <= setStatusStage(row.status)", :style="{ background: '#2cb42c' }")
+              .progress-line__bar(v-else)
+
+        template(slot="tqi", slot-scope="{ row, index }")
+          .qualifications__data {{ row.tqi }}
+
+        template(slot="icons", slot-scope="{ row, index }")
+          .qualifications__icons
+            img.qualifications__icon(
+              v-for="(icon, key) in icons",
+              :src="icon.icon",
+              @click="makeAction(index, key)",
+              :class="{ qualifications_opacity: isActive(key, index) }"
             )
-          .drop-type(v-if="row.testType === 'Sample'")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :selectedOption="currentStatus",
-              :options="TestWorkflowStatusesSample",
-              @chooseOption="setStatus"
-            )
-
-      template(slot="progress", slot-scope="{ row, index }")
-        .progress-line
-          .progress-line__body(v-for="stage in 5")
-            .progress-line__bar(v-if="stage <= setStatusStage(row.status)", :style="{ background: '#2cb42c' }")
-            .progress-line__bar(v-else)
-
-      template(slot="tqi", slot-scope="{ row, index }")
-        .qualifications__data {{ row.tqi }}
-
-      template(slot="icons", slot-scope="{ row, index }")
-        .qualifications__icons
-          img.qualifications__icon(
-            v-for="(icon, key) in icons",
-            :src="icon.icon",
-            @click="makeAction(index, key)",
-            :class="{ qualifications_opacity: isActive(key, index) }"
-          )
 </template>
 
 <script>
@@ -367,6 +367,7 @@ export default {
 
       try {
         await this.storeAssessment(formData);
+        await this.sendToRates();
         await this.manageSaveClick(this.currentActive);
       } catch (err) {
       } finally {
@@ -431,6 +432,18 @@ export default {
       }
     },
 
+    async sendToRates() {
+      let qualification = {
+        source: this.currentSource,
+        target: this.currentTarget,
+        steps: this.currentSteps,
+        industry: this.currentIndustry,
+      };
+      await this.$http.post('/vendorsapi/qualification-rates/' + this.currentVendor._id, {
+          qualification,
+        });
+    },
+
     setStatus({ option }) {
       this.currentStatus = option;
     },
@@ -482,7 +495,7 @@ export default {
           const vendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
           await this.storeCurrentVendor(vendor.body);
         } catch (err) {
-        }finally{
+        } finally {
           this.$emit("refreshQualifications");
         }
       }
@@ -552,7 +565,8 @@ export default {
   created() {
     this.getTests();
   },
-  mounted() {},
+  mounted() {
+  },
 };
 </script>
 
@@ -571,28 +585,35 @@ export default {
     @extend %table-data;
     overflow-x: hidden;
   }
+
   &__editing-data {
     @extend %table-data;
     box-shadow: inset 0 0 7px $brown-shadow;
   }
+
   &__data-input {
     @extend %table-text-input;
   }
+
   &__icons {
     @extend %table-icons;
     height: 32px;
     justify-content: flex-end;
   }
+
   &__icon {
     @extend %table-icon;
   }
+
   &__drop-menu {
     position: relative;
     box-shadow: inset 0 0 7px $brown-shadow;
   }
+
   &_opacity {
     opacity: 1;
   }
+
   &__form {
     width: 70%;
     position: absolute;
@@ -602,14 +623,17 @@ export default {
     bottom: 0;
   }
 }
+
 .progress-line {
   display: flex;
   height: 32px;
   align-items: center;
   padding: 0 5px;
+
   &__body {
     width: 25%;
   }
+
   &__bar {
     height: 5px;
     margin: 0 1px;

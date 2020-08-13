@@ -18,7 +18,7 @@ const {
   removeClientDoc,
   syncClientRatesCost
 } = require('../clients');
-const { getRatePricelist, changeClientPricelist, bindClientRates, getClientRates } = require('../rates');
+const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../rates');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -225,7 +225,7 @@ router.post('/rates', async (req, res) => {
 router.post('/rates/change-pricelist/:id', async (req, res) => {
   const { id: clientId } = req.params;
   try {
-    await changeClientPricelist(clientId, req.body);
+    await changeMainRatePricelist(clientId, req.body);
     res.send('Saved');
   } catch (err) {
     console.log(err);

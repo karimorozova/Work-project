@@ -1,10 +1,10 @@
 const { Clients, Vendors } = require('../models');
-const { getVendor } = require('../vendors');
 
-const changeClientPricelist = async (subjectId, pricelistItem, fromVendor = false) => {
+const changeMainRatePricelist = async (subjectId, pricelistItem, fromVendor = false) => {
   try {
     const { _id: rowId, price, altered, notification } = pricelistItem;
-    const subject = fromVendor ? await getVendor({ _id: subjectId }) : await Clients.findOne({ _id: subjectId });
+    const neededSubject = fromVendor ? Vendors : Clients;
+    const subject = await neededSubject.findOne({ _id: subjectId });
     const { pricelistTable } = subject.rates;
     const neededRowIndex = pricelistTable.findIndex(item => item._id.toString() === rowId);
     const { price: oldPrice } = pricelistTable[neededRowIndex];
@@ -13,12 +13,11 @@ const changeClientPricelist = async (subjectId, pricelistItem, fromVendor = fals
     pricelistTable[neededRowIndex].altered = altered;
     pricelistTable[neededRowIndex].notification = notification;
     subject.rates.pricelistTable = pricelistTable;
-    const updateSubject = fromVendor ? Vendors : Clients;
-    await updateSubject.updateOne({ _id: subjectId }, { rates: subject.rates });
+    await neededSubject.updateOne({ _id: subjectId }, { rates: subject.rates });
   } catch (err) {
     console.log(err);
-    console.log('Error in changeClientPricelist');
+    console.log('Error in changeMainRatePricelist');
   }
 };
 
-module.exports = { changeClientPricelist };
+module.exports = { changeMainRatePricelist };
