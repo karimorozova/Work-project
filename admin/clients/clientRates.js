@@ -8,6 +8,7 @@ const {
   filterRedundantSteps,
   filterRedundantIndustries
 } = require('./editClientRates');
+const { generateCompetenciesCombinations } = require('../vendors');
 const { tableKeys } = require('../enums');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
@@ -174,7 +175,16 @@ const changePricelistTable = (
   return changedPricelistTable;
 };
 
-//TODO: Add source-language existence check
+/**
+ * @param clientId - id of a current client
+ * @param newService - fresh created service, consists: {
+ *   sourceLanguage: {Object},
+ *   targetLanguages: {Array},
+ *   steps: {Array},
+ *   industries: {Array}
+ * }
+ * @returns: Nothing, but updates client's rates with new combinations
+ */
 const addNewRateComponents = async (clientId, newService) => {
   const { rates, defaultPricelist, currency } = await Clients.findOne({ _id: clientId });
   const boundPricelist = await Pricelist.findOne({ _id: defaultPricelist });
@@ -213,9 +223,9 @@ const addNewRateComponents = async (clientId, newService) => {
     industryMultipliersTable,
     pricelistTable,
   );
-  await Clients.updateOne({ _id: clientId },
-    { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
-  );
+  // await Clients.updateOne({ _id: clientId },
+  //   { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
+  // );
 };
 
 const getNeededCurrency = (basicPriceObj, clientCurrency) => {
