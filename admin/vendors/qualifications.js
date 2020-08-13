@@ -1,7 +1,6 @@
 const { Vendors, LangTest } = require('../models');
 const { createRateCombinations } = require('./createVendorRates');
 
-
 const saveQualifications = async (listOfNewCompetencies, vendorId) => {
   const allTests = await LangTest.find({});
   let { qualifications } = await Vendors.findOne({ _id: vendorId });
@@ -46,10 +45,15 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
         });
       } else {
         const currentTestForItem = allTests.find(test =>
-          test.source.toString() === element.sourceLanguage.toString());
+          test.source.toString() === element.sourceLanguage.toString() &&
+          test.targets.find(target => target.toString() === element.targetLanguage.toString()) &&
+          test.industries.find(industry => industry.toString() === element.industry.toString()) &&
+          test.steps.find(step => step.toString() === element.step.toString())
+        );
         const ifExistsStep = isExists(currentTestForItem.steps, element.step);
         if (ifExistsStep) {
-          listQualificationsForSave[findIndex].steps.push(element.step);
+          const ifExistsStepInQualification = isExists(listQualificationsForSave[findIndex].steps, element.step)
+          ifExistsStepInQualification || listQualificationsForSave[findIndex].steps.push(element.step);
         }
       }
     }
@@ -59,8 +63,8 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
     { _id: vendorId },
     { qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests) }
   );
-  await createRateCombinations(listForRates, vendorId);
 
+  await createRateCombinations(listForRates, vendorId);
 
   function qualificationsArrayAdditions(qualificationsArray, testsArray) {
     let finalQualifivationArray = [];
@@ -73,21 +77,64 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
           qualification.steps.some((currentStep) => step.toString() === currentStep.toString())
         )
       );
-      if(!qualification.hasOwnProperty('testType') || qualification.testType == ''){
+      if (!qualification.hasOwnProperty('testType') || qualification.testType == '') {
         let currentQualification = {}
         Object.assign(currentQualification, qualification.toJSON());
         currentQualification.testType = currentTest.evaluationType === 'Test' ? 'Test' : 'Sample';
         finalQualifivationArray.push(currentQualification)
-      }else{
+      } else {
         finalQualifivationArray.push(qualification.toJSON());
       }
     });
     return finalQualifivationArray;
   }
-
-  function isExists(arr, searchElement) {
-    return arr.map(item => item.toString()).includes(searchElement.toString());
-  }
 };
 
-module.exports = { saveQualifications };
+const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId) => {
+  const allTests = await LangTest.find({});
+  let { qualifications } = await Vendors.findOne({ _id: vendorId });
+  let newQualifications = qualifications;
+  currentTest = allTests.find(test =>
+    test.source.toString() === competence.sourceLanguage._id &&
+    test.targets.find(target => target.toString() === competence.targetLanguage._id) &&
+    test.industries.find(industry => industry.toString() === competence.industry._id) &&
+    test.steps.find(step => step.toString() === competence.step._id)
+  );
+  if (currentTest) {
+    const findIndex = qualifications.findIndex(qualification =>
+      qualification.source.toString() === competence.sourceLanguage._id &&
+      qualification.target.toString() === competence.targetLanguage._id &&
+      qualification.industry.toString() === competence.industry._id
+    );
+    if (findIndex === -1) {
+      newQualifications.push({
+        source: competence.sourceLanguage,
+        target: competence.targetLanguage,
+        industry: competence.industry,
+        steps: [competence.step],
+        testType: currentTest.evaluationType,
+      })
+    } else {
+      const currentTestForItem = allTests.find(test =>
+        test.source.toString() === competence.sourceLanguage._id &&
+        test.targets.find(target => target.toString() === competence.targetLanguage._id) &&
+        test.industries.find(industry => industry.toString() === competence.industry._id) &&
+        test.steps.find(step => step.toString() === competence.step._id)
+      );
+      const ifExistsStep = isExists(currentTestForItem.steps, competence.step._id);
+      if (ifExistsStep) {
+        const ifExistsStepInQualification = isExists(newQualifications[findIndex].steps, competence.step._id)
+        ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id)
+      }
+    }
+  } else {
+    // to rates
+  }
+  await Vendors.updateOne({ _id: vendorId }, { qualifications: newQualifications });
+};
+
+const isExists = (arr, searchElement) => {
+  return arr.map(item => item.toString()).includes(searchElement.toString());
+}
+
+module.exports = { saveQualifications, saveQualificationsAfterUpdateCompetencies };

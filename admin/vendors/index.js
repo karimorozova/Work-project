@@ -11,7 +11,7 @@ const {
   deleteVendorCompetencies, 
   generateCompetenciesCombinations 
 } = require('./competencies');
-const { saveQualifications } = require('./qualifications');
+const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications');
 const { updateVendorsRatePrices } = require('./updateVendorRates');
 const { syncVendorRatesCost } = require('./syncVendorRatesCost');
 const { createRateRowFromQualification } = require('./createVendorRates');
@@ -40,5 +40,6 @@ module.exports = {
   updateVendorsRatePrices,
   syncVendorRatesCost,
   createRateRowFromQualification,
-  generateCompetenciesCombinations
+  generateCompetenciesCombinations,
+  saveQualificationsAfterUpdateCompetencies
 };

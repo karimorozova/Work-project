@@ -286,6 +286,7 @@ export default {
       this.isPopup = action;
     },
     addData() {
+      this.currentIndex = -1;
       this.togglePopup(true);
     },
     closeAddData() {
@@ -320,29 +321,35 @@ export default {
     },
     searchSame(type) {
       let result = false;
-      const allVendorsTests = this.vendorTests.filter((test) =>
-        test.evaluationType === type && this.currentIndex >= 0 ? test._id !== this.vendorTests[this.currentIndex]._id : false
-      );
-      allVendorsTests.length
-        ? allVendorsTests.forEach((element) => {
-            const source = element.source.lang === this.currentSource.lang;
-            const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets;
-            const target = element.targets.find((target) =>
-              currentTargetForSearch.some((currentTarget) => target.lang === currentTarget.lang)
-            );
-            const industry = element.industries.find((industry) =>
-              this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)
-            );
-            const step = element.steps.find((steps) =>
-              this.currentSteps.some((currentStep) => steps.title === currentStep.title)
-            );
-            result =
-              ((source && Object.keys(target !== undefined ? target : {}).length > 0) &&
-                Object.keys(industry !== undefined ? industry : {}).length > 0) &&
-              Object.keys(step !== undefined ? step : {}).length > 0;
-          })
-        : (result = false);
+      const allVendorsTests =
+        this.currentIndex !== -1
+          ? this.vendorTests.filter((test) =>
+              test.evaluationType === type ? test._id !== this.vendorTests[this.currentIndex]._id : false
+            )
+          : this.vendorTests;
 
+      for (const element of allVendorsTests) {
+        const source = element.source.lang === this.currentSource.lang;
+        const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets;
+        const target = element.targets.find((target) =>
+          currentTargetForSearch.some((currentTarget) => target.lang === currentTarget.lang)
+        );
+        const industry = element.industries.find((industry) =>
+          this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)
+        );
+        const step = element.steps.find((steps) =>
+          this.currentSteps.some((currentStep) => steps.title === currentStep.title)
+        );
+        result =
+          source &&
+          Object.keys(target !== undefined ? target : {}).length > 0 &&
+          Object.keys(industry !== undefined ? industry : {}).length > 0 &&
+          Object.keys(step !== undefined ? step : {}).length > 0;
+
+        if (result) {
+          break;
+        }
+      }
       return result;
     },
     isTestSame() {
@@ -365,10 +372,10 @@ export default {
         source: this.currentSource,
         industries: this.currentIndustries,
         steps: this.currentSteps,
-        index: this.currentIndex >= 0  ? this.currentIndex : "",
-        oldPath: this.currentIndex >= 0  ? this.vendorTests[this.currentIndex].path : "",
-        fileName: this.currentIndex >= 0  ? this.vendorTests[this.currentIndex].fileName : "",
-        _id: this.currentIndex >= 0  ? this.vendorTests[this.currentIndex]._id : "",
+        index: this.currentIndex >= 0 ? this.currentIndex : "",
+        oldPath: this.currentIndex >= 0 ? this.vendorTests[this.currentIndex].path : "",
+        fileName: this.currentIndex >= 0 ? this.vendorTests[this.currentIndex].fileName : "",
+        _id: this.currentIndex >= 0 ? this.vendorTests[this.currentIndex]._id : "",
       };
       try {
         await this.saveLangTest({ testData, file: this.currentFile });
@@ -544,7 +551,7 @@ export default {
       return this.currentTargets.length ? this.currentTargets.map((item) => item.lang) : [];
     },
   },
-  mounted(){
+  mounted() {
     this.domain = __WEBPACK__API_URL__;
   },
   created() {

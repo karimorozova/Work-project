@@ -1,7 +1,7 @@
 const { Vendors } = require('../models');
 const { getVendor } = require('./getVendors');
 const ObjectId = require('mongodb').ObjectID;
-const { saveQualifications } = require('./qualifications');
+const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications');
 const { updateVendorRatesFromCompetence } = require('./newUpdateVendorRates');
 const { deleteVendorRates } = require('./deleteVendorRates');
 
@@ -12,12 +12,13 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
       const neededServiceIndex = competencies.findIndex(item => item._id.toString() === dataToUpdate._id);
       competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
       await Vendors.updateOne({ _id: vendorId }, { competencies });
+      await saveQualificationsAfterUpdateCompetencies(dataToUpdate, vendorId);
       await updateVendorRatesFromCompetence(vendorId, dataToUpdate, competencies[neededServiceIndex]);
     } else {
       const combinationsWithoutRepetitions = generateCompetenciesCombinations(dataToUpdate)
         .filter(x => competencies.every(y =>
           `${x.sourceLanguage}/${x.targetLanguage}/${x.industry}/${x.step}` !==
-          `${y.sourceLanguage}/${y.targetLanguage}/${y.industry}/${y.step}`
+          `${y.sourceLanguage._id}/${y.targetLanguage._id}/${y.industry._id}/${y.step._id}`
         ));
         competencies.push(...combinationsWithoutRepetitions);
         await Vendors.updateOne({ _id: vendorId }, { competencies });
