@@ -223,9 +223,9 @@ const addNewRateComponents = async (clientId, newService) => {
     industryMultipliersTable,
     pricelistTable,
   );
-  // await Clients.updateOne({ _id: clientId },
-  //   { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
-  // );
+  await Clients.updateOne({ _id: clientId },
+    { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
+  );
 };
 
 const getNeededCurrency = (basicPriceObj, clientCurrency) => {
