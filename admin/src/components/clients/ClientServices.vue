@@ -345,7 +345,9 @@ export default {
       } finally {
         this.setDefaults();
         this.newRow = false;
-        this.$emit("updateRates", true);
+        setTimeout(() => {
+          this.$emit("updateRates", true);
+        }, 1000);
       }
     },
 
