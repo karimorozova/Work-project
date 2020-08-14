@@ -120,7 +120,7 @@ export default {
             row: this.dataArray[index]
           })
       } catch (err) {
-        this.alertToggle({message: "Impossibly update price", isShow: true, type: "error" });
+        this.alertToggle({message: "Impossible update price", isShow: true, type: "error" });
       }finally{
         this.refreshResultTable();
         const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
