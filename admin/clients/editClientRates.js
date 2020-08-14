@@ -6,21 +6,23 @@ const { tableKeys } = require('../enums');
 
 const updateClientLangPairs = async (sourceLangId, sourceLangDifference, targetLangDifference, clientId, serviceId) => {
   const { rates, services } = await Clients.findOne({ _id: clientId });
-  const { difference, itemsToAdd, itemsToDelete } = targetLangDifference;
   let updatedRates = rates;
-  switch (difference) {
-    default:
-    case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
-    differenceOperationType.AddAndReplace:
-      updatedRates = await filterRedundantLangPairs(updatedRates, services, serviceId, itemsToDelete, sourceLangId);
-      updatedRates = await pushNewTargetPairs(updatedRates, services, serviceId, itemsToAdd, sourceLangId);
-      break;
-    case differenceOperationType.JustAdd:
-      updatedRates = await pushNewTargetPairs(updatedRates, services, serviceId, itemsToAdd, sourceLangId);
-      break;
-    case differenceOperationType.JustDelete:
-      updatedRates = await filterRedundantLangPairs(updatedRates, services, serviceId, itemsToDelete, sourceLangId);
-      break;
+  if (targetLangDifference) {
+    const { difference, itemsToAdd, itemsToDelete } = targetLangDifference;
+    switch (difference) {
+      default:
+      case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
+        differenceOperationType.AddAndReplace:
+        updatedRates = await filterRedundantLangPairs(updatedRates, services, serviceId, itemsToDelete, sourceLangId);
+        updatedRates = await pushNewTargetPairs(updatedRates, services, serviceId, itemsToAdd, sourceLangId);
+        break;
+      case differenceOperationType.JustAdd:
+        updatedRates = await pushNewTargetPairs(updatedRates, services, serviceId, itemsToAdd, sourceLangId);
+        break;
+      case differenceOperationType.JustDelete:
+        updatedRates = await filterRedundantLangPairs(updatedRates, services, serviceId, itemsToDelete, sourceLangId);
+        break;
+    }
   }
   if (sourceLangDifference.lang) {
     const { basicPricesTable, pricelistTable } = updatedRates;
@@ -47,7 +49,7 @@ const updateClientStepMultipliers = async (serviceStepDifference, clientId, serv
   switch (difference) {
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
-    differenceOperationType.AddAndReplace:
+      differenceOperationType.AddAndReplace:
       updatedRates = await filterRedundantSteps(client.rates, client.services, serviceId, itemsToDelete);
       updatedRates = await pushNewStepCombinations(updatedRates, client.services, serviceId, itemsToAdd);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
@@ -70,7 +72,7 @@ const updateClientIndustryMultipliers = async (industryDifference, clientId, ser
   switch (difference) {
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
-    differenceOperationType.AddAndReplace:
+      differenceOperationType.AddAndReplace:
       updatedRates = await filterRedundantIndustries(client.rates, client.services, serviceId, itemsToDelete);
       updatedRates = await pushNewIndustryMultiplier(updatedRates, client.services, serviceId, itemsToAdd);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });

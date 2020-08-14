@@ -4,12 +4,12 @@ const { getNeededCurrency, getNeededLangPair, getNeededStepRow } = require('./cl
 const { multiplyPrices } = require('../multipliers');
 
 const syncClientRatesCost = async (clientId, tableKey, row) => {
-  const { defaultPricelist, currency, rates } = await Clients.findOne({ _id: clientId });
+  const { currency, rates } = await Clients.findOne({ _id: clientId });
   const {
     basicPricesTable,
     stepMultipliersTable,
     industryMultipliersTable,
-  } = await Pricelist.findOne({ _id: defaultPricelist });
+  } = await Pricelist.findOne({  isDefault: true  });
   switch (tableKey) {
     default:
     case tableKeys.basicPricesTable:
