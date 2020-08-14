@@ -129,55 +129,40 @@ const changePricelistTable = (
   key,
   oldMultiplier
 ) => {
-  let neededPricelistRows;
-  let neededPricelistRowIndex;
-  let neededPricelistRow;
+  let updatedPricelist;
   switch (key) {
     default:
     case tableKeys.basicPricesTable:
       const { sourceLanguage, targetLanguage, basicPrice } = updatedItem;
-      neededPricelistRows = pricelistTable.filter(item => (
-        `${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`
-      ));
-      for (let { _id, altered } of neededPricelistRows) {
-        if (!altered) {
-          neededPricelistRowIndex = pricelistTable.findIndex(item => item._id.toString() === _id.toLocaleString());
-          neededPricelistRow = pricelistTable[neededPricelistRowIndex];
-          neededPricelistRow.price /= oldMultiplier;
-          neededPricelistRow.price *= basicPrice;
-          pricelistTable.splice(neededPricelistRowIndex, 1, neededPricelistRow);
+      updatedPricelist = pricelistTable.map(item => {
+        if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`) {
+          item.price /= oldMultiplier;
+          item.price *= Number(basicPrice);
         }
-      }
+        return item;
+      });
       break;
     case tableKeys.stepMultipliersTable:
       const { step, unit, size, multiplier: stepMultiplier } = updatedItem;
-      neededPricelistRows = pricelistTable.filter(item => (
-        `${item.step} ${item.unit} ${item.size}` === `${step._id} ${unit._id} ${size}`
-      ));
-      for (let { _id, altered } of neededPricelistRows) {
-        if (!altered) {
-          neededPricelistRowIndex = pricelistTable.findIndex(item => item._id.toString() === _id.toString());
-          neededPricelistRow = pricelistTable[neededPricelistRowIndex];
-          neededPricelistRow.price /= oldMultiplier;
-          neededPricelistRow.price *= stepMultiplier;
-          pricelistTable.splice(neededPricelistRowIndex, 1, neededPricelistRow);
+      updatedPricelist = pricelistTable.map(item => {
+        if (`${item.step} ${item.unit} ${item.size}` === `${step._id} ${unit._id} ${size}`) {
+          item.price /= oldMultiplier;
+          item.price *= Number(stepMultiplier);
         }
-      }
+        return item;
+      });
       break;
     case tableKeys.industryMultipliersTable:
-    const { industry, multiplier: industryMultiplier } = updatedItem;
-    neededPricelistRows = pricelistTable.filter(item => item.industry.toString() === industry._id);
-    for (let { _id, altered } of neededPricelistRows) {
-      if (!altered) {
-        neededPricelistRowIndex = pricelistTable.findIndex(item => item._id.toString() === _id.toString());
-        neededPricelistRow = pricelistTable[neededPricelistRowIndex];
-        neededPricelistRow.price /= oldMultiplier;
-        neededPricelistRow.price *= industryMultiplier;
-        pricelistTable.splice(neededPricelistRowIndex, 1, neededPricelistRow);
-      }
-    }
+      const { industry, multiplier: industryMultiplier } = updatedItem;
+      updatedPricelist = pricelistTable.map(item => {
+        if (item.industry.toString() === industry._id) {
+          item.price /= oldMultiplier;
+          item.price *= Number(industryMultiplier);
+        }
+        return item;
+      });
   }
-  return pricelistTable;
+  return updatedPricelist;
 };
 
 /**
@@ -480,13 +465,13 @@ const deleteClientRates = async (clientId, serviceToDelete) => {
   basicPricesTable = basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
     !langPairsToDelete.includes(`${sourceLanguage.toString()} ${targetLanguage.toString()}`)
   ));
-  const { stepMultipliersTable: filteredStepsTable } = filterRedundantSteps(
+  const { stepMultipliersTable: filteredStepsTable } = await filterRedundantSteps(
     client.rates,
     client.services,
     serviceToDelete._id,
     services
   );
-  const { industryMultipliersTable: filteredIndustriesTable } = filterRedundantIndustries(
+  const { industryMultipliersTable: filteredIndustriesTable } = await filterRedundantIndustries(
     client.rates,
     client.services,
     serviceToDelete._id,
