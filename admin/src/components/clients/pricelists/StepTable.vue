@@ -146,7 +146,7 @@ export default {
           row: this.dataArray[index],
         });
       } catch (err) {
-        this.alertToggle({ message: "Impossibly update price", isShow: true, type: "error" });
+        this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" });
       } finally {
         this.refreshResultTable();
         const client = await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);

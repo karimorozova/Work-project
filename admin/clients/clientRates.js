@@ -12,7 +12,7 @@ const { tableKeys } = require('../enums');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
-  const boundPricelist = await Pricelist.findOne({ _id: client.defaultPricelist });
+  const boundPricelist = await Pricelist.findOne({ isDefault: true });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates;
   let updatedPricelistTable;
   switch (itemIdentifier) {
@@ -28,12 +28,10 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
         'Client'
       );
       updatedPricelistTable = changePricelistTable(
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
         pricelistTable,
         updatedItem,
-        itemIdentifier
+        itemIdentifier,
+        basicPrice
       );
       client.rates.basicPricesTable = updatedBasicPriceTable;
       client.rates.pricelistTable = updatedPricelistTable;
@@ -50,12 +48,10 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
         'Client'
       );
       updatedPricelistTable = changePricelistTable(
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
         pricelistTable,
         updatedItem,
-        itemIdentifier
+        itemIdentifier,
+        stepMultiplier
       );
       client.rates.stepMultipliersTable = updatedStepMultipliersTable;
       client.rates.pricelistTable = updatedPricelistTable;
@@ -72,12 +68,10 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
         'Client'
       );
       updatedPricelistTable = changePricelistTable(
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
         pricelistTable,
         updatedItem,
-        itemIdentifier
+        itemIdentifier,
+        industryMultiplier
       );
       client.rates.industryMultipliersTable = updatedIndustryMultipliersTable;
       client.rates.pricelistTable = updatedPricelistTable;
@@ -121,75 +115,107 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) =>
 
 const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id.toString() === searchItemId);
 
+/**
+ *
+ * @param pricelistTable - {Array} - Array of client's pricelist
+ * @param updatedItem - {Object} - Object with updated data
+ * @param key - {String} - table identifier
+ * @param oldMultiplier - {Number} - Old price or step/industry multiplier
+ * @returns {Array} - returns pricelist with updated rows
+ */
 const changePricelistTable = (
-  basicPricesTable,
-  stepMultipliersTable,
-  industryMultipliersTable,
   pricelistTable,
   updatedItem,
-  key) => {
-  let changedPricelistTable = [];
-  for (let item of pricelistTable) {
-    if (!item.altered) {
-      const neededBasicPriceItem = basicPricesTable.find(basicPrice => basicPrice.serviceId === updatedItem.serviceId);
-      const neededStepMultipliersItem = stepMultipliersTable.find(({ step, unit, serviceId, size }) => (
-        step.toString() === item.step.toString() &&
-        unit.toString() === item.unit.toString() &&
-        serviceId === item.serviceId &&
-        size === item.size
-      ));
-      const neededIndustryItem = industryMultipliersTable.find(industry => industry.serviceId === updatedItem.serviceId);
-      switch (key) {
-        default:
-        case tableKeys.basicPricesTable:
-          item.price = multiplyPrices(
-            updatedItem.basicPrice, neededStepMultipliersItem.multiplier, neededIndustryItem.multiplier
-          );
-          changedPricelistTable.push(item);
-          break;
-        case tableKeys.stepMultipliersTable:
-          const neededPricelistItem = item.step.toString() === updatedItem.step._id &&
-          item.unit.toString() === updatedItem.unit._id &&
-          item.serviceId === updatedItem.serviceId &&
-          item.size === updatedItem.size ? item : undefined;
-          if (neededPricelistItem) {
-            item.price = multiplyPrices(
-              neededBasicPriceItem.basicPrice, updatedItem.multiplier, neededIndustryItem.multiplier);
-            changedPricelistTable.push(item);
-          } else {
-            changedPricelistTable.push(item);
-          }
-          break;
-        case tableKeys.industryMultipliersTable:
-          item.price = multiplyPrices(
-            neededBasicPriceItem.basicPrice, neededStepMultipliersItem.multiplier, updatedItem.multiplier
-          );
-          changedPricelistTable.push(item);
-          break;
-      }
-    } else {
-      changedPricelistTable.push(item);
-    }
+  key,
+  oldMultiplier
+) => {
+  let updatedPricelist;
+  switch (key) {
+    default:
+    case tableKeys.basicPricesTable:
+      const { sourceLanguage, targetLanguage, basicPrice } = updatedItem;
+      updatedPricelist = pricelistTable.map(item => {
+        if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`) {
+          item.price /= oldMultiplier;
+          item.price *= Number(basicPrice);
+        }
+        return item;
+      });
+      break;
+    case tableKeys.stepMultipliersTable:
+      const { step, unit, size, multiplier: stepMultiplier } = updatedItem;
+      updatedPricelist = pricelistTable.map(item => {
+        if (`${item.step} ${item.unit} ${item.size}` === `${step._id} ${unit._id} ${size}`) {
+          item.price /= oldMultiplier;
+          item.price *= Number(stepMultiplier);
+        }
+        return item;
+      });
+      break;
+    case tableKeys.industryMultipliersTable:
+      const { industry, multiplier: industryMultiplier } = updatedItem;
+      updatedPricelist = pricelistTable.map(item => {
+        if (item.industry.toString() === industry._id) {
+          item.price /= oldMultiplier;
+          item.price *= Number(industryMultiplier);
+        }
+        return item;
+      });
   }
-  return changedPricelistTable;
+  return updatedPricelist;
 };
 
-//TODO: Add source-language existence check
+/**
+ * @param clientId - id of a current client
+ * @param newService - fresh created service, consists: {
+ *   sourceLanguage: {Object},
+ *   targetLanguages: {Array},
+ *   services: {Array},
+ *   industries: {Array}
+ * }
+ * @returns: Nothing, but updates client's rates with new combinations
+ */
 const addNewRateComponents = async (clientId, newService) => {
-  const { rates, defaultPricelist, currency } = await Clients.findOne({ _id: clientId });
-  const boundPricelist = await Pricelist.findOne({ _id: defaultPricelist });
+  const { rates, currency } = await Clients.findOne({ _id: clientId });
+
+  const boundPricelist = await Pricelist.findOne({ isDefault: true});
   const { sourceLanguage, targetLanguages } = newService;
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
   const { uniqueServiceSteps, uniqueIndustries } = await getUniqueServiceItems(newService, rates);
+  const newSteps = [];
+  for (let { steps } of newService.services) {
+    for (let { step } of steps) {
+      newSteps.push({ _id: step._id });
+    }
+  }
+  const newIndustries = newService.industries.map(item => item._id);
+  const newStepMultiplierCombinations = [];
+  const newIndustryMultiplierCombinations = [];
+  for (let step of newSteps) {
+    newStepMultiplierCombinations.push(...await getStepMultipliersCombinations(step, boundPricelist));
+  }
+  for (let industry of newIndustries) {
+    const neededIndustryRow = boundPricelist.industryMultipliersTable.find(item => (
+      item.industry.toString() === industry.toString()
+    ));
+    const multiplier = neededIndustryRow.hasOwnProperty('multiplier') ? neededIndustryRow.multiplier : 100;
+    newIndustryMultiplierCombinations.push({
+      industry,
+      multiplier
+    });
+  }
+  const freshBasicPriceRows = [];
   for (let { _id } of targetLanguages) {
     const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage._id, _id);
     const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : 1;
-    basicPricesTable.push({
+    const newBasicPriceObj = {
       type: sourceLanguage._id.toString() === _id ? 'Mono' : 'Duo',
       sourceLanguage: sourceLanguage._id,
       targetLanguage: _id,
       basicPrice: boundBasicPrice
-    });
+    };
+    basicPricesTable.push(newBasicPriceObj);
+    freshBasicPriceRows.push(newBasicPriceObj);
   }
   if (uniqueServiceSteps.length) {
     for (let service of uniqueServiceSteps) {
@@ -198,19 +224,20 @@ const addNewRateComponents = async (clientId, newService) => {
   }
   if (uniqueIndustries.length) {
     for (let { _id } of uniqueIndustries) {
-      const { multiplier } = boundPricelist.industryMultipliersTable.find(({ industry }) => (
+      const neededIndustryRow = boundPricelist.industryMultipliersTable.find(({ industry }) => (
         industry.toString() === _id.toString()
       ));
+      const multiplier = !!neededIndustryRow ? neededIndustryRow.multiplier : 100;
       industryMultipliersTable.push({
         industry: _id,
         multiplier
       });
     }
   }
-  pricelistTable = await getPricelistCombinations(
-    basicPricesTable,
-    stepMultipliersTable,
-    industryMultipliersTable,
+  pricelistTable = await generateNewPricelistCombinations(
+    freshBasicPriceRows,
+    newStepMultiplierCombinations,
+    newIndustryMultiplierCombinations,
     pricelistTable,
   );
   await Clients.updateOne({ _id: clientId },
@@ -293,7 +320,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
           const neededStepRow = stepMultipliersTable.find(item => (
             `${item.step} ${item.unit} ${item.size}` === `${_id} ${unitId} ${size}`
           ));
-          const multiplier = neededStepRow ? neededStepRow.multiplier : 100;
+          const multiplier = !!neededStepRow ? neededStepRow.multiplier : 100;
           stepUnitSizeCombinations.push({
             step: _id,
             unit: unitId,
@@ -305,7 +332,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
         const neededStepRow = stepMultipliersTable.find(({ step, unit }) => (
           `${step} ${unit}` === `${_id} ${unitId}`
         ));
-        const multiplier = neededStepRow ? neededStepRow.multiplier : 100;
+        const multiplier = !!neededStepRow ? neededStepRow.multiplier : 100;
         stepUnitSizeCombinations.push({
           step: _id,
           unit: unitId,
@@ -317,6 +344,32 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
     }
   }
   return stepUnitSizeCombinations;
+};
+
+const generateNewPricelistCombinations = (
+  newBasicPriceRows,
+  newStepMultiplierRows,
+  newIndustryMultiplierRows,
+  oldPricelistTable,
+  serviceId
+) => {
+  for (let { step, unit, size, multiplier: stepMultiplierValue } of newStepMultiplierRows) {
+    for (let { sourceLanguage, targetLanguage, basicPrice } of newBasicPriceRows) {
+      for (let { industry, multiplier: industryMultiplierValue } of newIndustryMultiplierRows) {
+        oldPricelistTable.push({
+          serviceId,
+          sourceLanguage,
+          targetLanguage,
+          step,
+          unit,
+          size,
+          industry,
+          price: multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue),
+        });
+      }
+    }
+  }
+  return oldPricelistTable;
 };
 
 const getPricelistCombinations = async (
@@ -413,13 +466,13 @@ const deleteClientRates = async (clientId, serviceToDelete) => {
   basicPricesTable = basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
     !langPairsToDelete.includes(`${sourceLanguage.toString()} ${targetLanguage.toString()}`)
   ));
-  const { stepMultipliersTable: filteredStepsTable } = filterRedundantSteps(
+  const { stepMultipliersTable: filteredStepsTable } = await filterRedundantSteps(
     client.rates,
     client.services,
     serviceToDelete._id,
     services
   );
-  const { industryMultipliersTable: filteredIndustriesTable } = filterRedundantIndustries(
+  const { industryMultipliersTable: filteredIndustriesTable } = await filterRedundantIndustries(
     client.rates,
     client.services,
     serviceToDelete._id,
