@@ -2,23 +2,24 @@ const ObjectId = require('mongodb').ObjectID;
 const { Step, Clients, Services } = require('../models');
 const { differenceOperationType } = require('../enums/differenceOperationType');
 const { multiplyPrices } = require('../multipliers');
+const { tableKeys } = require('../enums');
 
-const updateClientLangPairs = async (sourceLangId, sourceLangDifference, targetLangDifference, clientId) => {
-  const { rates } = await Clients.findOne({ _id: clientId });
+const updateClientLangPairs = async (sourceLangId, sourceLangDifference, targetLangDifference, clientId, serviceId) => {
+  const { rates, services } = await Clients.findOne({ _id: clientId });
   const { difference, itemsToAdd, itemsToDelete } = targetLangDifference;
   let updatedRates = rates;
   switch (difference) {
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
     differenceOperationType.AddAndReplace:
-      updatedRates = filterRedundantLangPairs(updatedRates, itemsToDelete, sourceLangId);
-      updatedRates = pushNewTargetPairs(updatedRates, itemsToAdd, sourceLangId);
+      updatedRates = await filterRedundantLangPairs(updatedRates, services, serviceId, itemsToDelete, sourceLangId);
+      updatedRates = await pushNewTargetPairs(updatedRates, services, serviceId, itemsToAdd, sourceLangId);
       break;
     case differenceOperationType.JustAdd:
-      updatedRates = pushNewTargetPairs(updatedRates, itemsToAdd, sourceLangId);
+      updatedRates = await pushNewTargetPairs(updatedRates, services, serviceId, itemsToAdd, sourceLangId);
       break;
     case differenceOperationType.JustDelete:
-      updatedRates = filterRedundantLangPairs(updatedRates, itemsToDelete, sourceLangId);
+      updatedRates = await filterRedundantLangPairs(updatedRates, services, serviceId, itemsToDelete, sourceLangId);
       break;
   }
   if (sourceLangDifference.lang) {
@@ -47,7 +48,7 @@ const updateClientStepMultipliers = async (serviceStepDifference, clientId, serv
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
     differenceOperationType.AddAndReplace:
-      updatedRates = filterRedundantSteps(client.rates, client.services, serviceId, itemsToDelete);
+      updatedRates = await filterRedundantSteps(client.rates, client.services, serviceId, itemsToDelete);
       updatedRates = await pushNewStepCombinations(updatedRates, client.services, serviceId, itemsToAdd);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
       break;
@@ -56,7 +57,7 @@ const updateClientStepMultipliers = async (serviceStepDifference, clientId, serv
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
       break;
     case differenceOperationType.JustDelete:
-      updatedRates = filterRedundantSteps(client.rates, client.services, serviceId, itemsToDelete);
+      updatedRates = await filterRedundantSteps(client.rates, client.services, serviceId, itemsToDelete);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
       break;
   }
@@ -70,23 +71,26 @@ const updateClientIndustryMultipliers = async (industryDifference, clientId, ser
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
     differenceOperationType.AddAndReplace:
-      updatedRates = filterRedundantIndustries(client.rates, client.services, serviceId, itemsToDelete);
-      updatedRates = pushNewIndustryMultiplier(updatedRates, client.services, serviceId, itemsToAdd);
+      updatedRates = await filterRedundantIndustries(client.rates, client.services, serviceId, itemsToDelete);
+      updatedRates = await pushNewIndustryMultiplier(updatedRates, client.services, serviceId, itemsToAdd);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
       break;
     case differenceOperationType.JustAdd:
-      updatedRates = pushNewIndustryMultiplier(client.rates, client.services, serviceId, itemsToAdd);
+      updatedRates = await pushNewIndustryMultiplier(client.rates, client.services, serviceId, itemsToAdd);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
       break;
     case differenceOperationType.JustDelete:
-      updatedRates = filterRedundantIndustries(client.rates, client.services, serviceId, itemsToDelete);
+      updatedRates = await filterRedundantIndustries(client.rates, client.services, serviceId, itemsToDelete);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
       break;
   }
 };
 
-const pushNewTargetPairs = (rates, itemsToAdd, sourceLanguage) => {
+const pushNewTargetPairs = async (rates, services, currentServiceId, itemsToAdd, sourceLanguage) => {
   const { stepMultipliersTable, industryMultipliersTable } = rates;
+  const changedService = services.find(item => item._id.toString() === currentServiceId.toString());
+  const neededStepRows = await findServiceRows(stepMultipliersTable, changedService, tableKeys.stepMultipliersTable);
+  const neededIndustryRows = await findServiceRows(industryMultipliersTable, changedService, tableKeys.industryMultipliersTable);
   for (let { _id } of itemsToAdd) {
     rates.basicPricesTable.push({
       type: _id.toString() === sourceLanguage.toString() ? 'Mono' : 'Duo',
@@ -97,30 +101,40 @@ const pushNewTargetPairs = (rates, itemsToAdd, sourceLanguage) => {
       ...generateNewLangCombinations(
         _id,
         sourceLanguage,
-        stepMultipliersTable,
-        industryMultipliersTable,
+        neededStepRows,
+        neededIndustryRows,
       ));
   }
   return rates;
 };
 
-const filterRedundantLangPairs = (rates, itemsToDelete, sourceLangId) => {
+const filterRedundantLangPairs = async (rates, services, currentServiceId, itemsToDelete, sourceLangId) => {
+  const { stepMultipliersTable, industryMultipliersTable } = rates;
   const itemsToDeleteIdPairs = itemsToDelete.map(item => `${sourceLangId} ${item._id}`);
+  const changedService = services.find(item => item._id.toString() === currentServiceId.toString());
+  const neededStepRows = await findServiceRows(stepMultipliersTable, changedService, tableKeys.stepMultipliersTable);
+  const neededIndustryRows = await findServiceRows(industryMultipliersTable, changedService, tableKeys.industryMultipliersTable);
   return {
     ...rates,
     basicPricesTable: rates.basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
       !itemsToDeleteIdPairs.includes(`${sourceLanguage} ${targetLanguage}`)
     )),
-    pricelistTable: rates.pricelistTable.filter(({ sourceLanguage, targetLanguage }) => (
-      !itemsToDeleteIdPairs.includes(`${sourceLanguage} ${targetLanguage}`)
-    ))
+    pricelistTable: await filterPricelistTable(
+      rates.pricelistTable,
+      [],
+      neededIndustryRows,
+      neededStepRows,
+      itemsToDeleteIdPairs,
+      tableKeys.basicPricesTable
+    )
   };
 };
 
 const pushNewStepCombinations = async (rates, services, currentServiceId, itemsToAdd) => {
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-  const duplicatesArr = checkForDuplicates(services, currentServiceId, itemsToAdd, 'services');
-  if (duplicatesArr.length) return rates;
+  const changedService = services.find(item => item._id.toString() === currentServiceId.toString());
+  const neededBasicPriceRows = await findServiceRows(basicPricesTable, changedService, tableKeys.basicPricesTable);
+  const neededIndustryRows = await findServiceRows(industryMultipliersTable, changedService, tableKeys.industryMultipliersTable);
   for (let { steps } of itemsToAdd) {
     for (let { step: _id } of steps) {
       const neededStep = await Step.findOne({ _id });
@@ -129,23 +143,28 @@ const pushNewStepCombinations = async (rates, services, currentServiceId, itemsT
         return [];
       } else {
         for (let { _id: unitId } of calculationUnit) {
-        const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
-          if (sizes.length) {
-            sizes.forEach(size => {
+          const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
+          const duplicatesArr = checkForDuplicates(services, currentServiceId, itemsToAdd, 'services');
+          if (!duplicatesArr.length) {
+            if (sizes.length) {
+              sizes.forEach(size => {
+                stepMultipliersTable.push({
+                  step: _id,
+                  unit: unitId,
+                  size
+                });
+              });
+            } else {
               stepMultipliersTable.push({
                 step: _id,
                 unit: unitId,
-                size
+                size: 1
               });
-            });
+            }
+            pricelistTable.push(...generateNewStepCombinations(neededBasicPriceRows, neededIndustryRows, _id, unitId, sizes));
           } else {
-            stepMultipliersTable.push({
-              step: _id,
-              unit: unitId,
-              size: 1
-            });
+            pricelistTable.push(...generateNewStepCombinations(neededBasicPriceRows, neededIndustryRows, _id, unitId, sizes));
           }
-          pricelistTable.push(...generateNewStepCombinations(basicPricesTable, industryMultipliersTable, _id, unitId));
         }
       }
     }
@@ -153,40 +172,81 @@ const pushNewStepCombinations = async (rates, services, currentServiceId, itemsT
   return rates;
 };
 
-const filterRedundantSteps = (rates, services, currentServiceId, itemsToDelete) => {
+const filterRedundantSteps = async (rates, services, currentServiceId, itemsToDelete) => {
+  const { basicPricesTable, industryMultipliersTable } = rates;
   const itemsToDeleteIds = itemsToDelete.map(({ steps }) => steps.map(({ step }) => step.toString()))
     .reduce((acc, curr) => [...acc, ...curr], []);
+  const changedService = services.find(item => item._id.toString() === currentServiceId.toString());
+  const neededBasicPriceRows = await findServiceRows(basicPricesTable, changedService, tableKeys.basicPricesTable);
+  const neededIndustryRows = await findServiceRows(industryMultipliersTable, changedService, tableKeys.industryMultipliersTable);
   const duplicatesArr = checkForDuplicates(services, currentServiceId, itemsToDelete, 'services');
-  if (duplicatesArr.length) return rates;
-  return {
-    ...rates,
-    stepMultipliersTable: rates.stepMultipliersTable.filter(item => !itemsToDeleteIds.includes(item.step.toString())),
-    pricelistTable: rates.pricelistTable.filter(item => !itemsToDeleteIds.includes(item.step.toString()))
-  };
+  if (!duplicatesArr.length) {
+    return {
+      ...rates,
+      stepMultipliersTable: rates.stepMultipliersTable.filter(item => !itemsToDeleteIds.includes(item.step.toString())),
+      pricelistTable: rates.pricelistTable.filter(item => !itemsToDeleteIds.includes(item.step.toString()))
+    };
+  } else {
+    return {
+      ...rates,
+      pricelistTable: await filterPricelistTable(
+        rates.pricelistTable,
+        neededBasicPriceRows,
+        neededIndustryRows,
+        [],
+        itemsToDeleteIds,
+        tableKeys.stepMultipliersTable
+      )
+    };
+  }
 };
 
-const pushNewIndustryMultiplier = (rates, services, currentServiceId, itemsToAdd) => {
+const pushNewIndustryMultiplier = async (rates, services, currentServiceId, itemsToAdd) => {
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
+  const changedService = services.find(item => item._id.toString() === currentServiceId.toString());
+  const neededBasicPriceRows = await findServiceRows(basicPricesTable, changedService, tableKeys.basicPricesTable);
+  const neededStepMultiplierRows = await findServiceRows(stepMultipliersTable, changedService, tableKeys.stepMultipliersTable);
   const duplicatesArr = checkForDuplicates(services, currentServiceId, itemsToAdd, 'industries');
-  if (duplicatesArr.length) return rates;
+
   for (let { _id } of itemsToAdd) {
-    industryMultipliersTable.push({
-      industry: _id
-    });
-    pricelistTable.push(...generateNewIndustryCombinations(basicPricesTable, stepMultipliersTable, _id, currentServiceId));
+    if (!duplicatesArr.length) {
+      industryMultipliersTable.push({
+        industry: _id
+      });
+      pricelistTable.push(...generateNewIndustryCombinations(neededBasicPriceRows, neededStepMultiplierRows, _id));
+    } else {
+      pricelistTable.push(...generateNewIndustryCombinations(neededBasicPriceRows, neededStepMultiplierRows, _id));
+    }
   }
   return rates;
 };
 
-const filterRedundantIndustries = (rates, services, currentServiceId, itemsToDelete) => {
+const filterRedundantIndustries = async (rates, services, currentServiceId, itemsToDelete) => {
+  const { basicPricesTable, stepMultipliersTable, pricelistTable } = rates;
   const duplicatesArr = checkForDuplicates(services, currentServiceId, itemsToDelete, 'industries');
-  if (duplicatesArr.length) return rates;
+  const changedService = services.find(item => item._id.toString() === currentServiceId.toString());
+  const neededBasicPriceRows = await findServiceRows(basicPricesTable, changedService, tableKeys.basicPricesTable);
+  const neededStepMultiplierRows = await findServiceRows(stepMultipliersTable, changedService, tableKeys.stepMultipliersTable);
   const itemsToDeleteIds = itemsToDelete.map(item => item._id.toString());
-  return {
-    ...rates,
-    industryMultipliersTable: rates.industryMultipliersTable.filter(item => !itemsToDeleteIds.includes(item.industry.toString())),
-    pricelistTable: rates.pricelistTable.filter(item => !itemsToDeleteIds.includes(item.industry.toString()))
-  };
+  if (!duplicatesArr.length) {
+    return {
+      ...rates,
+      industryMultipliersTable: rates.industryMultipliersTable.filter(item => !itemsToDeleteIds.includes(item.industry.toString())),
+      pricelistTable: rates.pricelistTable.filter(item => !itemsToDeleteIds.includes(item.industry.toString()))
+    };
+  } else {
+    return {
+      ...rates,
+      pricelistTable: await filterPricelistTable(
+        pricelistTable,
+        neededBasicPriceRows,
+        [],
+        neededStepMultiplierRows,
+        itemsToDeleteIds,
+        tableKeys.industryMultipliersTable
+      )
+    };
+  }
 };
 
 const checkForDuplicates = (clientServices, currentServiceId, operationItems, key) => {
@@ -204,12 +264,12 @@ const checkForDuplicates = (clientServices, currentServiceId, operationItems, ke
 const generateNewLangCombinations = (
   targetLanguage,
   sourceLanguage,
-  stepMultipliersTable,
-  industryMultipliersTable,
+  stepMultiplierRows,
+  industryMultiplierRows,
 ) => {
   const newCombinations = [];
-  for (let { step, unit, multiplier: stepMultiplierValue } of stepMultipliersTable) {
-    for (let { industry, multiplier: industryMultiplierValue } of industryMultipliersTable) {
+  for (let { step, unit, multiplier: stepMultiplierValue } of stepMultiplierRows) {
+    for (let { industry, multiplier: industryMultiplierValue } of industryMultiplierRows) {
       newCombinations.push({
         sourceLanguage,
         targetLanguage,
@@ -223,38 +283,151 @@ const generateNewLangCombinations = (
   return newCombinations;
 };
 
-const generateNewStepCombinations = (basicPriceTable, industryMultipliersTable, newStepId, unitId) => {
+const generateNewStepCombinations = (langPairRows, industryMultiplierRows, { _id }, unitId, sizes) => {
   const newCombinations = [];
-  for (let { sourceLanguage, targetLanguage, basicPrice } of basicPriceTable) {
-    for (let { industry, multiplier: industryMultiplierValue } of industryMultipliersTable) {
-      newCombinations.push({
-        sourceLanguage,
-        targetLanguage,
-        step: newStepId,
-        unit: unitId,
-        industry,
-        price: multiplyPrices(basicPrice, 100, industryMultiplierValue)
-      });
+  for (let { sourceLanguage, targetLanguage, basicPrice } of langPairRows) {
+    for (let { industry, multiplier: industryMultiplierValue } of industryMultiplierRows) {
+      if (sizes.length) {
+        for (let size of sizes) {
+          newCombinations.push({
+            sourceLanguage,
+            targetLanguage,
+            step: _id,
+            unit: unitId,
+            size,
+            industry,
+            price: multiplyPrices(basicPrice, 100, industryMultiplierValue)
+          });
+        }
+      } else {
+        newCombinations.push({
+          sourceLanguage,
+          targetLanguage,
+          step: _id,
+          unit: unitId,
+          size: 1,
+          industry,
+          price: multiplyPrices(basicPrice, 100, industryMultiplierValue)
+        });
+      }
     }
   }
   return newCombinations;
 };
 
-const generateNewIndustryCombinations = (basicPriceTable, stepMultipliersTable, newIndustryId) => {
+const generateNewIndustryCombinations = (langPairRows, stepMultiplierRows, newIndustryId) => {
   const newCombinations = [];
-  for (let { sourceLanguage, targetLanguage, basicPrice } of basicPriceTable) {
-    for (let { step, unit, multiplier: stepMultiplierValue } of stepMultipliersTable) {
+  for (let { sourceLanguage, targetLanguage, basicPrice } of langPairRows) {
+    for (let { step, unit, size, multiplier: stepMultiplierValue } of stepMultiplierRows) {
       newCombinations.push({
         sourceLanguage,
         targetLanguage,
         step,
         unit,
+        size,
         industry: newIndustryId,
         price: multiplyPrices(basicPrice, stepMultiplierValue, 100),
       });
     }
   }
   return newCombinations;
+};
+
+const findServiceRows = async (arr, service, key) => {
+  const neededRows = [];
+  switch (key) {
+    default:
+    case tableKeys.basicPricesTable:
+      const { sourceLanguage, targetLanguages } = service;
+      for (let targetLanguage of targetLanguages) {
+        neededRows.push(arr.find(item =>
+          (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
+          )));
+      }
+      break;
+    case tableKeys.stepMultipliersTable:
+      const { services } = service;
+      for (let serviceId of services) {
+        const { steps } = await Services.findOne({ _id: serviceId });
+        for (let { step } of steps) {
+          const { calculationUnit } = await Step.findOne({ _id: step });
+          if (calculationUnit.length) {
+            for (let { _id: unitId } of calculationUnit) {
+              const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
+              if (sizes.length) {
+                for (let size of sizes) {
+                  neededRows.push(arr.find(item => (
+                    `${item.step} ${item.unit} ${item.size}` === `${step} ${unitId} ${size}`
+                  )));
+                }
+              } else {
+                neededRows.push(arr.find(item => (
+                  `${item.step} ${item.unit} ${item.size}` === `${step} ${unitId} ${1}`
+                )));
+              }
+            }
+          }
+        }
+      }
+      break;
+    case tableKeys.industryMultipliersTable:
+      const { industries } = service;
+      for (let industry of industries) {
+        neededRows.push(arr.find(item => item.industry.toString() === industry.toString()));
+      }
+  }
+  return neededRows;
+};
+
+const filterPricelistTable = (
+  pricelistTable,
+  langPairRows = [],
+  industryMultiplierRows = [],
+  stepMultiplierRows = [],
+  idsToDelete,
+  key) => {
+  let filteredPricelist = [];
+  switch (key) {
+    default:
+    case tableKeys.basicPricesTable:
+      for (let idPair of idsToDelete) {
+        const sourceLanguage = idPair.split(' ')[0];
+        const targetLanguage = idPair.split(' ')[1];
+        for (let { step } of stepMultiplierRows) {
+          for (let { industry } of industryMultiplierRows) {
+            filteredPricelist = pricelistTable.filter(item => (
+              `${item.sourceLanguage} ${item.targetLanguage} ${item.step} ${item.industry}` !==
+              `${sourceLanguage} ${targetLanguage} ${step} ${industry}`
+            ));
+          }
+        }
+      }
+      break;
+    case tableKeys.stepMultipliersTable:
+      for (let { sourceLanguage, targetLanguage } of langPairRows) {
+        for (let id of idsToDelete) {
+          for (let { industry } of industryMultiplierRows) {
+            filteredPricelist = pricelistTable.filter(item => (
+              `${item.sourceLanguage} ${item.targetLanguage} ${item.step} ${item.industry}` !==
+              `${sourceLanguage} ${targetLanguage} ${id} ${industry}`
+            ));
+          }
+        }
+      }
+      break;
+    case tableKeys.industryMultipliersTable:
+      for (let { sourceLanguage, targetLanguage } of langPairRows) {
+        for (let { step } of stepMultiplierRows) {
+          for (let id of idsToDelete) {
+            filteredPricelist = pricelistTable.filter(item => (
+              `${item.sourceLanguage} ${item.targetLanguage} ${item.step} ${item.industry}` !==
+              `${sourceLanguage} ${targetLanguage} ${step} ${id}`
+            ));
+          }
+        }
+      }
+  }
+  return filteredPricelist;
 };
 
 module.exports = {
