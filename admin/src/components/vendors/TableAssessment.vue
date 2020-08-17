@@ -177,6 +177,9 @@ export default {
         industry: industries[index].name,
         industryId: industries[index]._id,
         [`is${field}`]: true,
+        mainIndex,
+        industryIndex,
+        stepIndex: index,
       };
       this.isForm = true;
     },
@@ -194,7 +197,6 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
 @import "../../assets/styles/settingsTable";
-
 .assessment {
   @extend %setting-table;
   margin: 20px 10px 40px;

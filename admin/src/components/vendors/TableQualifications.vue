@@ -298,10 +298,10 @@ export default {
     },
 
     handleLqa(index) {
-      if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)){
-        this.setDefaults();
-        return;
-      }
+      // if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)){
+      //   this.setDefaults();
+      //   return;
+      // }
       this.lqaData = {
         vendor: {
           name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
@@ -379,15 +379,15 @@ export default {
       }
     },
 
-    isSampleStatus(dataStatus, currentStatus){
-      return dataStatus === currentStatus ? true : false;
-    },
+    // isSampleStatus(dataStatus, currentStatus){
+    //   return dataStatus === currentStatus ? true : false;
+    // },
 
     async manageSaveClick(index, message) {
-      if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)){
-        this.setDefaults();
-        return;
-      };
+      // if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)){
+      //   this.setDefaults();
+      //   return;
+      // };
       const tqi =
         this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
           ? 0
