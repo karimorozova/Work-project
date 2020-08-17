@@ -268,7 +268,7 @@ export default {
 
       if (this.currentStatus === "Passed") {
         if (this.checkSuchData()) {
-          this.handleLqa();
+          this.handleLqa(index);
         } else {
           return;
         }
@@ -297,7 +297,11 @@ export default {
       return currentTest;
     },
 
-    handleLqa() {
+    handleLqa(index) {
+      if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)){
+        this.setDefaults();
+        return;
+      }
       this.lqaData = {
         vendor: {
           name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
@@ -307,7 +311,7 @@ export default {
           step: this.presentArrays(this.currentSteps, "title"),
         },
       };
-      this.openForm();
+      this.openForm(index);
     },
 
     checkSuchData() {
@@ -348,7 +352,7 @@ export default {
     async saveVendorLqa({ vendorData }) {
       const { file, grade } = vendorData;
       let assessment = {
-        step: this.currentSteps[0],
+        step: this.currentSteps,
         target: this.currentTarget,
         industry: this.currentIndustry,
         source: this.currentSource,
@@ -375,7 +379,15 @@ export default {
       }
     },
 
+    isSampleStatus(dataStatus, currentStatus){
+      return dataStatus === currentStatus ? true : false;
+    },
+
     async manageSaveClick(index, message) {
+      if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)){
+        this.setDefaults();
+        return;
+      };
       const tqi =
         this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
           ? 0
