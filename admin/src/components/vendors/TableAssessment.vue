@@ -122,17 +122,19 @@ export default {
       storeAssessment: "storeCurrentVendorAssessment",
     }),
     async saveVendorLqa({ vendorData }) {
-      const { file, grade, source, target, step, industryId } = vendorData;
+      const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex } = vendorData;
       const assessment = {
         ...this.currentAssessment,
         step,
         source,
         target,
+        mainIndex,
+        industryIndex,
+        stepIndex,
         [this.currentField]: { fileName: "", path: "", grade },
       };
       let formData = new FormData();
       formData.append("vendorId", this.currentVendor._id);
-      formData.append("index", this.currentIndex);
       formData.append("assessment", JSON.stringify(assessment));
       formData.append("assessmentFile", file);
 
@@ -159,7 +161,7 @@ export default {
       const stepData = this.assessmentData[mainIndex];
       const { source, target, industries } = stepData;
       this.currentAssessment = industries[index];
-      const currentStep  = this.currentAssessment.steps[industryIndex].step;
+      const currentStep = this.currentAssessment.steps[industryIndex].step;
       this.currentIndex = index;
       this.currentField = field.toLowerCase();
 
@@ -174,8 +176,7 @@ export default {
         step: currentStep.title,
         source,
         target,
-        industry: industries[index].name,
-        industryId: industries[index]._id,
+        industry: industries[index].industry,
         [`is${field}`]: true,
         mainIndex,
         industryIndex,
