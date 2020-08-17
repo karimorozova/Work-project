@@ -2,7 +2,7 @@ const { Vendors } = require('../models');
 const { getVendor } = require('./getVendors');
 const ObjectId = require('mongodb').ObjectID;
 const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications');
-const { updateVendorRatesFromCompetence } = require('./newUpdateVendorRates');
+const { updateVendorRatesFromCompetence } = require('./updateVendorRates');
 const { deleteVendorRates } = require('./deleteVendorRates');
 
 const updateVendorCompetencies = async (vendorId, dataToUpdate) => {

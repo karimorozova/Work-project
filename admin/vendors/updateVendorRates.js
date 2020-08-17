@@ -1,8 +1,19 @@
 const { Vendors, Pricelist } = require('../models');
-const { generateNewStepCombinations } = require('../clients/editClientRates');
-const { getPricelistCombinations, replaceOldItem, changePricelistTable } = require('../clients');
+const {
+  getPricelistCombinations,
+  replaceOldItem,
+  changePricelistTable,
+  getStepMultipliersCombinations
+} = require('../clients');
 const { tableKeys } = require('../enums');
 
+/**
+ *
+ * @param {String} vendorId - updating subject's id
+ * @param {String} newData - updated example from frontend
+ * @param {String} oldData - old example from database
+ * @return nothing - updates vendor's rates
+ */
 const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
   const defaultPricelist = await Pricelist.findOne({ isDefault: true });
@@ -12,19 +23,18 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const industryDifference = compareIds(newData.industry, oldData.industry);
   if (sourceLangDifference || targetLangDifference) {
     await updateVendorLangPairs(
-      oldData.sourceLanguage._id,
-      oldData.targetLanguage._id,
+      oldData,
       sourceLangDifference,
-      targetLangDifference._id,
+      targetLangDifference,
       vendor,
       defaultPricelist
     );
   }
   if (stepDifference) {
-    await updateVendorStep(oldData.step._id, newData.step, vendor, defaultPricelist);
+    await updateVendorStepMultipliers(oldData, stepDifference, vendor, defaultPricelist);
   }
   if (industryDifference) {
-    await updateVendorIndustry(oldData.industry._id, newData.industry, vendor, defaultPricelist);
+    await updateIndustryMultipliers(oldData, industryDifference, vendor, defaultPricelist);
   }
 
   function compareIds(obj1, obj2) {
@@ -32,243 +42,183 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   }
 };
 
-const updateVendorLangPairs = async (oldSourceId, oldTargetId, newSourceLang, newTargetId, vendor, defaultPricelist) => {
-  const { _id, rates, competencies } = vendor;
-  let updatedRates = rates;
+/**
+ *
+ * @param {Object} oldData - old example from database
+ * @param {Object} newSourceLang - new source language value of rate row
+ * @param {Object} newTargetLang - new target language value of rate row
+ * @param {Object} vendor - current vendor's data
+ * @param {Object} defaultPricelist - default pricelist data
+ * @return nothing - updates vendor's rates
+ */
+const updateVendorLangPairs = async (
+  oldData,
+  newSourceLang,
+  newTargetLang,
+  vendor,
+  defaultPricelist
+) => {
+  const { _id, competencies, rates } = vendor;
+  const { sourceLanguage, targetLanguage } = oldData;
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
   if (newSourceLang) {
-    updatedRates.basicPricesTable = changeOrPush(
-      competencies,
-      updatedRates.basicPricesTable,
-      oldSourceId,
-      oldTargetId,
-      newSourceLang._id,
-      tableKeys.basicPricesTable
-    );
-    updatedRates.pricelistTable = changeOrPush(
-      competencies,
-      updatedRates.pricelistTable,
-      oldSourceId,
-      oldTargetId,
-      newSourceLang._id,
-      tableKeys.pricelistTable
-    );
-    updatedRates.basicPricesTable = syncDefaultPricelistSourcePrices(
-      updatedRates.basicPricesTable,
-      newSourceLang._id,
-      defaultPricelist,
-      'basicPrice'
-    );
-    updatedRates.pricelistTable = syncDefaultPricelistSourcePrices(
-      updatedRates.pricelistTable,
-      newSourceLang._id,
-      defaultPricelist,
-      'price'
-    );
-  }
-  if (newTargetId) {
-    oldSourceId = newSourceLang ? newSourceLang._id : oldSourceId;
-    updatedRates.basicPricesTable = replaceByLangPair(updatedRates.basicPricesTable, oldSourceId, oldTargetId, newTargetId);
-    updatedRates.pricelistTable = replaceByLangPair(updatedRates.pricelistTable, oldSourceId, oldTargetId, newTargetId);
-    updatedRates.basicPricesTable = syncDefaultPricelistTargetPrices(
-      updatedRates.basicPricesTable,
-      newTargetId,
-      oldSourceId,
-      defaultPricelist,
-      'basicPrice'
-    );
-    updatedRates.pricelistTable = syncDefaultPricelistTargetPrices(
-      updatedRates.pricelistTable,
-      newTargetId,
-      oldSourceId,
-      defaultPricelist,
-      'price'
-    );
-
-    await Vendors.updateOne({ _id }, { rates: updatedRates });
-
-    function changeOrPush(competencies, arr, idToSearch, targetLangId, idForReplace, tableKey) {
-      const sameSourceIds = competencies.filter(item => item.sourceLanguage.toString() === idToSearch.toString());
-      if (sameSourceIds.length > 2) {
-        const defaultBasicPrice = findSameBasicPriceInDefault(defaultPricelist, idToSearch, targetLangId);
-        const itemToPush = tableKey === tableKeys.pricelistTable ?
-          {
-            type: idToSearch.toString() === targetLangId.toString() ? 'Mono' : 'Duo',
-            sourceLanguage: idToSearch,
-            targetLanguage: targetLangId,
-            basicPrice: defaultBasicPrice ? defaultBasicPrice : 1
-          } :
-          {
-            sourceLanguage: idToSearch,
-
-          };
-        arr.push({});
-      }
-      return arr.map(item => {
-        if (item.sourceLanguage.toString() === idToSearch.toString()) {
-          item.sourceLanguage = idForReplace;
-        }
-        return item;
-      });
+    const sameLangPairRow = findSameLangPairRow(basicPricesTable, newSourceLang._id, targetLanguage._id);
+    if (!sameLangPairRow) {
+      basicPricesTable = pushNewBasicPriceItem(
+        basicPricesTable,
+        defaultPricelist,
+        newSourceLang._id,
+        targetLanguage._id
+      );
+      pricelistTable = await getPricelistCombinations(
+        basicPricesTable,
+        stepMultipliersTable,
+        industryMultipliersTable,
+        pricelistTable
+      );
     }
-
-    function replaceByLangPair(arr, sourceLangId, oldTargetId, newTargetLangId) {
-      return arr.map(item => {
-        if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${oldTargetId}`) {
-          item.targetLanguage = newTargetLangId;
-        }
-        return item;
-      });
-    }
-
-    function syncDefaultPricelistSourcePrices(arr, newSourceLangId, defaultPricelist, priceKey) {
-      return arr.map(item => {
-        const defaultItem = defaultPricelist.basicPricesTable.find(item => (
-          item.sourceLanguage.toString() === newSourceLangId
-        ));
-        if (item.sourceLanguage.toString() === newSourceLangId && !!defaultItem) {
-          item[priceKey] = defaultItem[priceKey];
-        }
-        return item;
-      });
-    }
-
-    function syncDefaultPricelistTargetPrices(arr, newTargetLangId, sourceLangId, defaultPricelist, priceKey) {
-      return arr.map(item => {
-        const defaultItem = defaultPricelist.basicPricesTable.find(({ sourceLanguage, targetLanguage }) => (
-          `${sourceLanguage} ${targetLanguage}` === `${sourceLangId} ${newTargetLangId}`
-        ));
-        if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${newTargetLangId}` && !!defaultItem) {
-          item[priceKey] = defaultItem[priceKey];
-        }
-        return item;
-      });
+    const isNotLastLangPairInCompetence = findSameLangPairRow(competencies, sourceLanguage._id, targetLanguage._id);
+    if (!isNotLastLangPairInCompetence) {
+      basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
+      pricelistTable = filterRedundantLangPair(pricelistTable, sourceLanguage._id, targetLanguage._id);
     }
   }
+  if (newTargetLang) {
+    const sameLangPairRow = findSameLangPairRow(basicPricesTable, sourceLanguage._id, newTargetLang._id);
+    if (!sameLangPairRow) {
+      basicPricesTable = pushNewBasicPriceItem(
+        basicPricesTable,
+        defaultPricelist,
+        sourceLanguage,
+        newTargetLang._id
+      );
+      pricelistTable = await getPricelistCombinations(
+        basicPricesTable,
+        stepMultipliersTable,
+        industryMultipliersTable,
+        pricelistTable
+      );
+    }
+    const isNotLastLangPairInCompetence = findSameLangPairRow(competencies, sourceLanguage._id, targetLanguage._id);
+    if (!isNotLastLangPairInCompetence) {
+      basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
+      pricelistTable = filterRedundantLangPair(pricelistTable, sourceLanguage._id, targetLanguage._id);
+    }
+  }
+  await Vendors.updateOne({ _id }, {
+    rates: {
+      basicPricesTable,
+      stepMultipliersTable,
+      industryMultipliersTable,
+      pricelistTable
+    }
+  });
 
-  function findSameBasicPriceInDefault(defaultPricelist, sourceLanguage, targetLanguage) {
-    const { basicPrice } = defaultPricelist.basicPricesTable.find(item => (
+  function findSameLangPairRow(arr, sourceLangId, targetLangId) {
+    return arr.find(item => (
+      `${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${targetLangId}`
+    ));
+  }
+
+  function filterRedundantLangPair(arr, sourceLangId, targetLangId) {
+    return arr.filter(item => (
+      `${item.sourceLanguage} ${item.targetLanguage}` !== `${sourceLangId} ${targetLangId}`
+    ));
+  }
+
+  function pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage, targetLanguage) {
+    const neededLangRow = defaultPricelist.basicPricesTable.find(item => (
       `${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
     ));
-    return basicPrice;
+    const basicPrice = neededLangRow ? neededLangRow.basicPrice : 1;
+    basicPricesTable.push({
+      type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
+      sourceLanguage,
+      targetLanguage,
+      basicPrice
+    });
+    return basicPricesTable;
   }
 };
 
-const updateVendorStep = async (oldStepId, newStep, vendor, defaultPricelist) => {
-  const { _id, rates } = vendor;
-  let updatedRates = rates;
-  updatedRates = deleteRedundantSteps(updatedRates, newStep._id, oldStepId);
-  updatedRates = pushNewStepCombinations(updatedRates, newStep, defaultPricelist);
-  const duplicatesArr = checkForDuplicates(updatedRates.stepMultipliersTable, newStep._id, oldStepId);
-  if (duplicatesArr.length) {
-    return await Vendors.updateOne({ _id }, { rates });
+/**
+ *
+ * @param {Object} oldData - old example from database
+ * @param {Object} newStep - new step value of rate row
+ * @param {Object} vendor - current vendor's data
+ * @param {Object} defaultPricelist - default pricelist data
+ * @return nothing - updates vendor's rates
+ */
+const updateVendorStepMultipliers = async (oldData, newStep, vendor, defaultPricelist) => {
+  const { _id, competencies, rates } = vendor;
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
+  const sameStep = stepMultipliersTable.find(item => item.step._id.toString() === newStep._id.toString());
+  const isNotLastStepInCompetence = competencies.find(item => item.step.toString() === oldData.step._id.toString());
+  if (!sameStep) {
+    stepMultipliersTable.push(...await getStepMultipliersCombinations(newStep, defaultPricelist));
+    pricelistTable = await getPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable);
   }
-
-  await Vendors.updateOne({ _id }, { rates: updatedRates });
-
-  function deleteRedundantSteps(rates, oldStepId) {
-    return {
-      ...rates,
-      stepMultipliersTable: rates.stepMultipliersTable.filter(item => item.step.toString() !== oldStepId.toString()),
-      pricelistTable: rates.pricelistTable.filter(item => item.step.toString() !== oldStepId.toString()),
-    };
+  if (!isNotLastStepInCompetence) {
+    stepMultipliersTable = filterRedundantSteps(stepMultipliersTable, oldData.step._id);
+    pricelistTable = filterRedundantSteps(pricelistTable, oldData.step._id);
   }
-
-  function pushNewStepCombinations(rates, newStep, defaultPricelist) {
-    const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-    const { calculationUnit } = newStep;
-    if (!calculationUnit.length) return rates;
-    for (let { _id: unitId } of calculationUnit) {
-      const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
-      if (sizes.length) {
-        sizes.forEach(size => {
-          const neededStepRow = defaultPricelist.stepMultipliersTable.find(item => (
-            `${item.step} ${item.unit} ${item.size}` === `${newStep._id} ${unitId} ${size}`
-          ));
-          const multiplier = neededStepRow ? neededStepRow.multipart : 100;
-          stepMultipliersTable.push({
-            step: newStep._id,
-            unit: unitId,
-            size,
-            multiplier
-          });
-        });
-      } else {
-        const neededStepRow = defaultPricelist.stepMultipliersTable.find(item => (
-          `${step} ${unit}` === `${_id} ${unitId}`
-        ));
-        const multiplier = neededStepRow ? neededStepRow.multiplier : 100;
-        stepMultipliersTable.push({
-          step: newStep._id,
-          unit: unitId,
-          size: 1,
-          multiplier
-        });
-      }
-      pricelistTable.push(...generateNewStepCombinations(basicPricesTable, industryMultipliersTable, _id, unitId));
-    }
-    return {
+  await Vendors.updateOne({ _id }, {
+    rates: {
       basicPricesTable,
       stepMultipliersTable,
       industryMultipliersTable,
       pricelistTable
-    };
+    }
+  });
+
+  function filterRedundantSteps(arr, stepId) {
+    return arr.filter(item => item.step.toString() !== stepId.toString());
   }
 };
 
-const updateVendorIndustry = async (oldIndustryId, newIndustry, vendor, defaultPricelist) => {
-  const { _id, rates } = vendor;
-  let updatedRates = rates;
-  const duplicatesArr = checkForDuplicates(updatedRates.industryMultipliersTable, newIndustry._id, oldIndustryId);
-  if (duplicatesArr.length) {
-    await Vendors.updateOne({ _id }, { rates });
-  }
-  updatedRates = deleteRedundantIndustries(updatedRates, oldIndustryId);
-  updatedRates = pushNewIndustryCombinations(updatedRates, newIndustry._id);
-
-  await Vendors.updateOne({ _id }, { rates: updatedRates });
-
-  function deleteRedundantIndustries(rates, oldIndustryId) {
-    return {
-      ...rates,
-      industryMultipliersTable: rates.industryMultipliersTable.filter(item => (
-        item.industry.toString() !== oldIndustryId.toString()
-      )),
-      pricelistTable: rates.pricelistTable.filter(item => item.industry.toString() !== oldIndustryId.toString())
-    };
-  }
-
-  async function pushNewIndustryCombinations(rates, newIndustryId) {
-    let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-    const neededIndustryRow = defaultPricelist.industryMultipliersTable.find(({ industry }) => (
-      industry.toString() === newIndustryId.toString()
-    ));
-    const multiplier = neededIndustryRow.multiplier ? neededIndustryRow.multiplier : 100;
+/**
+ *
+ * @param {Object} oldData - old example from database
+ * @param {Object} newIndustry - new industry of rate row
+ * @param {Object} vendor - current vendor's data
+ * @param {Object} defaultPricelist - default pricelist data
+ * @return nothing - updates vendor's rates
+ */
+const updateIndustryMultipliers = async (oldData, newIndustry, vendor, defaultPricelist) => {
+  const { _id, competencies, rates } = vendor;
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
+  const sameIndustry = industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
+  const isNotLastIndustryInCompetence = competencies.find(item => item.industry.toString() === oldData.industry._id.toString());
+  if (!sameIndustry) {
+    const boundIndustry = defaultPricelist.industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
+    const multiplier = boundIndustry ? boundIndustry.multiplier : 100;
     industryMultipliersTable.push({
-      industry: newIndustryId,
+      industry: newIndustry._id,
       multiplier
     });
-    pricelistTable = await getPricelistCombinations(
-      basicPricesTable,
-      stepMultipliersTable,
-      industryMultipliersTable,
-      pricelistTable,
-    );
-    return {
+    pricelistTable = await getPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable);
+  }
+  if (!isNotLastIndustryInCompetence) {
+    industryMultipliersTable = industryMultipliersTable.filter(item => item.industry.toString() !== oldData.industry._id.toString());
+    pricelistTable = pricelistTable.filter(item => item.industry.toString() !== oldData.industry._id.toString());
+  }
+  await Vendors.updateOne({ _id }, {
+    rates: {
       basicPricesTable,
       stepMultipliersTable,
       industryMultipliersTable,
       pricelistTable
-    };
-  }
+    }
+  });
 };
 
-const checkForDuplicates = (arr, newItemId, oldItemId, key) => {
-  const itemsForCheck = arr
-    .filter(item => item[key].toString() !== oldItemId.toString())
-    .map(item => item[key]);
-  return itemsForCheck.find(id => id === newItemId);
-};
-
+/**
+ *
+ * @param {String} vendorId - updating subject's id
+ * @param {String} itemIdentifier - updating table identifier string
+ * @param {Object} updatedItem - updated example from frontend
+ * @return nothing - updates vendor's rates
+ */
 const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
   const defaultPricelist = await Pricelist.findOne({ isDefault: true });
@@ -286,12 +236,10 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
         tableKeys.basicPricesTable,
         'Vendor');
       updatedPricelistTable = changePricelistTable(
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
         pricelistTable,
         updatedItem,
-        itemIdentifier
+        itemIdentifier,
+        basicPrice
       );
       vendor.rates.basicPricesTable = updatedBasicPricesTable;
       vendor.rates.pricelistTable = updatedPricelistTable;
@@ -308,12 +256,10 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
         'Vendor'
       );
       updatedPricelistTable = changePricelistTable(
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
         pricelistTable,
         updatedItem,
-        itemIdentifier
+        itemIdentifier,
+        stepMultiplier
       );
       vendor.rates.stepMultipliersTable = updatedStepMultipliersTable;
       vendor.rates.pricelistTable = updatedPricelistTable;
@@ -330,12 +276,10 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
         'Vendor'
       );
       updatedPricelistTable = changePricelistTable(
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
         pricelistTable,
         updatedItem,
-        itemIdentifier
+        itemIdentifier,
+        industryMultiplier
       );
       vendor.rates.industryMultipliersTable = updatedIndustryMultipliersTable;
       vendor.rates.pricelistTable = updatedPricelistTable;

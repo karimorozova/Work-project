@@ -178,26 +178,70 @@ const VendorSchema = new mongoose.Schema({
     default: []
   },
   assessments: [{
-    step: {
-      type: Schema.Types.ObjectId, ref: 'Step'
+    sourceLanguage: {
+      type: Schema.Types.ObjectId,
+      ref: 'Language'
     },
-    langsData: [{
-      source: {
-        type: Schema.Types.ObjectId, ref: 'Language',
+    targetLanguage: {
+      type: Schema.Types.ObjectId,
+      ref: 'Language'
+    },
+    industries: [{
+      industry: {
+        type: Schema.Types.ObjectId,
+        ref: 'Industries'
       },
-      target: {
-        type: Schema.Types.ObjectId, ref: 'Language'
-      },
-      industries: [{
-        industry: {
-          type: Schema.Types.ObjectId, ref: 'Industries'
+      steps: [{
+        step: {
+          type: Schema.Types.ObjectId,
+          ref: 'Step',
         },
-        tqi: {},
-        lqa1: {},
-        lqa2: {},
-        lqa3: {}
+        tqi: {
+          fileName: {
+            type: 'String'
+          },
+          path: {
+            type: 'String'
+          },
+          grade: {
+            type: Number
+          }
+        },
+        lqa1: {
+          fileName: {
+            type: 'String'
+          },
+          path: {
+            type: 'String'
+          },
+          grade: {
+            type: Number
+          }
+        },
+        lqa2: {
+          fileName: {
+            type: 'String'
+          },
+          path: {
+            type: 'String'
+          },
+          grade: {
+            type: Number
+          }
+        },
+        lqa3: {
+          fileName: {
+            type: 'String'
+          },
+          path: {
+            type: 'String'
+          },
+          grade: {
+            type: Number
+          }
+        },
       }]
-    }],
+    }]
   }],
   wordCountInfo: [{
     industry: {

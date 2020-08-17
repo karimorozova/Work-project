@@ -162,12 +162,11 @@ router.post('/remove-vendor-qualification', async (req, res) => {
 
 router.post('/vendor-assessment', upload.fields([{ name: 'assessmentFile' }]), async (req, res) => {
   const assessment = JSON.parse(req.body.assessment);
-  const { index, vendorId } = req.body;
+  const { vendorId } = req.body;
   const files = req.files["assessmentFile"];
   try {
     const updatedVendor = await updateVendorAssessment({
       vendorId,
-      index,
       assessment,
       file: files[0]
     });
