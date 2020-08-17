@@ -125,6 +125,7 @@ export default {
       const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex } = vendorData;
       const assessment = {
         ...this.currentAssessment,
+        isNew: false,
         step,
         source,
         target,

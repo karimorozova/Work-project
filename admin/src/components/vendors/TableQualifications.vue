@@ -360,6 +360,7 @@ export default {
         lqa1: {},
         lqa2: {},
         lqa3: {},
+        isNew: true,
       };
 
       let formData = new FormData();
