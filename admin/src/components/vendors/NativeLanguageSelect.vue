@@ -1,11 +1,11 @@
 <template lang="pug">
     .drop-select(v-click-outside="outClick")
-        .select
+        .select(@click="toggleOptions")
             span.selected(v-if="selectedLang") {{ selectedLang.lang }}
             span.selected.no-choice(v-else) Options
             .arrow-button(@click="showLangs")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedLang}")
-        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search" @click.stop="stopPropagation")        
+        input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search" ref="search" @click.stop="stopPropagation")        
         .drop(v-if="droppedLang")
             .drop__item( v-for="(language, index) in filteredLangs" @click.stop="changeLang(index)")
                 span {{ language.lang }}
@@ -37,6 +37,9 @@ export default {
         }
     },
     methods: {
+        toggleOptions(){
+            this.droppedLang && this.$nextTick(() => this.$refs.search.focus());
+        },
         showLangs(event) {
             let elementsObj = event.composedPath();
             let tr = elementsObj.find(item => {

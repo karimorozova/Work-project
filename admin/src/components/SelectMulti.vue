@@ -6,7 +6,7 @@
             .arrow-button
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search")
+            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" ref="search" placeholder="Search")
             .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOptions(index)")
                 .checkbox
                     .checkbox__check(:class="{checked: activeClass(option)}")
@@ -54,12 +54,19 @@ export default {
             this.isDropped = false;
             this.searchValue = "";
         },
+        searchFocus(){
+            this.$nextTick(() => this.$refs.search.focus());
+        },
         toggleOptions() {
             this.isDropped = !this.isDropped;
             this.searchValue = "";
+            if(this.isDropped && this.hasSearch) {
+                this.searchFocus();
+            } 
         },
         chooseOptions(index) {
             this.$emit("chooseOptions", {option: this.filteredOptions[index]})
+            this.searchFocus();
         },
         activeClass(elem) {
             return (this.selectedOptions.indexOf(elem) != -1 ||

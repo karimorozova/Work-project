@@ -1,7 +1,7 @@
 <template lang="pug">
     .timezones-list
         .drop-select(v-click-outside="outTimezones")
-            .select
+            .select(@click="toggleOptions")
                 template(v-if="timezoneSelected")
                     .selected
                         span {{ timezoneSelected }}
@@ -10,7 +10,7 @@
                 .arrow-button(@click="openTimezones")
                     img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: timezonesDropped}")
             .search-zone(v-if="timezonesDropped")
-                input.search(type="text" v-model="timezoneSearch" placeholder="Search")
+                input.search(type="text" v-model="timezoneSearch" ref="search" placeholder="Search")
             .drop(v-if="timezonesDropped")
                 .drop__item(v-for="(timezone, ind) in foundZones" @click="chooseZone(ind)")
                     span {{ timezone.zone }}
@@ -33,6 +33,9 @@ export default {
         }
     },
     methods: {
+        toggleOptions(){
+            this.timezonesDropped && this.timezoneSelected && this.$nextTick(() => this.$refs.search.focus());
+        },
         async getTimezones() {
             try {
                 const result = await this.$http.get('/api/timezones')

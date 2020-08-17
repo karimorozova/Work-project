@@ -4,7 +4,7 @@
     VendorLqa(:vendorData="lqaData", @closeForm="closeForm()", @saveVendorLqa="saveVendorLqa")
 
   .assessment__item(v-for="(mainItem, mainIndex) in assessmentData")
-    .assessment__languages {{ mainItem.source.lang }} >> {{ mainItem.target.lang }}
+    .assessment__languages {{ mainItem.sourceLanguage.lang }} >> {{ mainItem.targetLanguage.lang }}
     .assessment__industry(v-for="(industryData, industryIndex) in mainItem.industries")
       .assessment__industry-title {{ industryData.industry.name }}
       .assessment__table
@@ -160,7 +160,7 @@ export default {
     },
     openForm({ field, index, mainIndex, industryIndex }) {
       const stepData = this.assessmentData[mainIndex];
-      const { source, target, industries } = stepData;
+      const { sourceLanguage, targetLanguage, industries } = stepData;
       this.currentAssessment = industries[index];
       const currentStep = this.currentAssessment.steps[industryIndex].step;
       this.currentIndex = index;
@@ -170,13 +170,13 @@ export default {
         vendor: {
           name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
           industry: this.currentAssessment.industry.name,
-          sourceLang: source.lang,
-          targetLang: target.lang,
+          sourceLang: sourceLanguage.lang,
+          targetLang: targetLanguage.lang,
           step: currentStep.title,
         },
         step: currentStep.title,
-        source,
-        target,
+        sourceLanguage: sourceLanguage,
+        targetLanguage: targetLanguage,
         industry: industries[index].industry,
         [`is${field}`]: true,
         mainIndex,
