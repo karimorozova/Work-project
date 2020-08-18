@@ -6,6 +6,7 @@ const {
   getStepMultipliersCombinations,
   getPricelistCombinations
 } = require('../clients');
+const ObjectId = require('mongodb').ObjectID;
 
 const createRateCombinations = async (listForRates, vendorId) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
@@ -49,19 +50,18 @@ const splitRatesArr = (arr) => {
   };
 };
 
-
 const combineVendorRates = async (langPairs, steps, industries, defaultPricelist, vendor) => {
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = defaultPricelist;
   const { rates, currency } = vendor;
   for (let { sourceLanguage, targetLanguage } of langPairs) {
-    const similarLangPair = getNeededLangPair(rates.basicPricesTable, sourceLanguage, targetLanguage);
+    const similarLangPair = getNeededLangPair(rates.basicPricesTable, sourceLanguage._id, targetLanguage._id);
     if (!similarLangPair) {
       const boundLangPairRow = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage);
       const boundBasicPrice = boundLangPairRow ? getNeededCurrency(boundLangPairRow, currency) : 1;
       rates.basicPricesTable.push({
         type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
-        sourceLanguage,
-        targetLanguage,
+        sourceLanguage: ObjectId(sourceLanguage._id),
+        targetLanguage: ObjectId(targetLanguage._id),
         basicPrice: boundBasicPrice
       });
     }

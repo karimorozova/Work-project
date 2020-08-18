@@ -1,5 +1,6 @@
 const { Vendors, LangTest } = require('../models');
 const { createRateCombinations } = require('./createVendorRates');
+const { updateVendorRatesFromCompetence } = require('./updateVendorRates');
 
 const saveQualifications = async (listOfNewCompetencies, vendorId) => {
   const allTests = await LangTest.find({});
@@ -14,11 +15,11 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       test.steps.find(step => step.toString() === competence.step.toString())
     );
     if (currentTest) {
-      return competence
+      return competence;
     } else {
-      listForRates.push(competence)
+      listForRates.push(competence);
     }
-  })
+  });
 
   let listQualificationsForSave = qualifications;
 
@@ -32,9 +33,9 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       });
     } else {
       const findIndex = listQualificationsForSave.findIndex(qualification =>
-          qualification.source.toString() === element.sourceLanguage.toString() &&
-          qualification.target.toString() === element.targetLanguage.toString() &&
-          qualification.industry.toString() === element.industry.toString()
+        qualification.source.toString() === element.sourceLanguage.toString() &&
+        qualification.target.toString() === element.targetLanguage.toString() &&
+        qualification.industry.toString() === element.industry.toString()
       );
       if (findIndex === -1) {
         listQualificationsForSave.push({
@@ -52,7 +53,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
         );
         const ifExistsStep = isExists(currentTestForItem.steps, element.step);
         if (ifExistsStep) {
-          const ifExistsStepInQualification = isExists(listQualificationsForSave[findIndex].steps, element.step)
+          const ifExistsStepInQualification = isExists(listQualificationsForSave[findIndex].steps, element.step);
           ifExistsStepInQualification || listQualificationsForSave[findIndex].steps.push(element.step);
         }
       }
@@ -78,10 +79,10 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
         )
       );
       if (!qualification.hasOwnProperty('testType') || qualification.testType == '') {
-        let currentQualification = {}
+        let currentQualification = {};
         Object.assign(currentQualification, qualification.toJSON());
         currentQualification.testType = currentTest.evaluationType === 'Test' ? 'Test' : 'Sample';
-        finalQualifivationArray.push(currentQualification)
+        finalQualifivationArray.push(currentQualification);
       } else {
         finalQualifivationArray.push(qualification.toJSON());
       }
@@ -90,7 +91,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
   }
 };
 
-const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId) => {
+const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, oldCompetence) => {
   const allTests = await LangTest.find({});
   let { qualifications } = await Vendors.findOne({ _id: vendorId });
   let newQualifications = qualifications;
@@ -113,7 +114,7 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId) =
         industry: competence.industry,
         steps: [competence.step],
         testType: currentTest.evaluationType,
-      })
+      });
     } else {
       const currentTestForItem = allTests.find(test =>
         test.source.toString() === competence.sourceLanguage._id &&
@@ -123,18 +124,18 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId) =
       );
       const ifExistsStep = isExists(currentTestForItem.steps, competence.step._id);
       if (ifExistsStep) {
-        const ifExistsStepInQualification = isExists(newQualifications[findIndex].steps, competence.step._id)
-        ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id)
+        const ifExistsStepInQualification = isExists(newQualifications[findIndex].steps, competence.step._id);
+        ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id);
       }
     }
   } else {
-    // to rates
+    await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
   }
   await Vendors.updateOne({ _id: vendorId }, { qualifications: newQualifications });
 };
 
 const isExists = (arr, searchElement) => {
   return arr.map(item => item.toString()).includes(searchElement.toString());
-}
+};
 
 module.exports = { saveQualifications, saveQualificationsAfterUpdateCompetencies };

@@ -99,8 +99,7 @@ async function updateVendorAssessment({ vendorId, assessment, file }) {
     const { isNew } = assessment;
     const fileData = await saveAssessmentFile({ assessment, file, vendorId });
     if (isNew) {
-      const newAssessment = addNewAssessment({ assessment, fileData });
-      assessments.push(newAssessment);
+      assessments = addNewAssessment(assessments, assessment, fileData);
     } else {
       assessments = updateExistingAssessment(assessment, assessments, fileData);
     }
@@ -143,22 +142,57 @@ function updateExistingAssessment(assessment, assessments, fileData) {
   return assessments;
 }
 
-function addNewAssessment({ assessment, fileData }) {
+function addNewAssessment(assessments, assessment, fileData) {
   let { step, source, target, industry, ...assessmentData } = assessment;
   const { qaKey, fileName, path } = fileData;
   assessmentData[qaKey] = { ...assessmentData[qaKey], fileName, path };
-  return {
-    sourceLanguage: ObjectId(source._id),
-    targetLanguage: ObjectId(target._id),
-    industries: [{
-      industry: ObjectId(industry._id),
-      steps: [{
-        step: ObjectId(step[0]._id),
+  const sameLangPairIndex = assessments.findIndex(({ sourceLanguage, targetLanguage }) => (
+    `${sourceLanguage._id} ${targetLanguage._id}` === `${source._id} ${target._id}`
+  ));
+  if (sameLangPairIndex !== -1) {
+    assessments[sameLangPairIndex].industries =
+      getUpdatedIndustries(assessments[sameLangPairIndex].industries, industry, step, assessmentData);
+  } else {
+    const steps = [];
+    for (let { _id } of step) {
+      steps.push({
+        step: ObjectId(_id),
         ...assessmentData
+      });
+    }
+    assessments.push({
+      sourceLanguage: ObjectId(source._id),
+      targetLanguage: ObjectId(target._id),
+      industries: [{
+        industry: ObjectId(industry._id),
+        steps,
       }]
-    }]
-  };
+    });
+  }
+  return assessments;
 }
+
+const getUpdatedIndustries = (industries, newIndustry, newSteps, newAssessmentData) => {
+  const sameIndustryIndex = industries.findIndex(({ industry }) => industry._id.toString() === newIndustry._id);
+  const steps = [];
+  for (let { _id } of newSteps) {
+    steps.push({
+      step: ObjectId(_id),
+      ...newAssessmentData
+    });
+  }
+  if (sameIndustryIndex !== -1) {
+    for (let { _id } of newSteps) {
+      industries[sameIndustryIndex].steps.push(...steps);
+    }
+  } else {
+    industries.push({
+      industry: ObjectId(newIndustry._id),
+      steps,
+    });
+  }
+  return industries;
+};
 
 async function saveHashedPassword(id, pass) {
   try {

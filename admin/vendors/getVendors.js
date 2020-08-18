@@ -29,8 +29,6 @@ async function getVendor(query) {
     .populate('rates.pricelistTable.step')
     .populate('rates.pricelistTable.unit')
     .populate('rates.pricelistTable.industry');
-
-
   return vendor;
 }
 
