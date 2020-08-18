@@ -109,7 +109,7 @@
           placeholder="Select",
           :hasSearch="true",
           :selectedOption="currentSource.hasOwnProperty('lang') ? currentSource.lang : ''",
-          :options="sourceData",
+          :options="sourceData | firstEnglishLanguage",
           @chooseOption="setSource"
         )
       .popup__drop.disabled-drop(v-else)

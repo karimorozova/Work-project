@@ -1,18 +1,20 @@
 <template lang="pug">
   .price
-    ResultFilter(
-      :source="sourceFilter"
-      :target="targetFilter"
-      :step="stepFilter"
-      :unit="unitFilter"
-      :industry="industryFilter"
-      :targets="['All'].concat(languages)"
-      :sources="['All'].concat(languages)"
-      :steps="['All'].concat(steps)"
-      :units="['All'].concat(units)"
-      :industries="['All'].concat(industries)"
-      @setFilter="setFilter"
-    )
+    .prices-filter(v-if="currentServices.length")
+      ResultFilter(
+        :source="sourceFilter"
+        :target="targetFilter"
+        :step="stepFilter"
+        :unit="unitFilter"
+        :industry="industryFilter"
+        :targets="dataForTargetFilter"
+        :sources="dataForSourceFilter"
+        :steps="dataForStepFilter"
+        :units="dataForUnitFilter"
+        :industries="dataForIndustryFilter"
+        @setFilter="setFilter"
+      )
+
     DataTable(
       :fields="fields"
       :tableData="dataArray"
@@ -167,14 +169,15 @@ export default {
       currentUnit: "",
       currentIndustry: "",
       currentPrice: "",
-
+      
       sourceFilter: "",
       targetFilter: "",
       stepFilter: "",
       unitFilter: "",
       industryFilter: "",
       isDataRemain: true,
-      currentActive: -1
+      currentActive: -1,
+      currentServices: null,
     };
   },
   methods: {
@@ -283,6 +286,12 @@ export default {
         this.isDataRemain = result.body.length === 25;
       }
     },
+    async getClientServices(){
+      const client = await this.$http.get(
+        `/clientsapi/client?id=${this.$route.params.id}`
+      );
+      this.currentServices = client.body.services;
+    },
     async getPricelist(filters, count = 0) {
       try {
         const result = await this.$http.post(
@@ -300,7 +309,21 @@ export default {
           type: "error"
         });
       }
+    },
+    getUniqueValues(arr, key){
+      return [...new Set(arr.map((item) => item[key]))]
+    },
+    getStepsFromServices(){
+      return [
+        ...new Set(
+          this.currentServices
+            .map((service) => service.services.map((step) => step.steps).flat())
+            .flat()
+            .map((step) => step.step)
+        ),
+      ];
     }
+
   },
   watch: {
     async isRefreshResultTable() {
@@ -311,16 +334,70 @@ export default {
     async refresh() {
       if (this.refresh) {
         this.getPricelist(this.allFilters);
+        this.getClientServices();
       }
     }
   },
   created() {
     this.getPricelist(this.allFilters);
+    this.getClientServices();
   },
   computed: {
     ...mapGetters({
       currentClient: "getCurrentClient"
     }),
+    dataForSourceFilter(){
+      if(this.currentServices.length){
+        return ["All"].concat(
+          this.getUniqueValues(
+            this.currentServices.map((source) => source.sourceLanguage),
+            "lang"
+          )
+        );
+      }
+    },
+    dataForTargetFilter(){
+      if(this.currentServices.length){
+        return ["All"].concat(
+          this.getUniqueValues(
+            this.currentServices.map((target) => target.targetLanguages).flat(),
+            "lang"
+          )
+        );
+      }
+    },
+    dataForStepFilter(){
+      if(this.currentServices.length){
+        return ["All"].concat([
+          ...new Set(
+            this.steps
+              .filter((step) => this.getStepsFromServices().some((stepId) => step._id.toString() === stepId))
+              .map((step) => step.title)
+          ),
+        ]);
+      }
+    },
+    dataForUnitFilter(){
+      if(this.currentServices.length){
+        return ["All"].concat([
+          ...new Set(
+            this.units.filter((unit) =>
+              this.getStepsFromServices().some((stepId) => unit.steps.some((step) => step._id.toString() === stepId))
+            ).map((unit) => unit.type)
+          )
+        ]);
+      }
+    },
+    dataForIndustryFilter(){
+      if(this.currentServices.length){
+        return ["All"].concat(
+          this.getUniqueValues(
+            this.currentServices.map((industry) => industry.industries).flat(),
+            "name"
+          )
+        );
+      }
+    },
     allFilters() {
       let result = {
         sourceFilter: this.sourceFilter,

@@ -65,10 +65,10 @@
         .result-table(v-if="currentClient._id")
           ResultTable(
                 :clientId="currentClient._id"
-                :languages="languages.map(i => i.lang)"
-                :steps="steps.map(i => i.title)"
-                :units="units.map(i => i.type)"
-                :industries="industries.map(i => i.name)"
+                :languages="languages"
+                :steps="steps"
+                :units="units"
+                :industries="industries"
                 :isRefreshResultTable="isRefreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
 
@@ -320,8 +320,6 @@ export default {
       for (let i = 0; i < this.contactsPhotos.length; i++) {
         sendData.append("photos", this.contactsPhotos[i]);
       }
-
-      console.log('data', dataForClient);
       try {
         const result = await this.$http.post(
           "/clientsapi/update-client",
