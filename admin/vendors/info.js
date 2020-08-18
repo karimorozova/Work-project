@@ -101,19 +101,9 @@ async function updateVendorAssessment({ vendorId, assessment, file }) {
     if (isNew) {
       const newAssessment = addNewAssessment({ assessment, fileData });
       assessments.push(newAssessment);
+    } else {
+      assessments = updateExistingAssessment(assessment, assessments, fileData);
     }
-    // else {
-    //   assessments = updateExistingAssessment(assessment, assessments, fileData);
-    // }
-    // for (let { industry } of newIndustries) {
-    //   const { industries: existingIndustries } = assessments;
-    //   const updateIndex = existingIndustries.findIndex(item => item.industry._id.toString() === industry._id.toString());
-    //   if (updateIndex !== -1) {
-    //     existingIndustries[updateIndex] = updateExistingAssesment({
-    //       vendorId, index, assessment, fileData, updatingAssessment: existingIndustries[updateIndex]
-    //     });
-    //   }
-    // }
     return await getVendorAfterUpdate({ _id: vendorId }, { assessments });
   } catch (err) {
     console.log(err);
@@ -144,25 +134,13 @@ function langsMatchIndex({ source, target, langsData }) {
 }
 
 function updateExistingAssessment(assessment, assessments, fileData) {
-  // const { industry, step, source, target, ...assessmentData } = assessment;
+  const { industry, step, source, target, ...assessmentData } = assessment;
   const { mainIndex, industryIndex, stepIndex } = assessment;
   const neededAssessment = assessments[mainIndex];
   const { qaKey, fileName, path } = fileData;
-  const newAssessment = { ...assessmentData, [qaKey]: { ...assessmentData[qaKey], fileName, path } };
-  // let { langsData } = updatingAssessment;
-  // const langsDataIndex = langsMatchIndex({ source, target, langsData });
-  // if (langsDataIndex !== -1) {
-  //   if (index) {
-  //     langsData[langsDataIndex].industries[index] = newAssessment;
-  //   } else {
-  //     langsData[langsDataIndex].industries = [newAssessment];
-  //   }
-  // } else {
-  //   langsData.push({
-  //     source, target, industries: [newAssessment]
-  //   });
-  // }
-  // return { step, langsData };
+  neededAssessment.industries[industryIndex].steps[stepIndex][qaKey] = { ...assessmentData[qaKey], fileName, path };
+  assessments[mainIndex] = neededAssessment;
+  return assessments;
 }
 
 function addNewAssessment({ assessment, fileData }) {

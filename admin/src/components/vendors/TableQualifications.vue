@@ -267,11 +267,7 @@ export default {
       }
 
       if (this.currentStatus === "Passed") {
-        if (this.checkSuchData()) {
           this.handleLqa(index);
-        } else {
-          return;
-        }
       } else if (this.currentStatus === "Test Sent") {
         const template = await this.$http.post(`/vendorsapi/get-message`, {
           ...this.currentVendor,
@@ -288,13 +284,12 @@ export default {
 
     getAvailableTest() {
       if (!this.vendorTests.length) return null;
-      const currentTest = this.vendorTests.find(
+      return this.vendorTests.find(
         (test) =>
-          test.source._id.toString() == this.currentSource._id.toString() &&
+          test.source._id.toString() === this.currentSource._id.toString() &&
           test.targets.map((target) => target._id.toString()).includes(this.currentTarget._id.toString()) &&
           test.industries.map((industry) => industry._id.toString()).includes(this.currentIndustry._id.toString())
       );
-      return currentTest;
     },
 
     handleLqa(index) {
@@ -381,7 +376,7 @@ export default {
     },
 
     isSampleStatus(dataStatus, currentStatus){
-      return dataStatus === currentStatus ? true : false;
+      return dataStatus === currentStatus;
     },
 
     async manageSaveClick(index, message) {
@@ -482,19 +477,15 @@ export default {
         case "Test Sent":
         case "Sample Requested":
           return 2;
-          break;
         case "Test Received":
         case "Sample Received":
           return 3;
-          break;
         case "Test In Review":
         case "Sample In Review":
           return 4;
-          break;
         case "Passed":
         case "Not Passed":
           return 5;
-          break;
         default:
           return 1;
       }
