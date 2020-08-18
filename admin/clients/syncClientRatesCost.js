@@ -58,7 +58,7 @@ const synchronizeStepMultiplier = async (row, stepMultipliersTable, rates, subje
   const neededStepMultiplierRow = getNeededStepRow(stepMultipliersTable, step, unit, size);
   const neededRowIndex = rates.stepMultipliersTable.findIndex(item => item._id.toString() === _id.toString());
   const oldMultiplier = !!neededStepMultiplierRow ? neededStepMultiplierRow.multiplier : multiplier;
-  rates.stepMultipliersTable[neededRowIndex].multiplier = neededStepMultiplierRow.multiplier;
+  rates.stepMultipliersTable[neededRowIndex].multiplier = oldMultiplier;
   rates.stepMultipliersTable[neededRowIndex].altered = false;
   rates.stepMultipliersTable[neededRowIndex].notification = '';
   rates.pricelistTable = recalculateFromNewMultiplier(row, oldMultiplier, rates.pricelistTable, tableKeys.stepMultipliersTable);
@@ -71,7 +71,7 @@ const synchronizeIndustryMultiplier = async (row, industryMultipliersTable, rate
   const neededIndustryMultiplierRow = industryMultipliersTable.find(item => item.industry.toString() === industry._id.toString());
   const neededRowIndex = rates.industryMultipliersTable.findIndex(item => item._id.toString() === _id.toString());
   const oldMultiplier = !!neededIndustryMultiplierRow ? neededIndustryMultiplierRow.multiplier : multiplier;
-  rates.industryMultipliersTable[neededRowIndex].multiplier = neededIndustryMultiplierRow.multiplier;
+  rates.industryMultipliersTable[neededRowIndex].multiplier = oldMultiplier;
   rates.industryMultipliersTable[neededRowIndex].altered = false;
   rates.industryMultipliersTable[neededRowIndex].notification = '';
   rates.pricelistTable = recalculateFromNewMultiplier(row, oldMultiplier, rates.pricelistTable, tableKeys.industryMultipliersTable);
