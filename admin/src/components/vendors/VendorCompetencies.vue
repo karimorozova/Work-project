@@ -23,7 +23,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOption="currentSource.lang",
-            :options="languages.map((i) => i.lang)",
+            :options="sourceData | firstEnglishLanguage",
             @chooseOption="setSource"
           )
 
@@ -410,6 +410,9 @@ export default {
     ...mapGetters({
       currentVendor: "getCurrentVendor",
     }),
+    sourceData(){
+      return this.languages.map((i) => i.lang)
+    }
   },
   created() {
     this.currentVendor._id && this.getVendorInfo();

@@ -49,7 +49,7 @@
                       placeholder="Select"
                       :hasSearch="true"
                       :selectedOptions="currentClient.hasOwnProperty('sourceLanguages') ? makeStringLanguage(currentClient.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
-                      :options="languageData"
+                      :options="sourceLanguages | firstEnglishLanguage"
                       @chooseOptions="setSource"
                     )
             .block-item
@@ -60,7 +60,7 @@
                       placeholder="Select"
                       :hasSearch="true"
                       :selectedOptions="currentClient.hasOwnProperty('targetLanguages') ? makeStringLanguage(currentClient.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
-                      :options="languageData"
+                      :options="targetLanguages"
                       @chooseOptions="setTarget"
                     )
 </template>
@@ -182,7 +182,12 @@ export default {
     ...mapGetters({
       currentClient: "getCurrentClient"
     }),
-    languageData() {
+    sourceLanguages(){
+      if (this.languages) {
+        return this.languages.map(item => item.lang);
+      }
+    },
+    targetLanguages() {
       if (this.languages) {
         return this.languages.map(item => item.lang);
       }

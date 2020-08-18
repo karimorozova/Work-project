@@ -23,7 +23,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOption="currentSource.lang",
-            :options="sourceLanguagesClient",
+            :options="sourceLanguagesClient | firstEnglishLanguage",
             @chooseOption="setSource",
             @scrollDrop="scrollDrop"
           )
