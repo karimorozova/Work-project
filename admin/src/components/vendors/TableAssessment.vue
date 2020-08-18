@@ -18,7 +18,7 @@
           template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
             .assessment__head-title {{ field.label }}
 
-          template(slot="industry", slot-scope="{ row, index }")
+          template(slot="step", slot-scope="{ row, index }")
             .assessment__data(v-if="row.step") {{ row.step.title }}
 
           template(slot="tqi", slot-scope="{ row, index }")
@@ -67,9 +67,9 @@ export default {
     return {
       fields: [
         {
-          label: "Industry",
-          headerKey: "headerIndustry",
-          key: "industry",
+          label: "Step",
+          headerKey: "headerStep",
+          key: "step",
           width: "20%",
           padding: "0",
         },
