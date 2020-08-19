@@ -20,12 +20,10 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
       await getServiceDifferences(clientId, dataToUpdate, oldData);
       services.splice(neededServiceIndex, 1, dataForSave);
     } else {
-
-      services.push(...generateServiceCombinations(dataToUpdate));
-      await Clients.updateOne({ _id: clientId }, { services });
-      await addNewRateComponents(clientId, dataToUpdate);
+      const generatedServiceCombinations = [...await generateServiceCombinations(dataToUpdate, services)];
+      services.push(...generatedServiceCombinations);
+      await addNewRateComponents(clientId, generatedServiceCombinations);
     }
-
     await Clients.updateOne({ _id: clientId }, { services });
   } catch (err) {
     console.log(err);
@@ -33,9 +31,9 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
   }
 };
 
-const generateServiceCombinations = (dataToUpdate) => {
+const generateServiceCombinations = async (dataToUpdate, oldServices) => {
   const servicesCombinations = [];
-
+  const { services: arrServices } = dataToUpdate;
   const serviceDataIds = {
     sourceLanguage: [ObjectId(dataToUpdate.sourceLanguage._id)],
     targetLanguages: dataToUpdate.targetLanguages.map(item => ObjectId(item._id)),
@@ -47,13 +45,33 @@ const generateServiceCombinations = (dataToUpdate) => {
     serviceDataIds.targetLanguages.forEach(targetLanguages => {
       serviceDataIds.services.forEach(services => {
         serviceDataIds.industries.forEach(industries => {
-          servicesCombinations.push({ sourceLanguage, targetLanguages, services, industries });
+          const isMono = arrServices.find(item => item._id === services.toString()).languageForm;
+          if (isMono === 'Mono') {
+            const isSame = checkForDuplicateRow(oldServices, sourceLanguage, targetLanguages, services, industries);
+            if (!isSame) {
+              servicesCombinations.push({ sourceLanguage: targetLanguages, targetLanguages, services, industries });
+            }
+          } else {
+            servicesCombinations.push({ sourceLanguage, targetLanguages, services, industries });
+          }
         });
       });
     });
   });
   return servicesCombinations;
-}
+};
+
+const checkForDuplicateRow = (oldServices, newSourceLang, newTargetLang, newService, newIndustry) => {
+  let isIdentical = false;
+  for (let { sourceLanguage, targetLanguages, services, industries } of oldServices) {
+    const isSameSource = sourceLanguage.toString() === newSourceLang.toString();
+    const isSameTarget = targetLanguages.find(item => item.toString() === newTargetLang.toString());
+    const isSameService = services.find(item => item.toString() === newService.toString());
+    const isSameIndustry = industries.find(item => item.toString() === newIndustry.toString());
+    isIdentical = isSameSource && !!isSameTarget && isSameService && !!isSameIndustry;
+  }
+  return isIdentical;
+};
 
 const deleteClientService = async (clientId, serviceId) => {
   try {

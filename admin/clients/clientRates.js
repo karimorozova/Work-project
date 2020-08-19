@@ -1,4 +1,4 @@
-const { Clients, Step, Services, Pricelist } = require('../models');
+const { Clients, Step, Services, Pricelist, Languages, Industries } = require('../models');
 const _ = require('lodash');
 const { multiplyPrices, getArrayDifference } = require('../multipliers');
 const {
@@ -165,84 +165,108 @@ const changePricelistTable = (
   return updatedPricelist;
 };
 
-/**
- * @param clientId - id of a current client
- * @param newService - fresh created service, consists: {
- *   sourceLanguage: {Object},
- *   targetLanguages: {Array},
- *   services: {Array},
- *   industries: {Array}
- * }
- * @returns: Nothing, but updates client's rates with new combinations
- */
-const addNewRateComponents = async (clientId, newService) => {
+const addNewRateComponents = async (clientId, newServicesArr) => {
   const { rates, currency } = await Clients.findOne({ _id: clientId });
-
-  const boundPricelist = await Pricelist.findOne({ isDefault: true});
-  const { sourceLanguage, targetLanguages } = newService;
+  const boundPricelist = await Pricelist.findOne({ isDefault: true });
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-  const { uniqueServiceSteps, uniqueIndustries } = await getUniqueServiceItems(newService, rates);
-  const newSteps = [];
-  for (let { steps } of newService.services) {
-    for (let { step } of steps) {
-      newSteps.push({ _id: step._id });
-    }
-  }
-  const newIndustries = newService.industries.map(item => item._id);
+  /**
+   * @param clientId - id of a current client
+   * @param newServicesArr - fresh created services, consists: {
+   *   sourceLanguage: {Object},
+   *   targetLanguages: {Array},
+   *   services: {Array},
+   *   industries: {Array}
+   * }
+   * @returns: Nothing, but updates client's rates with new combinations
+   */
+  const freshBasicPriceRows = [];
   const newStepMultiplierCombinations = [];
   const newIndustryMultiplierCombinations = [];
-  for (let step of newSteps) {
-    newStepMultiplierCombinations.push(...await getStepMultipliersCombinations(step, boundPricelist));
-  }
-  for (let industry of newIndustries) {
-    const neededIndustryRow = boundPricelist.industryMultipliersTable.find(item => (
-      item.industry.toString() === industry.toString()
-    ));
-    const multiplier = neededIndustryRow.hasOwnProperty('multiplier') ? neededIndustryRow.multiplier : 100;
-    newIndustryMultiplierCombinations.push({
-      industry,
-      multiplier
-    });
-  }
-  const freshBasicPriceRows = [];
-  for (let { _id } of targetLanguages) {
-    const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage._id, _id);
-    const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : 1;
-    const newBasicPriceObj = {
-      type: sourceLanguage._id.toString() === _id ? 'Mono' : 'Duo',
-      sourceLanguage: sourceLanguage._id,
-      targetLanguage: _id,
-      basicPrice: boundBasicPrice
-    };
-    basicPricesTable.push(newBasicPriceObj);
-    freshBasicPriceRows.push(newBasicPriceObj);
-  }
-  if (uniqueServiceSteps.length) {
-    for (let service of uniqueServiceSteps) {
-      stepMultipliersTable.push(...await getStepMultipliersCombinations(service, boundPricelist));
+  for (let newService of newServicesArr) {
+    newService = await gatherFullServiceInfo(newService);
+    const { sourceLanguage, targetLanguages } = newService;
+    const { uniqueServiceSteps, uniqueIndustries } = await getUniqueServiceItems(newService, rates);
+    const newSteps = [];
+    for (let { steps } of newService.services) {
+      for (let { step } of steps) {
+        newSteps.push({ _id: step._id });
+      }
     }
-  }
-  if (uniqueIndustries.length) {
-    for (let { _id } of uniqueIndustries) {
-      const neededIndustryRow = boundPricelist.industryMultipliersTable.find(({ industry }) => (
-        industry.toString() === _id.toString()
+    const newIndustries = newService.industries.map(item => item._id);
+    for (let step of newSteps) {
+      newStepMultiplierCombinations.push(...await getStepMultipliersCombinations(step, boundPricelist));
+    }
+    for (let industry of newIndustries) {
+      const neededIndustryRow = boundPricelist.industryMultipliersTable.find(item => (
+        item.industry.toString() === industry.toString()
       ));
-      const multiplier = !!neededIndustryRow ? neededIndustryRow.multiplier : 100;
-      industryMultipliersTable.push({
-        industry: _id,
+      const multiplier = neededIndustryRow.hasOwnProperty('multiplier') ? neededIndustryRow.multiplier : 100;
+      newIndustryMultiplierCombinations.push({
+        industry,
         multiplier
       });
     }
+    for (let { _id } of targetLanguages) {
+      const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage._id, _id);
+      const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : 1;
+      const newBasicPriceObj = {
+        type: sourceLanguage._id.toString() === _id.toString() ? 'Mono' : 'Duo',
+        sourceLanguage: sourceLanguage._id,
+        targetLanguage: _id,
+        basicPrice: boundBasicPrice
+      };
+      basicPricesTable.push(newBasicPriceObj);
+      freshBasicPriceRows.push(newBasicPriceObj);
+    }
+    if (uniqueServiceSteps.length) {
+      for (let service of uniqueServiceSteps) {
+        stepMultipliersTable.push(...await getStepMultipliersCombinations(service, boundPricelist));
+      }
+    }
+    if (uniqueIndustries.length) {
+      for (let { _id } of uniqueIndustries) {
+        const neededIndustryRow = boundPricelist.industryMultipliersTable.find(({ industry }) => (
+          industry.toString() === _id.toString()
+        ));
+        const multiplier = !!neededIndustryRow ? neededIndustryRow.multiplier : 100;
+        industryMultipliersTable.push({
+          industry: _id,
+          multiplier
+        });
+      }
+    }
   }
-  pricelistTable = await generateNewPricelistCombinations(
+  pricelistTable.push(...generateNewPricelistCombinations(
     freshBasicPriceRows,
     newStepMultiplierCombinations,
     newIndustryMultiplierCombinations,
-    pricelistTable,
-  );
+    pricelistTable));
+  pricelistTable = _.uniqBy(pricelistTable, (item) => (
+    item.sourceLanguage.toString() +
+    item.targetLanguage.toString() +
+    item.step.toString() +
+    item.unit.toString() +
+    item.size +
+    item.industry.toString()
+  ));
   await Clients.updateOne({ _id: clientId },
     { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
   );
+};
+
+const gatherFullServiceInfo = async (
+  {
+    sourceLanguage: sourceLanguageId,
+    targetLanguages: targetLanguageId,
+    services: serviceId,
+    industries: industryId
+  }) => {
+  return {
+    sourceLanguage: await Languages.findOne({ _id: sourceLanguageId }),
+    targetLanguages: [await Languages.findOne({ _id: targetLanguageId })],
+    services: [await Services.findOne({ _id: serviceId })],
+    industries: [await Industries.findOne({ _id: industryId })]
+  };
 };
 
 const getNeededCurrency = (basicPriceObj, clientCurrency) => {
@@ -271,7 +295,7 @@ const getNeededStepRow = (arr, step, unit, size) => (
 const getUniqueServiceItems = async (newService, rates) => {
   const { services: newServices, industries: newIndustries } = newService;
   const { stepMultipliersTable, industryMultipliersTable } = rates;
-  const newStepUnitCombination = getStepUnitCombinations(newServices);
+  const newStepUnitCombination = await getStepUnitCombinations(newServices);
   const currentIndustries = industryMultipliersTable.map(item => item.industry);
   const currentStepUnitCombinations = stepMultipliersTable.map(({ step, unit }) => `${step} - ${unit}`);
   let uniqueServiceStepsCombinations = newStepUnitCombination.length ?
@@ -293,10 +317,11 @@ const getUniqueServiceItems = async (newService, rates) => {
   };
 };
 
-const getStepUnitCombinations = (newServices) => {
+const getStepUnitCombinations = async (newServices) => {
   const stepUnitCombinations = [];
   for (let { steps } of newServices) {
     for (let { step } of steps) {
+      step = await Step.findOne({ _id: step });
       const { _id, calculationUnit } = step;
       for (let { _id: unitId } of calculationUnit) {
         stepUnitCombinations.push(`${_id} - ${unitId}`);
