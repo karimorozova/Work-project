@@ -337,8 +337,9 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
   if (!calculationUnit.length) {
     return [];
   } else {
-    for (let { _id: unitId } of calculationUnit) {
-      const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
+    for (let item of calculationUnit) {
+      const { _id: unitId } = item;
+      const sizes = item.hasOwnProperty('sizes') ? item.sizes : [];
       if (sizes.length) {
         sizes.forEach(size => {
           const neededStepRow = stepMultipliersTable.find(item => (

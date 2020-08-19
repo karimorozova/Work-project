@@ -144,8 +144,9 @@ const pushNewStepCombinations = async (rates, services, currentServiceId, itemsT
       if (!calculationUnit.length) {
         return [];
       } else {
-        for (let { _id: unitId } of calculationUnit) {
-          const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
+        for (let item of calculationUnit) {
+          const { _id: unitId } = item;
+          const sizes = item.hasOwnProperty('sizes') ? item.sizes : [];
           const duplicatesArr = checkForDuplicates(services, currentServiceId, itemsToAdd, 'services');
           if (!duplicatesArr.length) {
             if (sizes.length) {
@@ -354,8 +355,9 @@ const findServiceRows = async (arr, service, key) => {
         for (let { step } of steps) {
           const { calculationUnit } = await Step.findOne({ _id: step });
           if (calculationUnit.length) {
-            for (let { _id: unitId } of calculationUnit) {
-              const sizes = calculationUnit.hasOwnProperty('sizes') ? calculationUnit.sizes : [];
+            for (let item of calculationUnit) {
+              const { _id: unitId } = item;
+              const sizes = item.hasOwnProperty('sizes') ? item.sizes : [];
               if (sizes.length) {
                 for (let size of sizes) {
                   neededRows.push(arr.find(item => (
