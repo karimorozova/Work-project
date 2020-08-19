@@ -8,7 +8,8 @@ const {
   getStepMultipliersCombinations,
   getPricelistCombinations,
   replaceOldItem,
-  changePricelistTable
+  changePricelistTable,
+  generateNewPricelistCombinations
 } = require('./clientRates');
 const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info');
 const { getAfterTaskStatusUpdate } = require('./projects');
@@ -48,7 +49,8 @@ const clients = {
   synchronizeBasicPrice,
   synchronizeStepMultiplier,
   synchronizeIndustryMultiplier,
-  synchronizePricelistTable
+  synchronizePricelistTable,
+  generateNewPricelistCombinations
 };
 
 module.exports = clients;

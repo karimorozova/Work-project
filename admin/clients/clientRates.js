@@ -164,21 +164,20 @@ const changePricelistTable = (
   }
   return updatedPricelist;
 };
-
+/**
+ * @param clientId - id of a current client
+ * @param newServicesArr - fresh created services, consists: {
+ *   sourceLanguage: {Object},
+ *   targetLanguages: {Array},
+ *   services: {Array},
+ *   industries: {Array}
+ * }
+ * @returns: Nothing, but updates client's rates with new combinations
+ */
 const addNewRateComponents = async (clientId, newServicesArr) => {
   const { rates, currency } = await Clients.findOne({ _id: clientId });
   const boundPricelist = await Pricelist.findOne({ isDefault: true });
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-  /**
-   * @param clientId - id of a current client
-   * @param newServicesArr - fresh created services, consists: {
-   *   sourceLanguage: {Object},
-   *   targetLanguages: {Array},
-   *   services: {Array},
-   *   industries: {Array}
-   * }
-   * @returns: Nothing, but updates client's rates with new combinations
-   */
   const freshBasicPriceRows = [];
   const newStepMultiplierCombinations = [];
   const newIndustryMultiplierCombinations = [];
@@ -376,13 +375,11 @@ const generateNewPricelistCombinations = (
   newStepMultiplierRows,
   newIndustryMultiplierRows,
   oldPricelistTable,
-  serviceId
 ) => {
   for (let { step, unit, size, multiplier: stepMultiplierValue } of newStepMultiplierRows) {
     for (let { sourceLanguage, targetLanguage, basicPrice } of newBasicPriceRows) {
       for (let { industry, multiplier: industryMultiplierValue } of newIndustryMultiplierRows) {
         oldPricelistTable.push({
-          serviceId,
           sourceLanguage,
           targetLanguage,
           step,
@@ -533,5 +530,6 @@ module.exports = {
   getPricelistCombinations,
   getObjDifferences,
   replaceOldItem,
-  changePricelistTable
+  changePricelistTable,
+  generateNewPricelistCombinations
 };

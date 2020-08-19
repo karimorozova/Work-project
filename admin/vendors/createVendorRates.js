@@ -4,9 +4,8 @@ const {
   getNeededLangPair,
   getNeededCurrency,
   getStepMultipliersCombinations,
-  getPricelistCombinations
+  generateNewPricelistCombinations
 } = require('../clients');
-const ObjectId = require('mongodb').ObjectID;
 
 const createRateCombinations = async (listForRates, vendorId) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
@@ -16,16 +15,22 @@ const createRateCombinations = async (listForRates, vendorId) => {
   let {
     basicPricesTable,
     stepMultipliersTable,
-    industryMultipliersTable
+    industryMultipliersTable,
+    rates
   } = await combineVendorRates(langPairs, steps, industries, defaultPricelist, vendor);
-  const pricelistTable = await getPricelistCombinations(
-    basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable
-  );
+  let pricelistTable = [...await generateNewPricelistCombinations(
+    basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
+  pricelistTable = _.uniqBy(pricelistTable, (item) => (
+    item.sourceLanguage.toString() +
+    item.targetLanguage.toString() +
+    item.step.toString() +
+    item.unit.toString() +
+    item.size +
+    item.industry.toString()
+  ));
   await Vendors.updateOne({ _id: vendorId }, {
     rates: {
-      basicPricesTable,
-      stepMultipliersTable,
-      industryMultipliersTable,
+      ...rates,
       pricelistTable,
     }
   });
@@ -52,18 +57,23 @@ const splitRatesArr = (arr) => {
 
 const combineVendorRates = async (langPairs, steps, industries, defaultPricelist, vendor) => {
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = defaultPricelist;
+  const newLangPairCombinations = [];
+  const newStepMultiplierCombinations = [];
+  const newIndustryMultiplierCombinations = [];
   const { rates, currency } = vendor;
   for (let { sourceLanguage, targetLanguage } of langPairs) {
-    const similarLangPair = getNeededLangPair(rates.basicPricesTable, sourceLanguage._id, targetLanguage._id);
+    const similarLangPair = getNeededLangPair(rates.basicPricesTable, sourceLanguage, targetLanguage);
     if (!similarLangPair) {
       const boundLangPairRow = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage);
       const boundBasicPrice = boundLangPairRow ? getNeededCurrency(boundLangPairRow, currency) : 1;
-      rates.basicPricesTable.push({
+      const langPairCombination = {
         type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
-        sourceLanguage: ObjectId(sourceLanguage._id),
-        targetLanguage: ObjectId(targetLanguage._id),
+        sourceLanguage,
+        targetLanguage,
         basicPrice: boundBasicPrice
-      });
+      };
+      newLangPairCombinations.push(langPairCombination);
+      rates.basicPricesTable.push(langPairCombination);
     }
   }
   for (let step of steps) {
@@ -74,6 +84,7 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
       if (!sameStepMultipliers.length) {
         newStepsArr.push(...await getStepMultipliersCombinations({ _id: step }, { stepMultipliersTable: stepMultipliersTable }));
         newStepsArr.map(item => ({ ...item, step: item.step._id }));
+        newStepMultiplierCombinations.push(...newStepsArr);
         rates.stepMultipliersTable.push(...newStepsArr);
       }
     }
@@ -83,13 +94,22 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
     if (!sameIndustryMultiplier) {
       const neededIndustryRow = industryMultipliersTable.find(item => item.industry.toString() === industry.toString());
       const multiplier = neededIndustryRow ? neededIndustryRow.multiplier : 100;
+      newIndustryMultiplierCombinations.push({
+        industry,
+        multiplier
+      });
       rates.industryMultipliersTable.push({
         industry,
         multiplier
       });
     }
   }
-  return rates;
+  return {
+    basicPricesTable: newLangPairCombinations,
+    stepMultipliersTable: newStepMultiplierCombinations,
+    industryMultipliersTable: newIndustryMultiplierCombinations,
+    rates
+  };
 
   function checkForStepDuplicates(stepMultipliersTable, step) {
     const occurrences = [];
@@ -125,19 +145,25 @@ const createRateRowFromQualification = async (vendorId, qualification) => {
   }];
   steps = steps.map(item => item._id);
   const industries = [industry._id];
-  let {
+  const {
     basicPricesTable,
     stepMultipliersTable,
-    industryMultipliersTable
+    industryMultipliersTable,
+    rates
   } = await combineVendorRates(langPairs, steps, industries, defaultPricelist, vendor);
-  const pricelistTable = await getPricelistCombinations(
-    basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable
-  );
+  let pricelistTable = [...await generateNewPricelistCombinations(
+    basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
+  pricelistTable = _.uniqBy(pricelistTable, (item) => (
+    item.sourceLanguage.toString() +
+    item.targetLanguage.toString() +
+    item.step.toString() +
+    item.unit.toString() +
+    item.size +
+    item.industry.toString()
+  ));
   await Vendors.updateOne({ _id: vendorId }, {
     rates: {
-      basicPricesTable,
-      stepMultipliersTable,
-      industryMultipliersTable,
+      ...rates,
       pricelistTable,
     }
   });
