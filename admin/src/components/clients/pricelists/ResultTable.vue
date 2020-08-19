@@ -19,8 +19,8 @@
       :fields="fields"
       :tableData="dataArray"
       @bottomScrolled="bottomScrolled"
-      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
-      :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 7}]"
+      :tableheadRowClass="dataArray.length < 7 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="client-pricelist-table-row"
       bodyCellClass="client-pricelist-table-cell"
     )
@@ -64,9 +64,13 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
-          .tooltip(v-if="row.altered")
-            span#myTooltip.tooltiptext {{ row.notification }}
-            img.price__icons-info(:style="{cursor: 'help'}" src="../../../assets/images/red-info-icon.png")
+          .altered(v-if="row.altered")
+            .tooltip
+              span(v-if="index <= 1")
+                span#myTooltip.tooltiptext-bottom {{ row.notification }}
+              span(v-else)
+                span#myTooltip.tooltiptext {{ row.notification }}
+              img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png")
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link(@click="getRowPrice(index)")
@@ -150,14 +154,14 @@ export default {
           label: "Price",
           headerKey: "headerPrice",
           key: "price",
-          width: "10%",
+          width: "12%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "15%",
+          width: "13%",
           padding: "0"
         }
       ],
@@ -474,37 +478,73 @@ export default {
   }
 
   &__icons {
-    padding-top: 3px;
+    padding-top: 2px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
-   &-info {   margin-top:  4px; margin-right: 3px;    }
+   &-info {
+     margin-top:  1px; 
+     margin-right: 3px;    
+  }
     &-link {
       cursor: pointer;
       font-size: 18px;
       margin-top: 5px;
+     margin-right: 4px;
     }
     &-link-opacity {
       cursor: default;
       font-size: 18px;
       margin-top: 4px;
       opacity: 0.5;
+      margin-right: 4px;
     }
   }
 
   &__icon {
     cursor: pointer;
     opacity: 0.5;
-    margin-right: 4px;
+    margin-right: 2px;
   }
 
   &_opacity {
     opacity: 1;
   }
 }
+
 .tooltip {
   position: relative;
-  display: inline-block;
+  display: flex;
+
+  .tooltiptext-bottom{
+    font-size: 14px;
+    visibility: hidden;
+    width: 140px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: -190%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    &::after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      margin-left: -5px;
+      transform: rotate(180deg);
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent;
+    }
+  }
+
   .tooltiptext {
     font-size: 14px;
     visibility: hidden;
@@ -532,8 +572,15 @@ export default {
       border-color: #67573e transparent transparent transparent;
     }
   }
+
   &:hover {
     .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+  &:hover {
+    .tooltiptext-bottom {
       visibility: visible;
       opacity: 1;
     }

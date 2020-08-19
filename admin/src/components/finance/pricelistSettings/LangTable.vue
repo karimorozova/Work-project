@@ -377,9 +377,9 @@ export default {
     background-color: transparent;
   }
   &__icons {
-    padding-top: 3px;
+    padding-top: 2px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
   }
   &__icon {

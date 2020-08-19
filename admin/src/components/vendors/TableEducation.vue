@@ -22,25 +22,21 @@
                 div(v-click-outside="closePickers")
                   img.education__calendar(src="../../assets/images/calendar.png" @click="openPickers")
                   .education__datepickers(v-if="isDatepickers")
-                      .education__pickers
-                          DatePickers(
-                              title="From"
-                              @setTodaysDate="(e) => setDate(e, 'fromDate')"
-                              @setNextDate="(e) => setDate(e, 'fromDate')"
-                              @setPrevDate="(e) => setDate(e, 'fromDate')"
-                              @setDate="(e) => setDate(e, 'fromDate')"
-                              @removeAnytime="(e) => removeAnytime(e, 'fromDate')"
-                              @setAnytime="(e) => setAnytime(e, 'fromDate')"
-                              :date="fromDate")
-                          DatePickers(
-                              title="To"
-                              @setTodaysDate="(e) => setDate(e, 'toDate')"
-                              @setNextDate="(e) => setDate(e, 'toDate')"
-                              @setPrevDate="(e) => setDate(e, 'toDate')"
-                              @setDate="(e) => setDate(e, 'toDate')"
-                              @removeAnytime="(e) => removeAnytime(e, 'toDate')"
-                              @setAnytime="(e) => setAnytime(e, 'toDate')" 
-                              :date="toDate")
+                      .education__pickers 
+                          Datepicker(
+                            :value="fromDate"
+                            @selected="(e) => setDate(e, 'fromDate')"
+                            calendarClass="vendor__calendar-custom" 
+                            :inline="true"
+                            monday-first=true
+                          )
+                          Datepicker(
+                            :value="toDate"
+                            @selected="(e) => setDate(e, 'toDate')"
+                            calendarClass="vendor__calendar-custom" 
+                            :inline="true"
+                            monday-first=true
+                          )
                       .education__button
                           Button(value="Assign" @clicked="setDateRange")
         
@@ -79,7 +75,7 @@
 </template>
 
 <script>
-import DatePickers from "../reports/DatePickers";
+import Datepicker from "../Datepicker";
 import Button from "../Button";
 import SettingsTable from "../Table/SettingsTable";
 import Add from "../Add";
@@ -170,7 +166,7 @@ export default {
       deleteIndex: -1,
 
       isDatepickers: false,
-      fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      fromDate: new Date(),
       toDate: new Date(),
       domain: "http://localhost:3001"
     };
@@ -181,7 +177,6 @@ export default {
       storeEducation: "storeCurrentVendorEducation",
       deleteEducation: "deleteCurrentVendorEducation"
     }),
-
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();
@@ -311,8 +306,8 @@ export default {
     openPickers() {
       this.isDatepickers = true;
     },
-    setDate({ date }, prop) {
-      this[prop] = new Date(date);
+    setDate(e, prop) {
+      this[prop] = new Date(e);
     },
     setAnytime(e, prop) {
       this[prop] = prop === "fromDate" ? new Date("2019-01-01") : new Date();
@@ -347,7 +342,7 @@ export default {
     }
   },
   components: {
-    DatePickers,
+    Datepicker,
     Button,
     SettingsTable,
     Add
@@ -400,8 +395,7 @@ export default {
     z-index: 50;
     background-color: $white;
     position: absolute;
-    width: 472px;
-    padding: 20px;
+    padding: 20px 0 20px 20px;
     box-sizing: border-box;
     box-shadow: 0 0 10px $brown-shadow;
   }
@@ -410,8 +404,9 @@ export default {
     justify-content: space-between;
   }
   &__button {
-    margin-top: 10px;
+    margin-top: 20px;
     text-align: right;
+    margin-right: 20px;
   }
 
   &__no-file {

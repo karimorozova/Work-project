@@ -7,6 +7,8 @@
       :errors="errors",
       :areErrors="areErrors",
       :isApproveModal="isDeleting",
+      bodyClass="bodyHeigth-300",
+      :rowCount="8",
       @closeErrors="closeErrors",
       @approve="deleteCompetencies",
       @notApprove="setDefaults",

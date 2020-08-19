@@ -922,7 +922,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .vdp-datepicker__calendar div .cell {
   font-size: 16px;
 }
@@ -1126,8 +1126,27 @@ export default {
   color: rgba(0, 0, 0, 0.2);
 }
 
-/* Custom styles for different components */
 
+/* Custom styles for different components */
+.vendor__calendar-custom{
+    width: 250px;
+    margin-right: 20px;
+    .cell.beforeToday{
+      color: #67573e;
+    }
+    .cell.day{
+      color: #67573e;
+    }
+    .cell.today{
+      color: #d15f45!important;
+      background-color: #fff!important;
+      font-weight: bold;
+    }
+    .selected{
+      background-color: #D15F45!important;
+      color: #fff!important;
+    }
+}
 .datepicker-custom {
   border-radius: 5px;
   border: 1px solid #68573E;
@@ -1199,4 +1218,6 @@ export default {
 .request_background {
     background-color: rgba(229, 105, 97, 0.24);
 }
+
+
 </style>
