@@ -1,5 +1,5 @@
 const { Vendors } = require('../models');
-const { getVendor } = require('./getVendors');
+const { getVendor, getVendorAfterUpdate } = require('./getVendors');
 const ObjectId = require('mongodb').ObjectID;
 const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications');
 const { deleteVendorRates } = require('./deleteVendorRates');
@@ -10,18 +10,18 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
     if (dataToUpdate._id) {
       const neededServiceIndex = competencies.findIndex(item => item._id.toString() === dataToUpdate._id);
       competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
-      await Vendors.updateOne({ _id: vendorId }, { competencies });
       const oldCompetence = competencies[neededServiceIndex];
-      await saveQualificationsAfterUpdateCompetencies(dataToUpdate, vendorId, oldCompetence);
+      const { rates, qualifications } = await saveQualificationsAfterUpdateCompetencies(dataToUpdate, vendorId, oldCompetence);
+      return getVendorAfterUpdate({ _id: vendorId }, { competencies, rates, qualifications });
     } else {
       const combinationsWithoutRepetitions = generateCompetenciesCombinations(dataToUpdate)
         .filter(x => competencies.every(y =>
           `${x.sourceLanguage}/${x.targetLanguage}/${x.industry}/${x.step}` !==
           `${y.sourceLanguage._id}/${y.targetLanguage._id}/${y.industry._id}/${y.step._id}`
         ));
-        competencies.push(...combinationsWithoutRepetitions);
-        await Vendors.updateOne({ _id: vendorId }, { competencies });
-        await saveQualifications(combinationsWithoutRepetitions, vendorId);
+      competencies.push(...combinationsWithoutRepetitions);
+      const { rates, qualifications } = await saveQualifications(combinationsWithoutRepetitions, vendorId);
+      return getVendorAfterUpdate({ _id: vendorId }, { competencies, rates, qualifications });
     }
   } catch (err) {
     console.log(err);
@@ -58,19 +58,19 @@ const generateCompetenciesCombinations = (dataToUpdate) => {
     });
   });
   return competenciesCombinations;
-}
+};
 
 const deleteVendorCompetencies = async (vendorId, competenceId) => {
   try {
     const { competencies } = await Vendors.findOne({ _id: vendorId });
     const neededIndex = competencies.findIndex(item => item._id.toString() === competenceId);
-    await deleteVendorRates(vendorId, competencies[neededIndex]);
+    const { rates } = await deleteVendorRates(vendorId, competencies[neededIndex]);
     competencies.splice(neededIndex, 1);
-    await Vendors.updateOne({ _id: vendorId }, { competencies });
+    await getVendorAfterUpdate({ _id: vendorId }, { competencies, rates });
   } catch (err) {
     console.log(err);
     console.log('Error in deleteVendorCompetencies');
   }
 };
 
-module.exports = { updateVendorCompetencies, deleteVendorCompetencies, generateCompetenciesCombinations};
+module.exports = { updateVendorCompetencies, deleteVendorCompetencies, generateCompetenciesCombinations };

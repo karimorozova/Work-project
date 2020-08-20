@@ -28,12 +28,10 @@ const createRateCombinations = async (listForRates, vendorId) => {
     item.size +
     item.industry.toString()
   ));
-  await Vendors.updateOne({ _id: vendorId }, {
-    rates: {
-      ...rates,
-      pricelistTable,
-    }
-  });
+  return {
+    ...rates,
+    pricelistTable
+  };
 };
 
 const splitRatesArr = (arr) => {

@@ -12,7 +12,7 @@ const updateClientLangPairs = async (sourceLangId, sourceLangDifference, targetL
     switch (difference) {
       default:
       case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
-        differenceOperationType.AddAndReplace:
+      differenceOperationType.AddAndReplace:
         updatedRates = await filterRedundantLangPairs(updatedRates, services, serviceId, itemsToDelete, sourceLangId);
         updatedRates = await pushNewTargetPairs(updatedRates, services, serviceId, itemsToAdd, sourceLangId);
         break;
@@ -49,7 +49,7 @@ const updateClientStepMultipliers = async (serviceStepDifference, clientId, serv
   switch (difference) {
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
-      differenceOperationType.AddAndReplace:
+    differenceOperationType.AddAndReplace:
       updatedRates = await filterRedundantSteps(client.rates, client.services, serviceId, itemsToDelete);
       updatedRates = await pushNewStepCombinations(updatedRates, client.services, serviceId, itemsToAdd);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
@@ -72,7 +72,7 @@ const updateClientIndustryMultipliers = async (industryDifference, clientId, ser
   switch (difference) {
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace ||
-      differenceOperationType.AddAndReplace:
+    differenceOperationType.AddAndReplace:
       updatedRates = await filterRedundantIndustries(client.rates, client.services, serviceId, itemsToDelete);
       updatedRates = await pushNewIndustryMultiplier(updatedRates, client.services, serviceId, itemsToAdd);
       await Clients.updateOne({ _id: client._id }, { rates: updatedRates });
@@ -112,24 +112,35 @@ const pushNewTargetPairs = async (rates, services, currentServiceId, itemsToAdd,
 
 const filterRedundantLangPairs = async (rates, services, currentServiceId, itemsToDelete, sourceLangId) => {
   const { stepMultipliersTable, industryMultipliersTable } = rates;
-  const itemsToDeleteIdPairs = itemsToDelete.map(item => `${sourceLangId} ${item._id}`);
+  const itemsToDeleteIds = itemsToDelete.map(item => `${sourceLangId} ${item._id}`);
   const changedService = services.find(item => item._id.toString() === currentServiceId.toString());
   const neededStepRows = await findServiceRows(stepMultipliersTable, changedService, tableKeys.stepMultipliersTable);
   const neededIndustryRows = await findServiceRows(industryMultipliersTable, changedService, tableKeys.industryMultipliersTable);
-  return {
-    ...rates,
-    basicPricesTable: rates.basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
-      !itemsToDeleteIdPairs.includes(`${sourceLanguage} ${targetLanguage}`)
-    )),
-    pricelistTable: await filterPricelistTable(
-      rates.pricelistTable,
-      [],
-      neededIndustryRows,
-      neededStepRows,
-      itemsToDeleteIdPairs,
-      tableKeys.basicPricesTable
-    )
-  };
+  const duplicatesArr = checkForDuplicateLangPairs(services, currentServiceId, itemsToDeleteIds);
+  if (!duplicatesArr.length) {
+    return {
+      ...rates,
+      basicPricesTable: rates.basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
+        !itemsToDeleteIds.includes(`${sourceLanguage} ${targetLanguage}`)
+      )),
+      pricelistTable: rates.pricelistTable.filter(item => (
+        !itemsToDeleteIds.includes(`${item.sourceLanguage} ${item.targetLanguage}`)
+      ))
+    };
+  } else {
+    return {
+      ...rates,
+      pricelistTable: await filterPricelistTable(
+        rates.pricelistTable,
+        [],
+        neededIndustryRows,
+        neededStepRows,
+        itemsToDeleteIds,
+        tableKeys.basicPricesTable
+      )
+    };
+  }
+
 };
 
 const pushNewStepCombinations = async (rates, services, currentServiceId, itemsToAdd) => {
@@ -258,6 +269,22 @@ const checkForDuplicates = (clientServices, currentServiceId, operationItems, ke
   for (let { _id } of operationItems) {
     for (let item of servicesForCheck) {
       const sameItem = item[key].find(item => item.toString() === _id.toString());
+      if (sameItem) occurrences.push(sameItem);
+    }
+  }
+  return occurrences;
+};
+
+const checkForDuplicateLangPairs = (clientServices, currentServiceId, langPairIds) => {
+  const occurrences = [];
+  const servicesForCheck = clientServices.filter(({ _id }) => _id.toString() !== currentServiceId.toString());
+  for (let langPairString of langPairIds) {
+    const sourceLanguage = langPairString.split(' ')[0];
+    const targetLanguage = langPairString.split(' ')[1];
+    for (let service of servicesForCheck) {
+      const sameItem = service.targetLanguages.find(item => (
+        `${service.sourceLanguage} ${item}` === `${sourceLanguage} ${targetLanguage}`
+      ));
       if (sameItem) occurrences.push(sameItem);
     }
   }
@@ -438,6 +465,7 @@ module.exports = {
   updateClientLangPairs,
   updateClientStepMultipliers,
   updateClientIndustryMultipliers,
+  filterRedundantLangPairs,
   filterRedundantSteps,
   filterRedundantIndustries,
   generateNewStepCombinations

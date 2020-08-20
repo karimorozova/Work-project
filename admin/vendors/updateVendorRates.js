@@ -22,7 +22,7 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const stepDifference = compareIds(newData.step, oldData.step);
   const industryDifference = compareIds(newData.industry, oldData.industry);
   if (sourceLangDifference || targetLangDifference) {
-    await updateVendorLangPairs(
+    return await updateVendorLangPairs(
       oldData,
       sourceLangDifference,
       targetLangDifference,
@@ -31,10 +31,10 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
     );
   }
   if (stepDifference) {
-    await updateVendorStepMultipliers(oldData, stepDifference, vendor, defaultPricelist);
+    return await updateVendorStepMultipliers(oldData, stepDifference, vendor, defaultPricelist);
   }
   if (industryDifference) {
-    await updateIndustryMultipliers(oldData, industryDifference, vendor, defaultPricelist);
+    return await updateIndustryMultipliers(oldData, industryDifference, vendor, defaultPricelist);
   }
 
   function compareIds(obj1, obj2) {
@@ -105,14 +105,15 @@ const updateVendorLangPairs = async (
       pricelistTable = filterRedundantLangPair(pricelistTable, sourceLanguage._id, targetLanguage._id);
     }
   }
-  await Vendors.updateOne({ _id }, {
+  return {
     rates: {
       basicPricesTable,
       stepMultipliersTable,
       industryMultipliersTable,
       pricelistTable
     }
-  });
+  };
+
 
   function findSameLangPairRow(arr, sourceLangId, targetLangId) {
     return arr.find(item => (
@@ -162,14 +163,14 @@ const updateVendorStepMultipliers = async (oldData, newStep, vendor, defaultPric
     stepMultipliersTable = filterRedundantSteps(stepMultipliersTable, oldData.step._id);
     pricelistTable = filterRedundantSteps(pricelistTable, oldData.step._id);
   }
-  await Vendors.updateOne({ _id }, {
+  return {
     rates: {
       basicPricesTable,
       stepMultipliersTable,
       industryMultipliersTable,
       pricelistTable
     }
-  });
+  };
 
   function filterRedundantSteps(arr, stepId) {
     return arr.filter(item => item.step.toString() !== stepId.toString());
@@ -202,14 +203,14 @@ const updateIndustryMultipliers = async (oldData, newIndustry, vendor, defaultPr
     industryMultipliersTable = industryMultipliersTable.filter(item => item.industry.toString() !== oldData.industry._id.toString());
     pricelistTable = pricelistTable.filter(item => item.industry.toString() !== oldData.industry._id.toString());
   }
-  await Vendors.updateOne({ _id }, {
+  return {
     rates: {
       basicPricesTable,
       stepMultipliersTable,
       industryMultipliersTable,
       pricelistTable
     }
-  });
+  };
 };
 
 /**

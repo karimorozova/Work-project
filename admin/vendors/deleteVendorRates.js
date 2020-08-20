@@ -16,14 +16,14 @@ const deleteVendorRates = async (vendorId, competenceToDelete) => {
     industryMultipliersTable,
     pricelistTable,
     true);
-  await Vendors.updateOne({ _id: vendorId }, {
+  return {
     rates: {
       basicPricesTable,
       stepMultipliersTable,
       industryMultipliersTable,
       pricelistTable
     }
-  });
+  };
 };
 
 module.exports = {

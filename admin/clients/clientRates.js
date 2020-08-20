@@ -6,7 +6,8 @@ const {
   updateClientStepMultipliers,
   updateClientIndustryMultipliers,
   filterRedundantSteps,
-  filterRedundantIndustries
+  filterRedundantIndustries,
+  filterRedundantLangPairs
 } = require('./editClientRates');
 const { tableKeys } = require('../enums');
 
@@ -238,7 +239,11 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
     newStepMultiplierCombinations,
     newIndustryMultiplierCombinations,
     pricelistTable));
-  pricelistTable = _.uniqBy(pricelistTable, (item) => (
+  basicPricesTable = _.uniqBy(basicPricesTable, item => (
+    item.sourceLanguage.toString() +
+    item.targetLanguage.toString()
+  ));
+  pricelistTable = _.uniqBy(pricelistTable, item => (
     item.sourceLanguage.toString() +
     item.targetLanguage.toString() +
     item.step.toString() +
@@ -475,18 +480,22 @@ const getObjDifferences = (obj1, obj2) => {
 
 const deleteClientRates = async (clientId, serviceToDelete) => {
   const client = await Clients.findOne({ _id: clientId });
-  let { basicPricesTable, pricelistTable } = client.rates;
+  let { pricelistTable } = client.rates;
   let { sourceLanguage, targetLanguages, services: serviceIds, industries } = serviceToDelete;
   const services = [];
   for (let id of serviceIds) {
     const service = await Services.findOne({ _id: id });
     services.push(service);
   }
-  const langPairsToDelete = targetLanguages.map(id => `${sourceLanguage} ${id}`);
   const industryIdsToDelete = industries.map(id => ({ _id: id.toString() }));
-  basicPricesTable = basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
-    !langPairsToDelete.includes(`${sourceLanguage.toString()} ${targetLanguage.toString()}`)
-  ));
+  targetLanguages = targetLanguages.map(item => ({ _id: item }));
+  const { basicPricesTable: filteredBasicPricesTable } = await filterRedundantLangPairs(
+    client.rates,
+    client.services,
+    serviceToDelete._id,
+    targetLanguages,
+    sourceLanguage._id
+  );
   const { stepMultipliersTable: filteredStepsTable } = await filterRedundantSteps(
     client.rates,
     client.services,
@@ -500,7 +509,7 @@ const deleteClientRates = async (clientId, serviceToDelete) => {
     industryIdsToDelete
   );
   pricelistTable = await getPricelistCombinations(
-    basicPricesTable,
+    filteredBasicPricesTable,
     filteredStepsTable,
     filteredIndustriesTable,
     pricelistTable,
@@ -508,14 +517,13 @@ const deleteClientRates = async (clientId, serviceToDelete) => {
   );
   await Clients.updateOne({ _id: clientId }, {
     rates: {
-      basicPricesTable,
+      basicPricesTable: filteredBasicPricesTable,
       stepMultipliersTable: filteredStepsTable,
       industryMultipliersTable: filteredIndustriesTable,
       pricelistTable
     }
   });
 };
-
 
 module.exports = {
   updateClientRates,

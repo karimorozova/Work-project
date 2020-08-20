@@ -60,12 +60,10 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
     }
   });
 
-  await Vendors.updateOne(
-    { _id: vendorId },
-    { qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests) }
-  );
-
-  await createRateCombinations(listForRates, vendorId);
+  return {
+    rates: await createRateCombinations(listForRates, vendorId),
+    qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests),
+  };
 
   function qualificationsArrayAdditions(qualificationsArray, testsArray) {
     let finalQualifivationArray = [];
@@ -95,6 +93,7 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
   const allTests = await LangTest.find({});
   let { qualifications } = await Vendors.findOne({ _id: vendorId });
   let newQualifications = qualifications;
+  let rates = [];
   currentTest = allTests.find(test =>
     test.source.toString() === competence.sourceLanguage._id &&
     test.targets.find(target => target.toString() === competence.targetLanguage._id) &&
@@ -129,9 +128,12 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
       }
     }
   } else {
-    await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
+    rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
   }
-  await Vendors.updateOne({ _id: vendorId }, { qualifications: newQualifications });
+  return {
+    rates,
+    qualifications: newQualifications
+  };
 };
 
 const isExists = (arr, searchElement) => {

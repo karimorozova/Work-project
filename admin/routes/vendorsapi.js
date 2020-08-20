@@ -191,8 +191,7 @@ router.post('/filtered-vendors', async (req, res) => {
 router.post('/competencies', async (req, res) => {
   const { vendorId, currentData } = req.body;
   try {
-    await updateVendorCompetencies(vendorId, currentData);
-    const vendor = await getVendor({ "_id": vendorId });
+    const vendor = await updateVendorCompetencies(vendorId, currentData);
     res.send(vendor);
   } catch (err) {
     console.log(err);
@@ -203,8 +202,8 @@ router.post('/competencies', async (req, res) => {
 router.delete('/competencies/:vendorId/:competenceId', async (req, res) => {
   const { vendorId, competenceId } = req.params;
   try {
-    await deleteVendorCompetencies(vendorId, competenceId);
-    res.send('Deleted');
+    const vendor = await deleteVendorCompetencies(vendorId, competenceId);
+    res.send(vendor);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on deleting Vendor Competencies');
