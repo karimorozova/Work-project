@@ -9,11 +9,13 @@
         GeneralInstructions(:project="currentProject")
     .project-info__all-info
         TasksAndSteps(
+            :originallyLanguages="originallyLanguages"
             :isFinishedStatus="isFinishedStatus"
             @getMetrics="getMetrics"
             @setVendor="setVendor"
             @setDate="setDate"
-            @showErrors="showErrors")
+            @showErrors="showErrors"
+        )
             ValidationErrors(v-if="areErrorsExist"
                 :errors="errors"
                 :isAbsolute="isBlockAbsoulte"
@@ -52,6 +54,8 @@ export default {
             isEditAndSend: false,
             message: "",
             mailSubject: "",
+
+            originallyLanguages: null,
         }
     },
     methods: {
@@ -198,6 +202,18 @@ export default {
             const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
             await this.setCurrentProject(curProject.body);
         },
+        async getOriginallyLanguages(){
+            try {
+                const result = await this.$http.get("/api/languages");
+                this.originallyLanguages = result.body;
+            } catch (err) {
+                this.alertToggle({
+                    message: "Error in Originally Languages",
+                    isShow: true,
+                    type: "error",
+                });
+            }
+        },
     },
     computed: {
         ...mapGetters({
@@ -221,6 +237,7 @@ export default {
     created() {
         this.getProject();
         this.getVendors();
+        this.getOriginallyLanguages();
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {

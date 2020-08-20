@@ -50,6 +50,9 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
+        originallyLanguages: {
+            type: Array
+        },
         sourceLanguages: {type: Array},
         isRequest: {type: Boolean},
         calculationUnit: {type: String, default: "Words"}
@@ -89,7 +92,11 @@ export default {
         },
         setPossibleTargets(symbol) {
             const pairsWithPossibleTargets = this.languagePairs.filter(item => item.source && item.source.symbol === symbol);
-            this.targetAll = !pairsWithPossibleTargets.length ? [] : pairsWithPossibleTargets.map(pair => pair.target);
+            console.log(this.currentProject.customer.targetLanguages);
+            console.log(this.sourceLanguages);
+            this.targetAll = this.originallyLanguages.filter(item => this.currentProject.customer.targetLanguages
+            .some(id => (item._id.toString() === id)));
+            // this.targetAll = !pairsWithPossibleTargets.length ? [] : pairsWithPossibleTargets.map(pair => pair.target);
             if(this.targetAll.length) {
                 this.setUniqueLangs('targetAll');
                 this.sortLangs('targetAll');
@@ -147,44 +154,44 @@ export default {
                 }
             }
         },
-        async getLanguagePairs() {
-            try {
-                if(!this.currentProject._id) {
-                    const id = this.$route.params.id;
-                    const curProject = await this.$http.get(`/pm-manage/request?id=${id}`);
-                    await this.storeProject(curProject.body);
-                }
-                const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);
-                this.wordsRates = [...langPairs.data.wordsRates];
-                this.hoursRates = [...langPairs.data.hoursRates];
-                this.setLanguages();
-                if(this.isRequest) {
-                    this.setRequestLanguages();
-                }
-            } catch(err) {
+        // async getLanguagePairs() {
+        //     try {
+        //         if(!this.currentProject._id) {
+        //             const id = this.$route.params.id;
+        //             const curProject = await this.$http.get(`/pm-manage/request?id=${id}`);
+        //             await this.storeProject(curProject.body);
+        //         }
+        //         const langPairs = await this.$http.get(`/pm-manage/language-pairs?customerId=${this.currentProject.customer._id}`);
+        //         this.wordsRates = [...langPairs.data.wordsRates];
+        //         this.hoursRates = [...langPairs.data.hoursRates];
+        //         this.setLanguages();
+        //         if(this.isRequest) {
+        //             this.setRequestLanguages();
+        //         }
+        //     } catch(err) {
 
-            }
-        },
-        setLanguages() {
-            this.languagePairs = this.calculationUnit === 'Words' ? [...this.wordsRates] : [...this.hoursRates];
-            this.targetChosen = [];
-            if(this.languagePairs.length) {
-                const pairSymbol = this.isRequest ? this.currentProject.sourceLanguage.symbol : 'EN-GB';
-                const sourcePair =  this.languagePairs.find(item => item.source.symbol === pairSymbol);
-                const symbol = sourcePair ? sourcePair.source.symbol : "";
-                this.$emit('setSourceLanguage', { symbol });
-                this.setDefaultTargets(sourcePair);
-            }
-        },
-        setDefaultTargets(sourcePair) {
-            if(!sourcePair) {
-                this.targetAll = this.languagePairs.map(pair => pair.target);
-                this.sortLangs('targetAll');
-            } else {
-                this.setPossibleTargets(sourcePair.source.symbol);
-            }
-            this.targetAll = this.getDistinctLangs(this.targetAll);
-        },
+        //     }
+        // },
+        // setLanguages() {
+        //     this.languagePairs = this.calculationUnit === 'Words' ? [...this.wordsRates] : [...this.hoursRates];
+        //     this.targetChosen = [];
+        //     if(this.languagePairs.length) {
+        //         const pairSymbol = this.isRequest ? this.currentProject.sourceLanguage.symbol : 'EN-GB';
+        //         const sourcePair =  this.languagePairs.find(item => item.source.symbol === pairSymbol);
+        //         const symbol = sourcePair ? sourcePair.source.symbol : "";
+        //         this.$emit('setSourceLanguage', { symbol });
+        //         this.setDefaultTargets(sourcePair);
+        //     }
+        // },
+        // setDefaultTargets(sourcePair) {
+        //     if(!sourcePair) {
+        //         this.targetAll = this.languagePairs.map(pair => pair.target);
+        //         this.sortLangs('targetAll');
+        //     } else {
+        //         this.setPossibleTargets(sourcePair.source.symbol);
+        //     }
+        //     this.targetAll = this.getDistinctLangs(this.targetAll);
+        // },
         setRequestLanguages() {
             const { symbol } = this.currentProject.sourceLanguage;
             this.$emit('setSourceLanguage', { symbol });
@@ -210,7 +217,7 @@ export default {
         }
     },
     created() {
-        this.getLanguagePairs();
+        // this.getLanguagePairs();
     },
     components: {
         LanguagesSelect,

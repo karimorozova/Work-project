@@ -9,6 +9,7 @@
                 TasksLangs(v-if="isMonoService")
 
                 TasksLangsDuo(v-if="!isMonoService"
+                    :originallyLanguages="originallyLanguages"
                     :calculationUnit="currentUnit"
                     :sourceLanguages="sourceLanguages"
                     @setSourceLanguage="setSourceLang"
@@ -62,7 +63,10 @@ import { mapGetters,mapActions } from 'vuex';
 
 export default {
     props: {
-        isRequest: {type: Boolean}
+        isRequest: {type: Boolean},
+        originallyLanguages: {
+            type: Array
+        }
     },
     data() {
         return {
