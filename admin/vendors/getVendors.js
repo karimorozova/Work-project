@@ -70,7 +70,11 @@ async function getVendorAfterUpdate(query, update) {
     .populate('competencies.sourceLanguage')
     .populate('competencies.targetLanguage')
     .populate('competencies.industry')
-    .populate('competencies.step');
+    .populate('competencies.step')
+    .populate('rates.basicPricesTable')
+    .populate('rates.stepMultipliersTable')
+    .populate('rates.industryMultipliersTable')
+    .populate('rates.pricelistTable');
 }
 
 async function getFilteredVendors(filters) {

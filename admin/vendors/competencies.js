@@ -21,7 +21,8 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
         ));
       competencies.push(...combinationsWithoutRepetitions);
       const { rates, qualifications } = await saveQualifications(combinationsWithoutRepetitions, vendorId);
-      return getVendorAfterUpdate({ _id: vendorId }, { competencies, rates, qualifications });
+      await Vendors.updateOne({ _id: vendorId }, { competencies, rates, qualifications });
+      return await Vendors.findOne({ _id: vendorId });
     }
   } catch (err) {
     console.log(err);
@@ -66,7 +67,8 @@ const deleteVendorCompetencies = async (vendorId, competenceId) => {
     const neededIndex = competencies.findIndex(item => item._id.toString() === competenceId);
     const { rates } = await deleteVendorRates(vendorId, competencies[neededIndex]);
     competencies.splice(neededIndex, 1);
-    await getVendorAfterUpdate({ _id: vendorId }, { competencies, rates });
+    await Vendors.updateOne({ _id: vendorId }, { competencies, rates });
+    return await Vendors.findOne({ _id: vendorId });
   } catch (err) {
     console.log(err);
     console.log('Error in deleteVendorCompetencies');

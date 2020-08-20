@@ -59,9 +59,9 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       }
     }
   });
-
+  const rates = await createRateCombinations(listForRates, vendorId);
   return {
-    rates: await createRateCombinations(listForRates, vendorId),
+    rates,
     qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests),
   };
 

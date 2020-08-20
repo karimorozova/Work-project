@@ -364,6 +364,8 @@ function getVendorAssessment(assessments, queryIndustry) {
     TQI: [],
   };
   for (let item of assessments) {
+    console.log(item);
+    console.log(Object.keys(item));
     if (item.TQI.length) {
       for (let { industry, score } of item.TQI) {
         if (industry === queryIndustry) {

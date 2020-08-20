@@ -28,10 +28,11 @@ const createRateCombinations = async (listForRates, vendorId) => {
     item.size +
     item.industry.toString()
   ));
-  return {
+  rates = {
     ...rates,
     pricelistTable
   };
+  return rates;
 };
 
 const splitRatesArr = (arr) => {
@@ -88,7 +89,7 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
     }
   }
   for (let industry of industries) {
-    const sameIndustryMultiplier = rates.industryMultipliersTable.find(item => item.industry.toString() === industry);
+    const sameIndustryMultiplier = rates.industryMultipliersTable.find(item => item.industry.toString() === industry.toString());
     if (!sameIndustryMultiplier) {
       const neededIndustryRow = industryMultipliersTable.find(item => item.industry.toString() === industry.toString());
       const multiplier = neededIndustryRow ? neededIndustryRow.multiplier : 100;

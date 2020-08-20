@@ -1,5 +1,5 @@
 <template lang="pug">
-.competencies 
+.competencies
   .competencies__table
     SettingsTable(
       :fields="fields",
