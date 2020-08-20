@@ -3,8 +3,8 @@
         DataTable(
             :fields="fields"
             :tableData="vendorsData"
-            :bodyClass="vendorsData.length < 7 ? 'tbody_visible-overflow' : ''"
-            :tableheadRowClass="vendorsData.length < 7 ? 'tbody_visible-overflow' : ''"
+            :bodyClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
+            :tableheadRowClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
         )
             .benchmark-table__header(slot="headerVendor" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__header(slot="headerPrice" slot-scope="{ field }") {{ field.label }}

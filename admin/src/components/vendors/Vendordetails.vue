@@ -148,6 +148,7 @@
         :industries="industries",
         :vendorIndustries="currentVendor.industries.map((i) => i.name)",
         @updateQualifications="updateQualifications"
+        @updateRates="updateRates"
       )
 
     .title(v-if="currentVendor._id") Qualifications
@@ -157,6 +158,7 @@
         :currentVendor="currentVendor",
         @refreshQualifications="setDetailsTablesData"
         :refresh="isRefreshQualificationTable"
+        @updateRates="updateRates"
       )
 
     .title Documents

@@ -174,7 +174,7 @@ export default {
             const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY');
             const result = await this.$http.post('/clientsapi/client-project-date', {
                 date: formatDate,
-                clientId: this.project.customer._id
+                clientId: this.project.customer
             });
         },
         async createProject() {

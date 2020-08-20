@@ -257,10 +257,6 @@ export default {
       if (this.currentActive === -1) return;
       this.errors = [];
       if (!this.currentStatus) this.errors.push("Status should not be empty!");
-
-      // if (!this.errors.length && !this.getAvailableTest())
-      // this.errors.push("There is no test available for such data!");
-
       if (this.errors.length) {
         this.areErrors = true;
         return;
@@ -308,42 +304,6 @@ export default {
       };
       this.openForm(index);
     },
-
-    checkSuchData() {
-      return true;
-      // if (this.assessmentData.length == 0) {
-      //   return true;
-      // } else {
-      //   const getStep = this.assessmentData.find(
-      //     value => value.step._id == this.currentStep._id
-      //   );
-      //   if (getStep) {
-      //     const getTarget = getStep.langsData.find(
-      //       value => value.target._id == this.currentTarget._id
-      //     );
-      //     const getSource = getStep.langsData.find(
-      //       value => value.source._id == this.currentSource._id
-      //     );
-      //     if (getTarget && getSource) {
-      //       const getIndustry = getSource.industries.find(
-      //         value => value.industry._id == this.currentIndustry._id
-      //       );
-      //       if (getIndustry) {
-      //         this.errors.push("Such information already exists!");
-      //         this.areErrors = true;
-      //         return false;
-      //       } else {
-      //         return true;
-      //       }
-      //     } else {
-      //       return true;
-      //     }
-      //   } else {
-      //     return true;
-      //   }
-      // }
-    },
-
     async saveVendorLqa({ vendorData }) {
       const { file, grade } = vendorData;
       let assessment = {
@@ -371,6 +331,7 @@ export default {
         await this.manageSaveClick(this.currentActive);
       } catch (err) {
       } finally {
+        this.$emit("updateRates", true);
         this.closeForm();
       }
     },
