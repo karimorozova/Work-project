@@ -331,8 +331,10 @@ export default {
           oldData,
         });
         result.then((data) => {
-          this.clientServices = data.body;
+          this.clientServices = data.body.services;
+          this.clientServices.length && this.$emit("updateRates", true);
         });
+
         this.alertToggle({
           message: "Services are saved",
           isShow: true,
@@ -347,9 +349,9 @@ export default {
       } finally {
         this.setDefaults();
         this.newRow = false;
-        setTimeout(() => {
-          this.$emit("updateRates", true);
-        }, 1000);
+        // setTimeout(() => {
+        //   this.$emit("updateRates", true);
+        // }, 1000);
       }
     },
 

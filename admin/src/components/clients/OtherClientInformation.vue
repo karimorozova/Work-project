@@ -17,16 +17,16 @@
 
     .block-item
         .block-item__label Client First Quote Date:
-        .block-item__time ...
+        .block-item__time {{ currentClient.otherInfo.firstQuoteDate || emptyField }}
     .block-item
         .block-item__label Client Last Quote Date:
-        .block-item__time ...
+        .block-item__time {{ currentClient.otherInfo.lastQuoteDate || emptyField }}
     .block-item
         .block-item__label Client First Project Date:
-        .block-item__time ...
+        .block-item__time {{ currentClient.otherInfo.firstProjectDate || emptyField }}
     .block-item
         .block-item__label Client Last Project Date:
-        .block-item__time ...
+        .block-item__time {{ currentClient.otherInfo.lastProjectDate || emptyField }}
 
 </template>
 <script>
@@ -38,6 +38,7 @@ export default {
   data() {
     return {
       firstContactDate: '',
+      emptyField: "Not yet assigned",
     };
   },
   methods: {
@@ -54,10 +55,6 @@ export default {
       this.firstContactDate = date;
       let clientDates = {
         firstContactDate: date,
-        firstQuoteDate: "",
-        lastQuoteDate: "",
-        firstProjectDate: "",
-        lastProjectDate: ""
       };
       this.storeClientProperty({ prop: "otherInfo", value: clientDates });
     }
