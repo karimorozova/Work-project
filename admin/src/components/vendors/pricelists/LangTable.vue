@@ -9,8 +9,8 @@
     @closeErrors="closeErrors",
     @notApprove="setDefaults",
     @closeModal="setDefaults",
-    :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 7 }]",
-    :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 7 }]",
+    :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 6 }]",
+    :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 6 }]",
     bodyRowClass="client-pricelist-table-row",
     bodyCellClass="client-pricelist-table-cell"
   )
@@ -237,6 +237,8 @@ export default {
   watch: {
     async refresh() {
       if (this.refresh) {
+      console.log('refresh');
+
         const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
         this.dataArray =  vendor.data.rates.basicPricesTable;
       }
@@ -350,7 +352,7 @@ export default {
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: -190%;
+    bottom: -225%;
     left: 50%;
     margin-left: -75px;
     opacity: 0;

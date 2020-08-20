@@ -8,7 +8,7 @@
       :areErrors="areErrors",
       :isApproveModal="isDeleting",
       bodyClass="bodyHeigth-300",
-      :rowCount="8",
+      :rowCount="7",
       @closeErrors="closeErrors",
       @approve="deleteService",
       @notApprove="setDefaults",

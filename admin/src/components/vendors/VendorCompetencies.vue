@@ -8,7 +8,7 @@
       :areErrors="areErrors",
       :isApproveModal="isDeleting",
       bodyClass="bodyHeigth-300",
-      :rowCount="8",
+      :rowCount="7",
       @closeErrors="closeErrors",
       @approve="deleteCompetencies",
       @notApprove="setDefaults",
@@ -343,6 +343,7 @@ export default {
         this.setDefaults();
         this.newRow = false;
         this.$emit("updateQualifications");
+        this.$emit("updateRates", true);
       }
     },
 
@@ -378,6 +379,8 @@ export default {
           isShow: true,
           type: "error",
         });
+      }finally{
+        this.$emit("updateRates", true);
       }
     },
 

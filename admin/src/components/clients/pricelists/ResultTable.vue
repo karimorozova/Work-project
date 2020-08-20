@@ -19,8 +19,8 @@
       :fields="fields"
       :tableData="dataArray"
       @bottomScrolled="bottomScrolled"
-      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 7}]"
-      :tableheadRowClass="dataArray.length < 7 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 6}]"
+      :tableheadRowClass="dataArray.length < 6 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="client-pricelist-table-row"
       bodyCellClass="client-pricelist-table-cell"
     )
@@ -527,7 +527,7 @@ export default {
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: -190%;
+    bottom: -225%;
     left: 50%;
     margin-left: -75px;
     opacity: 0;
