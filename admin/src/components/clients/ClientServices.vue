@@ -349,9 +349,6 @@ export default {
       } finally {
         this.setDefaults();
         this.newRow = false;
-        // setTimeout(() => {
-        //   this.$emit("updateRates", true);
-        // }, 1000);
       }
     },
 
@@ -376,6 +373,9 @@ export default {
         const result = this.$http.delete(`/clientsapi/services/${this.$route.params.id}/${currentData._id}`);
         this.clientServices.splice(this.deleteIndex, 1);
         this.closeModal();
+        result.then((data) => {
+          data.services.length && this.$emit("updateRates", true);
+        });
         this.alertToggle({
           message: "Services are deleted",
           isShow: true,
@@ -387,8 +387,6 @@ export default {
           isShow: true,
           type: "error",
         });
-      } finally {
-        this.$emit("updateRates", true);
       }
     },
 

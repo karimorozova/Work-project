@@ -80,7 +80,7 @@ const deleteClientService = async (clientId, serviceId) => {
     const neededServiceIndex = services.findIndex(service => service._id.toString() === serviceId);
     await deleteClientRates(clientId, services[neededServiceIndex]);
     services.splice(neededServiceIndex, 1);
-    await Clients.updateOne({ _id: clientId }, { services });
+    return await getClientAfterUpdate({ _id: clientId }, { services });
   } catch (err) {
     console.log(err);
     console.log('Error in deleteClientService');

@@ -271,8 +271,8 @@ router.post('/services', async (req, res) => {
 router.delete('/services/:clientId/:serviceId', async (req, res) => {
   const { clientId, serviceId } = req.params;
   try {
-    await deleteClientService(clientId, serviceId);
-    res.send('Deleted');
+    const client = await deleteClientService(clientId, serviceId);
+    res.send(client);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on deleting Client services');
