@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { upload, clientMail } = require('../utils');
+const { upload } = require('../utils');
 const apiUrl = require('../helpers/apiurl');
 const fse = require('fs-extra');
 const {
@@ -16,7 +16,8 @@ const {
   saveClientDocumentDefault,
   saveClientDocument,
   removeClientDoc,
-  syncClientRatesCost
+  syncClientRatesCost,
+  updateClientProjectDate
 } = require('../clients');
 const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../rates');
 const { Clients } = require('../models');
@@ -259,9 +260,8 @@ router.post('/rates/rate-combinations/:id', async (req, res) => {
 router.post('/services', async (req, res) => {
   const { clientId, currentData, oldData } = req.body;
   try {
-    await updateClientService(clientId, currentData, oldData);
-    const result = await getClient({ _id: clientId })
-    res.send(result.services);
+    const updatedClient = await updateClientService(clientId, currentData, oldData);
+    res.send(updatedClient);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on saving Client services');
@@ -316,6 +316,17 @@ router.post('/remove-client-doc', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on removing client document");
+  }
+});
+
+router.post('/client-project-date', async (req, res) => {
+  const { clientId, date } = req.body;
+  try {
+    await updateClientProjectDate(clientId, date);
+    res.send('Updated');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating client\'s project date');
   }
 });
 

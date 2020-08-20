@@ -1,5 +1,6 @@
 const { Clients } = require('../models');
 const ObjectId = require('mongodb').ObjectID;
+const { getClientAfterUpdate } = require('./getClients');
 const {
   addNewRateComponents,
   getServiceDifferences,
@@ -24,7 +25,7 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
       services.push(...generatedServiceCombinations);
       await addNewRateComponents(clientId, generatedServiceCombinations);
     }
-    await Clients.updateOne({ _id: clientId }, { services });
+    return await getClientAfterUpdate({ _id: clientId }, { services });
   } catch (err) {
     console.log(err);
     console.log('Error in updateClientService');

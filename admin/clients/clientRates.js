@@ -35,7 +35,6 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       );
       client.rates.basicPricesTable = updatedBasicPriceTable;
       client.rates.pricelistTable = updatedPricelistTable;
-      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case tableKeys.stepMultipliersTable:
       const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
@@ -55,7 +54,6 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       );
       client.rates.stepMultipliersTable = updatedStepMultipliersTable;
       client.rates.pricelistTable = updatedPricelistTable;
-      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
     case tableKeys.industryMultipliersTable:
       const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString());
@@ -75,9 +73,9 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
       );
       client.rates.industryMultipliersTable = updatedIndustryMultipliersTable;
       client.rates.pricelistTable = updatedPricelistTable;
-      await Clients.updateOne({ _id: clientId }, { rates: client.rates });
       break;
   }
+  await Clients.updateOne({ _id: clientId }, { rates: client.rates });
 };
 
 const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) => {
