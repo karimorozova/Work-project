@@ -165,9 +165,17 @@ export default {
             }
             try {
                 await this.createProject();
+                await this.clientCreateProjectDate();
             } catch(err) {
                 this.alertToggle({message: "Server error on creating a new Project", isShow: true, type: "error"});
             }
+        },
+        async clientCreateProjectDate(){
+            const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY');
+            const result = await this.$http.post('/clientsapi/client-project-date', {
+                date: formatDate,
+                clientId: this.project.customer._id
+            });
         },
         async createProject() {
             this.project.dateFormatted = moment(this.project.startDate).format('YYYY MM DD');
