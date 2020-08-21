@@ -79,7 +79,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOption="currentSteps.title",
-            :options="steps.map((i) => i.title)",
+            :options="filteredSteps",
             @chooseOption="setStep"
           )
         .competencies__drop-menu(v-if="currentActive == index && newRow")
@@ -88,7 +88,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOptions="currentSteps.map((i) => i.title)",
-            :options="steps.map((i) => i.title)",
+            :options="filteredSteps",
             @chooseOptions="setSteps"
           )
 
@@ -417,6 +417,9 @@ export default {
     }),
     sourceData() {
       return this.languages.map((i) => i.lang);
+    },
+    filteredSteps(){
+      return this.steps.filter(step => step.calculationUnit.length).map(step => step.title)
     },
   },
   created() {
