@@ -370,17 +370,16 @@ async function getVendorAssessment(assessments, queryIndustry) {
         if (name === queryIndustry) {
           for (let { tqi, lqa1, lqa2, lqa3 } of steps) {
             result.TQI.push(tqi.grade);
-            if (lqa1.grade) {
-              result.lqa1Score = lqa1.grade;
-            } else if (lqa2.grade) {
-              result.lqa2Score = lqa2.grade;
-            } else if (lqa3.grade) {
-              result.lqa3Score = lqa3.grade;
-            }
+              lqa1.grade && setLQA('lqa1Score', lqa1.grade)
+              lqa2.grade && setLQA('lqa2Score', lqa2.grade)
+              lqa3.grade && setLQA('lqa3Score', lqa3.grade)
           }
         }
       }
     }
+  }
+  function setLQA(key, value){
+    result[key] = value;
   }
   return result;
 }

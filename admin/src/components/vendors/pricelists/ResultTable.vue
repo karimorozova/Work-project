@@ -311,7 +311,6 @@ export default {
     },
     async refresh() {
       if (this.refresh) {
-         console.log('refresh');
         this.getPricelist(this.allFilters);
       }
     },

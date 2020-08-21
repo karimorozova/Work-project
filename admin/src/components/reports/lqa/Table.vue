@@ -20,22 +20,22 @@
             .lqa-table__header(slot="tqi" slot-scope="{ row }")
                 span(v-if="row.assessments")
                     span(v-if="row.assessments[0]")
-                        span(v-if="row.assessments[0].TQI.length") {{ row.assessments[0].TQI[0].score }}
+                        span(v-if="row.assessments[0].TQI.length") {{ row.assessments[0].TQI[0] }}
 
             .lqa-table__header(slot="lqa1" slot-scope="{ row }")
                 span(v-if="row.assessments")
                     span(v-if="row.assessments[0]")
-                        span(v-if="row.assessments[0].LQA1") {{ row.assessments[0].LQA1.score }}
+                        span(v-if="row.assessments[0].lqa1Score") {{ row.assessments[0].lqa1Score }}
 
             .lqa-table__header(slot="lqa2" slot-scope="{ row }")
                 span(v-if="row.assessments")
                     span(v-if="row.assessments[0]")
-                        span(v-if="row.assessments[0].LQA2") {{ row.assessments[0].LQA2.score }}
+                        span(v-if="row.assessments[0].lqa2Score") {{ row.assessments[0].lqa2Score }}
 
             .lqa-table__header(slot="lqa3" slot-scope="{ row }")
                 span(v-if="row.assessments")
                     span(v-if="row.assessments[0]")
-                        span(v-if="row.assessments[0].LQA3") {{ row.assessments[0].LQA3.score }}
+                        span(v-if="row.assessments[0].lqa3Score") {{ row.assessments[0].lqa3Score }}
 </template>
 
 <script>

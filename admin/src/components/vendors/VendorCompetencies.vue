@@ -327,7 +327,8 @@ export default {
         });
         result.then((result) => {
           this.competenciesData = result.data.competencies;
-          this.competenciesData.length && this.$emit("updateRates", true) && this.$emit("updateQualifications");
+          this.competenciesData.length && this.$emit("updateQualifications");
+          this.competenciesData.length && this.$emit("updateRates", true)
         });
         this.alertToggle({
           message: "Competencies are saved",
