@@ -73,6 +73,8 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
       };
       newLangPairCombinations.push(langPairCombination);
       rates.basicPricesTable.push(langPairCombination);
+    } else {
+      newLangPairCombinations.push(similarLangPair);
     }
   }
   for (let step of steps) {
@@ -85,6 +87,8 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
         newStepsArr.map(item => ({ ...item, step: item.step._id }));
         newStepMultiplierCombinations.push(...newStepsArr);
         rates.stepMultipliersTable.push(...newStepsArr);
+      } else {
+        newStepMultiplierCombinations.push(...sameStepMultipliers);
       }
     }
   }
@@ -101,6 +105,8 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
         industry,
         multiplier
       });
+    } else {
+      newIndustryMultiplierCombinations.push(sameIndustryMultiplier);
     }
   }
   return {
@@ -139,8 +145,8 @@ const createRateRowFromQualification = async (vendorId, qualification) => {
   const { pricelistTable: oldPricelistTable } = vendor.rates;
   let { source, target, steps, industry } = qualification;
   const langPairs = [{
-    sourceLanguage: source,
-    targetLanguage: target,
+    sourceLanguage: source._id,
+    targetLanguage: target._id,
   }];
   steps = steps.map(item => item._id);
   const industries = [industry._id];
