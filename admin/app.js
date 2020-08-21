@@ -16,7 +16,6 @@ let logger = require('morgan');
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
-const { clearVendorAndClientData } = require('./helpers/defaults/clearVendorAndClientData');
 schedule.scheduleJob('0 */3 * * *', async function () {
   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
   try {
@@ -37,7 +36,6 @@ schedule.scheduleJob('30 23 * * *', async function () {
   }
 });
 
-clearVendorAndClientData();
 
 const allowedOrigins = [
   "https://admin.pangea.global",
