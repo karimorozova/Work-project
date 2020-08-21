@@ -49,7 +49,17 @@ async function getVendors(query) {
     .populate('competencies.sourceLanguage')
     .populate('competencies.targetLanguage')
     .populate('competencies.industry')
-    .populate('competencies.step');
+    .populate('competencies.step')
+    .populate('rates.basicPricesTable.sourceLanguage')
+    .populate('rates.basicPricesTable.targetLanguage')
+    .populate('rates.stepMultipliersTable.step')
+    .populate('rates.stepMultipliersTable.unit')
+    .populate('rates.industryMultipliersTable.industry')
+    .populate('rates.pricelistTable.sourceLanguage')
+    .populate('rates.pricelistTable.targetLanguage')
+    .populate('rates.pricelistTable.step')
+    .populate('rates.pricelistTable.unit')
+    .populate('rates.pricelistTable.industry');
   return vendors;
 }
 
@@ -71,10 +81,16 @@ async function getVendorAfterUpdate(query, update) {
     .populate('competencies.targetLanguage')
     .populate('competencies.industry')
     .populate('competencies.step')
-    .populate('rates.basicPricesTable')
-    .populate('rates.stepMultipliersTable')
-    .populate('rates.industryMultipliersTable')
-    .populate('rates.pricelistTable');
+    .populate('rates.basicPricesTable.sourceLanguage')
+    .populate('rates.basicPricesTable.targetLanguage')
+    .populate('rates.stepMultipliersTable.step')
+    .populate('rates.stepMultipliersTable.unit')
+    .populate('rates.industryMultipliersTable.industry')
+    .populate('rates.pricelistTable.sourceLanguage')
+    .populate('rates.pricelistTable.targetLanguage')
+    .populate('rates.pricelistTable.step')
+    .populate('rates.pricelistTable.unit')
+    .populate('rates.pricelistTable.industry');
 }
 
 async function getFilteredVendors(filters) {
@@ -98,7 +114,17 @@ async function getFilteredVendors(filters) {
       "assessments.targetLanguage",
       "assessments.industries.industry",
       "assessments.industries.steps.step",
-    ]);
+      'rates.basicPricesTable.sourceLanguage',
+      'rates.basicPricesTable.targetLanguage',
+      'rates.stepMultipliersTable.step',
+      'rates.stepMultipliersTable.unit',
+      'rates.industryMultipliersTable.industry',
+      'rates.pricelistTable.sourceLanguage',
+      'rates.pricelistTable.targetLanguage',
+      'rates.pricelistTable.step',
+      'rates.pricelistTable.unit',
+      'rates.pricelistTable.industry',
+    ])
   } catch (err) {
     console.log(err);
     console.log("Error on filtering vendors");

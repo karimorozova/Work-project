@@ -223,8 +223,6 @@ export default {
   watch: {
     async refresh() {
       if (this.refresh) {
-      console.log('refresh');
-
         const vendor = await this.$http.get(`/vendorsapi/vendor?id=${this.$route.params.id}`);
         this.dataArray = vendor.data.rates.industryMultipliersTable;
       }

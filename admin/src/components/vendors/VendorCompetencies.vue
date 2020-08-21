@@ -327,7 +327,7 @@ export default {
         });
         result.then((result) => {
           this.competenciesData = result.data.competencies;
-          this.competenciesData && this.$emit("updateRates", true);
+          this.competenciesData.length && this.$emit("updateRates", true) && this.$emit("updateQualifications");
         });
         this.alertToggle({
           message: "Competencies are saved",
@@ -343,7 +343,6 @@ export default {
       } finally {
         this.setDefaults();
         this.newRow = false;
-        this.$emit("updateQualifications");
       }
     },
 
@@ -379,7 +378,7 @@ export default {
           isShow: true,
           type: "error",
         });
-      }finally{
+      } finally {
         this.$emit("updateRates", true);
       }
     },
@@ -415,9 +414,9 @@ export default {
     ...mapGetters({
       currentVendor: "getCurrentVendor",
     }),
-    sourceData(){
-      return this.languages.map((i) => i.lang)
-    }
+    sourceData() {
+      return this.languages.map((i) => i.lang);
+    },
   },
   created() {
     this.currentVendor._id && this.getVendorInfo();
