@@ -1,4 +1,4 @@
-const { XtrfPrice, TierLqa, LangTier, Languages, MemoqProject, Vendors } = require("../models");
+const { Industries, LangTier, Languages, MemoqProject, Vendors } = require("../models");
 const { getMemoqUsers } = require("../services/memoqs/users");
 
 //// Tier report /////
@@ -245,7 +245,7 @@ async function getXtrfLqaReport(filters) {
             memoqDoc.finance.vendors.push({
               name,
               wordCount,
-              assessments: assessments.length ? [getVendorAssessment(assessments, 'Finance')] : []
+              assessments: assessments.length ? [await getVendorAssessment(assessments, 'Finance')] : []
             });
           }
           memoqVendors.splice(memoqIndex, 1, memoqDoc);
@@ -263,7 +263,7 @@ async function getXtrfLqaReport(filters) {
               name,
               wordCount,
               assessments: assessments.length ?
-                [getVendorAssessment(assessments, 'iGaming (Casino, Slot games, Gambling, etc.)')] : [],
+                [await getVendorAssessment(assessments, 'iGaming (Casino, Slot games, Gambling, etc.)')] : [],
             });
           }
           memoqVendors.splice(memoqIndex, 1, memoqDoc);
@@ -359,28 +359,27 @@ async function getXtrfLqaReport(filters) {
   }
 }
 
-function getVendorAssessment(assessments, queryIndustry) {
+async function getVendorAssessment(assessments, queryIndustry) {
   const result = {
     TQI: [],
   };
   for (let item of assessments) {
-    console.log(item);
-    console.log(Object.keys(item));
-    if (item.TQI.length) {
-      for (let { industry, score } of item.TQI) {
-        if (industry === queryIndustry) {
-          result.TQI.push({
-            score,
-          });
+    if (item.industries.length) {
+      for (let { steps, industry } of item.industries) {
+        const { name } = await Industries.findOne({ _id: industry });
+        if (name === queryIndustry) {
+          for (let { tqi, lqa1, lqa2, lqa3 } of steps) {
+            result.TQI.push(tqi.grade);
+            if (lqa1.grade) {
+              result.lqa1Score = lqa1.grade;
+            } else if (lqa2.grade) {
+              result.lqa2Score = lqa2.grade;
+            } else if (lqa3.grade) {
+              result.lqa3Score = lqa3.grade;
+            }
+          }
         }
       }
-    }
-    if (!!item.LQA1 && item.LQA1.industry === queryIndustry) {
-      result.lqa1Score = item.LQA1.score;
-    } else if (!!item.LQA2 && item.LQA2.industry === queryIndustry) {
-      result.lqa2Score = item.LQA2.score;
-    } else if (!!item.LQA3 && item.LQA3.industry === queryIndustry) {
-      result.lqa3Score = item.LQA3.score;
     }
   }
   return result;
