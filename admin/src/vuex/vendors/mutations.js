@@ -7,8 +7,6 @@ export const mutations = {
     },
     setVendorProp(state, payload) {
         state.currentVendor[payload.prop] = payload.value;
-        console.log('mut', payload);
-        console.log('state', state.currentVendor);
     },
     updateVendorIndustry(state, payload) {
         const position = state.currentVendor.industries.findIndex(item => item._id === payload._id);

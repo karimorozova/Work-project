@@ -25,6 +25,16 @@ const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
 const { testSentMessage } = require("../emailMessages/candidateCommunication");
 
+router.get('/vendor', async (req, res) => {
+  const id = req.query.id;
+  try {
+    const vendor = await getVendor({ "_id": id });
+    res.send(vendor);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on getting Vendor");
+  }
+});
 
 function moveFile(oldFile, vendorId) {
   let newFile = './dist/vendorsDocs/' + vendorId + '/' + oldFile.filename;
@@ -207,17 +217,6 @@ router.delete('/competencies/:vendorId/:competenceId', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on deleting Vendor Competencies');
-  }
-});
-
-router.get('/vendor', async (req, res) => {
-  const id = req.query.id;
-  try {
-    const vendor = await getVendor({ "_id": id });
-    res.send(vendor);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error on getting Vendor");
   }
 });
 

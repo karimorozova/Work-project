@@ -22,7 +22,12 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
       competencies.push(...combinationsWithoutRepetitions);
       const { rates, qualifications } = await saveQualifications(combinationsWithoutRepetitions, vendorId);
       await Vendors.updateOne({ _id: vendorId }, { competencies, rates, qualifications });
-      return await Vendors.findOne({ _id: vendorId });
+      return await Vendors.findOne({ _id: vendorId }).populate([
+        'competencies.sourceLanguage',
+        'competencies.targetLanguage',
+        'competencies.industry',
+        'competencies.step'
+      ]);
     }
   } catch (err) {
     console.log(err);
