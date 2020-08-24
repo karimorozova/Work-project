@@ -53,7 +53,7 @@ export default {
       return !this.client.currency ? this.client.currency = 'EUR' : this.client.currency;
     },
     pricelistsData() {
-      return this.pricelists.map(i => i.name);
+      return this.pricelists.filter(i => i.isActive).map(i => i.name);
     }
   },
   methods: {
