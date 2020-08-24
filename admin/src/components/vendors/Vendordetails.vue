@@ -20,7 +20,6 @@
           .photo-wrap(v-if="currentVendor.photo")
             input.photo-file(type="file", @change="previewPhoto") 
             img.photo-image(:src="currentVendor.photo")
-          label.job-title Job title
         .gen-info__block
           .block-item
             label.block-item__label.block-item_relative First Name:
@@ -318,7 +317,7 @@ export default {
       isApproveModal: false,
       asteriskStyle: { top: "0px" },
       photoFile: [],
-      genders: ["Male", "Female"],
+      genders: ["Male", "Female", "Other"],
       errors: [],
       langPairs: [],
       addSeveralPriceId: "",

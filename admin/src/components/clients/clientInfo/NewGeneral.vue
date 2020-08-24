@@ -38,7 +38,7 @@
                         :hasSearch="true"
                         placeholder="Select"
                         :selectedOption="client.hasOwnProperty('nativeLanguage') ? client.nativeLanguage.lang : currentLanguage"
-                        :options="languageData"
+                        :options="targetLanguages"
                         @chooseOption="setLanguage"
                     )
             .block-item
@@ -49,7 +49,7 @@
                       placeholder="Select"
                       :hasSearch="true"
                       :selectedOptions="client.hasOwnProperty('sourceLanguages') ? makeStringLanguage(client.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
-                      :options="languageData"
+                      :options="sourceLanguages | firstEnglishLanguage"
                       @chooseOptions="setSource"
                     )
             .block-item
@@ -60,7 +60,7 @@
                       placeholder="Select"
                       :hasSearch="true"
                       :selectedOptions="client.hasOwnProperty('targetLanguages') ? makeStringLanguage(client.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
-                      :options="languageData"
+                      :options="targetLanguages"
                       @chooseOptions="setTarget"
                     )
 </template>
@@ -159,7 +159,12 @@ export default {
     },
   },
   computed: {
-    languageData() {
+    sourceLanguages(){
+      if (this.languages) {
+        return this.languages.map(item => item.lang);
+      }
+    },
+    targetLanguages() {
       if (this.languages) {
         return this.languages.map(item => item.lang);
       }

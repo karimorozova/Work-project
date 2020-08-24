@@ -18,7 +18,6 @@
                 .photo-wrap(v-if="vendor.photo")
                     input.photo-file(type="file" @change="previewPhoto")                       
                     img.photo-image(:src="vendor.photo")
-                label.job-title Job title
             .gen-info__block
                 .block-item
                     label.block-item__label.block-item_relative First Name:
@@ -82,8 +81,12 @@
         .block-item-subinfo
           label.block-item-subinfo__label Vendor Status:
             span.require *
-          .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(:class="{'block-item_error-shadow': isSaveClicked && !currentVendor.status}")
-            VendorStatusSelect(isAllExist="no" :selectedStatus="vendor.status" @chosenStatus="chosenStatus")
+          .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(:class="{'block-item_error-shadow': isSaveClicked && !vendor.status}")
+            VendorStatusSelect(
+              isAllExist="no" 
+              :selectedStatus="vendorStatus" 
+              @chosenStatus="chosenStatus"
+            )
         .block-item-subinfo
           label.block-item-subinfo__label Professional level:
           .block-item-subinfo__drop.block-item-subinfo_high-index
@@ -129,7 +132,7 @@ export default {
       timezones: [],
       approveShow: false,
       photoFile: [],
-      genders: ["Male", "Female"],
+      genders: ["Male", "Female", "Other"],
       asteriskStyle: { top: "0px" },
       errors: [],
       vendor: {
@@ -263,6 +266,12 @@ export default {
     ...mapGetters({
       currentVendor: "getCurrentVendor"
     }),
+    vendorStatus(){
+      if(!this.vendor.status){
+       this.vendor.status = 'Potential'
+      }
+      return this.vendor.status
+    },
     selectedIndNames() {
       let result = [];
       if (this.vendor.industries.length) {
