@@ -6,7 +6,7 @@
     .block-item__input(:class="{'rates-info_error-shadow': !client.defaultPricelist.length && isSaveClicked}")
       SelectSingle(
           placeholder="Select"
-          :selectedOption="client.defaultPricelist.hasOwnProperty('name') ? client.defaultPricelist.name : client.defaultPricelist"
+          :selectedOption="clientPricelist"
           :options="pricelistsData"
           @chooseOption="setPricelist"
       )
@@ -16,7 +16,7 @@
     .block-item__input(:class="{'rates-info_error-shadow': !client.currency.length && isSaveClicked}")
       SelectSingle(
           placeholder="Select"
-          :selectedOption="client.currency"
+          :selectedOption="clientCurrency"
           :options="['EUR','USD','GBP']"
           @chooseOption="setCurrency"
       )
@@ -41,6 +41,17 @@ export default {
     };
   },
   computed: {
+    clientPricelist(){
+      if(this.pricelists.length){
+        if(!this.client.defaultPricelist.hasOwnProperty('name')){
+          this.client.defaultPricelist = this.pricelists.find(pricelist => pricelist.isClientDefault);
+        }
+        return this.client.defaultPricelist.name
+      }
+    },
+    clientCurrency(){
+      return !this.client.currency ? this.client.currency = 'EUR' : this.client.currency;
+    },
     pricelistsData() {
       return this.pricelists.map(i => i.name);
     }

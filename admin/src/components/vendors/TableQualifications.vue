@@ -318,6 +318,9 @@ export default {
         isNew: true,
       };
 
+      //TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
+      assessment.step = assessment.step.filter(step => step.title === "Translation");
+      //TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
       let formData = new FormData();
       formData.append("vendorId", this.currentVendor._id);
       formData.append("assessment", JSON.stringify(assessment));
