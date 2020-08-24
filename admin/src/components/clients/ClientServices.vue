@@ -59,7 +59,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOption="currentServices[0].title",
-            :options="services.map((i) => i.title)",
+            :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
             @chooseOption="setService"
           )
         .clientService__drop-menu(v-if="currentActive == index && newRow")
@@ -68,7 +68,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOptions="currentServices.map((i) => i.title)",
-            :options="services.map((i) => i.title)",
+            :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
             @chooseOptions="setServices"
           )
 

@@ -1,6 +1,15 @@
 <template lang="pug">
 .pricelists
     .pricelists__table
+        .pricelists__approve(v-if="isDeleting")
+            ApproveModal(
+                text="Are you sure?",
+                approveValue="Yes",
+                notApproveValue="Cancel",
+                @approve="deletePricelist",
+                @notApprove="setDefaults",
+                @close="setDefaults"
+            )
         SettingsTable(
             :fields="fields"
             :tableData="vuexPricelists"
@@ -46,6 +55,7 @@
 </template>
 
 <script>
+import ApproveModal from "../ApproveModal";
 import SettingsTable from "../Table/SettingsTable";
 import Add from "../Add";
 import CheckBox from "../CheckBox";
@@ -78,7 +88,9 @@ export default {
             currentActive: -1,
             currentName: "",
             isErrorExist: false,
-            errors: []
+            errors: [],
+            isDeleting: false,
+            deleteIndex: -1,
         }
     },
     methods: {
@@ -94,6 +106,9 @@ export default {
         // },
         showPriceSettings(id){
            this.$router.push(`/settings/pricelist/${id}`);
+        },
+        isDeletePricelist(){
+            this.isDeleting = true;
         },
         async makeAction(index, key) {
             if(this.currentActive !== -1 && this.currentActive !== index) {
@@ -113,7 +128,8 @@ export default {
                 await this.cancelEdition(index)
             }
             if(key === "delete") {
-                await this.deletePricelist(index);
+                this.deleteIndex = index
+                await this.isDeletePricelist();
             }
         },
         isNameUnique(index) {
@@ -172,18 +188,33 @@ export default {
             const copyQuantity = priceCopies.length ? priceCopies.length : "";
             return `${name}-copy${copyQuantity}`;
         },
-        async deletePricelist(index) {
+        async deletePricelist() {
+            this.errors = [];
+            const index = this.deleteIndex;
             const id = this.pricelists[index]._id;
-            if(!id) {
-                return this.pricelists.slice(index, 1);
-            }
+            if(!id) return this.pricelists.slice(index, 1);
+
             const { isClientDefault, isVendorDefault } = this.pricelists[index];
-            try {
-                await this.$http.delete(`/prices/pricelist/${id}`, {body: { isClientDefault, isVendorDefault }});
-                await this.getPricelists();
+            
+            if(!this.pricelists.filter(i => i.isActive).length){
+                this.errors.push('Cannot be deleted, no last active Pricelist')
+            }else if(this.pricelists[index].isActive === true && this.pricelists.filter(i => i.isActive).length <= 1){
+                this.errors.push('Cannot be deleted, no last active Pricelist')
+            }
+
+            if(this.errors.length) {
+                return this.isErrorExist = true;
+            }
+            const result = await this.$http.delete(`/prices/pricelist/${id}`, {
+                body: { isClientDefault, isVendorDefault }
+            });
+            if(result.data === 'Not deleted'){
+                this.errors.push('This Pricelist assigned in client and cannot be deleted')
+                return this.isErrorExist = true;
+            }else{
+                this.isDeleting = false;
                 this.alertToggle({message: "Pricelist deleted", isShow: true, type: "success"});
-            } catch(err) {
-                this.alertToggle({message: "Error on deleting pricelist.", isShow: true, type: "error"});
+                await this.getPricelists();
             }
         },
         async setDefaultPricelist(e, index, prop) {
@@ -227,6 +258,8 @@ export default {
             this.setDefaults();
         },
         setDefaults() {
+            this.isDeleting = false;
+            this.deleteIndex = -1;
             this.currentActive = -1;
             this.currentName = "";
         },
@@ -261,7 +294,8 @@ export default {
         Toggler,
         CheckBox,
         ValidationErrors,
-        NewPricelist
+        NewPricelist,
+        ApproveModal
     },
     created() {
         this.getPricelists();
@@ -277,6 +311,10 @@ export default {
     margin: 20px;
     margin-left: 0;
     position: relative;
+    &__approve{
+        position: absolute;
+        left: 30%;
+    }
     &__table {
         @extend %setting-table;
         width: 800px;
