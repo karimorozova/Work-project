@@ -9,7 +9,7 @@ const {
 
 const createRateCombinations = async (listForRates, vendorId) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
-  const defaultPricelist = await Pricelist.findOne({ isDefault: true });
+  const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true });
   const { pricelistTable: oldPricelistTable } = vendor.rates;
   const { langPairs, steps, industries } = splitRatesArr(listForRates);
   let {
@@ -141,7 +141,7 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
 
 const createRateRowFromQualification = async (vendorId, qualification) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
-  const defaultPricelist = await Pricelist.findOne({ isDefault: true });
+  const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true });
   const { pricelistTable: oldPricelistTable } = vendor.rates;
   let { source, target, steps, industry } = qualification;
   const langPairs = [{

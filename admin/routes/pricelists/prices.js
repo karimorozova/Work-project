@@ -25,10 +25,10 @@ router.post('/pricelist', async (req, res) => {
 
 router.delete('/pricelist/:id', async (req, res) => {
   const { id } = req.params;
-  const { isClientDefault, isVendorDefault } = req.body;
+  const { isVendorDefault } = req.body;
   try {
-    await deletePricelist(id, isClientDefault, isVendorDefault);
-    res.send("Deleted");
+    const isDeleted = await deletePricelist(id, isVendorDefault);
+    res.send(isDeleted ? 'Deleted' : 'Not deleted');
   } catch(err) {
     console.log(err);
     res.status(500).send("Error on deleting pricelist");

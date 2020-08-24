@@ -13,7 +13,7 @@ const syncVendorRatesCost = async (vendorId, tableKey, row) => {
     basicPricesTable,
     stepMultipliersTable,
     industryMultipliersTable,
-  } = await Pricelist.findOne({ isDefault: true });
+  } = await Pricelist.findOne({ isVendorDefault: true });
   switch (tableKey) {
     default:
     case tableKeys.basicPricesTable:

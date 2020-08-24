@@ -16,7 +16,7 @@ const { tableKeys } = require('../enums');
  */
 const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
-  const defaultPricelist = await Pricelist.findOne({ isDefault: true });
+  const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true });
   const sourceLangDifference = compareIds(newData.sourceLanguage, oldData.sourceLanguage);
   const targetLangDifference = compareIds(newData.targetLanguage, oldData.targetLanguage);
   const stepDifference = compareIds(newData.step, oldData.step);
@@ -222,7 +222,7 @@ const updateIndustryMultipliers = async (oldData, newIndustry, vendor, defaultPr
  */
 const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
-  const defaultPricelist = await Pricelist.findOne({ isDefault: true });
+  const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = vendor.rates;
   let updatedPricelistTable;
   switch (itemIdentifier) {

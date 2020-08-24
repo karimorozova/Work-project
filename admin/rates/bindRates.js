@@ -2,9 +2,9 @@ const { Pricelist, Clients } = require('../models');
 const { multiplyPrices } = require('../multipliers');
 
 const bindClientRates = async (clientId, defaultPricelistId, objToBind, key) => {
-  const { rates, currency } = await Clients.findOne({ _id: clientId });
+  const { rates, currency, defaultPricelist } = await Clients.findOne({ _id: clientId });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-  const pricelist = await Pricelist.findOne({  isDefault: true });
+  const pricelist = await Pricelist.findOne({ _id: defaultPricelist });
   switch (key) {
     default:
     case 'Basic Price Table':

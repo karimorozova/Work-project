@@ -1,4 +1,4 @@
-const { Pricelist } = require("../models");
+const { Pricelist, Clients } = require("../models");
 const { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers } = require('../helpers/defaults/defaultPriceLists')
 
 async function saveNewPricelist(pricelist) {
@@ -24,34 +24,30 @@ async function saveNewPricelist(pricelist) {
     }
 }
 
-async function deletePricelist(id, isClientDefault, isVendorDefault) {
-    try {
-        if(!isClientDefault && !isVendorDefault) {
-            return await Pricelist.deleteOne({"_id": id});
-        }
-        const firstPrice = await Pricelist.find().limit(1);
-        const defaultId = firstPrice[0].id;
-        if(firstPrice.length) {
-            await Pricelist.deleteOne({"_id": id});
-            await setDefaultPrice(defaultId, isClientDefault, isVendorDefault);
-        } 
-    } catch(err) {
-        console.log(err);
-        console.log("Error in deletePricelist");
+async function deletePricelist(id, isVendorDefault) {
+  try {
+    const isUsingByClient = await checkClientUsage(id);
+    if (!isVendorDefault && !isUsingByClient) {
+      await Pricelist.deleteOne({ "_id": id });
+      return true;
+    }
+    return false;
+  } catch(err) {
+    console.log(err);
+    console.log("Error in deletePricelist");
     }
 }
 
-async function setDefaultPrice(defaultId, isClientDefault, isVendorDefault) {
-    try {
-        if(isClientDefault && isVendorDefault) {
-          return await Pricelist.updateOne({"_id": defaultId}, { isClientDefault, isVendorDefault });
-        }
-        isClientDefault ? await Pricelist.updateOne({"_id": defaultId}, { isClientDefault })
-                : await Pricelist.updateOne({"_id": defaultId}, { isVendorDefault });
-    } catch(err) {
-        console.log(err);
-        console.log("Error in setDefaultPrice");
-    }
+/**
+ *
+ * @param pricelistId {ObjectId} - current pricelist id
+ * @return {Boolean} - checks if current pricelist is in use in any client
+ */
+const checkClientUsage = async (pricelistId) => {
+  const clients = await Clients.find();
+  return clients.some(client => (
+    client.defaultPricelist.toString() === pricelistId.toString()
+  ))
 }
 
 module.exports = { saveNewPricelist, deletePricelist };

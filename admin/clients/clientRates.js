@@ -13,7 +13,7 @@ const { tableKeys } = require('../enums');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
-  const boundPricelist = await Pricelist.findOne({ isDefault: true });
+  const boundPricelist = await Pricelist.findOne({ _id: client.defaultPricelist });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates;
   let updatedPricelistTable;
   switch (itemIdentifier) {
@@ -177,8 +177,8 @@ const changePricelistTable = (
  * @returns: Nothing, but updates client's rates with new combinations
  */
 const addNewRateComponents = async (clientId, newServicesArr) => {
-  const { rates, currency } = await Clients.findOne({ _id: clientId });
-  const boundPricelist = await Pricelist.findOne({ isDefault: true });
+  const { rates, currency, defaultPricelist } = await Clients.findOne({ _id: clientId });
+  const boundPricelist = await Pricelist.findOne({ _id: defaultPricelist });
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
   const freshBasicPriceRows = [];
   const newStepMultiplierCombinations = [];
