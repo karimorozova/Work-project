@@ -4,7 +4,10 @@
                 label.block-item__label Status:
                     span.require *
                 .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !client.status}")
-                    ClientStatusSelect(:selectedStatus="client.status" @chosenStatus="setStatus")
+                    ClientStatusSelect(
+                      :selectedStatus="clientStatus" 
+                      @chosenStatus="setStatus"
+                    )
             .block-item
                 label.block-item__label Test:
                 .block-item__check-item.checkbox
@@ -53,6 +56,14 @@ export default {
     },
     setStatus({ status }) {
       this.client.status = status;
+    }
+  },
+  computed: {
+    clientStatus() {
+      if(!this.client.status){
+        this.client.status = 'Potential'
+      }
+      return this.client.status
     }
   },
   components: {
