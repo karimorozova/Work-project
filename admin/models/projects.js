@@ -12,6 +12,15 @@ const ProjectsSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  isUrgent: {
+    type: Boolean,
+    default: false
+  },
+  paymentProfile: {
+    type: String,
+    default: '',
+    trim: true
+  },
   clientProjectNumber: {
     type: String,
     default: '',
@@ -57,15 +66,15 @@ const ProjectsSchema = new mongoose.Schema({
     targetFile: "",
     finance: {
       'Wordcount': {
-        receivables: "", 
+        receivables: "",
         payables: "",
-        halfReceivables: "", 
+        halfReceivables: "",
         halfPayables: "",
       },
       'Price': {
-        receivables: "", 
+        receivables: "",
         payables: "",
-        halfReceivables: "", 
+        halfReceivables: "",
         halfPayables: "",
       }
     },
@@ -160,10 +169,6 @@ const ProjectsSchema = new mongoose.Schema({
       'Wordcount': {},
       'Price': {}
     }
-  },
-  isUrgent: {
-    type: Boolean,
-    default: false
   },
   isAutoDelivery: {
     type: Boolean,
