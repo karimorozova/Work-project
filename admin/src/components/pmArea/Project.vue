@@ -207,9 +207,11 @@ export default {
         },
         async getCustomers() {
             try {
-                if(!this.clients.length) {
-                    let result = await this.$http.get(`/active-clients?status=Active`);
-                    this.clients = [...result.body];
+                if(!this.project._id){
+                    if(!this.clients.length) {
+                        let result = await this.$http.get(`/active-clients?status=Active`);
+                        this.clients = [...result.body];
+                    }
                 }
             } catch(err) {
                 this.alertToggle({message: "Error on getting customers", isShow: true, type: "error"});
@@ -262,21 +264,18 @@ export default {
 
 <style lang="scss" scoped>
 .project {
-    padding: 20px;
-    width: 67%;
+    padding: 40px;
     display: flex;
     flex-direction: column;
-    @media (max-width: 1600px) {
-        width: 70%;
-    }
     &__project-template {
         position: relative;
         width: 191px;
         margin-bottom: 60px;
     }
     &__all-info {
+        width: 960px;
         padding: 20px;
-        box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
+        box-shadow: 0 0 10px #67573e9d;
     }
     &__info-row {
         width: 100%;
@@ -290,7 +289,7 @@ export default {
         }
     }
     &__name {
-        font-size: 29px;
+        font-size: 22px;
         padding: 0 5px;
         height: 44px;
         width: 33%;
