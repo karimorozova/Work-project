@@ -350,6 +350,18 @@ async function getXtrfLqaReport(filters) {
         return item;
       }).filter(item => Object.keys(item).length !== 1);
     }
+    result = result.map(item => {
+      if (item.finance.vendors.length) {
+        item.finance.vendors = item.finance.vendors.filter(vendor => vendor.wordCount);
+      }
+      if (item.gaming.vendors.length) {
+        item.gaming.vendors = item.gaming.vendors.filter(vendor => vendor.wordCount);
+      }
+      if (item.other.vendors.length) {
+        item.other.vendors = item.other.vendors.filter(vendor => vendor.wordCount);
+      }
+      return item
+    });
     return result.filter(vendor => (vendor.finance && vendor.finance.vendors.length)
       || (vendor.gaming && vendor.gaming.vendors.length)
       || (vendor.other && vendor.other.vendors.length));
