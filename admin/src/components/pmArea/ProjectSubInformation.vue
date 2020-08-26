@@ -140,10 +140,8 @@ export default {
     },
     async deleteData(index) {
       try {
-        const result = await this.$http.delete("/pm-manage/client-contact", {
-          projectId: this.project._id,
-          contactId: this.projectClientContacts[index]._id,
-        });
+        const result = await this.$http.delete(
+          `/pm-manage/client-contact/${this.project._id}/${this.projectClientContacts[index]._id}`);
         this.projectClientContacts = result.data.clientContacts;
         this.alertToggle({
           message: "Project client contact removed",
@@ -155,7 +153,7 @@ export default {
           message: "Error on Deleting project client contact",
           isShow: true,
           type: "error",
-        });        
+        });
       } finally {
         this.manageCancelEdition();
       }

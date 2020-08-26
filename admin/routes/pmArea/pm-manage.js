@@ -3,6 +3,7 @@ const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
+
 const {
   getProject, createProject, createTasks, createTaskWithCommonUnits, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
   manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
@@ -11,7 +12,7 @@ const {
 } = require("../../projects");
 const {
   upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact,
-  stepReassignedNotification, managerNotifyMail, notifyClientProjectCancelled, notifyClientTasksCancelled
+  stepReassignedNotification, managerNotifyMail, sendEmail, notifyClientProjectCancelled, notifyClientTasksCancelled
 } = require("../../utils");
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, getAfterProjectDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
@@ -879,15 +880,15 @@ router.post('/client-contact', async (req, res) => {
       clientContacts.push(contact);
     }
     const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
-    res.send(project);
+    res.send('project');
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on updating/creating client contact');
   }
 });
 
-router.delete('/client-contact', async (req, res) => {
-  const { projectId, contactId } = req.body;
+router.delete('/client-contact/:projectId/:contactId', async (req, res) => {
+  const { projectId, contactId } = req.params;
   try {
     const { clientContacts } = await Projects.findOne({ _id: projectId });
     const contactToDeleteIndex = clientContacts.findIndex(item => item._id.toString() === contactId.toString());
@@ -897,6 +898,19 @@ router.delete('/client-contact', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on deleting client contact');
+  }
+});
+
+router.post('/contact-email', async (req, res) => {
+  const { projectId, contactId, template } = req.body;
+  try {
+    const { clientContacts } = await Projects.findOne({ _id: projectId });
+    const { email } = clientContacts.find(contact => contact._id.toString() === contactId.toString());
+    const subject = 'Pangea translation services';
+    await sendEmail({ to: email, subject }, template);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on sending message to client\'s contact');
   }
 });
 
