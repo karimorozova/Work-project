@@ -868,4 +868,36 @@ router.post('/payment-profile', async (req, res) => {
   }
 });
 
+router.post('/client-contact', async (req, res) => {
+  const { projectId, contact } = req.body;
+  try {
+    const { clientContacts } = await Projects.findOne({ _id: projectId });
+    const existingContact = clientContacts.findIndex(item => item._id.toString() === contact._id.toString());
+    if (existingContact) {
+      clientContacts.splice(existingContact, 1, contact);
+    } else {
+      clientContacts.push(contact);
+    }
+    const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
+    res.send(project);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on updating/creating client contact');
+  }
+});
+
+router.delete('/client-contact', async (req, res) => {
+  const { projectId, contactId } = req.body;
+  try {
+    const { clientContacts } = await Projects.findOne({ _id: projectId });
+    const contactToDeleteIndex = clientContacts.findIndex(item => item._id.toString() === contactId.toString());
+    clientContacts.splice(contactToDeleteIndex, 1);
+    const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
+    res.send(project);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on deleting client contact');
+  }
+});
+
 module.exports = router;
