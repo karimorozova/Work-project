@@ -210,7 +210,7 @@ export default {
     }
     &__all-info {
         padding: 20px;
-        box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
+        box-shadow: 0 0 10px #67573e9d;
     }
     &__info-row {
         width: 100%;

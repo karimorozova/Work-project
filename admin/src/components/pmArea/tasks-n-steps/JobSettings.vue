@@ -192,6 +192,7 @@ export default {
         box-sizing: border-box;
         background-color: $active-background;
         padding: 12px 20px 0;
+        border-radius: 10px;
 
     }
     &__label{

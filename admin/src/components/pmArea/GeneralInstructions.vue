@@ -130,7 +130,7 @@ export default {
     width: 20%;
     margin-top: 20px;
     padding: 25px;
-    box-shadow: 0 3px 20px $brown-shadow;
+    box-shadow: 0 0 10px #67573e9d;
     display: flex;
     flex-direction: column;
     align-items: flex-start;

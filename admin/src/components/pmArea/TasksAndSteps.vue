@@ -225,15 +225,11 @@ export default {
 
 .tasks-steps {
     box-sizing: border-box;
-    width: 67%;
+    min-width: 1000px;
     padding: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    box-shadow: 0 3px 20px $brown-shadow;
+    margin: 0 40px;
+    box-shadow: 0 0 10px #67573e9d;
     position: relative;
-    @media (max-width: 1600px) {
-        width: 70%;
-    }
     &__info {
         position: absolute;
         z-index: 1000;
@@ -247,14 +243,14 @@ export default {
         right: 0;
         width: 300px;
         border: 1px solid $main-color;
-        box-shadow: 0 3px 20px $brown-shadow;
+        box-shadow: 0 0 10px #67573e9d;
     }
     &__file-counter {
         margin-top: 10px;
         text-align: center;
     }
     &__tasks-title {
-        font-size: 29px;
+        font-size: 22px;
         margin-bottom: 20px;
         display: flex;
         justify-content: space-between;

@@ -308,7 +308,7 @@ export default {
 .tasks-data__langs {
   overflow: hidden;
   .select {
-    height: 28px;
+    height: 32px;
     cursor: pointer;
     .selected {
       width: 80%;
@@ -320,12 +320,7 @@ export default {
 }
 
 .tasks-data__langs-mod {
-  overflow: hidden;
-  box-shadow: 0 2px 15px rgba(104, 87, 62, .5);
-  border-radius: 10px;
-  border: none;
   .select {
-    height: 36px;
     .selected {
       width: 90%;
       border-right: none;

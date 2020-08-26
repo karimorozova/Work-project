@@ -116,15 +116,13 @@ export default {
 
 .project-finance {
     box-sizing: border-box;
-    width: 67%;
-    margin: 20px;
-    box-shadow: 0 3px 20px rgba(104, 87, 62, 0.5);
-    @media (max-width: 1600px) {
-        width: 70%;
-    }
+    min-width: 1000px;
+    box-shadow: 0 0 10px #67573e9d;
+    margin: 40px;
+
     &__title {
         padding: 20px;
-        font-size: 18px;
+        font-size: 22px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -152,7 +150,7 @@ export default {
         margin-right: 3px;
         color: $main-color;
         &::-webkit-inner-spin-button,
-        &::-webkit-outer-spin-button, {
+        &::-webkit-outer-spin-button{
             -webkit-appearance: none;
             margin: 0;
         }

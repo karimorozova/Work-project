@@ -127,7 +127,7 @@ export default {
     width: 67%;
     padding: 20px;
     margin: 0 20px 20px 20px;
-    box-shadow: 0 3px 20px $brown-shadow;
+    box-shadow: 0 0 10px #67573e9d;
     position: relative;
     @media (max-width: 1600px) {
         width: 70%;
@@ -145,7 +145,7 @@ export default {
         right: 0;
         width: 300px;
         border: 1px solid $main-color;
-        box-shadow: 0 3px 20px $brown-shadow;
+        box-shadow: 0 0 10px #67573e9d;
     }
     &__file-counter {
         margin-top: 10px;

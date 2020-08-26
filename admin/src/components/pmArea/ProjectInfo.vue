@@ -1,12 +1,11 @@
 <template lang="pug">
 .project-info(v-if="currentProject._id")
-    .project-info__title Project Id: 
-        span.project-info_bold {{currentProject.projectId}}
-    .project-info__title Project Status: 
-        span.project-info_bold {{ currentProject.status }}
     .project-info__all-info
         Project(:project="currentProject")
-        GeneralInstructions(:project="currentProject")
+        //- GeneralInstructions(:project="currentProject")
+        ProjectSubInformation(
+            :project="currentProject"
+        )
     .project-info__all-info
         TasksAndSteps(
             :originallyLanguages="originallyLanguages"
@@ -43,6 +42,7 @@ import ProjectFinance from "./ProjectFinance";
 import TasksAndSteps from "./TasksAndSteps";
 const Preview = () => import("./Preview");
 import { mapGetters, mapActions } from 'vuex';
+import ProjectSubInformation from './ProjectSubInformation';
 
 export default {
     data() {
@@ -232,7 +232,8 @@ export default {
         ProjectAction,
         TasksAndSteps,
         ProjectFinance,
-        Preview
+        Preview,
+        ProjectSubInformation
     },
     created() {
         this.getProject();
@@ -254,25 +255,15 @@ export default {
 
 .project-info {
     position: relative;
-    width: 100%;
     display: flex;
     flex-direction: column;
-    &__title {
-        padding: 20px 0 0 40px;
-        font-size: 20px;
-    }
     &__all-info {
-        width: 100%;
         display: flex;
         align-items: flex-start;
         box-sizing: border-box;
-        padding-left: 20px;
     }
     &__action {
-        width: 20%;
-        @media (max-width: 1600px) {
-            width: 23%;
-        }
+
     }
     &__preview {
         position: absolute;

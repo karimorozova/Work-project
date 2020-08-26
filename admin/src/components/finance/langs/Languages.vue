@@ -92,7 +92,7 @@ export default {
 
 .languages {
     height: 187px;
-    width: 191px;
+    width: 180px;
     border: 1px solid #67573E;
     border-radius: 10px;
     overflow: hidden;
