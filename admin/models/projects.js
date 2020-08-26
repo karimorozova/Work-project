@@ -16,6 +16,7 @@ const ProjectsSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  clientContacts: [],
   paymentProfile: {
     type: String,
     default: '',
