@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import Preview from "../../vendors/VendorPreview";
+import Preview from "../../vendors/WYSIWYG";
 import DataTable from "../../DataTable";
 import ProgressLine from "../../ProgressLine";
 import Tabs from "../../Tabs";

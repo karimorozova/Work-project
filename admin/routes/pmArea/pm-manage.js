@@ -880,7 +880,7 @@ router.post('/client-contact', async (req, res) => {
       clientContacts.push(contact);
     }
     const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
-    res.send('project');
+    res.send(project);
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on updating/creating client contact');

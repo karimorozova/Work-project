@@ -1,7 +1,7 @@
 <template lang="pug">
   .qualifications
     .qualifications__preview(v-if="isEditAndSend")
-      VendorPreview(@closePreview="closePreview", :message="previewMessage", @send="sendMessage")
+      WYSIWYG(@closePreview="closePreview", :message="previewMessage", @send="sendMessage")
     .qualifications__form(v-if="isForm")
       VendorLqa(:vendorData="lqaData", @closeForm="closeForm", @saveVendorLqa="saveVendorLqa")
     .qualifications__table
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import VendorPreview from "./VendorPreview";
+import WYSIWYG from "./WYSIWYG";
 import { mapGetters, mapActions } from "vuex";
 import SettingsTable from "../Table/SettingsTable";
 import SelectSingle from "../SelectSingle";
@@ -525,7 +525,7 @@ export default {
     },
   },
   components: {
-    VendorPreview,
+    WYSIWYG,
     SettingsTable,
     SelectSingle,
     VendorLqa,

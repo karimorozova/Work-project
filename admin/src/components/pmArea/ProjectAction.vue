@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import Preview from "../vendors/VendorPreview";
+import Preview from "../vendors/WYSIWYG";
 import SelectSingle from "../SelectSingle";
 import Button from "../Button";
 import { mapGetters, mapActions } from "vuex";
