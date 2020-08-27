@@ -907,7 +907,7 @@ router.post('/contact-email', async (req, res) => {
     const { clientContacts } = await Projects.findOne({ _id: projectId });
     const { email } = clientContacts.find(contact => contact._id.toString() === contactId.toString());
     const subject = 'Pangea translation services';
-    await sendEmail({ to: email, subject }, template);
+    await sendEmail({ to: email, subject }, template, true);
     res.send(true)
   } catch(err) {
     console.log(err);
