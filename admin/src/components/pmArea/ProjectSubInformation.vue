@@ -1,5 +1,7 @@
 <template lang="pug">
 .sub-information
+  .sub-information__preview(v-if="isEditAndSend")
+    WYSIWYG(@closePreview="closeWYSIWYG", :message="message", @send="sendMessage")
   .sub-information__project {{ project.projectId }}
   .sub-information__row
     .row__title Project Status:
@@ -49,15 +51,20 @@
           )
 
       template(slot="icons", slot-scope="{ row, index }")
-        .client-table__icons
-          i.client-table__icon.fa.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
-          i.client-table__icon.fa.fa-envelope(:class="{ 'client-table_opacity': true }", aria-hidden="true")
-          img.client-table__icon(
-            v-for="(icon, key) in icons",
-            :src="icon.icon",
-            @click="makeAction(index, key)",
-            :class="{ 'client-table_opacity': isActive(key, index) }"
-          )
+        .client-table__height
+          .client-table__icons
+            i.client-table__icon.fa.fa-envelope(
+              @click="openWYSIWYG(index)",
+              :class="{ 'client-table_opacity': true }",
+              aria-hidden="true"
+            )
+            i.client-table__icon.fa.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
+            img.client-table__icon(
+              v-for="(icon, key) in icons",
+              :src="icon.icon",
+              @click="makeAction(index, key)",
+              :class="{ 'client-table_opacity': isActive(key, index) }"
+            )
 
   Add(@add="addData")
 </template>
@@ -69,6 +76,7 @@ import scrollDrop from "@/mixins/scrollDrop";
 import crudIcons from "@/mixins/crudIcons";
 import SettingsTable from "../Table/SettingsTable";
 import SelectSingle from "@/components/SelectSingle";
+import WYSIWYG from "../vendors/WYSIWYG";
 
 export default {
   mixins: [scrollDrop, crudIcons],
@@ -95,19 +103,52 @@ export default {
       ],
 
       projectClientContacts: [],
-      currentClientContact: null,
+      currentClientContact: "",
+      message: "",
 
       isTableDropMenu: true,
       areErrors: false,
       errors: [],
       isDeleting: false,
       currentActive: -1,
+      isEditAndSend: false,
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
     }),
+    openWYSIWYG(index) {
+      this.isEditAndSend = true;
+      this.setEditingData(index);
+    },
+    closeWYSIWYG() {
+      this.isEditAndSend = false;
+      this.setDefaults();
+    },
+    async sendMessage(message) {
+      try {
+        const result = await this.$http.post("/pm-manage/contact-email", {
+          projectId: this.project._id,
+          contactId: this.currentClientContact._id,
+          template: message,
+        });
+        this.alertToggle({
+          message: "Message sent successfully",
+          isShow: true,
+          type: "success",
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: "Error! Message not sent",
+          isShow: true,
+          type: "error",
+        });
+      } finally {
+        this.manageCancelEdition();
+        this.closeWYSIWYG();
+      }
+    },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing();
@@ -135,13 +176,20 @@ export default {
       this.currentClientContact = "";
     },
     async manageDeleteClick(index) {
-      this.deleteIndex = index;
-      this.isDeleting = true;
+      if (!this.projectClientContacts[index]._id) {
+        this.projectClientContacts.splice(index, 1);
+        this.setDefaults();
+        return;
+      } else {
+        this.deleteIndex = index;
+        this.isDeleting = true;
+      }
     },
-    async deleteData(index) {
+    async deleteData() {
       try {
         const result = await this.$http.delete(
-          `/pm-manage/client-contact/${this.project._id}/${this.projectClientContacts[index]._id}`);
+          `/pm-manage/client-contact/${this.project._id}/${this.projectClientContacts[this.deleteIndex]._id}`
+        );
         this.projectClientContacts = result.data.clientContacts;
         this.alertToggle({
           message: "Project client contact removed",
@@ -155,12 +203,15 @@ export default {
           type: "error",
         });
       } finally {
-        this.manageCancelEdition();
+        this.setDefaults();
       }
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
       this.errors = [];
+      if (this.projectClientContacts.find((item) => item.firstName === this.currentClientContact.firstName)) {
+        this.errors.push("Such contact exists");
+      }
       if (!this.currentClientContact.hasOwnProperty("firstName")) {
         this.errors.push("Сhoose сlient сontact");
       }
@@ -193,7 +244,13 @@ export default {
       }
     },
     manageCancelEdition(index) {
-      this.setDefaults();
+      if (!this.projectClientContacts[index]._id) {
+        this.projectClientContacts.splice(index, 1);
+        this.setDefaults();
+        return;
+      } else {
+        this.setDefaults();
+      }
     },
     addData() {
       if (this.currentActive !== -1) {
@@ -269,6 +326,7 @@ export default {
     Add,
     SettingsTable,
     SelectSingle,
+    WYSIWYG,
   },
 };
 </script>
@@ -288,8 +346,7 @@ export default {
   margin-bottom: 40px;
   min-width: 390px;
   width: 390px;
-  max-height: 412px;
-  overflow-x: hidden;
+
   &__row {
     width: 100%;
     display: flex;
@@ -326,10 +383,13 @@ export default {
     &__data-input {
       @extend %table-text-input;
     }
+    &__height {
+      height: 32px;
+    }
     &__icons {
       @extend %table-icons;
-      height: 32px;
       justify-content: center;
+      display: flex;
     }
     &__icon {
       @extend %table-icon;
