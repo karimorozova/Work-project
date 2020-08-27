@@ -24,6 +24,7 @@ export default {
                 industry: "",
                 startDate: new Date(),
                 deadline: "",
+                billingDate: "",
             }
         }
     },

@@ -4,6 +4,7 @@
         .project__info-row
             input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
             input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name" disabled)
+        .project__info-row
             .project__date
                 LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
                     Datepicker(v-model="project.startDate" @selected="(e) => updateProjectDate(e, 'startDate')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start" :disabledPicker="disabledPicker")
@@ -12,11 +13,30 @@
                 LabelValue(label="Deadline" :isRequired="isRequiredField" customClass="project_margin")
                     Datepicker(v-model="project.deadline" @selected="(e) => updateProjectDate(e, 'deadline')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
+            .project__date
+                LabelValue(label="Billing Date" customClass="project_margin")
+                    Datepicker(
+                        v-model="project.billingDate"
+                        ref="billingDate"
+                        @selected="(e) => updateProjectDate(e, 'billingDate')" 
+                        :highlighted="highlighted" 
+                        monday-first=true 
+                        inputClass="datepicker-custom" 
+                        calendarClass="calendar-custom" 
+                        :format="customFormatter" 
+                        :disabledPicker="isBilling"
+                    )
+                img.project__calendar-icon(src="../../assets/images/calendar.png" @click="billingOpen")
+            .project__same.checkbox
+                  input(type="checkbox" id="same" :checked="isBilling" @change="setSameDate")
+                  label(for="same") As deadline
         .project__info-row
             .project__client
                 LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
-                    .project__client-link(v-if="project._id")
-                        .project__link(@click="goToClientInfo") {{ project.customer.name }}
+                    .project__input-icons(v-if="project._id")
+                        i.fa.fa-external-link.icon-link(aria-hidden='true')
+                        input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
+
                     .project__drop-menu(v-else)
                         SelectSingle(
                             :selectedOption="project.customer.name"
@@ -27,7 +47,7 @@
                         )
             .project__industry
                 LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
-                    .project__selected-industry(v-if="project.tasks && project.tasks.length") {{ project.industry.name }}
+                    input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" disabled)
                     .project__drop-menu(v-else)
                         SelectSingle(
                             :selectedOption="selectedIndustry.name || project.industry.name"
@@ -76,6 +96,7 @@ export default {
     },
     data() {
         return {
+            isBilling: false,
             isTest: false,
             selectedIndustry: "",
             industries: [],
@@ -87,6 +108,7 @@ export default {
             },
             startDate: new Date(),
             deadline: "",
+            billingDate: "",
             isSearchClient: true,
             isRequiredField: true,
             errors: [],
@@ -118,6 +140,18 @@ export default {
                 this.isTest = e.target.checked
             }else{
                 await this.setProjectProp({prop: 'isTest', value: e.target.checked});
+            }
+        },
+        async setSameDate(e){
+            this.isBilling = e.target.checked;
+            if(!this.project._id){
+                e.target.checked 
+                ? this.project.billingDate = this.project.deadline
+                : this.project.billingDate = ""              
+            }else{
+                e.target.checked 
+                ? this.updateProjectDate(this.$refs.deadline.value, 'billingDate') 
+                : this.updateProjectDate("", 'billingDate')
             }
         },
         async setClientNumber(e) {
@@ -201,6 +235,9 @@ export default {
         deadlineOpen() {
             this.$refs.deadline.showCalendar();
         },
+        billingOpen() {
+            this.$refs.billingDate.showCalendar();
+        },
         goToClientInfo() {
             const route = this.$router.resolve({path: `/clients/details/${this.project.customer._id}`});
             window.open(route.href, "_blank");
@@ -225,6 +262,15 @@ export default {
             }else{
                 return;
             }
+        },
+        isbillingDate(){
+           if(this.$refs.deadline.value == ""){
+                this.isBilling = false;
+            }else if(this.$refs.deadline.value == this.$refs.billingDate.value){
+                this.isBilling = true;
+            }else{
+                this.isBilling = false;
+            }
         }
     },
     computed: {
@@ -245,6 +291,9 @@ export default {
         disabledPicker() {
             return !!(this.project._id && this.project.tasks && this.project.tasks.length);
         },
+    },
+    mounted(){
+        this.isbillingDate();
     },
     components: {
         SelectSingle,
@@ -267,6 +316,18 @@ export default {
     padding: 40px;
     display: flex;
     flex-direction: column;
+    &__input-icons{
+        position: relative;
+        .icon-link{
+            position: absolute;
+            right: 6px;
+            top: 8px;
+            font-size: 18px;
+        }
+    }
+    &__same{
+        width: 113px;
+    }
     &__project-template {
         position: relative;
         width: 191px;
@@ -292,7 +353,7 @@ export default {
         font-size: 22px;
         padding: 0 5px;
         height: 44px;
-        width: 33%;
+        width: 35%;
         border-radius: 5px;
         color: #68573E;
         border: 1px solid #68573E;
@@ -311,10 +372,10 @@ export default {
     &__drop-menu {
         position: relative;
         height: 28px;
-        width: 191px;
+        width: 170px;
     }
     &__client-link {
-        width: 191px;
+        width: 170px;
         display: flex;
         justify-content: flex-start;
     }
@@ -322,8 +383,11 @@ export default {
         border-bottom: 1px solid #68573E;
         cursor: pointer;
     }
+    &__input-client{
+        cursor: pointer;
+    }
     &__input-text {
-        width: 151px;
+        width: 158px;
         height: 28px;
         border: 1px solid #68573E;
         border-radius: 5px;
@@ -331,6 +395,20 @@ export default {
         color: #68573E;
         font-size: 14px;
         outline: none;
+        &:focus {
+            box-shadow: 0 0 5px #68573E;
+        }
+    }
+    &__input-text2 {
+        width: 133px;
+        height: 28px;
+        border: 1px solid #68573E;
+        border-radius: 5px;
+        padding: 0 5px;
+        color: #68573E;
+        font-size: 14px;
+        outline: none;
+        padding-right: 30px;
         &:focus {
             box-shadow: 0 0 5px #68573E;
         }
