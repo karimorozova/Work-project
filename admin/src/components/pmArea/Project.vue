@@ -135,8 +135,6 @@ export default {
                 const date = {[prop]: e};
                 await this.setDate(prop, date);
             }else{
-                console.log(prop === 'deadline', this.isBilling);
-                console.log(this.project.billingDate, this.project.deadline);
                 if(prop === 'deadline' && this.isBilling){
                     this.project.billingDate = e
                 }
