@@ -25,6 +25,7 @@
                         calendarClass="calendar-custom" 
                         :format="customFormatter" 
                         :disabledPicker="isBilling"
+                        :disabled="disabled"
                     )
                 img.project__calendar-icon(src="../../assets/images/calendar.png" @click="billingOpen")
             .project__same.checkbox
@@ -127,8 +128,18 @@ export default {
         },
         async updateProjectDate(e, prop) {
             if(this.project._id) {
+                if(prop === 'deadline' && this.isBilling){
+                    const date = {['billingDate']: e};
+                    await this.setDate('billingDate', date );
+                }
                 const date = {[prop]: e};
                 await this.setDate(prop, date);
+            }else{
+                console.log(prop === 'deadline', this.isBilling);
+                console.log(this.project.billingDate, this.project.deadline);
+                if(prop === 'deadline' && this.isBilling){
+                    this.project.billingDate = e
+                }
             }
         },
         async setDate(prop, date) {
@@ -147,11 +158,11 @@ export default {
             if(!this.project._id){
                 e.target.checked 
                 ? this.project.billingDate = this.project.deadline
-                : this.project.billingDate = ""              
+                : this.project.billingDate = this.project.billingDate
             }else{
                 e.target.checked 
                 ? this.updateProjectDate(this.$refs.deadline.value, 'billingDate') 
-                : this.updateProjectDate("", 'billingDate')
+                : this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
             }
         },
         async setClientNumber(e) {
@@ -292,9 +303,6 @@ export default {
             return !!(this.project._id && this.project.tasks && this.project.tasks.length);
         },
     },
-    mounted(){
-        this.isbillingDate();
-    },
     components: {
         SelectSingle,
         SelectMulti,
@@ -307,6 +315,7 @@ export default {
         await this.getProjectData();
         this.getCustomers();
         this.getIndustries();
+        this.isbillingDate();
     }
 }
 </script>
