@@ -21,7 +21,7 @@ async function getXtrfTierReport(filters, grouped = false) {
     }
     const groupedLangs = getGroupedLangs(result, 'group');
     return grouped ? groupedLangs : result;
-  } catch (err) {
+  } catch(err) {
     console.log(err);
     console.log("Error in getXtrfTierReport");
   }
@@ -350,6 +350,18 @@ async function getXtrfLqaReport(filters) {
         return item;
       }).filter(item => Object.keys(item).length !== 1);
     }
+    result = result.map(item => {
+      if (item.finance.vendors.length) {
+        item.finance.vendors = item.finance.vendors.filter(vendor => vendor.wordCount);
+      }
+      if (item.gaming.vendors.length) {
+        item.gaming.vendors = item.gaming.vendors.filter(vendor => vendor.wordCount);
+      }
+      if (item.other.vendors.length) {
+        item.other.vendors = item.other.vendors.filter(vendor => vendor.wordCount);
+      }
+      return item
+    });
     return result.filter(vendor => (vendor.finance && vendor.finance.vendors.length)
       || (vendor.gaming && vendor.gaming.vendors.length)
       || (vendor.other && vendor.other.vendors.length));
@@ -370,17 +382,19 @@ async function getVendorAssessment(assessments, queryIndustry) {
         if (name === queryIndustry) {
           for (let { tqi, lqa1, lqa2, lqa3 } of steps) {
             result.TQI.push(tqi.grade);
-              lqa1.grade && setLQA('lqa1Score', lqa1.grade)
-              lqa2.grade && setLQA('lqa2Score', lqa2.grade)
-              lqa3.grade && setLQA('lqa3Score', lqa3.grade)
+            lqa1.grade && setLQA('lqa1Score', lqa1.grade)
+            lqa2.grade && setLQA('lqa2Score', lqa2.grade)
+            lqa3.grade && setLQA('lqa3Score', lqa3.grade)
           }
         }
       }
     }
   }
-  function setLQA(key, value){
+
+  function setLQA(key, value) {
     result[key] = value;
   }
+
   return result;
 }
 
@@ -439,7 +453,13 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
 }
 
 function getFilteringQuery(filters) {
-  let query = { $and: [{ documents: { $ne: null }, creationTime: { $gte: new Date('2020-04-01T00:00:00Z') } }] };
+  let query = {
+    $and: [{
+      documents: { $ne: null },
+      creationTime: { $gte: new Date('2020-04-01T00:00:00Z') },
+      projectStatus: 'Live',
+    }]
+  };
   if (filters.nameFilter) {
     query[
       'documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName'
@@ -463,8 +483,8 @@ async function getVendorsQuery(filters) {
 }
 
 function isEmpty(obj) {
-  for(let key in obj) {
-    if(obj.hasOwnProperty(key))
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key))
       return false;
   }
   return true;
@@ -537,7 +557,7 @@ async function getXtrfUpcomingReport(filters) {
       financeReports: financeReports.filter(vendor => vendor.LQA !== 'passed'),
       gamingReports: gamingReports.filter(vendor => vendor.LQA !== 'passed'),
     };
-  } catch (err) {
+  } catch(err) {
     console.log(err);
     console.log("Error in getXtrfUpcomingReport");
   }
