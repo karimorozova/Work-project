@@ -1,16 +1,20 @@
 export default {
     methods: {
-        extendedVendors(index) {            
-            const allSteps = this.currentProject.steps;
-            const step = index >= 0 ? allSteps[index] : this.step;
-            const sameTaskSteps = allSteps.filter(item => item.stepId !== step.stepId && item.taskId === step.taskId);
-            const assignedTaskVendors = sameTaskSteps.filter(item => item.vendor).map(item => item.vendor._id);
-            let result = !this.isMainGroup() ? this.vendors.filter(item => assignedTaskVendors.indexOf(item._id) === -1) : [...this.vendors];
-            if(this.isAllShow) {
-                return result.filter(item => item.status === 'Active');
-            }
-            result = result.filter(item => item.status === 'Active' && this.checkForLanguagePair(item, index));
-            return result;
+        extendedVendors(index) {
+            // const allSteps = this.currentProject.steps;
+            // const step = index >= 0 ? allSteps[index] : this.step;
+            // if(step.vendor == null){
+                return this.vendors
+            // }else{
+            //     const sameTaskSteps = allSteps.filter(item => item.stepId !== step.stepId && item.taskId === step.taskId);
+            //     const assignedTaskVendors = sameTaskSteps.filter(item => item.vendor).map(item => item.vendor._id);
+            //     let result = !this.isMainGroup() ? this.vendors.filter(item => assignedTaskVendors.indexOf(item._id) === -1) : [...this.vendors];
+            //     if(this.isAllShow) {
+            //         return result.filter(item => item.status === 'Active');
+            //     }
+            //     result = result.filter(item => item.status === 'Active' && this.checkForLanguagePair(item, index));
+            // }
+            // return result;
 
         },
         isMainGroup() {

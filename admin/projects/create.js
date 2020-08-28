@@ -322,6 +322,7 @@ function getFinanceForCustomUnits(task, steps) {
 
 function getTasksForCustomUnits(tasksInfo) {
   const { stepsAndUnits, projectId, service, targets, source, stepsDates, taskRefFiles } = tasksInfo;
+  const { steps, ...rest } = service;
   let tasks = [];
   let tasksLength = tasksInfo.project.tasks.length + 1;
   for (let i = 0; i < targets.length; i++) {
@@ -333,8 +334,8 @@ function getTasksForCustomUnits(tasksInfo) {
       sourceLanguage: source.symbol,
       refFiles: taskRefFiles,
       service: {
-        ...service,
-        calculationUnit: stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
+        ...rest,
+        // calculationUnit: stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
       },
       stepsAndUnits: stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
       projectId,

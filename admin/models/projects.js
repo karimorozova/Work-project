@@ -12,6 +12,16 @@ const ProjectsSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  isUrgent: {
+    type: Boolean,
+    default: false
+  },
+  clientContacts: [],
+  paymentProfile: {
+    type: String,
+    default: '',
+    trim: true
+  },
   clientProjectNumber: {
     type: String,
     default: '',
@@ -33,7 +43,7 @@ const ProjectsSchema = new mongoose.Schema({
     default: []
   },
   steps: [{
-    vendor: {type: Schema.Types.ObjectId, ref: 'Vendors'},
+    vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
     stepId: "",
     taskId: "",
     serviceStep: {},
@@ -57,15 +67,15 @@ const ProjectsSchema = new mongoose.Schema({
     targetFile: "",
     finance: {
       'Wordcount': {
-        receivables: "", 
+        receivables: "",
         payables: "",
-        halfReceivables: "", 
+        halfReceivables: "",
         halfPayables: "",
       },
       'Price': {
-        receivables: "", 
+        receivables: "",
         payables: "",
-        halfReceivables: "", 
+        halfReceivables: "",
         halfPayables: "",
       }
     },
@@ -73,7 +83,7 @@ const ProjectsSchema = new mongoose.Schema({
     vendorDiscount: "",
     check: false,
     vendorsClickedOffer: Array,
-    isVendorRead: {type: Boolean, default: false}
+    isVendorRead: { type: Boolean, default: false }
   }],
   totalCost: {
     type: String,
@@ -141,6 +151,9 @@ const ProjectsSchema = new mongoose.Schema({
     default: [],
     trim: true
   },
+  billingDate: {
+    type: Date,
+  },
   deliverables: {
     type: String,
     default: "",
@@ -161,10 +174,6 @@ const ProjectsSchema = new mongoose.Schema({
       'Price': {}
     }
   },
-  isUrgent: {
-    type: Boolean,
-    default: false
-  },
   isAutoDelivery: {
     type: Boolean,
     default: false
@@ -177,11 +186,11 @@ const ProjectsSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  isTest:{
+  isTest: {
     type: Boolean,
     default: false
   }
-},{ minimize: false, strict: false });
+}, { minimize: false, strict: false });
 
 const Projects = mongoose.model('Projects', ProjectsSchema);
 

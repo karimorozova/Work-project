@@ -129,6 +129,7 @@ export default {
     &-span {
       vertical-align: sub;
       display: inline-block;
+      font-size: 18px;
     }
   }
   &__extra-choice{

@@ -22,24 +22,34 @@ async function getProject(obj) {
 }
 
 async function updateProject(query, update) {
-    return await Projects.findOneAndUpdate(query, update, {new: true})
-        .populate('industry')
-        .populate('customer')
-        .populate('service')
-        .populate('projectManager', ['firstName', 'lastName', 'photo', 'email'])
-        .populate('accountManager', ['firstName', 'lastName', 'photo', 'email'])
-        .populate('steps.vendor', ['firstName', 'surname', 'email']);
+  return await Projects.findOneAndUpdate(query, update, { new: true })
+    .populate('industry')
+    .populate('customer')
+    .populate('service')
+    .populate('projectManager', ['firstName', 'lastName', 'photo', 'email'])
+    .populate('accountManager', ['firstName', 'lastName', 'photo', 'email'])
+    .populate('steps.vendor', ['firstName', 'surname', 'email']);
+}
+
+async function getProjectAfterUpdate(query, update) {
+  return await Projects.findOneAndUpdate(query, update, { new: true })
+    .populate('industry')
+    .populate('customer')
+    .populate('service')
+    .populate('projectManager', ['firstName', 'lastName', 'photo', 'email'])
+    .populate('accountManager', ['firstName', 'lastName', 'photo', 'email'])
+    .populate('steps.vendor', ['firstName', 'surname', 'email']);
 }
 
 async function getFilteredProjects(filters) {
-    const query = getFilterdProjectsQuery(filters);
-    const projects = await Projects.aggregate([
-        {
-            $lookup: {
-                from: "clients",
-                localField: "customer",
-                foreignField: "_id",
-                as: "customer"
+  const query = getFilterdProjectsQuery(filters);
+  const projects = await Projects.aggregate([
+    {
+      $lookup: {
+        from: "clients",
+        localField: "customer",
+        foreignField: "_id",
+        as: "customer"
             }
         },
         {
@@ -64,4 +74,4 @@ async function getFilteredProjects(filters) {
     }
 }
 
-module.exports = { getProject, getProjects, updateProject, getFilteredProjects };
+module.exports = { getProject, getProjects, updateProject, getFilteredProjects, getProjectAfterUpdate };

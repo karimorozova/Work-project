@@ -131,7 +131,7 @@
               )
 
     .vendor-info__preview(v-if="isEditAndSend")
-      VendorPreview(
+      WYSIWYG(
         @closePreview="closePreview",
         :previewDropMenu="true",
         :templates="templatesWysiwyg",
@@ -270,7 +270,7 @@ import IndustryTable from "./pricelists/IndustryTable";
 import StepTable from "./pricelists/StepTable";
 import LangTable from "./pricelists/LangTable";
 import CKEditor from "ckeditor4-vue";
-import VendorPreview from "./VendorPreview";
+import WYSIWYG from "./WYSIWYG";
 import VendorAction from "./VendorAction";
 import VendorCandidate from "./VendorCandidate";
 import TableQualifications from "./TableQualifications";
@@ -651,7 +651,7 @@ export default {
   },
   components: {
     VendorCompetencies,
-    VendorPreview,
+    WYSIWYG,
     VendorCandidate,
     VendorAction,
     TableQualifications,

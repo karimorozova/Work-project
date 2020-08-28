@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import Preview from "../vendors/VendorPreview";
+import Preview from "../vendors/WYSIWYG";
 import SelectSingle from "../SelectSingle";
 import Button from "../Button";
 import { mapGetters, mapActions } from "vuex";
@@ -455,21 +455,26 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
-
 .project-action {
-  padding: 10px 20px;
-  box-shadow: 0 3px 20px $brown-shadow;
+  padding: 20px;
+  box-shadow: 0 0 10px #67573e9d;
   box-sizing: border-box;
-  width: 100%;
+  width: 390px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+
+  &__setting{
+    display: flex;
+    flex-direction: column;
+  }
 
   &__payment {
     margin-bottom: 10px;
     &-span {
       vertical-align: sub;
       display: inline-block;
+      font-size: 18px;
     }
   }
   &__text-input {
@@ -486,7 +491,7 @@ export default {
   }
   &__title {
     padding-bottom: 5px;
-    font-size: 20px;
+    font-size: 22px;
     border-bottom: 1px solid $brown-border;
     margin-bottom: 30px;
     display: flex;
@@ -574,7 +579,7 @@ export default {
     position: relative;
     &__menu {
       position: relative;
-      width: 165px;
+      width: 190px;
       height: 30px;
     }
     &__item {
@@ -588,6 +593,7 @@ export default {
     }
     &__label {
       position: relative;
+      width: 160px;
     }
     &__assigned-icon {
       position: absolute;

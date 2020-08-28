@@ -222,6 +222,8 @@ import { mapGetters, mapActions} from "vuex";
   border: 1px solid $brown-border;
   margin-bottom: 50px;
   position: relative;
+  border-radius: 10px;
+
     &__drop-menu {
       position: relative; 
       width: 191px;

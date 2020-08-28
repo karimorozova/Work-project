@@ -304,11 +304,12 @@ export default {
         justify-content: space-between;
     }
     &__item {
-        padding: 30px;
+        padding: 20px 10px;
         width: 49%;
         border: 1px solid $brown-border;
         border-radius: 2px;
         box-sizing: border-box;
+        border-radius: 10px;
 
         &-title {
             font-size: 21px;

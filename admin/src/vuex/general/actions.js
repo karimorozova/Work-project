@@ -76,11 +76,16 @@ export const setStepVendor = async ({ commit, dispatch, state }, payload) => {
     try {
         const { vendor, index } = payload;
         let step = state.currentProject.steps[index];
-        if(step.serviceStep.calculationUnit === 'Words') {
-            await Vue.http.post('/memoqapi/check-user', { email: vendor.email });
-        }
+
+        // if(step.serviceStep.calculationUnit === 'Words') {
+        //     await Vue.http.post('/memoqapi/check-user', { email: vendor.email });
+        // }
+
         const status = "Created";
         const updatedProject = await Vue.http.post('/pm-manage/step-payables', {projectId: state.currentProject._id, step: {...step, vendor, status}, index});
+
+        console.log(updatedProject);
+
         if(step.vendor) {
             await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
         }

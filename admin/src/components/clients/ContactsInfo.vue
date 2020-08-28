@@ -52,14 +52,15 @@
                 template(slot="icons" slot-scope="{ row, index }")
                     .contacts-info__icons
                         img.contacts-info__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :class="{'contacts-info_opacity': isIconClass(index, key)}")
-        .contacts-info__error(v-if="isErrorShow")
-            .contacts-info__error-message
-                p Please finish the current edition first!
-                span.clients-table__close(@click="closeErrorMessage") +
-        .contacts-info__delete-approve(v-if="isDeleteMessageShow")
-            p Are you sure you want to delete?
-            Button.contacts-info__button(value="Cancel" @clicked="cancelDelete")
-            Button.contacts-info__button(value="Delete" @clicked="approveDelete")
+        .contacts-info__approve(v-if="isDeleteMessageShow")
+            ApproveModal(
+                text="Are you sure?"
+                approveValue="Yes"
+                notApproveValue="Cancel"
+                @approve="approveDelete"
+                @notApprove="cancelDelete"
+                @close="cancelDelete"
+            )
         ValidationErrors(v-if="areErrorsExist"
             :errors="errors"
             :customStyles="errorsStyle"
@@ -74,6 +75,7 @@ import DataTable from "../DataTable";
 import CustomRadio from "../CustomRadio";
 import Add from "../Add";
 import ValidationErrors from "../ValidationErrors";
+import ApproveModal from '../ApproveModal';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -158,7 +160,9 @@ export default {
         },
         makeAction(index, key) {
             if(this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
-                return this.isErrorShow = true;
+                this.errors = [];
+                this.errors.push('Please finish the current edition first!')
+                return this.areErrorsExist = true;
             }
             if(key === 'edit') {
                 this.setCurrentEditionValues(index);
@@ -242,7 +246,8 @@ export default {
         DataTable,
         CustomRadio,
         Add,
-        ValidationErrors
+        ValidationErrors,
+        ApproveModal
     }
 }
 </script>
@@ -333,29 +338,19 @@ export default {
         transform: rotate(45deg);
         cursor: pointer;
     }
-    &__delete-approve {
+    &__approve {
         position: absolute;
-        width: 332px;
-        height: 270px;
-        top: 10%;
-        left: 50%;
-        margin-left: -166px;
+        z-index: 50;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: transparent;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 0 10px $main-color;
-        background-color: $white;
-        z-index: 20;
-        p {
-            font-size: 21px;
-            width: 50%;
-            text-align: center;
-        }
-        .approve-block {
-            margin-bottom: 15px;
-        }
     }
+
     &__cancel-edition {
         cursor: pointer;
         position: absolute;
