@@ -8,8 +8,7 @@ async function updateProjectMetrics({ projectId }) {
     let { steps, tasks } = project;
     let isMetricsExist = true;
     for (let task of tasks) {
-      const stepUnits = Array.isArray(task.service.calculationUnit) ?
-        task.service.calculationUnit : JSON.parse(task.service.calculationUnit);
+      const stepUnits = JSON.parse(task.stepsAndUnits);
       const isIncludesWordCount = stepUnits.find(item => item.unit === 'CAT Wordcount');
       if (!!isIncludesWordCount && task.status === "Created") {
         const analysis = await getProjectAnalysis(task.memoqProjectId);
@@ -25,7 +24,7 @@ async function updateProjectMetrics({ projectId }) {
     }
     let isWordFirst;
     const lastTask = tasks[tasks.length - 1];
-    const stepUnits = JSON.parse(lastTask.service.calculationUnit);
+    const stepUnits = JSON.parse(lastTask.stepsAndUnits);
     isWordFirst = stepUnits[0].unit === 'CAT Wordcount' && stepUnits[1].unit !== 'CAT Wordcount';
     let lastSteps = [];
     if(isWordFirst)

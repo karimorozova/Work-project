@@ -45,6 +45,7 @@ router.get("/request", async (req, res) => {
   }
 })
 
+//old
 router.get("/language-pairs", async (req, res) => {
   const { customerId } = req.query;
   try {

@@ -18,18 +18,18 @@ async function getFinanceDataForPackages({project, service, packageSize, target}
 
 async function getReceivables({project, packageSize, target, step, industryId}, common = false) {
     try {
-      const clientId = common ? project.customer.toString() : project.customer.id;
-        const client = await getClient({"_id": clientId});
-        const ratePair = client.monoRates.find(item => {
-            return item.target.symbol === target.symbol && item.packageSize === packageSize
-            && hasActiveRateValue({step, pair: item, stepIndustry: industryId})
-        })
-        if(ratePair) {
-            const { min, value } = ratePair.rates[step._id];
-            const receivables = value > min ? value : min;
-            return {receivables, clientRate: ratePair.rates[step._id]};
-        }
-        return {receivables: 0, clientRate: ""};
+      // const clientId = common ? project.customer.toString() : project.customer.id;
+      //   const client = await getClient({"_id": clientId});
+      //   const ratePair = client.monoRates.find(item => {
+      //       return item.target.symbol === target.symbol && item.packageSize === packageSize
+      //       && hasActiveRateValue({step, pair: item, stepIndustry: industryId})
+      //   })
+      //   if(ratePair) {
+      //       const { min, value } = ratePair.rates[step._id];
+      //       const receivables = value > min ? value : min;
+      //       return {receivables, clientRate: ratePair.rates[step._id]};
+      //   }
+      return { receivables: 0, clientRate: "" };
     } catch(err) {
         console.log(err);
         console.log("Error in getReceivables");
@@ -38,16 +38,16 @@ async function getReceivables({project, packageSize, target, step, industryId}, 
 
 async function getVendorWithPayables({packageSize, target, step, industryId}) {
     try {
-        const vendors = await getVendors({status: 'Active'});
-        const matchedVendors = vendors.filter(item => isVendorMatches({
-            rates: item.monoRates, packageSize, target, step, industryId
-        }))
-        if(matchedVendors.length === 1) {
-            return getVendorRate({
-                vendor: matchedVendors[0], ratesProp: 'monoRates', packageSize, target, industryId, step
-            });
-        }
-        return {vendor: null, vendorRate: "", payables: 0};
+      // const vendors = await getVendors({status: 'Active'});
+      // const matchedVendors = vendors.filter(item => isVendorMatches({
+      //     rates: item.monoRates, packageSize, target, step, industryId
+      // }))
+      // if(matchedVendors.length === 1) {
+      //     return getVendorRate({
+      //         vendor: matchedVendors[0], ratesProp: 'monoRates', packageSize, target, industryId, step
+      //     });
+      // }
+      return { vendor: null, vendorRate: "", payables: 0 };
     } catch(err) {
         console.log(err);
         console.log("Error in getVendorWithPayables");

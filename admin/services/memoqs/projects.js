@@ -10,7 +10,7 @@ const headerWithoutAction = getHeaders('IServerProjectService');
 async function getMemoqAllProjects() {
     const xml = `${xmlHeader}
             <soapenv:Body>
-                <ns:ListProjects>                    
+                <ns:ListProjects>
                 </ns:ListProjects>
             </soapenv:Body>
             </soapenv:Envelope>`
@@ -36,7 +36,7 @@ async function createMemoqProjectWithTemplate(projectData) {
                     <ns:CreatorUser>${projectData.creatorUserId}</ns:CreatorUser>
                     <ns:Domain>${projectData.industry}</ns:Domain>
                     <ns:Name>[PngSys] ${projectData.projectName}</ns:Name>
-                    <ns:Project>[PngSys] ${projectData.projectName}</ns:Project>            
+                    <ns:Project>[PngSys] ${projectData.projectName}</ns:Project>
                     <ns:SourceLanguageCode>${projectData.source.memoq}</ns:SourceLanguageCode>
                     <ns:TargetLanguageCodes>${targets}</ns:TargetLanguageCodes>
                     <ns:TemplateGuid>${projectData.template}</ns:TemplateGuid>
@@ -132,11 +132,11 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
         });
         projectUsers.unshift({id: pm.User.UserGuid, isPm: true});
         const areUsersSet = await setMemoqProjectUsers(
-            memoqProjectId, 
-            Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i)))
-            );
-        return areUsersSet ? await assignMemoqTranslators({memoqProjectId, assignedSteps, users}) 
-            : new Error("Can't set one or all users in memoQ");
+          memoqProjectId,
+          Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i)))
+        );
+      return areUsersSet ? await assignMemoqTranslators({ memoqProjectId, assignedSteps, users })
+        : new Error("Can't set one or all users in memoQ");
     } catch(err) {
         console.log(err);
         console.log("Error in setMemoqTranslators");
@@ -172,8 +172,8 @@ async function setMemoqProjectUsers(projectId, users) {
     const usersInfo = getUsersInfo(users);
     const xml = `${xmlHeader}
                 <soapenv:Body>
-                <ns:SetProjectUsers>                
-                    <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>                
+                <ns:SetProjectUsers>
+                    <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
                     <ns:userInfos>${usersInfo}</ns:userInfos>
                 </ns:SetProjectUsers>
                 </soapenv:Body>
@@ -192,11 +192,11 @@ async function setMemoqProjectUsers(projectId, users) {
 
 function getUsersInfo(users) {
     const userInfoXml = (user) => `<ns:ServerProjectUserInfo>
-                                <ns:PermForLicense>true</ns:PermForLicense>                 
-                                <ns:ProjectRoles>                         
-                                    <mem:ProjectManager>${user.isPm}</mem:ProjectManager>                         
+                                <ns:PermForLicense>true</ns:PermForLicense>
+                                <ns:ProjectRoles>
+                                    <mem:ProjectManager>${user.isPm}</mem:ProjectManager>
                                     <mem:Terminologist>false</mem:Terminologist>
-                                </ns:ProjectRoles>                      
+                                </ns:ProjectRoles>
                                 <ns:UserGuid>${user.id}</ns:UserGuid>
                             </ns:ServerProjectUserInfo>\n`
     return users.reduce((acc, cur) => acc + userInfoXml(cur), "")
@@ -221,8 +221,8 @@ async function setMemoqDocsAssignments(projectId, docsInfo) {
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
         return !result["s:Fault"];
     } catch(err) {
-        console.log("Error in setMemoqDocsAssignments");
-        console.log(err); 
+      console.log("Error in setMemoqDocsAssignments");
+      console.log(err);
         throw new Error(err.message);
     }
 }
@@ -281,9 +281,16 @@ async function getProjectAnalysis(projectId) {
             </soapenv:Envelope>`
     const headers = headerWithoutAction('RunAnalysis');
     try {
-        const { response } = await soapRequest({url, headers, xml});
-        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].RunAnalysisResponse;
+      const { response } = await soapRequest({ url, headers, xml });
+      if (response.statusCode === 200) {
+        const result = parser.toJson(response.body, {
+          object: true,
+          sanitize: true,
+          trim: true
+        })["s:Envelope"]["s:Body"].RunAnalysisResponse;
         return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
+      }
+      return null;
     } catch(err) {
         console.log("Error in getProjectAnalysis");
         console.log(err);
@@ -415,7 +422,7 @@ async function renameMemoqProject(projectId, name) {
 //     try {
 //         const { response } = await soapRequest({url, headers, xml});
 //         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
-//         return !result["s:Fault"] ? 
+//         return !result["s:Fault"] ?
 //             result.ExportTranslationDocumentAsTwoColumnRtfResponse.ExportTranslationDocumentAsTwoColumnRtfResult.FileGuid : false;
 //     } catch(err) {
 //         console.log("Error in getMemoqFileId");
@@ -492,9 +499,9 @@ async function updateMemoqProjectsData() {
                 const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
                 const memoqProject = getMemoqProjectData(project, languages);
                 await MemoqProject.updateOne(
-                    {serverProjectGuid: project.ServerProjectGuid}, 
-                    {...memoqProject, users, documents}, 
-                    {upsert: true})
+                  { serverProjectGuid: project.ServerProjectGuid },
+                  { ...memoqProject, users, documents },
+                  { upsert: true })
             }
         }
     } catch(err) {
@@ -505,16 +512,16 @@ async function updateMemoqProjectsData() {
 }
 
 function getUpdatedUsers(users) {
-    if(Array.isArray(users)) { 
-        return users.map(item => {
-            const isPm = item.ProjectRoles["a:ProjectManager"] === "true";
-            const isTerminologist = item.ProjectRoles["a:Terminologist"] === "true";
-            return {
-                ...item,
-                ProjectRoles: { isPm, isTerminologist }
-            }
-        })
-    }
+  if (Array.isArray(users)) {
+    return users.map(item => {
+      const isPm = item.ProjectRoles["a:ProjectManager"] === "true";
+      const isTerminologist = item.ProjectRoles["a:Terminologist"] === "true";
+      return {
+        ...item,
+        ProjectRoles: { isPm, isTerminologist }
+      }
+    })
+  }
     const isPm = users.ProjectRoles["a:ProjectManager"] === "true";
     const isTerminologist = users.ProjectRoles["a:Terminologist"] === "true";
     return {
