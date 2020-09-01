@@ -7,34 +7,51 @@ const { updateProjectMetrics } = require("../projects/metrics");
 const moment = require("moment");
 const fs = require("fs");
 
-async function createProject (project) {
+async function createProject(project) {
   let todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
   let todayEnd = new Date(todayStart);
   todayEnd.setUTCHours(23, 59, 59, 0);
   try {
-    const todaysProjects = await Projects.find({ "startDate": { $gte: todayStart, $lt: todayEnd } });
-    const nextNumber = (todaysProjects.length < 10) ? '[0' + (todaysProjects.length + 1) + ']' : '[' + (todaysProjects.length + 1) + ']';
+    const todaysProjects = await Projects.find({
+      startDate: { $gte: todayStart, $lt: todayEnd }
+    });
+    const nextNumber =
+      todaysProjects.length < 10
+        ? "[0" + (todaysProjects.length + 1) + "]"
+        : "[" + (todaysProjects.length + 1) + "]";
     project.status = project.status || "Draft";
-    project.projectId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
-    const createdProject = await Projects.create({ ...project, startDate: new Date() });
+    project.projectId =
+      moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
+    const createdProject = await Projects.create({
+      ...project,
+      startDate: new Date()
+    });
     await createProjectFolder(createdProject.id);
-    return await getProject({ "_id": createdProject.id });
-  } catch(err) {
+    return await getProject({ _id: createdProject.id });
+  } catch (err) {
     console.log(err);
-    console.log('Error in createProject');
+    console.log("Error in createProject");
   }
 }
 
-async function createTasks ({ tasksInfo, refFiles }) {
+async function createTasks({ tasksInfo, refFiles }) {
   try {
     const stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits);
     const stepsDates = JSON.parse(tasksInfo.stepsDates);
-    const project = await getProject({ "_id": tasksInfo.projectId });
+    const project = await getProject({ _id: tasksInfo.projectId });
     const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId);
-    const allInfo = { ...tasksInfo, taskRefFiles, stepsAndUnits, stepsDates, project };
+    const allInfo = {
+      ...tasksInfo,
+      taskRefFiles,
+      stepsAndUnits,
+      stepsDates,
+      project
+    };
     if (stepsAndUnits.length === 2) {
-      const onlyPackages = stepsAndUnits.every(({ unit }) => unit === 'Packages');
+      const onlyPackages = stepsAndUnits.every(
+        ({ unit }) => unit === "Packages"
+      );
       if (!onlyPackages) {
         await createTasksAndStepsForCustomUnits(allInfo);
       } else {
@@ -42,14 +59,14 @@ async function createTasks ({ tasksInfo, refFiles }) {
       }
     } else {
       const [{ unit }] = stepsAndUnits;
-      if (unit !== 'Packages') {
+      if (unit !== "Packages") {
         await createTasksAndStepsForCustomUnits(allInfo);
       } else {
         await createTasksWithPackagesUnit(allInfo);
       }
     }
-    return await getProject({ "_id": tasksInfo.projectId });
-  } catch(err) {
+    return await getProject({ _id: tasksInfo.projectId });
+  } catch (err) {
     console.log(err);
     console.log("Error in createTasks");
   }
@@ -57,7 +74,7 @@ async function createTasks ({ tasksInfo, refFiles }) {
 
 /// Creating tasks using info from client request start ///
 
-async function createTasksFromRequest ({ project, dataForTasks, isWords }) {
+async function createTasksFromRequest({ project, dataForTasks, isWords }) {
   const stepsAndUnits = JSON.parse(dataForTasks.stepsAndUnits);
   let newTasksInfo = { ...dataForTasks };
   const sourceFiles = getModifiedFiles(project.sourceFiles);
@@ -65,20 +82,24 @@ async function createTasksFromRequest ({ project, dataForTasks, isWords }) {
   try {
     if (isWords) {
       newTasksInfo.translateFiles = await storeFiles(sourceFiles, project.id);
-      newTasksInfo.referenceFiles = refFiles.length ? await storeFiles(refFiles, project.id) : [];
+      newTasksInfo.referenceFiles = refFiles.length
+        ? await storeFiles(refFiles, project.id)
+        : [];
       return { project, newTasksInfo };
     } else {
       const taskRefFiles = await storeFiles(refFiles, project.id);
       const allInfo = { ...dataForTasks, taskRefFiles, project, stepsAndUnits };
       if (stepsAndUnits.length === 2) {
-        const isOnlyPackages = stepsAndUnits[0].unit === 'Packages' && stepsAndUnits[1].unit === 'Packages';
+        const isOnlyPackages =
+          stepsAndUnits[0].unit === "Packages" &&
+          stepsAndUnits[1].unit === "Packages";
         if (!isOnlyPackages) {
           await createTasksAndStepsForCustomUnits(allInfo);
         } else {
           await createTasksWithPackagesUnit(allInfo);
         }
       } else {
-        const isPackage = stepsAndUnits[0].unit === 'Packages';
+        const isPackage = stepsAndUnits[0].unit === "Packages";
         if (!isPackage) {
           await createTasksAndStepsForCustomUnits(allInfo);
         } else {
@@ -86,14 +107,14 @@ async function createTasksFromRequest ({ project, dataForTasks, isWords }) {
         }
       }
     }
-    return await getProject({ "_id": project.projectId });
-  } catch(err) {
+    return await getProject({ _id: project.projectId });
+  } catch (err) {
     console.log(err);
     console.log("Error in createTasksFromRequest");
   }
 }
 
-function getModifiedFiles (files) {
+function getModifiedFiles(files) {
   if (files && files.length) {
     return files.map(item => {
       item.path = `./dist${item.path}`;
@@ -108,38 +129,47 @@ function getModifiedFiles (files) {
 
 /// Creating tasks for wordcount unit services start ///
 
-async function createTaskWithCommonUnits (newTasksInfo, docs) {
+async function createTaskWithCommonUnits(newTasksInfo, docs) {
   try {
-    const project = await Projects.findOne({ "_id": newTasksInfo.projectId });
+    const project = await Projects.findOne({ _id: newTasksInfo.projectId });
     await addTasksToProject({ newTasksInfo, project, docs });
-    return await getProject({ "_id": newTasksInfo.projectId });
-  } catch(err) {
+    return await getProject({ _id: newTasksInfo.projectId });
+  } catch (err) {
     console.log(err);
     console.log("Error in createTasksWithWordsUnit");
   }
 }
 
-async function addTasksToProject ({ newTasksInfo, project, docs }) {
+async function addTasksToProject({ newTasksInfo, project, docs }) {
   try {
     let memoqDocs;
     for (let target of newTasksInfo.targets) {
-      memoqDocs = Array.isArray(docs) ? docs.filter(({ TargetLangCode }) => TargetLangCode === target.memoq) : [docs];
+      memoqDocs = Array.isArray(docs)
+        ? docs.filter(({ TargetLangCode }) => TargetLangCode === target.memoq)
+        : [docs];
     }
     await updateProjectTasks({ newTasksInfo, project, memoqDocs });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     console.log("Error in addTasksToProject");
   }
 }
 
-async function updateProjectTasks (taskData) {
+async function updateProjectTasks(taskData) {
   const { newTasksInfo, project, memoqDocs } = taskData;
   try {
     const units = JSON.parse(newTasksInfo.stepsAndUnits);
-    const common = units[0].unit === 'CAT Wordcount';
-    const allInfo = { ...newTasksInfo, units, project, taskRefFiles: memoqDocs, stepsDates: newTasksInfo.stepsDates };
+    const common = units[0].unit === "CAT Wordcount";
+    const allInfo = {
+      ...newTasksInfo,
+      units,
+      project,
+      taskRefFiles: memoqDocs,
+      stepsDates: newTasksInfo.stepsDates
+    };
     const tasks = getWordCountTasks(taskData);
-    await Projects.updateOne({ "_id": project._id },
+    await Projects.updateOne(
+      { _id: project._id },
       {
         $set: { isMetricsExist: false },
         $push: { tasks }
@@ -147,42 +177,84 @@ async function updateProjectTasks (taskData) {
     );
     if (units.length === 2) {
       for (let { unit } of units) {
-        if (unit === 'Packages') {
+        if (unit === "Packages") {
           const { service, targets, packageSize } = newTasksInfo;
-          const { vendor, vendorRate, clientRate, payables, receivables } = await getFinanceDataForPackages({
-            project, service, packageSize, target: targets[0]
-          }, true);
-          const finance = { Wordcount: { receivables: '', payables: '' }, Price: { receivables, payables } };
-          const tasks = getTasksForPackages({ ...allInfo, projectId: project.projectId, finance }, common);
-          const steps = getStepsForMonoStepPackages({
-            tasks,
+          const {
             vendor,
             vendorRate,
             clientRate,
-            stepsDates: allInfo.stepsDates
-          }, common);
+            payables,
+            receivables
+          } = await getFinanceDataForPackages(
+            {
+              project,
+              service,
+              packageSize,
+              target: targets[0]
+            },
+            true
+          );
+          const finance = {
+            Wordcount: { receivables: "", payables: "" },
+            Price: { receivables, payables }
+          };
+          const tasks = getTasksForPackages(
+            { ...allInfo, projectId: project.projectId, finance },
+            common
+          );
+          const steps = getStepsForMonoStepPackages(
+            {
+              tasks,
+              vendor,
+              vendorRate,
+              clientRate,
+              stepsDates: allInfo.stepsDates
+            },
+            common
+          );
           const projectFinance = getProjectFinance(tasks, project.finance);
-          await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
-        } else if (unit !== 'Packages' && unit !== 'CAT Wordcount') {
-          const tasksWithoutFinance = getTasksForCustomUnits({ ...allInfo, projectId: project.projectId }, common);
-          const steps = await getStepsForMonoUnits({ ...allInfo, tasks: tasksWithoutFinance }, common);
-          const tasks = tasksWithoutFinance.map(item => getFinanceForCustomUnits(item, steps));
+          await updateProject(
+            { _id: project.id },
+            { finance: projectFinance, $push: { steps } }
+          );
+        } else if (unit !== "Packages" && unit !== "CAT Wordcount") {
+          const tasksWithoutFinance = getTasksForCustomUnits(
+            { ...allInfo, projectId: project.projectId },
+            common
+          );
+          const steps = await getStepsForMonoUnits(
+            { ...allInfo, tasks: tasksWithoutFinance },
+            common
+          );
+          const tasks = tasksWithoutFinance.map(item =>
+            getFinanceForCustomUnits(item, steps)
+          );
           const projectFinance = getProjectFinance(tasks, project.finance);
-          await updateProject({ _id: project.id }, { finance: projectFinance, $push: { steps } });
+          await updateProject(
+            { _id: project.id },
+            { finance: projectFinance, $push: { steps } }
+          );
         }
       }
     }
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     console.log("Error in updateProjectTasks");
   }
 }
 
-function getWordCountTasks (taskData) {
+function getWordCountTasks(taskData) {
   const { project, newTasksInfo, memoqDocs } = taskData;
   const {
-    service, stepsAndUnits, memoqProjectId,
-    stepsDates, source, targets, memoqFiles, translateFiles, referenceFiles
+    service,
+    stepsAndUnits,
+    memoqProjectId,
+    stepsDates,
+    source,
+    targets,
+    memoqFiles,
+    translateFiles,
+    referenceFiles
   } = newTasksInfo;
   const tasks = [];
   let tasksLength = project.tasks.length + 1;
@@ -192,7 +264,7 @@ function getWordCountTasks (taskData) {
     tasks.push({
       taskId: taskId,
       service: {
-        ...service,
+        ...service
       },
       stepsAndUnits,
       memoqProjectId,
@@ -208,8 +280,12 @@ function getWordCountTasks (taskData) {
       status: "Created",
       cost: "",
       sourceFiles: translateFiles,
-      refFiles: referenceFiles, check: false,
-      finance: { 'Wordcount': { receivables: 0, payables: 0 }, 'Price': { receivables: 0, payables: 0 } }
+      refFiles: referenceFiles,
+      check: false,
+      finance: {
+        Wordcount: { receivables: 0, payables: 0 },
+        Price: { receivables: 0, payables: 0 }
+      }
     });
     tasksLength++;
   }
@@ -284,58 +360,109 @@ function getWordCountTasks (taskData) {
 
 /// Creating tasks for wordcount unit services end ///
 // DONE
-async function createTasksAndStepsForCustomUnits (allInfo) {
-  const { project, service, packageSize, stepsAndUnits, targets, stepsDates } = allInfo;
+async function createTasksAndStepsForCustomUnits(allInfo) {
+  const {
+    project,
+    service,
+    packageSize,
+    stepsAndUnits,
+    targets,
+    stepsDates
+  } = allInfo;
   try {
     let steps = [];
-    const finance = { Wordcount: { receivables: "", payables: "" }, Price: { receivables: "", payables: "" } };
-    let tasksWithoutFinance = getTasksForCustomUnits({ ...allInfo, projectId: project.projectId, finance });
+    const finance = {
+      Wordcount: { receivables: "", payables: "" },
+      Price: { receivables: "", payables: "" }
+    };
+    let tasksWithoutFinance = getTasksForCustomUnits({
+      ...allInfo,
+      projectId: project.projectId,
+      finance
+    });
     for (const [index, { unit }] of stepsAndUnits.entries()) {
-      if (unit === 'Packages') {
-        const { vendor, vendorRate, clientRate } = await getFinanceDataForPackages({
-          project, service, packageSize, target: targets[0]
-        });
-        steps.push(...await getStepsForMonoStepPackages({
-          tasks: tasksWithoutFinance,
+      if (unit === "Packages") {
+        const {
           vendor,
           vendorRate,
-          clientRate,
-          stepsDates
-        }));
+          clientRate
+        } = await getFinanceDataForPackages({
+          project,
+          service,
+          packageSize,
+          target: targets[0]
+        });
+        steps.push(
+          ...(await getStepsForMonoStepPackages({
+            tasks: tasksWithoutFinance,
+            vendor,
+            vendorRate,
+            clientRate,
+            stepsDates
+          }))
+        );
       } else {
         let common = index === 1;
-        steps.push(...await getStepsForMonoUnits({ ...allInfo, tasks: tasksWithoutFinance }, common));
+        steps.push(
+          ...(await getStepsForMonoUnits(
+            { ...allInfo, tasks: tasksWithoutFinance },
+            common
+          ))
+        );
       }
     }
-    const tasks = tasksWithoutFinance.map(item => getFinanceForCustomUnits(item, steps));
+    const tasks = tasksWithoutFinance.map(item =>
+      getFinanceForCustomUnits(item, steps)
+    );
     const projectFinance = getProjectFinance(tasks, project.finance);
-    return updateProject({ "_id": project.id }, { finance: projectFinance, $push: { tasks: tasks, steps: steps } });
-  } catch(err) {
+    return updateProject(
+      { _id: project.id },
+      { finance: projectFinance, $push: { tasks: tasks, steps: steps } }
+    );
+  } catch (err) {
     console.log(err);
     console.log("Error in createTasksWithHoursUnit");
   }
 }
 
 //DONE
-function getFinanceForCustomUnits (task, steps) {
-  const taskSteps = steps.filter(item => item.taskId === task.taskId || item.taskId === `${item.taskId} S01`);
-  const receivables = +taskSteps.reduce((acc, cur) => {
-    acc += +cur.finance.Price.receivables;
-    return acc;
-  }, 0).toFixed(2);
-  const payables = +taskSteps.reduce((acc, cur) => {
-    acc += +cur.finance.Price.payables;
-    return acc;
-  }, 0).toFixed(2);
+function getFinanceForCustomUnits(task, steps) {
+  const taskSteps = steps.filter(
+    item => item.taskId === task.taskId || item.taskId === `${item.taskId} S01`
+  );
+  const receivables = +taskSteps
+    .reduce((acc, cur) => {
+      acc += +cur.finance.Price.receivables;
+      return acc;
+    }, 0)
+    .toFixed(2);
+  const payables = +taskSteps
+    .reduce((acc, cur) => {
+      acc += +cur.finance.Price.payables;
+      return acc;
+    }, 0)
+    .toFixed(2);
   return {
     ...task,
-    finance: { Price: { receivables, payables }, Wordcount: { receivables: "", payables: "" } }
+    finance: {
+      Price: { receivables, payables },
+      Wordcount: { receivables: "", payables: "" }
+    }
   };
 }
 
 //DONE
-function getTasksForCustomUnits (tasksInfo) {
-  const { stepsAndUnits, projectId, service, targets, source, stepsDates, taskRefFiles, finance } = tasksInfo;
+function getTasksForCustomUnits(tasksInfo) {
+  const {
+    stepsAndUnits,
+    projectId,
+    service,
+    targets,
+    source,
+    stepsDates,
+    taskRefFiles,
+    finance
+  } = tasksInfo;
   const { steps, ...rest } = service;
   let tasks = [];
   let tasksLength = tasksInfo.project.tasks.length + 1;
@@ -348,14 +475,15 @@ function getTasksForCustomUnits (tasksInfo) {
       sourceLanguage: source.symbol,
       refFiles: taskRefFiles,
       service: {
-        ...rest,
+        ...rest
       },
-      stepsAndUnits: stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
+      stepsAndUnits:
+        stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
       projectId,
       start: stepsDates[0].start,
       deadline: stepsDates[stepsDates.length - 1].deadline,
       finance,
-      status: 'Created'
+      status: "Created"
     });
     tasksLength++;
   }
@@ -363,12 +491,17 @@ function getTasksForCustomUnits (tasksInfo) {
 }
 
 //HALF DONE
-async function getStepsForMonoUnits (stepsInfo, common = false) {
+async function getStepsForMonoUnits(stepsInfo, common = false) {
   let { tasks, stepsDates } = stepsInfo;
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
-    const { stepsAndUnits, ...rest } = tasks[i];
-    const serviceStep = Array.isArray(stepsAndUnits) ? stepsAndUnits.find(item => item.hours) : stepsAndUnits;
+    let { stepsAndUnits, ...rest } = tasks[i];
+    const isObject = typeof stepsAndUnits === "object";
+    const isArray = Array.isArray(stepsAndUnits);
+    if (!isArray && !isObject) stepsAndUnits = JSON.parse(stepsAndUnits);
+    const serviceStep = isArray
+      ? stepsAndUnits.find(item => item.hours)
+      : stepsAndUnits;
     // calculation unit's length is always - 1;
     const hours = serviceStep.hours;
     const size = serviceStep.size || null;
@@ -381,7 +514,7 @@ async function getStepsForMonoUnits (stepsInfo, common = false) {
       payables: 0,
       vendor: null,
       vendorRate: 0,
-      clientRate: 0,
+      clientRate: 0
     };
     steps.push({
       ...rest,
@@ -396,7 +529,10 @@ async function getStepsForMonoUnits (stepsInfo, common = false) {
       hours,
       size,
       finance: {
-        Price: { receivables: financeData.receivables, payables: financeData.payables },
+        Price: {
+          receivables: financeData.receivables,
+          payables: financeData.payables
+        },
         Wordcount: { receivables: "", payables: "" }
       },
       progress: 0,
@@ -408,110 +544,80 @@ async function getStepsForMonoUnits (stepsInfo, common = false) {
   return steps;
 }
 
-async function getStepsForDuoUnits (stepsInfo, key) {
-  const { tasks, stepsAndUnits, stepsDates } = stepsInfo;
-  let counter = 1;
-  const steps = [];
-  for (let i = 0; i < tasks.length; i++) {
-    const task = tasks[i];
-    const stepsIdCounter = i + 1 < 10 ? `S0${i + 1}` : `S${i + 1}`;
-    const stepId = `${task.taskId} ${stepsIdCounter}`;
-    const firstServiceStep = task.stepsAndUnits[0];
-    const secondServiceStep = task.stepsAndUnits[1];
-    const firstStepData = stepsAndUnits[0];
-    const secondStepData = stepsAndUnits[1];
-    // const firstFinanceData = await getHoursStepFinanceData({
-    //   task, serviceStep: firstServiceStep, project: stepsInfo.project,
-    //   multiplier: firstStepData.hours * firstStepData.quantity
-    // });
-    // const secondFinanceData = await getHoursStepFinanceData({
-    //   task, serviceStep: secondServiceStep, project: stepsInfo.project,
-    //   multiplier: secondStepData.hours * secondStepData.quantity
-    // });
-    // TEMPORARY HARDCODE:
-    const financeData = {
-      receivables: 0,
-      payables: 0,
-      vendor: null,
-      vendorRate: 0,
-      clientRate: 0,
-    };
-    steps.push(
-      {
-        ...task,
-        stepId,
-        serviceStep: firstServiceStep,
-        name: firstServiceStep.step,
-        start: stepsDates[0].start,
-        deadline: stepsDates[0].deadline,
-        [Object.keys(firstStepData).includes(key) ? key : 'hours']: key === 'quantity' && !!firstStepData.quantity
-          ? firstStepData.quantity : firstStepData.hours,
-        size: firstServiceStep.size || null,
-        vendor: financeData.vendor || null,
-        vendorRate: financeData.vendorRate,
-        clientRate: financeData.clientRate,
-        finance: {
-          Price: { receivables: financeData.receivables, payables: financeData.payables },
-          Wordcount: { receivables: "", payables: "" }
-        },
-        progress: 0,
-        check: false,
-        vendorsClickedOffer: [],
-        isVendorRead: false,
-      },
-      {
-        ...task,
-        stepId: stepId + '.1',
-        serviceStep: secondServiceStep,
-        name: secondServiceStep.step,
-        start: stepsDates[1].start,
-        deadline: stepsDates[1].deadline,
-        [Object.keys(secondStepData).includes(key) ? key : 'hours']: key === 'quantity' && !!secondStepData.quantity
-          ? secondStepData.quantity : secondStepData.hours,
-        size: secondStepData.size || null,
-        vendor: financeData.vendor || null,
-        vendorRate: financeData.vendorRate,
-        clientRate: financeData.clientRate,
-        finance: {
-          Price: { receivables: financeData.receivables, payables: financeData.payables },
-          Wordcount: { receivables: "", payables: "" }
-        },
-        progress: 0,
-        check: false,
-        vendorsClickedOffer: [],
-        isVendorRead: false,
-      }
-    );
-    counter++;
-  }
-  return steps;
-}
-
 /// Creating tasks for wordcount unit services end ///
 
 /// Creating tasks for packages unit services start ///
 
-async function createTasksWithPackagesUnit (allInfo) {
-  const { project, service, targets, packageSize, stepsAndUnits, stepsDates } = allInfo;
+async function createTasksWithPackagesUnit(allInfo) {
+  const {
+    project,
+    service,
+    targets,
+    packageSize,
+    stepsAndUnits,
+    stepsDates
+  } = allInfo;
   try {
-    const { vendor, vendorRate, clientRate, payables, receivables } = await getFinanceDataForPackages({
-      project, service, packageSize, target: targets[0]
+    const {
+      vendor,
+      vendorRate,
+      clientRate,
+      payables,
+      receivables
+    } = await getFinanceDataForPackages({
+      project,
+      service,
+      packageSize,
+      target: targets[0]
     });
-    const finance = { Wordcount: { receivables: "", payables: "" }, Price: { receivables, payables } };
-    const tasks = getTasksForPackages({ ...allInfo, projectId: project.projectId, finance });
-    const steps = stepsAndUnits.length === 2 ?
-      getStepsForDuoStepPackages({ tasks, vendor, vendorRate, clientRate, stepsDates, stepsAndUnits })
-      : getStepsForMonoStepPackages({ tasks, vendor, vendorRate, clientRate, stepsDates });
+    const finance = {
+      Wordcount: { receivables: "", payables: "" },
+      Price: { receivables, payables }
+    };
+    const tasks = getTasksForPackages({
+      ...allInfo,
+      projectId: project.projectId,
+      finance
+    });
+    const steps =
+      stepsAndUnits.length === 2
+        ? getStepsForDuoStepPackages({
+            tasks,
+            vendor,
+            vendorRate,
+            clientRate,
+            stepsDates,
+            stepsAndUnits
+          })
+        : getStepsForMonoStepPackages({
+            tasks,
+            vendor,
+            vendorRate,
+            clientRate,
+            stepsDates
+          });
     const projectFinance = getProjectFinance(tasks, project.finance);
-    return updateProject({ "_id": project.id }, { finance: projectFinance, $push: { tasks: tasks, steps: steps } });
-  } catch(err) {
+    return updateProject(
+      { _id: project.id },
+      { finance: projectFinance, $push: { tasks: tasks, steps: steps } }
+    );
+  } catch (err) {
     console.log(err);
     console.log("Error in createTasksWithPackagesUnit");
   }
 }
 
-function getTasksForPackages (tasksInfo, common = false) {
-  const { stepsAndUnits, projectId, service, targets, source, stepsDates, taskRefFiles, finance } = tasksInfo;
+function getTasksForPackages(tasksInfo, common = false) {
+  const {
+    stepsAndUnits,
+    projectId,
+    service,
+    targets,
+    source,
+    stepsDates,
+    taskRefFiles,
+    finance
+  } = tasksInfo;
   let tasks = [];
   let tasksLength = tasksInfo.project.tasks.length + 1;
   for (let i = 0; i < targets.length; i++) {
@@ -523,22 +629,30 @@ function getTasksForPackages (tasksInfo, common = false) {
       targetLanguage: targets[i].symbol,
       refFiles: taskRefFiles,
       service: {
-        ...service,
+        ...service
       },
-      stepsAndUnits: stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
+      stepsAndUnits:
+        stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
       languageForm: service.languageForm,
       projectId,
       start: common ? stepsDates[0].start : stepsDates[0].start,
       deadline: stepsDates[stepsDates.length - 1].deadline,
       finance,
-      status: 'Created'
+      status: "Created"
     });
     tasksLength++;
   }
   return tasks;
 }
 
-function getStepsForDuoStepPackages ({ tasks, vendor, vendorRate, clientRate, stepsDates, stepsAndUnits }) {
+function getStepsForDuoStepPackages({
+  tasks,
+  vendor,
+  vendorRate,
+  clientRate,
+  stepsDates,
+  stepsAndUnits
+}) {
   let counter = 1;
   const steps = [];
   for (let i = 0; i < stepsAndUnits.length; i++) {
@@ -546,34 +660,41 @@ function getStepsForDuoStepPackages ({ tasks, vendor, vendorRate, clientRate, st
     const { stepsAndUnits, ...rest } = task;
     const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
     const stepId = `${task.taskId} ${stepsIdCounter}`;
-    steps.push(
-      {
-        ...rest,
-        stepId,
-        serviceStep: stepsAndUnits[i],
-        name: stepsAndUnits[i].step,
-        size: stepsAndUnits[i].size,
-        quantity: stepsAndUnits[i].quantity,
-        start: stepsDates[i].start,
-        deadline: stepsDates[i].deadline,
-        vendor,
-        progress: 0,
-        clientRate,
-        vendorRate,
-        check: false,
-        vendorsClickedOffer: [],
-        isVendorRead: false,
-      });
+    steps.push({
+      ...rest,
+      stepId,
+      serviceStep: stepsAndUnits[i],
+      name: stepsAndUnits[i].step,
+      size: stepsAndUnits[i].size,
+      quantity: stepsAndUnits[i].quantity,
+      start: stepsDates[i].start,
+      deadline: stepsDates[i].deadline,
+      vendor,
+      progress: 0,
+      clientRate,
+      vendorRate,
+      check: false,
+      vendorsClickedOffer: [],
+      isVendorRead: false
+    });
     counter++;
   }
   return steps;
 }
 
-function getStepsForMonoStepPackages ({ tasks, vendor, vendorRate, clientRate, stepsDates }, common = false) {
+function getStepsForMonoStepPackages(
+  { tasks, vendor, vendorRate, clientRate, stepsDates },
+  common = false
+) {
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
-    const { stepsAndUnits, ...rest } = tasks[i];
-    const serviceStep = Array.isArray(stepsAndUnits) ? stepsAndUnits.find(item => item.unit === 'Packages') : stepsAndUnits;
+    let { stepsAndUnits, ...rest } = tasks[i];
+    const isObject = typeof stepsAndUnits === "object";
+    const isArray = Array.isArray(stepsAndUnits);
+    if (!isArray && !isObject) stepsAndUnits = JSON.parse(stepsAndUnits);
+    const serviceStep = isArray
+      ? stepsAndUnits.find(item => item.unit === "Packages")
+      : stepsAndUnits;
     const size = serviceStep.size;
     const quantity = serviceStep.quantity;
     steps.push({
@@ -591,7 +712,7 @@ function getStepsForMonoStepPackages ({ tasks, vendor, vendorRate, clientRate, s
       vendorRate,
       check: false,
       vendorsClickedOffer: [],
-      isVendorRead: false,
+      isVendorRead: false
     });
   }
   return steps;
@@ -599,24 +720,35 @@ function getStepsForMonoStepPackages ({ tasks, vendor, vendorRate, clientRate, s
 
 /// Creating tasks for packages unit services end ///
 
-function createProjectFolder (projectId) {
+function createProjectFolder(projectId) {
   return new Promise((resolve, reject) => {
-    fs.mkdir(`./dist/projectFiles/${projectId}`, (err) => {
+    fs.mkdir(`./dist/projectFiles/${projectId}`, err => {
       if (err) reject(err);
-      resolve('ok');
+      resolve("ok");
     });
   });
 }
 
-function getProjectFinance (tasks, projectFinance) {
+function getProjectFinance(tasks, projectFinance) {
   const currentReceivables = projectFinance.Price.receivables || 0;
   const currentPayables = projectFinance.Price.payables || 0;
-  const receivables = +(tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0) + +currentReceivables).toFixed(2);
-  const payables = +(tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) + +currentPayables).toFixed(2);
+  const receivables = +(
+    tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0) +
+    +currentReceivables
+  ).toFixed(2);
+  const payables = +(
+    tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) +
+    +currentPayables
+  ).toFixed(2);
   return {
     Price: { receivables, payables },
     Wordcount: { ...projectFinance.Wordcount }
   };
 }
 
-module.exports = { createProject, createTasks, createTasksFromRequest, createTaskWithCommonUnits };
+module.exports = {
+  createProject,
+  createTasks,
+  createTasksFromRequest,
+  createTaskWithCommonUnits
+};

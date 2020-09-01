@@ -2,7 +2,7 @@ const { getProject, updateProject } = require('./getProjects');
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
 const { getProjectAnalysis } = require('../services/memoqs/projects');
 
-async function updateProjectMetrics({ projectId }) {
+async function updateProjectMetrics ({ projectId }) {
   try {
     const project = await getProject({ "_id": projectId });
     let { steps, tasks } = project;
@@ -27,17 +27,17 @@ async function updateProjectMetrics({ projectId }) {
     const stepUnits = JSON.parse(lastTask.stepsAndUnits);
     isWordFirst = stepUnits[0].unit === 'CAT Wordcount' && stepUnits[1].unit !== 'CAT Wordcount';
     let lastSteps = [];
-    if(isWordFirst)
-      for (let i = 0; i < 2 ; i++) lastSteps.push(steps.pop())
-      steps.push(...lastSteps);
+    if (isWordFirst)
+      for (let i = 0; i < 2; i++) lastSteps.push(steps.pop())
+    steps.push(...lastSteps);
     return await updateProject({ "_id": projectId }, { tasks, steps, isMetricsExist });
-  } catch (err) {
+  } catch(err) {
     console.log(err);
     console.log("Error in updateProjectMetrics");
   }
 }
 
-function getTaskMetrics({ task, matrix, analysis }) {
+function getTaskMetrics ({ task, matrix, analysis }) {
   let targetMetrics = analysis.AnalysisResultForLang;
   if (Array.isArray(analysis.AnalysisResultForLang)) {
     targetMetrics = analysis.AnalysisResultForLang.find(item => item.TargetLangCode === task.memoqTarget);
@@ -50,7 +50,7 @@ function getTaskMetrics({ task, matrix, analysis }) {
   return { ...taskMetrics, totalWords: metrics.All };
 }
 
-function getFilledMemoqMetrics(metrics) {
+function getFilledMemoqMetrics (metrics) {
   return {
     xTranslated: { text: "X translated", value: +metrics.XTranslated },
     repeat: { text: "Repetition", value: +metrics.Repetition },
@@ -64,7 +64,7 @@ function getFilledMemoqMetrics(metrics) {
   };
 }
 
-async function getProjectWithUpdatedFinance(project) {
+async function getProjectWithUpdatedFinance (project) {
   let projectToUpdate = { ...project._doc, id: project.id };
   let { tasks, steps } = projectToUpdate;
   try {
@@ -83,13 +83,13 @@ async function getProjectWithUpdatedFinance(project) {
     }
     // steps = steps.reverse()
     return { ...projectToUpdate, tasks, steps };
-  } catch (err) {
+  } catch(err) {
     console.log(err);
     console.log("Error in getProjectWithUpdatedFinance");
   }
 }
 
-function getTaskSteps(steps, task) {
+function getTaskSteps (steps, task) {
   const serviceSteps = task.service.steps.reduce((acc, cur) => {
     return { ...acc, [cur.stage]: cur.step };
   }, {});
@@ -100,12 +100,10 @@ function getTaskSteps(steps, task) {
     if (!existedStep) {
       let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
       const serviceStep = { ...serviceSteps[`stage${i + 1}`], memoqAssignmentRole: i };
-      // const stepUnit = JSON.parse(task.service.calculationUnit);
       updatedSteps.push({
         stepId: `${task.taskId} ${stepsIdCounter}`,
         taskId: task.taskId,
         serviceStep,
-        // stepUnit: stepUnit[i],
         name: serviceStep.title,
         sourceLanguage: task.sourceLanguage,
         targetLanguage: task.targetLanguage,
@@ -141,20 +139,20 @@ function getTaskSteps(steps, task) {
   return updatedSteps;
 }
 
-function getStepDeadline(task, i) {
+function getStepDeadline (task, i) {
   if (task.stepsDates.length > 1) {
     return task.stepsDates[i].deadline || task.deadline;
   }
   return task.deadline;
 }
 
-function getStepWordcount(taskMetrics, stage) {
+function getStepWordcount (taskMetrics, stage) {
   const receivables = stage === 'stage1' ? calculateTranslationWords(taskMetrics) : taskMetrics.totalWords;
   const payables = stage === 'stage1' ? 0 : taskMetrics.totalWords;
   return { receivables, payables };
 }
 
-function calculateWords(task) {
+function calculateWords (task) {
   const { metrics, stepsDates } = task;
   let receivables = calculateTranslationWords(metrics);
   receivables = stepsDates.length > 1 ? receivables + metrics.totalWords : receivables;
@@ -162,14 +160,14 @@ function calculateWords(task) {
   return { receivables, payables };
 }
 
-function calculateTranslationWords(metrics) {
+function calculateTranslationWords (metrics) {
   return Math.round(Object.keys(metrics).filter(item => item !== "totalWords")
     .reduce((prev, cur) => {
       return prev + metrics[cur].value * metrics[cur].client;
     }, 0));
 }
 
-function setStepsProgress(symbol, docs) {
+function setStepsProgress (symbol, docs) {
   const prop = symbol === 'translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount';
   const totalProgress = docs.reduce((acc, cur) => {
     acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop];
