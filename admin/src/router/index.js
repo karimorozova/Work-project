@@ -59,6 +59,8 @@ import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
 import VendorsCandidatesTests from '@/components/vendors/VendorsCandidatesTests'
 import Xtrf from '@/components/reports/Xtrf'
+import OverallView from '@/components/dashboard/OverallView'
+import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import { store } from '../vuex/store'
 
 Vue.use(Router)
@@ -89,7 +91,7 @@ const router = new Router({
         {
             path: '/',
             name: 'main',
-            redirect: '/dashboard',
+            redirect: '/dashboard/overall-view',
             component: Main,
             props: true,
             beforeEnter: (to, from, next) => {
@@ -113,8 +115,21 @@ const router = new Router({
                 },
                 {
                     path: 'dashboard',
-                    name: 'dashboard',
+                    name: '',
                     component: DashboardSettings,
+                    children: [
+                        {
+                            path: 'overall-view',
+                            name: 'overall-view',
+                            component: OverallView,
+                        },
+                        {
+                            path: 'sales-perfomance',
+                            name: 'sales-perfomance',
+                            component: SalesPerformance,
+                        }
+
+                    ]
                 },
                 {
                     path: 'settings',
@@ -160,7 +175,7 @@ const router = new Router({
                         {
                             path: 'discount-chart',
                             name: 'discount-chart',
-                            component: DiscountChart,                            
+                            component: DiscountChart,
                         },
                         {
                             path: 'matrix/:name',
@@ -216,7 +231,7 @@ const router = new Router({
                             name: 'active-vendors',
                             props: true,
                             component: ActiveVendors
-                        }, 
+                        },
                         {
                             path: 'inactive',
                             name: 'inactive-vendors',

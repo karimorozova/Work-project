@@ -500,7 +500,7 @@ async function updateMemoqProjectsData() {
                 const memoqProject = getMemoqProjectData(project, languages);
                 await MemoqProject.updateOne(
                   { serverProjectGuid: project.ServerProjectGuid },
-                  { ...memoqProject, users, documents },
+                  { ...memoqProject, users, documents, projectStatus: project.ProjectStatus },
                   { upsert: true })
             }
         }
@@ -538,17 +538,18 @@ function  getMemoqProjectData(project, languages) {
         return lang;
     })
     return {
-        name: project.Name,
-        creatorUser: project.CreatorUser,
-        client: project.Client,
-        creationTime: new Date(project.CreationTime),
-        deadline: new Date(project.Deadline),
-        serverProjectGuid: project.ServerProjectGuid,
-        domain: typeof project.Domain === 'string' ? project.Domain : "",
-        client: typeof project.Client === 'string' ? project.Client : "",
-        sourceLanguage,
-        targetLanguages,
-        totalWordCount: project.TotalWordCount
+      name: project.Name,
+      creatorUser: project.CreatorUser,
+      client: project.Client,
+      creationTime: new Date(project.CreationTime),
+      deadline: new Date(project.Deadline),
+      serverProjectGuid: project.ServerProjectGuid,
+      domain: typeof project.Domain === 'string' ? project.Domain : "",
+      client: typeof project.Client === 'string' ? project.Client : "",
+      sourceLanguage,
+      targetLanguages,
+      totalWordCount: project.TotalWordCount,
+      projectStatus: project.ProjectStatus
     }
 }
 
