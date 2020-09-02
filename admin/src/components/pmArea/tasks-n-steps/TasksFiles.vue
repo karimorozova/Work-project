@@ -151,7 +151,7 @@ export default {
     &__main {
         display: flex;
         align-items: center;
-        margin-bottom: 50px;
+        margin-bottom: 60px;
         justify-content: space-between;
     }
 
@@ -161,9 +161,8 @@ export default {
     &__tooltip {
         position: absolute;
         bottom: -25px;
-        opacity: 0.7;
+        opacity: 0.5;
         font-size: 14px;
-        text-align: center;
         width: 100%;
     }
 }
