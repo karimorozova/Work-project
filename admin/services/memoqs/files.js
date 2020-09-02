@@ -121,7 +121,6 @@ async function moveMemoqFileToProject(projectId, fileId) {
     };
     try {
       const { response } = await soapRequest({ url, headers, xml, timeout: 480000 });
-      console.log(response)
       if (response.statusCode === 200) {
         return parser.toJson(response.body, { object: true, sanitize: true, trim: true });
       }
