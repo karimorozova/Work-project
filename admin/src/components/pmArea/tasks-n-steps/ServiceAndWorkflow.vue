@@ -242,9 +242,6 @@ export default {
         width: 191px;
         height: 50px;
     }
-    &__menu-title {
-        font-size: 14px;
-    }
     &__default-dates {
         margin: 30px 0;
     }
