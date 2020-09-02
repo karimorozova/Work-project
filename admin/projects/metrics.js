@@ -100,10 +100,11 @@ function getTaskSteps (steps, task) {
     if (!existedStep) {
       let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
       const serviceStep = { ...serviceSteps[`stage${i + 1}`], memoqAssignmentRole: i };
+      const { calculationUnit, ...restStepData } = serviceStep;
       updatedSteps.push({
         stepId: `${task.taskId} ${stepsIdCounter}`,
         taskId: task.taskId,
-        serviceStep,
+        serviceStep: restStepData,
         name: serviceStep.title,
         sourceLanguage: task.sourceLanguage,
         targetLanguage: task.targetLanguage,
