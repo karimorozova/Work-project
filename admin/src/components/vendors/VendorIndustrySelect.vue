@@ -166,7 +166,7 @@ export default {
         border-top: 1px solid #67573E;
         font-size: 14px;
         width: 100%;
-        max-height: 150px;
+        max-height: 186px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;
