@@ -38,6 +38,7 @@
                         :options="serviceData"
                         :selectedOptions="selectedServices"
                         @chooseOptions="setServices"
+                        :allOptionsButtons="true"
                     )
 
             template(slot="sizes" slot-scope="{ row, index }")

@@ -51,6 +51,7 @@
                       :selectedOptions="client.hasOwnProperty('sourceLanguages') ? makeStringLanguage(client.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
                       :options="sourceLanguages | firstEnglishLanguage"
                       @chooseOptions="setSource"
+                      :allOptionsButtons="true"
                     )
             .block-item
                 label.block-item__label.block-item_relative Target Languages:
@@ -62,6 +63,7 @@
                       :selectedOptions="client.hasOwnProperty('targetLanguages') ? makeStringLanguage(client.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
                       :options="targetLanguages"
                       @chooseOptions="setTarget"
+                      :allOptionsButtons="true"
                     )
 </template>
 

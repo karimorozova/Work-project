@@ -33,7 +33,7 @@
             .add-several_width-78
                 .add-several__select-block
                     .add-several__drop-menu
-                        SelectMulti(:options="steps" :selectedOptions="selectedStepsTitles" @chooseOptions="setSteps" placeholder="Select")
+                        SelectMulti(:options="steps" :selectedOptions="selectedStepsTitles" @chooseOptions="setSteps" placeholder="Select" :allOptionsButtons="true")
                 .add-several__select-block
                     span.add-several__title Industries
                     .add-several__drop-menu
