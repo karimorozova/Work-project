@@ -4,6 +4,7 @@ const { getAfterRatesSaved, getAfterRatesImported } = require("./ratesmanage");
 const { getRatePricelist } = require('./getPricelist');
 const { changeMainRatePricelist } = require('./changePricelist');
 const { bindClientRates } = require('./bindRates');
+const { updatePricelistDiscount } = require('./discountTable');
 
 module.exports = {
   getAfterRatesSaved,
@@ -16,5 +17,6 @@ module.exports = {
   getRatePricelist,
   changeMainRatePricelist,
   getClientRates,
-  bindClientRates
+  bindClientRates,
+  updatePricelistDiscount
 };

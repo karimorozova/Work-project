@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
-const { getRatePricelist, changeMainRatePricelist } = require('../rates');
+const { getRatePricelist, changeMainRatePricelist } = require('../pricelist');
 const { updateProject, getProject } = require('../projects');
 const {
   getVendor,

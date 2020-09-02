@@ -21,6 +21,7 @@ const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const { getMemoqUsers } = require("../../services/memoqs/users");
 const { projectCancelledMessage, projectMiddleCancelledMessage, projectDeliveryMessage, tasksMiddleCancelledMessage } = require("../../emailMessages/clientCommunication")
+const { updatePricelistDiscount } = require('../../pricelist');
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -63,6 +64,8 @@ router.post("/new-project", async (req, res) => {
   const client = await Clients.findOne({ "_id": project.customer });
   project.projectManager = client.projectManager._id;
   project.accountManager = client.accountManager._id;
+  const leadContact = client.contacts.find(({ leadContact }) => leadContact === true);
+  project.clientContacts = [leadContact];
   try {
     const result = await createProject(project);
     res.send(result);
@@ -913,6 +916,18 @@ router.post('/contact-email', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(500).send('Error on sending message to client\'s contact');
+  }
+});
+
+router.post('/update-discount/:id', async (req, res) => {
+  const { _id: pricelistId } = req.params;
+  const { updatedRowObj } = req.body;
+  try {
+    const { discountChart } = await updatePricelistDiscount(pricelistId, updatedRowObj);
+    res.send(discountChart);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Error on updating pricelist\'s discount table');
   }
 });
 

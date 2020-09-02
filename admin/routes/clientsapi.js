@@ -19,7 +19,7 @@ const {
   syncClientRatesCost,
   updateClientProjectDate
 } = require('../clients');
-const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../rates');
+const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../pricelist');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');

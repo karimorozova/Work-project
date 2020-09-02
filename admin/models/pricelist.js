@@ -88,6 +88,20 @@ const PricelistSchema = new mongoose.Schema({
       default: false
     }
   }],
+  discountChart: {
+    type: Object,
+    default: {
+      xTranslated: { text: "X translated", rate: 0.1 },
+      repeat: { text: "Repetition", rate: 0.2 },
+      contextMatch: { text: "Context match", rate: 0.2 },
+      repeat100: { text: "100%", rate: 0.2 },
+      repeat50: { text: "50-74%", rate: 1 },
+      repeat75: { text: "75-84%", rate: 0.8 },
+      repeat85: { text: "85-94%", rate: 0.6 },
+      repeat95: { text: "95-99%", rate: 0.25 },
+      noMatch: { text: "No match", rate: 1 }
+    }
+  }
 }, { minimize: false });
 
 const Pricelist = mongoose.model('Pricelist', PricelistSchema);
