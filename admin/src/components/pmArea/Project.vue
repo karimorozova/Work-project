@@ -281,11 +281,8 @@ export default {
                 this.isBilling = false;
             }
         },
-        isNewProjectNow(){
-            return !this.project._id
-        },
         setIsBillingTrue(){
-            this.isBilling = this.isNewProjectNow();
+            this.isBilling = true;
         }
     },
     computed: {
@@ -320,7 +317,7 @@ export default {
         this.getCustomers();
         this.getIndustries();
         this.isbillingDate();
-        this.setIsBillingTrue();
+        !this.project._id && this.setIsBillingTrue();
     }
 }
 </script>
