@@ -62,7 +62,7 @@ const ProjectsSchema = new mongoose.Schema({
     deadline: {},
     progress: "",
     status: "",
-    clientRate: "",
+    clientRate: {},
     clientDiscount: "",
     targetFile: "",
     finance: {

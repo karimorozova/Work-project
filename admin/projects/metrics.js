@@ -153,20 +153,20 @@ async function getTaskSteps(steps, task) {
   return updatedSteps;
 }
 
-function getStepDeadline (task, i) {
-  if (task.stepsDates.length > 1) {
-    return task.stepsDates[i].deadline || task.deadline;
-  }
-  return task.deadline;
-}
+// function getStepDeadline (task, i) {
+//   if (task.stepsDates.length > 1) {
+//     return task.stepsDates[i].deadline || task.deadline;
+//   }
+//   return task.deadline;
+// }
 
-function getStepWordcount (taskMetrics, stage) {
+function getStepWordcount(taskMetrics, stage) {
   const receivables = stage === 'stage1' ? calculateTranslationWords(taskMetrics) : taskMetrics.totalWords;
   const payables = stage === 'stage1' ? 0 : taskMetrics.totalWords;
   return { receivables, payables };
 }
 
-function calculateWords (task) {
+function calculateWords(task) {
   const { metrics, stepsDates } = task;
   let receivables = calculateTranslationWords(metrics);
   receivables = stepsDates.length > 1 ? receivables + metrics.totalWords : receivables;
@@ -203,7 +203,7 @@ const setProjectFinanceData = async (projectData) => {
   const currencyRatio = await CurrencyRatio.findOne();
   const { rates, defaultPricelist, currency } = client;
   const pricelist = await Pricelist.findOne({ _id: defaultPricelist });
-  for (let { serviceStep, finance, sourceLanguage, targetLanguage, ...rest } of steps) {
+  for (let [index, { serviceStep, finance, sourceLanguage, targetLanguage, clientRate, ...rest }] of steps.entries()) {
     const { taskId } = rest;
     let { metrics } = tasks.find(item => item.taskId === taskId);
     sourceLanguage = await Languages.findOne({ symbol: sourceLanguage });
@@ -224,16 +224,19 @@ const setProjectFinanceData = async (projectData) => {
     }
     finance.rate = row;
     if (rest.memoqProjectId) {
-      step.clientRate = {
+      steps[index].clientRate = {
         value: row,
         min: 0,
         active: true,
-      }
+      };
       finance.Wordcount.receivables = getRelativeQuantity(metrics);
+      // finance['Quantity(relative)'] = getRelativeQuantity(metrics);
       finance.Wordcount.payables = rest.totalWords;
-      finance.subtotal = finance.rate * finance['Quantity(relative)'];
+      // finance['Quantity(total)'] = rest.totalWords;
+      finance.subtotal = finance.rate * finance.Wordcount.receivables;
     }
   }
+  console.log(steps);
   return steps;
 }
 
