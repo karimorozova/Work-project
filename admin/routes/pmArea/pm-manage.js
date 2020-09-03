@@ -920,10 +920,10 @@ router.post('/contact-email', async (req, res) => {
 });
 
 router.post('/update-discount/:id', async (req, res) => {
-  const { _id: pricelistId } = req.params;
+  const { id } = req.params;
   const { updatedRowObj } = req.body;
   try {
-    const { discountChart } = await updatePricelistDiscount(pricelistId, updatedRowObj);
+    const { discountChart } = await updatePricelistDiscount(id, updatedRowObj);
     res.send(discountChart);
   } catch(err) {
     console.log(err);
