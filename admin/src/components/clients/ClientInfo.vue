@@ -19,7 +19,7 @@
       .client-info__contacts-info(v-if="currentClient._id")
           ContactsInfo(
               :client="currentClient"
-              @contactDetails="contactDetails" 
+              @contactDetails="contactDetails"
               @saveContactUpdates="saveContactUpdates"
               @setLeadContact="setLeadContact"
               @newContact="addNewContact"
@@ -74,6 +74,10 @@
 
           )
 
+      .title Discount Chart
+      .client-info__chart(v-if="currentClient._id")
+          FinanceMatrix(:entity="currentClient", @setMatrixData="setMatrixData")
+
       .title(v-if="currentClient._id") Documents
       .client-info__documents(v-if="currentClient._id")
           ClientDocuments
@@ -100,7 +104,7 @@
       OtherClientInformation(
 
       )
-    
+
 </template>
 
 <script>
@@ -120,22 +124,23 @@ import IndustryTable from "./pricelists/IndustryTable";
 import StepTable from "./pricelists/StepTable";
 import LangTable from "./pricelists/LangTable";
 import ResultTable from "./pricelists/ResultTable";
+import FinanceMatrix from "../FinanceMatrix";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
     contactsPhotos: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     contractFiles: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     ndaFiles: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -159,17 +164,42 @@ export default {
       isLeadEmpty: "",
       isSaveClicked: false,
       isRefreshResultTable: false,
-      isRefreshAfterServiceUpdate: false
+      isRefreshAfterServiceUpdate: false,
     };
   },
   methods: {
+    async setMatrixData({ value, key }) {
+      try {
+        const result = await this.$http.post(
+          `/clientsapi/update-matrix/${this.currentClient._id}`,
+          {
+            updatedRowObj: {
+              value,
+              key,
+            },
+          }
+        );
+        this.currentClient.matrix = result.data;
+        this.alertToggle({
+          message: "Matrix data updated",
+          isShow: true,
+          type: "success",
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on setting matrix data",
+          isShow: true,
+          type: "error",
+        });
+      }
+    },
     refreshResultTable() {
       this.isRefreshResultTable = true;
       setTimeout(() => {
         this.isRefreshResultTable = false;
       }, 2000);
     },
-    updateRates(action){
+    updateRates(action) {
       this.isRefreshAfterServiceUpdate = action;
       setTimeout(() => {
         this.isRefreshAfterServiceUpdate = !action;
@@ -196,7 +226,7 @@ export default {
       this.isApproveModal = true;
     },
     contactLeadError() {
-      return this.currentClient.contacts.find(item => item.leadContact);
+      return this.currentClient.contacts.find((item) => item.leadContact);
     },
     async approveContactDelete({ index }) {
       this.clientShow = true;
@@ -206,13 +236,13 @@ export default {
           return this.alertToggle({
             message: "Error! At least one contact should remain!",
             isShow: true,
-            type: "error"
+            type: "error",
           });
         }
         const contacts = this.updateLeadWhenDeleted(index);
         const result = await this.$http.post("/clientsapi/deleteContact", {
           id: this.currentClient._id,
-          contacts
+          contacts,
         });
         const { updatedClient } = result.body;
         await this.storeClient(updatedClient);
@@ -220,13 +250,13 @@ export default {
         this.alertToggle({
           message: "Contact has been deleted",
           isShow: true,
-          type: "success"
+          type: "success",
         });
       } catch (err) {
         this.alertToggle({
           message: "Internal server error on deleting contact",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -234,7 +264,7 @@ export default {
       let contacts = this.currentClient.contacts.filter(
         (item, ind) => ind !== index
       );
-      const leadContact = contacts.find(item => item.leadContact);
+      const leadContact = contacts.find((item) => item.leadContact);
       if (!leadContact) {
         contacts[0].leadContact = true;
       }
@@ -288,13 +318,19 @@ export default {
         !this.currentClient.email ||
         !emailValidRegex.test(this.currentClient.email.toLowerCase())
       ) {
-        this.errors.push("Please provide a valid email in General Informations.");
+        this.errors.push(
+          "Please provide a valid email in General Informations."
+        );
       }
       if (
         !this.currentClient.billingInfo.email ||
-        !emailValidRegex.test(this.currentClient.billingInfo.email.toLowerCase())
+        !emailValidRegex.test(
+          this.currentClient.billingInfo.email.toLowerCase()
+        )
       ) {
-        this.errors.push("Please provide a valid email in Billing Informations.");
+        this.errors.push(
+          "Please provide a valid email in Billing Informations."
+        );
         this.billErrors.push("email");
       }
       if (
@@ -313,8 +349,9 @@ export default {
     async updateClient() {
       let sendData = new FormData();
       let dataForClient = this.currentClient;
-      this.getClientDocumentInfo().then((result) => 
-        (dataForClient.documents = result.data.documents));
+      this.getClientDocumentInfo().then(
+        (result) => (dataForClient.documents = result.data.documents)
+      );
 
       sendData.append("client", JSON.stringify(dataForClient));
       for (let i = 0; i < this.contactsPhotos.length; i++) {
@@ -325,20 +362,20 @@ export default {
           "/clientsapi/update-client",
           sendData
         );
-        console.log('res body', result.body);
+        console.log("res body", result.body);
         const { client } = result.body;
         await this.storeClient(client);
         await this.storeCurrentClient(client);
         this.alertToggle({
           message: "Client info has been updated",
           isShow: true,
-          type: "success"
+          type: "success",
         });
       } catch (err) {
         this.alertToggle({
           message: "Internal server error on updating Client info",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -353,7 +390,7 @@ export default {
           return this.alertToggle({
             message: "The client has related documents and cannot be deleted",
             isShow: true,
-            type: "error"
+            type: "error",
           });
         }
         const result = await this.$http.delete(
@@ -363,22 +400,24 @@ export default {
         this.alertToggle({
           message: "Client has been removed",
           isShow: true,
-          type: "success"
+          type: "success",
         });
         this.$router.push("/clients");
       } catch (err) {
         this.alertToggle({
           message: "Internal server error on deleting the Client",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
     setLeadContact({ index }) {
       this.updateLeadContact(index);
     },
-    async getClientDocumentInfo(){
-      return await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);
+    async getClientDocumentInfo() {
+      return await this.$http.get(
+        `/clientsapi/client?id=${this.$route.params.id}`
+      );
     },
     async getClientInfo() {
       if (!this.currentClient._id) {
@@ -398,7 +437,7 @@ export default {
       updateClientContact: "updateClientContact",
       updateLeadContact: "updateLeadContact",
       deleteClientContact: "deleteClientContact",
-      storeClientBillingInfoProperty: 'storeClientBillingInfoProperty'
+      storeClientBillingInfoProperty: "storeClientBillingInfoProperty",
     }),
     async getLangs() {
       try {
@@ -408,7 +447,7 @@ export default {
         this.alertToggle({
           message: "Error in Languages",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -420,7 +459,7 @@ export default {
         this.alertToggle({
           message: "Error in Industries",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -432,7 +471,7 @@ export default {
         this.alertToggle({
           message: "Error in Services",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -444,7 +483,7 @@ export default {
         this.alertToggle({
           message: "Error in Units",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -456,7 +495,7 @@ export default {
         this.alertToggle({
           message: "Error in Steps",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -468,18 +507,19 @@ export default {
         this.alertToggle({
           message: "Error in Timezones",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
-    }
+    },
   },
   computed: {
     ...mapGetters({
       allClients: "getClients",
-      currentClient: "getCurrentClient"
-    })
+      currentClient: "getCurrentClient",
+    }),
   },
   components: {
+    FinanceMatrix,
     ClientServices,
     General,
     OldGeneral,
@@ -495,7 +535,7 @@ export default {
     SideGeneral,
     ClientDocuments,
     OtherClientInformation,
-    RatesParameters
+    RatesParameters,
   },
   created() {
     this.getClientInfo();
@@ -507,10 +547,10 @@ export default {
     this.getTimezones();
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
+    next((vm) => {
       vm.fromRoute = from.path;
     });
-  }
+  },
 };
 </script>
 
@@ -543,6 +583,7 @@ export default {
   &__rates,
   &__sales,
   &__documents,
+  &__chart,
   &__billing {
     margin: 20px 10px 40px 10px;
     padding: 40px;

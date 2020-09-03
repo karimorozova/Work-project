@@ -155,7 +155,7 @@ export default {
         border: none;
         background-color: transparent;
         &::-webkit-inner-spin-button,
-        &::-webkit-outer-spin-button, {
+        &::-webkit-outer-spin-button{
             -webkit-appearance: none;
             margin: 0;
         }
