@@ -1,13 +1,11 @@
-const { Projects, Clients, Pricelist, Languages, Step, Units, CurrencyRatio } = require("../models");
+const { Projects, Languages, Step, Units } = require("../models");
 const { getProject, updateProject } = require("./getProjects");
 const { storeFiles } = require("./files");
 const { getFinanceDataForPackages } = require("../сalculations/packages");
 const { getHoursStepFinanceData } = require("../сalculations/hours");
 const { updateProjectMetrics } = require("../projects/metrics");
-const { multiplyPrices } = require('../multipliers');
 const moment = require("moment");
 const fs = require("fs");
-const ObjectId = require('mongodb').ObjectID;
 
 async function createProject(project) {
   let todayStart = new Date();
@@ -25,7 +23,6 @@ async function createProject(project) {
     project.status = project.status || "Draft";
     project.projectId =
       moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
-    // project = await getProjectFinanceData(project);
     const createdProject = await Projects.create({
       ...project,
       startDate: new Date()
@@ -35,35 +32,6 @@ async function createProject(project) {
   } catch (err) {
     console.log(err);
     console.log("Error in createProject");
-  }
-}
-
-const getProjectFinanceData = async (project) => {
-  const { customer, steps, industry } = project;
-  const client = await Clients.findOne({ _id: customer });
-  const currencyRatio = await CurrencyRatio.findOne();
-  const { rates, defaultPricelist, currency } = client;
-  const pricelist = await Pricelist.findOne({ _id: defaultPricelist });
-  for (let { serviceStep, finance, sourceLanguage, targetLanguage, ...rest } of steps) {
-    const { step, unit, size } = serviceStep;
-    const dataForComparison = {
-      sourceLanguage,
-      targetLanguage,
-      step,
-      unit,
-      size,
-      industry,
-      currency
-    }
-    let row = getPriceFromClientRates(rates.pricelistTable, dataForComparison);
-    if (!row) {
-      row = getPriceFromPricelist(pricelist, dataForComparison, currencyRatio);
-    }
-    finance.rate = row;
-    if (rest.memoqProjectId) {
-      // finance['Quantity(relative)'] = request for matrix
-      finance['Quantity(total)'] = rest.totalWords;
-    }
   }
 }
 
@@ -675,47 +643,9 @@ const gatherServiceStepInfo = async (serviceStep) => ({
   ...serviceStep
 })
 
-const getPriceFromClientRates = (pricelistTable, data) => {
-  const { sourceLanguage, targetLanguage, step, unit, size } = data;
-  return pricelistTable.find(row => (
-    row.sourceLanguage.toString() === sourceLanguage.toString() &&
-    row.targetLanguage.toString() === targetLanguage.toString() &&
-    row.step.toString() === step.toString() &&
-    row.unit.toString() === unit.toString() &&
-    row.size.toString === size.toString()
-  ));
-}
-
-const getPriceFromPricelist = (pricelist, data, currencyRatio) => {
-  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = pricelist;
-  const { sourceLanguage, targetLanguage, step, unit, size, industry, currency } = data;
-  let row = basicPricesTable.find(langPair => (
-    `${langPair.sourceLanguage} ${langPair.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
-  ));
-  if (!row) row = {
-    euroBasicPrice: 1,
-    usdBasicPrice: currencyRatio.USD,
-    gbpBasicPrice: currencyRatio.GBP
-  };
-  const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => (
-    `${item.step} ${item.unit} ${item.size}` === `${step} ${unit} ${size}`
-  ));
-  const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => (
-    item.industry.toString() === industry.toString()
-  ));
-  const basicPrice = getCorrectBasicPrice(row, currency);
-  return multiplyPrices(basicPrice, stepMultiplier, industryMultiplier);
-}
-
-const getCorrectBasicPrice = (basicPriceRow, currency) => {
-  if (currency === 'USD') return basicPriceRow.usdBasicPrice;
-  else if (currency === 'EUR') return basicPriceRow.euroBasicPrice;
-  else return basicPriceRow.gbpBasicPrice;
-}
-
 module.exports = {
   createProject,
   createTasks,
   createTasksFromRequest,
-  createTaskWithCommonUnits
+  createTaskWithCommonUnits,
 };

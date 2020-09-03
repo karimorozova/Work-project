@@ -5,7 +5,7 @@
       ServiceAndWorkflow
     .tasks-data__item
       .tasks-data__item-title File Preparation
-      .tasks-data__langs
+      .tasks-data__langs(v-if="originallyLanguages !== null")
         TasksLangs(v-if="isMonoService", :originallyLanguages="originallyLanguages")
         TasksLangsDuo(
           v-if="!isMonoService",
@@ -36,7 +36,7 @@
           v-for="(step, index) in sortedJobs",
           :currentJob="step",
           :currentIndex="index"
-        ) 
+        )
 
   .tasks-data__add-tasks(v-if="isProject && isButton")
     Button(value="Add tasks", @clicked="checkForErrors")

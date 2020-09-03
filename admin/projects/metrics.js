@@ -1,11 +1,14 @@
 const { getProject, updateProject } = require('./getProjects');
+const { CurrencyRatio, Clients, Pricelist, Step, Units, Languages } = require('../models');
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
 const { getProjectAnalysis } = require('../services/memoqs/projects');
+const { multiplyPrices } = require('../multipliers');
 
-async function updateProjectMetrics ({ projectId }) {
+
+async function updateProjectMetrics({ projectId }) {
   try {
     const project = await getProject({ "_id": projectId });
-    let { steps, tasks } = project;
+    let { steps, tasks, customer, industry } = project;
     let isMetricsExist = true;
     for (let task of tasks) {
       const stepUnits = JSON.parse(task.stepsAndUnits);
@@ -16,7 +19,7 @@ async function updateProjectMetrics ({ projectId }) {
           const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
           task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
           task.finance.Wordcount = calculateWords(task);
-          steps = getTaskSteps(steps, task);
+          steps = await getTaskSteps(steps, task);
         } else {
           isMetricsExist = false;
         }
@@ -30,6 +33,7 @@ async function updateProjectMetrics ({ projectId }) {
     if (isWordFirst)
       for (let i = 0; i < 2; i++) lastSteps.push(steps.pop())
     steps.push(...lastSteps);
+    steps = await setProjectFinanceData({ steps, customer, industry });
     return await updateProject({ "_id": projectId }, { tasks, steps, isMetricsExist });
   } catch(err) {
     console.log(err);
@@ -89,23 +93,32 @@ async function getProjectWithUpdatedFinance (project) {
   }
 }
 
-function getTaskSteps (steps, task) {
+async function getTaskSteps(steps, task) {
   const serviceSteps = task.service.steps.reduce((acc, cur) => {
     return { ...acc, [cur.stage]: cur.step };
   }, {});
   let updatedSteps = JSON.parse(JSON.stringify(steps));
+  const stepsAndUnits = JSON.parse(task.stepsAndUnits);
   let counter = 1;
   for (let i = 0; i < task.stepsDates.length; i++) {
     const existedStep = updatedSteps.find(item => item.taskId === task.taskId && item.name === serviceSteps[`stage${i + 1}`].title);
     if (!existedStep) {
       let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
-      const serviceStep = { ...serviceSteps[`stage${i + 1}`], memoqAssignmentRole: i };
-      const { calculationUnit, ...restStepData } = serviceStep;
+      const { _id: stepId } = await Step.findOne({ title: stepsAndUnits[i].step });
+      const { _id: unitId } = await Units.findOne({ type: stepsAndUnits[i].unit });
+      const serviceStep = {
+        step: stepId,
+        unit: unitId,
+        size: stepsAndUnits[i].size,
+        memoqAssignmentRole: i
+      }
+      // const serviceStep = { ...serviceSteps[`stage${i + 1}`], memoqAssignmentRole: i };
+      // const { calculationUnit, ...restStepData } = serviceStep;
       updatedSteps.push({
         stepId: `${task.taskId} ${stepsIdCounter}`,
         taskId: task.taskId,
-        serviceStep: restStepData,
-        name: serviceStep.title,
+        serviceStep,
+        name: stepsAndUnits[i].step,
         sourceLanguage: task.sourceLanguage,
         targetLanguage: task.targetLanguage,
         memoqProjectId: task.memoqProjectId,
@@ -182,6 +195,76 @@ function setStepsProgress (symbol, docs) {
     };
   }
   return { ...stepProgress, ...totalProgress };
+}
+
+const setProjectFinanceData = async (projectData) => {
+  const { customer, steps, industry } = projectData;
+  const client = await Clients.findOne({ _id: customer });
+  const currencyRatio = await CurrencyRatio.findOne();
+  const { rates, defaultPricelist, currency } = client;
+  const pricelist = await Pricelist.findOne({ _id: defaultPricelist });
+  for (let { serviceStep, finance, sourceLanguage, targetLanguage, ...rest } of steps) {
+    sourceLanguage = await Languages.findOne({ symbol: sourceLanguage });
+    targetLanguage = await Languages.findOne({ symbol: targetLanguage });
+    const { step, unit, size } = serviceStep;
+    const dataForComparison = {
+      sourceLanguage,
+      targetLanguage,
+      step,
+      unit,
+      size: size ? size : 1,
+      industry: industry._id,
+      currency
+    }
+    let row = getPriceFromClientRates(rates.pricelistTable, dataForComparison);
+    if (!row) {
+      row = getPriceFromPricelist(pricelist, dataForComparison, currencyRatio);
+    }
+    finance.rate = row;
+    if (rest.memoqProjectId) {
+      // finance['Quantity(relative)'] = request for matrix
+      finance['Quantity(total)'] = rest.totalWords;
+    }
+  }
+  return steps;
+}
+
+const getPriceFromClientRates = (pricelistTable, data) => {
+  const { sourceLanguage, targetLanguage, step, unit, size } = data;
+  return pricelistTable.find(row => (
+    row.sourceLanguage.toString() === sourceLanguage.toString() &&
+    row.targetLanguage.toString() === targetLanguage.toString() &&
+    row.step.toString() === step.toString() &&
+    row.unit.toString() === unit.toString() &&
+    row.size.toString === size.toString()
+  ));
+}
+
+const getPriceFromPricelist = (pricelist, data, currencyRatio) => {
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = pricelist;
+  const { sourceLanguage, targetLanguage, step, unit, size, industry, currency } = data;
+  let row = basicPricesTable.find(langPair => (
+    `${langPair.sourceLanguage} ${langPair.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
+  ));
+  if (!row) row = {
+    euroBasicPrice: 1,
+    usdBasicPrice: currencyRatio.USD,
+    gbpBasicPrice: currencyRatio.GBP
+  };
+  const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => (
+    `${item.step} ${item.unit} ${item.size}` === `${step} ${unit} ${size}`
+  ));
+  const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => (
+    item.industry.toString() === industry.toString()
+  ));
+  const basicPrice = getCorrectBasicPrice(row, currency);
+  return multiplyPrices(basicPrice, stepMultiplier, industryMultiplier);
+}
+
+const getCorrectBasicPrice = (basicPriceRow, currency) => {
+  if (currency === 'USD') return basicPriceRow.usdBasicPrice;
+  else if (currency === 'EUR') return basicPriceRow.euroBasicPrice;
+  else return basicPriceRow.gbpBasicPrice;
 }
 
 module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance };
