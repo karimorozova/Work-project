@@ -91,15 +91,15 @@ const PricelistSchema = new mongoose.Schema({
   discountChart: {
     type: Object,
     default: {
-      xTranslated: { text: "X translated", rate: 0.1 },
-      repeat: { text: "Repetition", rate: 0.2 },
-      contextMatch: { text: "Context match", rate: 0.2 },
-      repeat100: { text: "100%", rate: 0.2 },
-      repeat50: { text: "50-74%", rate: 1 },
-      repeat75: { text: "75-84%", rate: 0.8 },
-      repeat85: { text: "85-94%", rate: 0.6 },
-      repeat95: { text: "95-99%", rate: 0.25 },
-      noMatch: { text: "No match", rate: 1 }
+      xTranslated: { text: "X translated", rate: 10 },
+      repeat: { text: "Repetition", rate: 20 },
+      contextMatch: { text: "Context match", rate: 20 },
+      repeat100: { text: "100%", rate: 20 },
+      repeat50: { text: "50-74%", rate: 100 },
+      repeat75: { text: "75-84%", rate: 80 },
+      repeat85: { text: "85-94%", rate: 60 },
+      repeat95: { text: "95-99%", rate: 25 },
+      noMatch: { text: "No match", rate: 100 }
     }
   }
 }, { minimize: false });

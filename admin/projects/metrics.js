@@ -33,7 +33,7 @@ async function updateProjectMetrics({ projectId }) {
     if (isWordFirst)
       for (let i = 0; i < 2; i++) lastSteps.push(steps.pop())
     steps.push(...lastSteps);
-    steps = await setProjectFinanceData({ steps, customer, industry });
+    steps = await setProjectFinanceData({ steps, customer, industry, tasks });
     return await updateProject({ "_id": projectId }, { tasks, steps, isMetricsExist });
   } catch(err) {
     console.log(err);
@@ -198,12 +198,14 @@ function setStepsProgress (symbol, docs) {
 }
 
 const setProjectFinanceData = async (projectData) => {
-  const { customer, steps, industry } = projectData;
+  const { customer, steps, industry, tasks } = projectData;
   const client = await Clients.findOne({ _id: customer });
   const currencyRatio = await CurrencyRatio.findOne();
   const { rates, defaultPricelist, currency } = client;
   const pricelist = await Pricelist.findOne({ _id: defaultPricelist });
   for (let { serviceStep, finance, sourceLanguage, targetLanguage, ...rest } of steps) {
+    const { taskId } = rest;
+    let { metrics } = tasks.find(item => item.taskId === taskId);
     sourceLanguage = await Languages.findOne({ symbol: sourceLanguage });
     targetLanguage = await Languages.findOne({ symbol: targetLanguage });
     const { step, unit, size } = serviceStep;
@@ -222,8 +224,14 @@ const setProjectFinanceData = async (projectData) => {
     }
     finance.rate = row;
     if (rest.memoqProjectId) {
-      // finance['Quantity(relative)'] = request for matrix
-      finance['Quantity(total)'] = rest.totalWords;
+      step.clientRate = {
+        value: row,
+        min: 0,
+        active: true,
+      }
+      finance.Wordcount.receivables = getRelativeQuantity(metrics);
+      finance.Wordcount.payables = rest.totalWords;
+      finance.subtotal = finance.rate * finance['Quantity(relative)'];
     }
   }
   return steps;
@@ -265,6 +273,17 @@ const getCorrectBasicPrice = (basicPriceRow, currency) => {
   if (currency === 'USD') return basicPriceRow.usdBasicPrice;
   else if (currency === 'EUR') return basicPriceRow.euroBasicPrice;
   else return basicPriceRow.gbpBasicPrice;
+}
+
+const getRelativeQuantity = (metrics) => {
+  delete metrics.totalWords
+  let counter = 0
+  for (let item in metrics) {
+    if (metrics.hasOwnProperty(item)) {
+      counter += (metrics[item].value * metrics[item].client) / 100
+    }
+  }
+  return counter;
 }
 
 module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance };

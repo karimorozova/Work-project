@@ -312,55 +312,55 @@ const ClientSchema = new mongoose.Schema({
     default: {
       xTranslated: {
         text: "X translated",
-        rate: 0.25,
+        rate: 25,
         altered,
         notification
       },
       repeat: {
         text: "Repetition",
-        rate: 0.3,
+        rate: 30,
         altered,
         notification
       },
       contextMatch: {
         text: "Context match",
-        value: 0.3,
+        value: 30,
         altered,
         notification
       },
       repeat100: {
         text: "100%",
-        rate: 0.3,
+        rate: 30,
         altered,
         notification
       },
       repeat50: {
         text: "50-74%",
-        rate: 1,
+        rate: 100,
         altered,
         notification
       },
       repeat75: {
         text: "75-84%",
-        rate: 0.9,
+        rate: 90,
         altered,
         notification
       },
       repeat85: {
         text: "85-94%",
-        rate: 0.7,
+        rate: 70,
         altered,
         notification
       },
       repeat95: {
         text: "95-99%",
-        rate: 0.4,
+        rate: 40,
         altered,
         notification
       },
       noMatch: {
         text: "No match",
-        rate: 1,
+        rate: 100,
         altered,
         notification
       }
