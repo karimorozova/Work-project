@@ -123,7 +123,7 @@ export default {
 
 .step-files {
     box-shadow: 0 0 5px $brown-shadow;
-    padding: 10px;
+    padding: 20px;
     &__table {
         margin-top: 20px;
     }

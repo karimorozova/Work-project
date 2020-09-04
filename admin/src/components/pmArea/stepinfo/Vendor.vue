@@ -117,7 +117,7 @@ export default {
 
 .step-vendor {
     box-shadow: 0 0 5px $brown-shadow;
-    padding: 10px;
+    padding: 20px;
     &__title {
         margin-bottom: 15px;
         font-size: 18px;
