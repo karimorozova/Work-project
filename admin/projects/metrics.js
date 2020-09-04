@@ -245,7 +245,6 @@ const setProjectFinanceData = async (projectData) => {
       // finance['Quantity(relative)'] = getRelativeQuantity(metrics);
       finance.Wordcount.payables = rest.totalWords;
       // finance['Quantity(total)'] = rest.totalWords;
-      finance.subtotal = finance.rate * finance.Wordcount.receivables;
     }
   }
   return steps;
