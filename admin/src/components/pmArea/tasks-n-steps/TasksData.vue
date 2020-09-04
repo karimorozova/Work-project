@@ -1,51 +1,51 @@
 <template lang="pug">
-.tasks-data
-  .tasks-data__main
-    .tasks-data__item
-      ServiceAndWorkflow
-    .tasks-data__item
-      .tasks-data__item-title File Preparation
-      .tasks-data__langs(v-if="originallyLanguages !== null")
-        TasksLangs(v-if="isMonoService", :originallyLanguages="originallyLanguages")
-        TasksLangsDuo(
-          v-if="!isMonoService",
-          :originallyLanguages="originallyLanguages",
-          :calculationUnit="currentUnit",
-          :sourceLanguages="sourceLanguages",
-          @setSourceLanguage="setSourceLang",
-          @setTargets="setTargets",
-          :isRequest="isRequest"
-        )
-      .tasks-data__files(v-if="currentProject.status !== 'Requested'")
-        TasksFiles(:tasksData="tasksData")
-      .tasks-data__files.tasks-data_m-bottom-40(v-else)
-        TasksFilesRequested
+    .tasks-data
+        .tasks-data__main
+            .tasks-data__item
+                ServiceAndWorkflow
+            .tasks-data__item
+                .tasks-data__item-title File Preparation
+                .tasks-data__langs(v-if="originallyLanguages !== null")
+                    TasksLangs(v-if="isMonoService", :originallyLanguages="originallyLanguages")
+                    TasksLangsDuo(
+                        v-if="!isMonoService",
+                        :originallyLanguages="originallyLanguages",
+                        :calculationUnit="currentUnit",
+                        :sourceLanguages="sourceLanguages",
+                        @setSourceLanguage="setSourceLang",
+                        @setTargets="setTargets",
+                        :isRequest="isRequest"
+                    )
+                .tasks-data__files(v-if="currentProject.status !== 'Requested'")
+                    TasksFiles(:tasksData="tasksData")
+                .tasks-data__files.tasks-data_m-bottom-40(v-else)
+                    TasksFilesRequested
 
-      .tasks-data__service-steps(v-if="countCATWordcount == 2")
-        JobSettings(
-          v-if="tasksData.stepsAndUnits.length",
-          :tasksData="tasksData",
-          v-for="(step, index) in [sortedJobs[0]]",
-          :currentJob="step",
-          :currentIndex="index"
-        )
-      .tasks-data__service-steps(v-else)
-        JobSettings(
-          v-if="tasksData.stepsAndUnits.length",
-          :tasksData="tasksData",
-          v-for="(step, index) in sortedJobs",
-          :currentJob="step",
-          :currentIndex="index"
-        )
+                .tasks-data__service-steps(v-if="countCATWordcount == 2")
+                    JobSettings(
+                        v-if="tasksData.stepsAndUnits.length",
+                        :tasksData="tasksData",
+                        v-for="(step, index) in [sortedJobs[0]]",
+                        :currentJob="step",
+                        :currentIndex="index"
+                    )
+                .tasks-data__service-steps(v-else)
+                    JobSettings(
+                        v-if="tasksData.stepsAndUnits.length",
+                        :tasksData="tasksData",
+                        v-for="(step, index) in sortedJobs",
+                        :currentJob="step",
+                        :currentIndex="index"
+                    )
 
-  .tasks-data__add-tasks(v-if="isProject && isButton")
-    Button(value="Add tasks", @clicked="checkForErrors")
-  .tasks-data__buttons(v-if="isRequest && isButton")
-    .tasks-data__button
-      Button(:value="currentProject.isAssigned ? 'Assign to AM' : 'Assign to PM'", @clicked="assignManager")
-    .tasks-data__button
-      Button(value="Add tasks", @clicked="checkForErrors", :isDisabled="isAddTasksDisabled")
-  slot(name="errors")
+        .tasks-data__add-tasks(v-if="isProject && isButton")
+            Button(value="Add tasks", @clicked="checkForErrors")
+        .tasks-data__buttons(v-if="isRequest && isButton")
+            .tasks-data__button
+                Button(:value="currentProject.isAssigned ? 'Assign to AM' : 'Assign to PM'", @clicked="assignManager")
+            .tasks-data__button
+                Button(value="Add tasks", @clicked="checkForErrors", :isDisabled="isAddTasksDisabled")
+        slot(name="errors")
 </template>
 
 <script>
@@ -104,26 +104,57 @@ export default {
     },
     checkRequestErrors() {
       let errors = [];
-      if (!this.currentProject.industry) errors.push("Please, select industry.");
-      if (!this.currentProject.projectName) errors.push("Please, enter project name.");
+      if (!this.currentProject.industry)
+        errors.push("Please, select industry.");
+      if (!this.currentProject.projectName)
+        errors.push("Please, enter project name.");
       return errors;
     },
     async checkForErrors() {
       this.errors = [];
-      const { source, targets, packageSize, sourceFiles, refFiles, quantity } = this.tasksData;
+      const {
+        source,
+        targets,
+        packageSize,
+        sourceFiles,
+        refFiles,
+        quantity,
+      } = this.tasksData;
       if (this.isRequest) {
         this.errors = this.checkRequestErrors();
       }
       if (this.tasksData.workflow.id == 2917) {
-        if (this.tasksData.stepsDates[0].deadline == "" || this.tasksData.stepsDates[1].start == "") {
+        if (
+          this.tasksData.stepsDates[0].deadline == "" ||
+          this.tasksData.stepsDates[1].start == ""
+        ) {
           this.errors.push("Please, select tasks deadline.");
         }
       }
-      if (!this.isMonoService && !source) this.errors.push("Please, select Source language.");
-      if (this.tasksData.stepsAndUnits == null) this.errors.push("Please, select Unit.");
-      if (!targets || !targets.length) this.errors.push("Please, select Target language(s).");
-      this.isRequest ? this.checkRequestFies() : this.checkFiles(sourceFiles, refFiles);
-      if (this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).");
+      if (!this.isMonoService && !source)
+        this.errors.push("Please, select Source language.");
+      if (this.tasksData.stepsAndUnits == null)
+        this.errors.push("Please, select Unit.");
+      if (!targets || !targets.length)
+        this.errors.push("Please, select Target language(s).");
+      this.isRequest
+        ? this.checkRequestFies()
+        : this.checkFiles(sourceFiles, refFiles);
+      if (this.isDeadlineMissed())
+        this.errors.push("Please, update deadline (Project's or tasks).");
+
+      const isUnitCAT = this.tasksData.stepsAndUnits
+        .map((i) => i.unit)
+        .includes("CAT Wordcount");
+
+      const isStepLanguageOnTargetLanguage = this.tasksData.targets
+        .map((i) => i.lang)
+        .includes(this.tasksData.source.lang);
+
+      if (isUnitCAT && isStepLanguageOnTargetLanguage) {
+          this.errors.push('Target and Source Languages cannot be a same if a unit "CAT Wordcount" is selected')
+      }
+
       if (this.countCATWordcount >= 1) {
         let isCATWordcount = [];
         this.tasksData.stepsAndUnits.forEach((element) => {
@@ -140,9 +171,13 @@ export default {
         return this.$emit("showErrors", { errors: this.errors });
       }
       try {
-        await this.addTasks();
+        // await this.addTasks();
       } catch (err) {
-        this.alertToggle({ message: "Error on adding tasks", isShow: true, type: "error" });
+        this.alertToggle({
+          message: "Error on adding tasks",
+          isShow: true,
+          type: "error",
+        });
       }
     },
     isDeadlineMissed() {
@@ -151,7 +186,9 @@ export default {
       const missedDeadline = this.tasksData.stepsDates.find(
         (item) => item.deadline && new Date(item.deadline) <= today
       );
-      return !!missedDeadline || new Date(this.currentProject.deadline) <= today;
+      return (
+        !!missedDeadline || new Date(this.currentProject.deadline) <= today
+      );
     },
     checkRequestFies() {
       const { sourceFiles, refFiles } = this.currentProject;
@@ -163,11 +200,17 @@ export default {
     },
     checkFiles(sourceFiles, refFiles) {
       if (this.currentUnit === "CAT Wordcount") {
-        if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).");
-        if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource())
-          this.errors.push("Reference file cannot be the same as Source!");
-      } else {
-        if (!refFiles || !refFiles.length) this.errors.push("Please, upload Reference file(s).");
+        if (!sourceFiles || !sourceFiles.length)
+          this.errors.push("Please, upload Source file(s).");
+        //REF FILES SAME AS SOURCE!
+        //   if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource())
+        //     this.errors.push("Reference file cannot be the same as Source!");
+        // } else {
+        //
+        // }
+        if (!refFiles || !refFiles.length) {
+          this.errors.push("Please, upload Reference file(s).");
+        }
       }
     },
     // checkHoursSteps() {
@@ -192,7 +235,9 @@ export default {
       });
     },
     async addTasks() {
-      const source = this.tasksData.source || this.languages.find((item) => item.symbol === "EN-GB");
+      const source =
+        this.tasksData.source ||
+        this.languages.find((item) => item.symbol === "EN-GB");
       this.$emit("addTasks", {
         ...this.tasksData,
         refFiles: this.tasksData.refFiles || [],
@@ -215,8 +260,13 @@ export default {
         const result = await this.$http.get("/memoqapi/templates");
         this.templates = result.data || [];
         if (this.templates.length) {
-          const defTemplate = this.templates.find((item) => item.name === "2 Steps");
-          this.setTasksDataValue({ prop: "template", value: defTemplate || this.templates[0] });
+          const defTemplate = this.templates.find(
+            (item) => item.name === "2 Steps"
+          );
+          this.setTasksDataValue({
+            prop: "template",
+            value: defTemplate || this.templates[0],
+          });
         }
       } catch (err) {}
     },
@@ -229,22 +279,30 @@ export default {
     }),
     countCATWordcount() {
       if (this.tasksData.stepsAndUnits) {
-        return this.tasksData.stepsAndUnits.filter((item) => item.unit == "CAT Wordcount").length;
+        return this.tasksData.stepsAndUnits.filter(
+          (item) => item.unit == "CAT Wordcount"
+        ).length;
       }
     },
     sortedJobs() {
       if (this.tasksData.stepsAndUnits) {
-        return this.tasksData.stepsAndUnits.sort((a, b) => a.stepCounter - b.stepCounter);
+        return this.tasksData.stepsAndUnits.sort(
+          (a, b) => a.stepCounter - b.stepCounter
+        );
       }
     },
     isMonoService() {
       if (this.currentProject.status === "Requested") {
         return this.currentProject.service.languageForm === "Mono";
       }
-      return this.tasksData.service ? this.tasksData.service.languageForm === "Mono" : false;
+      return this.tasksData.service
+        ? this.tasksData.service.languageForm === "Mono"
+        : false;
     },
     isProject() {
-      return this.currentProject.status && this.currentProject.status !== "Requested";
+      return (
+        this.currentProject.status && this.currentProject.status !== "Requested"
+      );
     },
     isButton() {
       const forbiddenStatuses = ["Cancelled", "Cancelled Halfway", "Closed"];
@@ -253,19 +311,29 @@ export default {
     currentUnit() {
       // return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
       if (this.tasksData.stepsAndUnits) {
-        return this.tasksData.stepsAndUnits.find((item) => item.unit == "CAT Wordcount")
-          ? this.tasksData.stepsAndUnits.find((item) => item.unit == "CAT Wordcount").unit
+        return this.tasksData.stepsAndUnits.find(
+          (item) => item.unit == "CAT Wordcount"
+        )
+          ? this.tasksData.stepsAndUnits.find(
+              (item) => item.unit == "CAT Wordcount"
+            ).unit
           : "";
       }
     },
     areAllFilesApproved() {
-      const allFiles = [...this.currentProject.sourceFiles, ...this.currentProject.refFiles];
-      const isNotApproved = !allFiles.length || allFiles.find((item) => !item.isApproved);
+      const allFiles = [
+        ...this.currentProject.sourceFiles,
+        ...this.currentProject.refFiles,
+      ];
+      const isNotApproved =
+        !allFiles.length || allFiles.find((item) => !item.isApproved);
       return !isNotApproved;
     },
     isAddTasksDisabled() {
       return (
-        !this.currentProject.isDeadlineApproved || !this.currentProject.isBriefApproved || !this.areAllFilesApproved
+        !this.currentProject.isDeadlineApproved ||
+        !this.currentProject.isBriefApproved ||
+        !this.areAllFilesApproved
       );
     },
   },
@@ -291,20 +359,24 @@ export default {
 
 .tasks-data {
   position: relative;
+
   &__workflow-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 50px;
   }
+
   &__toggler-title {
     font-size: 14px;
     margin-right: 15px;
   }
+
   &__main {
     display: flex;
     justify-content: space-between;
   }
+
   &__item {
     padding: 20px 10px;
     width: 49%;
@@ -318,6 +390,7 @@ export default {
       margin-bottom: 20px;
     }
   }
+
   &__drops {
     margin-bottom: 40px;
     width: 100%;
@@ -325,27 +398,33 @@ export default {
     justify-content: space-between;
     padding-bottom: 25px;
   }
+
   &__drop-menu {
     position: relative;
     width: 50%;
     height: 50px;
   }
+
   &__menu-title {
     font-size: 14px;
   }
+
   &__add-tasks {
     display: flex;
     justify-content: center;
     padding-top: 20px;
   }
+
   &__buttons {
     display: flex;
     justify-content: center;
     margin-top: 20px;
   }
+
   &__button {
     margin: 0 20px;
   }
+
   &_m-bottom-40 {
     margin-bottom: 40px;
   }
