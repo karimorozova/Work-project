@@ -110,7 +110,7 @@ async function getTaskSteps(steps, task) {
       const serviceStep = {
         step: ObjectId(stepId),
         unit: ObjectId(unitId),
-        size: stepsAndUnits[i].size,
+        size: stepsAndUnits[i].size || 1,
         memoqAssignmentRole: i
       }
       // const serviceStep = { ...serviceSteps[`stage${i + 1}`], memoqAssignmentRole: i };
@@ -150,7 +150,7 @@ async function getTaskSteps(steps, task) {
         Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
       } else {
         if (!step.hasOwnProperty('totalWords')) {
-          Object.assign(step, { totalWords: task.metrics.totalWords, size: 1 });
+          Object.assign(step, { totalWords: task.metrics.totalWords });
         }
       }
       updatedSteps.push(step);
