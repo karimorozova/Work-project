@@ -77,7 +77,7 @@ const ProjectsSchema = new mongoose.Schema({
     progress: "",
     status: "",
     clientRate: {},
-    clientDiscount: "",
+    // clientDiscount: "",
     targetFile: "",
     finance: {
       'Wordcount': {
@@ -94,7 +94,7 @@ const ProjectsSchema = new mongoose.Schema({
       }
     },
     vendorRate: "",
-    vendorDiscount: "",
+    // vendorDiscount: "",
     check: false,
     vendorsClickedOffer: Array,
     isVendorRead: { type: Boolean, default: false }
