@@ -38,6 +38,7 @@
                         :options="serviceData"
                         :selectedOptions="selectedServices"
                         @chooseOptions="setServices"
+                        :allOptionsButtons="true"
                     )
 
             template(slot="sizes" slot-scope="{ row, index }")
@@ -79,36 +80,36 @@ export default {
           headerKey: "headerUnit",
           key: "unit",
           width: "14%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Steps",
           headerKey: "headerSteps",
           key: "steps",
           width: "32%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Sizes",
           headerKey: "headerSizes",
           key: "sizes",
           width: "32%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "Active",
           headerKey: "headerActive",
           key: "active",
           width: "8%",
-          padding: "0"
+          padding: "0",
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
           width: "14%",
-          padding: "0"
-        }
+          padding: "0",
+        },
       ],
       steps: [],
       currentServices: [],
@@ -121,12 +122,12 @@ export default {
       isDeleting: false,
       deleteIndex: -1,
       currentActive: -1,
-      isTableDropMenu: true
+      isTableDropMenu: true,
     };
   },
   methods: {
     ...mapActions({
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
     }),
     setChips({ data }) {
       this.currentSizes.push(data);
@@ -136,7 +137,7 @@ export default {
     },
     formatSizes(array) {
       let sizes = "";
-      array.forEach(element => {
+      array.forEach((element) => {
         sizes += `<span style="display:inline-flex;padding:0 10px;height:20px;font-size:14px;line-height:20px;border-radius:8px;margin-right:5px;border:1px solid #67573e" class="test">${element}</span>`;
       });
       return sizes;
@@ -150,7 +151,7 @@ export default {
       if (position !== -1) {
         this.currentServices.splice(position, 1);
       } else {
-        const title = this.steps.find(item => item.title === option);
+        const title = this.steps.find((item) => item.title === option);
         this.currentServices.push(title);
       }
     },
@@ -162,7 +163,7 @@ export default {
         this.alertToggle({
           message: "Error on getting Services",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -174,7 +175,7 @@ export default {
         this.alertToggle({
           message: "Error on getting Units",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -191,7 +192,7 @@ export default {
         active: true,
         type: "",
         editable: true,
-        sizes: []
+        sizes: [],
       });
       this.setEditionData(this.units.length - 1);
     },
@@ -239,27 +240,27 @@ export default {
             type: this.units[index].type,
             active: true,
             steps: this.currentServices,
-            sizes: this.currentSizes
-          }
+            sizes: this.currentSizes,
+          },
         });
         this.alertToggle({
           message: "Saved only Steps",
           isShow: true,
-          type: "success"
+          type: "success",
         });
         this.getUnits();
-        if(result.data !== 'Updated'){
-          await this.$http.post('/pricelists/add-new-multiplier', {
-            key: 'Unit',
+        if (result.data !== "Updated") {
+          await this.$http.post("/pricelists/add-new-multiplier", {
+            key: "Unit",
             id: result.data,
           });
-        }else{
-          await this.$http.post('/pricelists/update-multiplier', {
-            key: 'Unit',
+        } else {
+          await this.$http.post("/pricelists/update-multiplier", {
+            key: "Unit",
             oldMultiplier: oldUnit,
           });
-          await this.$http.post('/clientsapi/rates', {
-            key: 'Unit',
+          await this.$http.post("/clientsapi/rates", {
+            key: "Unit",
             oldMultiplier: oldUnit,
           });
           this.getOldData();
@@ -268,7 +269,7 @@ export default {
         this.alertToggle({
           message: "Error on saving Unit Steps info",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -283,23 +284,23 @@ export default {
             type: this.currentUnit,
             active: this.units[index].active,
             steps: this.currentServices,
-            sizes: this.currentSizes
-          }
+            sizes: this.currentSizes,
+          },
         });
         this.alertToggle({ message: "Saved", isShow: true, type: "success" });
         this.getUnits();
-        if(result.data !== 'Updated'){
-          await this.$http.post('/pricelists/add-new-multiplier', {
-            key: 'Unit',
+        if (result.data !== "Updated") {
+          await this.$http.post("/pricelists/add-new-multiplier", {
+            key: "Unit",
             id: result.data,
           });
-        }else {
-          await this.$http.post('/pricelists/update-multiplier', {
-            key: 'Unit',
+        } else {
+          await this.$http.post("/pricelists/update-multiplier", {
+            key: "Unit",
             oldMultiplier: oldUnit,
           });
-          await this.$http.post('/clientsapi/rates', {
-            key: 'Unit',
+          await this.$http.post("/clientsapi/rates", {
+            key: "Unit",
             oldMultiplier: oldUnit,
           });
           this.getOldData();
@@ -308,7 +309,7 @@ export default {
         this.alertToggle({
           message: "Error on saving Unit info",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -320,13 +321,20 @@ export default {
       if (this.currentActive === -1) return;
       const editable = this.units[index].editable;
       this.errors = [];
+      if (index === 0 && this.currentSizes.length)
+        this.errors.push("This unit should not have any sizes");
       if (!this.currentUnit || !this.isUnique(index))
         this.errors.push("Unit should not be empty and be unique!");
-      if(this.currentSizes.map(item => Math.sign(item)).includes(NaN))
+      if (this.currentSizes.map((item) => Math.sign(item)).includes(NaN))
         this.errors.push("Size should be number!");
-      if(this.currentSizes.map(item => item == '').includes(true))
+      if (this.currentSizes.map((item) => item === "").includes(true))
         this.errors.push("Size cannot be empty!");
-      if(this.currentSizes.filter( (item, index, array) => index !== array.indexOf(item) || index !== array.lastIndexOf(item)).length)
+      if (
+        this.currentSizes.filter(
+          (item, index, array) =>
+            index !== array.indexOf(item) || index !== array.lastIndexOf(item)
+        ).length
+      )
         this.errors.push("Size should be unique!");
       if (this.errors.length) {
         this.areErrors = true;
@@ -347,7 +355,7 @@ export default {
         this.alertToggle({
           message: "This Unit cannot be deleted.",
           isShow: true,
-          type: "error"
+          type: "error",
         });
         return;
       }
@@ -356,13 +364,13 @@ export default {
         this.alertToggle({
           message: "Unit removed",
           isShow: true,
-          type: "success"
+          type: "success",
         });
       } catch (err) {
         this.alertToggle({
           message: "Error on removing Unit",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
       this.cancel();
@@ -376,7 +384,7 @@ export default {
         this.alertToggle({
           message: "Error on getting Units",
           isShow: true,
-          type: "error"
+          type: "error",
         });
       }
     },
@@ -390,31 +398,31 @@ export default {
         }
       });
       return duplicateIndex === -1;
-    }
+    },
   },
   computed: {
     serviceData() {
-      return this.steps.map(item => item.title);
+      return this.steps.map((item) => item.title);
     },
     selectedServices() {
-        return this.currentServices.length
-          ? this.currentServices.map(item => item.title)
-          : [];
-    }
+      return this.currentServices.length
+        ? this.currentServices.map((item) => item.title)
+        : [];
+    },
   },
   components: {
     SettingsTable,
     Add,
     SelectMulti,
-    Chips
+    Chips,
   },
   async created() {
-    await this.getOldData()
+    await this.getOldData();
   },
   mounted() {
     this.getUnits();
     this.getServices();
-  }
+  },
 };
 </script>
 

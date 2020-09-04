@@ -122,7 +122,7 @@ export default {
         position: absolute;
         width: 100%;
         border: 1px solid #BFB09D;
-        max-height: 150px;
+        max-height: 186px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;

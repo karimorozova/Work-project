@@ -49,6 +49,7 @@
             :selectedOptions="currentTargets.map((i) => i.lang)",
             :options="targetLanguagesClient",
             @chooseOptions="setTargets"
+            :allOptionsButtons="true"
           )
 
       template(slot="service", slot-scope="{ row, index }")
@@ -61,6 +62,7 @@
             :selectedOption="currentServices[0].title",
             :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
             @chooseOption="setService"
+            :allOptionsButtons="true"
           )
         .clientService__drop-menu(v-if="currentActive == index && newRow")
           SelectMulti(
@@ -70,6 +72,7 @@
             :selectedOptions="currentServices.map((i) => i.title)",
             :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
             @chooseOptions="setServices"
+            :allOptionsButtons="true"
           )
 
       template(slot="industry", slot-scope="{ row, index }")
@@ -91,6 +94,7 @@
             :selectedOptions="currentIndustries.map((i) => i.name)",
             :options="clientIndustries",
             @chooseOptions="setIndustries"
+            :allOptionsButtons="true"
           )
 
       template(slot="icons", slot-scope="{ row, index }")

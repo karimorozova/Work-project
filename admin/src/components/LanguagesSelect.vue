@@ -1,12 +1,12 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outClick" :class="customClass")
+    .drop-select(v-click-outside="outClick" :class="customClass" @click="showLangs")
         .select
             span.selected(v-if="selectedLangs.length === 1" :class="{'no-opacity': selectedLangs.length}" @click="showLangs") {{ selectedLangs[0] }}
             span.selected(v-if="!selectedLangs.length") {{ placeholder }}
             .selected(v-if="selectedLangs.length > 1" :class="{'no-opacity': selectedLangs.length}")
                 span(v-for="lang in selectedLangs") {{ lang }}; &nbsp;
             .arrow-button(@click="showLangs")
-                img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': isOpened}")
+                img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': isOpened}" @click="showLangs")
         input.search(v-if="isOpened" v-model="searchLang" placeholder="Search")
         .drop(v-if="isOpened")
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
@@ -218,7 +218,7 @@ export default {
         font-size: 14px;
         width: 100%;
         border-top: 1px solid #BFB09D;
-        max-height: 150px;
+        max-height: 186px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;
@@ -324,7 +324,7 @@ export default {
     .selected {
       width: 90%;
       border-right: none;
-      padding-left: 10px; 
+      padding-left: 10px;
     }
     .arrow-button {
       width: 10%;

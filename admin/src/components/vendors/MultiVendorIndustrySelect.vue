@@ -170,7 +170,7 @@ export default {
     .drop {
         font-size: 14px;
         border-top: 1px solid $light-brown;
-        max-height: 150px;
+        max-height: 186px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;

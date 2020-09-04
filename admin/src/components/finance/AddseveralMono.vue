@@ -22,13 +22,13 @@
             span.add-several__title.add-several_width-22 Packages
             .add-several_width-78
                 .add-several__drop-menu
-                    SelectMulti(placeholder="Select" :options="packages" :selectedOptions="selectedPackages" @chooseOptions="setPackage")
+                    SelectMulti(placeholder="Select" :options="packages" :selectedOptions="selectedPackages" @chooseOptions="setPackage" :allOptionsButtons="true")
         .add-several__service-industry
             span.add-several__title.add-several_width-22 Steps
             .add-several_width-78
                 .add-several__select-block
                     .add-several__drop-menu
-                        SelectMulti(:options="steps" :selectedOptions="selectedStepsTitles" @chooseOptions="setSteps" placeholder="Select")
+                        SelectMulti(:options="steps" :selectedOptions="selectedStepsTitles" @chooseOptions="setSteps" placeholder="Select" :allOptionsButtons="true")
                 .add-several__select-block
                     span.add-several__title Industries
                     .add-several__drop-menu

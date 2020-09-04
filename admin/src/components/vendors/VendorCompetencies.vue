@@ -48,6 +48,7 @@
             :selectedOptions="currentTargets.map((i) => i.lang)",
             :options="languages.map((i) => i.lang)",
             @chooseOptions="setTargets"
+            :allOptionsButtons="true"
           )
 
       template(slot="industry", slot-scope="{ row, index }")
@@ -69,6 +70,7 @@
             :selectedOptions="currentIndustries.map((i) => i.name)",
             :options="vendorIndustries",
             @chooseOptions="setIndustries"
+            :allOptionsButtons="true"
           )
 
       template(slot="step", slot-scope="{ row, index }")
@@ -90,6 +92,7 @@
             :selectedOptions="currentSteps.map((i) => i.title)",
             :options="filteredSteps",
             @chooseOptions="setSteps"
+            :allOptionsButtons="true"
           )
 
       template(slot="icons", slot-scope="{ row, index }")

@@ -280,6 +280,9 @@ export default {
             }else{
                 this.isBilling = false;
             }
+        },
+        setIsBillingTrue(){
+            this.isBilling = true;
         }
     },
     computed: {
@@ -314,6 +317,7 @@ export default {
         this.getCustomers();
         this.getIndustries();
         this.isbillingDate();
+        !this.project._id && this.setIsBillingTrue();
     }
 }
 </script>

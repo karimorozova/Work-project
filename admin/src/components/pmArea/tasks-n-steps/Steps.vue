@@ -176,10 +176,10 @@ export default {
             },
             tabs: ['Tasks', 'Steps'],
             fields: [
-                {label: "Check", headerKey: "headerCheck", key: "check", width: "4%"},
+                {label: "Check", headerKey: "headerCheck", key: "check", width: "5%"},
                 {label: "Step", headerKey: "headerName", key: "name", width: "9%", padding: 0},
                 {label: "Language", headerKey: "headerLanguage", key: "language", width: "12%"},
-                {label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "14%", padding: 0},
+                {label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "13%", padding: 0},
                 {label: "Start", headerKey: "headerStart", key: "start", width: "9%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%"},
                 {label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%"},
@@ -505,14 +505,13 @@ export default {
         box-shadow: 0 0 10px $brown-shadow;
     }
     &__info-icon {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        margin-left: 4px;
         i {
             color: $main-color;
             opacity: 0.7;
             transition: all 0.3s;
+            cursor: pointer;
+            margin-top: 2px;
+            margin-left: 5px;
             &:hover {
                 opacity: 1;
             }
@@ -596,6 +595,9 @@ export default {
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+.fa-info-circle{
+    font-size: 16px;
 }
 
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="radial">
         <div class="radial__num radial_left">0</div>
-        <svg  xmlns="http://www.w3.org/2000/svg" height="140" width="140" viewBox="0 0 240 240" data-value="40">
+        <svg  xmlns="http://www.w3.org/2000/svg" height="150" width="150" viewBox="0 0 240 240" data-value="40">
             <defs>
                 <mask id="mask1">
                     <rect width="100%" height="100%" fill="white"/>
@@ -62,7 +62,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/scss/colors.scss";
+@import "../../../../assets/scss/colors.scss";
 
 .radial {
     display: flex;

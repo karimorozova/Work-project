@@ -21,6 +21,7 @@ const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const { getMemoqUsers } = require("../../services/memoqs/users");
 const { projectCancelledMessage, projectMiddleCancelledMessage, projectDeliveryMessage, tasksMiddleCancelledMessage } = require("../../emailMessages/clientCommunication")
+const { updatePricelistDiscount } = require('../../pricelist');
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -28,7 +29,7 @@ router.get("/project", async (req, res) => {
   try {
     const project = await getProject({ "_id": id });
     res.send(project);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     console.log("Error on getting Project");
   }
@@ -39,19 +40,20 @@ router.get("/request", async (req, res) => {
   try {
     const request = await getClientRequest({ "_id": id });
     res.send(request);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     console.log("Error on getting Request");
   }
 })
 
+//old
 router.get("/language-pairs", async (req, res) => {
   const { customerId } = req.query;
   try {
     const customer = await getClient({ "_id": customerId });
     const { monoRates, wordsRates, hoursRates } = customer;
     res.send({ monoRates, wordsRates, hoursRates });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     console.log("Error on getting Project");
   }
@@ -62,10 +64,12 @@ router.post("/new-project", async (req, res) => {
   const client = await Clients.findOne({ "_id": project.customer });
   project.projectManager = client.projectManager._id;
   project.accountManager = client.accountManager._id;
+  const leadContact = client.contacts.find(({ leadContact }) => leadContact === true);
+  project.clientContacts = [leadContact];
   try {
     const result = await createProject(project);
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on creating a project!');
   }
@@ -82,7 +86,7 @@ router.post('/project-tasks', upload.fields([{ name: 'sourceFiles' }, { name: 'r
     const { sourceFiles, refFiles } = req.files;
     const updatedProject = await createTasks({ tasksInfo, sourceFiles, refFiles });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on adding project tasks');
   }
@@ -93,7 +97,7 @@ router.post("/project-words-tasks", async (req, res) => {
   try {
     const result = await createTaskWithCommonUnits(tasksInfo, docs);
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on adding project's words tasks");
   }
@@ -108,7 +112,7 @@ router.post('/update-project', async (req, res) => {
       isMetricsExist: project.isMetricsExist
     });
     res.send(savedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating project');
   }
@@ -120,7 +124,7 @@ router.post('/update-progress', async (req, res) => {
     const project = await getProject({ "_id": projectId });
     const result = await updateProjectProgress(project, isCatTool);
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on getting metrics ");
   }
@@ -149,7 +153,7 @@ router.post('/update-matrix', async (req, res) => {
     let updatedProject = { ...project._doc, id: projectId, tasks, steps };
     const result = await updateProjectCosts(updatedProject);
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating value of matrix');
   }
@@ -161,7 +165,7 @@ router.get("/all-managers", async (req, res) => {
     const users = await User.find({}, { firstName: 1, lastName: 1, group: 1 }).populate("group");
     const filteredUsers = groupFilters ? users.filter(item => groupFilters.split(",").indexOf(item.group.name) !== -1) : users;
     res.send(filteredUsers);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on getting managers ");
   }
@@ -172,7 +176,7 @@ router.put("/project-prop", async (req, res) => {
   try {
     const result = await updateProject({ "_id": projectId }, { [prop]: value });
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Internal server error / Cannot change Project's property");
   }
@@ -183,7 +187,7 @@ router.put("/other-project-prop", async (req, res) => {
   try {
     const result = await updateOtherProject({ "_id": projectId }, { [prop]: value });
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Internal server error / Cannot change Project's property");
   }
@@ -194,7 +198,7 @@ router.put("/project-status", async (req, res) => {
   try {
     const result = await updateProjectStatus(id, status, reason);
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Internal server error / Cannot change Project's status");
   }
@@ -213,7 +217,7 @@ router.put("/send-cancel-message", async (req, res) => {
       }
     }
     res.send("Message sent");
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Internal server error / Cannot change Project's status");
   }
@@ -224,7 +228,7 @@ router.put("/project-date", async (req, res) => {
   try {
     const result = await updateProject({ "_id": projectId }, date);
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Internal server error / Cannot change Project's deadline");
   }
@@ -235,7 +239,7 @@ router.get("/quote-message", async (req, res) => {
   try {
     const message = await getMessage(projectId, "quote");
     res.send({ message });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on getting quote message");
   }
@@ -246,7 +250,7 @@ router.get("/project-details", async (req, res) => {
   try {
     const message = await getMessage(projectId, "details");
     res.send({ message });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on getting project details");
   }
@@ -261,7 +265,7 @@ router.post("/project-details", async (req, res) => {
       subject: `Project details (ID C006, ${project.projectId} - ${project.projectName})`
     }, message);
     res.send("Project details sent");
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on sending project details");
   }
@@ -292,7 +296,7 @@ router.post("/send-quote", async (req, res) => {
       if (err) console.log(err)
     })
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on sending the Quote");
   }
@@ -304,7 +308,7 @@ router.post("/contact-mailing", async (req, res) => {
     const project = await getProject({ "_id": projectId });
     await sendEmailToContact(project, contact);
     res.send('Email has been sent')
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on contact-mailing");
   }
@@ -317,7 +321,7 @@ router.post("/vendor-request", async (req, res) => {
     const updatedSteps = await stepVendorsRequestSending(project, checkedSteps);
     const updatedProject = await updateProject({ "_id": project.id }, { steps: updatedSteps });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on sending the Request Confirmation");
   }
@@ -330,7 +334,7 @@ router.post("/vendor-assignment", async (req, res) => {
     await stepReassignedNotification(step);
     await updateMemoqProjectUsers(project.steps);
     res.send('messages sent');
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on sending emails to vendors");
   }
@@ -343,7 +347,7 @@ router.post("/reassign-vendor", async (req, res) => {
     const { steps, tasks } = await reassignVendor(project, reassignData);
     const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on sending emails to vendors");
   }
@@ -358,7 +362,7 @@ router.get('/costs', async (req, res) => {
     const { steps, tasks } = await setDefaultStepVendors(projectToUpdate, memoqUsers);
     const updatedProject = await updateProjectCosts({ ...projectToUpdate, steps, tasks });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on getting costs');
   }
@@ -369,7 +373,7 @@ router.post('/step-payables', async (req, res) => {
   try {
     const updatedProject = await getAfterPayablesUpdated({ projectId, step, index });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on getting step payables');
   }
@@ -385,7 +389,7 @@ router.post("/cancel-tasks", async (req, res) => {
       await cancelMemoqDocs(wordsCancelledTasks);
     }
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on cancelling tasks / cancel-tasks");
   }
@@ -397,7 +401,7 @@ router.post("/send-task-cancel-message", async (req, res) => {
     const project = await getProject({ "_id": id });
     await notifyClientTasksCancelled(project, message);
     res.send("Message sent");
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Internal server error / Cannot change Project's status");
   }
@@ -413,7 +417,7 @@ router.post("/step-status", async (req, res) => {
     await notifyVendorStepStart(steps, updatedSteps, project);
     const updatedProject = await updateProject({ "_id": id }, { steps: updatedSteps });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
   }
@@ -426,7 +430,7 @@ router.post("/steps-reopen", async (req, res) => {
     const updateProject = await getAfterReopenSteps(steps, project);
     await notifyStepReopened(steps, project.projectId);
     res.send(updateProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on reopening steps");
   }
@@ -440,7 +444,7 @@ router.get("/review-status", async (req, res) => {
     }
     const reviewStatus = await checkPermission({ projectId, taskId, userId });
     res.send(reviewStatus);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on checking delivery review status");
   }
@@ -452,7 +456,7 @@ router.post("/change-manager", async (req, res) => {
     const project = await getProject({ "_id": projectId });
     await changeManager({ projectId, taskId, manager, prevManager, prop, isAdmin, status, project });
     res.send("updated");
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on changing review manager");
   }
@@ -465,7 +469,7 @@ router.post("/approve-instruction", async (req, res) => {
       { "tasks.$[i].instructions.$[j].isChecked": !instruction.isChecked },
       { arrayFilters: [{ "i.taskId": taskId }, { "j.text": instruction.text }] });
     res.send("done");
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approve files");
   }
@@ -478,7 +482,7 @@ router.post("/approve-files", async (req, res) => {
       { "tasks.$[i].files.$[j].isFileApproved": isFileApproved },
       { arrayFilters: [{ "i.taskId": taskId }, { "j.path": { $in: paths } }] });
     res.send("done");
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approve files");
   }
@@ -511,7 +515,7 @@ router.post("/target", upload.fields([{ name: "targetFile" }]), async (req, res)
         });
     }
     res.send("uploaded");
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on uploading target file");
   }
@@ -531,7 +535,7 @@ router.post("/remove-dr-file", async (req, res) => {
     } else {
       res.send("done");
     }
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on removing dr file");
   }
@@ -547,7 +551,7 @@ router.post("/assign-dr2", async (req, res) => {
     }, { "tasks.$.status": "Pending Approval [DR2]" });
     await notifyReadyForDr2({ dr2Manager, project: updatedProject, taskId });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approving deliverable");
   }
@@ -564,7 +568,7 @@ router.post("/rollback-review", async (req, res) => {
       "tasks.taskId": taskId
     }, { "tasks.$.status": "Pending Approval [DR1]" });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approving deliverable");
   }
@@ -576,7 +580,7 @@ router.post("/tasks-approve-notify", async (req, res) => {
     const project = await getProject({ "tasks.taskId": taskId });
     const updatedProject = await getProjectAfterApprove({ taskId, project, isDeliver, contacts });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approving deliverable");
   }
@@ -588,7 +592,7 @@ router.post("/tasks-approve", async (req, res) => {
     const project = await getProject({ "tasks.taskId": taskId });
     const updatedProject = await setTasksDeliveryStatus({ taskId, project, status: "Ready for Delivery" });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approving deliverable");
   }
@@ -604,7 +608,7 @@ router.post("/delivery-data", async (req, res) => {
       .populate("tasks.dr2Manager");
     const result = projectDelivery.tasks[0];
     res.send(result);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on getting delivery data");
   }
@@ -622,7 +626,7 @@ router.get("/deliverables", async (req, res) => {
       await Projects.updateOne({ "tasks.taskId": taskId }, { "tasks.$.deliverables": link });
     }
     res.send({ link });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on downloading deliverables");
   }
@@ -636,7 +640,7 @@ router.post("/deliver", async (req, res) => {
       await notifyProjectDelivery(updatedProject);
     }
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on delivering tasks");
   }
@@ -647,7 +651,7 @@ router.post("/project-delivery", async (req, res) => {
   try {
     const updatedProject = await getAfterProjectDelivery(_id, message);
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on delivering tasks");
   }
@@ -661,7 +665,7 @@ router.post("/step-finance", async (req, res) => {
     const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps });
     const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on changing Step finance");
   }
@@ -678,7 +682,7 @@ router.post("/request-file", upload.fields([{ name: "newFile" }]), async (req, r
     request[prop] = requestFiles;
     await request.save();
     res.send(request);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on saving request file");
   }
@@ -691,7 +695,7 @@ router.post("/remove-request-file", async (req, res) => {
     request[prop] = await removeRequestFile({ path, files: request[prop] });
     await request.save();
     res.send(request);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on removing request file");
   }
@@ -709,7 +713,7 @@ router.post("/delete-request-files", async (req, res) => {
     }
     await request.save();
     res.send(request);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on removing request file");
   }
@@ -727,7 +731,7 @@ router.post("/file-approvement", async (req, res) => {
     })
     await request.save();
     res.send(request);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approvement of request file");
   }
@@ -740,7 +744,7 @@ router.post("/prop-approvement", async (req, res) => {
     request[prop] = !request[prop];
     request.save();
     res.send(request);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on approvement of request file");
   }
@@ -755,7 +759,7 @@ router.post("/request-value", async (req, res) => {
       await sendNotificationToManager(updatedRequest, prop);
     }
     res.send(updatedRequest);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on saving request property value");
   }
@@ -766,7 +770,7 @@ router.post("/project-value", async (req, res) => {
   try {
     const updatedProject = await updateProject({ "_id": id }, { [prop]: value });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on saving project property value");
   }
@@ -780,7 +784,7 @@ router.post("/request-tasks", async (req, res) => {
     const newProject = await createTasksFromRequest({ project: updatedProject, dataForTasks, isWords });
     await removeClientRequest(_id);
     res.send(newProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on adding tasks");
   }
@@ -799,7 +803,7 @@ router.post('/step-target', upload.fields([{ name: 'targetFile' }]), async (req,
       fileName: targetFile[0].filename
     });
     res.send(updatedProject);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error / Cannot add Target file to the Steps array of Project")
   }
@@ -818,7 +822,7 @@ router.post("/making-cancel-message", async (req, res) => {
       await projectMiddleCancelledMessage({ ...req.body, accManager, contact })
       : await projectCancelledMessage({ ...req.body, accManager, contact })
     res.send({ message });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on making project cancelled message");
   }
@@ -829,7 +833,7 @@ router.post("/making-delivery-message", async (req, res) => {
   try {
     const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
     res.send({ message });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on making delivery message");
   }
@@ -841,7 +845,7 @@ router.post("/making-tasks-cancel-message", async (req, res) => {
   try {
     const message = await tasksMiddleCancelledMessage({ project, tasks, accManager, contact, reason, isPay });
     res.send({ message });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send("Error on making tasks cancelled message");
   }
@@ -852,7 +856,7 @@ router.post('/urgent', async (req, res) => {
   try {
     const project = await getProjectAfterUpdate({ _id: projectId }, { isUrgent });
     res.send(project);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating project urgent');
   }
@@ -863,7 +867,7 @@ router.post('/payment-profile', async (req, res) => {
   try {
     const project = await getProjectAfterUpdate({ _id: projectId }, { paymentProfile });
     res.send(project);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating payment profile');
   }
@@ -881,7 +885,7 @@ router.post('/client-contact', async (req, res) => {
     }
     const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
     res.send(project);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating/creating client contact');
   }
@@ -895,7 +899,7 @@ router.delete('/client-contact/:projectId/:contactId', async (req, res) => {
     clientContacts.splice(contactToDeleteIndex, 1);
     const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
     res.send(project);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on deleting client contact');
   }
@@ -909,9 +913,21 @@ router.post('/contact-email', async (req, res) => {
     const subject = 'Pangea translation services';
     await sendEmail({ to: email, subject }, template, true);
     res.send(true)
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send('Error on sending message to client\'s contact');
+  }
+});
+
+router.post('/update-discount/:id', async (req, res) => {
+  const { id } = req.params;
+  const { updatedRowObj } = req.body;
+  try {
+    const { discountChart } = await updatePricelistDiscount(id, updatedRowObj);
+    res.send(discountChart);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating pricelist\'s discount table');
   }
 });
 

@@ -46,7 +46,17 @@ const ProjectsSchema = new mongoose.Schema({
     vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
     stepId: "",
     taskId: "",
-    serviceStep: {},
+    serviceStep: {
+      step: { type: Schema.Types.ObjectId, ref: 'Step' },
+      unit: { type: Schema.Types.ObjectId, ref: 'Units' },
+      size: {
+        type: Number,
+        default: 1
+      },
+      memoqAssignmentRole: {
+        type: Number,
+      }
+    },
     name: "",
     sourceLanguage: "",
     targetLanguage: "",
@@ -57,13 +67,17 @@ const ProjectsSchema = new mongoose.Schema({
     packageSize: "",
     hours: "",
     quantity: "",
+    size: {
+      type: Number,
+      default: 1
+    },
     totalWords: "",
     start: {},
     deadline: {},
     progress: "",
     status: "",
-    clientRate: "",
-    clientDiscount: "",
+    clientRate: {},
+    // clientDiscount: "",
     targetFile: "",
     finance: {
       'Wordcount': {
@@ -80,7 +94,7 @@ const ProjectsSchema = new mongoose.Schema({
       }
     },
     vendorRate: "",
-    vendorDiscount: "",
+    // vendorDiscount: "",
     check: false,
     vendorsClickedOffer: Array,
     isVendorRead: { type: Boolean, default: false }

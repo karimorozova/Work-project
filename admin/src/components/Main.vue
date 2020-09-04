@@ -59,7 +59,7 @@ export default {
                     title: "DASHBOARD",
                     imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
                     active: true,
-                    path: "/dashboard"
+                    path: "/"
                 },
                 {
                     title: "VENDORS",
@@ -163,9 +163,7 @@ export default {
                 this.checkForSpecifiedSideBar('client', 'CLIENTS');
             } else if (location.indexOf('vendor') !== -1) {
                 this.checkForSpecifiedSideBar('vendor', 'VENDORS');
-            } else {
-                this.checkAddressForSideBar(isFirstRender);
-            }
+            }else{}
         },
         checkAddressForSideBar(isFirstRender) {
             for (let elem of this.navbarList) {
@@ -203,8 +201,7 @@ export default {
         changeRoute(title) {
             switch (title) {
                 case "DASHBOARD":
-                    this.$router.push('/dashboard');
-                    this.isSidebar = false;
+                    this.$router.push('/');
                     break;
                 case "VENDORS":
                     this.$router.push('/vendors');
@@ -223,7 +220,6 @@ export default {
                     break;
                 case "SETTINGS":
                     this.$router.push('/settings');
-                    this.isSidebar = true;
                     break;
             }
         },
@@ -504,7 +500,7 @@ export default {
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 4px 6px 8px rgba(103, 87, 62, 0.4);
+            box-shadow: 1px 0px 10px #998E7E;
             transition: all 0.5s;
             z-index: 2;
             overflow: hidden;

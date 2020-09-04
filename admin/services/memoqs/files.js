@@ -120,9 +120,10 @@ async function moveMemoqFileToProject(projectId, fileId) {
         'soapAction': 'http://kilgray.com/memoqservices/2007/IServerProjectService/ImportTranslationDocument',
     };
     try {
-        const { response } = await soapRequest({url, headers, xml, timeout: 480000});
-        const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true});
-        return result;
+      const { response } = await soapRequest({ url, headers, xml, timeout: 480000 });
+      if (response.statusCode === 200) {
+        return parser.toJson(response.body, { object: true, sanitize: true, trim: true });
+      }
     } catch(err) {
         console.log(err);
         console.log("Error in moveMemoqFileToProject");
@@ -155,7 +156,7 @@ async function exportMemoqFile(fileId) {
     try {
         const { response } = await soapRequest({url, headers, xml});
         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"].BeginChunkedFileDownloadResponse;
-        return result ? result.BeginChunkedFileDownloadResult : new Error(); 
+      return result ? result.BeginChunkedFileDownloadResult : new Error();
     } catch(err) {
         console.log(err);
         console.log("Error in exportMemoqFile");

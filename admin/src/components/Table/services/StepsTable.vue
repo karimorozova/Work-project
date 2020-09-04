@@ -30,6 +30,7 @@
                           :options="unitData"
                           :selectedOptions="selectedUnits"
                           @chooseOptions="setUnits"
+                          :allOptionsButtons="true"
                         )
 
                 .steps__data.steps_centered(slot="stage1" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")

@@ -154,7 +154,7 @@ export default {
         font-size: 14px;
         width: 100%;
         border: 1px solid $light-brown;
-        max-height: 150px;
+        max-height: 186px;
         overflow-y: auto;
         overflow-x: hidden;
         flex-direction: column;

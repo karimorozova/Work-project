@@ -2,6 +2,17 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
+const altered = {
+  type: Boolean,
+  default: false
+};
+
+const notification = {
+  type: String,
+  default: '',
+  trim: true
+};
+
 const ClientSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -175,15 +186,8 @@ const ClientSchema = new mongoose.Schema({
         type: Number,
         default: 1,
       },
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      }
+      altered,
+      notification
     }],
     stepMultipliersTable: [{
       step: {
@@ -203,15 +207,8 @@ const ClientSchema = new mongoose.Schema({
         type: Boolean,
         default: false
       },
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      }
+      altered,
+      notification
     }],
     industryMultipliersTable: [{
       industry: {
@@ -221,15 +218,8 @@ const ClientSchema = new mongoose.Schema({
         type: Number,
         default: 100,
       },
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      }
+      altered,
+      notification
     }],
     pricelistTable: [{
       sourceLanguage: {
@@ -254,15 +244,8 @@ const ClientSchema = new mongoose.Schema({
         type: Number,
         default: 1
       },
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      }
+      altered,
+      notification
     }]
   },
   contacts: [{
@@ -327,15 +310,60 @@ const ClientSchema = new mongoose.Schema({
   matrix: {
     type: Object,
     default: {
-      xTranslated: { text: "X translated", rate: 0.25 },
-      repeat: { text: "Repetition", rate: 0.3 },
-      contextMatch: { text: "Context match", value: 0.3 },
-      repeat100: { text: "100%", rate: 0.3 },
-      repeat50: { text: "50-74%", rate: 1 },
-      repeat75: { text: "75-84%", rate: 0.9 },
-      repeat85: { text: "85-94%", rate: 0.7 },
-      repeat95: { text: "95-99%", rate: 0.4 },
-      noMatch: { text: "No match", rate: 1 }
+      xTranslated: {
+        text: "X translated",
+        rate: 25,
+        altered,
+        notification
+      },
+      repeat: {
+        text: "Repetition",
+        rate: 30,
+        altered,
+        notification
+      },
+      contextMatch: {
+        text: "Context match",
+        value: 30,
+        altered,
+        notification
+      },
+      repeat100: {
+        text: "100%",
+        rate: 30,
+        altered,
+        notification
+      },
+      repeat50: {
+        text: "50-74%",
+        rate: 100,
+        altered,
+        notification
+      },
+      repeat75: {
+        text: "75-84%",
+        rate: 90,
+        altered,
+        notification
+      },
+      repeat85: {
+        text: "85-94%",
+        rate: 70,
+        altered,
+        notification
+      },
+      repeat95: {
+        text: "95-99%",
+        rate: 40,
+        altered,
+        notification
+      },
+      noMatch: {
+        text: "No match",
+        rate: 100,
+        altered,
+        notification
+      }
     }
   },
   otherInfo: {

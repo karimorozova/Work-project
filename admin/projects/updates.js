@@ -11,7 +11,7 @@ async function updateProjectProgress(project, isCatTool) {
     let { steps, tasks } = project;
     try {
         for(let task of tasks) {
-          const units = JSON.parse(task.service.calculationUnit);
+          const units = JSON.parse(task.stepsAndUnits);
           for (let { unit } of units) {
             if (unit === 'CAT Wordcount' && isCatTool) {
               const docs = await getProjectTranslationDocs(task.memoqProjectId);

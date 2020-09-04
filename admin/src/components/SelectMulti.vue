@@ -6,6 +6,13 @@
             .arrow-button
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
+            .drop__buttonRow(v-if="allOptionsButtons")
+                .buttonRow__button(@click="setOrUnsetAllOptions('set')")
+                    i.fa.fa-check-square-o(aria-hidden='true')
+                    span Select All
+                .buttonRow__button(@click="setOrUnsetAllOptions('unset')")
+                    i.fa.fa-square-o(aria-hidden='true')
+                    span Clear All
             input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" ref="search" placeholder="Search")
             .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOptions(index)")
                 .checkbox
@@ -38,7 +45,11 @@ export default {
         placeholder: {
             type: String,
             default: ""
-        }
+        },
+        allOptionsButtons: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -74,7 +85,22 @@ export default {
         },
         search(e) {
             this.searchValue = e.target.value;
-        }
+        },
+        setOrUnsetAllOptions(key){
+            switch(key) {
+                case "set":
+                    const arrayForSet = this.filteredOptions.filter((a) => !this.selectedOptions.includes(a))
+                    for (let index = 0; index < arrayForSet.length; index++) {
+                        this.$emit("chooseOptions", { option: arrayForSet[index] })
+                    }
+                    break;
+                case "unset":
+                    for (let index = 0; index < this.selectedOptions.length; index++) {
+                        this.$emit("chooseOptions", { option: this.selectedOptions[index] })
+                    }
+                    break;
+            }
+        },
     },
     computed: {
         filteredOptions() {
@@ -92,7 +118,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.fa-check-square-o,
+.fa-square-o {
+    padding-right: 5px;
+}
 .drop-select {
     position: absolute;
     width: 100%;
@@ -103,7 +132,7 @@ export default {
 
     .drop {
         width: 100%;
-        max-height: 150px;
+        max-height: 186px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: white;
@@ -124,6 +153,28 @@ export default {
             }
             &:hover {
                 background-color: rgba(191, 176, 157, 0.5);
+            }
+        }
+        &__buttonRow{
+            height: 31px;
+            display: flex;
+            .buttonRow{
+                &__button{
+                    width: 50%;
+                    height: 31px;
+                    background: #938676;
+                    color: white;
+                    cursor: pointer;
+                    font-size: 12px;
+                    line-height: 33px;
+                    text-align: center;
+                    &:hover{
+                        background: #84786a;
+                    }
+                }
+            }
+            .buttonRow__button:last-child{
+                border-left: .5px solid white;
             }
         }
         &__search {

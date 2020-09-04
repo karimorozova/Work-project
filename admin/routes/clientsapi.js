@@ -19,7 +19,7 @@ const {
   syncClientRatesCost,
   updateClientProjectDate
 } = require('../clients');
-const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../rates');
+const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../pricelist');
 const { Clients } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
@@ -327,6 +327,21 @@ router.post('/client-project-date', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating client\'s project date');
+  }
+});
+
+router.post("/update-matrix/:id", async (req, res) => {
+  const { id } = req.params;
+  const { updatedRowObj } = req.body;
+  const { key, value } = updatedRowObj;
+  try {
+    const { matrix } = await Clients.findOne({ _id: id });
+    matrix[key].rate = +value;
+    const client = await getClientAfterUpdate({ _id: id }, { matrix });
+    res.send(client.matrix);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on updating Client discount table");
   }
 });
 

@@ -287,6 +287,7 @@ export default {
     display: flex;
     align-items: center;
     box-sizing: border-box;
+    overflow-y: auto;
   }
 
   &__editing-data {

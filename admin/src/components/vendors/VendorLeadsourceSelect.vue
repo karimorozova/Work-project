@@ -118,7 +118,7 @@ export default {
         border-top: 1px solid $main-color;
         font-size: 14px;
         width: 100%;
-        max-height: 150px;
+        max-height: 186px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: $white;

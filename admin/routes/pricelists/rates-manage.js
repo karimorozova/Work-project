@@ -1,6 +1,5 @@
 const router = require('express').Router();
-const { Pricelist } = require('../../models');
-const { getPricelist, getUpdatedPricelist, getAfterRatesSaved, getAfterRatesImported } = require('../../rates');
+const { getPricelist, getUpdatedPricelist, getAfterRatesSaved, getAfterRatesImported } = require('../../pricelist');
 
 router.post('/combination', async (req, res) => {
     const { priceId, ...rateInfo } = req.body;
@@ -18,7 +17,7 @@ router.post('/remove-rate', async (req, res) => {
     const { priceId, rateId, prop } = req.body;
     try {
         const updatedPricelist = await getUpdatedPricelist({"_id": priceId}, {
-            $pull: {[prop]: {'_id': rateId}}    
+          $pull: { [prop]: { '_id': rateId } }
         })
         res.send(updatedPricelist);
     } catch(err) {
@@ -31,7 +30,7 @@ router.post('/remove-rates', async (req, res) => {
     const { priceId, checkedIds, prop } = req.body;
     try {
         const updatedPricelist = await getUpdatedPricelist({"_id": priceId}, {
-            $pull: {[prop]: {'_id': {$in: checkedIds}}}    
+          $pull: { [prop]: { '_id': { $in: checkedIds } } }
         })
         res.send(updatedPricelist);
     } catch(err) {

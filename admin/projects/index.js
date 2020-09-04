@@ -9,7 +9,12 @@ const {
   sendClientDeliveries, notifyDeliverablesDownloaded, notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
   notifyVendorStepStart
 } = require('./emails');
-const { createProject, createTasks, createTaskWithCommonUnits, createTasksFromRequest } = require('./create');
+const {
+  createProject,
+  createTasks,
+  createTaskWithCommonUnits,
+  createTasksFromRequest
+} = require('./create');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 const { getProjectAfterFinanceUpdated } = require('./porjectFinance');
 
@@ -50,5 +55,5 @@ module.exports = {
   notifyStepReopened,
   getPdf,
   notifyVendorStepStart,
-  getProjectAfterUpdate
+  getProjectAfterUpdate,
 }

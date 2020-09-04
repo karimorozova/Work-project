@@ -30,11 +30,11 @@ async function saveGeneralBrief(requestData) {
     try {
         await writeFile(`./dist/reqfiles/${request.id}/written.txt`, `Package: ${obj.package}
             \nDescription: ${obj.briefDescr};
-            \nTargeted Audience: ${obj.briefAudience}; 
-            \nTitle: ${obj.briefTitle}; 
+            \nTargeted Audience: ${obj.briefAudience};
+            \nTitle: ${obj.briefTitle};
             \nTopics: ${obj.briefTopics};
             \nCovered points: ${obj.briefSure};
-            \nExamples: ${obj.briefExample}; 
+            \nExamples: ${obj.briefExample};
             \nStructure: ${JSON.stringify(obj.structure)};
             \nStyle: ${obj.style}
             \nTone of Voice: ${JSON.stringify(obj.tone)}
@@ -48,8 +48,8 @@ async function saveGeneralBrief(requestData) {
 }
 
 async function storeFiles({detailFiles, refFiles, requestId}) {
-    const newPath = `./dist/reqfiles/${requestId}/`;
-    let movedDetailFiles = [];
+  const newPath = `./dist/reqFiles/${requestId}/`;
+  let movedDetailFiles = [];
     let movedRefFiles = []
     try {
         if (detailFiles) {
