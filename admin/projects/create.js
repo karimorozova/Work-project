@@ -6,6 +6,7 @@ const { getHoursStepFinanceData } = require("../сalculations/hours");
 const { updateProjectMetrics } = require("../projects/metrics");
 const moment = require("moment");
 const fs = require("fs");
+const ObjectId = require('mongodb').ObjectID;
 
 async function createProject(project) {
   let todayStart = new Date();
@@ -190,6 +191,10 @@ function getWordCountTasks(taskData) {
   for (let i = 0; i < targets.length; i++) {
     let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
     let taskId = project.projectId + ` ${idNumber}`;
+    let { steps } = service;
+    for (let { step } of steps) {
+      step.calculationUnit = step.calculationUnit.map(({ steps, ...rest }) => rest);
+    }
     tasks.push({
       taskId: taskId,
       service: {
@@ -344,8 +349,6 @@ async function getStepsForMonoUnits(stepsInfo, common = false) {
       : stepsAndUnits;
     serviceStep = gatherServiceStepInfo(serviceStep);
     // calculation unit's length is always - 1;
-    const hours = serviceStep.hours;
-    const size = serviceStep.size || null;
     // const financeData = await getHoursStepFinanceData({
     //   task, serviceStep, project: stepsInfo.project, multiplier: hours * size || 1
     // });
@@ -367,8 +370,8 @@ async function getStepsForMonoUnits(stepsInfo, common = false) {
       vendor: financeData.vendor || null,
       vendorRate: financeData.vendorRate,
       clientRate: financeData.clientRate,
-      hours,
-      size,
+      hours: serviceStep.hours,
+      size: serviceStep.size || 1,
       finance: {
         Price: {
           receivables: financeData.receivables,
@@ -420,7 +423,7 @@ async function getStepsForDuoUnits(stepsInfo, key) {
         deadline: stepsDates[0].deadline,
         [Object.keys(serviceStep).includes(key) ? key : 'hours']: key === 'quantity' && !!serviceStep.quantity
           ? serviceStep.quantity : serviceStep.hours,
-        size: serviceStep.size || null,
+        size: serviceStep.size || 1,
         vendor: financeData.vendor || null,
         vendorRate: financeData.vendorRate,
         clientRate: financeData.clientRate,
@@ -637,11 +640,15 @@ function getProjectFinance(tasks, projectFinance) {
   };
 }
 
-const gatherServiceStepInfo = async (serviceStep) => ({
-  step: await Step.findOne({ title: serviceStep.title }),
-  unit: await Units.findOne({ type: serviceStep.unit }),
-  ...serviceStep
-})
+const gatherServiceStepInfo = async (serviceStep) => {
+  const { _id: stepId } = await Step.findOne({ title: serviceStep.title })
+  const { _id: unitId } = await Units.findOne({ type: serviceStep.unit })
+  return {
+    step: ObjectId(stepId),
+    unit: ObjectId(unitId),
+    ...serviceStep
+  }
+}
 
 module.exports = {
   createProject,

@@ -46,7 +46,17 @@ const ProjectsSchema = new mongoose.Schema({
     vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
     stepId: "",
     taskId: "",
-    serviceStep: {},
+    serviceStep: {
+      step: { type: Schema.Types.ObjectId, ref: 'Step' },
+      unit: { type: Schema.Types.ObjectId, ref: 'Units' },
+      size: {
+        type: Number,
+        default: 1
+      },
+      memoqAssignmentRole: {
+        type: Number,
+      }
+    },
     name: "",
     sourceLanguage: "",
     targetLanguage: "",
