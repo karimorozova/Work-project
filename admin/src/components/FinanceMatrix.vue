@@ -18,7 +18,7 @@
             template(slot="rate" slot-scope="{ row }")
                 input.finance-matrix__rate(
                     type="number" min="0" max ="100" 
-                    :value="row.rate" 
+                    :value="row.rate | maxRateCount"
                     @change="(e) => setMatrixData(e, row.key)"
                 )
                 span.finance-matrix__percent %

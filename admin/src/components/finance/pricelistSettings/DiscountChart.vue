@@ -20,7 +20,7 @@
           type="number",
           min="0",
           max="100",
-          :value="row.rate",
+          :value="row.rate | maxRateCount",
           @change="(e) => setMatrixData(e, row.key)"
         )
         span.pricelistDiscountChart__percent %
