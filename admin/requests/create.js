@@ -48,7 +48,7 @@ async function saveGeneralBrief(requestData) {
 }
 
 async function storeFiles({detailFiles, refFiles, requestId}) {
-  const newPath = `./dist/reqFiles/${requestId}/`;
+  const newPath = `./dist/reqfiles/${requestId}/`;
   let movedDetailFiles = [];
     let movedRefFiles = []
     try {
