@@ -235,7 +235,6 @@ const setProjectFinanceData = async (projectData) => {
     if (!row) {
       row = getPriceFromPricelist(pricelist, dataForComparison, currencyRatio);
     }
-    finance.rate = row;
     if (rest.memoqProjectId) {
       steps[index].clientRate = {
         value: row,
