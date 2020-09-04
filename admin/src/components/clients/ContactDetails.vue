@@ -3,7 +3,7 @@
         .contact-wrap__buttons
             .title
                 span Contact Details
-            .buttons 
+            .buttons
                 input.button(type="button" value="Save" @click="checkForErrors")
                 input.button(type="button" value="Cancel" @click="cancel")
                 input.button(type="button" value="Delete" @click="deleteContact")
