@@ -20,7 +20,7 @@ const {
   updateClientProjectDate
 } = require('../clients');
 const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../pricelist');
-const { Clients } = require('../models');
+const { Clients, Pricelist } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');
 
@@ -87,6 +87,8 @@ router.post('/update-client', upload.any(), async (req, res) => {
   let clientId = client._id;
   try {
     if (!client._id) {
+      const { discountChart } = await Pricelist.findOne({ _id: client.defaultPricelist });
+      client.matrix = discountChart;
       let result = await Clients.create(client);
       clientId = result.id;
     }
