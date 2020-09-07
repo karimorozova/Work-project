@@ -17,7 +17,9 @@ const {
   saveClientDocument,
   removeClientDoc,
   syncClientRatesCost,
-  updateClientProjectDate
+  updateClientProjectDate,
+  updateClientMatrix,
+  syncClientMatrix
 } = require('../clients');
 const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../pricelist');
 const { Clients, Pricelist } = require('../models');
@@ -335,15 +337,24 @@ router.post('/client-project-date', async (req, res) => {
 router.post("/update-matrix/:id", async (req, res) => {
   const { id } = req.params;
   const { updatedRowObj } = req.body;
-  const { key, value } = updatedRowObj;
   try {
-    const { matrix } = await Clients.findOne({ _id: id });
-    matrix[key].rate = +value;
-    const client = await getClientAfterUpdate({ _id: id }, { matrix });
-    res.send(client.matrix);
+    const { matrix } = await updateClientMatrix(id, updatedRowObj);
+    res.send(matrix);
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on updating Client discount table");
+  }
+});
+
+router.post('/sync-matrix', async (req, res) => {
+  const { id } = req.params;
+  const { key } = req.body;
+  try {
+    const { matrix } = await syncClientMatrix(id, key);
+    res.send(matrix);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on syncing client\'s matrix');
   }
 });
 

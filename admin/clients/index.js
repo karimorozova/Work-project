@@ -23,6 +23,8 @@ const {
   synchronizePricelistTable
 } = require('./syncClientRatesCost');
 
+const { updateClientMatrix, syncClientMatrix } = require('./clientMatrix');
+
 const clients = {
   getClient,
   getClients,
@@ -52,7 +54,9 @@ const clients = {
   synchronizePricelistTable,
   generateNewPricelistCombinations,
   updateClientProjectDate,
-  getClientsForNewProject
+  getClientsForNewProject,
+  updateClientMatrix,
+  syncClientMatrix
 };
 
 module.exports = clients;
