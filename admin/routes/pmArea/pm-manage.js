@@ -61,10 +61,11 @@ router.get("/language-pairs", async (req, res) => {
 
 router.post("/new-project", async (req, res) => {
   let project = { ...req.body };
-  const client = await Clients.findOne({ "_id": project.customer });
-  project.projectManager = client.projectManager._id;
-  project.accountManager = client.accountManager._id;
-  const leadContact = client.contacts.find(({ leadContact }) => leadContact === true);
+  const { contacts, billingInfo, projectManager, accountManager } = await Clients.findOne({ "_id": project.customer });
+  project.projectManager = projectManager._id;
+  project.accountManager = accountManager._id;
+  const leadContact = contacts.find(({ leadContact }) => leadContact === true);
+  project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';
   project.clientContacts = [leadContact];
   try {
     const result = await createProject(project);
