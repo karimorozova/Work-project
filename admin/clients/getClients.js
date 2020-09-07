@@ -96,14 +96,19 @@ async function gerFilteredClients(filters) {
             "wordsRates.industries",
             "hoursRates.source",
             "hoursRates.target",
-            "hoursRates.industries",
-            "monoRates.target",
+          "hoursRates.industries",
+          "monoRates.target",
           "monoRates.industries"
         ]);
-    } catch(err) {
-        console.log(err);
-        console.log("Error on filtering clients");
+    } catch (err) {
+      console.log(err);
+      console.log("Error on filtering clients");
     }
 }
 
-module.exports = { getClient, getClients, getClientAfterUpdate, gerFilteredClients };
+const getClientsForNewProject = (obj) => {
+  return Clients.find(obj, { _id: 1, name: 1, industries: 1 })
+    .populate('industries');
+}
+
+module.exports = { getClient, getClients, getClientAfterUpdate, gerFilteredClients, getClientsForNewProject };

@@ -1,4 +1,4 @@
-const { getClient, getClients, getClientAfterUpdate, gerFilteredClients } = require('./getClients');
+const { getClient, getClients, getClientAfterUpdate, gerFilteredClients, getClientsForNewProject } = require('./getClients');
 const {
   updateClientRates,
   deleteClientRates,
@@ -51,7 +51,8 @@ const clients = {
   synchronizeIndustryMultiplier,
   synchronizePricelistTable,
   generateNewPricelistCombinations,
-  updateClientProjectDate
+  updateClientProjectDate,
+  getClientsForNewProject
 };
 
 module.exports = clients;
