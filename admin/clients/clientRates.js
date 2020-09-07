@@ -393,7 +393,7 @@ const generateNewPricelistCombinations = (
           unit,
           size,
           industry,
-          price: multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue),
+          price: multiplyPrices(basicPrice, stepMultiplierValue, size, industryMultiplierValue),
         });
       }
     }
@@ -419,7 +419,7 @@ const getPricelistCombinations = async (
           unit,
           size,
           industry,
-          price: multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue),
+          price: multiplyPrices(basicPrice, stepMultiplierValue, size, industryMultiplierValue),
         });
       }
     }

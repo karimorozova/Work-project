@@ -279,7 +279,7 @@ const getPriceFromPricelist = (pricelist, data, currencyRatio) => {
     item.industry.toString() === industry.toString()
   ));
   const basicPrice = getCorrectBasicPrice(row, currency);
-  return multiplyPrices(basicPrice, stepMultiplier, industryMultiplier);
+  return multiplyPrices(basicPrice, stepMultiplier, size, industryMultiplier);
 }
 
 const getCorrectBasicPrice = (basicPriceRow, currency) => {

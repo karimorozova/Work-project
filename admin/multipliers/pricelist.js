@@ -23,11 +23,11 @@ const getPricelistCombinations = async (priceListId, filters) => {
           unit,
           size,
           industry: industry.name,
-          eurPrice: multiplyPrices(euroBasicPrice, stepMultiplierValue, industryMultiplierValue),
+          eurPrice: multiplyPrices(euroBasicPrice, stepMultiplierValue, size, industryMultiplierValue),
           euroMinPrice,
-          usdPrice: multiplyPrices(usdBasicPrice, stepMultiplierValue, industryMultiplierValue),
+          usdPrice: multiplyPrices(usdBasicPrice, stepMultiplierValue, size, industryMultiplierValue),
           usdMinPrice,
-          gbpPrice: multiplyPrices(gbpBasicPrice, stepMultiplierValue, industryMultiplierValue),
+          gbpPrice: multiplyPrices(gbpBasicPrice, stepMultiplierValue, size, industryMultiplierValue),
           gbpMinPrice,
           isGrouped: false,
         });
@@ -42,8 +42,12 @@ const getPricelistCombinations = async (priceListId, filters) => {
   return groupedPriceLists.splice(countFilter, 25);
 };
 
-const multiplyPrices = (basicPrice, firstPercentMultiplier, secondPercentMultiplier) => (
-  +(getPercentage(basicPrice, firstPercentMultiplier) * (secondPercentMultiplier / 100)).toFixed(2)
+const multiplyPrices = (basicPrice, firstPercentMultiplier, size, secondPercentMultiplier) => (
+  +(
+    getPercentage(basicPrice, firstPercentMultiplier) *
+    Number(size) *
+    (secondPercentMultiplier / 100)
+  ).toFixed(2)
 );
 
 const groupPriceList = (arr, allIndustries) => {

@@ -298,7 +298,7 @@ const generateNewLangCombinations = (
   industryMultiplierRows,
 ) => {
   const newCombinations = [];
-  for (let { step, unit, multiplier: stepMultiplierValue } of stepMultiplierRows) {
+  for (let { step, unit, size, multiplier: stepMultiplierValue } of stepMultiplierRows) {
     for (let { industry, multiplier: industryMultiplierValue } of industryMultiplierRows) {
       newCombinations.push({
         sourceLanguage,
@@ -306,7 +306,7 @@ const generateNewLangCombinations = (
         step,
         unit,
         industry,
-        price: multiplyPrices(1, stepMultiplierValue, industryMultiplierValue)
+        price: multiplyPrices(1, stepMultiplierValue, size, industryMultiplierValue)
       });
     }
   }
@@ -326,7 +326,7 @@ const generateNewStepCombinations = (langPairRows, industryMultiplierRows, { _id
             unit: unitId,
             size,
             industry,
-            price: multiplyPrices(basicPrice, 100, industryMultiplierValue)
+            price: multiplyPrices(basicPrice, 100, size, industryMultiplierValue)
           });
         }
       } else {
@@ -337,7 +337,7 @@ const generateNewStepCombinations = (langPairRows, industryMultiplierRows, { _id
           unit: unitId,
           size: 1,
           industry,
-          price: multiplyPrices(basicPrice, 100, industryMultiplierValue)
+          price: multiplyPrices(basicPrice, 100, 1, industryMultiplierValue)
         });
       }
     }
@@ -356,7 +356,7 @@ const generateNewIndustryCombinations = (langPairRows, stepMultiplierRows, newIn
         unit,
         size,
         industry: newIndustryId,
-        price: multiplyPrices(basicPrice, stepMultiplierValue, 100),
+        price: multiplyPrices(basicPrice, stepMultiplierValue, size, 100),
       });
     }
   }

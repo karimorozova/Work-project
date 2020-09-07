@@ -90,7 +90,7 @@ const getUpdatedPricelistRow = (basicPricesTable, stepMultipliersTable, industry
     sourceLanguage === obj.sourceLanguage &&
     targetLanguage === obj.targetLanguage
   ));
-  const { multiplier: stepMultiplierValue } = stepMultipliersTable.find(({ step, unit, size }) => (
+  const { multiplier: stepMultiplierValue, size } = stepMultipliersTable.find(({ step, unit, size }) => (
     step === objToBind.step &&
     unit === objToBind.unit &&
     size === objToBind.size
@@ -98,7 +98,7 @@ const getUpdatedPricelistRow = (basicPricesTable, stepMultipliersTable, industry
   const { multiplier: industryMultiplierValue } = industryMultipliersTable.find(({ industry }) => (
     industry === objToBind.industry
   ));
-  obj.price = multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue);
+  obj.price = multiplyPrices(basicPrice, stepMultiplierValue, size, industryMultiplierValue);
   return obj;
 };
 
