@@ -23,6 +23,7 @@
         Steps(v-if="currentProject.steps.length && isStepsShow"
             :allSteps="currentProject.steps"
             :tasks="currentProject.tasks"
+            :originallyLanguages="originallyLanguages"
             @setVendor="setVendor"
             @setDate="setDate"
             @showTab="showTab"
@@ -118,14 +119,14 @@ export default {
 
             if(sourceFiles && sourceFiles.length) {
                 this.translateFilesAmount = sourceFiles.length;
-                for(let file of sourceFiles){
-                    tasksData.append('sourceFiles', file); 
-                } 
+                for(let file of sourceFiles) {
+                  tasksData.append('sourceFiles', file);
+                }
             }
             if(refFiles && refFiles.length) {
-                for(let file of refFiles){
-                    tasksData.append('refFiles', file); 
-                } 
+                for(let file of refFiles) {
+                  tasksData.append('refFiles', file);
+                }
             }
 
             for (const iterator of calculationUnit) {
@@ -133,7 +134,7 @@ export default {
                     try {
                         const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
                         const { creatorUserId } = memoqCreatorUser.data;
-                        
+
                         if(!creatorUserId) throw new Error("No such user in memoq");
                         tasksData.append('creatorUserId', creatorUserId);
                         this.isInfo = true;
@@ -176,8 +177,8 @@ export default {
         //         const length = +dataForTasks.workflow.name.split(" ")[0];
         //         for(let i = 0; i < length; i++) {
 
-        //             if(!dataForTasks[`${steps[i].step.symbol}-quantity`] 
-        //              || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
+      //             if(!dataForTasks[`${steps[i].step.symbol}-quantity`]
+      //              || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
         //                 this.errors.push("Please, set Hours and Quantity for all service steps.");
         //                 return;
         //             }

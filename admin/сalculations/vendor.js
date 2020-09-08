@@ -12,17 +12,21 @@ const getFittingVendor = async (stepData) => {
   return null;
 };
 
-const findFittingVendor = (stepData, vendors) => {
+const findFittingVendor = (stepData, vendors, fromFront = false) => {
   const { sourceLanguage, targetLanguage, step, industry } = stepData;
   const fittingVendors = [];
-  for (let { _id, qualifications } of vendors) {
+  for (let vendor of vendors) {
+    const { _id, qualifications } = vendor;
     if (qualifications.length) {
       for (let { source, target, steps, industry: vendorIndustry, status } of qualifications) {
-        const fittingStep = steps.find(item => item.toString() === step.toString());
-        if (fittingStep && source.toString() === sourceLanguage._id.toString() &&
+        source = fromFront ? source._id : source;
+        target = fromFront ? target._id : target;
+        vendorIndustry = fromFront ? vendorIndustry._id : vendorIndustry;
+        steps = steps.map(item => fromFront ? item._id : item);
+        if (steps.includes(step) && source.toString() === sourceLanguage._id.toString() &&
           target.toString() === targetLanguage._id.toString() && vendorIndustry.toString() === industry.toString() &&
           status === 'Passed') {
-          fittingVendors.push(_id);
+          fittingVendors.push(fromFront ? vendor : _id);
         }
       }
     }
@@ -41,4 +45,4 @@ const checkIsSameVendor = (steps) => {
 }
 
 
-module.exports = { getFittingVendor, checkIsSameVendor }
+module.exports = { getFittingVendor, checkIsSameVendor, findFittingVendor }

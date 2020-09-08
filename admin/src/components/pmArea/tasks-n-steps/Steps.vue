@@ -76,27 +76,27 @@
 
             template(slot="start" slot-scope="{ row, index }")
                 Datepicker(
-                    @selected="(e) => changeDate(e, 'start', index)" 
-                    v-model="row.start"
-                    inputClass="steps__custom-input" 
-                    calendarClass="steps__calendar-custom" 
-                    :format="customFormatter" 
-                    monday-first=true
-                    :disabledPicker="isDatePickDisabled"
-                    :highlighted="highlighted"
-                    @scrollDrop="scrollDrop")
+                  @selected="(e) => changeDate(e, 'start', index)"
+                  v-model="row.start"
+                  inputClass="steps__custom-input"
+                  calendarClass="steps__calendar-custom"
+                  :format="customFormatter"
+                  monday-first=true
+                  :disabledPicker="isDatePickDisabled"
+                  :highlighted="highlighted"
+                  @scrollDrop="scrollDrop")
             template(slot="deadline" slot-scope="{ row, index }")
-                Datepicker(
-                    @selected="(e) => changeDate(e, 'deadline', index)" 
-                    v-model="row.deadline"
-                    inputClass="steps__custom-input" 
-                    calendarClass="steps__calendar-custom" 
-                    :format="customFormatter" 
-                    monday-first=true
-                    :disabled="disabled"
-                    :disabledPicker="isDatePickDisabled"
-                    :highlighted="highlighted"
-                    @scrollDrop="scrollDrop")
+              Datepicker(
+                @selected="(e) => changeDate(e, 'deadline', index)"
+                v-model="row.deadline"
+                inputClass="steps__custom-input"
+                calendarClass="steps__calendar-custom"
+                :format="customFormatter"
+                monday-first=true
+                :disabled="disabled"
+                :disabledPicker="isDatePickDisabled"
+                :highlighted="highlighted"
+                @scrollDrop="scrollDrop")
             template(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="progress(row.progress)")
             template(slot="status" slot-scope="{ row }")
@@ -107,7 +107,7 @@
                 span.steps__step-data(v-if="row.finance.Price.halfReceivables") {{ row.finance.Price.halfReceivables }}
 
             template(slot="payables" slot-scope="{ row }")
-                span.steps__money(v-if="isEuro(row, 'payables')") &euro;                
+              span.steps__money(v-if="isEuro(row, 'payables')") &euro;
                 span.steps__step-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ getTotalPayables(row) }}
                 span.steps__step-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
             template(slot="margin" slot-scope="{ row }")
@@ -126,7 +126,7 @@
         Reassignment(@close="closeReassignment" :step="reassignStep")
     .steps__approve-action(v-if="isApproveActionShow")
         ApproveModal(
-            :text="modalTexts.main" 
+          :text="modalTexts.main"
             :approveValue="modalTexts.approve"
             :notApproveValue="modalTexts.notApprove"
             @approve="approveAction"
@@ -159,12 +159,15 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
     mixins: [scrollDrop, stepVendor],
     props: {
-        allSteps: {
-            type: Array
-        },
-        tasks: {
-            type: Array
-        }
+      allSteps: {
+        type: Array
+      },
+      tasks: {
+        type: Array
+      },
+      originallyLanguages: {
+        type: Array
+      }
     },
     data() {
         return {
