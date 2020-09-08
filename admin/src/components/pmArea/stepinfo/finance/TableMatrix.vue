@@ -16,7 +16,7 @@
       template(slot="2", slot-scope="{ row, index }")
         .tableMatrix__data {{ row.value }}
       template(slot="3", slot-scope="{ row, index }")
-        .tableMatrix__data {{ (row.client * row.value).toFixed(4) }}
+        .tableMatrix__data {{ ((row.client * row.value)/100).toFixed(4) }}
 </template>
 
 <script>
