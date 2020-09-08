@@ -3,6 +3,7 @@ const { CurrencyRatio, Clients, Pricelist, Step, Units, Languages } = require('.
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
 const { getProjectAnalysis } = require('../services/memoqs/projects');
 const { multiplyPrices } = require('../multipliers');
+const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
 const ObjectId = require('mongodb').ObjectID;
 
 
@@ -20,7 +21,7 @@ async function updateProjectMetrics({ projectId }) {
           const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
           task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
           task.finance.Wordcount = calculateWords(task);
-          steps = await getTaskSteps(steps, task);
+          steps = await getTaskSteps(steps, task, industry);
         } else {
           isMetricsExist = false;
         }
@@ -35,6 +36,7 @@ async function updateProjectMetrics({ projectId }) {
       for (let i = 0; i < 2; i++) lastSteps.push(steps.pop())
     steps.push(...lastSteps);
     steps = await setProjectFinanceData({ steps, customer, industry, tasks });
+    steps = checkIsSameVendor(steps);
     return await updateProject({ "_id": projectId }, { tasks, steps, isMetricsExist });
   } catch (err) {
     console.log(err);
@@ -94,10 +96,11 @@ async function getProjectWithUpdatedFinance(project) {
   }
 }
 
-async function getTaskSteps(steps, task) {
+async function getTaskSteps(steps, task, industry) {
   const serviceSteps = task.service.steps.reduce((acc, cur) => {
     return { ...acc, [cur.stage]: cur.step };
   }, {});
+  const { sourceLanguage, targetLanguage } = task;
   let updatedSteps = JSON.parse(JSON.stringify(steps));
   const stepsAndUnits = JSON.parse(task.stepsAndUnits);
   let counter = 1;
@@ -115,18 +118,19 @@ async function getTaskSteps(steps, task) {
       }
       // const serviceStep = { ...serviceSteps[`stage${i + 1}`], memoqAssignmentRole: i };
       // const { calculationUnit, ...restStepData } = serviceStep;
+      const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
       const step = {
         stepId: `${task.taskId} ${stepsIdCounter}`,
         taskId: task.taskId,
         serviceStep,
         name: stepsAndUnits[i].step,
-        sourceLanguage: task.sourceLanguage,
-        targetLanguage: task.targetLanguage,
+        sourceLanguage: sourceLanguage,
+        targetLanguage: targetLanguage,
         memoqProjectId: task.memoqProjectId,
         memoqSource: task.memoqSource,
         memoqTarget: task.memoqTarget,
         memoqDocIds: task.memoqDocs.map(item => item.DocumentGuid),
-        vendor: null,
+        vendor: ObjectId(vendorId),
         start: task.stepsDates[i].start || task.start,
         deadline: task.stepsDates[i].deadline,
         progress: setStepsProgress(serviceStep.symbol, task.memoqDocs),
@@ -238,7 +242,7 @@ const setProjectFinanceData = async (projectData) => {
     if (rest.memoqProjectId) {
       steps[index].clientRate = {
         value: row,
-        min: 0,
+        min: client.minPrice,
         active: true,
       };
       finance.Wordcount.receivables = getRelativeQuantity(metrics);
@@ -272,12 +276,14 @@ const getPriceFromPricelist = (pricelist, data, currencyRatio) => {
     usdBasicPrice: currencyRatio.USD,
     gbpBasicPrice: currencyRatio.GBP
   };
-  const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => (
+  const stepRow = stepMultipliersTable.find(item => (
     `${item.step} ${item.unit} ${item.size}` === `${step} ${unit} ${size}`
   ));
-  const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => (
+  const stepMultiplier = stepRow ? stepRow.multiplier : 100;
+  const industryRow = industryMultipliersTable.find(item => (
     item.industry.toString() === industry.toString()
   ));
+  const industryMultiplier = industryRow ? industryRow.multiplier : 100;
   const basicPrice = getCorrectBasicPrice(row, currency);
   return multiplyPrices(basicPrice, stepMultiplier, size, industryMultiplier);
 }

@@ -1,3 +1,4 @@
+const { Languages } = require('../models');
 const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { hasActiveRateValue, isVendorMatches, getVendorRate, getUpdatedSteps, getUpdatedTasks } = require('./general');
@@ -6,11 +7,13 @@ const { getProjectAfterFinanceUpdated } = require("../projects/porjectFinance");
 async function getHoursStepFinanceData ({ task, serviceStep, project, multiplier }) {
   const industryId = project.industry.id;
   try {
-    const source = { symbol: task.sourceLanguage };
-    const target = { symbol: task.targetLanguage };
-    // const { vendor, vendorRate, payables } = await getVendorWithPayables({
-    //     source, target, step: serviceStep, industryId, multiplier
-    // });
+    // const source = { symbol: task.sourceLanguage };
+    // const target = { symbol: task.targetLanguage };
+    const source = await Languages.findOne({ symbol: task.sourceLanguage });
+    const target = await Languages.findOne({ symbol: task.targetLanguage });
+    const { vendor, vendorRate, payables } = await getVendorWithPayables({
+      source, target, step: serviceStep, industryId, multiplier
+    });
     // const { receivables, clientRate } = await getReceivables({
     //     project, source, target, step: serviceStep, industryId, multiplier
     // });
@@ -46,15 +49,15 @@ async function getReceivables ({ project, source, target, step, industryId, mult
   try {
     const clientId = project.customer._id || project.customer.toString();
     const client = await getClient({ "_id": clientId });
-    const ratePair = client.hoursRates.find(item => {
-      return item.target.symbol === target.symbol && item.source.symbol === source.symbol
-        && hasActiveRateValue({ step, pair: item, stepIndustry: industryId })
-    })
-    if (ratePair) {
-      const { min, value } = ratePair.rates[step._id];
-      const receivables = value * multiplier > min ? +(value * multiplier).toFixed(2) : min;
-      return { receivables, clientRate: ratePair.rates[step._id] };
-    }
+    // const ratePair = client.hoursRates.find(item => {
+    //   return item.target.symbol === target.symbol && item.source.symbol === source.symbol
+    //     && hasActiveRateValue({ step, pair: item, stepIndustry: industryId })
+    // })
+    // if (ratePair) {
+    //   const { min, value } = ratePair.rates[step._id];
+    //   const receivables = value * multiplier > min ? +(value * multiplier).toFixed(2) : min;
+    //   return { receivables, clientRate: ratePair.rates[step._id] };
+    // }
     return { receivables: 0, clientRate: "" };
   } catch(err) {
     console.log(err);
@@ -66,7 +69,7 @@ async function getVendorWithPayables ({ source, target, step, industryId, multip
   try {
     const vendors = await getVendors({ status: 'Active' });
     const matchedVendors = vendors.filter(item => isVendorMatches({
-      rates: item.hoursRates, source, target, step, industryId
+      rates: item.rates, source, target, step, industryId
     }));
     if (matchedVendors.length === 1) {
       return getVendorRate({

@@ -8,16 +8,27 @@ function hasActiveRateValue({step, rate, stepIndustry}) {
     return false;
 }
 
-function isVendorMatches({rates, packageSize, source, target, step, industryId}) {
-    return rates.find(item => {
-        if(item.target.symbol === target.symbol && isAnotherPartEqual(packageSize, source, item)) {
-            return hasActiveRateValue({
-                    step,
-                    pair: item,
-                    stepIndustry: industryId
-                });
-        }
-    })
+function isVendorMatches({ rates, source, target, step, industryId }) {
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = rates;
+  const isLangPairsMatch = basicPricesTable.find(({ sourceLanguage, targetLanguage }) => (
+    `${sourceLanguage} ${targetLanguage}` === `${source._id} ${target._id}`
+  ));
+  const isStepMatches = stepMultipliersTable.find(item => (
+    item.step.toString() === step.step.toString()
+  ));
+  const isIndustryMatches = industryMultipliersTable.find(({ industry }) => (
+    industry.toString() === industryId.toString()
+  ));
+  return !!(isLangPairsMatch && isStepMatches && isIndustryMatches);
+  // return rates.find(item => {
+  //     if(item.target.symbol === target.symbol && isAnotherPartEqual(packageSize, source, item)) {
+  //         return hasActiveRateValue({
+  //                 step,
+  //                 pair: item,
+  //                 stepIndustry: industryId
+  //             });
+  //     }
+  // })
 }
 
 function isAnotherPartEqual(packageSize, source, item) {
