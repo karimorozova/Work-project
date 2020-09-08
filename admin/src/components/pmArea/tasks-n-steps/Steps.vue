@@ -503,6 +503,7 @@ export default {
         z-index: 50;
         background-color: $white;
         box-shadow: 0 0 10px $brown-shadow;
+        margin-bottom: 120px;
     }
     &__info-icon {
         i {
