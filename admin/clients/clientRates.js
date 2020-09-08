@@ -1,4 +1,5 @@
 const { Clients, Step, Services, Pricelist, Languages, Industries } = require('../models');
+
 const _ = require('lodash');
 const { multiplyPrices, getArrayDifference } = require('../multipliers');
 const {
@@ -10,6 +11,8 @@ const {
   filterRedundantLangPairs
 } = require('./editClientRates');
 const { tableKeys } = require('../enums');
+const  {getRateInfoFromStepFinance} = require("../pricelist/ratesmanage");
+const { getClient } = require("../clients")
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
@@ -528,6 +531,17 @@ const deleteClientRates = async (clientId, serviceToDelete) => {
   });
 };
 
+async function getClientAfterCombinationsUpdated({project, step, rate}) {
+  try {
+    const rateInfo = await getRateInfoFromStepFinance({project, step, rate});
+    const client = await getClient({"_id": project.customer.id});
+    return await updateClientRates(client, rateInfo);
+  } catch(err) {
+    console.log(err);
+    console.log("Error in getClientAfterCombinationsUpdated");
+  }
+}
+
 module.exports = {
   updateClientRates,
   addNewRateComponents,
@@ -541,5 +555,6 @@ module.exports = {
   getObjDifferences,
   replaceOldItem,
   changePricelistTable,
-  generateNewPricelistCombinations
+  generateNewPricelistCombinations,
+  getClientAfterCombinationsUpdated,
 };

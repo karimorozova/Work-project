@@ -1,6 +1,7 @@
 function getStepsWithFinanceUpdated(step, project) {
     let { steps } = project;
     const task = project.tasks.find(item => item.taskId === step.taskId);
+    //S1
     const { receivables, payables } = task.service.calculationUnit === 'Words' ? getWordsPrices(step, task.metrics) : getPrices(step);
     const stepIndex = steps.findIndex(item => item.id === step._id);
     steps[stepIndex] = {
@@ -32,6 +33,7 @@ function getWordsPrices(step, metrics) {
     let receivables = metrics.totalWords*clientRate.value
     let payables = metrics.totalWords*vendorRate.value;
     let wordsSum = 0;
+    //step.name S2
     if(step.serviceStep.title === "translation") {
         for(let key in metrics) {
             if(key !== 'totalWords') {

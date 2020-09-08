@@ -9,7 +9,8 @@ const {
   getPricelistCombinations,
   replaceOldItem,
   changePricelistTable,
-  generateNewPricelistCombinations
+  generateNewPricelistCombinations,
+  getClientAfterCombinationsUpdated,
 } = require('./clientRates');
 const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info');
 const { getAfterTaskStatusUpdate, updateClientProjectDate } = require('./projects');
@@ -56,7 +57,8 @@ const clients = {
   updateClientProjectDate,
   getClientsForNewProject,
   updateClientMatrix,
-  syncClientMatrix
+  syncClientMatrix,
+  getClientAfterCombinationsUpdated
 };
 
 module.exports = clients;

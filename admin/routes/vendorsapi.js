@@ -19,7 +19,8 @@ const {
   deleteVendorCompetencies,
   updateVendorsRatePrices,
   syncVendorRatesCost,
-  createRateRowFromQualification
+  createRateRowFromQualification,
+  getVendorAfterCombinationsUpdated
 } = require('../vendors');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
@@ -275,8 +276,8 @@ router.post('/combination', async (req, res) => {
   const { step, rate } = req.body;
   try {
     const project = await getProject({ "steps._id": step._id });
-    // const updatedVendor = await getVendorAfterCombinationsUpdated({ project, step, rate });
-    // res.send(updatedVendor);
+    const updatedVendor = await getVendorAfterCombinationsUpdated({ project, step, rate });
+    res.send(updatedVendor);
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on adding combination for Vendor");

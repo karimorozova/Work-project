@@ -5,6 +5,8 @@ const {
   changePricelistTable,
   getStepMultipliersCombinations
 } = require('../clients');
+const { getRateInfoFromStepFinance, manageMonoPairRates, manageDuoPairRates } = require("../pricelist/ratesmanage")
+const { getVendor, getVendorAfterUpdate } = require("../vendors")
 const { tableKeys } = require('../enums');
 
 /**
@@ -288,8 +290,39 @@ const updateVendorsRatePrices = async (vendorId, itemIdentifier, updatedItem) =>
       break;
   }
 };
+async function updateVendorRates(vendor, rateInfo) {
+  const { stepsIds, prop, packageSize, industries, source, target, rates } = rateInfo;
+  try {
+    let updatedRates = [];
+    if(prop === 'monoRates') {
+      updatedRates = await manageMonoPairRates({
+        stepsIds, packageSize, industries, target, rates, currentRates: vendor[prop], entity: vendor
+      });
+    } else {
+      updatedRates = await manageDuoPairRates({
+        stepsIds, source, target, industries, rates, currentRates: vendor[prop], entity: vendor
+      });
+    }
+    return await getVendorAfterUpdate({"_id": vendor.id}, {[prop]: updatedRates});
+  } catch(err) {
+    console.log(err);
+    console.log("Error in updateVendorRates");
+  }
+}
+
+async function getVendorAfterCombinationsUpdated({project, step, rate}) {
+  try {
+    const rateInfo = await getRateInfoFromStepFinance({project, step, rate});
+    const vendor = await getVendor({"_id": step.vendor._id});
+    return await updateVendorRates(vendor, rateInfo);
+  } catch(err) {
+    console.log(err);
+    console.log("Error in getVendorAfterCombinationsUpdated");
+  }
+}
 
 module.exports = {
   updateVendorRatesFromCompetence,
-  updateVendorsRatePrices
+  updateVendorsRatePrices,
+  getVendorAfterCombinationsUpdated
 };
