@@ -112,7 +112,8 @@ export default {
             }
         },
         async onRowClicked({index}) {
-            this.$emit("selectProject", {project: this.allProjects[index]})
+	        const curProject = await this.$http.get(`/pm-manage/project?id=${this.allProjects[index]._id}`);
+          this.$emit("selectProject", {project: curProject.body})
         },
         getId(row) {
             return row.projectId || row.requestId;

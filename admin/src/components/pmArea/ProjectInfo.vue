@@ -203,16 +203,16 @@ export default {
             await this.setCurrentProject(curProject.body);
         },
         async getOriginallyLanguages(){
-            try {
-                const result = await this.$http.get("/api/languages");
-                this.originallyLanguages = result.body;
-            } catch (err) {
-                this.alertToggle({
-                    message: "Error in Originally Languages",
-                    isShow: true,
-                    type: "error",
-                });
-            }
+            // try {
+            //     const result = await this.$http.get("/api/languages");
+            //     this.originallyLanguages = result.body;
+            // } catch (err) {
+            //     this.alertToggle({
+            //         message: "Error in Originally Languages",
+            //         isShow: true,
+            //         type: "error",
+            //     });
+            // }
         },
     },
     computed: {

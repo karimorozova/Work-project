@@ -226,6 +226,7 @@ export default {
 .tasks-steps {
     box-sizing: border-box;
     min-width: 1000px;
+    width: 1000px;
     padding: 20px;
     margin: 0 40px;
     box-shadow: 0 0 10px #67573e9d;

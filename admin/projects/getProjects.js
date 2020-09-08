@@ -21,7 +21,7 @@ async function getProject(obj) {
   project.customer = await Clients.findOne({ _id: project.customer })
     .populate('sourceLanguages')
     .populate('targetLanguages')
-    .populate('services.services');
+    // .populate('services.services');
   return project
 }
 

@@ -35,7 +35,7 @@
             .project__client
                 LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
                     .project__input-icons(v-if="project._id")
-                        i.fa.fa-external-link.icon-link(aria-hidden='true')
+                        i.fa.fa-external-link.icon-link(aria-hidden='true' @click="goToClientInfo")
                         input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
 
                     .project__drop-menu(v-else)
@@ -334,6 +334,7 @@ export default {
             right: 6px;
             top: 8px;
             font-size: 18px;
+          cursor: pointer;
         }
     }
     &__same{
