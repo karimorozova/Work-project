@@ -166,7 +166,7 @@ async function getTaskSteps(steps, task, industry) {
         Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
       } else {
         if (!step.hasOwnProperty('totalWords')) {
-          Object.assign(step, { totalWords: task.metrics.totalWords });
+          Object.assign(step, { totalWords: task.metrics.totalWords, quantity: task.metrics.totalWords });
         }
       }
       updatedSteps.push(step);

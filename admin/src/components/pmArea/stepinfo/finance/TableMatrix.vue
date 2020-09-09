@@ -96,7 +96,6 @@
 		},
 		mounted() {
 			this.tableData = this.changeFormatForMetrics()
-			console.log(this.tableData)
 		}
 
 	}

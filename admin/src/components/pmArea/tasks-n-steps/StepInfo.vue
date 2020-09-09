@@ -160,7 +160,6 @@ export default {
       currentProject: "getCurrentProject",
     }),
     financeData() {
-
       return Object.keys(this.step.finance).reduce((prev, cur) => {
         let receivables = +this.step.finance[cur].receivables;
         let payables = +this.step.finance[cur].payables;

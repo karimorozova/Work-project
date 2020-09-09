@@ -30,6 +30,7 @@
             template(slot="payables" slot-scope="{ row }")
               span.step-finance__value {{ row.payables }}
               span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
+
         Results(:financeData="financeData")
       InfoBlock(:step="step")
       TableMatrix(:step="step")
