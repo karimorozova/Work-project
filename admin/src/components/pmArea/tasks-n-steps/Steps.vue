@@ -121,6 +121,7 @@
                     :vendors="vendors"
                     :task="getTask(infoIndex)"
                     @closeStepInfo="closeStepInfo"
+                    :originallyLanguages="originallyLanguages"
                 )
     .steps__reassignment(v-if="isReassignment")
         Reassignment(@close="closeReassignment" :step="reassignStep")

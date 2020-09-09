@@ -16,8 +16,8 @@
         .rates-item__title Ignore Min Price:
         .rates-item__input
             .checkbox
-                input(type="checkbox" id="test" :checked="currentClient.ignoreMinPrice" @change="setTest")
-                label(for="test")            
+                input(type="checkbox" id="ignoreMinPrice" :checked="currentClient.ignoreMinPrice" @change="setTest")
+                label(for="ignoreMinPrice")
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
@@ -78,7 +78,7 @@ export default {
       }
     }
   }
-  #test {
+  #ignoreMinPrice {
     width: 0;
   }
   .checkbox {

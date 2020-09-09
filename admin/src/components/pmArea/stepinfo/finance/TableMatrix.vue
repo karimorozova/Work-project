@@ -16,12 +16,13 @@
       template(slot="2", slot-scope="{ row, index }")
         .tableMatrix__data {{ row.value }}
       template(slot="3", slot-scope="{ row, index }")
-        .tableMatrix__data {{ ((row.client * row.value)/100).toFixed(4) }}
+        .tableMatrix__data {{ calculatedRate(row.client, row.value)}}
 </template>
 
 <script>
 	import DataTable from "../../../DataTable";
 	import {mapGetters} from "vuex";
+	import {isInteger} from "lodash";
 
 	export default {
 		props: {
@@ -82,6 +83,10 @@
 					)
 				}
 				return arrayOfMetrics;
+			},
+			calculatedRate(clientValue, wordCount) {
+				const currentNumber = (clientValue * wordCount) / 100
+				return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(3)
 			}
 		},
 		computed: {
