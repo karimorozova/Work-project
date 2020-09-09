@@ -346,7 +346,7 @@ router.post("/update-matrix/:id", async (req, res) => {
   }
 });
 
-router.post('/sync-matrix', async (req, res) => {
+router.post('/sync-matrix/:id', async (req, res) => {
   const { id } = req.params;
   const { key } = req.body;
   try {

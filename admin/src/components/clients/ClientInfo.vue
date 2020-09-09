@@ -76,7 +76,7 @@
 
       .title Discount Chart
       .client-info__chart(v-if="currentClient._id")
-          FinanceMatrix(:entity="currentClient", @setMatrixData="setMatrixData")
+          DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
       .title(v-if="currentClient._id") Documents
       .client-info__documents(v-if="currentClient._id")
@@ -101,9 +101,7 @@
         :isSaveClicked="isSaveClicked"
       )
     .client-subinfo__date(v-if="currentClient._id")
-      OtherClientInformation(
-
-      )
+      OtherClientInformation()
 
 </template>
 
@@ -124,8 +122,8 @@ import IndustryTable from "./pricelists/IndustryTable";
 import StepTable from "./pricelists/StepTable";
 import LangTable from "./pricelists/LangTable";
 import ResultTable from "./pricelists/ResultTable";
-import FinanceMatrix from "../FinanceMatrix";
 import { mapGetters, mapActions } from "vuex";
+import DiscountChart from "./DiscountChart";
 
 export default {
   props: {
@@ -192,6 +190,23 @@ export default {
           type: "error",
         });
       }
+    },
+	  async getDefaultValuesDC(discountKey){
+		  try {
+    		const result = await this.$http.post(`/clientsapi/sync-matrix/${this.currentClient._id}`,{key: discountKey})
+			  this.currentClient.matrix = result.data;
+		    this.alertToggle({
+			    message: "Matrix data updated",
+			    isShow: true,
+			    type: "success",
+		    });
+	    }catch (err) {
+		    this.alertToggle({
+			    message: "Error on setting matrix data",
+			    isShow: true,
+			    type: "error",
+		    });
+	    }
     },
     refreshResultTable() {
       this.isRefreshResultTable = true;
@@ -519,7 +534,7 @@ export default {
     }),
   },
   components: {
-    FinanceMatrix,
+	  DiscountChart,
     ClientServices,
     General,
     OldGeneral,
