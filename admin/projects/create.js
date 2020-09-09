@@ -313,13 +313,11 @@ async function getTasksForCustomUnits(tasksInfo) {
   let tasksLength = tasksInfo.project.tasks.length + 1;
   for (let i = 0; i < targets.length; i++) {
     const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
-    const sourceLanguage = await Languages.findOne({ symbol: source.symbol });
-    const targetLanguage = await Languages.findOne({ symbol: targets[i].symbol });
     const taskId = projectId + ` ${idNumber}`;
     tasks.push({
       taskId,
-      targetLanguage,
-      sourceLanguage,
+      targetLanguage: targets[i].symbol,
+      sourceLanguage: source.symbol,
       refFiles: taskRefFiles,
       service: {
         ...rest
@@ -339,17 +337,19 @@ async function getTasksForCustomUnits(tasksInfo) {
 
 //HALF DONE
 async function getStepsForMonoUnits(stepsInfo, common = false) {
-  let { tasks, stepsDates } = stepsInfo;
+  let { tasks, stepsDates, industry } = stepsInfo;
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
-    let { stepsAndUnits, industry, sourceLanguage, targetLanguage, ...rest } = tasks[i];
+    const task = tasks[i];
+    let { stepsAndUnits, sourceLanguage, targetLanguage, ...rest } = task;
     const isObject = typeof stepsAndUnits === "object";
     const isArray = Array.isArray(stepsAndUnits);
     if (!isArray && !isObject) stepsAndUnits = JSON.parse(stepsAndUnits);
     let serviceStep = isArray
       ? stepsAndUnits.find(item => item.hours)
       : stepsAndUnits;
-    serviceStep = gatherServiceStepInfo(serviceStep);
+    const stepName = serviceStep.step;
+    serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step } = serviceStep;
     // calculation unit's length is always - 1;
     // const financeData = await getHoursStepFinanceData({
@@ -364,12 +364,12 @@ async function getStepsForMonoUnits(stepsInfo, common = false) {
       clientRate: 0
     };
     steps.push({
-      ...rest,
+      ...task,
       start: common ? stepsDates[1].start : stepsDates[0].start,
       deadline: common ? stepsDates[1].deadline : stepsDates[0].deadline,
       stepId: `${tasks[i].taskId} S01`,
       serviceStep,
-      name: serviceStep.step,
+      name: stepName,
       vendor: financeData.vendor || null,
       vendorRate: financeData.vendorRate,
       clientRate: financeData.clientRate,
@@ -392,15 +392,16 @@ async function getStepsForMonoUnits(stepsInfo, common = false) {
 }
 
 async function getStepsForDuoUnits(stepsInfo, key) {
-  const { tasks, stepsAndUnits, stepsDates } = stepsInfo;
+  const { tasks, stepsAndUnits, stepsDates, industry } = stepsInfo;
   const steps = [];
   for (let i = 0; i < stepsAndUnits.length; i++) {
-    const task = tasks[i];
+    const task = tasks.length === 2 ? tasks[i] : tasks[0];
     const stepsIdCounter = i + 1 < 10 ? `S0${i + 1}` : `S${i + 1}`;
     const stepId = `${task.taskId} ${stepsIdCounter}`;
     let serviceStep = stepsAndUnits[i];
-    serviceStep = gatherServiceStepInfo(serviceStep);
-    const { sourceLanguage, targetLanguage, industry } = task;
+    const stepName = serviceStep.step;
+    serviceStep = await gatherServiceStepInfo(serviceStep);
+    const { sourceLanguage, targetLanguage } = task;
     const { step } = serviceStep;
     // const firstFinanceData = await getHoursStepFinanceData({
     //   //   task, serviceStep: firstServiceStep, project: stepsInfo.project,
@@ -423,7 +424,7 @@ async function getStepsForDuoUnits(stepsInfo, key) {
         ...task,
         stepId,
         serviceStep,
-        name: serviceStep.step,
+        name: stepName,
         start: stepsDates[0].start,
         deadline: stepsDates[0].deadline,
         [Object.keys(serviceStep).includes(key) ? key : 'hours']: key === 'quantity' && !!serviceStep.quantity
@@ -450,7 +451,7 @@ async function getStepsForDuoUnits(stepsInfo, key) {
 /// Creating tasks for packages unit services start ///
 
 async function createTasksWithPackagesUnit(allInfo) {
-  const { project, service, targets, packageSize, stepsAndUnits, stepsDates } = allInfo;
+  const { project, service, targets, packageSize, stepsAndUnits, stepsDates, industry } = allInfo;
   try {
     const {
       vendorRate,
@@ -465,13 +466,15 @@ async function createTasksWithPackagesUnit(allInfo) {
         vendorRate,
         clientRate,
         stepsDates,
-        stepsAndUnits
+        stepsAndUnits,
+        industry
       })
       : await getStepsForMonoStepPackages({
         tasks,
         vendorRate,
         clientRate,
-        stepsDates
+        stepsDates,
+        industry
       });
     const projectFinance = getProjectFinance(tasks, project.finance);
     steps = checkIsSameVendor(steps);
@@ -492,12 +495,10 @@ async function getTasksForPackages(tasksInfo, common = false) {
   for (let i = 0; i < targets.length; i++) {
     const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
     const taskId = projectId + ` ${idNumber}`;
-    const sourceLanguage = await Languages.findOne({ symbol: source.symbol });
-    const targetLanguage = await Languages.findOne({ symbol: targets[i].symbol });
     tasks.push({
       taskId,
-      sourceLanguage,
-      targetLanguage,
+      sourceLanguage: source.symbol,
+      targetLanguage: targets[i].symbol,
       refFiles: taskRefFiles,
       service: {
         ...service
@@ -516,14 +517,15 @@ async function getTasksForPackages(tasksInfo, common = false) {
   return tasks;
 }
 
-async function getStepsForDuoStepPackages({ tasks, vendorRate, clientRate, stepsDates, stepsAndUnits }) {
+async function getStepsForDuoStepPackages({ tasks, vendorRate, clientRate, stepsDates, stepsAndUnits, industry }) {
   let counter = 1;
   const steps = [];
   for (let i = 0; i < stepsAndUnits.length; i++) {
     const task = tasks.length === 2 ? tasks[i] : tasks[0];
-    const { stepsAndUnits, sourceLanguage, targetLanguage, industry, ...rest } = task;
+    const { stepsAndUnits, sourceLanguage, targetLanguage, ...rest } = task;
     let serviceStep = stepsAndUnits[i];
-    serviceStep = gatherServiceStepInfo(serviceStep);
+    const stepName = serviceStep.step;
+    serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step } = serviceStep;
     const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
     const stepId = `${task.taskId} ${stepsIdCounter}`;
@@ -531,7 +533,7 @@ async function getStepsForDuoStepPackages({ tasks, vendorRate, clientRate, steps
       ...rest,
       stepId,
       serviceStep,
-      name: stepsAndUnits[i].step,
+      name: stepName,
       size: stepsAndUnits[i].size,
       quantity: stepsAndUnits[i].quantity,
       start: stepsDates[i].start,
@@ -549,23 +551,25 @@ async function getStepsForDuoStepPackages({ tasks, vendorRate, clientRate, steps
   return steps;
 }
 
-async function getStepsForMonoStepPackages({ tasks, vendorRate, clientRate, stepsDates }, common = false) {
+async function getStepsForMonoStepPackages({ tasks, vendorRate, clientRate, stepsDates, industry }, common = false) {
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
-    let { stepsAndUnits, sourceLanguage, targetLanguage, industry, ...rest } = tasks[i];
+    const task = tasks[i];
+    let { stepsAndUnits, sourceLanguage, targetLanguage, ...rest } = task;
     const isObject = typeof stepsAndUnits === "object";
     const isArray = Array.isArray(stepsAndUnits);
     if (!isArray && !isObject) stepsAndUnits = JSON.parse(stepsAndUnits);
     let serviceStep = isArray
       ? stepsAndUnits.find(item => item.unit === "Packages")
       : stepsAndUnits;
-    serviceStep = gatherServiceStepInfo(serviceStep);
+    const stepName = serviceStep.step;
+    serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step, size, quantity } = serviceStep;
     steps.push({
-      ...rest,
+      ...task,
       stepId: `${tasks[i].taskId} S01`,
       serviceStep,
-      name: step,
+      name: stepName,
       start: common ? stepsDates[1].start : stepsDates[0].start,
       deadline: common ? stepsDates[1].deadline : stepsDates[0].deadline,
       size,
@@ -611,13 +615,11 @@ function getProjectFinance(tasks, projectFinance) {
 }
 
 const gatherServiceStepInfo = async (serviceStep) => {
-  const { _id: stepId } = await Step.findOne({ title: serviceStep.title })
-  const { _id: unitId } = await Units.findOne({ type: serviceStep.unit })
-  return {
-    step: ObjectId(stepId),
-    unit: ObjectId(unitId),
-    ...serviceStep
-  }
+  const { _id: stepId } = await Step.findOne({ title: serviceStep.step });
+  const { _id: unitId } = await Units.findOne({ type: serviceStep.unit });
+  serviceStep.step = ObjectId(stepId);
+  serviceStep.unit = ObjectId(unitId);
+  return serviceStep;
 }
 
 module.exports = {

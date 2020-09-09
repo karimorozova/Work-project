@@ -1,9 +1,10 @@
-const { Vendors, Languages } = require('../models');
+const { Vendors, Languages, Industries } = require('../models');
 
 const getFittingVendor = async (stepData) => {
   stepData.sourceLanguage = await Languages.findOne({ symbol: stepData.sourceLanguage });
   stepData.targetLanguage = await Languages.findOne({ symbol: stepData.targetLanguage });
-  stepData.industry = stepData.industry._id;
+  stepData.industry = typeof stepData.industry === 'string' ? await Industries.findOne({ name: stepData.industry })
+    : stepData.industry._id;
   const vendors = await Vendors.find();
   const fittingVendors = findFittingVendor(stepData, vendors);
   if (fittingVendors.length === 1) {
@@ -36,7 +37,7 @@ const findFittingVendor = (stepData, vendors, fromFront = false) => {
 
 const checkIsSameVendor = (steps) => {
   if (steps.length === 2) {
-    if (steps[0].vendor.toString() === steps[1].vendor.toString()) {
+    if (steps[0].vendor && steps[1].vendor && steps[0].vendor.toString() === steps[1].vendor.toString()) {
       steps[1].vendor = null;
       return steps;
     }

@@ -13,8 +13,9 @@ async function updateProjectMetrics({ projectId }) {
     let { steps, tasks, customer, industry } = project;
     let isMetricsExist = true;
     for (let task of tasks) {
-      const stepUnits = JSON.parse(task.stepsAndUnits);
-      const isIncludesWordCount = stepUnits.find(item => item.unit === 'CAT Wordcount');
+      let { stepsAndUnits } = task;
+      const stepUnitType = getStepUnitsType(stepsAndUnits);
+      let isIncludesWordCount = isIncludesWordcount(stepUnitType, stepsAndUnits);
       if (!!isIncludesWordCount && task.status === "Created") {
         const analysis = await getProjectAnalysis(task.memoqProjectId);
         if (analysis && analysis.AnalysisResultForLang) {
@@ -27,10 +28,21 @@ async function updateProjectMetrics({ projectId }) {
         }
       }
     }
-    let isWordFirst;
+    let isWordFirst = false;
     const lastTask = tasks[tasks.length - 1];
-    const stepUnits = JSON.parse(lastTask.stepsAndUnits);
-    isWordFirst = stepUnits[0].unit === 'CAT Wordcount' && stepUnits[1].unit !== 'CAT Wordcount';
+    const { stepsAndUnits } = lastTask;
+    const stepUnitType = getStepUnitsType(stepsAndUnits);
+    switch (stepUnitType) {
+      default:
+      case 'json':
+        const stepUnits = JSON.parse(lastTask.stepsAndUnits);
+        if (stepUnits.length === 2) {
+          isWordFirst = stepUnits[0].unit === 'CAT Wordcount' && stepUnits[1].unit !== 'CAT Wordcount';
+        }
+        break;
+      case 'object':
+        isWordFirst = false;
+    }
     let lastSteps = [];
     if (isWordFirst)
       for (let i = 0; i < 2; i++) lastSteps.push(steps.pop())
@@ -303,6 +315,29 @@ const getRelativeQuantity = (metrics) => {
     }
   }
   return counter;
+}
+
+const getStepUnitsType = (stepUnits) => {
+  const isObject = stepUnits.unit;
+  if (isObject) {
+    return 'object';
+  } else {
+    return 'json';
+  }
+}
+
+const isIncludesWordcount = (type, stepsAndUnits) => {
+  let isIncludesWordCount;
+  switch (type) {
+    default:
+    case 'object':
+      isIncludesWordCount = stepsAndUnits.unit === 'CAT Wordcount';
+      break;
+    case 'json':
+      stepsAndUnits = JSON.parse(stepsAndUnits);
+      isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
+  }
+  return isIncludesWordCount;
 }
 
 module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance };
