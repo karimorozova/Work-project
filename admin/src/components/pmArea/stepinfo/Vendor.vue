@@ -46,6 +46,9 @@ export default {
         },
         step: {
             type: Object
+        },
+        originallyLanguages: {
+          type: Array
         }
     },
     data() {

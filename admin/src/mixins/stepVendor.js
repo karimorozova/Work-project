@@ -2,6 +2,7 @@ const { findFittingVendor } = require('../../сalculations/vendor');
 export default {
   methods: {
     extendedVendors(index) {
+
       const allSteps = this.currentProject.steps;
       const industry = this.currentProject.industry;
       const step = index >= 0 ? allSteps[index] : this.step;
@@ -17,6 +18,7 @@ export default {
           step: stepId,
           industry: industry._id
         }, vendors, true);
+
       // const fittingVendors = this.vendors.filter()
       // if(step.vendor == null){
       // }else{

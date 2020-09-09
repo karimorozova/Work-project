@@ -3,7 +3,7 @@
   .block-item
     .block-item__title Pricelist:
       span.require *
-    .block-item__input(:class="{'rates-info_error-shadow': !client.defaultPricelist.length && isSaveClicked}")
+    .block-item__input(:class="{'rates-info_error-shadow': !client.defaultPricelist && isSaveClicked}")
       SelectSingle(
           placeholder="Select"
           :selectedOption="clientPricelist"
@@ -44,7 +44,8 @@ export default {
     clientPricelist(){
       if(this.pricelists.length){
         if(!this.client.defaultPricelist.hasOwnProperty('name')){
-          this.client.defaultPricelist = this.pricelists.find(pricelist => pricelist.isClientDefault);
+        	const activePricelists = this.pricelists.filter(i => i.isActive)
+          this.client.defaultPricelist = activePricelists.find(pricelist => true);
         }
         return this.client.defaultPricelist.name
       }
@@ -72,7 +73,7 @@ export default {
     },
     setPricelist({ option }) {
       this.client.defaultPricelist = this.pricelists.find(
-        i => i.name == option
+        i => i.name === option
       );
     },
     setCurrency({ option }) {

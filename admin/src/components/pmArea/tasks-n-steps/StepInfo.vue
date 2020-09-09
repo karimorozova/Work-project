@@ -7,6 +7,7 @@
             :step="step"
             :vendors="vendors"
             :vendor="step.vendor"
+            :originallyLanguages="originallyLanguages"
         )
     .step-info__block
         Finance(
@@ -51,6 +52,9 @@ export default {
     index: {
       type: [Number, String],
     },
+	  originallyLanguages: {
+		  type: Array
+	  }
   },
   data() {
     return {

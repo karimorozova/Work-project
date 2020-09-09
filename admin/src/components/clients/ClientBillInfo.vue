@@ -9,298 +9,337 @@
               input(type="checkbox" id="same" :checked="isSame" @change="setSame")
               label(for="same")
     .billing-info
-        .names-info
-            .names-info__item
-                label.names-info__label Contact Name:
-                input(type="text" :value="client.billingInfo.contactName" @change="(e) => changeProperty(e, 'contactName')")
+      .names-info
+        .names-info__item
+          label.names-info__label Contact Name:
+          input(type="text" :value="client.billingInfo.contactName" @change="(e) => changeProperty(e, 'contactName')")
 
-            .names-info__item
-                label.names-info__label Official Company Name:
-                input(type="text" :value="client.billingInfo.officialCompanyName" @change="(e) => changeProperty(e, 'officialCompanyName')")
+        .names-info__item
+          label.names-info__label Official Company Name:
+          input(type="text" :value="client.billingInfo.officialCompanyName" @change="(e) => changeProperty(e, 'officialCompanyName')")
 
-            .names-info__item
-                label.names-info__label.names-info_asterisk Email:
-                input(type="text" :value="client.billingInfo.email" @change="(e) => changeProperty(e, 'email')" :class="{'names-info_error-shadow': errorFields.indexOf('email') !== -1}")
-            
-            .names-info__item
-                label.names-info__label VAT: 
-                span.checkbox
-                    input(type="checkbox" id="vat" :checked="client.billingInfo.vat" @change="setVAT")
-                    label(for="vat")
+        .names-info__item
+          label.names-info__label.names-info_asterisk Email:
+          input(type="text" :value="client.billingInfo.email" @change="(e) => changeProperty(e, 'email')" :class="{'names-info_error-shadow': errorFields.indexOf('email') !== -1}")
 
-            .names-info__item
-                label.names-info__label Due Date:
-                .names-info__dueDate
-                    input(type="text" id="dueDate" :value="client.billingInfo.dueDate" @change="(e) => changeProperty(e, 'dueDate')")
-                    .dueDate-date days since issue date
-            
-            .names-info__item
-                label.names-info__label 
-                    p Starting balance
-                    p (for prepaid):
-                input(type="number" :value="client.billingInfo.startingBalance" @change="(e) => changeProperty(e, 'startingBalance')")
-  
-        .names-info
-            .names-info__item-address
-                label.names-info__label Address: 
-                textarea(type="text" placeholder="Text here" :value="client.billingInfo.address" @change="(e) => changeProperty(e, 'address')")
+        .names-info__item
+          label.names-info__label VAT:
+          span.checkbox
+            input(type="checkbox" id="vat" :checked="client.billingInfo.vat" @change="setVAT")
+            label(for="vat")
 
-            .names-info__item
-                label.names-info__label Automated invoice sending: 
-                span.checkbox
-                    input(type="checkbox" id="invoiceSending" :checked="client.billingInfo.invoiceSending" @change="setInvoiceSending")
-                    label(for="invoiceSending")
+        .names-info__item
+          label.names-info__label Due Date:
+          .names-info__dueDate
+            input(type="text" id="dueDate" :value="client.billingInfo.dueDate" @change="(e) => changeProperty(e, 'dueDate')")
+            .dueDate-date days since issue date
 
-            .names-info__item
-                label.names-info__label Payment type:
-                .names-info__drop
-                    SelectSingle(
-                        placeholder="Select"
-                        :selectedOption="client.billingInfo.paymentType"
-                        :options="['PPP','Pre-Payment','Monthly','50%/50%']"
-                        @chooseOption="setPayment"                   
-                    )
+        .names-info__item
+          label.names-info__label
+            p Starting balance
+            p (for prepaid):
+          input(type="number" :value="client.billingInfo.startingBalance" @change="(e) => changeProperty(e, 'startingBalance')")
 
-            .names-info__item
-                label.names-info__label
-                    p Balance
-                    p (for prepaid):
-                input(type="number" :value="client.billingInfo.balance" @change="(e) => changeProperty(e, 'balance')")           
+      .names-info
+        .names-info__item-address
+          label.names-info__label Address:
+          textarea(type="text" placeholder="Text here" :value="client.billingInfo.address" @change="(e) => changeProperty(e, 'address')")
 
-            .names-info__item
-                label.names-info__label
-                    p Minimum balance
-                    p (for prepaid):
-                input(type="number" :value="client.billingInfo.minimumBalance" @change="(e) => changeProperty(e, 'minimumBalance')")
+        .names-info__item
+          label.names-info__label Automated invoice sending:
+          span.checkbox
+            input(type="checkbox" id="invoiceSending" :checked="client.billingInfo.invoiceSending" @change="setInvoiceSending")
+            label(for="invoiceSending")
+
+        .names-info__item
+          label.names-info__label Payment type:
+          .names-info__drop
+            SelectSingle(
+              placeholder="Select"
+              :selectedOption="client.billingInfo.paymentType"
+              :options="['PPP','Pre-Payment','Monthly','50%/50%']"
+              @chooseOption="setPayment"
+            )
+
+        .names-info__item
+          label.names-info__label
+            p Balance
+            p (for prepaid):
+          input(type="number" :value="client.billingInfo.balance" @change="(e) => changeProperty(e, 'balance')")
+
+        .names-info__item
+          label.names-info__label
+            p Minimum balance
+            p (for prepaid):
+          input(type="number" :value="client.billingInfo.minimumBalance" @change="(e) => changeProperty(e, 'minimumBalance')")
 </template>
 
 <script>
-import SelectSingle from "../SelectSingle";
-import { mapGetters } from "vuex";
+	import SelectSingle from "../SelectSingle";
+	import {mapGetters} from "vuex";
 
-export default {
-  props: {
-    client: {
-      type: Object
-    },
-    errorFields: {
-      type: Array,
-      default: () => []
-    }
-  },
-  data() {
-    return {
-      isSame: false,
-    };
-  },
-  methods: {
-    changeProperty(e, prop) {
-      this.$emit("changeProperty", { prop, value: e.target.value });
-    },
-    setInvoiceSending(e) {
-      this.$emit("changeProperty", {
-        prop: "invoiceSending",
-        value: event.target.checked
-      });
-    },
-    isSetSame(currentEnum){
-      this.client.billingInfo.contactName = currentEnum.name
-      this.client.billingInfo.officialCompanyName = currentEnum.officialCompanyName
-      this.client.billingInfo.email = currentEnum.email
-    },
-    setSame(e){
-      this.isSame = event.target.checked
-      if(this.isSame){
-        if(Object.keys(this.currentClient).length == 0){
-          this.isSetSame(this.client);
-        }else{
-          this.isSetSame(this.currentClient);
-        }
-      }else{
-        this.client.billingInfo.contactName = this.client.billingInfo.officialCompanyName = this.client.billingInfo.email = "";
-      }
-    },
-    setVAT(e) {
-      this.$emit("changeProperty", {
-        prop: "vat",
-        value: event.target.checked
-      });
-    },
-    setPayment({ option }) {
-      this.$emit("changeProperty", {
-        prop: "paymentType",
-        value: option
-      });
-    }
-  },
-  computed: {
-    ...mapGetters({
-      currentClient: "getCurrentClient"
-    })
-  },
-  components: {
-    SelectSingle
-  }
-};
+	export default {
+		props: {
+			client: {
+				type: Object
+			},
+			errorFields: {
+				type: Array,
+				default: () => []
+			}
+		},
+		data() {
+			return {
+				isSame: false,
+			};
+		},
+		methods: {
+			changeProperty(e, prop) {
+				this.$emit("changeProperty", {prop, value: e.target.value});
+			},
+			setInvoiceSending(e) {
+				this.$emit("changeProperty", {
+					prop: "invoiceSending",
+					value: e.target.checked
+				});
+			},
+			isSetSame(currentEnum) {
+				this.client.billingInfo.contactName = currentEnum.name
+				this.client.billingInfo.officialCompanyName = currentEnum.officialCompanyName
+				this.client.billingInfo.email = currentEnum.email
+			},
+			setSame(e) {
+				this.isSame = e.target.checked
+				if (this.isSame) {
+					if (Object.keys(this.currentClient).length === 0) {
+						this.isSetSame(this.client);
+					} else {
+						this.isSetSame(this.currentClient);
+					}
+				} else {
+					this.client.billingInfo.contactName = this.client.billingInfo.officialCompanyName = this.client.billingInfo.email = "";
+				}
+			},
+			setVAT(e) {
+				this.$emit("changeProperty", {
+					prop: "vat",
+					value: e.target.checked
+				});
+			},
+			setPayment({option}) {
+				this.$emit("changeProperty", {
+					prop: "paymentType",
+					value: option
+				});
+			},
+			isSameInformation() {
+				if (this.client.name || this.client.officialCompanyName || this.client.email) {
+					this.isSame = this.client.billingInfo.contactName === this.client.name &&
+						this.client.billingInfo.officialCompanyName === this.client.officialCompanyName &&
+						this.client.billingInfo.email === this.client.email;
+				}
+			}
+		},
+		created() {
+			this.isSameInformation();
+		},
+		computed: {
+			...mapGetters({
+				currentClient: "getCurrentClient"
+			})
+		},
+		components: {
+			SelectSingle
+		}
+	};
 </script>
 
 <style lang="scss" scoped>
-.same-info{
-  &__row {
-    height: 55px;
-  }
-  &__block {
-    display: flex;
-    border-bottom: 1px solid #938676;
-    padding-bottom: 10px;
-    &-title {
-      margin-right: 5px;
+  .same-info {
+    &__row {
+      height: 55px;
     }
-  }
-}
-.billing-info {
-  display: flex;
-  justify-content: space-between;
-}
 
-.names-info {
-  width: 40%;
-  textarea {
-    color: rgba(103, 87, 62, 0.5);
-    height: 71px;
-    width: 185px;
-    border: 1px solid #67573e;
-    border-radius: 5px;
-    outline: none;
-    resize: none;
-    &:focus {
-      color: #67573e;
-    }
-    &::-webkit-input-placeholder {
-      opacity: 0.5;
-    }
-  }
-  &__dueDate {
-    width: 190px;
-    display: flex;
-    .dueDate-date {
-      width: 110px;
-      margin-left: 10px;
-    }
-  }
-  &__drop {
-    position: relative;
-    width: 191px;
-    height: 28px;
-  }
-  &__item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    &-address {
+    &__block {
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 20px;
+      border-bottom: 1px solid #938676;
+      padding-bottom: 10px;
+
+      &-title {
+        margin-right: 5px;
+      }
     }
-    &:last-child {
-      margin-bottom: 0;
-    }
-    label {
-      margin-bottom: 0;
-    }
-    input {
+  }
+
+  .billing-info {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .names-info {
+    width: 40%;
+
+    textarea {
       color: rgba(103, 87, 62, 0.5);
+      height: 71px;
+      width: 185px;
       border: 1px solid #67573e;
       border-radius: 5px;
-      padding: 0 5px;
       outline: none;
-      width: 191px;
-      height: 30px;
-      box-sizing: border-box;
+      resize: none;
+
       &:focus {
         color: #67573e;
       }
+
+      &::-webkit-input-placeholder {
+        opacity: 0.5;
+      }
     }
-  }
-  &_error-shadow {
-    box-shadow: 0 0 5px red;
-  }
-  &_asterisk {
-    position: relative;
-    &:after {
-      position: absolute;
-      content: "*";
-      top: -3px;
-      right: -8px;
-      color: red;
-      font-size: 14px;
+
+    &__dueDate {
+      width: 190px;
+      display: flex;
+
+      .dueDate-date {
+        width: 110px;
+        margin-left: 10px;
+      }
     }
-  }
-}
-.checkbox {
-  display: flex;
-  height: 28px;
-  width: 191px;
-  input[type="checkbox"] {
-    opacity: 0;
-    + {
+
+    &__drop {
+      position: relative;
+      width: 191px;
+      height: 28px;
+    }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+
+      &-address {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
       label {
-        &::after {
-          content: none;
+        margin-bottom: 0;
+      }
+
+      input {
+        color: rgba(103, 87, 62, 0.5);
+        border: 1px solid #67573e;
+        border-radius: 5px;
+        padding: 0 5px;
+        outline: none;
+        width: 191px;
+        height: 30px;
+        box-sizing: border-box;
+
+        &:focus {
+          color: #67573e;
         }
       }
     }
-    &:checked {
+
+    &_error-shadow {
+      box-shadow: 0 0 5px red;
+    }
+
+    &_asterisk {
+      position: relative;
+
+      &:after {
+        position: absolute;
+        content: "*";
+        top: -3px;
+        right: -8px;
+        color: red;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .checkbox {
+    display: flex;
+    height: 28px;
+    width: 191px;
+
+    input[type="checkbox"] {
+      opacity: 0;
+
       + {
         label {
           &::after {
-            content: "";
+            content: none;
+          }
+        }
+      }
+
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
           }
         }
       }
     }
-  }
-  label {
-    position: relative;
-    display: inline-block;
-    margin-top: 4px;
-    &::before {
-      position: absolute;
-      content: "";
+
+    label {
+      position: relative;
       display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid;
-      left: 0px;
-      top: 3px;
-    }
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
+      margin-top: 4px;
+
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid;
+        left: 0px;
+        top: 3px;
+      }
+
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+      }
     }
   }
-}
-#dueDate {
-  width: 70px;
-}
-#same-checkbox{
-  margin-top: -6px;
-}
-#vat,
-#invoiceSending {
-  width: 0;
-}
-p {
-  margin: 0;
-}
+
+  #dueDate {
+    width: 70px;
+  }
+
+  #same-checkbox {
+    margin-top: -6px;
+  }
+
+  #vat,
+  #invoiceSending {
+    width: 0;
+  }
+
+  p {
+    margin: 0;
+  }
 </style>

@@ -74,7 +74,7 @@
 
           )
 
-      .title Discount Chart
+      .title(v-if="currentClient._id") Discount Chart
       .client-info__chart(v-if="currentClient._id")
           DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
