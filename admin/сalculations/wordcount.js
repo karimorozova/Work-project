@@ -30,18 +30,22 @@ async function receivablesCalc({task, project, step}) {
 
 async function getAfterWordcountPayablesUpdated({project, step}) {
     try {
-        let { tasks, steps } = project;
-        const taskIndex = tasks.findIndex(item => item.taskId == step.taskId);
-        const stepIndex = steps.findIndex(item => item.taskId == step.taskId && item.stepId === step.stepId);
-        if(steps[stepIndex].serviceStep.symbol === 'translation') {
-            tasks[taskIndex].metrics = setTaskMetrics({metrics: tasks[taskIndex].metrics, matrix: step.vendor.matrix, prop: 'vendor'});
-        }
-        steps[stepIndex] = payablesCalc({metrics: tasks[taskIndex].metrics, project, step});
-        const taskSteps = steps.filter(item => item.taskId === tasks[taskIndex].taskId && item.finance.Wordcount.payables);
-        tasks[taskIndex].finance.Price.payables = +(taskSteps.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0).toFixed(2));
-        tasks[taskIndex].finance.Wordcount.payables = taskSteps.reduce((acc, cur) => acc + +cur.finance.Wordcount.payables, 0);
-        return await updateProjectCosts({...project._doc, id: project.id, tasks, steps});
-      } catch(err) {
+      let { tasks, steps } = project;
+      const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
+      const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId);
+      if (steps[stepIndex].name === 'Translation') {
+        tasks[taskIndex].metrics = setTaskMetrics({
+          metrics: tasks[taskIndex].metrics,
+          matrix: step.vendor.matrix,
+          prop: 'vendor'
+        });
+      }
+      // steps[stepIndex] = payablesCalc({metrics: tasks[taskIndex].metrics, project, step});
+      // const taskSteps = steps.filter(item => item.taskId === tasks[taskIndex].taskId && item.finance.Wordcount.payables);
+      // tasks[taskIndex].finance.Price.payables = +(taskSteps.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0).toFixed(2));
+      // tasks[taskIndex].finance.Wordcount.payables = taskSteps.reduce((acc, cur) => acc + +cur.finance.Wordcount.payables, 0);
+      return await updateProjectCosts({ ...project._doc, id: project.id, tasks, steps });
+    } catch(err) {
         console.log(err);
         console.log('Error in getAfterWordcountPayablesUpdated');
       }
