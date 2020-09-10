@@ -15,7 +15,6 @@ const {
   Vendors,
   Instruction,
   CancelReason,
-  DiscountChart,
   TierLqa,
   Units,
   CurrencyRatio,
@@ -95,20 +94,6 @@ async function fillCancelReasons() {
     }
   } catch (err) {
     console.log("Error on filling default Cancel Reasons");
-    console.log(err);
-  }
-}
-
-async function fillDiscountCharts() {
-  try {
-    const discountCharts = await DiscountChart.find();
-    if (!discountCharts.length) {
-      for (let chart of discountChartsDefault) {
-        await new DiscountChart(chart).save();
-      }
-    }
-  } catch (err) {
-    console.log("Error on filling default Discount Charts");
     console.log(err);
   }
 }
@@ -538,7 +523,6 @@ async function checkCollections() {
   await fillPackages();
   await fillInstructions();
   await fillCancelReasons();
-  await fillDiscountCharts();
   await fillLeadSources();
   await fillGroups();
   await fillUnits();

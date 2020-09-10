@@ -308,12 +308,6 @@ const emptyMatrix = {
     noMatch: {text: "No match", value: 1}
 }
 
-const discountChartsDefault = [
-    {name: "Chart 1", isClientDefault: true, isVendorDefault: true, isActive: true, matrixes: {client: emptyMatrix, vendor: emptyMatrix}},
-    {name: "Chart 2", isClientDefault: false, isVendorDefault: false, isActive: true, matrixes: {client: emptyMatrix, vendor: emptyMatrix}},
-    {name: "Chart 3", isClientDefault: false, isVendorDefault: false, isActive: true, matrixes: {client: emptyMatrix, vendor: emptyMatrix}}
-]
-
 const instructionsDefault = [
     {type: "Test", content: "Test content", isSpecific: false},
     {type: "Test specified", content: "Test content specified", isSpecific: true},
@@ -358,7 +352,6 @@ const defaultValue = {
     emptyMatrix,
     instructionsDefault,
     cancelReasonsDefault,
-    discountChartsDefault,
     tierLqasDefault,
     unitsDefault
 };

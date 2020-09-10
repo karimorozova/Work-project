@@ -18,7 +18,6 @@ const ZohoReport = require('./zohoReport');
 const ClientRequest = require('./clientRequest');
 const Instruction = require('./instruction');
 const CancelReason = require('./cancelReason');
-const DiscountChart = require('./discountChart');
 const XtrfTier = require('./xtrfTier');
 const XtrfReportLang = require('./xtrfReportLang');
 const XtrfVendor = require('./xtrfVendor');
@@ -55,7 +54,6 @@ const Models = {
   ClientRequest,
   Instruction,
   CancelReason,
-  DiscountChart,
   XtrfTier,
   XtrfReportLang,
   XtrfVendor,

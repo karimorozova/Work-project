@@ -23,8 +23,6 @@ import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import TableUnits from '@/components/Table/TableUnits'
-import DiscountChart from '@/components/Table/DiscountChart'
-import ChartMatrix from '@/components/Table/ChartMatrix'
 import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
 import TierLqas from '@/components/Table/TierLqas'
@@ -171,17 +169,6 @@ const router = new Router({
                             path: 'pricelists',
                             name: 'pricelists',
                             component: Pricelists
-                        },
-                        {
-                            path: 'discount-chart',
-                            name: 'discount-chart',
-                            component: DiscountChart,
-                        },
-                        {
-                            path: 'matrix/:name',
-                            name: 'matrix',
-                            props: true,
-                            component: ChartMatrix
                         },
                         {
                             path: 'instructions',

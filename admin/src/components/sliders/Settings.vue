@@ -21,10 +21,10 @@ export default {
     return {
       openQuotes: true,
       sidebarLinks: [
-          {title: "Languages"}, {title: "Services"}, {title: "Industries"}, {title: "Lead Sources"}, {title: "Packages"}, 
-          {title: "Pricelists"}, {title: "Cancellation Reasons"}, {title: "Discount Chart"}, {title: "Instructions"}, {title: "LQA"},
-          {title: "Units"}
-          ],
+        { title: "Languages" }, { title: "Services" }, { title: "Industries" }, { title: "Lead Sources" }, { title: "Packages" },
+        { title: "Pricelists" }, { title: "Cancellation Reasons" }, { title: "Instructions" }, { title: "LQA" },
+        { title: "Units" }
+      ],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
     };
@@ -34,10 +34,10 @@ export default {
       const { title } = this.sidebarLinks[index];
       this.activeLinkIndex = index;
       switch(title) {
-        case "Languages": 
+        case "Languages":
           this.$router.push("/settings/langs");
           break;
-        case "Units": 
+        case "Units":
           this.$router.push("/settings/units");
           break;
         case "Services":
@@ -60,9 +60,6 @@ export default {
           break;
         case "LQA":
           this.$router.push("/settings/tiers-lqas");
-          break;
-        case "Discount Chart":
-          this.$router.push("/settings/discount-chart");
           break;
         case "Instructions":
           this.$router.push("/settings/instructions");

@@ -3,7 +3,21 @@ const axios = require('axios');
 const unirest = require('unirest');
 const { upload } = require('../utils/');
 const fs = require('fs');
-const { Languages, Industries, Timezones, LeadSource, Group, Step, Package, Instruction, CancelReason, DiscountChart, User, ClientRequest, TierLqa, Units } = require('../models');
+const {
+  Languages,
+  Industries,
+  Timezones,
+  LeadSource,
+  Group,
+  Step,
+  Package,
+  Instruction,
+  CancelReason,
+  User,
+  ClientRequest,
+  TierLqa,
+  Units
+} = require('../models');
 const { getFilteredProjects, getPdf } = require('../projects/');
 const { getFilteredClientRequests } = require('../clientRequests');
 const { getServices } = require('../services/');
@@ -409,31 +423,6 @@ router.delete('/reason/:id', async (req, res) => {
       res.status(500).send("Error on deleting reason");
     }
 });
-
-router.get('/discount-charts', async (req, res) => {
-    try {
-      const charts = await DiscountChart.find({});
-      charts.sort((a, b) => {
-          if(a.name > b.name) return 1;
-          if(a.name < b.name) return -1;
-        });
-      res.send(charts);
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on getting discount charts from DB")
-    }
-});
-
-router.get('/chart', async (req, res) => {
-    const { name } = req.query;
-    try {
-        const chart = await DiscountChart.findOne({name});
-        res.send(chart);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting chart by name");
-    }
-})
 
 router.get('/tier-lqas', async (req, res) => {
     try {

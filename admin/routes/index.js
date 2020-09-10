@@ -17,7 +17,6 @@ const zohoRouter = require('./zoho');
 const clientsapiRouter = require('./clientsapi');
 const vendorsapiRouter = require('./vendorsapi');
 const projectsRouter = require('./projectsapi');
-const settingsUpdate = require('./settings/updates');
 const memoqapiRouter = require('./memoqapi');
 const multipliers = require('./pricelists/multipliers');
 
@@ -38,7 +37,6 @@ router.use('/clientsapi', requiresLogin, clientsapiRouter);
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
 router.use('/vendors/application', vendorApplicationRouter);
 router.use('/projectsapi', projectsRouter);
-router.use('/settings-update', settingsUpdate);
 router.use('/memoqapi', memoqapiRouter);
 
 module.exports = router;
