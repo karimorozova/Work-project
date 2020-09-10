@@ -6,28 +6,28 @@
       .details__col(v-if="nowTab === 'Receivables'")
         .col__title Rate:
           span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
-          input.details__input(v-else type="text" size="6" v-model="currentData.receivables.rate")
+          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.rate")
       .details__col(v-if="nowTab === 'Receivables'")
         .col__title Quantity[Relative]:
           span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.receivables.quantityRelative }}
-          input.details__input(v-else type="text" size="6" v-model="currentData.receivables.quantityRelative")
+          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.quantityRelative")
       .details__col(v-if="nowTab === 'Receivables'")
         .col__title Quantity [Total]:
           span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.receivables.quantityTotal }}
-          input.details__input(v-else type="text" size="6" v-model="currentData.receivables.quantityTotal")
+          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.quantityTotal")
 
       .details__col(v-if="nowTab === 'Payables'")
         .col__title Rate:
           span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.payables.rate }} &euro;
-          input.details__input(v-else type="text" size="6" v-model="currentData.payables.rate")
+          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.rate")
       .details__col(v-if="nowTab === 'Payables'")
         .col__title Quantity[Relative]:
           span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.payables.quantityRelative }}
-          input.details__input(v-else type="text" size="6" v-model="currentData.payables.quantityRelative")
+          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.quantityRelative")
       .details__col(v-if="nowTab === 'Payables'")
         .col__title Quantity [Total]:
           span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.payables.quantityTotal }}
-          input.details__input(v-else type="text" size="6" v-model="currentData.payables.quantityTotal")
+          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.quantityTotal")
 
 
     .details__row.details_border-top(v-if="nowTab === 'Receivables'")
@@ -60,10 +60,19 @@
 
 	export default {
 		props: {
-			financeData: {type: Object},
+			financeData: {
+				type: Object
+			},
 			selectedTab: {
 				type: String,
-			}
+			},
+			step: {
+				type: Object,
+			},
+			cancelSave: {
+				type: Boolean,
+        default: false,
+      }
 		},
 		data() {
 			return {
@@ -81,8 +90,8 @@
 					payables: {},
 				},
 				areErrorsExist: false,
-				floatRegex: /^[+-]?\d+(\.\d+)?$/,
-				integerRegex: /^[1-9]\d*$/,
+				// floatRegex: /^[+-]?\d+(\.\d+)?$/,
+				// integerRegex: /^[1-9]\d*$/,
 				nowTab: 'Receivables',
 			};
 		},
@@ -106,47 +115,30 @@
 			checkForErrors() {
 				this.errors = [];
 				if (this.financeData.vendor !== null) {
-					if (
-						!this.currentData.payables.rate ||
-						!this.floatRegex.test(this.currentData.payables.rate)
-					) {
+					if (!this.currentData.payables.rate) {
 						this.errors.push("Set valid Payables Rate value (integer/float)");
 					}
-					if (
-						!this.currentData.payables.quantityRelative ||
-						!this.integerRegex.test(this.currentData.payables.quantityRelative)
-					) {
+					if (!this.currentData.payables.quantityRelative) {
 						this.errors.push("Set valid Payables Quantity[Relative] value(integer)");
 					}
-					if (
-						!this.currentData.payables.quantityTotal ||
-						!this.integerRegex.test(this.currentData.payables.quantityTotal)
-					) {
+					if (!this.currentData.payables.quantityTotal) {
 						this.errors.push("Set valid Payables Quantity[Total] value(integer)");
 					}
-					if (this.currentData.receivables.quantityRelative > this.currentData.receivables.quantityTotal ||
-						this.currentData.payables.quantityRelative > this.currentData.payables.quantityTotal
-					) {
-						this.errors.push("Value Quantity[Relative] cannot be more than Quantity[Total]");
-					}
+					if(+this.currentData.receivables.quantityRelative > +this.currentData.receivables.quantityTotal){
+						this.errors.push("Value Quantity[Relative] in receivables, cannot be more than Quantity[Total]");
+          }
+					if(+this.currentData.payables.quantityRelative > +this.currentData.payables.quantityTotal){
+						this.errors.push("Value  Quantity[Relative] in payables, cannot be more than Quantity[Total]");
+          }
 				}
 
-				if (
-					!this.currentData.receivables.rate ||
-					!this.floatRegex.test(this.currentData.receivables.rate)
-				) {
+				if (!this.currentData.receivables.rate) {
 					this.errors.push("Set valid Receivables Rate value (integer/float)");
 				}
-				if (
-					!this.currentData.receivables.quantityRelative ||
-					!this.integerRegex.test(this.currentData.receivables.quantityRelative)
-				) {
+				if (!this.currentData.receivables.quantityRelative) {
 					this.errors.push("Set valid Receivables Quantity[Relative] value(integer)");
 				}
-				if (
-					!this.currentData.receivables.quantityTotal ||
-					!this.integerRegex.test(this.currentData.receivables.quantityTotal)
-				) {
+				if (!this.currentData.receivables.quantityTotal) {
 					this.errors.push("Set valid Receivables Quantity[Total] value(integer)");
 				}
 
@@ -154,14 +146,28 @@
 					return (this.areErrorsExist = true);
 				}
 				this.$emit("save", this.currentData);
-				this.cancel();
+				this.isEditing = false;
 			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false;
 			},
+      discardChanges(){
+	      const {clientRate, finance, totalWords, vendorRate, quantity} = this.step
+	      const {Wordcount, Price} = finance
+
+	      this.currentData.receivables.rate = clientRate.value
+	      this.currentData.receivables.quantityRelative = Wordcount.receivables
+	      this.currentData.receivables.quantityTotal = totalWords
+	      this.currentData.receivables.total = Price.receivables
+
+	      this.currentData.payables.rate = vendorRate.value
+	      this.currentData.payables.quantityRelative = Wordcount.payables
+	      this.currentData.payables.quantityTotal = quantity || 0
+	      this.currentData.payables.total = Price.payables
+      },
 			cancel() {
+        this.discardChanges();
 				this.isEditing = false;
-				this.currentData = "";
 				this.closeErrorsBlock();
 			},
 		},
@@ -170,7 +176,12 @@
 				if (newValue) {
 					this.nowTab = newValue;
 				}
-			}
+			},
+      cancelSave(action){
+				if(action){
+          this.discardChanges();
+        }
+      }
 		},
 		computed: {
 			...mapGetters({
@@ -217,6 +228,16 @@
 
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors";
+
+  input {
+    width: 70px;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
 
   .details {
     box-sizing: border-box;

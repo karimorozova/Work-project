@@ -31,7 +31,7 @@
               span.step-finance__value {{ row.payables }}
               span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
 
-        Results(:financeData="financeData")
+        Results(:step="step")
       InfoBlock(:step="step")
       TableMatrix(:step="step")
 

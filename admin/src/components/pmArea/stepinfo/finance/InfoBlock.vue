@@ -2,15 +2,15 @@
   .finance-info
     .finance-info__tabs
       Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
-    Details(:financeData="financeData" :selectedTab="selectedTab" @save="checkRateChange")
+    Details(:financeData="financeData" :step="step" :cancelSave="cancelSave" :selectedTab="selectedTab" @save="checkRateChange")
     .finance-info__modal(v-if="isModal")
       ApproveModal(
         :text="'Do you want to save rate in ' + rateOwner + ' language combinations?'"
         approveValue="Yes"
         notApproveValue="No"
         @approve="approveAction"
-        @notApprove="save"
-        @close="save"
+        @notApprove="noSave"
+        @close="noSave"
       )
 </template>
 
@@ -42,6 +42,7 @@
 				areErrorsExist: false,
 				isModal: false,
 				changedData: "",
+				cancelSave: false,
 			};
 		},
 		methods: {
@@ -75,9 +76,15 @@
 				// 	await this.save();
 				// }
 			},
+			noSave(){
+				this.isModal = false;
+				this.cancelSave = true;
+				setTimeout(() => {
+					this.cancelSave = false;
+        },500)
+			},
 			async approveAction() {
 				await this.save();
-
 				// const {rateValue, minimum} = this.changedData;
 				// if (this.selectedTab === "Receivables") {
 				// 	return await this.updateClientRate({
@@ -155,17 +162,14 @@
 						quantityRelative: Wordcount.receivables,
 						quantityTotal: totalWords,
 						total: Price.receivables,
-						// total: this.step.clientRate.value * this.step.finance.Wordcount.receivables,
 					},
 					payables: {
 						rate: vendorRate.value,
 						quantityRelative: Wordcount.payables,
 						quantityTotal: quantity || 0,
 						total: Price.payables
-						// total: this.step.vendorRate.value * this.step.finance.Wordcount.payables
 					}
 				}
-
 				// 	const stepRate =
 				// 		this.selectedTab === "Receivables"
 				// 			? this.step.clientRate
