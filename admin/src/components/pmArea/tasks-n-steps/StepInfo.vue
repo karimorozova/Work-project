@@ -1,7 +1,7 @@
 <template lang="pug">
 .step-info
     span.step-info__close(@click="closeInfo") +
-    .step-info__block.size Step Id - {{ step.stepId }}
+    .step-info__block.size Step ID - {{ step.stepId }}
     .step-info__block
         Vendor(
             :step="step"
@@ -15,7 +15,7 @@
             :financeData="financeData"
             @refreshFinance="refreshFinance"
         )
-    .step-info__block(v-if="step.serviceStep.symbol === 'translation'")
+    //.step-info__block(v-if="step.serviceStep.symbol === 'translation'")
         Matrix(
             :matrixData="matrixData"
             :step="step"

@@ -80,13 +80,13 @@ export default {
             try {
                 if(!this.step.vendor) return;
                 await this.$http.post("/vendorsapi/step-email", {projectId: this.currentProject._id, step : this.step});
-                this.alertToggle({message: "Email hase been sent", isShow: true, type: "success"});
+                this.alertToggle({message: "Email has been sent", isShow: true, type: "success"});
             } catch(err) {
                 this.alertToggle({message: "Internal server error / Cannot send email to vendor", isShow: true, type: "error"});
             }
         },
         gotToVendorInfo() {
-            this.$router.push(`/vendors/details/${this.vendor._id}`);
+	          window.open(`/vendors/details/${this.vendor._id}`, '_blank');
         },
         ...mapActions({
             alertToggle: "alertToggle",
