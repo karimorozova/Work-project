@@ -18,9 +18,9 @@
 	import ValidationErrors from "../../../ValidationErrors";
 	import ApproveModal from "../../../ApproveModal";
 	import Tabs from "@/components/Tabs";
-	// import LabelVal from "@/components/LabelVal";
 	import Details from "./Details";
 	import {mapActions} from "vuex";
+	// import LabelVal from "@/components/LabelVal";
 
 	export default {
 		props: {
@@ -93,27 +93,25 @@
 				// }
 			},
 			async save() {
+				const {receivables, payables} = this.changedData;
+
 				const Wordcount = {
-					receivables: this.changedData.receivables.quantityRelative,
-					payables: this.changedData.payables.quantityRelative,
-				};
-				const Price = {
-					receivables: this.changedData.receivables.rate * this.changedData.receivables.quantityRelative,
-					payables: this.changedData.payables.rate * this.changedData.payables.quantityRelative,
+					receivables: +receivables.quantityRelative,
+					payables: +payables.quantityRelative,
 				};
 				const clientRate = {
-					value: this.changedData.receivables.rate,
+					value: +receivables.rate,
 				};
 				const vendorRate = {
-					value: this.changedData.payables.rate,
+					value: +payables.rate,
 				};
-				const totalWords = this.changedData.receivables.quantityTotal;
-				const quantity = this.changedData.payables.quantityTotal;
+				const totalWords = +receivables.quantityTotal;
+				const quantity = +payables.quantityTotal;
 
 				try {
 					const changedStep = {
 						...this.step,
-						finance: {Price, Wordcount},
+						finance: {Wordcount},
 						clientRate,
 						vendorRate,
 						totalWords,
@@ -148,20 +146,26 @@
 		},
 		computed: {
 			financeData() {
+				const {clientRate, finance, totalWords, vendorRate, quantity, vendor} = this.step
+				const {Wordcount, Price} = finance
 				return {
+					vendor,
 					receivables: {
-						rate: this.step.clientRate.value,
-						quantityRelative: this.step.finance.Wordcount.receivables,
-						quantityTotal: this.step.totalWords,
-						total: this.step.clientRate.value * this.step.finance.Wordcount.receivables,
+						rate: clientRate.value,
+						quantityRelative: Wordcount.receivables,
+						quantityTotal: totalWords,
+						total: Price.receivables,
+						// total: this.step.clientRate.value * this.step.finance.Wordcount.receivables,
 					},
 					payables: {
-						rate: this.step.vendorRate.value,
-						quantityRelative: this.step.finance.Wordcount.payables,
-						quantityTotal: this.step.quantity || 0,
-						total: this.step.vendorRate.value * this.step.finance.Wordcount.payables
+						rate: vendorRate.value,
+						quantityRelative: Wordcount.payables,
+						quantityTotal: quantity || 0,
+						total: Price.payables
+						// total: this.step.vendorRate.value * this.step.finance.Wordcount.payables
 					}
 				}
+
 				// 	const stepRate =
 				// 		this.selectedTab === "Receivables"
 				// 			? this.step.clientRate
