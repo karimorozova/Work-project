@@ -5,7 +5,6 @@ const { updateVendorRatesFromCompetence } = require('./updateVendorRates');
 const saveQualifications = async (listOfNewCompetencies, vendorId) => {
   const allTests = await LangTest.find({});
   let { qualifications } = await Vendors.findOne({ _id: vendorId });
-
   let listForRates = [];
   const listCompetenciesForSave = listOfNewCompetencies.filter(competence => {
     let currentTest = allTests.find(test =>
@@ -14,13 +13,13 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       test.industries.find(industry => industry.toString() === competence.industry.toString()) &&
       test.steps.find(step => step.toString() === competence.step.toString())
     );
+    const ifExistsStep = isExists(currentTest.steps, competence.step);
     if (currentTest) {
       return competence;
     } else {
       listForRates.push(competence);
     }
   });
-
   let listQualificationsForSave = qualifications;
 
   listCompetenciesForSave.forEach(element => {
@@ -51,10 +50,14 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
           test.industries.find(industry => industry.toString() === element.industry.toString()) &&
           test.steps.find(step => step.toString() === element.step.toString())
         );
+
         const ifExistsStep = isExists(currentTestForItem.steps, element.step);
         if (ifExistsStep) {
           const ifExistsStepInQualification = isExists(listQualificationsForSave[findIndex].steps, element.step);
           ifExistsStepInQualification || listQualificationsForSave[findIndex].steps.push(element.step);
+          if (listQualificationsForSave[findIndex].status === 'Passed') {
+            listForRates.push(element);
+          }
         }
       }
     }
@@ -65,7 +68,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
     qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests),
   };
 
-  function qualificationsArrayAdditions(qualificationsArray, testsArray) {
+  function qualificationsArrayAdditions (qualificationsArray, testsArray) {
     let finalQualifivationArray = [];
     qualificationsArray.forEach(qualification => {
       let currentTest = testsArray.find(test =>
