@@ -105,42 +105,51 @@
 			},
 			checkForErrors() {
 				this.errors = [];
+				if (this.financeData.vendor !== null) {
+					if (
+						!this.currentData.payables.rate ||
+						!this.floatRegex.test(this.currentData.payables.rate)
+					) {
+						this.errors.push("Set valid Payables Rate value (integer/float)");
+					}
+					if (
+						!this.currentData.payables.quantityRelative ||
+						!this.integerRegex.test(this.currentData.payables.quantityRelative)
+					) {
+						this.errors.push("Set valid Payables Quantity[Relative] value(integer)");
+					}
+					if (
+						!this.currentData.payables.quantityTotal ||
+						!this.integerRegex.test(this.currentData.payables.quantityTotal)
+					) {
+						this.errors.push("Set valid Payables Quantity[Total] value(integer)");
+					}
+					if (this.currentData.receivables.quantityRelative > this.currentData.receivables.quantityTotal ||
+						this.currentData.payables.quantityRelative > this.currentData.payables.quantityTotal
+					) {
+						this.errors.push("Value Quantity[Relative] cannot be more than Quantity[Total]");
+					}
+				}
+
 				if (
 					!this.currentData.receivables.rate ||
 					!this.floatRegex.test(this.currentData.receivables.rate)
-				)
+				) {
 					this.errors.push("Set valid Receivables Rate value (integer/float)");
-				if (
-					!this.currentData.payables.rate ||
-					!this.floatRegex.test(this.currentData.payables.rate)
-				)
-					this.errors.push("Set valid Payables Rate value (integer/float)");
+				}
 				if (
 					!this.currentData.receivables.quantityRelative ||
 					!this.integerRegex.test(this.currentData.receivables.quantityRelative)
-				)
+				) {
 					this.errors.push("Set valid Receivables Quantity[Relative] value(integer)");
-				if (
-					!this.currentData.payables.quantityRelative ||
-					!this.integerRegex.test(this.currentData.payables.quantityRelative)
-				)
-					this.errors.push("Set valid Payables Quantity[Relative] value(integer)");
-				if (
-					!this.currentData.payables.quantityTotal ||
-					!this.integerRegex.test(this.currentData.payables.quantityTotal)
-				)
-					this.errors.push("Set valid Payables Quantity[Total] value(integer)");
+				}
 				if (
 					!this.currentData.receivables.quantityTotal ||
 					!this.integerRegex.test(this.currentData.receivables.quantityTotal)
-				)
+				) {
 					this.errors.push("Set valid Receivables Quantity[Total] value(integer)");
-
-				if(this.currentData.receivables.quantityRelative > this.currentData.receivables.quantityTotal ||
-					this.currentData.payables.quantityRelative > this.currentData.payables.quantityTotal
-        ){
-					this.errors.push("Value Quantity[Relative] cannot be more than Quantity[Total]");
 				}
+
 				if (this.errors.length) {
 					return (this.areErrorsExist = true);
 				}
