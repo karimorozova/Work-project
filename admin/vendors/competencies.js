@@ -9,8 +9,8 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
     let { competencies } = await getVendor({ _id: vendorId });
     if (dataToUpdate._id) {
       const neededServiceIndex = competencies.findIndex(item => item._id.toString() === dataToUpdate._id);
-      competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
       const oldCompetence = competencies[neededServiceIndex];
+      competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
       const { rates, qualifications } = await saveQualificationsAfterUpdateCompetencies(dataToUpdate, vendorId, oldCompetence);
       return getVendorAfterUpdate({ _id: vendorId }, { competencies, rates, qualifications });
     } else {

@@ -23,8 +23,9 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const targetLangDifference = compareIds(newData.targetLanguage, oldData.targetLanguage);
   const stepDifference = compareIds(newData.step, oldData.step);
   const industryDifference = compareIds(newData.industry, oldData.industry);
+  let updatedRates;
   if (sourceLangDifference || targetLangDifference) {
-    return await updateVendorLangPairs(
+    updatedRates = await updateVendorLangPairs(
       oldData,
       sourceLangDifference,
       targetLangDifference,
@@ -33,14 +34,15 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
     );
   }
   if (stepDifference) {
-    return await updateVendorStepMultipliers(oldData, stepDifference, vendor, defaultPricelist);
+    updatedRates = await updateVendorStepMultipliers(oldData, stepDifference, vendor, defaultPricelist);
   }
   if (industryDifference) {
-    return await updateIndustryMultipliers(oldData, industryDifference, vendor, defaultPricelist);
+    updatedRates = await updateIndustryMultipliers(oldData, industryDifference, vendor, defaultPricelist);
   }
+  return updatedRates
 
-  function compareIds(obj1, obj2) {
-    return obj1._id.toString() !== obj2._id.toString() ? obj1 : undefined;
+  function compareIds (obj1, id) {
+    return obj1._id.toString() === id.toString() ? undefined : obj1;
   }
 };
 

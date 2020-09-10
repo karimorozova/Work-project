@@ -127,9 +127,8 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
         ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id);
       }
     }
-  } else {
-    rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
   }
+  rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
   return {
     rates,
     qualifications: newQualifications
