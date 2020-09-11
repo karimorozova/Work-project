@@ -5,7 +5,7 @@
       .step-finance__info
         .step-finance__table(v-if="getUnitTypeByUnitId === 'CAT Wordcount'")
           DataTable(
-            :fields="fields"
+            :fields="fieldsCAT"
             :tableData="tableDataCAT"
             :tableheadClass="'table__header'"
             bodyClass="tbody_visible-overflow"
@@ -68,7 +68,7 @@
 		},
 		data() {
 			return {
-				fields: [
+				fieldsCAT: [
 					{
 						label: "Title",
 						headerKey: "headerTitle",
@@ -88,6 +88,46 @@
 						width: "33.33%",
 					},
 				],
+        fieldsOtherTitle:[
+	        {
+		        label: "Title",
+		        headerKey: "headerTitle",
+		        key: "title",
+		        width: "33.33%",
+	        },
+	        {
+		        label: "Receivables",
+		        headerKey: "headerReceivables",
+		        key: "receivables",
+		        width: "33.33%",
+	        },
+	        {
+		        label: "Payables",
+		        headerKey: "headerPayables",
+		        key: "payables",
+		        width: "33.33%",
+	        },
+        ],
+        fieldsOtherCalculations: [
+	        {
+		        label: "Unit",
+		        headerKey: "headerUnit",
+		        key: "unit",
+		        width: "33.33%",
+	        },
+	        {
+		        label: "Quantity Name",
+		        headerKey: "headerQuantityName",
+		        key: "quantityName",
+		        width: "33.33%",
+	        },
+	        {
+		        label: "",
+		        headerKey: "headerCount",
+		        key: "count",
+		        width: "33.33%",
+	        },
+        ],
 				isMainInfo: false,
 			};
 		},
