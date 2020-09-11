@@ -1,5 +1,4 @@
-const { payablesCalc } = require('../сalculations/wordcount');
-const { getVendorRate } = require('../сalculations/general');
+const { payablesCalc, getVendorRate } = require('../calculations');
 const { stepMiddleAssignNotification, stepMiddleReassignedNotification } = require('../utils');
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects');
 
@@ -11,9 +10,9 @@ async function reassignVendor(project, reassignData) {
         const newStep = getNewStep({isStart, progress, step, vendor, project, task: tasks[taskIndex]});
         const updatedStep = updateCurrentStep({step, isStart, isPay, progress});
         const stepIndex = steps.findIndex(item => item.stepId === step.stepId);
-        steps.splice(stepIndex, 1, updatedStep, newStep);
-        await updateMemoqProjectUsers(steps); 
-        tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
+      steps.splice(stepIndex, 1, updatedStep, newStep);
+      await updateMemoqProjectUsers(steps);
+      tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
         tasks[taskIndex].status = "Created";
         await stepMiddleReassignedNotification(updatedStep, reason, isPay);
         await stepMiddleAssignNotification(newStep, isStart);
@@ -25,8 +24,8 @@ async function reassignVendor(project, reassignData) {
 }
 
 function updateCurrentStep({step, isStart, isPay, progress}) {
-    let updatedStep = JSON.parse(JSON.stringify(step));
-    const { payables, receivables } = updatedStep.finance.Price; 
+  let updatedStep = JSON.parse(JSON.stringify(step));
+  const { payables, receivables } = updatedStep.finance.Price;
     updatedStep.finance.Price.receivables = 0;
     if(+progress) {
         updatedStep.status = "Cancelled Halfway";
@@ -46,7 +45,7 @@ function getUpdatedStepProgress(step, progress) {
         let updatedProgress = {...step.progress};
         updatedProgress.wordsDone = +(progress*step.progress.totalWordCount/100).toFixed(2);
         return updatedProgress;
-    } 
+    }
     return progress;
 }
 
@@ -91,9 +90,9 @@ function getStepPayables({task, step, project}) {
         })
         const Price = { ...step.finance.Price, payables };
         return {
-            ...step, 
-            finance: {...step.finance, Price}, 
-            vendorRate
+          ...step,
+          finance: { ...step.finance, Price },
+          vendorRate
         }
     }
 }
