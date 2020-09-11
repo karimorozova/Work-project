@@ -30,7 +30,7 @@ async function updateProjectMetrics ({ projectId }) {
           task.finance = {
             Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
             Price: setTaskFinance(taskSteps, 'Price'),
-          }
+          };
         } else {
           isMetricsExist = false;
         }
@@ -233,17 +233,19 @@ const setTaskFinance = (steps, prop) => {
     acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables;
     acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables;
     return acc;
-  }, {})
-}
+  }, {});
+};
 
 const getStepUnitsType = (stepUnits) => {
   const isObject = stepUnits.unit;
   if (isObject) {
     return 'object';
+  } else if (Array.isArray(stepUnits)) {
+    return 'array';
   } else {
     return 'json';
   }
-}
+};
 
 const isIncludesWordcount = (type, stepsAndUnits) => {
   let isIncludesWordCount;
@@ -252,11 +254,14 @@ const isIncludesWordcount = (type, stepsAndUnits) => {
     case 'object':
       isIncludesWordCount = stepsAndUnits.unit === 'CAT Wordcount';
       break;
+    case 'array':
+      isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
+      break;
     case 'json':
       stepsAndUnits = JSON.parse(stepsAndUnits);
       isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
   }
   return isIncludesWordCount;
-}
+};
 
 module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance };
