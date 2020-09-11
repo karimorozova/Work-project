@@ -9,6 +9,7 @@
     .project-info__all-info
         TasksAndSteps(
             :originallyLanguages="originallyLanguages"
+            :originallyUnits="originallyUnits"
             :isFinishedStatus="isFinishedStatus"
             @getMetrics="getMetrics"
             @setVendor="setVendor"
@@ -56,6 +57,7 @@ export default {
             mailSubject: "",
 
             originallyLanguages: null,
+	          originallyUnits: null,
         }
     },
     methods: {
@@ -214,6 +216,19 @@ export default {
             });
           }
         },
+        async getOriginallyUnits() {
+          try {
+            const result = await this.$http.get("/api/units");
+            this.originallyUnits = result.body;
+          } catch (err) {
+            this.alertToggle({
+              message: "Error in Originally Units",
+              isShow: true,
+              type: "error",
+            });
+          }
+        },
+
     },
     computed: {
         ...mapGetters({
@@ -239,6 +254,7 @@ export default {
         this.getProject();
         this.getVendors();
         this.getOriginallyLanguages();
+        this.getOriginallyUnits();
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {

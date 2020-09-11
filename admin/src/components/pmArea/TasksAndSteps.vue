@@ -24,6 +24,7 @@
             :allSteps="currentProject.steps"
             :tasks="currentProject.tasks"
             :originallyLanguages="originallyLanguages"
+            :originallyUnits="originallyUnits"
             @setVendor="setVendor"
             @setDate="setDate"
             @showTab="showTab"
@@ -43,6 +44,9 @@ export default {
         isFinishedStatus: {type: Boolean},
         originallyLanguages: {
             type: Array
+        },
+        originallyUnits: {
+          type: Array
         }
     },
     data() {

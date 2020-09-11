@@ -23,6 +23,8 @@ Vue.filter("maxRateCount", (num) => {
     newNum = 100;
   } else if (newNum < 0) {
     newNum = 0;
+  }else if ("" === newNum){
+    newNum = 0;
   }
   return newNum;
 });

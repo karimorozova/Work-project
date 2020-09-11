@@ -122,6 +122,7 @@
                     :task="getTask(infoIndex)"
                     @closeStepInfo="closeStepInfo"
                     :originallyLanguages="originallyLanguages"
+                    :originallyUnits="originallyUnits"
                 )
     .steps__reassignment(v-if="isReassignment")
         Reassignment(@close="closeReassignment" :step="reassignStep")
@@ -168,7 +169,10 @@ export default {
       },
       originallyLanguages: {
         type: Array
-      }
+      },
+	    originallyUnits: {
+		    type: Array
+	    }
     },
     data() {
         return {

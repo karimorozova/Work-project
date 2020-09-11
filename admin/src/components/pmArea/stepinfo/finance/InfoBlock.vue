@@ -2,29 +2,63 @@
   .finance-info
     .finance-info__tabs
       Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
-    Details(:financeData="financeData" :step="step" :cancelSave="cancelSave" :selectedTab="selectedTab" @save="checkRateChange")
+
+    DetailsTranslation(
+      v-if="getUnitTypeByUnitId === 'CAT Wordcount'"
+      :financeData="financeDataTranslation"
+      :step="step"
+      :cancelSave="cancelSave"
+      :selectedTab="selectedTab"
+      @save="checkRateChange"
+    )
+    DetailsPackages(
+      v-if="getUnitTypeByUnitId === 'Packages'"
+      :financeData="financeDataPackages"
+      :step="step"
+      :cancelSave="cancelSave"
+      :selectedTab="selectedTab"
+      @save="checkRateChange"
+    )
+    DetailsHours(
+      v-if="getUnitTypeByUnitId !== 'CAT Wordcount' && getUnitTypeByUnitId !== 'Packages'"
+      :financeData="financeDataHours"
+      :step="step"
+      :cancelSave="cancelSave"
+      :selectedTab="selectedTab"
+      @save="checkRateChange"
+    )
+
     .finance-info__modal(v-if="isModal")
       ApproveModal(
-        :text="'Do you want to save rate in ' + rateOwner + ' language combinations?'"
+        :text="'Are you sure you wish to change the default ' + rateOwner + ' rate'"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="approveAction"
         @notApprove="noSave"
         @close="noSave"
       )
+    TableMatrix(v-if="getUnitTypeByUnitId === 'CAT Wordcount'", :step="step" :selectedTab="selectedTab")
+
 </template>
 
 <script>
 	import ValidationErrors from "../../../ValidationErrors";
 	import ApproveModal from "../../../ApproveModal";
 	import Tabs from "@/components/Tabs";
-	import Details from "./Details";
+	import DetailsTranslation from "./DetailsTranslation";
+	import DetailsHours from "./DetailsHours";
+	import DetailsPackages from "./DetailsPackages";
 	import {mapActions} from "vuex";
-	// import LabelVal from "@/components/LabelVal";
+	import TableMatrix from "./TableMatrix"
 
 	export default {
 		props: {
-			step: {type: Object},
+			step: {
+				type: Object
+			},
+			originallyUnits: {
+				type: Array
+			}
 		},
 		data() {
 			return {
@@ -63,60 +97,36 @@
 			async checkRateChange(data) {
 				this.changedData = data;
 				this.isModal = true;
-
-				// const {rate} = data;
-				// const {clientRate, vendorRate} = this.step;
-				// if (
-				// 	(this.selectedTab === "Receivables" && rate !== clientRate) ||
-				// 	(this.selectedTab === "Payables" && rate !== vendorRate)
-				// ) {
-				// 	this.isModal = true;
-				// 	this.changedData = data;
-				// } else {
-				// 	await this.save();
-				// }
 			},
-			noSave(){
+			noSave() {
 				this.isModal = false;
 				this.cancelSave = true;
 				setTimeout(() => {
 					this.cancelSave = false;
-        },500)
+				}, 500)
 			},
 			async approveAction() {
 				await this.save();
-				// const {rateValue, minimum} = this.changedData;
-				// if (this.selectedTab === "Receivables") {
-				// 	return await this.updateClientRate({
-				// 		step: this.step,
-				// 		rate: {...this.step.clientRate, value: +rateValue, min: +minimum},
-				// 	});
-				// }
-				// if (this.step.vendor) {
-				// 	return await this.updateVendorRate({
-				// 		step: this.step,
-				// 		rate: {...this.step.vendorRate, value: +rateValue, min: +minimum},
-				// 	});
-				// }
 			},
 			async save() {
 				const {receivables, payables} = this.changedData;
+				let changedStep = {};
 
-				const Wordcount = {
-					receivables: +receivables.quantityRelative,
-					payables: +payables.quantityRelative,
-				};
 				const clientRate = {
 					value: +receivables.rate,
 				};
 				const vendorRate = {
 					value: +payables.rate,
 				};
-				const totalWords = +receivables.quantityTotal;
-				const quantity = +payables.quantityTotal;
 
-				try {
-					const changedStep = {
+				if (this.getUnitTypeByUnitId === 'CAT Wordcount') {
+					const Wordcount = {
+						receivables: +receivables.quantityRelative,
+						payables: +payables.quantityRelative,
+					};
+					const totalWords = +receivables.quantityTotal;
+					const quantity = +payables.quantityTotal;
+					changedStep = {
 						...this.step,
 						finance: {Wordcount},
 						clientRate,
@@ -124,9 +134,25 @@
 						totalWords,
 						quantity,
 					};
-
+				} else if (this.getUnitTypeByUnitId === 'Packages') {
+					const quantity = this.changedData.quantityTotal;
+					changedStep = {
+						...this.step,
+						clientRate,
+						vendorRate,
+						quantity,
+					};
+				} else {
+					const hours = this.changedData.quantityTotal;
+					changedStep = {
+						...this.step,
+						clientRate,
+						vendorRate,
+						hours,
+					};
+				}
+				try {
 					await this.updateStepFinance(changedStep);
-
 					this.alertToggle({
 						message: "Step finance saved!",
 						isShow: true,
@@ -142,20 +168,17 @@
 					this.isModal = false;
 				}
 			},
-			// collectData(data) {
-			// 	const {quantityTotal, quantityRelative} = data;
-			// 	const Wordcount = {
-			// 		receivables: +quantityTotal,
-			// 		payables: +quantityRelative,
-			// 	};
-			// 	return {Price: {...this.step.finance.Price}, Wordcount};
-			// },
 		},
 		computed: {
-			financeData() {
-				const {clientRate, finance, totalWords, vendorRate, quantity, vendor} = this.step
+			getUnitTypeByUnitId() {
+				return this.originallyUnits
+					.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
+			},
+			financeDataTranslation() {
+				const {clientRate, finance, status, totalWords, vendorRate, quantity, vendor} = this.step
 				const {Wordcount, Price} = finance
 				return {
+					stepStatus: status,
 					vendor,
 					receivables: {
 						rate: clientRate.value,
@@ -170,40 +193,41 @@
 						total: Price.payables
 					}
 				}
-				// 	const stepRate =
-				// 		this.selectedTab === "Receivables"
-				// 			? this.step.clientRate
-				// 			: this.step.vendorRate;
-				//
-				//
-				// 	const rateValue = stepRate ? stepRate.value : 0;
-				// 	const rateMin = stepRate ? stepRate.min : 0;
-				// 	const quantityRelative =
-				// 		this.selectedTab === "Receivables"
-				// 			? +this.step.finance.Wordcount.receivables
-				// 			: this.step.finance.Wordcount.payables;
-				//
-				//
-				// 	// const stepDiscount = this.selectedTab === "Receivables" ? this.step.clientDiscount : this.step.vendorDiscount;
-				// 	let subtotal =
-				// 		this.selectedTab === "Receivables"
-				// 			? +this.step.finance.Price.receivables
-				// 			: +this.step.finance.Price.payables;
-				// 	if (this.step.finance.Price.halfReceivables >= 0) {
-				// 		subtotal =
-				// 			this.selectedTab === "Receivables"
-				// 				? +this.step.finance.Price.halfReceivables
-				// 				: +this.step.finance.Price.halfPayables;
-				// 	}
-				// 	return {
-				// 		// stepStatus: this.step.status,
-				// 		// rateValue,
-				// 		// quantityRelative,
-				// 		// quantityTotal: this.step.totalWords || this.step.quantity,
-				// 		// subtotal,
-				// 		// minimum: rateMin,
-				// 		// discount: stepDiscount || 0
-				// 	};
+			},
+			financeDataPackages() {
+				const {clientRate, finance, status, vendorRate, quantity, vendor} = this.step
+				const {Price} = finance
+				return {
+					stepStatus: status,
+					vendor,
+					quantityTotal: quantity,
+					receivables: {
+						rate: clientRate.value,
+						total: Price.receivables,
+					},
+					payables: {
+						rate: vendorRate.value,
+						total: Price.payables
+					},
+				}
+			},
+			financeDataHours() {
+				const {clientRate, finance, status, vendorRate, hours, vendor} = this.step
+				const {Price} = finance
+				return {
+					stepStatus: status,
+					vendor,
+					receivables: {
+						rate: clientRate.value,
+						quantityTotal: hours,
+						total: Price.receivables,
+					},
+					payables: {
+						rate: vendorRate.value,
+						quantityTotal: hours,
+						total: Price.payables
+					},
+				}
 			},
 			rateOwner() {
 				return this.selectedTab === "Receivables" ? "Client's" : "Vendor's";
@@ -220,7 +244,10 @@
 			ValidationErrors,
 			ApproveModal,
 			Tabs,
-			Details,
+			DetailsTranslation,
+			TableMatrix,
+			DetailsHours,
+			DetailsPackages
 		},
 	};
 </script>
@@ -240,4 +267,5 @@
       margin-top: 25px;
     }
   }
+
 </style>

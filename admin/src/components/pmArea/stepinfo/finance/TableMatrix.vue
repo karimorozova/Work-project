@@ -12,11 +12,13 @@
       template(slot="empty", slot-scope="{ row, index }")
         .tableMatrix__data {{ row.text }}
       template(slot="1", slot-scope="{ row, index }")
-        .tableMatrix__data {{ row.client }}
+        .tableMatrix__data(v-if="selectedTab === 'Receivables'") {{ row.client }}
+        .tableMatrix__data(v-if="selectedTab === 'Payables'") {{ row.vendor }}
       template(slot="2", slot-scope="{ row, index }")
         .tableMatrix__data {{ row.value }}
       template(slot="3", slot-scope="{ row, index }")
-        .tableMatrix__data {{ calculatedRate(row.client, row.value)}}
+        .tableMatrix__data(v-if="selectedTab === 'Receivables'") {{ calculatedRate(row.client, row.value) }}
+        .tableMatrix__data(v-if="selectedTab === 'Payables'") {{ calculatedRate(row.vendor, row.value) }}
 </template>
 
 <script>
@@ -28,6 +30,9 @@
 		props: {
 			step: {
 				type: Object
+			},
+			selectedTab: {
+				type: String,
 			},
 		},
 		data() {
@@ -84,8 +89,8 @@
 				}
 				return arrayOfMetrics;
 			},
-			calculatedRate(clientValue, wordCount) {
-				const currentNumber = (clientValue * wordCount) / 100
+			calculatedRate(rate, wordCount) {
+				const currentNumber = (rate * wordCount) / 100
 				return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(3)
 			}
 		},

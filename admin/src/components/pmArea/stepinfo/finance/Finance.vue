@@ -3,10 +3,10 @@
     StepInfoTitle(title="Finance" :isIconReversed="isMainInfo" @titleClick="toggleMainInfo")
     .step-finance__main(v-if="isMainInfo")
       .step-finance__info
-        .step-finance__table
+        .step-finance__table(v-if="getUnitTypeByUnitId === 'CAT Wordcount'")
           DataTable(
             :fields="fields"
-            :tableData="tableData"
+            :tableData="tableDataCAT"
             :tableheadClass="'table__header'"
             bodyClass="tbody_visible-overflow"
             :tableheadRowClass="'table__header-row tbody_visible-overflow'"
@@ -31,9 +31,13 @@
               span.step-finance__value {{ row.payables }}
               span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
 
+        .step-finance__table(v-else) sdsdsdsdsd
+
         Results(:step="step")
-      InfoBlock(:step="step")
-      TableMatrix(:step="step")
+      InfoBlock(
+        :step="step"
+        :originallyUnits="originallyUnits"
+      )
 
 
 </template>
@@ -45,12 +49,22 @@
 	import ApproveModal from "../../../ApproveModal";
 	import Results from "./Results";
 	import InfoBlock from "./InfoBlock";
-	import TableMatrix from "./TableMatrix"
 
 	export default {
 		props: {
 			step: {type: Object},
-			financeData: {type: Array, default: () => []},
+			financeDataCAT: {
+				type: Array, default: () => []
+			},
+			originallyUnits: {
+				type: Array
+			},
+			financeDataOtherUnitsCalculations: {
+				type: Array, default: () => []
+			},
+			financeDataOtherUnitsTitle: {
+				type: Array, default: () => []
+			}
 		},
 		data() {
 			return {
@@ -92,14 +106,13 @@
 			ApproveModal,
 			Results,
 			InfoBlock,
-			TableMatrix,
 		},
 		computed: {
-			tableData() {
+			tableDataCAT() {
 				let result = [];
-				const dataLength = this.financeData.length;
+				const dataLength = this.financeDataCAT.length;
 				if (dataLength) {
-					result = this.financeData;
+					result = this.financeDataCAT;
 					result.splice(dataLength - 1, 0, {
 						title: "Rate",
 						receivables: this.step.clientRate ? this.step.clientRate.value : 0,
@@ -107,6 +120,10 @@
 					});
 				}
 				return result;
+			},
+			getUnitTypeByUnitId() {
+				return this.originallyUnits
+					.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
 			},
 		},
 	};

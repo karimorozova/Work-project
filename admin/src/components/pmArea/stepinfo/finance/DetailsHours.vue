@@ -7,27 +7,16 @@
         .col__title Rate:
           span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
           input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.rate")
-      .details__col(v-if="nowTab === 'Receivables'")
-        .col__title Quantity[Relative]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.receivables.quantityRelative }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.quantityRelative")
-      .details__col(v-if="nowTab === 'Receivables'")
-        .col__title Quantity [Total]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.receivables.quantityTotal }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.quantityTotal")
 
       .details__col(v-if="nowTab === 'Payables'")
         .col__title Rate:
           span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.payables.rate }} &euro;
           input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.rate")
-      .details__col(v-if="nowTab === 'Payables'")
-        .col__title Quantity[Relative]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.payables.quantityRelative }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.quantityRelative")
-      .details__col(v-if="nowTab === 'Payables'")
+
+      .details__col
         .col__title Quantity [Total]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.payables.quantityTotal }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.quantityTotal")
+          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.quantityTotal }}
+          input.details__input(v-else type="number" size="6" v-model.number="currentData.quantityTotal")
 
 
     .details__row.details_border-top(v-if="nowTab === 'Receivables'")
@@ -36,7 +25,7 @@
           .col__title Total:
             span.details__data(
               type="text"
-              :value="financeData.receivables.rate"
+              :value="financeData.receivables.total"
               :class="{'details_opacity-06': !isEditing}"
             ) {{ financeData.receivables.total }} &euro;
 
@@ -46,11 +35,12 @@
           .col__title Total:
             span.details__data(
               type="text"
-              :value="financeData.payables.rate"
+              :value="financeData.payables.total"
               :class="{'details_opacity-06': !isEditing}"
             ) {{ financeData.payables.total }} &euro;
 
     ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock" :isAbsolute="isEditing")
+
 </template>
 
 <script>
@@ -71,8 +61,8 @@
 			},
 			cancelSave: {
 				type: Boolean,
-        default: false,
-      }
+				default: false,
+			}
 		},
 		data() {
 			return {
@@ -90,8 +80,6 @@
 					payables: {},
 				},
 				areErrorsExist: false,
-				// floatRegex: /^[+-]?\d+(\.\d+)?$/,
-				// integerRegex: /^[1-9]\d*$/,
 				nowTab: 'Receivables',
 			};
 		},
@@ -118,28 +106,12 @@
 					if (!this.currentData.payables.rate) {
 						this.errors.push("Set valid Payables Rate value (integer/float)");
 					}
-					if (!this.currentData.payables.quantityRelative) {
-						this.errors.push("Set valid Payables Quantity[Relative] value(integer)");
-					}
-					if (!this.currentData.payables.quantityTotal) {
-						this.errors.push("Set valid Payables Quantity[Total] value(integer)");
-					}
-					if(+this.currentData.receivables.quantityRelative > +this.currentData.receivables.quantityTotal){
-						this.errors.push("Value Quantity[Relative] in receivables, cannot be more than Quantity[Total]");
-          }
-					if(+this.currentData.payables.quantityRelative > +this.currentData.payables.quantityTotal){
-						this.errors.push("Value  Quantity[Relative] in payables, cannot be more than Quantity[Total]");
-          }
 				}
-
 				if (!this.currentData.receivables.rate) {
 					this.errors.push("Set valid Receivables Rate value (integer/float)");
 				}
-				if (!this.currentData.receivables.quantityRelative) {
-					this.errors.push("Set valid Receivables Quantity[Relative] value(integer)");
-				}
-				if (!this.currentData.receivables.quantityTotal) {
-					this.errors.push("Set valid Receivables Quantity[Total] value(integer)");
+				if (!this.currentData.quantityTotal) {
+					this.errors.push("Set valid Quantity[Total] value(integer)");
 				}
 
 				if (this.errors.length) {
@@ -151,22 +123,20 @@
 			closeErrorsBlock() {
 				this.areErrorsExist = false;
 			},
-      discardChanges(){
-	      const {clientRate, finance, totalWords, vendorRate, quantity} = this.step
-	      const {Wordcount, Price} = finance
+			discardChanges(){
+				const {clientRate, finance, hours, vendorRate} = this.step
+				const {Price} = finance
 
-	      this.currentData.receivables.rate = clientRate.value
-	      this.currentData.receivables.quantityRelative = Wordcount.receivables
-	      this.currentData.receivables.quantityTotal = totalWords
-	      this.currentData.receivables.total = Price.receivables
+				this.currentData.quantityTotal = hours
 
-	      this.currentData.payables.rate = vendorRate.value
-	      this.currentData.payables.quantityRelative = Wordcount.payables
-	      this.currentData.payables.quantityTotal = quantity || 0
-	      this.currentData.payables.total = Price.payables
-      },
+				this.currentData.receivables.rate = clientRate.value
+				this.currentData.receivables.total = Price.receivables
+
+				this.currentData.payables.rate = vendorRate.value
+				this.currentData.payables.total = Price.payables
+			},
 			cancel() {
-        this.discardChanges();
+				this.discardChanges();
 				this.isEditing = false;
 				this.closeErrorsBlock();
 			},
@@ -177,11 +147,11 @@
 					this.nowTab = newValue;
 				}
 			},
-      cancelSave(action){
+			cancelSave(action){
 				if(action){
-          this.discardChanges();
-        }
-      }
+					this.discardChanges();
+				}
+			}
 		},
 		computed: {
 			...mapGetters({
