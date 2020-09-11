@@ -1,12 +1,10 @@
 const router = require("express").Router();
 const { User, Clients, Delivery, Projects } = require("../../models");
 const { getClient } = require("../../clients");
-const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
-const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-
+const { setDefaultStepVendors, calcCost, updateProjectCosts, getAfterPayablesUpdated } = require('../../calculations');
 const {
   getProject, createProject, createTasks, createTaskWithCommonUnits, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
-  manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
+  manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps,
   getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
   getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate
 } = require("../../projects");
@@ -146,11 +144,10 @@ router.post('/update-matrix', async (req, res) => {
     let tasks = [...project.tasks];
     let steps = [...project.steps];
     tasks[taskIndex].metrics[key][prop] = +value / 100;
-    const cost = calcCost(tasks[taskIndex].metrics, prop, rate);
-    steps[stepIndex].finance.Price[costName] = cost;
+    steps[stepIndex].finance.Price[costName] = calcCost(tasks[taskIndex].metrics, prop, rate);
     tasks[taskIndex].finance.Price[costName] = steps.filter(item => item.taskId === taskId).reduce((init, cur) => {
       return init + +cur.finance.Price[costName];
-    }, 0)
+    }, 0);
     let updatedProject = { ...project._doc, id: projectId, tasks, steps };
     const result = await updateProjectCosts(updatedProject);
     res.send(result);
@@ -679,8 +676,7 @@ router.post("/request-file", upload.fields([{ name: "newFile" }]), async (req, r
   const prop = existingFile.type === 'Source File' ? "sourceFiles" : "refFiles";
   try {
     let request = await getClientRequest({ "_id": id });
-    const requestFiles = await addRequestFile({ request, files, existingFile, prop });
-    request[prop] = requestFiles;
+    request[prop] = await addRequestFile({ request, files, existingFile, prop });
     await request.save();
     res.send(request);
   } catch (err) {

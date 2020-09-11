@@ -8,17 +8,17 @@ const apiUrl = require('../helpers/apiurl');
 
 async function storeFiles(filesArr, projectId) {
     try {
-        const project = await getProject({"_id": projectId});
-        const { tasks } = project;
-        let storedFiles = [];
-        if(filesArr.length) {
-            for(let file of filesArr) {
-                const newPath = `./dist/projectFiles/${projectId}/${tasks.length+1}-${file.filename.replace(/\s+/g, '_')}`;
-                await moveProjectFile(file, newPath);
-                storedFiles.push(newPath);
-            }
+      const project = await getProject({ "_id": projectId });
+      const { tasks } = project;
+      let storedFiles = [];
+      if (!!filesArr && filesArr.length) {
+        for (let file of filesArr) {
+          const newPath = `./dist/projectFiles/${projectId}/${tasks.length + 1}-${file.filename.replace(/\s+/g, '_')}`;
+          await moveProjectFile(file, newPath);
+          storedFiles.push(newPath);
         }
-        return storedFiles;
+      }
+      return storedFiles;
     } catch(err) {
         console.log(err);
         console.log("Error in storeFiels")
@@ -86,13 +86,13 @@ async function getPdf(project) {
         const html = await getPdfOfQuote(project);
         var options = { width: '820', height: '900', orientation: "landscape", base: apiUrl };
         return new Promise((resolve, reject) => {
-            htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function(err, res) {
-                if (err) {
-                    console.log(err)
-                    reject(err);
-                }
-                resolve('./dist/uploads/htmlpdf.pdf');
-              });
+          htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function (err) {
+            if (err) {
+              console.log(err);
+              reject(err);
+            }
+            resolve('./dist/uploads/htmlpdf.pdf');
+          });
         })
     } catch(err) {
         console.log(err);

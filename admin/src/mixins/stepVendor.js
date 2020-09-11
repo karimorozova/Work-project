@@ -1,4 +1,4 @@
-const { findFittingVendor } = require('../../сalculations/vendor');
+const { findFittingVendor } = require('../../calculations');
 export default {
   methods: {
     extendedVendors(index) {
@@ -48,7 +48,7 @@ export default {
     isVendorMatchesForDuoRate({ratesProp, step, vendor}) {
       return vendor[ratesProp].find(item => {
 
-        item.source == undefined ? item.source = { symbol: 'EN-GB' } : false
+        item.source === undefined ? item.source = { symbol: 'EN-GB' } : false;
 
         if (item.source.symbol === step.sourceLanguage &&
           item.target.symbol === step.targetLanguage) {
