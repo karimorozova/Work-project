@@ -1,8 +1,11 @@
-function getStepsWithFinanceUpdated(step, project) {
+const { Units } = require('../models');
+
+async function getStepsWithFinanceUpdated (step, project) {
   let { steps } = project;
   const task = project.tasks.find(item => item.taskId === step.taskId);
-  const isForCatWordcount = step.hasOwnProperty('totalWords');
-  const { receivables, payables } = isForCatWordcount ? getWordsPrices(step, task.metrics) : getPrices(step);
+  const unitType = await checkUnitType(step.serviceStep.unit);
+  const { receivables, payables } = unitType === 'CAT Wordcount' ? getWordsPrices(step, task.metrics) :
+    getPrices(step, unitType);
   const stepIndex = steps.findIndex(item => item.id === step._id);
   steps[stepIndex] = {
     ...step,
@@ -13,20 +16,19 @@ function getStepsWithFinanceUpdated(step, project) {
   return steps;
 }
 
-function getPrices(step) {
+function getPrices (step, unitType) {
   const { clientRate, vendorRate, finance } = step;
   let receivables = +finance.Price.receivables;
   let payables = +finance.Price.payables;
-  const isHours = step.hasOwnProperty('hours');
   if (clientRate) {
-    const clientValue = isHours ? +(step.hours * clientRate.value).toFixed(2) : clientRate.value;
-    receivables = clientValue > clientRate.min ? clientValue : clientRate.min;
+    receivables = unitType === 'Packages' ? +(step.quantity * clientRate.value).toFixed(2) :
+      +(step.hours * clientRate.value).toFixed(2);
   }
   if (vendorRate) {
-    const vendorValue = isHours ? +(step.hours * vendorRate.value).toFixed(2) : vendorRate.value;
-    payables = vendorValue > vendorRate.min ? vendorValue : vendorRate.min;
+    payables = unitType === 'Packages' ? +(step.quantity * vendorRate.value).toFixed(2) :
+      +(step.hours * vendorRate.value).toFixed(2);
   }
-  return { receivables, payables }
+  return { receivables, payables };
 }
 
 function getWordsPrices (step) {
@@ -35,7 +37,7 @@ function getWordsPrices (step) {
   let payables = 0;
   // let wordsSum = 0;
   if (step.name === "Translation") {
-    receivables = +step.finance.Wordcount.receivables * clientRate.value
+    receivables = +step.finance.Wordcount.receivables * clientRate.value;
     const doesStepHasVendorRate = vendorRate.hasOwnProperty('value');
     payables = doesStepHasVendorRate ? +step.finance.Wordcount.payables * +vendorRate.value : 0;
     // for (let key in metrics) {
@@ -56,4 +58,9 @@ function getWordsPrices (step) {
   };
 }
 
-module.exports = { getStepsWithFinanceUpdated }
+const checkUnitType = async (unitId) => {
+  const { type } = await Units.findOne({ _id: unitId });
+  return type;
+};
+
+module.exports = { getStepsWithFinanceUpdated };

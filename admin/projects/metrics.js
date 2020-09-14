@@ -1,9 +1,9 @@
 const { getProject, updateProject } = require('./getProjects');
-const { CurrencyRatio, Clients, Pricelist, Step, Units, Languages, Vendors } = require('../models');
+const { Step, Units } = require('../models');
+const { setStepFinanceData } = require('../сalculations/finance');
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
-const { getProjectAnalysis } = require('../services/memoqs/projects');
-const { multiplyPrices } = require('../multipliers');
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
+const { getProjectAnalysis } = require('../services/memoqs/projects');
 const ObjectId = require('mongodb').ObjectID;
 
 
@@ -26,7 +26,7 @@ async function updateProjectMetrics ({ projectId }) {
           task.finance = {
             Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
             Price: setTaskFinance(taskSteps, 'Price'),
-          };
+          }
         } else {
           isMetricsExist = false;
         }
@@ -116,7 +116,7 @@ async function getTaskSteps (steps, task, industry, customer) {
   const serviceSteps = task.service.steps.reduce((acc, cur) => {
     return { ...acc, [cur.stage]: cur.step };
   }, {});
-  const { sourceLanguage, targetLanguage } = task;
+  const { sourceLanguage, targetLanguage, metrics } = task;
   let updatedSteps = JSON.parse(JSON.stringify(steps));
   const stepsAndUnits = JSON.parse(task.stepsAndUnits);
   let counter = 1;
@@ -131,11 +131,12 @@ async function getTaskSteps (steps, task, industry, customer) {
       unit: ObjectId(unitId),
       size: stepsAndUnits[i].size || 1,
       memoqAssignmentRole: i
-    }
+    };
+    const quantity = metrics.totalWords;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await setProjectFinanceData({
-      customer, industry, serviceStep, task, vendorId
-    });
+    const { finance, clientRate, vendorRate, vendor } = await setStepFinanceData({
+      customer, industry, serviceStep, task, vendorId, quantity
+    }, true);
     const step = {
       stepId: `${task.taskId} ${stepsIdCounter}`,
       taskId: task.taskId,
@@ -155,11 +156,11 @@ async function getTaskSteps (steps, task, industry, customer) {
       clientRate,
       finance,
       vendorRate,
-      totalWords: task.metrics.totalWords,
+      totalWords: quantity,
       check: false,
       vendorsClickedOffer: [],
       isVendorRead: false
-    }
+    };
     if (type !== 'CAT Wordcount' && type !== 'Packages') {
       delete step.totalWords;
       Object.assign(step, { hours: stepsAndUnits[i].hours, size: stepsAndUnits[i].size });
@@ -168,7 +169,7 @@ async function getTaskSteps (steps, task, industry, customer) {
       Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
     } else {
       if (!step.hasOwnProperty('totalWords')) {
-        Object.assign(step, { totalWords: task.metrics.totalWords, quantity: task.metrics.totalWords });
+        Object.assign(step, { totalWords: quantity, quantity });
       }
     }
     updatedSteps.push(step);
@@ -183,13 +184,6 @@ async function getTaskSteps (steps, task, industry, customer) {
   }
   return updatedSteps;
 }
-
-// function getStepDeadline (task, i) {
-//   if (task.stepsDates.length > 1) {
-//     return task.stepsDates[i].deadline || task.deadline;
-//   }
-//   return task.deadline;
-// }
 
 function getStepWordcount (taskMetrics, stage) {
   const receivables = stage === 'stage1' ? calculateTranslationWords(taskMetrics) : taskMetrics.totalWords;
@@ -228,62 +222,6 @@ function setStepsProgress (symbol, docs) {
   return { ...stepProgress, ...totalProgress };
 }
 
-const setProjectFinanceData = async (projectData) => {
-  const { customer, serviceStep, industry, task, vendorId } = projectData;
-  const { metrics, sourceLanguage, targetLanguage } = task;
-  let vendor;
-  if (vendorId) {
-    vendor = await Vendors.findOne({ _id: vendorId });
-  }
-  const client = await Clients.findOne({ _id: customer });
-  const currencyRatio = await CurrencyRatio.findOne();
-  const { rates, defaultPricelist, currency } = client;
-  const pricelist = await Pricelist.findOne({ _id: defaultPricelist });
-  const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage });
-  const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage });
-  const { step, unit, size } = serviceStep;
-  const dataForComparison = {
-    sourceLanguage: sourceId,
-    targetLanguage: targetId,
-    step,
-    unit,
-    size: size ? size : 1,
-    industry: industry._id,
-  }
-  let clientPrice = getPriceFromPersonRates(
-    rates.pricelistTable,
-    dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio);
-
-  let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison)
-    || getPriceFromPricelist(pricelist, dataForComparison, currency, vendor.currency)
-    : 0;
-
-  const clientRate = {
-    value: clientPrice,
-    active: true,
-  };
-  const vendorRate = {
-    value: vendorPrice,
-    active: true
-  }
-  const totalWordsValue = metrics.totalWords || metrics.noMatch.value;
-  return {
-    clientRate,
-    vendorRate,
-    vendor: vendor ? vendor._id : null,
-    finance: {
-      Wordcount: {
-        receivables: getRelativeQuantity(metrics),
-        payables: totalWordsValue,
-      },
-      Price: {
-        receivables: +clientRate.value * +totalWordsValue,
-        payables: vendor ? +vendorRate.value + totalWordsValue : 0,
-      }
-    }
-  }
-};
-
 const setTaskFinance = (steps, prop) => {
   return steps.reduce((acc, cur) => {
     const receivables = +cur.finance[prop].receivables;
@@ -291,72 +229,17 @@ const setTaskFinance = (steps, prop) => {
     acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables;
     acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables;
     return acc;
-  }, {});
-};
-
-
-const getPriceFromPersonRates = (pricelistTable, data) => {
-  const { sourceLanguage, targetLanguage, step, unit, size } = data;
-  const row = pricelistTable.find(row => (
-    row.sourceLanguage.toString() === sourceLanguage.toString() &&
-    row.targetLanguage.toString() === targetLanguage.toString() &&
-    row.step.toString() === step.toString() &&
-    row.unit.toString() === unit.toString() &&
-    row.size.toString() === size.toString()
-  ));
-  return row ? row.price : undefined;
-}
-
-const getPriceFromPricelist = (pricelist, data, currency, currencyRatio) => {
-  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = pricelist;
-  const { sourceLanguage, targetLanguage, step, unit, size, industry } = data;
-  let row = basicPricesTable.find(langPair => (
-    `${langPair.sourceLanguage} ${langPair.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
-  ));
-  if (!row) row = {
-    euroBasicPrice: 1,
-    usdBasicPrice: currencyRatio.USD,
-    gbpBasicPrice: currencyRatio.GBP
-  };
-  const stepRow = stepMultipliersTable.find(item => (
-    `${item.step} ${item.unit} ${item.size}` === `${step} ${unit} ${size}`
-  ));
-  const stepMultiplier = stepRow ? stepRow.multiplier : 100;
-  const industryRow = industryMultipliersTable.find(item => (
-    item.industry.toString() === industry.toString()
-  ));
-  const industryMultiplier = industryRow ? industryRow.multiplier : 100;
-  const basicPrice = getCorrectBasicPrice(row, currency);
-  return multiplyPrices(basicPrice, stepMultiplier, size, industryMultiplier);
-}
-
-const getCorrectBasicPrice = (basicPriceRow, currency) => {
-  if (currency === 'USD') return basicPriceRow.usdBasicPrice;
-  else if (currency === 'EUR') return basicPriceRow.euroBasicPrice;
-  else return basicPriceRow.gbpBasicPrice;
-}
-
-const getRelativeQuantity = (metrics) => {
-  const { totalWords, ...rest } = metrics;
-  let counter = 0
-  for (let item in rest) {
-    if (rest.hasOwnProperty(item)) {
-      counter += (rest[item].value * rest[item].client) / 100
-    }
-  }
-  return counter;
+  }, {})
 }
 
 const getStepUnitsType = (stepUnits) => {
   const isObject = stepUnits.unit;
   if (isObject) {
     return 'object';
-  } else if (Array.isArray(stepUnits)) {
-    return 'array';
   } else {
     return 'json';
   }
-};
+}
 
 const isIncludesWordcount = (type, stepsAndUnits) => {
   let isIncludesWordCount;
@@ -365,14 +248,11 @@ const isIncludesWordcount = (type, stepsAndUnits) => {
     case 'object':
       isIncludesWordCount = stepsAndUnits.unit === 'CAT Wordcount';
       break;
-    case 'array':
-      isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
-      break;
     case 'json':
       stepsAndUnits = JSON.parse(stepsAndUnits);
       isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
   }
   return isIncludesWordCount;
-};
+}
 
 module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance };
