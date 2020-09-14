@@ -419,22 +419,25 @@ async function createTasksWithPackagesUnit (allInfo) {
   const { project, stepsAndUnits, stepsDates } = allInfo;
   try {
     const { customer: { _id: customer }, industry } = project;
-    const tasks = await getTasksForPackages({ ...allInfo, projectId: project.projectId });
+    const tasksWithoutFinance = await getTasksForPackages({ ...allInfo, projectId: project.projectId });
     let steps = stepsAndUnits.length === 2 ? await getStepsForDuoStepPackages({
-        tasks,
+        tasks: tasksWithoutFinance,
         customer,
         stepsDates,
         stepsAndUnits,
         industry
       })
       : await getStepsForMonoStepPackages({
-        tasks,
+        tasks: tasksWithoutFinance,
         customer,
         stepsDates,
         industry
       });
-    const projectFinance = getProjectFinance(tasks, project.finance);
     steps = checkIsSameVendor(steps);
+    const tasks = tasksWithoutFinance.map(item =>
+      getFinanceForCustomUnits(item, steps)
+    );
+    const projectFinance = getProjectFinance(tasks, project.finance);
     return updateProject(
       { _id: project.id },
       { finance: projectFinance, $push: { tasks: tasks, steps: steps } }
@@ -452,13 +455,14 @@ async function getTasksForPackages (tasksInfo, common = false) {
   for (let i = 0; i < targets.length; i++) {
     const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
     const taskId = projectId + ` ${idNumber}`;
+    const { steps, ...rest } = service;
     tasks.push({
       taskId,
       sourceLanguage: source.symbol,
       targetLanguage: targets[i].symbol,
       refFiles: taskRefFiles,
       service: {
-        ...service
+        ...rest
       },
       stepsAndUnits:
         stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
@@ -484,7 +488,7 @@ async function getStepsForDuoStepPackages ({ tasks, stepsDates, stepsAndUnits, i
     const task = tasks.length === 2 ? tasks[i] : tasks[0];
     const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
     const stepId = `${task.taskId} ${stepsIdCounter}`;
-    const { stepsAndUnits, sourceLanguage, targetLanguage, ...rest } = task;
+    const { sourceLanguage, targetLanguage } = task;
     let serviceStep = stepsAndUnits[i];
     const stepName = serviceStep.step;
     serviceStep = await gatherServiceStepInfo(serviceStep);
@@ -494,7 +498,7 @@ async function getStepsForDuoStepPackages ({ tasks, stepsDates, stepsAndUnits, i
       customer, industry, serviceStep, task, vendorId, quantity
     });
     steps.push({
-      ...rest,
+      ...task,
       stepId,
       serviceStep,
       name: stepName,

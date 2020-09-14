@@ -11,12 +11,12 @@ async function storeFiles(filesArr, projectId) {
         const project = await getProject({"_id": projectId});
         const { tasks } = project;
         let storedFiles = [];
-        if(filesArr.length) {
-            for(let file of filesArr) {
-                const newPath = `./dist/projectFiles/${projectId}/${tasks.length+1}-${file.filename.replace(/\s+/g, '_')}`;
-                await moveProjectFile(file, newPath);
-                storedFiles.push(newPath);
-            }
+        if (storedFiles && filesArr.length) {
+          for (let file of filesArr) {
+            const newPath = `./dist/projectFiles/${projectId}/${tasks.length + 1}-${file.filename.replace(/\s+/g, '_')}`;
+            await moveProjectFile(file, newPath);
+            storedFiles.push(newPath);
+          }
         }
         return storedFiles;
     } catch(err) {
