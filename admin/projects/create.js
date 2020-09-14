@@ -246,11 +246,11 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
       steps = await getStepsForMonoUnits(
         { ...allInfo, customer, industry, tasks: tasksWithoutFinance });
     }
+    steps = checkIsSameVendor(steps);
     const tasks = tasksWithoutFinance.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
     const projectFinance = getProjectFinance(tasks, project.finance);
-    steps = checkIsSameVendor(steps);
     return updateProject(
       { _id: project.id },
       { finance: projectFinance, $push: { tasks: tasks, steps: steps } }
