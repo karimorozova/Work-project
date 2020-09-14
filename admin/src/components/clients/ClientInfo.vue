@@ -26,11 +26,11 @@
               @approveDelete="approveContactDelete")
 
       .title(v-if="currentClient._id") Services
-      .client-info__services(v-if="this.currentClient.sourceLanguages && this.currentClient.targetLanguages && this.currentClient.industries")
+      .client-info__services(v-if="this.clientDataInCreated.sourceLanguages && this.clientDataInCreated.targetLanguages && this.currentClient.industries")
           ClientServices(
               :languages="languages"
-              :sourceLanguagesClient="this.currentClient.sourceLanguages.map(i => i.lang)"
-              :targetLanguagesClient="this.currentClient.targetLanguages.map(i => i.lang)"
+              :sourceLanguagesClient="clientDataInCreated.sourceLanguages.map(i => i.lang)"
+              :targetLanguagesClient="clientDataInCreated.targetLanguages.map(i => i.lang)"
               :industries="industries"
               :services="services"
               :clientIndustries="this.currentClient.industries.map(i => i.name)"
@@ -149,6 +149,7 @@ export default {
       steps: [],
       timezones: [],
       currentDocuments: [],
+      clientDataInCreated: {},
 
       isApproveModal: false,
       clientShow: true,
@@ -434,6 +435,13 @@ export default {
         `/clientsapi/client?id=${this.$route.params.id}`
       );
     },
+    async getClientInfoLangs(){
+	    const client = await this.$http.get(
+		    `/clientsapi/client-languages?id=${this.$route.params.id}`
+	    );
+	    this.clientDataInCreated.sourceLanguages = client.body.sourceLanguages;
+	    this.clientDataInCreated.targetLanguages = client.body.targetLanguages;
+    },
     async getClientInfo() {
       if (!this.currentClient._id) {
         const client = await this.$http.get(
@@ -532,6 +540,20 @@ export default {
       allClients: "getClients",
       currentClient: "getCurrentClient",
     }),
+	  sourceLanguagesClientData(){
+		  console.log(this.clientDataInCreated)
+    	if(this.clientDataInCreated.hasOwnProperty('sourceLanguages')){
+		    console.log('computed',this.clientDataInCreated)
+		    return this.clientDataInCreated.sourceLanguages.map(i => i.lang);
+      }
+	  },
+	  // targetLanguagesClientData(){
+		//   if(this.clientDataInCreated.hasOwnProperty('targetLanguages')){
+		// 	  console.log('computed',this.clientDataInCreated)
+		// 	  return this.clientDataInCreated.targetLanguages.map(i => i.lang);
+		//   }
+	  // },
+
   },
   components: {
 	  DiscountChart,
@@ -554,6 +576,7 @@ export default {
   },
   created() {
     this.getClientInfo();
+    this.getClientInfoLangs();
     this.getLangs();
     this.getUnits();
     this.getSteps();
