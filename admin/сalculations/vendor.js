@@ -39,7 +39,6 @@ const checkIsSameVendor = (steps) => {
   if (steps.length === 2) {
     if (steps[0].vendor && steps[1].vendor && steps[0].vendor.toString() === steps[1].vendor.toString()) {
       steps[1].vendor = null;
-      steps[1].vendorRate = ''
       steps[1].finance.Price.payables = 0;
       return steps;
     }
