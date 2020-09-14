@@ -36,10 +36,10 @@ const setStepFinanceData = async (projectData, forWords = false) => {
     value: clientPrice,
     active: true,
   };
-  const vendorRate = {
+  const vendorRate = vendorPrice !== 0 ? {
     value: vendorPrice,
     active: true
-  };
+  } : "";
   return {
     clientRate,
     vendorRate,
