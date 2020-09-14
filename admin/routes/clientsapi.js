@@ -358,4 +358,19 @@ router.post('/sync-matrix/:id', async (req, res) => {
   }
 });
 
+router.get('/client-languages', async (req, res) => {
+  let { id } = req.query;
+  try {
+    const client = await Clients
+      .findOne({"_id": id}, {sourceLanguages: 1, targetLanguages: 1})
+      .populate('sourceLanguages')
+      .populate('targetLanguages')
+
+    res.send(client);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on getting Client");
+  }
+});
+
 module.exports = router;

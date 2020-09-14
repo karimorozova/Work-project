@@ -13,7 +13,6 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       test.industries.find(industry => industry.toString() === competence.industry.toString()) &&
       test.steps.find(step => step.toString() === competence.step.toString())
     );
-    const ifExistsStep = isExists(currentTest.steps, competence.step);
     if (currentTest) {
       return competence;
     } else {
@@ -69,7 +68,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
   };
 
   function qualificationsArrayAdditions (qualificationsArray, testsArray) {
-    let finalQualifivationArray = [];
+    let finalQualificationArray = [];
     qualificationsArray.forEach(qualification => {
       let currentTest = testsArray.find(test =>
         test.source.toString() === qualification.source.toString() &&
@@ -79,16 +78,16 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
           qualification.steps.some((currentStep) => step.toString() === currentStep.toString())
         )
       );
-      if (!qualification.hasOwnProperty('testType') || qualification.testType == '') {
+      if (!qualification.hasOwnProperty('testType') || qualification.testType === '') {
         let currentQualification = {};
         Object.assign(currentQualification, qualification.toJSON());
         currentQualification.testType = currentTest.evaluationType === 'Test' ? 'Test' : 'Sample';
-        finalQualifivationArray.push(currentQualification);
+        finalQualificationArray.push(currentQualification);
       } else {
-        finalQualifivationArray.push(qualification.toJSON());
+        finalQualificationArray.push(qualification.toJSON());
       }
     });
-    return finalQualifivationArray;
+    return finalQualificationArray;
   }
 };
 
