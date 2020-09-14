@@ -410,11 +410,11 @@ export default {
         unitFilter: this.unitFilter,
         industryFilter: this.industryFilter
       };
-      if (this.sourceFilter == "All") result.sourceFilter = "";
-      if (this.targetFilter == "All") result.targetFilter = "";
-      if (this.stepFilter == "All") result.stepFilter = "";
-      if (this.unitFilter == "All") result.unitFilter = "";
-      if (this.industryFilter == "All") result.industryFilter = "";
+      if (this.sourceFilter === "All") result.sourceFilter = "";
+      if (this.targetFilter === "All") result.targetFilter = "";
+      if (this.stepFilter === "All") result.stepFilter = "";
+      if (this.unitFilter === "All") result.unitFilter = "";
+      if (this.industryFilter === "All") result.industryFilter = "";
 
       return result;
     },

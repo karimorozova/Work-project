@@ -6,11 +6,11 @@
     :step="stepFilter",
     :unit="unitFilter",
     :industry="industryFilter",
-    :targets="['All'].concat(languages)",
-    :sources="['All'].concat(languages)",
-    :steps="['All'].concat(steps)",
-    :units="['All'].concat(units)",
-    :industries="['All'].concat(industries)",
+    :targets="dataForTargetFilter"
+    :sources="dataForSourceFilter"
+    :steps="dataForStepFilter"
+    :units="dataForUnitFilter"
+    :industries="dataForIndustryFilter"
     @setFilter="setFilter"
   )
   DataTable(
@@ -231,7 +231,7 @@ export default {
     },
     async checkErrors(index) {
       if (this.currentActive === -1) return;
-      if (this.currentPrice == "") return;
+      if (this.currentPrice === "") return;
       await this.manageSaveClick(index);
     },
 
@@ -302,16 +302,27 @@ export default {
         });
       }
     },
+    getAllConcatUniqueValues(key, mapKey){
+	    return ["All"].concat(
+		    this.getUniqueValues(
+			    this.currentVendor.rates.pricelistTable.map((item) => item[key]),
+			    mapKey
+		    )
+	    );
+    },
+	  getUniqueValues(arr, key){
+		  return [...new Set(arr.map((item) => item[key]))]
+	  },
   },
   watch: {
     async isRefreshResultTable() {
       if (this.isRefreshResultTable) {
-        this.getPricelist(this.allFilters);
+        await this.getPricelist(this.allFilters);
       }
     },
     async refresh() {
       if (this.refresh) {
-        this.getPricelist(this.allFilters);
+	      await this.getPricelist(this.allFilters);
       }
     },
   },
@@ -322,6 +333,31 @@ export default {
     ...mapGetters({
       currentVendor: "getCurrentVendor",
     }),
+	  dataForSourceFilter(){
+		  if(this.currentVendor.rates.pricelistTable.length){
+			  return this.getAllConcatUniqueValues('sourceLanguage', "lang");
+		  }
+	  },
+	  dataForTargetFilter(){
+		  if(this.currentVendor.rates.pricelistTable.length){
+			  return this.getAllConcatUniqueValues('targetLanguage', "lang");
+		  }
+	  },
+	  dataForStepFilter(){
+		  if(this.currentVendor.rates.pricelistTable.length){
+			  return this.getAllConcatUniqueValues('step', "title");
+		  }
+	  },
+	  dataForUnitFilter(){
+		  if(this.currentVendor.rates.pricelistTable.length){
+			  return this.getAllConcatUniqueValues('unit', "type");
+		  }
+	  },
+	  dataForIndustryFilter(){
+		  if(this.currentVendor.rates.pricelistTable.length){
+			  return this.getAllConcatUniqueValues('industry', "name");
+		  }
+	  },
     allFilters() {
       let result = {
         sourceFilter: this.sourceFilter,
@@ -330,11 +366,11 @@ export default {
         unitFilter: this.unitFilter,
         industryFilter: this.industryFilter,
       };
-      if (this.sourceFilter == "All") result.sourceFilter = "";
-      if (this.targetFilter == "All") result.targetFilter = "";
-      if (this.stepFilter == "All") result.stepFilter = "";
-      if (this.unitFilter == "All") result.unitFilter = "";
-      if (this.industryFilter == "All") result.industryFilter = "";
+      if (this.sourceFilter === "All") result.sourceFilter = "";
+      if (this.targetFilter === "All") result.targetFilter = "";
+      if (this.stepFilter === "All") result.stepFilter = "";
+      if (this.unitFilter === "All") result.unitFilter = "";
+      if (this.industryFilter === "All") result.industryFilter = "";
 
       return result;
     },
