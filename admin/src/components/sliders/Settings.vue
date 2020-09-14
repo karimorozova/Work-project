@@ -21,7 +21,7 @@ export default {
     return {
       openQuotes: true,
       sidebarLinks: [
-        { title: "Languages" }, { title: "Services" }, { title: "Industries" }, { title: "Lead Sources" }, { title: "Packages" },
+        { title: "Languages" }, { title: "Services" }, { title: "Industries" }, { title: "Lead Sources" },
         { title: "Pricelists" }, { title: "Cancellation Reasons" }, { title: "Instructions" }, { title: "LQA" },
         { title: "Units" }
       ],
@@ -48,9 +48,6 @@ export default {
           break;
         case "Lead Sources":
           this.$router.push("/settings/leadsources");
-          break;
-        case "Packages":
-          this.$router.push("/settings/packages");
           break;
         case "Pricelists":
           this.$router.push("/settings/pricelists");

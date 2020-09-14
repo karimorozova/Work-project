@@ -10,7 +10,6 @@ const {
   LeadSource,
   Group,
   Step,
-  Package,
   Instruction,
   CancelReason,
   User,
@@ -304,45 +303,6 @@ router.post('/step', async (req, res) => {
       console.log(err);
       res.status(500).send("Error on updating/creating a step")
     }
-});
-
-router.get('/packages', async (req, res) => {
-  try {
-    const packages = await Package.find({});
-    res.send(packages);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on getting packages from DB")
-  }
-});
-
-router.post('/package', async (req, res) => {
-  const { pack } = req.body;
-  try {
-    if(pack._id) {
-      await Package.updateOne({"_id": pack._id}, pack);
-      return res.send('Updated');
-    }
-    await Package.create(pack);
-    res.send('New package saved.');
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on updating/creating a package")
-  }
-});
-
-router.delete('/package/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    if(!id) {
-      return res.send("Deleted unsaved package");
-    }
-    await Package.deleteOne({"_id": id});
-    res.send("Package deleted");
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on deleting package")
-  }
 });
 
 router.get('/instructions', async (req, res) => {

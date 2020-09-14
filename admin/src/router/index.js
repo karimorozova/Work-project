@@ -18,7 +18,6 @@ import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayou
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
 import TableGroups from '@/components/Table/TableGroups'
-import TablePackages from '@/components/Table/TablePackages'
 import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
@@ -144,11 +143,6 @@ const router = new Router({
                             path: 'groups',
                             name: 'groups',
                             component: TableGroups
-                        },
-                        {
-                            path: 'packages',
-                            name: 'packages',
-                            component: TablePackages
                         },
                         {
                             path: 'langs',

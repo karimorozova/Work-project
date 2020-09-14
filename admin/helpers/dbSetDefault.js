@@ -10,7 +10,6 @@ const {
   LeadSource,
   Group,
   Step,
-  Package,
   Clients,
   Vendors,
   Instruction,
@@ -31,12 +30,10 @@ const {
   leadSourcesDefault,
   groupsDefault,
   stepsDefault,
-  packagesDefault,
   clientsDefault,
   vendorsDefault,
   instructionsDefault,
   cancelReasonsDefault,
-  discountChartsDefault,
   tierLqasDefault,
   unitsDefault,
 } = require('./dbDefaultValue');
@@ -52,20 +49,6 @@ async function fillTierLqa() {
     }
   } catch (err) {
     console.log("Error on filling default Tier Lqas");
-    console.log(err);
-  }
-}
-
-async function fillPackages() {
-  try {
-    const packages = await Package.find();
-    if (!packages.length) {
-      for (let package of packagesDefault) {
-        await new Package(package).save();
-      }
-    }
-  } catch (err) {
-    console.log("Error on filling default Packages");
     console.log(err);
   }
 }
@@ -520,7 +503,6 @@ async function fillPricelist() {
 
 async function checkCollections() {
   await fillTierLqa();
-  await fillPackages();
   await fillInstructions();
   await fillCancelReasons();
   await fillLeadSources();

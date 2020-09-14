@@ -163,10 +163,6 @@ const industriesDefault = [
     {name: 'More', rate: 0,  icon: '/static/industries/more-icon.png', generic: '/static/example.xlsx', active: true}
 ];
 
-const packagesDefault = [
-    {name: "Up to 200", size: "200"},{name: "201 to 300", size: "300"},{name: "301 to 400", size: "400"},{name: "401 to 699", size: "700"},{name: "700 to 1000", size: "1000"},
-]
-
 const projectsDefault = [];
 
 const clientsDefault = [
@@ -348,7 +344,6 @@ const defaultValue = {
     leadSourcesDefault,
     groupsDefault,
     stepsDefault,
-    packagesDefault,
     emptyMatrix,
     instructionsDefault,
     cancelReasonsDefault,
