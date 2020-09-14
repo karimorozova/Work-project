@@ -166,13 +166,27 @@
 			...mapGetters({
 				currentProject: "getCurrentProject",
 			}),
-      financeDataOtherUnitsTitle(){
-	      return [ {
-		      unit: this.step.serviceStep.unit.type,
-		      quantityName: 'Test',
-		      count: '221',
-	      }]
-      },
+			financeDataOtherUnitsTitle() {
+				const currentUnit = this.originallyUnits.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
+				const {quantity, hours} = this.step
+				let quantityName = "";
+				let count = "";
+				if (currentUnit === "Packages") {
+					quantityName = "Quantity";
+					count = quantity;
+				} else if (currentUnit === "Hours") {
+					quantityName = "Hours";
+					count = hours;
+				} else {
+					quantityName = currentUnit;
+					count = hours;
+				}
+				return [{
+					unit: currentUnit,
+					quantityName: quantityName,
+					count: count,
+				}]
+			},
 			financeDataOtherUnitsCalculations() {
 				const {finance, clientRate, vendorRate} = this.step;
 				const {Price} = finance;

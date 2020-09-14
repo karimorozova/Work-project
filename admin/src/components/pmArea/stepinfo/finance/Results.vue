@@ -20,24 +20,14 @@
 			step: {
 				type: Object,
 			},
+			profitAndMargin:{
+				type: Object,
+      }
 		},
 		methods: {
 			isNaNCalculationValue(value) {
 				return isNaN(value) ? '0' : value
 			}
-		},
-		computed: {
-			profitAndMargin() {
-				const {finance} = this.step;
-				const {Price} = finance;
-
-				let result = {profit: 0, margin: 0, roi: 0};
-				result.profit = (Price.receivables - Price.payables).toFixed(2);
-				result.margin = (Price.payables / (Price.receivables - Price.payables)).toFixed(2);
-				result.roi = ((Price.receivables - Price.payables) / Price.payables).toFixed(2);
-
-				return result;
-			},
 		},
 	};
 </script>
