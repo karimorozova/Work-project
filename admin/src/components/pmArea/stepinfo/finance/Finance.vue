@@ -31,9 +31,51 @@
               span.step-finance__value {{ row.payables }}
               span.step-finance__money(v-if="showMoney(row, 'payables')") &nbsp;&euro;
 
-        .step-finance__table(v-else) sdsdsdsdsd
+        .step-finance__table(v-else)
+          DataTable(
+            :fields="fieldsOtherTitle"
+            :tableData="financeDataOtherUnitsTitle"
+            :tableheadClass="'table__header'"
+            bodyClass="tbody_visible-overflow"
+            :tableheadRowClass="'table__header-row tbody_visible-overflow'"
+            :bodyRowClass="'table__body-row-custom'"
+          )
+            template(v-for="field in fieldsOtherTitle", :slot="field.headerKey", slot-scope="{ field }")
+              .step-finance__label {{ field.label }}
 
-        Results(:step="step")
+            template(slot="unit" slot-scope="{ row }")
+              span.step-finance__value {{ row.unit }}
+
+            template(slot="quantityName" slot-scope="{ row }")
+              span.step-finance__value {{ row.quantityName }}
+
+            template(slot="count" slot-scope="{ row }")
+              span.step-finance__value {{ row.count }}
+
+          DataTable(
+            :fields="fieldsOtherCalculations"
+            :tableData="financeDataOtherUnitsCalculations"
+            :tableheadClass="'table__header'"
+            bodyClass="tbody_visible-overflow"
+            :tableheadRowClass="'table__header-row tbody_visible-overflow'"
+            :bodyRowClass="'table__body-row-custom'"
+          )
+            template(v-for="field in fieldsOtherCalculations", :slot="field.headerKey", slot-scope="{ field }")
+              .step-finance__label {{ field.label }}
+
+            template(slot="title" slot-scope="{ row }")
+              span.step-finance__value {{ row.title }}
+
+            template(slot="receivables" slot-scope="{ row }")
+              span.step-finance__value {{ row.receivables }}
+              span.step-finance__money(v-if="row.receivables") &nbsp;&euro;
+
+            template(slot="payables" slot-scope="{ row }")
+              span.step-finance__value {{ row.payables }}
+              span.step-finance__money(v-if="row.payables") &nbsp;&euro;
+
+
+        Results(:step="step" :profitAndMargin="profitAndMargin")
       InfoBlock(
         :step="step"
         :originallyUnits="originallyUnits"
@@ -88,46 +130,46 @@
 						width: "33.33%",
 					},
 				],
-        fieldsOtherTitle:[
-	        {
-		        label: "Title",
-		        headerKey: "headerTitle",
-		        key: "title",
-		        width: "33.33%",
-	        },
-	        {
-		        label: "Receivables",
-		        headerKey: "headerReceivables",
-		        key: "receivables",
-		        width: "33.33%",
-	        },
-	        {
-		        label: "Payables",
-		        headerKey: "headerPayables",
-		        key: "payables",
-		        width: "33.33%",
-	        },
-        ],
-        fieldsOtherCalculations: [
-	        {
-		        label: "Unit",
-		        headerKey: "headerUnit",
-		        key: "unit",
-		        width: "33.33%",
-	        },
-	        {
-		        label: "Quantity Name",
-		        headerKey: "headerQuantityName",
-		        key: "quantityName",
-		        width: "33.33%",
-	        },
-	        {
-		        label: "",
-		        headerKey: "headerCount",
-		        key: "count",
-		        width: "33.33%",
-	        },
-        ],
+				fieldsOtherCalculations: [
+					{
+						label: "Title",
+						headerKey: "headerTitle",
+						key: "title",
+						width: "33.33%",
+					},
+					{
+						label: "Receivables",
+						headerKey: "headerReceivables",
+						key: "receivables",
+						width: "33.33%",
+					},
+					{
+						label: "Payables",
+						headerKey: "headerPayables",
+						key: "payables",
+						width: "33.33%",
+					},
+				],
+				fieldsOtherTitle: [
+					{
+						label: "Unit",
+						headerKey: "headerUnit",
+						key: "unit",
+						width: "33.33%",
+					},
+					{
+						label: "Quantity Name",
+						headerKey: "headerQuantityName",
+						key: "quantityName",
+						width: "33.33%",
+					},
+					{
+						label: "",
+						headerKey: "headerCount",
+						key: "count",
+						width: "33.33%",
+					},
+				],
 				isMainInfo: false,
 			};
 		},
@@ -148,6 +190,17 @@
 			InfoBlock,
 		},
 		computed: {
+			profitAndMargin() {
+				const {finance} = this.step;
+				const {Price} = finance;
+
+				let result = {profit: 0, margin: 0, roi: 0};
+				result.profit = (Price.receivables - Price.payables).toFixed(2);
+				result.margin = (Price.payables / (Price.receivables - Price.payables)).toFixed(2);
+				result.roi = ((Price.receivables - Price.payables) / Price.payables).toFixed(2);
+
+				return result;
+			},
 			tableDataCAT() {
 				let result = [];
 				const dataLength = this.financeDataCAT.length;
@@ -189,7 +242,7 @@
 
     &__table {
       width: 520px;
-      height: 130px;
+      /*height: 130px;*/
       margin-right: 20px;
     }
   }

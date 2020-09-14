@@ -217,14 +217,13 @@
 				return {
 					stepStatus: status,
 					vendor,
+					quantityTotal: hours,
 					receivables: {
 						rate: clientRate.value,
-						quantityTotal: hours,
 						total: Price.receivables,
 					},
 					payables: {
 						rate: vendorRate.value,
-						quantityTotal: hours,
 						total: Price.payables
 					},
 				}
