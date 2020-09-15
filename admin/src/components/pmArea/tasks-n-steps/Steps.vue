@@ -286,7 +286,16 @@ export default {
             this.isReassignment = false;
         },
         setVendor({person}, index) {
-            this.$emit("setVendor", {vendor: person, index});
+          const { stepId, taskId } = this.allSteps[index];
+          const doesHaveAccess = this.userGroup.name === "Administrators" || this.userGroup.name === "Developers";
+          const relatedStep = this.allSteps.find(item => item.stepId !== stepId && item.taskId === taskId);
+          if (doesHaveAccess) {
+            this.$emit("setVendor", { vendor: person, index });
+          } else if (!relatedStep.vendor || relatedStep.vendor.toString() !== person._id.toString()) {
+            this.$emit("setVendor", { vendor: person, index });
+          } else {
+            this.showErrors(['This vendor has already been assigned to a related step']);
+          }
         },
         async setAction({option}) {
             if(option !== "No action available") {
