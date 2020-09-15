@@ -204,7 +204,7 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
       const neededIndustryRow = boundPricelist.industryMultipliersTable.find(item => (
         item.industry.toString() === industry.toString()
       ));
-      const multiplier = neededIndustryRow.hasOwnProperty('multiplier') ? neededIndustryRow.multiplier : 100;
+      const multiplier = neededIndustryRow ? neededIndustryRow.multiplier : 100;
       newIndustryMultiplierCombinations.push({
         industry,
         multiplier

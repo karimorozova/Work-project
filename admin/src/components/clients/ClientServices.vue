@@ -40,7 +40,7 @@
             :selectedOption="currentTargets[0].lang",
             :options="targetLanguagesClient",
             @chooseOption="setTarget"
-          ) 
+          )
         .clientService__drop-menu(v-if="currentActive == index && newRow")
           SelectMulti(
             :isTableDropMenu="isTableDropMenu",
@@ -295,17 +295,6 @@ export default {
       if (this.currentActive === -1) return;
       this.errors = [];
 
-      const client = await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);
-      const listServicesExceptTheCurrent = client.body.services.filter((item) => item._id !== this.currentId);
-      const arraysOfTheSame = listServicesExceptTheCurrent.filter(
-        (item) =>
-          item.sourceLanguage.lang === this.currentSource.lang &&
-          item.targetLanguages.find((x) => this.currentTargets.some((y) => x.lang === y.lang)) &&
-          item.industries.find((x) => this.currentIndustries.some((y) => x.name === y.name)) &&
-          item.services.find((x) => this.currentServices.some((y) => x.title === y.title))
-      );
-
-      if (arraysOfTheSame.length) this.errors.push("Such data already exists!");
       if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTargets.length) this.errors.push("Target should not be empty!");
       if (!this.currentIndustries.length) this.errors.push("Industry should not be empty!");

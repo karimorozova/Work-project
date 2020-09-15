@@ -21,7 +21,8 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
       await getServiceDifferences(clientId, dataToUpdate, oldData);
       services.splice(neededServiceIndex, 1, dataForSave);
     } else {
-      const generatedServiceCombinations = [...await generateServiceCombinations(dataToUpdate, services)];
+      let generatedServiceCombinations = [...await generateServiceCombinations(dataToUpdate, services)];
+      generatedServiceCombinations = getUniqueServiceCombinations(generatedServiceCombinations, services);
       services.push(...generatedServiceCombinations);
       await addNewRateComponents(clientId, generatedServiceCombinations);
     }
@@ -72,6 +73,17 @@ const checkForDuplicateRow = (oldServices, newSourceLang, newTargetLang, newServ
     isIdentical = isSameSource && !!isSameTarget && isSameService && !!isSameIndustry;
   }
   return isIdentical;
+};
+
+const getUniqueServiceCombinations = (newServices, oldServices) => {
+  return newServices.filter(newItem => (
+    oldServices.every(oldItem => (
+      newItem.sourceLanguage.toString() !== oldItem.sourceLanguage.toString() ||
+      newItem.targetLanguages.toString() !== oldItem.targetLanguages[0].toString() ||
+      newItem.services.toString() !== oldItem.services[0].toString() ||
+      newItem.industries.toString() !== oldItem.industries[0].toString()
+    ))
+  ));
 };
 
 const deleteClientService = async (clientId, serviceId) => {
