@@ -35,22 +35,10 @@ function getWordsPrices (step) {
   const { clientRate, vendorRate } = step;
   let receivables = 0;
   let payables = 0;
-  // let wordsSum = 0;
   if (step.name === "Translation") {
     receivables = +step.finance.Wordcount.receivables * clientRate.value;
     const doesStepHasVendorRate = vendorRate.hasOwnProperty('value');
     payables = doesStepHasVendorRate ? +step.finance.Wordcount.payables * +vendorRate.value : 0;
-    // for (let key in metrics) {
-    //   if (key !== 'totalWords') {
-    //     receivables += +metrics[key].value * +metrics[key].client * +clientRate.value;
-    //     payables += doesStepHasVendorRate ? +metrics[key].value * +metrics[key].vendor * +vendorRate.value
-    //       : +metrics[key].value;
-    //     wordsSum += +metrics[key].value;
-    //   }
-    // }
-    // receivables += +(+step.totalWords - +wordsSum) * +clientRate.value;
-    // payables += doesStepHasVendorRate ? +(+step.totalWords - +wordsSum) * +vendorRate.value
-    //   : +(+step.totalWords - +wordsSum);
   }
   return {
     receivables: parseFloat(receivables.toFixed(2)),

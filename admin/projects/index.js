@@ -12,9 +12,9 @@ const {
 const {
   createProject,
   createTasks,
-  createTaskWithCommonUnits,
   createTasksFromRequest
 } = require('./create');
+const { createTasksForWordcount } = require('./taskForWordcount');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 const { getProjectAfterFinanceUpdated } = require('./porjectFinance');
 
@@ -45,7 +45,7 @@ module.exports = {
   getProjectAfterFinanceUpdated,
   updateNonWordsTaskTargetFiles,
   createTasksFromRequest,
-  createTaskWithCommonUnits,
+  createTasksForWordcount,
   downloadCompletedFiles,
   notifyProjectDelivery,
   notifyManagerStepStarted,

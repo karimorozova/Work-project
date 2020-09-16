@@ -5,7 +5,7 @@ const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../Ñ
 const { getAfterPayablesUpdated } = require("../../Ñalculations/updates");
 
 const {
-  getProject, createProject, createTasks, createTaskWithCommonUnits, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
+  getProject, createProject, createTasks, createTasksForWordcount, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
   manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
   getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
   getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate
@@ -96,7 +96,7 @@ router.post('/project-tasks', upload.fields([{ name: 'sourceFiles' }, { name: 'r
 router.post("/project-words-tasks", async (req, res) => {
   const { tasksInfo, docs } = req.body;
   try {
-    const result = await createTaskWithCommonUnits(tasksInfo, docs);
+    const result = await createTasksForWordcount(tasksInfo, docs);
     res.send(result);
   } catch (err) {
     console.log(err);
