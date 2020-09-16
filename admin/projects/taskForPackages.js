@@ -1,6 +1,6 @@
 const { updateProject } = require("./getProjects");
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
-const { setStepFinanceData } = require('../сalculations/finance');
+const { getStepFinanceData } = require('../сalculations/finance');
 const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
@@ -83,7 +83,7 @@ async function getStepsForDuoStepPackages ({ tasks, stepsDates, stepsAndUnits, i
     serviceStep = await gatherServiceStepInfo(serviceStep);
     const { quantity, step, size } = serviceStep;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await setStepFinanceData({
+    const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity
     });
     steps.push({
@@ -124,7 +124,7 @@ async function getStepsForMonoStepPackages ({ tasks, stepsDates, industry, custo
     serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step, size, quantity } = serviceStep;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await setStepFinanceData({
+    const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity
     }, quantity);
     steps.push({

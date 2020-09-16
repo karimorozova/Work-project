@@ -2,14 +2,16 @@ const { getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
 const { hasActiveRateValue } = require('./general');
-const { Vendors } = require('../models');
+const { getStepFinanceData } = require('./finance');
+const { setTaskFinance, getStepQuantity } = require('../projects/helpers');
 
-function setTaskMetrics({metrics, matrix, prop}) {
-    let taskMetrics = {...metrics};
-    for(let key in matrix) {
-        taskMetrics[key][prop] = matrix[key].rate;
-    }
-    return taskMetrics;
+
+function setTaskMetrics ({ metrics, matrix, prop }) {
+  let taskMetrics = { ...metrics };
+  for (let key in matrix) {
+    taskMetrics[key][prop] = matrix[key].rate;
+  }
+  return taskMetrics;
 }
 
 async function receivablesCalc({task, project, step}) {
@@ -30,20 +32,26 @@ async function receivablesCalc({task, project, step}) {
 
 async function getAfterWordcountPayablesUpdated({project, step}) {
     try {
-      let { tasks, steps } = project;
+      let { tasks, steps, customer, industry } = project;
       const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
       const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId);
-      if (steps[stepIndex].name === 'Translation') {
-        tasks[taskIndex].metrics = setTaskMetrics({
-          metrics: tasks[taskIndex].metrics,
-          matrix: step.vendor.matrix,
-          prop: 'vendor'
-        });
-      }
-      // steps[stepIndex] = payablesCalc({metrics: tasks[taskIndex].metrics, project, step});
-      // const taskSteps = steps.filter(item => item.taskId === tasks[taskIndex].taskId && item.finance.Wordcount.payables);
-      // tasks[taskIndex].finance.Price.payables = +(taskSteps.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0).toFixed(2));
-      // tasks[taskIndex].finance.Wordcount.payables = taskSteps.reduce((acc, cur) => acc + +cur.finance.Wordcount.payables, 0);
+      tasks[taskIndex].metrics = setTaskMetrics({
+        metrics: tasks[taskIndex].metrics,
+        matrix: step.vendor.matrix,
+        prop: 'vendor'
+      });
+      const quantity = tasks[taskIndex].metrics.totalWords;
+      const { serviceStep, vendor } = step;
+      const { finance, vendorRate } = await getStepFinanceData({
+        customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity
+      });
+      steps[stepIndex].finance = finance;
+      steps[stepIndex].vendorRate = vendorRate;
+      const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId);
+      tasks[taskIndex].finance = {
+        Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
+        Price: setTaskFinance(taskSteps, 'Price'),
+      };
       return await updateProjectCosts({ ...project._doc, id: project.id, tasks, steps });
     } catch(err) {
         console.log(err);

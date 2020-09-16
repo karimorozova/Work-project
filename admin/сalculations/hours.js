@@ -3,6 +3,8 @@ const { getVendor, getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { hasActiveRateValue, isVendorMatches, getVendorRate, getUpdatedSteps, getUpdatedTasks } = require('./general');
 const { getProjectAfterFinanceUpdated } = require("../projects/porjectFinance");
+const { getStepFinanceData } = require('./finance');
+const { setTaskFinance, getStepQuantity } = require('../projects/helpers');
 
 async function getHoursStepFinanceData ({ task, serviceStep, project, multiplier }) {
   const industryId = project.industry.id;
@@ -25,20 +27,23 @@ async function getHoursStepFinanceData ({ task, serviceStep, project, multiplier
 }
 
 async function getAfterHoursPayablesUpdated ({ project, step }) {
-  let { tasks, steps } = project;
+  let { tasks, steps, customer, industry } = project;
+  const { serviceStep } = step;
   try {
-    const vendor = await getVendor({ "_id": step.vendor._id });
-    const { vendorRate, payables } = getVendorRate({
-      vendor,
-      source: { symbol: step.sourceLanguage },
-      ratesProp: 'hoursRates',
-      target: { symbol: step.targetLanguage },
-      industryId: project.industry.id,
-      step: step.serviceStep
+    const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
+    const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId);
+    const quantity = getStepQuantity(step);
+    const { finance, vendorRate } = await getStepFinanceData({
+      customer, industry, serviceStep, task: tasks[taskIndex], vendorId: step.vendor._id, quantity
     });
-    const updatedSteps = getUpdatedSteps({ steps, payables, vendorRate, step });
-    const updatedTasks = getUpdatedTasks({ tasks, payables, step });
-    return await getProjectAfterFinanceUpdated({ project, tasks: updatedTasks, steps: updatedSteps })
+    steps[stepIndex].finance = finance;
+    steps[stepIndex].vendorRate = vendorRate;
+    const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId);
+    tasks[taskIndex].finance = {
+      Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
+      Price: setTaskFinance(taskSteps, 'Price'),
+    };
+    return await getProjectAfterFinanceUpdated({ project, tasks, steps });
   } catch(err) {
     console.log(err);
     console.log('Error in getAfterPackagesPayablesUpdated');

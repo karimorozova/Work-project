@@ -4,7 +4,9 @@ async function getStepsWithFinanceUpdated (step, project) {
   let { steps } = project;
   const task = project.tasks.find(item => item.taskId === step.taskId);
   const unitType = await checkUnitType(step.serviceStep.unit);
-  const { receivables, payables } = unitType === 'CAT Wordcount' ? getWordsPrices(step, task.metrics) :
+  const { receivables, payables } = unitType === 'CAT Wordcount' && step.name === 'Translation' ?
+    getWordsPrices(step, task.metrics)
+    :
     getPrices(step, unitType);
   const stepIndex = steps.findIndex(item => item.id === step._id);
   steps[stepIndex] = {
@@ -21,12 +23,22 @@ function getPrices (step, unitType) {
   let receivables = +finance.Price.receivables;
   let payables = +finance.Price.payables;
   if (clientRate) {
-    receivables = unitType === 'Packages' ? +(step.quantity * clientRate.value).toFixed(2) :
-      +(step.hours * clientRate.value).toFixed(2);
+    if (unitType === 'CAT Wordcount') {
+      receivables = +(step.totalWords & clientRate.value).toFixed(2);
+    } else if (unitType === 'Packages') {
+      receivables = +(step.quantity * clientRate.value).toFixed(2);
+    } else {
+      receivables = +(step.hours * clientRate.value).toFixed(2);
+    }
   }
   if (vendorRate) {
-    payables = unitType === 'Packages' ? +(step.quantity * vendorRate.value).toFixed(2) :
-      +(step.hours * vendorRate.value).toFixed(2);
+    if (unitType === 'CAT Wordcount') {
+      receivables = +(step.totalWords & vendorRate.value).toFixed(2);
+    } else if (unitType === 'Packages') {
+      receivables = +(step.quantity * vendorRate.value).toFixed(2);
+    } else {
+      receivables = +(step.hours * vendorRate.value).toFixed(2);
+    }
   }
   return { receivables, payables };
 }

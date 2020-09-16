@@ -2,7 +2,7 @@ const { CurrencyRatio, Clients, Pricelist, Languages, Vendors } = require('../mo
 
 const { multiplyPrices } = require('../multipliers');
 
-const setStepFinanceData = async (projectData, forWords = false) => {
+const getStepFinanceData = async (projectData, forWords = false) => {
   const { customer, serviceStep, industry, task, vendorId, quantity } = projectData;
   const { metrics, sourceLanguage, targetLanguage } = task;
   let vendor;
@@ -112,5 +112,5 @@ const getCorrectBasicPrice = (basicPriceRow, currency) => {
 };
 
 module.exports = {
-  setStepFinanceData
+  getStepFinanceData
 };

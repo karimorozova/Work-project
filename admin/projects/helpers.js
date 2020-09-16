@@ -73,10 +73,28 @@ function createProjectFolder (projectId) {
   });
 }
 
+const setTaskFinance = (steps, prop) => {
+  return steps.reduce((acc, cur) => {
+    const receivables = +cur.finance[prop].receivables;
+    const payables = +cur.finance[prop].payables;
+    acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables;
+    acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables;
+    return acc;
+  }, {});
+};
+
+const getStepQuantity = (step) => {
+  if (step.hasOwnProperty('totalWords')) return step.totalWords;
+  else if (step.hasOwnProperty('hours')) return step.hours;
+  else return step.quantity;
+};
+
 module.exports = {
   gatherServiceStepInfo,
   getProjectFinance,
   getFinanceForCustomUnits,
   getModifiedFiles,
-  createProjectFolder
+  createProjectFolder,
+  setTaskFinance,
+  getStepQuantity
 };

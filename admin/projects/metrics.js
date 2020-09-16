@@ -1,9 +1,10 @@
 const { getProject, updateProject } = require('./getProjects');
 const { Step, Units } = require('../models');
-const { setStepFinanceData } = require('../сalculations/finance');
+const { getStepFinanceData } = require('../сalculations/finance');
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
 const { getProjectAnalysis } = require('../services/memoqs/projects');
+const { setTaskFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
 async function updateProjectMetrics ({ projectId }) {
@@ -112,7 +113,7 @@ async function getTaskSteps (steps, task, industry, customer) {
     };
     const quantity = metrics.totalWords;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await setStepFinanceData({
+    const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity
     }, true);
     const step = {
@@ -173,16 +174,6 @@ function setStepsProgress (symbol, docs) {
   }
   return { ...stepProgress, ...totalProgress };
 }
-
-const setTaskFinance = (steps, prop) => {
-  return steps.reduce((acc, cur) => {
-    const receivables = +cur.finance[prop].receivables;
-    const payables = +cur.finance[prop].payables;
-    acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables;
-    acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables;
-    return acc;
-  }, {});
-};
 
 const getStepUnitsType = (stepUnits) => {
   const isObject = stepUnits.unit;
