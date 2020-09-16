@@ -6,7 +6,6 @@
           :originallyLanguages="originallyLanguages"
           @setSourceLanguage="setSourceLang",
           @setTargets="setTargets",
-          @setClearLangs="setClearLangs",
         )
       .tasks-data__item
         .tasks-data__item-title File Preparation
@@ -33,22 +32,46 @@
         .tasks-data__files.tasks-data_m-bottom-40(v-else)
           TasksFilesRequested
 
-        .tasks-data__service-steps(v-if="countCATWordcount === 2")
-          JobSettings(
-            v-if="tasksData.stepsAndUnits.length",
-            :tasksDataProp="tasksData",
-            v-for="(step, index) in [sortedJobs[0]]",
-            :currentJob="step",
-            :currentIndex="index"
-          )
-        .tasks-data__service-steps(v-else)
-          JobSettings(
-            v-if="tasksData.stepsAndUnits.length",
-            :tasksDataProp="tasksData",
-            v-for="(step, index) in sortedJobs",
-            :currentJob="step",
-            :currentIndex="index"
-          )
+        .tasks-data__services
+          .tasks-data__service-steps(v-if="countCATWordcount === 2")
+            //JobSettings(
+            //  v-if="tasksData.stepsAndUnits.length && templates.length && originallyUnits.length",
+            //  :tasksDataProp="tasksData",
+            //  v-for="(step, index) in [sortedJobs[0]]",
+            //  :currentJob="step",
+            //  :currentIndex="index"
+            //  :templates="templates"
+            //  :originallyUnits="originallyUnits"
+            //)
+            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length",)
+              JobSettings(
+                :tasksDataProp="tasksData",
+                v-for="(step, index) in [sortedJobs[0]]",
+                :currentJob="step",
+                :currentIndex="index"
+                :templates="templates"
+                :originallyUnits="originallyUnits"
+              )
+
+          .tasks-data__service-steps(v-else)
+            //JobSettings(
+            //  v-if="tasksData.stepsAndUnits.length && templates.length && originallyUnits.length",
+            //  :tasksDataProp="tasksData",
+            //  v-for="(step, index) in sortedJobs",
+            //  :currentJob="step",
+            //  :currentIndex="index"
+            //  :templates="templates"
+            //  :originallyUnits="originallyUnits"
+            //)
+            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length",)
+              JobSettings(
+                :tasksDataProp="tasksData",
+                v-for="(step, index) in sortedJobs",
+                :currentJob="step",
+                :currentIndex="index"
+                :templates="templates"
+                :originallyUnits="originallyUnits"
+              )
 
     .tasks-data__add-tasks(v-if="isProject && isButton")
       Button(value="Add tasks", @clicked="checkForErrors")
@@ -74,10 +97,15 @@
 
 	export default {
 		props: {
-			isRequest: {type: Boolean},
+			isRequest: {
+				type: Boolean,
+      },
 			originallyLanguages: {
 				type: Array,
 			},
+			originallyUnits:{
+        type: Array,
+      },
 		},
 		data() {
 			return {
@@ -92,8 +120,6 @@
 			...mapActions(["alertToggle", "setTasksDataValue", "setRequestValue"]),
 
 			setSourceLang({symbol}) {
-				console.log('EMIT SET SOURCE LANG')
-
 				const value = this.languages.find((item) => item.symbol === symbol);
 				this.setTasksDataValue({prop: "source", value});
 				this.setTasksDataValue({prop: "targets", value: []});
@@ -105,26 +131,10 @@
 				},500 )
 			},
 			setTargets({targets}) {
-				console.log('EMIT SET TARGET LANG')
-
 				this.setTasksDataValue({prop: "targets", value: targets});
 				this.targetLanguages = [...targets];
 				console.log(this.targetLanguages)
 			},
-
-			async setClearLangs() {
-				console.log('CLEAR');
-				this.setTasksDataValue({prop: "source", value: undefined});
-				this.setTasksDataValue({prop: "targets", value: []});
-				this.sourceLanguages = [];
-				this.targetLanguages = [];
-
-				// this.setPossibleTargetsAction = true;
-				// setTimeout(() => {
-				// 	this.setPossibleTargetsAction = false;
-				// },1000 )
-			},
-
 			isRefFilesHasSource() {
 				const {sourceFiles, refFiles} = this.tasksData;
 				if (!refFiles || !refFiles.length) return false;
@@ -302,7 +312,7 @@
 			async getMemoqTemplates() {
 				try {
 					const result = await this.$http.get("/memoqapi/templates");
-					this.templates = result.data || [];
+					this.templates = result.data;
 					// if (this.templates.length) {
 					// 	const defTemplate = this.templates.find(
 					// 		(item) => item.name === "2 Steps"
@@ -393,8 +403,8 @@
 			ServiceAndWorkflow,
 			BigToggler,
 		},
-		created() {
-			this.getMemoqTemplates();
+		async created() {
+			await this.getMemoqTemplates();
 		},
 	};
 </script>
