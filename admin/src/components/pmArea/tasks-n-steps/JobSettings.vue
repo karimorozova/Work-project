@@ -6,7 +6,9 @@
         .hours-steps__packages
           .hours-steps__packages-item
             .hours-steps__packages-title {{currentJob.unit}}
-              input.hours-steps__input(type="number" min="1" max="1000" :value="currentJob.hours ? currentJob.hours : null" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)" @input="setLimit")
+              input.hours-steps__input(
+                type="number" min="1" max="1000"
+                :value="currentJob.hours ? currentJob.hours : null" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)")
           .hours-steps__packages-item
             .hours-steps__packages-item
               .hours-steps__sub-title Size
@@ -36,7 +38,9 @@
         .hours-steps__packages
           .hours-steps__packages-item
             .hours-steps__packages-title Quantity
-              input.hours-steps__input(type="number" min="1" max="1000" :value="currentJob.quantity ? currentJob.quantity : null"  @change="(e) => setQuantity(e, currentJob.step)" @input="setLimit" )
+              input.hours-steps__input(
+                type="number" min="1" max="1000"
+                :value="currentJob.quantity ? currentJob.quantity : null"  @change="(e) => setQuantity(e, currentJob.step)")
           .hours-steps__packages-item
             .hours-steps__sub-title Size
             .hours-steps__drop-menu
@@ -62,25 +66,31 @@
 			},
 			currentIndex: {
 				type: Number
-			}
+			},
+      templates: {
+				type: Array,
+      },
+			originallyUnits:{
+				type: Array,
+			},
 		},
 		data() {
 			return {
-				templates: [],
+				// templates: [],
 				selectedSizes: "",
 				selectedTemplate: "",
-				units: null,
+				// units: null,
 			}
 		},
 		methods: {
-			async getUnits() {
-				try {
-					const result = await this.$http.get('/api/units');
-					this.units = result.data;
-				} catch (err) {
-					this.alertToggle({message: "Error on getting units", isShow: true, type: "error"});
-				}
-			},
+			// async getUnits() {
+			// 	try {
+			// 		const result = await this.$http.get('/api/units');
+			// 		this.originallyUnits = result.data;
+			// 	} catch (err) {
+			// 		this.alertToggle({message: "Error on getting units", isShow: true, type: "error"});
+			// 	}
+			// },
 			...mapActions({
 				setDataValue: "setTasksDataValue",
 				alertToggle: "alertToggle"
@@ -137,46 +147,52 @@
 				}
 				this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
 			},
-			async getMemoqTemplates() {
-				try {
-					const result = await this.$http.get("/memoqapi/templates");
-					this.templates = result.data || [];
-				} catch (err) {
-					this.alertToggle({message: "Error on getting templates", isShow: true, type: "error"});
-				}
-			},
-			setStartedTempalte() {
-				if (this.currentJob.unit === "CAT Wordcount") {
-					const template = this.templates.find(i => true)
-					this.setTemplate({option: template.name})
-				}
-			},
+			// async getMemoqTemplates() {
+			// 	try {
+			// 		const result = await this.$http.get("/memoqapi/templates");
+			// 		this.templates = result.data || [];
+			// 	} catch (err) {
+			// 		this.alertToggle({message: "Error on getting templates", isShow: true, type: "error"});
+			// 	}
+			// },
+			// setStartedTempalte() {
+			// 	if (this.currentJob.unit === "CAT Wordcount") {
+			// 		const template = this.templates.find(i => true)
+			// 		this.setTemplate({option: template.name})
+			// 	}
+			// },
 		},
-		async created() {
-			await this.getMemoqTemplates();
-			await this.getUnits();
-			this.setStartedTempalte();
-		},
+		// async created() {
+			// await this.getMemoqTemplates();
+			// this.setStartedTempalte();
+			// await this.getUnits();
+		// },
 		computed: {
 			...mapGetters({
 				tasksData: "getTasksData"
 			}),
 			getSizes() {
-				if (this.units) {
+				if (this.originallyUnits.length) {
 					if (this.currentJob.unit !== 'CAT Wordcount') {
-						return this.units.filter(item => item.type === this.currentJob.unit)[0].sizes
+						let sizes = this.originallyUnits.filter(item => item.type === this.currentJob.unit)[0].sizes;
+						if(!sizes.length){
+							sizes = ["1"];
+            }
+						return sizes;
 					}
 				}
 			},
 			currentJobSize() {
-				if (this.units) {
+				if (this.originallyUnits.length) {
 					let oldStepsAndUnits = this.tasksData.stepsAndUnits;
 					oldStepsAndUnits[this.currentIndex].size = this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
 					return this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null
 				}
 			},
 			allTemplates() {
-				return this.templates.map(item => item.name);
+				if(this.templates.length){
+				  return this.templates.map(item => item.name);
+        }
 			},
 		},
 		components: {

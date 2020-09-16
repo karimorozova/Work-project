@@ -19,8 +19,6 @@ export default {
       );
     },
     setStartedLanguages(languageFormValue){
-      console.log('languageFormValue', languageFormValue )
-
         if(languageFormValue === undefined){
           languageFormValue = this.clientsServicesForWorkflow().find((i) => true).languageForm
         }
@@ -60,7 +58,6 @@ export default {
         this.storeDefaultService(service);
       }
       if(this.services.length){
-        console.log('start')
         this.setStartedLanguages();
       }
     },

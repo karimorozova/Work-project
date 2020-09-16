@@ -8,6 +8,7 @@
     transition(name="slide-fade")
         TasksData(v-if="isTaskData && !isFinishedStatus"
             :originallyLanguages="originallyLanguages"
+            :originallyUnits="originallyUnits"
             @setValue="setValue"
             @showErrors="showErrors"
             @addTasks="addTasks"
