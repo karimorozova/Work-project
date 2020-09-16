@@ -1,4 +1,4 @@
-const { Pricelist, Step, Units, Vendors, Languages, Industries, CurrencyRatio } = require('../models');
+const { Pricelist, Step, Units, Languages, Industries, CurrencyRatio } = require('../models');
 const { getFilteredBasicPrices } = require('./basicPrice');
 const { getFilteredStepMultiplier } = require('./stepMultipiers');
 const lodash = require('lodash');

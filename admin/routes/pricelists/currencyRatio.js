@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { CurrencyRatio } = require('../../models');
 const { updateBasicPriceValue, updateStepPriceValue } = require('../../multipliers');
+
 router.get('/currency-ratio', async (req, res) => {
   try {
     const currencyRatios = await CurrencyRatio.findOne();

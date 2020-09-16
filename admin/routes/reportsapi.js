@@ -1,10 +1,8 @@
 const router = require('express').Router();
-const { getReport } = require("../reports/get");
 const { getXtrfTierReport, getXtrfLqaReport, getXtrfUpcomingReport } = require("../reports/xtrf");
-const { getLangReports } = require("../reports/langReport");
 const  { upload } = require("../utils");
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
-const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, LangTier } = require("../models");
+const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa } = require("../models");
 convertExcel = require('excel-as-json').processFile;
 
 router.get('/languages', async (req, res) => {

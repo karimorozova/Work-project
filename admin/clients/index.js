@@ -1,4 +1,11 @@
-const { getClient, getClients, getClientAfterUpdate, gerFilteredClients, getClientsForNewProject } = require('./getClients');
+const {
+  getClient,
+  getClients,
+  getClientAfterUpdate,
+  gerFilteredClients,
+  getClientsForNewProject,
+  getClientRates
+} = require('./getClients');
 const {
   updateClientRates,
   deleteClientRates,
@@ -29,6 +36,7 @@ const { updateClientMatrix, syncClientMatrix } = require('./clientMatrix');
 const clients = {
   getClient,
   getClients,
+  getClientRates,
   gerFilteredClients,
   updateClientRates,
   deleteClientRates,

@@ -103,7 +103,7 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) =>
       const neededIndustryRow = industryMultipliersTable.find(item => (
         item.industry.toString() === industry._id.toString()
       ));
-      altered = !!neededIndustryRow.altered;
+      altered = neededIndustryRow ? neededIndustryRow.altered : false;
   }
   if (altered) {
     replacementItem.notification = 'Pricelist data has been updated';

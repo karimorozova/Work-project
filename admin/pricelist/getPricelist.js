@@ -1,4 +1,4 @@
-const { getClientRates } = require('./getPrices');
+const { getClientRates } = require('../clients');
 const { getVendor } = require('../vendors');
 
 const getFilteredPricelist = (pricelistTable, filters) => {

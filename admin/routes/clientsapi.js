@@ -5,9 +5,9 @@ const fse = require('fs-extra');
 const {
   getClient,
   getClients,
+  getClientRates,
   updateClientRates,
   getClientAfterUpdate,
-  importRates,
   updateClientInfo,
   getClientAfterCombinationsUpdated,
   updateClientService,
@@ -21,7 +21,7 @@ const {
   updateClientMatrix,
   syncClientMatrix
 } = require('../clients');
-const { getRatePricelist, changeMainRatePricelist, bindClientRates, getClientRates } = require('../pricelist');
+const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist');
 const { Clients, Pricelist } = require('../models');
 const { getProject } = require('../projects');
 const { getClientRequest } = require('../clientRequests');

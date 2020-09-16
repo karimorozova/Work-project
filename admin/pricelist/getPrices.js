@@ -1,29 +1,21 @@
-const { Pricelist, Clients } = require("../models");
+const { Pricelist } = require("../models");
 
 async function getPricelist (obj) {
-  const pricelist = await Pricelist.findOne(obj)
-    .populate("wordsRates.source")
-    .populate("wordsRates.target")
-    .populate("wordsRates.industries")
-    .populate("hoursRates.source")
-    .populate("hoursRates.target")
-    .populate("hoursRates.industries")
-    .populate("monoRates.target")
-    .populate("monoRates.industries");
-  return pricelist;
+  return await Pricelist.findOne(obj)
+    .populate('industryMultipliersTable.industry')
+    .populate('stepMultipliersTable.step')
+    .populate('stepMultipliersTable.unit')
+    .populate('basicPricesTable.sourceLanguage')
+    .populate('basicPricesTable.targetLanguage');
 }
 
 async function getPricelists (obj) {
-  const pricelist = await Pricelist.find(obj)
-    .populate("wordsRates.source")
-    .populate("wordsRates.target")
-    .populate("wordsRates.industries")
-    .populate("hoursRates.source")
-    .populate("hoursRates.target")
-    .populate("hoursRates.industries")
-    .populate("monoRates.target")
-    .populate("monoRates.industries");
-  return pricelist;
+  return await Pricelist.find(obj)
+    .populate('industryMultipliersTable.industry')
+    .populate('stepMultipliersTable.step')
+    .populate('stepMultipliersTable.unit')
+    .populate('basicPricesTable.sourceLanguage')
+    .populate('basicPricesTable.targetLanguage');
 }
 
 async function getUpdatedPricelist (query, update) {
@@ -35,18 +27,4 @@ async function getUpdatedPricelist (query, update) {
     .populate('basicPricesTable.targetLanguage');
 }
 
-const getClientRates = async (obj) => {
-  return Clients.findOne(obj)
-    .populate('rates.industryMultipliersTable.industry')
-    .populate('rates.stepMultipliersTable.step')
-    .populate('rates.stepMultipliersTable.unit')
-    .populate('rates.basicPricesTable.sourceLanguage')
-    .populate('rates.basicPricesTable.targetLanguage')
-    .populate('rates.pricelistTable.sourceLanguage')
-    .populate('rates.pricelistTable.targetLanguage')
-    .populate('rates.pricelistTable.step')
-    .populate('rates.pricelistTable.unit')
-    .populate('rates.pricelistTable.industry');
-};
-
-module.exports = { getPricelist, getPricelists, getUpdatedPricelist, getClientRates };
+module.exports = { getPricelist, getPricelists, getUpdatedPricelist };
