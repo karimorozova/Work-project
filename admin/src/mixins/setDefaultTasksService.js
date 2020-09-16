@@ -18,6 +18,28 @@ export default {
         arrayOfClientServices.some((b) => a._id.toString() === b)
       );
     },
+    setStartedLanguages(languageFormValue){
+      console.log('languageFormValue', languageFormValue )
+
+        if(languageFormValue === undefined){
+          languageFormValue = this.clientsServicesForWorkflow().find((i) => true).languageForm
+        }
+        if(languageFormValue === 'Duo'){
+          if(this.getClientLanguagesByServices('sourceLanguage').length){
+            // if(this.getClientLanguagesByServices('sourceLanguage').length === 1){
+            this.$emit("setSourceLanguage",
+              {symbol: this.getClientLanguagesByServices('sourceLanguage')[0].symbol }
+            );
+          }
+        }else if(languageFormValue === 'Mono'){
+          if(this.getClientLanguagesByServices('targetLanguages').length){
+            // if(this.getClientLanguagesByServices('targetLanguages').length === 1){
+            this.$emit("setTargets",
+              {targets: this.getClientLanguagesByServices('targetLanguages')}
+            );
+          }
+        }
+    },
     async setDefaultService() {
       try {
         if (!this.services.length) {
@@ -34,8 +56,12 @@ export default {
         const service = this.clientsServicesForWorkflow().find((i) => true);
         this.service = service.title;
         const option = service.steps.length === 1 ? "1 Step" : "2 Steps";
-        this.setWorkflow({ option });
+        await this.setWorkflow({ option });
         this.storeDefaultService(service);
+      }
+      if(this.services.length){
+        console.log('start')
+        this.setStartedLanguages();
       }
     },
   },

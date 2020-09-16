@@ -134,7 +134,7 @@ export default {
             }
 
             for (const iterator of calculationUnit) {
-                if(iterator == 'CAT Wordcount'){
+                if(iterator === 'CAT Wordcount'){
                     try {
                         const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
                         const { creatorUserId } = memoqCreatorUser.data;

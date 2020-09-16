@@ -42,14 +42,21 @@
 	import Languages from "@/components/finance/langs/Languages";
 	import Arrows from "@/components/finance/langs/Arrows";
 	import {mapGetters, mapActions} from "vuex";
+	import TasksLanguages from "../../../mixins/TasksLanguages";
 
 	export default {
+		mixins: [TasksLanguages],
 		props: {
 			originallyLanguages: {
 				type: Array,
 			},
-			sourceLanguages: {type: Array},
+			sourceLanguages: {
+				type: Array
+      },
 			isRequest: {type: Boolean},
+			setPossibleTargetsAction: {
+				type: Boolean
+      }
 		},
 		data() {
 			return {
@@ -83,7 +90,7 @@
 				);
 			},
 			setSource({option}) {
-				const {symbol} = this.currentProject.customer.sourceLanguages.find(
+				const {symbol} = this.originallyLanguages.find(
 					(item) => item.lang === option
 				);
 				this.$emit("setSourceLanguage", {symbol: symbol});
@@ -92,7 +99,9 @@
 			},
 
 			setPossibleTargets() {
-				this.targetAll = this.currentProject.customer.targetLanguages
+				if (this.tasksData.hasOwnProperty('service')) {
+					this.targetAll = this.getClientLanguagesByServices('targetLanguages')
+				}
 				if (this.targetAll.length) {
 					this.setUniqueLangs("targetAll");
 					this.sortLangs("targetAll");
@@ -177,26 +186,26 @@
 					? this.targetAll.filter((item) => symbols.indexOf(item.symbol) === -1)
 					: this.targetAll;
 			},
-			getStartedSourceLanguage() {
-				if (this.currentProject._id) {
-					if (this.currentProject.customer.sourceLanguages.length === 1) {
-						this.setSource({option: this.currentProject.customer.sourceLanguages[0].lang})
-					}
-				}
-			},
 		},
-		created() {
-			this.getStartedSourceLanguage();
+		watch: {
+			setPossibleTargetsAction(val) {
+				if(val){
+					this.setPossibleTargets();
+				}
+			}
 		},
 		computed: {
 			...mapGetters({
 				currentProject: "getCurrentProject",
+				tasksData: "getTasksData",
 			}),
 			possibleSourceLanguages() {
 				if (this.currentProject._id) {
-					return this.currentProject.customer.sourceLanguages.map(
-						(item) => item.lang
-					);
+					if (this.tasksData.hasOwnProperty('service')) {
+						return this.getClientLanguagesByServices('sourceLanguage').map(
+						  (item) => item.lang
+						);
+					}
 				}
 			},
 		},

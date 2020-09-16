@@ -2,19 +2,31 @@
   .tasks-data
     .tasks-data__main
       .tasks-data__item
-        ServiceAndWorkflow
+        ServiceAndWorkflow(
+          :originallyLanguages="originallyLanguages"
+          @setSourceLanguage="setSourceLang",
+          @setTargets="setTargets",
+          @setClearLangs="setClearLangs",
+        )
       .tasks-data__item
         .tasks-data__item-title File Preparation
-        .tasks-data__langs(v-if="currentProject.customer.sourceLanguages.length")
-          TasksLangs(v-if="isMonoService", :originallyLanguages="originallyLanguages")
+        .tasks-data__langs(v-if="originallyLanguages.length")
+          TasksLangs(
+            v-if="isMonoService",
+            :originallyLanguages="originallyLanguages"
+            :targetLanguages="targetLanguages"
+            @setSourceLanguage="setSourceLang",
+            @setTargets="setTargets",
+          )
           TasksLangsDuo(
-            v-if="!isMonoService",
+            v-if="!isMonoService"
             :originallyLanguages="originallyLanguages",
             :calculationUnit="currentUnit",
             :sourceLanguages="sourceLanguages",
             @setSourceLanguage="setSourceLang",
             @setTargets="setTargets",
             :isRequest="isRequest"
+            :setPossibleTargetsAction="setPossibleTargetsAction"
           )
         .tasks-data__files(v-if="currentProject.status !== 'Requested'")
           TasksFiles(:tasksData="tasksData")
@@ -72,21 +84,47 @@
 				templates: [],
 				sourceLanguages: [],
 				targetLanguages: [],
-				errors: []
+				errors: [],
+				setPossibleTargetsAction: false,
 			};
 		},
 		methods: {
 			...mapActions(["alertToggle", "setTasksDataValue", "setRequestValue"]),
+
 			setSourceLang({symbol}) {
+				console.log('EMIT SET SOURCE LANG')
+
 				const value = this.languages.find((item) => item.symbol === symbol);
 				this.setTasksDataValue({prop: "source", value});
 				this.setTasksDataValue({prop: "targets", value: []});
 				this.sourceLanguages = [value.symbol];
+
+				this.setPossibleTargetsAction = true;
+				setTimeout(() => {
+					this.setPossibleTargetsAction = false;
+				},500 )
 			},
 			setTargets({targets}) {
+				console.log('EMIT SET TARGET LANG')
+
 				this.setTasksDataValue({prop: "targets", value: targets});
 				this.targetLanguages = [...targets];
+				console.log(this.targetLanguages)
 			},
+
+			async setClearLangs() {
+				console.log('CLEAR');
+				this.setTasksDataValue({prop: "source", value: undefined});
+				this.setTasksDataValue({prop: "targets", value: []});
+				this.sourceLanguages = [];
+				this.targetLanguages = [];
+
+				// this.setPossibleTargetsAction = true;
+				// setTimeout(() => {
+				// 	this.setPossibleTargetsAction = false;
+				// },1000 )
+			},
+
 			isRefFilesHasSource() {
 				const {sourceFiles, refFiles} = this.tasksData;
 				if (!refFiles || !refFiles.length) return false;
@@ -123,10 +161,10 @@
 				if (this.isRequest) {
 					this.errors = this.checkRequestErrors();
 				}
-				if (this.tasksData.workflow.id == 2917) {
+				if (this.tasksData.workflow.id === 2917) {
 					if (
-						this.tasksData.stepsDates[0].deadline == "" ||
-						this.tasksData.stepsDates[1].start == ""
+						this.tasksData.stepsDates[0].deadline === "" ||
+						this.tasksData.stepsDates[1].start === ""
 					) {
 						this.errors.push("Please, select tasks deadline.");
 					}
@@ -265,15 +303,15 @@
 				try {
 					const result = await this.$http.get("/memoqapi/templates");
 					this.templates = result.data || [];
-					if (this.templates.length) {
-						const defTemplate = this.templates.find(
-							(item) => item.name === "2 Steps"
-						);
-						this.setTasksDataValue({
-							prop: "template",
-							value: defTemplate || this.templates[0],
-						});
-					}
+					// if (this.templates.length) {
+					// 	const defTemplate = this.templates.find(
+					// 		(item) => item.name === "2 Steps"
+					// 	);
+					// 	this.setTasksDataValue({
+					// 		prop: "template",
+					// 		value: defTemplate || this.templates[0],
+					// 	});
+					// }
 				} catch (err) {
 				}
 			},

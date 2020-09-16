@@ -57,9 +57,15 @@
 	import StepsDefaultDateModified from "./StepsDefaultDateModified";
 	import {mapGetters, mapActions} from "vuex";
 	import setDefaultTasksService from "@/mixins/setDefaultTasksService";
+	import TasksLanguages from "../../../mixins/TasksLanguages";
 
 	export default {
-		mixins: [setDefaultTasksService],
+		mixins: [setDefaultTasksService, TasksLanguages],
+		props: {
+			originallyLanguages: {
+				type: Array,
+			},
+		},
 		data() {
 			return {
 				isNeedToStoreService: true,
@@ -151,15 +157,19 @@
 			},
 			async setService({option}) {
 				const value = this.services.find((item) => item.title === option);
+				const languageFormValue = value.languageForm;
 				if (!value.steps.length) {
 					return this.showError();
 				}
 				this.service = option;
 				this.setDataValue({prop: "service", value});
 				if (value.languageForm === "Mono" || value.steps.length === 1) {
-					this.setWorkflow({option: "1 Step"});
+					await this.setWorkflow({option: "1 Step"});
 				} else {
-					this.setWorkflow({option: "2 Steps"});
+					await this.setWorkflow({option: "2 Steps"});
+				}
+				if(value) {
+          this.setStartedLanguages(languageFormValue);
 				}
 			},
 			async setWorkflow({option}) {

@@ -6,8 +6,8 @@
       .tasks-langs__drop-menu
         SelectSingle(
           placeholder="Language",
-          :options="targets.map((i) => i.lang)",
-          :selectedOption="selectedLang ? selectedLang : ''",
+          :options="possibleTargetLanguages",
+          :selectedOption="targetLanguages.length ? targetLanguages[0].lang : ''",
           @chooseOption="setLanguage"
         )
 </template>
@@ -18,44 +18,35 @@
 	import SelectSingle from "@/components/SelectSingle";
 	import {mapGetters, mapActions} from "vuex";
 	import taskData from "@/mixins/taskData";
+	import TasksLanguages from "../../../mixins/TasksLanguages";
+
 
 	export default {
-		mixins: [taskData],
+		mixins: [taskData, TasksLanguages],
 		props: {
 			originallyLanguages: {
 				type: Array,
 			},
+			targetLanguages: {
+				type: Array,
+			}
 		},
 		data() {
 			return {
 				targets: [],
-				selectedLang: null,
 				languagePairs: [],
 				asteriskStyle: {top: "-4px"},
 			};
 		},
 		methods: {
 			...mapActions({
-				storeProject: "storeProject",
 				setDataValue: "setTasksDataValue",
 				alertToggle: "alertToggle",
 			}),
 			setLanguage({option}) {
-				this.selectedLang = option;
-				this.setDataValue({
-					prop: "targets",
-					value: [this.currentProject.customer.targetLanguages.find((item) => item.lang === option)],
-				});
-			},
-			async getClientLanguages() {
-				this.targets = this.currentProject.customer.targetLanguages;
-			},
-			getStartedTargetLanguage() {
-				if(this.currentProject._id){
-					if (this.currentProject.customer.targetLanguages.length === 1) {
-						this.setLanguage({option: this.currentProject.customer.targetLanguages[0].lang})
-					}
-				}
+				this.$emit("setTargets",
+					{targets: [this.originallyLanguages.find((item) => item.lang === option)]}
+				);
 			},
 		},
 		computed: {
@@ -63,10 +54,14 @@
 				currentProject: "getCurrentProject",
 				tasksData: "getTasksData",
 			}),
-		},
-		created() {
-			this.getClientLanguages();
-			this.getStartedTargetLanguage();
+			possibleTargetLanguages() {
+				if (this.currentProject._id) {
+					if (this.tasksData.hasOwnProperty('service')) {
+						console.log(this.getClientLanguagesByServices('targetLanguages'))
+						return this.getClientLanguagesByServices('targetLanguages').map(i => i.lang);
+					}
+				}
+			},
 		},
 		components: {
 			LanguagesSelect,
