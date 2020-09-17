@@ -38,11 +38,11 @@
   .step-finance {
     &__results {
       width: 128px;
-      height: 90px;
       font-size: 14px;
       padding: 20px;
       background: #f4f0ee;
       border: 2px solid #938676;
+      margin-top: 62px;
     }
 
     &__summary-value {

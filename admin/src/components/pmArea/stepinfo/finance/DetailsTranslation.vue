@@ -2,53 +2,40 @@
   .details
     .details__icons(v-if="areIcons")
       img.details__icon(v-for="(icon, key) in dynamicIcons" :src="icon.src" :class="{'details_opacity-06': isActive(key)}" @click="makeAction(key)")
-    .details__row
-      .details__col(v-if="nowTab === 'Receivables'")
-        .col__title Rate:
-          span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.rate")
-      .details__col(v-if="nowTab === 'Receivables'")
-        .col__title Quantity[Relative]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.receivables.quantityRelative }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.quantityRelative")
-      .details__col(v-if="nowTab === 'Receivables'")
-        .col__title Quantity [Total]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.receivables.quantityTotal }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.quantityTotal")
 
-      .details__col(v-if="nowTab === 'Payables'")
-        .col__title Rate:
-          span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.payables.rate }} &euro;
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.rate")
-      .details__col(v-if="nowTab === 'Payables'")
-        .col__title Quantity[Relative]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.payables.quantityRelative }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.quantityRelative")
-      .details__col(v-if="nowTab === 'Payables'")
-        .col__title Quantity [Total]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.payables.quantityTotal }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.quantityTotal")
+    .table
+    .table__thead.table__header
+      .table__head-row.table__header-row.tbody_visible-overflow
+        .table__thead-cell
+        .table__thead-cell Receivables
+        .table__thead-cell Payables
 
+    .table__tbody.tbody_visible-overflow
+      .table__body-row
+        .table__tbody-cell Wordcount [Total]
+        .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.receivables.quantityTotal }}
+        input.details__editing-data(v-else type="number" v-model.number="currentData.receivables.quantityTotal")
+        .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.payables.quantityTotal }}
+        input.details__editing-data(v-else type="number" v-model.number="currentData.payables.quantityTotal")
 
-    .details__row.details_border-top(v-if="nowTab === 'Receivables'")
-      .details__col.details_margin-top
-        .details__item.details_no-margin-bottom
-          .col__title Total:
-            span.details__data(
-              type="text"
-              :value="financeData.receivables.total"
-              :class="{'details_opacity-06': !isEditing}"
-            ) {{ financeData.receivables.total }} &euro;
+      .table__body-row
+        .table__tbody-cell Wordcount [Relative]
+        .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.receivables.quantityRelative }}
+        input.details__editing-data(v-else type="number" v-model.number="currentData.receivables.quantityRelative")
+        .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.payables.quantityRelative }}
+        input.details__editing-data(v-else type="number" v-model.number="currentData.payables.quantityRelative")
 
-    .details__row.details_border-top(v-else)
-      .details__col.details_margin-top
-        .details__item.details_no-margin-bottom
-          .col__title Total:
-            span.details__data(
-              type="text"
-              :value="financeData.payables.total"
-              :class="{'details_opacity-06': !isEditing}"
-            ) {{ financeData.payables.total }} &euro;
+      .table__body-row
+        .table__tbody-cell Rate
+        .table__tbody-cell(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
+        input.details__editing-data(v-else type="number" v-model.number="currentData.receivables.rate")
+        .table__tbody-cell(v-if="!isEditing") {{ financeData.payables.rate }} &euro;
+        input.details__editing-data(v-else type="number" v-model.number="currentData.payables.rate")
+
+      .table__body-row
+        .table__tbody-cell Price
+        .table__tbody-cell {{ financeData.receivables.total }} &euro;
+        .table__tbody-cell {{ financeData.payables.total }} &euro;
 
     ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock" :isAbsolute="isEditing")
 </template>
@@ -71,8 +58,8 @@
 			},
 			cancelSave: {
 				type: Boolean,
-        default: false,
-      }
+				default: false,
+			}
 		},
 		data() {
 			return {
@@ -122,12 +109,12 @@
 					if (!this.currentData.payables.quantityTotal) {
 						this.errors.push("Set valid Payables Quantity[Total] value(integer)");
 					}
-					if(+this.currentData.receivables.quantityRelative > +this.currentData.receivables.quantityTotal){
+					if (+this.currentData.receivables.quantityRelative > +this.currentData.receivables.quantityTotal) {
 						this.errors.push("Value Quantity[Relative] in receivables, cannot be more than Quantity[Total]");
-          }
-					if(+this.currentData.payables.quantityRelative > +this.currentData.payables.quantityTotal){
+					}
+					if (+this.currentData.payables.quantityRelative > +this.currentData.payables.quantityTotal) {
 						this.errors.push("Value  Quantity[Relative] in payables, cannot be more than Quantity[Total]");
-          }
+					}
 				}
 
 				if (!this.currentData.receivables.rate) {
@@ -149,22 +136,22 @@
 			closeErrorsBlock() {
 				this.areErrorsExist = false;
 			},
-      discardChanges(){
-	      const {clientRate, finance, totalWords, vendorRate, quantity} = this.step
-	      const {Wordcount, Price} = finance
+			discardChanges() {
+				const {clientRate, finance, totalWords, vendorRate, quantity} = this.step
+				const {Wordcount, Price} = finance
 
-	      this.currentData.receivables.rate = clientRate.value
-	      this.currentData.receivables.quantityRelative = Wordcount.receivables
-	      this.currentData.receivables.quantityTotal = totalWords
-	      this.currentData.receivables.total = Price.receivables
+				this.currentData.receivables.rate = clientRate.value
+				this.currentData.receivables.quantityRelative = Wordcount.receivables
+				this.currentData.receivables.quantityTotal = totalWords
+				this.currentData.receivables.total = Price.receivables
 
-	      this.currentData.payables.rate = vendorRate.value
-	      this.currentData.payables.quantityRelative = Wordcount.payables
-	      this.currentData.payables.quantityTotal = quantity || 0
-	      this.currentData.payables.total = Price.payables
-      },
+				this.currentData.payables.rate = vendorRate.value
+				this.currentData.payables.quantityRelative = Wordcount.payables
+				this.currentData.payables.quantityTotal = quantity || 0
+				this.currentData.payables.total = Price.payables
+			},
 			cancel() {
-        this.discardChanges();
+				this.discardChanges();
 				this.isEditing = false;
 				this.closeErrorsBlock();
 			},
@@ -175,11 +162,11 @@
 					this.nowTab = newValue;
 				}
 			},
-      cancelSave(action){
-				if(action){
-          this.discardChanges();
-        }
-      }
+			cancelSave(action) {
+				if (action) {
+					this.discardChanges();
+				}
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -225,87 +212,7 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../../assets/scss/FinanceTablesStyle";
   @import "../../../../assets/scss/colors";
-
-  input {
-    width: 70px;
-
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-  }
-
-  .details {
-    box-sizing: border-box;
-    padding: 20px;
-    border: 0.5px solid $light-brown;
-    position: relative;
-
-    &__icons {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      height: 22px;
-    }
-
-    &__icon {
-      margin-left: 10px;
-      cursor: pointer;
-    }
-
-    &__col {
-      justify-content: flex-start;
-      display: grid;
-    }
-
-    &__row {
-      width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      height: 50px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    &__item {
-      margin-bottom: 25px;
-    }
-
-    &__data {
-      display: inline-block;
-      margin-left: 10px;
-      width: 70px;
-    }
-
-    &__input {
-      max-width: fit-content;
-      box-sizing: border-box;
-      border: 1px solid $light-brown;
-      padding: 0 5px;
-      border-radius: 5px;
-      outline: none;
-      color: $main-color;
-      margin-left: 10px;
-      height: 28px;
-    }
-
-    &_opacity-06 {
-      opacity: 0.6;
-    }
-
-    &_border-top {
-      border-top: 2px solid #938676;
-    }
-
-    &_no-margin-bottom {
-      margin-bottom: 0;
-    }
-
-    &_margin-top {
-      margin-top: 20px;
-    }
-  }
+  @import "../../../../assets/styles/settingsTable";
 </style>

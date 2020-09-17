@@ -108,8 +108,6 @@
 
 <style lang="scss" scoped>
   .tableMatrix {
-    margin-top: 40px;
-
     &__data {
       padding: 0 5px;
       display: flex;

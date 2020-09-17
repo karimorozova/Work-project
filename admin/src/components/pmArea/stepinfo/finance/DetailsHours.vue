@@ -2,42 +2,33 @@
   .details
     .details__icons(v-if="areIcons")
       img.details__icon(v-for="(icon, key) in dynamicIcons" :src="icon.src" :class="{'details_opacity-06': isActive(key)}" @click="makeAction(key)")
-    .details__row
-      .details__col(v-if="nowTab === 'Receivables'")
-        .col__title Rate:
-          span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.receivables.rate")
 
-      .details__col(v-if="nowTab === 'Payables'")
-        .col__title Rate:
-          span.details__data.details_opacity-06(v-if="!isEditing") {{ financeData.payables.rate }} &euro;
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.payables.rate")
+    .table
+    .table__thead.table__header
+      .table__head-row.table__header-row.tbody_visible-overflow
+        .table__thead-cell
+        .table__thead-cell Receivables
+        .table__thead-cell Payables
 
-      .details__col
-        .col__title Quantity [Total]:
-          span.details__data.details_opacity-06(v-if="!isQuantityEditable") {{ financeData.quantityTotal }}
-          input.details__input(v-else type="number" size="6" v-model.number="currentData.quantityTotal")
+    .table__tbody.tbody_visible-overflow
+      .table__body-row
+        .table__tbody-cell {{ financeData.title }}
+        .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.quantityTotal }}
+        input.details__editing-data(v-else type="number" v-model.number="currentData.quantityTotal")
+        .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.quantityTotal }}
+        input.details__editing-data(v-else type="number" v-model.number="currentData.quantityTotal")
 
+      .table__body-row
+        .table__tbody-cell Rate
+        .table__tbody-cell(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
+        input.details__editing-data(v-else type="number" v-model.number="currentData.receivables.rate")
+        .table__tbody-cell(v-if="!isEditing") {{ financeData.payables.rate }} &euro;
+        input.details__editing-data(v-else type="number" v-model.number="currentData.payables.rate")
 
-    .details__row.details_border-top(v-if="nowTab === 'Receivables'")
-      .details__col.details_margin-top
-        .details__item.details_no-margin-bottom
-          .col__title Total:
-            span.details__data(
-              type="text"
-              :value="financeData.receivables.total"
-              :class="{'details_opacity-06': !isEditing}"
-            ) {{ financeData.receivables.total }} &euro;
-
-    .details__row.details_border-top(v-else)
-      .details__col.details_margin-top
-        .details__item.details_no-margin-bottom
-          .col__title Total:
-            span.details__data(
-              type="text"
-              :value="financeData.payables.total"
-              :class="{'details_opacity-06': !isEditing}"
-            ) {{ financeData.payables.total }} &euro;
+      .table__body-row
+        .table__tbody-cell Price
+        .table__tbody-cell {{ financeData.receivables.total }} &euro;
+        .table__tbody-cell {{ financeData.payables.total }} &euro;
 
     ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock" :isAbsolute="isEditing")
 
@@ -123,7 +114,7 @@
 			closeErrorsBlock() {
 				this.areErrorsExist = false;
 			},
-			discardChanges(){
+			discardChanges() {
 				const {clientRate, finance, hours, vendorRate} = this.step
 				const {Price} = finance
 
@@ -147,8 +138,8 @@
 					this.nowTab = newValue;
 				}
 			},
-			cancelSave(action){
-				if(action){
+			cancelSave(action) {
+				if (action) {
 					this.discardChanges();
 				}
 			}
@@ -157,7 +148,6 @@
 			...mapGetters({
 				userGroup: "getUserGroup",
 			}),
-
 			isQuantityEditable() {
 				const groups = ["Administrators", "Developers"];
 				return this.isEditing && groups.indexOf(this.userGroup.name) !== -1;
@@ -197,87 +187,7 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../../assets/scss/FinanceTablesStyle";
   @import "../../../../assets/scss/colors";
-
-  input {
-    width: 70px;
-
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-  }
-
-  .details {
-    box-sizing: border-box;
-    padding: 20px;
-    border: 0.5px solid $light-brown;
-    position: relative;
-
-    &__icons {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      height: 22px;
-    }
-
-    &__icon {
-      margin-left: 10px;
-      cursor: pointer;
-    }
-
-    &__col {
-      justify-content: flex-start;
-      display: grid;
-    }
-
-    &__row {
-      width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      height: 50px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    &__item {
-      margin-bottom: 25px;
-    }
-
-    &__data {
-      display: inline-block;
-      margin-left: 10px;
-      width: 70px;
-    }
-
-    &__input {
-      max-width: fit-content;
-      box-sizing: border-box;
-      border: 1px solid $light-brown;
-      padding: 0 5px;
-      border-radius: 5px;
-      outline: none;
-      color: $main-color;
-      margin-left: 10px;
-      height: 28px;
-    }
-
-    &_opacity-06 {
-      opacity: 0.6;
-    }
-
-    &_border-top {
-      border-top: 2px solid #938676;
-    }
-
-    &_no-margin-bottom {
-      margin-bottom: 0;
-    }
-
-    &_margin-top {
-      margin-top: 20px;
-    }
-  }
+  @import "../../../../assets/styles/settingsTable";
 </style>
