@@ -1,5 +1,5 @@
 const { getProject, updateProject } = require('./getProjects');
-const { Step, Units } = require('../models');
+const { Step, Units, Vendors } = require('../models');
 const { getStepFinanceData } = require('../сalculations/finance');
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
@@ -23,6 +23,15 @@ async function updateProjectMetrics ({ projectId }) {
           const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
           task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
           steps = await getTaskSteps(steps, task, industry, customer);
+          const stepWithVendor = steps.find(step => step.vendor !== null);
+          if (stepWithVendor) {
+            const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
+            task.metrics = setTaskMetrics({
+              metrics: task.metrics,
+              matrix: vendor.matrix,
+              prop: 'vendor'
+            });
+          }
           const taskSteps = steps.filter(step => step.taskId === task.taskId);
           task.finance = {
             Wordcount: setTaskFinance(taskSteps, 'Wordcount'),

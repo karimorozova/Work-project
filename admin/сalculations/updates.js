@@ -1,7 +1,6 @@
 const { Units } = require('../models');
 const { getAfterWordcountPayablesUpdated } = require("./wordcount");
-const { getAfterPackagesPayablesUpdated } = require("./packages");
-const { getAfterHoursPayablesUpdated } = require("./hours");
+const { getAfterHoursPayablesUpdated } = require("./commonUnits");
 const { updateProject } = require("../projects");
 
 async function getAfterPayablesUpdated ({ projectId, step, index }) {

@@ -11,7 +11,7 @@ async function storeFiles(filesArr, projectId) {
         const project = await getProject({"_id": projectId});
         const { tasks } = project;
         let storedFiles = [];
-        if (storedFiles && filesArr.length) {
+        if (filesArr && filesArr.length) {
           for (let file of filesArr) {
             const newPath = `./dist/projectFiles/${projectId}/${tasks.length + 1}-${file.filename.replace(/\s+/g, '_')}`;
             await moveProjectFile(file, newPath);

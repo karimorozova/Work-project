@@ -3,7 +3,7 @@ const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
 const { hasActiveRateValue } = require('./general');
 const { getStepFinanceData } = require('./finance');
-const { setTaskFinance, getStepQuantity } = require('../projects/helpers');
+const { setTaskFinance } = require('../projects/helpers');
 
 
 function setTaskMetrics ({ metrics, matrix, prop }) {

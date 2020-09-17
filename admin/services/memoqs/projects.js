@@ -282,15 +282,12 @@ async function getProjectAnalysis(projectId) {
     const headers = headerWithoutAction('RunAnalysis');
     try {
       const { response } = await soapRequest({ url, headers, xml });
-      if (response.statusCode === 200) {
         const result = parser.toJson(response.body, {
           object: true,
           sanitize: true,
           trim: true
         })["s:Envelope"]["s:Body"].RunAnalysisResponse;
         return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
-      }
-      return null;
     } catch(err) {
         console.log("Error in getProjectAnalysis");
         console.log(err);
