@@ -21,9 +21,15 @@ export default {
     return {
       openQuotes: true,
       sidebarLinks: [
-        { title: "Languages" }, { title: "Services" }, { title: "Industries" }, { title: "Lead Sources" },
-        { title: "Pricelists" }, { title: "Cancellation Reasons" }, { title: "Instructions" }, { title: "LQA" },
-        { title: "Units" }
+        { title: "Languages" },
+        { title: "Industries" },
+        { title: "Services" },
+	      { title: "Units" },
+	      { title: "Pricelists" },
+        { title: "Cancellation Reasons" },
+        { title: "Instructions" },
+        { title: "LQA" },
+        { title: "Lead Sources" },
       ],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1

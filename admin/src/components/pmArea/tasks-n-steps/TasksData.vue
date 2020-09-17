@@ -1,11 +1,13 @@
 <template lang="pug">
   .tasks-data
     .tasks-data__main
-      .tasks-data__item
+      .tasks-data__item(v-if="originallySteps")
         ServiceAndWorkflow(
           :originallyLanguages="originallyLanguages"
           @setSourceLanguage="setSourceLang",
           @setTargets="setTargets",
+          :originallyUnits="originallyUnits"
+          :originallySteps="originallySteps"
         )
       .tasks-data__item
         .tasks-data__item-title File Preparation
@@ -34,15 +36,6 @@
 
         .tasks-data__services
           .tasks-data__service-steps(v-if="countCATWordcount === 2")
-            //JobSettings(
-            //  v-if="tasksData.stepsAndUnits.length && templates.length && originallyUnits.length",
-            //  :tasksDataProp="tasksData",
-            //  v-for="(step, index) in [sortedJobs[0]]",
-            //  :currentJob="step",
-            //  :currentIndex="index"
-            //  :templates="templates"
-            //  :originallyUnits="originallyUnits"
-            //)
             div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length",)
               JobSettings(
                 :tasksDataProp="tasksData",
@@ -54,15 +47,6 @@
               )
 
           .tasks-data__service-steps(v-else)
-            //JobSettings(
-            //  v-if="tasksData.stepsAndUnits.length && templates.length && originallyUnits.length",
-            //  :tasksDataProp="tasksData",
-            //  v-for="(step, index) in sortedJobs",
-            //  :currentJob="step",
-            //  :currentIndex="index"
-            //  :templates="templates"
-            //  :originallyUnits="originallyUnits"
-            //)
             div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length",)
               JobSettings(
                 :tasksDataProp="tasksData",
@@ -106,6 +90,9 @@
 			originallyUnits:{
         type: Array,
       },
+			originallySteps:{
+				type: Array,
+			},
 		},
 		data() {
 			return {
@@ -133,7 +120,6 @@
 			setTargets({targets}) {
 				this.setTasksDataValue({prop: "targets", value: targets});
 				this.targetLanguages = [...targets];
-				console.log(this.targetLanguages)
 			},
 			isRefFilesHasSource() {
 				const {sourceFiles, refFiles} = this.tasksData;
@@ -335,7 +321,7 @@
 			countCATWordcount() {
 				if (this.tasksData.stepsAndUnits) {
 					return this.tasksData.stepsAndUnits.filter(
-						(item) => item.unit == "CAT Wordcount"
+						(item) => item.unit === "CAT Wordcount"
 					).length;
 				}
 			},

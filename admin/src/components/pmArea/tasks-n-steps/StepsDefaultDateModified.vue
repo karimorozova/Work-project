@@ -2,7 +2,7 @@
 .steps-date
   .steps-date-wrapper
     .steps-date__header
-      .steps-date__title(v-if="steps") Step {{ stepCounter }} - {{setSteps[0].steps[stepCounter-1].step.title}} 
+      .steps-date__title(v-if="steps") Step {{ stepCounter }} - {{setSteps[0].steps[stepCounter-1].step.title}}
   .steps-date-wrapper 
     .steps-date__picker
       .steps-date__input-wrapper
@@ -90,7 +90,10 @@ import { mapGetters, mapActions} from "vuex";
         },
         tasksData:{
           type: Object
-        }
+        },
+        originallyUnits:{
+          type: Array,
+        },
     },
     data() {
         return {
@@ -102,35 +105,37 @@ import { mapGetters, mapActions} from "vuex";
             },
             isReadonly: false,
             services: null,
-            units: null,
+            // originallyUnits: null,
             currentUnit: '',
             steps: null,
         }
     },
     methods: {
         ...mapActions({
-            setDataValue: "setTasksDataValue"
+            setDataValue: "setTasksDataValue",
+	          getSteps: "getSteps",
+	          getServices: "getServices",
         }),
         setUnit({ option }) {    
-            this.currentUnit = this.units.find(item => item.type === option);
+            this.currentUnit = this.originallyUnits.find(item => item.type === option);
             this.sendUnit();
         },
         setParams(option){
-            this.currentUnit = this.units.find(item => item.type === option)
+            this.currentUnit = this.originallyUnits.find(item => item.type === option)
             this.sendUnit();
         },
-        async getUnits(){
-          try {
-            const result = await this.$http.get("/api/units");
-            this.units = result.body.filter(item => item.active);
-          } catch (err) {
-            this.alertToggle({
-              message: "Erorr on getting Units",
-              isShow: true,
-              type: "error"
-            });
-          }
-        },
+        // async getUnits(){
+        //   try {
+        //     const result = await this.$http.get("/api/originallyUnits");
+        //     this.originallyUnits = result.body.filter(item => item.active);
+        //   } catch (err) {
+        //     this.alertToggle({
+        //       message: "Erorr on getting Units",
+        //       isShow: true,
+        //       type: "error"
+        //     });
+        //   }
+        // },
         async getServiceSteps(){
           try {
             const services = await this.$http.get("/api/services");
@@ -168,9 +173,12 @@ import { mapGetters, mapActions} from "vuex";
             console.log(message);
         },
     },
-    mounted(){
+     created() {
       this.getServiceSteps();
-      this.getUnits();      
+    },
+	  mounted(){
+      // this.getServiceSteps();
+      // this.getUnits();
     },
     computed: {
         setSteps(){
