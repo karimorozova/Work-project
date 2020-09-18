@@ -8,20 +8,32 @@ const getDefaultBasicPrices = async () => {
   const { USD, GBP } = currencyRatio[0];
   const uniqueDuoLangs = await getUniqueLangPairs(vendors, clients);
   const defaultBasicPrices = [];
+  let sourcesArr = [];
+  let targetsArr = [];
+
   for (let uniquePair of uniqueDuoLangs) {
     const splicedString = uniquePair.split(' > ');
-    const type = splicedString[0] === splicedString[1] ? 'Mono' : 'Duo';
-    const sourceLang = await Languages.findOne({ lang: splicedString[0] });
-    const targetLang = await Languages.findOne({ lang: splicedString[1] });
-    defaultBasicPrices.push({
-      type,
-      sourceLanguage: sourceLang._id,
-      targetLanguage: targetLang._id,
-      euroBasicPrice: 1,
-      usdBasicPrice: USD,
-      gbpBasicPrice: GBP
-    });
+    sourcesArr.push(splicedString[0])
+    targetsArr.push(splicedString[1])
   }
+
+  const allLanguages = await Languages.find({})
+  let  originallySources = [...new Set(sourcesArr)].map(item => allLanguages.find(i => i.lang === item) )
+  let  originallyTargets = [...new Set(targetsArr)].map(item => allLanguages.find(i => i.lang === item) )
+
+  originallySources.forEach(source => {
+    return originallyTargets.forEach(target => {
+        return defaultBasicPrices.push({
+            type: source.lang  === target.lang ? 'Mono' : 'Duo',
+            sourceLanguage: source._id,
+            targetLanguage: target._id,
+            euroBasicPrice: 1,
+            usdBasicPrice: USD,
+            gbpBasicPrice: GBP
+        })
+    })
+  })
+
   return defaultBasicPrices;
 };
 
@@ -74,15 +86,15 @@ const getUniqueLangPairs = async (vendors, clients) => {
     for (let { sourceLanguage, targetLanguage } of competencies) {
       const { lang } = await Languages.findOne({ _id: sourceLanguage });
       const { lang: targetLang } = await Languages.findOne({ _id: targetLanguage });
-      langPairs.push(`${lang} ${targetLang}`);
+      langPairs.push(`${lang} > ${targetLang}`);
     }
   }
-  for (let { sourceLanguages, targetLanguage } of clients) {
+  for (let { sourceLanguages, targetLanguages } of clients) {
     for (const source of sourceLanguages) {
-      for (const target of targetLanguage) {
+      for (const target of targetLanguages) {
         const { lang } = await Languages.findOne({ _id: source });
         const { lang: targetLang } = await Languages.findOne({ _id: target });
-        langPairs.push(`${lang} ${targetLang}`);
+        langPairs.push(`${lang} > ${targetLang}`);
       }
     }
   }
