@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const StepSchema = new mongoose.Schema({
     title: {
@@ -6,10 +7,9 @@ const StepSchema = new mongoose.Schema({
         default : '',
         trim : true
     },
-    calculationUnit: {
-        type: Array,
-        default: () => [],
-    },
+    calculationUnit: [{
+        type: Schema.Types.ObjectId, ref: "Units"
+    }],
     isStage1: {
         type: Boolean
     },
