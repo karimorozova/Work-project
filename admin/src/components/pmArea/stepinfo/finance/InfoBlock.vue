@@ -1,32 +1,41 @@
 <template lang="pug">
   .finance-info
-    .finance-info__tabs
-      Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
+    .finance-info__row
+      .finance-info__table
+        .finance-info__bars
+          .bar
+            .bar__green(:style="{width: barsStatistic.receivables.width}")
+            .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
+          .bar
+            .bar__red(:style="{width: barsStatistic.payables.width }")
+            .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
 
-    DetailsTranslation(
-      v-if="getUnitTypeByUnitId === 'CAT Wordcount'"
-      :financeData="financeDataTranslation"
-      :step="step"
-      :cancelSave="cancelSave"
-      :selectedTab="selectedTab"
-      @save="checkRateChange"
-    )
-    DetailsPackages(
-      v-if="getUnitTypeByUnitId === 'Packages'"
-      :financeData="financeDataPackages"
-      :step="step"
-      :cancelSave="cancelSave"
-      :selectedTab="selectedTab"
-      @save="checkRateChange"
-    )
-    DetailsHours(
-      v-if="getUnitTypeByUnitId !== 'CAT Wordcount' && getUnitTypeByUnitId !== 'Packages'"
-      :financeData="financeDataHours"
-      :step="step"
-      :cancelSave="cancelSave"
-      :selectedTab="selectedTab"
-      @save="checkRateChange"
-    )
+        DetailsTranslation(
+          v-if="getUnitTypeByUnitId === 'CAT Wordcount'"
+          :financeData="financeDataTranslation"
+          :step="step"
+          :cancelSave="cancelSave"
+          :selectedTab="selectedTab"
+          @save="checkRateChange"
+        )
+        DetailsPackages(
+          v-if="getUnitTypeByUnitId === 'Packages'"
+          :financeData="financeDataPackages"
+          :step="step"
+          :cancelSave="cancelSave"
+          :selectedTab="selectedTab"
+          @save="checkRateChange"
+        )
+        DetailsHours(
+          v-if="getUnitTypeByUnitId !== 'CAT Wordcount' && getUnitTypeByUnitId !== 'Packages'"
+          :financeData="financeDataHours"
+          :step="step"
+          :cancelSave="cancelSave"
+          :selectedTab="selectedTab"
+          @save="checkRateChange"
+        )
+      .finance-info__result
+        Results(:step="step" :profitAndMargin="profitAndMargin")
 
     .finance-info__modal(v-if="isModal")
       ApproveModal(
@@ -37,6 +46,9 @@
         @notApprove="noSave"
         @close="noSave"
       )
+
+    .finance-info__tabs(v-if="getUnitTypeByUnitId === 'CAT Wordcount'")
+      Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
     TableMatrix(v-if="getUnitTypeByUnitId === 'CAT Wordcount'", :step="step" :selectedTab="selectedTab")
 
 </template>
@@ -50,6 +62,7 @@
 	import DetailsPackages from "./DetailsPackages";
 	import {mapActions} from "vuex";
 	import TableMatrix from "./TableMatrix"
+	import Results from "./Results";
 
 	export default {
 		props: {
@@ -174,6 +187,36 @@
 				return this.originallyUnits
 					.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
 			},
+
+			barsStatistic() {
+				const {finance} = this.step;
+				const {Price} = finance;
+				const payblesPercents = Math.ceil((Price.payables / Price.receivables) * 100)
+
+				return {
+					receivables: {
+						width: '100%',
+						price: Price.receivables,
+					},
+					payables: {
+						width: `${payblesPercents}%`,
+						price: Price.payables
+					}
+				}
+			},
+
+			profitAndMargin() {
+				const {finance} = this.step;
+				const {Price} = finance;
+
+				let result = {profit: 0, margin: 0, roi: 0};
+				result.profit = (Price.receivables - Price.payables).toFixed(2);
+				result.margin = ((1 - (Price.payables / Price.receivables)) * 100).toFixed(2);
+				result.roi = ((Price.receivables - Price.payables) / Price.payables).toFixed(2);
+
+				return result;
+			},
+
 			financeDataTranslation() {
 				const {clientRate, finance, status, totalWords, vendorRate, quantity, vendor} = this.step
 				const {Wordcount, Price} = finance
@@ -198,6 +241,7 @@
 				const {clientRate, finance, status, vendorRate, quantity, vendor} = this.step
 				const {Price} = finance
 				return {
+					title: "Quantity",
 					stepStatus: status,
 					vendor,
 					quantityTotal: quantity,
@@ -212,9 +256,11 @@
 				}
 			},
 			financeDataHours() {
+				const currentUnit = this.originallyUnits.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
 				const {clientRate, finance, status, vendorRate, hours, vendor} = this.step
 				const {Price} = finance
 				return {
+					title: currentUnit === "Hours" ? "Hours" : currentUnit,
 					stepStatus: status,
 					vendor,
 					quantityTotal: hours,
@@ -240,6 +286,7 @@
 			},
 		},
 		components: {
+			Results,
 			ValidationErrors,
 			ApproveModal,
 			Tabs,
@@ -254,8 +301,42 @@
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors";
 
+  .bar {
+    display: flex;
+    height: 16px;
+    align-items: center;
+
+    &__amount {
+      margin-left: 5px;
+    }
+
+    &__green {
+      background: #4CA553;
+      height: 8px;
+    }
+
+    &__red {
+      background: #D15F46;
+      height: 8px;
+    }
+
+  }
+
   .finance-info {
     position: relative;
+
+    &__bars {
+      margin: 15px 0;
+    }
+
+    &__row {
+      display: flex;
+    }
+
+    &__table {
+      width: 100%;
+      margin-right: 20px;
+    }
 
     &__modal {
       position: absolute;

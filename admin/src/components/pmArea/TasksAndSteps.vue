@@ -9,6 +9,7 @@
         TasksData(v-if="isTaskData && !isFinishedStatus"
             :originallyLanguages="originallyLanguages"
             :originallyUnits="originallyUnits"
+            :originallySteps="originallySteps"
             @setValue="setValue"
             @showErrors="showErrors"
             @addTasks="addTasks"
@@ -48,7 +49,10 @@ export default {
         },
         originallyUnits: {
           type: Array
-        }
+        },
+        originallySteps: {
+          type: Array
+        },
     },
     data() {
         return {

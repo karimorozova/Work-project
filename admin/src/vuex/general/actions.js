@@ -14,6 +14,7 @@ export const setProjectProp = ({ commit }, payload) => commit('storeProjectProp'
 export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
+
 export const getServices = async ({ commit, dispatch }) => {
   commit('startRequest')
   try {
@@ -27,6 +28,21 @@ export const getServices = async ({ commit, dispatch }) => {
     commit('endRequest');
   }
 }
+
+export const getSteps = async ({ commit, dispatch }) => {
+    commit('startRequest')
+    try {
+        const result = await Vue.http.get('/api/steps');
+        const allSteps = result.body;
+        allSteps.sort((a, b) => {return a.sortIndex - b.sortIndex});
+        dispatch('servicesGetting', allSteps);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+    } finally {
+        commit('endRequest');
+    }
+}
+
 export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
     commit('startRequest')
     try {      

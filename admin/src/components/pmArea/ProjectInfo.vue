@@ -10,6 +10,7 @@
         TasksAndSteps(
             :originallyLanguages="originallyLanguages"
             :originallyUnits="originallyUnits"
+            :originallySteps="originallySteps"
             :isFinishedStatus="isFinishedStatus"
             @getMetrics="getMetrics"
             @setVendor="setVendor"
@@ -27,7 +28,7 @@
                 @editAndSend="editAndSend"
                 @setStatus="setStatus"
                 @refreshProject="refreshProject"
-                )
+            )
     .project-info__all-info
         ProjectFinance
     .project-info__preview(v-if="isEditAndSend")
@@ -58,6 +59,7 @@ export default {
 
             originallyLanguages: null,
 	          originallyUnits: null,
+	          originallySteps: null,
         }
     },
     methods: {
@@ -228,6 +230,18 @@ export default {
             });
           }
         },
+        async getOriginallySteps() {
+          try {
+            const result = await this.$http.get("/api/steps");
+            this.originallySteps = result.body;
+          } catch (err) {
+            this.alertToggle({
+              message: "Error in Originally Steps",
+              isShow: true,
+              type: "error",
+            });
+          }
+        },
 
     },
     computed: {
@@ -250,11 +264,12 @@ export default {
         Preview,
         ProjectSubInformation
     },
-    created() {
-        this.getProject();
-        this.getVendors();
-        this.getOriginallyLanguages();
-        this.getOriginallyUnits();
+    async created() {
+        await this.getProject();
+        await this.getVendors();
+        await this.getOriginallyLanguages();
+        await this.getOriginallyUnits();
+        await this.getOriginallySteps();
     },
     beforeRouteEnter (to, from, next) {
         next(async (vm) => {

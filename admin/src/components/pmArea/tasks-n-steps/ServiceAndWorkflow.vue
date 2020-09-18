@@ -21,7 +21,8 @@
           @chooseOption="setWorkflow"
           :positionStyle="positionStyle"
         )
-    .workflow__default-dates(v-if="selectedWorkflow.id === 2917")
+
+    .workflow__default-dates(v-if="selectedWorkflow.id === 2917 && originallyUnits.length")
       StepsDefaultDateModified(
         :workflowId="2917"
         v-for="count in stepsCounter"
@@ -32,8 +33,9 @@
         @sendUnit="pushStepAndUnit"
         :service="service"
         :tasksData="tasksData"
+        :originallyUnits="originallyUnits"
       )
-    .workflow__default-dates(v-if="selectedWorkflow.id === 2890")
+    .workflow__default-dates(v-if="selectedWorkflow.id === 2890 && originallyUnits.length")
       StepsDefaultDateModified(
         :workflowId="2890"
         v-for="count in 1"
@@ -44,6 +46,7 @@
         @sendUnit="pushStepAndUnit"
         :service="service"
         :tasksData="tasksData"
+        :originallyUnits="originallyUnits"
       )
 
   transition(name="fade")
@@ -65,6 +68,12 @@
 			originallyLanguages: {
 				type: Array,
 			},
+			originallyUnits: {
+				type: Array,
+			},
+			originallySteps: {
+				type: Array,
+			},
 		},
 		data() {
 			return {
@@ -84,6 +93,7 @@
 				isError: false,
 				stepsAndUnits: [],
 				stepsAndUnitsMono: [],
+				workFlowOption: null,
 			};
 		},
 		methods: {
@@ -116,10 +126,19 @@
 				const currentSteps = this.services.find(
 					(item) => item.title === this.service
 				);
-				const steps = await this.$http.get("/api/steps");
+
+				let firstUnit = returnUnit(0, this.originallySteps);
+				let secondStep = returnUnit(1, this.originallySteps);
+
 				if (option === "2 Steps") {
-					let firstUnit = returnUnit(0);
-					let secondStep = returnUnit(1);
+
+					if (this.service === "Translation") {
+						const firstUnitCAT = currentSteps.steps[0].step.calculationUnit
+							.find(item => item.type === "CAT Wordcount");
+						if (firstUnitCAT.hasOwnProperty('type')) {
+							firstUnit = firstUnitCAT.type;
+						}
+					}
 					defaultStepsAndUnits = [
 						{
 							step: currentSteps.steps[0].step.title,
@@ -136,7 +155,7 @@
 					];
 					this.stepsAndUnits = defaultStepsAndUnits;
 				} else {
-					let firstUnit = returnUnit(0);
+					let firstUnit = returnUnit(0, this.originallySteps);
 					defaultStepsAndUnits = [
 						{
 							step: currentSteps.steps[0].step.title,
@@ -149,8 +168,8 @@
 				}
 				this.setDataValue({prop: "stepsAndUnits", value: defaultStepsAndUnits});
 
-				function returnUnit(index) {
-					return steps.data.find(
+				function returnUnit(index, array) {
+					return array.find(
 						(item) => item.title === currentSteps.steps[index].step.title
 					).calculationUnit[0].type;
 				}
@@ -168,13 +187,14 @@
 				} else {
 					await this.setWorkflow({option: "2 Steps"});
 				}
-				if(value) {
-          this.setStartedLanguages(languageFormValue);
+				if (value) {
+					this.setStartedLanguages(languageFormValue);
 				}
 			},
 			async setWorkflow({option}) {
 				const value = this.workflowSteps.find((item) => item.name === option);
-				await this.setDefaultStepsAndUnits(option);
+				this.workFlowOption = option
+				// await this.setDefaultStepsAndUnits(option);
 				this.setDataValue({prop: "workflow", value});
 				if (value.id === 2890) {
 					let stepDates = {
@@ -195,6 +215,7 @@
 			},
 			storeDefaultService(service) {
 				this.setDataValue({prop: "service", value: service});
+				this.setDefaultStepsAndUnits(this.workFlowOption);
 			},
 			setDefaultStepDates() {
 				this.stepsDates = [
@@ -257,7 +278,7 @@
 				return [];
 			},
 		},
-		mounted() {
+		created() {
 			this.setDefaultStepDates();
 		},
 		components: {
