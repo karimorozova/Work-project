@@ -1,19 +1,12 @@
-const { Vendors, Languages, Units, Industries, CurrencyRatio } = require('../../models');
+const { Vendors, Clients, Languages, Units, Industries, CurrencyRatio } = require('../../models');
 const ObjectId = require('mongodb').ObjectID;
 
 const getDefaultBasicPrices = async () => {
-  const vendors = await Vendors.find({ languagePairs: { $gt: [] } });
+  const vendors = await Vendors.find({ competencies: { $gt: [] } });
+  const clients = await Clients.find({ sourceLanguages: { $gt: [] }, targetLanguages: { $gt: [] } });
   const currencyRatio = await CurrencyRatio.find();
-  const {USD,GBP} = currencyRatio[0];
-  const duoLanguagesInUse = [];
-  for (let { languagePairs } of vendors) {
-    for (let pair of languagePairs) {
-      const { lang } = await Languages.findOne({ _id: pair.source });
-      const { lang: targetLang } = await Languages.findOne({ _id: pair.target });
-      duoLanguagesInUse.push(`${lang} > ${targetLang}`);
-    }
-  }
-  const uniqueDuoLangs = Array.from(new Set(duoLanguagesInUse));
+  const { USD, GBP } = currencyRatio[0];
+  const uniqueDuoLangs = await getUniqueLangPairs(vendors, clients);
   const defaultBasicPrices = [];
   for (let uniquePair of uniqueDuoLangs) {
     const splicedString = uniquePair.split(' > ');
@@ -27,7 +20,7 @@ const getDefaultBasicPrices = async () => {
       euroBasicPrice: 1,
       usdBasicPrice: USD,
       gbpBasicPrice: GBP
-    })
+    });
   }
   return defaultBasicPrices;
 };
@@ -35,7 +28,7 @@ const getDefaultBasicPrices = async () => {
 const getDefaultStepMultipliers = async () => {
   const units = await Units.find({ active: true });
   const currencyRatio = await CurrencyRatio.find();
-  const {USD,GBP} = currencyRatio[0];
+  const { USD, GBP } = currencyRatio[0];
   const defaultStepMultipliers = [];
   for (let { _id, sizes, steps } of units) {
     if (sizes.length) {
@@ -48,9 +41,9 @@ const getDefaultStepMultipliers = async () => {
             euroMinPrice: 1,
             usdMinPrice: USD,
             gbpMinPrice: GBP
-          })
-        })
-      })
+          });
+        });
+      });
     } else {
       steps.forEach(step => defaultStepMultipliers.push({
         step: step._id,
@@ -59,7 +52,7 @@ const getDefaultStepMultipliers = async () => {
         euroMinPrice: 1,
         usdMinPrice: USD,
         gbpMinPrice: GBP
-      }))
+      }));
     }
   }
   return defaultStepMultipliers;
@@ -70,11 +63,31 @@ const getDefaultIndustryMultipliers = async () => {
   for (let { _id } of industries) {
     defaultIndustryMultipliers.push({
       industry: _id,
-    })
+    });
   }
   return defaultIndustryMultipliers;
 };
 
+const getUniqueLangPairs = async (vendors, clients) => {
+  let langPairs = [];
+  for (let { competencies } of vendors) {
+    for (let { sourceLanguage, targetLanguage } of competencies) {
+      const { lang } = await Languages.findOne({ _id: sourceLanguage });
+      const { lang: targetLang } = await Languages.findOne({ _id: targetLanguage });
+      langPairs.push(`${lang} ${targetLang}`);
+    }
+  }
+  for (let { sourceLanguages, targetLanguage } of clients) {
+    for (const source of sourceLanguages) {
+      for (const target of targetLanguage) {
+        const { lang } = await Languages.findOne({ _id: source });
+        const { lang: targetLang } = await Languages.findOne({ _id: target });
+        langPairs.push(`${lang} ${targetLang}`);
+      }
+    }
+  }
+  return Array.from(new Set(langPairs));
+};
 
 
-module.exports = { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers }
+module.exports = { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers };
