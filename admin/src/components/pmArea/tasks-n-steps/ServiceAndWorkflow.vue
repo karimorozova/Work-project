@@ -133,7 +133,13 @@
 				if (option === "2 Steps") {
 
 					if (this.service === "Translation") {
-						const firstUnitCAT = currentSteps.steps[0].step.calculationUnit
+						const unitsObjects = this.originallyUnits.filter(item => {
+							return currentSteps.steps[0].step.calculationUnit.some(item2 => {
+								return item._id.toString() === item2.toString()
+							})
+						})
+
+						const firstUnitCAT = unitsObjects
 							.find(item => item.type === "CAT Wordcount");
 						if (firstUnitCAT.hasOwnProperty('type')) {
 							firstUnit = firstUnitCAT.type;
@@ -169,8 +175,7 @@
 				this.setDataValue({prop: "stepsAndUnits", value: defaultStepsAndUnits});
 
 				function returnUnit(index, array) {
-					return array.find(
-						(item) => item.title === currentSteps.steps[index].step.title
+					return array.find((item) => item.title === currentSteps.steps[index].step.title
 					).calculationUnit[0].type;
 				}
 			},

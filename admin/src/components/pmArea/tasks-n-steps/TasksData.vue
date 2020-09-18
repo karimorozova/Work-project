@@ -1,7 +1,7 @@
 <template lang="pug">
   .tasks-data
     .tasks-data__main
-      .tasks-data__item(v-if="originallySteps")
+      .tasks-data__item(v-if="originallySteps && originallyUnits")
         ServiceAndWorkflow(
           :originallyLanguages="originallyLanguages"
           @setSourceLanguage="setSourceLang",
