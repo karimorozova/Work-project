@@ -92,7 +92,14 @@
 			calculatedRate(rate, wordCount) {
 				const currentNumber = (rate * wordCount) / 100
 				return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(3)
-			}
+			},
+			buildMatrixArray(){
+				let matrixArr = this.changeFormatForMetrics()
+				if (!matrixArr[matrixArr.length - 1].hasOwnProperty('client')) {
+					matrixArr.pop()
+				}
+				this.tableData = matrixArr;
+      }
 		},
 		computed: {
 			...mapGetters({
@@ -100,7 +107,7 @@
 			}),
 		},
 		mounted() {
-			this.tableData = this.changeFormatForMetrics()
+      this.buildMatrixArray();
 		}
 
 	}
