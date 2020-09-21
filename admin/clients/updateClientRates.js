@@ -150,7 +150,8 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
           const stepId = stepToReplace._id;
           const { calculationUnit } = await Step.findOne({ _id: stepId });
           if (calculationUnit.length) {
-            for (let { _id: unitId, sizes } of calculationUnit) {
+            for (let unitId of calculationUnit) {
+              const { sizes } = await Units.findOne({ _id: unitId });
               if (sizes.length) {
                 deleteSize = true;
                 for (let i = 0; i < sizes.length; i += 1) {
@@ -205,11 +206,12 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
         const { _id } = stepToReplace;
         const { calculationUnit } = await Step.findOne({ _id });
         const neededUnit = calculationUnit.find(unit => unit._id === oldUnit._id);
+        const { sizes } = await Units.findOne({ _id: neededUnit });
         let sameCombination;
         let deleteSize;
-        if (neededUnit.sizes.length) {
+        if (sizes.length) {
           deleteSize = true;
-          neededUnit.sizes.forEach(size => {
+          sizes.forEach(size => {
             for (let { rates } of clients) {
               let { stepMultipliersTable } = rates;
               sameCombination = stepMultipliersTable.find(item => (
@@ -218,7 +220,7 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
               if (!sameCombination) {
                 newMultiplierCombinations.push({
                   step: _id,
-                  unit: neededUnit._id,
+                  unit: neededUnit,
                   size,
                 });
               }
@@ -233,7 +235,7 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
             if (!sameCombination) {
               newMultiplierCombinations.push({
                 step: _id,
-                unit: neededUnit._id,
+                unit: neededUnit,
                 size: 1,
                 defaultSize: true
               });
@@ -261,7 +263,7 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
   switch (sizeDifference) {
     default:
     case 'Just added':
-      for (let { _id: clientId, rates, services } of clients) {
+      for (let { _id: clientId, rates } of clients) {
         let { stepMultipliersTable } = rates;
         for (let size of newSizes) {
           for (let step of updatedSteps) {
@@ -280,7 +282,7 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
       }
       break;
     case 'Just deleted':
-      for (let { _id: clientId, rates, services } of clients) {
+      for (let { _id: clientId, rates } of clients) {
         let { stepMultipliersTable } = rates;
         for (let step of updatedSteps) {
           for (let size of deletedSizes) {

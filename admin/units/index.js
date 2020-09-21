@@ -27,10 +27,10 @@ async function deleteUnitFromStep(unitId) {
     const pricelists = await Pricelist.find();
     for (let step of steps) {
       const { calculationUnit } = step;
-      step.calculationUnit = calculationUnit.filter(unit => unit._id.toString() !== unitId);
+      step.calculationUnit = calculationUnit.filter(currentUnitId => currentUnitId.toString() !== unitId.toString());
       await Step.updateOne({ _id: step._id }, step, { upsert: true });
       for (let { _id, stepMultipliersTable } of pricelists) {
-        stepMultipliersTable = stepMultipliersTable.filter(item => item.unit.toString() !== unitId);
+        stepMultipliersTable = stepMultipliersTable.filter(item => item.unit.toString() !== unitId.toString());
         await Pricelist.updateOne({ _id }, { stepMultipliersTable });
       }
     }
@@ -48,10 +48,10 @@ async function changeUnitsInSteps(unitToUpdate) {
       await deleteUnitFromStep(_id);
     }
     for (let { _id: id } of unit.steps) {
-      const redundantSteps = steps.filter(item => item._id !== id);
+      const redundantSteps = steps.filter(item => item._id.toString() !== id.toString());
       if (redundantSteps.length) {
         for (let step of redundantSteps) {
-          step.calculationUnit = step.calculationUnit.filter(unit => unit._id !== _id);
+          step.calculationUnit = step.calculationUnit.filter(unitId => unitId.toString() !== _id.toString());
           await Step.updateOne({ _id: step._id }, step);
         }
       }
@@ -59,7 +59,7 @@ async function changeUnitsInSteps(unitToUpdate) {
     if (unit.steps.length) {
       for (let { _id: id } of unit.steps) {
         const step = await Step.findOne({ _id: id });
-        const isExists = step.calculationUnit.find(item => item._id === _id);
+        const isExists = step.calculationUnit.find(unitId => unitId.toString() === _id.toString());
         if (!isExists) {
           step.calculationUnit.push({
             _id,

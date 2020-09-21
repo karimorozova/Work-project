@@ -328,7 +328,8 @@ const updateActiveSteps = async (activityStatus, stepId) => {
     const { calculationUnit } = neededStep;
     let sameCombination;
     const newMultiplierCombinations = [];
-    for (let { _id, sizes } of calculationUnit) {
+    for (let unitId of calculationUnit) {
+      const { sizes } = await Units.findOne({ _id: unitId });
       if (sizes.length) {
         sizes.forEach(size => {
           for (let { stepMultipliersTable } of pricelists) {
@@ -342,7 +343,7 @@ const updateActiveSteps = async (activityStatus, stepId) => {
               usdMinPrice: USD,
               gbpMinPrice: GBP,
               step: stepId,
-              unit: _id,
+              unit: unitId,
               size,
             });
           }
@@ -359,7 +360,7 @@ const updateActiveSteps = async (activityStatus, stepId) => {
             usdMinPrice: USD,
             gbpMinPrice: GBP,
             step: stepId,
-            unit: _id,
+            unit: unitId,
             size: 1,
             defaultSize: true,
           });
@@ -394,17 +395,18 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
   const pricelists = await Pricelist.find();
   const currencyRatio = await CurrencyRatio.find();
   const { USD, GBP } = currencyRatio[0];
-  const { difference, itemsToReplace, itemsToDelete } = stepDifferences;
+  const { difference, itemsToAdd, itemsToDelete } = stepDifferences;
   switch (difference) {
     default:
     case differenceOperationType.DeleteAndReplace || differenceOperationType.JustReplace || differenceOperationType.AddAndReplace:
       for (let { _id, stepMultipliersTable } of pricelists) {
         let deleteSize;
-        for (let stepToReplace of itemsToReplace) {
+        for (let stepToReplace of itemsToAdd) {
           const stepId = stepToReplace._id;
           const { calculationUnit } = await Step.findOne({ _id: stepId });
           if (calculationUnit.length) {
-            for (let { _id: unitId, sizes } of calculationUnit) {
+            for (let unitId of calculationUnit) {
+              const { sizes } = await Units.findOne({ _id: unitId });
               if (sizes.length) {
                 deleteSize = true;
                 for (let i = 0; i < sizes.length; i += 1) {
@@ -456,15 +458,16 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
       break;
     case differenceOperationType.JustAdd:
       const newMultiplierCombinations = [];
-      for (let stepToReplace of itemsToReplace) {
+      for (let stepToReplace of itemsToAdd) {
         const { _id } = stepToReplace;
         const { calculationUnit } = await Step.findOne({ _id });
         const neededUnit = calculationUnit.find(unit => unit._id === oldUnit._id);
+        const { sizes } = await Units.findOne({ _id: neededUnit });
         let sameCombination;
         let deleteSize;
-        if (neededUnit.sizes.length) {
+        if (sizes.length) {
           deleteSize = true;
-          neededUnit.sizes.forEach(size => {
+          sizes.forEach(size => {
             for (let { stepMultipliersTable } of pricelists) {
               sameCombination = stepMultipliersTable.find(item => (
                 `${item.step} ${item.unit} ${item.size}` === `${_id} ${oldUnit._id} ${size}`
@@ -476,7 +479,7 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
                 usdMinPrice: USD,
                 gbpMinPrice: GBP,
                 step: _id,
-                unit: neededUnit._id,
+                unit: neededUnit,
                 size,
               });
             }
@@ -493,7 +496,7 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
               usdMinPrice: USD,
               gbpMinPrice: GBP,
               step: _id,
-              unit: neededUnit._id,
+              unit: neededUnit,
               size: 1,
               defaultSize: true
             });
@@ -731,8 +734,10 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
   if (key === 'Step') {
     const { _id, calculationUnit } = newMultiplier;
     if (calculationUnit.length) {
-      for (let { sizes, _id: unitId } of calculationUnit) {
+      for (let unitId of calculationUnit) {
+        const { sizes } = await Units.findOne({ _id: unitId });
         if (sizes.length) {
+          1;
           sizes.forEach(size => {
             combinations.push({
               euroMinPrice: 1,
