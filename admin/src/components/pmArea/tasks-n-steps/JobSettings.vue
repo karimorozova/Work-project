@@ -27,7 +27,7 @@
             span.hours-steps__label-red *
           .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
             SelectSingle(
-              :selectedOption="selectedTemplate.name"
+              :selectedOption="selectedTemplate"
               :options="allTemplates"
               placeholder="Template"
               @chooseOption="setTemplate"
@@ -78,7 +78,7 @@
 			return {
 				// templates: [],
 				selectedSizes: "",
-				selectedTemplate: "",
+				// selectedTemplate: "",
 				// units: null,
 			}
 		},
@@ -121,7 +121,8 @@
 			},
 			setTemplate({option}) {
 				const value = this.templates.find(item => item.name === option);
-				this.selectedTemplate = value;
+				// this.selectedTemplate = value;
+
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits;
 				oldStepsAndUnits[this.currentIndex].template = value;
 				oldStepsAndUnits[this.currentIndex].size = null;
@@ -169,8 +170,14 @@
 		// },
 		computed: {
 			...mapGetters({
-				tasksData: "getTasksData"
+				tasksData: "getTasksData",
 			}),
+			selectedTemplate(){
+        if(this.tasksData){
+          const {name} = this.tasksData.stepsAndUnits.find(obj => obj.hasOwnProperty('template')).template
+          return name || '';
+        }
+			},
 			getSizes() {
 				if (this.originallyUnits.length) {
 					if (this.currentJob.unit !== 'CAT Wordcount') {

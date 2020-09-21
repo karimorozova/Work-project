@@ -74,6 +74,9 @@
 			originallySteps: {
 				type: Array,
 			},
+			templates: {
+				type: Array,
+			}
 		},
 		data() {
 			return {
@@ -145,6 +148,7 @@
 							firstUnit = firstUnitCAT.type;
 						}
 					}
+
 					defaultStepsAndUnits = [
 						{
 							step: currentSteps.steps[0].step.title,
@@ -179,6 +183,20 @@
 					).calculationUnit[0].type;
 				}
 			},
+			setDefaultTemplate() {
+				let catUnit = this.tasksData.stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
+				if (catUnit) {
+					let stepsAndUnits = this.tasksData.stepsAndUnits;
+					let template = {
+						template: {
+							...this.templates[0]
+						}
+					}
+					Object.assign(stepsAndUnits[catUnit.stepCounter - 1], stepsAndUnits[catUnit.stepCounter - 1], template)
+					this.setDataValue({prop: "stepsAndUnits", value: stepsAndUnits});
+				}
+			},
+
 			async setService({option}) {
 				const value = this.services.find((item) => item.title === option);
 				const languageFormValue = value.languageForm;
@@ -199,7 +217,10 @@
 			async setWorkflow({option}) {
 				const value = this.workflowSteps.find((item) => item.name === option);
 				this.workFlowOption = option
-				// await this.setDefaultStepsAndUnits(option);
+
+				await this.setDefaultStepsAndUnits(option);
+				this.setDefaultTemplate();
+
 				this.setDataValue({prop: "workflow", value});
 				if (value.id === 2890) {
 					let stepDates = {
@@ -218,10 +239,12 @@
 					this.setDefaultStepDates();
 				}
 			},
+
 			storeDefaultService(service) {
 				this.setDataValue({prop: "service", value: service});
-				this.setDefaultStepsAndUnits(this.workFlowOption);
+				// this.setDefaultStepsAndUnits(this.workFlowOption);
 			},
+
 			setDefaultStepDates() {
 				this.stepsDates = [
 					{start: this.currentProject.startDate, deadline: ""},

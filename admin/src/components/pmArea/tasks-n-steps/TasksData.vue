@@ -1,13 +1,14 @@
 <template lang="pug">
   .tasks-data
     .tasks-data__main
-      .tasks-data__item(v-if="originallySteps && originallyUnits")
+      .tasks-data__item(v-if="originallySteps && originallyUnits && templates.length")
         ServiceAndWorkflow(
           :originallyLanguages="originallyLanguages"
           @setSourceLanguage="setSourceLang",
           @setTargets="setTargets",
           :originallyUnits="originallyUnits"
           :originallySteps="originallySteps"
+          :templates="templates"
         )
       .tasks-data__item
         .tasks-data__item-title File Preparation
