@@ -18,6 +18,7 @@ export default {
             setStepTermsAgreement: "setStepTermsAgreement"
         }),
         async toggle(e, bool) {
+	        console.log(e, bool)
             try {
                 await this.setStepTermsAgreement({jobId: this.job._id, value: bool});
             } catch(err) {
@@ -27,15 +28,28 @@ export default {
     },
     computed: {
         isReadonly() {
+	        console.log(this.job)
+	        return false
+
             const statuses = ["Started", "Approved", "In progress"];
-            if(statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === "Completed") return true;
+            if(statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === "Completed"){
+	            console.log('t1')
+	            return true;
+            }
+
             if(this.job.prevStep && this.job.status !== "Started") {
+	            console.log('tyt2')
                 return this.job.prevStep.progress < 100 || this.job.prevStep.status !== "Completed";
             }
             if(this.job.status !== "Started") {
+	            console.log('tyt3')
                 return this.job.status !== "Accepted" && this.job.status !== "Ready to Start";
             }
-            return this.job.status === "Started";
+            //MAX
+            // return this.job.status === "Started";
+
+
+
         }
     },
     components: {

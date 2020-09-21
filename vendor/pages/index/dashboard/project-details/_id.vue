@@ -104,7 +104,11 @@ export default {
             return "Start"
         },
         isForbidden() {
+        	  return false;
+
             if((this.job.status === "Accepted" || this.job.status === "Waiting to Start") && this.job.prevStep) {
+
+            	  //MAX
                 return this.job.prevStep.progress < 100 || this.job.prevStep.status !== "Completed";
             }
             if(!this.job.prevStep && this.statuses.indexOf(this.job.projectStatus) !== -1) {
