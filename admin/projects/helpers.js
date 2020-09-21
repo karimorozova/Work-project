@@ -7,6 +7,7 @@ const gatherServiceStepInfo = async (serviceStep) => {
   const { _id: unitId } = await Units.findOne({ type: serviceStep.unit });
   serviceStep.step = ObjectId(stepId);
   serviceStep.unit = ObjectId(unitId);
+  serviceStep.title = serviceStep.step;
   return serviceStep;
 };
 

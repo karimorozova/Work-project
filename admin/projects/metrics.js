@@ -119,7 +119,8 @@ async function getTaskSteps (task, industry, customer) {
       step: ObjectId(stepId),
       unit: ObjectId(unitId),
       size: stepsAndUnits[i].size || 1,
-      memoqAssignmentRole: i
+      memoqAssignmentRole: i,
+      title: stepsAndUnits[i].step
     };
     const quantity = getWordcountStepQuantity(type, metrics, stepsAndUnits[i]);
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
