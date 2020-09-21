@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const UnitSchema = new mongoose.Schema({
   type: {
@@ -6,10 +7,9 @@ const UnitSchema = new mongoose.Schema({
     default: '',
     trim: true,
   },
-  steps: {
-    type: Array,
-    default: () => [],
-  },
+  steps: [{
+    type: Schema.Types.ObjectId, ref: 'Step',
+  }],
   active: {
     type: Boolean,
     default: false,
@@ -18,7 +18,7 @@ const UnitSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  sizes:{
+  sizes: {
     type: Array,
     default: () => [],
   },

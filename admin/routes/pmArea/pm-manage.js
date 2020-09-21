@@ -357,11 +357,8 @@ router.post("/reassign-vendor", async (req, res) => {
 router.get('/costs', async (req, res) => {
   const { projectId } = req.query;
   try {
-    let project = await getProject({ "_id": projectId });
-    let projectToUpdate = await getProjectWithUpdatedFinance(project);
-    const memoqUsers = await getMemoqUsers();
-    const { steps, tasks } = await setDefaultStepVendors(projectToUpdate, memoqUsers);
-    const updatedProject = await updateProjectCosts({ ...projectToUpdate, steps, tasks });
+    let project = await Projects.findOne({ _id: projectId });
+    const updatedProject = await updateProjectCosts(project);
     res.send(updatedProject);
   } catch (err) {
     console.log(err);

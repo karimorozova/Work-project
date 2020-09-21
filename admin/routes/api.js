@@ -281,7 +281,8 @@ router.get('/group-user', async (req, res) => {
 
 router.get('/steps', async (req, res) => {
     try {
-      const steps = await Step.find({});
+      const steps = await Step.find({})
+        .populate('calculationUnit');
       res.send(steps);
     } catch(err) {
       console.log(err);
@@ -406,7 +407,9 @@ router.get('/pdf-file', async (req, res) => {
 
 router.get('/units', async (req, res) => {
   try {
-    const units = await Units.find();
+    const units = await Units.find()
+      .populate('steps');
+
     res.send(units);
   } catch (err) {
     console.log(err);

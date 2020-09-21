@@ -41,7 +41,7 @@ const ObjectId = require('mongodb').ObjectID;
 const { Converter } = require('easy-currencies');
 const { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers } = require('./defaults');
 
-async function fillTierLqa() {
+async function fillTierLqa () {
   try {
     const tierLqas = await TierLqa.find();
     if (!tierLqas.length) {
@@ -124,30 +124,26 @@ function fillSteps() {
     .then(async steps => {
       if (!steps.length) {
         for (const step of stepsDefault) {
+          let unit;
           let calculationUnit;
           const { title } = step;
           switch (title) {
             default:
             case 'Translation':
-              calculationUnit = await Units.findOne({ type: 'CAT Wordcount' });
-              break;
             case 'Revising':
-              calculationUnit = await Units.findOne({ type: 'CAT Wordcount' });
-              break;
             case 'Editing':
-              calculationUnit = await Units.findOne({ type: 'CAT Wordcount' });
+              unit = await Units.findOne({ type: 'CAT Wordcount' });
+              calculationUnit = unit._id;
               break;
             case 'QA':
-              calculationUnit = await Units.findOne({ type: 'Hours' });
-              break;
             case 'Graphic Design':
-              calculationUnit = await Units.findOne({ type: 'Hours' });
+              unit = await Units.findOne({ type: 'Hours' });
+              calculationUnit = unit._id;
               break;
             case 'Copywriting':
-              calculationUnit = await Units.findOne({ type: 'Packages' });
-              break;
             case 'Proofreading':
-              calculationUnit = await Units.findOne({ type: 'Packages' });
+              unit = await Units.findOne({ type: 'Packages' });
+              calculationUnit = unit._id;
               break;
           }
           await new Step({ ...step, calculationUnit }).save().then((res) => {
@@ -382,7 +378,7 @@ async function getRates(industries) {
   }
 }
 
-function getDuoCombinations({ languages, englishLang, industries, steps }) {
+function getDuoCombinations ({ languages, englishLang, industries, steps }) {
   const rates = steps.reduce((prev, cur) => {
     prev[cur.id] = { value: 0.08, min: 10, active: true };
     return prev;
@@ -399,7 +395,7 @@ function getDuoCombinations({ languages, englishLang, industries, steps }) {
   return combinations;
 }
 
-function getMonoCombinations({ languages, industries, steps }) {
+function getMonoCombinations ({ languages, industries, steps }) {
   const rates = steps.reduce((prev, cur) => {
     prev[cur.id] = { value: 0.1, min: 5, active: true };
     return prev;
@@ -432,20 +428,28 @@ async function fillUnits() {
 
 async function fillUnitSteps() {
   const units = await Units.find();
-  if (!units.length) {
+  const isEmptyUnitsStepsId = units[0].steps.length && units[1].steps.length && units[2].steps.length;
+
+  if (units.length && !isEmptyUnitsStepsId) {
     try {
       for (let unit of units) {
         const { type } = unit;
         switch (type) {
-          default:
-          case 'Cat Wordcount':
-            unit.steps = await Step.find({ $or: [{ title: 'Translation' }, { title: 'Revising' }, { title: 'Editing' }] });
-            break;
-          case 'Hours':
-            unit.steps = await Step.find({ $or: [{ title: 'QA' }, { title: 'Graphic Design' }] });
+          case 'CAT Wordcount':
+            const stepTranslation = await Step.findOne({ title: 'Translation' });
+            const stepRevising = await Step.findOne({ title: 'Revising' });
+            const stepEditing = await Step.findOne({ title: 'Editing' });
+            unit.steps = [stepTranslation._id, stepRevising._id, stepEditing._id];
             break;
           case 'Packages':
-            unit.steps = await Step.find({ $or: [{ title: 'Copywriting' }, { title: 'Proofreading' }] });
+            const stepCopywriting = await Step.findOne({ title: 'Copywriting' });
+            const stepProofreading = await Step.findOne({ title: 'Proofreading' });
+            unit.steps = [stepCopywriting._id, stepProofreading._id];
+            break;
+          default:
+            const stepGraphicDesign = await Step.findOne({ title: 'Graphic Design' });
+            const stepQA = await Step.findOne({ title: 'QA' });
+            unit.steps = [stepGraphicDesign._id, stepQA._id];
             break;
         }
         await Units.updateOne({ _id: ObjectId(unit._id) }, unit, { upsert: true });
@@ -507,13 +511,14 @@ async function checkCollections() {
   await fillCancelReasons();
   await fillLeadSources();
   await fillGroups();
+  await services();
   await fillUnits();
   await fillSteps();
   await fillUnitSteps();
   await timeZones();
   await languages();
   await industries();
-  await services();
+
   await clients();
   await vendors();
   await requests();

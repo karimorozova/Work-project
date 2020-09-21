@@ -19,6 +19,7 @@ async function getVendor(query) {
     .populate('competencies.targetLanguage')
     .populate('competencies.industry')
     .populate('competencies.step')
+    .populate('competencies.step.calculationUnit')
     .populate('rates.basicPricesTable.sourceLanguage')
     .populate('rates.basicPricesTable.targetLanguage')
     .populate('rates.stepMultipliersTable.step')

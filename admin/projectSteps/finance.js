@@ -22,9 +22,10 @@ function getPrices (step, unitType) {
   const { clientRate, vendorRate, finance } = step;
   let receivables = +finance.Price.receivables;
   let payables = +finance.Price.payables;
+
   if (clientRate) {
     if (unitType === 'CAT Wordcount') {
-      receivables = +(step.totalWords & clientRate.value).toFixed(2);
+      receivables = +(step.totalWords * clientRate.value).toFixed(2);
     } else if (unitType === 'Packages') {
       receivables = +(step.quantity * clientRate.value).toFixed(2);
     } else {
@@ -33,11 +34,11 @@ function getPrices (step, unitType) {
   }
   if (vendorRate) {
     if (unitType === 'CAT Wordcount') {
-      receivables = +(step.totalWords & vendorRate.value).toFixed(2);
+      payables = +(step.totalWords * vendorRate.value).toFixed(2);
     } else if (unitType === 'Packages') {
-      receivables = +(step.quantity * vendorRate.value).toFixed(2);
+      payables = +(step.quantity * vendorRate.value).toFixed(2);
     } else {
-      receivables = +(step.hours * vendorRate.value).toFixed(2);
+      payables = +(step.hours * vendorRate.value).toFixed(2);
     }
   }
   return { receivables, payables };

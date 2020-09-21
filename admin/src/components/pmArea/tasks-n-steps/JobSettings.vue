@@ -27,7 +27,7 @@
             span.hours-steps__label-red *
           .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
             SelectSingle(
-              :selectedOption="selectedTemplate.name"
+              :selectedOption="selectedTemplate"
               :options="allTemplates"
               placeholder="Template"
               @chooseOption="setTemplate"
@@ -76,11 +76,11 @@
 		},
 		data() {
 			return {
-				// templates: [],
-				selectedSizes: "",
-				selectedTemplate: "",
-				// units: null,
-			}
+        // templates: [],
+        selectedSizes: "",
+        // selectedTemplate: "",
+        // units: null,
+      }
 		},
 		methods: {
 			// async getUnits() {
@@ -120,20 +120,21 @@
 				this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
 			},
 			setTemplate({option}) {
-				const value = this.templates.find(item => item.name === option);
-				this.selectedTemplate = value;
-				let oldStepsAndUnits = this.tasksData.stepsAndUnits;
-				oldStepsAndUnits[this.currentIndex].template = value;
-				oldStepsAndUnits[this.currentIndex].size = null;
+        const value = this.templates.find(item => item.name === option);
+        // this.selectedTemplate = value;
 
-				let fieldsForDelete = ['quantity', 'hours'];
-				for (const iterator of fieldsForDelete) {
-					oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
-						? delete oldStepsAndUnits[this.currentIndex][iterator]
-						: false
-				}
-				this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
-			},
+        let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+        oldStepsAndUnits[this.currentIndex].template = value;
+        oldStepsAndUnits[this.currentIndex].size = null;
+
+        let fieldsForDelete = ['quantity', 'hours'];
+        for (const iterator of fieldsForDelete) {
+          oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+            ? delete oldStepsAndUnits[this.currentIndex][iterator]
+            : false;
+        }
+        this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits });
+      },
 			setSize({option}) {
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits;
 				oldStepsAndUnits[this.currentIndex].size = option;
@@ -168,25 +169,31 @@
 			// await this.getUnits();
 		// },
 		computed: {
-			...mapGetters({
-				tasksData: "getTasksData"
-			}),
-			getSizes() {
-				if (this.originallyUnits.length) {
-					if (this.currentJob.unit !== 'CAT Wordcount') {
-						let sizes = this.originallyUnits.filter(item => item.type === this.currentJob.unit)[0].sizes;
-						if(!sizes.length){
-							sizes = ["1"];
+      ...mapGetters({
+        tasksData: "getTasksData",
+      }),
+      selectedTemplate () {
+        if (this.tasksData) {
+          const { name } = this.tasksData.stepsAndUnits.find(obj => obj.hasOwnProperty('template')).template;
+          return name || '';
+        }
+      },
+      getSizes () {
+        if (this.originallyUnits.length) {
+          if (this.currentJob.unit !== 'CAT Wordcount') {
+            let sizes = this.originallyUnits.filter(item => item.type === this.currentJob.unit)[0].sizes;
+            if (!sizes.length) {
+              sizes = ["1"];
             }
-						return sizes;
-					}
-				}
-			},
-			currentJobSize() {
-				if (this.originallyUnits.length) {
-					let oldStepsAndUnits = this.tasksData.stepsAndUnits;
-					oldStepsAndUnits[this.currentIndex].size = this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
-					return this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null
+            return sizes;
+          }
+        }
+      },
+      currentJobSize () {
+        if (this.originallyUnits.length) {
+          let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+          oldStepsAndUnits[this.currentIndex].size = this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
+          return this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
 				}
 			},
 			allTemplates() {
