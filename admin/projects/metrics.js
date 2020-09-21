@@ -120,7 +120,7 @@ async function getTaskSteps (steps, task, industry, customer) {
       size: stepsAndUnits[i].size || 1,
       memoqAssignmentRole: i
     };
-    const quantity = metrics.totalWords;
+    const quantity = getWordcountStepQuantity(type, metrics, stepsAndUnits[i]);
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
     const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity
@@ -205,6 +205,20 @@ const isIncludesWordcount = (type, stepsAndUnits) => {
       isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
   }
   return isIncludesWordCount;
+};
+
+const getWordcountStepQuantity = (type, metrics, stepAndUnit) => {
+  let quantity = metrics.totalWords;
+  switch (type) {
+    case 'CAT Wordcount':
+      return quantity;
+    case 'Packages':
+      quantity = stepAndUnit.quantity;
+      return quantity;
+    default:
+      quantity = stepAndUnit.hours;
+      return quantity;
+  }
 };
 
 module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance };

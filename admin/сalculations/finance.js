@@ -9,6 +9,7 @@ const getStepFinanceData = async (projectData, forWords = false) => {
   if (vendorId) {
     vendor = await Vendors.findOne({ _id: vendorId });
   }
+  const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true });
   const client = await Clients.findOne({ _id: customer });
   const currencyRatio = await CurrencyRatio.findOne();
   const { rates, defaultPricelist, currency } = client;
@@ -29,7 +30,7 @@ const getStepFinanceData = async (projectData, forWords = false) => {
     dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio);
 
   let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison)
-    || getPriceFromPricelist(pricelist, dataForComparison, currency, vendor.currency)
+    || getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
     : 0;
 
   const clientRate = {
