@@ -27,7 +27,7 @@
             span.hours-steps__label-red *
           .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
             SelectSingle(
-              :selectedOption="selectedTemplate"
+              :selectedOption="currentJob.hasOwnProperty('template') ? currentJob.template.name : ''"
               :options="allTemplates"
               placeholder="Template"
               @chooseOption="setTemplate"
@@ -172,12 +172,12 @@
 			...mapGetters({
 				tasksData: "getTasksData",
 			}),
-			selectedTemplate(){
-        if(this.tasksData){
-          const {name} = this.tasksData.stepsAndUnits.find(obj => obj.hasOwnProperty('template')).template
-          return name || '';
-        }
-			},
+			// selectedTemplate(){
+      //   if(this.tasksData.hasOwnProperty('stepsAndUnits')){
+      //     const {template} = this.tasksData.stepsAndUnits.find(obj => obj.hasOwnProperty('template'))
+      //     return template ? template.name : '';
+      //   }
+			// },
 			getSizes() {
 				if (this.originallyUnits.length) {
 					if (this.currentJob.unit !== 'CAT Wordcount') {

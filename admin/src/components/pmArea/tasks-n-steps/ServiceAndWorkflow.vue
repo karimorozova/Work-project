@@ -141,12 +141,10 @@
 								return item._id.toString() === item2.toString()
 							})
 						})
-
 						const firstUnitCAT = unitsObjects
 							.find(item => item.type === "CAT Wordcount");
-						if (firstUnitCAT.hasOwnProperty('type')) {
-							firstUnit = firstUnitCAT.type;
-						}
+
+						firstUnit = firstUnitCAT ? firstUnitCAT.type : returnUnit(0, this.originallySteps)
 					}
 
 					defaultStepsAndUnits = [

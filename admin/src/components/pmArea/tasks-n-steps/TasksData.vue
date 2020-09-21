@@ -1,7 +1,7 @@
 <template lang="pug">
   .tasks-data
     .tasks-data__main
-      .tasks-data__item(v-if="originallySteps && originallyUnits && templates.length")
+      .tasks-data__item(v-if="originallySteps && originallyUnits && templates")
         ServiceAndWorkflow(
           :originallyLanguages="originallyLanguages"
           @setSourceLanguage="setSourceLang",
@@ -97,7 +97,7 @@
 		},
 		data() {
 			return {
-				templates: [],
+				templates: null,
 				sourceLanguages: [],
 				targetLanguages: [],
 				errors: [],
@@ -300,15 +300,6 @@
 				try {
 					const result = await this.$http.get("/memoqapi/templates");
 					this.templates = result.data;
-					// if (this.templates.length) {
-					// 	const defTemplate = this.templates.find(
-					// 		(item) => item.name === "2 Steps"
-					// 	);
-					// 	this.setTasksDataValue({
-					// 		prop: "template",
-					// 		value: defTemplate || this.templates[0],
-					// 	});
-					// }
 				} catch (err) {
 				}
 			},
