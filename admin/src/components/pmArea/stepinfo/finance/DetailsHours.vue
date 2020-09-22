@@ -15,20 +15,23 @@
         .table__tbody-cell {{ financeData.title }}
         .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.quantityTotal }}
         input.details__editing-data(v-else type="number" v-model.number="currentData.quantityTotal")
-        .table__tbody-cell(v-if="!isQuantityEditable") {{ financeData.quantityTotal }}
+        .table__tbody-cell(v-if="!isQuantityEditable && financeData.vendor") {{ financeData.quantityTotal }}
+        .table__tbody-cell(v-else-if="!financeData.vendor")
         input.details__editing-data(v-else type="number" v-model.number="currentData.quantityTotal")
 
       .table__body-row
         .table__tbody-cell Rate
         .table__tbody-cell(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
         input.details__editing-data(v-else type="number" v-model.number="currentData.receivables.rate")
-        .table__tbody-cell(v-if="!isEditing") {{ financeData.payables.rate }} &euro;
+        .table__tbody-cell(v-if="!isEditing && financeData.vendor") {{ financeData.payables.rate }} &euro;
+        .table__tbody-cell(v-else-if="!financeData.vendor")
         input.details__editing-data(v-else type="number" v-model.number="currentData.payables.rate")
 
       .table__body-row
         .table__tbody-cell Price
         .table__tbody-cell {{ financeData.receivables.total }} &euro;
-        .table__tbody-cell {{ financeData.payables.total }} &euro;
+        .table__tbody-cell(v-if="financeData.vendor") {{ financeData.payables.total }} &euro;
+        .table__tbody-cell(v-else)
 
     ValidationErrors(v-if="areErrorsExist" :errors="errors" @closeErrors="closeErrorsBlock" :isAbsolute="isEditing")
 
