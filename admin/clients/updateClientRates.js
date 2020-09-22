@@ -7,7 +7,8 @@ const updateRates = async (key, oldMultiplier) => {
     default:
     case 'Step':
       const oldStep = oldMultiplier;
-      const updatedStep = await Step.findOne({ _id: oldStep._id });
+      const updatedStep = await Step.findOne({ _id: oldStep._id })
+        .populate('calculationUnit');
       const unitDifferences = getArrayDifference(
         oldStep.calculationUnit, updatedStep.calculationUnit, 'type'
       );
@@ -21,7 +22,8 @@ const updateRates = async (key, oldMultiplier) => {
       break;
     case 'Unit':
       const oldUnit = oldMultiplier;
-      const updatedUnit = await Units.findOne({ _id: oldUnit._id });
+      const updatedUnit = await Units.findOne({ _id: oldUnit._id })
+        .populate('steps');
       const stepDifferences = getArrayDifference(oldUnit.steps, updatedUnit.steps, 'title');
       const { sizes: oldSizes } = oldUnit;
       const { sizes: updatedSizes } = updatedUnit;
@@ -59,7 +61,7 @@ const checkStepDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
             deleteSize = true;
             for (let i = 0; i < sizes.length; i += 1) {
               unitToReplace = {
-                step: oldStep._id,
+                step: oldStep,
                 unit: _id,
                 size: sizes[i],
               };
@@ -67,7 +69,7 @@ const checkStepDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
             }
           } else {
             unitToReplace = {
-              step: oldStep._id,
+              step: oldStep,
               unit: _id,
               size: 1,
               defaultSize: true
@@ -77,7 +79,7 @@ const checkStepDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
         }
         for (let unitToDelete of itemsToDelete) {
           stepMultipliersTable = stepMultipliersTable.filter(item => (
-            `${item.step} ${item.unit}` !== `${oldStep._id} ${unitToDelete._id}`
+            `${item.step} ${item.unit}` !== `${oldStep} ${unitToDelete._id}`
           ));
           if (deleteSize) {
             stepMultipliersTable = stepMultipliersTable.filter(item => (
@@ -94,7 +96,7 @@ const checkStepDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
         let { stepMultipliersTable } = rates;
         for (let unitToDelete of itemsToDelete) {
           stepMultipliersTable = stepMultipliersTable.filter(item => (
-            `${item.step} ${item.unit}` !== `${oldStep._id} ${unitToDelete._id}`
+            `${item.step} ${item.unit}` !== `${oldStep} ${unitToDelete._id}`
           ));
         }
         rates.stepMultipliersTable = stepMultipliersTable;
@@ -110,14 +112,14 @@ const checkStepDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
           deleteSize = true;
           sizes.forEach(size => {
             newMultiplierCombinations.push({
-              step: oldStep._id,
+              step: oldStep,
               unit: unitId,
               size,
             });
           });
         } else {
           newMultiplierCombinations.push({
-            step: oldStep._id,
+            step: oldStep,
             unit: unitId,
             size: 1,
             defaultSize: true
@@ -147,7 +149,7 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
         let { stepMultipliersTable } = rates;
         let deleteSize;
         for (let stepToReplace of itemsToAdd) {
-          const stepId = stepToReplace._id;
+          const stepId = stepToReplace;
           const { calculationUnit } = await Step.findOne({ _id: stepId });
           if (calculationUnit.length) {
             for (let unitId of calculationUnit) {
@@ -205,7 +207,7 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
       for (let stepToReplace of itemsToAdd) {
         const { _id } = stepToReplace;
         const { calculationUnit } = await Step.findOne({ _id });
-        const neededUnit = calculationUnit.find(unit => unit._id === oldUnit._id);
+        const neededUnit = calculationUnit.find(unit => unit.toString() === oldUnit._id.toString());
         const { sizes } = await Units.findOne({ _id: neededUnit });
         let sameCombination;
         let deleteSize;

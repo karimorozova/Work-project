@@ -1,6 +1,6 @@
 const { Units, Step, Pricelist } = require('../models');
 
-async function insertUnitIntoStep(unit, unitId) {
+async function insertUnitIntoStep (unit, unitId) {
   const { type, active, steps, sizes } = unit;
   try {
     for (let { _id } of steps) {
@@ -12,7 +12,7 @@ async function insertUnitIntoStep(unit, unitId) {
         active,
         editable: true,
         sizes,
-      })
+      });
       await Step.updateOne({ _id }, step, { upsert: true });
     }
   } catch (err) {
@@ -21,7 +21,7 @@ async function insertUnitIntoStep(unit, unitId) {
   }
 }
 
-async function deleteUnitFromStep(unitId) {
+async function deleteUnitFromStep (unitId) {
   try {
     const steps = await Step.find();
     const pricelists = await Pricelist.find();
@@ -40,10 +40,10 @@ async function deleteUnitFromStep(unitId) {
   }
 }
 
-async function changeUnitsInSteps(unitToUpdate) {
+async function changeUnitsInSteps (unitToUpdate) {
   const { _id, ...unit } = unitToUpdate;
   try {
-    const steps = await Step.find({ 'calculationUnit._id': _id });
+    const steps = await Step.find({ 'calculationUnit': _id });
     if (!unit.steps.length) {
       await deleteUnitFromStep(_id);
     }
@@ -68,7 +68,7 @@ async function changeUnitsInSteps(unitToUpdate) {
             active: unit.active,
             editable: true,
             sizes: unit.sizes,
-          })
+          });
         }
         await Step.updateOne({ _id: id }, step);
       }

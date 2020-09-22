@@ -211,7 +211,8 @@ const updateMultiplier = async (key, oldMultiplier) => {
     default:
     case 'Step':
       const oldStep = oldMultiplier;
-      const updatedStep = await Step.findOne({ _id: oldStep._id });
+      const updatedStep = await Step.findOne({ _id: oldStep._id })
+        .populate('calculationUnit');
       const unitDifferences = getArrayDifference(oldStep.calculationUnit, updatedStep.calculationUnit, 'type');
       const isStepActivityChanged = activityChange(oldStep, updatedStep, 'isActive');
       if (isStepActivityChanged) {
@@ -223,7 +224,8 @@ const updateMultiplier = async (key, oldMultiplier) => {
       break;
     case 'Unit':
       const oldUnit = oldMultiplier;
-      const updatedUnit = await Units.findOne({ _id: oldUnit._id });
+      const updatedUnit = await Units.findOne({ _id: oldUnit._id })
+        .populate('steps');
       const stepDifferences = getArrayDifference(oldUnit.steps, updatedUnit.steps, 'title');
       const { sizes: oldSizes } = oldUnit;
       const { sizes: updatedSizes } = updatedUnit;
@@ -461,7 +463,7 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
       for (let stepToReplace of itemsToAdd) {
         const { _id } = stepToReplace;
         const { calculationUnit } = await Step.findOne({ _id });
-        const neededUnit = calculationUnit.find(unit => unit._id === oldUnit._id);
+        const neededUnit = calculationUnit.find(unit => unit.toString() === oldUnit._id.toString());
         const { sizes } = await Units.findOne({ _id: neededUnit });
         let sameCombination;
         let deleteSize;
