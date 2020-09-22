@@ -157,10 +157,8 @@ async function getTaskSteps (task, industry, customer) {
     } else if (type === 'Packages') {
       delete step.totalWords;
       Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
-    } else {
-      if (!step.hasOwnProperty('totalWords')) {
+    } else{
         Object.assign(step, { totalWords: quantity, quantity });
-      }
     }
     newSteps.push(step);
     counter++;

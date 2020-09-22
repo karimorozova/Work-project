@@ -4,17 +4,17 @@
       .step-finance__summary-value
         span Profit:
         span.step-finance__money(v-if="step.vendor") {{ isNaNCalculationValue(+profitAndMargin.profit) }} &euro;
-        span.step-finance__money(v-else)
+        span.step-finance__money(v-else) --
     .step-finance__summary
       .step-finance__summary-value
         span Margin:
         span.step-finance__money(v-if="step.vendor") {{ isNaNCalculationValue(+profitAndMargin.margin) }}  %
-        span.step-finance__money(v-else)
+        span.step-finance__money(v-else) --
     .step-finance__summary
       .step-finance__summary-value
         span ROI:
         span.step-finance__money(v-if="step.vendor") {{ isNaNCalculationValue(+profitAndMargin.roi) }}  %
-        span.step-finance__money(v-else)
+        span.step-finance__money(v-else) --
 </template>
 
 <script>

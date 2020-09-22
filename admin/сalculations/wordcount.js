@@ -1,3 +1,4 @@
+
 const { getVendors } = require('../vendors/getVendors');
 const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
@@ -9,7 +10,7 @@ const { setTaskFinance } = require('../projects/helpers');
 function setTaskMetrics ({ metrics, matrix, prop }) {
   let taskMetrics = { ...metrics };
   for (let key in matrix) {
-    taskMetrics[key][prop] = matrix[key].rate;
+    taskMetrics[key][prop] = +matrix[key].rate;
   }
   return taskMetrics;
 }
@@ -45,14 +46,14 @@ async function getAfterWordcountPayablesUpdated({project, step}) {
       const { finance, vendorRate } = await getStepFinanceData({
         customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity
       });
-      steps[stepIndex].finance = finance;
+      steps[stepIndex].finance.Price = finance.Price;
       steps[stepIndex].vendorRate = vendorRate;
       const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId);
       tasks[taskIndex].finance = {
         Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
         Price: setTaskFinance(taskSteps, 'Price'),
       };
-      return await updateProjectCosts({ ...project._doc, id: project.id, tasks, steps });
+      return await updateProjectCosts({ ...project._doc, id: project._id, tasks, steps });
     } catch(err) {
         console.log(err);
         console.log('Error in getAfterWordcountPayablesUpdated');
@@ -250,7 +251,7 @@ async function updateProjectCosts(project) {
     try {
         const checkStatuses = ["Quote sent", "Approved"];
         const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1;
-        return await updateProject({ "_id": project.id }, { finance, isPriceUpdated });
+        return await updateProject({ "_id": project.id }, { ...project, finance, isPriceUpdated });
     } catch(err) {
         console.log(err);
         console.log("Error in updateProjectCosts");
