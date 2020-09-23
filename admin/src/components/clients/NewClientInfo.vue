@@ -186,7 +186,7 @@ export default {
             if(!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.');
             if(!this.client.contacts.length) this.errors.push('Please, add at least one contact.');
             if(!this.client.currency.length) this.errors.push('Please, add currency.');
-            if(this.client.defaultPricelist == '') this.errors.push('Please, add pricelist.');
+            if(this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.');
             if(!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.');
             if(!this.client.status) this.errors.push('Please, choose status.');
             if(!this.client.leadSource) {
@@ -201,6 +201,12 @@ export default {
                 this.billErrors.push('email');
             }
             if(!this.client.accountManager || !this.client.salesManager || !this.client.projectManager) this.errors.push('All managers should be assigned.');
+
+            const isSameEmailsExists = await this.checkSameClientEmails(this.client.email);
+            if(isSameEmailsExists){
+	            this.errors.push("A client with such Email already exists, the client's Email should be unique!");
+            }
+
             if(this.errors.length) {
                 this.areErrorsExist = true;
                 this.isSaveClicked = true;
@@ -208,16 +214,24 @@ export default {
             }
             await this.saveClient();
         },
+
+        async checkSameClientEmails(clientEmail){
+          const clientMails = await this.$http.get('/clientsapi/all-clients-emails');
+          const arrayOfMails = clientMails.body
+              .map(key => key.email);
+          return arrayOfMails.includes(clientEmail);
+        },
+
         uploadFiles(data){
             this.documentsFiles = data;
         },
         async saveClient() {            
             let sendData = new FormData();
 
-            if(this.client.timeZone == ''){
+            if(this.client.timeZone === ''){
                 this.client.timeZone = null
             } 
-            if(this.client.nativeLanguage == ''){
+            if(this.client.nativeLanguage === ''){
                 this.client.nativeLanguage = null
             }
             

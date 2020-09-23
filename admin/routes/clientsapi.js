@@ -373,4 +373,14 @@ router.get('/client-languages', async (req, res) => {
   }
 });
 
+router.get('/all-clients-emails', async (req, res) => {
+  try {
+    const clients = await Clients.find({}, {email: 1})
+    res.send(clients);
+  }catch{
+    console.log(err);
+    res.status(500).send("Error on getting Clients in /all-clients-emails");
+  }
+});
+
 module.exports = router;

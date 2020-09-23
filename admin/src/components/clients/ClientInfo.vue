@@ -355,6 +355,12 @@ export default {
         !this.currentClient.projectManager
       )
         this.errors.push("All managers should be assigned.");
+
+      const isSameEmailsExists = await this.checkSameClientEmails(this.currentClient.email, this.currentClient._id)
+	    if(isSameEmailsExists){
+		    this.errors.push("A client with such Email already exists, the client's Email should be unique!");
+	    }
+
       if (this.errors.length) {
         this.areErrorsExist = true;
         this.isSaveClicked = true;
@@ -362,6 +368,15 @@ export default {
       }
       await this.updateClient();
     },
+
+    async checkSameClientEmails(clientEmail, clientId){
+    	const clientMails = await this.$http.get('/clientsapi/all-clients-emails');
+      const arrayOfMails = clientMails.body
+          .filter(item => item._id.toString() !== clientId)
+          .map(key => key.email);
+      return arrayOfMails.includes(clientEmail);
+    },
+
     async updateClient() {
       let sendData = new FormData();
       let dataForClient = this.currentClient;
@@ -541,7 +556,6 @@ export default {
       currentClient: "getCurrentClient",
     }),
 	  sourceLanguagesClientData(){
-		  console.log(this.clientDataInCreated)
     	if(this.clientDataInCreated.hasOwnProperty('sourceLanguages')){
 		    console.log('computed',this.clientDataInCreated)
 		    return this.clientDataInCreated.sourceLanguages.map(i => i.lang);
