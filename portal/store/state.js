@@ -8,7 +8,6 @@ const state = {
   token: "",
   orderDetails: {},
   requestQuoteDetails: {},
-  token: "",
   alertMessage: "",
   isAlert: false,
   alertType: "success",

@@ -22,7 +22,7 @@
                 :isAbsolute="isBlockAbsoulte"
                 @closeErrors="closeErrorsBlock"
             )
-        .project-info__action(v-if="currentProject.status !== 'Closed'")
+        .project-info__action
             ProjectAction(
                 :project="currentProject"
                 @editAndSend="editAndSend"

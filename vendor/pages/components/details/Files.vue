@@ -72,8 +72,11 @@ export default {
             return !this.job.memoqProjectId ? +this.job.progress : this.getMemoqFilesProgress(file.fileName);
         },
         getMemoqFilesProgress(fileName) {
-            const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName);
-            return +(100*this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2);
+            // const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName);
+            // return +(100*this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2);
+
+          //MAX
+          return 5;
         },
         toggleFilesShow() {
             this.isFilesShown = !this.isFilesShown;
@@ -127,8 +130,7 @@ export default {
             job: "getSelectedJob"
         }),
         isEditor() {
-            if(!this.job.serviceStep.isEditor) return false;
-            return this.job.status === 'Started';
+	        return this.job.name === "Translation"
         }
     },
     components: {

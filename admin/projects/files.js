@@ -58,7 +58,14 @@ async function getDeliverablesLink({taskFiles, projectId, taskId}) {
 }
 
 function getParsedFiles(taskFiles) {
-    return taskFiles.reduce((acc, cur) => [...acc, {path: `./dist${cur.path}`, name: cur.fileName}], [])
+	return taskFiles.reduce((acc, cur) =>
+					[...acc,
+						{
+							path: cur.path.indexOf('./dist') === 0 ?  cur.path : `./dist${cur.path}`,
+							name: cur.fileName
+						}
+					],
+			[])
 }
 
 async function manageDeliveryFile({fileData, file}) {

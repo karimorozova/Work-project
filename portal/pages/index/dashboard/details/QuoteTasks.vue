@@ -42,14 +42,19 @@ export default {
             if(this.project.status === "Requested") {
                 return this.project.packageSize ? `${row.lang} / ${this.project.packageSize.size}` : `${this.project.sourceLanguage.lang} => ${row.lang}`;
             }
-            return this.getQuotePairs(row);
+	          return '?? >> ??'
+	        //MAX
+          //   return this.getQuotePairs(row);
         },
         getQuotePairs(task) {
             let ratesProp = 'monoRates';
             if(task.service.calculationUnit !== 'Packages') {
                 ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
             }
-            return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
+
+            return '?? >> ??'
+            //MAX
+            // return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
         },
         getMonoPair(task) {
             const targets = this.clientLanguages.monoRates.map(item => item.target);
@@ -68,7 +73,7 @@ export default {
         }),
         tableData() {
             if(this.project.status !== 'Requested') {
-                return this.project.tasks;
+                return this.project.tasks.filter(task => task.status !== "Cancelled");
             }
             return this.project.targetLanguages;
         }

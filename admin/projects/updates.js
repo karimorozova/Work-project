@@ -71,19 +71,19 @@ async function cancelTasks(tasks, project) {
 }
 
 function cancelSteps({stepIdentify, steps}) {
-    const updated = steps.map(item => {
-        if(stepIdentify.indexOf(item.stepId) !== -1) {
+    return steps.map(item => {
+        if (stepIdentify.indexOf(item.stepId) !== -1) {
             let newStatus = item.status !== 'Completed' ? "Cancelled" : item.status;
-            if(+item.progress.wordsDone > 0 && newStatus !== 'Completed') {
+            if (+item.progress.wordsDone > 0 && newStatus !== 'Completed') {
                 newStatus = "Cancelled Halfway";
                 let finance = getStepNewFinance(item);
-                return {...item._doc, status: newStatus, finance};
+                return { ...item._doc, previousStatus: item.status, status: newStatus, finance };
             }
+            item.previousStatus = item.status;
             item.status = newStatus;
         }
         return item;
-    })
-    return updated;
+    });
 }
 
 async function cancelCheckedTasks({tasksIds, projectTasks, changedSteps, projectId}) {
@@ -92,8 +92,10 @@ async function cancelCheckedTasks({tasksIds, projectTasks, changedSteps, project
     try {
         for(let task of tasks) {
             if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
+                task.previousStatus = task.status
                 task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
                 if(task.status === "Cancelled Halfway") {
+                    task.previousStatus = task.status
                     task.finance = getTaskNewFinance(changedSteps, task);
                     task.targetFiles = await getTaskTarfgetFiles({task, projectId, stepName: 'halfway'});
                 }
@@ -214,12 +216,37 @@ function getStepNewFinance(step) {
     return { Wordcount, Price }
 }
 
+async function reOpenProject(project, ifChangePreviousStatus = true){
+    let {steps , tasks} = project;
+
+    if(ifChangePreviousStatus){
+        steps = reopenItem(steps)
+        tasks = reopenItem(tasks)
+    }
+
+    return await updateProject(
+        {"_id": project._id},
+        { status: "In progress", tasks, steps}
+    );
+
+    function reopenItem(arr){
+        return arr.map( item => {
+            if(item.status === "Cancelled" || item.status === "Cancelled Halfway"){
+                item.status = item.previousStatus;
+            }
+            return item;
+        })
+    }
+}
+
 async function updateProjectStatus(id, status, reason) {
     try {
         const project = await getProject({"_id": id});
-        if(status !== "Cancelled") {
-            return await setNewProjectDetails(project, status, reason);
-        }
+
+        if(status === 'fromCancelled') return await reOpenProject(project);
+        if(status === 'fromClosed') return await reOpenProject(project, false);
+        if(status !== "Cancelled") return await setNewProjectDetails(project, status, reason);
+
         const { tasks, steps } = project;
         const notifySteps = steps.length ? steps.map(item => { return {...item._doc}}) : [];
         const { changedTasks, changedSteps } = await cancelTasks(tasks, project);

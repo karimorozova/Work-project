@@ -63,7 +63,7 @@ export const SET_REQUESTS = (state, payload) => {
 };
 
 export const SET_MONO_COMBINATIONS = (state, payload) => {
-    const pairs = !payload.length ? [] : payload.filter((item, index, self) => {
+    const pairs = !payload ? [] : payload.filter((item, index, self) => {
         return self.map(elem => elem.target.lang + elem.packageSize).indexOf(item.target.lang + item.packageSize) === index;
     });
     state.clientLanguages = {...state.clientLanguages, monoRates: pairs};
@@ -71,7 +71,7 @@ export const SET_MONO_COMBINATIONS = (state, payload) => {
 
 export const SET_DUO_COMBINATIONS = (state, payload) => {
     const { prop, combs } = payload;
-    const uniquePairs = !combs.length ? [] : combs.filter((item, index, self) => {
+    const uniquePairs = !combs ? [] : combs.filter((item, index, self) => {
         return self.map(elem => elem.source.lang + elem.target.lang).indexOf(item.source.lang + item.target.lang) === index;
     });
     state.clientLanguages = {...state.clientLanguages, [prop]: uniquePairs};

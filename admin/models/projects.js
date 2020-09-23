@@ -97,7 +97,8 @@ const ProjectsSchema = new mongoose.Schema({
     // vendorDiscount: "",
     check: false,
     vendorsClickedOffer: Array,
-    isVendorRead: { type: Boolean, default: false }
+    isVendorRead: { type: Boolean, default: false },
+    previousStatus: "",
   }],
   totalCost: {
     type: String,
