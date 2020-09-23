@@ -91,7 +91,7 @@ router.get('/projects', checkClientContact, async (req, res) => {
     try {
         const verificationResult = jwt.verify(token, secretKey);
         const client = await getClient({"_id": verificationResult.clientId})
-        const projects = await getProjects({"customer": verificationResult.clientId});
+        const projects = await getProjects({$and: [{status: {$ne: 'Draft'}}, {"customer": verificationResult.clientId}] });
         const requests = await getClientRequests({"customer": verificationResult.clientId, status: {$ne: "Cancelled"}});
         const user = client.contacts.find(item => item.email === verificationResult.contactEmail);
         res.send({client, user, projects, requests});
