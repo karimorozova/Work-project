@@ -61,7 +61,7 @@
             template(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="progress(row)")
             template(slot="status" slot-scope="{ row }")
-                .tasks__task-status {{ row.status }}
+                .tasks__task-status {{ row.status | StepsAndTasksStatusFilter }}
                     .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
                         img.tasks__time-icon(src="../../../assets/images/time_icon.png")
                         .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}

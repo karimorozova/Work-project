@@ -64,9 +64,7 @@
               TimezoneSelect(:timezoneSelected="currentVendor.timezone", @chosenZone="setTimezone")
           .block-item
             label.block-item__label.block-item_relative Native Language:
-            .block-item__drop-menu.block-item_medium-index(
-              :class="{ 'block-item_error-shadow': !currentVendor.native && isSaveClicked }"
-            )
+            .block-item__drop-menu.block-item_medium-index
               NativeLanguageSelect(:selectedLang="currentVendor.native", @chosenLang="setNative")
           .block-item
             label Gender:

@@ -186,6 +186,20 @@ export default {
         clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
       this.$refs.phone.value = this.vendor.phone;
     },
+    async checkUniqueEmailInVendors(){
+    	let isExists = false;
+	    try {
+		    const result = await this.$http.get(`/vendors/application/unique-email?email=${this.vendor.email}`);
+		    isExists = !!result.data;
+	    } catch (err) {
+		    this.alertToggle({
+			    message: "Error on email uniqueness checking",
+			    isShow: true,
+			    type: "error",
+		    });
+	    }
+	    return isExists;
+    },
     async checkForErrors() {
       const textReg = /^[-\sa-zA-Z]+$/;
       this.errors = [];
@@ -198,6 +212,9 @@ export default {
       if (!this.vendor.status) this.errors.push("Please, choose status.");
       if (this.checkEmail()) {
         this.errors.push("Please provide a valid email.");
+      }
+      if(await this.checkUniqueEmailInVendors()){
+	      this.errors.push("The email you've entered is already used in our system!")
       }
       if (this.errors.length) {
         this.areErrorsExist = true;

@@ -100,7 +100,7 @@
             template(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="progress(row.progress)")
             template(slot="status" slot-scope="{ row }")
-                span.steps__step-status {{ row.status }}
+                span.steps__step-status {{ row.status | StepsAndTasksStatusFilter }}
             template(slot="receivables" slot-scope="{ row }")
                 span.steps__money(v-if="isEuro(row, 'receivables')") &euro;
                 span.steps__step-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ getTotalReceivables(row) }}
