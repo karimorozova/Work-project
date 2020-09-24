@@ -1,4 +1,4 @@
-const { Projects, User, MemoqProject } = require('../models');
+const { Projects, User, MemoqProject, Units } = require('../models');
 const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor, notifyVendorStepStart } = require('./emails');
 const { notifyManagerProjectStarts } = require('../utils');
@@ -285,20 +285,26 @@ async function setNewProjectDetails(project, status, reason) {
 }
 
 async function getApprovedProject(project, status) {
-    const taskIds = project.tasks.map(item => item.taskId);
-    const { tasks, steps } = updateWithApprovedTasks({taskIds, project});
-    const stepsStatuses = ["Ready to Start", "Waiting to Start"];
-    const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
-    const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
-        acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
-        return acc;
-    }, {})
-    try {
-        if(wordsUnitSteps.length) {
-            for(let id in splittedByIdSteps) {
-                await setMemoqTranlsators(id, splittedByIdSteps[id]);
-            }
-        }
+  const taskIds = project.tasks.map(item => item.taskId);
+  const { tasks, steps } = updateWithApprovedTasks({ taskIds, project });
+  const stepsStatuses = ["Ready to Start", "Waiting to Start", "Accepted"];
+  const wordsUnitSteps = [];
+  for (let step of steps) {
+    const { serviceStep, status } = step;
+    const { unit: unitId } = serviceStep;
+    const { type } = await Units.findOne({ _id: unitId });
+    if (type === 'CAT Wordcount' && stepsStatuses.indexOf(status) !== -1) wordsUnitSteps.push(step);
+  }
+  const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
+    acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
+    return acc;
+  }, {});
+  try {
+    if (wordsUnitSteps.length) {
+      for (let id in splittedByIdSteps) {
+        await setMemoqTranlsators(id, splittedByIdSteps[id]);
+      }
+    }
         if(project.isStartAccepted) {
             await notifyManagerProjectStarts(project);
         }

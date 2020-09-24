@@ -20,21 +20,21 @@ async function updateProjectMetrics({ projectId }) {
 			const analysis = await getProjectAnalysis(task.memoqProjectId);
 			const { AnalysisResultForLang } = analysis;
 			if (analysis && AnalysisResultForLang) {
-				const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
-				task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
-				let newSteps = await getTaskSteps(task, industry, customer);
-				newSteps = checkIsSameVendor(newSteps);
-				const stepWithVendor = newSteps.find(step => step.vendor !== null);
-				if (stepWithVendor) {
-					const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
-					if (vendor) {
-						task.metrics = setTaskMetrics({
-							metrics: task.metrics,
-							matrix: vendor.matrix,
-							prop: 'vendor'
-						});
-					}
-				}
+        const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
+        task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
+        let newSteps = await getTaskSteps(task, industry, customer);
+        newSteps = checkIsSameVendor(newSteps);
+        const stepWithVendor = newSteps.find(step => step.vendor);
+        if (stepWithVendor) {
+          const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
+          if (vendor) {
+            task.metrics = setTaskMetrics({
+              metrics: task.metrics,
+              matrix: vendor.matrix,
+              prop: 'vendor'
+            });
+          }
+        }
 				task.finance = {
 					Wordcount: setTaskFinance(newSteps, 'Wordcount'),
 					Price: setTaskFinance(newSteps, 'Price'),

@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "cross-env API_URL='http://localhost:3001' nuxt",
-    "build": "API_URL='https://admin.pangea.global' nuxt build",
+    "build": "cross-env API_URL='https://admin.pangea.global' nuxt build",
     "build-test": "API_URL='http://testadmin.pangea.global' nuxt build",
     "start": "nuxt start",
     "generate": "API_URL='https://admin.pangea.global' nuxt generate",
