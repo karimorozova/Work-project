@@ -1,5 +1,5 @@
 <template lang="pug">
-    .project-details    
+    .project-details
         nuxt-child
 </template>
 

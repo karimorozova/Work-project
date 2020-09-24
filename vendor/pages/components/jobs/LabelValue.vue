@@ -21,14 +21,14 @@ export default {
 
 .pair {
     display: flex;
-    font-size: 14px;
+    /*font-size: 14px;*/
     align-items: center;
     justify-content: flex-start;
     &__label {
         margin-right: 10px;
     }
     &__value {
-        font-weight: 600;
+        /*font-weight: 600;*/
     }
 }
 

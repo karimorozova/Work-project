@@ -29,4 +29,12 @@ Vue.filter("maxRateCount", (num) => {
 	return newNum;
 });
 
-Vue.filter("stepsAndTasksStatusFilter", (status) => status === "Started" ? "In progress" : status)
+Vue.filter("stepsAndTasksStatusFilter", (status) => {
+	let newStatus = status;
+	if (status === "Started") {
+		newStatus = "In progress"
+	} else if (status === "Waiting to Start") {
+		newStatus = "Ready to Start"
+	}
+	return newStatus;
+});
