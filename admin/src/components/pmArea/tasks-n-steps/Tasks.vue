@@ -61,20 +61,20 @@
             template(slot="progress" slot-scope="{ row }")
                 ProgressLine(:progress="progress(row)")
             template(slot="status" slot-scope="{ row }")
-                .tasks__task-status {{ row.status | StepsAndTasksStatusFilter }}
+                .tasks__task-status {{ row.status | stepsAndTasksStatusFilter }}
                     .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
                         img.tasks__time-icon(src="../../../assets/images/time_icon.png")
                         .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
             template(slot="receivables" slot-scope="{ row }")
-                span.tasks__money(v-if="row.finance.Price.receivables") &euro;
-                span.tasks__task-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.receivables }}
-                span.tasks__task-data(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ row.finance.Price.halfReceivables }}
+                span.tasks__money(v-if="row.finance.Price.receivables") &euro;&nbsp;
+                span.tasks__task-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+                span.tasks__task-data(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
             template(slot="payables" slot-scope="{ row }")
-                span.tasks__money(v-if="row.finance.Price.payables") &euro;
-                span.tasks__task-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ row.finance.Price.payables }}
-                span.tasks__task-data(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ row.finance.Price.halfPayables }}
+                span.tasks__money(v-if="row.finance.Price.payables") &euro;&nbsp;
+                span.tasks__task-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
+                span.tasks__task-data(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
             template(slot="margin" slot-scope="{ row }")
-                span.tasks__money(v-if="marginCalc(row.finance.Price)") &euro;
+                span.tasks__money(v-if="marginCalc(row.finance.Price)") &euro;&nbsp;
                 span.tasks__task-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
             template(slot="delivery" slot-scope="{ row }")
                 img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
@@ -147,7 +147,7 @@ export default {
         openPreview() {
             this.isEditAndSend = true;
         },
-        async sendMessage(message) {
+        async sendMessage2(message) {
             try {
                 console.log(message);
             } catch (err) {
