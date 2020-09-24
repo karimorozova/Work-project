@@ -1,78 +1,102 @@
 <template lang="pug">
-    .terms
-        .terms__check
-            CheckBox(:isChecked="job.isVendorRead" :isReadonly="isReadonly" @check="(e) => toggle(e, true)" @unCheck="(e) => toggle(e, false)")
-        span.terms__text I have read the instructions and downloaded the reference files    
+  .terms
+    .terms__check
+      CheckBox(
+        :isChecked="job.isVendorRead"
+        :isReadonly="isReadonly"
+        @check="(e) => toggle(e, true)" @unCheck="(e) => toggle(e, false)"
+      )
+    span.terms__text I have read the instructions and downloaded the reference files
 </template>
 
 <script>
-import CheckBox from "~/components/CheckBox";
-import { mapActions } from "vuex";
+	import CheckBox from "~/components/CheckBox";
+	import { mapActions } from "vuex";
 
-export default {
-    props: {
-        job: {type: Object}
-    },
-    methods: {
-        ...mapActions({
-            setStepTermsAgreement: "setStepTermsAgreement"
-        }),
-        async toggle(e, bool) {
-	        console.log(e, bool)
-            try {
-                await this.setStepTermsAgreement({jobId: this.job._id, value: bool});
-            } catch(err) {
-
-            }
+	export default {
+		props: {
+			job: {
+				type: Object
+			},
+			allJobs: {
+				type: Array,
+			}
+		},
+		data() {
+			return {
+				project: null
+			}
+		},
+		methods: {
+			...mapActions({
+				setStepTermsAgreement: "setStepTermsAgreement"
+			}),
+			async toggle(e, bool) {
+				if(this.job.status === "Started"){
+					bool = true;
         }
-    },
-    computed: {
-        isReadonly() {
-	        console.log(this.job)
-	        return false
+				try {
+						await this.setStepTermsAgreement({ jobId: this.job._id, value: bool });
+				} catch (err) {}
+			},
+			async getProjectById() {
+				try {
+					const result = await this.$axios.get(`pm-manage/project?id=${ this.job.project_Id }`)
+					this.project = result.data;
+				} catch (e) {
+				}
+			},
+		},
+		computed: {
+			isReadonly() {
+				if(this.project) {
+					const statuses = ["Started", "Approved", "In progress"];
+					const { taskId, stepId } = this.job;
+					const { steps } = this.project;
+					const stepCurrentByTask = steps.filter(item => item.taskId === taskId)
+					const currentIndex = stepCurrentByTask.findIndex(item => item.stepId === stepId)
 
-            const statuses = ["Started", "Approved", "In progress"];
-            if(statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === "Completed"){
-	            console.log('t1')
-	            return true;
-            }
+					if(statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === "Completed") {
+						return true;
+					} else if(currentIndex === 0) {
+						return false;
+					} else if(currentIndex === 1) {
+						if(stepCurrentByTask[0].status === "Completed") {
+							return false;
+						}
+					} else {
+						return true;
+					}
+				}
+			}
 
-            if(this.job.prevStep && this.job.status !== "Started") {
-	            console.log('tyt2')
-                return this.job.prevStep.progress < 100 || this.job.prevStep.status !== "Completed";
-            }
-            if(this.job.status !== "Started") {
-	            console.log('tyt3')
-                return this.job.status !== "Accepted" && this.job.status !== "Ready to Start";
-            }
-            //MAX
-            // return this.job.status === "Started";
-
-
-
-        }
-    },
-    components: {
-        CheckBox
-    }
-}
+		},
+		async created() {
+			await this.getProjectById()
+		},
+		components: {
+			CheckBox
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors.scss";
 
-.terms {
+  .terms {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
+    padding: 10px 0;
+
     &__text {
-        margin: 10px 0;
-        font-size: 14px;
+      margin: 10px 0;
+      /*font-size: 14px;*/
     }
+
     &__check {
-        margin-right: 10px;
+      margin-right: 10px;
     }
-}
+  }
 
 </style>

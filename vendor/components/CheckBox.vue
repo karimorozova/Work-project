@@ -31,6 +31,7 @@ export default {
             width: 25px;
         }
         &_opacity {
+            cursor: no-drop;
             opacity: 0.5;
         }
     }
