@@ -28,7 +28,7 @@ function getSteps(project, id) {
             const prevStep = getPrevStepData(stepTask, steps, step);
             assignedSteps.push({...step._doc,
                 project_Id: project._id,
-                projectId: project.projectId, 
+                projectId: project.projectId,
                 projectName: project.projectName,
                 projectStatus: project.status,
                 brief: project.brief,
@@ -90,7 +90,7 @@ async function manageStatuses({project, steps, jobId, status}) {
             return await manageCompletedStatus({project, jobId, steps, task})
         }
         if(status === "Accepted" || status === "Rejected") {
-            const updatedSteps = status === "Accepted" 
+            const updatedSteps = status === "Accepted"
             ? await setAcceptedStepStatus({project, steps, jobId})
             : setRejectedStatus({steps, jobId});
             return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
@@ -218,11 +218,21 @@ function setRejectedStatus({steps, jobId}) {
 }
 
 async function setTaskStatusAndSave({project, jobId, steps, status}) {
-    const { tasks } = project;
-    const step = steps.find(item => item.id === jobId);
+
+	const { tasks } = project;
+	const { taskId } = steps.find(item => item._id.toString() === jobId);
+	const currSteps = steps.filter(item => item.taskId === taskId);
+
     const updatedTasks = tasks.map(item => {
-        if(item.taskId === step.taskId) {
-            item.status = status;
+        if(item.taskId === taskId){
+            if(currSteps.length === 2 && currSteps[0].status === "Completed" && currSteps[1].status === "Completed" ||
+                currSteps.length === 1 && currSteps[0].status === "Completed"
+            ){
+                item.status = "Pending Approval [DR1]"
+            }else{
+                item.status = "In progress"
+            }
+            return item;
         }
         return item;
     })

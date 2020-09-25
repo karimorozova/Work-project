@@ -51,6 +51,7 @@
 			isReadonly() {
 				if(this.project) {
 					const statuses = ["Started", "Approved", "In progress"];
+
 					const { taskId, stepId } = this.job;
 					const { steps } = this.project;
 					const stepCurrentByTask = steps.filter(item => item.taskId === taskId)
@@ -61,9 +62,7 @@
 					} else if(currentIndex === 0) {
 						return false;
 					} else if(currentIndex === 1) {
-						if(stepCurrentByTask[0].status === "Completed") {
-							return false;
-						}
+						return stepCurrentByTask[0].status !== "Completed";
 					} else {
 						return true;
 					}

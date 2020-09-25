@@ -107,7 +107,7 @@ async function getProjectWithUpdatedFinance(project) {
 }
 
 async function getTaskSteps(task, industry, customer) {
-	const { sourceLanguage, targetLanguage, metrics } = task;
+	const { sourceLanguage, targetLanguage, metrics, service } = task;
 	const stepsAndUnits = JSON.parse(task.stepsAndUnits);
 	const newSteps = [];
 	let counter = 1;
@@ -149,7 +149,8 @@ async function getTaskSteps(task, industry, customer) {
 			totalWords: quantity,
 			check: false,
 			vendorsClickedOffer: [],
-			isVendorRead: false
+			isVendorRead: false,
+			service
 		};
 		if (type !== 'CAT Wordcount' && type !== 'Packages') {
 			delete step.totalWords;

@@ -54,6 +54,13 @@
 			async startJob() {
 				if(!this.job.isVendorRead) return;
 				try {
+					//MAX
+					// const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
+					// const vendor = await this.$axios.get(`/vendorsapi/vendor?id=${'this.job.vendor._id'}`)
+          //
+					// if(this.job.name === "Translation" && type === "CAT Wordcount" && !vendor.hasOwnProperty('guid')) {
+					// 	await this.$axios.get(`/vendorsapi/create-memoq-vendor/${ this.job.vendor._id }`)
+					// }
 					await this.setStatus("Started");
 				} catch (err) {
 				}

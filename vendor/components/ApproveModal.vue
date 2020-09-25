@@ -80,16 +80,12 @@ export default {
 }
 
 .approve-modal_centered {
-    padding: 20px 30px;
-    max-width: 220px;
+    padding: 30px;
     .approve-modal {
         &__text {
             line-height: 1.5;
             font-size: 20px;
             text-align: center;       
-        }
-        &__buttons {
-            flex-direction: column;
         }
     }
 }

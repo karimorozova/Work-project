@@ -224,6 +224,21 @@
         .vendor-info__editor(v-if="currentVendor._id")
           ckeditor(v-model="currentVendor.notes", :config="editorConfig")
 
+    .title Vendor to memoq
+      div
+        h3(@click="openMemoqModal('Saved')") SAVE
+        h3(@click="openMemoqModal('Deleted')") DELETE
+
+    .approve-action(v-if="approveMemoqVendorAction")
+      ApproveModal(
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="approveModal"
+        @close="approveMemoqVendorAction = false"
+        @notApprove="approveMemoqVendorAction = false"
+      )
+
     .delete-approve(v-if="isApproveModal")
       p Are you sure you want to delete?
       input.button.approve-block(type="button", value="Cancel", @click="cancelApprove")
@@ -288,6 +303,7 @@ import Asterisk from "../Asterisk";
 import Addseverallangs from "../finance/Addseverallangs";
 import AvailablePairs from "../finance/pricelists/AvailablePairs";
 import photoPreview from "@/mixins/photoPreview";
+import ApproveModal from "../ApproveModal";
 
 export default {
   mixins: [photoPreview],
@@ -299,6 +315,8 @@ export default {
       units: [],
       steps: [],
 
+	    memoqAction: "",
+	    approveMemoqVendorAction: false,
       isRefreshQualificationTable: false,
       isRefreshAfterServiceUpdate: false,
       isRefreshResultTable: false,
@@ -348,6 +366,38 @@ export default {
       updateVendorStatus: "updateVendorStatus",
       setVendorsMatrixData: "setVendorsMatrixData",
     }),
+	  async approveModal(){
+    	await this.memoqVendorAction(this.memoqAction)
+		  this.approveMemoqVendorAction = false;
+		  this.memoqAction = ''
+	  },
+	  openMemoqModal(action){
+    	this.memoqAction = action;
+    	this.approveMemoqVendorAction = !!action;
+    },
+    async memoqVendorAction(action){
+      if(action === 'Saved'){
+        await this.sendVendorToMemoq(`/vendorsapi/create-memoq-vendor/${this.currentVendor._id}`, action)
+      }else{
+	      await this.sendVendorToMemoq(`/vendorsapi/delete-memoq-vendor/${this.currentVendor._id}`, action)
+      }
+    },
+    async sendVendorToMemoq(link, action){
+    	try {
+        await this.$http.get(link)
+		    this.alertToggle({
+			    message: `Vendor in Memoq are ${action}`,
+			    isShow: true,
+			    type: "success",
+		    });
+	    }catch (err) {
+		    this.alertToggle({
+			    message: "Error on action with Memoq & Vendor",
+			    isShow: true,
+			    type: "error",
+		    });
+	    }
+    },
     async updateQualifications() {
         this.isRefreshQualificationTable = true;
         setTimeout(() => {
@@ -648,6 +698,7 @@ export default {
     },
   },
   components: {
+	  ApproveModal,
     VendorCompetencies,
     WYSIWYG,
     VendorCandidate,

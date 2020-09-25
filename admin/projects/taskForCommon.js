@@ -48,7 +48,6 @@ async function getTasksForCustomUnits (tasksInfo) {
     stepsDates,
     taskRefFiles,
   } = tasksInfo;
-  const { steps, ...rest } = service;
   let tasks = [];
   let tasksLength = tasksInfo.project.tasks.length + 1;
   for (let i = 0; i < targets.length; i++) {
@@ -59,9 +58,7 @@ async function getTasksForCustomUnits (tasksInfo) {
       targetLanguage: targets[i].symbol,
       sourceLanguage: source.symbol,
       refFiles: taskRefFiles,
-      service: {
-        ...rest
-      },
+      service,
       stepsAndUnits:
         stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
       projectId,

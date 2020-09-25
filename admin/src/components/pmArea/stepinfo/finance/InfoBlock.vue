@@ -6,7 +6,7 @@
           .bar
             .bar__green(:style="{width: barsStatistic.receivables.width}")
             .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
-          .bar(v-if="step.vendor")
+          .bar
             .bar__red(:style="{width: barsStatistic.payables.width }")
             .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
 

@@ -62,15 +62,9 @@ function getWordCountTasks (taskData) {
   for (let i = 0; i < targets.length; i++) {
     let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
     let taskId = project.projectId + ` ${idNumber}`;
-    let { steps } = service;
-    for (let { step } of steps) {
-      step.calculationUnit = step.calculationUnit.map(({ steps, ...rest }) => rest);
-    }
     tasks.push({
       taskId: taskId,
-      service: {
-        ...service
-      },
+      service,
       stepsAndUnits,
       memoqProjectId,
       start: project.startDate,

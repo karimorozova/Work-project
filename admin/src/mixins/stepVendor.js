@@ -2,7 +2,7 @@ const { findFittingVendor } = require('../../сalculations/vendor');
 export default {
   methods: {
     extendedVendors(index) {
-      //return this.vendors;
+      // return this.vendors;
 
       const allSteps = this.currentProject.steps;
       const industry = this.currentProject.industry;
@@ -19,20 +19,6 @@ export default {
           step: stepId,
           industry: industry._id
         }, vendors, true);
-
-      // const fittingVendors = this.vendors.filter()
-      // if(step.vendor == null){
-      // }else{
-      //     const sameTaskSteps = allSteps.filter(item => item.stepId !== step.stepId && item.taskId === step.taskId);
-      //     const assignedTaskVendors = sameTaskSteps.filter(item => item.vendor).map(item => item.vendor._id);
-      //     let result = !this.isMainGroup() ? this.vendors.filter(item => assignedTaskVendors.indexOf(item._id) === -1) : [...this.vendors];
-      //     if(this.isAllShow) {
-      //         return result.filter(item => item.status === 'Active');
-      //     }
-      //     result = result.filter(item => item.status === 'Active' && this.checkForLanguagePair(item, index));
-      // }
-      // return result;
-
     },
     isMainGroup() {
       return this.userGroup.name === 'Administrators' || this.userGroup.name === 'Developers';

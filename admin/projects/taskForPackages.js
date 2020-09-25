@@ -44,15 +44,12 @@ async function getTasksForPackages (tasksInfo, common = false) {
   for (let i = 0; i < targets.length; i++) {
     const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
     const taskId = projectId + ` ${idNumber}`;
-    const { steps, ...rest } = service;
     tasks.push({
       taskId,
       sourceLanguage: source.symbol,
       targetLanguage: targets[i].symbol,
       refFiles: taskRefFiles,
-      service: {
-        ...rest
-      },
+      service,
       stepsAndUnits:
         stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
       languageForm: service.languageForm,
@@ -126,7 +123,7 @@ async function getStepsForMonoStepPackages ({ tasks, stepsDates, industry, custo
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
     const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity
-    }, quantity);
+    });
     steps.push({
       ...task,
       stepId: `${tasks[i].taskId} S01`,

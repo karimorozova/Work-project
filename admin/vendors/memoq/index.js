@@ -15,11 +15,13 @@ const createVendorOnMemoq = async (vendor) => {
             <ns:FullName>${firstName} ${surname}</ns:FullName>
             <ns:LTFullName>${firstName} ${surname}</ns:LTFullName>
             <ns:LTUsername>${email}</ns:LTUsername>
-            <ns:Password>Mandrake37</ns:Password>
-            <ns:UserName>peysho@mail.ru</ns:UserName>
+            <ns:Password>secret</ns:Password>
+            <ns:UserName>${email}</ns:UserName>
          </ns:userInfo>
       </ns:CreateUser>
-   </soapenv:Body>`;
+   </soapenv:Body>
+</soapenv:Envelope>`;
+
   const headers = headerWithoutAction('CreateUser');
   try {
     const { response } = await soapRequest({ url, headers, xml });
@@ -41,15 +43,12 @@ const deleteVendorOnMemoq = async (vendorGuid) => {
       <ns:DeleteUser>
          <ns:userGuid>${vendorGuid}</ns:userGuid>
       </ns:DeleteUser>
-   </soapenv:Body>`;
+   </soapenv:Body>
+</soapenv:Envelope>`;
+
   const headers = headerWithoutAction('DeleteUser');
   try {
     const { response } = await soapRequest({ url, headers, xml });
-    // const result = parser.toJson(response.body, {
-    //   object: true,
-    //   sanitize: true,
-    //   trim: true
-    // })['s:Envelope']['s:Body'].DeleteUserResponse;
     return response;
   } catch (err) {
     console.log(err);
