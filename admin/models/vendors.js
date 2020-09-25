@@ -3,6 +3,10 @@ const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
 const VendorSchema = new mongoose.Schema({
+  guid: {
+    type: String,
+    default: ""
+  },
   photo: {
     type: String,
     default: "",

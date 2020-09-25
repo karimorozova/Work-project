@@ -20,7 +20,9 @@ const {
   updateVendorsRatePrices,
   syncVendorRatesCost,
   createRateRowFromQualification,
-  getVendorAfterCombinationsUpdated
+  getVendorAfterCombinationsUpdated,
+  createVendorOnMemoq,
+  deleteVendorOnMemoq
 } = require('../vendors');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
@@ -37,7 +39,7 @@ router.get('/vendor', async (req, res) => {
   }
 });
 
-function moveFile(oldFile, vendorId) {
+function moveFile (oldFile, vendorId) {
   let newFile = './dist/vendorsDocs/' + vendorId + '/' + oldFile.filename;
   mv(oldFile.path, newFile, {
     mkdirp: true
@@ -494,6 +496,31 @@ router.post("/get-message", async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on getting quote message");
+  }
+});
+
+router.get("/create-memoq-vendor", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const vendor = await Vendors.findOne({ _id: id });
+    const response = await createVendorOnMemoq(vendor);
+    console.log(response);
+    res.send('Created');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on creating vendor in memoQ');
+  }
+});
+
+router.delete("delete-memoq-vendor", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { guid } = await Vendors.findOne({ _id: id });
+    await deleteVendorOnMemoq(guid);
+    res.send('Deleted');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on deleting vendor in memoQ');
   }
 });
 module.exports = router;
