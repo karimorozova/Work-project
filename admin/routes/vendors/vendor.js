@@ -6,18 +6,19 @@ const { Vendors } = require('../../models');
 const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp } = require('../../vendors');
 const { upload, sendEmail } = require('../../utils');
 const { setVendorNewPassword } = require('../../users');
-const { createVendorOnMemoq } = require('../../vendors/memoq')
-const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunication')
+const { createVendorOnMemoq } = require('../../vendors/memoq');
+const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunication');
+const { assignMemoqTranslator } = require('../../projects');
 
 router.post("/login", async (req, res, next) => {
-	if(req.body.logemail) {
-		Vendors.authenticate(req.body.logemail, req.body.logpassword, async (error, vendor) => {
-			if(error || !vendor) {
-				let err = new Error('Wrong email or password.');
-				err.status = 401;
-				res.status(401).send("Wrong email or password.");
-			} else {
-				try {
+  if (req.body.logemail) {
+    Vendors.authenticate(req.body.logemail, req.body.logpassword, async (error, vendor) => {
+      if (error || !vendor) {
+        let err = new Error('Wrong email or password.');
+        err.status = 401;
+        res.status(401).send("Wrong email or password.");
+      } else {
+        try {
 					const token = await jwt.sign({ vendorId: vendor._id }, secretKey, { expiresIn: '2h' });
 					res.statusCode = 200;
 					res.send(token);
@@ -117,19 +118,31 @@ router.post("/selected-job", checkVendor, async (req, res) => {
 })
 
 router.post("/create-memoq-vendor", checkVendor, async (req, res) => {
-	const { token } = req.body;
-	const { vendorId } = jwt.verify(token, secretKey);
-	const vendor = await Vendors.findOne({ _id: vendorId });
-	const guid = await createVendorOnMemoq(vendor);
-	if(guid) {
-		const message = sendMemoqCredentials(vendor);
-		const subject = `MemoQ account`;
-		await sendEmail({ to: vendor.email, subject }, message);
-		await Vendors.updateOne({ _id: vendorId }, { guid });
-		res.status(200).send('Saved');
-	} else {
-		res.status(500).send('Error on creating vendor in memoQ')
-	}
+  const { token } = req.body;
+  const { vendorId } = jwt.verify(token, secretKey);
+  const vendor = await Vendors.findOne({ _id: vendorId });
+  const guid = await createVendorOnMemoq(vendor);
+  if (guid) {
+    const message = sendMemoqCredentials(vendor);
+    const subject = `MemoQ account`;
+    await sendEmail({ to: vendor.email, subject }, message);
+    await Vendors.updateOne({ _id: vendorId }, { guid });
+    res.status(200).send('Saved');
+  } else {
+    res.status(500).send('Error on creating vendor in memoQ');
+  }
+});
+
+router.post("/assign-translator", checkVendor, async (req, res) => {
+  const { token, stepId, projectId } = req.body;
+  try {
+    const { vendorId } = jwt.verify(token, secretKey);
+    await assignMemoqTranslator(vendorId, stepId, projectId);
+    res.send('Assigned');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on assigning vendor as translator');
+  }
 });
 
 module.exports = router;
