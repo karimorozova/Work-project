@@ -522,4 +522,5 @@ router.get("/delete-memoq-vendor/:id", async (req, res) => {
 		res.status(500).send('Error on deleting vendor in memoQ');
 	}
 });
+
 module.exports = router;

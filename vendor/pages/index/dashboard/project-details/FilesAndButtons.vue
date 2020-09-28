@@ -14,6 +14,11 @@
       .files-buttons__icon(v-for="(icon, key) in icons")
         img.files-buttons__image(:src="icon.icon" @click="makeAction(key)")
         span.files-buttons__tooltip {{ key }}
+
+    .alert(v-if="emailAlert")
+      span.closebtn(@click="closeEmailAlert") &times;
+      |  Credentials from MemoQ account have been sent to your Email.
+
 </template>
 
 <script>
@@ -40,29 +45,38 @@
 					Approve: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
 					Reject: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
 				},
+        emailAlert: false,
 			}
 		},
 		methods: {
 			...mapActions([
 				"setJobStatus",
 				"selectJob",
-				"alertToggle"
+				"alertToggle",
+
 			]),
+			closeEmailAlert(){
+        this.emailAlert = false;
+      },
 			setDeliverables({ files }) {
 				this.$emit('setDeliverables', { files });
 			},
 			async startJob() {
 				if(!this.job.isVendorRead) return;
+				const vendor = this.getVendor;
 				try {
-					//MAX
-					// const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
-					// const vendor = await this.$axios.get(`/vendorsapi/vendor?id=${'this.job.vendor._id'}`)
-          //
-					// if(this.job.name === "Translation" && type === "CAT Wordcount" && !vendor.hasOwnProperty('guid')) {
-					// 	await this.$axios.get(`/vendorsapi/create-memoq-vendor/${ this.job.vendor._id }`)
-					// }
-					await this.setStatus("Started");
+					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
+					if(this.job.name === "Translation" && type === "CAT Wordcount" && vendor.guid == null) {
+						await this.$axios.post(`/vendor/create-memoq-vendor`, {
+							token: this.getToken
+						})
+						this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
+            this.emailAlert = true;
+					}
 				} catch (err) {
+					this.alertToggle({ message: "Error in creating Vendor in MemoQ", isShow: true, type: "error" });
+				} finally {
+					await this.setStatus("Started");
 				}
 			},
 			async makeAction(key) {
@@ -88,7 +102,9 @@
 		computed: {
 			...mapGetters({
 				job: "getSelectedJob",
-				allJobs: "getAllJobs"
+				allJobs: "getAllJobs",
+				getToken: "getToken",
+				getVendor: "getVendor",
 			}),
 			isStartButton() {
 				return this.job.status === "Accepted" || this.job.status === "Ready to Start" || this.job.status === "Waiting to Start";
@@ -193,4 +209,25 @@
     }
   }
 
+  .alert {
+    padding: 20px;
+    background-color: #F6F1EF;
+    color: #67573E;
+    margin: 30px 10px 20px;
+  }
+
+  .closebtn {
+    margin-left: 15px;
+    color: #67573E;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .closebtn:hover {
+    color: black;
+  }
 </style>

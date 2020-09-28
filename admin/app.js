@@ -16,15 +16,15 @@ let logger = require('morgan');
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
-// const { getMemoqUsers } = require('./services/memoqs/users');
-//
-// const foo = async () => {
-//   const users = await getMemoqUsers();
-//   const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email  === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com' );
-//   console.log(needed);
-// }
-//
-// foo();
+const { getMemoqUsers } = require('./services/memoqs/users');
+
+const foo = async () => {
+  const users = await getMemoqUsers();
+  const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email  === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com' );
+  console.log(needed);
+}
+
+foo();
 
 schedule.scheduleJob('0 */3 * * *', async function () {
   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);

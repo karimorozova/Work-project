@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const VendorSchema = new mongoose.Schema({
   guid: {
     type: String,
-    default: ""
+    default: null
   },
   photo: {
     type: String,
