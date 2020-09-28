@@ -151,23 +151,23 @@ async function getTaskSteps(task, industry, customer) {
 			vendorsClickedOffer: [],
 			isVendorRead: false,
 			service
-		};
-		if (type !== 'CAT Wordcount' && type !== 'Packages') {
-			delete step.totalWords;
-			Object.assign(step, { hours: stepsAndUnits[i].hours, size: stepsAndUnits[i].size });
-		} else if (type === 'Packages') {
-			delete step.totalWords;
-			Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
-		} else {
-			Object.assign(step, { totalWords: quantity, quantity });
-		}
-		if (step.name === "Revising") {
-			const { _id } = await Units.findOne({ type: 'Packages' })
-			step.serviceStep.unit = ObjectId(_id);
-		}
-		newSteps.push(step);
-		counter++;
-	}
+    };
+    if (type !== 'CAT Wordcount' && type !== 'Packages') {
+      delete step.totalWords;
+      Object.assign(step, { hours: stepsAndUnits[i].hours, size: stepsAndUnits[i].size });
+    } else if (type === 'Packages') {
+      delete step.totalWords;
+      Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
+    } else {
+      Object.assign(step, { totalWords: quantity, quantity });
+    }
+    if (step.name !== "Translation") {
+      const { _id } = await Units.findOne({ type: 'Packages' });
+      step.serviceStep.unit = ObjectId(_id);
+    }
+    newSteps.push(step);
+    counter++;
+  }
 	return newSteps;
 }
 
