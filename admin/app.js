@@ -9,7 +9,6 @@ const config = require("./server-config.json");
 const mongoose = require("mongoose");
 const port = config.server.port;
 const db = mongoose.connection;
-const checkCollections = require("./helpers/dbSetDefault");
 const { checkRoutes } = require("./middleware/index");
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
@@ -17,16 +16,15 @@ const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
 const { getMemoqUsers } = require('./services/memoqs/users');
-const { getProjectUsers } = require('./services/memoqs/projects');
+// const { getProjectUsers } = require('./services/memoqs/projects');
 
-const foo = async () => {
-  // const users = await getProjectUsers('');
-  // console.log(users);
-  // const users = await getMemoqUsers();
-  // // const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email  === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com' );
-  // const needed = users.find(user => user.email === 'shadowbroker2176@gmail.com');
-  // console.log(needed);
-}
+// const foo = async () => {
+// const users = await getProjectUsers('');
+// console.log(users);
+// const users = await getMemoqUsers();
+// // const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email  === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com' );
+// const needed = users.find(user => user.email === 'testqa1805@gmail.com');
+// }
 
 // foo();
 
@@ -35,7 +33,7 @@ schedule.scheduleJob('0 */3 * * *', async function () {
   try {
     await updateMemoqProjectsData();
     console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
-  } catch(err) {
+  } catch (err) {
     console.log(err.message);
   }
 });
@@ -109,7 +107,7 @@ app.use((req, res, next) => {
 const routes = require("./routes");
 app.use("/", routes);
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   return res.status(err.status).send(err.message);
 });
 

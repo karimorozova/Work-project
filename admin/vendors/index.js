@@ -15,7 +15,6 @@ const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = requir
 const { updateVendorsRatePrices, getVendorAfterCombinationsUpdated } = require('./updateVendorRates');
 const { syncVendorRatesCost } = require('./syncVendorRatesCost');
 const { createRateRowFromQualification } = require('./createVendorRates');
-const { createVendorOnMemoq, deleteVendorOnMemoq } = require('./memoq');
 
 module.exports = {
   getVendor,
@@ -44,6 +43,4 @@ module.exports = {
   generateCompetenciesCombinations,
   saveQualificationsAfterUpdateCompetencies,
   getVendorAfterCombinationsUpdated,
-  createVendorOnMemoq,
-  deleteVendorOnMemoq
 };

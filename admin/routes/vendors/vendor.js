@@ -6,11 +6,11 @@ const { Vendors } = require('../../models');
 const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp } = require('../../vendors');
 const { upload, sendEmail } = require('../../utils');
 const { setVendorNewPassword } = require('../../users');
-const { createVendorOnMemoq } = require('../../vendors/memoq');
+const { createMemoqUser } = require('../../services/memoqs/users');
 const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunication');
 const { assignMemoqTranslator } = require('../../projects');
 
-router.post("/login", async (req, res, next) => {
+router.post("/login", async (req, res) => {
   if (req.body.logemail) {
     Vendors.authenticate(req.body.logemail, req.body.logpassword, async (error, vendor) => {
       if (error || !vendor) {
@@ -19,10 +19,10 @@ router.post("/login", async (req, res, next) => {
         res.status(401).send("Wrong email or password.");
       } else {
         try {
-					const token = await jwt.sign({ vendorId: vendor._id }, secretKey, { expiresIn: '2h' });
-					res.statusCode = 200;
-					res.send(token);
-				} catch (err) {
+          const token = await jwt.sign({ vendorId: vendor._id }, secretKey, { expiresIn: '2h' });
+          res.statusCode = 200;
+          res.send(token);
+        } catch (err) {
 					console.log(err);
 					res.status(500).send("Server Error. Try again later.");
 				}
@@ -121,7 +121,7 @@ router.post("/create-memoq-vendor", checkVendor, async (req, res) => {
   const { token } = req.body;
   const { vendorId } = jwt.verify(token, secretKey);
   const vendor = await Vendors.findOne({ _id: vendorId });
-  const guid = await createVendorOnMemoq(vendor);
+  const guid = await createMemoqUser(vendor);
   if (guid) {
     const message = sendMemoqCredentials(vendor);
     const subject = `MemoQ account`;

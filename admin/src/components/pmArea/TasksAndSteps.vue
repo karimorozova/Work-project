@@ -100,26 +100,27 @@ export default {
             this.$emit("setDate", {date, prop, index});
         },
         getDataForTasks(dataForTasks) {
-            let tasksData = new FormData();
-            const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : "";
+          let tasksData = new FormData();
+          const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : "";
 
-            tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits));
-            tasksData.append('customerName', this.currentProject.customer.name);
-            if(dataForTasks.stepsAndUnits.find(item => item.template)){
-                tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id);
-            }
-            tasksData.append('workflow', dataForTasks.workflow.id);
-            tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates));
-            tasksData.append('service', JSON.stringify(dataForTasks.service));
-            tasksData.append('source', source);
-            tasksData.append('targets', JSON.stringify(dataForTasks.targets));
-            tasksData.append('projectId', this.currentProject._id);
-            tasksData.append('projectName', `${this.currentProject.projectId} - ${this.currentProject.projectName}`);
-            tasksData.append('industry', this.currentProject.industry.name.replace('&','and'));
-            tasksData.append('packageSize', dataForTasks.packageSize);
-            tasksData.append('quantity', dataForTasks.quantity);
-
-            return tasksData;
+          tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits));
+          tasksData.append('customerName', this.currentProject.customer.name);
+          if (dataForTasks.stepsAndUnits.find(item => item.template)) {
+            tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id);
+          }
+          tasksData.append('workflow', dataForTasks.workflow.id);
+          tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates));
+          tasksData.append('service', JSON.stringify(dataForTasks.service));
+          tasksData.append('source', source);
+          tasksData.append('targets', JSON.stringify(dataForTasks.targets));
+          tasksData.append('projectId', this.currentProject._id);
+          tasksData.append('projectName', `${this.currentProject.projectId} - ${this.currentProject.projectName}`);
+          tasksData.append('industry', this.currentProject.industry.name.replace('&', 'and'));
+          tasksData.append('packageSize', dataForTasks.packageSize);
+          tasksData.append('quantity', dataForTasks.quantity);
+          tasksData.append('projectManager', this.currentProject.projectManager._id);
+          tasksData.append('accountManager', this.currentProject.accountManager._id);
+          return tasksData;
         },
         async addTasks(dataForTasks) {
             let tasksData = this.getDataForTasks(dataForTasks);

@@ -12,7 +12,7 @@ const {
   assignMemoqTranslators
 } = require('../services/memoqs/projects');
 const { downloadMemoqFile } = require('../services/memoqs/files');
-const { getMemoqUsers } = require('../services/memoqs/users');
+const { getMemoqUsers, getMemoqUser, createMemoqUser } = require('../services/memoqs/users');
 
 async function updateProjectProgress (project, isCatTool) {
   let { steps, tasks } = project;
@@ -162,8 +162,7 @@ function getTaskNewFinance (changedSteps, task) {
     halfReceivables: +(priceValues.receivables.toFixed(2)),
     halfPayables: +(priceValues.payables.toFixed(2))
   };
-  const updatedFinance = { ...finance, Price };
-  return updatedFinance;
+  return { ...finance, Price };
 }
 
 function updateTaskNewFinance (changedSteps, task) {
@@ -485,8 +484,17 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
   const users = await getMemoqUsers();
   const neededStep = steps.find(step => step.stepId === stepId);
   const { memoqProjectId } = neededStep;
-  const currentUsers = await getProjectUsers(memoqProjectId);
   let projectUsers = [];
+  const currentProjectUsers = await getProjectUsers(memoqProjectId);
+  for (let userInfo of currentProjectUsers) {
+    const { ProjectRoles, User } = userInfo;
+    const { UserGuid } = User;
+    const isPm = ProjectRoles['a:ProjectManager'] === 'true';
+    projectUsers.push({
+      id: UserGuid,
+      isPm
+    });
+  }
   const memoqUser = users.find(user => user.email === vendor.email);
   if (memoqUser) projectUsers.push(
     {
@@ -502,6 +510,37 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
     : new Error("Can't set one or all users in memoQ");
 };
 
+const assignProjectManagers = async ({ managerIds, memoqProjectId }) => {
+  const users = await getMemoqUsers();
+  const projectManagers = [];
+  for (let managerId of managerIds) {
+    const manager = await User.findOne({ _id: managerId });
+    projectManagers.push(await checkAndCreateManager(users, manager));
+  }
+  await setMemoqProjectUsers(memoqProjectId, projectManagers);
+};
+
+const checkAndCreateManager = async (memoqUsers, manager) => {
+  const memoqManager = memoqUsers.find(user => user.email === manager.email);
+  if (memoqManager) {
+    return {
+      id: memoqManager.id,
+      isPm: manager.position === 'Project Manager'
+    };
+  } else {
+    const guid = await createMemoqUser({
+      firstName: manager.firstName,
+      email: manager.email,
+      surname: manager.lastName
+    });
+    const { id } = await getMemoqUser(guid);
+    return {
+      id,
+      isPm: manager.position === 'Project Manager',
+    };
+  }
+};
+
 module.exports = {
   getProjectAfterCancelTasks,
   updateProjectStatus,
@@ -512,5 +551,6 @@ module.exports = {
   getAfterReopenSteps,
   updateNonWordsTaskTargetFiles,
   updateOtherProject,
-  assignMemoqTranslator
+  assignMemoqTranslator,
+  assignProjectManagers
 };

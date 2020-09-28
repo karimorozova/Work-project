@@ -4,21 +4,22 @@ const { User, MemoqProject } = require('../models');
 const { downloadCompletedFiles } = require("../projects");
 const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers, getMemoqFileId } = require("../services/memoqs/projects");
 const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
-const { getMemoqTemplates} = require("../services/memoqs/resources");
+const { getMemoqTemplates } = require("../services/memoqs/resources");
+const { assignProjectManagers } = require('../projects/updates');
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
 const { updateProjectMetrics } = require("../projects/metrics");
 const { getFilteredOtherProjects } = require('../services/memoqs/otherProjects');
 
 router.get('/users', async (req, res) => {
-    try {
-        const result = await getMemoqUsers();
-        res.json(result);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting memoQ users");
-    }
-})
+  try {
+    const result = await getMemoqUsers();
+    res.json(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on getting memoQ users");
+  }
+});
 
 router.get('/user', async (req, res) => {
     const { userId } = req.query;
@@ -62,21 +63,29 @@ router.get('/templates', async (req, res) => {
 router.post('/memoq-project', upload.fields([{name: 'sourceFiles'}, {name: 'refFiles'}]), async (req, res) => {
     let tasksInfo = {...req.body};
     try {
-        if(tasksInfo.isRequest) {
-            tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
-            return res.send({ tasksInfo });
-        }
-        if(tasksInfo.source) {
-            tasksInfo.source = JSON.parse(tasksInfo.source);
-        }
-        tasksInfo.targets = JSON.parse(tasksInfo.targets);
-        tasksInfo.service = JSON.parse(tasksInfo.service);
-        tasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
-        const { sourceFiles, refFiles } = req.files;
-        tasksInfo.translateFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
-        tasksInfo.referenceFiles = refFiles ? await storeFiles(refFiles, tasksInfo.projectId) : [];
+      if (tasksInfo.isRequest) {
         tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
-        res.send({ tasksInfo });
+        await assignProjectManagers({
+          managerIds: [tasksInfo.projectManager, tasksInfo.accountManager],
+          memoqProjectId: tasksInfo.memoqProjectId
+        });
+        return res.send({ tasksInfo });
+      }
+      if (tasksInfo.source) {
+        tasksInfo.source = JSON.parse(tasksInfo.source);
+      }
+      tasksInfo.targets = JSON.parse(tasksInfo.targets);
+      tasksInfo.service = JSON.parse(tasksInfo.service);
+      tasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
+      const { sourceFiles, refFiles } = req.files;
+      tasksInfo.translateFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
+      tasksInfo.referenceFiles = refFiles ? await storeFiles(refFiles, tasksInfo.projectId) : [];
+      tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
+      await assignProjectManagers({
+        managerIds: [tasksInfo.projectManager, tasksInfo.accountManager],
+        memoqProjectId: tasksInfo.memoqProjectId
+      });
+      res.send({ tasksInfo });
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on creating a Project in memoQ");

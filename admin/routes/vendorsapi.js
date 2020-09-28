@@ -5,25 +5,24 @@ const fse = require('fs-extra');
 const { getRatePricelist, changeMainRatePricelist } = require('../pricelist');
 const { updateProject, getProject } = require('../projects');
 const {
-	getVendor,
-	getVendorAfterUpdate,
-	getFilteredVendors,
-	updateVendorEducation,
-	saveVendorDocument,
-	saveVendorDocumentDefault,
-	removeVendorDoc,
-	removeVendorEdu,
-	updateVendorAssessment,
-	notifyTestStatus,
-	updateVendorCompetencies,
-	deleteVendorCompetencies,
-	updateVendorsRatePrices,
-	syncVendorRatesCost,
-	createRateRowFromQualification,
-	getVendorAfterCombinationsUpdated,
-	createVendorOnMemoq,
-	deleteVendorOnMemoq
+  getVendor,
+  getVendorAfterUpdate,
+  getFilteredVendors,
+  updateVendorEducation,
+  saveVendorDocument,
+  saveVendorDocumentDefault,
+  removeVendorDoc,
+  removeVendorEdu,
+  updateVendorAssessment,
+  notifyTestStatus,
+  updateVendorCompetencies,
+  deleteVendorCompetencies,
+  updateVendorsRatePrices,
+  syncVendorRatesCost,
+  createRateRowFromQualification,
+  getVendorAfterCombinationsUpdated,
 } = require('../vendors');
+const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users');
 const { Vendors } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
 const { testSentMessage } = require("../emailMessages/candidateCommunication");
@@ -236,18 +235,6 @@ router.post('/step-email', async (req, res) => {
 	}
 });
 
-router.post('/rates', async (req, res) => {
-	const { vendorId, ...rateInfo } = req.body;
-	try {
-		const vendor = await getVendor({ "_id": vendorId });
-		// const updatedVendor = await updateVendorRates(vendor, rateInfo);
-		// res.send(updatedVendor);
-	} catch (err) {
-		console.log(err);
-		res.status(500).send("Error on updating rates of Vendor");
-	}
-});
-
 router.post('/remove-rate', async (req, res) => {
 	const { vendorId, rateId, prop } = req.body;
 	try {
@@ -283,17 +270,6 @@ router.post('/combination', async (req, res) => {
 	} catch (err) {
 		console.log(err);
 		res.status(500).send("Error on adding combination for Vendor");
-	}
-});
-
-router.post('/import-rates', async (req, res) => {
-	const { vendorId, ratesData, prop } = req.body;
-	try {
-		// const updatedVendor = await importRates({ vendorId, ratesData, prop });
-		// res.send(updatedVendor);
-	} catch (err) {
-		console.log(err);
-		res.status(500).send("Error on importing rates to Vendor");
 	}
 });
 
@@ -500,27 +476,27 @@ router.post("/get-message", async (req, res) => {
 });
 
 router.get("/create-memoq-vendor/:id", async (req, res) => {
-	const { id } = req.params;
-	const vendor = await Vendors.findOne({ _id: id });
-	const guid = await createVendorOnMemoq(vendor);
-	if(guid){
-		await Vendors.updateOne({ _id: id }, { guid });
-		res.status(200).send('Saved');
-	}else{
-		res.status(500).send('Error on creating vendor in memoQ')
-	}
+  const { id } = req.params;
+  const vendor = await Vendors.findOne({ _id: id });
+  const guid = await createMemoqUser(vendor);
+  if (guid) {
+    await Vendors.updateOne({ _id: id }, { guid });
+    res.status(200).send('Saved');
+  } else {
+    res.status(500).send('Error on creating vendor in memoQ');
+  }
 });
 
 router.get("/delete-memoq-vendor/:id", async (req, res) => {
-	const { id } = req.params;
-	const { guid } = await Vendors.findOne({ _id: id });
-	if(guid) {
-		await deleteVendorOnMemoq(guid);
-		await Vendors.updateOne({ _id: id }, { guid: null });
-		res.status(200).send('Deleted');
-	} else {
-		res.status(500).send('Error on deleting vendor in memoQ');
-	}
+  const { id } = req.params;
+  const { guid } = await Vendors.findOne({ _id: id });
+  if (guid) {
+    await deleteMemoqUser(guid);
+    await Vendors.updateOne({ _id: id }, { guid: null });
+    res.status(200).send('Deleted');
+  } else {
+    res.status(500).send('Error on deleting vendor in memoQ');
+  }
 });
 
 module.exports = router;
