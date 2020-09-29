@@ -65,7 +65,7 @@ function getWordCountTasks (taskData) {
     tasks.push({
       taskId: taskId,
       service,
-      stepsAndUnits,
+      stepsAndUnits: JSON.parse(stepsAndUnits),
       memoqProjectId,
       start: project.startDate,
       deadline: project.deadline,

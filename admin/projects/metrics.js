@@ -13,7 +13,7 @@ async function updateProjectMetrics({ projectId }) {
     let { steps, tasks, customer, industry } = project;
     let isMetricsExist = true;
     const task = tasks[tasks.length - 1];
-    const stepsAndUnits = JSON.parse(task.stepsAndUnits);
+    const { stepsAndUnits } = task;
     const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
     if (!!isIncludesWordCount && task.status === "Created") {
       const analysis = await getProjectAnalysis(task.memoqProjectId);
