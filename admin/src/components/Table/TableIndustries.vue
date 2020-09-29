@@ -49,6 +49,7 @@
                 .industries__icons
                     img.industries__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'industries_opacity': isActive(key, index)}")
     Add(@add="addIndustry")
+
 </template>
 
 <script>
@@ -237,6 +238,11 @@ export default {
                 active: true
             });
             this.setEditionData(this.industries.length - 1);
+
+            // const element = this.$el.querySelector('.table__tbody')
+	          // console.log(element);
+	          // element.scrollTop = 9999;
+
         },
         async getIndustries() {
             try {
