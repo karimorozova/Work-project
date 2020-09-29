@@ -10,7 +10,7 @@ const { createMemoqUser } = require('../../services/memoqs/users');
 const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunication');
 const { assignMemoqTranslator } = require('../../projects');
 
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
   if (req.body.logemail) {
     Vendors.authenticate(req.body.logemail, req.body.logpassword, async (error, vendor) => {
       if (error || !vendor) {
@@ -23,9 +23,9 @@ router.post("/login", async (req, res) => {
           res.statusCode = 200;
           res.send(token);
         } catch (err) {
-					console.log(err);
-					res.status(500).send("Server Error. Try again later.");
-				}
+          console.log(err);
+          res.status(500).send("Server Error. Try again later.");
+        }
 			}
 		});
 	} else {

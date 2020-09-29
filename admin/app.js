@@ -16,15 +16,16 @@ const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
 const { getMemoqUsers } = require('./services/memoqs/users');
-// const { getProjectUsers } = require('./services/memoqs/projects');
+const { getProjectUsers } = require('./services/memoqs/projects');
 
-// const foo = async () => {
-// const users = await getProjectUsers('');
-// console.log(users);
-// const users = await getMemoqUsers();
-// // const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email  === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com' );
-// const needed = users.find(user => user.email === 'testqa1805@gmail.com');
-// }
+const foo = async () => {
+  // const users = await getProjectUsers('');
+  // console.log(users);
+  const users = await getMemoqUsers();
+  const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com');
+  console.log(needed);
+  // const needed = users.find(user => user.email === 'testqa1805@gmail.com');
+};
 
 // foo();
 
@@ -107,7 +108,7 @@ app.use((req, res, next) => {
 const routes = require("./routes");
 app.use("/", routes);
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   return res.status(err.status).send(err.message);
 });
 
