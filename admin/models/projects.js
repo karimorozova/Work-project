@@ -55,6 +55,10 @@ const ProjectsSchema = new mongoose.Schema({
       },
       memoqAssignmentRole: {
         type: Number,
+      },
+      title: {
+        type: String,
+        trim: true,
       }
     },
     name: "",
