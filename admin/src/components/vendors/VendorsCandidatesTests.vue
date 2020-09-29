@@ -103,7 +103,7 @@
             span Mono
 
     .popup__dropRow
-      .popup__drop(v-if="currentLanguageType == '' || currentLanguageType === 'Duo'")
+      .popup__drop(v-if="currentLanguageType === '' || currentLanguageType === 'Duo'")
         .popup__drop-title Source:
         SelectSingle(
           placeholder="Select",
@@ -155,7 +155,7 @@
 
     .popup__buttonRow
       .pupup_button
-        Button(:value="currentIndex ? 'Update' : 'Create'", @clicked="saveTest")
+        Button(:value="currentIndex ? 'Create' : 'Update'", @clicked="saveTest")
     .popup__close 
       i.fa.fa-times(aria-hidden="true", @click="closeAddData")
 </template>
@@ -296,13 +296,13 @@ export default {
     async saveTest() {
       this.errors = [];
       if (!this.currentSource) this.errors.push("Source should not be empty!");
-      if (this.selectedTargets.length == 0) this.errors.push("Target should not be empty!");
+      if (this.selectedTargets.length === 0) this.errors.push("Target should not be empty!");
       if (!this.currentIndustries.length) this.errors.push("Industries should not be empty!");
       if (!this.currentSteps.length) this.errors.push("Steps should not be empty!");
       if (!this.currentEvaluationType) this.errors.push("Evaluation type should not be empty");
       if (!this.currentLanguageType) this.errors.push("Language type should not be empty");
       if (!this.currentEvaluationName) this.errors.push("Evaluation name should not be empty");
-      if (this.currentIndex == -1 && this.currentEvaluationType === "Test") {
+      if (this.currentIndex === -1 && this.currentEvaluationType === "Test") {
         if (!this.currentFile) this.errors.push("File should not be empty!");
       }
       if (this.isTestSame()) this.errors.push("Such a test already exists");

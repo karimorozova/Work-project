@@ -15,9 +15,13 @@
         @chooseOption="setAction"
       )
 
-    .project-action__confirm(v-if="isAction('ReOpen')")
+    .project-action__confirm(v-if="isAction('ReOpen') && project.status !== 'Rejected'")
       .project-action__button
         Button(:value="'Confirm'" @clicked="approveAction = true")
+
+    .project-action__confirm(v-if="isAction('ReOpen') && project.status === 'Rejected'")
+      .project-action__button
+        Button(:value="'Confirm'" @clicked="approveActionToDraft = true")
 
     .project-action__confirm(v-if="isAction('Accept/Reject Quote')")
       .project-action__button
@@ -82,7 +86,16 @@
         notApproveValue="No"
         @approve="approveModal"
         @close="closeModal"
-        @notApprove="notApproveModal"
+        @notApprove="closeModal"
+      )
+    .approve-action(v-if="approveActionToDraft")
+      ApproveModal(
+        text="Are you sure you want to re-open the project?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="approveModalToDraft"
+        @close="closeModal"
+        @notApprove="closeModal"
       )
 
 </template>
@@ -91,7 +104,7 @@
 	import Preview from "../vendors/WYSIWYG";
 	import SelectSingle from "../SelectSingle";
 	import Button from "../Button";
-	import { mapGetters, mapActions } from "vuex";
+	import { mapActions } from "vuex";
 	import ApproveModal from "../ApproveModal";
 
 	export default {
@@ -121,18 +134,22 @@
 				isEditAndSend: false,
 				isPay: false,
 				approveAction: false,
+				approveActionToDraft: false,
 			};
 		},
 		methods: {
-			notApproveModal(){
+			closeModal() {
 				this.approveAction = false;
-      },
-			closeModal(){
-				this.approveAction = false;
+				this.approveActionToDraft = false;
 			},
-			approveModal(){
+			approveModal() {
 				this.reOpenProject();
 				this.approveAction = false;
+				this.selectedAction = '';
+			},
+			approveModalToDraft() {
+				this.reOpenProjectToDraft();
+				this.approveActionToDraft = false;
 				this.selectedAction = '';
 			},
 			refreshProject() {
@@ -145,7 +162,7 @@
 				this.isEditAndSend = true;
 			},
 			async getCancelMessage() {
-				if (this.project.status === "In progress" || this.project.status === "Draft") {
+				if(this.project.status === "In progress" || this.project.status === "Draft") {
 					await this.setStatus("Cancelled", this.selectedReason);
 				}
 				try {
@@ -174,7 +191,7 @@
 			async getSendQuoteMessage() {
 				try {
 					const template = await this.$http.get(
-							`/pm-manage/quote-message?projectId=${this.project._id}`
+							`/pm-manage/quote-message?projectId=${ this.project._id }`
 					);
 					this.previewMessage = template.body.message;
 					this.openPreview();
@@ -185,7 +202,7 @@
 			async getProjectDetailsMessage() {
 				try {
 					const template = await this.$http.get(
-							`/pm-manage/project-details?projectId=${this.project._id}`
+							`/pm-manage/project-details?projectId=${ this.project._id }`
 					);
 					this.previewMessage = template.body.message;
 					this.openPreview();
@@ -202,7 +219,7 @@
 				this.closePreview();
 			},
 			isAction(action) {
-				return this.selectedAction === action ? true : false;
+				return this.selectedAction === action;
 			},
 			setDefaults() {
 				this.selectedAction = "";
@@ -215,7 +232,7 @@
 			setAction({ option }) {
 				this.selectedAction = option;
 				this.isAlternativeAction = false;
-				if (this.selectedAction === "Accept/Reject Quote") {
+				if(this.selectedAction === "Accept/Reject Quote") {
 					this.approveButtonValue = "Accept";
 					(this.alternativeButtonValue = "Reject"),
 							(this.isAlternativeAction = true);
@@ -250,13 +267,16 @@
 					this.setDefaults();
 				}
 			},
+      async reOpenProjectToDraft(){
+	      await this.setStatus('Draft', "");
+      },
 			async reOpenProject() {
 				let status;
-				if(this.project.status === "Cancelled" || this.project.status === "Cancelled Halfway"){
+				if(this.project.status === "Cancelled" || this.project.status === "Cancelled Halfway") {
 					status = "fromCancelled"
-        }else{
+				} else {
 					status = "fromClosed"
-        }
+				}
 				await this.setStatus(status, "");
 			},
 			async clientQuote(message) {
@@ -309,7 +329,7 @@
 				}
 			},
 			async cancelProjectMessage(message) {
-				if (
+				if(
 						this.project.status === "Delivered" ||
 						this.project.status === "Closed"
 				)
@@ -367,11 +387,11 @@
 			},
 			async setManager({ option }, prop) {
 				const manager = this.managers.find(
-						item => `${item.firstName} ${item.lastName}` === option
+						item => `${ item.firstName } ${ item.lastName }` === option
 				);
-				if (manager._id === this.project[prop]._id) return;
+				if(manager._id === this.project[prop]._id) return;
 				try {
-					if (this.type === "project") {
+					if(this.type === "project") {
 						await this.setProjectValue({
 							id: this.project._id,
 							prop,
@@ -412,21 +432,21 @@
 			},
 			accManagers() {
 				let result = [];
-				if (this.managers.length) {
+				if(this.managers.length) {
 					result = this.managers.filter(
 							item => item.group.name === "Account Managers"
 					);
-					result = result.map(item => `${item.firstName} ${item.lastName}`);
+					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
 				}
 				return result;
 			},
 			projManagers() {
 				let result = [];
-				if (this.managers.length) {
+				if(this.managers.length) {
 					result = this.managers.filter(
 							item => item.group.name === "Project Managers"
 					);
-					result = result.map(item => `${item.firstName} ${item.lastName}`);
+					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
 				}
 				return result;
 			},
@@ -452,29 +472,32 @@
 					"Requested",
 					"Cancelled"
 				];
-				if (this.project.status === "Approved") {
+				if(this.project.status === "Approved") {
 					// result = ["Send a Quote", "Cancel"];
 					result = ["Cancel"];
 				}
-				if (
+				if(
 						this.project.finance.Price.receivables &&
 						nonStartedStatuses.indexOf(this.project.status) !== -1
 				) {
 					result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
 				}
-				if (
+				if(
 						this.project.status === "Started" ||
 						this.project.status === "In progress"
 				) {
 					result = ["Send Project Details", "Cancel"];
 				}
-				if (this.project.status === "Ready for Delivery") {
+				if(this.project.status === "Ready for Delivery") {
 					result = ["Deliver", "Cancel"];
 				}
-				if (this.project.status === "Closed") {
-					result = ["ReOpen","Deliver"];
+				if(this.project.status === "Closed") {
+					result = ["ReOpen", "Deliver"];
 				}
-				if (this.project.status === "Cancelled" || this.project.status === "Cancelled Halfway") {
+				if(this.project.status === "Rejected") {
+					result = ["ReOpen", "Cancel"]
+				}
+				if(this.project.status === "Cancelled" || this.project.status === "Cancelled Halfway") {
 					result = ['ReOpen']
 				}
 				return result;
@@ -497,7 +520,7 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
 
-  .approve-action{
+  .approve-action {
     position: absolute;
     margin-top: 50px;
   }
