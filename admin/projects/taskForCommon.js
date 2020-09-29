@@ -59,8 +59,7 @@ async function getTasksForCustomUnits (tasksInfo) {
       sourceLanguage: source.symbol,
       refFiles: taskRefFiles,
       service,
-      stepsAndUnits:
-        stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
+      stepsAndUnits,
       projectId,
       start: stepsDates[0].start,
       deadline: stepsDates[stepsDates.length - 1].deadline,
@@ -81,12 +80,8 @@ async function getStepsForMonoUnits (allInfo, common = false) {
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
     let { stepsAndUnits, sourceLanguage, targetLanguage } = task;
-    const isObject = typeof stepsAndUnits === "object";
-    const isArray = Array.isArray(stepsAndUnits);
-    if (!isArray && !isObject) stepsAndUnits = JSON.parse(stepsAndUnits);
-    let serviceStep = isArray
-      ? stepsAndUnits.find(item => item.hours)
-      : stepsAndUnits;
+    stepsAndUnits = JSON.parse(stepsAndUnits);
+    let serviceStep = stepsAndUnits.find(item => item.hours);
     const stepName = serviceStep.step;
     serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step, hours, size } = serviceStep;

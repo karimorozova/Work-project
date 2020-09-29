@@ -9,17 +9,16 @@ const ObjectId = require('mongodb').ObjectID;
 
 async function updateProjectMetrics({ projectId }) {
 	try {
-		const project = await getProject({ "_id": projectId });
-		let { steps, tasks, customer, industry } = project;
-		let isMetricsExist = true;
-		const task = tasks[tasks.length - 1];
-		let { stepsAndUnits } = task;
-		const stepUnitType = getStepUnitsType(stepsAndUnits);
-		let isIncludesWordCount = isIncludesWordcount(stepUnitType, stepsAndUnits);
-		if (!!isIncludesWordCount && task.status === "Created") {
-			const analysis = await getProjectAnalysis(task.memoqProjectId);
-			const { AnalysisResultForLang } = analysis;
-			if (analysis && AnalysisResultForLang) {
+    const project = await getProject({ "_id": projectId });
+    let { steps, tasks, customer, industry } = project;
+    let isMetricsExist = true;
+    const task = tasks[tasks.length - 1];
+    const stepsAndUnits = JSON.parse(task.stepsAndUnits);
+    const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
+    if (!!isIncludesWordCount && task.status === "Created") {
+      const analysis = await getProjectAnalysis(task.memoqProjectId);
+      const { AnalysisResultForLang } = analysis;
+      if (analysis && AnalysisResultForLang) {
         const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
         task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
         let newSteps = await getTaskSteps(task, industry, customer);
@@ -188,34 +187,6 @@ function setStepsProgress(symbol, docs) {
 	}
 	return { ...stepProgress, ...totalProgress };
 }
-
-const getStepUnitsType = (stepUnits) => {
-	const isObject = stepUnits.unit;
-	if (isObject) {
-		return 'object';
-	} else if (Array.isArray(stepUnits)) {
-		return 'array';
-	} else {
-		return 'json';
-	}
-};
-
-const isIncludesWordcount = (type, stepsAndUnits) => {
-	let isIncludesWordCount;
-	switch (type) {
-		default:
-		case 'object':
-			isIncludesWordCount = stepsAndUnits.unit === 'CAT Wordcount';
-			break;
-		case 'array':
-			isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
-			break;
-		case 'json':
-			stepsAndUnits = JSON.parse(stepsAndUnits);
-			isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
-	}
-	return isIncludesWordCount;
-};
 
 const getWordcountStepQuantity = (type, metrics, stepAndUnit) => {
 	let quantity = metrics.totalWords;

@@ -50,8 +50,7 @@ async function getTasksForPackages (tasksInfo, common = false) {
       targetLanguage: targets[i].symbol,
       refFiles: taskRefFiles,
       service,
-      stepsAndUnits:
-        stepsAndUnits.length === 1 ? stepsAndUnits[0] : stepsAndUnits,
+      stepsAndUnits,
       languageForm: service.languageForm,
       projectId,
       start: common ? stepsDates[0].start : stepsDates[0].start,
@@ -111,12 +110,8 @@ async function getStepsForMonoStepPackages ({ tasks, stepsDates, industry, custo
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
     let { stepsAndUnits, sourceLanguage, targetLanguage } = task;
-    const isObject = typeof stepsAndUnits === "object";
-    const isArray = Array.isArray(stepsAndUnits);
-    if (!isArray && !isObject) stepsAndUnits = JSON.parse(stepsAndUnits);
-    let serviceStep = isArray
-      ? stepsAndUnits.find(item => item.unit === "Packages")
-      : stepsAndUnits;
+    stepsAndUnits = JSON.parse(stepsAndUnits);
+    let serviceStep = stepsAndUnits.find(item => item.unit === "Packages");
     const stepName = serviceStep.step;
     serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step, size, quantity } = serviceStep;
