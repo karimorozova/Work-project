@@ -144,7 +144,6 @@ export default {
                     try {
                         const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${this.currentProject.projectManager._id}`);
                         const { creatorUserId } = memoqCreatorUser.data;
-
                         if(!creatorUserId) throw new Error("No such user in memoq");
                         tasksData.append('creatorUserId', creatorUserId);
                         this.isInfo = true;
@@ -182,18 +181,6 @@ export default {
                 this.isInfo = false;
             }
         },
-        // appendHoursStepsInfo(dataForTasks) {
-        //         const steps = [...dataForTasks.service.steps];
-        //         const length = +dataForTasks.workflow.name.split(" ")[0];
-        //         for(let i = 0; i < length; i++) {
-
-      //             if(!dataForTasks[`${steps[i].step.symbol}-quantity`]
-      //              || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
-        //                 this.errors.push("Please, set Hours and Quantity for all service steps.");
-        //                 return;
-        //             }
-        //         }
-        // },
         getMetrics() {
             this.$emit("getMetrics");
         },

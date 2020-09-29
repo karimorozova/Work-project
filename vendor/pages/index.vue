@@ -196,8 +196,6 @@ export default {
   &__photo {
     border-radius: 50%;
     background-color: white;
-    padding-bottom: 1px;
-    padding-right: 1px;
     width: 35px;
     height: 35px;
     object-fit: cover;

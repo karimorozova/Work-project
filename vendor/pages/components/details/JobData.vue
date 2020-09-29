@@ -42,7 +42,7 @@
 			}
 		},
 		filters: {
-			stepStatusFilter: (status) => status === "Started" ? "In progress" : status === "Waiting to Start" ? "Ready to Start" : "Ready to Start"
+			stepStatusFilter: (status) => status === "Started" ? "In progress" : status === "Waiting to Start" ? "Ready to Start" : status
 		},
 		components: {
 			LabelValue,
