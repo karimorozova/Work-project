@@ -93,11 +93,11 @@ const createMemoqUser = async ({ firstName, surname, email }) => {
   }
 };
 
-const deleteMemoqUser = async (vendorGuid) => {
+const deleteMemoqUser = async (guid) => {
   const xml = `${xmlHeader}
     <soapenv:Body>
       <ns:DeleteUser>
-         <ns:userGuid>${vendorGuid}</ns:userGuid>
+         <ns:userGuid>${guid}</ns:userGuid>
       </ns:DeleteUser>
    </soapenv:Body>
 </soapenv:Envelope>`;
