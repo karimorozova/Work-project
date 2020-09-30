@@ -80,7 +80,6 @@ async function getStepsForMonoUnits (allInfo, common = false) {
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
     let { stepsAndUnits, sourceLanguage, targetLanguage } = task;
-    stepsAndUnits = JSON.parse(stepsAndUnits);
     let serviceStep = stepsAndUnits.find(item => item.hours);
     const stepName = serviceStep.step;
     serviceStep = await gatherServiceStepInfo(serviceStep);
