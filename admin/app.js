@@ -15,17 +15,19 @@ let logger = require('morgan');
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
-const { getMemoqUsers } = require('./services/memoqs/users');
-const { getProjectUsers } = require('./services/memoqs/projects');
+const checkCollections = require("./helpers/dbSetDefault");
 
-const foo = async () => {
-  // const users = await getProjectUsers('');
-  // console.log(users);
-  const users = await getMemoqUsers();
-  const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com');
-  console.log(needed);
-  // const needed = users.find(user => user.email === 'testqa1805@gmail.com');
-};
+// const { getMemoqUsers } = require('./services/memoqs/users');
+// const { getProjectUsers } = require('./services/memoqs/projects');
+//
+// const foo = async () => {
+//   // const users = await getProjectUsers('');
+//   // console.log(users);
+//   const users = await getMemoqUsers();
+//   const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com');
+//   console.log(needed);
+//   // const needed = users.find(user => user.email === 'testqa1805@gmail.com');
+// };
 
 // foo();
 
