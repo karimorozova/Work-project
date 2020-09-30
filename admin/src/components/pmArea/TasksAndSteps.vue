@@ -119,7 +119,6 @@ export default {
           tasksData.append('packageSize', dataForTasks.packageSize);
           tasksData.append('quantity', dataForTasks.quantity);
           tasksData.append('projectManager', this.currentProject.projectManager._id);
-          tasksData.append('accountManager', this.currentProject.accountManager._id);
           return tasksData;
         },
         async addTasks(dataForTasks) {

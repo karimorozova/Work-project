@@ -511,13 +511,11 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
     : new Error("Can't set one or all users in memoQ");
 };
 
-const assignProjectManagers = async ({ managerIds, memoqProjectId }) => {
+const assignProjectManagers = async ({ manager, memoqProjectId }) => {
   const users = await getMemoqUsers();
   const projectManagers = [];
-  for (let managerId of managerIds) {
-    const manager = await User.findOne({ _id: managerId });
-    projectManagers.push(await checkAndCreateManager(users, manager));
-  }
+  const pm = await User.findOne({ _id: manager });
+  projectManagers.push(await checkAndCreateManager(users, pm));
   await setMemoqProjectUsers(memoqProjectId, projectManagers);
 };
 
@@ -526,7 +524,7 @@ const checkAndCreateManager = async (memoqUsers, manager) => {
   if (memoqManager) {
     return {
       id: memoqManager.id,
-      isPm: manager.position === 'Project Manager'
+      isPm: true
     };
   } else {
     const guid = await createMemoqUser({
@@ -534,10 +532,9 @@ const checkAndCreateManager = async (memoqUsers, manager) => {
       email: manager.email,
       surname: manager.lastName
     });
-    const { id } = await getMemoqUser(guid);
     return {
-      id,
-      isPm: manager.position === 'Project Manager',
+      id: guid,
+      isPm: true,
     };
   }
 };

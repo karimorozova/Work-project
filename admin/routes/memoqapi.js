@@ -82,7 +82,7 @@ router.post('/memoq-project', upload.fields([{name: 'sourceFiles'}, {name: 'refF
       tasksInfo.referenceFiles = refFiles ? await storeFiles(refFiles, tasksInfo.projectId) : [];
       tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
       await assignProjectManagers({
-        managerIds: [tasksInfo.projectManager, tasksInfo.accountManager],
+        manager: tasksInfo.projectManager,
         memoqProjectId: tasksInfo.memoqProjectId
       });
       res.send({ tasksInfo });
