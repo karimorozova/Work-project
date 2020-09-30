@@ -106,8 +106,7 @@ async function getProjectWithUpdatedFinance(project) {
 }
 
 async function getTaskSteps(task, industry, customer) {
-	const { sourceLanguage, targetLanguage, metrics, service } = task;
-	const stepsAndUnits = JSON.parse(task.stepsAndUnits);
+	const { sourceLanguage, targetLanguage, metrics, service, stepsAndUnits } = task;
 	const newSteps = [];
 	let counter = 1;
 	for (let i = 0; i < task.stepsDates.length; i++) {
