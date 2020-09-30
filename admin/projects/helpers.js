@@ -3,11 +3,11 @@ const ObjectId = require('mongodb').ObjectID;
 const fs = require("fs");
 
 const gatherServiceStepInfo = async (serviceStep) => {
-  const { _id: stepId } = await Step.findOne({ title: serviceStep.step });
+  const { _id: stepId, title } = await Step.findOne({ title: serviceStep.step });
   const { _id: unitId } = await Units.findOne({ type: serviceStep.unit });
   serviceStep.step = ObjectId(stepId);
   serviceStep.unit = ObjectId(unitId);
-  serviceStep.title = serviceStep.step;
+  serviceStep.title = title;
   return serviceStep;
 };
 
