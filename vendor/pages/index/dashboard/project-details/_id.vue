@@ -8,9 +8,8 @@
           MainInfo
         .details__describe
           OtherInfo
-      .details__files(v-if="originallyUnits")
+      .details__files
         FilesAndButtons(
-          :originallyUnits="originallyUnits"
           :deliverables="targetFiles"
           @showModal="showModal"
           @setDeliverables="setDeliverables"
@@ -42,7 +41,6 @@
 				isApproveModal: false,
 				statuses: ["Quote sent", "Draft", "Requested"],
 				targetFiles: [],
-				originallyUnits: null,
 			}
 		},
 		methods: {
@@ -80,7 +78,8 @@
 						await this.getJobInfo();
 					}
 					if(this.job.status !== "Started") return;
-					const isCatTool = this.job.serviceStep.calculationUnit === 'Words';
+					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
+					const isCatTool = type === 'CAT Wordcount';
 					await this.$axios.post('/pm-manage/update-progress', { projectId: this.job.project_Id, isCatTool });
 					await this.getJobs();
 					this.setCurrentJob();
@@ -101,18 +100,12 @@
 				} catch (err) {
 				}
 			},
-			async getOriginallyUnits() {
-				try {
-					const result = await this.$axios.get("/api/units");
-					this.originallyUnits = result.data;
-				} catch (err) {
-				}
-			},
 		},
 		computed: {
 			...mapGetters({
 				job: "getSelectedJob",
-				allJobs: "getAllJobs"
+				allJobs: "getAllJobs",
+				originallyUnits: "getOriginallyUnits",
 			}),
 			buttonValue() {
 				return "Start"
@@ -147,9 +140,6 @@
 		mounted() {
 			this.refreshProgress();
 		},
-		async created() {
-			await this.getOriginallyUnits()
-		}
 	}
 </script>
 

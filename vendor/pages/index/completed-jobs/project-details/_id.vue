@@ -46,7 +46,7 @@ export default {
     computed: {
         ...mapGetters({
             job: "getSelectedJob",
-            allJobs: "getAllJobs"
+            allJobs: "getAllJobs",
         })
     },
     components: {

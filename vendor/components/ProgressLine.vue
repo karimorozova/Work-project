@@ -24,7 +24,6 @@ export default {
     border: 1px solid $brown-border;
     position: relative;
     box-sizing: border-box;
-    padding: 1px;
     &__tooltip {
         position: absolute;
         width: 100%;

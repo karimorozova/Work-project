@@ -24,7 +24,7 @@
         template(slot="category" slot-scope="{ row, index }")
           span.job-files__data {{ row.category }}
         template(slot="progress" slot-scope="{ row, index }")
-          .job-files__progress(v-if="row.category === 'Source file'")
+          .job-files__progress(v-if="row.category === 'Source file' && isTranslation")
             ProgressLine(:progress="getProgress(row)")
         template(slot="source" slot-scope="{ row, index }")
           .job-files_flex-centered
@@ -50,11 +50,11 @@
 				jobFiles: [],
 				fields: [
 					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "35%", padding: 0 },
-					{ label: "Category", headerKey: "headerCategory", key: "category", width: "25%", padding: 0 },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "12%", padding: 0 },
+					{ label: "Category", headerKey: "headerCategory", key: "category", width: "20%", padding: 0 },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "15%", padding: 0 },
 					{ label: "Source", headerKey: "headerSource", key: "source", width: "10%", padding: 0 },
 					{ label: "Target", headerKey: "headerTarget", key: "target", width: "10%", padding: 0 },
-					{ label: "Editor", headerKey: "headerEditor", key: "editor", width: "8%", padding: 0 }
+					{ label: "Editor", headerKey: "headerEditor", key: "editor", width: "10%", padding: 0 }
 				],
 				domain: ""
 			}
@@ -69,14 +69,18 @@
 				return this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
 			},
 			getProgress(file) {
-				return !this.job.memoqProjectId ? +this.job.progress : this.getMemoqFilesProgress(file.fileName);
+        return this.getMemoqFilesProgress(file.fileName)
+        //MAX
+				// return !this.job.memoqProjectId ? +this.job.progress : this.getMemoqFilesProgress(file.fileName);
 			},
 			getMemoqFilesProgress(fileName) {
 				if(this.job.status !== 'Completed'){
 					const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName);
 					const value = (100*this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2)
           return +value
-        }else{
+        }else if(this.job.status === 'Completed'){
+					return 100;
+        } else{
 					this.job.progress;
         }
 			},
@@ -115,7 +119,8 @@
 				link.click();
 			},
 			async downloadTarget(file) {
-				if(this.job.serviceStep.calculationUnit !== 'Words') {
+				const {type} = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
+				if( type !== 'CAT Wordcount') {
 					return this.createLinkAndDownolad(this.job.targetFile.split('./dist')[1]);
 				}
 				this.createLinkAndDownolad(file.target);
@@ -129,14 +134,18 @@
 		},
 		computed: {
 			...mapGetters({
-				job: "getSelectedJob"
+				job: "getSelectedJob",
+				originallyUnits: "getOriginallyUnits"
 			}),
 			isEditor() {
 				if(this.job) {
 					const { status, name } = this.job;
 					return status === "Started" && name === "Translation";
 				}
-			}
+			},
+      isTranslation(){
+				return this.job.name === "Translation";
+      },
 		},
 		components: {
 			DataTable,

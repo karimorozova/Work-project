@@ -64,13 +64,22 @@ export default {
       ],
       isAccountMenu: false,
       accountInfo: false,
-      domain: ""
+      domain: "",
     };
   },
   methods: {
-    mainPageRender() {
+	  ...mapActions(["alertToggle", "setOriginallyUnits", "logout", "getVendorInfo"]),
+
+	  mainPageRender() {
       this.toggleSideBar(true);
     },
+	  async getOriginallyUnits() {
+		  try {
+			  const result = await this.$axios.get("/api/units");
+			  this.setOriginallyUnits(result.data)
+		  } catch (err) {
+		  }
+	  },
     toggleSideBar(isFirstRender) {
       for(let elem of this.navbarList) {
         if(window.location.toString().indexOf(elem.path) !== -1) {
@@ -107,7 +116,6 @@ export default {
       const vendorToken = this.$cookie.get("vendor");
       this.$store.commit("SET_TOKEN", vendorToken);
     },
-    ...mapActions(["alertToggle", "logout", "getVendorInfo"])
   },
   computed: {
     ...mapGetters({
@@ -120,13 +128,15 @@ export default {
       }
     }
   },
-  components: {
+   async created(){
+     await this.getOriginallyUnits();
   },
   mounted() {
     this.domain = process.env.domain;
     this.setToken();
     this.getVendorInfo();
     this.mainPageRender();
+
   },
   updated() {
     this.toggleSideBar(false);

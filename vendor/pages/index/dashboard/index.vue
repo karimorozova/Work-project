@@ -49,7 +49,8 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				getJobs: "getJobs",
-				setJobStatus: "setJobStatus"
+				setJobStatus: "setJobStatus",
+				setOriginallyUnits:"setOriginallyUnits",
 			}),
 			showModal({ index }) {
 				this.currentIndex = index;

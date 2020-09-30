@@ -24,7 +24,7 @@ export default {
         return {
             form: {
                 logemail: "",
-                logpassword: ""
+                logpassword: "",
             },
             isAllFieldsError: false
         };
@@ -57,7 +57,8 @@ export default {
         },
         ...mapActions({
             alertToggle: "alertToggle",
-            login: "login"
+            login: "login",
+	          setOriginallyUnits:"setOriginallyUnits",
         })
     }
 };

@@ -5,11 +5,13 @@
       UploadDeliverable(@setDeliverables="setDeliverables")
     .files-buttons__terms(v-if="job.status !== 'Completed'")
       TermsAgree(v-if="job._id" :job="job")
+
     .files-buttons__buttons(v-if="deliverables.length || (isButton && job.status !== 'Completed')" :class="{'files-buttons_opacity05': !job.isVendorRead}")
       .files-buttons__button(v-if="isStartButton")
         Button(value="Start" :isDisabled="!job.isVendorRead" @makeAction="startJob")
       .files-buttons__button(v-if="isCompleteButton")
         Button(value="Complete" @makeAction="showModal")
+
     .files-buttons__icons(v-if="areIcons && job.status !== 'Completed'")
       .files-buttons__icon(v-for="(icon, key) in icons")
         img.files-buttons__image(:src="icon.icon" @click="makeAction(key)")
@@ -35,9 +37,6 @@
         type: Array,
         default: () => []
       },
-      originallyUnits: {
-        type: Array,
-      }
     },
     methods: {
       ...mapActions([
@@ -116,6 +115,7 @@
 				allJobs: "getAllJobs",
 				getToken: "getToken",
 				getVendor: "getVendor",
+	      originallyUnits: "getOriginallyUnits",
 			}),
 			isStartButton() {
 				return this.job.status === "Accepted" || this.job.status === "Ready to Start" || this.job.status === "Waiting to Start";

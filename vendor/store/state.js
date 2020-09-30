@@ -37,6 +37,7 @@ const state = {
   currentRequests: 0,
   alertMessage: "",
   isAlert: false,
-  alertType: "success"
+  alertType: "success",
+  originallyUnits: [],
 };
 export default state
