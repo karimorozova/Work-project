@@ -62,7 +62,9 @@ const getMemoqUser = async (guid) => {
   }
 };
 
-const createMemoqUser = async ({ firstName, surname, email }) => {
+const createMemoqUser = async ({ firstName, surname, email }, isTranslator = false) => {
+  // const userGuid = isTranslator ? '00000000-0000-0000-0000-000000000003' : '00000000-0000-0000-0000-000000000002'
+
   const xml = `${xmlHeader}
      <soapenv:Body>
       <ns:CreateUser>
@@ -71,7 +73,7 @@ const createMemoqUser = async ({ firstName, surname, email }) => {
             <ns:FullName>${firstName} ${surname}</ns:FullName>
             <ns:LTFullName>${firstName} ${surname}</ns:LTFullName>
             <ns:LTUsername>${email}</ns:LTUsername>
-            <ns:Password>secret</ns:Password>
+            <ns:Password>0CD1F57DA9F66809BC7614C50EA10EB94AAE480F</ns:Password>
             <ns:UserName>${email}</ns:UserName>
          </ns:userInfo>
       </ns:CreateUser>
