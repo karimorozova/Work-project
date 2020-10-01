@@ -1,6 +1,6 @@
 <template lang="pug">
     .project-details
-        TitleInput(title="PROJECT DETAILS" :isAsterisk="true")
+        TitleInput(title="Project Details" :isAsterisk="true")
             .project-details__files
                 .project-details__item
                     UploadFileButton(label="Files" buttonTitle="Upload File(s)" @uploadedFile="setDetailFiles" inputName="detailFiles")
@@ -106,7 +106,7 @@ export default {
     &__files {
         display: flex;
         justify-content: space-between;
-        margin-top: 30px;
+        margin-top: 10px;
         margin-left: 12px;
         box-sizing: border-box;
     }

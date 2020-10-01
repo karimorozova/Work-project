@@ -1,114 +1,106 @@
 <template lang="pug">
-    .languages
-        TitleInput(title="SELECT LANGUAGES" :isAsterisk="true")
-            .languages__menus
-                .languages__source
-                    .languages__label Source Language
-                    .languages__drop-menu
-                        SingleLangsMenu(:languages="sourceLangs" :selectedLang="selectedSource" @selectLanguage="setSource")
-                .languages__target
-                    .languages__label Target Language(s)
-                    .languages__drop-menu
-                        MultiLangsMenu(:languages="targetLangs" :selectedLangs="selectedTargets" @selectLanguage="setTargets")
+  .languages
+    TitleInput(title="Selected Languages" :isAsterisk="true")
+      .languages__menus
+        .languages__source
+          .languages__label Source Language
+          .languages__drop-menu
+            SingleLangsMenu(:languages="sourceLangs" :selectedLang="selectedSource" @selectLanguage="setSource")
+        .languages__target
+          .languages__label Target Language(s)
+          .languages__drop-menu
+            MultiLangsMenu(:languages="targetLangs" :selectedLangs="selectedTargets" @selectLanguage="setTargets")
 </template>
 
 <script>
-import TitleInput from "../TitleInput";
-import SingleLangsMenu from "../SingleLangsMenu";
-import MultiLangsMenu from "../MultiLangsMenu";
-import { mapGetters, mapActions } from "vuex";
+  import TitleInput from "../TitleInput";
+  import SingleLangsMenu from "../SingleLangsMenu";
+  import MultiLangsMenu from "../MultiLangsMenu";
+  import { mapGetters, mapActions } from "vuex";
 
-export default {
-    data() {
-        return {
-            selectedTargets: []
-        }
+  export default {
+    props: {
+      clientInfo: {
+        type: Object
+      }
+    },
+    data () {
+      return {
+        selectedTargets: []
+      };
     },
     methods: {
-        ...mapActions({
-            setOrderDetail: "setOrderDetail"
-        }),
-        setSource({ language }) {
-            this.setOrderDetail({prop: 'source', value: language});
-        },
-        setTargets({ language }) {
-            const position = this.targets.indexOf(language.symbol);
-            if(position !== -1) {
-                this.selectedTargets.splice(position, 1);
-            } else {
-                this.selectedTargets.push(language);
-            }
-            this.setOrderDetail({prop: 'targets', value: this.selectedTargets});
+      ...mapActions({
+        setOrderDetail: "setOrderDetail"
+      }),
+      setSource ({ language }) {
+        this.setOrderDetail({ prop: 'source', value: language });
+      },
+      setTargets ({ language }) {
+        const position = this.targets.indexOf(language.symbol);
+        if (position !== -1) {
+          this.selectedTargets.splice(position, 1);
+        } else {
+          this.selectedTargets.push(language);
         }
+        this.setOrderDetail({ prop: 'targets', value: this.selectedTargets });
+      }
     },
     computed: {
-        ...mapGetters({
-            clientLanguages: "getCombinations",
-            orderDetails: "getOrderDetails"
-        }),
-        sourceLangs() {
-            if(this.clientLanguages.wordsRates) {
-                return this.clientLanguages.wordsRates.map(item => item.source)
-                    .filter((item, index, arr) => {
-                        return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
-                    });
-            }
-            return [];
-        },
-        targetLangs() {
-            if(this.clientLanguages.wordsRates) {
-                let result = this.clientLanguages.wordsRates.filter(item => this.selectedSource.lang !== 'Select' && item.source.lang === this.selectedSource.lang);
-                result = result.map(item => item.target)
-                    .filter((item, index, arr) => {
-                        return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
-                    });
-                return result.sort((a, b) => {
-                    if(a.lang > b.lang) return 1;
-                    if(a.lang < b.lang) return -1;
-                });
-            }
-            return [];
-        },
-        targets() {
-            let result = [];
-            if(this.orderDetails.targets && this.orderDetails.targets.length) {
-                result = this.selectedTargets.map(item => item.symbol)
-            }
-            return result;
-        },
-        selectedSource() {
-            return this.orderDetails.source || {lang: 'Select'};
+      ...mapGetters({
+        clientLanguages: "getCombinations",
+        orderDetails: "getOrderDetails"
+      }),
+      sourceLangs () {
+        return this.clientInfo.sourceLanguages;
+      },
+      targetLangs () {
+        return this.clientInfo.targetLanguages;
+      },
+      targets () {
+        let result = [];
+        if (this.orderDetails.targets && this.orderDetails.targets.length) {
+          result = this.selectedTargets.map(item => item.symbol);
         }
+        return result;
+      },
+      selectedSource () {
+        return this.orderDetails.source || { lang: 'Select' };
+      }
     },
     components: {
-        TitleInput,
-        SingleLangsMenu,
-        MultiLangsMenu
+      TitleInput,
+      SingleLangsMenu,
+      MultiLangsMenu
     }
-}
+  };
 </script>
 
 <style lang="scss" scoped>
 
-.languages {
+  .languages {
     width: 100%;
+
     &__label {
-        margin-bottom: 5px;
-        font-size: 12px;
+      margin-bottom: 5px;
+      font-size: 12px;
     }
+
     &__menus {
-        display: flex;
-        justify-content: space-between;
-        padding-left: 12px;
-        margin-top: 10px;
-        box-sizing: border-box;
+      display: flex;
+      justify-content: space-between;
+      padding-left: 12px;
+      margin-top: 10px;
+      box-sizing: border-box;
     }
+
     &__source, &__target {
-        width: 45%;
+      width: 45%;
     }
+
     &__drop-menu {
-        position: relative;
+      position: relative;
     }
-}
+  }
 
 </style>

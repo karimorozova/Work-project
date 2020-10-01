@@ -1,7 +1,7 @@
 <template lang="pug">
-    .copywriting    
+    .copywriting
         FormWrapper
-            RequestForm(:service="service" @checkErrors="checkErrors")
+            RequestForm(:service="service" @checkErrors="checkErrors" :clientInfo="clientInfo")
         OrderInfo(
             :service="service.title"
             :isDuo="false"
@@ -66,7 +66,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            orderDetails: "getOrderDetails"
+            orderDetails: "getOrderDetails",
+            clientInfo: "getClientInfo"
         })
     },
     components: {
@@ -89,7 +90,6 @@ export default {
 .copywriting {
     width: 100%;
     display: flex;
-    justify-content: center;
     align-items: flex-start;
 }
 

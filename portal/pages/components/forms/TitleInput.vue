@@ -39,10 +39,10 @@ export default {
     }
 }
 
-.project-number, .industries-drop {
-    .pair-block__title {
-        font-size: 12px;
-    }
-}
+/*.project-number, .industries-drop {*/
+/*    .pair-block__title {*/
+/*        font-size: 22px;*/
+/*    }*/
+/*}*/
 
 </style>

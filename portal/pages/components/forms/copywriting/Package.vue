@@ -34,13 +34,16 @@ export default {
         },
         async getPackages() {
             try {
-                const result = await this.$axios.get('/api/packages');
-                this.packageSizes = result.data.map(item => {
-                    item.isChecked = false;
-                    return item;
-                });
-                this.packageSizes[0].isChecked = true;
-                this.setOrderDetail({prop: "packageSize", value: this.packageSizes[0]})
+              // MAX, do we need this now?
+                const result = await this.$axios.get('/api/units');
+                const packages = result.data.find(item => item.type === 'Packages');
+                // this.packageSizes
+                // this.packageSizes = result.data.map(item => {
+                //     item.isChecked = false;
+                //     return item;
+                // });
+                // this.packageSizes[0].isChecked = true;
+                // this.setOrderDetail({prop: "packageSize", value: this.packageSizes[0]})
             } catch(err) {
 
             }

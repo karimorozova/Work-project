@@ -1,6 +1,6 @@
 <template lang="pug">
     .translation
-        RequestForm(@checkErrors="checkErrors")
+        RequestForm(:service="service" @checkErrors="checkErrors" :clientInfo="clientInfo")
         ValidationErrors(v-if="areErrors" :isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
 </template>
 
@@ -12,6 +12,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
+            requestService: "tr",
+            service: {title: "Select"},
             areErrors: false,
             errors: []
         }
@@ -19,6 +21,7 @@ export default {
     methods: {
         ...mapActions({
             submitForm: "createWordsRequest",
+            setOrderDetail: "setOrderDetails",
         }),
         closeErrors() {
             this.areErrors = false;
@@ -40,17 +43,30 @@ export default {
             } catch(err) {
 
             }
+        },
+      async setService() {
+        try {
+          const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
+          this.service = serv.data;
+          this.setOrderDetail({prop: 'service', value: this.service._id});
+        } catch(err) {
+
         }
+      }
     },
     computed: {
         ...mapGetters({
-            orderDetails: "getOrderDetails"
+            orderDetails: "getOrderDetails",
+            clientInfo: "getClientInfo"
         })
     },
     components: {
         RequestForm,
         ValidationErrors
-    }    
+    },
+  created() {
+    this.setService();
+  }
 }
 </script>
 

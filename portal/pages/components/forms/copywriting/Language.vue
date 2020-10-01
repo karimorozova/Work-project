@@ -3,7 +3,7 @@
         TitleInput(title="SELECT LANGUAGE:" :isAsterisk="true")
             .drop-menu
                 SingleLangsMenu(
-                    :languages="targetLangs" 
+                    :languages="languages"
                     :selectedLang="selectedTarget"
                     @selectLanguage="selectLanguage"
                     )
@@ -15,6 +15,11 @@ import SingleLangsMenu from "../SingleLangsMenu";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+    props: {
+      languages: {
+        type: Array
+      }
+    },
     data() {
         return {
             selectedTarget: {lang: "Select"},
@@ -34,17 +39,6 @@ export default {
             clientLanguages: "getCombinations",
             orderDetails: "getOrderDetails"
         }),
-        targetLangs() {
-            if(this.clientLanguages.monoRates) {
-                let result = this.clientLanguages.monoRates;
-                result = result.map(item => item.target)
-                    .filter((item, index, arr) => {
-                        return arr.map(lang => lang.symbol).indexOf(item.symbol) === index;
-                    });
-                return result;
-            }
-            return [];
-        },
         targets() {
             let result = [];
             if(this.orderDetails.targets && this.orderDetails.targets.length) {

@@ -1,12 +1,12 @@
 <template lang="pug">
     .project-deadline
-        TitleInput(title="SUGGESTED DEADLINE:" :isAsterisk="true")
+        TitleInput(title="Suggested Deadline:" :isAsterisk="true")
             .project-deadline__date(v-click-outside="closePicker")
                 input.project-deadline__input(type="text" placeholder="dd-mm-yyyy" readonly :value="formattedDeadline")
                 img.project-deadline__icon(src="../../../assets/images/calendar.png" @click="togglePicker")
                 .project-deadline__picker
-                    Datepicker(v-if="isPickerOpened" 
-                        :inline="true" 
+                    Datepicker(v-if="isPickerOpened"
+                        :inline="true"
                         :monday-first="true"
                         :highlighted="highlighted"
                         :disabled="disabled"
@@ -56,7 +56,7 @@ export default {
         formattedDeadline() {
             return this.orderDetails.deadline ? moment(this.orderDetails.deadline).format("DD-MM-YYYY") : "";
         }
-    }, 
+    },
     components: {
         TitleInput,
         Datepicker
@@ -74,7 +74,7 @@ export default {
     &__input {
         box-sizing: border-box;
         height: 30px;
-        width: 90%;
+        width: 100%;
         padding: 0 5px;
         outline: none;
         border: 1px solid $main-color;
@@ -83,7 +83,6 @@ export default {
         margin-top: 5px;
         display: flex;
         justify-content: flex-end;
-        text-align: center;
         &::-webkit-input-placeholder {
             opacity: 0.6;
         }
@@ -97,7 +96,7 @@ export default {
     }
     &__icon {
         position: absolute;
-        right: -5px;
+        right: 8px;
         top: 5px;
         width: 20px;
         cursor: pointer;

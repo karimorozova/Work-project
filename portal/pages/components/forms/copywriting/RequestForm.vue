@@ -8,7 +8,7 @@
                     Deadline
             .form__block
                 .form__item
-                    Language
+                    Language(:languages="clientInfo.targetLanguages")
             .form__block
                 .form__item
                     Package
@@ -58,12 +58,19 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        service: {type: Object},
-        isMarketing: {type: Boolean}
+        service: {
+          type: Object
+        },
+        isMarketing: {
+          type: Boolean
+        },
+        clientInfo: {
+          type: Object,
+        }
     },
     methods: {
         ...mapActions([
-            "setOrderDetail"            
+            "setOrderDetail"
         ]),
         setQuoteDecision({value}) {
             this.setOrderDetail({prop: 'quoteDecision', value});

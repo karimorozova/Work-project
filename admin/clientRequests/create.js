@@ -12,10 +12,10 @@ async function createRequest(request) {
         const nextNumber = (todaysRequests.length < 10) ? '[0' + (todaysRequests.length + 1) + ']': '[' + (todaysRequests.length + 1) + ']';
         const requestId = moment(new Date()).format("YYYY MM DD") + ' ' + nextNumber;
         const requestData = {...request, requestId};
-        if(request.unit === 'Words') {
+        if(request.serviceTitle === 'Translation') {
             return await createWordsRequest({...requestData})
         }
-        if(request.unit === 'Packages') {
+        else {
             return await createPackagesRequest({...requestData});
         }
     } catch(err) {
@@ -44,7 +44,7 @@ async function createPackagesRequest(request) {
         const tones = request.tones ? JSON.parse(request.tones) : "";
         const designs = request.designs ? JSON.parse(request.designs) : "";
         const seo = getSeo(request);
-        const newRequest = await ClientRequest.create({...request, 
+        const newRequest = await ClientRequest.create({...request,
             packageSize, targetLanguages, genBrief, tones, designs, seo
         });
         return await getClientRequest({"_id": newRequest.id});

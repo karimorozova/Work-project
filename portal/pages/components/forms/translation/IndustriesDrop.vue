@@ -7,7 +7,7 @@
                     :options="industries"
                     customClass="translation-form"
                     @chooseOption="setIndustry"
-                )    
+                )
 </template>
 
 <script>

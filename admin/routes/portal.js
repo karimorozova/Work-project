@@ -76,7 +76,7 @@ router.post("/reset-pass", async (req, res) => {
     try {
         const client = await Clients.findOne({"contacts.email": email});
         if(!client) {
-            return res.status(400).send("No such user"); 
+            return res.status(400).send("No such user");
         }
         await setClientsContactNewPassword(client, email);
         res.send("new password sent");

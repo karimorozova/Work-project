@@ -93,7 +93,7 @@ export default {
         sourceLanguages() {
             let result = this.allLangsWithDialects;
             if(this.requestDetails.service) {
-                result = this.selLangsForService('source');   
+                result = this.selLangsForService('source');
             }
             return result;
         },

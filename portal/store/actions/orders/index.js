@@ -12,16 +12,6 @@ export const setOrderNestedDetail = ({commit}, payload) => {
     commit('SET_NESTED_DETAIL', payload);
 }
 
-export const setDefaultSource = async function ({commit}, payload) {
-    try {
-        const english = await this.$axios.get(`/portal/default-source?ratesProp=${payload.ratesProp}`);
-        const source = english.data.source || {lang: 'Select'};
-        commit('SET_DETAIL', {prop: 'source', value: source});
-    } catch(err) {
-        dispatch('alertToggle', {message: err.message, isShow: true, type: "error"});
-    }
-}
-
 export const removeFile = ({commit}, payload) => {
     commit('REMOVE_FILE', payload);
 }
@@ -37,7 +27,7 @@ export const createWordsRequest = async function ({commit, dispatch, state}, pay
         salesManager: state.clientInfo.salesManager._id,
         status: 'Requested',
         service: payload.service._id,
-        unit: payload.service.calculationUnit
+        serviceTitle: payload.service.title,
     }
     try {
         const details = appendData(orderDetails);
@@ -63,7 +53,7 @@ export const createPackagesRequest = async function ({commit, dispatch, state}, 
         salesManager: state.clientInfo.salesManager._id,
         status: 'Requested',
         service: payload.service._id,
-        unit: payload.service.calculationUnit
+        serviceTitle: payload.service.title
     }
     try {
         const details = appendData(orderDetails);

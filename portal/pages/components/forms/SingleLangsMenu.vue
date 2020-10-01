@@ -2,11 +2,11 @@
     .single-langs(v-click-outside="closeMenu")
         .single-langs__label
         .single-langs__menu
-            .single-langs__select(@click="toggleMenu") 
+            .single-langs__select(@click="toggleMenu")
                 span.single-langs__selected(:class="{'single-langs_opacity-07': this.selectedLang.lang === 'Select'}") {{ selectedLang.lang }}
                 img.single-langs__arrow(src="../../../assets/images/arrow_open.png" :class="{'single-langs_rotate-180': isOpen}")
             .single-langs__drop(v-if="isOpen")
-                .single-langs__item(v-for="language in languages" @click="selectLanguage(language)") 
+                .single-langs__item(v-for="language in languages" @click="selectLanguage(language)")
                     img.single-langs__flag(v-if="language" :src="domain+language.icon")
                     span.single-langs__language(:class="{'single-langs_orange': language.lang === selectedLang.lang}") {{ language.lang }}
 </template>

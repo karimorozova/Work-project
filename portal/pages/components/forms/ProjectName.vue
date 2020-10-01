@@ -1,6 +1,6 @@
 <template lang="pug">
     .project-name
-        TitleInput(title="PROJECT NAME:" :isAsterisk="true")
+        TitleInput(title="Project Name:" :isAsterisk="true")
             input.project-name__input(type="text" placeholder="50 characters maximum" :value="orderDetails.projectName" @input="setProjectName")
 </template>
 
@@ -11,7 +11,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     methods: {
         ...mapActions({
-            setOrderDetail: "setOrderDetail" 
+            setOrderDetail: "setOrderDetail"
         }),
         setProjectName(e) {
             let value = e.target.value;
@@ -32,7 +32,7 @@ export default {
     },
     components: {
         TitleInput
-    }    
+    }
 }
 </script>
 
@@ -49,10 +49,9 @@ export default {
         border: 1px solid $main-color;
         border-radius: 5px;
         font-size: 14px;
-        margin-left: 12px;
         margin-top: 5px;
         &::-webkit-input-placeholder {
-            opacity: 0.6; 
+            opacity: 0.6;
         }
     }
 }

@@ -31,6 +31,7 @@
 import moment from "moment";
 import DataTable from "../Tables/DataTable";
 import tableFields from "~/mixins/tableFields";
+import { mapActions } from "vuex";
 
 export default {
     mixins: [tableFields],
@@ -56,6 +57,9 @@ export default {
         }
     },
     methods: {
+      ...mapActions([
+        "setClientInfo"
+      ]),
         getFormattedDate(date) {
             return moment(date).format("DD-MM-YYYY");
         },
@@ -66,7 +70,8 @@ export default {
         async clientInfo() {
           const token = this.jsess;
           const result = await this.$axios.$get(`/portal/clientinfo?token=${token}`);
-            this.companyName = result.client.name;
+          this.setClientInfo(result.client);
+          this.companyName = result.client.name;
         },
         async download(index) {
             const project = this.projects[index];

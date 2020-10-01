@@ -8,19 +8,19 @@
                     .form__deadline
                         Deadline
                 .form__block
+                    .form__number
+                      ProjectNumber
                     .form__industry
                         IndustriesDrop(
                             :selectedIndustry="selectedIndustry"
                             :industries="industries"
                             @setIndustry="setIndustry"
                         )
-                    .form__number
-                        ProjectNumber
                 .form__block
-                    Languages
+                    Languages(:clientInfo="clientInfo")
                 .form__block
                     ProjectDetails
-                .form__block    
+                .form__block
                     Brief
                 .form__block
                     QuoteDecision(:quoteDecision="quoteDecision" @setQuoteDecision="setQuoteDecision")
@@ -49,19 +49,20 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
     props: {
-        requestService: {type: String, default: "tr"}
+        service: {type: Object},
+        clientInfo: {
+          type: Object
+        }
     },
     data() {
         return {
             selectedIndustry: "",
-            service: {title: "Select"}
         }
     },
     methods: {
         ...mapActions([
             "setOrderDetails",
             "setOrderDetail",
-            "setDefaultSource",
             "alertToggle"
         ]),
         setQuoteDecision({value}) {
@@ -75,29 +76,12 @@ export default {
         checkErrors() {
             this.$emit('checkErrors', {service: this.service});
         },
-        setDefaultIndustry() {
-            if(this.clientIndustries.length === 1) {
-                this.setOrderDetail({prop: 'industry', value: this.clientIndustries[0]._id})
-            }
-        },
-        async setDefaultRequestSource() {
-            try {
-                const serv = await this.$axios.get(`/portal/request-service?symbol=${this.requestService}`);
-                this.service = serv.data;
-                this.setOrderDetail({prop: "service", value: this.service._id});
-                const unit = this.service.calculationUnit ? this.service.calculationUnit.toLowerCase() : "";
-                const ratesProp = unit ? `${unit}Rates` : 'wordsRates'
-                await this.setDefaultSource({ratesProp});
-            } catch(err) { 
-                this.alertToggle({message: "Error on getting service and default source", isShow: true, type: "error"})
-            }
-        }
     },
     computed: {
         ...mapGetters({
             services: "getAllServices",
             orderDetails: "getOrderDetails",
-            clientIndustries: "getClientIndustries"
+            clientIndustries: "getClientIndustries",
         }),
         industries() {
             return this.clientIndustries ? this.clientIndustries.map(item => item.name) : [];
@@ -137,7 +121,6 @@ export default {
     mounted() {
         this.setOrderDetails({});
         this.setOrderDetail({prop: 'quoteDecision', value: 'Send'});
-        this.setDefaultRequestSource();
     }
 }
 </script>
@@ -148,7 +131,6 @@ export default {
 .request-form {
     width: 100%;
     display: flex;
-    justify-content: center;
     align-items: flex-start;
 }
 
@@ -163,14 +145,14 @@ export default {
         }
     }
     &__name {
-        width: 247px;
+        width: 220px;
     }
     &__deadline {
-        width: fit-content;
+        width: 220px;
     }
     &__industry {
         position: relative;
-        width: 247px;
+        width: 220px;
         margin-left: 12px;
         z-index: 20;
     }

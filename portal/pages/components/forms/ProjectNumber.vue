@@ -1,7 +1,12 @@
 <template lang="pug">
     .project-number
         TitleInput(title="Client Project Number:")
-            input.project-number__input(type="text" placeholder="Project ID" :value="orderDetails.clientProjectNumber" @input="setProjectNumber")
+            input.project-number__input(
+              type="text"
+              placeholder="Project ID"
+              :value="orderDetails.clientProjectNumber"
+              @input="setProjectNumber"
+              )
 </template>
 
 <script>
@@ -11,7 +16,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     methods: {
         ...mapActions({
-            setOrderDetail: "setOrderDetail" 
+            setOrderDetail: "setOrderDetail"
         }),
         setProjectNumber(e) {
             const value = e.target.value;
@@ -28,7 +33,7 @@ export default {
     },
     components: {
         TitleInput
-    }    
+    }
 }
 </script>
 
@@ -39,7 +44,7 @@ export default {
     &__input {
         box-sizing: border-box;
         height: 30px;
-        width: 100%;
+        width: 220px;
         padding: 0 5px;
         outline: none;
         border: 1px solid $main-color;
@@ -47,7 +52,7 @@ export default {
         font-size: 14px;
         margin-top: 5px;
         &::-webkit-input-placeholder {
-            opacity: 0.6; 
+            opacity: 0.6;
         }
     }
 }
