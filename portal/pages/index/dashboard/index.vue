@@ -71,7 +71,7 @@ export default {
       let statuses = ['Quote sent', 'Requested'];
       const projects = this.filterByStatus(statuses);
       const result = [...this.requests, ...projects];
-      return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1); 
+      return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1);
     }
   },
   components: {
@@ -84,11 +84,9 @@ export default {
 <style lang="scss" scoped>
 
 .dashboard {
-  padding-top: 80px;
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   &__item {
     width: 1010px;
     display: flex;

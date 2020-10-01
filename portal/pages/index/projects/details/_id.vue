@@ -7,7 +7,7 @@
                 .details__main
                     MainInfo
                 .details__describe
-                    OtherInfo 
+                    OtherInfo
 </template>
 
 <script>
@@ -18,7 +18,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
-            
+
         }
     },
     methods: {
@@ -71,13 +71,10 @@ export default {
     color: $main-color;
     width: 100%;
     box-sizing: border-box;
-    padding: 30px;
     display: flex;
-    justify-content: center;
     align-items: center;
     &__data {
         width: 1020px;
-        margin-top: 10px;
         box-shadow: 0 0 15px $brown-shadow;
         box-sizing: border-box;
     }

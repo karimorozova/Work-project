@@ -217,7 +217,7 @@ export default {
     }
     &__data {
         padding-left: 20px;
-        margin-bottom: 40px; 
+        margin-bottom: 40px;
         width: 100%;
         max-height: 250px;
         display: flex;

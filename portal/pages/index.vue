@@ -5,14 +5,14 @@
         h2.clientsPortal CLIENT PORTAL
       .clientsTop__searchBlock
         .dropdownWrapper(v-click-outside="closeRequestsMenu")
-          .sel_project_block
+          .sel_project_block(@click="showDropdown")
             .sel_project_block__proj
               span New Project
-            .sel_project_block__imgWrapper(@click="showDropdown")
+            .sel_project_block__imgWrapper
               img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
-          .clientsTop__dropdown
-            .additional(v-if="dropdownVisible")
-              .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
+              .clientsTop__dropdown
+                .additional(v-if="dropdownVisible")
+                  .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
         .account-menu(v-click-outside="hideAccountMenu")
           .womanWrapper
             img.womanWrapper__photo(v-if="user.photo" :src="domain+user.photo")
@@ -325,8 +325,8 @@
 
         .sel_project_block {
           margin-right: 150px;
-          width: 239px;
-          width: 33%;
+          /*width: 239px;*/
+          /*width: 33%;*/
           background-color: #D15F45;
           border-radius: 14px;
           width: 100%;
@@ -335,9 +335,9 @@
           align-items: center;
           justify-content: space-between;
           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+          cursor: pointer;
 
           &__proj {
-            border-right: 1px solid #fff;
             line-height: 100%;
             color: #fff;
             width: 80%;
@@ -372,16 +372,15 @@
         .clientsTop__dropdown {
           z-index: -1;
           position: absolute;
-          right: 50px;
-          top: 22px;
+          right: 0;
+          top: 41px;
 
           .additional {
-            padding-top: 10px;
             border: 2px solid #978d7e;
             color: #67573e;
             background-color: #fff;
             font-size: 16px;
-            width: 185px;
+            width: 240px;
 
             &__listItem {
               padding: 15px;
@@ -410,8 +409,6 @@
         &__photo {
           border-radius: 50%;
           background-color: white;
-          padding-bottom: 1px;
-          padding-right: 1px;
           width: 35px;
           height: 35px;
           object-fit: cover;
@@ -419,7 +416,7 @@
 
         .accountMenuWrapper {
           .accountBlock {
-            width: 192px;
+            width: 230px;
             height: 124px;
             background-color: #fff;
             box-shadow: 1px 1px 11px black;
@@ -491,7 +488,7 @@
               align-items: center;
               cursor: pointer;
               .icon_exit {
-                margin-left: 10px;
+                margin-left: 12px;
                 img {
                   height: 32px;
                 }
@@ -500,7 +497,7 @@
               .sign_out {
                 font-size: 12px;
                 color: #67573e;
-                margin-left: 7%;
+                margin-left: 7px;
               }
               &:hover {
                 background-color: #ddd3c8;
@@ -562,7 +559,7 @@
     &__inner {
       width: 100%;
       box-sizing: border-box;
-      padding-left: 40px;
+      padding: 30px;
     }
     .maininfoWrapper {
       width: 100%;

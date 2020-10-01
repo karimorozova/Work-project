@@ -32,12 +32,12 @@ export default {
     data() {
         return {
             requestFilter: {
-                from: new Date(new Date().getFullYear(), 0, 1), 
+                from: new Date(new Date().getFullYear(), 0, 1),
                 to: new Date()
             },
             projectNameFilter: '',
             deadlineFilter: {
-                from: new Date(new Date().getFullYear(), 0, 1), 
+                from: new Date(new Date().getFullYear(), 0, 1),
                 to: new Date(new Date().getFullYear(), new Date().getMonth() + 4, 1)
             },
             projectIdFilter: '',
@@ -108,9 +108,7 @@ export default {
 .all-projects {
     width: 100%;
     display: flex;
-    justify-content: center;
     align-items: flex-start;
-    padding-top: 80px;
     margin: 0 auto;
     &__drop-menu {
         width: 970px;
@@ -124,9 +122,6 @@ export default {
         padding: 0 14px;
         color: #67573e;
         transition: all 0.2s;
-        @media (max-width: 1550px) {
-            margin-left: 58px;
-        }       
     }
     &__drop-select {
         width: 100%;
@@ -147,9 +142,6 @@ export default {
         border-radius: 0;
         border: none;
         margin-bottom: 0;
-        @media (max-width: 1550px) {
-            margin-left: 58px;
-        }
     }
 }
 
