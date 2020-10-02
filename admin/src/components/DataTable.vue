@@ -91,6 +91,9 @@ export default {
     border-top: none;
 
     .table__body-row {
+      .steps-cell{
+        padding: 7px 5px 6px 5px;
+      }
       cursor: pointer;
       &:nth-of-type(odd) {
         .table__tbody-cell {

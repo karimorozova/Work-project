@@ -35,7 +35,7 @@
                     @check="(e) => toggleOptions(e, true)" 
                     @uncheck="(e) => toggleOptions(e, false)")
             .review__forbidden(v-if="isReviewing")            
-            Options(v-if="areOptions"
+            Options(v-if="areOptions && isAllChecked"
                 :isAssign="isAssign"
                 :isDeliver="isDeliver"
                 :isNotify="isNotify"
@@ -332,7 +332,7 @@ export default {
         position: relative;
     }
     &__check-item {
-        margin-bottom: 5px;
+        margin-bottom: 6px;
     }
     &__options {
         align-self: center;

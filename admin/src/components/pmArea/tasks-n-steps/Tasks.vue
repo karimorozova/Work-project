@@ -25,6 +25,7 @@
         :bodyClass="['steps-table-body', {'tbody_visible-overflow': allTasks.length < 10}]"
         :tableheadRowClass="allTasks.length < 10 ? 'tbody_visible-overflow' : ''"
         @onRowClicked="onRowClicked"
+        :bodyCellClass="'steps-cell'"
       )
         template(slot="headerCheck" slot-scope="{ field }")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
@@ -78,7 +79,7 @@
           span.tasks__task-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
         template(slot="delivery" slot-scope="{ row }")
           img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
-          img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review.png" @click="reviewForDelivery(row)")
+          img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
 
     .tasks__approve-action(v-if="isApproveActionShow")
       ApproveModal(
@@ -120,11 +121,11 @@
 				fields: [
 					{ label: "check", headerKey: "headerCheck", key: "check", width: "3%" },
 					{ label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "14%" },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%" },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "10%" },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "9%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%" },
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "14%" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "16%" },
 					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%" },
 					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "8%" },
 					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%" },
@@ -141,6 +142,7 @@
 				isPay: false,
 				reason: "",
 				taskStatuses: [],
+				pickedTask: null,
 			}
 		},
 		methods: {
@@ -173,8 +175,8 @@
 			setAction({ option }) {
 				this.selectedAction = option;
 				if(option === 'Delivery Review [1]' || option === 'Delivery Review [2]') {
-					// this.reviewForDelivery();
-					this.isDeliveryReview = true;
+					console.log(this.pickedTask);
+					this.reviewForDelivery(this.pickedTask);
 				} else {
 					this.setModalTexts(option);
 					this.isApproveActionShow = true;
@@ -225,7 +227,6 @@
 				this.closeApproveModal();
 				this.unCheckAllTasks();
 			},
-
 			async cancelTasks(tasks) {
 				const validStatuses = ["Created", "Started", "Approved"];
 				const filteredTasks = tasks.filter(item => validStatuses.indexOf(item.status) !== -1);
@@ -311,20 +312,36 @@
 				}
 				return Math.round(progress);
 			},
+			pushStatusFoCurrentTask(status) {
+				if(status === 'Pending Approval [DR1]') {
+					this.taskStatuses.push('Delivery Review [1]')
+				} else if(status === 'Pending Approval [DR2]') {
+					this.taskStatuses.push('Delivery Review [2]')
+				}
+			},
+			clearTaskDeliveryStatuses() {
+				this.taskStatuses = this.taskStatuses
+						.filter(item => item !== 'Delivery Review [1]' && item !== 'Delivery Review [2]')
+			},
+			setCurrentTask(index) {
+				index >= 0 ? this.pickedTask = this.allTasks[index] : this.pickedTask = null
+			},
 			toggleCheck(e, index, val) {
 				this.allTasks[index].isChecked = val;
 				this.setProjectProp({ value: this.allTasks, prop: 'tasks' });
-				const count = this.allTasks.filter(i => i.isChecked).length;
 
-				if(count === 1) {
+				const count = this.allTasks.filter(i => i.isChecked).length;
+				const ifOneTask = count === 1
+				ifOneTask ? this.setCurrentTask(this.allTasks.findIndex(i => i.isChecked)) : this.setCurrentTask(-1);
+
+				if(ifOneTask && val) {
 					const { status } = this.allTasks[index];
-					if(status === 'Pending Approval [DR1]') {
-						this.taskStatuses.push('Delivery Review [1]')
-					} else if(status === 'Pending Approval [DR2]') {
-						this.taskStatuses.push('Delivery Review [2]')
-					}
+					this.pushStatusFoCurrentTask(status)
+				} else if(ifOneTask && !val) {
+					const { status } = this.allTasks.filter(item => item.isChecked)[0];
+					this.pushStatusFoCurrentTask(status)
 				} else if(count > 1 || !count) {
-					this.taskStatuses = this.taskStatuses.filter(item => item !== 'Delivery Review [1]' && item !== 'Delivery Review [2]')
+					this.clearTaskDeliveryStatuses();
 				}
 			},
 			toggleAll(e, val) {
@@ -333,6 +350,7 @@
 					return acc;
 				}, []);
 				this.setProjectProp({ value: tasks, prop: 'tasks' });
+				this.clearTaskDeliveryStatuses();
 			},
 			closeApproveModal() {
 				this.isApproveActionShow = false;
@@ -340,6 +358,7 @@
 			},
 			closeReview() {
 				this.isDeliveryReview = false;
+				this.selectedAction = "";
 			},
 			async downloadFiles(task) {
 				try {
@@ -380,7 +399,6 @@
 				user: 'getUser'
 			}),
 			availableActionsOptions() {
-				console.log(this.taskStatuses)
 				return this.taskStatuses
 			},
 			isAllSelected() {

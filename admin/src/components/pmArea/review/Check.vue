@@ -29,7 +29,7 @@ export default {
         font-size: 20px;
         cursor: pointer;
         transition: all 0.4s;
-        margin-right: 5px;
+        margin-right: 8px;
     }
     &_green {
         color: $green-approve;
