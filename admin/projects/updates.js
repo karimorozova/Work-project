@@ -531,26 +531,36 @@ const checkAndCreateManager = async (memoqUsers, manager) => {
 	} else {
 		const guid = await createMemoqUser({
 			firstName: manager.firstName,
-			email: manager.email,
-			surname: manager.lastName
-		});
-		return {
-			id: guid,
-			isPm: true,
-		};
-	}
+      email: manager.email,
+      surname: manager.lastName
+    });
+    return {
+      id: guid,
+      isPm: true,
+    };
+  }
+};
+
+const checkProjectHasMemoqStep = async (projectId) => {
+  let { steps } = await Projects.findOne({ _id: projectId });
+  if (steps.length) {
+    steps = steps.map(step => step.memoqProjectId);
+    return Array.from(new Set(steps.filter(item => !!item)));
+  }
+  return [];
 };
 
 module.exports = {
-	getProjectAfterCancelTasks,
-	updateProjectStatus,
-	setStepsStatus,
-	downloadCompletedFiles,
-	updateProjectProgress,
-	updateWithApprovedTasks,
-	getAfterReopenSteps,
-	updateNonWordsTaskTargetFiles,
-	updateOtherProject,
-	assignMemoqTranslator,
-	assignProjectManagers
+  getProjectAfterCancelTasks,
+  updateProjectStatus,
+  setStepsStatus,
+  downloadCompletedFiles,
+  updateProjectProgress,
+  updateWithApprovedTasks,
+  getAfterReopenSteps,
+  updateNonWordsTaskTargetFiles,
+  updateOtherProject,
+  assignMemoqTranslator,
+  assignProjectManagers,
+  checkProjectHasMemoqStep
 };

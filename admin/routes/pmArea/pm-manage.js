@@ -8,7 +8,7 @@ const {
   getProject, createProject, createTasks, createTasksForWordcount, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
   manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
   getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
-  getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate
+  getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate, checkProjectHasMemoqStep, assignProjectManagers
 } = require("../../projects");
 const {
   upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact,
@@ -766,6 +766,14 @@ router.post("/request-value", async (req, res) => {
 router.post("/project-value", async (req, res) => {
   const { id, prop, value } = req.body;
   try {
+    if (prop === 'projectManager') {
+      const memoqSteps = await checkProjectHasMemoqStep(id);
+      if (memoqSteps.length) {
+        for (let memoqProjectId of memoqSteps) {
+          await assignProjectManagers({ manager: value._id, memoqProjectId });
+        }
+      }
+    }
     const updatedProject = await updateProject({ "_id": id }, { [prop]: value });
     res.send(updatedProject);
   } catch (err) {
