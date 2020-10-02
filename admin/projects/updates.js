@@ -487,14 +487,16 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	const { memoqProjectId } = neededStep;
 	let projectUsers = [];
 	const currentProjectUsers = await getProjectUsers(memoqProjectId);
-	for (let userInfo of currentProjectUsers) {
-		const { ProjectRoles, User } = userInfo;
-		const { UserGuid } = User;
-		const isPm = ProjectRoles['a:ProjectManager'] === 'true';
-		projectUsers.push({
-			id: UserGuid,
-			isPm
-		});
+	if(currentProjectUsers.length) {
+		for (let userInfo of currentProjectUsers) {
+			const { ProjectRoles, User } = userInfo;
+			const { UserGuid } = User;
+			const isPm = ProjectRoles['a:ProjectManager'] === 'true';
+			projectUsers.push({
+				id: UserGuid,
+				isPm
+			});
+		}
 	}
 	const memoqUser = users.find(user => user.email === vendor.email);
 	if(memoqUser) projectUsers.push(

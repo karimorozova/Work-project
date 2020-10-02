@@ -47,7 +47,7 @@ export default {
         background-color: $white;
         color: $main-color;
         font-size: 14px;
-        padding: 0 3px;
+        padding: 0 7px;
     }
 }
 

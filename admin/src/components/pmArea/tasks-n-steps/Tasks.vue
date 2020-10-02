@@ -302,15 +302,15 @@
 				if(task.service.title === 'Translation') {
 					const [firstStep, secondStep] = taskSteps;
 					if(taskSteps.length === 2) {
-						progress = ((((+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount) * 100)
-								+ secondStep.progress) / taskSteps.length).toFixed(2)
+            const secondStepProgress = typeof secondStep.progress === "object" ? 0 : secondStep.progress;
+						progress = ((((+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount) * 100) + secondStepProgress) / taskSteps.length)
 					} else {
-						progress = (+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount * 100).toFixed(2)
+						progress = (+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount * 100)
 					}
 				} else {
 					progress = taskSteps.reduce((init, cur) => init + cur.progress / taskSteps.length, 0)
 				}
-				return Math.round(progress);
+				return progress.toFixed(2);
 			},
 			pushStatusFoCurrentTask(status) {
 				if(status === 'Pending Approval [DR1]') {

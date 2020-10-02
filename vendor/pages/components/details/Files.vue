@@ -191,7 +191,7 @@
 
     &__progress {
       @extend %flex;
-      padding: 0 3px;
+      padding: 0 7px;
     }
 
     &__editor {

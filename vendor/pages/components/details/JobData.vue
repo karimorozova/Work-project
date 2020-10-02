@@ -49,7 +49,7 @@
 			}
 		},
 		filters: {
-			stepStatusFilter: (status) => status === "Started" ? "In progress" : status === "Waiting to Start" ? "Ready to Start" : status
+			stepStatusFilter: (status) => status === "Started" ? "In progress" : status
 		},
 		components: {
 			LabelValue,
