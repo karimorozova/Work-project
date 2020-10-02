@@ -114,9 +114,10 @@ import SelectSingle from "../SelectSingle";
 import SelectMulti from "../SelectMulti";
 import SettingsTable from "../Table/SettingsTable";
 import crudIcons from "@/mixins/crudIcons";
+import scrollEnd from "../../mixins/scrollEnd";
 
 export default {
-  mixins: [crudIcons],
+  mixins: [crudIcons, scrollEnd],
   props: {
     vendorIndustries: {
       type: Array,
@@ -399,6 +400,9 @@ export default {
         industry: [],
       });
       this.setEditingData(this.competenciesData.length - 1);
+	    this.$nextTick(() => {
+		    this.scrollToEnd();
+	    });
     },
 
     closeErrors() {

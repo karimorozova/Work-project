@@ -117,9 +117,10 @@ import SelectMulti from "../SelectMulti";
 import SettingsTable from "../Table/SettingsTable";
 import crudIcons from "@/mixins/crudIcons";
 import scrollDrop from "@/mixins/scrollDrop";
+import scrollEnd from "../../mixins/scrollEnd";
 
 export default {
-  mixins: [scrollDrop, crudIcons],
+  mixins: [scrollDrop, crudIcons, scrollEnd],
   props: {
     clientIndustries: {
       type: Array,
@@ -395,6 +396,9 @@ export default {
         industries: [],
       });
       this.setEditingData(this.clientServices.length - 1);
+	    this.$nextTick(() => {
+		    this.scrollToEnd();
+	    });
     },
 
     closeErrors() {
