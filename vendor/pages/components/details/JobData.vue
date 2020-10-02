@@ -26,19 +26,26 @@
 <script>
 	import LabelValue from "../jobs/LabelValue";
 	import Progress from "~/components/Progress";
+	import { mapGetters } from "vuex";
 
 	export default {
 		props: {
 			job: { type: Object }
 		},
 		computed: {
+			...mapGetters({
+        units: "getOriginallyUnits",
+      }),
 			progress() {
 				if(this.job.progress) {
 					return this.job.progress.totalWordCount ? +(this.job.progress.wordsDone / this.job.progress.totalWordCount * 100).toFixed(2) : this.job.progress;
 				}
 			},
 			isWordcount() {
-				return this.job.serviceStep.calculationUnit === "Words";
+				if(this.units){
+				  const { type } = 	this.units.find(i => i._id.toString() === this.job.serviceStep.unit)
+				  return type === "CAT Wordcount";
+        }
 			}
 		},
 		filters: {
