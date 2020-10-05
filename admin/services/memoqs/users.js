@@ -63,8 +63,7 @@ const getMemoqUser = async (guid) => {
 };
 
 const createMemoqUser = async ({ firstName, surname, email }, isTranslator = false) => {
-  const userGuid = isTranslator ? '00000000-0000-0000-0000-000000000003' : '00000000-0000-0000-0000-000000000002'
-
+  const groupGuid = isTranslator ? '00000000-0000-0000-0000-000000000003' : '00000000-0000-0000-0000-000000000002';
   const xml = `${xmlHeader}
      <soapenv:Body>
       <ns:CreateUser>
@@ -80,10 +79,11 @@ const createMemoqUser = async ({ firstName, surname, email }, isTranslator = fal
    </soapenv:Body>
 </soapenv:Envelope>`;
 
+  let result;
   const headers = headerWithoutAction('CreateUser');
   try {
     const { response } = await soapRequest({ url, headers, xml });
-    const result = parser.toJson(response.body, {
+    result = parser.toJson(response.body, {
       object: true,
       sanitize: true,
       trim: true
@@ -92,6 +92,28 @@ const createMemoqUser = async ({ firstName, surname, email }, isTranslator = fal
   } catch (err) {
     console.log(err);
     console.log('Error in createVendorOnMemoq');
+  } finally {
+    await setUserGroup(result.CreateUserResult, groupGuid);
+  }
+};
+
+const setUserGroup = async (userGuid, groupGuid) => {
+  const xml = `${xmlHeader}
+      <soapenv:Body>
+        <ns:SetUsersOfGroup>
+           <ns:groupGuid>${groupGuid}</ns:groupGuid>
+           <ns:userGuids>
+              <arr:guid>${userGuid}</arr:guid>
+           </ns:userGuids>
+        </ns:SetUsersOfGroup>
+      </soapenv:Body>
+   </soapenv:Envelope>`;
+  const headers = headerWithoutAction('SetUsersOfGroup');
+  try {
+    await soapRequest({ url, headers, xml });
+  } catch (err) {
+    console.log(err);
+    console.log('Error in setUserGroup');
   }
 };
 

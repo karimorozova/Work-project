@@ -478,7 +478,7 @@ router.post("/get-message", async (req, res) => {
 router.get("/create-memoq-vendor/:id", async (req, res) => {
   const { id } = req.params;
   const vendor = await Vendors.findOne({ _id: id });
-  const guid = await createMemoqUser(vendor);
+  const guid = await createMemoqUser(vendor, true);
   if (guid) {
     await Vendors.updateOne({ _id: id }, { guid });
     res.status(200).send('Saved');

@@ -121,7 +121,7 @@ router.post("/create-memoq-vendor", checkVendor, async (req, res) => {
   const { token } = req.body;
   const { vendorId } = jwt.verify(token, secretKey);
   const vendor = await Vendors.findOne({ _id: vendorId });
-  const guid = await createMemoqUser(vendor);
+  const guid = await createMemoqUser(vendor, true);
   if (guid) {
     const message = sendMemoqCredentials(vendor);
     const subject = `MemoQ account`;
