@@ -56,7 +56,7 @@
         const vendor = this.getVendor;
         try {
           const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
-          if (this.job.name === "Translation" && type === "CAT Wordcount" && vendor.guid == null) {
+          if (type === "CAT Wordcount" && vendor.guid == null) {
             await this.$axios.post(`/vendor/create-memoq-vendor`, {
               token: this.getToken
             });

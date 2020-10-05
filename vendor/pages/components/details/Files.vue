@@ -24,7 +24,7 @@
         template(slot="category" slot-scope="{ row, index }")
           span.job-files__data {{ row.category }}
         template(slot="progress" slot-scope="{ row, index }")
-          .job-files__progress(v-if="row.category === 'Source file' && isTranslation")
+          .job-files__progress(v-if="row.category === 'Source file' && isCAT")
             ProgressLine(:progress="getProgress(row)")
         template(slot="source" slot-scope="{ row, index }")
           .job-files_flex-centered
@@ -69,20 +69,20 @@
 				return this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
 			},
 			getProgress(file) {
-        return this.getMemoqFilesProgress(file.fileName)
-        //MAX
+				return this.getMemoqFilesProgress(file.fileName)
+				//MAX
 				// return !this.job.memoqProjectId ? +this.job.progress : this.getMemoqFilesProgress(file.fileName);
 			},
 			getMemoqFilesProgress(fileName) {
-				if(this.job.status !== 'Completed'){
+				if(this.job.status !== 'Completed') {
 					const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName);
-					const value = (100*this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2)
-          return +value
-        }else if(this.job.status === 'Completed'){
+					const value = (100 * this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2)
+					return +value
+				} else if(this.job.status === 'Completed') {
 					return 100;
-        } else{
+				} else {
 					this.job.progress;
-        }
+				}
 			},
 			toggleFilesShow() {
 				this.isFilesShown = !this.isFilesShown;
@@ -119,8 +119,8 @@
 				link.click();
 			},
 			async downloadTarget(file) {
-				const {type} = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
-				if( type !== 'CAT Wordcount') {
+				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
+				if(type !== 'CAT Wordcount') {
 					return this.createLinkAndDownolad(this.job.targetFile.split('./dist')[1]);
 				}
 				this.createLinkAndDownolad(file.target);
@@ -130,7 +130,10 @@
 				link.href = this.domain + href;
 				link.target = "_blank";
 				link.click();
-			}
+			},
+			isCATWordcount(unitId) {
+				return this.originallyUnits.find(item => item._id.toString() === unitId).type === 'CAT Wordcount'
+			},
 		},
 		computed: {
 			...mapGetters({
@@ -139,13 +142,13 @@
 			}),
 			isEditor() {
 				if(this.job) {
-					const { status, name } = this.job;
-					return status === "Started" && name === "Translation";
+					const { status, serviceStep } = this.job;
+					return status === "Started" && this.isCATWordcount(serviceStep.unit);
 				}
 			},
-      isTranslation(){
-				return this.job.name === "Translation";
-      },
+			isCAT() {
+				return this.isCATWordcount(this.job.serviceStep.unit);
+			},
 		},
 		components: {
 			DataTable,

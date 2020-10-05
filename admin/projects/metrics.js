@@ -159,10 +159,10 @@ async function getTaskSteps(task, industry, customer) {
     } else {
       Object.assign(step, { totalWords: quantity, quantity });
     }
-    if (step.name !== "Translation") {
-      const { _id } = await Units.findOne({ type: 'Packages' });
-      step.serviceStep.unit = ObjectId(_id);
-    }
+    // if (step.name !== "Translation") {
+    //   const { _id } = await Units.findOne({ type: 'Packages' });
+    //   step.serviceStep.unit = ObjectId(_id);
+    // }
     newSteps.push(step);
     counter++;
   }

@@ -299,10 +299,14 @@
 			progress(task) {
 				let progress = 0;
 				const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
+
 				if(task.service.title === 'Translation') {
 					const [firstStep, secondStep] = taskSteps;
 					if(taskSteps.length === 2) {
-            const secondStepProgress = typeof secondStep.progress === "object" ? 0 : secondStep.progress;
+						const secondStepProgress = typeof secondStep.progress === "object" ?
+								(+secondStep.progress.wordsDone / +secondStep.progress.totalWordCount) * 100 :
+								secondStep.progress;
+
 						progress = ((((+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount) * 100) + secondStepProgress) / taskSteps.length)
 					} else {
 						progress = (+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount * 100)
@@ -310,6 +314,7 @@
 				} else {
 					progress = taskSteps.reduce((init, cur) => init + cur.progress / taskSteps.length, 0)
 				}
+
 				return progress.toFixed(2);
 			},
 			pushStatusFoCurrentTask(status) {

@@ -19,8 +19,8 @@ async function updateProjectProgress(project, isCatTool) {
 	try {
 		for (let task of tasks) {
 			const units = task.stepsAndUnits;
-			for (let { unit, step } of units) {
-				if(unit === 'CAT Wordcount' && step === "Translation" && isCatTool) {
+			for (let { unit } of units) {
+				if(unit === 'CAT Wordcount' && isCatTool) {
 					const docs = await getProjectTranslationDocs(task.memoqProjectId);
 					task.memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === task.memoqTarget) : [docs];
 					steps = updateWordcountStepsProgress({ steps, task });
@@ -480,37 +480,44 @@ async function updateOtherProject(query, update) {
 
 const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	const vendor = await Vendors.findOne({ _id: vendorId });
-	const { steps } = await Projects.findOne({ _id: projectId })
-			.populate('steps.vendor');
+	const { steps } = await Projects.findOne({ _id: projectId }).populate('steps.vendor');
 	const users = await getMemoqUsers();
 	const neededStep = steps.find(step => step.stepId === stepId);
-	const { memoqProjectId } = neededStep;
+	const { memoqProjectId, taskId } = neededStep;
+	const assignedSteps = steps.filter(item => item.taskId === taskId)
 	let projectUsers = [];
 	const currentProjectUsers = await getProjectUsers(memoqProjectId);
-	if(currentProjectUsers.length) {
-		for (let userInfo of currentProjectUsers) {
-			const { ProjectRoles, User } = userInfo;
-			const { UserGuid } = User;
-			const isPm = ProjectRoles['a:ProjectManager'] === 'true';
-			projectUsers.push({
-				id: UserGuid,
-				isPm
-			});
-		}
+	const isArray = Array.isArray(currentProjectUsers);
+
+	if(isArray) {
+		for (let userInfo of currentProjectUsers) assignPM(userInfo);
+	} else {
+		if(currentProjectUsers.hasOwnProperty('User')) assignPM(currentProjectUsers);
 	}
+
 	const memoqUser = users.find(user => user.email === vendor.email);
-	if(memoqUser) projectUsers.push(
-			{
-				id: memoqUser.id,
-				isPm: false
-			}
-	);
+	if(memoqUser) projectUsers.push({
+		id: memoqUser.id,
+		isPm: false
+	});
+
 	const areUsersSet = await setMemoqProjectUsers(
 			memoqProjectId,
 			Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i)))
 	);
-	return areUsersSet ? await assignMemoqTranslators({ memoqProjectId, assignedSteps: [neededStep], users })
+
+	return areUsersSet ? await assignMemoqTranslators({ memoqProjectId, assignedSteps, users })
 			: new Error("Can't set one or all users in memoQ");
+
+	function assignPM(userObject) {
+		const { ProjectRoles, User } = userObject;
+		const { UserGuid } = User;
+		const isPm = ProjectRoles['a:ProjectManager'] === 'true';
+		projectUsers.push({
+			id: UserGuid,
+			isPm
+		});
+	}
 };
 
 const assignProjectManagers = async ({ manager, memoqProjectId }) => {
@@ -531,36 +538,36 @@ const checkAndCreateManager = async (memoqUsers, manager) => {
 	} else {
 		const guid = await createMemoqUser({
 			firstName: manager.firstName,
-      email: manager.email,
-      surname: manager.lastName
-    });
-    return {
-      id: guid,
-      isPm: true,
-    };
-  }
+			email: manager.email,
+			surname: manager.lastName
+		});
+		return {
+			id: guid,
+			isPm: true,
+		};
+	}
 };
 
 const checkProjectHasMemoqStep = async (projectId) => {
-  let { steps } = await Projects.findOne({ _id: projectId });
-  if (steps.length) {
-    steps = steps.map(step => step.memoqProjectId);
-    return Array.from(new Set(steps.filter(item => !!item)));
-  }
-  return [];
+	let { steps } = await Projects.findOne({ _id: projectId });
+	if(steps.length) {
+		steps = steps.map(step => step.memoqProjectId);
+		return Array.from(new Set(steps.filter(item => !!item)));
+	}
+	return [];
 };
 
 module.exports = {
-  getProjectAfterCancelTasks,
-  updateProjectStatus,
-  setStepsStatus,
-  downloadCompletedFiles,
-  updateProjectProgress,
-  updateWithApprovedTasks,
-  getAfterReopenSteps,
-  updateNonWordsTaskTargetFiles,
-  updateOtherProject,
-  assignMemoqTranslator,
-  assignProjectManagers,
-  checkProjectHasMemoqStep
+	getProjectAfterCancelTasks,
+	updateProjectStatus,
+	setStepsStatus,
+	downloadCompletedFiles,
+	updateProjectProgress,
+	updateWithApprovedTasks,
+	getAfterReopenSteps,
+	updateNonWordsTaskTargetFiles,
+	updateOtherProject,
+	assignMemoqTranslator,
+	assignProjectManagers,
+	checkProjectHasMemoqStep
 };
