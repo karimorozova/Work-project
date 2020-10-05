@@ -146,16 +146,18 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
 
 async function assignMemoqTranslators({ memoqProjectId, assignedSteps, users }) {
 	const docsInfo = assignedSteps.reduce((acc, cur) => {
-		const { id } = users.find(item => item.email === cur.vendor.email);
-		for (let docId of cur.memoqDocIds) {
-			acc[docId] = acc[docId] || {};
-			let users = acc[docId].users || [];
-			users.push({
-				deadline: cur.deadline,
-				memoqRole: cur.serviceStep.memoqAssignmentRole,
-				userId: id
-			})
-			acc[docId].users = users;
+		const user = users.find(item => item.email === cur.vendor.email);
+		if(user) {
+			for (let docId of cur.memoqDocIds) {
+				acc[docId] = acc[docId] || {};
+				let users = acc[docId].users || [];
+				users.push({
+					deadline: cur.deadline,
+					memoqRole: cur.serviceStep.memoqAssignmentRole,
+					userId: user.id
+				})
+				acc[docId].users = users;
+			}
 		}
 		return acc;
 	}, {})
