@@ -80,15 +80,25 @@ async function cancelTasks(tasks, project) {
 function cancelSteps({ stepIdentify, steps }) {
 	return steps.map(item => {
 		if(stepIdentify.indexOf(item.stepId) !== -1) {
-			let newStatus = item.status !== 'Completed' ? "Cancelled" : item.status;
-			if(+item.progress.wordsDone > 0 && newStatus !== 'Completed') {
-				newStatus = "Cancelled Halfway";
-				let finance = getStepNewFinance(item);
-				return { ...item._doc, previousStatus: item.status, status: newStatus, finance };
-			}
-			item.previousStatus = item.status;
-			item.status = newStatus;
-		}
+      let newStatus = item.status !== 'Completed' ? "Cancelled" : item.status;
+      if (+item.progress.wordsDone > 0 && newStatus !== 'Completed') {
+        newStatus = "Cancelled Halfway";
+        let finance = getStepNewFinance(item);
+        return { ...item._doc, previousStatus: item.status, status: newStatus, finance };
+      }
+      item.finance = {
+        Wordcount: {
+          receivables: 0,
+          payables: 0
+        },
+        Price: {
+          receivables: 0,
+          payables: 0
+        }
+      };
+      item.previousStatus = item.status;
+      item.status = newStatus;
+    }
 		return item;
 	});
 }
@@ -99,13 +109,24 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
 	try {
 		for (let task of tasks) {
 			if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
-				task.previousStatus = task.status;
-				task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
-				if(task.status === "Cancelled Halfway") {
-					task.previousStatus = task.status;
-					task.finance = getTaskNewFinance(changedSteps, task);
-					task.targetFiles = await getTaskTarfgetFiles({ task, projectId, stepName: 'halfway' });
-				}
+        task.previousStatus = task.status;
+        task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
+        task.previousStatus = task.status;
+        if (task.status === "Cancelled Halfway") {
+          task.finance = getTaskNewFinance(changedSteps, task);
+          task.targetFiles = await getTaskTarfgetFiles({ task, projectId, stepName: 'halfway' });
+        } else {
+          task.finance = {
+            Wordcount: {
+              receivables: 0,
+              payables: 0
+            },
+            Price: {
+              receivables: 0,
+              payables: 0
+            }
+          };
+        }
 			}
 		}
 		return tasks;

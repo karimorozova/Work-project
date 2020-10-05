@@ -5,7 +5,7 @@ async function getProjectAfterFinanceUpdated({project, steps, tasks}) {
         let { finance, isPriceUpdated, status } = project;
         finance.Price = getProjectFinancePrice(tasks);
         const checkStatuses = ["Quote sent", "Approved"];
-        isPriceUpdated = checkStatuses.indexOf(status) !== -1; 
+        isPriceUpdated = checkStatuses.indexOf(status) !== -1;
         return await updateProject({"_id": project.id}, { finance, steps, tasks, isPriceUpdated });
     } catch(err) {
         console.log(err);
@@ -35,8 +35,8 @@ function getUpdatedProjectFinance(tasks) {
     let payables = 0;
     for(let task of tasks) {
         if(task.status !== 'Cancelled') {
-            receivables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfReceivables : +task.finance.Price.receivables;
-            payables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfPayables : +task.finance.Price.payables;
+          receivables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfReceivables : receivables;
+          payables += task.status === "Cancelled Halfway" ? +task.finance.Price.halfPayables : payables;
         }
     }
     return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) };
