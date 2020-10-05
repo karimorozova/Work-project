@@ -80,7 +80,7 @@
 					if(this.job.status !== "Started") return;
 					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
 					const isCatTool = type === 'CAT Wordcount';
-					await this.$axios.post('/pm-manage/update-progress', { projectId: this.job.project_Id, isCatTool });
+            await this.$axios.post('/pm-manage/update-progress', { projectId: this.job.project_Id, isCatTool });
 					await this.getJobs();
 					this.setCurrentJob();
 					this.alertToggle({ message: "Progress updated", isShow: true, type: "success" });
