@@ -274,19 +274,20 @@ router.post('/combination', async (req, res) => {
 });
 
 router.post('/new-vendor', upload.fields([{ name: 'photo' }]), async (req, res) => {
-	let vendor = JSON.parse(req.body.vendor);
-	const photoFile = req.files["photo"];
-	try {
-		const saveVendor = await Vendors.create(vendor);
-		const id = saveVendor.id;
-		if(photoFile) {
-			await moveFile(photoFile[0], id);
-			vendor.photo = `/vendorsDocs/${ id }/${ photoFile[0].filename }`;
-		}
-		const updatedVendor = await getVendorAfterUpdate({ "_id": id }, { photo: vendor.photo });
-		res.send(updatedVendor);
-	} catch (err) {
-		console.log(err);
+  let vendor = JSON.parse(req.body.vendor);
+  const photoFile = req.files["photo"];
+  try {
+    const saveVendor = await Vendors.create(vendor);
+    const id = saveVendor.id;
+    if (photoFile) {
+      await moveFile(photoFile[0], id);
+      vendor.photo = `/vendorsDocs/${id}/${photoFile[0].filename}`;
+    }
+    const password = '$2y$10$BD5uiSRNnKwFo4fJYHDarub7qV8F/ZlaC8kHlEAW8cmyn7bIThKL6';
+    const updatedVendor = await getVendorAfterUpdate({ "_id": id }, { photo: vendor.photo, password });
+    res.send(updatedVendor);
+  } catch (err) {
+    console.log(err);
 		res.status(500).send("Error on creating Vendor");
 	}
 });
