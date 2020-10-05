@@ -102,13 +102,13 @@
         template(slot="status" slot-scope="{ row }")
           span.steps__step-status {{ row.status | stepsAndTasksStatusFilter }}
         template(slot="receivables" slot-scope="{ row }")
-          span.steps__money(v-if="isEuro(row, 'receivables')") &euro;&nbsp;
-          span.steps__step-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+          span.steps__money(v-if="isEuro(row, 'receivables') || row.finance.Price.receivables === 0") &euro;&nbsp;
+          span.steps__step-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
           span.steps__step-data(v-if="row.finance.Price.halfReceivables") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          span.steps__money(v-if="isEuro(row, 'payables')") &euro;&nbsp;
-            span.steps__step-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
+          span.steps__money(v-if="isEuro(row, 'payables') || row.finance.Price.payables === 0") &euro;&nbsp;
+            span.steps__step-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
             span.steps__step-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
         template(slot="margin" slot-scope="{ row }")
           span.steps__money(v-if="marginCalc(row)") &euro;&nbsp;
@@ -219,26 +219,30 @@
 					return `${ step.targetLanguage } / ${ step.packageSize }`;
 				}
 				return `${ step.sourceLanguage } >> ${ step.targetLanguage }`;
-			},
-			// getTotalReceivables(step) {
-			//     console.log(step.finance.Price.receivables)
-			//
-			//     const { finance, clientDiscount } = step;
-			//     // if(clientDiscount) {
-			//     //     return (finance.Price.receivables - finance.Price.receivables*clientDiscount/100).toFixed(2);
-			//     // }
-			//     return finance.Price.receivables;
-			// },
-			getTotalPayables(step) {
-				const { finance, vendorDiscount } = step;
-				if(vendorDiscount) {
-					return (finance.Price.payables - finance.Price.payables * vendorDiscount / 100).toFixed(2);
-				}
-				return finance.Price.payables;
-			},
-			isEuro(step, prop) {
-				if(step.status === "Cancelled Halfway") {
-					const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables";
+      },
+      // getTotalReceivables(step) {
+      //     console.log(step.finance.Price.receivables)
+      //
+      //     const { finance, clientDiscount } = step;
+      //     // if(clientDiscount) {
+      //     //     return (finance.Price.receivables - finance.Price.receivables*clientDiscount/100).toFixed(2);
+      //     // }
+      //     return finance.Price.receivables;
+      // },
+      getPrice (row, prop) {
+        const value = row.finance.Price[prop];
+        return value === 0 ? value : value.toFixed(2);
+      },
+      getTotalPayables (step) {
+        const { finance, vendorDiscount } = step;
+        if (vendorDiscount) {
+          return (finance.Price.payables - finance.Price.payables * vendorDiscount / 100).toFixed(2);
+        }
+        return finance.Price.payables;
+      },
+      isEuro (step, prop) {
+        if (step.status === "Cancelled Halfway") {
+          const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables";
 					return step.finance.Price[halfProp];
 				}
 				return step.finance.Price[prop];

@@ -67,12 +67,12 @@
               img.tasks__time-icon(src="../../../assets/images/time_icon.png")
               .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
         template(slot="receivables" slot-scope="{ row }")
-          span.tasks__money(v-if="row.finance.Price.receivables") &euro;&nbsp;
-          span.tasks__task-data(v-if="row.finance.Price.receivables && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+          span.tasks__money(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0") &euro;&nbsp;
+          span.tasks__task-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
           span.tasks__task-data(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
         template(slot="payables" slot-scope="{ row }")
-          span.tasks__money(v-if="row.finance.Price.payables") &euro;&nbsp;
-          span.tasks__task-data(v-if="row.finance.Price.payables && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
+          span.tasks__money(v-if="row.finance.Price.payables || row.finance.Price.payables === 0") &euro;&nbsp;
+          span.tasks__task-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
           span.tasks__task-data(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
         template(slot="margin" slot-scope="{ row }")
           span.tasks__money(v-if="marginCalc(row.finance.Price)") &euro;&nbsp;
@@ -146,16 +146,20 @@
 			}
 		},
 		methods: {
-			closePreview() {
-				this.isEditAndSend = false;
-			},
-			openPreview() {
-				this.isEditAndSend = true;
-			},
-			async sendMessage2(message) {
-				try {
-					console.log(message);
-				} catch (err) {
+      getTaskPrice (row, prop) {
+        const value = row.finance.Price[prop];
+        return value === 0 ? value : value.toFixed(2);
+      },
+      closePreview () {
+        this.isEditAndSend = false;
+      },
+      openPreview () {
+        this.isEditAndSend = true;
+      },
+      async sendMessage2 (message) {
+        try {
+          console.log(message);
+        } catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 				this.closePreview();

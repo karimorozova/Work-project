@@ -195,9 +195,9 @@
 
 				return {
 					receivables: {
-						width: '100%',
-						price: Price.receivables,
-					},
+            width: Price.receivables === 0 ? '0%' : '100%',
+            price: Price.receivables,
+          },
 					payables: {
 						width: `${payblesPercents}%`,
 						price: Price.payables
