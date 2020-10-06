@@ -339,7 +339,7 @@ function sendMemoqCredentials(obj) {
 										<p>
 											<div>Your credentials:</div>
 											<div>Login: ${ obj.email }</div>
-											<div>Password: secret</div>
+											<div>Password: 1234</div>
                     </p>
                 </div>
                 <footer>

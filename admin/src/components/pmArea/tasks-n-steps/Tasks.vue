@@ -368,6 +368,7 @@
 			closeReview() {
 				this.isDeliveryReview = false;
 				this.selectedAction = "";
+				this.clearTaskDeliveryStatuses();
 			},
 			async downloadFiles(task) {
 				try {

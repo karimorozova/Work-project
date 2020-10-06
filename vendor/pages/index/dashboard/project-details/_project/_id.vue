@@ -23,15 +23,15 @@
           text="Are you sure you have completed your job and reviewed your work?"
           approveValue="Complete"
           notApproveValue="Cancel")
-      Forbidden(v-if="isForbidden" :message="forbiddenMessage")
+      Forbidden(v-if="isForbidden.status" :message="isForbidden.message")
 </template>
 
 <script>
-	import MainInfo from "./MainInfo";
-	import OtherInfo from "./OtherInfo";
-	import FilesAndButtons from "./FilesAndButtons";
+	import MainInfo from "../MainInfo";
+	import OtherInfo from "../OtherInfo";
+	import FilesAndButtons from "../FilesAndButtons";
 
-	const Forbidden = () => import("../../../components/details/Forbidden");
+	const Forbidden = () => import("../../../../components/details/Forbidden");
 	const ApproveModal = () => import("~/components/ApproveModal");
 	import { mapGetters, mapActions } from "vuex";
 
@@ -41,6 +41,10 @@
 				isApproveModal: false,
 				statuses: ["Quote sent", "Draft", "Requested"],
 				targetFiles: [],
+				message: "",
+				project: null,
+				currentStep: {},
+				currentTask: {},
 			}
 		},
 		methods: {
@@ -52,6 +56,13 @@
 			}),
 			closeModal() {
 				this.isApproveModal = false;
+			},
+			async getProjectById(id) {
+				try {
+					const result = await this.$axios.get(`pm-manage/project?id=${ id }`)
+					this.project = result.data;
+				} catch (e) {
+				}
 			},
 			showModal() {
 				this.isApproveModal = true;
@@ -80,7 +91,7 @@
 					if(this.job.status !== "Started") return;
 					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
 					const isCatTool = type === 'CAT Wordcount';
-            await this.$axios.post('/pm-manage/update-progress', { projectId: this.job.project_Id, isCatTool });
+					await this.$axios.post('/pm-manage/update-progress', { projectId: this.job.project_Id, isCatTool });
 					await this.getJobs();
 					this.setCurrentJob();
 					this.alertToggle({ message: "Progress updated", isShow: true, type: "success" });
@@ -100,6 +111,12 @@
 				} catch (err) {
 				}
 			},
+			async getStepFromProject(stepId) {
+				this.currentStep = await this.project.steps.find(item => item._id === stepId);
+			},
+			async getTaskFromProject(taskId) {
+				this.currentTask = await this.project.tasks.find(item => item.taskId === taskId);
+			},
 		},
 		computed: {
 			...mapGetters({
@@ -111,24 +128,31 @@
 				return "Start"
 			},
 			isForbidden() {
-				return false;
-
-				if((this.job.status === "Accepted" || this.job.status === "Waiting to Start") && this.job.prevStep) {
-					//MAX
-					return this.job.prevStep.progress < 100 || this.job.prevStep.status !== "Completed";
+				let result = {};
+				if(this.currentTask) {
+					const { status } = this.currentTask;
+					switch (status) {
+						case "Approved":
+						case "Ready to Start":
+						case "In progress":
+						case "Pending Approval [DR1]":
+						case "Pending Approval [DR2]":
+						case "Delivered":
+							result = {
+								status: false,
+								message: ""
+							}
+							break;
+						case "Created":
+							result = {
+								status: true,
+								message: "Project or Task hasn't been approved yet."
+							};
+							break;
+					}
 				}
-				if(!this.job.prevStep && this.statuses.indexOf(this.job.projectStatus) !== -1) {
-					return true;
-				}
-				return false;
+				return result;
 			},
-			forbiddenMessage() {
-				let message = "Project hasn't been approved yet.";
-				if(this.statuses.indexOf(this.job.projectStatus) === -1) {
-					message = "Sorry, you can't start the job until previous job is completed!";
-				}
-				return message;
-			}
 		},
 		components: {
 			MainInfo,
@@ -140,11 +164,18 @@
 		mounted() {
 			this.refreshProgress();
 		},
+		async created() {
+			await this.getProjectById(this.$route.params.project);
+			if(this.project) {
+				await this.getStepFromProject(this.$route.params.id);
+				await this.getTaskFromProject(this.currentStep.taskId);
+			}
+		},
 	}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../../assets/scss/colors.scss";
+  @import "../../../../../assets/scss/colors";
 
   .details {
     color: $main-color;

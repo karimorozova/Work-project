@@ -4,20 +4,20 @@
         .review__title Delivery Review {{ dr }}
         Drops(
             :isReviewing="isReviewing"
-            :project="project" 
-            :user="user" 
-            :dr1Manager="dr1Manager" 
-            :dr2Manager="dr2Manager" 
+            :project="project"
+            :user="user"
+            :dr1Manager="dr1Manager"
+            :dr2Manager="dr2Manager"
             :timestamp="timestamp"
             @assignManager="assignManager"
             @setContacts="setContacts")
         .review__title.review_left-align {{ checklistTile }} Checklist
-        .review__check 
+        .review__check
             .review__check-item(v-for="instruction in instructions")
-                Check(@toggleApprovement="(e) => toggle(e, instruction)" 
+                Check(@toggleApprovement="(e) => toggle(e, instruction)"
                     :isApproved="instruction.isChecked"
                     :text="instruction.text")
-            .review__forbidden(v-if="isReviewing")        
+            .review__forbidden(v-if="isReviewing")
         .review__table
             Table(
                 :isReviewing="isReviewing"
@@ -29,12 +29,14 @@
                 @checkFile="checkFile"
                 @updateDeliveryData="getDeliveryData")
         .review__options
-            .review__options-check
-                CheckBox(:isChecked="areOptions" 
+            .review__options-check(v-if="isAllChecked")
+                CheckBox(
+                    :isChecked="areOptions"
                     customClass="review-options"
-                    @check="(e) => toggleOptions(e, true)" 
-                    @uncheck="(e) => toggleOptions(e, false)")
-            .review__forbidden(v-if="isReviewing")            
+                    @check="(e) => toggleOptions(e, true)"
+                    @uncheck="(e) => toggleOptions(e, false)"
+                )
+            .review__forbidden(v-if="isReviewing")
             Options(v-if="areOptions && isAllChecked"
                 :isAssign="isAssign"
                 :isDeliver="isDeliver"
@@ -135,7 +137,7 @@ export default {
         async toggle(e, instruction) {
             await this.approveInstruction({
                 projectId: this.project._id,
-                taskId: this.task.taskId, 
+                taskId: this.task.taskId,
                 instruction
                 });
             await this.getDeliveryData();
@@ -217,8 +219,8 @@ export default {
                 }
                 await this.approveWithOption({
                     taskId: this.task.taskId, isDeliver: this.isDeliver, contacts: this.contacts
-                    });    
-            } catch(err) { 
+                    });
+            } catch(err) {
             } finally {
                 this.$emit("close");
             }
@@ -228,9 +230,9 @@ export default {
             if(this.isReviewing || this.dr1Manager._id === manager._id) return;
             await this.changeReviewManager({
                 prevManager: this[prop],
-                manager, 
-                prop, 
-                projectId: this.project._id, 
+                manager,
+                prop,
+                projectId: this.project._id,
                 taskId: this.task.taskId,
                 isAdmin: this.isAdmin,
                 status: `dr${this.dr}`
@@ -239,7 +241,7 @@ export default {
         },
         async rollBack() {
             await this.rollBackReview({
-                projectId: this.project._id, 
+                projectId: this.project._id,
                 taskId: this.task.taskId,
                 manager: this.rollbackManager
                 })
@@ -261,7 +263,7 @@ export default {
                 if(this.task.status === "Pending Approval [DR2]") {
                     this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager));
                     this.timestamp = result.data.timestamp;
-                }                
+                }
             } catch(err) {
                 this.alertToggle({message: "Error on getting delivery data", isShow: true, type: "error"});
             }
@@ -338,7 +340,7 @@ export default {
         align-self: center;
         width: 430px;
         height: 28px;
-        margin: 20px 0; 
+        margin: 20px 0;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -358,7 +360,7 @@ export default {
     }
     &_left-align {
         text-align: left;
-        font-size: 20px; 
+        font-size: 20px;
     }
     &__modal {
         position: absolute;
