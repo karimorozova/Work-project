@@ -316,6 +316,7 @@ router.post("/send-quote", async (req, res) => {
 
 router.post("/send-task-quote", async (req, res) => {
   const { projectId, message, tasksIds } = req.body;
+  console.log(tasksIds);
   try {
     const project = await getProject({ "_id": projectId });
     let subject = project.isUrgent ? "URGENT! Decide on a Quote" : "Decide on a Quote";
@@ -333,7 +334,7 @@ router.post("/send-task-quote", async (req, res) => {
     }, message);
     let { tasks } = project;
     tasks = tasks.map(task => {
-      if (tasksIds.includes(task._id)) {
+      if (tasksIds.includes(task.taskId)) {
         task.status = 'Quote sent';
       }
       return task;
