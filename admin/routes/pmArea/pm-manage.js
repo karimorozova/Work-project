@@ -315,7 +315,7 @@ router.post("/send-quote", async (req, res) => {
 })
 
 router.post("/send-task-quote", async (req, res) => {
-  const { projectId, message } = req.body;
+  const { projectId, message, tasksIds } = req.body;
   try {
     const project = await getProject({ "_id": projectId });
     let subject = project.isUrgent ? "URGENT! Decide on a Quote" : "Decide on a Quote";
@@ -331,10 +331,18 @@ router.post("/send-task-quote", async (req, res) => {
       attachments,
       subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})`
     }, message);
+    let { tasks } = project;
+    tasks = tasks.map(task => {
+      if (tasksIds.includes(task._id)) {
+        task.status = 'Quote sent';
+      }
+      return task;
+    });
+    const updatedProject = await updateProject({ "_id": projectId }, { tasks });
     fs.unlink(pdf, (err) => {
       if (err) console.log(err);
     });
-    res.send('Quote Sent');
+    res.send(updatedProject);
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on sending the Quote");

@@ -297,9 +297,10 @@
 			async sendMessageQuote(message){
 				try {
 					await this.$http.post("/pm-manage/send-task-quote", {
-						projectId: this.currentProject._id,
-						message: message
-					});
+            projectId: this.currentProject._id,
+            message: message,
+            tasksIds: this.allTasks.filter(item => item.isChecked).map(item => item.taskId)
+          });
 					this.alertToggle({ message: "Message sent", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
