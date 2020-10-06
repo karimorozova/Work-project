@@ -211,7 +211,7 @@ router.put("/send-cancel-message", async (req, res) => {
     const project = await getProject({ "_id": id });
     await notifyClientProjectCancelled(project, message);
     if (project.status === "Cancelled") {
-      const wordsTasks = project.tasks.filter(item => item.service.calculationUnit === 'Words');
+      const wordsTasks = project.tasks.filter(item => item.service.title === 'Translation');
       if (wordsTasks.length) {
         await cancelMemoqDocs(wordsTasks);
         await setCancelledNameInMemoq(wordsTasks, `${project.projectId} - ${project.projectName}`);
@@ -244,7 +244,18 @@ router.get("/quote-message", async (req, res) => {
     console.log(err);
     res.status(500).send("Error on getting quote message");
   }
-})
+});
+
+router.post("/task-quote-message", async (req, res) => {
+  const { projectId, tasks } = req.body;
+  try {
+    const message = await getMessage(projectId, 'task', tasks);
+    res.send({ message });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on getting task quote message");
+  }
+});
 
 router.get("/project-details", async (req, res) => {
   const { projectId } = req.query;
@@ -294,8 +305,8 @@ router.post("/send-quote", async (req, res) => {
       isClientOfferClicked: false
     });
     fs.unlink(pdf, (err) => {
-      if (err) console.log(err)
-    })
+      if (err) console.log(err);
+    });
     res.send(updatedProject);
   } catch (err) {
     console.log(err);
@@ -303,12 +314,39 @@ router.post("/send-quote", async (req, res) => {
   }
 })
 
+router.post("/send-task-quote", async (req, res) => {
+  const { projectId, message } = req.body;
+  try {
+    const project = await getProject({ "_id": projectId });
+    let subject = project.isUrgent ? "URGENT! Decide on a Quote" : "Decide on a Quote";
+    let messageId = "taskQuote";
+    if (project.isPriceUpdated) {
+      messageId = "taskQuoteUpdated";
+      subject += " (UPDATED)";
+    }
+    const pdf = await getPdf(project);
+    const attachments = [{ content: fs.createReadStream(pdf), filename: "quote.pdf" }];
+    await clientQuoteEmail({
+      ...project.customer._doc,
+      attachments,
+      subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})`
+    }, message);
+    fs.unlink(pdf, (err) => {
+      if (err) console.log(err);
+    });
+    res.send('Quote Sent');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on sending the Quote");
+  }
+});
+
 router.post("/contact-mailing", async (req, res) => {
   const { projectId, contact } = req.body;
   try {
     const project = await getProject({ "_id": projectId });
     await sendEmailToContact(project, contact);
-    res.send('Email has been sent')
+    res.send('Email has been sent');
   } catch (err) {
     console.log(err);
     res.status(500).send("Error on contact-mailing");

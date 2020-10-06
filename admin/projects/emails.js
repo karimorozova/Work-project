@@ -1,7 +1,12 @@
 const { sendEmail, managerNotifyMail, clientQuoteEmail } = require("../utils/mailTemplate");
-const { managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage, 
-    stepCompletedMessage, stepDecisionMessage, readyForDr2Message } = require("../emailMessages/internalCommunication");
-const { messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, projectDeliveryMessage } = require("../emailMessages/clientCommunication");
+const {
+	managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage,
+	stepCompletedMessage, stepDecisionMessage, readyForDr2Message
+} = require("../emailMessages/internalCommunication");
+const {
+	messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, projectDeliveryMessage,
+	getTaskQuoteForClient
+} = require("../emailMessages/clientCommunication");
 const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage, stepReadyToStartMessage } = require("../emailMessages/vendorCommunication");
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
@@ -13,9 +18,9 @@ async function stepCancelNotifyVendor(steps) {
     try {
         for(let step of steps) {
             if(step.vendor && step.status !== "Completed") {
-                const message = step.status !== "Started" ? 
-                    stepCancelledMessage(step)
-                    : stepMiddleCancelledMessage(step);
+	            const message = step.status !== "Started" ?
+			            stepCancelledMessage(step)
+			            : stepMiddleCancelledMessage(step);
                 step["to"] = step.vendor.email;
                 const id = step.status !== "Started" ? "V004.0" : "V003.0";
                 const subject = step.status !== "Started" ? "Step cancelled" : "Step cancelled in the middle";
@@ -29,27 +34,33 @@ async function stepCancelNotifyVendor(steps) {
     }
 }
 
-async function getMessage(projectId, messageTarget) {
-    try {
-        let quote = await getQuoteInfo(projectId);
-        const message = messageTarget === "quote" ? messageForClient(quote) : emailMessageForContact(quote);
-        return message;
-    } catch(err) {
+async function getMessage (projectId, messageTarget, taskIds = []) {
+	try {
+		let quote = await getQuoteInfo(projectId, taskIds);
+		switch (messageTarget) {
+			case 'quote':
+			case 'task':
+				return messageForClient(quote);
+			default:
+				return emailMessageForContact(quote);
+		}
+	} catch (err) {
         console.log(err);
         console.log("Error in getMessage");
     }
 }
 
-async function getQuoteInfo(projectId) {
-    try {
-        const project = await getProject({"_id": projectId});
-        const service = await getService({"_id": project.tasks[0].service});
-        let quote = {...project._doc, id: project.id};
-        quote.service = service.title;
-        const { contacts } = project.customer;
-        quote.contact = contacts.find(item => item.leadContact);
-        quote.firstName = quote.contact.firstName;
-        quote.surname = quote.contact.surname;
+async function getQuoteInfo (projectId, tasksIds) {
+	try {
+		const project = await getProject({ "_id": projectId });
+		const service = await getService({ "_id": project.tasks[0].service });
+		let quote = { ...project._doc, id: project.id };
+		quote.selectedTasks = tasksIds.length ? project.tasks.filter(task => tasksIds.includes(task.taskId)) : [];
+		quote.service = service.title;
+		const { contacts } = project.customer;
+		quote.contact = contacts.find(item => item.leadContact);
+		quote.firstName = quote.contact.firstName;
+		quote.surname = quote.contact.surname;
         return quote;
     } catch(err) {
         console.log(err);
@@ -228,18 +239,18 @@ async function notifyVendorStepStart(steps, allSteps, project) {
     }
 }
 
-module.exports = { 
-    stepCancelNotifyVendor, 
-    getMessage, 
-    taskCompleteNotifyPM, 
-    notifyClientTaskReady, 
-    sendClientDeliveries, 
-    notifyDeliverablesDownloaded,
-    notifyProjectDelivery,
-    notifyManagerStepStarted,
-    stepCompletedNotifyPM,
-    notifyStepDecisionMade,
-    notifyReadyForDr2,
-    notifyStepReopened,
-    notifyVendorStepStart
-}
+module.exports = {
+	stepCancelNotifyVendor,
+	getMessage,
+	taskCompleteNotifyPM,
+	notifyClientTaskReady,
+	sendClientDeliveries,
+	notifyDeliverablesDownloaded,
+	notifyProjectDelivery,
+	notifyManagerStepStarted,
+	stepCompletedNotifyPM,
+	notifyStepDecisionMade,
+	notifyReadyForDr2,
+	notifyStepReopened,
+	notifyVendorStepStart
+};

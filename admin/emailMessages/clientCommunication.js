@@ -4,22 +4,22 @@ const { secretKey } = require('../configs');
 const moment = require('moment');
 
 function messageForClient(obj) {
-    const date = Date.now();
-    const name = `${obj.contact.firstName} ${obj.contact.surname}`;
-    const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
-    const tasksInfo = getTasksInfo(activeTasks, obj.steps);
-    const subTotal = getSubTotal(activeTasks, obj.steps);
-    const tmDiscount = (obj.finance.Price.receivables - subTotal).toFixed(2);
-    const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
+  const date = Date.now();
+  const name = `${obj.contact.firstName} ${obj.contact.surname}`;
+  const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
+  const tasksInfo = obj.selectedTasks.length ? getTasksInfo(obj.selectedTasks, obj.steps) : getTasksInfo(activeTasks, obj.steps);
+  const subTotal = obj.selectedTasks.length ? getSubTotal(obj.selectedTasks, obj.steps) : getSubTotal(activeTasks, obj.steps);
+  const tmDiscount = (obj.finance.Price.receivables - subTotal).toFixed(2);
+  const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
 
-    let detailHeader = "Please see below the quote details:";
-    if (obj.isPriceUpdated) {
-        detailHeader = "Your quote has been updated - please see below the quote details:";
-    }
-    const reason = obj.reason ? `<p>Reason ${obj.reason}</p><p>Please see below the updated quote details</p>` : "";
-    const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
-    const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`
-    
+  let detailHeader = "Please see below the quote details:";
+  if (obj.isPriceUpdated) {
+    detailHeader = "Your quote has been updated - please see below the quote details:";
+  }
+  const reason = obj.reason ? `<p>Reason ${obj.reason}</p><p>Please see below the updated quote details</p>` : "";
+  const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+  const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+
     return `<div class="wrapper"
                 style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;">
                 <header style="background-color:#66563E;text-align:center;">
@@ -94,7 +94,7 @@ function messageForClient(obj) {
                                     Cost</td>
                             </tr>
                             ${tasksInfo}
-                            
+
                         </table>
                         </br>
                         <table class="details__table"
@@ -115,7 +115,7 @@ function messageForClient(obj) {
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                                     &euro; ${tmDiscount}</td>
                             </tr>
-                            
+
                             <tr>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -226,11 +226,11 @@ function getPdfOfQuote(obj){
     const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
     const tasksInfo = getTasksInfoPdf(activeTasks, obj.steps);
     const subTotal = getSubTotal(activeTasks, obj.steps);
-    const clientName = obj.customer.officialName || obj.customer.name;
-    const contact = obj.customer.contacts.find(item => item.leadContact); 
+  const clientName = obj.customer.officialName || obj.customer.name;
+  const contact = obj.customer.contacts.find(item => item.leadContact);
     return `<div class="wrapper pdf" style="width:800px;font-size:12px!important;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
-                    <img src="static/logo.png" alt=""> 
+                    <img src="static/logo.png" alt="">
                 </header>
                 <div class="quote__header" style="font-size:14px;background-color:#66563D;color:white;text-transform:uppercase;text-align:center;font-weight:bold;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     quote
@@ -317,7 +317,7 @@ function getPdfOfQuote(obj){
                             <td class="table__text-right table__text-bold" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:bold;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>
                             ${subTotal.toFixed(2)}</td>
                         </tr>
-                        
+
                         <tr>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
                             <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
@@ -343,7 +343,7 @@ function getPdfOfQuote(obj){
                     </div>
                     <div class="notes__row" style="display:-webkit-box;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;" >
                         <div class="notes__row-title" style="width:150px;font-weight:bold;" >
-                            Payment terms: 
+                            Payment terms:
                         </div>
                         <div class="notes__row-text">
                             30 days after invoice
@@ -351,7 +351,7 @@ function getPdfOfQuote(obj){
                     </div>
                     <div class="notes__row" style="display:-webkit-box;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;" >
                         <div class="notes__row-title" style="width:150px;font-weight:bold;" >
-                            Turnaround time: 
+                            Turnaround time:
                         </div>
                         <div class="notes__row-text">
                             ${moment(obj.deadline).format('LLL')}
@@ -451,7 +451,7 @@ function emailMessageForContact(obj) {
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${obj.firstName} ${surname},</h3>
             <div class="all-info" style="padding: 0 15px 0 30px;">
                 <p class="description" style="font-size: 18px;">
-                    Here is the information about the project: 
+                    Here is the information about the project:
                 </p>
                 <h3 class="detailsTitle">Project Details</h3>
                 <table class="details">
@@ -595,7 +595,7 @@ function projectMiddleCancelledMessage(obj) {
                 </footer>
             </div>`;
 
-} 
+}
 
 function tasksCancelledMessage(obj) {
     return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -726,14 +726,14 @@ function getTaskProgress(task, steps) {
 }
 
 module.exports = {
-    messageForClient,
-    emailMessageForContact,
-    taskReadyMessage,
-    taskDeliveryMessage,
-    projectCancelledMessage,
-    tasksCancelledMessage,
-    tasksMiddleCancelledMessage,
-    projectDeliveryMessage,
-    projectMiddleCancelledMessage,
-    getPdfOfQuote
+  messageForClient,
+  emailMessageForContact,
+  taskReadyMessage,
+  taskDeliveryMessage,
+  projectCancelledMessage,
+  tasksCancelledMessage,
+  tasksMiddleCancelledMessage,
+  projectDeliveryMessage,
+  projectMiddleCancelledMessage,
+  getPdfOfQuote,
 }
