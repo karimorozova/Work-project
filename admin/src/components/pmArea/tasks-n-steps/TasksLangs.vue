@@ -57,7 +57,6 @@
 			possibleTargetLanguages() {
 				if (this.currentProject._id) {
 					if (this.tasksData.hasOwnProperty('service')) {
-						console.log(this.getClientLanguagesByServices('targetLanguages'))
 						return this.getClientLanguagesByServices('targetLanguages').map(i => i.lang);
 					}
 				}

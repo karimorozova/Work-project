@@ -131,7 +131,7 @@
 				return statuses.indexOf(this.job.status) !== -1 || this.progress >= 100;
 			},
 			areIcons() {
-				const statuses = ["Created", "Request Sent"];
+				const statuses = ["Created", "Request Sent", "Quote sent"];
 				return statuses.indexOf(this.job.status) !== -1;
 			},
 			isFileUpload() {

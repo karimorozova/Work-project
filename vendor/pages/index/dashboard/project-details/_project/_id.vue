@@ -144,9 +144,16 @@
 							}
 							break;
 						case "Created":
+						case "Quote sent":
 							result = {
 								status: true,
 								message: "Project or Task hasn't been approved yet."
+							};
+							break;
+						case "Rejected":
+							result = {
+								status: true,
+								message: "Project or Task has rejected."
 							};
 							break;
 					}

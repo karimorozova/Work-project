@@ -324,7 +324,6 @@
 						projectId: this.project._id,
 						isUrgent: event.target.checked,
 					});
-					console.log(result.data);
 					this.alertToggle({
 						message: "Urgent status updated",
 						isShow: true,

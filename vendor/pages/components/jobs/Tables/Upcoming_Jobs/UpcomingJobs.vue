@@ -99,7 +99,7 @@
         this.$emit('makeAction', {index, key});
       },
       isApproveReject(row) {
-        return row.status === "Request Sent" || row.status === "Created";
+        return row.status === "Request Sent" || row.status === "Created" || row.status === "Quote sent";
       }
     },
     components: {

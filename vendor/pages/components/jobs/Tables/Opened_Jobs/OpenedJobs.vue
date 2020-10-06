@@ -107,7 +107,7 @@
 				return moment(date).format('DD-MMM-YYYY')
 			},
 			isApproveReject(row) {
-				return row.status === "Request Sent" || row.status === "Created";
+				return row.status === "Request Sent" || row.status === "Created" || row.status === "Quote sent";
 			},
 			isEnterIcon(status) {
 				const statuses = ["Accepted", "Ready to Start", "Started"];

@@ -161,9 +161,9 @@
 			openPreview() {
 				this.isEditAndSend = true;
 			},
-			openPreviewQuote(){
+			openPreviewQuote() {
 				this.isEditAndSendQuote = true;
-      },
+			},
 			getPair(task) {
 				if(task.packageSize) {
 					return `${ task.targetLanguage } / ${ task.packageSize }`;
@@ -179,10 +179,10 @@
 			async getSendQuoteMessage() {
 				try {
 					const template = await this.$http.post(
-							`/pm-manage/task-quote-message`,{
+							`/pm-manage/task-quote-message`, {
 								projectId: this.currentProject._id,
-                tasks: this.allTasks.filter(item => item.isChecked).map(item => item.taskId)
-              }
+								tasks: this.allTasks.filter(item => item.isChecked && item.status === "Created").map(item => item.taskId)
+							}
 					);
 					this.previewMessageQuote = template.body.message;
 					this.openPreviewQuote();
@@ -275,7 +275,6 @@
 							isPay: this.isPay
 						});
 						this.previewMessage = template.body.message;
-						console.log('this.previewMessage', this.previewMessage);
 						this.openPreview();
 					} catch (err) {
 						this.alertToggle({ message: "Cannot formation message", isShow: true, type: "error" })
@@ -294,13 +293,14 @@
 				}
 				this.closePreview();
 			},
-			async sendMessageQuote(message){
+			async sendMessageQuote(message) {
 				try {
-					await this.$http.post("/pm-manage/send-task-quote", {
-            projectId: this.currentProject._id,
-            message: message,
-            tasksIds: this.allTasks.filter(item => item.isChecked).map(item => item.taskId)
-          });
+					const result = await this.$http.post("/pm-manage/send-task-quote", {
+						projectId: this.currentProject._id,
+						message: message,
+						tasksIds: this.allTasks.filter(item => item.isChecked && item.status === "Created").map(item => item.taskId)
+					});
+					this.$emit('updateTasks', result.data.tasks)
 					this.alertToggle({ message: "Message sent", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
@@ -364,6 +364,17 @@
 			setCurrentTask(index) {
 				index >= 0 ? this.pickedTask = this.allTasks[index] : this.pickedTask = null
 			},
+			addedSendQuoteStatus() {
+				const pickedTasks = this.allTasks.filter(i => i.isChecked);
+				const isEveryCreated = pickedTasks.every(item => item.status === "Created")
+				if(isEveryCreated && this.currentProject.status !== "Draft") {
+					this.taskStatuses = ['Cancel', 'Send a Quote']
+				} else if(!pickedTasks.length) {
+					this.taskStatuses = ['Cancel']
+				} else {
+					this.taskStatuses = ['Cancel']
+				}
+			},
 			toggleCheck(e, index, val) {
 				this.allTasks[index].isChecked = val;
 				this.setProjectProp({ value: this.allTasks, prop: 'tasks' });
@@ -384,23 +395,17 @@
 
 				this.addedSendQuoteStatus();
 			},
-			addedSendQuoteStatus() {
-				const pickedTasks = this.allTasks.filter(i => i.isChecked);
-				const isEveryCreated = pickedTasks.every(item => item.status === "Created")
-				if(isEveryCreated && this.currentProject.status !== "Draft") {
-					this.taskStatuses = ['Cancel', 'Send a Quote']
-				} else if(!pickedTasks.length) {
-					this.taskStatuses = ['Cancel']
-				} else {
-					this.taskStatuses = ['Cancel']
-				}
-			},
 			toggleAll(e, val) {
 				const tasks = this.allTasks.reduce((acc, cur) => {
 					acc.push({ ...cur, isChecked: val });
 					return acc;
 				}, []);
 				this.setProjectProp({ value: tasks, prop: 'tasks' });
+
+				if(tasks.map(task => task.status).includes("Created")) {
+					this.taskStatuses = ['Cancel', 'Send a Quote']
+				}
+
 				this.clearTaskDeliveryStatuses();
 			},
 			closeApproveModal() {

@@ -100,7 +100,6 @@
 			},
 			async addWordsTasksFromRequest({ dataForTasks, request }) {
 				try {
-					console.log('tyt1')
 					const newProject = await this.$http.post('/pm-manage/request-tasks', { dataForTasks, request, isWords: true });
 					const { project, newTasksInfo } = newProject.data;
 					let { isAssigned, requestId, refFiles, template, ...tasksData } = newTasksInfo;
