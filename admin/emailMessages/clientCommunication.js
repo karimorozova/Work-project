@@ -20,8 +20,11 @@ function messageForClient(obj) {
   let acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
   let declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
   if(obj.selectedTasks.length){
-    acceptQuote = '<a href=' + `${apiUrl}/projectsapi/accept-decline-tasks-quote?projectId=${obj.id}&t=${token}&to=${date}&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
-    declineQuote = '<a href=' + `${apiUrl}/projectsapi/accept-decline-tasks-quote?projectId=${obj.id}&t=${token}&to=${date}&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+    let taskIdsString = '';
+    obj.selectedTasks.forEach(task => taskIdsString += `${task.taskId};`);
+    taskIdsString = taskIdsString.replace(/[' ']/g, '%');
+    acceptQuote = '<a href=' + `${apiUrl}/projectsapi/accept-decline-tasks-quote?projectId=${obj.id}&tasksIds=${taskIdsString}&t=${token}&to=${date}&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+    declineQuote = '<a href=' + `${apiUrl}/projectsapi/accept-decline-tasks-quote?projectId=${obj.id}&tasksIds=${taskIdsString}&t=${token}&to=${date}&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
   }
 
     return `<div class="wrapper"

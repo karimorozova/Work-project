@@ -259,10 +259,10 @@ export default {
             key: "Unit",
             oldMultiplier: oldUnit,
           });
-          await this.$http.post("/clientsapi/rates", {
-            key: "Unit",
-            oldMultiplier: oldUnit,
-          });
+          // await this.$http.post("/clientsapi/rates", {
+          //   key: "Unit",
+          //   oldMultiplier: oldUnit,
+          // });
           this.getOldData();
         }
       } catch (error) {
@@ -299,10 +299,10 @@ export default {
             key: "Unit",
             oldMultiplier: oldUnit,
           });
-          await this.$http.post("/clientsapi/rates", {
-            key: "Unit",
-            oldMultiplier: oldUnit,
-          });
+          // await this.$http.post("/clientsapi/rates", {
+          //   key: "Unit",
+          //   oldMultiplier: oldUnit,
+          // });
           this.getOldData();
         }
       } catch (error) {

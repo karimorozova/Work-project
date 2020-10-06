@@ -193,10 +193,10 @@ export default {
                     key: 'Step',
                     oldMultiplier: oldStep,
                   });
-                  await this.$http.post('/clientsapi/rates', {
-                    key: 'Step',
-                    oldMultiplier: oldStep
-                  });
+                  // await this.$http.post('/clientsapi/rates', {
+                  //   key: 'Step',
+                  //   oldMultiplier: oldStep
+                  // });
                 }
                 this.alertToggle({message: "Information saved", isShow: true, type: "success"});
             } catch(err) {

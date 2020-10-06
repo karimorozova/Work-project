@@ -119,9 +119,9 @@ async function manageCompletedStatus({project, jobId, steps, task}) {
             return await taskCompleteNotifyPM(project, task);
         }
         const stage1step = task.service.steps.find(item => item.stage === 'stage1');
-        if(step.serviceStep._id === stage1step.step._id) {
-            const updatedSteps = getWithReadyToStartSteps({task, steps});
-            return await Projects.updateOne({"steps._id": jobId},{steps: updatedSteps});
+        if (step.serviceStep.step.toString() === stage1step.step._id.toString()) {
+          const updatedSteps = getWithReadyToStartSteps({ task, steps });
+          return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps });
         }
         return await Projects.updateOne({"steps._id": jobId},{ steps })
     } catch(err) {
@@ -172,9 +172,9 @@ function getTaskTargetFiles(task) {
 function getWithReadyToStartSteps({task, steps}) {
     const stage2step = task.service.steps.find(item => item.stage === 'stage2');
     return steps.map(item => {
-        if(stage2step && item.serviceStep._id === stage2step.step._id && item.taskId === task.taskId) {
-            item.status = 'Ready to Start';
-        }
+      if (stage2step && item.status === 'Waiting to Start' && item.taskId === task.taskId) {
+        item.status = 'Ready to Start';
+      }
         return item;
     })
 }
@@ -195,12 +195,12 @@ async function setAcceptedStepStatus({project, steps, jobId}) {
             }
         }
         const updatedSteps = steps.map(item => {
-            item.status = item.id === jobId ? status : item.status;
+          item.status = item.id === jobId && item.status !== 'Rejected' ? status : item.status;
             return item;
         })
-        if((status === 'Ready to Start' || status === 'Waiting to Start') && step.serviceStep.title === 'Words') {
-            await updateMemoqProjectUsers(updatedSteps);
-        }
+      if ((status === 'Ready to Start' || status === 'Waiting to Start')) {
+        await updateMemoqProjectUsers(updatedSteps);
+      }
         return updatedSteps;
     } catch(err) {
         console.log(err);
@@ -259,9 +259,9 @@ function isAllStepsCompleted({jobId, steps}) {
     const taskSteps = steps.filter(item => item.taskId === currentStep.taskId);
     const validStatuses = ["Completed", "Cancelled", "Cancelled Halfway"]
     const nonCompleted = taskSteps.reduce((init, cur) => {
-        if(cur.taskId === currentStep.taskId && validStatuses.indexOf(cur.status) !== "Completed") {
-            return init;
-        }
+      if (cur.taskId === currentStep.taskId && validStatuses.indexOf(cur.status) !== -1) {
+        return init;
+      }
         return ++init;
     }, 0);
     return nonCompleted === 0;

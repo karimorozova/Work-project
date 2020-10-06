@@ -5,7 +5,7 @@ const { emitter } = require('../events');
 const { getProjectManageToken } = require("../middleware");
 
 router.get('/accept-decline-tasks-quote', getProjectManageToken,  async (req, res) => {
-    const { to: mailDate, prop, projectId } = req.query;
+    let { to: mailDate, tasksIds, prop, projectId } = req.query;
   const date = new Date().getTime();
     const expiry = date - mailDate;
     try {
@@ -14,12 +14,26 @@ router.get('/accept-decline-tasks-quote', getProjectManageToken,  async (req, re
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
         } else {
           const project = await getProject({ "_id": projectId });
-          let { tasks } = project;
+          let { tasks, steps } = project;
+          tasksIds = tasksIds.replace(/[%]/g, ' ');
+          tasksIds = tasksIds.split(';');
+          tasksIds.pop();
+          if (prop === 'Rejected') {
+            const neededSteps = steps.filter(step => tasksIds.includes(step.taskId)).map(step => step._id);
+            steps = steps.map(step => {
+              if (neededSteps.includes(step._id)) {
+                step.status = prop;
+              }
+              return step;
+            });
+          }
           tasks = tasks.map(task => {
-            if (task.status === 'Quote sent') task.status = prop;
+            if (task.status === 'Quote sent' && tasksIds.includes(task.taskId)) {
+              task.status = prop;
+            }
             return task;
           });
-          await Projects.updateOne({ "_id": projectId }, { isClientOfferClicked: true, tasks });
+          await Projects.updateOne({ "_id": projectId }, { isClientOfferClicked: true, tasks, steps });
           prop === 'Rejected' ? emitter.emit('projectRejectedNotification', project) : emitter.emit('projectApprovedNotification', project);
           res.set('Content-Type', 'text/html');
           res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`);
