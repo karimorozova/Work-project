@@ -4,6 +4,33 @@ const { getProject, updateProjectStatus } = require('../projects');
 const { emitter } = require('../events');
 const { getProjectManageToken } = require("../middleware");
 
+router.get('/accept-decline-tasks-quote', getProjectManageToken,  async (req, res) => {
+    const {to: mailDate, tasksIds, prop, projectId } = req.query;
+    const date = new Date().getTime();
+    const expiry = date - mailDate;
+    try {
+        if(expiry > 900000) {
+            res.set('Content-Type', 'text/html');
+            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
+        } else {
+            const project = await getProject({"_id": projectId});
+            let { tasks } = project;
+            tasks = tasks.map(item => {
+                JSON.parse(tasksIds).includes(item.taskId) && (item.status = prop)
+                return item
+            });
+	          await Projects.updateOne({"_id": projectId}, {isClientOfferClicked: true, tasks});
+            prop === 'Rejected' ? emitter.emit('projectRejectedNotification', project) : emitter.emit('projectApprovedNotification', project);
+            res.set('Content-Type', 'text/html')
+            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`)
+        }
+    } catch(err) {
+        console.log(err);
+        res.set('Content-Type', 'text/html')
+        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
+    }
+});
+
 router.get('/acceptquote', getProjectManageToken, async (req, res) => {
     const {to: mailDate, projectId } = req.query;
     const date = new Date().getTime();
@@ -29,7 +56,7 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
             console.log(err);
             res.set('Content-Type', 'text/html')
             res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
-        }    
+        }
 })
 
 router.get('/declinequote', async (req, res) => {

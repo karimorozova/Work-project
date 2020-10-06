@@ -107,7 +107,7 @@ export default {
   background-color: $white;
   min-width: 1000px;
   max-width: 100%;
-  top: 15%;
+  top: 10%;
   left: 20%;
   right: 20%;
   margin: 0 auto;

@@ -17,8 +17,13 @@ function messageForClient(obj) {
     detailHeader = "Your quote has been updated - please see below the quote details:";
   }
   const reason = obj.reason ? `<p>Reason ${obj.reason}</p><p>Please see below the updated quote details</p>` : "";
-  const acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
-  const declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+  let acceptQuote = '<a href=' + `${apiUrl}/projectsapi/acceptquote?projectId=${obj.id}&to=${date}&t=${token}` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+  let declineQuote = '<a href=' + `${apiUrl}/projectsapi/declinequote?projectId=${obj.id}&to=${date}t=${token}` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+  if(obj.selectedTasks.length){
+  	 const taskIds = obj.selectedTasks.map(item => item.taskId);
+     acceptQuote = '<a href=' + `${apiUrl}/projectsapi/accept-decline-tasks-quote?projectId=${obj.id}&tasksIds=${taskIds}&t=${token}&to=${date}&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+     declineQuote = '<a href=' + `${apiUrl}/projectsapi/accept-decline-tasks-quote?projectId=${obj.id}&tasksIds=${taskIds}&t=${token}&to=${date}&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${obj.projectId}, ${obj.finance.Price.receivables} &euro;</a>`;
+  }
 
     return `<div class="wrapper"
                 style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;">

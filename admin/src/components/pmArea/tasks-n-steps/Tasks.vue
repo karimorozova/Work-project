@@ -2,6 +2,8 @@
   .tasks
     .tasks__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
+    .tasks__preview(v-if="isEditAndSendQuote")
+      Preview(@closePreview="closePreview" :message="previewMessageQuote" @send="sendMessageQuote")
     .tasks__action
       .tasks__title Task Action
       .tasks__drop-menu
@@ -137,7 +139,9 @@
 				isApproveActionShow: false,
 				isDeliveryReview: false,
 				isEditAndSend: false,
+				isEditAndSendQuote: false,
 				previewMessage: "",
+				previewMessageQuote: "",
 				reviewTask: [],
 				isPay: false,
 				reason: "",
@@ -146,24 +150,20 @@
 			}
 		},
 		methods: {
-      getTaskPrice (row, prop) {
-        const value = row.finance.Price[prop];
-        return value === 0 ? value : value.toFixed(2);
-      },
-      closePreview () {
-        this.isEditAndSend = false;
-      },
-      openPreview () {
-        this.isEditAndSend = true;
-      },
-      async sendMessage2 (message) {
-        try {
-          console.log(message);
-        } catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
-				}
-				this.closePreview();
+			getTaskPrice(row, prop) {
+				const value = row.finance.Price[prop];
+				return value === 0 ? value : value.toFixed(2);
 			},
+			closePreview() {
+				this.isEditAndSend = false;
+				this.isEditAndSendQuote = false;
+			},
+			openPreview() {
+				this.isEditAndSend = true;
+			},
+			openPreviewQuote(){
+				this.isEditAndSendQuote = true;
+      },
 			getPair(task) {
 				if(task.packageSize) {
 					return `${ task.targetLanguage } / ${ task.packageSize }`;
@@ -176,11 +176,26 @@
 			onRowClicked({ index }) {
 				this.$emit("onRowClicked", { index: index })
 			},
-			setAction({ option }) {
+			async getSendQuoteMessage() {
+				try {
+					const template = await this.$http.post(
+							`/pm-manage/task-quote-message`,{
+								projectId: this.currentProject._id,
+                tasks: this.allTasks.filter(item => item.isChecked).map(item => item.taskId)
+              }
+					);
+					this.previewMessageQuote = template.body.message;
+					this.openPreviewQuote();
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+				}
+			},
+			async setAction({ option }) {
 				this.selectedAction = option;
 				if(option === 'Delivery Review [1]' || option === 'Delivery Review [2]') {
-					console.log(this.pickedTask);
 					this.reviewForDelivery(this.pickedTask);
+				} else if(option === 'Send a Quote') {
+					await this.getSendQuoteMessage();
 				} else {
 					this.setModalTexts(option);
 					this.isApproveActionShow = true;
@@ -237,7 +252,7 @@
 				if(!filteredTasks.length) return;
 				try {
 					if(this.allTasks === tasks.length) {
-						await setProjectStatus({ status: "Cancelled" });
+						await this.setProjectStatus({ status: "Cancelled" });
 					} else {
 						const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id });
 						await this.storeProject(updatedProject.body);
@@ -260,6 +275,7 @@
 							isPay: this.isPay
 						});
 						this.previewMessage = template.body.message;
+						console.log('this.previewMessage', this.previewMessage);
 						this.openPreview();
 					} catch (err) {
 						this.alertToggle({ message: "Cannot formation message", isShow: true, type: "error" })
@@ -270,6 +286,18 @@
 				try {
 					await this.$http.post("/pm-manage/send-task-cancel-message", {
 						id: this.currentProject._id,
+						message: message
+					});
+					this.alertToggle({ message: "Message sent", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+				}
+				this.closePreview();
+			},
+			async sendMessageQuote(message){
+				try {
+					await this.$http.post("/pm-manage/send-task-quote", {
+						projectId: this.currentProject._id,
 						message: message
 					});
 					this.alertToggle({ message: "Message sent", isShow: true, type: "success" })
@@ -351,6 +379,19 @@
 					this.pushStatusFoCurrentTask(status)
 				} else if(count > 1 || !count) {
 					this.clearTaskDeliveryStatuses();
+				}
+
+				this.addedSendQuoteStatus();
+			},
+			addedSendQuoteStatus() {
+				const pickedTasks = this.allTasks.filter(i => i.isChecked);
+				const isEveryCreated = pickedTasks.every(item => item.status === "Created")
+				if(isEveryCreated && this.currentProject.status !== "Draft") {
+					this.taskStatuses = ['Cancel', 'Send a Quote']
+				} else if(!pickedTasks.length) {
+					this.taskStatuses = ['Cancel']
+				} else {
+					this.taskStatuses = ['Cancel']
 				}
 			},
 			toggleAll(e, val) {

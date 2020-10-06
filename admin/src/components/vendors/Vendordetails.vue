@@ -343,7 +343,7 @@ export default {
       editorConfig: {
         allowedContent: true,
         uiColor: "#F4F0EE",
-        resize_minHeigh: "130",
+        resize_minHeight: "130",
         height: 167,
       },
       templatesWysiwyg: [

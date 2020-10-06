@@ -108,7 +108,7 @@
 
         template(slot="payables" slot-scope="{ row }")
           span.steps__money(v-if="isEuro(row, 'payables') || row.finance.Price.payables === 0") &euro;&nbsp;
-            span.steps__step-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+            span.steps__step-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
             span.steps__step-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
         template(slot="margin" slot-scope="{ row }")
           span.steps__money(v-if="marginCalc(row)") &euro;&nbsp;
