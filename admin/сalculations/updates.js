@@ -8,7 +8,7 @@ async function getAfterPayablesUpdated ({ projectId, step, index }) {
 		const queryStr = `steps.${index}`;
 		let project = await updateProject({ "_id": projectId }, { $set: { [queryStr]: step } });
 		let { type } = await Units.findOne({ _id: step.serviceStep.unit });
-		if (type === 'CAT Wordcount' && step.name === 'Translation') {
+		if (type === 'CAT Wordcount') {
 			return await getAfterWordcountPayablesUpdated({ project, step });
 		} else {
 			return await getAfterHoursPayablesUpdated({ project, step });

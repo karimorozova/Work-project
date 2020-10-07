@@ -4,10 +4,7 @@ async function getStepsWithFinanceUpdated (step, project) {
   let { steps } = project;
   const task = project.tasks.find(item => item.taskId === step.taskId);
   const unitType = await checkUnitType(step.serviceStep.unit);
-  const { receivables, payables } = unitType === 'CAT Wordcount' && step.name === 'Translation' ?
-    getWordsPrices(step, task.metrics)
-    :
-    getPrices(step, unitType);
+  const { receivables, payables } = unitType === 'CAT Wordcount' ? getWordsPrices(step, task.metrics) : getPrices(step, unitType);
   const stepIndex = steps.findIndex(item => item.id === step._id);
   steps[stepIndex] = {
     ...step,
@@ -48,11 +45,12 @@ function getWordsPrices (step) {
   const { clientRate, vendorRate } = step;
   let receivables = 0;
   let payables = 0;
-  if (step.name === "Translation") {
+  //MAX
+  // if (step.name === "Translation") {
     receivables = +step.finance.Wordcount.receivables * clientRate.value;
     const doesStepHasVendorRate = vendorRate.hasOwnProperty('value');
     payables = doesStepHasVendorRate ? +step.finance.Wordcount.payables * +vendorRate.value : 0;
-  }
+  // }
   return {
     receivables: parseFloat(receivables.toFixed(2)),
     payables: parseFloat(payables.toFixed(2))

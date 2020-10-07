@@ -11,8 +11,16 @@
             .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
 
         DetailsTranslation(
-          v-if="getUnitTypeByUnitId === 'CAT Wordcount'"
+          v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'"
           :financeData="financeDataTranslation"
+          :step="step"
+          :cancelSave="cancelSave"
+          :selectedTab="selectedTab"
+          @save="checkRateChange"
+        )
+        DetailsOtherCAT(
+          v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name !== 'Translation'"
+          :financeData="financeDataCAT"
           :step="step"
           :cancelSave="cancelSave"
           :selectedTab="selectedTab"
@@ -47,9 +55,9 @@
         @close="noSave"
       )
 
-    .finance-info__tabs(v-if="getUnitTypeByUnitId === 'CAT Wordcount'")
+    .finance-info__tabs(v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'")
       Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
-    TableMatrix(v-if="getUnitTypeByUnitId === 'CAT Wordcount'", :step="step" :selectedTab="selectedTab")
+    TableMatrix(v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'", :step="step" :selectedTab="selectedTab")
 
 </template>
 
@@ -60,9 +68,10 @@
 	import DetailsTranslation from "./DetailsTranslation";
 	import DetailsHours from "./DetailsHours";
 	import DetailsPackages from "./DetailsPackages";
-	import {mapActions} from "vuex";
+	import { mapActions } from "vuex";
 	import TableMatrix from "./TableMatrix"
 	import Results from "./Results";
+	import DetailsOtherCAT from "./DetailsOtherCAT";
 
 	export default {
 		props: {
@@ -99,8 +108,8 @@
 				updateVendorRate: "updateVendorRate",
 				alertToggle: "alertToggle",
 			}),
-			setTab({index}) {
-				if (!this.step.vendor && index === 1) return;
+			setTab({ index }) {
+				if(!this.step.vendor && index === 1) return;
 				this.selectedTab = this.tabs[index];
 			},
 			closeErrorsBlock() {
@@ -122,7 +131,7 @@
 				await this.save();
 			},
 			async save() {
-				const {receivables, payables} = this.changedData;
+				const { receivables, payables } = this.changedData;
 				let changedStep = {};
 
 				const clientRate = {
@@ -132,7 +141,7 @@
 					value: +payables.rate,
 				};
 
-				if (this.getUnitTypeByUnitId === 'CAT Wordcount') {
+				if(this.getUnitTypeByUnitId === 'CAT Wordcount') {
 					const Wordcount = {
 						receivables: +receivables.quantityRelative,
 						payables: +payables.quantityRelative,
@@ -141,13 +150,13 @@
 					const quantity = +payables.quantityTotal;
 					changedStep = {
 						...this.step,
-						finance: {Wordcount},
+						finance: { Wordcount },
 						clientRate,
 						vendorRate,
 						totalWords,
 						quantity,
 					};
-				} else if (this.getUnitTypeByUnitId === 'Packages') {
+				} else if(this.getUnitTypeByUnitId === 'Packages') {
 					const quantity = this.changedData.quantityTotal;
 					changedStep = {
 						...this.step,
@@ -185,31 +194,31 @@
 		computed: {
 			getUnitTypeByUnitId() {
 				return this.originallyUnits
-					.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
+						.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
 			},
 
 			barsStatistic() {
-				const {finance} = this.step;
-				const {Price} = finance;
+				const { finance } = this.step;
+				const { Price } = finance;
 				const payblesPercents = Math.ceil((Price.payables / Price.receivables) * 100)
 
 				return {
 					receivables: {
-            width: Price.receivables === 0 ? '0%' : '100%',
-            price: Price.receivables,
-          },
+						width: Price.receivables === 0 ? '0%' : '100%',
+						price: Price.receivables,
+					},
 					payables: {
-						width: `${payblesPercents}%`,
+						width: `${ payblesPercents }%`,
 						price: Price.payables
 					}
 				}
 			},
 
 			profitAndMargin() {
-				const {finance} = this.step;
-				const {Price} = finance;
+				const { finance } = this.step;
+				const { Price } = finance;
 
-				let result = {profit: 0, margin: 0, roi: 0};
+				let result = { profit: 0, margin: 0, roi: 0 };
 				result.profit = (Price.receivables - Price.payables).toFixed(2);
 				result.margin = ((1 - (Price.payables / Price.receivables)) * 100).toFixed(2);
 				result.roi = ((Price.receivables - Price.payables) / Price.payables).toFixed(2);
@@ -218,8 +227,8 @@
 			},
 
 			financeDataTranslation() {
-				const {clientRate, finance, status, totalWords, vendorRate, quantity, vendor} = this.step
-				const {Wordcount, Price} = finance
+				const { clientRate, finance, status, totalWords, vendorRate, quantity, vendor } = this.step
+				const { Wordcount, Price } = finance
 				return {
 					stepStatus: status,
 					vendor,
@@ -237,9 +246,30 @@
 					}
 				}
 			},
+			financeDataCAT() {
+				const { clientRate, finance, status, totalWords, vendorRate, quantity, vendor } = this.step
+				const { Wordcount, Price } = finance
+				return {
+					stepStatus: status,
+					vendor,
+					title: this.step.name,
+					receivables: {
+						rate: clientRate.value,
+						quantityRelative: Wordcount.receivables,
+						quantityTotal: totalWords,
+						total: Price.receivables,
+					},
+					payables: {
+						rate: vendorRate.value,
+						quantityRelative: Wordcount.payables,
+						quantityTotal: quantity || 0,
+						total: Price.payables
+					}
+				}
+			},
 			financeDataPackages() {
-				const {clientRate, finance, status, vendorRate, quantity, vendor} = this.step
-				const {Price} = finance
+				const { clientRate, finance, status, vendorRate, quantity, vendor } = this.step
+				const { Price } = finance
 				return {
 					title: "Quantity",
 					stepStatus: status,
@@ -257,8 +287,8 @@
 			},
 			financeDataHours() {
 				const currentUnit = this.originallyUnits.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
-				const {clientRate, finance, status, vendorRate, hours, vendor} = this.step
-				const {Price} = finance
+				const { clientRate, finance, status, vendorRate, hours, vendor } = this.step
+				const { Price } = finance
 				return {
 					title: currentUnit === "Hours" ? "Hours" : currentUnit,
 					stepStatus: status,
@@ -280,12 +310,13 @@
 		},
 		watch: {
 			step: function (val) {
-				if (!val.vendor) {
-					this.setTab({index: 0});
+				if(!val.vendor) {
+					this.setTab({ index: 0 });
 				}
 			},
 		},
 		components: {
+			DetailsOtherCAT,
 			Results,
 			ValidationErrors,
 			ApproveModal,
