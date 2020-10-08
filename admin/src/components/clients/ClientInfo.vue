@@ -14,6 +14,7 @@
           :isSaveClicked="isSaveClicked"
           :languages="languages"
           :timezones="timezones"
+          :allClientAliases="aliases"
         )
       .title(v-if="currentClient._id") Contact Details
       .client-info__contacts-info(v-if="currentClient._id")
@@ -148,6 +149,7 @@
 				services: [],
 				units: [],
 				steps: [],
+				aliases: [],
 				timezones: [],
 				currentDocuments: [],
 				clientDataInCreated: {
@@ -541,6 +543,18 @@
 					});
 				}
 			},
+			async getAliases() {
+				try {
+					const result = await this.$http.get("/memoqapi/memoq-client-aliases");
+					this.aliases = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Aliases",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
 			async getTimezones() {
 				try {
 					const result = await this.$http.get("/api/timezones");
@@ -599,6 +613,7 @@
 			this.getIndustries();
 			this.getServices();
 			this.getTimezones();
+			this.getAliases();
 		},
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
