@@ -1,248 +1,305 @@
 <template lang="pug">
-.project 
+  .project
     .project__all-info
-        .project__info-row
-            input.project__name(type="text" :value="projectName" disabled)
-            .project__date
-                LabelValue(label="Start Date & Time" :isRequired="false" customClass="project_margin")
-                    input.project__input-text(type="text" :value="formateDate(project.creationTime)" disabled)
-                img.project__calendar-icon(src="../../../assets/images/calendar.png")
-            .project__date
-                LabelValue(label="Deadline" :isRequired="false" customClass="project_margin")
-                    input.project__input-text(type="text" :value="formateDate(project.deadline)" disabled)
-                img.project__calendar-icon(src="../../../assets/images/calendar.png")  
-        .project__info-row
-            .project__client
-                LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")
-                    span {{ project.client }}
-            .project__industry
-                LabelValue(label="Industry" :isRequired="false" customClass="project_margin")
-                    span {{project.domain}}
-            .project__number
-                LabelValue(label="Client Project Number" customClass="project_margin")
-                    span {{ project.serverProjectGuid }}
-            .project__test.checkbox
-                  input(type="checkbox" id="test" :checked="project.isTest" @change="setTest(project._id)")
-                  label(for="test") Test
+      .project__info-row
+        input.project__name(type="text" :value="projectName" disabled)
+      .project__info-row
+        .project__date
+          LabelValue(label="Start Date & Time" :isRequired="false" customClass="project_margin")
+            input.project__input-text(type="text" :value="formateDate(project.creationTime)" disabled)
+          img.project__calendar-icon(src="../../../assets/images/calendar.png")
+        .project__date
+          LabelValue(label="Deadline" :isRequired="false" customClass="project_margin")
+            input.project__input-text(type="text" :value="formateDate(project.deadline)" disabled)
+          img.project__calendar-icon(src="../../../assets/images/calendar.png")
+        .project__date
+          | Will Billing Date
+      .project__info-row
+        .project__client
+          LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")
+            .project__input-icons
+              i.fa.fa-external-link.icon-link(aria-hidden='true')
+              input.project__input-text2.project__input-client(type="text" :value="project.client" readonly)
+        .project__industry
+          LabelValue(label="Industry" :isRequired="false" customClass="project_margin")
+            input.project__input-text(   type="text" :value="project.domain" disabled)
+        .project__number
+          LabelValue(label="№" customClass="project_margin")
+            span {{ project.serverProjectGuid }}
+        .project__test.checkbox
+          input(type="checkbox" id="test" :checked="project.isTest" @change="setTest(project._id)")
+          label(for="test") Test
 </template>
 
 <script>
-import LabelValue from "../LabelValue";
-import moment from "moment";
-import { mapActions } from "vuex";
+	import LabelValue from "../LabelValue";
+	import moment from "moment";
+	import { mapActions } from "vuex";
 
-export default {
-  props: {
-    project: {
-      type: Object
-    },
-    projectName: {
-      type: String
-    }
-  },
-  data() {
-    return {
-      isTest: false
-    };
-  },
-  methods: {
-    ...mapActions(["alertToggle"]),
-    formateDate: time => moment(time).format("DD-MM-YYYY HH:mm"),
-    async setTest(projectId) {
-      await this.setProjectProp({
-        projectId: projectId,
-        prop: "isTest",
-        value: event.target.checked
-      });
-    },
-    async setProjectProp({ projectId, prop, value }) {
-      try {
-        const result = await this.$http.put("/pm-manage/other-project-prop", {
-          projectId,
-          prop,
-          value
-        });
-        this.alertToggle({
-          message: "Project type changed",
-          isShow: true,
-          type: "success"
-        });
-      } catch (err) {
-        this.alertToggle({
-          message: "Server Error / Cannot update status Project",
-          isShow: true,
-          type: "error"
-        });
-      }
-    }
-  },
-  components: {
-    LabelValue
-  }
-};
+	export default {
+		props: {
+			project: {
+				type: Object
+			},
+			projectName: {
+				type: String
+			}
+		},
+		data() {
+			return {
+				isTest: false
+			};
+		},
+		methods: {
+			...mapActions(["alertToggle"]),
+			formateDate: time => moment(time).format("DD-MM-YYYY HH:mm"),
+			async setTest(projectId) {
+				await this.setProjectProp({
+					projectId: projectId,
+					prop: "isTest",
+					value: event.target.checked
+				});
+			},
+			async setProjectProp({ projectId, prop, value }) {
+				try {
+					const result = await this.$http.put("/pm-manage/other-project-prop", {
+						projectId,
+						prop,
+						value
+					});
+					this.alertToggle({
+						message: "Project type changed",
+						isShow: true,
+						type: "success"
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: "Server Error / Cannot update status Project",
+						isShow: true,
+						type: "error"
+					});
+				}
+			}
+		},
+		components: {
+			LabelValue
+		}
+	};
 </script>
 
 <style lang="scss" scoped>
-.project {
-  padding: 20px;
-  width: 67%;
-  display: flex;
-  flex-direction: column;
-  @media (max-width: 1600px) {
-    width: 70%;
-  }
-  &__project-template {
-    position: relative;
-    width: 191px;
-    margin-bottom: 60px;
-  }
-  &__all-info {
-    padding: 20px;
-    box-shadow: 0 0 10px #67573e9d;
-  }
-  &__info-row {
-    width: 100%;
+  .project {
+    padding: 40px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    ::-webkit-input-placeholder {
-      color: #68573e;
-      opacity: 0.47;
-    }
-  }
-  &__name {
-    font-size: 29px;
-    padding: 0 5px;
-    height: 44px;
-    width: 33%;
-    border-radius: 5px;
-    color: #68573e;
-    border: 1px solid #68573e;
-    outline: none;
-    &:focus {
-      box-shadow: 0 0 5px #68573e;
-    }
-  }
-  &__date {
-    width: fit-content;
-    position: relative;
-  }
-  &__client,
-  &__industry,
-  &__number {
-    width: fit-content;
-  }
-  &__drop-menu {
-    position: relative;
-    height: 28px;
-    width: 191px;
-  }
-  &__client-link {
-    width: 191px;
-    display: flex;
-    justify-content: flex-start;
-  }
-  &__link {
-    border-bottom: 1px solid #68573e;
-    cursor: pointer;
-  }
-  &__input-text {
-    width: 151px;
-    height: 28px;
-    border: 1px solid #68573e;
-    border-radius: 5px;
-    padding: 0 5px;
-    color: #68573e;
-    font-size: 16px;
-    outline: none;
-    &:focus {
-      box-shadow: 0 0 5px #68573e;
-    }
-  }
-  &__textarea {
-    width: 43%;
-  }
-  &__text {
-    width: 100%;
-    margin-top: 10px;
-    border-radius: 10px;
-    border: 1px solid #68573e;
-    padding: 5px;
-    color: #68573e;
-    resize: none;
-    outline: none;
-    box-sizing: border-box;
-    &:focus {
-      box-shadow: 0 0 5px #68573e;
-    }
-  }
-  &__calendar-icon {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 18px;
-    cursor: pointer;
-  }
-  &__button {
-    text-align: center;
-    margin-top: 30px;
-  }
-  &_no-margin {
-    margin-bottom: 0;
-  }
-  &__test{
-    height: 24px;
-  }
-  .checkbox {
-    display: flex;
-    input[type="checkbox"] {
-      opacity: 0;
-      + {
-        label {
-          &::after {
-            content: none;
-          }
-        }
+    flex-direction: column;
+
+    &__input-icons {
+      position: relative;
+
+      .icon-link {
+        position: absolute;
+        right: 6px;
+        top: 8px;
+        font-size: 18px;
+        cursor: pointer;
       }
-      &:checked {
+    }
+
+    &__project-template {
+      position: relative;
+      width: 191px;
+      margin-bottom: 60px;
+    }
+
+    &__all-info {
+      width: 960px;
+      padding: 20px;
+      box-shadow: 0 0 10px #67573e9d;
+    }
+
+    &__info-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+
+      ::-webkit-input-placeholder {
+        color: #68573E;
+        opacity: 0.47;
+      }
+    }
+
+    &__name {
+      font-size: 22px;
+      padding: 0 5px;
+      height: 44px;
+      width: 35%;
+      border-radius: 5px;
+      color: #68573E;
+      border: 1px solid #68573E;
+      outline: none;
+
+      &:focus {
+        box-shadow: 0 0 5px #68573E;
+      }
+    }
+
+    &__date {
+      width: fit-content;
+      position: relative;
+    }
+
+    &__client,
+    &__industry,
+    &__number {
+      width: fit-content;
+    }
+
+    &__drop-menu {
+      position: relative;
+      height: 28px;
+      width: 191px;
+    }
+
+    &__client-link {
+      width: 191px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    &__link {
+      border-bottom: 1px solid #68573e;
+      cursor: pointer;
+    }
+
+    &__input-text {
+      width: 158px;
+      height: 28px;
+      border: 1px solid #68573E;
+      border-radius: 5px;
+      padding: 0 5px;
+      color: #68573E;
+      font-size: 14px;
+      outline: none;
+
+      &:focus {
+        box-shadow: 0 0 5px #68573E;
+      }
+    }
+
+    &__input-text2 {
+      width: 133px;
+      height: 28px;
+      border: 1px solid #68573E;
+      border-radius: 5px;
+      padding: 0 5px;
+      color: #68573E;
+      font-size: 14px;
+      outline: none;
+      padding-right: 30px;
+
+      &:focus {
+        box-shadow: 0 0 5px #68573E;
+      }
+    }
+
+    &__textarea {
+      width: 43%;
+    }
+
+    &__text {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #68573E;
+      padding: 5px;
+      color: #68573E;
+      resize: none;
+      outline: none;
+      box-sizing: border-box;
+
+      &:focus {
+        box-shadow: 0 0 5px #68573E;
+      }
+    }
+
+    &__calendar-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 18px;
+      cursor: pointer;
+    }
+
+    &__button {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    &_no-margin {
+      margin-bottom: 0;
+    }
+
+    &__test {
+      height: 24px;
+    }
+
+    .checkbox {
+      display: flex;
+
+      input[type="checkbox"] {
+        opacity: 0;
+
         + {
           label {
             &::after {
-              content: "";
+              content: none;
+            }
+          }
+        }
+
+        &:checked {
+          + {
+            label {
+              &::after {
+                content: "";
+              }
             }
           }
         }
       }
-    }
-    label {
-      position: relative;
-      display: inline-block;
-      padding-left: 22px;
-      padding-top: 4px;
-      &::before {
-        position: absolute;
-        content: "";
+
+      label {
+        position: relative;
         display: inline-block;
-        height: 16px;
-        width: 16px;
-        border: 1px solid;
-        left: 0px;
-        top: 3px;
-      }
-      &::after {
-        position: absolute;
-        content: "";
-        display: inline-block;
-        height: 5px;
-        width: 9px;
-        border-left: 2px solid;
-        border-bottom: 2px solid;
-        transform: rotate(-45deg);
-        left: 4px;
-        top: 7px;
+        padding-left: 22px;
+        padding-top: 4px;
+
+        &::before {
+          position: absolute;
+          content: "";
+          display: inline-block;
+          height: 16px;
+          width: 16px;
+          border: 1px solid;
+          left: 0px;
+          top: 3px;
+        }
+
+        &::after {
+          position: absolute;
+          content: "";
+          display: inline-block;
+          height: 5px;
+          width: 9px;
+          border-left: 2px solid;
+          border-bottom: 2px solid;
+          transform: rotate(-45deg);
+          left: 4px;
+          top: 7px;
+        }
       }
     }
   }
-}
 </style>

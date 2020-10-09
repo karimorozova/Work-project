@@ -1,1090 +1,1187 @@
 <template lang="pug">
-.vendor-wrap
-  .vendor-info
-    .buttons
-      input.button(type="button", value="Save", @click="checkForErrors")
-      input.button(type="button", value="Cancel", @click="cancel")
-      input.button(type="button", value="Delete", @click="deleteVendor")
-    .title General Information
-    .vendor-details
-      .gen-info
-        .gen-info__block
-          .photo-wrap(v-if="!currentVendor.photo")
-            input.photo-file(type="file", @change="previewPhoto")
-            .photo-text(v-if="!imageExist")
-              p.photo-text__message(v-if="!isFileError") upload your photo
-                span.photo-extensions *.jpg/jpeg/png
-                span.photo-size <= 2MB
-            img.photo-image(v-if="imageExist")
-            p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
-          .photo-wrap(v-if="currentVendor.photo")
-            input.photo-file(type="file", @change="previewPhoto") 
-            img.photo-image(:src="currentVendor.photo")
-        .gen-info__block
-          .block-item
-            label.block-item__label.block-item_relative First Name:
-              Asterisk(:customStyle="asteriskStyle")
-            input.block-item__input-filed(
-              :class="{ 'block-item_error-shadow': !currentVendor.firstName && isSaveClicked }",
-              type="text",
-              placeholder="First Name",
-              :value="currentVendor.firstName",
-              @change="(e) => updateProp(e, 'firstName')"
-            )
-          .block-item
-            label Surname:
-            input.block-item__input-filed(
-              type="text",
-              placeholder="Surname",
-              :value="currentVendor.surname",
-              @change="(e) => updateProp(e, 'surname')"
-            )
-          .block-item
-            label.block-item__label.block-item_relative Email:
-              Asterisk(:customStyle="asteriskStyle")
-            input.block-item__input-filed(
-              :class="{ 'block-item_error-shadow': validateEmail() && isSaveClicked }",
-              type="text",
-              placeholder="Email",
-              :value="currentVendor.email",
-              @change="(e) => updateProp(e, 'email')"
-            )
-          .block-item
-            label Phone:
-            input.block-item__input-filed(
-              type="text",
-              placeholder="Phone",
-              :value="currentVendor.phone",
-              @input="setPhone",
-              ref="phone"
-            )
-          .block-item
-            label Time Zone:
-            .block-item__drop-menu.block-item_high-index
-              TimezoneSelect(:timezoneSelected="currentVendor.timezone", @chosenZone="setTimezone")
-          .block-item
-            label.block-item__label.block-item_relative Native Language:
-            .block-item__drop-menu.block-item_medium-index
-              NativeLanguageSelect(:selectedLang="currentVendor.native", @chosenLang="setNative")
-          .block-item
-            label Gender:
-            .block-item__drop-menu
-              SelectSingle(
-                :options="genders",
-                :selectedOption="currentVendor.gender",
-                placeholder="Gender",
-                @chooseOption="updateGender"
+  .vendor-wrap
+    .vendor-info
+      .buttons
+        input.button(type="button", value="Save", @click="checkForErrors")
+        input.button(type="button", value="Cancel", @click="cancel")
+        input.button(type="button", value="Delete", @click="deleteVendor")
+      .title General Information
+      .vendor-details
+        .gen-info
+          .gen-info__block
+            .photo-wrap(v-if="!currentVendor.photo")
+              input.photo-file(type="file", @change="previewPhoto")
+              .photo-text(v-if="!imageExist")
+                p.photo-text__message(v-if="!isFileError") upload your photo
+                  span.photo-extensions *.jpg/jpeg/png
+                  span.photo-size <= 2MB
+              img.photo-image(v-if="imageExist")
+              p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
+            .photo-wrap(v-if="currentVendor.photo")
+              input.photo-file(type="file", @change="previewPhoto")
+              img.photo-image(:src="currentVendor.photo")
+          .gen-info__block
+            .block-item
+              label.block-item__label.block-item_relative First Name:
+                Asterisk(:customStyle="asteriskStyle")
+              input.block-item__input-filed(
+                :class="{ 'block-item_error-shadow': !currentVendor.firstName && isSaveClicked }",
+                type="text",
+                placeholder="First Name",
+                :value="currentVendor.firstName",
+                @change="(e) => updateProp(e, 'firstName')"
               )
-        .gen-info__block
-          .block-item
-            label Company Name:
-            input.block-item__input-filed(
-              type="text",
-              placeholder="Company Name",
-              :value="currentVendor.companyName",
-              @change="(e) => updateProp(e, 'companyName')"
-            )
-          .block-item
-            label Website:
-            input.block-item__input-filed(
-              type="text",
-              placeholder="Website",
-              :value="currentVendor.website",
-              @change="(e) => updateProp(e, 'website')"
-            )
-          .block-item
-            label Skype:
-            input.block-item__input-filed(
-              type="text",
-              placeholder="Skype",
-              :value="currentVendor.skype",
-              @change="(e) => updateProp(e, 'skype')"
-            )
-          .block-item
-            label Linkedin:
-            input.block-item__input-filed(
-              type="text",
-              placeholder="Linkedin",
-              :value="currentVendor.linkedin",
-              @change="(e) => updateProp(e, 'linkedin')"
-            )
-          .block-item
-            label WhatsApp:
-            input.block-item__input-filed(
-              type="text",
-              placeholder="WhatsApp",
-              :value="currentVendor.whatsapp",
-              @change="(e) => updateProp(e, 'whatsapp')"
-            )
-          .block-item
-            label Industries:
-              span.require *
-            .block-item__drop-menu(
-              :class="{ 'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length }"
-            )
-              MultiVendorIndustrySelect(
-                :selectedInd="currentVendor.industries || []",
-                :filteredIndustries="selectedIndNames",
-                @chosenInd="chosenInd"
+            .block-item
+              label Surname:
+              input.block-item__input-filed(
+                type="text",
+                placeholder="Surname",
+                :value="currentVendor.surname",
+                @change="(e) => updateProp(e, 'surname')"
               )
+            .block-item
+              label.block-item__label.block-item_relative Email:
+                Asterisk(:customStyle="asteriskStyle")
+              input.block-item__input-filed(
+                :class="{ 'block-item_error-shadow': validateEmail() && isSaveClicked }",
+                type="text",
+                placeholder="Email",
+                :value="currentVendor.email",
+                @change="(e) => updateProp(e, 'email')"
+              )
+            .block-item
+              label Phone:
+              input.block-item__input-filed(
+                type="text",
+                placeholder="Phone",
+                :value="currentVendor.phone",
+                @input="setPhone",
+                ref="phone"
+              )
+            .block-item
+              label Time Zone:
+              .block-item__drop-menu.block-item_high-index
+                TimezoneSelect(:timezoneSelected="currentVendor.timezone", @chosenZone="setTimezone")
+            .block-item
+              label.block-item__label.block-item_relative Native Language:
+              .block-item__drop-menu.block-item_medium-index
+                NativeLanguageSelect(:selectedLang="currentVendor.native", @chosenLang="setNative")
+            .block-item
+              label Gender:
+              .block-item__drop-menu
+                SelectSingle(
+                  :options="genders",
+                  :selectedOption="currentVendor.gender",
+                  placeholder="Gender",
+                  @chooseOption="updateGender"
+                )
+          .gen-info__block
+            .block-item
+              label Company Name:
+              input.block-item__input-filed(
+                type="text",
+                placeholder="Company Name",
+                :value="currentVendor.companyName",
+                @change="(e) => updateProp(e, 'companyName')"
+              )
+            .block-item
+              label Website:
+              input.block-item__input-filed(
+                type="text",
+                placeholder="Website",
+                :value="currentVendor.website",
+                @change="(e) => updateProp(e, 'website')"
+              )
+            .block-item
+              label Skype:
+              input.block-item__input-filed(
+                type="text",
+                placeholder="Skype",
+                :value="currentVendor.skype",
+                @change="(e) => updateProp(e, 'skype')"
+              )
+            .block-item
+              label Linkedin:
+              input.block-item__input-filed(
+                type="text",
+                placeholder="Linkedin",
+                :value="currentVendor.linkedin",
+                @change="(e) => updateProp(e, 'linkedin')"
+              )
+            .block-item
+              label WhatsApp:
+              input.block-item__input-filed(
+                type="text",
+                placeholder="WhatsApp",
+                :value="currentVendor.whatsapp",
+                @change="(e) => updateProp(e, 'whatsapp')"
+              )
+            .block-item
+              label Industries:
+                span.require *
+              .block-item__drop-menu(
+                :class="{ 'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length }"
+              )
+                MultiVendorIndustrySelect(
+                  :selectedInd="currentVendor.industries || []",
+                  :filteredIndustries="selectedIndNames",
+                  @chosenInd="chosenInd"
+                )
+            .block-item
+              label Aliases:
+              .block-item__drop-menu
+                SelectMulti(
+                  placeholder="Select"
+                  :hasSearch="true"
+                  :selectedOptions="currentVendor.hasOwnProperty('aliases') ? currentVendor.aliases : currentVendorAliases"
+                  :options="vendorAliases"
+                  @chooseOptions="setAlias"
+                )
 
-    .vendor-info__preview(v-if="isEditAndSend")
-      WYSIWYG(
-        @closePreview="closePreview",
-        :previewDropMenu="true",
-        :templates="templatesWysiwyg",
-        :message="'<p>Message...</p>'",
-        @send="sendQuote"
-      )
-
-    .title Competencies
-    .vendor-info__competencies(v-if="currentVendor.industries")
-      VendorCompetencies(
-        :languages="languages",
-        :steps="steps",
-        :industries="industries",
-        :vendorIndustries="currentVendor.industries.map((i) => i.name)",
-        @updateQualifications="updateQualifications"
-        @updateRates="updateRates"
-      )
-
-    .title(v-if="currentVendor._id") Qualifications
-      TableQualifications(
-        :qualificationData="qualificationData",
-        :assessmentData="assessmentData",
-        :currentVendor="currentVendor",
-        @refreshQualifications="setDetailsTablesData"
-        :refresh="isRefreshQualificationTable"
-        @updateRates="updateRates"
-      )
-
-    .title Documents
-      TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
-
-    .title Assessment
-      TableAssessment(
-        :assessmentData="assessmentData",
-        :currentVendor="currentVendor",
-        @refreshAssessment="setDetailsTablesData"
-      )
-
-    .title Professional experience
-      TableProfessionalExperience(
-        :professionalExperienceData="professionalExperienceData",
-        :vendorId="vendorId",
-        @refreshProfExperiences="setDetailsTablesData"
-      )
-
-    .title Education
-      TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
-
-    .title Rates
-      .vendor-info__rates(v-if="currentVendor._id")
-        .vendor-info__tables-row
-          .lang-table(v-if="currentVendor._id && languages.length")
-            LangTable(
-              :tableData="currentVendor.rates.basicPricesTable",
-              :vendorId="currentVendor._id",
-              @refreshResultTable="refreshResultTable",
-              :refresh="isRefreshAfterServiceUpdate"
-            )
-          .step-table(v-if="currentVendor._id && steps.length && units.length")
-            StepTable(
-              :tableData="currentVendor.rates.stepMultipliersTable",
-              :vendorId="currentVendor._id",
-              @refreshResultTable="refreshResultTable",
-              :refresh="isRefreshAfterServiceUpdate"
-            )
-          .industry-table(v-if="currentVendor._id && industries.length")
-            IndustryTable(
-              :tableData="currentVendor.rates.industryMultipliersTable",
-              :vendorId="currentVendor._id",
-              @refreshResultTable="refreshResultTable",
-              :refresh="isRefreshAfterServiceUpdate"
-            )
-        .result-table(v-if="currentVendor._id")
-          ResultTable(
-            :vendorId="currentVendor._id",
-            :languages="languages.map((i) => i.lang)",
-            :steps="steps.map((i) => i.title)",
-            :units="units.map((i) => i.type)",
-            :industries="industries.map((i) => i.name)",
-            :isRefreshResultTable="isRefreshResultTable",
-            :refresh="isRefreshAfterServiceUpdate"
-          )
-
-    .title Discount Chart
-      .vendor-info__drop-matrix(v-if="currentVendor._id")
-        FinanceMatrix(:entity="currentVendor", @setMatrixData="setMatrixData")
-
-    .title Notes & Comments
-      .vendor-info__notes-block
-        .vendor-info__notes
-          VendorCandidate(:candidateData="currentVendor")
-        .vendor-info__editor(v-if="currentVendor._id")
-          ckeditor(v-model="currentVendor.notes", :config="editorConfig")
-
-    .title Vendor to memoq
-      div
-        h3(@click="openMemoqModal('Saved')") SAVE
-        h3(@click="openMemoqModal('Deleted')") DELETE
-
-    .approve-action(v-if="approveMemoqVendorAction")
-      ApproveModal(
-        text="Are you sure?"
-        approveValue="Yes"
-        notApproveValue="No"
-        @approve="approveModal"
-        @close="approveMemoqVendorAction = false"
-        @notApprove="approveMemoqVendorAction = false"
-      )
-
-    .delete-approve(v-if="isApproveModal")
-      p Are you sure you want to delete?
-      input.button.approve-block(type="button", value="Cancel", @click="cancelApprove")
-      input.button(type="button", value="Delete", @click="approveVendorDelete")
-
-  .vendor-subinfo
-    .vendor-subinfo__general
-      .block-item-subinfo
-        label.block-item-subinfo__label Vendor Status:
-          span.require *
-        .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(
-          :class="{ 'block-item-subinfo_error-shadow': isSaveClicked && !currentVendor.status }"
+      .vendor-info__preview(v-if="isEditAndSend")
+        WYSIWYG(
+          @closePreview="closePreview",
+          :previewDropMenu="true",
+          :templates="templatesWysiwyg",
+          :message="'<p>Message...</p>'",
+          @send="sendQuote"
         )
-          VendorStatusSelect(isAllExist="no", :selectedStatus="currentVendor.status", @chosenStatus="chosenStatus")
-      .block-item-subinfo
-        label.block-item-subinfo__label Professional level:
-        .block-item-subinfo__drop.block-item-subinfo_high-index
-          SelectSingle(
-            :options="['level1', 'level2']",
-            placeholder="Level",
-            :selectedOption="optionProfessionalLevel",
-            @chooseOption="updateProfessionalLevel"
+
+      .title Competencies
+      .vendor-info__competencies(v-if="currentVendor.industries")
+        VendorCompetencies(
+          :languages="languages",
+          :steps="steps",
+          :industries="industries",
+          :vendorIndustries="currentVendor.industries.map((i) => i.name)",
+          @updateQualifications="updateQualifications"
+          @updateRates="updateRates"
+        )
+
+      .title(v-if="currentVendor._id") Qualifications
+        TableQualifications(
+          :qualificationData="qualificationData",
+          :assessmentData="assessmentData",
+          :currentVendor="currentVendor",
+          @refreshQualifications="setDetailsTablesData"
+          :refresh="isRefreshQualificationTable"
+          @updateRates="updateRates"
+        )
+
+      .title Documents
+        TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
+
+      .title Assessment
+        TableAssessment(
+          :assessmentData="assessmentData",
+          :currentVendor="currentVendor",
+          @refreshAssessment="setDetailsTablesData"
+        )
+
+      .title Professional experience
+        TableProfessionalExperience(
+          :professionalExperienceData="professionalExperienceData",
+          :vendorId="vendorId",
+          @refreshProfExperiences="setDetailsTablesData"
+        )
+
+      .title Education
+        TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
+
+      .title Rates
+        .vendor-info__rates(v-if="currentVendor._id")
+          .vendor-info__tables-row
+            .lang-table(v-if="currentVendor._id && languages.length")
+              LangTable(
+                :tableData="currentVendor.rates.basicPricesTable",
+                :vendorId="currentVendor._id",
+                @refreshResultTable="refreshResultTable",
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+            .step-table(v-if="currentVendor._id && steps.length && units.length")
+              StepTable(
+                :tableData="currentVendor.rates.stepMultipliersTable",
+                :vendorId="currentVendor._id",
+                @refreshResultTable="refreshResultTable",
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+            .industry-table(v-if="currentVendor._id && industries.length")
+              IndustryTable(
+                :tableData="currentVendor.rates.industryMultipliersTable",
+                :vendorId="currentVendor._id",
+                @refreshResultTable="refreshResultTable",
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+          .result-table(v-if="currentVendor._id")
+            ResultTable(
+              :vendorId="currentVendor._id",
+              :languages="languages.map((i) => i.lang)",
+              :steps="steps.map((i) => i.title)",
+              :units="units.map((i) => i.type)",
+              :industries="industries.map((i) => i.name)",
+              :isRefreshResultTable="isRefreshResultTable",
+              :refresh="isRefreshAfterServiceUpdate"
+            )
+
+      .title Discount Chart
+        .vendor-info__drop-matrix(v-if="currentVendor._id")
+          FinanceMatrix(:entity="currentVendor", @setMatrixData="setMatrixData")
+
+      .title Notes & Comments
+        .vendor-info__notes-block
+          .vendor-info__notes
+            VendorCandidate(:candidateData="currentVendor")
+          .vendor-info__editor(v-if="currentVendor._id")
+            ckeditor(v-model="currentVendor.notes", :config="editorConfig")
+
+      .title Vendor to memoq
+        div
+          h3(@click="openMemoqModal('Saved')") SAVE
+          h3(@click="openMemoqModal('Deleted')") DELETE
+
+      .approve-action(v-if="approveMemoqVendorAction")
+        ApproveModal(
+          text="Are you sure?"
+          approveValue="Yes"
+          notApproveValue="No"
+          @approve="approveModal"
+          @close="approveMemoqVendorAction = false"
+          @notApprove="approveMemoqVendorAction = false"
+        )
+
+      .delete-approve(v-if="isApproveModal")
+        p Are you sure you want to delete?
+        input.button.approve-block(type="button", value="Cancel", @click="cancelApprove")
+        input.button(type="button", value="Delete", @click="approveVendorDelete")
+
+    .vendor-subinfo
+      .vendor-subinfo__general
+        .block-item-subinfo
+          label.block-item-subinfo__label Vendor Status:
+            span.require *
+          .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(
+            :class="{ 'block-item-subinfo_error-shadow': isSaveClicked && !currentVendor.status }"
           )
-      .block-item-subinfo
-        label.block-item-subinfo__label Test:
-        .block-item-subinfo__check-item.checkbox
-          input#test(type="checkbox", :checked="currentVendor.isTest", @change="setTest")
-          label(for="test")
+            VendorStatusSelect(isAllExist="no", :selectedStatus="currentVendor.status", @chosenStatus="chosenStatus")
+        .block-item-subinfo
+          label.block-item-subinfo__label Professional level:
+          .block-item-subinfo__drop.block-item-subinfo_high-index
+            SelectSingle(
+              :options="['level1', 'level2']",
+              placeholder="Level",
+              :selectedOption="optionProfessionalLevel",
+              @chooseOption="updateProfessionalLevel"
+            )
+        .block-item-subinfo
+          label.block-item-subinfo__label Test:
+          .block-item-subinfo__check-item.checkbox
+            input#test(type="checkbox", :checked="currentVendor.isTest", @change="setTest")
+            label(for="test")
 
-    .vendor-subinfo__action
-      VendorAction(@openPreview="openPreview")
+      .vendor-subinfo__action
+        VendorAction(@openPreview="openPreview")
 
-  ValidationErrors(v-if="areErrorsExist", :errors="errors", @closeErrors="closeErrors")
+    ValidationErrors(v-if="areErrorsExist", :errors="errors", @closeErrors="closeErrors")
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import FinanceMatrix from "../FinanceMatrix";
-import VendorCompetencies from "./VendorCompetencies";
-import ResultTable from "./pricelists/ResultTable";
-import IndustryTable from "./pricelists/IndustryTable";
-import StepTable from "./pricelists/StepTable";
-import LangTable from "./pricelists/LangTable";
-import CKEditor from "ckeditor4-vue";
-import WYSIWYG from "./WYSIWYG";
-import VendorAction from "./VendorAction";
-import VendorCandidate from "./VendorCandidate";
-import TableQualifications from "./TableQualifications";
-import TableProfessionalExperience from "./TableProfessionalExperience";
-import TableEducation from "./TableEducation";
-import TableDocuments from "./TableDocuments";
-import TableAssessment from "./TableAssessment";
-import ClickOutside from "vue-click-outside";
-import VendorStatusSelect from "./VendorStatusSelect";
-import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
-import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
-import NativeLanguageSelect from "./NativeLanguageSelect";
-import TimezoneSelect from "../clients/TimezoneSelect";
-import ValidationErrors from "../ValidationErrors";
-import SelectSingle from "../SelectSingle";
-import Asterisk from "../Asterisk";
-import Addseverallangs from "../finance/Addseverallangs";
-import AvailablePairs from "../finance/pricelists/AvailablePairs";
-import photoPreview from "@/mixins/photoPreview";
-import ApproveModal from "../ApproveModal";
+	import { mapGetters, mapActions } from "vuex";
+	import FinanceMatrix from "../FinanceMatrix";
+	import VendorCompetencies from "./VendorCompetencies";
+	import ResultTable from "./pricelists/ResultTable";
+	import IndustryTable from "./pricelists/IndustryTable";
+	import StepTable from "./pricelists/StepTable";
+	import LangTable from "./pricelists/LangTable";
+	import CKEditor from "ckeditor4-vue";
+	import WYSIWYG from "./WYSIWYG";
+	import VendorAction from "./VendorAction";
+	import VendorCandidate from "./VendorCandidate";
+	import TableQualifications from "./TableQualifications";
+	import TableProfessionalExperience from "./TableProfessionalExperience";
+	import TableEducation from "./TableEducation";
+	import TableDocuments from "./TableDocuments";
+	import TableAssessment from "./TableAssessment";
+	import ClickOutside from "vue-click-outside";
+	import VendorStatusSelect from "./VendorStatusSelect";
+	import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
+	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
+	import NativeLanguageSelect from "./NativeLanguageSelect";
+	import TimezoneSelect from "../clients/TimezoneSelect";
+	import ValidationErrors from "../ValidationErrors";
+	import SelectSingle from "../SelectSingle";
+	import Asterisk from "../Asterisk";
+	import Addseverallangs from "../finance/Addseverallangs";
+	import AvailablePairs from "../finance/pricelists/AvailablePairs";
+	import photoPreview from "@/mixins/photoPreview";
+	import ApproveModal from "../ApproveModal";
+	import SelectMulti from "../SelectMulti";
 
-export default {
-  mixins: [photoPreview],
-  data() {
-    return {
-      languages: [],
-      industries: [],
-      services: [],
-      units: [],
-      steps: [],
+	export default {
+		mixins: [photoPreview],
+		data() {
+			return {
+				languages: [],
+				industries: [],
+				services: [],
+				units: [],
+				steps: [],
+				aliases: [],
 
-	    memoqAction: "",
-	    approveMemoqVendorAction: false,
-      isRefreshQualificationTable: false,
-      isRefreshAfterServiceUpdate: false,
-      isRefreshResultTable: false,
-      vendorId: "",
-      educationData: [],
-      professionalExperienceData: [],
-      qualificationData: [],
-      documentsData: [],
-      assessmentData: [],
-      areErrorsExist: false,
-      isSaveClicked: false,
-      vendorShow: true,
-      imageExist: false,
-      isApproveModal: false,
-      asteriskStyle: { top: "0px" },
-      photoFile: [],
-      genders: ["Male", "Female", "Other"],
-      errors: [],
-      langPairs: [],
-      addSeveralPriceId: "",
-      oldEmail: "",
-      isFileError: false,
-      isEditAndSend: false,
-      editorConfig: {
-        allowedContent: true,
-        uiColor: "#F4F0EE",
-        resize_minHeight: "130",
-        height: 167,
-      },
-      templatesWysiwyg: [
-        {
-          title: "tempate",
-          message: "<p>test message</p>",
-        },
-      ],
-    };
-  },
-  methods: {
-    ...mapActions({
-      alertToggle: "alertToggle",
-      updateVendorProp: "updateVendorProp",
-      updateCurrentVendor: "updateCurrentVendor",
-      deleteCurrentVendor: "deleteCurrentVendor",
-      storeCurrentVendor: "storeCurrentVendor",
-      updateIndustry: "updateIndustry",
-      getDuoCombinations: "getVendorDuoCombinations",
-      updateVendorStatus: "updateVendorStatus",
-      setVendorsMatrixData: "setVendorsMatrixData",
-    }),
-	  async approveModal(){
-    	await this.memoqVendorAction(this.memoqAction)
-		  this.approveMemoqVendorAction = false;
-		  this.memoqAction = ''
-	  },
-	  openMemoqModal(action){
-    	this.memoqAction = action;
-    	this.approveMemoqVendorAction = !!action;
-    },
-    async memoqVendorAction(action){
-      if(action === 'Saved'){
-        await this.sendVendorToMemoq(`/vendorsapi/create-memoq-vendor/${this.currentVendor._id}`, action)
-      }else{
-	      await this.sendVendorToMemoq(`/vendorsapi/delete-memoq-vendor/${this.currentVendor._id}`, action)
-      }
-    },
-    async sendVendorToMemoq(link, action){
-    	try {
-        await this.$http.get(link)
-		    this.alertToggle({
-			    message: `Vendor in Memoq are ${action}`,
-			    isShow: true,
-			    type: "success",
-		    });
-	    }catch (err) {
-		    this.alertToggle({
-			    message: "Error on action with Memoq & Vendor",
-			    isShow: true,
-			    type: "error",
-		    });
-	    }
-    },
-    async updateQualifications() {
-        this.isRefreshQualificationTable = true;
-        setTimeout(() => {
-          this.isRefreshQualificationTable = false;
-        }, 2000);
-    },
-    async setMatrixData({ value, key }) {
-      try {
-        await this.setVendorsMatrixData({ value, key });
-        this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" });
-      } catch (err) {
-        this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" });
-      }
-    },
-    refreshResultTable() {
-      this.isRefreshResultTable = true;
-      setTimeout(() => {
-        this.isRefreshResultTable = false;
-      }, 2000);
-    },
-    updateRates(action) {
-      this.isRefreshAfterServiceUpdate = action;
-      setTimeout(() => {
-        this.isRefreshAfterServiceUpdate = !action;
-      }, 2000);
-    },
-    async setTest() {
-      const vendor = {
-        id: this.currentVendor._id,
-        isTest: event.target.checked,
-      };
-      try {
-        await this.updateVendorStatus(vendor);
-        this.alertToggle({
-          message: "Vendor status updated",
-          isShow: true,
-          type: "success",
-        });
-      } catch (err) {
-        this.alertToggle({
-          message: "Server error / Cannot update Vendor status",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    closePreview() {
-      this.isEditAndSend = false;
-    },
-    openPreview() {
-      this.isEditAndSend = true;
-    },
-    async sendQuote(message) {
-      try {
-        console.log(message);
-      } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" });
-      }
-      this.closePreview();
-    },
-    closeLangPairs() {
-      this.isAvailablePairs = false;
-    },
-    deleteVendor() {
-      this.isApproveModal = true;
-    },
-    cancelApprove() {
-      this.isApproveModal = false;
-    },
-    closeErrors() {
-      this.areErrorsExist = false;
-    },
-    validateEmail() {
-      const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-      return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase());
-    },
-    setPhone(e) {
-      const { value } = e.target;
-      const regex = /^[0-9]+$/;
-      const characters = value.split("").filter((item) => regex.test(item));
-      const clearedValue = characters.join("");
-      const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
-      this.$refs.phone.value = phoneValue;
-      this.updateVendorProp({ prop: "phone", value: phoneValue });
-    },
-    async checkEmail() {
-      if (this.validateEmail()) {
-        return this.errors.push("Please provide a valid email.");
-      }
-      if (this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
-        try {
-          const result = await this.$http.get(`/vendors/application/unique-email?email=${this.currentVendor.email}`);
-          const isUnique = !result.data;
-          isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
-        } catch (err) {
-          this.alertToggle({
-            message: "Error on email uniqueness checking",
-            isShow: true,
-            type: "error",
-          });
-        }
-      }
-    },
-    async checkForErrors() {
-      const textReg = /^[-\sa-zA-Z]+$/;
-      try {
-        this.errors = [];
-        if (!this.currentVendor.firstName || !textReg.test(this.currentVendor.firstName))
-          this.errors.push("Please, enter valid first name.");
-        if (this.currentVendor.surname && !textReg.test(this.currentVendor.surname))
-          this.errors.push("Please, enter valid surname.");
-        if (!this.currentVendor.industries.length) this.errors.push("Please, choose at least one industry.");
-        if (!this.currentVendor.status) this.errors.push("Please, choose status.");
-        await this.checkEmail();
-        if (this.errors.length) {
-          this.areErrorsExist = true;
-          this.isSaveClicked = true;
-          return;
-        }
-        await this.updateVendor();
-      } catch (err) {}
-    },
-    async updateVendor() {
-      let sendData = new FormData();
-      sendData.append("vendor", JSON.stringify(this.currentVendor));
-      sendData.append("photo", this.photoFile[0]);
-      try {
-        await this.updateCurrentVendor(sendData);
-        this.oldEmail = this.currentVendor.email;
-        this.alertToggle({
-          message: "Vendor info updated",
-          isShow: true,
-          type: "success",
-        });
-      } catch (err) {
-        this.alertToggle({
-          message: "Server error / Cannot update Vendor info",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    updateProp(e, prop) {
-      const value = e.target.value;
-      this.updateVendorProp({ prop, value });
-    },
-    updateGender({ option }) {
-      this.updateVendorProp({ prop: "gender", value: option });
-    },
-    updateProfessionalLevel({ option }) {
-      this.updateVendorProp({ prop: "professionalLevel", value: option });
-    },
-    setTimezone(data) {
-      this.updateVendorProp({ prop: "timezone", value: data });
-    },
-    setNative({ lang }) {
-      this.updateVendorProp({ prop: "native", value: lang });
-    },
-    chosenStatus({ option }) {
-      this.updateVendorProp({ prop: "status", value: option });
-    },
-    cancel() {
-      this.$router.go(-1);
-    },
-    async approveVendorDelete() {
-      this.isApproveModal = false;
-      if (!this.currentVendor._id) {
-        return this.cancel();
-      }
-      try {
-        const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${this.currentVendor._id}`);
-        if (isAssigned.body) {
-          return this.alertToggle({
-            message: "The vendor was assigned to a step and cannot be deleted.",
-            isShow: true,
-            type: "error",
-          });
-        }
-        await this.deleteCurrentVendor({ id: this.currentVendor._id });
-        this.alertToggle({
-          message: "Vendor removed",
-          isShow: true,
-          type: "success",
-        });
-        this.$router.go(-1);
-      } catch (err) {
-        this.alertToggle({
-          message: "Server error / Cannot delete the Vendor",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    chosenInd({ industry }) {
-      this.updateIndustry(industry);
-    },
-    setDetailsTablesData() {
-      this.educationData = Array.from(this.currentVendor.educations);
-      this.professionalExperienceData = Array.from(this.currentVendor.profExperiences);
-      this.qualificationData = Array.from(this.currentVendor.qualifications);
-      this.documentsData = Array.from(this.currentVendor.documents);
-      this.assessmentData = Array.from(this.currentVendor.assessments);
-    },
-    async getVendor() {
-      this.vendorId = this.$route.params.id;
-      const id = this.$route.params.id;
-      try {
-        if (!this.currentVendor._id) {
-          const vendor = await this.$http.get(`/vendorsapi/vendor?id=${id}`);
-          await this.storeCurrentVendor(vendor.body);
-          this.oldEmail = this.currentVendor.email;
-        }
-        this.setDetailsTablesData();
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on getting Vendor's info",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    async getLangs() {
-      try {
-        const result = await this.$http.get("/api/languages");
-        this.languages = Array.from(result.body);
-      } catch (err) {
-        this.alertToggle({
-          message: "Error in Languages",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    async getIndustries() {
-      try {
-        const result = await this.$http.get("/api/industries");
-        this.industries = result.body;
-      } catch (err) {
-        this.alertToggle({
-          message: "Error in Industries",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    async getServices() {
-      try {
-        const result = await this.$http.get("/api/services");
-        this.services = result.body;
-      } catch (err) {
-        this.alertToggle({
-          message: "Error in Services",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    async getUnits() {
-      try {
-        const result = await this.$http.get("/api/units");
-        this.units = result.body;
-      } catch (err) {
-        this.alertToggle({
-          message: "Error in Units",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-    async getSteps() {
-      try {
-        const result = await this.$http.get("/api/steps");
-        this.steps = result.body;
-      } catch (err) {
-        this.alertToggle({
-          message: "Error in Steps",
-          isShow: true,
-          type: "error",
-        });
-      }
-    },
-  },
-  computed: {
-    ...mapGetters({
-      currentVendor: "getCurrentVendor",
-    }),
-    selectedIndNames() {
-      let result = [];
-      if (this.currentVendor.industries && this.currentVendor.industries.length) {
-        for (let ind of this.currentVendor.industries) {
-          result.push(ind.name);
-        }
-      }
-      return result;
-    },
-    optionProfessionalLevel() {
-      return this.currentVendor.hasOwnProperty("professionalLevel") ? this.currentVendor.professionalLevel : "";
-    },
-  },
-  components: {
-	  ApproveModal,
-    VendorCompetencies,
-    WYSIWYG,
-    VendorCandidate,
-    VendorAction,
-    TableQualifications,
-    TableAssessment,
-    TableDocuments,
-    TableEducation,
-    TableProfessionalExperience,
-    VendorLeadsourceSelect,
-    VendorStatusSelect,
-    MultiVendorIndustrySelect,
-    NativeLanguageSelect,
-    TimezoneSelect,
-    ValidationErrors,
-    Asterisk,
-    Addseverallangs,
-    AvailablePairs,
-    SelectSingle,
-    ckeditor: CKEditor.component,
-    LangTable,
-    StepTable,
-    IndustryTable,
-    ResultTable,
-    FinanceMatrix,
-  },
-  directives: {
-    ClickOutside,
-  },
-  created() {
-    this.getVendor();
-    this.getLangs();
-    this.getUnits();
-    this.getSteps();
-    this.getIndustries();
-    this.getServices();
-  },
-  mounted() {
-    this.oldEmail = this.currentVendor.email;
-  },
-  beforeDestroy() {
-    this.storeCurrentVendor({});
-  },
-};
+				currentVendorAliases: [],
+				memoqAction: "",
+				approveMemoqVendorAction: false,
+				isRefreshQualificationTable: false,
+				isRefreshAfterServiceUpdate: false,
+				isRefreshResultTable: false,
+				vendorId: "",
+				educationData: [],
+				professionalExperienceData: [],
+				qualificationData: [],
+				documentsData: [],
+				assessmentData: [],
+				areErrorsExist: false,
+				isSaveClicked: false,
+				vendorShow: true,
+				imageExist: false,
+				isApproveModal: false,
+				asteriskStyle: { top: "0px" },
+				photoFile: [],
+				genders: ["Male", "Female", "Other"],
+				errors: [],
+				langPairs: [],
+				addSeveralPriceId: "",
+				oldEmail: "",
+				isFileError: false,
+				isEditAndSend: false,
+				editorConfig: {
+					allowedContent: true,
+					uiColor: "#F4F0EE",
+					resize_minHeight: "130",
+					height: 167,
+				},
+				templatesWysiwyg: [
+					{
+						title: "tempate",
+						message: "<p>test message</p>",
+					},
+				],
+			};
+		},
+		methods: {
+			...mapActions({
+				alertToggle: "alertToggle",
+				updateVendorProp: "updateVendorProp",
+				updateCurrentVendor: "updateCurrentVendor",
+				deleteCurrentVendor: "deleteCurrentVendor",
+				storeCurrentVendor: "storeCurrentVendor",
+				updateIndustry: "updateIndustry",
+				getDuoCombinations: "getVendorDuoCombinations",
+				updateVendorStatus: "updateVendorStatus",
+				setVendorsMatrixData: "setVendorsMatrixData",
+			}),
+			setAlias({ option }) {
+				if(this.currentVendor.hasOwnProperty('aliases')) {
+					if(this.currentVendor.aliases.length) {
+						this.currentVendorAliases = this.currentVendor.aliases
+					}
+				}
+				const position = this.currentVendorAliases.indexOf(option);
+
+				if(position !== -1) {
+					this.currentVendorAliases.splice(position, 1);
+					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases });
+				} else {
+					this.currentVendorAliases.push(option);
+					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases });
+				}
+			},
+			async approveModal() {
+				await this.memoqVendorAction(this.memoqAction)
+				this.approveMemoqVendorAction = false;
+				this.memoqAction = ''
+			},
+			openMemoqModal(action) {
+				this.memoqAction = action;
+				this.approveMemoqVendorAction = !!action;
+			},
+			async memoqVendorAction(action) {
+				if(action === 'Saved') {
+					await this.sendVendorToMemoq(`/vendorsapi/create-memoq-vendor/${ this.currentVendor._id }`, action)
+				} else {
+					await this.sendVendorToMemoq(`/vendorsapi/delete-memoq-vendor/${ this.currentVendor._id }`, action)
+				}
+			},
+			async sendVendorToMemoq(link, action) {
+				try {
+					await this.$http.get(link)
+					this.alertToggle({
+						message: `Vendor in Memoq are ${ action }`,
+						isShow: true,
+						type: "success",
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: "Error on action with Memoq & Vendor",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			async updateQualifications() {
+				this.isRefreshQualificationTable = true;
+				setTimeout(() => {
+					this.isRefreshQualificationTable = false;
+				}, 2000);
+			},
+			async setMatrixData({ value, key }) {
+				try {
+					await this.setVendorsMatrixData({ value, key });
+					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" });
+				} catch (err) {
+					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" });
+				}
+			},
+			refreshResultTable() {
+				this.isRefreshResultTable = true;
+				setTimeout(() => {
+					this.isRefreshResultTable = false;
+				}, 2000);
+			},
+			updateRates(action) {
+				this.isRefreshAfterServiceUpdate = action;
+				setTimeout(() => {
+					this.isRefreshAfterServiceUpdate = !action;
+				}, 2000);
+			},
+			async setTest() {
+				const vendor = {
+					id: this.currentVendor._id,
+					isTest: event.target.checked,
+				};
+				try {
+					await this.updateVendorStatus(vendor);
+					this.alertToggle({
+						message: "Vendor status updated",
+						isShow: true,
+						type: "success",
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: "Server error / Cannot update Vendor status",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			closePreview() {
+				this.isEditAndSend = false;
+			},
+			openPreview() {
+				this.isEditAndSend = true;
+			},
+			async sendQuote(message) {
+				try {
+					console.log(message);
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+				}
+				this.closePreview();
+			},
+			closeLangPairs() {
+				this.isAvailablePairs = false;
+			},
+			deleteVendor() {
+				this.isApproveModal = true;
+			},
+			cancelApprove() {
+				this.isApproveModal = false;
+			},
+			closeErrors() {
+				this.areErrorsExist = false;
+			},
+			validateEmail() {
+				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+				return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase());
+			},
+			setPhone(e) {
+				const { value } = e.target;
+				const regex = /^[0-9]+$/;
+				const characters = value.split("").filter((item) => regex.test(item));
+				const clearedValue = characters.join("");
+				const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
+				this.$refs.phone.value = phoneValue;
+				this.updateVendorProp({ prop: "phone", value: phoneValue });
+			},
+			async checkEmail() {
+				if(this.validateEmail()) {
+					return this.errors.push("Please provide a valid email.");
+				}
+				if(this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
+					try {
+						const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.currentVendor.email }`);
+						const isUnique = !result.data;
+						isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
+					} catch (err) {
+						this.alertToggle({
+							message: "Error on email uniqueness checking",
+							isShow: true,
+							type: "error",
+						});
+					}
+				}
+			},
+			async checkForErrors() {
+				const textReg = /^[-\sa-zA-Z]+$/;
+				try {
+					this.errors = [];
+					if(!this.currentVendor.firstName || !textReg.test(this.currentVendor.firstName))
+						this.errors.push("Please, enter valid first name.");
+					if(this.currentVendor.surname && !textReg.test(this.currentVendor.surname))
+						this.errors.push("Please, enter valid surname.");
+					if(!this.currentVendor.industries.length) this.errors.push("Please, choose at least one industry.");
+					if(!this.currentVendor.status) this.errors.push("Please, choose status.");
+					await this.checkEmail();
+					if(this.errors.length) {
+						this.areErrorsExist = true;
+						this.isSaveClicked = true;
+						return;
+					}
+					await this.updateVendor();
+				} catch (err) {
+				}
+			},
+			async updateVendor() {
+				let sendData = new FormData();
+				sendData.append("vendor", JSON.stringify(this.currentVendor));
+				sendData.append("photo", this.photoFile[0]);
+				try {
+					await this.updateCurrentVendor(sendData);
+					this.oldEmail = this.currentVendor.email;
+					this.alertToggle({
+						message: "Vendor info updated",
+						isShow: true,
+						type: "success",
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: "Server error / Cannot update Vendor info",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			updateProp(e, prop) {
+				const value = e.target.value;
+				this.updateVendorProp({ prop, value });
+			},
+			updateGender({ option }) {
+				this.updateVendorProp({ prop: "gender", value: option });
+			},
+			updateProfessionalLevel({ option }) {
+				this.updateVendorProp({ prop: "professionalLevel", value: option });
+			},
+			setTimezone(data) {
+				this.updateVendorProp({ prop: "timezone", value: data });
+			},
+			setNative({ lang }) {
+				this.updateVendorProp({ prop: "native", value: lang });
+			},
+			chosenStatus({ option }) {
+				this.updateVendorProp({ prop: "status", value: option });
+			},
+			cancel() {
+				this.$router.go(-1);
+			},
+			async approveVendorDelete() {
+				this.isApproveModal = false;
+				if(!this.currentVendor._id) {
+					return this.cancel();
+				}
+				try {
+					const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ this.currentVendor._id }`);
+					if(isAssigned.body) {
+						return this.alertToggle({
+							message: "The vendor was assigned to a step and cannot be deleted.",
+							isShow: true,
+							type: "error",
+						});
+					}
+					await this.deleteCurrentVendor({ id: this.currentVendor._id });
+					this.alertToggle({
+						message: "Vendor removed",
+						isShow: true,
+						type: "success",
+					});
+					this.$router.go(-1);
+				} catch (err) {
+					this.alertToggle({
+						message: "Server error / Cannot delete the Vendor",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			chosenInd({ industry }) {
+				this.updateIndustry(industry);
+			},
+			setDetailsTablesData() {
+				this.educationData = Array.from(this.currentVendor.educations);
+				this.professionalExperienceData = Array.from(this.currentVendor.profExperiences);
+				this.qualificationData = Array.from(this.currentVendor.qualifications);
+				this.documentsData = Array.from(this.currentVendor.documents);
+				this.assessmentData = Array.from(this.currentVendor.assessments);
+			},
+			async getVendor() {
+				this.vendorId = this.$route.params.id;
+				const id = this.$route.params.id;
+				try {
+					if(!this.currentVendor._id) {
+						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`);
+						await this.storeCurrentVendor(vendor.body);
+						this.oldEmail = this.currentVendor.email;
+					}
+					this.setDetailsTablesData();
+				} catch (err) {
+					this.alertToggle({
+						message: "Error on getting Vendor's info",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			async getLangs() {
+				try {
+					const result = await this.$http.get("/api/languages");
+					this.languages = Array.from(result.body);
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Languages",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			async getIndustries() {
+				try {
+					const result = await this.$http.get("/api/industries");
+					this.industries = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Industries",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			async getServices() {
+				try {
+					const result = await this.$http.get("/api/services");
+					this.services = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Services",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			async getUnits() {
+				try {
+					const result = await this.$http.get("/api/units");
+					this.units = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Units",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			async getSteps() {
+				try {
+					const result = await this.$http.get("/api/steps");
+					this.steps = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Steps",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+			async getAliases() {
+				try {
+					const result = await this.$http.get("/memoqapi/memoq-vendor-aliases");
+					this.aliases = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Aliases",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
+		},
+		computed: {
+			...mapGetters({
+				currentVendor: "getCurrentVendor",
+			}),
+			vendorAliases() {
+				if(this.aliases) {
+					return this.aliases;
+				}
+			},
+			selectedIndNames() {
+				let result = [];
+				if(this.currentVendor.industries && this.currentVendor.industries.length) {
+					for (let ind of this.currentVendor.industries) {
+						result.push(ind.name);
+					}
+				}
+				return result;
+			},
+			optionProfessionalLevel() {
+				return this.currentVendor.hasOwnProperty("professionalLevel") ? this.currentVendor.professionalLevel : "";
+			},
+		},
+		components: {
+			SelectMulti,
+			ApproveModal,
+			VendorCompetencies,
+			WYSIWYG,
+			VendorCandidate,
+			VendorAction,
+			TableQualifications,
+			TableAssessment,
+			TableDocuments,
+			TableEducation,
+			TableProfessionalExperience,
+			VendorLeadsourceSelect,
+			VendorStatusSelect,
+			MultiVendorIndustrySelect,
+			NativeLanguageSelect,
+			TimezoneSelect,
+			ValidationErrors,
+			Asterisk,
+			Addseverallangs,
+			AvailablePairs,
+			SelectSingle,
+			ckeditor: CKEditor.component,
+			LangTable,
+			StepTable,
+			IndustryTable,
+			ResultTable,
+			FinanceMatrix,
+		},
+		directives: {
+			ClickOutside,
+		},
+		created() {
+			this.getVendor();
+			this.getLangs();
+			this.getUnits();
+			this.getSteps();
+			this.getIndustries();
+			this.getServices();
+			this.getAliases();
+		},
+		mounted() {
+			this.oldEmail = this.currentVendor.email;
+		},
+		beforeDestroy() {
+			this.storeCurrentVendor({});
+		},
+	};
 </script>
 
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss";
+  @import "../../assets/scss/colors.scss";
 
-.block-item-subinfo {
-  display: flex;
-  height: 50px;
-  &__error-shadow {
-    height: 30px;
-  }
-  &__check-item {
-    width: 190px;
-  }
-  &__last {
-    height: 30px;
-  }
-  &_maxhigh-index {
-    z-index: 12;
-  }
-  &_high-index {
-    z-index: 10;
-  }
-  &__label {
-    width: 160px;
-    padding-top: 6px;
-  }
-  &__drop {
-    position: relative;
-    width: 190px;
-  }
-}
-.block-item-subinfo:last-child {
-  height: 30px;
-}
-.vendor-wrap {
-  position: relative;
-  width: 100%;
-  display: flex;
-}
-
-.vendor-subinfo {
-  &__general {
-    padding: 20px;
-    margin-top: 120px;
-    width: 350px;
-    box-shadow: 0 0 10px #67573e9d;
-  }
-  &__action {
-    margin-top: 40px;
-    width: 390px;
-    box-shadow: 0 0 10px #67573e9d;
-  }
-}
-
-.vendor-info {
-  padding: 40px;
-  position: relative;
-  width: 1020px;
-  &__competencies {
-    box-sizing: border-box;
-    margin: 20px 10px 40px 10px;
-    padding: 40px;
-    box-shadow: 0 0 10px #67573e9d;
-    position: relative;
-  }
-  &__drop-matrix {
-    box-sizing: border-box;
-    margin: 20px 10px 40px 10px;
-    padding: 40px;
-    box-shadow: 0 0 10px #67573e9d;
-    position: relative;
-  }
-  &__notes-block {
+  .block-item-subinfo {
     display: flex;
+    height: 50px;
+
+    &__error-shadow {
+      height: 30px;
+    }
+
+    &__check-item {
+      width: 190px;
+    }
+
+    &__last {
+      height: 30px;
+    }
+
+    &_maxhigh-index {
+      z-index: 12;
+    }
+
+    &_high-index {
+      z-index: 10;
+    }
+
+    &__label {
+      width: 160px;
+      padding-top: 6px;
+    }
+
+    &__drop {
+      position: relative;
+      width: 190px;
+    }
   }
-  &__editor {
-    margin: 20px 10px 50px 10px;
+
+  .block-item-subinfo:last-child {
+    height: 30px;
+  }
+
+  .vendor-wrap {
+    position: relative;
     width: 100%;
-  }
-  &__preview {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-  }
-  &__rates {
-    box-sizing: border-box;
-    margin: 20px 10px 40px 10px;
-    padding: 40px;
-    box-shadow: 0 0 10px #67573e9d;
-    font-size: 16px;
-  }
-  &__tables-row {
     display: flex;
-    .lang-table {
-      width: 33%;
+  }
+
+  .vendor-subinfo {
+    &__general {
+      padding: 20px;
+      margin-top: 120px;
+      width: 350px;
+      box-shadow: 0 0 10px #67573e9d;
     }
-    .industry-table {
-      width: 26%;
-    }
-    .step-table {
-      width: 42%;
+
+    &__action {
+      margin-top: 40px;
+      width: 390px;
+      box-shadow: 0 0 10px #67573e9d;
     }
   }
-}
 
-.title {
-  font-size: 22px;
-}
-.gen-info {
-  box-sizing: border-box;
-  margin: 20px 10px 40px 10px;
-  padding: 40px;
-  box-shadow: 0 0 10px #67573e9d;
-}
-
-.gen-info {
-  display: flex;
-  justify-content: space-between;
-  &__block {
-    width: 35%;
-    &:first-child {
-      width: 22%;
-      text-align: center;
-    }
-  }
-}
-
-.block-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  &__label {
-    margin-bottom: 0;
-  }
-  &_relative {
+  .vendor-info {
+    padding: 40px;
     position: relative;
-  }
-  &__drop-menu {
-    position: relative;
-    width: 191px;
-    height: 28px;
-    box-sizing: border-box;
-  }
-  &_high-index {
-    z-index: 10;
-  }
-  &_medium-index {
-    z-index: 8;
-  }
-  label {
-    margin-bottom: 0;
-  }
-  &__input-filed {
-    font-size: 14px;
-    color: #67573e;
-    border: 1px solid #67573e;
-    border-radius: 5px;
-    padding: 0 5px;
-    outline: none;
-    width: 191px;
-    height: 30px;
-    box-sizing: border-box;
-  }
-  ::-webkit-input-placeholder {
-    opacity: 0.5;
-  }
-  &_error-shadow {
-    box-shadow: 0 0 5px red;
-    border-radius: 5px;
-  }
-}
-#test {
-  width: 0;
-}
-.checkbox {
-  display: flex;
-  height: 28px;
-  input[type="checkbox"] {
-    opacity: 0;
-    + {
-      label {
-        &::after {
-          content: none;
-        }
+    width: 1020px;
+
+    &__competencies {
+      box-sizing: border-box;
+      margin: 20px 10px 40px 10px;
+      padding: 40px;
+      box-shadow: 0 0 10px #67573e9d;
+      position: relative;
+    }
+
+    &__drop-matrix {
+      box-sizing: border-box;
+      margin: 20px 10px 40px 10px;
+      padding: 40px;
+      box-shadow: 0 0 10px #67573e9d;
+      position: relative;
+    }
+
+    &__notes-block {
+      display: flex;
+    }
+
+    &__editor {
+      margin: 20px 10px 50px 10px;
+      width: 100%;
+    }
+
+    &__preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    &__rates {
+      box-sizing: border-box;
+      margin: 20px 10px 40px 10px;
+      padding: 40px;
+      box-shadow: 0 0 10px #67573e9d;
+      font-size: 16px;
+    }
+
+    &__tables-row {
+      display: flex;
+
+      .lang-table {
+        width: 33%;
+      }
+
+      .industry-table {
+        width: 26%;
+      }
+
+      .step-table {
+        width: 42%;
       }
     }
-    &:checked {
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .gen-info {
+    box-sizing: border-box;
+    margin: 20px 10px 40px 10px;
+    padding: 40px;
+    box-shadow: 0 0 10px #67573e9d;
+  }
+
+  .gen-info {
+    display: flex;
+    justify-content: space-between;
+
+    &__block {
+      width: 35%;
+
+      &:first-child {
+        width: 22%;
+        text-align: center;
+      }
+    }
+  }
+
+  .block-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    &__label {
+      margin-bottom: 0;
+    }
+
+    &_relative {
+      position: relative;
+    }
+
+    &__drop-menu {
+      position: relative;
+      width: 191px;
+      height: 28px;
+      box-sizing: border-box;
+    }
+
+    &_high-index {
+      z-index: 10;
+    }
+
+    &_medium-index {
+      z-index: 8;
+    }
+
+    label {
+      margin-bottom: 0;
+    }
+
+    &__input-filed {
+      font-size: 14px;
+      color: #67573e;
+      border: 1px solid #67573e;
+      border-radius: 5px;
+      padding: 0 5px;
+      outline: none;
+      width: 191px;
+      height: 30px;
+      box-sizing: border-box;
+    }
+
+    ::-webkit-input-placeholder {
+      opacity: 0.5;
+    }
+
+    &_error-shadow {
+      box-shadow: 0 0 5px red;
+      border-radius: 5px;
+    }
+  }
+
+  #test {
+    width: 0;
+  }
+
+  .checkbox {
+    display: flex;
+    height: 28px;
+
+    input[type="checkbox"] {
+      opacity: 0;
+
       + {
         label {
           &::after {
-            content: "";
+            content: none;
+          }
+        }
+      }
+
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
           }
         }
       }
     }
-  }
-  label {
-    position: relative;
-    display: inline-block;
-    padding-left: 22px;
-    padding-top: 4px;
-    &::before {
-      position: absolute;
-      content: "";
+
+    label {
+      position: relative;
       display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid;
-      left: 0px;
-      top: 3px;
+      padding-left: 22px;
+      padding-top: 4px;
+
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid;
+        left: 0px;
+        top: 3px;
+      }
+
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+      }
     }
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
-    }
   }
-}
-.buttons {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding-right: 10px;
-  box-sizing: border-box;
-  width: 1020px;
-}
 
-.button {
-  margin-left: 30px;
-  width: 138px;
-  height: 35px;
-  color: white;
-  font-size: 14px;
-  border-radius: 10px;
-  -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-  background-color: #d15f45;
-  border: 1px solid #d15f45;
-  cursor: pointer;
-  outline: none;
-  .delete-approve & {
-    margin-left: 0;
-  }
-}
-
-.photo-wrap {
-  width: 195px;
-  height: 160px;
-  border: 1px solid #67573e;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .photo-image {
-    max-width: 100%;
-    max-height: 100%;
-  }
-}
-
-.photo-file {
-  position: absolute;
-  top: -25px;
-  left: -100px;
-  height: 180px;
-  background-color: transparent;
-  outline: none;
-  border: none;
-  z-index: 5;
-  cursor: pointer;
-}
-
-.photo-text {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  &__message {
-    font-size: 18px;
-    opacity: 0.5;
-    width: 50%;
-    text-align: center;
-  }
-  &__error-message {
-    position: absolute;
-    bottom: 30%;
-    z-index: 10;
-    background-color: $white;
-    padding: 3px;
+  .buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 10px;
     box-sizing: border-box;
-    color: $orange;
+    width: 1020px;
   }
-}
 
-.photo-extensions,
-.photo-size {
-  display: block;
-  font-size: 12px;
-  margin-top: 10px;
-}
-.require {
-  font-size: 14px;
-  color: red;
-  margin-left: 2px;
-}
-.delete-approve {
-  position: absolute;
-  width: 332px;
-  height: 270px;
-  top: 10%;
-  left: 50%;
-  margin-left: -166px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 10px #67573e;
-  background-color: #fff;
-  z-index: 20;
-  p {
-    font-size: 21px;
-    width: 50%;
-    text-align: center;
+  .button {
+    margin-left: 30px;
+    width: 138px;
+    height: 35px;
+    color: white;
+    font-size: 14px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+    background-color: #d15f45;
+    border: 1px solid #d15f45;
+    cursor: pointer;
+    outline: none;
+
+    .delete-approve & {
+      margin-left: 0;
+    }
   }
-  .approve-block {
-    margin-bottom: 15px;
+
+  .photo-wrap {
+    width: 195px;
+    height: 160px;
+    border: 1px solid #67573e;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .photo-image {
+      max-width: 100%;
+      max-height: 100%;
+    }
   }
-}
+
+  .photo-file {
+    position: absolute;
+    top: -25px;
+    left: -100px;
+    height: 180px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    z-index: 5;
+    cursor: pointer;
+  }
+
+  .photo-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    &__message {
+      font-size: 18px;
+      opacity: 0.5;
+      width: 50%;
+      text-align: center;
+    }
+
+    &__error-message {
+      position: absolute;
+      bottom: 30%;
+      z-index: 10;
+      background-color: $white;
+      padding: 3px;
+      box-sizing: border-box;
+      color: $orange;
+    }
+  }
+
+  .photo-extensions,
+  .photo-size {
+    display: block;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .require {
+    font-size: 14px;
+    color: red;
+    margin-left: 2px;
+  }
+
+  .delete-approve {
+    position: absolute;
+    width: 332px;
+    height: 270px;
+    top: 10%;
+    left: 50%;
+    margin-left: -166px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px #67573e;
+    background-color: #fff;
+    z-index: 20;
+
+    p {
+      font-size: 21px;
+      width: 50%;
+      text-align: center;
+    }
+
+    .approve-block {
+      margin-bottom: 15px;
+    }
+  }
 </style>

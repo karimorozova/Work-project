@@ -1,5 +1,23 @@
 const { MemoqProject } = require('../../models');
 
+const filterMemoqProjectsVendors = users => {
+	const documents = users.map(i => i.documents).reduce((a, b) => a.concat(b), []);
+	let usersFullName = [];
+	documents.forEach((item) => {
+		if(
+				item !== null &&
+				item.hasOwnProperty('UserAssignments') &&
+				Object.entries(item.UserAssignments).length !== 0 &&
+				item.UserAssignments.constructor === Object &&
+				item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length
+		) {
+			item = item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.map(i => i.UserInfoHeader).map(i => i.FullName)
+			usersFullName.push(item)
+		}
+	});
+	return [...new Set(usersFullName.reduce((a, b) => a.concat(b), []))]
+}
+
 function getFilteredProjectQuery(filters) {
   let query = {};
   if(filters.lastDate) {
@@ -46,4 +64,5 @@ async function getFilteredOtherProjects(filters) {
 
 module.exports = {
   getFilteredOtherProjects,
+	filterMemoqProjectsVendors
 }

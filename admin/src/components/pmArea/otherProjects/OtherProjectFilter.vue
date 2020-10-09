@@ -109,7 +109,7 @@ export default {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   &__itemCenter {
     display: flex;
     justify-content: center;

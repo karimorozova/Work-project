@@ -12,7 +12,6 @@
     .step-info__block
       Finance(
         :step="step"
-        :financeDataCAT="financeDataCAT"
         @refreshFinance="refreshFinance"
         :originallyUnits="originallyUnits"
       )

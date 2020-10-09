@@ -75,7 +75,6 @@
             :selectedOptions="currentClient.hasOwnProperty('aliases') ? currentClient.aliases : currentClientAliases"
             :options="clientAliases"
             @chooseOptions="setAlias"
-            :allOptionsButtons="true"
           )
 </template>
 

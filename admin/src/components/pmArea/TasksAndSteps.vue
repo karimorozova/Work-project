@@ -73,7 +73,7 @@
 				"getServices"
 			]),
 			updateTasks(data) {
-        	this.currentProject.tasks = data;
+				this.currentProject.tasks = data;
 			},
 			setDefaultIsTaskData() {
 				if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
