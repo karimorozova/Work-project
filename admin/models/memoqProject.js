@@ -34,6 +34,11 @@ const MemoqProjectSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  status: {
+    type: String,
+    default: '',
+    trim: true
+  },
   domain: {
     type: String,
     default: '',

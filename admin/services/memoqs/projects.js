@@ -503,10 +503,6 @@ async function updateMemoqProjectsData() {
           project: { ...memoqProject, users },
           documents
         }) : memoqProject;
-        if (isProjectCompleted) {
-          // console.log(memoqProject.client);
-          // console.log(memoqProject);
-        }
         if (!isProjectCompleted) memoqProject.status = 'In progress';
         await MemoqProject.updateOne(
           { serverProjectGuid: project.ServerProjectGuid },
