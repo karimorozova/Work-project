@@ -498,8 +498,15 @@ async function updateMemoqProjectsData() {
         users = getUpdatedUsers(users);
         const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
         let memoqProject = getMemoqProjectData(project, languages);
-        const isProjectCompleted = checkIfProjectCompleted(documents);
-        memoqProject = isProjectCompleted ? await createOtherProjectFinanceData({ project, documents }) : memoqProject;
+        const isProjectCompleted = documents != undefined && documents.length ? checkIfProjectCompleted(documents) : false;
+        memoqProject = isProjectCompleted ? await createOtherProjectFinanceData({
+          project: { ...memoqProject, users },
+          documents
+        }) : memoqProject;
+        if (isProjectCompleted) {
+          // console.log(memoqProject.client);
+          // console.log(memoqProject);
+        }
         if (!isProjectCompleted) memoqProject.status = 'In progress';
         await MemoqProject.updateOne(
           { serverProjectGuid: project.ServerProjectGuid },

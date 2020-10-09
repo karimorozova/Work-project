@@ -2,7 +2,7 @@ const filterMemoqProjectsVendors = users => {
   const documents = users.map(i => i.documents).reduce((a, b) => a.concat(b), []);
   let usersFullName = [];
   documents.forEach((item) => {
-    if (checkDocumentHasCorrectEntity(item)) {
+    if (checkDocumentHasCorrectStructure(item)) {
       item = item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.map(i => i.UserInfoHeader)
         .map(i => i.FullName);
       usersFullName.push(item);

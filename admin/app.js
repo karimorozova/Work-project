@@ -17,7 +17,13 @@ const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
 const a = async () => {
-  // await updateMemoqProjectsData();
+  console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
+  try {
+    await updateMemoqProjectsData();
+    console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
+  } catch (err) {
+    console.log(err.message);
+  }
 };
 a();
 

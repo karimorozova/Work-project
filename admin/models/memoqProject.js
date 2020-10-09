@@ -17,6 +17,9 @@ const MemoqProjectSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  customer: {
+    type: Schema.Types.ObjectId, ref: 'Clients'
+  },
   clientContacts: [],
   creationTime: {
     type: Date,
@@ -70,19 +73,10 @@ const MemoqProjectSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
-  steps: [{
-    taskId: '',
-    stepId: '',
-    hours: '',
-    quantity: '',
-    totalWords: '',
-    progress: '',
-    status: '',
-    clientRate: {},
-    finance: {},
-    vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
-    vendorRate: '',
-  }],
+  steps: {
+    type: Array,
+    default: []
+  },
   projectManager: {
     type: Schema.Types.ObjectId, ref: 'User'
   },
