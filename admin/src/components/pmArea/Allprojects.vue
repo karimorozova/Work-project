@@ -139,11 +139,10 @@ export default {
 <style lang="scss" scoped>
 
 .all-projects {
-    margin: 50px 20px 20px 20px;
-    max-width: 1205px;
-    width: calc(100% - 60px);
-    box-shadow: 0 0 10px #68573E;
-    padding: 15px;
+  margin: 40px 40px 40px 20px;
+  width: 1100px;
+  box-shadow: 0 0 10px rgba(104,87,62,.5);
+  padding: 20px;
 }
 
 </style>

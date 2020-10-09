@@ -37,6 +37,10 @@ const VendorSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  aliases:{
+    type: Array,
+    default: [],
+  },
   email: {
     type: String,
     default: '',

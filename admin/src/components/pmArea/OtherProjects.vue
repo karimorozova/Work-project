@@ -107,11 +107,10 @@ export default {
   width: 100%;
 }
 .other-projects {
-  margin: 50px 20px 20px 20px;
-  max-width: 1205px;
-  width: calc(100% - 60px);
+  margin: 40px 40px 40px 20px;
+  width: 1100px;
+  box-shadow: 0 0 10px rgba(104,87,62,.5);
+  padding: 20px;
   height: calc(100% - 140px);
-  box-shadow: 0 0 10px #68573e;
-  padding: 15px;  
 }
 </style>
