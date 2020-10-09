@@ -24,14 +24,15 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
   if (industry !== 'Other') {
     let tasksLength = documents.length + 1;
     for (let i = 0; i < documents.length; i += 1) {
-      const { WorkflowStatus } = documents[i];
+      const { WorkflowStatus, TargetLangCode } = documents[i];
       let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
       let taskId = taskName + `${idNumber}`;
+      const targetLanguage = targetLanguages.find(lang => lang.memoq === TargetLangCode);
       const taskSteps = await getTaskSteps(
         {
           taskId,
           sourceLanguage: sourceLanguage.memoq,
-          targetLanguages: targetLanguages[i] ? targetLanguages[i].memoq : null,
+          targetLanguage: targetLanguage.symbol,
         },
         project, documents[i], customer, vendors
       );
@@ -40,7 +41,7 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
         start: project.creationTime,
         deadline: project.deadline,
         sourceLanguage: sourceLanguage.memoq,
-        targetLanguage: targetLanguages[i] ? targetLanguages[i].memoq : null,
+        targetLanguage: targetLanguage.symbol,
         status: WorkflowStatus,
         progress: 100,
         finance: taskSteps.length ? getTaskFinance(taskSteps, WorkflowStatus) : defaultFinanceObj,
@@ -63,8 +64,8 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
       const { DocumentAssignmentRole, UserInfoHeader: { FullName } } = memoqVendorsArr[i];
       const stepName = +DocumentAssignmentRole ? 'Revising' : 'Translation';
       const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
-      const clientRate = customer ? await getStepUserRate(customer, project, stepName, task) : '';
-      const vendorRate = vendor ? await getStepUserRate(vendor, project, stepName, task) : '';
+      const clientRate = await getStepUserRate(customer, project, stepName, task);
+      const vendorRate = await getStepUserRate(vendor, project, stepName, task);
       steps.push({
         stepId: `${taskId} S0${i + 1}`,
         sourceLanguage,
@@ -111,30 +112,32 @@ const getStepUserRate = async (user, project, stepName, task) => {
   const currencyRatio = await CurrencyRatio.findOne();
   const industry = await getIndustryId(domain);
   let { sourceLanguage, targetLanguage } = task;
-  const { pricelistTable, currency } = user.rates;
-  const pricelist = user.hasOwnProperty('defaultPricelist') ?
-    await Pricelist.findOne({ _id: user.defaultPricelist })
-    : await Pricelist.findOne({ isVendorDefault: true });
-  const source = await Languages.findOne({ memoq: sourceLanguage });
-  const target = await Languages.findOne({ memoq: targetLanguage });
-  const step = await Step.findOne({ title: stepName });
-  const unit = await Units.findOne({ type: 'CAT Wordcount' });
-  const dataForComparison = {
-    sourceLanguage: source ? source._id : null,
-    targetLanguage: target ? target._id : null,
-    step,
-    unit,
-    size: 1,
-    industry: industry._id,
-  };
-  if (source && target && step) {
-    let userPrice = getPriceFromPersonRates(
-      pricelistTable,
-      dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio);
-    return {
-      value: userPrice,
-      active: true
+  if (user) {
+    const { pricelistTable, currency } = user.rates;
+    const pricelist = user.hasOwnProperty('defaultPricelist') ?
+      await Pricelist.findOne({ _id: user.defaultPricelist })
+      : await Pricelist.findOne({ isVendorDefault: true });
+    const source = await Languages.findOne({ memoq: sourceLanguage });
+    const target = await Languages.findOne({ memoq: targetLanguage });
+    const step = await Step.findOne({ title: stepName });
+    const unit = await Units.findOne({ type: 'CAT Wordcount' });
+    const dataForComparison = {
+      sourceLanguage: source ? source._id : null,
+      targetLanguage: target ? target._id : null,
+      step,
+      unit,
+      size: 1,
+      industry: industry._id,
     };
+    if (source && target && step) {
+      let userPrice = getPriceFromPersonRates(
+        pricelistTable,
+        dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio);
+      return {
+        value: userPrice,
+        active: true
+      };
+    }
   }
   return '';
 };
@@ -161,14 +164,14 @@ const getIndustryId = async (industryName) => {
 };
 
 const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords) => {
-  const priceReceivables = clientRate.value * +WeightedWords;
-  const pricePayables = vendorRate.value * +WeightedWords;
-  const profit = priceReceivables - pricePayables;
-  const ROI = ((priceReceivables - pricePayables) / pricePayables).toFixed(2);
+  const priceReceivables = clientRate ? clientRate.value * +WeightedWords : 0;
+  const pricePayables = vendorRate ? vendorRate.value * +WeightedWords : 0;
+  const profit = pricePayables ? priceReceivables - pricePayables : 0;
+  const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
     Wordcount: {
-      receivables: +TotalWordCount,
-      payables: +TotalWordCount,
+      receivables: +WeightedWords,
+      payables: +WeightedWords,
     },
     Price: {
       receivables: priceReceivables,
@@ -186,8 +189,8 @@ const getTaskFinance = (taskSteps, TotalWordCount) => {
     priceReceivables += finance.Price.receivables;
     pricePayables += finance.Price.payables;
   }
-  const profit = priceReceivables - pricePayables;
-  const ROI = ((priceReceivables - pricePayables) / pricePayables).toFixed(2);
+  const profit = pricePayables ? priceReceivables - pricePayables : 0;
+  const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
     Wordcount: {
       receivables: +TotalWordCount,
@@ -211,9 +214,8 @@ const getProjectFinance = (tasks) => {
     pricePayables += finance.Price.payables;
     TotalWordCount += finance.Wordcount.receivables;
   }
-  const profit = priceReceivables - pricePayables;
-  const ROI = ((priceReceivables - pricePayables) / pricePayables).toFixed(2);
-  const margin = (pricePayables / (priceReceivables - pricePayables)).toFixed(2);
+  const profit = pricePayables ? priceReceivables - pricePayables : 0;
+  const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
     Wordcount: {
       receivables: +TotalWordCount,
@@ -224,7 +226,6 @@ const getProjectFinance = (tasks) => {
       payables: pricePayables,
     },
     profit,
-    margin,
     ROI
   };
 };
