@@ -3,6 +3,7 @@ const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages } = require('../../models');
+const { createOtherProjectFinanceData } = require('./otherProjects');
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
 const headerWithoutAction = getHeaders('IServerProjectService');
@@ -493,15 +494,18 @@ async function updateMemoqProjectsData() {
 		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
 		for (let project of allProjects) {
 			if(project.Name.indexOf("PngSys") === -1) {
-				let users = await getProjectUsers(project.ServerProjectGuid);
-				users = getUpdatedUsers(users);
-				const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
-				const memoqProject = getMemoqProjectData(project, languages);
-				await MemoqProject.updateOne(
-						{ serverProjectGuid: project.ServerProjectGuid },
-						{ ...memoqProject, users, documents, projectStatus: project.ProjectStatus },
-						{ upsert: true })
-			}
+        let users = await getProjectUsers(project.ServerProjectGuid);
+        users = getUpdatedUsers(users);
+        const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
+        let memoqProject = getMemoqProjectData(project, languages);
+        const isProjectCompleted = checkIfProjectCompleted(documents);
+        memoqProject = isProjectCompleted ? await createOtherProjectFinanceData({ project, documents }) : memoqProject;
+        if (!isProjectCompleted) memoqProject.status = 'In progress';
+        await MemoqProject.updateOne(
+          { serverProjectGuid: project.ServerProjectGuid },
+          { ...memoqProject, users, documents, projectStatus: project.ProjectStatus },
+          { upsert: true });
+      }
 		}
 	} catch (err) {
 		console.log("Error in updateMemoqProjectsData");
@@ -511,43 +515,45 @@ async function updateMemoqProjectsData() {
 }
 
 function getUpdatedUsers(users) {
-	if(Array.isArray(users)) {
-		return users.map(item => {
-			const isPm = item.ProjectRoles["a:ProjectManager"] === "true";
-			const isTerminologist = item.ProjectRoles["a:Terminologist"] === "true";
-			return {
-				...item,
-				ProjectRoles: { isPm, isTerminologist }
-			}
-		})
-	}
-	const isPm = users.ProjectRoles["a:ProjectManager"] === "true";
-	const isTerminologist = users.ProjectRoles["a:Terminologist"] === "true";
-	return {
-		...users,
-		ProjectRoles: { isPm, isTerminologist }
-	}
+  if (Array.isArray(users)) {
+    return users.map(item => {
+      const isPm = item.ProjectRoles['a:ProjectManager'] === 'true';
+      const isTerminologist = item.ProjectRoles['a:Terminologist'] === 'true';
+      return {
+        ...item,
+        ProjectRoles: { isPm, isTerminologist }
+      };
+    });
+  }
+  const isPm = users.ProjectRoles['a:ProjectManager'] === 'true';
+  const isTerminologist = users.ProjectRoles['a:Terminologist'] === 'true';
+  return {
+    ...users,
+    ProjectRoles: { isPm, isTerminologist }
+  };
 }
 
-function getMemoqProjectData(project, languages) {
-	const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
-	const targetCodes = typeof project.TargetLanguageCodes["a:string"] === 'string' ? [project.TargetLanguageCodes["a:string"]] : project.TargetLanguageCodes["a:string"];
-	const targetLanguages = targetCodes.map(item => {
-		const lang = languages.find(l => l.memoq === item);
-		return lang;
-	})
-	return {
-		name: project.Name,
-		creatorUser: project.CreatorUser,
-		client: project.Client,
-		creationTime: new Date(project.CreationTime),
-		deadline: new Date(project.Deadline),
-		serverProjectGuid: project.ServerProjectGuid,
-		domain: typeof project.Domain === 'string' ? project.Domain : "",
-		client: typeof project.Client === 'string' ? project.Client : "",
-		sourceLanguage,
-		targetLanguages,
-		totalWordCount: project.TotalWordCount,
+const checkIfProjectCompleted = (documents) => documents.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished');
+
+function getMemoqProjectData (project, languages) {
+  const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
+  const targetCodes = typeof project.TargetLanguageCodes['a:string'] === 'string' ? [project.TargetLanguageCodes['a:string']] : project.TargetLanguageCodes['a:string'];
+  const targetLanguages = targetCodes.map(item => {
+    const lang = languages.find(l => l.memoq === item);
+    return lang;
+  });
+  return {
+    name: project.Name,
+    creatorUser: project.CreatorUser,
+    client: project.Client,
+    creationTime: new Date(project.CreationTime),
+    deadline: new Date(project.Deadline),
+    serverProjectGuid: project.ServerProjectGuid,
+    domain: typeof project.Domain === 'string' ? project.Domain : '',
+    client: typeof project.Client === 'string' ? project.Client : '',
+    sourceLanguage,
+    targetLanguages,
+    totalWordCount: project.TotalWordCount,
 		projectStatus: project.ProjectStatus
 	}
 }

@@ -739,7 +739,6 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
       for (let unitId of calculationUnit) {
         const { sizes } = await Units.findOne({ _id: unitId });
         if (sizes.length) {
-          1;
           sizes.forEach(size => {
             combinations.push({
               euroMinPrice: 1,

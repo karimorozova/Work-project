@@ -5,31 +5,21 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo")(session);
 const bodyParser = require("body-parser");
-const config = require("./server-config.json");
-const mongoose = require("mongoose");
+const config = require('./server-config.json');
+const mongoose = require('mongoose');
 const port = config.server.port;
 const db = mongoose.connection;
-const { checkRoutes } = require("./middleware/index");
+const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
 const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
-const checkCollections = require("./helpers/dbSetDefault");
-
-// const { getMemoqUsers } = require('./services/memoqs/users');
-// const { getProjectUsers } = require('./services/memoqs/projects');
-//
-// const foo = async () => {
-//   // const users = await getProjectUsers('');
-//   // console.log(users);
-//   const users = await getMemoqUsers();
-//   const needed = users.filter(user => user.email === 'maxttt@gmail.com' || user.email === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com');
-//   console.log(needed);
-//   // const needed = users.find(user => user.email === 'testqa1805@gmail.com');
-// };
-
-// foo();
+const checkCollections = require('./helpers/dbSetDefault');
+const a = async () => {
+  // await updateMemoqProjectsData();
+};
+a();
 
 schedule.scheduleJob('0 */3 * * *', async function () {
   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);

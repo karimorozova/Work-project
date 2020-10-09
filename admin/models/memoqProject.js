@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const MemoqProjectSchema = new mongoose.Schema({
   name: {
@@ -16,6 +17,7 @@ const MemoqProjectSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  clientContacts: [],
   creationTime: {
     type: Date,
     default: new Date(),
@@ -25,7 +27,7 @@ const MemoqProjectSchema = new mongoose.Schema({
     default: new Date(),
   },
   projectStatus: {
-    type: 'String',
+    type: String,
     default: '',
     trim: true
   },
@@ -39,31 +41,58 @@ const MemoqProjectSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
-    sourceLanguage: {
-      type: Object,
-      default: {}
-    },
-    targetLanguages: {
-      type: Array,
-      default: []
-    },
-    totalWordCount: {
-      type: String,
-      default: '',
-      trim: true
-    },
-    documents: {
-      type: Array,
-      default: []
-    },
-    users: {
-      type: Array,
-      default: []
-    },
-    isTest:{
-        type: Boolean,
-        default: false
-    }
+  sourceLanguage: {
+    type: Object,
+    default: {}
+  },
+  targetLanguages: {
+    type: Array,
+    default: []
+  },
+  totalWordCount: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  documents: {
+    type: Array,
+    default: []
+  },
+  users: {
+    type: Array,
+    default: []
+  },
+  isTest: {
+    type: Boolean,
+    default: false
+  },
+  tasks: {
+    type: Array,
+    default: [],
+  },
+  steps: [{
+    taskId: '',
+    stepId: '',
+    hours: '',
+    quantity: '',
+    totalWords: '',
+    progress: '',
+    status: '',
+    clientRate: {},
+    finance: {},
+    vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
+    vendorRate: '',
+  }],
+  projectManager: {
+    type: Schema.Types.ObjectId, ref: 'User'
+  },
+  accountManager: {
+    type: Schema.Types.ObjectId, ref: 'User'
+  },
+  finance: {},
+  billingDate: {
+    type: Date,
+  },
 });
 
 const MemoqProject = mongoose.model('MemoqProject', MemoqProjectSchema);

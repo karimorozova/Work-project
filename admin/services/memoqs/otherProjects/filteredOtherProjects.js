@@ -1,4 +1,4 @@
-const { MemoqProject } = require('../../models');
+const { MemoqProject } = require('../../../models');
 
 function getFilteredProjectQuery(filters) {
   let query = {};
