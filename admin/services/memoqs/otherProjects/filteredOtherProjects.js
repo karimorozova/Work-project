@@ -1,17 +1,22 @@
 const { MemoqProject } = require('../../../models');
 
 function getFilteredProjectQuery(filters) {
-	let query = {};
-	if(filters.lastDate) {
-		query.creationTime = {$lt: new Date(filters.lastDate)};
-	}
-	if (filters.clientFilter) {
-		query.client = { '$regex': new RegExp(`${filters.clientFilter}`, 'i') };
-	}
-	if (filters.startFilter) {
-		query.creationTime = filters.lastDate ? {$lt: new Date(filters.lastDate), $gte: new Date(filters.startFilter)} : {$gte: new Date(filters.startFilter)};
-	}
-	if (filters.deadlineFilter) {
+  let query = {
+    status: filters.query,
+  };
+  if (filters.lastDate) {
+    query.creationTime = { $lt: new Date(filters.lastDate) };
+  }
+  if (filters.clientFilter) {
+    query.client = { '$regex': new RegExp(`${filters.clientFilter}`, 'i') };
+  }
+  if (filters.startFilter) {
+    query.creationTime = filters.lastDate ? {
+      $lt: new Date(filters.lastDate),
+      $gte: new Date(filters.startFilter)
+    } : { $gte: new Date(filters.startFilter) };
+  }
+  if (filters.deadlineFilter) {
 		query.deadline = { $lte: new Date(filters.deadlineFilter) };
 	}
 	if (filters.pmFilter) {
