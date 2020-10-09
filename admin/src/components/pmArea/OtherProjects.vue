@@ -30,7 +30,8 @@ export default {
         clientFilter: "",
         pmFilter: "",
         startFilter: "",
-        deadlineFilter: ""
+        deadlineFilter: "",
+        query: "",
       },
       sourceFilter: [],
       targetFilter: []
@@ -51,10 +52,13 @@ export default {
       await this.getProjects(this.allFilters);
     },
     async getProjects(filters) {
+    	let query = this.$route.query.status;
+	    query = query.replace(/(-)/g, ' ')
+      this.filters.query = query
       try {
         const result = await this.$http.post(
           "/memoqapi/other-projects",
-          filters
+            filters,
         );
         this.allProjects = result.data;
       } catch (err) {
