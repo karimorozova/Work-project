@@ -13,11 +13,8 @@
 
 <script>
 	import Sidebar from '../Sidebar';
-	// import { mapActions } from "vuex";
-	// import defaultSidebarLinks from "@/mixins/defaultSidebarLinks";
 
 	export default {
-		// mixins: [defaultSidebarLinks],
 		data() {
 			return {
 				sidebarLinksMulti: [
@@ -32,8 +29,8 @@
 					{
 						title: "XTRF PROJECTS",
 						links: [
-							{ arrayIndex: 1, title: 'Completed Projects', routeName: '' },
-							{ arrayIndex: 1, title: 'Other Projects', routeName: 'other-projects' },
+							{ arrayIndex: 1, title: 'Completed Projects', status: "Closed", routeName: 'closed-other-projects' },
+							{ arrayIndex: 1, title: 'Other Projects', status: "In-progress", routeName: 'open-other-projects' },
 						],
 					},
 				],
@@ -45,8 +42,8 @@
 		methods: {
 			toggleLink({ arrayIndex, index }) {
 				this.currentIndex = [arrayIndex, index];
-				const { routeName } = this.sidebarLinksMulti[arrayIndex].links[index];
-				this.$router.push({ name: routeName });
+				const { routeName, status } = this.sidebarLinksMulti[arrayIndex].links[index];
+				this.$router.push({ name: routeName, query: { status: status } });
 			},
 			setDefaultActiveLink() {
 				const { name } = this.$route;
@@ -62,8 +59,8 @@
 			},
 			goToRoute() {
 				if(this.currentIndex.length) {
-					const { routeName } = this.sidebarLinksMulti[this.currentIndex[0]].links[this.currentIndex[1]];
-					this.$router.push({ name: routeName });
+					const { routeName, status } = this.sidebarLinksMulti[this.currentIndex[0]].links[this.currentIndex[1]];
+					this.$router.push({ name: routeName, query: { status: status } });
 				}
 			},
 			async getRequestsQuantity() {

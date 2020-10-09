@@ -354,8 +354,13 @@ const router = new Router({
                             component: PrevProjects
                         },
                         {
-                            path: 'other-projects',
-                            name: 'other-projects',
+                            path: 'open-other-projects',
+                            name: 'open-other-projects',
+                            component: OtherProjects
+                        },
+                        {
+                            path: 'closed-other-projects',
+                            name: 'closed-other-projects',
                             component: OtherProjects
                         }
                     ]
