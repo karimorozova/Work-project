@@ -206,9 +206,14 @@ router.post('/other-projects', async (req, res) => {
 router.get('/other-project', async (req, res) => {
 	const { id } = req.query;
 	try {
-		const project = await MemoqProject.findOne({ _id: id });
-		res.send(project);
-	} catch (err) {
+    const project = await MemoqProject.findOne({ _id: id })
+      .populate('customer')
+      .populate('steps.vendor')
+      .populate('projectManager')
+      .populate('accountManager');
+
+    res.send(project);
+  } catch (err) {
 		console.log(err);
 		res.status(500).send(err);
 	}

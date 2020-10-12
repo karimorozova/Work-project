@@ -11,7 +11,7 @@
             .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
 
         DetailsTranslation(
-          v-if="true"
+          v-if="step.name === 'Translation'"
           :financeData="financeDataTranslation"
           :step="step"
           :cancelSave="cancelSave"
@@ -19,7 +19,7 @@
           @save="checkRateChange"
         )
         DetailsOtherCAT(
-          v-if="true"
+          v-if="step.name === 'Revising'"
           :financeData="financeDataCAT"
           :step="step"
           :cancelSave="cancelSave"
