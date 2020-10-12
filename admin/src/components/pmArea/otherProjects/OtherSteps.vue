@@ -19,19 +19,32 @@
       )
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
           span.tasks__label {{ field.label }}
-        template(slot="info" slot-scope="{row}")
+        template(slot="info" slot-scope="{row, index}")
           .steps__info-icon(@click="showStepDetails(index)")
             i.fa.fa-info-circle
         template(slot="name" slot-scope="{ row }")
           span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
         template(slot="language" slot-scope="{ row, index }")
-          span.steps__step-data {{ `${project.sourceLanguage.symbol} >> ${stepsTargetLanguages[index].symbol}` }}
+          span.steps__step-data {{ `${project.sourceLanguage.symbol} >> ${stepsTargetLanguages[index] != undefined ? stepsTargetLanguages[index].symbol : stepsTargetLanguages[0].symbol}` }}
         template(slot="vendor" slot-scope="{ row, index }")
           span.steps__step-data.steps_no-padding {{ row.UserInfoHeader.FullName }}
         template(slot="start" slot-scope="{ row, index }")
           span.steps__step-data {{row.DocumentAssignmentRole === 0 || index === 0 ? formateDate(project.creationTime) : formateDate(projectSteps[index-1].DeadLine) }}
         template(slot="deadline" slot-scope="{ row, index }")
           span.steps__step-data {{formateDate(row.DeadLine)}}
+
+        template(slot="receivables" slot-scope="{ row, index }")
+          span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
+          span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
+
+        template(slot="payables" slot-scope="{ row, index }")
+          span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
+          span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
+
+        template(slot="margin" slot-scope="{ row, index }")
+          span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
+          span.steps__step-data {{ project.steps[index].finance.profit  }}
+
 
       transition(name="fade")
         .steps__info(v-if="isStepInfo")
@@ -45,6 +58,8 @@
           //  :originallyUnits="originallyUnits"
           //)
           OtherStepInfo(
+            :index="infoIndex"
+            :step="project.steps[infoIndex]"
             @closeStepInfo="closeStepInfo"
           )
 </template>
@@ -144,7 +159,7 @@
 				this.infoIndex = -1;
 			},
 			formateDate: time => moment(time).format("DD-MM-YYYY"),
-			getStepName: num => (num === 0 ? "Transtation" : "Revision"),
+			getStepName: num => (num === "0" ? "Translation" : "Revision"),
 			createdListOfTargetLanguages() {
 				let someArr = [];
 				this.project.targetLanguages.forEach(element => {

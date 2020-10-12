@@ -7,7 +7,7 @@
         i.fa.fa-clone(aria-hidden="true")
     .sub-information__row
       .row__title Project Status:
-      .row__data {{ project.projectStatus }}
+      .row__data {{ project.status }}
     .sub-information__row
       .row__title Payment Profile:
       .row__data

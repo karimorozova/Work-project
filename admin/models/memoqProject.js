@@ -78,10 +78,32 @@ const MemoqProjectSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
-  steps: {
-    type: Array,
-    default: []
-  },
+  steps: [{
+    vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
+    stepId: "",
+    taskId: "",
+    name: "",
+    sourceLanguage: "",
+    targetLanguage: "",
+    quantity: "",
+    totalWords: "",
+    clientRate: {},
+    VendorRate: {},
+    finance: {
+      'Wordcount': {
+        receivables: "",
+        payables: "",
+        halfReceivables: "",
+        halfPayables: "",
+      },
+      'Price': {
+        receivables: "",
+        payables: "",
+        halfReceivables: "",
+        halfPayables: "",
+      }
+    },
+  }],
   projectManager: {
     type: Schema.Types.ObjectId, ref: 'User'
   },

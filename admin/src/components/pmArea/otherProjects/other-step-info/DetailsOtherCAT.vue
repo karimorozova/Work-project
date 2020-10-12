@@ -28,7 +28,8 @@
 
       .table__body-row
         .table__tbody-cell Price
-        .table__tbody-cell {{ financeData.receivables.total }} &euro;
+        .table__tbody-cell(v-if="financeData.receivables.total") {{ financeData.receivables.total }} &euro;
+        .table__tbody-cell(v-else)
         .table__tbody-cell(v-if="financeData.vendor") {{ financeData.payables.total }} &euro;
         .table__tbody-cell(v-else)
 

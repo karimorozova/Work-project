@@ -24,7 +24,7 @@
           LabelValue(label="Industry" :isRequired="false" customClass="project_margin")
             input.project__input-text(   type="text" :value="project.domain" disabled)
         .project__number
-          LabelValue(label="№" customClass="project_margin")
+          LabelValue(label="&#8470;" customClass="project_margin")
             span {{ project.serverProjectGuid }}
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest(project._id)")
