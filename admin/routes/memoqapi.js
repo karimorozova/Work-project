@@ -1,9 +1,18 @@
 const router = require('express').Router();
 const { upload } = require('../utils');
 const { User, MemoqProject } = require('../models');
-const { downloadCompletedFiles } = require("../projects");
-const { getMemoqAllProjects, createMemoqProjectWithTemplate, getProjectTranslationDocs, getProjectAnalysis, getProjectUsers, getMemoqFileId } = require("../services/memoqs/projects");
-const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require("../services/memoqs/files");
+const { downloadCompletedFiles } = require('../projects');
+const {
+  getMemoqAllProjects,
+  createMemoqProjectWithTemplate,
+  getProjectTranslationDocs,
+  getProjectAnalysis,
+  getProjectUsers,
+  getMemoqFileId,
+  updateAllMemoqProjects,
+  updateMemoqProjectFinance
+} = require('../services/memoqs/projects');
+const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require('../services/memoqs/files');
 const { getMemoqTemplates } = require("../services/memoqs/resources");
 const { assignProjectManagers } = require('../projects/updates');
 const { storeFiles } = require("../projects/files");
@@ -211,7 +220,6 @@ router.get('/other-project', async (req, res) => {
       .populate('steps.vendor')
       .populate('projectManager')
       .populate('accountManager');
-
     res.send(project);
   } catch (err) {
 		console.log(err);
@@ -231,14 +239,36 @@ router.get('/memoq-client-aliases', async (req, res) => {
 })
 
 router.get('/memoq-vendor-aliases', async (req, res) => {
-	try {
-		let users = await MemoqProject.find({}, { _id: 0, documents: 1 })
-		const result = filterMemoqProjectsVendors(users);
-		res.send(result)
-	} catch (err) {
-		console.log(err);
-		res.status(500).send(err);
-	}
+  try {
+    let users = await MemoqProject.find({}, { _id: 0, documents: 1 });
+    const result = filterMemoqProjectsVendors(users);
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
 })
+
+router.get('/update-memoq-finance/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const neededProject = await MemoqProject.findOne({ _id: id });
+    const updatedProject = await updateMemoqProjectFinance(neededProject);
+    res.send(updatedProject);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating project\'s finance');
+  }
+});
+
+router.get('/update-all-memoq-finance', async (req, res) => {
+  try {
+    const updateProjects = await updateAllMemoqProjects();
+    res.send(updateProjects);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating all other projects');
+  }
+});
 
 module.exports = router;

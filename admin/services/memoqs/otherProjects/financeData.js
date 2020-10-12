@@ -165,8 +165,8 @@ const getIndustryId = async (industryName) => {
 };
 
 const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords) => {
-  const priceReceivables = clientRate ? clientRate.value * +WeightedWords : 0;
-  const pricePayables = vendorRate ? vendorRate.value * +WeightedWords : 0;
+  const priceReceivables = clientRate ? +clientRate.value * +WeightedWords : 0;
+  const pricePayables = vendorRate ? +vendorRate.value * +WeightedWords : 0;
   const profit = pricePayables ? priceReceivables - pricePayables : 0;
   const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
@@ -190,7 +190,7 @@ const getTaskFinance = (taskSteps, TotalWordCount) => {
     priceReceivables += finance.Price.receivables;
     pricePayables += finance.Price.payables;
   }
-  const profit = pricePayables ? priceReceivables - pricePayables : 0;
+  const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
   const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
     Wordcount: {

@@ -524,6 +524,7 @@ async function updateMemoqProjectsData() {
 const updateAllMemoqProjects = async () => {
   const projects = await MemoqProject.find();
   const clients = await Clients.find();
+  // const updateProjects = [];
   for (let i = 0; i < projects.length; i++) {
     let project = projects[i];
     const { _id, documents, users } = project;
@@ -534,8 +535,30 @@ const updateAllMemoqProjects = async () => {
       documents
     }) : project;
     if (!doesHaveCorrectStructure) project.status = 'In progress';
-    await MemoqProject.updateOne({ _id }, { ...project });
+    if (!project.hasOwnProperty('$__')) await MemoqProject.updateOne({ _id }, { ...project });
   }
+  return await MemoqProject.find()
+    .populate('customer')
+    .populate('steps.vendor')
+    .populate('projectManager')
+    .populate('accountManager');
+};
+
+const updateMemoqProjectFinance = async (project) => {
+  const clients = await Clients.find();
+  const { _id, documents, users } = project;
+  const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
+    checkIfProjectStructure(clients, project, documents, users) : false;
+  project = doesHaveCorrectStructure ? await createOtherProjectFinanceData({
+    project,
+    documents
+  }) : project;
+  if (!doesHaveCorrectStructure) project.status = 'In progress';
+  return await MemoqProject.findOneAndUpdate({ _id }, { ...project })
+    .populate('customer')
+    .populate('steps.vendor')
+    .populate('projectManager')
+    .populate('accountManager');
 };
 
 function getUpdatedUsers (users) {
@@ -616,5 +639,6 @@ module.exports = {
   setCancelledNameInMemoq,
   updateMemoqProjectsData,
   assignMemoqTranslators,
-  updateAllMemoqProjects
+  updateAllMemoqProjects,
+  updateMemoqProjectFinance
 }
