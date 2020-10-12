@@ -26,7 +26,7 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
     }
     let tasksLength = documents.length + 1;
     for (let i = 0; i < documents.length; i += 1) {
-      const { WorkflowStatus, TargetLangCode } = documents[i];
+      const { WorkflowStatus, TargetLangCode, TotalWordCount } = documents[i];
       let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
       let taskId = taskName + `${idNumber}`;
       const targetLanguage = targetLanguages.find(lang => lang.memoq === TargetLangCode);
@@ -46,7 +46,7 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
         targetLanguage: targetLanguage.symbol,
         status: WorkflowStatus,
         progress: 100,
-        finance: taskSteps.length ? getTaskFinance(taskSteps, WorkflowStatus) : defaultFinanceObj,
+        finance: taskSteps.length ? getTaskFinance(taskSteps, TotalWordCount) : defaultFinanceObj,
       };
       tasks.push(task);
       steps.push(...taskSteps);
@@ -93,6 +93,7 @@ const getUpdatedProjectData = (project, allClients, ourUsers) => {
     project.projectManager = getProjectManager(users, ourUsers);
     project.accountManager = ObjectId(neededCustomer.accountManager._id);
     project.industry = industry.name === 'Other' ? project.domain : ObjectId(industry._id);
+    project.paymentProfile = neededCustomer.billingInfo.paymentType;
   }
   return { updatedProject: project, neededCustomer };
 };

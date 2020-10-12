@@ -17,6 +17,15 @@ const MemoqProjectSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  paymentProfile: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  isUrgent: {
+    type: Boolean,
+    default: false
+  },
   customer: {
     type: Schema.Types.ObjectId, ref: 'Clients'
   },
@@ -80,29 +89,16 @@ const MemoqProjectSchema = new mongoose.Schema({
   },
   steps: [{
     vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
-    stepId: "",
-    taskId: "",
-    name: "",
-    sourceLanguage: "",
-    targetLanguage: "",
-    quantity: "",
-    totalWords: "",
-    clientRate: {},
-    VendorRate: {},
-    finance: {
-      'Wordcount': {
-        receivables: "",
-        payables: "",
-        halfReceivables: "",
-        halfPayables: "",
-      },
-      'Price': {
-        receivables: "",
-        payables: "",
-        halfReceivables: "",
-        halfPayables: "",
-      }
-    },
+    stepId: '',
+    taskId: '',
+    name: '',
+    sourceLanguage: '',
+    targetLanguage: '',
+    quantity: '',
+    totalWords: '',
+    clientRate: '',
+    vendorRate: '',
+    finance: {},
   }],
   projectManager: {
     type: Schema.Types.ObjectId, ref: 'User'
