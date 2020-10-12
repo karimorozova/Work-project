@@ -59,27 +59,27 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
   const { taskId, sourceLanguage, targetLanguage } = task;
   const { TotalWordCount, WeightedWords } = document;
   const steps = [];
-    const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
-    for (let i = 0; i < memoqVendorsArr.length; i += 1) {
-      const { DocumentAssignmentRole, UserInfoHeader: { FullName } } = memoqVendorsArr[i];
-      const stepName = +DocumentAssignmentRole ? 'Revising' : 'Translation';
-      const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
-      const clientRate = await getStepUserRate(customer, project, stepName, task);
-      const vendorRate = await getStepUserRate(vendor, project, stepName, task);
-      steps.push({
-        taskId,
-        stepId: `${taskId} S0${i + 1}`,
-        sourceLanguage,
-        targetLanguage,
-        name: stepName,
-        totalWords: TotalWordCount,
-        quantity: WeightedWords,
-        clientRate,
-        vendorRate,
-        vendor: vendor ? ObjectId(vendor._id) : null,
-        finance: getStepFinance(clientRate, vendorRate, TotalWordCount, WeightedWords),
-      });
-    }
+  const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
+  for (let i = 0; i < memoqVendorsArr.length; i += 1) {
+    const { DocumentAssignmentRole, UserInfoHeader: { FullName } } = memoqVendorsArr[i];
+    const stepName = +DocumentAssignmentRole ? 'Revising' : 'Translation';
+    const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
+    const clientRate = await getStepUserRate(customer, project, stepName, task);
+    const vendorRate = await getStepUserRate(vendor, project, stepName, task);
+    steps.push({
+      taskId,
+      stepId: `${taskId} S0${i + 1}`,
+      sourceLanguage,
+      targetLanguage,
+      name: stepName,
+      totalWords: TotalWordCount,
+      quantity: WeightedWords,
+      clientRate,
+      vendorRate,
+      vendor: vendor ? ObjectId(vendor._id) : null,
+      finance: getStepFinance(clientRate, vendorRate, TotalWordCount, WeightedWords),
+    });
+  }
   return steps;
 };
 

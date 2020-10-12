@@ -249,8 +249,8 @@ router.get('/memoq-vendor-aliases', async (req, res) => {
   }
 })
 
-router.get('/update-memoq-finance/:id', async (req, res) => {
-  const { id } = req.params;
+router.post('/update-memoq-finance', async (req, res) => {
+  const { id } = req.body;
   try {
     const neededProject = await MemoqProject.findOne({ _id: id });
     const updatedProject = await updateMemoqProjectFinance(neededProject);

@@ -535,7 +535,7 @@ const updateAllMemoqProjects = async () => {
       documents
     }) : project;
     if (!doesHaveCorrectStructure) project.status = 'In progress';
-    if (!project.hasOwnProperty('$__')) await MemoqProject.updateOne({ _id }, { ...project });
+    await MemoqProject.updateOne({ _id }, { ...project._doc });
   }
   return await MemoqProject.find()
     .populate('customer')
@@ -554,7 +554,7 @@ const updateMemoqProjectFinance = async (project) => {
     documents
   }) : project;
   if (!doesHaveCorrectStructure) project.status = 'In progress';
-  return await MemoqProject.findOneAndUpdate({ _id }, { ...project })
+  return await MemoqProject.findOneAndUpdate({ _id }, { ...project._doc })
     .populate('customer')
     .populate('steps.vendor')
     .populate('projectManager')
