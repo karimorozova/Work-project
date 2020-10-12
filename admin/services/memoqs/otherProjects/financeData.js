@@ -1,17 +1,16 @@
 const { Clients, Vendors, User, Languages, Industries, Pricelist, CurrencyRatio, Step, Units } = require('../../../models');
 const ObjectId = require('mongodb').ObjectID;
 const { getPriceFromPersonRates, getPriceFromPricelist } = require('../../../сalculations/finance');
-const { checkDocumentHasCorrectStructure } = require('./helpers');
 const { defaultFinanceObj } = require('../../../enums');
 
 const createOtherProjectFinanceData = async ({ project, documents }) => {
   const clients = await Clients.find();
   const vendors = await Vendors.find();
   const users = await User.find();
-  if (!project.hasOwnProperty('users')) return project;
-  const { updatedProject, neededCustomer } = getUpdatedProjectData(project, documents, clients, users);
+  const { updatedProject, neededCustomer } = getUpdatedProjectData(project, clients, users);
   if (!neededCustomer) return project;
   const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
+  if (!tasks.length && !steps.length) return project;
   const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
   return { ...updatedProject, tasks, steps, finance };
 };
@@ -22,6 +21,9 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
   const tasks = [];
   const steps = [];
   if (industry !== 'Other') {
+    if (!Array.isArray(documents)) {
+      documents = [documents];
+    }
     let tasksLength = documents.length + 1;
     for (let i = 0; i < documents.length; i += 1) {
       const { WorkflowStatus, TargetLangCode } = documents[i];
@@ -31,7 +33,7 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
       const taskSteps = await getTaskSteps(
         {
           taskId,
-          sourceLanguage: sourceLanguage.memoq,
+          sourceLanguage: sourceLanguage.symbol,
           targetLanguage: targetLanguage.symbol,
         },
         project, documents[i], customer, vendors
@@ -40,7 +42,7 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
         taskId,
         start: project.creationTime,
         deadline: project.deadline,
-        sourceLanguage: sourceLanguage.memoq,
+        sourceLanguage: sourceLanguage.symbol,
         targetLanguage: targetLanguage.symbol,
         status: WorkflowStatus,
         progress: 100,
@@ -57,8 +59,6 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
   const { taskId, sourceLanguage, targetLanguage } = task;
   const { TotalWordCount, WeightedWords } = document;
   const steps = [];
-  const documentHasCorrectStructure = checkDocumentHasCorrectStructure(document);
-  if (documentHasCorrectStructure) {
     const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
     for (let i = 0; i < memoqVendorsArr.length; i += 1) {
       const { DocumentAssignmentRole, UserInfoHeader: { FullName } } = memoqVendorsArr[i];
@@ -67,6 +67,7 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
       const clientRate = await getStepUserRate(customer, project, stepName, task);
       const vendorRate = await getStepUserRate(vendor, project, stepName, task);
       steps.push({
+        taskId,
         stepId: `${taskId} S0${i + 1}`,
         sourceLanguage,
         targetLanguage,
@@ -79,30 +80,29 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
         finance: getStepFinance(clientRate, vendorRate, TotalWordCount, WeightedWords),
       });
     }
-  } else {
-    return [];
-  }
   return steps;
 };
 
-const getUpdatedProjectData = (project, documents, allClients, ourUsers) => {
+const getUpdatedProjectData = (project, allClients, ourUsers) => {
   const { client: memoqClient, users } = project;
   const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
   const industry = getIndustryId(project.domain);
-  project.customer = neededCustomer ? ObjectId(neededCustomer._id) : null;
-  project.status = 'Closed';
-  project.projectManager = getProjectManager(users, ourUsers);
-  project.accountManager = neededCustomer ? ObjectId(neededCustomer.accountManager._id) : null;
-  project.industry = industry.name === 'Other' ? project.domain : ObjectId(industry._id);
+  if (neededCustomer) {
+    project.customer = ObjectId(neededCustomer._id);
+    project.status = 'Closed';
+    project.projectManager = getProjectManager(users, ourUsers);
+    project.accountManager = ObjectId(neededCustomer.accountManager._id);
+    project.industry = industry.name === 'Other' ? project.domain : ObjectId(industry._id);
+  }
   return { updatedProject: project, neededCustomer };
 };
 
 const getProjectManager = (memoqUsers, ourUsers) => {
-  const memoqPM = memoqUsers.find(({ ProjectRoles }) => ProjectRoles.isPM);
+  const memoqPM = memoqUsers.find(({ ProjectRoles }) => ProjectRoles.isPm);
   if (memoqPM) {
     const { User: { EmailAddress } } = memoqPM;
     const ourUser = ourUsers.find(user => user.email === EmailAddress);
-    if (ourUser) return ourUser;
+    if (ourUser) return ObjectId(ourUser._id);
   }
   return null;
 };
@@ -113,19 +113,19 @@ const getStepUserRate = async (user, project, stepName, task) => {
   const industry = await getIndustryId(domain);
   let { sourceLanguage, targetLanguage } = task;
   if (user) {
-    const { pricelistTable, currency } = user.rates;
+    const { rates: { pricelistTable }, currency } = user;
     const pricelist = user.hasOwnProperty('defaultPricelist') ?
       await Pricelist.findOne({ _id: user.defaultPricelist })
       : await Pricelist.findOne({ isVendorDefault: true });
-    const source = await Languages.findOne({ memoq: sourceLanguage });
-    const target = await Languages.findOne({ memoq: targetLanguage });
+    const source = await Languages.findOne({ symbol: sourceLanguage });
+    const target = await Languages.findOne({ symbol: targetLanguage });
     const step = await Step.findOne({ title: stepName });
-    const unit = await Units.findOne({ type: 'CAT Wordcount' });
+    const { _id: unitId } = await Units.findOne({ type: 'CAT Wordcount' });
     const dataForComparison = {
       sourceLanguage: source ? source._id : null,
       targetLanguage: target ? target._id : null,
-      step,
-      unit,
+      step: step ? step._id : null,
+      unit: unitId,
       size: 1,
       industry: industry._id,
     };

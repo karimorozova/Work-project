@@ -78,10 +78,68 @@ const MemoqProjectSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
-  steps: {
-    type: Array,
-    default: []
-  },
+  steps: [{
+    vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
+    stepId: '',
+    taskId: '',
+    serviceStep: {
+      step: { type: Schema.Types.ObjectId, ref: 'Step' },
+      unit: { type: Schema.Types.ObjectId, ref: 'Units' },
+      size: {
+        type: Number,
+        default: 1
+      },
+      memoqAssignmentRole: {
+        type: Number,
+      },
+      title: {
+        type: String,
+        trim: true,
+      }
+    },
+    name: '',
+    sourceLanguage: '',
+    targetLanguage: '',
+    memoqProjectId: '',
+    memoqSource: '',
+    memoqTarget: '',
+    memoqDocIds: [],
+    packageSize: '',
+    hours: '',
+    quantity: '',
+    size: {
+      type: Number,
+      default: 1
+    },
+    totalWords: '',
+    start: {},
+    deadline: {},
+    progress: '',
+    status: '',
+    clientRate: {},
+    // clientDiscount: "",
+    targetFile: '',
+    finance: {
+      'Wordcount': {
+        receivables: '',
+        payables: '',
+        halfReceivables: '',
+        halfPayables: '',
+      },
+      'Price': {
+        receivables: '',
+        payables: '',
+        halfReceivables: '',
+        halfPayables: '',
+      }
+    },
+    vendorRate: '',
+    // vendorDiscount: "",
+    check: false,
+    vendorsClickedOffer: Array,
+    isVendorRead: { type: Boolean, default: false },
+    previousStatus: '',
+  }],
   projectManager: {
     type: Schema.Types.ObjectId, ref: 'User'
   },
