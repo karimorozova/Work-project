@@ -13,19 +13,28 @@
             input.project__input-text(type="text" :value="formateDate(project.deadline)" disabled)
           img.project__calendar-icon(src="../../../assets/images/calendar.png")
         .project__date
-          | Will Billing Date
+          LabelValue(label="Billing Date" :isRequired="false" customClass="project_margin")
+            input.project__input-text(type="text" :value="formateDate(project.deadline)" disabled)
+          img.project__calendar-icon(src="../../../assets/images/calendar.png")
       .project__info-row
-        .project__client
+        .project__client(v-if='project.customer')
           LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")
+            .tooltip
+              span#myTooltip.tooltiptext XTRF: {{ project.client }}
+              img(:style="{ cursor: 'help', 'margin-right': '5px' }", src="../../../assets/images/red-info-icon.png")
             .project__input-icons
-              i.fa.fa-external-link.icon-link(aria-hidden='true')
-              input.project__input-text2.project__input-client(type="text" :value="project.client" readonly)
+              i.fa.fa-external-link.icon-link(aria-hidden='true' @click="goToClientInfo(project.customer._id)")
+              input.project__input-text2.project__input-client(type="text" :value="project.customer.name" readonly)
+        .project__client(v-else)
+          LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")
+            input.project__input-text(type="text" :value="project.client" disabled)
+
         .project__industry
           LabelValue(label="Industry" :isRequired="false" customClass="project_margin")
-            input.project__input-text(   type="text" :value="project.domain" disabled)
+            input.project__input-text(type="text" :value="project.domain | otherProjectsIndustryFilter" disabled)
         .project__number
-          LabelValue(label="&#8470;" customClass="project_margin")
-            span {{ project.serverProjectGuid }}
+          LabelValue(label="№" customClass="project_margin")
+            span.number {{ project.serverProjectGuid }}
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest(project._id)")
           label(for="test") Test
@@ -35,6 +44,8 @@
 	import LabelValue from "../LabelValue";
 	import moment from "moment";
 	import { mapActions } from "vuex";
+	import '../../../filters/OtherProjectsFilters'
+
 
 	export default {
 		props: {
@@ -51,6 +62,10 @@
 			};
 		},
 		methods: {
+			goToClientInfo(id) {
+				const route = this.$router.resolve({ path: `/clients/details/${ id }` });
+				window.open(route.href, "_blank");
+			},
 			...mapActions(["alertToggle"]),
 			formateDate: time => moment(time).format("DD-MM-YYYY HH:mm"),
 			async setTest(projectId) {
@@ -301,5 +316,50 @@
         }
       }
     }
+  }
+
+  .tooltip {
+    position: relative;
+    display: flex;
+
+    .tooltiptext {
+      font-size: 14px;
+      visibility: hidden;
+      width: 140px;
+      background-color: #67573e;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 150%;
+      left: 50%;
+      margin-left: -75px;
+      opacity: 0;
+      transition: opacity 0.3s;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #67573e transparent transparent transparent;
+      }
+    }
+
+    &:hover {
+      .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  }
+
+  .number {
+    letter-spacing: -1px;
   }
 </style>

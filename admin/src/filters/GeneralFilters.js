@@ -34,9 +34,5 @@ Vue.filter("stepsAndTasksStatusFilter", (status) => {
 	if (status === "Started") {
 		newStatus = "In progress"
 	}
-	// } else if (status === "Waiting to Start") {
-	// 	newStatus = "Ready to Start"
-	// }
-	// console.log(status)
 	return newStatus;
 });

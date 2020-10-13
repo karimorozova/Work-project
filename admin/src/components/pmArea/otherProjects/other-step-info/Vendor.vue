@@ -2,10 +2,13 @@
   .step-vendor
     .step-vendor__title Vendor:
     .step-vendor__info
+      .tooltip(v-if="XTRFVendorName")
+        span#myTooltip.tooltiptext XTRF: {{ XTRFVendorName }}
+        img(:style="{ cursor: 'help', 'margin-right': '5px', 'padding-bottom': '5px' }", src="../../../../assets/images/red-info-icon.png")
       .step-vendor__current-vendor
-        input.step-vendor__input-text(type="text" value="Will be Vendor" disabled)
+        input.step-vendor__input-text(type="text" :value="vendorName" disabled)
       .step-vendor__contacts
-        .step-vendor__icon(@click="alert('gotToVendorInfo will be')")
+        .step-vendor__icon(@click="gotToVendorInfo(vendor._id)")
           i.fa.fa-info-circle
         .step-vendor__icon(@click="sendEmail")
           i.fa.fa-envelope
@@ -19,18 +22,39 @@
 	export default {
 		props: {
 			vendor: {
-				type: [Object, String]
+				type: Object
 			},
 			step: {
 				type: Object
 			},
+			project: {
+				type: Object
+			},
+			index:{
+				type: Number
+      }
 		},
 		data() {
 			return {}
 		},
+		computed: {
+			vendorName() {
+				if(this.vendor) {
+					return `${ this.vendor.firstName } ${ this.vendor.surname }`
+				}
+			},
+      XTRFVendorName(){
+				if(this.project){
+					const stepIndex = this.step.name === 'Translation' ? 0 : 1
+					return  this.project.documents[this.index]
+              .UserAssignments.TranslationDocumentUserRoleAssignmentDetails[stepIndex]
+                .UserInfoHeader.FullName
+				}
+      },
+		},
 		methods: {
-			currentVendorName(vendor) {
-				// return vendor ? vendor.firstName + ' ' + vendor.surname : "";
+			gotToVendorInfo(id) {
+				window.open(`/vendors/details/${ id }`, '_blank');
 			},
 			async sendEmail() {
 				// try {
@@ -40,9 +64,6 @@
 				// } catch (err) {
 				// 	this.alertToggle({ message: "Internal server error / Cannot send email to vendor", isShow: true, type: "error" });
 				// }
-			},
-			gotToVendorInfo() {
-				// window.open(`/vendors/details/${this.vendor._id}`, '_blank');
 			},
 			...mapActions({
 				alertToggle: "alertToggle",
@@ -103,6 +124,47 @@
       font-size: 14px;
       outline: none;
       padding-right: 30px;
+    }
+  }
+
+  .tooltip {
+    position: relative;
+    display: flex;
+
+    .tooltiptext {
+      font-size: 14px;
+      visibility: hidden;
+      width: 140px;
+      background-color: #67573e;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 150%;
+      left: 50%;
+      margin-left: -75px;
+      opacity: 0;
+      transition: opacity 0.3s;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #67573e transparent transparent transparent;
+      }
+    }
+
+    &:hover {
+      .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
     }
   }
 </style>

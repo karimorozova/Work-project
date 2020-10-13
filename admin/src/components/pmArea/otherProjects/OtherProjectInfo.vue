@@ -5,10 +5,11 @@
         :project="project"
         :projectName="projectName"
       )
-      OtherProjectSubInformation(
-        :project="project"
-        :projectId="projectId"
-      )
+      span(v-if="Object.keys(project).length")
+        OtherProjectSubInformation(
+          :project="project"
+          :projectId="projectId"
+        )
     .project-info__all-info
       OtherTasksAndSteps(
         :project="project"

@@ -30,7 +30,7 @@
         template(slot="progress" slot-scope="{ row }")
           ProgressLine(:progress="((row.ConfirmedWordCount / row.TotalWordCount) * 100).toFixed(0)")
         template(slot="status" slot-scope="{ row }")
-          .tasks__task-status {{ row.DocumentStatus }}
+          .tasks__task-status {{ row.DocumentStatus | otherProjectsTaskStatus }}
 
         template(slot="receivables" slot-scope="{ row, index }")
           .tasks__task-status(v-if="project.status === 'Closed'")
@@ -52,6 +52,7 @@
   import ProgressLine from '../../ProgressLine';
   import Tabs from '../../Tabs';
   import moment from 'moment';
+  import '../../../filters/OtherProjectsFilters'
   import { mapGetters, mapActions } from 'vuex';
 
   export default {
@@ -145,9 +146,6 @@
       ProgressLine,
       Tabs
     },
-    mounted () {
-      console.log(this.project);
-    }
   };
 </script>
 

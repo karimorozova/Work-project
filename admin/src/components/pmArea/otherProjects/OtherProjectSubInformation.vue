@@ -12,68 +12,65 @@
       .row__title Payment Profile:
       .row__data
         input.row__input(type="text" :value="project.paymentProfile" disabled)
-        //SelectSingle.drop(
-        //  placeholder="Select",
-        //  :selectedOption="project.paymentProfile",
-        //  :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
-        //  @chooseOption="setPayment"
-        //)
+
     .sub-information__row(v-if="project.status === 'Closed'")
       .row__title Urgent:
       .row__data
         .checkbox
-          input#urgent(type="checkbox", :checked="project.isUrgent", @change="setUrgentStatus" disabled)
+          input#urgent(type="checkbox", :checked="project.isUrgent" disabled)
           label(for="urgent")
 
-    //- .client-table
-    //-   SettingsTable(
-    //-     :fields="fields",
-    //-     :tableData="projectClientContacts",
-    //-     :errors="errors",
-    //-     :areErrors="areErrors",
-    //-     :isApproveModal="isDeleting",
-    //-     @closeErrors="closeErrors",
-    //-     @approve="deleteData",
-    //-     @notApprove="setDefaults",
-    //-     @closeModal="setDefaults"
-    //-   )
-    //-     template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-    //-       .client-table__head-title {{ field.label }}
+    .client-table(v-if="project.status === 'Closed'")
+      SettingsTable(
+        :fields="fields",
+        :tableData="projectClientContacts",
+        :errors="errors",
+        :areErrors="areErrors",
+        :isApproveModal="isDeleting",
+        @closeErrors="closeErrors",
+        @approve="deleteData",
+        @notApprove="setDefaults",
+        @closeModal="setDefaults"
+      )
 
-    //-     template(slot="client", slot-scope="{ row, index }")
-    //-       .client-table__data(v-if="currentActive !== index")
-    //-         span.client-table__client(v-if="row.firstName") {{ row.firstName }}
-    //-       .client-table__drop-menu(v-else)
-    //-         SelectSingle(
-    //-           placeholder="Select",
-    //-           :isTableDropMenu="isTableDropMenu",
-    //-           :hasSearch="true",
-    //-           :selectedOption="currentClientContact.firstName",
-    //-           :options="clientData",
-    //-           @chooseOption="setClientContact"
-    //-         )
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          .client-table__head-title {{ field.label }}
 
-    //-     template(slot="icons", slot-scope="{ row, index }")
-    //-       .client-table__height
-    //-         .client-table__icons
-    //-           i.client-table__icon.fa.fa-envelope(
-    //-             @click="openWYSIWYG(index)",
-    //-             :class="{ 'client-table_opacity': true }",
-    //-             aria-hidden="true"
-    //-           )
-    //-           i.client-table__icon.fa.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
-    //-           img.client-table__icon(
-    //-             v-for="(icon, key) in icons",
-    //-             :src="icon.icon",
-    //-             @click="makeAction(index, key)",
-    //-             :class="{ 'client-table_opacity': isActive(key, index) }"
-    //-           )
+        template(slot="client", slot-scope="{ row, index }")
+          .client-table__data(v-if="currentActive !== index")
+            span.client-table__client(v-if="row.firstName") {{ row.firstName }}
+          .client-table__drop-menu(v-else)
+            SelectSingle(
+              placeholder="Select",
+              :isTableDropMenu="isTableDropMenu",
+              :hasSearch="true",
+              :selectedOption="currentClientContact.firstName",
+              :options="clientData",
+              @chooseOption="setClientContact"
+            )
 
-    //Add(@add="addData")
+        template(slot="icons", slot-scope="{ row, index }")
+          .client-table__height
+            .client-table__icons
+              i.client-table__icon.fa.fa-envelope(
+                @click="openWYSIWYG(index)",
+                :class="{ 'client-table_opacity': true }",
+                aria-hidden="true"
+              )
+              i.client-table__icon.fa.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
+              img.client-table__icon(
+                v-for="(icon, key) in icons",
+                :src="icon.icon",
+                @click="makeAction(index, key)",
+                :class="{ 'client-table_opacity': isActive(key, index) }"
+              )
+
+    Add(@add="addData")
+
 </template>
 
 <script>
-	import {mapActions} from "vuex";
+	import { mapActions } from "vuex";
 	import Add from "../../Add";
 	import scrollDrop from "@/mixins/scrollDrop";
 	import crudIcons from "@/mixins/crudIcons";
@@ -84,10 +81,12 @@
 	export default {
 		mixins: [scrollDrop, crudIcons],
 		props: {
-			project: {type: Object},
-			projectId:{
+			project: {
+				type: Object
+			},
+			projectId: {
 				type: String,
-      }
+			}
 		},
 		data() {
 			return {
@@ -153,7 +152,7 @@
 			},
 			async sendMessage(message) {
 				try {
-					const result = await this.$http.post("/pm-manage/contact-email", {
+					const result = await this.$http.post("/memoqapi/contact-email", {
 						projectId: this.project._id,
 						contactId: this.currentClientContact._id,
 						template: message,
@@ -175,7 +174,7 @@
 				}
 			},
 			async makeAction(index, key) {
-				if (this.currentActive !== -1 && this.currentActive !== index) {
+				if(this.currentActive !== -1 && this.currentActive !== index) {
 					return this.isEditing();
 				}
 				switch (key) {
@@ -186,10 +185,10 @@
 						this.manageCancelEdition(index);
 						break;
 					case "delete":
-						if (this.projectClientContacts.length <= 1) {
+						if(this.projectClientContacts.length <= 1) {
 							this.errors = [];
 							this.errors.push('Can\'t be deleted')
-							if (this.errors.length) {
+							if(this.errors.length) {
 								this.areErrors = true;
 								return;
 							}
@@ -210,10 +209,9 @@
 				this.currentClientContact = "";
 			},
 			async manageDeleteClick(index) {
-				if (!this.projectClientContacts[index]._id) {
+				if(!this.projectClientContacts[index]._id) {
 					this.projectClientContacts.splice(index, 1);
 					this.setDefaults();
-					return;
 				} else {
 					this.deleteIndex = index;
 					this.isDeleting = true;
@@ -222,11 +220,11 @@
 			async deleteData() {
 				try {
 					const result = await this.$http.delete(
-							`/pm-manage/client-contact/${this.project._id}/${this.projectClientContacts[this.deleteIndex]._id}`
+							`/pm-manage/client-contact/${ this.project._id }/${ this.projectClientContacts[this.deleteIndex]._id }`
 					);
 					this.projectClientContacts = result.data.clientContacts;
 					this.alertToggle({
-						message: "Project client contact removed",
+						message: "Client contact removed",
 						isShow: true,
 						type: "success",
 					});
@@ -241,15 +239,15 @@
 				}
 			},
 			async checkErrors(index) {
-				if (this.currentActive === -1) return;
+				if(this.currentActive === -1) return;
 				this.errors = [];
-				if (this.projectClientContacts.find((item) => item.firstName === this.currentClientContact.firstName)) {
+				if(this.projectClientContacts.find((item) => item.firstName === this.currentClientContact.firstName)) {
 					this.errors.push("Such contact exists");
 				}
-				if (!this.currentClientContact.hasOwnProperty("firstName")) {
+				if(!this.currentClientContact.hasOwnProperty("firstName")) {
 					this.errors.push("Сhoose сlient сontact");
 				}
-				if (this.errors.length) {
+				if(this.errors.length) {
 					this.areErrors = true;
 					return;
 				}
@@ -257,13 +255,13 @@
 			},
 			async manageSaveClick(index) {
 				try {
-					const result = await this.$http.post("/pm-manage/client-contact", {
+					const result = await this.$http.post("/memoqapi/client-contact", {
 						projectId: this.project._id,
 						contact: this.currentClientContact,
 					});
 					this.projectClientContacts = result.data.clientContacts;
 					this.alertToggle({
-						message: "Saved project client contact",
+						message: "Client contact saved",
 						isShow: true,
 						type: "success",
 					});
@@ -278,16 +276,15 @@
 				}
 			},
 			manageCancelEdition(index) {
-				if (!this.projectClientContacts[index]._id) {
+				if(!this.projectClientContacts[index]._id) {
 					this.projectClientContacts.splice(index, 1);
 					this.setDefaults();
-					return;
 				} else {
 					this.setDefaults();
 				}
 			},
 			addData() {
-				if (this.currentActive !== -1) {
+				if(this.currentActive !== -1) {
 					return this.isEditing();
 				}
 				this.projectClientContacts.push({
@@ -299,47 +296,8 @@
 				this.currentActive = index;
 				this.currentClientContact = this.projectClientContacts[index];
 			},
-			setClientContact({option}) {
+			setClientContact({ option }) {
 				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option);
-			},
-			async setPayment({option}) {
-				try {
-					const result = await this.$http.post("/pm-manage/payment-profile", {
-						projectId: this.project._id,
-						paymentProfile: option,
-					});
-					this.project.paymentProfile = result.data.paymentProfile;
-					this.alertToggle({
-						message: "Project payment profile updated",
-						isShow: true,
-						type: "success",
-					});
-				} catch (err) {
-					this.alertToggle({
-						message: "Cannot update project payment profile",
-						isShow: true,
-						type: "error",
-					});
-				}
-			},
-			async setUrgentStatus() {
-				try {
-					const result = await this.$http.post("/pm-manage/urgent", {
-						projectId: this.project._id,
-						isUrgent: event.target.checked,
-					});
-					this.alertToggle({
-						message: "Urgent status updated",
-						isShow: true,
-						type: "success",
-					});
-				} catch (err) {
-					this.alertToggle({
-						message: "Cannot update Urgent status",
-						isShow: true,
-						type: "error",
-					});
-				}
 			},
 			getClientContacts() {
 				this.projectClientContacts = this.project.clientContacts;
@@ -347,13 +305,17 @@
 		},
 		computed: {
 			clientData() {
-				if (this.project) {
+				if(this.project) {
 					return this.project.customer.contacts.map((i) => i.firstName);
 				}
 			},
 		},
+		// mounted() {
+		//
+		// },
 		created() {
-			this.project && this.getClientContacts();
+			console.log(this.project);
+			this.getClientContacts();
 		},
 		components: {
 			Add,
@@ -395,6 +357,7 @@
         width: 190px;
         position: relative;
       }
+
       &__input {
         width: 133px;
         height: 28px;
