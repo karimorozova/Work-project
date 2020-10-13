@@ -28,7 +28,8 @@
         span(v-if="row.finance && row.finance.Price.payables") &euro;
           span {{ row.finance.Price.payables }}
       template(slot="roi" slot-scope="{ row }")
-         span {{ row.ROI }}
+         span(v-if="row.finance && row.finance.ROI") {{ row.finance.ROI }}
+         span(v-else)
       template(slot="startDate" slot-scope="{ row }")
         span {{formateDate(row.creationTime)}}
       template(slot="deadline" slot-scope="{ row }")
@@ -59,7 +60,7 @@
             label: "ID",
             headerKey: "headerProjectId",
             key: "projectId",
-            width: "9%"
+            width: "10%"
           },
           {
             label: "Project Name",
@@ -125,7 +126,7 @@
             label: "Test",
             headerKey: "headerTest",
             key: "projectTest",
-            width: "5%"
+            width: "4%"
           }
         ]
       };

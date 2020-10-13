@@ -20,7 +20,7 @@
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
           span.tasks__label {{ field.label }}
         template(slot="info" slot-scope="{row, index}")
-          .steps__info-icon(@click="showStepDetails(index)")
+          .steps__info-icon(@click="showStepDetails(index)" :class="{isDisabled: project.status === 'In progress'}")
             i.fa.fa-info-circle
         template(slot="name" slot-scope="{ row }")
           span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
@@ -51,15 +51,6 @@
 
       transition(name="fade")
         .steps__info(v-if="isStepInfo")
-          //StepInfo(
-          //  :step="allSteps[infoIndex]"
-          //  :index="infoIndex"
-          //  :vendors="vendors"
-          //  :task="getTask(infoIndex)"
-          //  @closeStepInfo="closeStepInfo"
-          //  :originallyLanguages="originallyLanguages"
-          //  :originallyUnits="originallyUnits"
-          //)
           OtherStepInfo(
             :index="infoIndex"
             :step="project.steps[infoIndex]"
@@ -155,26 +146,28 @@
 			await this.createdListOfTargetLanguages();
 		},
 		methods: {
-      showStepDetails (index) {
-        this.infoIndex = index;
-        this.isStepInfo = true;
-      },
-      closeStepInfo () {
-        this.isStepInfo = false;
-        this.infoIndex = -1;
-      },
-      formateDate: time => moment(time).format('DD-MM-YYYY'),
-      getStepName: num => (num === '0' ? 'Translation' : 'Revision'),
-      createdListOfTargetLanguages () {
-        let someArr = [];
-        this.project.targetLanguages.forEach(element => {
-          for (var i = 0; i < 2; i++) {
-            someArr.push(element);
-          }
-        });
-        return (this.stepsTargetLanguages = someArr);
-      },
-      showTab ({ index }) {
+			showStepDetails(index) {
+				if(this.project.status === 'Closed') {
+					this.infoIndex = index;
+					this.isStepInfo = true;
+				}
+			},
+			closeStepInfo() {
+				this.isStepInfo = false;
+				this.infoIndex = -1;
+			},
+			formateDate: time => moment(time).format('DD-MM-YYYY'),
+			getStepName: num => (num === '0' ? 'Translation' : 'Revision'),
+			createdListOfTargetLanguages() {
+				let someArr = [];
+				this.project.targetLanguages.forEach(element => {
+					for (var i = 0; i < 2; i++) {
+						someArr.push(element);
+					}
+				});
+				return (this.stepsTargetLanguages = someArr);
+			},
+			showTab({ index }) {
 				return this.tabs[index] === "Steps"
 						? true
 						: this.$emit("showTab", { tab: this.tabs[index] });
@@ -330,5 +323,9 @@
   .fade-enter,
   .fade-leave-to {
     opacity: 0;
+  }
+
+  .isDisabled {
+    cursor: not-allowed !important;
   }
 </style>

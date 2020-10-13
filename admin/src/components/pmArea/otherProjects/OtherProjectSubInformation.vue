@@ -65,7 +65,8 @@
                 :class="{ 'client-table_opacity': isActive(key, index) }"
               )
 
-    Add(@add="addData")
+    span(v-if="project.status === 'Closed'")
+      Add(@add="addData")
 
 </template>
 
@@ -314,7 +315,6 @@
 		//
 		// },
 		created() {
-			console.log(this.project);
 			this.getClientContacts();
 		},
 		components: {

@@ -27,7 +27,7 @@
               input.project__input-text2.project__input-client(type="text" :value="project.customer.name" readonly)
         .project__client(v-else)
           LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")
-            input.project__input-text(type="text" :value="project.client" disabled)
+            input.project__input-text(type="text" :value="'XTRF: ' + project.client" disabled)
 
         .project__industry
           LabelValue(label="Industry" :isRequired="false" customClass="project_margin")
