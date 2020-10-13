@@ -20,7 +20,7 @@
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
           span.tasks__label {{ field.label }}
         template(slot="info" slot-scope="{row, index}")
-          .steps__info-icon(@click="showStepDetails(index)" :class="{isDisabled: project.status === 'In progress'}")
+          div(@click="showStepDetails(index)" :class="{isDisabled: project.status === 'In progress', 'steps__info-icon': project.status !== 'In progress'}")
             i.fa.fa-info-circle
         template(slot="name" slot-scope="{ row }")
           span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
@@ -326,6 +326,10 @@
   }
 
   .isDisabled {
+    color: $main-color;
+    opacity: 0.7;
+    margin-top: 3px;
+    margin-left: 12px;
     cursor: not-allowed !important;
   }
 </style>
