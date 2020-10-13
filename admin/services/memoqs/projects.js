@@ -546,7 +546,7 @@ const updateMemoqProjectFinance = async (project) => {
   if (!doesHaveCorrectStructure && project.status === 'In progress') {
     return project;
   }
-  await createOtherProjectFinanceData({ project, documents });
+  return await createOtherProjectFinanceData({ project, documents });
 };
 
 function getUpdatedUsers (users) {

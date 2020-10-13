@@ -254,8 +254,7 @@ router.post('/update-memoq-finance', async (req, res) => {
   const { id } = req.body;
   try {
     const neededProject = await MemoqProject.findOne({ _id: id });
-    await updateMemoqProjectFinance(neededProject);
-    const updatedProject = await getMemoqProject({ _id: id });
+    const updatedProject = await updateMemoqProjectFinance(neededProject);
     res.send(updatedProject);
   } catch (err) {
     console.log(err);
@@ -279,7 +278,8 @@ router.post('/client-contact', async (req, res) => {
   try {
     const { clientContacts } = await MemoqProject.findOne({ _id: projectId });
     const existingContact = clientContacts.findIndex(item => item._id.toString() === contact._id.toString());
-    if (existingContact) {
+    console.log(existingContact);
+    if (existingContact !== -1) {
       clientContacts.splice(existingContact, 1, contact);
     } else {
       clientContacts.push(contact);

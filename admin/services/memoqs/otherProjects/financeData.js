@@ -2,6 +2,7 @@ const { Clients, Vendors, Languages, Industries, Pricelist, CurrencyRatio, Step,
 const ObjectId = require('mongodb').ObjectID;
 const { getPriceFromPersonRates, getPriceFromPricelist } = require('../../../сalculations/finance');
 const { defaultFinanceObj } = require('../../../enums');
+const { getProjectAfterUpdate } = require('./getMemoqProject');
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
   const clients = await Clients.find();
@@ -13,12 +14,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   if (!tasks.length && !steps.length) return project;
   const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
-  return await MemoqProject.updateOne(
-    { _id: project._id }, { ...additionalData, tasks, steps, finance })
-    .populate('customer')
-    .populate('steps.vendor')
-    .populate('projectManager')
-    .populate('accountManager');
+  return await getProjectAfterUpdate({ _id: project._id }, { ...additionalData, tasks, steps, finance });
 };
 
 const getProjectTasks = async (documents, project, customer, vendors) => {

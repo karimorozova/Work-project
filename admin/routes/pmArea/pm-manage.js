@@ -931,7 +931,7 @@ router.post('/client-contact', async (req, res) => {
   try {
     const { clientContacts } = await Projects.findOne({ _id: projectId });
     const existingContact = clientContacts.findIndex(item => item._id.toString() === contact._id.toString());
-    if (existingContact) {
+    if (existingContact !== -1) {
       clientContacts.splice(existingContact, 1, contact);
     } else {
       clientContacts.push(contact);
