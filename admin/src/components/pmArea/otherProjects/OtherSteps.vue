@@ -63,6 +63,8 @@
           OtherStepInfo(
             :index="infoIndex"
             :step="project.steps[infoIndex]"
+            :project="project"
+            :vendor="project.steps[infoIndex].vendor"
             @closeStepInfo="closeStepInfo"
           )
 </template>
