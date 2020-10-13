@@ -214,7 +214,7 @@ export default {
     }
     &__drop-menu {
         position: relative;
-        width: 200px;
+        width: 160px;
         height: 28px;
     }
     &_medium-menu {

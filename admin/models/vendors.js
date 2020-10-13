@@ -411,7 +411,7 @@ const VendorSchema = new mongoose.Schema({
     default: {
       xTranslated: { text: "X translated", rate: 10 },
       repeat: { text: "Repetition", rate: 20 },
-      contextMatch: { text: "Context match", value: 20 },
+      contextMatch: { text: "Context match", rate: 20 },
       repeat100: { text: "100%", rate: 20 },
       repeat50: { text: "50-74%", rate: 100 },
       repeat75: { text: "75-84%", rate: 80 },

@@ -164,6 +164,7 @@ export default {
     margin-top: 20px;
     margin-left: 20px;
     position: relative;
+    width: 1180px;
     &__table {
         margin: 40px 40px 40px 0;
         padding: 20px;
