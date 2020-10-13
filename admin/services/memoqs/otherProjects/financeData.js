@@ -174,8 +174,8 @@ const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords) =
       payables: +WeightedWords,
     },
     Price: {
-      receivables: priceReceivables,
-      payables: pricePayables,
+      receivables: priceReceivables.toFixed(2),
+      payables: pricePayables.toFixed(2),
     },
     profit,
     ROI
@@ -186,8 +186,8 @@ const getTaskFinance = (taskSteps, TotalWordCount) => {
   let priceReceivables = 0;
   let pricePayables = 0;
   for (let { finance } of taskSteps) {
-    priceReceivables += finance.Price.receivables;
-    pricePayables += finance.Price.payables;
+    priceReceivables += +finance.Price.receivables;
+    pricePayables += +finance.Price.payables;
   }
   const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
   const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
@@ -197,8 +197,8 @@ const getTaskFinance = (taskSteps, TotalWordCount) => {
       payables: +TotalWordCount,
     },
     Price: {
-      receivables: priceReceivables,
-      payables: pricePayables,
+      receivables: priceReceivables.toFixed(2),
+      payables: pricePayables.toFixed(2),
     },
     profit,
     ROI
@@ -210,8 +210,8 @@ const getProjectFinance = (tasks) => {
   let pricePayables = 0;
   let TotalWordCount = 0;
   for (let { finance } of tasks) {
-    priceReceivables += finance.Price.receivables;
-    pricePayables += finance.Price.payables;
+    priceReceivables += +finance.Price.receivables;
+    pricePayables += +finance.Price.payables;
     TotalWordCount += finance.Wordcount.receivables;
   }
   const profit = pricePayables ? priceReceivables - pricePayables : 0;
@@ -222,8 +222,8 @@ const getProjectFinance = (tasks) => {
       payables: +TotalWordCount,
     },
     Price: {
-      receivables: priceReceivables,
-      payables: pricePayables,
+      receivables: priceReceivables.toFixed(2),
+      payables: pricePayables.toFixed(2),
     },
     profit,
     ROI
