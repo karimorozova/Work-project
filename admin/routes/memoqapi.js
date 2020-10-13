@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { upload } = require('../utils');
+const { upload, sendEmail } = require('../utils');
 const { User, MemoqProject } = require('../models');
 const { downloadCompletedFiles } = require('../projects');
 const {
@@ -12,6 +12,7 @@ const {
   updateAllMemoqProjects,
   updateMemoqProjectFinance
 } = require('../services/memoqs/projects');
+const { getMemoqProject, getProjectAfterUpdate } = require('../services/memoqs/otherProjects/getMemoqProject');
 const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require('../services/memoqs/files');
 const { getMemoqTemplates } = require("../services/memoqs/resources");
 const { assignProjectManagers } = require('../projects/updates');
@@ -254,11 +255,7 @@ router.post('/update-memoq-finance', async (req, res) => {
   try {
     const neededProject = await MemoqProject.findOne({ _id: id });
     await updateMemoqProjectFinance(neededProject);
-    const updatedProject = await MemoqProject.findOne({ _id: id })
-      .populate('customer')
-      .populate('steps.vendor')
-      .populate('projectManager')
-      .populate('accountManager');
+    const updatedProject = await getMemoqProject({ _id: id });
     res.send(updatedProject);
   } catch (err) {
     console.log(err);
@@ -274,6 +271,52 @@ router.get('/update-all-memoq-finance', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating all other projects');
+  }
+});
+
+router.post('/client-contact', async (req, res) => {
+  const { projectId, contact } = req.body;
+  try {
+    const { clientContacts } = await MemoqProject.findOne({ _id: projectId });
+    const existingContact = clientContacts.findIndex(item => item._id.toString() === contact._id.toString());
+    if (existingContact) {
+      clientContacts.splice(existingContact, 1, contact);
+    } else {
+      clientContacts.push(contact);
+    }
+    const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
+    res.send(project);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating/creating client contact');
+  }
+});
+
+router.delete('/client-contact/:projectId/:contactId', async (req, res) => {
+  const { projectId, contactId } = req.params;
+  try {
+    const { clientContacts } = await MemoqProject.findOne({ _id: projectId });
+    const contactToDeleteIndex = clientContacts.findIndex(item => item._id.toString() === contactId.toString());
+    clientContacts.splice(contactToDeleteIndex, 1);
+    const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
+    res.send(project);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on deleting client contact');
+  }
+});
+
+router.post('/contact-email', async (req, res) => {
+  const { projectId, contactId, template } = req.body;
+  try {
+    const { clientContacts } = await MemoqProject.findOne({ _id: projectId });
+    const { email } = clientContacts.find(contact => contact._id.toString() === contactId.toString());
+    const subject = 'Pangea translation services';
+    await sendEmail({ to: email, subject }, template, true);
+    res.send(true);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on sending message to client\'s contact');
   }
 });
 
