@@ -15,8 +15,11 @@
         :projectId="projectId"
         :projectSteps="projectSteps"
       )
-      .project-info__action
-        OtherProjectAction
+      .project-info__action(v-if="project.status === 'Closed'")
+        OtherProjectAction(
+          :project="project"
+          @refreshCurrProject="refreshProject"
+        )
 
 </template>
 
@@ -38,6 +41,9 @@
 		},
 		methods: {
 			...mapActions(["alertToggle"]),
+			refreshProject(project) {
+				this.project = project
+			},
 			async getProjectSteps(id) {
 				try {
 					const result = await this.$http.get(`/memoqapi/other-project?id=${ id }`);

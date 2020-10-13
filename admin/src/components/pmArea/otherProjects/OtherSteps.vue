@@ -34,16 +34,19 @@
           span.steps__step-data {{formateDate(row.DeadLine)}}
 
         template(slot="receivables" slot-scope="{ row, index }")
-          span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
-          span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
+          div(v-if="project.status === 'Closed'")
+            span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
+            span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
 
         template(slot="payables" slot-scope="{ row, index }")
-          span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
-          span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
+          div(v-if="project.status === 'Closed'")
+            span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
+            span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
 
         template(slot="margin" slot-scope="{ row, index }")
-          span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
-          span.steps__step-data {{ project.steps[index].finance.profit  }}
+          div(v-if="project.status === 'Closed'")
+            span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
+            span.steps__step-data {{ project.steps[index].finance.profit }}
 
 
       transition(name="fade")

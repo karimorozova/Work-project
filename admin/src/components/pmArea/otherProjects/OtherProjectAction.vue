@@ -2,9 +2,18 @@
   .project-action
     .drops
     .drops__item
+      .drops__label Update project:
+      .drops__menu
+        .drops__refresh-button(@click="refreshProject")
+
+    .drops__item
       .drops__label Account Manager:
       .drops__menu
-        input.drops__input(type="text" value="AM" disabled)
+        input.drops__input(
+          type="text"
+          :value="project.accountManager !== null ? `${project.accountManager.firstName} ${project.accountManager.lastName}` : ''"
+          disabled
+        )
       //SelectSingle(
       //  :options="accManagers"
       //  :selectedOption="selectedAccManager"
@@ -13,7 +22,11 @@
     .drops__item
       .drops__label Project Manager:
       .drops__menu
-        input.drops__input(type="text" value="PM" disabled)
+        input.drops__input(
+          type="text"
+          :value="project.projectManager !== null ? `${project.projectManager.firstName} ${project.accountManager.lastName}` : ''"
+          disabled
+        )
       //SelectSingle(
       //  :options="projManagers"
       //  :selectedOption="selectedProjManager"
@@ -29,13 +42,38 @@
 	import ApproveModal from "../../ApproveModal";
 
 	export default {
-		props: {},
+		props: {
+			project: {
+				type: Object
+			},
+		},
 		data() {
 			return {
 				managers: [],
 			};
 		},
 		methods: {
+			async refreshProject() {
+				try {
+					const result = await this.$http.post('/memoqapi/update-memoq-finance', {
+						id: this.project._id
+					});
+					this.$emit('refreshCurrProject', result.data);
+				} catch (err) {
+					this.alertToggle({
+						message: "Server Error / Cannot update Project",
+						isShow: true,
+						type: "error"
+					});
+				} finally {
+					this.alertToggle({
+						message: "Project update",
+						isShow: true,
+						type: "success"
+					});
+				}
+			},
+
 			// async setManager({ option }, prop) {
 			// 	const manager = this.managers.find(
 			// 			item => `${ item.firstName } ${ item.lastName }` === option
@@ -134,6 +172,13 @@
     .drops {
       width: 100%;
       position: relative;
+
+      &__refresh-button {
+        background-image: url("../../../assets/images/refresh-icon.png");
+        width: 24px;
+        height: 20px;
+        cursor: pointer;
+      }
 
       &__menu {
         position: relative;

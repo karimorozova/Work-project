@@ -33,15 +33,15 @@
           .tasks__task-status {{ row.DocumentStatus }}
 
         template(slot="receivables" slot-scope="{ row, index }")
-          .tasks__task-status
+          .tasks__task-status(v-if="project.status === 'Closed'")
             span(v-if="project.tasks[index].finance.Price.receivables") &euro;&nbsp;
             span {{ project.tasks[index].finance.Price.receivables }}
         template(slot="payables" slot-scope="{ row, index }")
-          .tasks__task-status
+          .tasks__task-status(v-if="project.status === 'Closed'")
             span(v-if="project.tasks[index].finance.Price.payables") &euro;&nbsp;
             span {{ project.tasks[index].finance.Price.payables }}
         template(slot="margin" slot-scope="{ row, index }")
-          .tasks__task-status
+          .tasks__task-status(v-if="project.status === 'Closed'")
             span(v-if="project.tasks[index].finance.profit") &euro;&nbsp;
             span {{ project.tasks[index].finance.profit }}
 

@@ -22,13 +22,13 @@
       template(slot="status" slot-scope="{ row }")
         span {{ row.status }}
       template(slot="receivables" slot-scope="{ row }")
-        //- span(v-if="row.finance && row.finance.Price.receivables") &euro;
-        //-     span {{ row.finance.Price.receivables }}
+        span(v-if="row.finance && row.finance.Price.receivables") &euro;
+          span {{ row.finance.Price.receivables }}
       template(slot="payables" slot-scope="{ row }")
-        //- span(v-if="row.finance && row.finance.Price.payables") &euro;
-        //-     span {{ row.finance.Price.payables }}
+        span(v-if="row.finance && row.finance.Price.payables") &euro;
+          span {{ row.finance.Price.payables }}
       template(slot="roi" slot-scope="{ row }")
-        //- span {{ row.roi }}
+         span {{ row.ROI }}
       template(slot="startDate" slot-scope="{ row }")
         span {{formateDate(row.creationTime)}}
       template(slot="deadline" slot-scope="{ row }")

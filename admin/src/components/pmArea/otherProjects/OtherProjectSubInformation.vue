@@ -8,17 +8,17 @@
     .sub-information__row
       .row__title Project Status:
       .row__data {{ project.status }}
-    .sub-information__row
+    .sub-information__row(v-if="project.status === 'Closed'")
       .row__title Payment Profile:
       .row__data
-        input.row__input(type="text" value="Profile" disabled)
+        input.row__input(type="text" :value="project.paymentProfile" disabled)
         //SelectSingle.drop(
         //  placeholder="Select",
         //  :selectedOption="project.paymentProfile",
         //  :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
         //  @chooseOption="setPayment"
         //)
-    .sub-information__row
+    .sub-information__row(v-if="project.status === 'Closed'")
       .row__title Urgent:
       .row__data
         .checkbox
