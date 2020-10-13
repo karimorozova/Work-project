@@ -1,17 +1,24 @@
-const { Clients, Vendors, User, Languages, Industries, Pricelist, CurrencyRatio, Step, Units } = require('../../../models');
+const { Clients, Vendors, Languages, Industries, Pricelist, CurrencyRatio, Step, Units, MemoqProject } = require('../../../models');
 const ObjectId = require('mongodb').ObjectID;
 const { getPriceFromPersonRates, getPriceFromPricelist } = require('../../../сalculations/finance');
 const { defaultFinanceObj } = require('../../../enums');
 
-const createOtherProjectFinanceData = async ({ project, documents }) => {
+const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
   const clients = await Clients.find();
   const vendors = await Vendors.find();
-  const { updatedProject, neededCustomer } = getUpdatedProjectData(project, clients);
+  const { additionalData, neededCustomer } = getUpdatedProjectData(project, clients);
   if (!neededCustomer) return project;
+  const updatedProject = { ...project._doc, ...additionalData };
   const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
   if (!tasks.length && !steps.length) return project;
   const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
-  return { ...updatedProject, tasks, steps, finance };
+  if (fromCron) return { ...updatedProject, tasks, steps, finance };
+  return await MemoqProject.updateOne(
+    { _id: project._id }, { ...additionalData, tasks, steps, finance })
+    .populate('customer')
+    .populate('steps.vendor')
+    .populate('projectManager')
+    .populate('accountManager');
 };
 
 const getProjectTasks = async (documents, project, customer, vendors) => {
@@ -86,15 +93,18 @@ const getUpdatedProjectData = (project, allClients) => {
   const { client: memoqClient } = project;
   const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
   const industry = getIndustryId(project.domain);
+  let additionalData = {};
   if (neededCustomer) {
-    project.customer = ObjectId(neededCustomer._id);
-    project.status = 'Closed';
-    project.projectManager = ObjectId(neededCustomer.projectManager._id);
-    project.accountManager = ObjectId(neededCustomer.accountManager._id);
-    project.industry = industry.name === 'Other' ? project.domain : ObjectId(industry._id);
-    project.paymentProfile = neededCustomer.billingInfo.paymentType;
+    additionalData = {
+      customer: ObjectId(neededCustomer._id),
+      status: 'Closed',
+      projectManager: ObjectId(neededCustomer.projectManager._id),
+      accountManager: ObjectId(neededCustomer.accountManager._id),
+      industry: industry.name === 'Other' ? project.domain : ObjectId(industry._id),
+      paymentProfile: neededCustomer.billingInfo.paymentType,
+    };
   }
-  return { updatedProject: project, neededCustomer };
+  return { additionalData, neededCustomer };
 };
 
 const getStepUserRate = async (user, project, stepName, task) => {

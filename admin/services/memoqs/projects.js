@@ -496,21 +496,20 @@ async function updateMemoqProjectsData() {
     const clients = await Clients.find();
     const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
     for (let project of allProjects) {
+      const { ServerProjectGuid } = project;
       if (project.Name.indexOf('PngSys') === -1) {
-        let users = await getProjectUsers(project.ServerProjectGuid);
+        let users = await getProjectUsers(ServerProjectGuid);
         users = getUpdatedUsers(users);
-        const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
+        const documents = await getProjectTranslationDocs(ServerProjectGuid);
         let memoqProject = getMemoqProjectData(project, languages);
+        memoqProject.status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
         const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
-          checkIfProjectStructure(clients, memoqProject, documents) : false;
-        memoqProject = doesHaveCorrectStructure ? await createOtherProjectFinanceData({
-          project: memoqProject,
-          documents
-        }) : memoqProject;
-        if (!doesHaveCorrectStructure) memoqProject.status = 'In progress';
+          checkProjectStructure(clients, memoqProject, documents) : false;
+        memoqProject = doesHaveCorrectStructure && memoqProject.status !== 'In progress' ?
+          await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
         await MemoqProject.updateOne(
-          { serverProjectGuid: project.ServerProjectGuid },
-          { ...memoqProject, users, documents, projectStatus: project.ProjectStatus },
+          { ServerProjectGuid },
+          { ...memoqProject, users, documents },
           { upsert: true });
       }
     }
@@ -526,38 +525,28 @@ const updateAllMemoqProjects = async () => {
   const clients = await Clients.find();
   for (let i = 0; i < projects.length; i++) {
     let project = projects[i];
-    const { _id, documents } = project;
-    const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
-      checkIfProjectStructure(clients, project, documents) : false;
-    project = doesHaveCorrectStructure ? await createOtherProjectFinanceData({
-      project,
-      documents
-    }) : project;
-    if (!doesHaveCorrectStructure) project.status = 'In progress';
-    await MemoqProject.updateOne({ _id }, { ...project._doc });
+    const { documents } = project;
+    const doesHaveDocuments = documents !== null && documents !== undefined;
+    project.status = doesHaveDocuments ? isAllTasksFinished(documents) ? 'Closed' : 'In progress' : 'In progress';
+    const doesHaveCorrectStructure = doesHaveDocuments ? checkProjectStructure(clients, project, documents) : false;
+    if (doesHaveCorrectStructure && project.status !== 'In progress') {
+      await createOtherProjectFinanceData({
+        project,
+        documents
+      });
+    }
   }
-  return await MemoqProject.find()
-    .populate('customer')
-    .populate('steps.vendor')
-    .populate('projectManager')
-    .populate('accountManager');
 };
 
 const updateMemoqProjectFinance = async (project) => {
   const clients = await Clients.find();
-  const { _id, documents } = project;
-  const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
-    checkIfProjectStructure(clients, project, documents) : false;
-  project = doesHaveCorrectStructure ? await createOtherProjectFinanceData({
-    project,
-    documents
-  }) : project;
-  if (!doesHaveCorrectStructure) project.status = 'In progress';
-  return await MemoqProject.findOneAndUpdate({ _id }, { ...project._doc })
-    .populate('customer')
-    .populate('steps.vendor')
-    .populate('projectManager')
-    .populate('accountManager');
+  const { documents } = project;
+  project.status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
+  const doesHaveCorrectStructure = checkProjectStructure(clients, project, documents);
+  if (!doesHaveCorrectStructure && project.status === 'In progress') {
+    return project;
+  }
+  await createOtherProjectFinanceData({ project, documents });
 };
 
 function getUpdatedUsers (users) {
@@ -579,24 +568,23 @@ function getUpdatedUsers (users) {
   };
 }
 
-const checkIfProjectStructure = (clients, memoqProject, documents) => {
+const checkProjectStructure = (clients, memoqProject, documents) => {
   const doesCorrelateWithOurClient = clients.find(({ aliases }) => aliases.includes(memoqProject.client));
-  const isProjectFinished = isAllTasksFinished(documents);
   const doesHaveVendorsDocs = doesHaveVendors(documents);
-  return !!doesCorrelateWithOurClient && isProjectFinished && doesHaveVendorsDocs;
-
-  function isAllTasksFinished (docs) {
-    if (docs.constructor === Object) {
-      const { DocumentStatus } = docs;
-      return DocumentStatus === 'TranslationFinished';
-    }
-    return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished');
-  }
+  return !!doesCorrelateWithOurClient && doesHaveVendorsDocs;
 
   function doesHaveVendors (docs) {
     if (docs.constructor === Object) return checkDocumentHasCorrectStructure(docs);
     return docs.every(document => checkDocumentHasCorrectStructure(document));
   }
+};
+
+const isAllTasksFinished = (docs) => {
+  if (docs.constructor === Object) {
+    const { DocumentStatus } = docs;
+    return DocumentStatus === 'TranslationFinished';
+  }
+  return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished');
 };
 
 function getMemoqProjectData (project, languages) {

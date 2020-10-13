@@ -253,7 +253,12 @@ router.post('/update-memoq-finance', async (req, res) => {
   const { id } = req.body;
   try {
     const neededProject = await MemoqProject.findOne({ _id: id });
-    const updatedProject = await updateMemoqProjectFinance(neededProject);
+    await updateMemoqProjectFinance(neededProject);
+    const updatedProject = await MemoqProject.findOne({ _id: id })
+      .populate('customer')
+      .populate('steps.vendor')
+      .populate('projectManager')
+      .populate('accountManager');
     res.send(updatedProject);
   } catch (err) {
     console.log(err);
@@ -263,8 +268,9 @@ router.post('/update-memoq-finance', async (req, res) => {
 
 router.get('/update-all-memoq-finance', async (req, res) => {
   try {
-    const updateProjects = await updateAllMemoqProjects();
-    res.send(updateProjects);
+    await updateAllMemoqProjects();
+    const updatedProjects = await MemoqProject.find();
+    res.send(updatedProjects);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating all other projects');
