@@ -502,9 +502,9 @@ async function updateMemoqProjectsData() {
         const documents = await getProjectTranslationDocs(project.ServerProjectGuid);
         let memoqProject = getMemoqProjectData(project, languages);
         const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
-          checkIfProjectStructure(clients, memoqProject, documents, users) : false;
+          checkIfProjectStructure(clients, memoqProject, documents) : false;
         memoqProject = doesHaveCorrectStructure ? await createOtherProjectFinanceData({
-          project: { ...memoqProject, users },
+          project: memoqProject,
           documents
         }) : memoqProject;
         if (!doesHaveCorrectStructure) memoqProject.status = 'In progress';
@@ -524,12 +524,11 @@ async function updateMemoqProjectsData() {
 const updateAllMemoqProjects = async () => {
   const projects = await MemoqProject.find();
   const clients = await Clients.find();
-  // const updateProjects = [];
   for (let i = 0; i < projects.length; i++) {
     let project = projects[i];
-    const { _id, documents, users } = project;
+    const { _id, documents } = project;
     const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
-      checkIfProjectStructure(clients, project, documents, users) : false;
+      checkIfProjectStructure(clients, project, documents) : false;
     project = doesHaveCorrectStructure ? await createOtherProjectFinanceData({
       project,
       documents
@@ -546,9 +545,9 @@ const updateAllMemoqProjects = async () => {
 
 const updateMemoqProjectFinance = async (project) => {
   const clients = await Clients.find();
-  const { _id, documents, users } = project;
+  const { _id, documents } = project;
   const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
-    checkIfProjectStructure(clients, project, documents, users) : false;
+    checkIfProjectStructure(clients, project, documents) : false;
   project = doesHaveCorrectStructure ? await createOtherProjectFinanceData({
     project,
     documents
@@ -580,11 +579,11 @@ function getUpdatedUsers (users) {
   };
 }
 
-const checkIfProjectStructure = (clients, memoqProject, documents, users) => {
+const checkIfProjectStructure = (clients, memoqProject, documents) => {
   const doesCorrelateWithOurClient = clients.find(({ aliases }) => aliases.includes(memoqProject.client));
   const isProjectFinished = isAllTasksFinished(documents);
   const doesHaveVendorsDocs = doesHaveVendors(documents);
-  return !!doesCorrelateWithOurClient && isProjectFinished && doesHaveVendorsDocs && !!users.length;
+  return !!doesCorrelateWithOurClient && isProjectFinished && doesHaveVendorsDocs;
 
   function isAllTasksFinished (docs) {
     if (docs.constructor === Object) {

@@ -6,8 +6,7 @@ const { defaultFinanceObj } = require('../../../enums');
 const createOtherProjectFinanceData = async ({ project, documents }) => {
   const clients = await Clients.find();
   const vendors = await Vendors.find();
-  const users = await User.find();
-  const { updatedProject, neededCustomer } = getUpdatedProjectData(project, clients, users);
+  const { updatedProject, neededCustomer } = getUpdatedProjectData(project, clients);
   if (!neededCustomer) return project;
   const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
   if (!tasks.length && !steps.length) return project;
@@ -83,29 +82,19 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
   return steps;
 };
 
-const getUpdatedProjectData = (project, allClients, ourUsers) => {
-  const { client: memoqClient, users } = project;
+const getUpdatedProjectData = (project, allClients) => {
+  const { client: memoqClient } = project;
   const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
   const industry = getIndustryId(project.domain);
   if (neededCustomer) {
     project.customer = ObjectId(neededCustomer._id);
     project.status = 'Closed';
-    project.projectManager = getProjectManager(users, ourUsers);
+    project.projectManager = ObjectId(neededCustomer.projectManager._id);
     project.accountManager = ObjectId(neededCustomer.accountManager._id);
     project.industry = industry.name === 'Other' ? project.domain : ObjectId(industry._id);
     project.paymentProfile = neededCustomer.billingInfo.paymentType;
   }
   return { updatedProject: project, neededCustomer };
-};
-
-const getProjectManager = (memoqUsers, ourUsers) => {
-  const memoqPM = memoqUsers.find(({ ProjectRoles }) => ProjectRoles.isPm);
-  if (memoqPM) {
-    const { User: { EmailAddress } } = memoqPM;
-    const ourUser = ourUsers.find(user => user.email === EmailAddress);
-    if (ourUser) return ObjectId(ourUser._id);
-  }
-  return null;
 };
 
 const getStepUserRate = async (user, project, stepName, task) => {
