@@ -45,7 +45,7 @@ import NewClient from '@/components/clients/NewClient'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import Requests from '@/components/pmArea/Requests'
-import PrevProjects from '@/components/pmArea/PrevProjects'
+import ClosedProjects from '@/components/pmArea/ClosedProjects'
 import OtherProjects from '@/components/pmArea/OtherProjects'
 import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
@@ -349,9 +349,9 @@ const router = new Router({
                             props: true
                         },
                         {
-                            path: 'prev-projects',
-                            name: 'prev-projects',
-                            component: PrevProjects
+                            path: 'closed-projects',
+                            name: 'closed-projects',
+                            component: ClosedProjects
                         },
                         {
                             path: 'open-other-projects',

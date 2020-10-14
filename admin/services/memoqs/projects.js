@@ -496,19 +496,19 @@ async function updateMemoqProjectsData() {
     const clients = await Clients.find();
     const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
     for (let project of allProjects) {
-      const { ServerProjectGuid } = project;
-      if (project.Name.indexOf('PngSys') === -1) {
+	    const { ServerProjectGuid } = project;
+			    if (project.Name.indexOf('PngSys') === -1) {
         let users = await getProjectUsers(ServerProjectGuid);
         users = getUpdatedUsers(users);
         const documents = await getProjectTranslationDocs(ServerProjectGuid);
         let memoqProject = getMemoqProjectData(project, languages);
-        memoqProject.status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
+        memoqProject.status = documents !== null && documents !== undefined && (isAllTasksFinished(documents) ? 'Closed' : 'In progress');
         const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
           checkProjectStructure(clients, memoqProject, documents) : false;
         memoqProject = doesHaveCorrectStructure && memoqProject.status !== 'In progress' ?
           await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
         await MemoqProject.updateOne(
-          { ServerProjectGuid },
+          { serverProjectGuid: ServerProjectGuid},
           { ...memoqProject, users, documents },
           { upsert: true });
       }

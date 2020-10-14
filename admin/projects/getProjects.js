@@ -47,6 +47,7 @@ async function getProjectAfterUpdate(query, update) {
 
 async function getFilteredProjects(filters) {
   const query = getFilterdProjectsQuery(filters);
+
   const projects = await Projects.aggregate([
     {
       $lookup: {

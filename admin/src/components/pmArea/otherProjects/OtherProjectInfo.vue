@@ -27,7 +27,7 @@
 <script>
 	import OtherProjectDetails from "./OtherProjectDetails";
 	import OtherTasksAndSteps from "./OtherTasksAndSteps";
-	import { mapGetters, mapActions } from "vuex";
+	import { mapActions } from "vuex";
 	import OtherProjectSubInformation from "./OtherProjectSubInformation";
 	import OtherProjectAction from "./OtherProjectAction";
 
@@ -66,8 +66,13 @@
 				try {
 					const result = await this.$http.get(`/memoqapi/other-project?id=${ id }`);
 					this.project = result.data;
-					this.projectId = /(.*])\s- /gm.exec(result.data.name)[1];
-					this.projectName = / - (.*)/gm.exec(result.data.name)[1];
+					this.projectId = /(.*])\s- /gm.exec(result.data.name) ?
+							/(.*])\s- /gm.exec(result.data.name)[1] :
+							'';
+					this.projectName = / - (.*)/gm.exec(result.data.name) ?
+							/ - (.*)/gm.exec(result.data.name)[1] :
+							result.data.name;
+
 				} catch (err) {
 					this.alertToggle({
 						message: "Can't get project",

@@ -170,6 +170,8 @@
         } else {
           if (clientName !== null) {
             return clientName[1];
+          }else{
+          	return row.name;
           }
         }
       },

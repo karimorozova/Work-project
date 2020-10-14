@@ -23,14 +23,14 @@
 						links: [
 							{ arrayIndex: 0, title: 'Open Projects', routeName: 'open-projects' },
 							{ arrayIndex: 0, title: 'Incoming Requests', routeName: 'requests' },
-							{ arrayIndex: 0, title: 'Previous Projects', routeName: 'prev-projects' },
+							{ arrayIndex: 0, title: 'Completed Projects', routeName: 'closed-projects' },
 						],
 					},
 					{
 						title: "XTRF PROJECTS",
 						links: [
+							{ arrayIndex: 1, title: 'Open Projects', status: "In-progress", routeName: 'open-other-projects' },
 							{ arrayIndex: 1, title: 'Completed Projects', status: "Closed", routeName: 'closed-other-projects' },
-							{ arrayIndex: 1, title: 'Other Projects', status: "In-progress", routeName: 'open-other-projects' },
 						],
 					},
 				],
