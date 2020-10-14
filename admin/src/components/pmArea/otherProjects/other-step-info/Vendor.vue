@@ -46,9 +46,11 @@
       XTRFVendorName(){
 				if(this.project){
 					const stepIndex = this.step.name === 'Translation' ? 0 : 1
-					return  this.project.documents[this.index]
-              .UserAssignments.TranslationDocumentUserRoleAssignmentDetails[stepIndex]
-                .UserInfoHeader.FullName
+          const documents = this.project.documents
+              .map(item => item.UserAssignments)
+              .map(item => item.TranslationDocumentUserRoleAssignmentDetails).flat();
+
+					return documents[stepIndex].UserInfoHeader.FullName
 				}
       },
 		},

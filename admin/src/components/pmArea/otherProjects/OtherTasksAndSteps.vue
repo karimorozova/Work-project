@@ -19,7 +19,6 @@
 <script>
 	import OtherTasks from "./OtherTasks";
 	import OtherSteps from "./OtherSteps";
-	import { mapGetters, mapActions } from "vuex";
 
 	export default {
 		props: {
