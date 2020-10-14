@@ -29,8 +29,8 @@
 					{
 						title: "XTRF PROJECTS",
 						links: [
-							{ arrayIndex: 1, title: 'Completed Projects', status: "Closed", routeName: 'closed-other-projects' },
 							{ arrayIndex: 1, title: 'Open Projects', status: "In-progress", routeName: 'open-other-projects' },
+							{ arrayIndex: 1, title: 'Completed Projects', status: "Closed", routeName: 'closed-other-projects' },
 						],
 					},
 				],

@@ -28,7 +28,7 @@
         template(slot="deadline" slot-scope="{ row }")
           span.tasks__task-data {{ formateDate(project.deadline)}}
         template(slot="progress" slot-scope="{ row }")
-          ProgressLine(:progress="((row.ConfirmedWordCount / row.TotalWordCount) * 100).toFixed(0)")
+          ProgressLine(:progress="setProgress(row.DocumentStatus)")
         template(slot="status" slot-scope="{ row }")
           .tasks__task-status {{ row.DocumentStatus | otherProjectsTaskStatus }}
 
@@ -129,6 +129,16 @@
 			getTargetLanguage(memoqLang) {
 				const obj = this.project.targetLanguages.filter(item => item).find(item => item.memoq === memoqLang);
 				return obj ? obj.symbol : ''
+			},
+			setProgress(status){
+				switch (status) {
+					case 'TranslationFinished':
+					case 'ProofreadingFinished':
+						return 100;
+          default:
+					case 'TranslationInProgress':
+						return 0
+				}
 			},
 			formateId(index) {
 				let newIndex = index + 1;

@@ -9,7 +9,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   const vendors = await Vendors.find();
   const { additionalData, neededCustomer } = getUpdatedProjectData(project, clients);
   if (!neededCustomer) return project;
-  const updatedProject = { ...project._doc, ...additionalData };
+  const updatedProject =  fromCron ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
   const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
   if (!tasks.length && !steps.length) return project;
   const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
@@ -19,7 +19,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
 
 const getProjectTasks = async (documents, project, customer, vendors) => {
   const { sourceLanguage, targetLanguages, name, industry } = project;
-  const taskName = name ? /(.*])\s- /gm.exec(name)[1] : null;
+  const taskName = name && /(.*])\s- /gm.exec(name) ? /(.*])\s- /gm.exec(name)[1] : null;
   const tasks = [];
   const steps = [];
   if (industry !== 'Other') {
@@ -31,7 +31,8 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
       const { WorkflowStatus, TargetLangCode, TotalWordCount } = documents[i];
       let idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
       let taskId = taskName + `${idNumber}`;
-      const targetLanguage = targetLanguages.find(lang => lang.memoq === TargetLangCode);
+      let targetLanguage = targetLanguages.filter(item => item).find(lang => lang.memoq === TargetLangCode);
+      targetLanguage = targetLanguage ? targetLanguage : { symbol: '' }
       const taskSteps = await getTaskSteps(
         {
           taskId,
