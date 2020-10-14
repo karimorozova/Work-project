@@ -11,7 +11,7 @@
       .drops__menu
         input.drops__input(
           type="text"
-          :value="project.accountManager !== null ? `${project.accountManager.firstName} ${project.accountManager.lastName}` : ''"
+          :value="project.accountManager !== null && project.hasOwnProperty('accountManager') ? `${project.accountManager.firstName} ${project.accountManager.lastName}` : ''"
           disabled
         )
       //SelectSingle(
@@ -24,7 +24,7 @@
       .drops__menu
         input.drops__input(
           type="text"
-          :value="project.projectManager !== null ? `${project.projectManager.firstName} ${project.accountManager.lastName}` : ''"
+          :value="project.projectManager !== null && project.hasOwnProperty('projectManager') ? `${project.projectManager.firstName} ${project.accountManager.lastName}` : ''"
           disabled
         )
       //SelectSingle(
