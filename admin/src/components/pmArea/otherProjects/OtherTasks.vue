@@ -48,105 +48,105 @@
 </template>
 
 <script>
-  import DataTable from '../../DataTable';
-  import ProgressLine from '../../ProgressLine';
-  import Tabs from '../../Tabs';
-  import moment from 'moment';
-  import '../../../filters/OtherProjectsFilters'
-  import { mapGetters, mapActions } from 'vuex';
+	import DataTable from '../../DataTable';
+	import ProgressLine from '../../ProgressLine';
+	import Tabs from '../../Tabs';
+	import moment from 'moment';
+	import '../../../filters/OtherProjectsFilters'
+	import { mapGetters, mapActions } from 'vuex';
 
-  export default {
-    props: {
-      project: {
-        type: Object
-      },
-      projectId: {
-        type: String
-      }
-    },
-    data () {
-      return {
-        fields: [
-          {
-            label: 'Task ID',
-            headerKey: 'headerTaskid',
-            key: 'taskId',
-            width: '15.5%'
-          },
-          {
-            label: 'Language',
-            headerKey: 'headerLanguage',
-            key: 'language',
-            width: '13%'
-          },
-          {
-            label: 'Start',
-            headerKey: 'headerStart',
-            key: 'start',
-            width: '10%'
-          },
-          {
-            label: 'Deadline',
-            headerKey: 'headerDeadline',
-            key: 'deadline',
-            width: '10%'
-          },
-          {
-            label: 'Progress',
-            headerKey: 'headerProgress',
-            key: 'progress',
-            width: '8%'
-          },
-          {
-            label: 'Status',
-            headerKey: 'headerStatus',
-            key: 'status',
-            width: '16.5%'
-          },
-          {
-            label: 'Receivables',
-            headerKey: 'headerReceivables',
-            key: 'receivables',
-            width: '9%'
-          },
-          {
-            label: 'Payables',
-            headerKey: 'headerPayables',
-            key: 'payables',
-            width: '9%'
-          },
-          {
-            label: 'Margin',
-            headerKey: 'headerMargin',
-            key: 'margin',
-            width: '9%'
-          }
-        ],
-        tabs: ['Tasks', 'Steps']
-      };
-    },
-    methods: {
-      getTargetLanguage (memoqLang) {
-        return this.project.targetLanguages.find(item => item.memoq === memoqLang)
-          .symbol;
-      },
-      formateId (index) {
-        let newIndex = index + 1;
-        return newIndex < 10 ? this.projectId + ' T0' + newIndex : this.projectId + ' T' + newIndex;
-      },
-      formateDate: time => moment(time).format('DD-MM-YYYY'),
-      showTab ({ index }) {
-        return this.tabs[index] === 'Tasks'
-          ? true
-          : this.$emit('showTab', { tab: this.tabs[index] });
-      }
-    },
-    components: {
-      DataTable,
-      ProgressLine,
-      Tabs
-    },
-  };
+	export default {
+		props: {
+			project: {
+				type: Object
+			},
+			projectId: {
+				type: String
+			}
+		},
+		data() {
+			return {
+				fields: [
+					{
+						label: 'Task ID',
+						headerKey: 'headerTaskid',
+						key: 'taskId',
+						width: '15.5%'
+					},
+					{
+						label: 'Language',
+						headerKey: 'headerLanguage',
+						key: 'language',
+						width: '13%'
+					},
+					{
+						label: 'Start',
+						headerKey: 'headerStart',
+						key: 'start',
+						width: '10%'
+					},
+					{
+						label: 'Deadline',
+						headerKey: 'headerDeadline',
+						key: 'deadline',
+						width: '10%'
+					},
+					{
+						label: 'Progress',
+						headerKey: 'headerProgress',
+						key: 'progress',
+						width: '8%'
+					},
+					{
+						label: 'Status',
+						headerKey: 'headerStatus',
+						key: 'status',
+						width: '16.5%'
+					},
+					{
+						label: 'Receivables',
+						headerKey: 'headerReceivables',
+						key: 'receivables',
+						width: '9%'
+					},
+					{
+						label: 'Payables',
+						headerKey: 'headerPayables',
+						key: 'payables',
+						width: '9%'
+					},
+					{
+						label: 'Margin',
+						headerKey: 'headerMargin',
+						key: 'margin',
+						width: '9%'
+					}
+				],
+				tabs: ['Tasks', 'Steps']
+			};
+		},
+		methods: {
+			getTargetLanguage(memoqLang) {
+				const obj = this.project.targetLanguages.filter(item => item).find(item => item.memoq === memoqLang);
+				return obj ? obj.symbol : ''
+			},
+			formateId(index) {
+				let newIndex = index + 1;
+				return newIndex < 10 ? this.projectId + ' T0' + newIndex : this.projectId + ' T' + newIndex;
+			},
+			formateDate: time => moment(time).format('DD-MM-YYYY'),
+			showTab({ index }) {
+				return this.tabs[index] === 'Tasks'
+						? true
+						: this.$emit('showTab', { tab: this.tabs[index] });
+			}
+		},
+		components: {
+			DataTable,
+			ProgressLine,
+			Tabs
+		},
+	};
 </script>
 
 <style lang="scss" scoped>
