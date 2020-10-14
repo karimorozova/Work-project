@@ -115,5 +115,6 @@ const getCorrectBasicPrice = (basicPriceRow, currency) => {
 module.exports = {
   getStepFinanceData,
   getPriceFromPersonRates,
-  getPriceFromPricelist
+  getPriceFromPricelist,
+  getCorrectBasicPrice
 };

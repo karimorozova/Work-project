@@ -1,8 +1,10 @@
-const { Clients, Vendors, Languages, Industries, Pricelist, CurrencyRatio, Step, Units, MemoqProject } = require('../../../models');
+const { Clients, Vendors, Languages, Industries, Pricelist, Step, Units } = require('../../../models');
 const ObjectId = require('mongodb').ObjectID;
-const { getPriceFromPersonRates, getPriceFromPricelist } = require('../../../сalculations/finance');
+const { getPriceFromPersonRates } = require('../../../сalculations/finance');
 const { defaultFinanceObj } = require('../../../enums');
 const { getProjectAfterUpdate } = require('./getMemoqProject');
+const { getCorrectBasicPrice } = require('../../../сalculations/finance');
+const { multiplyPrices } = require('../../../multipliers');
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
   const clients = await Clients.find();
@@ -105,7 +107,6 @@ const getUpdatedProjectData = (project, allClients) => {
 
 const getStepUserRate = async (user, project, stepName, task) => {
   const { domain } = project;
-  const currencyRatio = await CurrencyRatio.findOne();
   const industry = await getIndustryId(domain);
   let { sourceLanguage, targetLanguage } = task;
   if (user) {
@@ -128,7 +129,7 @@ const getStepUserRate = async (user, project, stepName, task) => {
     if (source && target && step) {
       let userPrice = getPriceFromPersonRates(
         pricelistTable,
-        dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio);
+        dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency);
       return {
         value: userPrice,
         active: true
@@ -224,6 +225,27 @@ const getProjectFinance = (tasks) => {
     profit,
     ROI
   };
+};
+
+const getPriceFromPricelist = (pricelist, data, currency) => {
+  const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = pricelist;
+  const { sourceLanguage, targetLanguage, step, unit, size, industry } = data;
+  let row = basicPricesTable.find(langPair => (
+    `${langPair.sourceLanguage} ${langPair.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
+  ));
+  const stepRow = stepMultipliersTable.find(item => (
+    `${item.step} ${item.unit} ${item.size}` === `${step} ${unit} ${size}`
+  ));
+  const industryRow = industryMultipliersTable.find(item => (
+    item.industry.toString() === industry.toString()
+  ));
+  if (row && stepRow && industryRow) {
+    const { multiplier: stepMultiplier } = stepRow;
+    const { multiplier: industryMultiplier } = industryRow;
+    const basicPrice = getCorrectBasicPrice(row, currency);
+    return multiplyPrices(basicPrice, stepMultiplier, size, industryMultiplier);
+  }
+  return 0;
 };
 
 module.exports = {
