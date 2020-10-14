@@ -20,12 +20,12 @@
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
           span.tasks__label {{ field.label }}
         template(slot="info" slot-scope="{row, index}")
-          div(@click="showStepDetails(index)" :class="{isDisabled: project.status === 'In progress', 'steps__info-icon': project.status !== 'In progress'}")
+          div(@click="showStepDetails(index)" :class="{isDisabled: isFinanceData(index), 'steps__info-icon': !isFinanceData(index) }")
             i.fa.fa-info-circle
         template(slot="name" slot-scope="{ row }")
           span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
         template(slot="language" slot-scope="{ row, index }")
-          span.steps__step-data {{ `${project.sourceLanguage.symbol} >> ${stepsTargetLanguages[index] != undefined ? stepsTargetLanguages[index].symbol : stepsTargetLanguages[0].symbol}` }}
+          span.steps__step-data {{ languagePair(index) }}
         template(slot="vendor" slot-scope="{ row, index }")
           span.steps__step-data.steps_no-padding {{ row.UserInfoHeader.FullName }}
         template(slot="start" slot-scope="{ row, index }")
@@ -34,17 +34,17 @@
           span.steps__step-data {{formateDate(row.DeadLine)}}
 
         template(slot="receivables" slot-scope="{ row, index }")
-          div(v-if="project.status === 'Closed'")
+          div(v-if="project.status === 'Closed' && project.steps.length")
             span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
             span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
 
         template(slot="payables" slot-scope="{ row, index }")
-          div(v-if="project.status === 'Closed'")
+          div(v-if="project.status === 'Closed' && project.steps.length")
             span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
             span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
 
         template(slot="margin" slot-scope="{ row, index }")
-          div(v-if="project.status === 'Closed'")
+          div(v-if="project.status === 'Closed' && project.steps.length")
             span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
             span.steps__step-data {{ project.steps[index].finance.profit }}
 
@@ -146,8 +146,24 @@
 			await this.createdListOfTargetLanguages();
 		},
 		methods: {
+			isFinanceData(index) {
+				if(this.project.status === 'In progress') {
+					return true;
+				}
+				if(this.project.steps.length) {
+					if(this.project.steps[index].vendor === null) {
+						return true;
+					}
+				} else {
+					return true;
+				}
+			},
+			languagePair(index) {
+				let secondLang = this.stepsTargetLanguages[index] != undefined ? this.stepsTargetLanguages[index].symbol : ''
+				return `${ this.project.sourceLanguage.symbol } >> ${ secondLang }`
+			},
 			showStepDetails(index) {
-				if(this.project.status === 'Closed') {
+				if(this.project.status === 'Closed' && !this.isFinanceData(index)) {
 					this.infoIndex = index;
 					this.isStepInfo = true;
 				}
@@ -161,9 +177,7 @@
 			createdListOfTargetLanguages() {
 				let someArr = [];
 				this.project.targetLanguages.forEach(element => {
-					for (var i = 0; i < 2; i++) {
-						someArr.push(element);
-					}
+					for (let i = 0; i < 2; i++) someArr.push(element);
 				});
 				return (this.stepsTargetLanguages = someArr);
 			},
@@ -177,7 +191,7 @@
 			OtherStepInfo,
 			DataTable,
 			Tabs
-		}
+		},
 	};
 </script>
 
