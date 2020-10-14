@@ -1,10 +1,30 @@
-const languagesDefault = require('./languages');
-const { getDefaultBasicPrices, getDefaultStepMultipliers,
-  getDefaultIndustryMultipliers, getDefaultPriceLists } = require('./defaultPriceLists');
+const { defaultLanguages } = require('./defaultLanguages');
+const {
+  getDefaultBasicPrices,
+  getDefaultStepMultipliers,
+  getDefaultIndustryMultipliers
+} = require('./defaultPriceLists');
+const { defaultUsers } = require('./defaultUsers');
+const { defaultSteps, defaultUnits } = require('./defaultStepsAndUnits');
+const { defaultClients } = require('./defaultClients');
+const { defaultVendors } = require('./defaultVendor');
+const { defaultTimezones } = require('./defaultTimezones');
+const { defaultIndustries } = require('./defaultIndustries');
+const { defaultServices } = require('./defaultServices');
+const { defaultGroups } = require('./defaultGroups');
 
 module.exports = {
-  languagesDefault,
+  defaultLanguages,
   getDefaultBasicPrices,
   getDefaultStepMultipliers,
   getDefaultIndustryMultipliers,
-  getDefaultPriceLists };
+  defaultUsers,
+  defaultSteps,
+  defaultUnits,
+  defaultClients,
+  defaultVendors,
+  defaultTimezones,
+  defaultIndustries,
+  defaultServices,
+  defaultGroups
+};

@@ -4,94 +4,96 @@ const { getFilteringQuery } = require("./filter");
 async function getVendor(query) {
   const vendor = await Vendors.findOne(query)
     .populate("native")
-    .populate("industries")
+    .populate('industries', ['name', 'icon'])
     .populate("languagePairs.source")
     .populate("languagePairs.target")
-    .populate("qualifications.source")
-    .populate("qualifications.target")
-    .populate("qualifications.industry")
-    .populate("qualifications.steps")
-    .populate("assessments.sourceLanguage")
-    .populate("assessments.targetLanguage")
-    .populate("assessments.industries.industry")
-    .populate("assessments.industries.steps.step")
-    .populate('competencies.sourceLanguage')
-    .populate('competencies.targetLanguage')
-    .populate('competencies.industry')
-    .populate('competencies.step')
-    .populate('competencies.step.calculationUnit')
-    .populate('rates.basicPricesTable.sourceLanguage')
-    .populate('rates.basicPricesTable.targetLanguage')
-    .populate('rates.stepMultipliersTable.step')
-    .populate('rates.stepMultipliersTable.unit')
-    .populate('rates.industryMultipliersTable.industry')
-    .populate('rates.pricelistTable.sourceLanguage')
-    .populate('rates.pricelistTable.targetLanguage')
-    .populate('rates.pricelistTable.step')
-    .populate('rates.pricelistTable.unit')
-    .populate('rates.pricelistTable.industry');
+    .populate("qualifications.source", ['lang'])
+    .populate("qualifications.target", ['lang'])
+    .populate("qualifications.industry", ['name'])
+    .populate("qualifications.steps", ['title'])
+    .populate("assessments.sourceLanguage", ['lang'])
+    .populate("assessments.targetLanguage", ['lang'])
+    .populate("assessments.industries.industry", ['name'])
+    .populate("assessments.industries.steps.step", ['title'])
+    .populate('competencies.sourceLanguage', ['lang'])
+    .populate('competencies.targetLanguage', ['lang'])
+    .populate('competencies.industry', ['name'])
+    .populate('competencies.step', ['title'])
+    .populate('competencies.step.calculationUnit', ['type'])
+    .populate('rates.basicPricesTable.sourceLanguage', ['lang', 'iso1'])
+    .populate('rates.basicPricesTable.targetLanguage', ['lang', 'iso1'])
+    .populate('rates.stepMultipliersTable.step', ['title'])
+    .populate('rates.stepMultipliersTable.unit', ['type'])
+    .populate('rates.industryMultipliersTable.industry', ['icon'])
+    .populate('rates.pricelistTable.sourceLanguage', ['lang'])
+    .populate('rates.pricelistTable.targetLanguage', ['lang'])
+    .populate('rates.pricelistTable.step', ['title'])
+    .populate('rates.pricelistTable.unit', ['type'])
+    .populate('rates.pricelistTable.industry', ['name']);
   return vendor;
 }
 
 async function getVendors(query) {
   const vendors = await Vendors.find(query)
     .populate("native")
-    .populate("industries")
+    .populate('industries', ['name', 'icon'])
     .populate("languagePairs.source")
     .populate("languagePairs.target")
-    .populate("qualifications.source")
-    .populate("qualifications.target")
-    .populate("qualifications.industry")
-    .populate("qualifications.steps")
-    .populate("assessments.sourceLanguage")
-    .populate("assessments.targetLanguage")
-    .populate("assessments.industries.industry")
-    .populate("assessments.industries.steps.step")
-    .populate('competencies.sourceLanguage')
-    .populate('competencies.targetLanguage')
-    .populate('competencies.industry')
-    .populate('competencies.step')
-    .populate('rates.basicPricesTable.sourceLanguage')
-    .populate('rates.basicPricesTable.targetLanguage')
-    .populate('rates.stepMultipliersTable.step')
-    .populate('rates.stepMultipliersTable.unit')
-    .populate('rates.industryMultipliersTable.industry')
-    .populate('rates.pricelistTable.sourceLanguage')
-    .populate('rates.pricelistTable.targetLanguage')
-    .populate('rates.pricelistTable.step')
-    .populate('rates.pricelistTable.unit')
-    .populate('rates.pricelistTable.industry');
+    .populate("qualifications.source", ['lang'])
+    .populate("qualifications.target", ['lang'])
+    .populate("qualifications.industry", ['name'])
+    .populate("qualifications.steps", ['title'])
+    .populate("assessments.sourceLanguage", ['lang'])
+    .populate("assessments.targetLanguage", ['lang'])
+    .populate("assessments.industries.industry", ['name'])
+    .populate("assessments.industries.steps.step", ['title'])
+    .populate('competencies.sourceLanguage', ['lang'])
+    .populate('competencies.targetLanguage', ['lang'])
+    .populate('competencies.industry', ['name'])
+    .populate('competencies.step', ['title'])
+    .populate('competencies.step.calculationUnit', ['type'])
+    .populate('rates.basicPricesTable.sourceLanguage', ['lang', 'iso1'])
+    .populate('rates.basicPricesTable.targetLanguage', ['lang', 'iso1'])
+    .populate('rates.stepMultipliersTable.step', ['title'])
+    .populate('rates.stepMultipliersTable.unit', ['type'])
+    .populate('rates.industryMultipliersTable.industry', ['icon'])
+    .populate('rates.pricelistTable.sourceLanguage', ['lang'])
+    .populate('rates.pricelistTable.targetLanguage', ['lang'])
+    .populate('rates.pricelistTable.step', ['title'])
+    .populate('rates.pricelistTable.unit', ['type'])
+    .populate('rates.pricelistTable.industry', ['name']);
   return vendors;
 }
 
 async function getVendorAfterUpdate(query, update) {
   return await Vendors.findOneAndUpdate(query, update, { new: true })
     .populate("native")
-    .populate("industries")
+    .populate('industries', ['name', 'icon'])
     .populate("languagePairs.source")
     .populate("languagePairs.target")
-    .populate("qualifications.source")
-    .populate("qualifications.target")
-    .populate("qualifications.industry")
-    .populate("qualifications.steps")
-    .populate("assessments.sourceLanguage")
-    .populate("assessments.targetLanguage")
-    .populate("assessments.industries.industry")
-    .populate("assessments.industries.steps.step")
-    .populate('competencies.sourceLanguage')
-    .populate('competencies.targetLanguage')
-    .populate('competencies.industry')
-    .populate('competencies.step')
-    .populate('rates.basicPricesTable.sourceLanguage')
-    .populate('rates.basicPricesTable.targetLanguage')
-    .populate('rates.stepMultipliersTable.step')
-    .populate('rates.stepMultipliersTable.unit')
-    .populate('rates.industryMultipliersTable.industry')
-    .populate('rates.pricelistTable.sourceLanguage')
-    .populate('rates.pricelistTable.targetLanguage')
-    .populate('rates.pricelistTable.step')
-    .populate('rates.pricelistTable.unit')
-    .populate('rates.pricelistTable.industry');
+    .populate("qualifications.source", ['lang'])
+    .populate("qualifications.target", ['lang'])
+    .populate("qualifications.industry", ['name'])
+    .populate("qualifications.steps", ['title'])
+    .populate("assessments.sourceLanguage", ['lang'])
+    .populate("assessments.targetLanguage", ['lang'])
+    .populate("assessments.industries.industry", ['name'])
+    .populate("assessments.industries.steps.step", ['title'])
+    .populate('competencies.sourceLanguage', ['lang'])
+    .populate('competencies.targetLanguage', ['lang'])
+    .populate('competencies.industry', ['name'])
+    .populate('competencies.step', ['title'])
+    .populate('competencies.step.calculationUnit', ['type'])
+    .populate('rates.basicPricesTable.sourceLanguage', ['lang', 'iso1'])
+    .populate('rates.basicPricesTable.targetLanguage', ['lang', 'iso1'])
+    .populate('rates.stepMultipliersTable.step', ['title'])
+    .populate('rates.stepMultipliersTable.unit', ['type'])
+    .populate('rates.industryMultipliersTable.industry', ['icon'])
+    .populate('rates.pricelistTable.sourceLanguage', ['lang'])
+    .populate('rates.pricelistTable.targetLanguage', ['lang'])
+    .populate('rates.pricelistTable.step', ['title'])
+    .populate('rates.pricelistTable.unit', ['type'])
+    .populate('rates.pricelistTable.industry', ['name']);
 }
 
 async function getFilteredVendors(filters) {
@@ -103,28 +105,7 @@ async function getFilteredVendors(filters) {
     ]).sort({ _id: 1 }).limit(25);
 
     return Vendors.populate(vendors, [
-      "native",
       "industries",
-      "languagePairs.source",
-      "languagePairs.target",
-      "qualifications.source",
-      "qualifications.target",
-      "qualifications.industry",
-      "qualifications.steps",
-      "assessments.sourceLanguage",
-      "assessments.targetLanguage",
-      "assessments.industries.industry",
-      "assessments.industries.steps.step",
-      'rates.basicPricesTable.sourceLanguage',
-      'rates.basicPricesTable.targetLanguage',
-      'rates.stepMultipliersTable.step',
-      'rates.stepMultipliersTable.unit',
-      'rates.industryMultipliersTable.industry',
-      'rates.pricelistTable.sourceLanguage',
-      'rates.pricelistTable.targetLanguage',
-      'rates.pricelistTable.step',
-      'rates.pricelistTable.unit',
-      'rates.pricelistTable.industry',
     ])
   } catch (err) {
     console.log(err);

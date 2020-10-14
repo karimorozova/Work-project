@@ -20,22 +20,22 @@ const {
 } = require('../models');
 
 const {
-  languagesDefault,
+  defaultLanguages,
   requestsDefault,
   projectsDefault,
-  usersDefault,
-  servicesDefault,
-  industriesDefault,
-  timezonesDefault,
+  defaultUsers,
+  defaultServices,
+  defaultIndustries,
+  defaultTimezones,
   leadSourcesDefault,
-  groupsDefault,
-  stepsDefault,
-  clientsDefault,
-  vendorsDefault,
+  defaultGroups,
+  defaultSteps,
+  defaultClients,
+  defaultVendors,
   instructionsDefault,
   cancelReasonsDefault,
   tierLqasDefault,
-  unitsDefault,
+  defaultUnits,
 } = require('./dbDefaultValue');
 const ObjectId = require('mongodb').ObjectID;
 const { Converter } = require('easy-currencies');
@@ -104,7 +104,7 @@ function fillGroups() {
   return Group.find({})
     .then(async groups => {
       if (!groups.length) {
-        for (const group of groupsDefault) {
+        for (const group of defaultGroups) {
           await new Group({ name: group }).save().then((res) => {
 
           }).catch(err => {
@@ -123,7 +123,7 @@ function fillSteps() {
   return Step.find({})
     .then(async steps => {
       if (!steps.length) {
-        for (const step of stepsDefault) {
+        for (const step of defaultSteps) {
           let unit;
           let calculationUnit;
           const { title } = step;
@@ -164,7 +164,7 @@ function timeZones() {
   return Timezones.find({})
     .then(async timezones => {
       if (!timezones.length) {
-        for (const time of timezonesDefault) {
+        for (const time of defaultTimezones) {
           await new Timezones({ zone: time }).save().then((res) => {
 
           }).catch(err => {
@@ -183,7 +183,13 @@ function clients() {
   return Clients.find({})
     .then(async clients => {
       if (!clients.length) {
-        for (const client of clientsDefault) {
+        for (const client of defaultClients) {
+          let { projectManager, accountManager, salesManager } = client;
+          client.projectManager = ObjectId(await User.findOne({ email: projectManager })._id);
+          client.accountManager = ObjectId(await User.findOne({ email: accountManager })._id);
+          client.salesManager = ObjectId(await User.findOne({ email: salesManager })._id);
+          const pricelists = await Pricelist.find();
+          client.defaultPricelist = ObjectId(pricelists[0]._id)
           let industries = await Industries.find({});
           for (let industry of industries) {
             for (let ind in client.industries) {
@@ -209,10 +215,8 @@ function vendors() {
   return Vendors.find({})
     .then(async vendors => {
       if (!vendors.length) {
-        for (let vendor of vendorsDefault) {
+        for (let vendor of defaultVendors) {
           const industries = await Industries.find({});
-          const language = await Languages.findOne({ "lang": vendor.native });
-          vendor.native = language._id;
           for (let industry of industries) {
             for (let ind in vendor.industries) {
               if (industry.name == vendor.industries[ind].name) {
@@ -237,7 +241,7 @@ function languages() {
   return Languages.find({})
     .then(async languages => {
       if (!languages.length) {
-        for (const lang of languagesDefault) {
+        for (const lang of defaultLanguages) {
           await new Languages(lang).save().then((lang) => {
 
           }).catch((err) => {
@@ -311,7 +315,7 @@ function users() {
   User.find({})
     .then(async (users) => {
       if (!users.length) {
-        for (let user of usersDefault) {
+        for (let user of defaultUsers) {
           const group = await Group.findOne({ name: user.group });
           user.group = group.id;
           new User(user).save().then(result => {
@@ -330,7 +334,7 @@ function users() {
 function industries() {
   return Industries.find({}).then(async industries => {
     if (!industries.length) {
-      for (var industry of industriesDefault) {
+      for (var industry of defaultIndustries) {
         console.log(industry.name);
         await new Industries(industry).save().then(industry => {
           console.log(`industry ${industry.name} was saved!`);
@@ -346,7 +350,7 @@ function services() {
   return Services.find({})
     .then(async (services) => {
       if (!services.length) {
-        for (const service of servicesDefault) {
+        for (const service of defaultServices) {
           await new Services(service).save()
             .then((service) => {
               console.log(`Service ${service.title} was saved!`);
@@ -362,61 +366,12 @@ function services() {
     });
 }
 
-async function getRates(industries) {
-  try {
-    const languages = await Languages.find().limit(10);
-    const englishLang = await Languages.findOne({ symbol: "EN-GB" });
-    const wordsSteps = await Step.find({ calculationUnit: "Words" });
-    const hoursSteps = await Step.find({ calculationUnit: "Hours" });
-    const monoSteps = await Step.find({ calculationUnit: "Packages" });
-    const wordsRates = getDuoCombinations({ languages, englishLang, industries, steps: wordsSteps });
-    const hoursRates = getDuoCombinations({ languages, englishLang, industries, steps: hoursSteps });
-    const monoRates = getMonoCombinations({ languages, industries, steps: monoSteps });
-    return { wordsRates, hoursRates, monoRates };
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-function getDuoCombinations ({ languages, englishLang, industries, steps }) {
-  const rates = steps.reduce((prev, cur) => {
-    prev[cur.id] = { value: 0.08, min: 10, active: true };
-    return prev;
-  }, {});
-  let combinations = [];
-  for (let lang of languages) {
-    combinations.push({
-      source: englishLang.id,
-      target: lang.id,
-      industries,
-      rates
-    });
-  }
-  return combinations;
-}
-
-function getMonoCombinations ({ languages, industries, steps }) {
-  const rates = steps.reduce((prev, cur) => {
-    prev[cur.id] = { value: 0.1, min: 5, active: true };
-    return prev;
-  }, {});
-  let combinations = [];
-  for (let lang of languages) {
-    combinations.push({
-      packageSize: 200,
-      target: lang.id,
-      industries,
-      rates
-    });
-  }
-  return combinations;
-}
 
 async function fillUnits() {
   try {
     const units = await Units.find();
     if (!units.length) {
-      for (let unit of unitsDefault) {
+      for (let unit of defaultUnits) {
         await new Units(unit).save();
       }
     }
@@ -511,6 +466,7 @@ async function checkCollections() {
   await fillCancelReasons();
   await fillLeadSources();
   await fillGroups();
+  await users();
   await services();
   await fillUnits();
   await fillSteps();
@@ -518,14 +474,12 @@ async function checkCollections() {
   await timeZones();
   await languages();
   await industries();
-
-  await clients();
-  await vendors();
   await requests();
   await projects();
-  await users();
   await fillCurrencyRatio();
   await fillPricelist();
+  await clients();
+  await vendors();
 }
 
 module.exports = checkCollections();

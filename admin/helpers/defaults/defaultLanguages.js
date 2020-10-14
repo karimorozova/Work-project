@@ -1,4 +1,4 @@
-const languagesDefault = [
+const defaultLanguages = [
   {
     "lang": "Afrikaans",
     "icon": "/static/flags31x21pix/Afrikaans[AF].png",
@@ -1404,4 +1404,4 @@ const languagesDefault = [
   }
 ];
 
-module.exports = languagesDefault;
+module.exports = { defaultLanguages };
