@@ -1,10 +1,16 @@
 const ObjectId = require('mongodb').ObjectID;
 
 function getFilterdProjectsQuery(filters) {
-    const status = !filters.statusFilter || filters.statusFilter === 'All' ? {$ne: ""} : filters.statusFilter;
-    let query = {
-        status
+
+    let status;
+    if(filters.projectType === 'Open'){
+       status = !filters.statusFilter || filters.statusFilter === 'All' ? {$ne: "Closed"} : filters.statusFilter;
+    }else if(filters.projectType === 'Closed'){
+        status = "Closed"
     }
+
+    let query = { status }
+
     if(filters.lastDate) {
         query.startDate = {$lt: new Date(filters.lastDate)};
     }

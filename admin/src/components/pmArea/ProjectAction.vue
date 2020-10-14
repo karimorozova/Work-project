@@ -162,7 +162,12 @@
 				this.isEditAndSend = true;
 			},
 			async getCancelMessage() {
-				if(this.project.status === "In progress" || this.project.status === "Draft") {
+				if(
+						this.project.status === "In progress" ||
+						this.project.status === "Draft" ||
+						this.project.status === "Approved" ||
+						this.project.status === "Rejected"
+				) {
 					await this.setStatus("Cancelled", this.selectedReason);
 				}
 				try {
@@ -267,9 +272,9 @@
 					this.setDefaults();
 				}
 			},
-      async reOpenProjectToDraft(){
-	      await this.setStatus('Draft', "");
-      },
+			async reOpenProjectToDraft() {
+				await this.setStatus('Draft', "");
+			},
 			async reOpenProject() {
 				let status;
 				if(this.project.status === "Cancelled" || this.project.status === "Cancelled Halfway") {

@@ -81,6 +81,7 @@ export default {
         projectManagers: {type: Array},
         salesManagers: {type: Array},
         projectsType: {type: String},
+	      statuses: {type: Array},
     },
     data() {
         return {
@@ -90,7 +91,6 @@ export default {
             highlighted: {
                 days: [6, 0]
             },
-            statuses: ["All", "Approved", "Closed", "Cancelled", "Cancelled Halfway", "Draft", "In Progress", "Quote sent", "Rejected"],
             typingTimer: "",
             doneTypingInterval: 800
         }
