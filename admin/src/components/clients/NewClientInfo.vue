@@ -213,6 +213,12 @@
 						this.errors.push("The website field must contain a link");
 					}
 				}
+				const filesSize = this.documentsFiles.filter(item => item.file)
+				if(filesSize.length) {
+					if(filesSize.map(item => item.file).map(item => item.size).some(item => item > 40000000)) {
+						this.errors.push("The file should not exceed 40 MB!");
+					}
+				}
 
 				if(this.errors.length) {
 					this.areErrorsExist = true;
