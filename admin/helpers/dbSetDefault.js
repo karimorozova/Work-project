@@ -1,3 +1,5 @@
+const ObjectId = require('mongodb').ObjectID;
+const { Converter } = require('easy-currencies');
 const {
   Languages,
   User,
@@ -17,29 +19,29 @@ const {
 } = require('../models');
 
 const {
+  getDefaultBasicPrices,
+  getDefaultStepMultipliers,
+  getDefaultIndustryMultipliers,
   defaultLanguages,
   defaultUsers,
   defaultServices,
   defaultIndustries,
   defaultTimezones,
-  leadSourcesDefault,
   defaultGroups,
   defaultSteps,
   defaultClients,
   defaultVendors,
-  instructionsDefault,
-  cancelReasonsDefault,
   defaultUnits,
-} = require('./dbDefaultValue');
-const ObjectId = require('mongodb').ObjectID;
-const { Converter } = require('easy-currencies');
-const { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers } = require('./defaults');
+  defaultCancelReasons,
+  defaultInstructions,
+  defaultLeadSources
+} = require('./defaults');
 
 async function fillInstructions() {
   try {
     const instructions = await Instruction.find();
     if (!instructions.length) {
-      for (let instruction of instructionsDefault) {
+      for (let instruction of defaultInstructions) {
         await new Instruction(instruction).save();
       }
     }
@@ -53,7 +55,7 @@ async function fillCancelReasons() {
   try {
     const cancelReasons = await CancelReason.find();
     if (!cancelReasons.length) {
-      for (let cancelReason of cancelReasonsDefault) {
+      for (let cancelReason of defaultCancelReasons) {
         await new CancelReason(cancelReason).save();
       }
     }
@@ -67,7 +69,7 @@ function fillLeadSources() {
   return LeadSource.find({})
     .then(async sources => {
       if (!sources.length) {
-        for (const source of leadSourcesDefault) {
+        for (const source of defaultLeadSources) {
           await new LeadSource({ source }).save().then((res) => {
 
           }).catch(err => {
@@ -260,7 +262,7 @@ function users() {
 function industries() {
   return Industries.find({}).then(async industries => {
     if (!industries.length) {
-      for (var industry of defaultIndustries) {
+      for (let industry of defaultIndustries) {
         console.log(industry.name);
         await new Industries(industry).save().then(industry => {
           console.log(`industry ${industry.name} was saved!`);
@@ -277,6 +279,7 @@ function services() {
     .then(async (services) => {
       if (!services.length) {
         for (const service of defaultServices) {
+
           await new Services(service).save()
             .then((service) => {
               console.log(`Service ${service.title} was saved!`);
@@ -392,10 +395,10 @@ async function checkCollections() {
   await fillLeadSources();
   await fillGroups();
   await users();
-  await services();
   await fillUnits();
   await fillSteps();
   await fillUnitSteps();
+  await services();
   await timeZones();
   await languages();
   await industries();
