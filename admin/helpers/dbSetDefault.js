@@ -1,7 +1,5 @@
 const {
   Languages,
-  Requests,
-  Projects,
   User,
   Services,
   Industries,
@@ -14,15 +12,12 @@ const {
   Vendors,
   Instruction,
   CancelReason,
-  TierLqa,
   Units,
   CurrencyRatio,
 } = require('../models');
 
 const {
   defaultLanguages,
-  requestsDefault,
-  projectsDefault,
   defaultUsers,
   defaultServices,
   defaultIndustries,
@@ -34,24 +29,11 @@ const {
   defaultVendors,
   instructionsDefault,
   cancelReasonsDefault,
-  tierLqasDefault,
   defaultUnits,
 } = require('./dbDefaultValue');
 const ObjectId = require('mongodb').ObjectID;
 const { Converter } = require('easy-currencies');
 const { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers } = require('./defaults');
-
-async function fillTierLqa () {
-  try {
-    const tierLqas = await TierLqa.find();
-    if (!tierLqas.length) {
-      await TierLqa.create(tierLqasDefault);
-    }
-  } catch (err) {
-    console.log("Error on filling default Tier Lqas");
-    console.log(err);
-  }
-}
 
 async function fillInstructions() {
   try {
@@ -255,62 +237,6 @@ function languages() {
     });
 }
 
-function requests() {
-  Requests.find({})
-    .then(requests => {
-      if (!requests.length) {
-        for (const req of requestsDefault) {
-          new Requests(req).save()
-            .then((lang) => {
-              //console.log(`Request: with name ${req.contactName} was save!`)
-            })
-            .catch((err) => {
-              console.log(`Request: with name ${req.contactName} wasn't save. Because of ${err.message}`);
-            });
-        }
-
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    });
-}
-
-function projects() {
-  return Projects.find({})
-    .then(async (projects) => {
-      if (!projects.length) {
-        for (const proj of projectsDefault) {
-          var languages = await Languages.find({});
-          var customer = await Clients.find({}).populate('industry');
-          proj.customer = customer[0]._id;
-          for (let lang of languages) {
-            var language = JSON.stringify(lang);
-            if (lang.lang === proj.sourceLanguage.lang) {
-              proj.sourceLanguage = JSON.parse(language);
-            }
-            for (let ind in proj.targetLanguages) {
-              if (lang.lang === proj.targetLanguages[ind].lang) {
-                proj.targetLanguages[ind] = JSON.parse(language);
-                console.log(proj.targetLanguages[ind]);
-              }
-            }
-          }
-          await new Projects(proj).save()
-            .then((res) => {
-              //console.log(`Project: with name ${proj.projectId} was save!`)
-            })
-            .catch((err) => {
-              console.log(`Project: with id ${proj.projectId} wasn't save. Because of ${err.message}`);
-            });
-        }
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    });
-}
-
 function users() {
   User.find({})
     .then(async (users) => {
@@ -461,7 +387,6 @@ async function fillPricelist() {
 }
 
 async function checkCollections() {
-  await fillTierLqa();
   await fillInstructions();
   await fillCancelReasons();
   await fillLeadSources();
@@ -474,8 +399,6 @@ async function checkCollections() {
   await timeZones();
   await languages();
   await industries();
-  await requests();
-  await projects();
   await fillCurrencyRatio();
   await fillPricelist();
   await clients();
