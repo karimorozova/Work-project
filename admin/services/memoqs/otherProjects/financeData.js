@@ -170,9 +170,9 @@ const getIndustryId = async (industryName) => {
 };
 
 const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords) => {
-  const priceReceivables = clientRate ? +clientRate.value * +WeightedWords : 0;
-  const pricePayables = vendorRate ? +vendorRate.value * +WeightedWords : 0;
-  const profit = pricePayables ? priceReceivables - pricePayables : 0;
+  const priceReceivables = clientRate ? (+clientRate.value * +WeightedWords).toFixed(2) : 0;
+  const pricePayables = vendorRate ? (+vendorRate.value * +WeightedWords).toFixed(2) : 0;
+  const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
   const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
     Wordcount: {
@@ -180,8 +180,8 @@ const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords) =
       payables: +WeightedWords,
     },
     Price: {
-      receivables: priceReceivables.toFixed(2),
-      payables: pricePayables.toFixed(2),
+      receivables: priceReceivables,
+      payables: pricePayables,
     },
     profit,
     ROI
@@ -220,7 +220,7 @@ const getProjectFinance = (tasks) => {
     pricePayables += +finance.Price.payables;
     TotalWordCount += finance.Wordcount.receivables;
   }
-  const profit = pricePayables ? priceReceivables - pricePayables : 0;
+  const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
   const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
     Wordcount: {
