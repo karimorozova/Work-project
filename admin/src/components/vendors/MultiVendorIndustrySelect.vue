@@ -58,11 +58,7 @@ export default {
         async getIndustries() {
             try {
                 const result = await this.$http.get('/api/industries')
-                this.industries = result.data.filter(item => {
-                    if (item.name !== 'More' && item.name !== 'Other') {
-                        return item
-                    }
-                });
+                this.industries = result.data.filter(item => item.active);
             } catch(err) {
                 this.errors.push(err)             
             }
