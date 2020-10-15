@@ -10,7 +10,7 @@ async function getClient (obj) {
     .populate('services.industries', ['name'])
     .populate('sourceLanguages', ['lang'])
     .populate('targetLanguages', ['lang'])
-    .populate('rates.industryMultipliersTable.industry', ['icon'])
+    .populate('rates.industryMultipliersTable.industry', ['name', 'icon'])
     .populate('rates.stepMultipliersTable.step', ['title'])
     .populate('rates.stepMultipliersTable.unit', ['type'])
     .populate('rates.basicPricesTable.sourceLanguage', ['lang', 'iso1'])

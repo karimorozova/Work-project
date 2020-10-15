@@ -128,12 +128,20 @@ const getStepUserRate = async (user, project, stepName, task) => {
       industry: industry._id,
     };
     if (source && target && step) {
-      let userPrice = getPriceFromPersonRates(
-        pricelistTable,
-        dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency);
+      let userPrice = getPriceFromPersonRates(pricelistTable, dataForComparison);
+      console.log(userPrice);
+      if (!userPrice) {
+        console.log('tyt');
+        return {
+          value: getPriceFromPricelist(pricelist, dataForComparison, currency),
+          active: true,
+          fromUser: false
+        }
+      }
       return {
         value: userPrice,
-        active: true
+        active: true,
+        fromUser: true
       };
     }
   }

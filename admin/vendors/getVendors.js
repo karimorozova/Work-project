@@ -24,7 +24,7 @@ async function getVendor(query) {
     .populate('rates.basicPricesTable.targetLanguage', ['lang', 'iso1'])
     .populate('rates.stepMultipliersTable.step', ['title'])
     .populate('rates.stepMultipliersTable.unit', ['type'])
-    .populate('rates.industryMultipliersTable.industry', ['icon'])
+    .populate('rates.industryMultipliersTable.industry', ['name', 'icon'])
     .populate('rates.pricelistTable.sourceLanguage', ['lang'])
     .populate('rates.pricelistTable.targetLanguage', ['lang'])
     .populate('rates.pricelistTable.step', ['title'])
