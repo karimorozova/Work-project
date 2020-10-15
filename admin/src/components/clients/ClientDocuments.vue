@@ -178,9 +178,9 @@
 			},
 			async manageDeleteClick(index) {
 				if(!this.documentsData[index].path) {
-					this.documentsData.pop();
 					return this.setDefaults();
 				}
+
 				this.deleteIndex = index;
 				this.isDeleting = true;
 			},
