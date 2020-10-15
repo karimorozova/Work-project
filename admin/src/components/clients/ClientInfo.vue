@@ -156,6 +156,9 @@
 					sourceLanguages:[],
           targetLanguages: [],
         },
+				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/,
+
+
 
 				isApproveModal: false,
 				clientShow: true,
@@ -366,7 +369,11 @@
 				if(isSameEmailsExists) {
 					this.errors.push("A client with such Email already exists, the client's Email should be unique!");
 				}
-
+        if(this.currentClient.website){
+        	if(this.websiteRegEx.exec(this.currentClient.website) === null){
+		        this.errors.push("The website field must contain a link");
+          }
+        }
 				if(this.errors.length) {
 					this.areErrorsExist = true;
 					this.isSaveClicked = true;
