@@ -22,9 +22,8 @@ const {
   syncClientMatrix
 } = require('../clients');
 const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist');
-const { Clients, Pricelist } = require('../models');
+const { Clients, Pricelist, ClientRequest, Projects } = require('../models');
 const { getProject } = require('../projects');
-const { getClientRequest } = require('../clientRequests');
 
 router.get('/client', async (req, res) => {
   let { id } = req.query;
@@ -159,11 +158,11 @@ router.post('/update-matrix', async (req, res) => {
 router.get('/any-doc', async (req, res) => {
   const { id } = req.query;
   try {
-    const request = await getClientRequest({ "customer": id });
+    const request = await ClientRequest.findOne({ customer: id });
     if (request) {
       return res.send(request);
     }
-    const project = await getProject({ "customer": id });
+    const project = await Projects.findOne({ "customer": id });
     res.send(project);
   } catch (err) {
     res.status(500).send("Error on getting any document of client");

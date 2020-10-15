@@ -23,7 +23,7 @@ const {
   getVendorAfterCombinationsUpdated,
 } = require('../vendors');
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users');
-const { Vendors } = require('../models');
+const { Vendors, Projects } = require('../models');
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests');
 const { testSentMessage } = require("../emailMessages/candidateCommunication");
 
@@ -414,7 +414,7 @@ router.post('/update-matrix', async (req, res) => {
 router.get('/any-step', async (req, res) => {
 	const { id } = req.query;
 	try {
-		const project = await getProject({ "steps.vendor": id });
+		const project = await Projects.findOne({ 'steps.vendor': id });
 		res.send(project);
 	} catch (err) {
 		res.status(500).send("Error on gettinf any step with current Vendor");
