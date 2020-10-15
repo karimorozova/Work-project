@@ -234,10 +234,10 @@
           .vendor-info__editor(v-if="currentVendor._id")
             ckeditor(v-model="currentVendor.notes", :config="editorConfig")
 
-      .title Vendor to memoq
-        div
-          h3(@click="openMemoqModal('Saved')") SAVE
-          h3(@click="openMemoqModal('Deleted')") DELETE
+      //.title Vendor to memoq
+        //div
+          //h3(@click="openMemoqModal('Saved')") SAVE
+          //h3(@click="openMemoqModal('Deleted')") DELETE
 
       .approve-action(v-if="approveMemoqVendorAction")
         ApproveModal(
