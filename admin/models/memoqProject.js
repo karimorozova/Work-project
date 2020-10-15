@@ -110,6 +110,10 @@ const MemoqProjectSchema = new mongoose.Schema({
   billingDate: {
     type: Date,
   },
+  lockedForRecalculation: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const MemoqProject = mongoose.model('MemoqProject', MemoqProjectSchema);
