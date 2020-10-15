@@ -175,12 +175,15 @@
 			formateDate: time => moment(time).format('DD-MM-YYYY'),
 			getStepName: num => (num === '0' ? 'Translation' : 'Revision'),
 			createdListOfTargetLanguages() {
+				const memoq = this.project.documents.map(item => item.TargetLangCode);
+        const languages = memoq.map(item => this.project.targetLanguages.find(item2 => item === item2.memoq))
 				let someArr = [];
-				this.project.targetLanguages.forEach(element => {
+				languages.forEach(element => {
 					for (let i = 0; i < 2; i++) someArr.push(element);
 				});
 				return (this.stepsTargetLanguages = someArr);
 			},
+
 			showTab({ index }) {
 				return this.tabs[index] === "Steps"
 						? true
