@@ -1,3 +1,5 @@
+const { Industries } = require('../../../models');
+
 const filterMemoqProjectsVendors = users => {
   const documents = users.map(i => i.documents).reduce((a, b) => a.concat(b), []);
   let usersFullName = [];
@@ -18,4 +20,36 @@ const checkDocumentHasCorrectStructure = (document) => {
     document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
 };
 
-module.exports = { filterMemoqProjectsVendors, checkDocumentHasCorrectStructure };
+const findFittingIndustryId = async (industryName) => {
+  const neededIndustry = await Industries.findOne({
+    name: { $regex: new RegExp(`${industryName}`, 'i') }
+  });
+  if (!neededIndustry) {
+    switch (industryName) {
+      case 'eLearning':
+        return await Industries.findOne({ name: 'E-Learning' });
+      case 'Tourism':
+      case 'Travel, Tourism & Hospitality':
+        return await Industries.findOne({ name: 'Hospitality' });
+      case 'Medicine':
+        return await Industries.findOne({ name: 'Pharma' });
+      case 'Law':
+        return await Industries.findOne({ name: 'Legal' });
+      case 'Computer Hardware':
+        return await Industries.findOne({ name: 'IT' });
+      case 'Forex':
+        return await Industries.findOne({ name: 'CFDs & Online Trading' });
+      case 'Lottery':
+        return await Industries.findOne({ name: 'iGaming (Casino, Slot games, Gambling, etc.)' });
+      case 'Media, Broadcasting & Publishing':
+      case 'PR Agency':
+        return await Industries.findOne({ name: 'Marketing' });
+      default:
+      case '':
+        return await Industries.findOne({ name: 'Other' });
+    }
+  }
+  return neededIndustry;
+};
+
+module.exports = { filterMemoqProjectsVendors, checkDocumentHasCorrectStructure, findFittingIndustryId };

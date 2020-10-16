@@ -1,10 +1,11 @@
-const { Clients, Vendors, Languages, Industries, Pricelist, Step, Units } = require('../../../models');
+const { Clients, Vendors, Languages, Pricelist, Step, Units } = require('../../../models');
 const ObjectId = require('mongodb').ObjectID;
 const { getPriceFromPersonRates } = require('../../../сalculations/finance');
 const { defaultFinanceObj } = require('../../../enums');
 const { getProjectAfterUpdate } = require('./getMemoqProject');
 const { getCorrectBasicPrice } = require('../../../сalculations/finance');
 const { multiplyPrices } = require('../../../multipliers');
+const { findFittingIndustryId } = require('./helpers');
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
   const clients = await Clients.find();
@@ -91,7 +92,7 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
 const getUpdatedProjectData = (project, allClients) => {
   const { client: memoqClient } = project;
   const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
-  const industry = getIndustryId(project.domain);
+  const industry = findFittingIndustryId(project.domain);
   let additionalData = {};
   if (neededCustomer) {
     additionalData = {
@@ -99,7 +100,7 @@ const getUpdatedProjectData = (project, allClients) => {
       status: 'Closed',
       projectManager: ObjectId(neededCustomer.projectManager._id),
       accountManager: ObjectId(neededCustomer.accountManager._id),
-      industry: industry.name === 'Other' ? project.domain : ObjectId(industry._id),
+      industry: ObjectId(industry._id),
       paymentProfile: neededCustomer.billingInfo.paymentType,
     };
   }
@@ -107,8 +108,7 @@ const getUpdatedProjectData = (project, allClients) => {
 };
 
 const getStepUserRate = async (user, project, stepName, task) => {
-  const { domain } = project;
-  const industry = await getIndustryId(domain);
+  const { industry } = project;
   let { sourceLanguage, targetLanguage } = task;
   if (user) {
     const { rates: { pricelistTable }, currency } = user;
@@ -125,7 +125,7 @@ const getStepUserRate = async (user, project, stepName, task) => {
       step: step ? step._id : null,
       unit: unitId,
       size: 1,
-      industry: industry._id,
+      industry: industry,
     };
     if (source && target && step) {
       let userPrice = getPriceFromPersonRates(pricelistTable, dataForComparison);
@@ -144,27 +144,6 @@ const getStepUserRate = async (user, project, stepName, task) => {
     }
   }
   return '';
-};
-
-const getIndustryId = async (industryName) => {
-  if (industryName === 'iGaming' || industryName === 'Finance') {
-    return await Industries.findOne({ name: { '$regex': new RegExp(`${industryName}`, 'i') } });
-  } else {
-    switch (industryName) {
-      case 'eLearning':
-        return await Industries.findOne({ name: 'E-Learning' });
-      case 'Tourism':
-        return await Industries.findOne({ name: 'Museums & Tourist Attractions' });
-      case 'Medicine':
-        return await Industries.findOne({ name: 'Medical Devices' });
-      case 'Law':
-        return await Industries.findOne({ name: 'Legal' });
-      case 'Sport-Betting':
-        return await Industries.findOne({ name: 'Sports Betting' });
-      default:
-        return await Industries.findOne({ name: 'Other' });
-    }
-  }
 };
 
 const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords) => {
