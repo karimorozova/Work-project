@@ -173,7 +173,7 @@ export default {
       currentUnit: "",
       currentIndustry: "",
       currentPrice: "",
-      
+
       sourceFilter: "",
       targetFilter: "",
       stepFilter: "",
@@ -242,7 +242,7 @@ export default {
           "/clientsapi/rates/change-pricelist/" + this.clientId,
           {
             _id: id,
-            price: parseFloat(this.currentPrice).toFixed(3),
+            price: this.currentPrice,
             altered: true,
             notification: "Price disconnected from function"
           }
@@ -483,8 +483,8 @@ export default {
     justify-content: flex-end;
     align-items: center;
    &-info {
-     margin-top:  1px; 
-     margin-right: 3px;    
+     margin-top:  1px;
+     margin-right: 3px;
   }
     &-link {
       cursor: pointer;

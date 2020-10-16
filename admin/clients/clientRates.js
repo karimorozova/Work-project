@@ -140,7 +140,7 @@ const changePricelistTable = (
         if (`${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`) {
           item.price /= oldMultiplier;
           item.price *= Number(basicPrice);
-          item.price = item.price.toFixed(2);
+          item.price = item.price.toFixed(4);
         }
         return item;
       });
@@ -151,7 +151,7 @@ const changePricelistTable = (
         if (`${item.step} ${item.unit} ${item.size}` === `${step._id} ${unit._id} ${size}`) {
           item.price /= oldMultiplier;
           item.price *= Number(stepMultiplier);
-          item.price = item.price.toFixed(2);
+          item.price = item.price.toFixed(4);
         }
         return item;
       });
@@ -162,7 +162,7 @@ const changePricelistTable = (
         if (item.industry.toString() === industry._id) {
           item.price /= oldMultiplier;
           item.price *= Number(industryMultiplier);
-          item.price = item.price.toFixed(2);
+          item.price = item.price.toFixed(4);
         }
         return item;
       });

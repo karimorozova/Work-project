@@ -242,7 +242,7 @@ export default {
       try {
         const result = await this.$http.post("/vendorsapi/rates/change-pricelist/" + this.vendorId, {
           _id: id,
-          price: parseFloat(this.currentPrice).toFixed(3),
+          price: this.currentPrice,
           altered: true,
           notification: "Price disconnected from function",
         });
