@@ -8,7 +8,8 @@ const {
   getPercentage,
   multiplyPrices,
   arrayComparer,
-  getArrayDifference
+  getArrayDifference,
+  updatePriceMultiplier
 } = require('./pricelist');
 
 module.exports = {
@@ -25,5 +26,6 @@ module.exports = {
   getPercentage,
   multiplyPrices,
   arrayComparer,
-  getArrayDifference
+  getArrayDifference,
+  updatePriceMultiplier
 }

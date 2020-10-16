@@ -38,6 +38,10 @@ const PricelistSchema = new mongoose.Schema({
     altered: {
       type: Boolean,
       default: false
+    },
+    isActive: {
+      type: Boolean,
+      default: true
     }
   }],
   stepMultipliersTable: [{
@@ -73,6 +77,10 @@ const PricelistSchema = new mongoose.Schema({
     altered: {
       type: Boolean,
       default: false
+    },
+    isActive: {
+      type: Boolean,
+      default: true
     }
   }],
   industryMultipliersTable: [{
@@ -86,6 +94,10 @@ const PricelistSchema = new mongoose.Schema({
     altered: {
       type: Boolean,
       default: false
+    },
+    isActive: {
+      type: Boolean,
+      default: true
     }
   }],
   discountChart: {

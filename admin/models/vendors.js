@@ -312,6 +312,9 @@ const VendorSchema = new mongoose.Schema({
         type: String,
         default: '',
         trim: true
+      },
+      isActive: {
+        type: Boolean
       }
     }],
     stepMultipliersTable: [{
@@ -340,6 +343,9 @@ const VendorSchema = new mongoose.Schema({
         type: String,
         default: '',
         trim: true
+      },
+      isActive: {
+        type: Boolean
       }
     }],
     industryMultipliersTable: [{
@@ -358,6 +364,9 @@ const VendorSchema = new mongoose.Schema({
         type: String,
         default: '',
         trim: true
+      },
+      isActive: {
+        type: Boolean
       }
     }],
     pricelistTable: [{
@@ -391,6 +400,9 @@ const VendorSchema = new mongoose.Schema({
         type: String,
         default: '',
         trim: true
+      },
+      isActive: {
+        type: Boolean
       }
     }]
   },

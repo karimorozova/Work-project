@@ -162,7 +162,7 @@ router.put('/languages/:id', upload.fields([{name: "flag"}]), async (req, res) =
   const { active, icon } = req.body;
   const flag = req.files["flag"];
   const { id }= req.params;
-  const isActive = active ? true : false;
+  const isActive = !!active;
   try {
     await updateLanguage({id, icon, isActive, flag});
     res.send('Updated');

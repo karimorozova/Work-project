@@ -1,5 +1,4 @@
 const { Pricelist, Step, Units } = require('../models');
-const ObjectId = require('mongodb').ObjectID;
 
 const getFilteredStepMultipliers = async (stepMultipliersTable, filters, needToSplice) => {
   const { countFilter } = filters;
@@ -30,13 +29,15 @@ const getFilteredStepMultipliers = async (stepMultipliersTable, filters, needToS
   if (filters.sizeFilter) {
     stepMultipliersTable = stepMultipliersTable.filter(({ size }) => size === +filters.sizeFilter)
   }
-  return needToSplice ? stepMultipliersTable.splice(countFilter, 25) : stepMultipliersTable;
+  if (needToSplice) stepMultipliersTable = stepMultipliersTable.splice(countFilter, 25);
+  return stepMultipliersTable;
 };
 
 const getFilteredStepMultiplier = async (filters, priceListId, needToSplice = true) => {
   try {
-    const { stepMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, stepMultipliersTable: 1 })
+    let { stepMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, stepMultipliersTable: 1 })
       .populate('stepMultipliersTable.step').populate('stepMultipliersTable.unit');
+    stepMultipliersTable = stepMultipliersTable.filter(row => row.isActive === true);
     return await getFilteredStepMultipliers(stepMultipliersTable, filters, needToSplice);
   } catch (err) {
     console.log(err);

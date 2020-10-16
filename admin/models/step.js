@@ -20,7 +20,8 @@ const StepSchema = new mongoose.Schema({
     type: Boolean
   },
   isActive: {
-    type: Boolean
+    type: Boolean,
+    default: true
   },
   symbol: {
     type: String,

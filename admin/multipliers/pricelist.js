@@ -7,7 +7,7 @@ const { differenceOperationType } = require('../enums/differenceOperationType');
 
 const getPricelistCombinations = async (priceListId, filters) => {
   const { countFilter, industryFilter } = filters;
-  const getAllIndustries = await Industries.find();
+  const getAllIndustries = await Industries.find({isActive: true});
   const basicPricesTable = await getFilteredBasicPrices(filters, priceListId, false);
   const stepMultipliersTable = await getFilteredStepMultiplier(filters, priceListId, false);
   const { industryMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { industryMultipliersTable: 1 }).populate('industryMultipliersTable.industry');
@@ -204,9 +204,23 @@ const addNewMultiplier = async (key, newMultiplierId) => {
   }
 };
 
+const updatePriceMultiplier = async (lang, value) => {
+  const pricelists = await Pricelist.find();
+  for (let { _id, basicPricesTable } of pricelists) {
+    basicPricesTable = basicPricesTable.map(row => {
+      if (row.sourceLanguage.toString() === lang.toString() || row.targetLanguage.toString() === lang.toString()) {
+        row.isActive = !!value;
+      }
+      return row;
+    });
+    await Pricelist.updateOne({ _id }, { basicPricesTable });
+  }
+};
+
 //TODO: Add sizes replacement if they are not empty,
 // if you add size for existing combination, you should replace them with actual size, and delete the default ones
 const updateMultiplier = async (key, oldMultiplier) => {
+  let value;
   switch (key) {
     default:
     case 'Step':
@@ -214,9 +228,9 @@ const updateMultiplier = async (key, oldMultiplier) => {
       const updatedStep = await Step.findOne({ _id: oldStep._id })
         .populate('calculationUnit');
       const unitDifferences = getArrayDifference(oldStep.calculationUnit, updatedStep.calculationUnit, 'type');
-      const isStepActivityChanged = activityChange(oldStep, updatedStep, 'isActive');
-      if (isStepActivityChanged) {
-        await updateActiveSteps(isStepActivityChanged, oldStep._id);
+      value = activityChange(oldStep, updatedStep, 'isActive');
+      if (value) {
+        await updateRowActivity(value, oldStep._id, 'stepMultipliersTable', 'step');
       }
       if (unitDifferences) {
         await checkStepDifference(unitDifferences, oldStep);
@@ -230,9 +244,9 @@ const updateMultiplier = async (key, oldMultiplier) => {
       const { sizes: oldSizes } = oldUnit;
       const { sizes: updatedSizes } = updatedUnit;
       const sizeDifferences = getSizeDifference(oldSizes, updatedSizes);
-      const isUnitActivityChanged = activityChange(oldUnit, updatedUnit, 'active');
-      if (isUnitActivityChanged) {
-        await updateActiveUnits(isUnitActivityChanged, oldUnit._id);
+      value = activityChange(oldUnit, updatedUnit, 'active');
+      if (value) {
+        await updateRowActivity(value, oldUnit._id, 'stepMultipliersTable', 'unit');
       }
       await checkSizeDifference(oldUnit, updatedUnit.steps, sizeDifferences);
       if (stepDifferences) {
@@ -242,156 +256,39 @@ const updateMultiplier = async (key, oldMultiplier) => {
     case 'Industry':
       const oldIndustry = oldMultiplier;
       const updatedIndustry = await Industries.findOne({ _id: oldIndustry._id });
-      const isIndustryActivityChanged = activityChange(oldIndustry, updatedIndustry, 'active');
-      if (isIndustryActivityChanged) {
-        await updatedActiveIndustry(isIndustryActivityChanged, oldIndustry._id);
+      value = activityChange(oldIndustry, updatedIndustry, 'active');
+      if (value) {
+        await updateRowActivity(value, oldIndustry._id, 'industryMultipliersTable', 'industry');
       }
   }
 };
 
 const activityChange = (oldExample, updatedExample, activityKey) => {
-  if (oldExample[activityKey] && !updatedExample[activityKey]) {
-    return 'Not active';
-  } else if (!oldExample[activityKey] && updatedExample[activityKey]) {
-    return 'Active';
+  if (oldExample[activityKey] === updatedExample[activityKey]) {
+    return false;
+  } else {
+    if (oldExample[activityKey] && !updatedExample[activityKey]) {
+      return 'Not active';
+    } else if (!oldExample[activityKey] && updatedExample[activityKey]) {
+      return 'Active';
+    }
   }
 };
 
-const updateActiveUnits = async (activityStatus, unitId) => {
+const updateRowActivity = async (value, rowId, tableName, prop) => {
   const pricelists = await Pricelist.find();
-  const currencyRatio = await CurrencyRatio.find();
-  const { USD, GBP } = currencyRatio[0];
-  if (activityStatus === differenceOperationType.JustDelete) {
-    for (let { _id, stepMultipliersTable } of pricelists) {
-      stepMultipliersTable = stepMultipliersTable.filter(item => item.unit.toString() !== unitId);
-      await Pricelist.updateOne({ _id }, { stepMultipliersTable });
-    }
-  } else if (activityStatus === differenceOperationType.JustAdd) {
-    const neededUnit = await Units.findOne({ _id: unitId });
-    const { steps } = neededUnit;
-    let sameCombination;
-    const newMultiplierCombinations = [];
-    for (let { _id } of steps) {
-      if (neededUnit.sizes.length) {
-        neededUnit.sizes.forEach(size => {
-          for (let { stepMultipliersTable } of pricelists) {
-            sameCombination = stepMultipliersTable.find(item => (
-              `${item.step} ${item.unit} ${item.size}` === `${_id} ${unitId} ${size}`
-            ));
-          }
-          if (!sameCombination) {
-            newMultiplierCombinations.push({
-              euroMinPrice: 1,
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
-              step: _id,
-              unit: neededUnit._id,
-              size,
-            });
-          }
-        });
-      } else {
-        for (let { stepMultipliersTable } of pricelists) {
-          sameCombination = stepMultipliersTable.find(item => (
-            `${item.step} ${item.unit} ${item.size}` === `${_id} ${unitId} ${1}`
-          ));
-        }
-        if (!sameCombination) {
-          newMultiplierCombinations.push({
-            euroMinPrice: 1,
-            usdMinPrice: USD,
-            gbpMinPrice: GBP,
-            step: _id,
-            unit: neededUnit._id,
-            size: 1,
-            defaultSize: true,
-          });
-        }
+  for (let pricelist of pricelists) {
+    let neededTable = pricelist[tableName];
+    neededTable = neededTable.map(row => {
+      if (row[prop].toString() === rowId) {
+        row.isActive = value === 'Active';
       }
-    }
-    for (let { _id, stepMultipliersTable } of pricelists) {
-      await Pricelist.updateOne({ _id },
-        { stepMultipliersTable: [...stepMultipliersTable, ...newMultiplierCombinations] });
-    }
+      return row;
+    });
+    await Pricelist.updateOne({ _id: pricelist._id }, { [tableName]: neededTable });
   }
 };
 
-const updateActiveSteps = async (activityStatus, stepId) => {
-  const pricelists = await Pricelist.find();
-  const currencyRatio = await CurrencyRatio.find();
-  const { USD, GBP } = currencyRatio[0];
-  if (activityStatus === 'Not Active') {
-    for (let { _id, stepMultipliersTable } of pricelists) {
-      stepMultipliersTable = stepMultipliersTable.filter(item => item.step.toString() !== stepId);
-      await Pricelist.updateOne({ _id }, { stepMultipliersTable });
-    }
-  } else if (activityStatus === 'Active') {
-    const neededStep = await Step.findOne({ _id: stepId });
-    const { calculationUnit } = neededStep;
-    let sameCombination;
-    const newMultiplierCombinations = [];
-    for (let unitId of calculationUnit) {
-      const { sizes } = await Units.findOne({ _id: unitId });
-      if (sizes.length) {
-        sizes.forEach(size => {
-          for (let { stepMultipliersTable } of pricelists) {
-            sameCombination = stepMultipliersTable.find(item => (
-              `${item.step} ${item.unit} ${item.size}` === `${stepId} ${_id} ${size}`
-            ));
-          }
-          if (!sameCombination) {
-            newMultiplierCombinations.push({
-              euroMinPrice: 1,
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
-              step: stepId,
-              unit: unitId,
-              size,
-            });
-          }
-        });
-      } else {
-        for (let { stepMultipliersTable } of pricelists) {
-          sameCombination = stepMultipliersTable.find(item => (
-            `${item.step} ${item.unit} ${item.size}` === `${stepId} ${_id} ${1}`
-          ));
-        }
-        if (!sameCombination) {
-          newMultiplierCombinations.push({
-            euroMinPrice: 1,
-            usdMinPrice: USD,
-            gbpMinPrice: GBP,
-            step: stepId,
-            unit: unitId,
-            size: 1,
-            defaultSize: true,
-          });
-        }
-      }
-    }
-    for (let { _id, stepMultipliersTable } of pricelists) {
-      await Pricelist.updateOne({ _id },
-        { stepMultipliersTable: [...stepMultipliersTable, ...newMultiplierCombinations] });
-    }
-  }
-};
-
-const updatedActiveIndustry = async (activityStatus, industryId) => {
-  const pricelists = await Pricelist.find();
-  if (activityStatus === 'Not active') {
-    for (let { _id, industryMultipliersTable } of pricelists) {
-      industryMultipliersTable = industryMultipliersTable.filter(({ industry }) => industry.toString() !== industryId);
-      await Pricelist.updateOne({ _id }, { industryMultipliersTable });
-    }
-  } else if (activityStatus === 'Active') {
-    for (let { _id, industryMultipliersTable } of pricelists) {
-      industryMultipliersTable.push({
-        industry: industryId
-      });
-      await Pricelist.updateOne({ _id }, { industryMultipliersTable });
-    }
-  }
-};
 
 const checkUnitDifference = async (stepDifferences, oldUnit) => {
   const pricelists = await Pricelist.find();
@@ -802,5 +699,6 @@ module.exports = {
   multiplyPrices,
   getSizeDifference,
   activityChange,
-  arrayComparer
+  arrayComparer,
+  updatePriceMultiplier
 };

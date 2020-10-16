@@ -2,17 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
-const altered = {
-	type: Boolean,
-	default: false
-};
-
-const notification = {
-	type: String,
-	default: '',
-	trim: true
-};
-
 const ClientSchema = new mongoose.Schema({
 	name: {
 		type: String,
@@ -190,8 +179,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Number,
 				default: 1,
 			},
-			altered,
-			notification
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      },
+      isActive: {
+        type: Boolean
+      }
 		}],
 		stepMultipliersTable: [{
 			step: {
@@ -211,8 +210,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Boolean,
 				default: false
 			},
-			altered,
-			notification
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      },
+      isActive: {
+        type: Boolean
+      }
 		}],
 		industryMultipliersTable: [{
 			industry: {
@@ -222,8 +231,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Number,
 				default: 100,
 			},
-			altered,
-			notification
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      },
+      isActive: {
+        type: Boolean
+      }
 		}],
 		pricelistTable: [{
 			sourceLanguage: {
@@ -248,8 +267,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Number,
 				default: 1
 			},
-			altered,
-			notification
+      altered: {
+        type: Boolean,
+        default: false,
+      },
+      notification: {
+        type: String,
+        default: '',
+        trim: true
+      },
+      isActive: {
+        type: Boolean
+      }
 		}]
 	},
 	contacts: [{

@@ -58,7 +58,7 @@
             span.languages__title Previous page
         .languages__page-numbers(v-for="(arr, num) in langPaging")
             span.languages__page-number(@click="toPage(num)" :class="{'languages_current': num === currentPage-1}") {{ num + 1 }}
-        .languages__next(@click="nextPage" :class="{'languages_non-active': !hasNext}") 
+        .languages__next(@click="nextPage" :class="{'languages_non-active': !hasNext}")
             span.languages__title Next page
 </template>
 
@@ -154,7 +154,7 @@ export default {
                 this.cancel();
                 await this.getLanguages();
             }
-        },  
+        },
         closeErrors() {
             this.areErrors = false;
         },
@@ -168,6 +168,10 @@ export default {
             newData.append("active", isActive);
             try {
                 await this.$http.put(`/api/languages/${id}`, newData);
+                await this.$http.post('/pricelists/update-language-activity', {
+                  lang: id,
+                  value: isActive
+                })
                 await this.getLanguages();
                 this.alertToggle({message: "Information updated.", isShow: true, type: "success"})
             } catch(err) {
@@ -192,11 +196,11 @@ export default {
         },
         async getLanguages() {
             try {
-                const result = await this.$http.get("/api/languages"); 
+                const result = await this.$http.get("/api/languages");
                 this.languages = result.body.sort((a, b) => {
                     if (a.lang < b.lang) return -1;
                     if (a.lang > b.lang) return 1;
-                });    
+                });
             } catch(err) {
                 this.alertToggle({message: "Error on getting languages.", isShow: true, type: "error"});
             }
@@ -308,7 +312,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 10px;        
+        margin-top: 10px;
     }
     &__prev, &__next {
         text-align: center;

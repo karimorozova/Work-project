@@ -10,12 +10,13 @@ const getFilteredBasicPrice = async (filteredBasicPrices, filters, needToSplice)
     const lang = await Languages.findOne({ lang: filters.targetFilter });
     filteredBasicPrices = filteredBasicPrices.filter(({ targetLanguage }) => (
       targetLanguage._id.toString() === lang._id.toString()
-    ))
+    ));
   }
   if (filters.typeFilter) {
     filteredBasicPrices = filteredBasicPrices.filter(({ type }) => type === filters.typeFilter);
   }
-  return needToSplice ? filteredBasicPrices.splice(countFilter, 25) : filteredBasicPrices;
+  if (needToSplice) filteredBasicPrices = filteredBasicPrices.splice(countFilter, 25);
+  return filteredBasicPrices.filter(row => row.isActive === true);
 }
 const getFilteredBasicPrices = async (filters, priceListId, needToSplice = true) => {
   try {

@@ -14,14 +14,15 @@ const getDefaultBasicPrices = async () => {
       targetLanguage: language._id,
       euroBasicPrice: 1,
       usdBasicPrice: USD,
-      gbpBasicPrice: GBP
+      gbpBasicPrice: GBP,
+      isActive: true
     });
   });
   return defaultBasicPrices;
 };
 
 const getDefaultStepMultipliers = async () => {
-  const units = await Units.find({ active: true });
+  const units = await Units.find();
   const currencyRatio = await CurrencyRatio.find();
   const { USD, GBP } = currencyRatio[0];
   const defaultStepMultipliers = [];
@@ -46,18 +47,20 @@ const getDefaultStepMultipliers = async () => {
         size: 1,
         euroMinPrice: 1,
         usdMinPrice: USD,
-        gbpMinPrice: GBP
+        gbpMinPrice: GBP,
+        isActive: true
       }));
     }
   }
   return defaultStepMultipliers;
 };
 const getDefaultIndustryMultipliers = async () => {
-  const industries = await Industries.find({ active: true });
+  const industries = await Industries.find();
   const defaultIndustryMultipliers = [];
   for (let { _id } of industries) {
     defaultIndustryMultipliers.push({
       industry: _id,
+      isActive: true
     });
   }
   return defaultIndustryMultipliers;
