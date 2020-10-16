@@ -34,12 +34,20 @@
           span.steps__step-data {{formateDate(row.DeadLine)}}
 
         template(slot="receivables" slot-scope="{ row, index }")
-          div(v-if="project.status === 'Closed' && project.steps.length")
+          .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
+            span.pricelist__list(v-if="project.steps[index].clientRate && !project.steps[index].clientRate.fromUser")
+              img.pricelist__img( src="../../../assets/images/red-info-icon.png")
+            span.pricelist__list(v-else)
+
             span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
             span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
 
         template(slot="payables" slot-scope="{ row, index }")
-          div(v-if="project.status === 'Closed' && project.steps.length")
+          .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
+            span.pricelist__list(v-if="project.steps[index].vendorRate && !project.steps[index].clientRate.fromUser")
+              img.pricelist__img( src="../../../assets/images/red-info-icon.png")
+            span.pricelist__list(v-else)
+
             span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
             span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
 
@@ -91,7 +99,7 @@
 						label: "Step",
 						headerKey: "headerName",
 						key: "name",
-						width: "14%",
+						width: "12%",
 						padding: 0
 					},
 					{
@@ -111,25 +119,25 @@
 						label: "Start",
 						headerKey: "headerStart",
 						key: "start",
-						width: "14%"
+						width: "12%"
 					},
 					{
 						label: "Deadline",
 						headerKey: "headerDeadline",
 						key: "deadline",
-						width: "14%"
+						width: "12%"
 					},
 					{
 						label: "Receivables",
 						headerKey: "headerReceivables",
 						key: "receivables",
-						width: "9%"
+						width: "12%"
 					},
 					{
 						label: "Payables",
 						headerKey: "headerPayables",
 						key: "payables",
-						width: "9%"
+						width: "12%"
 					},
 					{
 						label: "Margin",
@@ -176,7 +184,7 @@
 			getStepName: num => (num === '0' ? 'Translation' : 'Revision'),
 			createdListOfTargetLanguages() {
 				const memoq = this.project.documents.map(item => item.TargetLangCode);
-        const languages = memoq.map(item => this.project.targetLanguages.find(item2 => item === item2.memoq))
+				const languages = memoq.map(item => this.project.targetLanguages.find(item2 => item === item2.memoq))
 				let someArr = [];
 				languages.forEach(element => {
 					for (let i = 0; i < 2; i++) someArr.push(element);
@@ -200,6 +208,25 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .pricelist {
+    &__block {
+      display: flex;
+    }
+
+    &__list {
+      height: 20px;
+      width: 20px;
+    }
+
+    &__img {
+      height: 20px;
+      width: 20px;
+      margin-top: -2px;
+      margin-right: 2px;
+    }
+  }
+
 
   .steps {
     display: flex;
