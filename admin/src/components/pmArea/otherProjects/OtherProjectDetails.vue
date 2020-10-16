@@ -3,6 +3,12 @@
     .project__all-info
       .project__info-row
         input.project__name(type="text" :value="projectName" disabled)
+
+        .project__lock-icons(v-if="!project.lockedForRecalculation")
+          i.fa.fa-unlock(aria-hidden='true' @click="toggleLock(project.lockedForRecalculation)")
+        .project__lock-icons(v-if="project.lockedForRecalculation")
+          i.fa.fa-lock(aria-hidden='true' @click="toggleLock(project.lockedForRecalculation)")
+
       .project__info-row
         .project__date
           LabelValue(label="Start Date & Time" :isRequired="false" customClass="project_margin")
@@ -65,6 +71,27 @@
 			goToClientInfo(id) {
 				const route = this.$router.resolve({ path: `/clients/details/${ id }` });
 				window.open(route.href, "_blank");
+			},
+			async toggleLock(action) {
+				const message = !action ? 'locked' : 'unlocked';
+				try {
+					const result = await this.$http.post('/memoqapi/set-recalculation-lock', {
+						projectId: this.project._id,
+						value: !action,
+					})
+					this.$emit('updateProject', result.body)
+					this.alertToggle({
+						message: `Project ${ message }`,
+						isShow: true,
+						type: "success"
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: "Server Error / Cannot locked Project",
+						isShow: true,
+						type: "error"
+					});
+				}
 			},
 			...mapActions(["alertToggle"]),
 			formateDate: time => moment(time).format("DD-MM-YYYY HH:mm"),
@@ -316,6 +343,17 @@
         }
       }
     }
+  }
+
+  .fa {
+    font-size: 26px;
+    color: #938676;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .fa:hover {
+    color: #67573E;
   }
 
   .tooltip {

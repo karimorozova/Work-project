@@ -505,6 +505,7 @@ async function updateMemoqProjectsData() {
         memoqProject.status = documents !== null && documents !== undefined && (isAllTasksFinished(documents) ? 'Closed' : 'In progress');
         const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
           checkProjectStructure(clients, memoqProject, documents) : false;
+				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ? false : memoqProject.lockedForRecalculation;
         memoqProject = doesHaveCorrectStructure && memoqProject.status !== 'In progress' ?
           await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
         await MemoqProject.updateOne(
