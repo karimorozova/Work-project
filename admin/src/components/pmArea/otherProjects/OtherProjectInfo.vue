@@ -22,6 +22,10 @@
           :project="project"
           @refreshCurrProject="refreshProject"
         )
+    .project-info__all-info(v-if="project.status === 'Closed' && project.hasOwnProperty('finance')")
+      OtherProjectFinance(
+        :project="project"
+      )
 
 </template>
 
@@ -31,6 +35,7 @@
 	import { mapActions } from "vuex";
 	import OtherProjectSubInformation from "./OtherProjectSubInformation";
 	import OtherProjectAction from "./OtherProjectAction";
+	import OtherProjectFinance from "./OtherProjectFinance";
 
 	export default {
 		data() {
@@ -93,6 +98,7 @@
 			});
 		},
 		components: {
+			OtherProjectFinance,
 			OtherProjectAction,
 			OtherProjectSubInformation,
 			OtherProjectDetails,
