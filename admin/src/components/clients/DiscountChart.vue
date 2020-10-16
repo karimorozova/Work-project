@@ -149,7 +149,7 @@
       padding: 5px;
       position: absolute;
       z-index: 1;
-      bottom: 150%;
+      bottom: 30px;
       left: 50%;
       margin-left: -75px;
       opacity: 0;
