@@ -310,7 +310,8 @@ export default {
                 return
             }
             const vendor = this.vendors[index];
-            this.storeCurrentVendor(vendor);
+            //MM
+            // this.storeCurrentVendor(vendor);
             this.$router.push(`/vendors/details/${vendor._id}`);
         }
     },

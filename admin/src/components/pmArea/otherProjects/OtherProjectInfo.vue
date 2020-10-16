@@ -4,6 +4,7 @@
       OtherProjectDetails(
         :project="project"
         :projectName="projectName"
+        @updateProject="updateProject"
       )
       span(v-if="Object.keys(project).length")
         OtherProjectSubInformation(
@@ -44,6 +45,9 @@
 			...mapActions(["alertToggle"]),
 			refreshProject(project) {
 				this.project = project
+			},
+			updateProject(data) {
+				this.project = data;
 			},
 			async getProjectSteps(id) {
 				try {
