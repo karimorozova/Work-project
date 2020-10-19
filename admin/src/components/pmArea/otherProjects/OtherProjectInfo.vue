@@ -4,6 +4,7 @@
       OtherProjectDetails(
         :project="project"
         :projectName="projectName"
+        @updateProject="updateProject"
       )
       span(v-if="Object.keys(project).length")
         OtherProjectSubInformation(
@@ -21,6 +22,10 @@
           :project="project"
           @refreshCurrProject="refreshProject"
         )
+    .project-info__all-info(v-if="project.status === 'Closed' && project.hasOwnProperty('finance')")
+      OtherProjectFinance(
+        :project="project"
+      )
 
 </template>
 
@@ -30,6 +35,7 @@
 	import { mapActions } from "vuex";
 	import OtherProjectSubInformation from "./OtherProjectSubInformation";
 	import OtherProjectAction from "./OtherProjectAction";
+	import OtherProjectFinance from "./OtherProjectFinance";
 
 	export default {
 		data() {
@@ -44,6 +50,9 @@
 			...mapActions(["alertToggle"]),
 			refreshProject(project) {
 				this.project = project
+			},
+			updateProject(data) {
+				this.project = data;
 			},
 			async getProjectSteps(id) {
 				try {
@@ -89,6 +98,7 @@
 			});
 		},
 		components: {
+			OtherProjectFinance,
 			OtherProjectAction,
 			OtherProjectSubInformation,
 			OtherProjectDetails,

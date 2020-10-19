@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
 const IndustriesSchema = new mongoose.Schema({
     icon: {
@@ -21,18 +20,6 @@ const IndustriesSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    rate: {
-        type: Number,
-        default: 0
-    },
-    package: {
-        type: Number,
-        default: 200,
-    },
-    isLast: {
-        type: Boolean,
-        default: false
-    }
 });
 
 const Industries = mongoose.model('Industries', IndustriesSchema);

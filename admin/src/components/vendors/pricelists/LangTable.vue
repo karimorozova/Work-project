@@ -350,7 +350,7 @@ export default {
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: -225%;
+    bottom: -55px;
     left: 50%;
     margin-left: -75px;
     opacity: 0;
@@ -379,7 +379,7 @@ export default {
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 150%;
+    bottom: 30px;
     left: 50%;
     margin-left: -75px;
     opacity: 0;

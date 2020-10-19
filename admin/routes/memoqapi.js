@@ -319,4 +319,15 @@ router.post('/contact-email', async (req, res) => {
   }
 });
 
+router.post('/set-recalculation-lock', async (req, res) => {
+  const { projectId, value } = req.body;
+  try {
+    const project = await getProjectAfterUpdate({ _id: projectId }, { lockedForRecalculation: value });
+    res.send(project);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on setting recalculation lock');
+  }
+});
+
 module.exports = router;

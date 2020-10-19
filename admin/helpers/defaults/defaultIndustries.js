@@ -27,7 +27,13 @@ const defaultIndustries = [
     generic: '/static/example.xlsx',
     active: true
   },
-  { name: 'Legal', rate: 0, icon: '/static/industries/legal-icon.png', generic: '/static/example.xlsx', active: true },
+  {
+    name: 'Legal',
+    rate: 0,
+    icon: '/static/industries/legal-icon.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
   {
     name: 'Video Games',
     rate: 0,
@@ -42,7 +48,13 @@ const defaultIndustries = [
     generic: '/static/example.xlsx',
     active: true
   },
-  { name: 'Pharma', rate: 0, icon: '/static/industries/more-icon.png', generic: '/static/example.xlsx', active: true },
+  {
+    name: 'Pharma',
+    rate: 0,
+    icon: '/static/industries/more-icon.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
   {
     name: 'Websites, Apps & Platforms',
     rate: 0,
@@ -92,7 +104,91 @@ const defaultIndustries = [
     generic: '/static/example.xlsx',
     active: true
   },
-  { name: 'Other', rate: 0, icon: '/static/industries/more-icon.png', generic: '/static/example.xlsx', active: true }
+  {
+    name: 'Other',
+    rate: 0,
+    icon: '/static/industries/more-icon.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Automotive',
+    rate: 0,
+    icon: '/static/industries/automotive.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'IT',
+    rate: 0,
+    icon: '/static/industries/it.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'E-commerce',
+    rate: 0,
+    icon: '/static/industries/e-commerce.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Education',
+    rate: 0,
+    icon: '/static/industries/education.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Health Care',
+    rate: 0,
+    icon: '/static/industries/healt-care.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Manufacturing',
+    rate: 0,
+    icon: '/static/industries/manufacturing.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Market Research',
+    rate: 0,
+    icon: '/static/industries/market-research.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Marketing',
+    rate: 0,
+    icon: '/static/industries/marketing.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Real Estate',
+    rate: 0,
+    icon: '/static/industries/real-estate.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Software & Web',
+    rate: 0,
+    icon: '/static/industries/software-web.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
+  {
+    name: 'Hospitality',
+    rate: 0,
+    icon: '/static/industries/hospitality.png',
+    generic: '/static/example.xlsx',
+    active: true
+  },
 ];
 
-module.exports = { defaultIndustries }
+
+module.exports = { defaultIndustries };
