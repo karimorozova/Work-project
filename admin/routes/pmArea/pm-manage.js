@@ -25,6 +25,7 @@ const {
   updatePricelistDiscount,
   checkPricelistLangPairs,
   replenishPricelistLangs } = require('../../pricelist');
+const { pushNewLangs } = require('../../multipliers');
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -1005,7 +1006,7 @@ router.post('/check-pricelist-langs', async (req, res) => {
 router.get('/pricelist-new-langs', async (req, res) => {
   const { pricelistId } = req.params;
   try {
-    const { newLangPairs } = await Pricelist.findOne({ _id: pricelistId });
+    const { newLangPairs } = await Pricelist.findOne({ _id: pricelistId }).populate('newLangPairs', ['lang']);
     res.send(newLangPairs);
   } catch (err) {
     console.log(err);
@@ -1013,4 +1014,14 @@ router.get('/pricelist-new-langs', async (req, res) => {
   }
 });
 
+router.post('/add-new-langs', async (req, res) => {
+  const { pricelistId, langArr } = req.body;
+  try {
+    const updatedPricelist = await pushNewLangs(pricelistId, langArr);
+    res.send(updatedPricelist)
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on adding new languages');
+  }
+});
 module.exports = router;
