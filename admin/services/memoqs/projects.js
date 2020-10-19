@@ -3,8 +3,7 @@ const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients } = require('../../models');
-const { createOtherProjectFinanceData } = require('./otherProjects');
-const { checkDocumentHasCorrectStructure } = require('./otherProjects/helpers');
+const { createOtherProjectFinanceData, isAllTasksFinished, checkProjectStructure } = require('./otherProjects');
 
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
@@ -520,35 +519,6 @@ async function updateMemoqProjectsData() {
   }
 }
 
-const updateAllMemoqProjects = async () => {
-  const projects = await MemoqProject.find();
-  const clients = await Clients.find();
-  for (let i = 0; i < projects.length; i++) {
-    let project = projects[i];
-    const { documents, lockedForRecalculation } = project;
-    const doesHaveDocuments = documents !== null && documents !== undefined;
-    project.status = doesHaveDocuments ? isAllTasksFinished(documents) ? 'Closed' : 'In progress' : 'In progress';
-    const doesHaveCorrectStructure = doesHaveDocuments ? checkProjectStructure(clients, project, documents) : false;
-    if (doesHaveCorrectStructure && project.status !== 'In progress' && !lockedForRecalculation) {
-      await createOtherProjectFinanceData({
-        project,
-        documents
-      });
-    }
-  }
-};
-
-const updateMemoqProjectFinance = async (project) => {
-  const clients = await Clients.find();
-  const { documents } = project;
-  project.status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
-  const doesHaveCorrectStructure = checkProjectStructure(clients, project, documents);
-  if (!doesHaveCorrectStructure && project.status === 'In progress') {
-    return project;
-  }
-  return await createOtherProjectFinanceData({ project, documents });
-};
-
 function getUpdatedUsers (users) {
   if (Array.isArray(users)) {
     return users.map(item => {
@@ -567,25 +537,6 @@ function getUpdatedUsers (users) {
     ProjectRoles: { isPm, isTerminologist }
   };
 }
-
-const checkProjectStructure = (clients, memoqProject, documents) => {
-  const doesCorrelateWithOurClient = !!clients.find(({ aliases }) => aliases.includes(memoqProject.client));
-  const doesHaveVendorsDocs = doesHaveVendors(documents);
-  return !!doesCorrelateWithOurClient && doesHaveVendorsDocs;
-
-  function doesHaveVendors (docs) {
-    if (docs.constructor === Object) return checkDocumentHasCorrectStructure(docs);
-    return docs.every(document => checkDocumentHasCorrectStructure(document));
-  }
-};
-
-const isAllTasksFinished = (docs) => {
-  if (docs.constructor === Object) {
-    const { DocumentStatus } = docs;
-    return DocumentStatus === 'TranslationFinished';
-  }
-  return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished');
-};
 
 function getMemoqProjectData (project, languages) {
   const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
@@ -626,6 +577,4 @@ module.exports = {
   setCancelledNameInMemoq,
   updateMemoqProjectsData,
   assignMemoqTranslators,
-  updateAllMemoqProjects,
-  updateMemoqProjectFinance
 }

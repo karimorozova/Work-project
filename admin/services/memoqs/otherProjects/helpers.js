@@ -20,6 +20,25 @@ const checkDocumentHasCorrectStructure = (document) => {
     !!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
 };
 
+const isAllTasksFinished = (docs) => {
+  if (docs.constructor === Object) {
+    const { DocumentStatus } = docs;
+    return DocumentStatus === 'TranslationFinished';
+  }
+  return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished');
+};
+
+const checkProjectStructure = (clients, memoqProject, documents) => {
+  const doesCorrelateWithOurClient = !!clients.find(({ aliases }) => aliases.includes(memoqProject.client));
+  const doesHaveVendorsDocs = doesHaveVendors(documents);
+  return !!doesCorrelateWithOurClient && doesHaveVendorsDocs;
+
+  function doesHaveVendors (docs) {
+    if (docs.constructor === Object) return checkDocumentHasCorrectStructure(docs);
+    return docs.every(document => checkDocumentHasCorrectStructure(document));
+  }
+};
+
 const findFittingIndustryId = async (industryName) => {
   const neededIndustry = await Industries.findOne({
     name: { $regex: new RegExp(`${industryName}`, 'i') }
@@ -52,4 +71,10 @@ const findFittingIndustryId = async (industryName) => {
   return neededIndustry;
 };
 
-module.exports = { filterMemoqProjectsVendors, checkDocumentHasCorrectStructure, findFittingIndustryId };
+module.exports = {
+  filterMemoqProjectsVendors,
+  checkDocumentHasCorrectStructure,
+  findFittingIndustryId,
+  isAllTasksFinished,
+  checkProjectStructure
+};

@@ -1,8 +1,14 @@
 const { getFilteredOtherProjects } = require('./filteredOtherProjects');
 const { createOtherProjectFinanceData } = require('./financeData');
-const { filterMemoqProjectsVendors } = require('./helpers');
+const { filterMemoqProjectsVendors, isAllTasksFinished, checkProjectStructure } = require('./helpers');
+const { updateMemoqProjectFinance, updateAllMemoqProjects } = require('./otherProjectUpdates');
+
 module.exports = {
   getFilteredOtherProjects,
   createOtherProjectFinanceData,
-  filterMemoqProjectsVendors
+  filterMemoqProjectsVendors,
+  isAllTasksFinished,
+  checkProjectStructure,
+  updateMemoqProjectFinance,
+  updateAllMemoqProjects
 };

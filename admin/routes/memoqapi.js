@@ -8,18 +8,21 @@ const {
   getProjectTranslationDocs,
   getProjectAnalysis,
   getProjectUsers,
-  getMemoqFileId,
-  updateAllMemoqProjects,
-  updateMemoqProjectFinance
+  getMemoqFileId
 } = require('../services/memoqs/projects');
-const { getMemoqProject, getProjectAfterUpdate } = require('../services/memoqs/otherProjects/getMemoqProject');
+const { getProjectAfterUpdate } = require('../services/memoqs/otherProjects/getMemoqProject');
 const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require('../services/memoqs/files');
 const { getMemoqTemplates } = require("../services/memoqs/resources");
 const { assignProjectManagers } = require('../projects/updates');
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
 const { updateProjectMetrics } = require("../projects/metrics");
-const { getFilteredOtherProjects, filterMemoqProjectsVendors } = require('../services/memoqs/otherProjects');
+const {
+  getFilteredOtherProjects,
+  filterMemoqProjectsVendors,
+  updateAllMemoqProjects,
+  updateMemoqProjectFinance
+} = require('../services/memoqs/otherProjects');
 
 router.get('/users', async (req, res) => {
 	try {
