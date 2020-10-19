@@ -263,7 +263,16 @@ function industries() {
   return Industries.find({}).then(async industries => {
     if (!industries.length) {
       for (let industry of defaultIndustries) {
-        console.log(industry.name);
+        await new Industries(industry).save().then(industry => {
+          console.log(`industry ${industry.name} was saved!`);
+        }).catch(err => {
+          console.log(`Industry ${industry.name} wasn't saved. Because of ${err.message}`);
+        });
+      }
+    } else if (industries.length < defaultIndustries.length) {
+      const mapped = industries.map(item => item.name);
+      const missingIndustries = defaultIndustries.filter(industry => !mapped.includes(industry.name));
+      for (let industry of missingIndustries) {
         await new Industries(industry).save().then(industry => {
           console.log(`industry ${industry.name} was saved!`);
         }).catch(err => {
@@ -278,8 +287,76 @@ function services() {
   return Services.find({})
     .then(async (services) => {
       if (!services.length) {
+        const steps = await Step.find({}, {title: 1});
         for (const service of defaultServices) {
-
+          switch (service.title) {
+            case 'Translation':
+            case 'Localization':
+            case 'Certified Translation':
+            case 'SEO Translation':
+            case 'Transcreation':
+            case 'Official Translation':
+              const translationSteps = steps.filter(step => step.title === 'Translation' || step.title === 'Revising');
+              for (let i = 0; i < translationSteps.length; i++) {
+                service.steps.push({
+                  stage: `stage${i + 1}`,
+                  step: ObjectId(translationSteps[i]._id)
+                })
+              }
+              break;
+            case 'Voice Over':
+            case 'Audio':
+              const recordingStep = steps.find(step => step.title === 'Recording');
+              recordingStep && service.steps.push({
+                stage: 'stage1',
+                steps: ObjectId(recordingStep._id),
+              });
+              break;
+            case 'DTP':
+            case 'Localized Graphic Design':
+              const dtpAndGraphicDesignSteps = steps.filter(step => step.title === 'Graphic Design'
+                || step.title === 'QA');
+              for (let i = 0; i < dtpAndGraphicDesignSteps.length; i++) {
+                service.steps.push({
+                  stage: `stage${i + 1}`,
+                  step: ObjectId(dtpAndGraphicDesignSteps[i]._id)
+                })
+              }
+              break;
+            case 'Copywriting':
+              const copywritingAndProofreadingSteps = steps.filter(step => step.title === 'Copywriting'
+                || step.title === 'Proofreading');
+              for (let i = 0; i < copywritingAndProofreadingSteps.length; i++) {
+                service.steps.push({
+                  stage: `stage${i + 1}`,
+                  step: ObjectId(copywritingAndProofreadingSteps[i]._id)
+                })
+              }
+              break;
+            case 'Proofing':
+              const revisingStep = steps.find(step => step.title === 'Revising');
+              revisingStep && service.steps.push({
+                stage: 'stage1',
+                step: ObjectId(revisingStep._id),
+              });
+              break;
+            case 'Linguistic QA':
+              const icrStep = steps.find(step => step.title === 'ICR');
+              icrStep &&  service.steps.push({
+                stage: 'stage1',
+                step: ObjectId(icrStep._id),
+              });
+              break;
+            case 'Subtitling':
+              const subtitlingAndRevisingSteps = steps.filter(step => step.title === 'Subtitling'
+                || step.title === 'Revising');
+              for (let i = 0; i < subtitlingAndRevisingSteps.length; i++) {
+                service.steps.push({
+                  stage: `stage${i + 1}`,
+                  step: ObjectId(subtitlingAndRevisingSteps[i]._id)
+                })
+              }
+          }
           await new Services(service).save()
             .then((service) => {
               console.log(`Service ${service.title} was saved!`);

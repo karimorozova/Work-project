@@ -497,7 +497,7 @@ async function updateMemoqProjectsData() {
     const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
     for (let project of allProjects) {
 	    const { ServerProjectGuid } = project;
-			    if (project.Name.indexOf('PngSys') === -1) {
+	      if (project.Name.indexOf('PngSys') === -1) {
         let users = await getProjectUsers(ServerProjectGuid);
         users = getUpdatedUsers(users);
         const documents = await getProjectTranslationDocs(ServerProjectGuid);
@@ -505,6 +505,7 @@ async function updateMemoqProjectsData() {
         memoqProject.status = documents !== null && documents !== undefined && (isAllTasksFinished(documents) ? 'Closed' : 'In progress');
         const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
           checkProjectStructure(clients, memoqProject, documents) : false;
+				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ? false : memoqProject.lockedForRecalculation;
         memoqProject = doesHaveCorrectStructure && memoqProject.status !== 'In progress' ?
           await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
         await MemoqProject.updateOne(
@@ -525,11 +526,11 @@ const updateAllMemoqProjects = async () => {
   const clients = await Clients.find();
   for (let i = 0; i < projects.length; i++) {
     let project = projects[i];
-    const { documents } = project;
+    const { documents, lockedForRecalculation } = project;
     const doesHaveDocuments = documents !== null && documents !== undefined;
     project.status = doesHaveDocuments ? isAllTasksFinished(documents) ? 'Closed' : 'In progress' : 'In progress';
     const doesHaveCorrectStructure = doesHaveDocuments ? checkProjectStructure(clients, project, documents) : false;
-    if (doesHaveCorrectStructure && project.status !== 'In progress') {
+    if (doesHaveCorrectStructure && project.status !== 'In progress' && !lockedForRecalculation) {
       await createOtherProjectFinanceData({
         project,
         documents

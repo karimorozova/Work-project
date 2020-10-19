@@ -242,7 +242,7 @@ export default {
       try {
         const result = await this.$http.post("/vendorsapi/rates/change-pricelist/" + this.vendorId, {
           _id: id,
-          price: parseFloat(this.currentPrice).toFixed(3),
+          price: this.currentPrice,
           altered: true,
           notification: "Price disconnected from function",
         });
@@ -484,7 +484,7 @@ export default {
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: -225%;
+    bottom: -55px;
     left: 50%;
     margin-left: -75px;
     opacity: 0;
@@ -513,7 +513,7 @@ export default {
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 150%;
+    bottom: 30px;
     left: 50%;
     margin-left: -75px;
     opacity: 0;
