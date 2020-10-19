@@ -569,7 +569,7 @@ function getUpdatedUsers (users) {
 }
 
 const checkProjectStructure = (clients, memoqProject, documents) => {
-  const doesCorrelateWithOurClient = clients.find(({ aliases }) => aliases.includes(memoqProject.client));
+  const doesCorrelateWithOurClient = !!clients.find(({ aliases }) => aliases.includes(memoqProject.client));
   const doesHaveVendorsDocs = doesHaveVendors(documents);
   return !!doesCorrelateWithOurClient && doesHaveVendorsDocs;
 
