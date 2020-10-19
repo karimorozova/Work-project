@@ -16,7 +16,7 @@ const defaultIndustries = [
   {
     name: 'Medical Devices',
     rate: 0,
-    icon: '/static/industries/more-icon.png',
+    icon: '/static/industries/medical-devices.png',
     generic: '/static/example.xlsx',
     active: true
   },
@@ -38,34 +38,34 @@ const defaultIndustries = [
     name: 'Video Games',
     rate: 0,
     icon: '/static/industries/video-games.png',
-    generic: ['/static/example.xlsx'],
+    generic: '/static/example.xlsx',
     active: true
   },
   {
     name: 'E-Learning',
     rate: 0,
-    icon: '/static/industries/more-icon.png',
+    icon: '/static/industries/elerning.png',
     generic: '/static/example.xlsx',
     active: true
   },
   {
     name: 'Pharma',
     rate: 0,
-    icon: '/static/industries/more-icon.png',
+    icon: '/static/industries/pharma.png',
     generic: '/static/example.xlsx',
     active: true
   },
   {
     name: 'Websites, Apps & Platforms',
     rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
+    icon: '/static/industries/website-apps-platforms.png',
     generic: '/static/example.xlsx',
     active: true
   },
   {
     name: 'Museums & Tourist Attractions',
     rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
+    icon: '/static/industries/museums-tourist-attraction.png',
     generic: '/static/example.xlsx',
     active: true
   },

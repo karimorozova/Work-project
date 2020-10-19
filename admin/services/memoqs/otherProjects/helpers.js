@@ -14,10 +14,10 @@ const filterMemoqProjectsVendors = users => {
 };
 
 const checkDocumentHasCorrectStructure = (document) => {
-  return document !== null && document.hasOwnProperty('UserAssignments') &&
+   return  document !== null && document.hasOwnProperty('UserAssignments') &&
     Object.entries(document.UserAssignments).length !== 0 &&
     document.UserAssignments.constructor === Object &&
-    document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
+    !!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
 };
 
 const findFittingIndustryId = async (industryName) => {
