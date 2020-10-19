@@ -11,7 +11,7 @@ const updateAllMemoqProjects = async () => {
     const doesHaveDocuments = documents !== null && documents !== undefined;
     project.status = doesHaveDocuments ? isAllTasksFinished(documents) ? 'Closed' : 'In progress' : 'In progress';
     const doesHaveCorrectStructure = doesHaveDocuments ? checkProjectStructure(clients, project, documents) : false;
-    if (doesHaveCorrectStructure && project.status !== 'In progress' && !lockedForRecalculation) {
+    if (doesHaveCorrectStructure && !lockedForRecalculation) {
       await createOtherProjectFinanceData({
         project,
         documents
@@ -25,7 +25,7 @@ const updateMemoqProjectFinance = async (project) => {
   const { documents } = project;
   project.status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
   const doesHaveCorrectStructure = checkProjectStructure(clients, project, documents);
-  if (!doesHaveCorrectStructure && project.status === 'In progress') {
+  if (!doesHaveCorrectStructure) {
     return project;
   }
   return await createOtherProjectFinanceData({ project, documents });

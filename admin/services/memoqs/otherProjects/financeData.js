@@ -11,7 +11,6 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
 	const clients = await Clients.find();
 	const vendors = await Vendors.find();
 	const { additionalData, neededCustomer } = getUpdatedProjectData(project, clients);
-    console.log({ name: project.name, status: project.status, clientName: neededCustomer.name });
 	if(!neededCustomer) return project;
 	const updatedProject = fromCron ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
 	const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
