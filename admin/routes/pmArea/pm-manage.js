@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { User, Clients, Delivery, Projects } = require("../../models");
+const { User, Clients, Delivery, Projects, Pricelist } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
@@ -21,7 +21,10 @@ const { getClientRequest, updateClientRequest, addRequestFile, removeRequestFile
 const { updateMemoqProjectUsers, cancelMemoqDocs, setCancelledNameInMemoq } = require("../../services/memoqs/projects");
 const { getMemoqUsers } = require("../../services/memoqs/users");
 const { projectCancelledMessage, projectMiddleCancelledMessage, projectDeliveryMessage, tasksMiddleCancelledMessage } = require("../../emailMessages/clientCommunication")
-const { updatePricelistDiscount } = require('../../pricelist');
+const {
+  updatePricelistDiscount,
+  checkPricelistLangPairs,
+  replenishPricelistLangs } = require('../../pricelist');
 const fs = require("fs");
 
 router.get("/project", async (req, res) => {
@@ -981,6 +984,32 @@ router.post('/update-discount/:id', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating pricelist\'s discount table');
+  }
+});
+
+router.post('/check-pricelist-langs', async (req, res) => {
+  const { pricelistId, langPairs } = req.body;
+  try {
+    const newLangPairs = checkPricelistLangPairs(pricelistId, langPairs);
+    if (newLangPairs.length) {
+      await replenishPricelistLangs(pricelistId, newLangPairs);
+      res.send('Replenished!');
+    }
+    res.send('Doesn\'t need to update!');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on checking pricelist languages!');
+  }
+});
+
+router.get('/pricelist-new-langs', async (req, res) => {
+  const { pricelistId } = req.params;
+  try {
+    const { newLangPairs } = await Pricelist.findOne({ _id: pricelistId });
+    res.send(newLangPairs);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting pricelist\'s new languages!');
   }
 });
 

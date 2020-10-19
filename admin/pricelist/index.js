@@ -1,5 +1,5 @@
 const { getPricelist, getPricelists, getUpdatedPricelist } = require("./getPrices");
-const { saveNewPricelist, deletePricelist } = require("./pricelists");
+const { saveNewPricelist, deletePricelist, checkPricelistLangPairs, replenishPricelistLangs } = require("./pricelists");
 const { getRatePricelist } = require('./getPricelist');
 const { changeMainRatePricelist } = require('./changePricelist');
 const { bindClientRates } = require('./bindRates');
@@ -14,5 +14,7 @@ module.exports = {
   getRatePricelist,
   changeMainRatePricelist,
   bindClientRates,
-  updatePricelistDiscount
+  updatePricelistDiscount,
+  checkPricelistLangPairs,
+  replenishPricelistLangs
 };

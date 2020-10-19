@@ -48,6 +48,30 @@ const checkClientUsage = async (pricelistId) => {
   return clients.some(client => (
     client.defaultPricelist.toString() === pricelistId.toString()
   ))
+};
+
+const checkPricelistLangPairs = async (pricelistId, userNewLangs) => {
+  const { newLangPairs: existingLangPairs } = pricelistId ? await Pricelist.findOne({ _id: pricelistId })
+    : await Pricelist.findOne({ isVendorDefault: true });
+  let newLangPairs = [];
+  for (let newLangPair of userNewLangs) {
+    const stringifiedArr = existingLangPairs.map(pair => `${pair.source} - ${pair.target}`);
+    if (!stringifiedArr.includes(newLangPair)) {
+      const splittedString = newLangPair.split(' - ');
+      newLangPairs.push({
+        source: splittedString[0],
+        target: splittedString[1],
+      })
+    }
+  }
+  return newLangPairs;
+};
+
+const replenishPricelistLangs = async (pricelistId, langsToAdd) => {
+  const { _id, newLangPairs: existingLangPairs } = pricelistId ? await Pricelist.findOne({ _id: pricelistId })
+    : await Pricelist.findOne({ isVendorDefault: true });
+  existingLangPairs.push(...langsToAdd);
+  return await Pricelist.updateOne({ _id }, { newLangPairs: existingLangPairs });
 }
 
-module.exports = { saveNewPricelist, deletePricelist };
+module.exports = { saveNewPricelist, deletePricelist, checkPricelistLangPairs, replenishPricelistLangs };

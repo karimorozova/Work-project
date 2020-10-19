@@ -12,6 +12,10 @@ const PricelistSchema = new mongoose.Schema({
   isActive: {
     type: Boolean
   },
+  newLangPairs: {
+    type: Array,
+    default: []
+  },
   basicPricesTable: [{
     type: {
       type: String,
