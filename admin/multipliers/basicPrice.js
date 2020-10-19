@@ -1,6 +1,5 @@
 const { Pricelist, Languages, CurrencyRatio } = require('../models');
 const ObjectId = require('mongodb').ObjectID;
-const { getUpdatedPricelist } = require('../pricelist');
 
 const getFilteredBasicPrice = async (filteredBasicPrices, filters, needToSplice) => {
   const { countFilter } = filters;
@@ -94,7 +93,7 @@ const pushNewLangs = async (pricelistId, newLangs) => {
       gbpBasicPrice: GBP
     })
   }
-  return await getUpdatedPricelist({ _id: pricelistId }, { basicPricesTable });
+  return await Pricelist.updateOne({ _id: pricelistId }, { basicPricesTable });
 };
 
 module.exports = { getFilteredBasicPrices, updateBasicPrices, updateBasicPriceValue, pushNewLangs };

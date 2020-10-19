@@ -995,7 +995,7 @@ router.post('/check-pricelist-langs', async (req, res) => {
     if (newLangPairs.length) {
       await replenishPricelistLangs(pricelistId, newLangPairs);
       res.send('Replenished!');
-    }else{
+    } else {
       res.send('Doesn\'t need to update!');
     }
   } catch (err) {
@@ -1018,8 +1018,9 @@ router.get('/pricelist-new-langs', async (req, res) => {
 router.post('/add-new-langs', async (req, res) => {
   const { pricelistId, langArr } = req.body;
   try {
-    const updatedPricelist = await pushNewLangs(pricelistId, langArr);
-    res.send(updatedPricelist)
+    await pushNewLangs(pricelistId, langArr);
+    const updatedPricelist = await Pricelist.findOne({ _id: pricelistId });
+    res.send(updatedPricelist);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on adding new languages');
