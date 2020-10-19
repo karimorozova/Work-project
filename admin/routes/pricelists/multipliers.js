@@ -8,7 +8,8 @@ const {
   updateBasicPrices,
   getPricelistCombinations,
   addNewMultiplier,
-  updateMultiplier
+  updateMultiplier,
+  updatePriceMultiplier
 } = require('../../multipliers');
 
 router.post('/step-multipliers/:id', async (req, res) => {
@@ -37,8 +38,9 @@ router.post('/step-multipliers-update/:id', async (req, res) => {
 router.get('/industry-multipliers/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const { industryMultipliersTable } = await Pricelist.findOne({ _id: id}, {_id: 0, industryMultipliersTable: 1})
+    let { industryMultipliersTable } = await Pricelist.findOne({ _id: id}, {_id: 0, industryMultipliersTable: 1})
       .populate('industryMultipliersTable.industry');
+    industryMultipliersTable = industryMultipliersTable.filter(row => row.isActive === true);
     res.send(industryMultipliersTable);
   } catch (err) {
     console.log(err);
@@ -102,6 +104,17 @@ router.post('/add-new-multiplier', async (req, res) => {
     res.status(500).send('Error on adding new multiplier');
   }
 })
+
+router.post('/update-language-activity', async (req, res) => {
+  const { lang, value } = req.body;
+  try {
+    await updatePriceMultiplier(lang, value);
+    res.send('Saved')
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating price multiplier');
+  }
+});
 
 router.post('/update-multiplier', async (req, res) => {
   const { oldMultiplier, key } = req.body;
