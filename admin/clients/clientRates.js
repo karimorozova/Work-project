@@ -1,7 +1,7 @@
 const { Clients, Step, Services, Pricelist, Languages, Industries } = require('../models');
 
 const _ = require('lodash');
-const { multiplyPrices, getArrayDifference } = require('../multipliers');
+const { multiplyPrices, getArrayDifference } = require('../multipliers/pricelist');
 const {
   updateClientLangPairs,
   updateClientStepMultipliers,

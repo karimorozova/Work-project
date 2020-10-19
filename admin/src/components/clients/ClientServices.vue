@@ -196,6 +196,7 @@ export default {
       deleteIndex: -1,
       isTableDropMenu: true,
       newRow: false,
+	    defaultPriceList: null,
     };
   },
   methods: {
@@ -329,6 +330,11 @@ export default {
           this.clientServices.length && this.$emit("updateRates", true);
         });
 
+	      await this.$http.post('/pm-manage/check-pricelist-langs',{
+		      pricelistId: this.defaultPriceList,
+		      langPairs: this.getArrayLanguagesCombinations(this.currentSource,this.currentTargets)
+	      });
+
         this.alertToggle({
           message: "Services are saved",
           isShow: true,
@@ -345,6 +351,10 @@ export default {
         this.newRow = false;
       }
     },
+
+	  getArrayLanguagesCombinations(source, targets) {
+		  return targets.map(item => `${ source.lang } - ${ item.lang }`)
+	  },
 
     async manageDeleteClick(index) {
       if (!this.clientServices[index]._id) {
@@ -413,8 +423,11 @@ export default {
       if (!this.currentClient._id) {
         const client = await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);
         this.clientServices = client.body.services;
+        this.defaultPriceList = client.body.defaultPricelist;
       } else {
         this.clientServices = this.currentClient.services;
+	      this.defaultPriceList = this.currentClient.defaultPricelist;
+
       }
     },
   },

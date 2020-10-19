@@ -991,12 +991,13 @@ router.post('/update-discount/:id', async (req, res) => {
 router.post('/check-pricelist-langs', async (req, res) => {
   const { pricelistId, langPairs } = req.body;
   try {
-    const newLangPairs = checkPricelistLangPairs(pricelistId, langPairs);
+    const newLangPairs =  await checkPricelistLangPairs(pricelistId, langPairs);
     if (newLangPairs.length) {
       await replenishPricelistLangs(pricelistId, newLangPairs);
       res.send('Replenished!');
+    }else{
+      res.send('Doesn\'t need to update!');
     }
-    res.send('Doesn\'t need to update!');
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on checking pricelist languages!');
