@@ -80,10 +80,13 @@ const updateBasicPriceValue = async ({ USD, GBP }) => {
 }
 
 const pushNewLangs = async (pricelistId, newLangs) => {
-  const { basicPricesTable } = await Pricelist.findOne({ _id: pricelistId });
+  let { basicPricesTable, newLangPairs } = await Pricelist.findOne({ _id: pricelistId });
   const currencyRatio = await CurrencyRatio.find();
   const { USD, GBP } = currencyRatio;
   for (let { source, target } of newLangs) {
+    newLangPairs = newLangPairs.filter(row => (
+      row.source.toString() !== source._id.toString() && row.target.toString() !== target._id.toString()
+    ));
     const type = source._id.toString() === target._id.toString() ? 'Mono' : 'Duo';
     basicPricesTable.push({
       sourceLanguage: ObjectId(source._id),
@@ -93,7 +96,7 @@ const pushNewLangs = async (pricelistId, newLangs) => {
       gbpBasicPrice: GBP
     })
   }
-  return await Pricelist.updateOne({ _id: pricelistId }, { basicPricesTable });
+  return await Pricelist.updateOne({ _id: pricelistId }, { basicPricesTable, newLangPairs });
 };
 
 module.exports = { getFilteredBasicPrices, updateBasicPrices, updateBasicPriceValue, pushNewLangs };

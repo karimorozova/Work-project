@@ -1022,8 +1022,7 @@ router.post('/add-new-langs', async (req, res) => {
 	const { pricelistId, langArr } = req.body;
 	try {
 		await pushNewLangs(pricelistId, langArr);
-		const updatedPricelist = await Pricelist.findOne({ _id: pricelistId });
-		res.send(updatedPricelist);
+		res.send('Updated!');
 	} catch (err) {
 		console.log(err);
 		res.status(500).send('Error on adding new languages');

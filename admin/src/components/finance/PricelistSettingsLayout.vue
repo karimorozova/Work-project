@@ -80,8 +80,8 @@
 			}),
 			async savePairs(dataArr) {
 				try {
-					const result = await this.$http.post('/pm-manage/check-pricelist-langs',{
-						langPairs: dataArr,
+					const result = await this.$http.post('/pm-manage/add-new-langs',{
+						langArr: dataArr,
             pricelistId: this.$route.params.id,
           });
 					console.log(result);
