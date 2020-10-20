@@ -1,6 +1,6 @@
 const defaultIndustries = [
   {
-    name: 'iGaming (Casino, Slot games, Gambling, etc.)',
+    name: 'iGaming',
     rate: 0,
     icon: '/static/industries/casino-poker-igaming.png',
     generic: '/static/example.xlsx',
