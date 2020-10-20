@@ -9,7 +9,7 @@
     .title
       .title__title(v-if="this.pricelists") {{ this.pricelists.find((i) => i._id == priceId).name }}
       .buttons
-        .title__return
+        .title__return(v-if="newLanguagesPairs.length")
           .update-btn(@click="openModal") Update Languages pairs
         .title__return
           Button(value="Back", @clicked="goBack")
@@ -54,7 +54,7 @@
 	import CurrencyRatio from "./pricelistSettings/CurrencyRatio";
 	import Button from "../Button";
 	import DiscountChart from "./pricelistSettings/DiscountChart";
-	import { mapGetters, mapActions } from "vuex";
+	import { mapActions } from "vuex";
 
 	export default {
 		data() {
@@ -80,25 +80,25 @@
 			}),
 			async savePairs(dataArr) {
 				try {
-					const result = await this.$http.post('/pm-manage/add-new-langs',{
+					const result = await this.$http.post('/pm-manage/add-new-langs', {
 						langArr: dataArr,
-            pricelistId: this.$route.params.id,
-          });
-					console.log(result);
-
+						pricelistId: this.$route.params.id,
+					});
+					this.newLanguagesPairs = result.data;
+					this.getAllData();
+					this.refreshResultTable();
 					this.alertToggle({
 						message: "New Languages Pairs saved",
 						isShow: true,
 						type: "success",
 					});
-				}catch (err) {
+				} catch (err) {
 					this.alertToggle({
 						message: "Error on saving Languages Pairs.",
 						isShow: true,
 						type: "error",
 					});
 				}
-				console.log(dataArr);
 				this.languageModal = false;
 			},
 			closeModal() {
@@ -107,18 +107,18 @@
 			openModal() {
 				this.languageModal = true;
 			},
-      async getNewLanguagesPairs(){
+			async getNewLanguagesPairs() {
 				try {
-          const result = await this.$http.get(`/pm-manage/pricelist-new-langs/${this.$route.params.id}`);
-          this.newLanguagesPairs = result.data;
-				}catch (err) {
+					const result = await this.$http.get(`/pm-manage/pricelist-new-langs/${ this.$route.params.id }`);
+					this.newLanguagesPairs = result.data;
+				} catch (err) {
 					this.alertToggle({
 						message: "Error on getting new Languages Pairs.",
 						isShow: true,
 						type: "error",
 					});
 				}
-      },
+			},
 			async getPricelists() {
 				try {
 					const result = await this.$http.get("/prices/pricelists");
