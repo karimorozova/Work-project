@@ -2,7 +2,7 @@
   .layout
     .new__languages(v-if="languageModal")
       NewLanguageModal(
-        :languagesArr="[{source: {lang:'asdasdasd'}, target: {lang:'asdasdasd'} }, {source: {lang:'1212'}, target: {lang:'asdasdasd'}}]"
+        :languagesArr="newLanguagesPairs"
         @savePairs="savePairs"
         @closePairs="closeModal"
       )
@@ -70,16 +70,36 @@
 				isRefresh: false,
 				isRefreshResultTable: false,
 				languageModal: false,
-        newLanguagespairs: [],
+				newLanguagesPairs: [],
+
 			};
 		},
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
 			}),
-			savePairs(dataArr) {
+			async savePairs(dataArr) {
+				try {
+					const result = await this.$http.post('/pm-manage/check-pricelist-langs',{
+						langPairs: dataArr,
+            pricelistId: this.$route.params.id,
+          });
+					console.log(result);
 
+					this.alertToggle({
+						message: "New Languages Pairs saved",
+						isShow: true,
+						type: "success",
+					});
+				}catch (err) {
+					this.alertToggle({
+						message: "Error on saving Languages Pairs.",
+						isShow: true,
+						type: "error",
+					});
+				}
 				console.log(dataArr);
+				this.languageModal = false;
 			},
 			closeModal() {
 				this.languageModal = false;
@@ -87,6 +107,18 @@
 			openModal() {
 				this.languageModal = true;
 			},
+      async getNewLanguagesPairs(){
+				try {
+          const result = await this.$http.get(`/pm-manage/pricelist-new-langs/${this.$route.params.id}`);
+          this.newLanguagesPairs = result.data;
+				}catch (err) {
+					this.alertToggle({
+						message: "Error on getting new Languages Pairs.",
+						isShow: true,
+						type: "error",
+					});
+				}
+      },
 			async getPricelists() {
 				try {
 					const result = await this.$http.get("/prices/pricelists");
@@ -186,6 +218,7 @@
 			this.getDefaultSteps();
 			this.getDefaultUnits();
 			this.getDefaultIndustries();
+			this.getNewLanguagesPairs();
 		},
 		components: {
 			LangTable,
@@ -203,7 +236,7 @@
   .new__languages {
     position: absolute;
     z-index: 9999;
-    transform: translate(100%, 100%);
+    transform: translate(120%, 100%);
   }
 
   .title {
@@ -245,7 +278,7 @@
     }
   }
 
-  .buttons{
+  .buttons {
     display: flex;
   }
 

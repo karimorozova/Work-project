@@ -52,7 +52,7 @@
   .language {
     background: #fff;
     box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
-    width: 400px;
+    width: 360px;
     padding: 20px;
 
     &__pairs {

@@ -1004,26 +1004,29 @@ router.post('/check-pricelist-langs', async (req, res) => {
   }
 });
 
-router.get('/pricelist-new-langs', async (req, res) => {
-  const { pricelistId } = req.params;
-  try {
-    const { newLangPairs } = await Pricelist.findOne({ _id: pricelistId }).populate('newLangPairs', ['lang']);
-    res.send(newLangPairs);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on getting pricelist\'s new languages!');
-  }
+router.get('/pricelist-new-langs/:id', async (req, res) => {
+	const { id } = req.params;
+	try {
+		const { newLangPairs } = await Pricelist.findOne({ _id: id })
+				.populate('newLangPairs.source', ['lang'])
+				.populate('newLangPairs.target', ['lang']);
+
+		res.send(newLangPairs);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting pricelist\'s new languages!');
+	}
 });
 
 router.post('/add-new-langs', async (req, res) => {
-  const { pricelistId, langArr } = req.body;
-  try {
-    await pushNewLangs(pricelistId, langArr);
-    const updatedPricelist = await Pricelist.findOne({ _id: pricelistId });
-    res.send(updatedPricelist);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on adding new languages');
-  }
+	const { pricelistId, langArr } = req.body;
+	try {
+		await pushNewLangs(pricelistId, langArr);
+		const updatedPricelist = await Pricelist.findOne({ _id: pricelistId });
+		res.send(updatedPricelist);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on adding new languages');
+	}
 });
 module.exports = router;
