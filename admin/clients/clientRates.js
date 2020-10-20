@@ -105,11 +105,7 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) =>
       ));
       altered = neededIndustryRow ? neededIndustryRow.altered : false;
   }
-  if (altered) {
-    replacementItem.notification = 'Pricelist data has been updated';
-  } else {
-    replacementItem.notification = `${personKey}'s data is different from pricelist`;
-  }
+  replacementItem.notification = `${personKey}'s data is different from pricelist`;
   const itemToUpdateIndex = findIndexToReplace(arr, _id);
   arr.splice(itemToUpdateIndex, 1, replacementItem);
   return arr;
