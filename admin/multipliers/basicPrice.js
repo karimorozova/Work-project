@@ -1,5 +1,7 @@
 const { Pricelist, Languages, CurrencyRatio } = require('../models');
 const ObjectId = require('mongodb').ObjectID;
+const { tableKeys } = require('../enums');
+const { postNotifications } = require('./relatedUsersNotifications');
 
 const getFilteredBasicPrice = async (filteredBasicPrices, filters, needToSplice) => {
   const { countFilter } = filters;
@@ -39,6 +41,7 @@ const updateBasicPrices = async (basicPriceToUpdate, priceListId) => {
     ));
     basicPriceToUpdate.altered = true;
     await basicPricesTable.splice(basicPriceIndex, 1, basicPriceToUpdate)
+    await postNotifications(priceListId, basicPriceToUpdate, tableKeys.basicPricesTable);
     await Pricelist.updateOne({ _id: priceListId }, {basicPricesTable});
   } catch (err) {
     console.log(err);
