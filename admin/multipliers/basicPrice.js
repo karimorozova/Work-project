@@ -84,9 +84,10 @@ const pushNewLangs = async (pricelistId, newLangs) => {
   const currencyRatio = await CurrencyRatio.find();
   const { USD, GBP } = currencyRatio;
   for (let { source, target } of newLangs) {
-    newLangPairs = newLangPairs.filter(row => (
-      row.source.toString() !== source._id.toString() && row.target.toString() !== target._id.toString()
+    const rowToDeleteIndex = newLangPairs.findIndex(row => (
+      row.source.toString() === source._id && row.target.toString() === target._id
     ));
+    newLangPairs.splice(rowToDeleteIndex, 1);
     const type = source._id.toString() === target._id.toString() ? 'Mono' : 'Duo';
     basicPricesTable.push({
       sourceLanguage: ObjectId(source._id),
