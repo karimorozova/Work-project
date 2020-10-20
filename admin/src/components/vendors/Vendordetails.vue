@@ -25,7 +25,7 @@
               label.block-item__label.block-item_relative First Name:
                 Asterisk(:customStyle="asteriskStyle")
               input.block-item__input-filed(
-                :class="{ 'block-item_error-shadow': !currentVendor.firstName && isSaveClicked }",
+                :class="{ 'block-item_error-shadow': errors.includes('Please, enter valid first name.') && isSaveClicked }",
                 type="text",
                 placeholder="First Name",
                 :value="currentVendor.firstName",
@@ -456,7 +456,7 @@
 			async setTest() {
 				const vendor = {
 					id: this.currentVendor._id,
-					isTest: event.target.checked,
+					isTest: e.target.checked,
 				};
 				try {
 					await this.updateVendorStatus(vendor);
@@ -536,6 +536,9 @@
 					this.errors = [];
 					if(!this.currentVendor.firstName || !textReg.test(this.currentVendor.firstName))
 						this.errors.push("Please, enter valid first name.");
+					if(/^\s+$/.exec(this.currentVendor.firstName)) {
+						this.errors.push("Please, enter valid first name.")
+					}
 					if(this.currentVendor.surname && !textReg.test(this.currentVendor.surname))
 						this.errors.push("Please, enter valid surname.");
 					if(!this.currentVendor.industries.length) this.errors.push("Please, choose at least one industry.");
@@ -568,6 +571,8 @@
 						isShow: true,
 						type: "error",
 					});
+				} finally {
+					this.closeErrors()
 				}
 			},
 			updateProp(e, prop) {
