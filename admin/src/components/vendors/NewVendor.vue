@@ -22,7 +22,7 @@
                 .block-item
                     label.block-item__label.block-item_relative First Name:
                         Asterisk(:customStyle="asteriskStyle")
-                    input.block-item__input-field(:class="{'block-item_error-shadow': !vendor.firstName && isSaveClicked}" type="text" placeholder="First Name" :value="vendor.firstName" @change="(e) => updateProp(e,'firstName')")
+                    input.block-item__input-field(:class="{'block-item_error-shadow': errors.includes('Please, enter valid first name.') && isSaveClicked}" type="text" placeholder="First Name" :value="vendor.firstName" @change="(e) => updateProp(e,'firstName')")
                 .block-item
                     label Surname:
                     input.block-item__input-field(type="text" placeholder="Surname" :value="vendor.surname" @change="(e) => updateProp(e,'surname')")
@@ -160,7 +160,8 @@ export default {
         isTest: false,
         professionalLevel: ""
       },
-      isFileError: false
+      isFileError: false,
+      onlySpaces: /^\s+$/,
     };
   },
   methods: {
@@ -205,6 +206,9 @@ export default {
       this.errors = [];
       if (!this.vendor.firstName || !textReg.test(this.vendor.firstName))
         this.errors.push("Please, enter valid first name.");
+	    if(this.onlySpaces.exec(this.vendor.firstName)) {
+		    this.errors.push("Please, enter valid first name.")
+	    }
       if (this.vendor.surname && !textReg.test(this.vendor.surname))
         this.errors.push("Please, enter valid surname.");
       if (!this.vendor.industries.length)
