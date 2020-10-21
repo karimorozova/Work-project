@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const LangTierSchema = new mongoose.Schema({
-  industries: [{
+  // industry: [{
     industry: {
       type: String,
       trim: true
@@ -26,7 +26,7 @@ const LangTierSchema = new mongoose.Schema({
         }
       }]
     }]
-  }],
+  // }],
 });
 
 const LangTier = mongoose.model('LangTier', LangTierSchema);
