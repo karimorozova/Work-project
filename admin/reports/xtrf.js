@@ -249,7 +249,7 @@ async function getXtrfLqaReport(filters) {
             });
           }
           memoqVendors.splice(memoqIndex, 1, memoqDoc);
-        } else if (!!memoqDoc && industry.name.toString() === 'iGaming (Casino, Slot games, Gambling, etc.)') {
+        } else if (!!memoqDoc && industry.name.toString() === 'iGaming') {
           const gamingVendorIndex = memoqDoc.gaming.vendors.findIndex(vendor => vendor.name === name);
           if (gamingVendorIndex !== -1) {
             const updatedVendor = {
@@ -263,7 +263,7 @@ async function getXtrfLqaReport(filters) {
               name,
               wordCount,
               assessments: assessments.length ?
-                [await getVendorAssessment(assessments, 'iGaming (Casino, Slot games, Gambling, etc.)')] : [],
+                [await getVendorAssessment(assessments, 'iGaming')] : [],
             });
           }
           memoqVendors.splice(memoqIndex, 1, memoqDoc);

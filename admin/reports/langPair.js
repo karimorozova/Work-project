@@ -2,7 +2,7 @@ const { Languages, Industries } = require("../models");
 
 async function getLangPairReport(projects) {
     const finance = ["CFDs & Online Trading", "ICOs & Cryptocurrency"];
-    const gaming = ["Poker", "Video Games", "iGaming (Casino, Slot games, Gambling, etc.)"];
+    const gaming = ["Poker", "Video Games", "iGaming"];
     try {
         const langs = await Languages.find({symbol: {$nin: ["EN", "EN-GB", "EN-US"]}});
         const financeIndustries = await Industries.find({name: {$in: finance}});
