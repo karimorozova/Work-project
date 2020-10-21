@@ -71,10 +71,20 @@ const findFittingIndustryId = async (industryName) => {
   return neededIndustry;
 };
 
+const getProjectStatus = (project) => {
+  const { documents } = project;
+  let status = 'Quote';
+  if (documents !== null && documents !== undefined) {
+    status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
+  }
+  return status;
+}
+
 module.exports = {
   filterMemoqProjectsVendors,
   checkDocumentHasCorrectStructure,
   findFittingIndustryId,
   isAllTasksFinished,
-  checkProjectStructure
+  checkProjectStructure,
+  getProjectStatus
 };

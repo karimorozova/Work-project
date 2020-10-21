@@ -17,10 +17,6 @@ const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
 
-const { newLangReport } = require('./reports/newLangTierReport');
-
-newLangReport();
-
 // const a = async () => {
 //   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
 //   try {

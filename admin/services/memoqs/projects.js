@@ -3,7 +3,7 @@ const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients } = require('../../models');
-const { createOtherProjectFinanceData, isAllTasksFinished, checkProjectStructure } = require('./otherProjects');
+const { createOtherProjectFinanceData, getProjectStatus, checkProjectStructure } = require('./otherProjects');
 
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
@@ -501,11 +501,13 @@ async function updateMemoqProjectsData() {
         users = getUpdatedUsers(users);
         const documents = await getProjectTranslationDocs(ServerProjectGuid);
         let memoqProject = getMemoqProjectData(project, languages);
-        memoqProject.status = documents !== null && documents !== undefined && (isAllTasksFinished(documents) ? 'Closed' : 'In progress');
-        const doesHaveCorrectStructure = documents !== null && documents !== undefined ?
+        memoqProject.status = getProjectStatus(project);
+        const doesHaveCorrectStructure = memoqProject.status !== 'Quote' ?
           checkProjectStructure(clients, memoqProject, documents) : false;
-				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ? false : memoqProject.lockedForRecalculation;
-        memoqProject = doesHaveCorrectStructure && memoqProject.status === 'Closed' ? await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
+				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
+          false : memoqProject.lockedForRecalculation;
+        memoqProject = doesHaveCorrectStructure && memoqProject.status === 'Closed' ?
+          await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
         await MemoqProject.updateOne(
           { serverProjectGuid: ServerProjectGuid},
           { ...memoqProject, users, documents },
