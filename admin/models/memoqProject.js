@@ -17,6 +17,9 @@ const MemoqProjectSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+  industry: {
+    type: Schema.Types.ObjectId, ref: 'Industries'
+  },
 	paymentProfile: {
 		type: String,
 		default: '',
