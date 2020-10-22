@@ -501,7 +501,7 @@ async function updateMemoqProjectsData() {
         users = getUpdatedUsers(users);
         const documents = await getProjectTranslationDocs(ServerProjectGuid);
         let memoqProject = getMemoqProjectData(project, languages);
-        memoqProject.status = getProjectStatus(project);
+        memoqProject.status = getProjectStatus(documents);
         const doesHaveCorrectStructure = memoqProject.status !== 'Quote' ?
           checkProjectStructure(clients, memoqProject, documents) : false;
 				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
