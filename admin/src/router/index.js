@@ -46,6 +46,7 @@ import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import Requests from '@/components/pmArea/Requests'
 import ClosedProjects from '@/components/pmArea/ClosedProjects'
+import QuoteProjects from '@/components/pmArea/QuoteProjects'
 import OtherProjects from '@/components/pmArea/OtherProjects'
 import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
@@ -362,7 +363,18 @@ const router = new Router({
                             path: 'closed-other-projects',
                             name: 'closed-other-projects',
                             component: OtherProjects
-                        }
+                        },
+                        {
+                            path: 'quote-other-projects',
+                            name: 'quote-other-projects',
+                            component: OtherProjects
+                        },
+                        {
+                            path: 'quote-projects',
+                            name: 'quote-projects',
+                            component: QuoteProjects
+                        },
+
                     ]
                 },
                 {
