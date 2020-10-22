@@ -76,7 +76,8 @@
 
 			async getXTRFProjects() {
 				try {
-					const result = await this.$http.get('/memoqapi/update-all-memoq-finance');
+          console.log(this.$route);
+					const result = await this.$http.get(`/memoqapi/update-all-memoq-finance/${this.$route.query.status}`);
 					this.$emit('refreshProjects', result.data);
 				} catch (err) {
 					this.alertToggle({

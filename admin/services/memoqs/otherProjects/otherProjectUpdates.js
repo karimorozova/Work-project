@@ -1,9 +1,21 @@
 const { MemoqProject, Clients } = require('../../../models');
 const { isAllTasksFinished, checkProjectStructure, getProjectStatus } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
+const { getMemoqProjects } = require('./getMemoqProject');
 
-const updateAllMemoqProjects = async () => {
-  const projects = await MemoqProject.find();
+const updateAllMemoqProjects = async (querySource) => {
+  let query = {};
+  switch (querySource) {
+    case 'In-progress':
+      query.status = 'In progress';
+      break
+    case 'Quote':
+      query.status = 'Quote';
+      break;
+    case 'Closed':
+      query.status = 'Closed';
+  }
+  const projects = await MemoqProject.find(query);
   const clients = await Clients.find();
   for (let i = 0; i < projects.length; i++) {
     let project = projects[i];
@@ -12,13 +24,13 @@ const updateAllMemoqProjects = async () => {
     const doesHaveCorrectStructure = project.status !== 'Quote' ?
       checkProjectStructure(clients, project, documents) : false;
     if (doesHaveCorrectStructure && !lockedForRecalculation) {
-      return await createOtherProjectFinanceData({
+      await createOtherProjectFinanceData({
         project,
         documents
       });
     }
   }
-  return projects;
+  return await getMemoqProjects(query);
 };
 
 const updateMemoqProjectFinance = async (project) => {

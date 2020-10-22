@@ -265,11 +265,11 @@ router.post('/update-memoq-finance', async (req, res) => {
   }
 });
 
-router.get('/update-all-memoq-finance', async (req, res) => {
+router.get('/update-all-memoq-finance/:from', async (req, res) => {
+  const { from } = req.params;
   try {
-    await updateAllMemoqProjects();
-    const updatedProjects = await MemoqProject.find();
-    res.send(updatedProjects);
+    const updateProjects = await updateAllMemoqProjects(from);
+    res.send(updateProjects);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating all other projects');

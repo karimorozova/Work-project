@@ -23,9 +23,10 @@ const checkDocumentHasCorrectStructure = (document) => {
 const isAllTasksFinished = (docs) => {
   if (docs.constructor === Object) {
     const { DocumentStatus } = docs;
-    return DocumentStatus === 'TranslationFinished';
+    return DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished';
   }
-  return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished');
+  return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished'
+    || DocumentStatus === 'ProofreadingFinished');
 };
 
 const checkProjectStructure = (clients, memoqProject, documents) => {

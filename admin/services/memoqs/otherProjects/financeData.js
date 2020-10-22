@@ -1,10 +1,10 @@
-const { Clients, Vendors, Languages, Pricelist, Step, Units } = require('../../../models');
+const { Clients, Vendors, Languages, Pricelist, Step, Units, MemoqProject } = require('../../../models');
 const ObjectId = require('mongodb').ObjectID;
 const { getPriceFromPersonRates, getCorrectBasicPrice } = require('../../../сalculations/finance');
 const { defaultFinanceObj } = require('../../../enums');
-const { getProjectAfterUpdate } = require('./getMemoqProject');
 const { multiplyPrices } = require('../../../multipliers');
 const { findFittingIndustryId } = require('./helpers');
+const { getMemoqProject } = require('./getMemoqProject');
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
 	const clients = await Clients.find();
@@ -17,10 +17,9 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
 	const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
 	if(fromCron) return { ...updatedProject, tasks, steps, finance };
 	const lockedForRecalculation = project.status === 'Closed';
-	return await getProjectAfterUpdate(
-	  { _id: project._id },
-    { ...additionalData, tasks, steps, finance, lockedForRecalculation }
-    );
+	await MemoqProject.updateOne({ _id: project._id },
+    { ...additionalData, tasks, steps, finance, lockedForRecalculation });
+	return await getMemoqProject({ _id: project._id });
 };
 
 const getProjectTasks = async (documents, project, customer, vendors) => {
