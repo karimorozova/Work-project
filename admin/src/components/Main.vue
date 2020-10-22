@@ -91,13 +91,13 @@ export default {
                     imgBrown: require("../assets/images/CATEGORIES/REPORTS.png"),
                     imgWhite: require("../assets/images/CATEGORIES/REPORTS2.png"),
                     active: false,
-                    path: "/reports"
+                    path: "/reports/lang-pair-tier"
                 },
                 {
                     title: "SETTINGS",
                     imgBrown: require("../assets/images/CATEGORIES/SETTINGS.png"),
                     active: false,
-                    path: "/settings"
+                    path: "/settings/langs"
                 }
             ],
             newProject: [{
@@ -163,6 +163,10 @@ export default {
                 this.checkForSpecifiedSideBar('client', 'CLIENTS');
             } else if (location.indexOf('vendor') !== -1) {
                 this.checkForSpecifiedSideBar('vendor', 'VENDORS');
+            }else if (location.indexOf('reports') !== -1) {
+	            this.checkForSpecifiedSideBar('reports', 'REPORTS')
+            }else if (location.indexOf('settings') !== -1) {
+	            this.checkForSpecifiedSideBar('settings', 'SETTINGS')
             }else{}
         },
         checkAddressForSideBar(isFirstRender) {

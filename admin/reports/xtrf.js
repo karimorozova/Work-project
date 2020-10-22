@@ -1,4 +1,4 @@
-const { Industries, LangTier, Languages, MemoqProject, Vendors } = require("../models");
+const { Industries, Languages, MemoqProject, Vendors } = require("../models");
 const { getMemoqUsers } = require("../services/memoqs/users");
 
 
@@ -43,9 +43,9 @@ const rebuildTierReportsStructure = (reports) => {
 	}
 
 	function getTierAllType(wordcount, clientsCount) {
-		if(wordcount > 55000 && clientsCount > 9) {
+		if(wordcount > 55000) {
 			return 1;
-		} else if(wordcount >= 10000 && clientsCount >= 5 && clientsCount <= 9) {
+		} else if(wordcount >= 10000) {
 			return 2;
 		} else {
 			return 3;
@@ -53,13 +53,51 @@ const rebuildTierReportsStructure = (reports) => {
 	}
 
 	function getTierIgmingFinanceType(wordcount, clientsCount) {
-		if(wordcount > 30000 && clientsCount > 4) {
+		if(wordcount > 30000) {
 			return 1;
-		} else if(wordcount >= 5000 && wordcount < 30000 && clientsCount >= 3 && clientsCount <= 4) {
+		} else if(wordcount >= 5000 && wordcount < 30000) {
 			return 2;
 		} else {
 			return 3;
 		}
+	}
+
+	return result;
+};
+
+
+const filterReports = (reports, filters) => {
+	let result;
+	const filterKeys = Object.keys(filters);
+	if(filterKeys.length) {
+		if(filterKeys.length === 1 && filterKeys[0] !== 'tierFilter') {
+			let key = filterKeys[0] === 'sourceFilter' ? 'source' : 'target';
+			result = reports.filter(i => i[key] === filters[filterKeys[0]])
+		} else if(filterKeys.length === 2 && !filterKeys.includes('tierFilter')) {
+			result = filteredLanguages(reports)
+		} else if(filterKeys.length === 3) {
+			result = filteredLanguages(reports);
+			result = filteredTiers(result)
+		} else if(filterKeys.length === 1 && filterKeys[0] === 'tierFilter') {
+			result = filteredTiers(reports);
+		} else if(filterKeys.length === 2 && filterKeys.includes('tierFilter')) {
+			let key = filterKeys.filter(i => i !== 'tierFilter')[0] === 'sourceFilter' ? 'source' : 'target';
+			result = reports.filter(i => i[key] === filters[filterKeys[0]]);
+			result = filteredTiers(result)
+		}
+	} else {
+		result = reports;
+	}
+
+	function filteredLanguages(arr) {
+		return arr.filter(i => i.source === filters.sourceFilter).filter(i => i.target === filters.targetFilter)
+	}
+
+	function filteredTiers(arr) {
+		return arr.filter(i =>
+				i.hasOwnProperty('allTier') && i.allTier.tier === filters.tierFilter ||
+				i.hasOwnProperty('financeTier') && i.financeTier.tier === filters.tierFilter ||
+				i.hasOwnProperty('gameTier') && i.gameTier.tier === filters.tierFilter)
 	}
 
 	return result;
@@ -628,4 +666,4 @@ async function getXtrfUpcomingReport(filters) {
 	}
 }
 
-module.exports = { rebuildTierReportsStructure, getXtrfLqaReport, getXtrfUpcomingReport };
+module.exports = { rebuildTierReportsStructure, getXtrfLqaReport, getXtrfUpcomingReport, filterReports };

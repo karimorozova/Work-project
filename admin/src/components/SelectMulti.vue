@@ -77,11 +77,11 @@ export default {
         },
         chooseOptions(index) {
             this.$emit("chooseOptions", {option: this.filteredOptions[index]})
-            this.searchFocus();
+            // this.searchFocus();
         },
         activeClass(elem) {
-            return (this.selectedOptions.indexOf(elem) != -1 ||
-                this.selectedOptions.indexOf(elem.name) != -1)
+            return (this.selectedOptions.indexOf(elem) !== -1 ||
+                this.selectedOptions.indexOf(elem.name) !== -1)
         },
         search(e) {
             this.searchValue = e.target.value;

@@ -21,13 +21,6 @@ const defaultIndustries = [
     active: true
   },
   {
-    name: 'ICOs & Cryptocurrency',
-    rate: 0,
-    icon: '/static/industries/icos-cryptocurrency.png',
-    generic: '/static/example.xlsx',
-    active: true
-  },
-  {
     name: 'Legal',
     rate: 0,
     icon: '/static/industries/legal-icon.png',
@@ -94,13 +87,6 @@ const defaultIndustries = [
     name: 'Poker',
     rate: 0,
     icon: '/static/industries/casino-poker-igaming.png',
-    generic: '/static/example.xlsx',
-    active: true
-  },
-  {
-    name: 'Hotel & Real Estates',
-    rate: 0,
-    icon: '/static/industries/hotel-real-estates.png',
     generic: '/static/example.xlsx',
     active: true
   },

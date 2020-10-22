@@ -16,7 +16,7 @@ const defaultLanguages = [
   {
     "lang": "Amharic",
     "icon": "/static/flags31x21pix/Amharic[AM].png",
-    "group": "Amharic [AM",
+    "group": "Amharic [AM]",
     "symbol": "AM",
     "xtm": "am_ET",
     "iso1": "am",

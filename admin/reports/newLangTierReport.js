@@ -80,9 +80,10 @@ const newLangReport = async () => {
       case 'Poker':
       case 'eSport':
       case 'iGaming':
+      case 'iGaming (Casino, Slot games, Gambling, etc.)':
       case 'Video Games':
         return 'iGaming';
-      case 'CFDs & Online Trading':
+      case 'CFDs and Online Trading':
       case 'ICOs & Cryptocurrency':
       case 'Finance':
         return 'Finance';

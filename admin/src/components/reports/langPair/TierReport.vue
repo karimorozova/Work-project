@@ -1,59 +1,61 @@
 <template lang="pug">
   .tier
-    .tier__filters
-      Filters(
-        :isLqa="false"
-        :languages="languages"
-        :targetFilter="targetFilter"
-        :tierFilter="tierFilter"
-        @setTierFilter="setTierFilter"
-        @setTargetFilter="setTargetFilter"
-      )
-    .tier__table
-      DataTable(
-        :fields="fields"
-        :tableData="reportData"
-        bodyClass="height-700"
-        @onRowClicked="showInfo"
-      )
+    .tier__body
+      .tier__filters
+        TierReportsFilter(
+          :isLqa="false"
+          :languages="languages"
+          :targetFilter="targetFilter"
+          :sourceFilter="sourceFilter"
+          :tierFilter="tierFilter"
+          @setTierFilter="setTierFilter"
+          @setTargetFilter="setTargetFilter"
+          @setSourceFilter="setSourceFilter"
+        )
+      .tier__table
+        DataTable(
+          :fields="fields"
+          :tableData="reportData"
+          bodyClass="height-700"
+          @onRowClicked="showInfo"
+        )
+          .tier__header(slot="headerSource" slot-scope="{ field }") {{ field.label }}
+          .tier__header(slot="headerTarget" slot-scope="{ field }") {{ field.label }}
+          .tier__header(slot="headerAll" slot-scope="{ field }") {{ field.label }}
+            img.tier__icon(
+              :class="{'tier_rotated': isAllSorted}"
+              src="../../../assets/images/open-arrow_white.png"
+              @click="sortData('allTier', 'isAllSorted')")
+          .tier__header(slot="headerFin" slot-scope="{ field }") {{ field.label }}
+            img.tier__icon(
+              :class="{'tier_rotated': isFinanceSorted}"
+              src="../../../assets/images/open-arrow_white.png"
+              @click="sortData('financeTier', 'isFinanceSorted')")
+          .tier__header(slot="headerGame" slot-scope="{ field }") {{ field.label }}
+            img.tier__icon(
+              :class="{'tier_rotated': isGamingSorted}"
+              src="../../../assets/images/open-arrow_white.png"
+              @click="sortData('gameTier', 'isGamingSorted')")
 
-        .tier__header(slot="headerSource" slot-scope="{ field }") {{ field.label }}
-        .tier__header(slot="headerTarget" slot-scope="{ field }") {{ field.label }}
-        .tier__header(slot="headerAll" slot-scope="{ field }") {{ field.label }}
-          img.tier__icon(
-            :class="{'tier_rotated': isAllSorted}"
-            src="../../../assets/images/open-arrow_white.png"
-            @click="sortData('allTier', 'isAllSorted')")
-        .tier__header(slot="headerFin" slot-scope="{ field }") {{ field.label }}
-          img.tier__icon(
-            :class="{'tier_rotated': isFinanceSorted}"
-            src="../../../assets/images/open-arrow_white.png"
-            @click="sortData('financeTier', 'isFinanceSorted')")
-        .tier__header(slot="headerGame" slot-scope="{ field }") {{ field.label }}
-          img.tier__icon(
-            :class="{'tier_rotated': isGamingSorted}"
-            src="../../../assets/images/open-arrow_white.png"
-            @click="sortData('gameTier', 'isGamingSorted')")
-          
-        template(slot="source" slot-scope="{ row }")
-          .tier__data {{ row.source }}
-        template(slot="target" slot-scope="{ row }")
-          .tier__data {{ row.target }}
-        template(slot="all" slot-scope="{ row, index }")
-          .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('allTier') ? row.allTier.tier : '-' }}
-          .tier__data.tier_orange(v-else) Clients - {{ row.hasOwnProperty('allTier') ? row.allTier.clients : '-' }}; &nbsp; &nbsp; Words - {{row.hasOwnProperty('allTier') ? row.allTier.wordcount : '-' }}
-        template(slot="fin" slot-scope="{ row, index }")
-          .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('financeTier') ? row.financeTier.tier : '-' }}
-          .tier__data.tier_orange(v-else) Clients - {{ row.hasOwnProperty('financeTier') ? row.financeTier.clients : '-' }}; &nbsp; &nbsp; Words - {{ row.hasOwnProperty('financeTier') ? row.financeTier.wordcount : '-' }}
-        template(slot="game" slot-scope="{ row, index }")
-          .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('gameTier') ? row.gameTier.tier : '-' }}
-          .tier__data.tier_orange(v-else) Clients - {{ row.hasOwnProperty('gameTier') ? row.gameTier.clients : '-' }}; &nbsp; &nbsp; Words - {{ row.hasOwnProperty('gameTier') ? row.gameTier.wordcount : '-' }}
+          template(slot="source" slot-scope="{ row }")
+            .tier__data {{ row.source }}
+          template(slot="target" slot-scope="{ row }")
+            .tier__data {{ row.target }}
+          template(slot="all" slot-scope="{ row, index }")
+            .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('allTier') ? row.allTier.tier : '-' }}
+            .tier__data.tier_orange(v-else) Clients: {{ row.hasOwnProperty('allTier') ? row.allTier.clients : '-' }}; &nbsp; &nbsp; Words: {{row.hasOwnProperty('allTier') ? row.allTier.wordcount : '-' }}
+          template(slot="fin" slot-scope="{ row, index }")
+            .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('financeTier') ? row.financeTier.tier : '-' }}
+            .tier__data.tier_orange(v-else) Clients: {{ row.hasOwnProperty('financeTier') ? row.financeTier.clients : '-' }}; &nbsp; &nbsp; Words: {{ row.hasOwnProperty('financeTier') ? row.financeTier.wordcount : '-' }}
+          template(slot="game" slot-scope="{ row, index }")
+            .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('gameTier') ? row.gameTier.tier : '-' }}
+            .tier__data.tier_orange(v-else) Clients: {{ row.hasOwnProperty('gameTier') ? row.gameTier.clients : '-' }}; &nbsp; &nbsp; Words: {{ row.hasOwnProperty('gameTier') ? row.gameTier.wordcount : '-' }}
 </template>
 
 <script>
 	import DataTable from "@/components/DataTable";
-	import Filters from "../Filters";
 	import { mapActions } from "vuex";
+	import TierReportsFilter from "./TierReportsFilter";
 
 	export default {
 		props: {
@@ -62,18 +64,19 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Source Language", headerKey: "headerSource", key: "source", width: "20%" },
-					{ label: "Target Language", headerKey: "headerTarget", key: "target", width: "20%" },
-					{ label: "All Industries", headerKey: "headerAll", key: "all", width: "20%" },
-					{ label: "Financial Industries", headerKey: "headerFin", key: "fin", width: "20%" },
-					{ label: "Gaming Industries", headerKey: "headerGame", key: "game", width: "20%" }
+					{ label: "Source Language", headerKey: "headerSource", key: "source", width: "23%" },
+					{ label: "Target Language", headerKey: "headerTarget", key: "target", width: "23%" },
+					{ label: "All Industries", headerKey: "headerAll", key: "all", width: "18%" },
+					{ label: "Financial Industries", headerKey: "headerFin", key: "fin", width: "18%" },
+					{ label: "Gaming Industries", headerKey: "headerGame", key: "game", width: "18%" }
 				],
 				reportData: [],
 				isAllSorted: false,
 				isFinanceSorted: false,
 				isGamingSorted: false,
 				tierFilter: "All",
-				targetFilter: ["All"],
+				targetFilter: "All",
+				sourceFilter: "English [grouped]",
 				activeIndex: -1,
 				allLangs: [],
 				languages: [],
@@ -87,7 +90,7 @@
 				this.activeIndex = -1;
 				try {
 					const result = await this.$http.post("/reportsapi/xtrf-tier-report", { filters: this.filters });
-					console.log(result);
+					console.log('result', result);
 					this.reportData = result.body;
 
 					const languages = await this.$http.get("/api/languages");
@@ -115,17 +118,12 @@
 				this.tierFilter = value;
 				await this.getReport();
 			},
-			async setTargetFilter({ lang }) {
-				if(lang !== 'All') {
-					this.targetFilter = this.targetFilter.filter(item => item !== 'All');
-					const position = this.targetFilter.indexOf(lang);
-					if(position === -1) {
-						this.targetFilter.push(lang);
-						return await this.getReport();
-					}
-					this.targetFilter.splice(position, 1);
-				}
-				this.targetFilter = !this.targetFilter.length || lang === 'All' ? ["All"] : this.targetFilter;
+			async setSourceFilter({ option }) {
+				this.sourceFilter = option;
+				await this.getReport();
+			},
+			async setTargetFilter({ option }) {
+				this.targetFilter = option;
 				await this.getReport();
 			},
 			showInfo({ index }) {
@@ -135,18 +133,11 @@
 		computed: {
 			filters() {
 				let result = {};
-				if(this.targetFilter[0] !== 'All') {
-					let languageArray = [];
-
-					this.targetFilter.forEach(element => {
-						languageArray.push(
-								this.allLangs
-										.filter(item => item.group == element)
-										.map(item => item.lang)
-										.join()
-						);
-					});
-					result.targetFilter = languageArray.toString().split(',');
+				if(this.targetFilter !== 'All') {
+					result.targetFilter = this.targetFilter;
+				}
+				if(this.sourceFilter !== 'All') {
+					result.sourceFilter = this.sourceFilter;
 				}
 				if(this.tierFilter !== 'All') {
 					result.tierFilter = +this.tierFilter;
@@ -155,8 +146,8 @@
 			}
 		},
 		components: {
+			TierReportsFilter,
 			DataTable,
-			Filters
 		},
 		mounted() {
 			this.getReport();
@@ -168,15 +159,19 @@
   @import "../../../assets/scss/colors.scss";
 
   .tier {
-    box-sizing: border-box;
-    padding: 40px;
+
+    &__body {
+      margin: 40px 40px 40px 20px;
+      width: 1100px;
+      box-shadow: 0 0 10px rgba(104, 87, 62, .5);
+      padding: 20px;
+    }
 
     &__filters {
       margin-bottom: 20px;
     }
 
     &__table {
-      width: 70%;
       position: relative;
     }
 
