@@ -320,15 +320,17 @@ export default {
       return allVendorsTests.map((test) => test.evaluationName).includes(this.currentEvaluationName);
     },
     searchSame(type) {
-      let result = false;
-      const allVendorsTests =
-        this.currentIndex !== -1
-          ? this.vendorTests.filter((test) =>
-              test.evaluationType === type ? test._id !== this.vendorTests[this.currentIndex]._id : false
-            )
-          : this.vendorTests;
 
-      for (const element of allVendorsTests) {
+      let result = false;
+      // const allVendorsTests =
+      //   this.currentIndex !== -1
+      //     ? this.vendorTests.filter((test) =>
+      //         test.evaluationType === type ? test._id !== this.vendorTests[this.currentIndex]._id : false
+      //       )
+      //     : this.vendorTests;
+
+
+      for (const element of this.vendorTests) {
         const source = element.source.lang === this.currentSource.lang;
         const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets;
         const target = element.targets.find((target) =>
@@ -352,12 +354,13 @@ export default {
       }
       return result;
     },
+
     isTestSame() {
-      if (this.currentEvaluationType === "Test") {
-        return this.searchSame("Test");
-      } else {
-        return this.searchSame("Sample");
-      }
+	    return this.searchSame();
+      // if (this.currentEvaluationType === "Test") {
+      // } else {
+      //   return this.searchSame("Sample");
+      // }
     },
     async sendSaveTest() {
       const targets =

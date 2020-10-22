@@ -17,19 +17,19 @@ Vue.filter("otherProjectsIndustryFilter", (str) => {
 		case 'Sport-Betting':
 			return 'Sports Betting';
 		case 'Hotel and Real Estates':
-			return 'Hotel & Real Estates'
+			return 'Real Estate';
 		case 'iGaming':
 		case 'iGaming (Casino, Slot games, Gambling, etc.)':
-			return 'iGaming'
+			return 'iGaming';
 		case 'CFDs and Online Trading':
-			return 'CFDs & Online Trading'
+			return 'CFDs & Online Trading';
 		case 'E-Learning':
 		case 'eLearning':
-			return 'E-Learning'
+			return 'E-Learning';
 		case 'Medicine':
-			return 'Medical Devices'
+			return 'Medical Devices';
 		case 'IT':
-			return 'Websites, Apps & Platforms'
+			return 'Websites, Apps & Platforms';
 		default:
 			return str
 	}

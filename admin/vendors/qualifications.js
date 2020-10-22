@@ -38,7 +38,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
         listQualificationsForSave.push({
           source: element.sourceLanguage,
           target: element.targetLanguage,
-          industry: [element.industry],
+          industries: [element.industry],
           steps: [element.step],
         });
       } else {
@@ -70,16 +70,17 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 
   function qualificationsArrayAdditions (qualificationsArray, testsArray) {
     let finalQualificationArray = [];
+
+    console.log('qualificationsArray',qualificationsArray);
+
     qualificationsArray.forEach(qualification => {
       let currentTest = testsArray.find(test =>
         test.source.toString() === qualification.source.toString() &&
         test.targets.find(target => target.toString() === qualification.target.toString()) &&
-        test.industries.find(industry => qualification.industries.some((currentIndustry) =>
-          industry.toString() === currentIndustry.toString()) &&
-          test.steps.find(step =>
-            qualification.steps.some((currentStep) => step.toString() === currentStep.toString())
-          )
+        test.industries.find(industry => qualification.industries.some((currentIndustry) => industry.toString() === currentIndustry.toString()) &&
+        test.steps.find(step => qualification.steps.some((currentStep) => step.toString() === currentStep.toString()))
       ));
+
       if (!qualification.hasOwnProperty('testType') || qualification.testType === '') {
         let currentQualification = {};
         Object.assign(currentQualification, qualification.toJSON());

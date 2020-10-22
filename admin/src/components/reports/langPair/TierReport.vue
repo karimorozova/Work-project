@@ -4,7 +4,8 @@
       .tier__filters
         TierReportsFilter(
           :isLqa="false"
-          :languages="languages"
+          :allSources="allSources"
+          :allTargets="allTargets"
           :targetFilter="targetFilter"
           :sourceFilter="sourceFilter"
           :tierFilter="tierFilter"
@@ -58,9 +59,6 @@
 	import TierReportsFilter from "./TierReportsFilter";
 
 	export default {
-		props: {
-			// allXtrfLangs: { type: Array, default: () => [] }
-		},
 		data() {
 			return {
 				fields: [
@@ -78,9 +76,8 @@
 				targetFilter: "All",
 				sourceFilter: "English [grouped]",
 				activeIndex: -1,
-				allLangs: [],
-				languages: [],
-				isLanguages: true,
+				allSources: [],
+				allTargets: [],
 
 			}
 		},
@@ -90,17 +87,14 @@
 				this.activeIndex = -1;
 				try {
 					const result = await this.$http.post("/reportsapi/xtrf-tier-report", { filters: this.filters });
-					console.log('result', result);
-					this.reportData = result.body;
-
-					const languages = await this.$http.get("/api/languages");
-					this.allLangs = languages.data;
-					if(this.isLanguages) {
-						this.languages = [...new Set(languages.data.map(item => item.group))];
-						this.languages.unshift("All");
+					const { filteredReports, structuredReports } = result.data;
+					this.reportData = filteredReports;
+					if(structuredReports) {
+						this.allSources = [...new Set(structuredReports.map(i => i.source))];
+						this.allSources.unshift('All');
+						this.allTargets = [...new Set(structuredReports.map(i => i.target))];
+						this.allTargets.unshift('All');
 					}
-					this.isLanguages = false;
-
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting tier report", isShow: true, type: "error" });
 				}

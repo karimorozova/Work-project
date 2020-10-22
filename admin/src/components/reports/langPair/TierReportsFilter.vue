@@ -8,7 +8,7 @@
               placeholder="Select"
               :hasSearch="true"
               customClass="height-32"
-              :options="languages"
+              :options="allSources"
               :selectedOption="sourceFilter"
               @chooseOption="setSourceFilter"
             )
@@ -19,7 +19,7 @@
               placeholder="Select"
               :hasSearch="true"
               customClass="height-32"
-              :options="languages"
+              :options="allTargets"
               :selectedOption="targetFilter"
               @chooseOption="setTargetFilter"
             )
@@ -43,7 +43,8 @@
 		props: {
 			targetFilter: { type: String },
 			sourceFilter: { type: String },
-			languages: { type: Array, default: () => [] },
+			allSources: { type: Array, default: () => [] },
+			allTargets: { type: Array, default: () => [] },
 			tierFilter: { type: String },
 		},
 		data() {

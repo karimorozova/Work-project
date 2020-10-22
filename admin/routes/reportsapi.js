@@ -39,7 +39,8 @@ router.post('/xtrf-tier-report', async (req, res) => {
 		const reports = await LangTier.find();
 		const structuredReports = rebuildTierReportsStructure(reports);
 		const filteredReports = filterReports(structuredReports, filters);
-		res.send(filteredReports);
+		const result = { filteredReports, structuredReports };
+		res.send(result);
 	} catch (err) {
 		console.log(err);
 		res.status(500).send("Error on getting reports");
