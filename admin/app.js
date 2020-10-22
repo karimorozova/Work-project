@@ -13,9 +13,10 @@ const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
 const { updateMemoqProjectsData, updateAllMemoqProjects } = require('./services/memoqs/projects');
-const { getLangReports } = require('./reports/langReport');
+// const { getLangReports } = require('./reports/langReport');
 const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
+const { newLangReport } = require('./reports/newLangTierReport');
 
 // const a = async () => {
 //   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
@@ -41,7 +42,7 @@ schedule.scheduleJob('0 */3 * * *', async function () {
 schedule.scheduleJob('30 23 * * *', async function () {
   console.log('------- Start updating lang tier data: ', `${new Date()} -------`);
   try {
-    await getLangReports();
+    await newLangReport();
     console.log('------- Finish updating lang tier data: ', `${new Date()} --------`);
   } catch (err) {
     console.log(err.message);
