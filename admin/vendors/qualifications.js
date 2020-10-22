@@ -26,20 +26,19 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       listQualificationsForSave.push({
         source: element.sourceLanguage,
         target: element.targetLanguage,
-        industry: element.industry,
+        industries: [element.industry],
         steps: [element.step],
       });
     } else {
       const findIndex = listQualificationsForSave.findIndex(qualification =>
         qualification.source.toString() === element.sourceLanguage.toString() &&
-        qualification.target.toString() === element.targetLanguage.toString() &&
-        qualification.industry.toString() === element.industry.toString()
+        qualification.target.toString() === element.targetLanguage.toString()
       );
       if (findIndex === -1) {
         listQualificationsForSave.push({
           source: element.sourceLanguage,
           target: element.targetLanguage,
-          industry: element.industry,
+          industry: [element.industry],
           steps: [element.step],
         });
       } else {
@@ -49,11 +48,13 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
           test.industries.find(industry => industry.toString() === element.industry.toString()) &&
           test.steps.find(step => step.toString() === element.step.toString())
         );
-
         const ifExistsStep = isExists(currentTestForItem.steps, element.step);
-        if (ifExistsStep) {
+        const isSameIndustryExists = isExists(currentTestForItem.industries, element.industry);
+        if (ifExistsStep && isSameIndustryExists) {
           const ifExistsStepInQualification = isExists(listQualificationsForSave[findIndex].steps, element.step);
+          const industryExistsInQualification = isExists(listQualificationsForSave[findIndex].industries, element.industry);
           ifExistsStepInQualification || listQualificationsForSave[findIndex].steps.push(element.step);
+          industryExistsInQualification || listQualificationsForSave[findIndex].industries.push(element.industry);
           if (listQualificationsForSave[findIndex].status === 'Passed') {
             listForRates.push(element);
           }
@@ -73,11 +74,12 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
       let currentTest = testsArray.find(test =>
         test.source.toString() === qualification.source.toString() &&
         test.targets.find(target => target.toString() === qualification.target.toString()) &&
-        test.industries.find(industry => industry.toString() === qualification.industry.toString()) &&
-        test.steps.find(step =>
-          qualification.steps.some((currentStep) => step.toString() === currentStep.toString())
-        )
-      );
+        test.industries.find(industry => qualification.industries.some((currentIndustry) =>
+          industry.toString() === currentIndustry.toString()) &&
+          test.steps.find(step =>
+            qualification.steps.some((currentStep) => step.toString() === currentStep.toString())
+          )
+      ));
       if (!qualification.hasOwnProperty('testType') || qualification.testType === '') {
         let currentQualification = {};
         Object.assign(currentQualification, qualification.toJSON());
@@ -106,13 +108,13 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
     const findIndex = qualifications.findIndex(qualification =>
       qualification.source.toString() === competence.sourceLanguage._id &&
       qualification.target.toString() === competence.targetLanguage._id &&
-      qualification.industry.toString() === competence.industry._id
+      qualification.industries.toString() === competence.industry._id
     );
     if (findIndex === -1) {
       newQualifications.push({
         source: competence.sourceLanguage,
         target: competence.targetLanguage,
-        industry: competence.industry,
+        industries: [competence.industry],
         steps: [competence.step],
         testType: currentTest.evaluationType,
       });
@@ -124,7 +126,8 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
         test.steps.find(step => step.toString() === competence.step._id)
       );
       const ifExistsStep = isExists(currentTestForItem.steps, competence.step._id);
-      if (ifExistsStep) {
+      const isSameIndustryExists = isExists(currentTestForItem.industries, competence.industry._id);
+      if (ifExistsStep && isSameIndustryExists) {
         const ifExistsStepInQualification = isExists(newQualifications[findIndex].steps, competence.step._id);
         ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id);
       }

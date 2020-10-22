@@ -24,7 +24,7 @@
         template(slot="target", slot-scope="{ row, index }")
           .qualifications__data {{ row.target.lang }}
         template(slot="industry", slot-scope="{ row, index }")
-          .qualifications__data {{ row.industry.name }}
+          .qualifications__data {{ presentArrays(row.industries, 'name') }}
         template(slot="step", slot-scope="{ row, index }")
           .qualifications__data {{ presentArrays(row.steps, 'title') }}
 
@@ -163,7 +163,7 @@ export default {
 
       currentSource: "",
       currentTarget: "",
-      currentIndustry: "",
+      currentIndustries: [],
       currentSteps: [],
       currentStatus: "",
       currentIndex: "",
@@ -232,7 +232,7 @@ export default {
       this.currentActive = index;
       this.currentSource = this.qualificationData[index].source;
       this.currentTarget = this.qualificationData[index].target;
-      this.currentIndustry = this.qualificationData[index].industry;
+      this.currentIndustries = this.qualificationData[index].industries;
       this.currentStatus = this.qualificationData[index].status;
       this.currentSteps = this.qualificationData[index].steps;
       this.currentTqi = this.qualificationData[index].tqi;
@@ -247,7 +247,7 @@ export default {
       this.isDeleting = false;
       this.currentSource = [];
       this.currentTarget = "";
-      this.currentIndustry = "";
+      this.currentIndustries = [];
       this.currentStatus = "";
       this.currentTqi = null;
       this.currentSteps = [];
@@ -267,7 +267,7 @@ export default {
       } else if (this.currentStatus === "Test Sent") {
         const template = await this.$http.post(`/vendorsapi/get-message`, {
           ...this.currentVendor,
-          industry: this.currentIndustry,
+          industries: this.currentIndustries,
           target: this.currentTarget,
           source: this.currentSource,
         });
@@ -283,8 +283,8 @@ export default {
       return this.vendorTests.find(
         (test) =>
           test.source._id.toString() === this.currentSource._id.toString() &&
-          test.targets.map((target) => target._id.toString()).includes(this.currentTarget._id.toString()) &&
-          test.industries.map((industry) => industry._id.toString()).includes(this.currentIndustry._id.toString())
+          test.targets.map((target) => target._id.toString()).includes(this.currentTarget._id.toString())
+          // test.industries.map((industry) => industry._id.toString()).includes(this.currentIndustry._id.toString())
       );
     },
 
@@ -296,7 +296,7 @@ export default {
       this.lqaData = {
         vendor: {
           name: `${this.currentVendor.firstName} ${this.currentVendor.surname}`,
-          industry: this.currentIndustry.name,
+          industries: this.presentArrays(this.currentIndustries, 'name'),
           sourceLang: this.currentSource.lang,
           targetLang: this.currentTarget.lang,
           step: this.presentArrays(this.currentSteps, "title"),
@@ -309,7 +309,7 @@ export default {
       let assessment = {
         step: this.currentSteps,
         target: this.currentTarget,
-        industry: this.currentIndustry,
+        industry: this.currentIndustries,
         source: this.currentSource,
         tqi: { fileName: "", path: "", grade },
         lqa1: {},
@@ -355,7 +355,7 @@ export default {
 
       let qualification = {
         target: this.currentTarget,
-        industry: this.currentIndustry,
+        industries: this.currentIndustries,
         steps: this.currentSteps,
         status: this.currentStatus,
         source: this.currentSource,
@@ -409,7 +409,7 @@ export default {
         source: this.currentSource,
         target: this.currentTarget,
         steps: this.currentSteps,
-        industry: this.currentIndustry,
+        industries: this.currentIndustries,
       };
       await this.$http.post('/vendorsapi/qualification-rates/' + this.currentVendor._id, {
           qualification,

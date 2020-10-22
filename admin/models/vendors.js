@@ -153,9 +153,9 @@ const VendorSchema = new mongoose.Schema({
     target: {
       type: Schema.Types.ObjectId, ref: 'Language'
     },
-    industry: {
+    industries: [{
       type: Schema.Types.ObjectId, ref: 'Industries'
-    },
+    }],
     steps: [{
       type: Schema.Types.ObjectId, ref: 'Step'
     }],
