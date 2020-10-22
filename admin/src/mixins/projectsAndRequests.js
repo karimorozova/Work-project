@@ -38,6 +38,13 @@ export default {
 						projectType: "Closed"
 					});
 					break;
+				case 'quote-projects':
+					result = await this.$http.post(`/api/${ this.endpoint }`, {
+						...filters,
+						lastDate: this.lastDate,
+						projectType: "Quote"
+					});
+					break;
 				case 'open-projects':
 					result = await this.$http.post(`/api/${ this.endpoint }`, {
 						...filters,
