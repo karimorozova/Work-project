@@ -16,9 +16,9 @@ const rebuildTierReportsStructure = (reports) => {
 						.findIndex(item => item.source === curr.lang && item.target === target.lang);
 				const industryObj = {
 					[objName]: {
-						tier: getTierFromWordcount(target.wordcount, objName, target.clients),
+						tier: getTierFromWordcount(target.wordcount, objName, curr.clients),
 						wordcount: target.wordcount,
-						clients: 222
+						clients: curr.clients
 					}
 				};
 				const structureObject = {

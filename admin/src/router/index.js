@@ -365,6 +365,11 @@ const router = new Router({
                             component: OtherProjects
                         },
                         {
+                            path: 'quote-other-projects',
+                            name: 'quote-other-projects',
+                            component: OtherProjects
+                        },
+                        {
                             path: 'quote-projects',
                             name: 'quote-projects',
                             component: QuoteProjects
