@@ -253,6 +253,18 @@ router.get('/memoq-vendor-aliases', async (req, res) => {
   }
 })
 
+router.post('/switch-to-in-progress', async (req, res) => {
+  const { id } = req.body;
+  try {
+    const updateProject = await getProjectAfterUpdate({ _id: id },
+      { status: 'In progress', fromQuote: true });
+    res.send(updateProject);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on switching project\'s status')
+  }
+});
+
 router.post('/update-memoq-finance', async (req, res) => {
   const { id } = req.body;
   try {

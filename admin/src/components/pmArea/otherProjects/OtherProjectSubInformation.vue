@@ -129,9 +129,12 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 			}),
-			sendToProgressProjects(){
+			async sendToProgressProjects(){
         try {
-	        console.log('da')
+          const result = await this.$http.post('/memoqapi/switch-to-in-progress', {
+            id: this.project._id,
+          });
+          this.project = result.body;
         }catch (err) {
 	        this.alertToggle({
 		        message: "Error on sending project to In progress projects",
