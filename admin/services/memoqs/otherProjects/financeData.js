@@ -16,7 +16,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
 	if(!tasks.length && !steps.length) return project;
 	const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
 	if(fromCron) return { ...updatedProject, tasks, steps, finance };
-	const lockedForRecalculation = project.status === 'Closed';
+	const lockedForRecalculation = updatedProject.status === 'Closed';
 	await MemoqProject.updateOne({ _id: project._id },
     { ...additionalData, tasks, steps, finance, lockedForRecalculation });
 	return await getMemoqProject({ _id: project._id });

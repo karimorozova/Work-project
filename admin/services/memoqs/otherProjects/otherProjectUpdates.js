@@ -21,13 +21,14 @@ const updateAllMemoqProjects = async (querySource) => {
     let project = projects[i];
     const { documents, lockedForRecalculation } = project;
     project.status = getProjectStatus(project);
-    const doesHaveCorrectStructure = project.status !== 'Quote' ?
-      checkProjectStructure(clients, project, documents) : false;
-    if (doesHaveCorrectStructure && !lockedForRecalculation) {
-      await createOtherProjectFinanceData({
-        project,
-        documents
-      });
+    if (!lockedForRecalculation) {
+      const doesHaveCorrectStructure = checkProjectStructure(clients, project, documents);
+      if (doesHaveCorrectStructure) {
+        await createOtherProjectFinanceData({
+          project,
+          documents
+        });
+      }
     }
   }
   return await getMemoqProjects(query);
@@ -35,10 +36,10 @@ const updateAllMemoqProjects = async (querySource) => {
 
 const updateMemoqProjectFinance = async (project) => {
   const clients = await Clients.find();
-  const { documents } = project;
+  const { documents, lockedForRecalculation } = project;
   project.status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
   const doesHaveCorrectStructure = checkProjectStructure(clients, project, documents);
-  if (!doesHaveCorrectStructure) {
+  if (!doesHaveCorrectStructure && lockedForRecalculation) {
     return project;
   }
   return await createOtherProjectFinanceData({ project, documents });
