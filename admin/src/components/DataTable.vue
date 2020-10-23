@@ -202,6 +202,10 @@ export default {
 .other-all-projects {
   max-height: calc(90vh - 240px);
 }
+.other-project-cell{
+  max-height: 120px;
+  overflow-y: auto;
+}
 
 .reports__table {
   margin-bottom: 0;

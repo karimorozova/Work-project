@@ -58,6 +58,9 @@
                     Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
                 img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
             .filters__itemCenter
+                //.filters__item
+                  LabelValue(label="Client Name")
+                    span asdasd
                 .filters__itemCenter-button(@click="refreshProjects")
 </template>
 
@@ -190,7 +193,7 @@ export default {
     margin-bottom: 30px;
     &__itemCenter{
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         &-button{
             background-image: url('../../assets/images/refresh-icon.png');
             width: 24px;
@@ -202,14 +205,14 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        width: 21%;
+        width: 23%;
         font-size: 14px;
         height: 80px;
         &:nth-of-type(3) {
-            width: 25%;
+            width: 23%;
         }
         &:last-child {
-            width: 19%;
+            width: 23%;
         }
     }
     &__drop-menu {
@@ -221,11 +224,11 @@ export default {
         width: 166px;
     }
     &_short-menu {
-        width: 148px;
+        width: 160px;
     }
     &__text-input {
         padding: 0 5px;
-        width: 156px;
+        width: 155px;
         height: 28px;
         outline: none;
         border: 1px solid #68573E;
