@@ -72,8 +72,7 @@ const findFittingIndustryId = async (industryName) => {
   return neededIndustry;
 };
 
-const getProjectStatus = (project) => {
-  const { documents } = project;
+const getProjectStatus = (documents) => {
   let status = 'Quote';
   if (documents !== null && documents !== undefined) {
     status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
