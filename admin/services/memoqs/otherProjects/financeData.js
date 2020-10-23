@@ -91,7 +91,7 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
 };
 
 const getUpdatedProjectData = (project, allClients) => {
-	const { client: memoqClient } = project;
+	const { client: memoqClient, fromQuote } = project;
 	const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
 	const industry = findFittingIndustryId(project.domain);
 	let additionalData = {};
@@ -103,6 +103,7 @@ const getUpdatedProjectData = (project, allClients) => {
 			accountManager: ObjectId(neededCustomer.accountManager._id),
 			industry: ObjectId(industry._id),
 			paymentProfile: neededCustomer.billingInfo.paymentType,
+      fromQuote: project.status === 'In progress' ? fromQuote : false,
 		};
 	}
 	return { additionalData, neededCustomer };
