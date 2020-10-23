@@ -2,7 +2,7 @@ const defaultIndustries = [
   {
     name: 'iGaming',
     rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
+    icon: '/static/industries/igaming.png',
     generic: '/static/example.xlsx',
     active: true
   },
@@ -23,7 +23,7 @@ const defaultIndustries = [
   {
     name: 'Legal',
     rate: 0,
-    icon: '/static/industries/legal-icon.png',
+    icon: '/static/industries/legal.png',
     generic: '/static/example.xlsx',
     active: true
   },
@@ -65,35 +65,28 @@ const defaultIndustries = [
   {
     name: 'eSport',
     rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
+    icon: '/static/industries/esport.png',
     generic: '/static/example.xlsx',
     active: true
   },
   {
     name: 'Sports Betting',
     rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
+    icon: '/static/industries/sports-betting.png',
     generic: '/static/example.xlsx',
     active: true
   },
   {
     name: 'Finance',
     rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
-    generic: '/static/example.xlsx',
-    active: true
-  },
-  {
-    name: 'Poker',
-    rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
+    icon: '/static/industries/finance.png',
     generic: '/static/example.xlsx',
     active: true
   },
   {
     name: 'Other',
     rate: 0,
-    icon: '/static/industries/more-icon.png',
+    icon: '/static/industries/other.png',
     generic: '/static/example.xlsx',
     active: true
   },
@@ -114,7 +107,7 @@ const defaultIndustries = [
   {
     name: 'E-commerce',
     rate: 0,
-    icon: '/static/industries/e-commerce.png',
+    icon: '/static/industries/ecommerce.png',
     generic: '/static/example.xlsx',
     active: true
   },
@@ -128,7 +121,7 @@ const defaultIndustries = [
   {
     name: 'Health Care',
     rate: 0,
-    icon: '/static/industries/healt-care.png',
+    icon: '/static/industries/health-care.png',
     generic: '/static/example.xlsx',
     active: true
   },

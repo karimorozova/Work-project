@@ -10,6 +10,7 @@
         OtherProjectSubInformation(
           :project="project"
           :projectId="projectId"
+          @updateProject="updateProject"
         )
     .project-info__all-info
       OtherTasksAndSteps(
