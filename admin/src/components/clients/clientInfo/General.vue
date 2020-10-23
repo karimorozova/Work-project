@@ -69,11 +69,11 @@
       .block-item
         label.block-item__label.block-item_relative Aliases:
         .block-item__drop
-          SelectMultiBlocks(
-            :options="clientAliases"
-            :selectedOptions="currentClient.hasOwnProperty('aliases') ? currentClient.aliases : currentClientAliases"
-            @chooseOptions="setAlias"
-          )
+          //SelectMultiBlocks(
+            //:options="clientAliases"
+            //:selectedOptions="currentClient.hasOwnProperty('aliases') ? currentClient.aliases : currentClientAliases"
+            //@chooseOptions="setAlias"
+          //)
           SelectMulti(
             placeholder="Select"
             :hasSearch="true"
