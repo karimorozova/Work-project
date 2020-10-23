@@ -8,6 +8,11 @@
     .sub-information__row
       .row__title Project Status:
       .row__data {{ project.status }}
+    .sub-information__row(v-if="project.status === 'Quote'")
+      .row__title Send to In Progress
+      .row__data
+        span(@click="sendToProgressProjects()")
+          i.fa.fa-paper-plane(aria-hidden="true")
     .sub-information__row(v-if="project.status === 'Closed'")
       .row__title Payment Profile:
       .row__data
@@ -124,6 +129,17 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 			}),
+			sendToProgressProjects(){
+        try {
+	        console.log('da')
+        }catch (err) {
+	        this.alertToggle({
+		        message: "Error on sending project to In progress projects",
+		        isShow: true,
+		        type: "error",
+	        });
+        }
+      },
 			copyId() {
 				let id = document.getElementById('id');
 				let elementText = id.textContent;
@@ -433,6 +449,17 @@
   .fa-info-circle,
   .fa-envelope {
     font-size: 18px;
+  }
+
+  .fa-paper-plane {
+    font-size: 18px;
+    color: #938676;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .fa-paper-plane:hover {
+    color: #67573E;
   }
 
   .drop {
