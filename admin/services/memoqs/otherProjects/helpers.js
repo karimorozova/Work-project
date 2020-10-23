@@ -14,31 +14,57 @@ const filterMemoqProjectsVendors = users => {
 };
 
 const checkDocumentHasCorrectStructure = (document) => {
-   return  document !== null && document.hasOwnProperty('UserAssignments') &&
+   return document !== null && document.hasOwnProperty('UserAssignments') &&
     Object.entries(document.UserAssignments).length !== 0 &&
     document.UserAssignments.constructor === Object &&
     !!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
 };
 
 const isAllTasksFinished = (docs) => {
-  if (docs.constructor === Object) {
-    const { DocumentStatus } = docs;
-    return DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished';
+  if (Array.isArray(docs)) {
+    return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished'
+      || DocumentStatus === 'ProofreadingFinished');
   }
-  return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished'
-    || DocumentStatus === 'ProofreadingFinished');
+  const { DocumentStatus } = docs;
+  return DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished';
 };
 
-const checkProjectStructure = (clients, memoqProject, documents) => {
-  const doesCorrelateWithOurClient = !!clients.find(({ aliases }) => aliases.includes(memoqProject.client));
-  const doesHaveVendorsDocs = doesHaveVendors(documents);
+const checkProjectStructure = (clients, vendors, memoqProject, documents) => {
+  const doesCorrelateWithOurClient = clients.find(({ aliases }) => aliases.includes(memoqProject.client));
+  const doesHaveVendorsDocs = doesHaveVendors(vendors, documents);
   return !!doesCorrelateWithOurClient && doesHaveVendorsDocs;
 
-  function doesHaveVendors (docs) {
-    if (docs.constructor === Object) return checkDocumentHasCorrectStructure(docs);
-    return docs.every(document => checkDocumentHasCorrectStructure(document));
+  function doesHaveVendors (vendors, docs) {
+    let doesCorrelateWithOurVendors = false;
+    if (Array.isArray(docs)) {
+      const hasCorrectStructure = docs.every(document => checkDocumentHasCorrectStructure(document));
+      if (hasCorrectStructure) {
+        for (let { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } of docs) {
+          doesCorrelateWithOurVendors = doesCorrelateWithOurVendor(vendors, memoqVendorsArr)
+        }
+        return doesCorrelateWithOurVendors;
+      }
+      return doesCorrelateWithOurVendors;
+    }
+    const hasCorrectStructure = checkDocumentHasCorrectStructure(docs);
+    if (hasCorrectStructure) {
+      const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = docs;
+      doesCorrelateWithOurVendors = doesCorrelateWithOurVendor(vendors, memoqVendorsArr)
+      return doesCorrelateWithOurVendors;
+    }
+    return doesCorrelateWithOurVendors
   }
 };
+
+const doesCorrelateWithOurVendor = (vendors, userAssignments) => {
+  let correlates = false;
+  for (let i = 0; i < userAssignments.length; i ++) {
+    const { UserInfoHeader: { FullName } } = userAssignments[i];
+    const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
+    if (vendor) correlates = true;
+  }
+  return correlates
+}
 
 const findFittingIndustryId = async (industryName) => {
   const neededIndustry = await Industries.findOne({

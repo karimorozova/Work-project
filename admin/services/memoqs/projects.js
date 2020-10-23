@@ -2,7 +2,7 @@ const { xmlHeader, getHeaders } = require('../../configs');
 const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
-const { MemoqProject, Languages, Clients } = require('../../models');
+const { MemoqProject, Languages, Clients, Vendors } = require('../../models');
 const { createOtherProjectFinanceData, getProjectStatus, checkProjectStructure } = require('./otherProjects');
 
 
@@ -493,6 +493,7 @@ async function updateMemoqProjectsData() {
 	try {
     let allProjects = await getMemoqAllProjects();
     const clients = await Clients.find();
+    const vendors = await Vendors.find();
     const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
     for (let project of allProjects) {
 	    const { ServerProjectGuid } = project;
@@ -503,7 +504,7 @@ async function updateMemoqProjectsData() {
         let memoqProject = getMemoqProjectData(project, languages);
         memoqProject.status = getProjectStatus(documents);
         const doesHaveCorrectStructure = memoqProject.status !== 'Quote' ?
-          checkProjectStructure(clients, memoqProject, documents) : false;
+          checkProjectStructure(clients, vendors, memoqProject, documents) : false;
 				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
           false : memoqProject.lockedForRecalculation;
         memoqProject = doesHaveCorrectStructure ?
