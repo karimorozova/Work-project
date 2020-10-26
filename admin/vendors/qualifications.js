@@ -28,7 +28,11 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 		if(!listQualificationsForSave.length) {
 			listQualificationsForSave.push(pushFirstQualification(element));
 		} else {
-			const findIndex = listQualificationsForSave.findIndex(qualification => qualification.testId.toString() === element.testId.toString());
+			const findIndex = listQualificationsForSave.findIndex(
+					qualification => qualification.testId.toString() === element.testId.toString() &&
+							qualification.source.toString() === element.sourceLanguage.toString() &&
+							qualification.target.toString() === element.targetLanguage.toString()
+			);
 			if(findIndex === -1) {
 				listQualificationsForSave.push(pushFirstQualification(element));
 			} else {
@@ -86,7 +90,11 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 	let currentTest = findSameTest(allTests, competence);
 	let rates;
 	if(currentTest) {
-		const findIndex = qualifications.findIndex(qualification => qualification.testId.toString() === currentTest._id.toString());
+		const findIndex = qualifications.findIndex(
+				qualification => qualification.testId.toString() === currentTest._id.toString() &&
+						qualification.source.toString() === competence.sourceLanguage._id &&
+						qualification.target.toString() === competence.targetLanguage._id
+		);
 		if(findIndex === -1) {
 			newQualifications.push({
 				source: competence.sourceLanguage,

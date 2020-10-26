@@ -13,7 +13,7 @@
                     .vendor-lqa__value(v-if="vendorData") {{ vendorData.vendor.sourceLang }}
               .vendor-lqa__item
                 LabelVal(text="Industry:" customClass="new-chart-label start-justified")
-                    .vendor-lqa__value(v-if="vendorData") {{ vendorData.vendor.industry }}
+                    .vendor-lqa__value(v-if="vendorData") {{ vendorData.vendor.industries }}
               .vendor-lqa__item
                 LabelVal(text="LQA#:" customClass="new-chart-label start-justified")
                     .vendor-lqa__value(v-if="vendorData") {{lqa}}
