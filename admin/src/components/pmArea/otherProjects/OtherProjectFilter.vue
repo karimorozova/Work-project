@@ -169,8 +169,10 @@
       background-color: #D15F45;
       border: 1px solid #D15F45;
       cursor: pointer;
+      outline: 0;
+      line-height: 34px;
 
-      &:active, &:focus {
+      &:active {
         transform: scale(.98);
         outline: none !important;
         outline-color: none;

@@ -32,6 +32,9 @@
               :selectedOption="tierFilter"
               @chooseOption="setTierFilter"
             )
+    .button
+      .button__row
+          input.button__update-btn(type="submit" value="Update Lang Tier Reports" @click="updateReports()")
 </template>
 
 <script>
@@ -53,6 +56,9 @@
 			}
 		},
 		methods: {
+			updateReports(){
+				this.$emit('updateReports');
+      },
 			setTierFilter({ option }) {
 				this.$emit('setTierFilter', { value: this.tiers[option] });
 			},
@@ -82,13 +88,39 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
+  .button {
+    &__row {
+      margin-bottom: 20px;
+    }
+    &__update-btn {
+      width: 188px;
+      height: 34px;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 10px;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
+      background-color: #D15F45;
+      border: 1px solid #D15F45;
+      cursor: pointer;
+      outline: 0;
+      line-height: 34px;
+
+      &:active {
+        transform: scale(.98);
+        outline: none !important;
+        outline-color: none;
+        border: none;
+      }
+    }
+  }
+
   .report-filters {
     &__row {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       box-sizing: border-box;
     }
 

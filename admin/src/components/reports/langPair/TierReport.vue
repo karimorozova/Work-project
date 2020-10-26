@@ -12,6 +12,7 @@
           @setTierFilter="setTierFilter"
           @setTargetFilter="setTargetFilter"
           @setSourceFilter="setSourceFilter"
+          @updateReports="updateReports"
         )
       .tier__table
         DataTable(
@@ -83,6 +84,17 @@
 		},
 		methods: {
 			...mapActions(['alertToggle']),
+			async updateReports() {
+				await this.updateReportsCollections();
+				await this.getReport();
+			},
+			async updateReportsCollections() {
+				try {
+					await this.$http.get('/reportsapi/rewrite-xtrf-tier-report');
+				} catch (err) {
+					this.alertToggle({ message: "Error on update tier reports", isShow: true, type: "error" })
+				}
+			},
 			async getReport() {
 				this.activeIndex = -1;
 				try {

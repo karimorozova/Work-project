@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { rebuildTierReportsStructure, getXtrfLqaReport, getXtrfUpcomingReport, filterReports } = require("../reports/xtrf");
+const { newLangReport } = require("../reports/newLangTierReport");
 const { upload } = require("../utils");
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
 const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, LangTier } = require("../models");
@@ -65,6 +66,18 @@ router.post('/xtrf-lqa', upload.fields([{ name: 'reportFiles' }]), async (req, r
 	} catch (err) {
 		console.log(err);
 		res.status(500).send("Error on filling xtrf LQA reports");
+	}
+});
+
+
+
+router.get('/rewrite-xtrf-tier-report', async (req, res) => {
+	try {
+		await newLangReport();
+		res.send('Updated');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send("Error on getting reports");
 	}
 });
 
