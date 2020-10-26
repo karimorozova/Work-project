@@ -9,7 +9,7 @@
       .row__title Project Status:
       .row__data {{ project.status }}
     .sub-information__row(v-if="project.status === 'Quote'")
-      .row__title Send to In Progress
+      .row__title Move to In Progress:
       .row__data
         span(@click="sendToProgressProjects()")
           i.fa.fa-paper-plane(aria-hidden="true")
@@ -129,20 +129,20 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 			}),
-			async sendToProgressProjects(){
-        try {
-          const result = await this.$http.post('/memoqapi/switch-to-in-progress', {
-            id: this.project._id,
-          });
-          this.project = result.body;
-        }catch (err) {
-	        this.alertToggle({
-		        message: "Error on sending project to In progress projects",
-		        isShow: true,
-		        type: "error",
-	        });
-        }
-      },
+			async sendToProgressProjects() {
+				try {
+					const result = await this.$http.post('/memoqapi/switch-to-in-progress', {
+						id: this.project._id,
+					});
+					this.$emit('updateProject', result.body)
+				} catch (err) {
+					this.alertToggle({
+						message: "Error on sending project to In progress projects",
+						isShow: true,
+						type: "error",
+					});
+				}
+			},
 			copyId() {
 				let id = document.getElementById('id');
 				let elementText = id.textContent;

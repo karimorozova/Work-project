@@ -16,7 +16,8 @@ const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
 const { newLangReport } = require('./reports/newLangTierReport');
-newLangReport()
+
+// newLangReport()
 // const a = async () => {
 //   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
 //   try {

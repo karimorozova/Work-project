@@ -2,6 +2,7 @@
   .projects-table
     DataTable(
       :fields="fields"
+      :bodyCellClass="'other-project-cell'"
       :tableData="allProjects"
       :bodyClass="['other-all-projects', {'tbody_visible-overflow': allProjects.length < 9}]"
       :tableheadRowClass="allProjects.length < 9 ? 'tbody_visible-overflow' : ''"
@@ -66,7 +67,7 @@
             label: "Project Name",
             headerKey: "headerProjectId",
             key: "projectName",
-            width: "14%"
+            width: "12%"
           },
           {
             label: "Client Name",
@@ -78,13 +79,13 @@
             label: "Languages",
             headerKey: "headerLanguages",
             key: "languages",
-            width: "11%"
+            width: "12%"
           },
           {
             label: "Status",
             headerKey: "headerStatus",
             key: "status",
-            width: "7%"
+            width: "8%"
           },
           {
             label: "Receivables",

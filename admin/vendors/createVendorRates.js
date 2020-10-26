@@ -143,13 +143,13 @@ const createRateRowFromQualification = async (vendorId, qualification) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
   const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true });
   const { pricelistTable: oldPricelistTable } = vendor.rates;
-  let { source, target, steps, industry } = qualification;
+  let { source, target, steps } = qualification;
   const langPairs = [{
     sourceLanguage: source._id,
     targetLanguage: target._id,
   }];
   steps = steps.map(item => item._id);
-  const industries = [industry._id];
+  const industries = qualification.industries.map(i => i._id);
   const {
     basicPricesTable,
     stepMultipliersTable,

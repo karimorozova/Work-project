@@ -3,11 +3,11 @@ const { sendEmail } = require("../utils/mailTemplate");
 const fs = require("fs");
 
 async function notifyTestStatus({vendor, qualification, testPath, template}) {
-    const {source, target, industry, status} = qualification;
+    const {source, target, industries, status} = qualification;
     let messageId = "CAN001.0"; 
     let subject = `${target.lang} - Translator@Pangea position - Sample text for translation (ID ${messageId})`;
     let message;
-    template ? message = template : message = testSentMessage({...vendor, source, target, industry});
+    template ? message = template : message = testSentMessage({...vendor, source, target, industries});
     try {
         if(status === "Test Sent") {
             const attachments = [{filename: testPath.split("/").pop(), content: fs.createReadStream(`./dist${testPath}`)}];

@@ -24,7 +24,7 @@
             span.projects-table__label {{ field.label }}
         template(slot="headerRoi" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
-        template(slot="headerStartDate" slot-scope="{ field }") 
+        template(slot="headerStartDate" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
         template(slot="headerDeadline" slot-scope="{ field }")
             span.projects-table__label {{ field.label }}
@@ -50,10 +50,10 @@
                 span {{ row.finance.Price.payables }}
         template(slot="roi" slot-scope="{ row }")
             span {{ row.roi }}
-        template(slot="startDate" slot-scope="{ row }") 
+        template(slot="startDate" slot-scope="{ row }")
             span {{ row.startDate.split('T')[0].split('-').reverse().join('-') }}
         template(slot="deadline" slot-scope="{ row }")
-            span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}              
+            span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
         template(slot="projectManager" slot-scope="{ row }")
             span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
         template(slot="projectTest" slot-scope="{ row, index }")
@@ -76,7 +76,7 @@ export default {
     data() {
         return {
             fields: [
-                {label: "ID", headerKey: "headerProjectId", key: "projectId", width: "9%"},
+                {label: "ID", headerKey: "headerProjectId", key: "projectId", width: "10%"},
                 {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%"},
                 {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "12%"},
                 {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "12%"},
@@ -86,7 +86,7 @@ export default {
                 {label: "ROI", headerKey: "headerRoi", key: "roi", width: "6%"},
                 {label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%"},
-                {label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%"},
+                {label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "10%"},
                 {label: "Test", headerKey: "headerTest", key: "projectTest", width: "5%"},
             ],
         }
@@ -98,9 +98,9 @@ export default {
         ]),
         async setTest(projectId){
             await this.setProjectProp({
-                projectId: projectId, 
-                prop: 'isTest', 
-                value: event.target.checked
+                projectId: projectId,
+                prop: 'isTest',
+                value: e.target.checked
             });
         },
         async setProjectProp({projectId, prop, value}) {
