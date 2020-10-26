@@ -79,12 +79,12 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 	}
 };
 
-
 const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, oldCompetence) => {
 	const allTests = await LangTest.find({});
 	let { qualifications } = await Vendors.findOne({ _id: vendorId });
 	let newQualifications = qualifications;
 	let currentTest = findSameTest(allTests, competence);
+	let rates;
 	if(currentTest) {
 		const findIndex = qualifications.findIndex(qualification => qualification.testId.toString() === currentTest._id.toString());
 		if(findIndex === -1) {
@@ -110,7 +110,8 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 			}
 		}
 	}
-	const rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
+	rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
+
 	return {
 		rates,
 		qualifications: newQualifications

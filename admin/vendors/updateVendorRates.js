@@ -38,7 +38,7 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   }
   if (industryDifference) {
     updatedRates = await updateIndustryMultipliers(oldData, industryDifference, vendor, defaultPricelist);
-  }
+}
   return updatedRates
 
   function compareIds (obj1, id) {
@@ -190,11 +190,12 @@ const updateVendorStepMultipliers = async (oldData, newStep, vendor, defaultPric
  * @return nothing - updates vendor's rates
  */
 const updateIndustryMultipliers = async (oldData, newIndustry, vendor, defaultPricelist) => {
-  const { _id, competencies, rates } = vendor;
+  const { competencies, rates } = vendor;
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
   const sameIndustry = industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
   const isNotLastIndustryInCompetence = competencies.find(item => item.industry.toString() === oldData.industry._id.toString());
-  if (!sameIndustry) {
+
+  if (sameIndustry === undefined) {
     const boundIndustry = defaultPricelist.industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
     const multiplier = boundIndustry ? boundIndustry.multiplier : 100;
     industryMultipliersTable.push({

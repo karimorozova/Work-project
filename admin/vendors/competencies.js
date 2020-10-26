@@ -12,7 +12,7 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
 			const oldCompetence = competencies[neededServiceIndex];
 			competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
 			const { rates, qualifications } = await saveQualificationsAfterUpdateCompetencies(dataToUpdate, vendorId, oldCompetence);
-			return getVendorAfterUpdate({ _id: vendorId }, { competencies, rates, qualifications });
+			return await getVendorAfterUpdate({ _id: vendorId }, { competencies, rates: rates.rates, qualifications });
 		} else {
 			const combinationsWithoutRepetitions = generateCompetenciesCombinations(dataToUpdate)
 					.filter(x => competencies.every(y =>
