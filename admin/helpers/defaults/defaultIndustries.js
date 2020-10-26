@@ -84,13 +84,6 @@ const defaultIndustries = [
     active: true
   },
   {
-    name: 'Poker',
-    rate: 0,
-    icon: '/static/industries/casino-poker-igaming.png',
-    generic: '/static/example.xlsx',
-    active: true
-  },
-  {
     name: 'Other',
     rate: 0,
     icon: '/static/industries/more-icon.png',
