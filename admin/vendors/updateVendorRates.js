@@ -3,10 +3,10 @@ const {
   getPricelistCombinations,
   replaceOldItem,
   changePricelistTable,
-  getStepMultipliersCombinations
 } = require('../clients');
 const { getRateInfoFromStepFinance, manageMonoPairRates, manageDuoPairRates } = require("../pricelist/ratesmanage")
-const { getVendor, getVendorAfterUpdate } = require("../vendors")
+const { getVendor, getVendorAfterUpdate } = require("./index");
+const { createRateCombinations } = require('./createVendorRates');
 const { tableKeys } = require('../enums');
 
 /**
@@ -15,6 +15,10 @@ const { tableKeys } = require('../enums');
  * @param {String} newData - updated competence example from frontend
  * @param {String} oldData - old competence example from database
  * @return nothing - updates vendor's rates
+ */
+
+/*
+
  */
 const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
@@ -36,10 +40,10 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
     );
   }
   if (stepDifference) {
-    updatedRates = await updateVendorStepMultipliers(oldData, stepDifference, vendor, updatedRates, defaultPricelist);
+    updatedRates = await updateVendorStepMultipliers(oldData, stepDifference, vendor, updatedRates);
   }
   if (industryDifference) {
-    updatedRates = await updateIndustryMultipliers(oldData, industryDifference, vendor, updatedRates, defaultPricelist);
+    updatedRates = await updateIndustryMultipliers(oldData, industryDifference, vendor, updatedRates);
 }
   return updatedRates
 
@@ -165,35 +169,27 @@ const updateVendorLangPairs = async (
  * @param {Object} oldData - old example from database
  * @param {Object} newStep - new step value of rate row
  * @param {Object} vendor - current vendor's data
- * @param {Object} defaultPricelist - default pricelist data
  * @param {Object} vendorRates - updated vendor's rates
  * @return nothing - updates vendor's rates
  */
-const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates, defaultPricelist) => {
-  const { competencies } = vendor;
-  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = vendorRates;
-  const sameStep = stepMultipliersTable.find(item => item.step._id.toString() === newStep._id.toString());
+const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates) => {
+  const { competencies, _id: vendorId } = vendor;
+  const sameStep = vendorRates.stepMultipliersTable.find(item => item.step._id.toString() === newStep._id.toString());
   const isNotLastStepInCompetence = competencies.find(item => item.step.toString() === oldData.step._id.toString());
   if (!sameStep) {
-    stepMultipliersTable.push(...await getStepMultipliersCombinations(newStep, defaultPricelist));
-    pricelistTable = await getPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable);
-  } else {
-
+    const dataForCreation = [{
+      step: newStep._id,
+      sourceLanguage: oldData.sourceLanguage._id,
+      targetLanguage: oldData.targetLanguage._id,
+      industry: oldData.industry._id
+    }];
+    vendorRates = await createNewRateCombinations(dataForCreation, vendorRates, vendorId);
   }
   if (!isNotLastStepInCompetence) {
-    stepMultipliersTable = filterRedundantSteps(stepMultipliersTable, oldData.step._id);
-    pricelistTable = filterRedundantSteps(pricelistTable, oldData.step._id);
+    vendorRates.stepMultipliersTable = filterRedundantItem(vendorRates.stepMultipliersTable, oldData.step._id);
+    vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.step._id);
   }
-  return {
-    basicPricesTable,
-    stepMultipliersTable,
-    industryMultipliersTable,
-    pricelistTable
-  };
-
-  function filterRedundantSteps(arr, stepId) {
-    return arr.filter(item => item.step.toString() !== stepId.toString());
-  }
+  return vendorRates;
 };
 
 /**
@@ -201,35 +197,30 @@ const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates
  * @param {Object} oldData - old example from database
  * @param {Object} newIndustry - new industry of rate row
  * @param {Object} vendor - current vendor's data
- * @param {Object} defaultPricelist - default pricelist data
  * @param {Object} vendorRates - updated vendor's rates
  * @return nothing - updates vendor's rates
  */
-const updateIndustryMultipliers = async (oldData, newIndustry, vendor, vendorRates, defaultPricelist) => {
-  const { competencies } = vendor;
-  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = vendorRates;
-  const sameIndustry = industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
+const updateIndustryMultipliers = async (oldData, newIndustry, vendor, vendorRates) => {
+  const { competencies, _id: vendorId } = vendor;
+  const sameIndustry = vendorRates.industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
   const isNotLastIndustryInCompetence = competencies.find(item => item.industry.toString() === oldData.industry._id.toString());
   if (!sameIndustry) {
-    const boundIndustry = defaultPricelist.industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
-    const multiplier = boundIndustry ? boundIndustry.multiplier : 100;
-    industryMultipliersTable.push({
-      industry: newIndustry._id,
-      multiplier
-    });
-    pricelistTable = await getPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable);
+    const dataForCreation = [{
+      industry: newIndustry,_id,
+      sourceLanguage: oldData.sourceLanguage._id,
+      targetLanguage: oldData.targetLanguage._id,
+      step: oldData.step._id
+    }];
+    vendorRates = await createNewRateCombinations(dataForCreation, vendorRates, vendorId);
   }
   if (!isNotLastIndustryInCompetence) {
-    industryMultipliersTable = industryMultipliersTable.filter(item => item.industry.toString() !== oldData.industry._id.toString());
-    pricelistTable = pricelistTable.filter(item => item.industry.toString() !== oldData.industry._id.toString());
+    vendorRates.industryMultipliersTable = filterRedundantItem(vendorRates.industryMultipliersTable, oldData.step._id)
+    vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.step._id)
   }
-  return {
-    basicPricesTable,
-    stepMultipliersTable,
-    industryMultipliersTable,
-    pricelistTable
-  };
+  return vendorRates
 };
+
+const filterRedundantItem = (arr, itemId) => arr.filter(item => item.step.toString() !== itemId.toString());
 
 /**
  *
@@ -335,6 +326,20 @@ async function getVendorAfterCombinationsUpdated({project, step, rate}) {
     console.log(err);
     console.log("Error in getVendorAfterCombinationsUpdated");
   }
+}
+
+const createNewRateCombinations = async (dataForCreation, vendorRates, vendorId) => {
+  const {
+    basicPricesTable,
+    stepMultipliersTable,
+    industryMultipliersTable,
+    pricelistTable,
+  } = await createRateCombinations(dataForCreation, vendorId);
+  vendorRates.basicPricesTable = [...vendorRates.basicPricesTable, ...basicPricesTable];
+  vendorRates.stepMultipliersTable = [...vendorRates.stepMultipliersTable, ...stepMultipliersTable];
+  vendorRates.industryMultipliersTable = [...vendorRates.industryMultipliersTable, ...industryMultipliersTable];
+  vendorRates.pricelistTable = [...vendorRates.pricelistTable, ...pricelistTable];
+  return vendorRates;
 }
 
 module.exports = {

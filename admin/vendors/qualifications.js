@@ -85,10 +85,9 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 
 const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, oldCompetence) => {
 	const allTests = await LangTest.find({});
-	let { qualifications } = await Vendors.findOne({ _id: vendorId });
+	let { qualifications, rates, competencies } = await Vendors.findOne({ _id: vendorId });
 	let newQualifications = qualifications;
 	let currentTest = findSameTest(allTests, competence);
-	const rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
   if(currentTest) {
 		const findIndex = qualifications.findIndex(
 				qualification => qualification.testId.toString() === currentTest._id.toString() &&
@@ -117,12 +116,85 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 				ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id);
 			}
 		}
-	}
+    console.log('asdasdasdasda');
+    rates = checkRedundantRates(oldCompetence, competencies, qualifications, rates);
+  } else {
+    console.log('tyt');
+    rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
+  }
 	return {
 		rates,
 		qualifications: newQualifications
 	};
 };
+
+
+const checkRedundantRates = (competence, allCompetencies, allQualifications, rates) => {
+  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
+  const { sourceLanguage, targetLanguage, step, industry } = competence;
+  allCompetencies = allCompetencies.filter(row => {
+    const sameLanguage = `${row.sourceLanguage} ${row.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`;
+    const sameStep = row.step.toString() === step._id.toString();
+    const sameIndustry = row.industry.toString() === industry._id.toString();
+    if (!sameLanguage && !sameStep && !sameIndustry) {
+      return row;
+    }
+  });
+  allQualifications = allQualifications.filter(({ status }) => status === 'Passed');
+  const sameLangPairsIndex = allCompetencies.findIndex(row => (
+    `${row.sourceLanguage} ${row.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`
+  ));
+  const sameQualificationLangPairIndex = allQualifications.findIndex(({ source, target }) => (
+    `${source} ${target}` === `${sourceLanguage._id} ${targetLanguage._id}`
+  ))
+  const sameStepIndex = allCompetencies.findIndex(row => (
+    row.step.toString() === step._id.toString()
+  ));
+  const sameQualificationStepIndex = allQualifications.findIndex(({ steps }) => (
+    steps.map(item => item.toString()).includes(step._id.toString())
+  ));
+  const sameIndustryIndex = allCompetencies.findIndex(row => (
+    row.industry.toString() === industry._id.toString()
+  ));
+  const sameQualificationIndustryIndex = allQualifications.findIndex(({ industries }) => (
+    industries.map(item => item.toString()).includes(industry._id.toString())
+  ))
+
+  if ((sameLangPairsIndex === -1 || !allCompetencies.length) && (sameQualificationLangPairIndex === -1 || !allQualifications.length)) {
+    basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
+    pricelistTable = filterRedundantLangPair(pricelistTable, sourceLanguage._id, targetLanguage._id);
+  }
+  if ((sameStepIndex === -1 || !allCompetencies.length) && (sameQualificationStepIndex === -1 || !allQualifications.length)) {
+    stepMultipliersTable = filterRedundantStep(stepMultipliersTable, step._id);
+    pricelistTable = filterRedundantStep(pricelistTable, step._id);
+  }
+  if ((sameIndustryIndex === -1 || !allCompetencies.length) && (sameQualificationIndustryIndex === -1 || !allQualifications.length)) {
+    industryMultipliersTable = filterRedundantIndustry(industryMultipliersTable, industry._id);
+    pricelistTable = filterRedundantIndustry(pricelistTable, industry._id);
+  }
+
+  return {
+    basicPricesTable,
+    stepMultipliersTable,
+    industryMultipliersTable,
+    pricelistTable
+  }
+
+
+  function filterRedundantLangPair(arr, sourceLangId, targetLangId) {
+    return arr.filter(item => (
+      `${item.sourceLanguage} ${item.targetLanguage}` !== `${sourceLangId} ${targetLangId}`
+    ));
+  }
+
+  function filterRedundantStep (arr, itemId) {
+    return arr.filter(item => item.step.toString() !== itemId.toString());
+  }
+
+  function filterRedundantIndustry (arr, itemId) {
+    return arr.filter(item => item.industry.toString() !== itemId.toString());
+  }
+}
 
 const findSameTest = (arrTest, competence) => {
 	return arrTest.find(test =>

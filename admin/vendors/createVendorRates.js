@@ -176,5 +176,7 @@ const createRateRowFromQualification = async (vendorId, qualification) => {
 
 module.exports = {
   createRateCombinations,
-  createRateRowFromQualification
+  createRateRowFromQualification,
+  splitRatesArr,
+  combineVendorRates
 };
