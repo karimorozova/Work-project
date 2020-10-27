@@ -84,10 +84,10 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 	let { qualifications } = await Vendors.findOne({ _id: vendorId });
 	let newQualifications = qualifications;
 	let currentTest = findSameTest(allTests, competence);
-	let rates;
-	if(currentTest) {
-		const findIndex = qualifications.findIndex(qualification => qualification.testId.toString() === currentTest._id.toString());
-		if(findIndex === -1) {
+	const rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
+  if(currentTest) {
+		const neededTestIndex = qualifications.findIndex(qualification => qualification.testId.toString() === currentTest._id.toString());
+		if(neededTestIndex === -1) {
 			newQualifications.push({
 				source: competence.sourceLanguage,
 				target: competence.targetLanguage,
@@ -100,18 +100,16 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 			const currentTestForItem = allTests.find((test) => test._id.toString() === currentTest._id.toString());
 			const ifExistsIndustry = isExists(currentTestForItem.industries, competence.industry._id);
 			if(ifExistsIndustry) {
-				const ifExistsStepInQualification = isExists(newQualifications[findIndex].industries, competence.industry._id);
-				ifExistsStepInQualification || newQualifications[findIndex].industries.push(competence.industry._id);
+				const ifExistsStepInQualification = isExists(newQualifications[neededTestIndex].industries, competence.industry._id);
+				ifExistsStepInQualification || newQualifications[neededTestIndex].industries.push(competence.industry._id);
 			}
 			const ifExistsStep = isExists(currentTestForItem.steps, competence.step._id);
 			if(ifExistsStep) {
-				const ifExistsStepInQualification = isExists(newQualifications[findIndex].steps, competence.step._id);
-				ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id);
+				const ifExistsStepInQualification = isExists(newQualifications[neededTestIndex].steps, competence.step._id);
+				ifExistsStepInQualification || newQualifications[neededTestIndex].steps.push(competence.step._id);
 			}
 		}
 	}
-	rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
-
 	return {
 		rates,
 		qualifications: newQualifications
