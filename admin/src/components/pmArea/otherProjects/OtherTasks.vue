@@ -126,7 +126,7 @@
 		},
 		methods: {
 			getTargetLanguage(memoqLang) {
-				const obj = this.project.targetLanguages.filter(item => item).find(item => item.memoq === memoqLang);
+				const obj = this.getAllLanguages.find(item => item.memoq === memoqLang);
 				return obj ? obj.symbol : ''
 			},
 			setProgress(status){
@@ -149,6 +149,11 @@
 						? true
 						: this.$emit('showTab', { tab: this.tabs[index] });
 			}
+		},
+		computed: {
+			...mapGetters({
+				getAllLanguages: 'getAllLanguages',
+			}),
 		},
 		components: {
 			DataTable,

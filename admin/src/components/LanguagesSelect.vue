@@ -148,7 +148,7 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
-    height: 32px;
+    height: 28px;
     .all-projects__filters & {
         height: 28px;
     }

@@ -2,12 +2,13 @@ const { MemoqProject, Languages, LangTier } = require('../models');
 
 const newLangReport = async () => {
 	const languages = await Languages.find();
-	const projects = await MemoqProject.find({ status: 'Closed' });
+	let projects = await MemoqProject.find({$and: [ {status:"Closed"},{isTest: false}]});
+	projects = projects.filter(item => item.sourceLanguage);
 	const reports = [];
 
 	for (let { domain, sourceLanguage, documents } of projects) {
 		const industryGroup = findIndustry(domain);
-		industryGroup && distributeIndustries(industryGroup, sourceLanguage, documents)
+		industryGroup && sourceLanguage && distributeIndustries(industryGroup, sourceLanguage, documents)
 		distributeIndustries('All', sourceLanguage, documents)
 	}
 
@@ -67,7 +68,7 @@ const newLangReport = async () => {
 
 	function findLanguageGroup(allLanguages, memoqSymbol) {
 		return allLanguages.find(lang => lang.memoq === memoqSymbol) ? allLanguages.find(lang => (
-				lang.memoq === memoqSymbol)).group : 'TEST';
+				lang.memoq === memoqSymbol)).group : memoqSymbol;
 	}
 
 	function findAllTargets(documents) {

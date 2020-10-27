@@ -11,7 +11,7 @@
       .filters-other__col
         .filters-other__date
           LabelValue(label="Start Date and Time")
-            Datepicker(@selected="setStart" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-34" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
+            Datepicker(@selected="setStart" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-30" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
           img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="startOpen")
 
         .filters-other__item
@@ -23,7 +23,7 @@
       .filters-other__col
         .filters-other__date
           LabelValue(label="Deadline")
-            Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-34" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
+            Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-30" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
           img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="deadlineOpen")
 
         .filters-other__item
@@ -225,7 +225,7 @@
     &__text-input {
       padding: 0 5px;
       width: 156px;
-      height: 32px;
+      height: 30px;
       outline: none;
       border: 1px solid #68573e;
       border-radius: 5px;
@@ -243,9 +243,9 @@
 
     &__calendar-icon {
       position: absolute;
-      top: 7px;
+      top: 6px;
       right: 5px;
-      width: 20px;
+      width: 18px;
       cursor: pointer;
     }
   }

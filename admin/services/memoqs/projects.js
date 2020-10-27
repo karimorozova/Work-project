@@ -507,6 +507,8 @@ async function updateMemoqProjectsData() {
           checkProjectStructure(clients, vendors, memoqProject, documents) : false;
 				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
           false : memoqProject.lockedForRecalculation;
+	      memoqProject.isTest = memoqProject.isTest === undefined ?
+			      false : memoqProject.isTest;
         memoqProject = doesHaveCorrectStructure ?
           await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
         await MemoqProject.updateOne(

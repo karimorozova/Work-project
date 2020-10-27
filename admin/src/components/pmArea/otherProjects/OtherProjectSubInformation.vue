@@ -2,7 +2,7 @@
   .sub-information
     .sub-information__preview(v-if="isEditAndSend")
       WYSIWYG(@closePreview="closeWYSIWYG", :message="message", @send="sendMessage")
-    .sub-information__project( id="id") {{ projectId }}
+    .sub-information__project(v-if="projectId" id="id") {{ projectId }}
       span(class="click-copy" @click="copyId")
         i.fa.fa-clone(aria-hidden="true")
     .sub-information__row

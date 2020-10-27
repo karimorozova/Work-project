@@ -18,7 +18,7 @@
         :projectId="projectId"
         :projectSteps="projectSteps"
       )
-      .project-info__action(v-if="project.status === 'Closed'")
+      .project-info__action
         OtherProjectAction(
           :project="project"
           @refreshCurrProject="refreshProject"
@@ -58,11 +58,13 @@
 			async getProjectSteps(id) {
 				try {
 					const result = await this.$http.get(`/memoqapi/other-project?id=${ id }`);
-					this.projectSteps = result.data.documents
-							.map(
-									item =>
-											item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails
-							)
+					const tasks = result.data.documents.reduce((acc, curr) => {
+						for (let i = 0; i < 2; i++)
+							curr.UserAssignments.TranslationDocumentUserRoleAssignmentDetails[i].langSymbol = curr.TargetLangCode
+						acc.push({ ...curr });
+						return acc
+					}, []);
+					this.projectSteps = tasks.map(item => item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails)
 							.flat();
 				} catch (err) {
 					this.alertToggle({
