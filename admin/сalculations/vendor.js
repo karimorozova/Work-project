@@ -5,7 +5,7 @@ const getFittingVendor = async (stepData) => {
   stepData.targetLanguage = await Languages.findOne({ symbol: stepData.targetLanguage });
   stepData.industry = typeof stepData.industry === 'string' ? await Industries.findOne({ name: stepData.industry })
     : stepData.industry._id;
-  const vendors = await Vendors.find();
+  const vendors = await Vendors.find({status: 'Active'});
   const fittingVendors = findFittingVendor(stepData, vendors);
   if (fittingVendors.length === 1) {
     return fittingVendors[0];
@@ -19,13 +19,14 @@ const findFittingVendor = (stepData, vendors, fromFront = false) => {
   for (let vendor of vendors) {
     const { _id, qualifications } = vendor;
     if (qualifications.length) {
-      for (let { source, target, steps, industry: vendorIndustry, status } of qualifications) {
+      for (let { source, target, steps, industries: vendorIndustries, status } of qualifications) {
         source = fromFront ? source._id : source;
         target = fromFront ? target._id : target;
-        vendorIndustry = fromFront ? vendorIndustry._id : vendorIndustry;
+        vendorIndustries = vendorIndustries.map(item => fromFront ? item._id : item);
         steps = steps.map(item => fromFront ? item._id : item);
+
         if (steps.includes(step) && source.toString() === sourceLanguage._id.toString() &&
-          target.toString() === targetLanguage._id.toString() && vendorIndustry.toString() === industry.toString() &&
+          target.toString() === targetLanguage._id.toString() && vendorIndustries.includes(industry) &&
           status === 'Passed') {
           fittingVendors.push(fromFront ? vendor : _id);
         }

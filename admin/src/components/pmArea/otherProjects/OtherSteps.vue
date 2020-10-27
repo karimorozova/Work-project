@@ -166,7 +166,6 @@
 				}
 			},
 			getVendorFullName(index){
-				console.log(this.projectSteps[index])
 				return this.projectSteps[index].UserInfoHeader.FullName
       },
 			getLanguageSymbol(memoqSymbol) {

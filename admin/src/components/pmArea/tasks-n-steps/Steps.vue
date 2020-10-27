@@ -98,7 +98,7 @@
             :highlighted="highlighted"
             @scrollDrop="scrollDrop")
         template(slot="progress" slot-scope="{ row }")
-          ProgressLine(:progress="progress(row.progress)")
+          ProgressLine(:progress="row.progress")
         template(slot="status" slot-scope="{ row }")
           span.steps__step-status {{ row.status | stepsAndTasksStatusFilter }}
         template(slot="receivables" slot-scope="{ row }")
@@ -421,9 +421,6 @@
 			closeErrors() {
 				this.areErrorsExist = false;
 				this.errors = [];
-			},
-			progress(prog) {
-				return prog.totalWordCount ? ((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : prog;
 			},
 			toggleCheck(e, index, val) {
 				this.allSteps[index].check = val;
