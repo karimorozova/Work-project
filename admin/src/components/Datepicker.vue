@@ -1187,10 +1187,10 @@ export default {
   height: 30px;
 }
 
-.datepicker-height-34 {
+.datepicker-height-30 {
   border-radius: 5px;
   border: 1px solid #68573E;
-  height: 34px;
+  height: 30px;
   color: #68573E;
   padding-left: 5px;
   outline: none;

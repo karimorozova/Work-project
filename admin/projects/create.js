@@ -21,7 +21,7 @@ async function createProject (project) {
         : "[" + (todaysProjects.length + 1) + "]";
     project.status = project.status || "Draft";
     project.projectId =
-      moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
+      "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
     const createdProject = await Projects.create({
       ...project,
       startDate: new Date()

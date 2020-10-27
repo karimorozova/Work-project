@@ -76,10 +76,10 @@ export default {
     data() {
         return {
             fields: [
-                {label: "ID", headerKey: "headerProjectId", key: "projectId", width: "10%"},
-                {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%"},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "12%"},
-                {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "12%"},
+                {label: "ID", headerKey: "headerProjectId", key: "projectId", width: "13%"},
+                {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "9%"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "11%"},
+                {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "11%"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "8%"},
                 {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "7%"},
                 {label: "Payables", headerKey: "headerPayables", key: "payables", width: "6%"},

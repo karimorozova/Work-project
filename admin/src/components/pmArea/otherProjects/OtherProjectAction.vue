@@ -14,11 +14,6 @@
           :value="project.accountManager !== null && project.hasOwnProperty('accountManager') ? `${project.accountManager.firstName} ${project.accountManager.lastName}` : ''"
           disabled
         )
-      //SelectSingle(
-      //  :options="accManagers"
-      //  :selectedOption="selectedAccManager"
-      //  @chooseOption="(e) => setManager(e, 'accountManager')"
-      //)
     .drops__item
       .drops__label Project Manager:
       .drops__menu
@@ -27,11 +22,6 @@
           :value="project.projectManager !== null && project.hasOwnProperty('projectManager') ? `${project.projectManager.firstName} ${project.accountManager.lastName}` : ''"
           disabled
         )
-      //SelectSingle(
-      //  :options="projManagers"
-      //  :selectedOption="selectedProjManager"
-      //  @chooseOption="(e) => setManager(e, 'projectManager')"
-      //)
 
 </template>
 
@@ -73,87 +63,15 @@
 					});
 				}
 			},
-
-			// async setManager({ option }, prop) {
-			// 	const manager = this.managers.find(
-			// 			item => `${ item.firstName } ${ item.lastName }` === option
-			// 	);
-			// 	if(manager._id === this.project[prop]._id) return;
-			// 	try {
-			// 		if(this.type === "project") {
-			// 			await this.setProjectValue({
-			// 				id: this.project._id,
-			// 				prop,
-			// 				value: manager
-			// 			});
-			// 		} else {
-			// 		}
-			// 	} catch (err) {
-			// 	}
-			// },
-
-			// async getManagers() {
-			// 	try {
-			// 		const result = await this.$http.get("/users");
-			// 		this.managers = result.data;
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: "Error on getting managers",
-			// 			isShow: true,
-			// 			type: "error"
-			// 		});
-			// 	}
-			// },
 			...mapActions({
-				// setProjectValue: "setProjectValue",
 				alertToggle: "alertToggle",
 			})
-		},
-		computed: {
-
-			// accManagers() {
-			// 	let result = [];
-			// 	if(this.managers.length) {
-			// 		result = this.managers.filter(
-			// 				item => item.group.name === "Account Managers"
-			// 		);
-			// 		result = result.map(item => `${ item.firstName } ${ item.lastName }`);
-			// 	}
-			// 	return result;
-			// },
-			// projManagers() {
-			// 	let result = [];
-			// 	if(this.managers.length) {
-			// 		result = this.managers.filter(
-			// 				item => item.group.name === "Project Managers"
-			// 		);
-			// 		result = result.map(item => `${ item.firstName } ${ item.lastName }`);
-			// 	}
-			// 	return result;
-			// },
-			// selectedAccManager() {
-			// 	return this.project.accountManager
-			// 			? this.project.accountManager.firstName +
-			// 			" " +
-			// 			this.project.accountManager.lastName
-			// 			: "";
-			// },
-			// selectedProjManager() {
-			// 	return this.project.projectManager
-			// 			? this.project.projectManager.firstName +
-			// 			" " +
-			// 			this.project.projectManager.lastName
-			// 			: "";
-			// },
 		},
 		components: {
 			ApproveModal,
 			SelectSingle,
 			Button
 		},
-		async created() {
-			// this.getManagers();
-		}
 	};
 </script>
 

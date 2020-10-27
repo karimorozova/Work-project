@@ -4,17 +4,17 @@
             .clients-filters
                 .clients-filters__row
                     .clients-filters__item
-                        label Name
+                        label Name:
                         input.clients-filters__input-field(type="text" placeholder="Company Name" v-model="nameFilter" @keyup="filterByName")
                     .clients-filters__item
-                        label Industry
+                        label Industry:
                         .clients-filters__drop-menu
                             ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
                     .clients-filters__item
-                        label Lead Source
+                        label Lead Source:
                         .clients-filters__drop-menu
                             ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="leadsourceFilter" @chosenLeadsource="chosenLeadsource")
-                .clients-filters__row.clients-filters_flex-end
+                .clients-filters__row-button
                     input.add-button(type="submit" value="Add client" @click="addClient")
             ClientsTable(
                 :clients="allClients"
@@ -184,10 +184,17 @@ label {
 
 .clients-filters {
     margin-bottom: 20px;
+    &__row-button{
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
     &__row {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        height: 30px;
+        margin-bottom: 20px;
     }
     &__drop-menu {
         width: 191px;
@@ -198,7 +205,7 @@ label {
     &__input-field {
         margin-left: 15px;
         width: 191px;
-        height: 28px;
+        height: 30px;
         padding-left: 5px;
         border: 1px solid #67573E;
         color: #67573E;
@@ -223,9 +230,9 @@ label {
 }
 
 .add-button {
-    margin-top: 20px;
     width: 168px;
     height: 34px;
+    line-height:34px;
     color: #fff;
     font-size: 14px;
     border-radius: 10px;

@@ -6,8 +6,8 @@ const {
 } = require('./defaultPriceLists');
 const { defaultUsers } = require('./defaultUsers');
 const { defaultSteps, defaultUnits } = require('./defaultStepsAndUnits');
-const { defaultClients } = require('./defaultClients');
-const { defaultVendors } = require('./defaultVendor');
+// const { defaultClients } = require('./defaultClients');
+// const { defaultVendors } = require('./defaultVendor');
 const { defaultTimezones } = require('./defaultTimezones');
 const { defaultIndustries } = require('./defaultIndustries');
 const { defaultServices } = require('./defaultServices');
@@ -24,8 +24,8 @@ module.exports = {
   defaultUsers,
   defaultSteps,
   defaultUnits,
-  defaultClients,
-  defaultVendors,
+  // defaultClients,
+  // defaultVendors,
   defaultTimezones,
   defaultIndustries,
   defaultServices,

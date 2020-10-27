@@ -122,12 +122,12 @@
 			return {
 				fields: [
 					{ label: "check", headerKey: "headerCheck", key: "check", width: "3%" },
-					{ label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "14%" },
+					{ label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "17%" },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "10%" },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "9%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%" },
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "16%" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "13%" },
 					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%" },
 					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "8%" },
 					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%" },

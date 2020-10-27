@@ -27,7 +27,7 @@
         template(slot="language" slot-scope="{ row, index }")
           span.steps__step-data {{ languagePair(index) }}
         template(slot="vendor" slot-scope="{ row, index }")
-          span.steps__step-data.steps_no-padding {{ row.UserInfoHeader.FullName }}
+          span.steps__step-data.steps_no-padding {{ getVendorFullName(index) }}
         template(slot="start" slot-scope="{ row, index }")
           span.steps__step-data {{row.DocumentAssignmentRole === 0 || index === 0 ? formateDate(project.creationTime) : formateDate(projectSteps[index-1].DeadLine) }}
         template(slot="deadline" slot-scope="{ row, index }")
@@ -73,6 +73,7 @@
 	import Tabs from "../../Tabs";
 	import moment from "moment";
 	import OtherStepInfo from "./OtherStepInfo";
+	import { mapGetters } from "vuex";
 
 	export default {
 		props: {
@@ -150,9 +151,7 @@
 				isStepInfo: false,
 			};
 		},
-		async created() {
-			await this.createdListOfTargetLanguages();
-		},
+
 		methods: {
 			isFinanceData(index) {
 				if(this.project.status === 'In progress') {
@@ -166,8 +165,15 @@
 					return true;
 				}
 			},
+			getVendorFullName(index){
+				console.log(this.projectSteps[index])
+				return this.projectSteps[index].UserInfoHeader.FullName
+      },
+			getLanguageSymbol(memoqSymbol) {
+				return this.getAllLanguages.find(item => item.memoq === memoqSymbol) === undefined ? '' : this.getAllLanguages.find(item => item.memoq === memoqSymbol).symbol;
+			},
 			languagePair(index) {
-				let secondLang = this.stepsTargetLanguages[index] != undefined ? this.stepsTargetLanguages[index].symbol : ''
+				let secondLang = this.projectSteps[index].langSymbol !== null ? this.getLanguageSymbol(this.projectSteps[index].langSymbol) : '';
 				return `${ this.project.sourceLanguage.symbol } >> ${ secondLang }`
 			},
 			showStepDetails(index) {
@@ -182,21 +188,16 @@
 			},
 			formateDate: time => moment(time).format('DD-MM-YYYY'),
 			getStepName: num => (num === '0' ? 'Translation' : 'Revision'),
-			createdListOfTargetLanguages() {
-				const memoq = this.project.documents.map(item => item.TargetLangCode);
-				const languages = memoq.map(item => this.project.targetLanguages.find(item2 => item === item2.memoq))
-				let someArr = [];
-				languages.forEach(element => {
-					for (let i = 0; i < 2; i++) someArr.push(element);
-				});
-				return (this.stepsTargetLanguages = someArr);
-			},
-
 			showTab({ index }) {
 				return this.tabs[index] === "Steps"
 						? true
 						: this.$emit("showTab", { tab: this.tabs[index] });
 			}
+		},
+		computed: {
+			...mapGetters({
+				getAllLanguages: 'getAllLanguages',
+			}),
 		},
 		components: {
 			OtherStepInfo,

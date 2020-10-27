@@ -174,6 +174,8 @@ export default {
         background-color: #D15F45;
         border: 1px solid #D15F45;
         cursor: pointer;
+        line-height:34px;
+
         &:active, &:focus {
             transform: scale(.98);
             outline: none!important;
