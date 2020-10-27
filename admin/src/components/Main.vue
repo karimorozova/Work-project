@@ -532,13 +532,11 @@ export default {
                 margin-left: 0;
                 margin-right: 0;
                 cursor: pointer;
-                transition: all 0.2s;
                 &:last-child {
                     margin-bottom: 0;
                 }
 
                 .title {
-                    transition: all 0.2s;
                     color: #fff;
                 }
 

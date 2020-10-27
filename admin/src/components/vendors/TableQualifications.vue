@@ -280,17 +280,6 @@
 
 			getAvailableTest() {
 				if(!this.vendorTests.length) return null;
-
-				console.log(
-						this.vendorTests.find(
-								(test) =>
-										test.source._id.toString() === this.currentSource._id.toString() &&
-										test.targets.map((target) => target._id.toString()).includes(this.currentTarget._id.toString()) &&
-										test.industries.find((industry) => this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)) &&
-										test.steps.find((step) => this.currentSteps.some((currentStep) => step._id.toString() === currentStep._id.toString()))
-						)
-        );
-
 				return this.vendorTests.find(
 						(test) =>
 								test.source._id.toString() === this.currentSource._id.toString() &&
@@ -333,6 +322,7 @@
 				//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
 				assessment.step = assessment.step.filter(step => step.title === "Translation");
 				//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
+
 				let formData = new FormData();
 				formData.append("vendorId", this.currentVendor._id);
 				formData.append("assessment", JSON.stringify(assessment));
@@ -341,7 +331,10 @@
 				this.currentTqi = vendorData.grade;
 
 				try {
-					await this.storeAssessment(formData);
+					//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
+          if(assessment.step.length) await this.storeAssessment(formData);
+					//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
+
 					await this.sendToRates();
 					await this.manageSaveClick(this.currentActive);
 				} catch (err) {
