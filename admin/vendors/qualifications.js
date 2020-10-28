@@ -89,12 +89,12 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 	let newQualifications = qualifications;
 	let currentTest = findSameTest(allTests, competence);
   if(currentTest) {
-		const findIndex = qualifications.findIndex(
+		const neededQualificationIndex = qualifications.findIndex(
 				qualification => qualification.testId.toString() === currentTest._id.toString() &&
 						qualification.source.toString() === competence.sourceLanguage._id &&
 						qualification.target.toString() === competence.targetLanguage._id
 		);
-		if(findIndex === -1) {
+		if(neededQualificationIndex === -1) {
 			newQualifications.push({
 				source: competence.sourceLanguage,
 				target: competence.targetLanguage,
@@ -104,97 +104,76 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 				testType: currentTest.evaluationType,
 			});
 		} else {
-			const currentTestForItem = allTests.find((test) => test._id.toString() === currentTest._id.toString());
+      const currentTestForItem = allTests.find((test) => test._id.toString() === currentTest._id.toString());
 			const ifExistsIndustry = isExists(currentTestForItem.industries, competence.industry._id);
 			if(ifExistsIndustry) {
-				const ifExistsStepInQualification = isExists(newQualifications[findIndex].industries, competence.industry._id);
-				ifExistsStepInQualification || newQualifications[findIndex].industries.push(competence.industry._id);
+				const ifExistsStepInQualification = isExists(newQualifications[neededQualificationIndex].industries, competence.industry._id);
+				ifExistsStepInQualification || newQualifications[neededQualificationIndex].industries.push(competence.industry._id);
 			}
 			const ifExistsStep = isExists(currentTestForItem.steps, competence.step._id);
 			if(ifExistsStep) {
-				const ifExistsStepInQualification = isExists(newQualifications[findIndex].steps, competence.step._id);
-				ifExistsStepInQualification || newQualifications[findIndex].steps.push(competence.step._id);
+				const ifExistsStepInQualification = isExists(newQualifications[neededQualificationIndex].steps, competence.step._id);
+				ifExistsStepInQualification || newQualifications[neededQualificationIndex].steps.push(competence.step._id);
 			}
 		}
-    console.log('asdasdasdasda');
-    rates = checkRedundantRates(oldCompetence, competencies, qualifications, rates);
+		const neededCompetencies = getCompetenciesForCheck(competencies);
+		if (neededCompetencies.length) {
+      const langPairsToDelete = [];
+      const industriesToDelete = [];
+      const stepsToDelete = [];
+      for (let { sourceLanguage, targetLanguage, industry, step } of neededCompetencies) {
+        const oldCompetenceLangPair = `${oldCompetence.sourceLanguage._id} ${oldCompetence.targetLanguage._id}`;
+        const doesHaveSameLangPair = `${sourceLanguage} ${targetLanguage}` === oldCompetenceLangPair;
+        const doesHaveSameStep = step.toString() === oldCompetence.step._id.toString();
+        const doesHaveSameIndustry = industry.toString() === oldCompetence.industry._id.toString();
+        if (!doesHaveSameLangPair) langPairsToDelete.push(oldCompetenceLangPair);
+        if (!doesHaveSameStep) stepsToDelete.push(oldCompetence.step._id.toString());
+        if (!doesHaveSameIndustry) industriesToDelete.push(oldCompetence.industry._id.toString());
+      }
+      rates.basicPricesTable = rates.basicPricesTable.filter(row => (
+        !langPairsToDelete.includes(`${row.sourceLanguage} ${row.targetLanguage}`)
+      ));
+      rates.stepMultipliersTable = rates.stepMultipliersTable.filter(row => !stepsToDelete.includes(row.step.toString()));
+      rates.industryMultipliersTable = rates.industryMultipliersTable.filter(row => (
+        !industriesToDelete.includes(row.industry.toString())
+      ));
+      rates.pricelistTable = rates.pricelistTable.filter(row => (
+        !langPairsToDelete.includes(`${row.sourceLanguage} ${row.targetLanguage}`) &&
+        !stepsToDelete.includes(row.step.toString()) &&
+        !industriesToDelete.includes(row.industry.toString())
+      ))
+    } else {
+		  rates = {
+		    basicPricesTable: [],
+        stepMultipliersTable: [],
+        industryMultipliersTable: [],
+        pricelistTable: []
+      }
+    }
   } else {
-    console.log('tyt');
     rates = await updateVendorRatesFromCompetence(vendorId, competence, oldCompetence);
   }
-	return {
-		rates,
-		qualifications: newQualifications
-	};
-};
-
-
-const checkRedundantRates = (competence, allCompetencies, allQualifications, rates) => {
-  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
-  const { sourceLanguage, targetLanguage, step, industry } = competence;
-  allCompetencies = allCompetencies.filter(row => {
-    const sameLanguage = `${row.sourceLanguage} ${row.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`;
-    const sameStep = row.step.toString() === step._id.toString();
-    const sameIndustry = row.industry.toString() === industry._id.toString();
-    if (!sameLanguage && !sameStep && !sameIndustry) {
-      return row;
-    }
-  });
-  allQualifications = allQualifications.filter(({ status }) => status === 'Passed');
-  const sameLangPairsIndex = allCompetencies.findIndex(row => (
-    `${row.sourceLanguage} ${row.targetLanguage}` === `${sourceLanguage._id} ${targetLanguage._id}`
-  ));
-  const sameQualificationLangPairIndex = allQualifications.findIndex(({ source, target }) => (
-    `${source} ${target}` === `${sourceLanguage._id} ${targetLanguage._id}`
-  ))
-  const sameStepIndex = allCompetencies.findIndex(row => (
-    row.step.toString() === step._id.toString()
-  ));
-  const sameQualificationStepIndex = allQualifications.findIndex(({ steps }) => (
-    steps.map(item => item.toString()).includes(step._id.toString())
-  ));
-  const sameIndustryIndex = allCompetencies.findIndex(row => (
-    row.industry.toString() === industry._id.toString()
-  ));
-  const sameQualificationIndustryIndex = allQualifications.findIndex(({ industries }) => (
-    industries.map(item => item.toString()).includes(industry._id.toString())
-  ))
-
-  if ((sameLangPairsIndex === -1 || !allCompetencies.length) && (sameQualificationLangPairIndex === -1 || !allQualifications.length)) {
-    basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
-    pricelistTable = filterRedundantLangPair(pricelistTable, sourceLanguage._id, targetLanguage._id);
-  }
-  if ((sameStepIndex === -1 || !allCompetencies.length) && (sameQualificationStepIndex === -1 || !allQualifications.length)) {
-    stepMultipliersTable = filterRedundantStep(stepMultipliersTable, step._id);
-    pricelistTable = filterRedundantStep(pricelistTable, step._id);
-  }
-  if ((sameIndustryIndex === -1 || !allCompetencies.length) && (sameQualificationIndustryIndex === -1 || !allQualifications.length)) {
-    industryMultipliersTable = filterRedundantIndustry(industryMultipliersTable, industry._id);
-    pricelistTable = filterRedundantIndustry(pricelistTable, industry._id);
-  }
-
   return {
-    basicPricesTable,
-    stepMultipliersTable,
-    industryMultipliersTable,
-    pricelistTable
-  }
+    rates,
+    qualifications: newQualifications
+  };
 
-
-  function filterRedundantLangPair(arr, sourceLangId, targetLangId) {
-    return arr.filter(item => (
-      `${item.sourceLanguage} ${item.targetLanguage}` !== `${sourceLangId} ${targetLangId}`
-    ));
+  function getCompetenciesForCheck(competencies) {
+    return competencies.filter(row => {
+      const { sourceLanguage, targetLanguage, industry, step, _id } = row;
+      const qualificationLangPairs = newQualifications.map(row => `${row.source} ${row.target}`);
+      const qualificationSteps = newQualifications.map(row => [...row.steps]);
+      const qualificationIndustries = newQualifications.map(row => [...row.industries]);
+      const doesHaveLangPair = qualificationLangPairs.includes(`${sourceLanguage} ${targetLanguage}`);
+      const doesHaveStep = qualificationSteps.includes(step);
+      const doesHaveIndustry = qualificationIndustries.includes(industry);
+      const doesHaveSameId = competence._id.toString() === _id.toString();
+      if (!doesHaveLangPair && !doesHaveStep && !doesHaveIndustry && !doesHaveSameId) {
+        return row;
+      }
+    });
   }
-
-  function filterRedundantStep (arr, itemId) {
-    return arr.filter(item => item.step.toString() !== itemId.toString());
-  }
-
-  function filterRedundantIndustry (arr, itemId) {
-    return arr.filter(item => item.industry.toString() !== itemId.toString());
-  }
-}
+};
 
 const findSameTest = (arrTest, competence) => {
 	return arrTest.find(test =>

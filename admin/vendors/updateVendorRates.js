@@ -72,7 +72,7 @@ const updateVendorLangPairs = async (
   vendorRates,
   defaultPricelist
 ) => {
-  const { competencies } = vendor;
+  let { competencies, qualifications } = vendor;
   const { sourceLanguage, targetLanguage } = oldData;
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = vendorRates;
   if (newSourceLang && newTargetLang) {
@@ -124,6 +124,14 @@ const updateVendorLangPairs = async (
         );
       }
   }
+  const qualificationLangPairs = qualifications.map(({ source, target }) => `${source} ${target}`);
+  competencies = competencies.filter(row => {
+    const { sourceLanguage, targetLanguage, _id } = row;
+    if (!qualificationLangPairs.includes(`${sourceLanguage} ${targetLanguage}`)
+      && _id.toString() !== oldData._id.toString()) {
+      return row;
+    }
+  });
   const isNotLastLangPairInCompetence = findSameLangPairRow(competencies, sourceLanguage._id, targetLanguage._id);
   if (!isNotLastLangPairInCompetence) {
     basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
@@ -174,7 +182,7 @@ const updateVendorLangPairs = async (
  */
 const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates) => {
   const { competencies, _id: vendorId } = vendor;
-  const sameStep = vendorRates.stepMultipliersTable.find(item => item.step._id.toString() === newStep._id.toString());
+  const sameStep = vendorRates.stepMultipliersTable.find(item => item.step.toString() === newStep._id.toString());
   const isNotLastStepInCompetence = competencies.find(item => item.step.toString() === oldData.step._id.toString());
   if (!sameStep) {
     const dataForCreation = [{
@@ -186,8 +194,9 @@ const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates
     vendorRates = await createNewRateCombinations(dataForCreation, vendorRates, vendorId);
   }
   if (!isNotLastStepInCompetence) {
-    vendorRates.stepMultipliersTable = filterRedundantItem(vendorRates.stepMultipliersTable, oldData.step._id);
-    vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.step._id);
+    vendorRates.stepMultipliersTable = filterRedundantItem(
+      vendorRates.stepMultipliersTable, oldData.step._id, 'step');
+    vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.step._id, 'step');
   }
   return vendorRates;
 };
@@ -206,7 +215,7 @@ const updateIndustryMultipliers = async (oldData, newIndustry, vendor, vendorRat
   const isNotLastIndustryInCompetence = competencies.find(item => item.industry.toString() === oldData.industry._id.toString());
   if (!sameIndustry) {
     const dataForCreation = [{
-      industry: newIndustry,_id,
+      industry: newIndustry._id,
       sourceLanguage: oldData.sourceLanguage._id,
       targetLanguage: oldData.targetLanguage._id,
       step: oldData.step._id
@@ -214,13 +223,14 @@ const updateIndustryMultipliers = async (oldData, newIndustry, vendor, vendorRat
     vendorRates = await createNewRateCombinations(dataForCreation, vendorRates, vendorId);
   }
   if (!isNotLastIndustryInCompetence) {
-    vendorRates.industryMultipliersTable = filterRedundantItem(vendorRates.industryMultipliersTable, oldData.step._id)
-    vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.step._id)
+    vendorRates.industryMultipliersTable = filterRedundantItem(
+      vendorRates.industryMultipliersTable, oldData.industry._id, 'industry');
+    vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.industry._id, 'industry')
   }
   return vendorRates
 };
 
-const filterRedundantItem = (arr, itemId) => arr.filter(item => item.step.toString() !== itemId.toString());
+const filterRedundantItem = (arr, itemId, key) => arr.filter(item => item[key].toString() !== itemId.toString());
 
 /**
  *
@@ -335,10 +345,10 @@ const createNewRateCombinations = async (dataForCreation, vendorRates, vendorId)
     industryMultipliersTable,
     pricelistTable,
   } = await createRateCombinations(dataForCreation, vendorId);
-  vendorRates.basicPricesTable = [...vendorRates.basicPricesTable, ...basicPricesTable];
-  vendorRates.stepMultipliersTable = [...vendorRates.stepMultipliersTable, ...stepMultipliersTable];
-  vendorRates.industryMultipliersTable = [...vendorRates.industryMultipliersTable, ...industryMultipliersTable];
-  vendorRates.pricelistTable = [...vendorRates.pricelistTable, ...pricelistTable];
+  vendorRates.basicPricesTable = [...basicPricesTable];
+  vendorRates.stepMultipliersTable = [...stepMultipliersTable];
+  vendorRates.industryMultipliersTable = [...industryMultipliersTable];
+  vendorRates.pricelistTable = [...pricelistTable];
   return vendorRates;
 }
 

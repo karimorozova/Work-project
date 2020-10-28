@@ -37,14 +37,21 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
 	}
 
 	function generateCompetenceForSave(dataToUpdate) {
-		let dataToSave = {};
-		for (const key in dataToUpdate) {
-			if(dataToUpdate.hasOwnProperty(key)) {
-				const element = dataToUpdate[key];
-				dataToSave[key] = ObjectId(element._id);
-			}
-		}
-		return dataToSave;
+	  return {
+	    _id: ObjectId(dataToUpdate._id),
+      sourceLanguage: ObjectId(dataToUpdate.sourceLanguage._id),
+      targetLanguage: ObjectId(dataToUpdate.targetLanguage._id),
+      step: ObjectId(dataToUpdate.step._id),
+      industry: ObjectId(dataToUpdate.industry._id)
+    }
+		// let dataToSave = {};
+		// for (const key in dataToUpdate) {
+		// 	if(dataToUpdate.hasOwnProperty(key)) {
+		// 		const element = dataToUpdate[key];
+		// 		dataToSave[key] = ObjectId(element._id);
+		// 	}
+		// }
+		// return dataToSave;
 	}
 };
 
