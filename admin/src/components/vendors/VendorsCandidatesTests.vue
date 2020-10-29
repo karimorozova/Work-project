@@ -13,8 +13,8 @@
       Datatable(
         :fields="fields",
         :tableData="vendorTests",
-        :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': vendorTests.length < 5 }]",
-        :tableheadRowClass="vendorTests.length < 5 ? 'tbody_visible-overflow' : ''",
+        :bodyClass="['candidates-vendor-table', { 'tbody_visible-overflow': vendorTests.length < 17 }]",
+        :tableheadRowClass="vendorTests.length < 17 ? 'tbody_visible-overflow' : ''",
         @onRowClicked="editData"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
@@ -581,7 +581,8 @@
 
     &__approve {
       position: absolute;
-      transform: translate(100%, 50%);
+      left: 40%;
+      top: 40%;
     }
 
     &__data {
