@@ -13,7 +13,7 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
 			competencies.splice(neededServiceIndex, 1, generateCompetenceForSave(dataToUpdate));
 			await Vendors.updateOne({ _id: vendorId }, { competencies });
 			let { rates, qualifications } = await saveQualificationsAfterUpdateCompetencies(dataToUpdate, vendorId, oldCompetence);
-      return await getVendorAfterUpdate({ _id: vendorId }, { rates, qualifications });
+			return await getVendorAfterUpdate({ _id: vendorId }, { rates, qualifications });
 		} else {
 			const combinationsWithoutRepetitions = generateCompetenciesCombinations(dataToUpdate)
 					.filter(x => competencies.every(y =>
@@ -37,21 +37,13 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
 	}
 
 	function generateCompetenceForSave(dataToUpdate) {
-	  return {
-	    _id: ObjectId(dataToUpdate._id),
-      sourceLanguage: ObjectId(dataToUpdate.sourceLanguage._id),
-      targetLanguage: ObjectId(dataToUpdate.targetLanguage._id),
-      step: ObjectId(dataToUpdate.step._id),
-      industry: ObjectId(dataToUpdate.industry._id)
-    }
-		// let dataToSave = {};
-		// for (const key in dataToUpdate) {
-		// 	if(dataToUpdate.hasOwnProperty(key)) {
-		// 		const element = dataToUpdate[key];
-		// 		dataToSave[key] = ObjectId(element._id);
-		// 	}
-		// }
-		// return dataToSave;
+		return {
+			_id: ObjectId(dataToUpdate._id),
+			sourceLanguage: ObjectId(dataToUpdate.sourceLanguage._id),
+			targetLanguage: ObjectId(dataToUpdate.targetLanguage._id),
+			step: ObjectId(dataToUpdate.step._id),
+			industry: ObjectId(dataToUpdate.industry._id)
+		}
 	}
 };
 
