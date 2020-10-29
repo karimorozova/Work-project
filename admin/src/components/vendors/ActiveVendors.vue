@@ -27,7 +27,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .active-vendors {
-  max-width: 1200px;
+  width: 1200px;
 }
 
 </style>
