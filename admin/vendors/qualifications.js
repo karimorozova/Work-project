@@ -8,7 +8,12 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 	let { qualifications } = await Vendors.findOne({ _id: vendorId });
 	let listForRates = [];
 	const listCompetenciesForSave = listOfNewCompetencies.filter(competence => {
-		let currentTest = findSameTest(allTests, competence);
+    let currentTest = allTests.find(test =>
+      test.source.toString() === competence.sourceLanguage.toString() &&
+      test.targets.find(target => target.toString() === competence.targetLanguage.toString()) &&
+      test.industries.find(industry => industry.toString() === competence.industry.toString()) &&
+      test.steps.find(step => step.toString() === competence.step.toString())
+    );
 		if(currentTest) {
 			competence.testId = currentTest._id;
 			return competence;
@@ -71,7 +76,7 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 	const allTests = await LangTest.find({});
 	let { qualifications, rates, competencies } = await Vendors.findOne({ _id: vendorId });
 	let newQualifications = qualifications;
-	let currentTest = findSameTest(allTests, competence);
+  let currentTest = findSameTest(allTests, competence);
 	if(currentTest) {
 		const neededQualificationIndex = qualifications.findIndex(
 				qualification => qualification.testId.toString() === currentTest._id.toString() &&
@@ -101,6 +106,7 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 			}
 		}
 		const neededCompetencies = getCompetenciesForCheck(competencies);
+    console.log(neededCompetencies);
 		if(neededCompetencies.length) {
 			const langPairsToDelete = [];
 			const industriesToDelete = [];
@@ -144,7 +150,14 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 
 	function getCompetenciesForCheck(competencies) {
 		return competencies.filter(item => item._id.toString() !== competence._id.toString())
-				.filter(item => findSameTest(allTests, item) === undefined && item);
+				.filter(item => (
+          allTests.find(test =>
+            test.source.toString() === item.sourceLanguage.toString() &&
+            test.targets.find(target => target.toString() === item.targetLanguage.toString()) &&
+            test.industries.find(industry => industry.toString() === item.industry.toString()) &&
+            test.steps.find(step => step.toString() === item.step.toString())
+          ) === undefined && item
+  ));
 	}
 };
 
