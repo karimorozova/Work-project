@@ -5,8 +5,8 @@ const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getService } = require('../services');
 const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
-const { getProjectDeliverables } = require("../projects/files");
-const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, noitfyRequestCancelled } = require("../clientRequests");
+const { getProjectDeliverables } = require('../projects/files');
+const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, notifyRequestCancelled } = require('../clientRequests');
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
@@ -276,8 +276,8 @@ router.post('/cancel-quote', checkClientContact, async (req, res) => {
     const { id } = req.body;
     try {
         const request = await updateClientRequest({"_id": id},{ status: "Cancelled" });
-        await noitfyRequestCancelled(request);
-        res.send(request);
+      await notifyRequestCancelled(request);
+      res.send(request);
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on request quote status update");

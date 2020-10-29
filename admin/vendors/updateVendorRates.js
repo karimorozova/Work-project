@@ -1,13 +1,14 @@
-const { Vendors, Pricelist } = require('../models');
+const { Vendors, Pricelist, LangTest } = require('../models');
 const {
-  getPricelistCombinations,
   replaceOldItem,
   changePricelistTable,
+  generateNewPricelistCombinations
 } = require('../clients');
 const { getRateInfoFromStepFinance, manageMonoPairRates, manageDuoPairRates } = require("../pricelist/ratesmanage")
 const { getVendor, getVendorAfterUpdate } = require("./index");
 const { createRateCombinations } = require('./createVendorRates');
 const { tableKeys } = require('../enums');
+const { getCompetenciesForCheck } = require('./helpers');
 
 /**
  *
@@ -15,10 +16,6 @@ const { tableKeys } = require('../enums');
  * @param {String} newData - updated competence example from frontend
  * @param {String} oldData - old competence example from database
  * @return nothing - updates vendor's rates
- */
-
-/*
-
  */
 const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
   const vendor = await Vendors.findOne({ _id: vendorId });
@@ -74,7 +71,13 @@ const updateVendorLangPairs = async (
 ) => {
   let { competencies, qualifications } = vendor;
   const { sourceLanguage, targetLanguage } = oldData;
-  let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = vendorRates;
+  let {
+    basicPricesTable,
+    stepMultipliersTable,
+    industryMultipliersTable,
+    pricelistTable: oldPricelistTable
+  } = vendorRates;
+  let pricelistTable;
   if (newSourceLang && newTargetLang) {
     const sameLangPairRow = findSameLangPairRow(basicPricesTable, newSourceLang._id, newTargetLang._id);
     if (!sameLangPairRow) {
@@ -84,12 +87,8 @@ const updateVendorLangPairs = async (
         newSourceLang._id,
         newTargetLang._id
       );
-      pricelistTable = await getPricelistCombinations(
-        basicPricesTable,
-        stepMultipliersTable,
-        industryMultipliersTable,
-        pricelistTable
-      );
+      pricelistTable = [...await generateNewPricelistCombinations(
+        basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
     }
   } else if (newSourceLang && !newTargetLang) {
     const sameLangPairRow = findSameLangPairRow(basicPricesTable, newSourceLang._id, targetLanguage._id);
@@ -100,12 +99,8 @@ const updateVendorLangPairs = async (
           newSourceLang._id,
           targetLanguage._id
         );
-        pricelistTable = await getPricelistCombinations(
-          basicPricesTable,
-          stepMultipliersTable,
-          industryMultipliersTable,
-          pricelistTable
-        );
+        pricelistTable = [...await generateNewPricelistCombinations(
+          basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
       }
   } else {
     const sameLangPairRow = findSameLangPairRow(basicPricesTable, sourceLanguage._id, newTargetLang._id);
@@ -116,12 +111,8 @@ const updateVendorLangPairs = async (
           sourceLanguage,
           newTargetLang._id
         );
-        pricelistTable = await getPricelistCombinations(
-          basicPricesTable,
-          stepMultipliersTable,
-          industryMultipliersTable,
-          pricelistTable
-        );
+        pricelistTable = [...await generateNewPricelistCombinations(
+          basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
       }
   }
   const qualificationLangPairs = qualifications.map(({ source, target }) => `${source} ${target}`);
@@ -137,6 +128,14 @@ const updateVendorLangPairs = async (
     basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
     pricelistTable = filterRedundantLangPair(pricelistTable, sourceLanguage._id, targetLanguage._id);
   }
+  pricelistTable = _.uniqBy(pricelistTable, (item) => (
+    item.sourceLanguage.toString() +
+    item.targetLanguage.toString() +
+    item.step.toString() +
+    item.unit.toString() +
+    item.size +
+    item.industry.toString()
+  ));
   return {
     basicPricesTable,
     stepMultipliersTable,
@@ -145,7 +144,7 @@ const updateVendorLangPairs = async (
   };
 
 
-  function findSameLangPairRow(arr, sourceLangId, targetLangId) {
+  function findSameLangPairRow (arr, sourceLangId, targetLangId) {
     return arr.find(item => (
       `${item.sourceLanguage} ${item.targetLanguage}` === `${sourceLangId} ${targetLangId}`
     ));
@@ -182,8 +181,10 @@ const updateVendorLangPairs = async (
  */
 const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates) => {
   const { competencies, _id: vendorId } = vendor;
+  const allTests = await LangTest.find({});
+  const neededCompetencies = getCompetenciesForCheck(competencies, oldData._id, allTests);
   const sameStep = vendorRates.stepMultipliersTable.find(item => item.step.toString() === newStep._id.toString());
-  const isNotLastStepInCompetence = competencies.find(item => item.step.toString() === oldData.step._id.toString());
+  const isNotLastStepInCompetence = neededCompetencies.find(item => item.step.toString() === oldData.step._id.toString());
   if (!sameStep) {
     const dataForCreation = [{
       step: newStep._id,
@@ -211,8 +212,12 @@ const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates
  */
 const updateIndustryMultipliers = async (oldData, newIndustry, vendor, vendorRates) => {
   const { competencies, _id: vendorId } = vendor;
-  const sameIndustry = vendorRates.industryMultipliersTable.find(item => item.industry.toString() === newIndustry._id.toString());
-  const isNotLastIndustryInCompetence = competencies.find(item => item.industry.toString() === oldData.industry._id.toString());
+  const sameIndustry = vendorRates.industryMultipliersTable.find(item => (
+    item.industry.toString() === newIndustry._id.toString()
+  ));
+  const isNotLastIndustryInCompetence = competencies.find(item => (
+    item.industry.toString() === oldData.industry._id.toString()
+  ));
   if (!sameIndustry) {
     const dataForCreation = [{
       industry: newIndustry._id,

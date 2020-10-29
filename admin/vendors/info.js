@@ -122,16 +122,6 @@ async function saveAssessmentFile({ assessment, file, vendorId }) {
   }
 }
 
-function langsMatchIndex({ source, target, langsData }) {
-  return langsData.findIndex(item => {
-    let isPairMatch = item.target.id === target._id;
-    if (isPairMatch && item.source) {
-      isPairMatch = source && item.source.id === source._id;
-    }
-    return isPairMatch;
-  });
-}
-
 function updateExistingAssessment(assessment, assessments, fileData) {
   const { industry, step, source, target, ...assessmentData } = assessment;
   const { mainIndex, industryIndex, stepIndex } = assessment;
@@ -171,7 +161,7 @@ const getUpdatedIndustries = (assessmentIndustries, newIndustries, newSteps, new
   for(let newIndustry of newIndustries) {
     const sameIndustryIndex = assessmentIndustries.findIndex(({ industry }) => industry._id.toString() === newIndustry._id);
     if (sameIndustryIndex !== -1) {
-      for (let { _id } of newSteps) assessmentIndustries[sameIndustryIndex].steps.push(...steps);
+      for (let step of newSteps) assessmentIndustries[sameIndustryIndex].steps.push(...steps);
     } else {
       assessmentIndustries.push({ industry: ObjectId(newIndustry._id), steps});
     }

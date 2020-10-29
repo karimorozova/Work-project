@@ -1,16 +1,19 @@
 const ObjectId = require('mongodb').ObjectID;
 
-function getFilterdRequestsQuery(filters) {
-    let query = {}
-    if(filters.lastDate) {
-        query.startDate = {$lt: new Date(filters.lastDate)};
-    }
-    if(filters.startFilter) {
-        query.startDate = filters.lastDate ? {$lt: new Date(filters.lastDate), $gte: new Date(filters.startFilter)} : {$gte: new Date(filters.startFilter)};
-    }
-    if(filters.deadlineFilter) {
-        query.deadline = {$lte: new Date(filters.deadlineFilter)};
-    }
+function getFilteredRequestsQuery (filters) {
+  let query = {};
+  if (filters.lastDate) {
+    query.startDate = { $lt: new Date(filters.lastDate) };
+  }
+  if (filters.startFilter) {
+    query.startDate = filters.lastDate ? {
+      $lt: new Date(filters.lastDate),
+      $gte: new Date(filters.startFilter)
+    } : { $gte: new Date(filters.startFilter) };
+  }
+  if (filters.deadlineFilter) {
+    query.deadline = { $lte: new Date(filters.deadlineFilter) };
+  }
     if(filters.clientFilter) {
         query["customer.name"] = {"$regex": new RegExp(`${filters.clientFilter}`, 'i')};
     }
@@ -21,14 +24,14 @@ function getFilterdRequestsQuery(filters) {
         query["targetLanguages.symbol"] = {$in: filters.targetFilter};
     }
     if(filters.pmIds) {
-        const managerFilter = filters.pmIds.map(item => ObjectId(item._id));
-        query.projectManager = {$in: managerFilter};
+      const managerFilter = filters.pmIds.map(item => ObjectId(item._id));
+      query.projectManager = { $in: managerFilter };
     }
-    if(filters.salesIds) {
-        const managerFilter = filters.salesIds.map(item => ObjectId(item._id));
-        query.salesManager = {$in: managerFilter};
-    }
-    return query;
+  if (filters.salesIds) {
+    const managerFilter = filters.salesIds.map(item => ObjectId(item._id));
+    query.salesManager = { $in: managerFilter };
+  }
+  return query;
 }
 
-module.exports = { getFilterdRequestsQuery }
+module.exports = { getFilteredRequestsQuery };

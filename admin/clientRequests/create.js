@@ -61,8 +61,7 @@ function getSeo(request) {
         let seoInfo = Object.keys(request).filter(item => item.indexOf('seo') !== -1);
         if(seoInfo.length) {
             seoInfo = seoInfo.map(item => {
-                const newItem = item.split('-')[1];
-                return newItem;
+              return item.split('-')[1];
             })
         }
         seoData.push(...seoInfo, isMetaTags);

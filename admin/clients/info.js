@@ -43,17 +43,14 @@ async function attachPhotos({ photoFiles, contacts, clientId }) {
   }
 }
 
-async function removeClientDoc({ clientId, fileName, path, category }) {
+async function removeClientDoc ({ clientId, path, category }) {
   try {
     const client = await Clients.findOne({ _id: clientId });
     const { documents } = client;
     const neededFileIndex = documents.findIndex(item => item.category === category);
     documents[neededFileIndex].fileName = '';
     documents[neededFileIndex].path = '';
-
-    // console.log({clientId, fileName, path, category});
-
-    await removeOldClientFile(path, "");
+    await removeOldClientFile(path, '');
     return await getClientAfterUpdate({ _id: clientId }, { documents });
 
   } catch (err) {
@@ -119,40 +116,6 @@ function removeOldClientFile(oldPath, newPath) {
     });
     resolve("removed");
   });
-}
-
-async function attachNdaContract({ newContract, newNda, oldContract, oldNda, clientId }) {
-  let contract = "";
-  let nda = "";
-  try {
-    if (newContract) {
-      if (oldContract) {
-        await fs.unlink('./dist' + oldContract, (err) => {
-          console.log(err);
-        });
-      }
-      const namePrefix = newContract.fieldname.slice(0, 3).toLowerCase();
-      const newPath = `/clientsDocs/${clientId}/${namePrefix}-${newContract.filename}`;
-      await moveFile(newContract, `./dist${newPath}`);
-      contract = newPath;
-    }
-
-    if (newNda) {
-      if (oldNda) {
-        await fs.unlink('./dist' + oldNda, (err) => {
-          console.log(err);
-        });
-      }
-      const namePrefix = newNda.fieldname.slice(0, 3).toLowerCase();
-      const newPath = `/clientsDocs/${clientId}/${namePrefix}-${newNda.filename}`;
-      await moveFile(newNda, `./dist${newPath}`);
-      nda = newPath;
-    }
-    return { contract, nda };
-  } catch (err) {
-    console.log(err);
-    console.log("Error in attachNdaContract");
-  }
 }
 
 module.exports = { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc };

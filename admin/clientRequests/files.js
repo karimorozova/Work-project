@@ -31,7 +31,7 @@ async function storeRequestFiles(filesArr, requestId) {
         return storedFiles;
     } catch(err) {
         console.log(err);
-        console.log("Error in storeFiels");
+      console.log('Error in storeFiles');
     }
 }
 

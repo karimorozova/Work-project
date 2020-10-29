@@ -1,4 +1,4 @@
-const { Units, Clients, Services, Step, Industries } = require('../models');
+const { Units, Clients, Step, Industries } = require('../models');
 const { getArrayDifference, getSizeDifference, activityChange } = require('../multipliers/pricelist');
 const { differenceOperationType } = require('../enums/differenceOperationType');
 
