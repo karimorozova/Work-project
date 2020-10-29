@@ -219,6 +219,14 @@ export default {
 .matrix-table {
   max-height: 350px;
 }
+.candidates-vendor-table{
+  max-height: 600px!important;
+  overflow-y: scroll;
+  margin-bottom: 20px;
+  border: 0.5px solid $cell-border;
+  border-bottom: 1px solid $cell-border;
+  border-top: none;
+}
 
 .rates-matrix-body {
   max-height: 400px;
