@@ -163,12 +163,12 @@ export default {
       if (this.currentActive === -1) return;
       const doc = this.documentsData[index];
       this.errors = [];
+      if(this.documentsData.map(doc => doc.fileName).includes(this.currentFile.name)){
+	      this.errors.push("Cannot create document with same file name!");
+      }
       if (!this.currentCategory)
         this.errors.push("Category should not be empty!");
-      if (
-        (!doc.path && !this.currentFile) ||
-        (doc.fileName == "" && !this.currentFile)
-      )
+      if ((!doc.path && !this.currentFile) || (doc.fileName === "" && !this.currentFile))
         this.errors.push("Upload a file to save!");
       if (this.isSameExist(index))
         this.errors.push(
