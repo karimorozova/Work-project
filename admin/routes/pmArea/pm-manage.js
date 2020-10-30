@@ -991,7 +991,7 @@ router.post('/update-discount/:id', async (req, res) => {
 router.post('/check-pricelist-langs', async (req, res) => {
   const { pricelistId, langPairs } = req.body;
   try {
-    const newLangPairs =  await checkPricelistLangPairs(pricelistId, langPairs);
+    const newLangPairs = await checkPricelistLangPairs(pricelistId, langPairs);
     if (newLangPairs.length) {
       await replenishPricelistLangs(pricelistId, newLangPairs);
       res.send('Replenished!');
