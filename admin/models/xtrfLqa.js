@@ -2,17 +2,69 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const XtrfLqaSchema = new mongoose.Schema({
-    vendor: { 
-        type : Schema.Types.ObjectId, ref: 'XtrfVendor',
+  sourceLanguage: {
+    type: Schema.Types.ObjectId, ref: 'Language',
+    default: null
+  },
+  targetLanguage: {
+    type: Schema.Types.ObjectId, ref: 'Language',
+    default: null
+  },
+  industries: [{
+    industry: {
+      type: 'String',
+      default: ''
     },
-    wordcounts: {
-        type: Object,
+    vendors: [{
+      vendorId: {
+        type: Schema.Types.ObjectId, ref: 'Vendor',
         default: null
-    },
-    updatedAt: {
-        type: Date,
-        default: new Date()
-    }
+      },
+      name: {
+        type: 'String',
+        default: ''
+      },
+      email: {
+        type: 'String',
+        default: ''
+      },
+      wordCount: {
+        type: Number,
+        default: 0
+      },
+      otherInfo: [{
+        clientId: {
+          type: Schema.Types.ObjectId, ref: 'Client',
+          default: null
+        },
+        clientName: {
+          type: 'String',
+          default: ''
+        },
+        startDate: {
+          type: Date,
+          default: new Date()
+        },
+        deadline: {
+          type: Date,
+          default: new Date()
+        },
+        projectId: {
+          type: 'String',
+          default: ''
+        },
+        wordcountPayables: {
+          type: Number,
+          default: 0,
+        },
+        wordcountReceivables: {
+          type: Number,
+          default: 0
+        }
+      }]
+    }],
+  }]
+
 });
 
 const XtrfLqa = mongoose.model('XtrfLqa', XtrfLqaSchema);
