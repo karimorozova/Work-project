@@ -1,8 +1,9 @@
 const { MemoqProject, Languages, LangTier } = require('../models');
+const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
 
 const newLangReport = async () => {
 	const languages = await Languages.find();
-	let projects = await MemoqProject.find({$and: [ {status:"Closed"},{isTest: false}]});
+	let projects = await MemoqProject.find({ $and: [{ status: "Closed" }, { isTest: false }] });
 	projects = projects.filter(item => item.sourceLanguage);
 	const reports = [];
 
@@ -67,8 +68,9 @@ const newLangReport = async () => {
 	}
 
 	function findLanguageGroup(allLanguages, memoqSymbol) {
-		return allLanguages.find(lang => lang.memoq === memoqSymbol) ? allLanguages.find(lang => (
-				lang.memoq === memoqSymbol)).group : memoqSymbol;
+		return allLanguages.find(lang => {
+			return findLanguageByMemoqLanguageCode(lang, memoqSymbol)
+		}).group;
 	}
 
 	function findAllTargets(documents) {
