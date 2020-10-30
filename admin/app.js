@@ -16,18 +16,10 @@ const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
 const { newLangReport } = require('./reports/newLangTierReport');
+const { readFile } = require('./reports/parseOldMemoqProjects');
 
-// newLangReport()
-// const a = async () => {
-//   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
-//   try {
-//     await updateMemoqProjectsData();
-//     console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
-//   } catch (err) {
-//     console.log(err.message);
-//   }
-// };
-// a();
+
+// readFile()
 
 schedule.scheduleJob('0 */3 * * *', async function () {
   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
