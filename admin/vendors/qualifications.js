@@ -161,10 +161,10 @@ const findSameTestFromCompetence = (arrTest, competence, includesId = false) => 
     step = step._id;
   }
   return arrTest.find(test =>
-    test.source.toString() === sourceLanguage &&
-    test.targets.find(target => target.toString() === targetLanguage) &&
-    test.industries.find(testIndustry => testIndustry.toString() === industry) &&
-    test.steps.find(testStep => testStep.toString() === step)
+    test.source.toString() === sourceLanguage.toString() &&
+    test.targets.find(target => target.toString() === targetLanguage.toString()) &&
+    test.industries.find(testIndustry => testIndustry.toString() === industry.toString()) &&
+    test.steps.find(testStep => testStep.toString() === step.toString())
   );
 };
 
