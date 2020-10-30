@@ -1,18 +1,19 @@
 const { MemoqProject, Languages, LangTier } = require('../models');
+const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
 
 const newLangReport = async () => {
-	const languages = await Languages.find();
-	let projects = await MemoqProject.find({$and: [ {status:"Closed"},{isTest: false}]});
-	projects = projects.filter(item => item.sourceLanguage);
-	const reports = [];
+  const languages = await Languages.find();
+  let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }] });
+  projects = projects.filter(item => item.sourceLanguage);
+  const reports = [];
 
-	for (let { domain, sourceLanguage, documents } of projects) {
-		const industryGroup = findIndustry(domain);
-		industryGroup && sourceLanguage && distributeIndustries(industryGroup, sourceLanguage, documents)
-		distributeIndustries('All', sourceLanguage, documents)
-	}
+  for (let { domain, sourceLanguage, documents } of projects) {
+    const industryGroup = findIndustry(domain);
+    industryGroup && sourceLanguage && distributeIndustries(industryGroup, sourceLanguage, documents);
+    distributeIndustries('All', sourceLanguage, documents);
+  }
 
-	function distributeIndustries(industryKey, sourceLanguage, documents) {
+  function distributeIndustries (industryKey, sourceLanguage, documents) {
 		const doesIndustryExists = reports.find(row => row.industry === industryKey);
 		if(doesIndustryExists === undefined) {
 			reports.push({
@@ -67,9 +68,10 @@ const newLangReport = async () => {
 	}
 
 	function findLanguageGroup(allLanguages, memoqSymbol) {
-		return allLanguages.find(lang => lang.memoq === memoqSymbol) ? allLanguages.find(lang => (
-				lang.memoq === memoqSymbol)).group : memoqSymbol;
-	}
+    return allLanguages.find(lang => {
+      return findLanguageByMemoqLanguageCode(lang, memoqSymbol);
+    }).group;
+  }
 
 	function findAllTargets(documents) {
 		return documents.map(({ TargetLangCode, TotalWordCount }) => (
