@@ -1,5 +1,5 @@
 const { MemoqProject, Clients, Vendors } = require('../../../models');
-const { isAllTasksFinished, checkProjectStructure, getProjectStatus } = require('./helpers');
+const { checkProjectStructure, getProjectStatus } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects } = require('./getMemoqProject');
 
@@ -21,7 +21,7 @@ const updateAllMemoqProjects = async (querySource) => {
   for (let i = 0; i < projects.length; i++) {
     let project = projects[i];
     const { documents, lockedForRecalculation } = project;
-    project.status = getProjectStatus(project);
+    project.status = getProjectStatus(documents);
     if (!lockedForRecalculation) {
       const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, project, documents);
       if (doesHaveCorrectStructure) {
@@ -39,7 +39,7 @@ const updateMemoqProjectFinance = async (project) => {
   const clients = await Clients.find();
   const vendors = await Vendors.find();
   const { documents, lockedForRecalculation } = project;
-  project.status = getProjectStatus(project)
+  project.status = getProjectStatus(documents);
   const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, project, documents);
   if (!doesHaveCorrectStructure && lockedForRecalculation) {
     return project;
