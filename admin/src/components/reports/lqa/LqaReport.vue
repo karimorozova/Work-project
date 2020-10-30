@@ -1,166 +1,218 @@
 <template lang="pug">
-    .lqa
-        .lqa__filters
-            Filters(
-                :languages="languages"
-                :targetFilter="targetFilter"
-                :industryFilter="industryFilter"
-                :tierFilter="tierFilter"
-                :nameFilter="nameFilter"
-                @setNameFilter="(e) => setFilter(e, 'nameFilter')"
-                @setTargetFilter="setTargetFilter"
-                @setIndustryFilter="(e) => setFilter(e, 'industryFilter')"
-                @setTierFilter="(e) => setFilter(e, 'tierFilter')"
-          
-            )
-        .lqa__languages
-            .lqa__language(v-for="report in reportData")
-                div(v-if="report !== null")
-                    h3.lga__text Target Language: {{ report.target }}
-                    .lqa__group-industries(v-if="report.finance")
-                        .lqa__industry(v-if="report.finance.vendors.length")
-                            h4.lqa__text Industry: Finance
-                            Table(:vendorsData="report.finance.vendors" field="Finance" :tier="String(report.finance.tier)")
-                    .lqa__group-industries(v-if="report.gaming")
-                        .lqa__industry(v-if="report.gaming.vendors.length")
-                            h4.lqa__text Industry: iGaming
-                            Table(:vendorsData="report.gaming.vendors" field="iGaming" :tier="String(report.gaming.tier)")
-                    .lqa__group-industries(v-if="report.other")
-                        .lqa__industry(v-if="report.other.vendors.length")
-                            h4.lqa__text Industry: Others
-                            Table(:vendorsData="report.other.vendors" field="Others" :tier="String(report.other.tier)")
-            .lqa__form(v-if="false")
-                NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
+  .lqa
+    .lqa__filters
+      LqaReportFilter(
+        :isLqa="false"
+        :allSources="['allSources']"
+        :allTargets="['allTargets']"
+        :allVendors="['Vendors']"
+        :targetFilter="targetFilter"
+        :sourceFilter="sourceFilter"
+        :tierFilter="tierFilter"
+        :industryFilter="industryFilter"
+        :vendorFilter="vendorFilter"
+        @setTierFilter="setTierFilter"
+        @setTargetFilter="setTargetFilter"
+        @setSourceFilter="setSourceFilter"
+        @setIndustryFilter="setIndustryFilter"
+        @setVendorFilter="setVendorFilter"
+      )
+    .lqa__languages
+      .lqa__language(v-for="{ sourceLanguage, targetLanguage, industries } in reportData")
+        .lqa__text {{ sourceLanguage }} >> {{ targetLanguage }}
+        .lqa__industries(v-for="{industry, vendors} in industries")
+          .lqa__industry {{ industry }}
+            Table(:vendorsData="vendors")
+
+      //.lqa__form(v-if="false")
+        NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
 </template>
 
 <script>
-import Filters from "../Filters";
-import NewVendor from "../NewVendor";
-import Table from "./Table";
-import { mapActions } from "vuex";
-import newXtrfVendor from "@/mixins/newXtrfVendor";
+	import NewVendor from "../NewVendor";
+	import Table from "./Table";
+	import { mapActions } from "vuex";
+	import LqaReportFilter from "./LqaReportFilter";
 
-export default {
-    mixins: [newXtrfVendor],
-    props: {
-        allXtrfLangs: {type: Array, default: () => []}
-    },
-    data() {
-        return {
-            reportData: null,
-            nameFilter: "",
-            targetFilter: ["All"],
-            industryFilter: "All",
-            tierFilter: "All",
-            languages: [],
-            allLangs: [],
-            isLanguages: true
-        }
-    },
-    methods: {
-        ...mapActions(['alertToggle']),
-        async getReport() {
-            try {
-                const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
-                this.reportData = result.data;
-                
-                const languages = await this.$http.get("/api/languages");
-                this.allLangs = languages.data;
+	export default {
+		data() {
+			return {
+				reportData: null,
+				nameFilter: "",
 
-                if (this.isLanguages) {
-                    this.languages = [...new Set(languages.data.map(item => item.group))];
-                    this.languages.unshift("All");
-                }
+				sourceFilter: "All",
+				targetFilter: "All",
+				industryFilter: "All",
+				tierFilter: "All",
+				vendorFilter: "All",
 
-                this.isLanguages = false;
-            } catch(err) {
-                this.alertToggle({message: "Error on getting LQA report", isShow: true, type: "error"});
-            }
-        },
-        async setFilter({value}, prop) {
-            this[prop] = value;
-            await this.getReport();
-        },
-        async setTargetFilter({lang}) {
-            if(lang !== 'All') {
-                this.targetFilter = this.targetFilter.filter(item => item !== 'All');
-                const position = this.targetFilter.indexOf(lang);
-                if(position === -1) {
-                    this.targetFilter.push(lang);
-                    return await this.getReport();
-                }
-                this.targetFilter.splice(position, 1);
-            }
-            this.targetFilter = !this.targetFilter.length || lang === 'All' ? ["All"] : this.targetFilter;
-            await this.getReport();
-        }
-    }, 
-    computed: {
-        filters() {
-            let result = { nameFilter: this.nameFilter };
-            if (this.targetFilter[0] !== "All") {
-                let languageArray = [];
+				languages: [],
+				allLangs: [],
+				isLanguages: true
+			}
+		},
+		methods: {
+			...mapActions(['alertToggle']),
+			async getReport() {
+				try {
+					// const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
+					this.reportData = [
+						{
+							sourceLanguage: 'EN',
+							targetLanguage: 'FR',
+							industries: [{
+								industry: 'Finance',
+								vendors: [{
+									name: 'KDJ ajsk',
+									email: 'ghjasda@asjhd.asd',
+									wordCount: 12738,
+									otherInfo: []
+								},
+									{
+										name: ' asdf sadfsa f',
+										email: 'ghjasda@asjhd.asd',
+										wordCount: 234234234,
+										otherInfo: []
+									},
+									{
+										name: 'Kasd fsdafsdk',
+										email: 'ghjasda@asjhd.asd',
+										wordCount: 12723121238,
+										otherInfo: []
+									}
+								],
+							},
+								{
+									industry: 'Finance',
+									vendors: [{
+										name: 'ASDSAD SAD',
+										email: 'ghjasda@asjhd.asd',
+										wordCount: 12738,
+										otherInfo: []
+									}],
+								},
+								{
+									industry: 'IGaming',
+									vendors: [{
+										name: 'SAKJDKSAN asd',
+										email: 'ghjasda@asjhd.asd',
+										wordCount: 333,
+										otherInfo: []
+									}],
+								}
+							]
+						},
+						{
+							sourceLanguage: 'EN',
+							targetLanguage: 'GB',
+							industries: [{
+								industry: 'Finance',
+								vendors: [{
+									name: 'asd asd 21 ',
+									email: 'ghjasda@asjhd.asd',
+									wordCount: 7777,
+									otherInfo: []
+								}],
+							}]
+						}, {
+							sourceLanguage: 'EN',
+							targetLanguage: 'FR',
+							industries: [{
+								industry: 'IGaming',
+								vendors: [{
+									name: 'JAHSD ASHD',
+									email: 'ghjasd2a@asjhd.asd',
+									wordCount: 5555,
+									otherInfo: []
+								}],
+							}]
+						}];
+					console.log(this.reportData);
 
-                this.targetFilter.forEach(element => {
-                    languageArray.push(
-                        this.allLangs
-                        .filter(item => item.group == element)
-                        .map(item => item.lang)
-                        .join()
-                    );
-                });
-                result.targetFilter = languageArray.toString().split(',');
-            }
-            if (this.industryFilter !== "All") {
-                result.industryFilter = this.industryFilter;
-            }
-            if (this.tierFilter !== "All") {
-                result.tierFilter = +this.tierFilter;
-            }
-            return result;
-        }
-    },
-    components: {
-        Filters,
-        NewVendor,
-        Table
-    },
-    mounted() {
-        this.getReport();
-    }
-}
+
+					// const languages = await this.$http.get("/api/languages");
+					// this.allLangs = languages.data;
+					//
+					// if(this.isLanguages) {
+					// 	this.languages = [...new Set(languages.data.map(item => item.group))];
+					// 	this.languages.unshift("All");
+					// }
+					//
+					// this.isLanguages = false;
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting LQA report", isShow: true, type: "error" });
+				}
+			},
+
+			async setTierFilter({ value }) {
+				this.tierFilter = value;
+				await this.getReport();
+			},
+			async setSourceFilter({ option }) {
+				this.sourceFilter = option;
+				await this.getReport();
+			},
+			async setTargetFilter({ option }) {
+				this.targetFilter = option;
+				await this.getReport();
+			},
+			async setVendorFilter({ option }) {
+				this.vendorFilter = option;
+				await this.getReport();
+			},
+			async setIndustryFilter({ option }) {
+				this.industryFilter = option;
+				await this.getReport();
+			},
+		},
+		computed: {
+			filters() {
+				let result = {};
+				if(this.targetFilter !== 'All') {
+					result.targetFilter = this.targetFilter;
+				}
+				if(this.sourceFilter !== 'All') {
+					result.sourceFilter = this.sourceFilter;
+				}
+				if(this.tierFilter !== 'All') {
+					result.tierFilter = this.tierFilter;
+				}
+				if(this.industryFilter !== "All") {
+					result.industryFilter = this.industryFilter;
+				}
+				if(this.vendorFilter !== "All") {
+					result.vendorFilter = this.vendorFilter;
+				}
+				return result;
+			}
+		},
+		components: {
+			LqaReportFilter,
+			NewVendor,
+			Table
+		},
+		mounted() {
+			this.getReport();
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
+  .lqa {
+    margin: 40px 40px 40px 20px;
+    width: 1100px;
+    box-shadow: 0 0 10px rgba(104, 87, 62, .5);
+    padding: 20px;
 
-h3, h4 {
-    margin: 0;
-    padding: 0;
-}
-
-.lqa {
-    box-sizing: border-box;
-    padding: 40px;
-    position: relative;
     &__text {
-        margin: 10px 0 5px;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 10px;
     }
-    &__languages {
-        width: 70%;
-        max-height: 680px;
-        overflow-y: auto;
-        margin-top: 40px;
+
+    &__industry {
+      font-size: 20px;
     }
-    &__language{
-        padding-top: 20px;
-    }
-    &__form {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
-}
+  }
 
 </style>

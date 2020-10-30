@@ -112,12 +112,16 @@
 				}
 			},
 			sortData(tierProp, prop) {
+				console.log(tierProp, prop);
+
 				this.activeIndex = -1;
 				this[prop] = !this[prop];
 				if(this[prop]) {
-					this.reportData = this.reportData.sort((a, b) => a[tierProp].tier - b[tierProp].tier || b[tierProp].wordcount / 6 - a[tierProp].wordcount / 6);
+					this.reportData = this.reportData.sort((a, b) => a[tierProp]['tier'] - b[tierProp]['tier']);
+					console.log(this.reportData)
 				} else {
-					this.reportData = this.reportData.sort((a, b) => b[tierProp].tier - a[tierProp].tier || a[tierProp].wordcount / 6 - b[tierProp].wordcount / 6);
+					this.reportData = this.reportData.sort((a, b) => b[tierProp]['tier'] - a[tierProp]['tier']);
+					console.log(this.reportData)
 				}
 			},
 			async setTierFilter({ value }) {

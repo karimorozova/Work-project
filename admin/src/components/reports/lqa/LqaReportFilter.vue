@@ -32,9 +32,34 @@
               :selectedOption="tierFilter"
               @chooseOption="setTierFilter"
             )
-    .button
+    .report-filters__row
+      .report-filters__item
+        LabelVal(text="Vendor Name:" customClass="new-chart-label")
+          .report-filters__drop
+            SelectSingle(
+              placeholder="Select"
+              :hasSearch="true"
+              customClass="height-32"
+              :options="allVendors"
+              :selectedOption="vendorFilter"
+              @chooseOption="setVendorFilter"
+            )
+      .report-filters__item
+        LabelVal(text="Industries:" customClass="new-chart-label")
+          .report-filters__drop
+            SelectSingle(
+              placeholder="Select"
+              :hasSearch="true"
+              customClass="height-32"
+              :options="industries"
+              :selectedOption="industryFilter"
+              @chooseOption="setIndustryFilter"
+            )
+      .report-filters__item
+
+    //.button
       .button__row
-          input.button__update-btn(type="submit" value="Update Lang Tier Reports" @click="updateReports()")
+        input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReports()")
 </template>
 
 <script>
@@ -46,19 +71,23 @@
 		props: {
 			targetFilter: { type: String },
 			sourceFilter: { type: String },
+			tierFilter: { type: String },
+			vendorFilter: { type: String },
+			industryFilter: { type: String },
 			allSources: { type: Array, default: () => [] },
 			allTargets: { type: Array, default: () => [] },
-			tierFilter: { type: String },
+			allVendors: { type: Array, default: () => [] },
 		},
 		data() {
 			return {
 				tiers: { "All": "All", "Tier 1": "1", "Tier 2": "2", "Tier 3": "3" },
+				industries: ['Finance', 'iGaming']
 			}
 		},
 		methods: {
-			updateReports(){
-				this.$emit('updateReports');
-      },
+			// updateReports() {
+			// 	this.$emit('updateReports');
+			// },
 			setTierFilter({ option }) {
 				this.$emit('setTierFilter', { value: this.tiers[option] });
 			},
@@ -68,11 +97,15 @@
 			setSourceFilter({ option }) {
 				this.$emit("setSourceFilter", { option });
 			},
+			setIndustryFilter({ option }) {
+				this.$emit("setIndustryFilter", { option });
+			},
+			setVendorFilter({ option }) {
+				this.$emit("setVendorFilter", { option });
+			},
+
 		},
 		computed: {
-			selectedLangs() {
-				return this.targetFilter.map(item => item.symbol);
-			},
 			tierNames() {
 				return Object.keys(this.tiers);
 			}
@@ -92,8 +125,9 @@
     &__row {
       margin-bottom: 20px;
     }
+
     &__update-btn {
-      width: 188px;
+      width: 194px;
       height: 34px;
       color: #fff;
       font-size: 14px;
@@ -123,6 +157,7 @@
       margin-bottom: 20px;
       box-sizing: border-box;
     }
+
     &__item {
       width: 28%;
     }
