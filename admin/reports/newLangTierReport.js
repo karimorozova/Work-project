@@ -63,40 +63,50 @@ const newLangReport = async () => {
 		await LangTier.create(result);
 	}
 
-	function returnSourceObj(languages, source, client, targets) {
-		return { lang: findLanguageGroup(languages, source), clients: client, targets: findAllTargets(targets) };
-	}
+  function returnSourceObj (languages, source, client, targets) {
+    return { lang: findLanguageGroup(languages, source), clients: client, targets: findAllTargets(targets) };
+  }
 
-	function findLanguageGroup(allLanguages, memoqSymbol) {
+  function findLanguageGroup (allLanguages, memoqSymbol) {
     return allLanguages.find(lang => {
       return findLanguageByMemoqLanguageCode(lang, memoqSymbol);
     }).group;
   }
 
-	function findAllTargets(documents) {
-		return documents.map(({ TargetLangCode, TotalWordCount }) => (
-				{
-					lang: findLanguageGroup(languages, TargetLangCode),
-					wordcount: +TotalWordCount
-				}
-		));
-	}
-
-	function findIndustry(domain) {
-		switch (domain) {
-			case 'Poker':
-			case 'eSport':
-			case 'iGaming':
-			case 'iGaming (Casino, Slot games, Gambling, etc.)':
-			case 'Video Games':
-				return 'iGaming';
-			case 'CFDs and Online Trading':
-			case 'ICOs & Cryptocurrency':
-			case 'Finance':
-				return 'Finance';
-		}
-	}
+  function findAllTargets (documents) {
+    return documents.map(({ TargetLangCode, TotalWordCount }) => (
+      {
+        lang: findLanguageGroup(languages, TargetLangCode),
+        wordcount: +TotalWordCount
+      }
+    ));
+  }
 };
 
-module.exports = { newLangReport };
+const findIndustry = (domain) => {
+  switch (domain) {
+    case 'Poker':
+    case 'eSport':
+    case 'iGaming':
+    case 'iGaming (Casino, Slot games, Gambling, etc.)':
+    case 'Video Games':
+    case 'Food, Beverage & Tobacco':
+    case 'Lottery':
+    case 'Other':
+      return 'iGaming';
+    case 'CFDs and Online Trading':
+    case 'ICOs & Cryptocurrency':
+    case 'PR Agency':
+    case 'Real Estate':
+    case 'Law':
+    case 'Marketing':
+    case 'Forex':
+    case 'ICO':
+
+    case 'Finance':
+      return 'Finance';
+  }
+};
+
+module.exports = { newLangReport, findIndustry };
 

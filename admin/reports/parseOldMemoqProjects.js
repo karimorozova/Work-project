@@ -1,24 +1,30 @@
-const { Languages, Vendors, Clients, Industries } = require('../models');
+const { Languages, Vendors, Clients, Industries, XtrfLqa } = require('../models');
 const readXlsxFile = require('read-excel-file/node');
-const fs = require('fs');
+const ObjectId = require('mongodb').ObjectID;
+const { findIndustry } = require('./newLangTierReport');
 
 // File location: ./static/oldMemoqProjects/1.xlsx
 
-const readFile = async () => {
+const parseAndWriteLQAReport = async () => {
+  const reports = await XtrfLqa.find();
+  if (reports.length) await XtrfLqa.remove();
   const vendors = await Vendors.find();
   const languages = await Languages.find();
   const clients = await Clients.find();
-  const financeIndustry = await Industries.find({ name: 'Finance' });
-  const igamingIndustry = await Industries.find({ name: 'iGaming (Casino, Slot games, Gambling, etc.)' });
+  const financeIndustry = await Industries.findOne({ name: 'Finance' });
+  const igamingIndustry = await Industries.findOne({ name: 'iGaming' });
   let data = [];
-  readXlsxFile('./static/oldMemoqProjects/1.xlsx').then((rows) => {
-    data = rows.reduce((acc, curr, index) => {
-      const languagePair = curr[2];
+  readXlsxFile('./static/oldMemoqProjects/1.xlsx').then(async (rows) => {
+    data.push(rows.reduce((acc, curr, index) => {
+      const languagePair = curr[3];
       const name = curr[0];
       const email = curr[1];
-      const sourceLanguage = languagePair.split(' » ')[0];
-      const targetLanguage = languagePair.split(' » ')[1];
-      const industry = curr[4];
+      const step = curr[2];
+      const targetSymbol = languagePair.split(' » ')[1];
+      const targetLanguage = languages.find(({ symbol, xtm, iso1, iso2 }) => (
+        targetSymbol === symbol || targetSymbol === xtm || targetSymbol === iso1 || targetSymbol === iso2
+      ));
+      let industry = curr[4];
       const startDate = curr[5].split(' ')[0];
       const deadline = curr[6].split(' ')[0];
       const projectId = curr[7];
@@ -26,75 +32,75 @@ const readFile = async () => {
       const clientName = curr[9];
       const wordcountPayables = curr[10];
       const wordcountReceivables = curr[11];
-      if (index !== 0) {
-        acc.push(acc[languagePair] && (industry === 'Finance' || industry === 'iGaming') ?
-          {
-            ...acc[name],
-            industries: [
-              ...acc[industries],
-
-            ],
-            wordcount: acc[wordcount] + wordcountPayables,
-            industry,
-            otherInfo: [...acc[otherInfo],
-              {
-                projectId,
-                projectName,
-                clientName,
-                startDate,
-                deadline,
-                wordcountReceivables,
-                wordcountPayables,
-              }
-            ]
+      const ourVendor = vendors.find(({ aliases }) => aliases.includes(name));
+      const ourClient = clients.find(({ aliases }) => aliases.includes(clientName));
+      const otherInfo = {
+        projectId,
+        projectName,
+        clientId: ourClient ? ObjectId(ourClient._id) : null,
+        clientName: ourClient ? ourClient.name : clientName,
+        startDate,
+        deadline,
+        wordcountReceivables,
+        wordcountPayables,
+      };
+      const newVendorObj = {
+        vendorId: ourVendor ? ObjectId(ourVendor._id) : null,
+        name,
+        email,
+        wordCount: +wordcountPayables,
+        otherInfo: [{
+          ...otherInfo
+        }]
+      };
+      industry = findIndustry(industry);
+      if (index !== 0 && step === 'translation' && targetLanguage !== undefined) {
+        if (acc[languagePair]) {
+          industry = industry === 'Finance' ? ObjectId(financeIndustry._id) : ObjectId(igamingIndustry._id);
+          const neededIndustryIndex = acc[languagePair].industries.findIndex(item => item.industry.toString() === industry.toString());
+          const neededVendorIndex = neededIndustryIndex !== -1 ?
+            acc[languagePair].industries[neededIndustryIndex].vendors.findIndex(vendor => vendor.name === name) : -1;
+          const newIndustryObj = {
+            industry: industry === 'Finance' ? ObjectId(financeIndustry._id) : ObjectId(igamingIndustry._id),
+            vendors: [{
+              ...newVendorObj
+            }],
+          };
+          if (neededIndustryIndex !== -1 && neededVendorIndex !== -1) {
+            let wordCount = acc[languagePair].industries[neededIndustryIndex].vendors[neededVendorIndex].wordCount;
+            acc[languagePair].industries[neededIndustryIndex].vendors[neededVendorIndex].wordCount =
+              Number((+wordCount + +wordcountPayables).toFixed(2));
+            acc[languagePair].industries[neededIndustryIndex].vendors[neededVendorIndex].otherInfo.push(otherInfo);
+          } else if (neededIndustryIndex !== -1 && neededVendorIndex === -1) {
+            acc[languagePair].industries[neededIndustryIndex].vendors.push(newVendorObj);
+          } else if (neededIndustryIndex === -1 && neededVendorIndex === -1) {
+            acc[languagePair].industries.push(newIndustryObj);
           }
-          :
-          {
-            sourceLanguage,
+        } else {
+          acc[languagePair] = {
             targetLanguage,
             industries: [{
-              industry: industry === 'Finance' ? financeIndustry : igamingIndustry,
+              industry: industry === 'Finance' ? ObjectId(financeIndustry._id) : ObjectId(igamingIndustry._id),
               vendors: [{
-                vendorId: vendors.find(({ aliases }) => aliases.includes(name)) || null,
-                name,
-                email,
-                wordcount: wordcountPayables,
-                otherInfo: [{
-                  projectId,
-                  projectName,
-                  clientId: clients.find(({ aliases }) => aliases.includes(clientName)) || null,
-                  clientName,
-                  startDate,
-                  deadline,
-                  wordcountReceivables,
-                  wordcountPayables,
-                }]
+                ...newVendorObj
               }],
             }],
-            name,
-            wordcount: wordcountPayables,
-            industry,
-            otherInfo: [
-              {
-                projectId,
-                projectName,
-                clientName,
-                startDate,
-                deadline,
-                wordcountReceivables,
-                wordcountPayables,
-              }
-            ]
-          });
+          };
+        }
       }
       return acc;
+    }, {}));
+    data = data.reduce((acc, curr) => {
+      acc.push(...Object.values(curr));
+      return acc;
     }, []);
-    for (let { name, otherInfo } of data) {
-
+    for (let row of data) {
+      await XtrfLqa(row).save();
     }
+    console.log('Saved!');
   });
 };
 
 module.exports = {
-  readFile
+  parseAndWriteLQAReport
 };
