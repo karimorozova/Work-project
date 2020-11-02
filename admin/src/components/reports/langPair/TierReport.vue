@@ -112,16 +112,19 @@
 				}
 			},
 			sortData(tierProp, prop) {
-				console.log(tierProp, prop);
-
 				this.activeIndex = -1;
 				this[prop] = !this[prop];
+
+				const residualArr = this.reportData.filter(item => !item.hasOwnProperty(tierProp));
 				if(this[prop]) {
-					this.reportData = this.reportData.sort((a, b) => a[tierProp]['tier'] - b[tierProp]['tier']);
-					console.log(this.reportData)
+					this.reportData = this.reportData.filter(item => item.hasOwnProperty(tierProp))
+              .sort((a, b) => a[tierProp]['tier'] - b[tierProp]['tier']);
+          this.reportData.push(...residualArr);
+
 				} else {
-					this.reportData = this.reportData.sort((a, b) => b[tierProp]['tier'] - a[tierProp]['tier']);
-					console.log(this.reportData)
+					this.reportData = this.reportData.filter(item => item.hasOwnProperty(tierProp))
+              .sort((a, b) => b[tierProp]['tier'] - a[tierProp]['tier'])
+					this.reportData.unshift(...residualArr);
 				}
 			},
 			async setTierFilter({ value }) {

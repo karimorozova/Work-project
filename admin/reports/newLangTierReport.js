@@ -1,5 +1,6 @@
 const { MemoqProject, Languages, LangTier } = require('../models');
 const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
+const { fillLangTierReportWithLocal } = require('../projects/langTierReport');
 
 const newLangReport = async () => {
   const languages = await Languages.find();
@@ -37,6 +38,7 @@ const newLangReport = async () => {
 
 	await LangTier.deleteMany();
 	await postReports();
+	await fillLangTierReportWithLocal();
 
 	async function postReports() {
 		const result = [];

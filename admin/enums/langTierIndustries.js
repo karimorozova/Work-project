@@ -1,5 +1,5 @@
 const langTierIndustries = {
-  iGaming: 'iGaming (Casino, Slot games, Gambling, etc.)',
+  iGaming: 'iGaming',
   Finance: 'Finance',
 };
 
