@@ -17,12 +17,12 @@ const getProjectAfterUpdate = async (query, update) => {
 };
 
 const getMemoqProjects = async (query = {}) => {
-  return await MemoqProject.find(query)
+  return await MemoqProject.find(query).sort({_id: -1}).limit(25)
     .populate('customer')
     .populate('projectManager', ['firstName', 'lastName', 'photo', 'email'])
     .populate('accountManager', ['firstName', 'lastName', 'photo', 'email'])
     .populate('steps.vendor', ['firstName', 'surname', 'email']);
-}
+};
 
 module.exports = {
   getMemoqProject,
