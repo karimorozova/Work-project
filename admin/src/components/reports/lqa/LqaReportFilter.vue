@@ -56,10 +56,11 @@
               @chooseOption="setIndustryFilter"
             )
       .report-filters__item
+    .report-filters__row
+      .button
+        .button__row
+          input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReports()")
 
-    //.button
-      .button__row
-        input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReports()")
 </template>
 
 <script>
@@ -85,9 +86,9 @@
 			}
 		},
 		methods: {
-			// updateReports() {
-			// 	this.$emit('updateReports');
-			// },
+			updateReports() {
+				alert('Coming soon...')
+			},
 			setTierFilter({ option }) {
 				this.$emit('setTierFilter', { value: this.tiers[option] });
 			},
@@ -122,10 +123,6 @@
   @import "../../../assets/scss/colors.scss";
 
   .button {
-    &__row {
-      margin-bottom: 20px;
-    }
-
     &__update-btn {
       width: 194px;
       height: 34px;
@@ -137,7 +134,7 @@
       border: 1px solid #D15F45;
       cursor: pointer;
       outline: 0;
-      line-height: 34px;
+      line-height: 32px;
 
       &:active {
         transform: scale(.98);

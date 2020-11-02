@@ -1,5 +1,5 @@
 <template lang="pug">
-  .lqa
+  .lqa(@scroll="handleBodyScroll")
     .lqa__filters
       LqaReportFilter(
         :isLqa="false"
@@ -46,99 +46,38 @@
 				tierFilter: "All",
 				vendorFilter: "All",
 
-				languages: [],
+				availableSources: [],
+				availableTargets: [],
+				availableVendors: [],
 				allLangs: [],
-				isLanguages: true
+				isLanguages: true,
+				filterCount: 10,
+				isDataRemain: true,
 			}
 		},
 		methods: {
 			...mapActions(['alertToggle']),
-			async getReport() {
+			async handleBodyScroll(e) {
+				const element = e.target;
+				if(Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
+					if(this.isDataRemain) {
+						const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
+						this.filterCount += 10;
+						this.isDataRemain = result.data.length === 10;
+						this.reportData.push(...result.data)
+					}
+				}
+			},
+			async getFilterOptions() {
+				const result = await this.$http.get('/reportapi/xtrf-lqa-reports-options');
+				for (let key in result.data) {
+					if(result.data.hasOwnProperty(key)) this[key].push(...result.data[key])
+				}
+			},
+			async getReport(filters) {
 				try {
-					// const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters: this.filters });
-					this.reportData = [
-						{
-							sourceLanguage: 'EN',
-							targetLanguage: 'FR',
-							industries: [{
-								industry: 'Finance',
-								vendors: [{
-									name: 'KDJ ajsk',
-									email: 'ghjasda@asjhd.asd',
-									wordCount: 12738,
-									otherInfo: []
-								},
-									{
-										name: ' asdf sadfsa f',
-										email: 'ghjasda@asjhd.asd',
-										wordCount: 234234234,
-										otherInfo: []
-									},
-									{
-										name: 'Kasd fsdafsdk',
-										email: 'ghjasda@asjhd.asd',
-										wordCount: 12723121238,
-										otherInfo: []
-									}
-								],
-							},
-								{
-									industry: 'Finance',
-									vendors: [{
-										name: 'ASDSAD SAD',
-										email: 'ghjasda@asjhd.asd',
-										wordCount: 12738,
-										otherInfo: []
-									}],
-								},
-								{
-									industry: 'IGaming',
-									vendors: [{
-										name: 'SAKJDKSAN asd',
-										email: 'ghjasda@asjhd.asd',
-										wordCount: 333,
-										otherInfo: []
-									}],
-								}
-							]
-						},
-						{
-							sourceLanguage: 'EN',
-							targetLanguage: 'GB',
-							industries: [{
-								industry: 'Finance',
-								vendors: [{
-									name: 'asd asd 21 ',
-									email: 'ghjasda@asjhd.asd',
-									wordCount: 7777,
-									otherInfo: []
-								}],
-							}]
-						}, {
-							sourceLanguage: 'EN',
-							targetLanguage: 'FR',
-							industries: [{
-								industry: 'IGaming',
-								vendors: [{
-									name: 'JAHSD ASHD',
-									email: 'ghjasd2a@asjhd.asd',
-									wordCount: 5555,
-									otherInfo: []
-								}],
-							}]
-						}];
-					console.log(this.reportData);
-
-
-					// const languages = await this.$http.get("/api/languages");
-					// this.allLangs = languages.data;
-					//
-					// if(this.isLanguages) {
-					// 	this.languages = [...new Set(languages.data.map(item => item.group))];
-					// 	this.languages.unshift("All");
-					// }
-					//
-					// this.isLanguages = false;
+					const result = await this.$http.post("/reportsapi/xtrf-lqa-report", { filters });
+					this.reportData = result.data;
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting LQA report", isShow: true, type: "error" });
 				}
@@ -146,23 +85,23 @@
 
 			async setTierFilter({ value }) {
 				this.tierFilter = value;
-				await this.getReport();
+				await this.getReport(this.filters);
 			},
 			async setSourceFilter({ option }) {
 				this.sourceFilter = option;
-				await this.getReport();
+				await this.getReport(this.filters);
 			},
 			async setTargetFilter({ option }) {
 				this.targetFilter = option;
-				await this.getReport();
+				await this.getReport(this.filters);
 			},
 			async setVendorFilter({ option }) {
 				this.vendorFilter = option;
-				await this.getReport();
+				await this.getReport(this.filters);
 			},
 			async setIndustryFilter({ option }) {
 				this.industryFilter = option;
-				await this.getReport();
+				await this.getReport(this.filters);
 			},
 		},
 		computed: {
@@ -183,6 +122,7 @@
 				if(this.vendorFilter !== "All") {
 					result.vendorFilter = this.vendorFilter;
 				}
+				result.countFilter = this.filterCount;
 				return result;
 			}
 		},
@@ -191,8 +131,11 @@
 			NewVendor,
 			Table
 		},
+		created() {
+			this.getFilterOptions();
+		},
 		mounted() {
-			this.getReport();
+			this.getReport(this.filters);
 		}
 	}
 </script>
@@ -203,6 +146,8 @@
     width: 1100px;
     box-shadow: 0 0 10px rgba(104, 87, 62, .5);
     padding: 20px;
+    max-height: 750px;
+    overflow-y: auto;
 
     &__text {
       font-size: 22px;
