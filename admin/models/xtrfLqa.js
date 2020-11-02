@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const XtrfLqaSchema = new mongoose.Schema({
+  sourceLanguage: {
+    type: Schema.Types.ObjectId, ref: 'Language',
+    default: null
+  },
   targetLanguage: {
     type: Schema.Types.ObjectId, ref: 'Language',
     default: null
