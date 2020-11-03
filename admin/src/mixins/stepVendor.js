@@ -2,23 +2,23 @@ const { findFittingVendor } = require('../../сalculations/vendor');
 export default {
   methods: {
     extendedVendors(index) {
-      // return this.vendors;
+      return this.vendors;
 
-      const allSteps = this.currentProject.steps;
-      const industry = this.currentProject.industry;
-      const step = index >= 0 ? allSteps[index] : this.step;
-      const languages = this.originallyLanguages;
-      const sourceLanguage = languages.find(item => item.symbol === step.sourceLanguage);
-      const targetLanguage = languages.find(item => item.symbol === step.targetLanguage);
-      const stepId = step.serviceStep.step;
-      const vendors = this.vendors;
-      return findFittingVendor(
-        {
-          sourceLanguage,
-          targetLanguage,
-          step: stepId,
-          industry: industry._id
-        }, vendors, true);
+      // const allSteps = this.currentProject.steps;
+      // const industry = this.currentProject.industry;
+      // const step = index >= 0 ? allSteps[index] : this.step;
+      // const languages = this.originallyLanguages;
+      // const sourceLanguage = languages.find(item => item.symbol === step.sourceLanguage);
+      // const targetLanguage = languages.find(item => item.symbol === step.targetLanguage);
+      // const stepId = step.serviceStep.step;
+      // const vendors = this.vendors;
+      // return findFittingVendor(
+      //   {
+      //     sourceLanguage,
+      //     targetLanguage,
+      //     step: stepId,
+      //     industry: industry._id
+      //   }, vendors, true);
     },
     isMainGroup() {
       return this.userGroup.name === 'Administrators' || this.userGroup.name === 'Developers';

@@ -2,27 +2,27 @@ const { Languages, Units, Industries, CurrencyRatio } = require('../../models');
 const ObjectId = require('mongodb').ObjectID;
 
 const getDefaultBasicPrices = async () => {
-	const currencyRatio = await CurrencyRatio.find();
-	const { USD, GBP } = currencyRatio[0];
-	const defaultBasicPrices = [];
-	const allLanguages = await Languages.find({});
-	const EnglishBritain = allLanguages.find(({ lang }) => lang === 'English (United Kingdom)');
+  const currencyRatio = await CurrencyRatio.find();
+  const { USD, GBP } = currencyRatio[0];
+  const defaultBasicPrices = [];
+  const allLanguages = await Languages.find({});
+  const EnglishBritain = allLanguages.find(({ lang }) => lang === 'English (United Kingdom)');
 
 
-	allLanguages.forEach(language => {
-		addedDefaultBasicPrices(EnglishBritain, language)
-	});
-	allLanguages.forEach(language => {
-		addedDefaultBasicPrices(language, EnglishBritain)
-	});
+  allLanguages.forEach(language => {
+    addedDefaultBasicPrices(EnglishBritain, language);
+  });
+  allLanguages.filter(({ lang }) => lang === 'English (United Kingdom)').forEach(language => {
+    addedDefaultBasicPrices(language, EnglishBritain);
+  });
 
-	function addedDefaultBasicPrices(source, target) {
-		return defaultBasicPrices.push({
-			type: source.lang === target.lang ? 'Mono' : 'Duo',
-			sourceLanguage: source._id,
-			targetLanguage: target._id,
-			euroBasicPrice: 1,
-			usdBasicPrice: USD,
+  function addedDefaultBasicPrices (source, target) {
+    return defaultBasicPrices.push({
+      type: source.lang === target.lang ? 'Mono' : 'Duo',
+      sourceLanguage: source._id,
+      targetLanguage: target._id,
+      euroBasicPrice: 1,
+      usdBasicPrice: USD,
 			gbpBasicPrice: GBP,
 			isActive: true
 		});

@@ -103,7 +103,7 @@
       border: 1px solid #D15F45;
       cursor: pointer;
       outline: 0;
-      line-height: 34px;
+      line-height: 32px;
 
       &:active {
         transform: scale(.98);

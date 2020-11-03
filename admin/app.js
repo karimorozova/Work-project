@@ -17,10 +17,11 @@ const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/parseOldMemoqProjects');
-//
-// const a = async () => {
-//   await parseAndWriteLQAReport()
-// }
+const { parseGmailMessages } = require('./gmail');
+
+// parseGmailMessages();
+
+// const a = async () => parseAndWriteLQAReport();
 // a();
 
 schedule.scheduleJob('0 */3 * * *', async function () {
