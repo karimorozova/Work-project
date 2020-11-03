@@ -12,7 +12,7 @@ const getDefaultBasicPrices = async () => {
 	allLanguages.forEach(language => {
 		addedDefaultBasicPrices(EnglishBritain, language)
 	});
-	allLanguages.forEach(language => {
+	allLanguages.filter(({ lang }) => lang === 'English (United Kingdom)').forEach(language => {
 		addedDefaultBasicPrices(language, EnglishBritain)
 	});
 
