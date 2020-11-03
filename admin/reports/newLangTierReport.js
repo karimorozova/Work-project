@@ -104,7 +104,7 @@ const findIndustry = (domain) => {
     case 'Marketing':
     case 'Forex':
     case 'ICO':
-
+    case 'Education':
     case 'Finance':
       return 'Finance';
   }

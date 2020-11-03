@@ -4,123 +4,221 @@ const ObjectId = require('mongodb').ObjectID;
 const { findIndustry } = require('./newLangTierReport');
 const fs = require('fs');
 
+/*
+ nameIndex = 0;
+ emailIndex = 1;
+ stepIndex = 2;
+ languagePairIndex = 3;
+ industryIndex = 4;
+ startDateIndex = 5;
+ deadLineIndex = 6;
+ projectIdIndex = 7;
+ projectNameIndex = 8;
+ clientNameIndex = 9;
+ wordcountPayablesIndex = 10;
+ wordcountReceivablesIndex = 11;
+ */
 const parseAndWriteLQAReport = async () => {
+  const reports = await XtrfLqa.find();
+  if (reports.length) await XtrfLqa.remove();
+  const vendors = await Vendors.find();
+  const languages = await Languages.find();
+  const clients = await Clients.find();
+  const financeIndustry = await Industries.findOne({ name: 'Finance' });
+  const iGamingIndustry = await Industries.findOne({ name: 'iGaming' });
+  let data = [];
   let filesArr = [];
   fs.readdirSync('./static/oldMemoqProjects').forEach(file => {
     filesArr.push(file);
   });
   for (let file of filesArr) {
-    await parseFiles(file);
+    const fileData = await readXlsxFile(`./static/oldMemoqProjects/${file}`);
+    data.push(...fileData.slice(1));
   }
 
-  async function parseFiles (fileName) {
-    const reports = await XtrfLqa.find();
-    if (reports.length) await XtrfLqa.remove();
-    const vendors = await Vendors.find();
-    const languages = await Languages.find();
-    const clients = await Clients.find();
-    const financeIndustry = await Industries.findOne({ name: 'Finance' });
-    const igamingIndustry = await Industries.findOne({ name: 'iGaming' });
-    let data = [];
-    readXlsxFile(`./static/oldMemoqProjects/${fileName}`).then(async (rows) => {
-      data.push(rows.reduce((acc, curr, index) => {
-        const languagePair = curr[3];
-        const name = curr[0];
-        const email = curr[1];
-        const step = curr[2];
-        if (languagePair) {
-          const sourceSymbol = languagePair.split(' » ')[0];
-          const targetSymbol = languagePair.split(' » ')[1];
-          const sourceLanguage = languages.find(({ symbol, xtm, iso1, iso2 }) => (
-            sourceSymbol === symbol || sourceSymbol === xtm || sourceSymbol === iso1 || sourceSymbol === iso2
-          ));
-          const targetLanguage = languages.find(({ symbol, xtm, iso1, iso2 }) => (
-            targetSymbol === symbol || targetSymbol === xtm || targetSymbol === iso1 || targetSymbol === iso2
-          ));
-          let industry = curr[4];
-          const startDate = curr[5].split(' ')[0];
-          const deadline = curr[6].split(' ')[0];
-          const projectId = curr[7];
-          const projectName = curr[8];
-          const clientName = curr[9];
-          const wordcountPayables = curr[10];
-          const wordcountReceivables = curr[11];
-          const ourVendor = vendors.find(({ aliases }) => aliases.includes(name));
-          const ourClient = clients.find(({ aliases }) => aliases.includes(clientName));
-          const otherInfo = {
-            projectId,
-            projectName,
-            clientId: ourClient ? ObjectId(ourClient._id) : null,
-            clientName: ourClient ? ourClient.name : clientName,
+  let report = data.reduce((acc, cur) => {
+    if (cur[10] > 0 && cur[2] === 'translation') {
+      acc[cur[3]] = !acc[cur[3]] ?
+        getInitialPairInfo(cur)
+        :
+        gatherInfo(cur, acc[cur[3]]);
+    }
+    return acc;
+  }, {});
+  const newReports = [];
+  for (let key of Object.keys(report)) {
+    const { Finance, iGaming } = report[key];
+    const sourceIso = getLangISO1(key, 0);
+    const targetIso = getLangISO1(key, 1);
+    const sourceLanguage = languages.find(({ iso1 }) => iso1 === sourceIso);
+    const targetLanguage = languages.find(({ iso1 }) => iso1 === targetIso);
+    newReports.push({
+      langPair: key,
+      sourceLanguage: sourceLanguage ? ObjectId(sourceLanguage._id) : null,
+      targetLanguage: targetLanguage ? ObjectId(targetLanguage._id) : null,
+      industries: {
+        Finance: {
+          industryId: ObjectId(financeIndustry._id),
+          vendors: getVendorsData(Finance)
+        },
+        iGaming: {
+          industryId: ObjectId(iGamingIndustry._id),
+          vendors: getVendorsData(iGaming)
+        }
+      }
+    });
+  }
+  for (let report of newReports) {
+    await new XtrfLqa(report).save();
+  }
+  console.log('Saved!');
+
+  function getVendorsData (vendorsObj) {
+    if (!vendorsObj) return [];
+    else {
+      const vendorsArr = [];
+      for (let vendorKey of Object.keys(vendorsObj)) {
+        const vendorInfo = vendorsObj[vendorKey];
+        let { name, otherInfo } = vendorInfo;
+        const ourVendor = vendors.find(({ aliases }) => aliases.includes(name));
+        const ourClient = clients.find(({ aliases }) => aliases.includes(otherInfo.clientName));
+        otherInfo = otherInfo.map(item => {
+          if (ourClient) {
+            item.clientId = ObjectId(ourClient._id);
+          } else {
+            item.clientId = null;
+          }
+          return item;
+        });
+        vendorsArr.push({
+          ...vendorInfo,
+          vendorId: ourVendor ? ObjectId(ourVendor._id) : null,
+          otherInfo,
+        });
+      }
+      return vendorsArr;
+    }
+  }
+
+  function getLangISO1 (langPair, langIndex) {
+    const langPairArr = langPair.split(' » ');
+    let langIso = langPairArr[langIndex].split('-');
+    langIso[0] = langIso[0].toLowerCase();
+    langIso = langIso.join('-');
+    return langIso;
+  }
+
+  function getInitialPairInfo (cur) {
+    const industry = findIndustry(cur[4]);
+    const startDate = getCorrectTime(cur[5]);
+    const deadline = getCorrectTime(cur[6]);
+    return {
+      [industry]: {
+        [cur[0]]: {
+          name: cur[0],
+          email: cur[1],
+          wordCount: cur[10],
+          otherInfo: [{
+            clientName: cur[9],
             startDate,
             deadline,
-            wordcountReceivables,
-            wordcountPayables,
-          };
-          const newVendorObj = {
-            vendorId: ourVendor ? ObjectId(ourVendor._id) : null,
-            name,
-            email,
-            wordCount: +wordcountPayables,
-            otherInfo: [{
-              ...otherInfo
-            }]
-          };
-          industry = findIndustry(industry);
-          if (index !== 0 && step === 'translation') {
-            if (acc[languagePair]) {
-              industry = industry === 'Finance' ? ObjectId(financeIndustry._id) : ObjectId(igamingIndustry._id);
-              const neededIndustryIndex = acc[languagePair].industries.findIndex(item => (
-                item.industry.toString() === industry.toString()
-              ));
-              const neededVendorIndex = neededIndustryIndex !== -1 ?
-                acc[languagePair].industries[neededIndustryIndex].vendors.findIndex(vendor => vendor.name === name) : -1;
-              const newIndustryObj = {
-                industry: industry === 'Finance' ? ObjectId(financeIndustry._id) : ObjectId(igamingIndustry._id),
-                vendors: [{
-                  ...newVendorObj
-                }],
-              };
-              if (neededIndustryIndex !== -1 && neededVendorIndex !== -1) {
-                let wordCount = acc[languagePair].industries[neededIndustryIndex].vendors[neededVendorIndex].wordCount;
-                acc[languagePair].industries[neededIndustryIndex].vendors[neededVendorIndex].wordCount =
-                  Number((+wordCount + +wordcountPayables).toFixed(2));
-                acc[languagePair].industries[neededIndustryIndex].vendors[neededVendorIndex].otherInfo.push(otherInfo);
-              } else if (neededIndustryIndex !== -1 && neededVendorIndex === -1) {
-                acc[languagePair].industries[neededIndustryIndex].vendors.push(newVendorObj);
-              } else if (neededIndustryIndex === -1 && neededVendorIndex === -1) {
-                console.log(1);
-                acc[languagePair].industries.push(newIndustryObj);
-              }
-            } else {
-              acc[languagePair] = {
-                sourceLanguage,
-                targetLanguage,
-                industries: [{
-                  industry: industry === 'Finance' ? ObjectId(financeIndustry._id) : ObjectId(igamingIndustry._id),
-                  vendors: [{
-                    ...newVendorObj
-                  }],
-                }],
-              };
-            }
-          }
+            projectId: cur[7],
+            wordcountPayables: cur[10],
+            wordcountReceivables: cur[11]
+          }]
         }
-        return acc;
-      }, {}));
-      data = data.reduce((acc, curr) => {
-        acc.push(...Object.values(curr));
-        return acc;
-      }, []);
-      console.log('Written to array');
-      for (let row of data) {
-        await XtrfLqa(row).save();
       }
-      console.log('Saved!');
-    });
-	}
+    };
+  }
+
+  function gatherInfo (cur, languagePairData) {
+    const { Finance, iGaming } = languagePairData;
+    let result = {};
+    if (Finance) {
+      result.Finance = Finance;
+    }
+    if (iGaming) {
+      result.iGaming = iGaming;
+    }
+    const industry = findIndustry(cur[4]);
+    if (industry === 'Finance') {
+      result.Finance = getIndustryData(Finance, cur);
+    } else if (industry === 'iGaming') {
+      result.iGaming = getIndustryData(iGaming, cur);
+    }
+    return result;
+  }
+
+  function getIndustryData (industry, cur) {
+    const startDate = getCorrectTime(cur[5]);
+    const deadline = getCorrectTime(cur[6]);
+    const newOtherInfo = {
+      clientName: cur[9],
+      startDate,
+      deadline,
+      projectId: cur[7],
+      wordcountPayables: cur[10],
+      wordcountReceivables: cur[11]
+    };
+    const vendor = industry ? Object.keys(industry).find(key => key === cur[0]) : null;
+    let industryData;
+    if (vendor) {
+      const { otherInfo } = industry[vendor];
+      otherInfo.push(newOtherInfo);
+      industryData = {
+        ...industry,
+        [vendor]: {
+          name: cur[0],
+          email: cur[1],
+          wordCount: +(industry[vendor].wordCount + cur[10]).toFixed(2),
+          otherInfo,
+        },
+      };
+    } else {
+      industryData = industry ? {
+          ...industry,
+          [cur[0]]: {
+            name: cur[0],
+            email: cur[1],
+            wordCount: cur[10],
+            otherInfo: [{
+              clientName: cur[9],
+              startDate,
+              deadline,
+              projectId: cur[7],
+              wordcountPayables: cur[10],
+              wordcountReceivables: cur[11]
+            }]
+          },
+        }
+        :
+        {
+          [cur[0]]: {
+            name: cur[0],
+            email: cur[1],
+            wordCount: cur[10],
+            otherInfo: [{
+              clientName: cur[9],
+              startDate,
+              deadline,
+              projectId: cur[7],
+              wordcountPayables: cur[10],
+              wordcountReceivables: cur[11]
+            }]
+          }
+        };
+    }
+    return industryData;
+  }
+
+  function getCorrectTime (dateString) {
+    let dateArr = dateString.split(' ');
+    dateArr.pop();
+    dateArr = dateArr.join('T');
+    return new Date(dateArr);
+  }
 };
 
 module.exports = {
-	parseAndWriteLQAReport
+  parseAndWriteLQAReport
 };
