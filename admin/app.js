@@ -17,9 +17,12 @@ const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/parseOldMemoqProjects');
+const { parseGmailMessages } = require('./gmail');
 
-const a = async () => parseAndWriteLQAReport();
-a();
+// parseGmailMessages();
+
+// const a = async () => parseAndWriteLQAReport();
+// a();
 
 schedule.scheduleJob('0 */3 * * *', async function () {
   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
