@@ -78,20 +78,20 @@
 	import ServiceAndWorkflow from "./ServiceAndWorkflow";
 	import Button from "../../Button";
 	import BigToggler from "@/components/BigToggler";
-	import {mapGetters, mapActions} from "vuex";
+	import { mapGetters, mapActions } from "vuex";
 
 	export default {
 		props: {
 			isRequest: {
 				type: Boolean,
-      },
+			},
 			originallyLanguages: {
 				type: Array,
 			},
-			originallyUnits:{
-        type: Array,
-      },
-			originallySteps:{
+			originallyUnits: {
+				type: Array,
+			},
+			originallySteps: {
 				type: Array,
 			},
 		},
@@ -107,41 +107,41 @@
 		methods: {
 			...mapActions(["alertToggle", "setTasksDataValue", "setRequestValue"]),
 
-			setSourceLang({symbol}) {
+			setSourceLang({ symbol }) {
 				const value = this.languages.find((item) => item.symbol === symbol);
-				this.setTasksDataValue({prop: "source", value});
-				this.setTasksDataValue({prop: "targets", value: []});
+				this.setTasksDataValue({ prop: "source", value });
+				this.setTasksDataValue({ prop: "targets", value: [] });
 				this.sourceLanguages = [value.symbol];
 
 				this.setPossibleTargetsAction = true;
 				setTimeout(() => {
 					this.setPossibleTargetsAction = false;
-				},500 )
+				}, 500)
 			},
-			setTargets({targets}) {
-				this.setTasksDataValue({prop: "targets", value: targets});
+			setTargets({ targets }) {
+				this.setTasksDataValue({ prop: "targets", value: targets });
 				this.targetLanguages = [...targets];
 			},
 			isRefFilesHasSource() {
-				const {sourceFiles, refFiles} = this.tasksData;
-				if (!refFiles || !refFiles.length) return false;
+				const { sourceFiles, refFiles } = this.tasksData;
+				if(!refFiles || !refFiles.length) return false;
 				for (let file of refFiles) {
 					const sourceFile = sourceFiles.find((item) => item.name === file.name);
-					if (sourceFile) return true;
+					if(sourceFile) return true;
 				}
 				return false;
 			},
 			isValidQuantity(quantity) {
-				if (!quantity) {
+				if(!quantity) {
 					return false;
 				}
 				return /^[1-9]{1,}(\d{1,})?/.test(quantity);
 			},
 			checkRequestErrors() {
 				let errors = [];
-				if (!this.currentProject.industry)
+				if(!this.currentProject.industry)
 					errors.push("Please, select industry.");
-				if (!this.currentProject.projectName)
+				if(!this.currentProject.projectName)
 					errors.push("Please, enter project name.");
 				return errors;
 			},
@@ -155,57 +155,54 @@
 					refFiles,
 					quantity,
 				} = this.tasksData;
-				if (this.isRequest) {
+				if(this.isRequest) {
 					this.errors = this.checkRequestErrors();
 				}
-				if (this.tasksData.workflow.id === 2917) {
-					if (
-						this.tasksData.stepsDates[0].deadline === "" ||
-						this.tasksData.stepsDates[1].start === ""
+				if(this.tasksData.workflow.id === 2917) {
+					if(
+							this.tasksData.stepsDates[0].deadline === "" ||
+							this.tasksData.stepsDates[1].start === ""
 					) {
 						this.errors.push("Please, select tasks deadline.");
 					}
 				}
-				if (!this.isMonoService && !source)
+				if(!this.isMonoService && !source)
 					this.errors.push("Please, select Source language.");
-				if (this.tasksData.stepsAndUnits == null)
+				if(this.tasksData.stepsAndUnits == null)
 					this.errors.push("Please, select Unit.");
-				if (!targets || !targets.length)
+				if(!targets || !targets.length)
 					this.errors.push("Please, select Target language(s).");
 				this.isRequest
-					? this.checkRequestFies()
-					: this.checkFiles(sourceFiles, refFiles);
-				if (this.isDeadlineMissed())
+						? this.checkRequestFies()
+						: this.checkFiles(sourceFiles, refFiles);
+				if(this.isDeadlineMissed())
 					this.errors.push("Please, update deadline (Project's or tasks).");
 
 				const isUnitCAT = this.tasksData.stepsAndUnits
-					.map((i) => i.unit)
-					.includes("CAT Wordcount");
+						.map((i) => i.unit)
+						.includes("CAT Wordcount");
 
 				const isStepLanguageOnTargetLanguage = this.tasksData.targets
-					.map((i) => i.lang)
-					.includes(this.tasksData.source.lang);
+						.map((i) => i.lang)
+						.includes(this.tasksData.source.lang);
 
-				if (isUnitCAT && isStepLanguageOnTargetLanguage) {
+				if(isUnitCAT && isStepLanguageOnTargetLanguage) {
 					this.errors.push(
-						'Target and Source Languages cannot be a same if a unit "CAT Wordcount" is selected'
+							'Target and Source Languages cannot be a same if a unit "CAT Wordcount" is selected'
 					);
 				}
 
-				if (this.countCATWordcount >= 1) {
+				if(this.countCATWordcount >= 1) {
 					let isCATWordcount = [];
 					this.tasksData.stepsAndUnits.forEach((element) => {
 						isCATWordcount.push(element.hasOwnProperty("template"));
 					});
-					if (!isCATWordcount.includes(true)) {
+					if(!isCATWordcount.includes(true)) {
 						this.errors.push("Please, select Template.");
 					}
 				}
-				// this.checkHoursSteps();
-				// if(this.isMonoService && !packageSize) this.errors.push("Please, select Package.");
-				// if(this.isMonoService && !this.isValidQuantity(quantity)) this.errors.push("Please, enter the valid Quantity.");
-				if (this.errors.length) {
-					return this.$emit("showErrors", {errors: this.errors});
+				if(this.errors.length) {
+					return this.$emit("showErrors", { errors: this.errors });
 				}
 				try {
 					await this.addTasks();
@@ -221,16 +218,16 @@
 				let today = new Date();
 				today.setHours(23, 59, 59);
 				const missedDeadline = this.tasksData.stepsDates.find(
-					(item) => item.deadline && new Date(item.deadline) <= today
+						(item) => item.deadline && new Date(item.deadline) <= today
 				);
 				return (
-					!!missedDeadline || new Date(this.currentProject.deadline) <= today
+						!!missedDeadline || new Date(this.currentProject.deadline) <= today
 				);
 			},
 			checkRequestFies() {
-				const {sourceFiles, refFiles} = this.currentProject;
+				const { sourceFiles, refFiles } = this.currentProject;
 
-				if (this.currentUnit === "CAT Wordcount" && !sourceFiles.length)
+				if(this.currentUnit === "CAT Wordcount" && !sourceFiles.length)
 					this.errors.push("Please, upload Source file(s).");
 
 				//reference file is not mandatory!
@@ -238,8 +235,8 @@
 				//   this.errors.push("Please, upload Reference file(s).");
 			},
 			checkFiles(sourceFiles, refFiles) {
-				if (this.currentUnit === "CAT Wordcount") {
-					if (!sourceFiles || !sourceFiles.length)
+				if(this.currentUnit === "CAT Wordcount") {
+					if(!sourceFiles || !sourceFiles.length)
 						this.errors.push("Please, upload Source file(s).");
 					//REF FILES SAME AS SOURCE!
 					//   if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource())
@@ -247,7 +244,6 @@
 					// } else {
 					//
 					// }
-
 					//reference file is not mandatory!
 					// if (!refFiles || !refFiles.length) {
 					//   this.errors.push("Please, upload Reference file(s).");
@@ -276,9 +272,7 @@
 				});
 			},
 			async addTasks() {
-				const source =
-					this.tasksData.source ||
-					this.languages.find((item) => item.symbol === "EN-GB");
+				const source = this.tasksData.source || this.languages.find((item) => item.symbol === "EN-GB");
 				this.$emit("addTasks", {
 					...this.tasksData,
 					refFiles: this.tasksData.refFiles || [],
@@ -320,30 +314,30 @@
 				tasksData: "getTasksData",
 			}),
 			countCATWordcount() {
-				if (this.tasksData.stepsAndUnits) {
+				if(this.tasksData.stepsAndUnits) {
 					return this.tasksData.stepsAndUnits.filter(
-						(item) => item.unit === "CAT Wordcount"
+							(item) => item.unit === "CAT Wordcount"
 					).length;
 				}
 			},
 			sortedJobs() {
-				if (this.tasksData.stepsAndUnits) {
+				if(this.tasksData.stepsAndUnits) {
 					return this.tasksData.stepsAndUnits.sort(
-						(a, b) => a.stepCounter - b.stepCounter
+							(a, b) => a.stepCounter - b.stepCounter
 					);
 				}
 			},
 			isMonoService() {
-				if (this.currentProject.status === "Requested") {
+				if(this.currentProject.status === "Requested") {
 					return this.currentProject.service.languageForm === "Mono";
 				}
 				return this.tasksData.service
-					? this.tasksData.service.languageForm === "Mono"
-					: false;
+						? this.tasksData.service.languageForm === "Mono"
+						: false;
 			},
 			isProject() {
 				return (
-					this.currentProject.status && this.currentProject.status !== "Requested"
+						this.currentProject.status && this.currentProject.status !== "Requested"
 				);
 			},
 			isButton() {
@@ -352,14 +346,14 @@
 			},
 			currentUnit() {
 				// return this.tasksData.service ? this.tasksData.service.calculationUnit : "";
-				if (this.tasksData.stepsAndUnits) {
+				if(this.tasksData.stepsAndUnits) {
 					return this.tasksData.stepsAndUnits.find(
-						(item) => item.unit === "CAT Wordcount"
-					)
-						? this.tasksData.stepsAndUnits.find(
 							(item) => item.unit === "CAT Wordcount"
-						).unit
-						: "";
+					)
+							? this.tasksData.stepsAndUnits.find(
+									(item) => item.unit === "CAT Wordcount"
+							).unit
+							: "";
 				}
 			},
 			areAllFilesApproved() {
@@ -368,14 +362,14 @@
 					...this.currentProject.refFiles,
 				];
 				const isNotApproved =
-					!allFiles.length || allFiles.find((item) => !item.isApproved);
+						!allFiles.length || allFiles.find((item) => !item.isApproved);
 				return !isNotApproved;
 			},
 			isAddTasksDisabled() {
 				return (
-					!this.currentProject.isDeadlineApproved ||
-					!this.currentProject.isBriefApproved ||
-					!this.areAllFilesApproved
+						!this.currentProject.isDeadlineApproved ||
+						!this.currentProject.isBriefApproved ||
+						!this.areAllFilesApproved
 				);
 			},
 		},
