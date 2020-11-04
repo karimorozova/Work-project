@@ -9,7 +9,7 @@ import VueResource from 'vue-resource';
 import 'normalize.css';
 import "./assets/scss/style.scss";
 import VueLodash from 'vue-lodash';
-import "./filters/GeneralFilters.js";
+import "./filters/GeneralFilters";
 export const bus = new Vue();
 
 axios.interceptors.request.use(config => {

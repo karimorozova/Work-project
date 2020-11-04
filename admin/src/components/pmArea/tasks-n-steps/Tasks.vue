@@ -62,7 +62,8 @@
         template(slot="deadline" slot-scope="{ row }")
           span.tasks__task-data {{ formatDate(row.deadline) }}
         template(slot="progress" slot-scope="{ row }")
-          ProgressLine(:progress="progress(row)")
+          | in repairing...
+          //ProgressLine(:progress="progress(row)")
         template(slot="status" slot-scope="{ row }")
           .tasks__task-status {{ row.status | stepsAndTasksStatusFilter }}
             .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
