@@ -6,13 +6,10 @@ const {
   updateClientLangPairs,
   updateClientStepMultipliers,
   updateClientIndustryMultipliers,
-  filterRedundantSteps,
-  filterRedundantIndustries,
-  filterRedundantLangPairs
 } = require('./editClientRates');
 const { tableKeys } = require('../enums');
-const  {getRateInfoFromStepFinance} = require("../pricelist/ratesmanage");
-const { getClient } = require("../clients")
+const { getRateInfoFromStepFinance } = require('../pricelist/ratesmanage');
+const { getClient } = require('../clients');
 
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
@@ -400,7 +397,7 @@ const generateNewPricelistCombinations = (
   return oldPricelistTable;
 };
 
-const getPricelistCombinations = async (
+const getPricelistCombinations = (
   basicPricesTable,
   stepMultipliersTable,
   industryMultipliersTable,
@@ -480,61 +477,100 @@ const getObjDifferences = (obj1, obj2) => {
   return diffs;
 };
 
-const deleteClientRates = async (clientId, serviceToDelete) => {
-  const client = await Clients.findOne({ _id: clientId });
-  let { pricelistTable } = client.rates;
-  let { sourceLanguage, targetLanguages, services: serviceIds, industries } = serviceToDelete;
-  const services = [];
-  for (let id of serviceIds) {
-    const service = await Services.findOne({ _id: id });
-    services.push(service);
-  }
-  const industryIdsToDelete = industries.map(id => ({ _id: id.toString() }));
-  targetLanguages = targetLanguages.map(item => ({ _id: item }));
-  const { basicPricesTable: filteredBasicPricesTable } = await filterRedundantLangPairs(
-    client.rates,
-    client.services,
-    serviceToDelete._id,
-    targetLanguages,
-    sourceLanguage._id
+const clearClientRates = (client, rowToDelete) => {
+  const { rates, services } = client;
+  let { pricelistTable } = rates;
+  let { sourceLanguage, targetLanguages, services: servicesToDelete, industries } = rowToDelete;
+  const langPair = `${sourceLanguage._id} ${targetLanguages[0]._id}`;
+  const filteredBasicPricesTable = filterRedundantLangPair(
+    rates,
+    services,
+    rowToDelete._id,
+    langPair
   );
-  const { stepMultipliersTable: filteredStepsTable } = await filterRedundantSteps(
-    client.rates,
-    client.services,
-    serviceToDelete._id,
-    services
+  const filteredStepsTable = filterRedundantSteps(
+    rates,
+    services,
+    rowToDelete._id,
+    servicesToDelete[0]
   );
-  const { industryMultipliersTable: filteredIndustriesTable } = await filterRedundantIndustries(
-    client.rates,
-    client.services,
-    serviceToDelete._id,
-    industryIdsToDelete
+  const filteredIndustriesTable = filterRedundantIndustry(
+    rates,
+    services,
+    rowToDelete._id,
+    industries[0]
   );
-  pricelistTable = await getPricelistCombinations(
+  pricelistTable = getPricelistCombinations(
     filteredBasicPricesTable,
     filteredStepsTable,
     filteredIndustriesTable,
     pricelistTable,
     true
   );
-  await Clients.updateOne({ _id: clientId }, {
-    rates: {
-      basicPricesTable: filteredBasicPricesTable,
-      stepMultipliersTable: filteredStepsTable,
-      industryMultipliersTable: filteredIndustriesTable,
-      pricelistTable
-    }
-  });
+  return {
+    basicPricesTable: filteredBasicPricesTable,
+    stepMultipliersTable: filteredStepsTable,
+    industryMultipliersTable: filteredIndustriesTable,
+    pricelistTable
+  };
 };
 
-async function getClientAfterCombinationsUpdated({project, step, rate}) {
+const filterRedundantLangPair = (rates, services, rowToDeleteId, langPair) => {
+  const { basicPricesTable } = rates;
+  const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString());
+  const otherLangPairs = otherServices.map(row => `${row.sourceLanguage._id} ${row.targetLanguages[0]._id}`);
+  const redundantLangPairs = [];
+  if (!otherLangPairs.includes(langPair)) redundantLangPairs.push(langPair);
+  if (redundantLangPairs.length) {
+    return basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
+      !redundantLangPairs.includes(`${sourceLanguage} ${targetLanguage}`)
+    ));
+  }
+  return basicPricesTable;
+};
+
+const filterRedundantSteps = (rates, services, rowToDeleteId, serviceToDelete) => {
+  const { stepMultipliersTable } = rates;
+  const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString());
+  const stepIdsToDelete = serviceToDelete.steps.map(({ step }) => step.toString());
+  let otherSteps = otherServices.map(row => row.services.map(({ steps }) => steps.map(({ step }) => step.toString())));
+  otherSteps = Array.from(new Set(flatArr(otherSteps)));
+  const redundantSteps = [];
+  for (let step of stepIdsToDelete) {
+    if (!otherSteps.includes(step)) redundantSteps.push(step);
+  }
+  if (redundantSteps.length) {
+    return stepMultipliersTable.filter(({ step }) => !redundantSteps.includes(step.toString()));
+  }
+  return stepMultipliersTable;
+
+  function flatArr (arr) {
+    return arr.reduce((acc, cur) => {
+      return acc.concat(Array.isArray(cur) ? flatArr(cur) : cur);
+    }, []);
+  }
+};
+
+const filterRedundantIndustry = (rates, services, rowToDeleteId, industryToDelete) => {
+  const { industryMultipliersTable } = rates;
+  const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString());
+  const otherIndustries = otherServices.map(row => row.industries[0]._id);
+  const redundantIndustries = [];
+  if (!otherIndustries.includes(industryToDelete._id)) redundantIndustries.push(industryToDelete._id.toString());
+  if (redundantIndustries.length) {
+    return industryMultipliersTable.filter(({ industry }) => !redundantIndustries.includes(industry.toString()));
+  }
+  return industryMultipliersTable;
+};
+
+async function getClientAfterCombinationsUpdated ({ project, step, rate }) {
   try {
-    const rateInfo = await getRateInfoFromStepFinance({project, step, rate});
-    const client = await getClient({"_id": project.customer.id});
+    const rateInfo = await getRateInfoFromStepFinance({ project, step, rate });
+    const client = await getClient({ '_id': project.customer.id });
     return await updateClientRates(client, rateInfo);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
-    console.log("Error in getClientAfterCombinationsUpdated");
+    console.log('Error in getClientAfterCombinationsUpdated');
   }
 }
 
@@ -542,7 +578,7 @@ module.exports = {
   updateClientRates,
   addNewRateComponents,
   getServiceDifferences,
-  deleteClientRates,
+  clearClientRates,
   getStepMultipliersCombinations,
   getNeededCurrency,
   getNeededLangPair,

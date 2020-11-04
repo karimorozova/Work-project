@@ -4,7 +4,7 @@ const { getClientAfterUpdate } = require('./getClients');
 const {
   addNewRateComponents,
   getServiceDifferences,
-  deleteClientRates,
+  clearClientRates,
 } = require('./clientRates');
 
 const updateClientService = async (clientId, dataToUpdate, oldData) => {
@@ -88,11 +88,14 @@ const getUniqueServiceCombinations = (newServices, oldServices) => {
 
 const deleteClientService = async (clientId, serviceId) => {
   try {
-    const { services } = await Clients.findOne({ _id: clientId });
+    const client = await Clients.findOne({ _id: clientId })
+      .populate('services.services')
+      .populate('services.industries');
+    const { services } = client;
     const neededServiceIndex = services.findIndex(service => service._id.toString() === serviceId);
-    await deleteClientRates(clientId, services[neededServiceIndex]);
+    const rates = clearClientRates(client, services[neededServiceIndex]);
     services.splice(neededServiceIndex, 1);
-    return await getClientAfterUpdate({ _id: clientId }, { services });
+    return await getClientAfterUpdate({ _id: clientId }, { services, rates });
   } catch (err) {
     console.log(err);
     console.log('Error in deleteClientService');
