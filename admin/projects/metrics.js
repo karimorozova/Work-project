@@ -7,40 +7,41 @@ const { getProjectAnalysis } = require('../services/memoqs/projects');
 const { setTaskFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
-async function updateProjectMetrics({ projectId }) {
+async function updateProjectMetrics(projectId, tasks) {
 	try {
-    const project = await getProject({ "_id": projectId });
-    let { steps, tasks, customer, industry } = project;
-    let isMetricsExist = true;
-    const task = tasks[tasks.length - 1];
-    const { stepsAndUnits } = task;
-    const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
-    if (!!isIncludesWordCount && task.status === "Created") {
-      const analysis = await getProjectAnalysis(task.memoqProjectId);
-      const { AnalysisResultForLang } = analysis;
-      if (analysis && AnalysisResultForLang) {
-        const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
-        task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
-        let newSteps = await getTaskSteps(task, industry, customer);
-        newSteps = checkIsSameVendor(newSteps);
-        const stepWithVendor = newSteps.find(step => step.vendor);
-        if (stepWithVendor) {
-          const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
-          if (vendor) {
-            task.metrics = setTaskMetrics({
-              metrics: task.metrics,
-              matrix: vendor.matrix,
-              prop: 'vendor'
-            });
-          }
-        }
-				task.finance = {
-					Wordcount: setTaskFinance(newSteps, 'Wordcount'),
-					Price: setTaskFinance(newSteps, 'Price'),
-				};
-				steps.push(...newSteps);
-			} else {
-				isMetricsExist = false;
+		const project = await getProject({ "_id": projectId });
+		let { steps, customer, industry } = project;
+		let isMetricsExist = true;
+		for (let task of tasks) {
+			const { stepsAndUnits } = task;
+			const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
+			if(!!isIncludesWordCount && task.status === "Created") {
+				const analysis = await getProjectAnalysis(task.memoqProjectId);
+				const { AnalysisResultForLang } = analysis;
+				if(analysis && AnalysisResultForLang) {
+					const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
+					task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
+					let newSteps = await getTaskSteps(task, industry, customer);
+					newSteps = checkIsSameVendor(newSteps);
+					const stepWithVendor = newSteps.find(step => step.vendor);
+					if(stepWithVendor) {
+						const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
+						if(vendor) {
+							task.metrics = setTaskMetrics({
+								metrics: task.metrics,
+								matrix: vendor.matrix,
+								prop: 'vendor'
+							});
+						}
+					}
+					task.finance = {
+						Wordcount: setTaskFinance(newSteps, 'Wordcount'),
+						Price: setTaskFinance(newSteps, 'Price'),
+					};
+					steps.push(...newSteps);
+				} else {
+					isMetricsExist = false;
+				}
 			}
 		}
 		return await updateProject({ "_id": projectId }, { tasks, steps, isMetricsExist });
@@ -53,7 +54,7 @@ async function updateProjectMetrics({ projectId }) {
 function getTaskMetrics({ task, matrix, analysis }) {
 	const { AnalysisResultForLang } = analysis;
 	let targetMetrics = AnalysisResultForLang;
-	if (Array.isArray(AnalysisResultForLang)) {
+	if(Array.isArray(AnalysisResultForLang)) {
 		targetMetrics = AnalysisResultForLang.find(({ TargetLangCode }) => TargetLangCode === task.memoqTarget);
 	}
 	const { Summary } = targetMetrics;
@@ -87,7 +88,7 @@ async function getProjectWithUpdatedFinance(project) {
 	try {
 		for (let step of steps) {
 			const parsedStep = JSON.parse(JSON.stringify(step));
-			if (!step.finance.Price.receivables && parsedStep.serviceStep.unit === 'CAT Wordcount') {
+			if(!step.finance.Price.receivables && parsedStep.serviceStep.unit === 'CAT Wordcount') {
 				let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
 				const receivables = step.finance.Price.receivables ? {
 							rate: step.clientRate, cost: +step.finance.Price.receivables
@@ -110,7 +111,7 @@ async function getTaskSteps(task, industry, customer) {
 	const newSteps = [];
 	let counter = 1;
 	for (let i = 0; i < task.stepsDates.length; i++) {
-		let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
+		let stepsIdCounter = counter < 10 ? `S0${ counter }` : `S${ counter }`;
 		const { _id: stepId } = await Step.findOne({ title: stepsAndUnits[i].step });
 		const { _id: unitId, type } = await Units.findOne({ type: stepsAndUnits[i].unit });
 		const serviceStep = {
@@ -126,7 +127,7 @@ async function getTaskSteps(task, industry, customer) {
 			customer, industry, serviceStep, task, vendorId, quantity
 		}, true);
 		const step = {
-			stepId: `${task.taskId} ${stepsIdCounter}`,
+			stepId: `${ task.taskId } ${ stepsIdCounter }`,
 			taskId: task.taskId,
 			serviceStep,
 			name: stepsAndUnits[i].step,
@@ -149,23 +150,23 @@ async function getTaskSteps(task, industry, customer) {
 			vendorsClickedOffer: [],
 			isVendorRead: false,
 			service
-    };
-    if (type !== 'CAT Wordcount' && type !== 'Packages') {
-      delete step.totalWords;
-      Object.assign(step, { hours: stepsAndUnits[i].hours, size: stepsAndUnits[i].size });
-    } else if (type === 'Packages') {
-      delete step.totalWords;
-      Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
-    } else {
-      Object.assign(step, { totalWords: quantity, quantity });
-    }
-    // if (step.name !== "Translation") {
-    //   const { _id } = await Units.findOne({ type: 'Packages' });
-    //   step.serviceStep.unit = ObjectId(_id);
-    // }
-    newSteps.push(step);
-    counter++;
-  }
+		};
+		if(type !== 'CAT Wordcount' && type !== 'Packages') {
+			delete step.totalWords;
+			Object.assign(step, { hours: stepsAndUnits[i].hours, size: stepsAndUnits[i].size });
+		} else if(type === 'Packages') {
+			delete step.totalWords;
+			Object.assign(step, { quantity: stepsAndUnits[i].quantity, size: stepsAndUnits[i].size });
+		} else {
+			Object.assign(step, { totalWords: quantity, quantity });
+		}
+		// if (step.name !== "Translation") {
+		//   const { _id } = await Units.findOne({ type: 'Packages' });
+		//   step.serviceStep.unit = ObjectId(_id);
+		// }
+		newSteps.push(step);
+		counter++;
+	}
 	return newSteps;
 }
 

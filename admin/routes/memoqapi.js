@@ -148,10 +148,10 @@ router.get('/project-docs', async (req, res) => {
 	}
 })
 
-router.get('/metrics', async (req, res) => {
-	const { projectId } = req.query;
+router.post('/metrics', async (req, res) => {
+	const { projectId, tasks } = req.body;
 	try {
-		const updatedProject = await updateProjectMetrics({ projectId });
+		const updatedProject = await updateProjectMetrics(projectId, tasks);
 		res.send(updatedProject);
 	} catch (err) {
 		console.log(err);
