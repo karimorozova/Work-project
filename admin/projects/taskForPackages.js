@@ -2,14 +2,15 @@ const { updateProject } = require("./getProjects");
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
 const { getStepFinanceData } = require('../сalculations/finance');
 const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = require('./helpers');
+const { getStepsForDuoUnits, getTasksForCustomUnits } = require('./create');
 const ObjectId = require('mongodb').ObjectID;
 
 async function createTasksWithPackagesUnit (allInfo) {
   const { project, stepsAndUnits, stepsDates } = allInfo;
   try {
     const { customer: { _id: customer }, industry } = project;
-    const tasksWithoutFinance = await getTasksForPackages({ ...allInfo, projectId: project.projectId });
-    let steps = stepsAndUnits.length === 2 ? await getStepsForDuoStepPackages({
+    const tasksWithoutFinance = await getTasksForCustomUnits({ ...allInfo, projectId: project.projectId });
+    let steps = stepsAndUnits.length === 2 ? await getStepsForDuoUnits({
         tasks: tasksWithoutFinance,
         customer,
         stepsDates,
@@ -35,74 +36,6 @@ async function createTasksWithPackagesUnit (allInfo) {
     console.log(err);
     console.log("Error in createTasksWithPackagesUnit");
   }
-}
-
-async function getTasksForPackages (tasksInfo, common = false) {
-  const { stepsAndUnits, projectId, service, targets, source, stepsDates, taskRefFiles } = tasksInfo;
-  let tasks = [];
-  let tasksLength = tasksInfo.project.tasks.length + 1;
-  for (let i = 0; i < targets.length; i++) {
-    const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
-    const taskId = projectId + ` ${idNumber}`;
-    tasks.push({
-      taskId,
-      sourceLanguage: source.symbol,
-      targetLanguage: targets[i].symbol,
-      refFiles: taskRefFiles,
-      service,
-      stepsAndUnits,
-      languageForm: service.languageForm,
-      projectId,
-      start: common ? stepsDates[0].start : stepsDates[0].start,
-      deadline: stepsDates[stepsDates.length - 1].deadline,
-      finance: {
-        Wordcount: { receivables: "", payables: "" },
-        Price: { receivables: "", payables: "" }
-      },
-      status: "Created"
-    });
-    tasksLength++;
-  }
-  return tasks;
-}
-
-async function getStepsForDuoStepPackages ({ tasks, stepsDates, stepsAndUnits, industry, customer }) {
-  let counter = 1;
-  const steps = [];
-  for (let i = 0; i < stepsAndUnits.length; i++) {
-    const task = tasks.length === 2 ? tasks[i] : tasks[0];
-    const stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
-    const stepId = `${task.taskId} ${stepsIdCounter}`;
-    const { sourceLanguage, targetLanguage } = task;
-    let serviceStep = stepsAndUnits[i];
-    const stepName = serviceStep.step;
-    serviceStep = await gatherServiceStepInfo(serviceStep);
-    const { quantity, step, size } = serviceStep;
-    const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
-      customer, industry, serviceStep, task, vendorId, quantity
-    });
-    steps.push({
-      ...task,
-      stepId,
-      serviceStep,
-      name: stepName,
-      size,
-      quantity,
-      start: stepsDates[i].start,
-      deadline: stepsDates[i].deadline,
-      vendor: ObjectId(vendor),
-      progress: 0,
-      clientRate,
-      vendorRate,
-      finance,
-      check: false,
-      vendorsClickedOffer: [],
-      isVendorRead: false
-    });
-    counter++;
-  }
-  return steps;
 }
 
 async function getStepsForMonoStepPackages ({ tasks, stepsDates, industry, customer }, common = false) {

@@ -24,7 +24,6 @@ const findFittingVendor = (stepData, vendors, fromFront = false) => {
         target = fromFront ? target._id : target;
         vendorIndustries = vendorIndustries.map(item => fromFront ? item._id : item);
         steps = steps.map(item => fromFront ? item._id : item);
-
         if (steps.includes(step) && source.toString() === sourceLanguage._id.toString() &&
           target.toString() === targetLanguage._id.toString() && vendorIndustries.includes(industry) &&
           status === 'Passed') {

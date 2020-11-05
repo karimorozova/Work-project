@@ -3,12 +3,19 @@ const ObjectId = require('mongodb').ObjectID;
 const fs = require("fs");
 
 const gatherServiceStepInfo = async (serviceStep) => {
-  const { _id: stepId, title } = await Step.findOne({ title: serviceStep.step });
-  const { _id: unitId } = await Units.findOne({ type: serviceStep.unit });
+  const { stepId, title, unitId } = typeof serviceStep.step === 'string' ?
+    await getStepAndUnitEntity(serviceStep, 'title', 'type') :
+    await getStepAndUnitEntity(serviceStep, '_id', '_id');
   serviceStep.step = ObjectId(stepId);
   serviceStep.unit = ObjectId(unitId);
   serviceStep.title = title;
   return serviceStep;
+
+  async function getStepAndUnitEntity (serviceStep, stepKey, unitKey) {
+    const { _id: stepId, title } = await Step.findOne({ [stepKey]: serviceStep.step });
+    const { _id: unitId } = await Units.findOne({ [unitKey]: serviceStep.unit });
+    return { stepId, title, unitId };
+  }
 };
 
 function getProjectFinance (tasks, projectFinance) {
