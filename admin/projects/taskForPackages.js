@@ -2,7 +2,7 @@ const { updateProject } = require("./getProjects");
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
 const { getStepFinanceData } = require('../сalculations/finance');
 const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = require('./helpers');
-const { getStepsForDuoUnits, getTasksForCustomUnits } = require('./create');
+const { getStepsForDuoUnits, getTasksForCustomUnits } = require('./taskForCommon');
 const ObjectId = require('mongodb').ObjectID;
 
 async function createTasksWithPackagesUnit (allInfo) {
@@ -28,7 +28,7 @@ async function createTasksWithPackagesUnit (allInfo) {
       getFinanceForCustomUnits(item, steps)
     );
     const projectFinance = getProjectFinance(tasks, project.finance);
-    return updateProject(
+    return await updateProject(
       { _id: project.id },
       { finance: projectFinance, $push: { tasks: tasks, steps: steps } }
     );

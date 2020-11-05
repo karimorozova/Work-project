@@ -13,7 +13,9 @@ const {
 const {
   createProject,
   createTasks,
-  createTasksFromRequest
+  createTasksFromRequest,
+  getTasksForCustomUnits,
+  getStepsForDuoUnits
 } = require('./create');
 const { createTasksForWordcount } = require('./taskForWordcount');
 const { getProjectWithUpdatedFinance } = require('./metrics');
@@ -59,5 +61,7 @@ module.exports = {
   getProjectAfterUpdate,
   assignMemoqTranslator,
   checkProjectHasMemoqStep,
-  assignProjectManagers
+  assignProjectManagers,
+  getTasksForCustomUnits,
+  getStepsForDuoUnits
 }

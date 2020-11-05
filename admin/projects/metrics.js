@@ -10,7 +10,7 @@ const ObjectId = require('mongodb').ObjectID;
 async function updateProjectMetrics(projectId, tasks) {
 	try {
 		const project = await getProject({ "_id": projectId });
-		let { steps, customer, industry } = project;
+		let { steps, customer, tasks: existingTasks, industry } = project;
 		let isMetricsExist = true;
 		for (let task of tasks) {
 			const { stepsAndUnits } = task;
@@ -44,7 +44,7 @@ async function updateProjectMetrics(projectId, tasks) {
 				}
 			}
 		}
-		return await updateProject({ "_id": projectId }, { tasks, steps, isMetricsExist });
+		return await updateProject({ "_id": projectId }, { tasks: existingTasks, steps, isMetricsExist });
 	} catch (err) {
 		console.log(err);
 		console.log("Error in updateProjectMetrics");
