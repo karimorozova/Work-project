@@ -54,7 +54,7 @@
 
 <script>
 	import LabelVal from "@/components/LabelVal";
-	import {mapActions, mapGetters} from 'vuex';
+	import { mapActions, mapGetters } from 'vuex';
 	import taskData from "@/mixins/taskData";
 	import SelectSingle from "@/components/SelectSingle";
 
@@ -67,20 +67,20 @@
 			currentIndex: {
 				type: Number
 			},
-      templates: {
+			templates: {
 				type: Array,
-      },
-			originallyUnits:{
+			},
+			originallyUnits: {
 				type: Array,
 			},
 		},
 		data() {
 			return {
-        // templates: [],
-        selectedSizes: "",
-        // selectedTemplate: "",
-        // units: null,
-      }
+				// templates: [],
+				selectedSizes: "",
+				// selectedTemplate: "",
+				// units: null,
+			}
 		},
 		methods: {
 			// async getUnits() {
@@ -102,10 +102,10 @@
 				let fieldsForDelete = ['template', 'hours'];
 				for (const iterator of fieldsForDelete) {
 					oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
-						? delete oldStepsAndUnits[this.currentIndex][iterator]
-						: false
+							? delete oldStepsAndUnits[this.currentIndex][iterator]
+							: false
 				}
-				this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
+				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits });
 			},
 			setHours(e, step) {
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits;
@@ -114,28 +114,27 @@
 				let fieldsForDelete = ['quantity', 'template'];
 				for (const iterator of fieldsForDelete) {
 					oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
-						? delete oldStepsAndUnits[this.currentIndex][iterator]
-						: false
+							? delete oldStepsAndUnits[this.currentIndex][iterator]
+							: false
 				}
-				this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
+				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits });
 			},
-			setTemplate({option}) {
-        const value = this.templates.find(item => item.name === option);
-        // this.selectedTemplate = value;
+			setTemplate({ option }) {
+				const value = this.templates.find(item => item.name === option);
+				// this.selectedTemplate = value;
+				let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+				oldStepsAndUnits[this.currentIndex].template = value;
+				oldStepsAndUnits[this.currentIndex].size = null;
 
-        let oldStepsAndUnits = this.tasksData.stepsAndUnits;
-        oldStepsAndUnits[this.currentIndex].template = value;
-        oldStepsAndUnits[this.currentIndex].size = null;
-
-        let fieldsForDelete = ['quantity', 'hours'];
-        for (const iterator of fieldsForDelete) {
-          oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
-            ? delete oldStepsAndUnits[this.currentIndex][iterator]
-            : false;
-        }
-        this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits });
-      },
-			setSize({option}) {
+				let fieldsForDelete = ['quantity', 'hours'];
+				for (const iterator of fieldsForDelete) {
+					oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
+							? delete oldStepsAndUnits[this.currentIndex][iterator]
+							: false;
+				}
+				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits });
+			},
+			setSize({ option }) {
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits;
 				oldStepsAndUnits[this.currentIndex].size = option;
 				this.selectedSizes = option;
@@ -143,10 +142,10 @@
 				let fieldsForDelete = ['template'];
 				for (const iterator of fieldsForDelete) {
 					oldStepsAndUnits[this.currentIndex].hasOwnProperty(iterator)
-						? delete oldStepsAndUnits[this.currentIndex][iterator]
-						: false
+							? delete oldStepsAndUnits[this.currentIndex][iterator]
+							: false
 				}
-				this.setDataValue({prop: "stepsAndUnits", value: oldStepsAndUnits});
+				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits });
 			},
 			// async getMemoqTemplates() {
 			// 	try {
@@ -164,42 +163,45 @@
 			// },
 		},
 		// async created() {
-			// await this.getMemoqTemplates();
-			// this.setStartedTempalte();
-			// await this.getUnits();
+		// await this.getMemoqTemplates();
+		// this.setStartedTempalte();
+		// await this.getUnits();
 		// },
 		computed: {
-      ...mapGetters({
-        tasksData: "getTasksData",
-      }),
-      selectedTemplate () {
-        if (this.tasksData) {
-          const { name } = this.tasksData.stepsAndUnits.find(obj => obj.hasOwnProperty('template')).template;
-          return name || '';
-        }
-      },
-      getSizes () {
-        if (this.originallyUnits.length) {
-          if (this.currentJob.unit !== 'CAT Wordcount') {
-            let sizes = this.originallyUnits.filter(item => item.type === this.currentJob.unit)[0].sizes;
-            if (!sizes.length) {
-              sizes = ["1"];
-            }
-            return sizes;
-          }
-        }
-      },
-      currentJobSize () {
-        if (this.originallyUnits.length) {
-          let oldStepsAndUnits = this.tasksData.stepsAndUnits;
-          oldStepsAndUnits[this.currentIndex].size = this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
-          return this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
+			...mapGetters({
+				tasksData: "getTasksData",
+			}),
+			selectedTemplate() {
+				if(this.tasksData) {
+					if(this.tasksData.stepsAndUnits.find(obj => obj.hasOwnProperty('template'))) {
+						const { name } = this.tasksData.stepsAndUnits.find(obj => obj.hasOwnProperty('template')).template;
+						return name
+					}
+					return ''
+				}
+			},
+			getSizes() {
+				if(this.originallyUnits.length) {
+					if(this.currentJob.unit !== 'CAT Wordcount') {
+						let sizes = this.originallyUnits.filter(item => item.type === this.currentJob.unit)[0].sizes;
+						if(!sizes.length) {
+							sizes = ["1"];
+						}
+						return sizes;
+					}
+				}
+			},
+			currentJobSize() {
+				if(this.originallyUnits.length) {
+					let oldStepsAndUnits = this.tasksData.stepsAndUnits;
+					oldStepsAndUnits[this.currentIndex].size = this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
+					return this.getSizes.includes(this.currentJob.size) ? this.currentJob.size : null;
 				}
 			},
 			allTemplates() {
-				if(this.templates.length){
-				  return this.templates.map(item => item.name);
-        }
+				if(this.templates.length) {
+					return this.templates.map(item => item.name);
+				}
 			},
 		},
 		components: {

@@ -37,7 +37,7 @@
 
         .tasks-data__services
           .tasks-data__service-steps(v-if="countCATWordcount === 2")
-            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length",)
+            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length")
               JobSettings(
                 :tasksDataProp="tasksData",
                 v-for="(step, index) in [sortedJobs[0]]",
@@ -48,7 +48,7 @@
               )
 
           .tasks-data__service-steps(v-else)
-            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length",)
+            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length")
               JobSettings(
                 :tasksDataProp="tasksData",
                 v-for="(step, index) in sortedJobs",
