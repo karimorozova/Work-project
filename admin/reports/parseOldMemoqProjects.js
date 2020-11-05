@@ -2,6 +2,7 @@ const { Languages, Vendors, Clients, Industries, XtrfLqa } = require('../models'
 const readXlsxFile = require('read-excel-file/node');
 const ObjectId = require('mongodb').ObjectID;
 const { findIndustry } = require('./newLangTierReport');
+const { getLqaSpecificTierForVendor } = require('../reports/xtrf');
 const fs = require('fs');
 
 /*
@@ -82,6 +83,7 @@ const parseAndWriteLQAReport = async () => {
         let { name, otherInfo } = vendorInfo;
         const ourVendor = vendors.find(({ aliases }) => aliases.includes(name));
         const ourClient = clients.find(({ aliases }) => aliases.includes(otherInfo.clientName));
+        vendorInfo.tier = getLqaSpecificTierForVendor(vendorInfo);
         otherInfo = otherInfo.map(item => {
           if (ourClient) {
             item.clientId = ObjectId(ourClient._id);

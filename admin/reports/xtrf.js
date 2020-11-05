@@ -1,6 +1,6 @@
-const { Industries, Languages, MemoqProject, Vendors } = require("../models");
-const { getMemoqUsers } = require("../services/memoqs/users");
-
+const { Industries, MemoqProject, Languages, Vendors, XtrfLqa } = require('../models');
+const { getMemoqUsers } = require('../services/memoqs/users');
+const ObjectId = require('mongodb').ObjectID;
 
 const personalFlat = (arr) => arr.reduce((acc, curr) => Array.isArray(curr) ? [...acc, ...personalFlat(curr)] : [...acc, curr], []);
 
@@ -277,198 +277,51 @@ function getLqaSpecificTier(vendors) {
 
 //// Lqa report /////
 async function getXtrfLqaReport(filters) {
-	const filterQuery = getFilteringQuery(filters);
-	const vendorFilterQuery = await getVendorsQuery(filters);
-	const { nameFilter, industryFilter, targetFilter, tierFilter } = filters;
-	try {
-		const tiers = await getXtrfTierReport(filters);
-		const vendors = await Vendors.find(vendorFilterQuery);
-		const memoqs = await MemoqProject.find(filterQuery);
-		const financeDocs = getIndustryDocs(memoqs, 'Finance');
-		const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-		let calculatedTiers = [];
-		calculatedTiers.push(tiers.reduce((acc, curr) => {
-			acc[curr.group] = acc[curr.group] ?
-					{
-						...acc[curr.group],
-						allTier: {
-							wordcount: acc[curr.group].allTier.wordcount + curr.allTier.wordcount,
-						},
-						financeTier: {
-							wordcount: acc[curr.group].financeTier.wordcount + curr.financeTier.wordcount,
-						},
-						gameTier: {
-							wordcount: acc[curr.group].gameTier.wordcount + curr.gameTier.wordcount,
-						}
-					} : {
-						group: curr.group,
-						memoqSymbol: curr.memoqSymbol,
-						allTier: {
-							wordcount: curr.allTier.wordcount,
-						},
-						financeTier: {
-							wordcount: curr.financeTier.wordcount,
-						},
-						gameTier: {
-							wordcount: curr.gameTier.wordcount,
-						}
-					};
-			return acc;
-		}, {}));
-		calculatedTiers = calculatedTiers.reduce((acc, curr) => {
-			acc.push(...Object.values(curr));
-			return acc;
-		}, []);
-		const memoqVendors = calculatedTiers.map(tier => ({
-			target: tier.group,
-			finance: {
-				vendors: [...Object.values(getLqaWordcount(tier, financeDocs, nameFilter))],
-			},
-			gaming: {
-				vendors: [...Object.values(getLqaWordcount(tier, gamingDocs, nameFilter))],
-			},
-			other: {
-				vendors: [],
-			}
-		}));
-		for (let { firstName, surname, wordCountInfo, assessments } of vendors) {
-			for (let { industry, targetLanguage: { group }, wordCount } of wordCountInfo) {
-				const name = surname ? `${ firstName } ${ surname }` : firstName;
-				const memoqIndex = memoqVendors.findIndex(item => item.target === group);
-				const memoqDoc = memoqVendors[memoqIndex];
-				if(!!memoqDoc && industry.name.toString() === 'Finance') {
-					const financeVendorIndex = memoqDoc.finance.vendors.findIndex(vendor => vendor.name === name);
-					if(financeVendorIndex !== -1) {
-						const updatedVendor = {
-							...memoqDoc.finance.vendors[financeVendorIndex],
-							wordCount: memoqDoc.finance.vendors[financeVendorIndex].wordCount + wordCount,
-						};
-						memoqDoc.finance.vendors.splice(financeVendorIndex, 1, updatedVendor);
-					} else {
-						memoqDoc.finance.vendors.push({
-							name,
-							wordCount,
-							assessments: assessments.length ? [await getVendorAssessment(assessments, 'Finance')] : []
-						});
-					}
-					memoqVendors.splice(memoqIndex, 1, memoqDoc);
-				} else if(!!memoqDoc && industry.name.toString() === 'iGaming') {
-					const gamingVendorIndex = memoqDoc.gaming.vendors.findIndex(vendor => vendor.name === name);
-					if(gamingVendorIndex !== -1) {
-						const updatedVendor = {
-							...memoqDoc.gaming.vendors[gamingVendorIndex],
-							wordCount: memoqDoc.gaming.vendors[gamingVendorIndex].wordCount + wordCount,
-							assessments,
-						};
-						memoqDoc.gaming.vendors.splice(gamingVendorIndex, 1, updatedVendor);
-					} else {
-						memoqDoc.gaming.vendors.push({
-							name,
-							wordCount,
-							assessments: assessments.length ?
-									[await getVendorAssessment(assessments, 'iGaming')] : [],
-						});
-					}
-					memoqVendors.splice(memoqIndex, 1, memoqDoc);
-				} else if(!!memoqDoc && industry.name.toString() === 'Other') {
-					const otherVendorIndex = memoqDoc.other.vendors.findIndex(vendor => vendor.name === name);
-					if(otherVendorIndex !== -1) {
-						const updatedVendor = {
-							...memoqDoc.other.vendors[otherVendorIndex],
-							wordCount: memoqDoc.other.vendors[otherVendorIndex].wordCount + wordCount,
-						};
-						memoqDoc.other.vendors.splice(otherVendorIndex, 1, updatedVendor);
-					} else {
-						memoqDoc.other.vendors.push({
-							name,
-							wordCount,
-						});
-					}
-					memoqVendors.splice(memoqIndex, 1, memoqDoc);
-				}
-			}
-		}
-		let result = memoqVendors.map(vendor => ({
-			target: vendor.target,
-			finance: {
-				tier: getLqaSpecificTier(vendor.finance.vendors),
-				...vendor.finance,
-			},
-			gaming: {
-				tier: getLqaSpecificTier(vendor.gaming.vendors),
-				...vendor.gaming,
-			},
-			other: {
-				tier: getLqaSpecificTier(vendor.other.vendors),
-				...vendor.other
-			}
-		}));
-		if(industryFilter) {
-			if(industryFilter === 'Finance') {
-				result = result.map(vendor => ({
-					target: vendor.target,
-					finance: {
-						...vendor.finance,
-					}
-				})).filter(vendor => vendor.finance.vendors.length);
-			} else if(industryFilter === 'iGaming') {
-				result = result.map(vendor => ({
-					target: vendor.target,
-					gaming: {
-						...vendor.gaming
-					}
-				})).filter(vendor => vendor.gaming.vendors.length);
-			} else {
-				result = result.map(vendor => ({
-					target: vendor.target,
-					other: {
-						...vendor.other
-					}
-				})).filter(vendor => vendor.other.vendors.length);
-			}
-		}
-		if(targetFilter) {
-			const langGroupObjects = await Languages.find({ lang: { $in: targetFilter } });
-			const langGroups = [];
-			for (let { group } of langGroupObjects) {
-				langGroups.push(group);
-			}
-			const filteredReport = [];
-			for (let group of [...new Set(langGroups)]) {
-				filteredReport.push(result.find(vendor => vendor.target === group));
-			}
-			result = filteredReport;
-		}
-		if(tierFilter) {
-			result = result.map(item => {
-				if(item.finance && item.finance.tier !== tierFilter) {
-					delete item.finance;
-				}
-				if(item.gaming && item.gaming.tier !== tierFilter) {
-					delete item.gaming;
-				}
-				if(item.other && item.other.tier !== tierFilter) {
-					delete item.other;
-				}
-				return item;
-			}).filter(item => Object.keys(item).length !== 1);
-		}
-		result = result.map(item => {
-			if(item.finance.vendors.length) {
-				item.finance.vendors = item.finance.vendors.filter(vendor => vendor.wordCount);
-			}
-			if(item.gaming.vendors.length) {
-				item.gaming.vendors = item.gaming.vendors.filter(vendor => vendor.wordCount);
-			}
-			if(item.other.vendors.length) {
-				item.other.vendors = item.other.vendors.filter(vendor => vendor.wordCount);
-			}
-			return item
-		});
-		return result.filter(vendor => (vendor.finance && vendor.finance.vendors.length)
-				|| (vendor.gaming && vendor.gaming.vendors.length)
-				|| (vendor.other && vendor.other.vendors.length));
-	} catch (err) {
+  const { sourceFilter, countFilter, tierFilter, industryFilter } = filters;
+  const languages = await Languages.find();
+  const filterQuery = await getFilteringQuery(filters, languages);
+  try {
+    let result = [];
+    const xtrfLqaReport = await XtrfLqa.find(filterQuery).skip(countFilter - 10).limit(countFilter)
+      .populate('sourceLanguage', ['lang'])
+      .populate('targetLanguage', ['lang'])
+      .populate('industries.Finance.industryId', ['name'])
+      .populate('industries.iGaming.industryId', ['name']);
+    for (let { sourceLanguage, targetLanguage, industries } of xtrfLqaReport) {
+      sourceLanguage = sourceLanguage ? sourceLanguage.lang : 'no language data';
+      targetLanguage = targetLanguage ? targetLanguage.lang : 'no language data';
+      result.push({
+        sourceLanguage,
+        targetLanguage,
+        industries
+      });
+    }
+    // if (sourceFilter) {
+    //   result = result.filter(({ sourceLanguage }) => sourceLanguage === sourceFilter);
+    // }
+    if (tierFilter) {
+      result = result.filter(({ industries }) => {
+        const { Finance, iGaming } = industries;
+        const { vendors: financeVendors } = Finance;
+        const { vendors: igamingVendors } = iGaming;
+        Finance.vendors = financeVendors.filter(vendor => vendor.tier === +tierFilter);
+        iGaming.vendors = igamingVendors.filter(vendor => vendor.tier === +tierFilter);
+        return industries;
+      });
+    }
+    if (industryFilter) {
+      result = result.map(item => {
+        const { Finance, iGaming } = item.industries;
+        if (industryFilter === 'Finance') {
+          iGaming.vendors = [];
+          return item;
+        }
+        Finance.vendors = [];
+        return item;
+      });
+    }
+    return result;
+  } catch (err) {
 		console.log(err);
 		console.log("Error in getXtrfLqaReport");
 	}
@@ -555,26 +408,18 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
 	}, {});
 }
 
-function getFilteringQuery(filters) {
-	let query = {
-		$and: [{
-			documents: { $ne: null },
-			creationTime: { $gte: new Date('2020-04-01T00:00:00Z') },
-			projectStatus: 'Live',
-		}]
-	};
-	if(filters.nameFilter) {
-		query[
-				'documents.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.UserInfoHeader.FullName'
-				] = { '$regex': new RegExp(`${ filters.nameFilter }`, 'i') };
-	}
-	if(filters.industryFilter) {
-		query.domain = { '$regex': new RegExp(`${ filters.industryFilter }`, 'i') };
-	}
-	if(filters.targetFilter) {
-		query['targetLanguages.lang'] = { $in: filters.targetFilter };
-	}
-	return query;
+async function getFilteringQuery (filters, languages) {
+  let query = {};
+  if (filters.targetFilter) {
+    const { targetFilter } = filters;
+    const targetLanguageIds = languages.filter(({ lang }) => targetFilter.includes(lang)).map(({ _id }) => _id);
+    query['targetLanguages'] = { $in: targetLanguageIds };
+  }
+  if (filters.industryFilter) {
+    const { industryFilter } = filters;
+    query[`industries.${industryFilter}.vendors`] = { $not: { $size: 0 } };
+  }
+  return query;
 }
 
 async function getVendorsQuery(filters) {
@@ -666,4 +511,10 @@ async function getXtrfUpcomingReport(filters) {
 	}
 }
 
-module.exports = { rebuildTierReportsStructure, getXtrfLqaReport, getXtrfUpcomingReport, filterReports };
+module.exports = {
+  rebuildTierReportsStructure,
+  getXtrfLqaReport,
+  getXtrfUpcomingReport,
+  filterReports,
+  getLqaSpecificTierForVendor
+};
