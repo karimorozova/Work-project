@@ -481,10 +481,14 @@
 			},
 			async sendQuote(message) {
 				try {
-					console.log(message);
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
-				}
+          await this.$http.post(`/vendorsapi/send-email`, {
+            message,
+            vendorId: this.vendorId
+          });
+          this.alertToggle({ message: 'Message sent!' });
+        } catch (err) {
+          this.alertToggle({ message: err.message, isShow: true, type: 'error' });
+        }
 				this.closePreview();
 			},
 			closeLangPairs() {

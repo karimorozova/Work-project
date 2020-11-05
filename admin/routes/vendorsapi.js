@@ -15,6 +15,7 @@ const {
   removeVendorEdu,
   updateVendorAssessment,
   notifyTestStatus,
+  sendMessageToVendor,
   updateVendorCompetencies,
   deleteVendorCompetencies,
   updateVendorsRatePrices,
@@ -457,26 +458,37 @@ router.post('/remove-lang-test', async (req, res) => {
 });
 
 router.post('/test-emails', async (req, res) => {
-	const { vendor, qualification, testPath, message } = req.body;
-	try {
-		await notifyTestStatus({ vendor, qualification, testPath, template: message });
-		res.send("email sent");
-	} catch (err) {
-		res.send(500).send("Error on sending test status email to vendor");
-	}
+  const { vendor, qualification, testPath, message } = req.body;
+  try {
+    await notifyTestStatus({ vendor, qualification, testPath, template: message });
+    res.send('email sent');
+  } catch (err) {
+    res.send(500).send('Error on sending test status email to vendor');
+  }
 });
 
-router.post("/get-message", async (req, res) => {
-	try {
-		const message = await testSentMessage(req.body);
-		res.send({ message });
-	} catch (err) {
-		console.log(err);
-		res.status(500).send("Error on getting quote message");
-	}
+router.post('/send-email', async (req, res) => {
+  const { vendorId, message } = req.body;
+  try {
+    await sendMessageToVendor(vendorId, message);
+    res.send('Sent!');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on sending message to vendor');
+  }
 });
 
-router.get("/create-memoq-vendor/:id", async (req, res) => {
+router.post('/get-message', async (req, res) => {
+  try {
+    const message = await testSentMessage(req.body);
+    res.send({ message });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting quote message');
+  }
+});
+
+router.get('/create-memoq-vendor/:id', async (req, res) => {
   const { id } = req.params;
   const vendor = await Vendors.findOne({ _id: id });
   const guid = await createMemoqUser(vendor, true);
