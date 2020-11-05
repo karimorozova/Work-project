@@ -25,17 +25,15 @@ export default {
 			if(languageFormValue === 'Duo') {
 				if(this.getClientLanguagesByServices('sourceLanguage').length) {
 					// if(this.getClientLanguagesByServices('sourceLanguage').length === 1){
-					this.$emit("setSourceLanguage",
-							{ symbol: this.getClientLanguagesByServices('sourceLanguage')[0].symbol }
-					);
+					this.$emit("setSourceLanguage", { symbol: this.getClientLanguagesByServices('sourceLanguage')[0].symbol });
 				}
 			} else if(languageFormValue === 'Mono') {
 				if(this.getClientLanguagesByServices('targetLanguages').length) {
 					// if(this.getClientLanguagesByServices('targetLanguages').length === 1){
-					const [firstElem] = this.getClientLanguagesByServices('targetLanguages')
-					this.$emit("setTargets",
-							{ targets: [firstElem] }
-					);
+					const [firstElem] = this.getClientLanguagesByServices('targetLanguages');
+					this.$emit("setTargets", { targets: [firstElem] });
+					this.$emit("setSourceLanguage", { symbol: firstElem.symbol });
+
 				}
 			}
 		},

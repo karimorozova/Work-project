@@ -8,6 +8,7 @@
         )
     .project-info__all-info
         TasksAndSteps(
+            v-if="originallyLanguages && originallyUnits && originallySteps"
             :originallyLanguages="originallyLanguages"
             :originallyUnits="originallyUnits"
             :originallySteps="originallySteps"

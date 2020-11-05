@@ -6,7 +6,7 @@
     .tasks-steps__tasks-title Tasks and Steps
       img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
-      TasksData(v-if="isTaskData && !isFinishedStatus"
+      TasksData(v-if="isTaskData && !isFinishedStatus && originallyLanguages.length"
         :originallyLanguages="originallyLanguages"
         :originallyUnits="originallyUnits"
         :originallySteps="originallySteps"

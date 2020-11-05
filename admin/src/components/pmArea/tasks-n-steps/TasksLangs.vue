@@ -16,7 +16,7 @@
 	import LanguagesSelect from "@/components/LanguagesSelect";
 	import Asterisk from "@/components/Asterisk";
 	import SelectSingle from "@/components/SelectSingle";
-	import {mapGetters, mapActions} from "vuex";
+	import { mapGetters, mapActions } from "vuex";
 	import taskData from "@/mixins/taskData";
 	import TasksLanguages from "../../../mixins/TasksLanguages";
 
@@ -35,7 +35,7 @@
 			return {
 				targets: [],
 				languagePairs: [],
-				asteriskStyle: {top: "-4px"},
+				asteriskStyle: { top: "-4px" },
 			};
 		},
 		methods: {
@@ -43,10 +43,10 @@
 				setDataValue: "setTasksDataValue",
 				alertToggle: "alertToggle",
 			}),
-			setLanguage({option}) {
-				this.$emit("setTargets",
-					{targets: [this.originallyLanguages.find((item) => item.lang === option)]}
-				);
+			setLanguage({ option }) {
+				this.$emit("setTargets", { targets: [this.originallyLanguages.find((item) => item.lang === option)] });
+				const { symbol } = this.originallyLanguages.find((item) => item.lang === option);
+				this.$emit("setSourceLanguage", { symbol: symbol });
 			},
 		},
 		computed: {
@@ -55,8 +55,8 @@
 				tasksData: "getTasksData",
 			}),
 			possibleTargetLanguages() {
-				if (this.currentProject._id) {
-					if (this.tasksData.hasOwnProperty('service')) {
+				if(this.currentProject._id) {
+					if(this.tasksData.hasOwnProperty('service')) {
 						return this.getClientLanguagesByServices('targetLanguages').map(i => i.lang);
 					}
 				}

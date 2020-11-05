@@ -210,7 +210,7 @@
 				const unchecked = this.allTasks.map(item => {
 					item.isChecked = false;
 					return item;
-				})
+				});
 				this.storeProject({ ...this.currentProject, tasks: unchecked });
 			},
 			updatereviewTask({ tasksIds }) {

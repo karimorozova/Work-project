@@ -110,9 +110,10 @@
 			setSourceLang({ symbol }) {
 				const value = this.languages.find((item) => item.symbol === symbol);
 				this.setTasksDataValue({ prop: "source", value });
-				this.setTasksDataValue({ prop: "targets", value: [] });
+				if(this.tasksData.service.languageForm !== 'Mono') {
+					this.setTasksDataValue({ prop: "targets", value: [] });
+				}
 				this.sourceLanguages = [value.symbol];
-
 				this.setPossibleTargetsAction = true;
 				setTimeout(() => {
 					this.setPossibleTargetsAction = false;
@@ -294,15 +295,6 @@
 				try {
 					const result = await this.$http.get("/memoqapi/templates");
 					this.templates = result.data;
-					// if (this.templates.length) {
-					// 	const defTemplate = this.templates.find(
-					// 		(item) => item.name === "2 Steps"
-					// 	);
-					// 	this.setTasksDataValue({
-					// 		prop: "template",
-					// 		value: defTemplate || this.templates[0],
-					// 	});
-					// }
 				} catch (err) {
 				}
 			},
