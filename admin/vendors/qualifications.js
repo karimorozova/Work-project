@@ -8,7 +8,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 	let { qualifications } = await Vendors.findOne({ _id: vendorId });
 	let listForRates = [];
 	const listCompetenciesForSave = listOfNewCompetencies.filter(competence => {
-    let currentTest = findSameTestFromCompetence(allTests, competence);
+		let currentTest = findSameTestFromCompetence(allTests, competence);
 		if(currentTest) {
 			competence.testId = currentTest._id;
 			return competence;
@@ -43,9 +43,8 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 				}
 			}
 		}
-
-
 	});
+
 	const rates = await createRateCombinations(listForRates, vendorId);
 
 	return { rates, qualifications: qualificationsArrayAdditions(listQualificationsForSave, allTests) };
@@ -54,7 +53,7 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 		let finalQualificationArray = [];
 		qualificationsArray.forEach(qualification => {
 			let currentTest = findSameTestFromQualification(testsArray, qualification);
-			if(!qualification.hasOwnProperty('testType') || qualification.testType === '') {
+			if(currentTest && (!qualification.hasOwnProperty('testType') || qualification.testType === '')) {
 				let currentQualification = {};
 				Object.assign(currentQualification, qualification.toJSON());
 				currentQualification.testType = currentTest.evaluationType === 'Test' ? 'Test' : 'Sample';
@@ -70,8 +69,8 @@ const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, oldCompetence) => {
 	const allTests = await LangTest.find({});
 	let { qualifications, rates, competencies } = await Vendors.findOne({ _id: vendorId });
-  let newQualifications = qualifications;
-  let currentTest = findSameTestFromCompetence(allTests, competence, true);
+	let newQualifications = qualifications;
+	let currentTest = findSameTestFromCompetence(allTests, competence, true);
 	if(currentTest) {
 		const neededQualificationIndex = qualifications.findIndex(
 				qualification => qualification.testId.toString() === currentTest._id.toString() &&
@@ -90,27 +89,27 @@ const saveQualificationsAfterUpdateCompetencies = async (competence, vendorId, o
 		} else {
 			const currentTestForItem = allTests.find((test) => test._id.toString() === currentTest._id.toString());
 			const ifExistsIndustry = isExists(currentTestForItem.industries, competence.industry._id);
-      if (ifExistsIndustry) {
-        const ifExistsStepInQualification = isExists(newQualifications[neededQualificationIndex].industries, competence.industry._id);
-        ifExistsStepInQualification || newQualifications[neededQualificationIndex].industries.push(competence.industry._id);
-      }
-      const ifExistsStep = isExists(currentTestForItem.steps, competence.step._id);
-      if (ifExistsStep) {
-        const ifExistsStepInQualification = isExists(newQualifications[neededQualificationIndex].steps, competence.step._id);
-        ifExistsStepInQualification || newQualifications[neededQualificationIndex].steps.push(competence.step._id);
-      }
-    }
-    const neededCompetencies = getCompetenciesForCheck(competencies, oldCompetence._id, allTests);
-    if (neededCompetencies.length) {
-      const langPairsToDelete = [];
-      const industriesToDelete = [];
-      const stepsToDelete = [];
-      for (let { sourceLanguage, targetLanguage, industry, step } of neededCompetencies) {
-        const oldCompetenceLangPair = `${oldCompetence.sourceLanguage._id} ${oldCompetence.targetLanguage._id}`;
-        const doesHaveSameLangPair = `${sourceLanguage} ${targetLanguage}` === oldCompetenceLangPair;
-        const doesHaveSameStep = step.toString() === oldCompetence.step._id.toString();
-        const doesHaveSameIndustry = industry.toString() === oldCompetence.industry._id.toString();
-        if (!doesHaveSameLangPair) langPairsToDelete.push(oldCompetenceLangPair);
+			if(ifExistsIndustry) {
+				const ifExistsStepInQualification = isExists(newQualifications[neededQualificationIndex].industries, competence.industry._id);
+				ifExistsStepInQualification || newQualifications[neededQualificationIndex].industries.push(competence.industry._id);
+			}
+			const ifExistsStep = isExists(currentTestForItem.steps, competence.step._id);
+			if(ifExistsStep) {
+				const ifExistsStepInQualification = isExists(newQualifications[neededQualificationIndex].steps, competence.step._id);
+				ifExistsStepInQualification || newQualifications[neededQualificationIndex].steps.push(competence.step._id);
+			}
+		}
+		const neededCompetencies = getCompetenciesForCheck(competencies, oldCompetence._id, allTests);
+		if(neededCompetencies.length) {
+			const langPairsToDelete = [];
+			const industriesToDelete = [];
+			const stepsToDelete = [];
+			for (let { sourceLanguage, targetLanguage, industry, step } of neededCompetencies) {
+				const oldCompetenceLangPair = `${ oldCompetence.sourceLanguage._id } ${ oldCompetence.targetLanguage._id }`;
+				const doesHaveSameLangPair = `${ sourceLanguage } ${ targetLanguage }` === oldCompetenceLangPair;
+				const doesHaveSameStep = step.toString() === oldCompetence.step._id.toString();
+				const doesHaveSameIndustry = industry.toString() === oldCompetence.industry._id.toString();
+				if(!doesHaveSameLangPair) langPairsToDelete.push(oldCompetenceLangPair);
 				if(!doesHaveSameStep) stepsToDelete.push(oldCompetence.step._id.toString());
 				if(!doesHaveSameIndustry) industriesToDelete.push(oldCompetence.industry._id.toString());
 			}
@@ -153,19 +152,19 @@ const findSameTestFromQualification = (arrTest, qualification) => {
 };
 
 const findSameTestFromCompetence = (arrTest, competence, includesId = false) => {
-  let { sourceLanguage, targetLanguage, industry, step } = competence;
-  if (includesId) {
-    sourceLanguage = sourceLanguage._id;
-    targetLanguage = targetLanguage._id;
-    industry = industry._id;
-    step = step._id;
-  }
-  return arrTest.find(test =>
-    test.source.toString() === sourceLanguage.toString() &&
-    test.targets.find(target => target.toString() === targetLanguage.toString()) &&
-    test.industries.find(testIndustry => testIndustry.toString() === industry.toString()) &&
-    test.steps.find(testStep => testStep.toString() === step.toString())
-  );
+	let { sourceLanguage, targetLanguage, industry, step } = competence;
+	if(includesId) {
+		sourceLanguage = sourceLanguage._id;
+		targetLanguage = targetLanguage._id;
+		industry = industry._id;
+		step = step._id;
+	}
+	return arrTest.find(test =>
+			test.source.toString() === sourceLanguage.toString() &&
+			test.targets.find(target => target.toString() === targetLanguage.toString()) &&
+			test.industries.find(testIndustry => testIndustry.toString() === industry.toString()) &&
+			test.steps.find(testStep => testStep.toString() === step.toString())
+	);
 };
 
 const pushFirstQualification = (element) => {
