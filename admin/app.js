@@ -22,14 +22,14 @@ const { Pricelist } = require('./models');
 const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 
 
-const foo = async () => {
-	const users = await getMemoqUsers();
+// const foo = async () => {
+// 	const users = await getMemoqUsers();
 	// const needed = users.filter(user => user.email === 'maksym@pangea.global' || user.email === 'maxyplmr@gmail.com');
 	// console.log(needed);
-	console.log(users.filter(i => typeof i.email === 'object'))
-}
+// 	console.log(users.filter(i => typeof i.email === 'object'))
+// }
  // deleteMemoqUser('97d8076f-6e07-4145-b0dc-a77f2e9a15e3');
-foo();
+// foo();
 // parseGmailMessages();
 
 schedule.scheduleJob('0 */3 * * *', async function () {
