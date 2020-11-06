@@ -49,10 +49,14 @@ const parseAndWriteLQAReport = async () => {
   const newReports = [];
   for (let key of Object.keys(report)) {
     const { Finance, iGaming } = report[key];
+    const sourceLangSymbol = key.split(' » ')[0];
+    const targetLangSymbol = key.split(' » ')[0];
     const sourceIso = getLangISO1(key, 0);
     const targetIso = getLangISO1(key, 1);
-    const sourceLanguage = languages.find(({ iso1 }) => iso1 === sourceIso);
-    const targetLanguage = languages.find(({ iso1 }) => iso1 === targetIso);
+    const sourceLanguage = languages.find(({ iso1 }) => iso1 === sourceIso)
+      || languages.find(({ symbol, xtm }) => symbol === sourceLangSymbol || xtm === sourceLangSymbol);
+    const targetLanguage = languages.find(({ iso1 }) => iso1 === targetIso) ||
+      languages.find(({ symbol, xtm }) => symbol === targetLangSymbol || xtm === targetLangSymbol);
     newReports.push({
       langPair: key,
       sourceLanguage: sourceLanguage ? ObjectId(sourceLanguage._id) : null,
