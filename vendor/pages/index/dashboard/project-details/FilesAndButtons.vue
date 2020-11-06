@@ -3,7 +3,7 @@
     Files
     .files-buttons__upload(v-if="isFileUpload")
       UploadDeliverable(@setDeliverables="setDeliverables")
-    .files-buttons__terms(v-if="job.status !== 'Completed'")
+    .files-buttons__terms(v-if="job.status !== 'Completed' && job.status !== 'Request Sent' ")
       TermsAgree(v-if="job._id" :job="job")
 
     .files-buttons__buttons(v-if="deliverables.length || (isButton && job.status !== 'Completed')" :class="{'files-buttons_opacity05': !job.isVendorRead}")
@@ -25,11 +25,11 @@
 
 <script>
 	import Files from "../../../components/details/Files";
+	import { mapActions, mapGetters } from "vuex";
 
 	const TermsAgree = () => import("../../../components/details/TermsAgree");
 	const UploadDeliverable = () => import("../../../components/details/UploadDeliverable");
 	const Button = () => import("~/components/buttons/Button");
-	import { mapGetters, mapActions } from "vuex";
 
 	export default {
     props: {
@@ -53,10 +53,9 @@
       },
       async startJob () {
         if (!this.job.isVendorRead) return;
-        const vendor = this.getVendor;
-        try {
+	      try {
           const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
-          if (type === "CAT Wordcount" && vendor.guid == null) {
+          if (type === "CAT Wordcount" && this.getVendor.guid == null) {
             await this.$axios.post(`/vendor/create-memoq-vendor`, {
               token: this.getToken
             });
@@ -189,9 +188,10 @@
     }
 
     &__icons {
-      width: 10%;
+      width: 12%;
       align-self: center;
       justify-content: space-between;
+      padding: 25px 0 15px 0;
     }
 
     &__icon {
@@ -200,9 +200,9 @@
 
     &__tooltip {
       position: absolute;
-      bottom: -15px;
+      bottom: -16px;
       left: -8px;
-      font-size: 14px;
+      /*font-size: 14px;*/
     }
 
     &__image {

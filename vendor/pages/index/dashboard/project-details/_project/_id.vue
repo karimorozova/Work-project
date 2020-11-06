@@ -59,7 +59,9 @@
 			},
 			async getProjectById(id) {
 				try {
-					const result = await this.$axios.get(`pm-manage/project?id=${ id }`)
+					const result = await this.$axios.get(`pm-manage/project?id=${ id }`);
+					console.log('err')
+					console.log(result.data)
 					this.project = result.data;
 				} catch (e) {
 				}
@@ -172,8 +174,11 @@
 			this.refreshProgress();
 		},
 		async created() {
+			console.log('tyt22')
 			await this.getProjectById(this.$route.params.project);
+
 			if(this.project) {
+				console.log('tyt')
 				await this.getStepFromProject(this.$route.params.id);
 				await this.getTaskFromProject(this.currentStep.taskId);
 			}

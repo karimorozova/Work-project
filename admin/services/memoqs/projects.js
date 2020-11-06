@@ -81,6 +81,7 @@ async function moveMemoqFileToProject(fileId) {
 }
 
 async function updateMemoqProjectUsers(steps) {
+	//MM
 	const stepsStatuses = ["Ready to Start", "Waiting to Start", "Started", "Completed"];
 	const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
 	const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
@@ -126,6 +127,8 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
 		const users = await getMemoqUsers();
 		const currentUsers = await getProjectUsers(memoqProjectId);
 		const pm = Array.isArray(currentUsers) ? currentUsers.find(item => item.ProjectRoles["a:ProjectManager"]) : currentUsers;
+
+
 		const assignedSteps = steps.filter(item => item.vendor);
 		let projectUsers = assignedSteps.map(item => {
 			const memoqUser = users.find(user => user.email === item.vendor.email);
@@ -148,7 +151,7 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
 
 async function assignMemoqTranslators({ memoqProjectId, assignedSteps, users }) {
 	const docsInfo = assignedSteps.reduce((acc, cur) => {
-		const user = users.find(item => item.email === cur.vendor.email);
+		const user = users.filter(user => typeof user.email === 'string').find(item => item.email === cur.vendor.email);
 		if(user) {
 			for (let docId of cur.memoqDocIds) {
 				acc[docId] = acc[docId] || {};
@@ -157,12 +160,12 @@ async function assignMemoqTranslators({ memoqProjectId, assignedSteps, users }) 
 					deadline: cur.deadline,
 					memoqRole: cur.serviceStep.memoqAssignmentRole,
 					userId: user.id
-				})
+				});
 				acc[docId].users = users;
 			}
 		}
 		return acc;
-	}, {})
+	}, {});
 	try {
 		await setMemoqDocsAssignments(memoqProjectId, docsInfo);
 	} catch (err) {
@@ -270,6 +273,7 @@ async function getProjectTranslationDocs(projectId) {
 }
 
 async function getProjectAnalysis(projectId) {
+	console.log(projectId);
 	const xml = `${ xmlHeader }
                 <soapenv:Body>
                 <ns:RunAnalysis>

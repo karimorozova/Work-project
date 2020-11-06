@@ -133,7 +133,9 @@
 					if(this.currentProject.isMetricsExist) {
 						return await this.updateProjectProgress();
 					}
-					const result = await this.$http.get(`/memoqapi/metrics?projectId=${ this.currentProject._id }`);
+					const result = await this.$http.post('/memoqapi/metrics', {
+						projectId: this.currentProject._id
+					});
 					const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`);
 					await this.setCurrentProject(updatedProject.body);
 					this.alertToggle({ message: "Metrics are received.", isShow: true, type: "success" });

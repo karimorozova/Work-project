@@ -84,7 +84,7 @@
       }),
       chooseJob({index}) {
         this.selectJob(this.jobs[index]);
-        this.$router.push(`/dashboard/project-details/${this.jobs[index]._id}`);
+	      this.$router.push(`/dashboard/project-details/${this.jobs[index].project_Id}/${ this.jobs[index]._id }`);
       },
       closeErrors() {
         this.areErrors = false;

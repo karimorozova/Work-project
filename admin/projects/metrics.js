@@ -11,8 +11,8 @@ async function updateProjectMetrics(projectId, tasks) {
 	try {
 		const project = await getProject({ "_id": projectId });
 		let { steps, customer, tasks: existingTasks, industry } = project;
-		const newTasksIds = tasks.map(i => i.taskId);
-		existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
+		if(!tasks) tasks = project.tasks.filter(task => !task.hasOwnProperty('metrics'));
+		filterExistingTasks();
 		let isMetricsExist = true;
 		for (let task of tasks) {
 			const { stepsAndUnits } = task;
@@ -46,6 +46,12 @@ async function updateProjectMetrics(projectId, tasks) {
 				}
 			}
 		}
+
+		function filterExistingTasks() {
+			const newTasksIds = tasks.map(i => i.taskId);
+			existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
+		}
+
 		existingTasks.push(...tasks);
 
 		return await updateProject({ "_id": projectId }, { tasks: existingTasks, steps, isMetricsExist });
