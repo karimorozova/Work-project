@@ -294,10 +294,22 @@ export default {
     },
 
     async checkErrors(index) {
+    	const currentIndex = index;
       if (this.currentActive === -1) return;
       this.errors = [];
 
-      if (!this.currentSource) this.errors.push("Source should not be empty!");
+    if(!this.newRow){
+	    const arraysOfTheSame = this.clientServices
+          .filter((item, index) => index !== currentIndex)
+          .filter((item) =>
+					    item.sourceLanguage.lang === this.currentSource.lang &&
+					    item.targetLanguages.find((x) => this.currentTargets.some((y) => x.lang === y.lang)) &&
+					    item.industries.find((x) => this.currentIndustries.some((y) => x.name === y.name)) &&
+					    item.services.find((x) => this.currentServices.some((y) => x.title === y.title))
+	    );
+	    if (arraysOfTheSame.length) this.errors.push("Such data already exists!");
+    }
+	    if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTargets.length) this.errors.push("Target should not be empty!");
       if (!this.currentIndustries.length) this.errors.push("Industry should not be empty!");
       if (!this.currentServices.length) this.errors.push("Service should not be empty!");
@@ -309,6 +321,7 @@ export default {
     },
 
     async manageSaveClick(index) {
+
       if (this.currentActive === -1) return;
       try {
         const id = this.clientServices[index]._id;

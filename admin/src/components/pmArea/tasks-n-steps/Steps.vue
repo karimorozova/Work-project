@@ -98,7 +98,7 @@
             :highlighted="highlighted"
             @scrollDrop="scrollDrop")
         template(slot="progress" slot-scope="{ row }")
-          ProgressLine(:progress="row.progress")
+          ProgressLine(:progress="progress(row.progress)")
         template(slot="status" slot-scope="{ row }")
           span.steps__step-status {{ row.status | stepsAndTasksStatusFilter }}
         template(slot="receivables" slot-scope="{ row }")
@@ -229,6 +229,9 @@
       //     // }
       //     return finance.Price.receivables;
       // },
+			progress(prog) {
+				return prog.totalWordCount ? ((prog.wordsDone/prog.totalWordCount)*100).toFixed(2) : prog;
+			},
       getPrice (row, prop) {
         const value = row.finance.Price[prop];
         return value === 0 ? value : value.toFixed(2);

@@ -9,25 +9,12 @@
 	export default {
 		props: {
 			progress: {
-				type: [Number, String, Object]
+				type: [Number, String]
 			}
-		},
-		methods: {
-			progressObj(prog) {
-				if(!prog.wordsDone && !prog.totalWordCount) {
-					return 0
-				} else {
-					return ((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2)
-				}
-			},
 		},
 		computed: {
 			currentProgress() {
-				if(typeof this.progress === 'object') {
-					return this.progressObj(this.progress)
-				} else {
-					return !isNaN(this.progress) ? this.progress : 0;
-				}
+				return !isNaN(this.progress) ? this.progress : 0;
 			}
 		}
 	}
@@ -42,7 +29,6 @@
     border: 1px solid $brown-border;
     position: relative;
     box-sizing: border-box;
-
     &__tooltip {
       position: absolute;
       width: 100%;
@@ -52,19 +38,16 @@
       display: flex;
       justify-content: center;
     }
-
     &:hover {
       .progress-line__tooltip {
         opacity: 1;
       }
     }
-
     &__filler {
       background-color: $green;
       height: 100%;
       max-width: 100%;
     }
-
     &__value {
       background-color: $white;
       color: $main-color;
