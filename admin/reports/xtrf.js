@@ -540,34 +540,72 @@ async function getVendorLqa(obj) {
 
 // Upcoming LQA
 async function getXtrfUpcomingReport(filters) {
-	const filterQuery = getFilteringQuery(filters);
-	const { nameFilter } = filters;
-	try {
-		const tiers = await getXtrfTierReport(filters);
-		const memoqs = await MemoqProject.find(filterQuery);
-		const financeDocs = getIndustryDocs(memoqs, 'Finance');
-		const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
-		let financeReports = getUpcomingWordcount(tiers, financeDocs, nameFilter, 'Finance');
-		let gamingReports = getUpcomingWordcount(tiers, gamingDocs, nameFilter, 'iGaming');
-		financeReports = await getVendorLqa(financeReports);
-		gamingReports = await getVendorLqa(gamingReports);
-		if(filters.tierFilter) {
-			Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
-			Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
-		}
-		if(filters.lqaFilter) {
-			financeReports = financeReports.filter(item => item.LQA === +filters.lqaFilter);
-			gamingReports = gamingReports.filter(item => item.LQA === +filters.lqaFilter);
-		}
-		return {
-			financeReports: financeReports.filter(vendor => vendor.LQA !== 'passed'),
-			gamingReports: gamingReports.filter(vendor => vendor.LQA !== 'passed'),
-		};
-	} catch (err) {
-		console.log(err);
-		console.log("Error in getXtrfUpcomingReport");
-	}
+  const filterQuery = getFilteringQuery(filters);
+  const { nameFilter, tierFilter, industryFilter } = filters;
+  try {
+    const lqaReport = await XtrfLqa.find()
+      .populate('sourceLanguage', ['lang'])
+      .populate('targetLanguage', ['lang']);
+    let result = [];
+    for (let { sourceLanguage, targetLanguage, industries } of lqaReport) {
+      const { Finance, iGaming } = industries;
+      const { vendors: financeVendors } = Finance;
+      const { vendors: igamingVendors } = iGaming;
+      result.push(...getVendorsData(financeVendors, sourceLanguage, targetLanguage, 'Finance'));
+      result.push(...getVendorsData(igamingVendors, sourceLanguage, targetLanguage, 'iGaming'));
+    }
+    if (industryFilter) {
+      result = result.filter(({ industry }) => industry === industryFilter);
+    }
+    if (tierFilter) {
+      result = result.filter(({ tier }) => tier === tierFilter);
+    }
+    if (nameFilter) {
+      const nameRegex = new RegExp(nameFilter, 'i');
+      result = result.filter(({ name }) => nameRegex.test(name));
+    }
+    // const tiers = await getXtrfTierReport(filters);
+    // const memoqs = await MemoqProject.find(filterQuery);
+    // const financeDocs = getIndustryDocs(memoqs, 'Finance');
+    // const gamingDocs = getIndustryDocs(memoqs, 'iGaming');
+    // let financeReports = getUpcomingWordcount(tiers, financeDocs, nameFilter, 'Finance');
+    // let gamingReports = getUpcomingWordcount(tiers, gamingDocs, nameFilter, 'iGaming');
+    // financeReports = await getVendorLqa(financeReports);
+    // gamingReports = await getVendorLqa(gamingReports);
+    // if(filters.tierFilter) {
+    // 	Object.values(financeReports).filter(item => item.tier === filters.tierFilter);
+    // 	Object.values(gamingReports).filter(item => item.tier === filters.tierFilter);
+    // }
+    // if(filters.lqaFilter) {
+    // 	financeReports = financeReports.filter(item => item.LQA === +filters.lqaFilter);
+    // 	gamingReports = gamingReports.filter(item => item.LQA === +filters.lqaFilter);
+    // }
+    // return {
+    // 	financeReports: financeReports.filter(vendor => vendor.LQA !== 'passed'),
+    // 	gamingReports: gamingReports.filter(vendor => vendor.LQA !== 'passed'),
+    // };
+    return result;
+  } catch (err) {
+    console.log(err);
+    console.log('Error in getXtrfUpcomingReport');
+  }
 }
+
+const getVendorsData = (vendorsArr, sourceLanguage, targetLanguage, industry) => {
+  const data = [];
+  for (let { name, vendorId, wordCount, tier } of vendorsArr) {
+    data.push({
+      name,
+      vendorId,
+      wordCount,
+      tier,
+      sourceLanguage: sourceLanguage.lang,
+      targetLanguage: targetLanguage ? targetLanguage.lang : 'no language data',
+      industry
+    });
+  }
+  return data;
+};
 
 module.exports = {
   rebuildTierReportsStructure,

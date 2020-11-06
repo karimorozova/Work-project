@@ -14,8 +14,8 @@
                 @setTierFilter="(e) => setFilter(e, 'tierFilter')"
                 @setLqaFilter="(e) => setFilter(e, 'lqaFilter')"
             )
-        .lqa-vendors__table(v-if="Object.keys(this.reportData).length")
-            Table(:vendorsData="allVendors" @selectVendor="selectVendor")
+        .lqa-vendors__table(v-if="this.reportData.length")
+          Table(:vendorsData="allVendors" @selectVendor="selectVendor")
         .lqa-vendors__form(v-if="isForm")
             VendorLqaForm(
                 :vendorData="selectedVendor"
@@ -79,10 +79,10 @@ export default {
             this[prop] = value;
             await this.getReport();
         },
-        selectVendor({vendor}) {           
-            this.selectedVendor = vendor;
-            this.isForm = true;
-        },
+      selectVendor ({ vendor }) {
+        this.selectedVendor = vendor;
+        this.isForm = true;
+      },
         closeForm() {
             this.isForm = false;
         },
@@ -100,23 +100,23 @@ export default {
     },
     computed: {
         allVendors() {
-            let result = [];
-            let financeObj = this.reportData.financeReports;
-            let gamingObj = this.reportData.gamingReports
-            changeObject(financeObj, 'Finance');
-            changeObject(gamingObj, 'IGaming');
-            joinArrays(financeObj);
-            joinArrays(gamingObj);
+          // let financeObj = this.reportData.financeReports;
+          // let gamingObj = this.reportData.gamingReports
+          // changeObject(financeObj, 'Finance');
+          // changeObject(gamingObj, 'IGaming');
+          // joinArrays(financeObj);
+          // joinArrays(gamingObj);
 
-            return result;
+          return this.reportData;
 
-            function changeObject(obj, industry){
-                for (let key in obj) {
-                    obj[key].industry = industry;
-                }
-             }
-            function joinArrays(obj){
-                for (let key in obj) {
+          function changeObject (obj, industry) {
+            for (let key in obj) {
+              obj[key].industry = industry;
+            }
+          }
+
+          function joinArrays (obj) {
+            for (let key in obj) {
                     result.push(obj[key])
                 }
             }
