@@ -3,9 +3,9 @@
     .lqa__filters
       LqaReportFilter(
         :isLqa="false"
-        :allSources="['allSources']"
-        :allTargets="['allTargets']"
-        :allVendors="['Vendors']"
+        :allSources="availableSources"
+        :allTargets="availableTargets"
+        :allVendors="availableVendors"
         :targetFilter="targetFilter"
         :sourceFilter="sourceFilter"
         :tierFilter="tierFilter"
@@ -47,9 +47,9 @@
         tierFilter: 'All',
         vendorFilter: 'All',
 
-        availableSources: [],
-        availableTargets: [],
-        availableVendors: [],
+        availableSources: ['All'],
+        availableTargets: ['All'],
+        availableVendors: ['All'],
         allLangs: [],
         isLanguages: true,
         filterCount: 10,
@@ -71,9 +71,11 @@
         }
       },
       async getFilterOptions () {
-        const result = await this.$http.get('/reportapi/xtrf-lqa-reports-options');
+        const result = await this.$http.get('/reportsapi/xtrf-lqa-reports-filter-options');
         for (let key in result.data) {
-          if (result.data.hasOwnProperty(key)) this[key].push(...result.data[key]);
+          if (result.data.hasOwnProperty(key)) {
+            this[key].push(...result.data[key]);
+          }
         }
       },
       async getReport (filters) {

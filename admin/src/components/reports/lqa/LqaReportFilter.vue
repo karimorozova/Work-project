@@ -81,9 +81,9 @@
 		},
 		data() {
 			return {
-				tiers: { "All": "All", "Tier 1": "1", "Tier 2": "2", "Tier 3": "3" },
-				industries: ['Finance', 'iGaming']
-			}
+        tiers: { 'All': 'All', 'Tier 1': '1', 'Tier 2': '2', 'Tier 3': '3' },
+        industries: ['All', 'Finance', 'iGaming', 'Other']
+      }
 		},
 		methods: {
       async updateReports () {

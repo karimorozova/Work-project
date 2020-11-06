@@ -1,5 +1,11 @@
 const router = require('express').Router();
-const { rebuildTierReportsStructure, getXtrfLqaReport, getXtrfUpcomingReport, filterReports } = require("../reports/xtrf");
+const {
+  rebuildTierReportsStructure,
+  getXtrfLqaReport,
+  getXtrfUpcomingReport,
+  filterReports,
+  getLqaReportFilterOptions
+} = require('../reports/xtrf');
 const { newLangReport } = require('../reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('../reports/parseOldMemoqProjects');
 const { upload } = require('../utils');
@@ -83,25 +89,39 @@ router.get('/rewrite-xtrf-tier-report', async (req, res) => {
 });
 
 router.post('/xtrf-lqa-report', async (req, res) => {
-	const { filters } = req.body;
-	try {
-		const reports = await getXtrfLqaReport(filters);
-		res.send(reports);
-	} catch (err) {
-		console.log(err);
-		res.status(500).send("Error on getting reports");
-	}
+  const { filters } = req.body;
+  try {
+    const reports = await getXtrfLqaReport(filters);
+    res.send(reports);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting reports');
+  }
+});
+
+router.get('/xtrf-lqa-reports-filter-options', async (req, res) => {
+  try {
+    const lqaReport = await XtrfLqa.find()
+      .populate('sourceLanguage')
+      .populate('targetLanguage');
+
+    const filterOptions = getLqaReportFilterOptions(lqaReport);
+    res.send(filterOptions);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting lqa report options');
+  }
 });
 
 router.post('/xtrf-upcoming-lqa-report', async (req, res) => {
-	const { filters } = req.body;
-	try {
-		const reports = await getXtrfUpcomingReport(filters);
-		res.send(reports);
-	} catch (err) {
-		console.log(err);
-		res.status(500).send("Error on getting upcoming reports");
-	}
+  const { filters } = req.body;
+  try {
+    const reports = await getXtrfUpcomingReport(filters);
+    res.send(reports);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting upcoming reports');
+  }
 });
 
 router.post('/xtrf-prices', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
