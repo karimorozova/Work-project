@@ -18,11 +18,12 @@
         @setVendorFilter="setVendorFilter"
       )
     .lqa__languages
-      .lqa__language(v-for="{ sourceLanguage, targetLanguage, industries } in reportData")
+      .lqa__language(v-for="{ sourceLanguage, targetLanguage, industries: { Finance, iGaming } } in reportData")
         .lqa__text {{ sourceLanguage }} >> {{ targetLanguage }}
-        .lqa__industries(v-for="{industry, vendors} in industries")
-          .lqa__industry {{ industry }}
-            Table(:vendorsData="vendors")
+          .lqa__industry(v-if="Finance.vendors.length") Finance
+            Table(v-if="Finance.vendors.length" :vendorsData="Finance.vendors")
+          .lqa__industry(v-if="iGaming.vendors.length") iGaming
+            Table(v-if="iGaming.vendors.length" :vendorsData="iGaming.vendors")
 
       //.lqa__form(v-if="false")
         NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
@@ -52,6 +53,7 @@
         allLangs: [],
         isLanguages: true,
         filterCount: 10,
+        skipCount: 0,
         isDataRemain: true,
       }
 		},
@@ -61,8 +63,8 @@
         const element = e.target;
         if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
           if (this.isDataRemain) {
+            this.skipCount += 10;
             const result = await this.$http.post('/reportsapi/xtrf-lqa-report', { filters: this.filters });
-            this.filterCount += 10;
             this.isDataRemain = result.data.length === 10;
             this.reportData.push(...result.data);
           }
@@ -123,6 +125,7 @@
           result.vendorFilter = this.vendorFilter;
         }
         result.countFilter = this.filterCount;
+        result.skipCount = this.skipCount;
         return result;
       }
     },

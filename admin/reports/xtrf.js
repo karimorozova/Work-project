@@ -277,12 +277,13 @@ function getLqaSpecificTier(vendors) {
 
 //// Lqa report /////
 async function getXtrfLqaReport(filters) {
-  const { sourceFilter, countFilter, tierFilter, industryFilter } = filters;
+  const { sourceFilter, countFilter, skipCount, tierFilter, industryFilter } = filters;
   const languages = await Languages.find();
   const filterQuery = await getFilteringQuery(filters, languages);
+  const dataLimitQuery = { 'industries.Finance.vendors.otherInfo': 0, 'industries.iGaming.vendors.otherInfo': 0 };
   try {
     let result = [];
-    const xtrfLqaReport = await XtrfLqa.find(filterQuery).skip(countFilter - 10).limit(countFilter)
+    const xtrfLqaReport = await XtrfLqa.find(filterQuery, dataLimitQuery).skip(skipCount).limit(countFilter)
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
       .populate('industries.Finance.industryId', ['name'])
@@ -409,7 +410,9 @@ function getUpcomingWordcount(tiers, arr, vendorName, industry) {
 }
 
 async function getFilteringQuery (filters, languages) {
-  let query = {};
+  let query = {
+    $or: [{ 'industries.Finance.vendors': { $not: { $size: 0 } } }, { 'industries.iGaming.vendors': { $not: { $size: 0 } } }]
+  };
   if (filters.targetFilter) {
     const { targetFilter } = filters;
     const targetLanguageIds = languages.filter(({ lang }) => targetFilter.includes(lang)).map(({ _id }) => _id);

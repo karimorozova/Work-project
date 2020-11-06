@@ -10,8 +10,7 @@
 
       .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.name }}
       .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordCount }}
-      .lqa-table__header(slot="tier" slot-scope="{ row }")
-        span soon...
+      .lqa-table__header(slot="tier" slot-scope="{ row }") {{ row.tier }}
       .lqa-table__header(slot="tqi" slot-scope="{ row }")
         span soon...
       .lqa-table__header(slot="lqa1" slot-scope="{ row }")
