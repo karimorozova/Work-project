@@ -56,7 +56,7 @@
               @chooseOption="setIndustryFilter"
             )
       .report-filters__item
-    .report-filters__row
+    //.report-filters__row
       .button
         .button__row
           input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReports()")
