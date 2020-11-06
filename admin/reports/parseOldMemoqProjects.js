@@ -50,7 +50,7 @@ const parseAndWriteLQAReport = async () => {
   for (let key of Object.keys(report)) {
     const { Finance, iGaming } = report[key];
     const sourceLangSymbol = key.split(' » ')[0];
-    const targetLangSymbol = key.split(' » ')[0];
+    const targetLangSymbol = key.split(' » ')[1];
     const sourceIso = getLangISO1(key, 0);
     const targetIso = getLangISO1(key, 1);
     const sourceLanguage = languages.find(({ iso1 }) => iso1 === sourceIso)
