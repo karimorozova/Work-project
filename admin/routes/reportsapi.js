@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const { rebuildTierReportsStructure, getXtrfLqaReport, getXtrfUpcomingReport, filterReports } = require("../reports/xtrf");
-const { newLangReport } = require("../reports/newLangTierReport");
-const { upload } = require("../utils");
+const { newLangReport } = require('../reports/newLangTierReport');
+const { parseAndWriteLQAReport } = require('../reports/parseOldMemoqProjects');
+const { upload } = require('../utils');
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
 const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, LangTier } = require("../models");
 convertExcel = require('excel-as-json').processFile;
@@ -159,14 +160,24 @@ router.post('/new-xtrf-vendor', async (req, res) => {
 		return acc;
 	}, {});
 	try {
-		const xtrfLang = await XtrfReportLang.findOne({ lang: language });
-		const vendor = await XtrfVendor.create({ name, language: xtrfLang, basicPrices, tqis });
-		await XtrfLqa.create({ vendor, wordcounts: { Finance: 0, iGaming: 0, General: 0 } });
-		res.send('saved');
-	} catch (err) {
-		console.log(err);
-		res.status(500).send("Error on saving new xtrf vendor");
-	}
+    const xtrfLang = await XtrfReportLang.findOne({ lang: language });
+    const vendor = await XtrfVendor.create({ name, language: xtrfLang, basicPrices, tqis });
+    await XtrfLqa.create({ vendor, wordcounts: { Finance: 0, iGaming: 0, General: 0 } });
+    res.send('saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on saving new xtrf vendor');
+  }
+});
+
+router.get('/restore-old-xtrf-lqa-report', async (req, res) => {
+  try {
+    await parseAndWriteLQAReport();
+    res.send('Restored!');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Erron on restoring old xtrf-lqa reports!');
+  }
 });
 
 module.exports = router;

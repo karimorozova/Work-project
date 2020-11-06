@@ -10,6 +10,10 @@ const vendorsArr = [{
     type: 'String',
     default: ''
   },
+  tier: {
+    type: Number,
+    default: 0
+  },
   email: {
     type: 'String',
     default: ''

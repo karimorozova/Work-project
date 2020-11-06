@@ -86,8 +86,13 @@
 			}
 		},
 		methods: {
-      updateReports () {
-        alert('Coming soon...');
+      async updateReports () {
+        try {
+          await this.$http.get('/reportsapi/restore-old-xtrf-lqa-report');
+          this.alertToggle({ message: 'Started to restore...' });
+        } catch (err) {
+          this.alertToggle({ message: 'Error on restoring old files', isShow: true, type: 'error' });
+        }
       },
       setTierFilter ({ option }) {
         this.$emit('setTierFilter', { value: this.tiers[option] });
