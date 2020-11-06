@@ -31,7 +31,7 @@
       )
         template(slot="headerCheck" slot-scope="{ field }")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
-        template(slot="headerTaskid" slot-scope="{ field }")
+        template(slot="headerTaskId" slot-scope="{ field }")
           span.tasks__label {{ field.label }}
         template(slot="headerLanguage" slot-scope="{ field }")
           span.tasks__label {{ field.label }}
@@ -61,9 +61,8 @@
           span.tasks__task-data {{ formatDate(row.start) }}
         template(slot="deadline" slot-scope="{ row }")
           span.tasks__task-data {{ formatDate(row.deadline) }}
-        template(slot="progress" slot-scope="{ row }")
-          | in repairing...
-          //ProgressLine(:progress="progress(row)")
+        template(slot="progress" slot-scope="{ row, index }")
+          ProgressLine(:progress="progress(row, index)")
         template(slot="status" slot-scope="{ row }")
           .tasks__task-status {{ row.status | stepsAndTasksStatusFilter }}
             .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
@@ -123,7 +122,7 @@
 			return {
 				fields: [
 					{ label: "check", headerKey: "headerCheck", key: "check", width: "3%" },
-					{ label: "Task ID", headerKey: "headerTaskid", key: "taskId", width: "17%" },
+					{ label: "Task ID", headerKey: "headerTaskId", key: "taskId", width: "17%" },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "10%" },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "9%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%" },
@@ -332,21 +331,30 @@
 			},
 			progress(task) {
 				let progress = 0;
+				const CATServices = ['Translation', 'SEO Translation', 'Official Translation', 'Localization'];
 				const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
 
-				if(task.service.title === 'Translation') {
+				if(CATServices.includes(task.service.title)) {
 					const [firstStep, secondStep] = taskSteps;
 					if(taskSteps.length === 2) {
-						const secondStepProgress = typeof secondStep.progress === "object" ?
-								(+secondStep.progress.wordsDone / +secondStep.progress.totalWordCount) * 100 :
-								secondStep.progress;
-
-						progress = ((((+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount) * 100) + secondStepProgress) / taskSteps.length)
-					} else {
-						progress = (+firstStep.progress.wordsDone / +firstStep.progress.totalWordCount * 100)
+						if(isObject(secondStep.progress) && isObject(firstStep.progress)) {
+							const firstStepProgress = calculatePercentage(firstStep);
+							const secondStepProgress = calculatePercentage(secondStep);
+							progress = (firstStepProgress + secondStepProgress) / 2;
+						}
+					} else if(taskSteps.length === 1) {
+						progress = calculatePercentage(firstStep);
 					}
 				} else {
 					progress = taskSteps.reduce((init, cur) => init + cur.progress / taskSteps.length, 0)
+				}
+
+				function isObject(key) {
+					return typeof key === "object"
+				}
+
+				function calculatePercentage(step) {
+					return (+step.progress.wordsDone / +step.progress.totalWordCount) * 100;
 				}
 
 				return progress.toFixed(2);
