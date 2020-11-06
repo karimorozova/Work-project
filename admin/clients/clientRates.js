@@ -439,8 +439,12 @@ const getPricelistCombinations = (
   ));
 };
 
+Object.fromEntries = l => l.reduce((a, [k,v]) => ({...a, [k]: v}), {});
+
 const getServiceDifferences = async (clientId, updatedService, oldService) => {
-  const sourceLangDifference = getObjDifferences(updatedService.sourceLanguage, oldService.sourceLanguage);
+  const updatedSourceLanguage = Object.fromEntries(Object.entries(updatedService.sourceLanguage).filter(item => item[0] === 'lang' || item[0] === '_id'));
+
+  const sourceLangDifference = getObjDifferences(updatedSourceLanguage, oldService.sourceLanguage);
   const targetLangDifference = getArrayDifference(oldService.targetLanguages, updatedService.targetLanguages, '_id');
   const serviceStepDifference = getArrayDifference(oldService.services, updatedService.services, '_id');
   const industryDifference = getArrayDifference(oldService.industries, updatedService.industries, '_id');

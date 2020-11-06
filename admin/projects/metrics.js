@@ -11,6 +11,8 @@ async function updateProjectMetrics(projectId, tasks) {
 	try {
 		const project = await getProject({ "_id": projectId });
 		let { steps, customer, tasks: existingTasks, industry } = project;
+		const newTasksIds = tasks.map(i => i.taskId);
+		existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
 		let isMetricsExist = true;
 		for (let task of tasks) {
 			const { stepsAndUnits } = task;
@@ -44,6 +46,8 @@ async function updateProjectMetrics(projectId, tasks) {
 				}
 			}
 		}
+		existingTasks.push(...tasks);
+
 		return await updateProject({ "_id": projectId }, { tasks: existingTasks, steps, isMetricsExist });
 	} catch (err) {
 		console.log(err);
