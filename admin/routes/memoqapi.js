@@ -233,10 +233,10 @@ router.get('/other-project', async (req, res) => {
 
 router.get('/memoq-client-aliases', async (req, res) => {
 	try {
-		const names = await MemoqProject.find({}, { _id: 0, client: 1 });
-		const result = [...new Set(names.map(i => i.client))]
-		res.send(result)
-	} catch (err) {
+    const names = await MemoqProject.find({}, { _id: 0, client: 1 });
+    const result = [...new Set(names.map(i => i.client))].filter(name => !name.match(/^\s+$|^$/gi));
+    res.send(result);
+  } catch (err) {
 		console.log(err);
 		res.status(500).send(err);
 	}

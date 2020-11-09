@@ -10,7 +10,7 @@ const filterMemoqProjectsVendors = users => {
       usersFullName.push(item);
     }
   });
-  return [...new Set(usersFullName.reduce((a, b) => a.concat(b), []))];
+  return [...new Set(usersFullName.reduce((a, b) => a.concat(b), []))].filter(name => !name.match(/^\s+$|^$/gi));
 };
 
 const checkDocumentHasCorrectStructure = (document) => {

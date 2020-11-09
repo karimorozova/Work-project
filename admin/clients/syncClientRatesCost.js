@@ -30,9 +30,13 @@ const synchronizeBasicPrice = async (row, basicPricesTable, rates, subjectId, cu
   const { _id, sourceLanguage, targetLanguage, basicPrice } = row;
   const neededSubject = fromVendor ? Vendors : Clients;
   const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id);
-  const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : basicPrice;
+  let boundBasicPrice = 0;
+  if (neededLangPair) {
+    boundBasicPrice = fromVendor ? (getNeededCurrency(neededLangPair, currency) / 2)
+      : getNeededCurrency(neededLangPair, currency);
+  }
   const neededRowIndex = rates.basicPricesTable.findIndex(item => item._id.toString() === _id.toString());
-  rates.basicPricesTable[neededRowIndex].basicPrice = boundBasicPrice;
+  rates.basicPricesTable[neededRowIndex].basicPrice = boundBasicPrice ? boundBasicPrice : basicPrice;
   rates.basicPricesTable[neededRowIndex].altered = false;
   rates.basicPricesTable[neededRowIndex].notification = '';
   rates.pricelistTable = recalculateFromNewPrice(row, boundBasicPrice, rates);
