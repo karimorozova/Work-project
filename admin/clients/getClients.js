@@ -83,8 +83,8 @@ const getClientRates = async (obj) => {
     .populate('rates.pricelistTable.industry');
 };
 
-const getClientsForNewProject = (obj) => {
-  return Clients.find(obj, { _id: 1, name: 1, industries: 1 })
+const getClientsForNewProject = () => {
+  return Clients.find({ $or: [{ status: 'Active' }, { status: 'Potential' }] }, { _id: 1, name: 1, industries: 1 })
     .populate('industries');
 };
 

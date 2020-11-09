@@ -255,9 +255,9 @@
 				try {
 					if(!this.project._id) {
 						if(!this.clients.length) {
-							let result = await this.$http.get(`/active-clients?status=Active`);
-							this.clients = [...result.body];
-						}
+              let result = await this.$http.get(`/active-clients`);
+              this.clients = [...result.body];
+            }
 					}
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting customers", isShow: true, type: "error" });

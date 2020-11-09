@@ -64,12 +64,15 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
     const similarLangPair = getNeededLangPair(rates.basicPricesTable, sourceLanguage, targetLanguage);
     if (!similarLangPair) {
       const boundLangPairRow = getNeededLangPair(basicPricesTable, sourceLanguage, targetLanguage);
-      const boundBasicPrice = boundLangPairRow ? getNeededCurrency(boundLangPairRow, currency) : 1;
+      let boundBasicPrice = 0;
+      if (boundLangPairRow) {
+        boundBasicPrice = (getNeededCurrency(boundLangPairRow, currency) / 2);
+      }
       const langPairCombination = {
         type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
         sourceLanguage,
         targetLanguage,
-        basicPrice: boundBasicPrice
+        basicPrice: boundBasicPrice ? boundBasicPrice : 1,
       };
       newLangPairCombinations.push(langPairCombination);
       rates.basicPricesTable.push(langPairCombination);

@@ -46,9 +46,8 @@ router.post('/all-clients', requiresLogin, async (req, res) => {
 })
 
 router.get('/active-clients', requiresLogin, async (req, res) => {
-  const { status } = req.query;
   try {
-    const clients = await getClientsForNewProject({ status });
+    const clients = await getClientsForNewProject();
     res.send(clients);
   } catch (err) {
     console.log(err);
