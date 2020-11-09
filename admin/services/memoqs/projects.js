@@ -81,7 +81,6 @@ async function moveMemoqFileToProject(fileId) {
 }
 
 async function updateMemoqProjectUsers(steps) {
-	//MM
 	const stepsStatuses = ["Ready to Start", "Waiting to Start", "Started", "Completed"];
 	const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
 	const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
@@ -273,7 +272,6 @@ async function getProjectTranslationDocs(projectId) {
 }
 
 async function getProjectAnalysis(projectId) {
-	console.log(projectId);
 	const xml = `${ xmlHeader }
                 <soapenv:Body>
                 <ns:RunAnalysis>

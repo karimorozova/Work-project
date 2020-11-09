@@ -503,11 +503,16 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	const vendor = await Vendors.findOne({ _id: vendorId });
 	const { steps } = await Projects.findOne({ _id: projectId }).populate('steps.vendor');
 	const users = await getMemoqUsers();
+	const isSecondStep = /(\sS02)/.exec(stepId);
 	const neededStep = steps.find(step => step.stepId === stepId);
 	const { memoqProjectId, taskId } = neededStep;
-	//MM
-	// const assignedSteps = steps.filter(item => item.taskId === taskId)
+	let assignedSteps = [];
 
+	if(isSecondStep) {
+		assignedSteps.push(...steps.filter(item => item.taskId === taskId));
+	} else {
+		assignedSteps.push(neededStep);
+	}
 	let projectUsers = [];
 	const currentProjectUsers = await getProjectUsers(memoqProjectId);
 	const isArray = Array.isArray(currentProjectUsers);
@@ -529,7 +534,7 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 			Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i)))
 	);
 
-	return areUsersSet ? await assignMemoqTranslators({ memoqProjectId, assignedSteps: [neededStep], users })
+	return areUsersSet ? await assignMemoqTranslators({ memoqProjectId, assignedSteps, users })
 			: new Error("Can't set one or all users in memoQ");
 
 	function assignPM(userObject) {

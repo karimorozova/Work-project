@@ -47,7 +47,7 @@
 
     .finance-info__modal(v-if="isModal")
       ApproveModal(
-        :text="'Are you sure you wish to change the default ' + rateOwner + ' rate'"
+        :text="'Are you sure you wish to change the rate?'"
         approveValue="Yes"
         notApproveValue="Cancel"
         @approve="approveAction"
