@@ -215,7 +215,7 @@
           .result-table(v-if="currentVendor._id")
             ResultTable(
               :vendorId="currentVendor._id",
-              :languages="languages.map((i) => i.lang)",
+              :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
               :steps="steps.map((i) => i.title)",
               :units="units.map((i) => i.type)",
               :industries="industries.map((i) => i.name)",

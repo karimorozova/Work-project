@@ -37,7 +37,7 @@
               placeholder="Select",
               :hasSearch="true",
               :selectedOption="currentTargets.lang",
-              :options="languages.map((i) => i.lang)",
+              :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
               @chooseOption="setTarget"
             )
           .competencies__drop-menu(v-if="currentActive == index && newRow")
@@ -46,7 +46,7 @@
               placeholder="Select",
               :hasSearch="true",
               :selectedOptions="currentTargets.map((i) => i.lang)",
-              :options="languages.map((i) => i.lang)",
+              :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
               @chooseOptions="setTargets"
               :allOptionsButtons="true"
             )
@@ -430,8 +430,8 @@
 				currentVendor: "getCurrentVendor",
 			}),
 			sourceData() {
-				return this.languages.map((i) => i.lang);
-			},
+        return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b));
+      },
 			filteredSteps() {
 				return this.steps.filter(step => step.calculationUnit.length).map(step => step.title)
 			},

@@ -582,13 +582,13 @@
 			}),
 			sourceLanguagesClientData() {
 				if(this.clientDataInCreated.sourceLanguages.length) {
-					return this.clientDataInCreated.sourceLanguages.map(i => i.lang);
-				}
+          return this.clientDataInCreated.sourceLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b));
+        }
 			},
 			targetLanguagesClientData(){
-			  if(this.clientDataInCreated.targetLanguages.length){
-				  return this.clientDataInCreated.targetLanguages.map(i => i.lang);
-			  }
+			  if(this.clientDataInCreated.targetLanguages.length) {
+          return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b));
+        }
 			},
 
 		},

@@ -235,13 +235,13 @@
 			},
 			sourceLanguages() {
 				if(this.languages) {
-					return this.languages.map(item => item.lang);
-				}
+          return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b));
+        }
 			},
 			targetLanguages() {
 				if(this.languages) {
-					return this.languages.map(item => item.lang);
-				}
+          return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b));
+        }
 			},
 			timezoneData() {
 				if(this.timezones) {
