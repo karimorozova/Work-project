@@ -3,9 +3,9 @@ const {
   rebuildTierReportsStructure,
   getXtrfLqaReport,
   getXtrfUpcomingReport,
-  filterReports,
+  filterTierReport,
   getLqaReportFilterOptions
-} = require('../reports/xtrf');
+} = require('../reports');
 const { newLangReport } = require('../reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('../reports/parseOldMemoqProjects');
 const { upload } = require('../utils');
@@ -44,12 +44,12 @@ router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, 
 router.post('/xtrf-tier-report', async (req, res) => {
 	const { filters } = req.body;
 	try {
-		const reports = await LangTier.find();
-		const structuredReports = rebuildTierReportsStructure(reports);
-		const filteredReports = filterReports(structuredReports, filters);
-		const result = { filteredReports, structuredReports };
-		res.send(result);
-	} catch (err) {
+    const reports = await LangTier.find();
+    const structuredReports = rebuildTierReportsStructure(reports);
+    const filteredReports = filterTierReport(structuredReports, filters);
+    const result = { filteredReports, structuredReports };
+    res.send(result);
+  } catch (err) {
 		console.log(err);
 		res.status(500).send("Error on getting reports");
 	}
