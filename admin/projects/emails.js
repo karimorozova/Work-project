@@ -82,9 +82,17 @@ const sendQuoteMessage = async (project, message) => {
     attachments,
     subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})`
   }, message);
-  return fs.unlink(pdf, (err) => {
+
+  const projectTasks = project.tasks.filter(({status}) => status === 'Created').map((task) => {
+    task.status = 'Quote sent';
+    return task;
+  });
+
+  fs.unlink(pdf, (err) => {
     if (err) console.log(err);
   });
+  
+  return projectTasks;
 };
 
 const getQuotesInfo = (project, selectedContacts) => {
