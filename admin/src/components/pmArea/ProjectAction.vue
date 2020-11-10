@@ -49,7 +49,7 @@
         )
       span More Information:
       textarea(type="text" v-model="moreInformation" rows="4" class="project-action__text-input")
-      .project-action__setting(v-if="project.status === 'In progress'")
+      .project-action__setting(v-if="project.status === 'In Progress'")
         .project-action__payment
           .project-action__payment-span
             span Partial Payment
@@ -173,14 +173,14 @@
 				this.isEditAndSend = true;
 			},
 			async getCancelMessage() {
-				if(
-						this.project.status === "In progress" ||
-						this.project.status === "Draft" ||
-						this.project.status === "Approved" ||
-						this.project.status === "Rejected"
-				) {
-					await this.setStatus("Cancelled", this.selectedReason);
-				}
+        if (
+          this.project.status === 'In Progress' ||
+          this.project.status === 'Draft' ||
+          this.project.status === 'Approved' ||
+          this.project.status === 'Rejected'
+        ) {
+          await this.setStatus('Cancelled', this.selectedReason);
+        }
 				try {
 					const template = await this.$http.post(
 							"/pm-manage/making-cancel-message",
@@ -522,8 +522,8 @@
 					result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
 				}
 				if(
-						this.project.status === "Started" ||
-						this.project.status === "In progress"
+          this.project.status === 'Started' ||
+          this.project.status === 'In Progress'
 				) {
 					result = ["Send Project Details", "Cancel"];
 				}

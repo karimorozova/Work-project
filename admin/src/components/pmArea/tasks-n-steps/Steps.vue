@@ -369,12 +369,12 @@
 				}
 			},
 			getAcceptedStepStatus() {
-				let status = "Accepted";
-				if(this.currentProject.status === 'Approved' || this.currentProject.status === 'In progress') {
-					status = "Ready to Start"
-				}
-				return status;
-			},
+        let status = 'Accepted';
+        if (this.currentProject.status === 'Approved' || this.currentProject.status === 'In Progress') {
+          status = 'Ready to Start';
+        }
+        return status;
+      },
 			async notApproveAction() {
 				const checkedSteps = this.getCheckedSteps();
 				if(!checkedSteps.length) {

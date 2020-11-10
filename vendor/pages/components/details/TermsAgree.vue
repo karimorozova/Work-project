@@ -50,17 +50,17 @@
 		computed: {
 			isReadonly() {
 				if(this.project) {
-					const statuses = ["Started", "Approved", "In progress"];
+          const statuses = ['Started', 'Approved', 'In Progress'];
 
-					const { taskId, stepId } = this.job;
-					const { steps } = this.project;
-					const stepCurrentByTask = steps.filter(item => item.taskId === taskId)
-					const currentIndex = stepCurrentByTask.findIndex(item => item.stepId === stepId)
+          const { taskId, stepId } = this.job;
+          const { steps } = this.project;
+          const stepCurrentByTask = steps.filter(item => item.taskId === taskId);
+          const currentIndex = stepCurrentByTask.findIndex(item => item.stepId === stepId);
 
-					if(statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === "Completed") {
-						return true;
-					} else if(currentIndex === 0) {
-						return false;
+          if (statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === 'Completed') {
+            return true;
+          } else if (currentIndex === 0) {
+            return false;
 					} else if(currentIndex === 1) {
 						return stepCurrentByTask[0].status !== "Completed";
 					} else {

@@ -260,9 +260,9 @@ async function reOpenProject(project, ifChangePreviousStatus = true) {
 	}
 
 	return await updateProject(
-			{ "_id": project._id },
-			{ status: "In progress", tasks, steps }
-	);
+    { '_id': project._id },
+    { status: 'In Progress', tasks, steps }
+  );
 
 	function reopenItem(arr) {
 		return arr.map(item => {
@@ -473,10 +473,10 @@ async function getAfterReopenSteps(steps, project) {
 		const chosenSteps = updatedSteps.filter(item => stepIdentify.indexOf(item.taskId + item.name) !== -1);
 		const updatedtasks = getTasksAfterReopen({ steps: chosenSteps, tasks: project.tasks });
 		return await updateProject({ "_id": project.id }, {
-			tasks: updatedtasks,
-			steps: updatedSteps,
-			status: "In progress"
-		});
+      tasks: updatedtasks,
+      steps: updatedSteps,
+      status: 'In Progress'
+    });
 	} catch (err) {
 		console.log(err);
 		console.log("Error in getAfterReopenSteps");

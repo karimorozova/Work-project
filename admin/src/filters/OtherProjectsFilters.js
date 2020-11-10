@@ -4,11 +4,11 @@ Vue.filter("otherProjectsTaskStatus", (str) => {
 	switch (str) {
 		case 'TranslationFinished':
 		case 'ProofreadingFinished':
-			return 'Completed';
-		case 'TranslationInProgress':
-			return 'In progress'
-		default:
-			return str
+      return 'Completed';
+    case 'TranslationInProgress':
+      return 'In Progress';
+    default:
+      return str;
 	}
 });
 

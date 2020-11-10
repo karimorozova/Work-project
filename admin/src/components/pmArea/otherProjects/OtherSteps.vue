@@ -154,17 +154,17 @@
 
 		methods: {
 			isFinanceData(index) {
-				if(this.project.status === 'In progress') {
-					return true;
-				}
-				if(this.project.steps.length) {
-					if(this.project.steps[index].vendor === null) {
-						return true;
-					}
-				} else {
-					return true;
-				}
-			},
+        if (this.project.status === 'In Progress') {
+          return true;
+        }
+        if (this.project.steps.length) {
+          if (this.project.steps[index].vendor === null) {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      },
 			getVendorFullName(index){
 				return this.projectSteps[index].UserInfoHeader.FullName
       },
