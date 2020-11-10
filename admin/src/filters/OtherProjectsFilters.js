@@ -6,7 +6,7 @@ Vue.filter("otherProjectsTaskStatus", (str) => {
 		case 'ProofreadingFinished':
       return 'Completed';
     case 'TranslationInProgress':
-      return 'In Progress';
+      return 'In progress';
     default:
       return str;
 	}

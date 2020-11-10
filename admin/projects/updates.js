@@ -261,7 +261,7 @@ async function reOpenProject(project, ifChangePreviousStatus = true) {
 
 	return await updateProject(
     { '_id': project._id },
-    { status: 'In Progress', tasks, steps }
+    { status: 'In progress', tasks, steps }
   );
 
 	function reopenItem(arr) {
@@ -498,7 +498,7 @@ async function getAfterReopenSteps(steps, project) {
 		return await updateProject({ "_id": project.id }, {
       tasks: updatedtasks,
       steps: updatedSteps,
-      status: 'In Progress'
+      status: 'In progress'
     });
 	} catch (err) {
 		console.log(err);

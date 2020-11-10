@@ -92,7 +92,7 @@
 						return item;
 					}
 					return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== 'Started'
-            && item.projectStatus !== 'Approved' && item.projectStatus !== 'In Progress'
+            && item.projectStatus !== 'Approved' && item.projectStatus !== 'In progress'
 				})
 			},
 			openedJobs() {
@@ -100,7 +100,7 @@
 				statuses.push("Started");
 				return this.jobs.filter(item => {
           return statuses.indexOf(item.status) !== -1 && (item.projectStatus === 'Started'
-            || item.projectStatus === 'Approved' || item.projectStatus === 'In Progress');
+            || item.projectStatus === 'Approved' || item.projectStatus === 'In progress');
 				})
 			}
 		},

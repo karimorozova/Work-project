@@ -32,7 +32,7 @@ Vue.filter("maxRateCount", (num) => {
 Vue.filter("stepsAndTasksStatusFilter", (status) => {
 	let newStatus = status;
 	if (status === "Started") {
-    newStatus = 'In Progress';
+    newStatus = 'In progress';
   }
 	return newStatus;
 });

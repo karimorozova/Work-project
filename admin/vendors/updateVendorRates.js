@@ -4,11 +4,12 @@ const {
   changePricelistTable,
   generateNewPricelistCombinations
 } = require('../clients');
-const { getRateInfoFromStepFinance, manageMonoPairRates, manageDuoPairRates } = require("../pricelist/ratesmanage")
+const { getRateInfoFromStepFinance, manageMonoPairRates, manageDuoPairRates } = require("../pricelist/ratesmanage");
 const { getVendor, getVendorAfterUpdate } = require("./index");
 const { createRateCombinations } = require('./createVendorRates');
 const { tableKeys } = require('../enums');
 const { getCompetenciesForCheck } = require('./helpers');
+const  _  = require('lodash');
 
 /**
  *

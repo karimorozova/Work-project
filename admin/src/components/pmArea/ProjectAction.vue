@@ -49,7 +49,7 @@
         )
       span More Information:
       textarea(type="text" v-model="moreInformation" rows="4" class="project-action__text-input")
-      .project-action__setting(v-if="project.status === 'In Progress'")
+      .project-action__setting(v-if="project.status === 'In progress'")
         .project-action__payment
           .project-action__payment-span
             span Partial Payment
@@ -174,7 +174,7 @@
 			},
 			async getCancelMessage() {
         if (
-          this.project.status === 'In Progress' ||
+          this.project.status === 'In progress' ||
           this.project.status === 'Draft' ||
           this.project.status === 'Approved' ||
           this.project.status === 'Rejected'
@@ -523,7 +523,7 @@
 				}
 				if(
           this.project.status === 'Started' ||
-          this.project.status === 'In Progress'
+          this.project.status === 'In progress'
 				) {
 					result = ["Send Project Details", "Cancel"];
 				}

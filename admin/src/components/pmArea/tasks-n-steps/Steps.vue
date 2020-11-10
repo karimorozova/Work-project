@@ -370,7 +370,7 @@
 			},
 			getAcceptedStepStatus() {
         let status = 'Accepted';
-        if (this.currentProject.status === 'Approved' || this.currentProject.status === 'In Progress') {
+        if (this.currentProject.status === 'Approved' || this.currentProject.status === 'In progress') {
           status = 'Ready to Start';
         }
         return status;

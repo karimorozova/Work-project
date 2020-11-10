@@ -154,7 +154,7 @@
 
 		methods: {
 			isFinanceData(index) {
-        if (this.project.status === 'In Progress') {
+        if (this.project.status === 'In progress') {
           return true;
         }
         if (this.project.steps.length) {

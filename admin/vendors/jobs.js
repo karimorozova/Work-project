@@ -182,7 +182,7 @@ function getWithReadyToStartSteps({task, steps}) {
 async function setAcceptedStepStatus({project, steps, jobId}) {
     let status = "Accepted";
     try {
-        if (project.status === 'In Progress' || project.status === 'Approved') {
+        if (project.status === 'In progress' || project.status === 'Approved') {
           status = 'Ready to Start';
         }
         const step = steps.find(item => item.id === jobId);
@@ -230,7 +230,7 @@ async function setTaskStatusAndSave({project, jobId, steps, status}) {
             ){
                 item.status = "Pending Approval [DR1]"
             }else{
-              item.status = 'In Progress';
+              item.status = 'In progress';
             }
             return item;
         }
@@ -248,7 +248,7 @@ async function setTaskStatusAndSave({project, jobId, steps, status}) {
 function getProjectStatus({project, status, updatedTasks}) {
     let projectStatus = project.status;
     if(projectStatus === "Approved" || projectStatus === "Started") {
-      return status === 'Started' ? 'In Progress' : projectStatus;
+      return status === 'Started' ? 'In progress' : projectStatus;
     }
     const incompletedTasks = updatedTasks.find(item => item.status !== 'Ready for Delivery' && item.status !== 'Cancelled');
     return incompletedTasks ? projectStatus : "Ready for Delivery";

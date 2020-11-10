@@ -49,7 +49,7 @@
 			}
 		},
 		filters: {
-      stepStatusFilter: (status) => status === 'Started' ? 'In Progress' : status
+      stepStatusFilter: (status) => status === 'Started' ? 'In progress' : status
     },
 		components: {
 			LabelValue,

@@ -63,7 +63,7 @@ export default {
   },
   computed: {
     filteredProjects() {
-      let statuses = ['Started', 'Approved', 'In Progress', 'Ready for Delivery'];
+      let statuses = ['Started', 'Approved', 'In progress', 'Ready for Delivery'];
       const result = this.filterByStatus(statuses);
       return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1);
     },

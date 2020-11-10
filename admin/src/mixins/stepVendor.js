@@ -12,6 +12,15 @@ export default {
 			const targetLanguage = languages.find(item => item.symbol === step.targetLanguage);
 			const stepId = step.serviceStep.step;
 			const vendors = this.vendors;
+
+			console.log('tyt')
+			console.log({
+				sourceLanguage,
+				targetLanguage,
+				step: stepId,
+				industry: industry._id
+			 })
+
 			return findFittingVendor(
 					{
 						sourceLanguage,

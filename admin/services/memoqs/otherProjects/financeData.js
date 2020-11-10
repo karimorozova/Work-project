@@ -103,7 +103,7 @@ const getUpdatedProjectData = (project, allClients) => {
       accountManager: ObjectId(neededCustomer.accountManager._id),
       industry: ObjectId(industry._id),
       paymentProfile: neededCustomer.billingInfo.paymentType,
-      fromQuote: project.status === 'In Progress' ? fromQuote : false,
+      fromQuote: project.status === 'In progress' ? fromQuote : false,
     };
 	}
 	return { additionalData, neededCustomer };

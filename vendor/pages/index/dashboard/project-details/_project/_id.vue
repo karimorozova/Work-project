@@ -136,7 +136,7 @@
 					switch (status) {
             case 'Approved':
             case 'Ready to Start':
-            case 'In Progress':
+            case 'In progress':
             case 'Pending Approval [DR1]':
             case 'Pending Approval [DR2]':
             case 'Delivered':

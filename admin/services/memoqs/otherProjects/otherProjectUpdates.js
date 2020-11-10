@@ -7,7 +7,7 @@ const updateAllMemoqProjects = async (querySource) => {
   let query = {};
   switch (querySource) {
     case 'In-progress':
-      query.status = 'In Progress';
+      query.status = 'In progress';
       break
     case 'Quote':
       query.status = 'Quote';

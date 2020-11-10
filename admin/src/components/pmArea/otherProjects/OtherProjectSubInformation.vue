@@ -9,7 +9,7 @@
       .row__title Project Status:
       .row__data {{ project.status }}
     .sub-information__row(v-if="project.status === 'Quote'")
-      .row__title Move to In Progress:
+      .row__title Move to In progress:
       .row__data
         span(@click="sendToProgressProjects()")
           i.fa.fa-paper-plane(aria-hidden="true")
@@ -137,7 +137,7 @@
 					this.$emit('updateProject', result.body)
 				} catch (err) {
 					this.alertToggle({
-            message: 'Error on sending project to In Progress projects',
+            message: 'Error on sending project to In progress projects',
             isShow: true,
             type: 'error',
           });

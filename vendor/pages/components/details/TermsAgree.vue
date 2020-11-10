@@ -50,7 +50,7 @@
 		computed: {
 			isReadonly() {
 				if(this.project) {
-          const statuses = ['Started', 'Approved', 'In Progress'];
+          const statuses = ['Started', 'Approved', 'In progress'];
 
           const { taskId, stepId } = this.job;
           const { steps } = this.project;

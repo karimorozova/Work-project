@@ -41,7 +41,7 @@ emitter.on('projectRejectedNotification', async (project) => {
 emitter.on('stepAcceptAction', async (obj) => {
     const { project, index, vendorId, decision } = obj;
   let { steps, status: projectStatus } = project;
-  const isProjectApproved = projectStatus === 'Approved' || projectStatus === 'In Progress';
+  const isProjectApproved = projectStatus === 'Approved' || projectStatus === 'In progress';
   const status = decision === 'accept' ? 'Accepted' : 'Rejected';
     steps[index].status = status === "Accepted" && isProjectApproved ? "Ready to Start" : status;
     steps[index].vendorsClickedOffer.push(vendorId);
