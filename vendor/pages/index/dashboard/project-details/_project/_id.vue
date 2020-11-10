@@ -134,19 +134,19 @@
 				if(this.currentTask) {
 					const { status } = this.currentTask;
 					switch (status) {
-						case "Approved":
-						case "Ready to Start":
-						case "In progress":
-						case "Pending Approval [DR1]":
-						case "Pending Approval [DR2]":
-						case "Delivered":
-							result = {
-								status: false,
-								message: ""
-							}
-							break;
-						case "Created":
-						case "Quote sent":
+            case 'Approved':
+            case 'Ready to Start':
+            case 'In Progress':
+            case 'Pending Approval [DR1]':
+            case 'Pending Approval [DR2]':
+            case 'Delivered':
+              result = {
+                status: false,
+                message: ''
+              };
+              break;
+            case 'Created':
+            case 'Quote sent':
 							result = {
 								status: true,
 								message: "Project or Task hasn't been approved yet."

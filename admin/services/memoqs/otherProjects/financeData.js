@@ -97,14 +97,14 @@ const getUpdatedProjectData = (project, allClients) => {
 	let additionalData = {};
 	if(neededCustomer) {
 		additionalData = {
-			customer: ObjectId(neededCustomer._id),
-			status: project.status,
-			projectManager: ObjectId(neededCustomer.projectManager._id),
-			accountManager: ObjectId(neededCustomer.accountManager._id),
-			industry: ObjectId(industry._id),
-			paymentProfile: neededCustomer.billingInfo.paymentType,
-      fromQuote: project.status === 'In progress' ? fromQuote : false,
-		};
+      customer: ObjectId(neededCustomer._id),
+      status: project.status,
+      projectManager: ObjectId(neededCustomer.projectManager._id),
+      accountManager: ObjectId(neededCustomer.accountManager._id),
+      industry: ObjectId(industry._id),
+      paymentProfile: neededCustomer.billingInfo.paymentType,
+      fromQuote: project.status === 'In Progress' ? fromQuote : false,
+    };
 	}
 	return { additionalData, neededCustomer };
 };

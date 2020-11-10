@@ -137,10 +137,10 @@
 					this.$emit('updateProject', result.body)
 				} catch (err) {
 					this.alertToggle({
-						message: "Error on sending project to In progress projects",
-						isShow: true,
-						type: "error",
-					});
+            message: 'Error on sending project to In Progress projects',
+            isShow: true,
+            type: 'error',
+          });
 				}
 			},
 			copyId() {
