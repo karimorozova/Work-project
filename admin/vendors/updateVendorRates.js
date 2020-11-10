@@ -38,10 +38,10 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
     );
   }
   if (stepDifference) {
-    updatedRates = await updateVendorStepMultipliers(oldData, stepDifference, vendor, updatedRates);
+    updatedRates = await updateVendorStepMultipliers(oldData, newData, stepDifference, vendor, updatedRates);
   }
   if (industryDifference) {
-    updatedRates = await updateIndustryMultipliers(oldData, industryDifference, vendor, updatedRates);
+    updatedRates = await updateIndustryMultipliers(oldData, newData, industryDifference, vendor, updatedRates);
 }
   return updatedRates
 
@@ -175,12 +175,13 @@ const updateVendorLangPairs = async (
 /**
  *
  * @param {Object} oldData - old example from database
+ * @param {Object} newData - new example from frontend
  * @param {Object} newStep - new step value of rate row
  * @param {Object} vendor - current vendor's data
  * @param {Object} vendorRates - updated vendor's rates
  * @return nothing - updates vendor's rates
  */
-const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates) => {
+const updateVendorStepMultipliers = async (oldData, newData, newStep, vendor, vendorRates) => {
   const { competencies, _id: vendorId } = vendor;
   const allTests = await LangTest.find({});
   const neededCompetencies = getCompetenciesForCheck(competencies, oldData._id, allTests);
@@ -189,11 +190,16 @@ const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates
   if (!sameStep) {
     const dataForCreation = [{
       step: newStep._id,
-      sourceLanguage: oldData.sourceLanguage._id,
-      targetLanguage: oldData.targetLanguage._id,
-      industry: oldData.industry._id
+      sourceLanguage: newData.sourceLanguage._id,
+      targetLanguage: newData.targetLanguage._id,
+      industry: newData.industry._id
     }];
-    vendorRates = await createNewRateCombinations(dataForCreation, vendorRates, vendorId);
+    const {
+      stepMultipliersTable,
+      pricelistTable
+    } = await createRateCombinations(dataForCreation, vendorId);
+    vendorRates.stepMultipliersTable = [...stepMultipliersTable];
+    vendorRates.pricelistTable = [...pricelistTable];
   }
   if (!isNotLastStepInCompetence) {
     vendorRates.stepMultipliersTable = filterRedundantItem(
@@ -206,12 +212,13 @@ const updateVendorStepMultipliers = async (oldData, newStep, vendor, vendorRates
 /**
  *
  * @param {Object} oldData - old example from database
+ * @param {Object} newData - new example from frontend
  * @param {Object} newIndustry - new industry of rate row
  * @param {Object} vendor - current vendor's data
  * @param {Object} vendorRates - updated vendor's rates
  * @return nothing - updates vendor's rates
  */
-const updateIndustryMultipliers = async (oldData, newIndustry, vendor, vendorRates) => {
+const updateIndustryMultipliers = async (oldData, newData, newIndustry, vendor, vendorRates) => {
   const { competencies, _id: vendorId } = vendor;
   const sameIndustry = vendorRates.industryMultipliersTable.find(item => (
     item.industry.toString() === newIndustry._id.toString()
@@ -222,11 +229,16 @@ const updateIndustryMultipliers = async (oldData, newIndustry, vendor, vendorRat
   if (!sameIndustry) {
     const dataForCreation = [{
       industry: newIndustry._id,
-      sourceLanguage: oldData.sourceLanguage._id,
-      targetLanguage: oldData.targetLanguage._id,
-      step: oldData.step._id
+      sourceLanguage: newData.sourceLanguage._id,
+      targetLanguage: newData.targetLanguage._id,
+      step: newData.step._id
     }];
-    vendorRates = await createNewRateCombinations(dataForCreation, vendorRates, vendorId);
+    const {
+      industryMultipliersTable,
+      pricelistTable
+    } = await createRateCombinations(dataForCreation, vendorId);
+    vendorRates.industryMultipliersTable = [...industryMultipliersTable];
+    vendorRates.pricelistTable = [...pricelistTable];
   }
   if (!isNotLastIndustryInCompetence) {
     vendorRates.industryMultipliersTable = filterRedundantItem(
@@ -344,19 +356,6 @@ async function getVendorAfterCombinationsUpdated({project, step, rate}) {
   }
 }
 
-const createNewRateCombinations = async (dataForCreation, vendorRates, vendorId) => {
-  const {
-    basicPricesTable,
-    stepMultipliersTable,
-    industryMultipliersTable,
-    pricelistTable,
-  } = await createRateCombinations(dataForCreation, vendorId);
-  vendorRates.basicPricesTable = [...basicPricesTable];
-  vendorRates.stepMultipliersTable = [...stepMultipliersTable];
-  vendorRates.industryMultipliersTable = [...industryMultipliersTable];
-  vendorRates.pricelistTable = [...pricelistTable];
-  return vendorRates;
-}
 
 module.exports = {
   updateVendorRatesFromCompetence,
