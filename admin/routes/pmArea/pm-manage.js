@@ -306,9 +306,15 @@ router.post("/send-quote", async (req, res) => {
   const { id, message } = req.body;
   try {
     const project = await getProject({ _id: id });
-    const projectTasks = await sendQuoteMessage(project, message);
+    const projectTasks = project.tasks.map((task) => {
+      if(task.status === 'Created' || task.status === 'Rejected'){
+        task.status = 'Quote sent';
+      }
+      return task;
+    });
+    await sendQuoteMessage(project, message);
     
-    const updatedProject = await getProjectAfterUpdate({ _id: id }, {
+    const updatedProject = await getProjectAfterUpdate({ _id: id },  {
       status: 'Quote sent',
       isClientOfferClicked: false,
       tasks: projectTasks,
@@ -318,7 +324,7 @@ router.post("/send-quote", async (req, res) => {
     console.log(err);
     res.status(500).send("Error on sending the Quote");
   }
-})
+});
 
 router.post("/send-task-quote", async (req, res) => {
   const { projectId, message, tasksIds } = req.body;
@@ -337,6 +343,7 @@ router.post("/send-task-quote", async (req, res) => {
       attachments,
       subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})`
     }, message);
+
     let { tasks } = project;
     tasks = tasks.map(task => {
       if (tasksIds.includes(task.taskId)) {
@@ -344,6 +351,7 @@ router.post("/send-task-quote", async (req, res) => {
       }
       return task;
     });
+
     const updatedProject = await updateProject({ "_id": projectId }, { tasks });
     fs.unlink(pdf, (err) => {
       if (err) console.log(err);

@@ -7,12 +7,11 @@ const {
 const {
   messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, getMessagesForContacts
 } = require('../emailMessages/clientCommunication');
-const { getPdf } = require('../projects');
 const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage, stepReadyToStartMessage } = require('../emailMessages/vendorCommunication');
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
 const { User } = require("../models");
-const { getDeliverablesLink, getProjectDeliverables } = require("./files");
+const { getDeliverablesLink, getProjectDeliverables, getPdf } = require("./files");
 const fs = require('fs');
 
 async function stepCancelNotifyVendor(steps) {
@@ -83,16 +82,9 @@ const sendQuoteMessage = async (project, message) => {
     subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})`
   }, message);
 
-  const projectTasks = project.tasks.filter(({status}) => status === 'Created').map((task) => {
-    task.status = 'Quote sent';
-    return task;
-  });
-
-  fs.unlink(pdf, (err) => {
+  return fs.unlink(pdf, (err) => {
     if (err) console.log(err);
   });
-  
-  return projectTasks;
 };
 
 const getQuotesInfo = (project, selectedContacts) => {
