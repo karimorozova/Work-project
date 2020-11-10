@@ -1,7 +1,7 @@
 <template lang="pug">
   .project-action
     .project-action__preview(v-if="isEditAndSend")
-      Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="messageArrToSend" @send="sendMessage")
+      Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
 
     .project-action__title
       .project-action__title-text Project Action:
@@ -125,7 +125,6 @@
     data () {
       return {
         previewMessage: '',
-        messageArrToSend: [],
         selectedAction: '',
         selectedReason: '',
         moreInformation: '',

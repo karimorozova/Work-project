@@ -334,10 +334,10 @@
 						this.competenciesData.length && this.$emit("updateRates", true)
 					});
 
-          await this.$http.post('/pm-manage/check-pricelist-langs',{
-          	pricelistId: null,
-	          langPairs: this.getArrayLanguagesCombinations(this.currentSource,this.currentTargets)
-				  });
+					await this.$http.post('/pm-manage/check-pricelist-langs', {
+						pricelistId: null,
+						langPairs: this.getArrayLanguagesCombinations(this.currentSource, this.currentTargets)
+					});
 
 					this.alertToggle({
 						message: "Competencies are saved",
@@ -345,6 +345,7 @@
 						type: "success",
 					});
 				} catch (err) {
+					console.log(err);
 					this.alertToggle({
 						message: "Error in save Competencies",
 						isShow: true,
@@ -356,7 +357,11 @@
 				}
 			},
 			getArrayLanguagesCombinations(source, targets) {
-				return targets.map(item => `${ source.lang } - ${ item.lang }`)
+				if(Array.isArray(targets)) {
+					return targets.map(item => `${ source.lang } - ${ item.lang }`)
+				} else {
+					return [`${ source.lang } - ${ targets.lang }`]
+				}
 			},
 			async manageDeleteClick(index) {
 				if(!this.competenciesData[index]._id) {
@@ -430,8 +435,8 @@
 				currentVendor: "getCurrentVendor",
 			}),
 			sourceData() {
-        return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b));
-      },
+				return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b));
+			},
 			filteredSteps() {
 				return this.steps.filter(step => step.calculationUnit.length).map(step => step.title)
 			},
