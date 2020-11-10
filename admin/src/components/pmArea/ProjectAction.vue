@@ -78,8 +78,10 @@
             :options="projManagers"
             :selectedOption="selectedProjManager"
             @chooseOption="(e) => setManager(e, 'projectManager')")
-      .project-action__setting(v-if="isAction('Send a Quote')")
-        .project-action__drop-menu
+      .drops__item(v-if="isAction('Send a Quote')")
+        .drops__label Receive the Quote:
+          img.drops__assigned-icon(v-if="project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
+        .drops__menu
           SelectMulti(
             :selectedOptions="selectedContacts"
             :options="fillContacts()"
