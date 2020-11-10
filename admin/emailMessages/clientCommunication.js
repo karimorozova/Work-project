@@ -161,15 +161,23 @@ function messageForClient(obj) {
 
 }
 
-function getSubTotal(tasks, steps){
-    return tasks.reduce((acc, cur) => {
-        const taskSteps = steps.filter(item => item.taskId === cur.taskId);
-        let unitPrice = taskSteps.reduce((sum, c) => {
-            return sum += c.clientRate ? c.clientRate.value : 0;
-        }, 0);
-        let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
-        if(cur.service.calculationUnit !== 'Words') {
-            totalQuantity = cur.finance.Price.receivables;
+const getMessagesForContacts = (quotesArr) => {
+  const messagesArr = [];
+  for (let quote of quotesArr) {
+    messagesArr.push(messageForClient(quote));
+  }
+  return messagesArr;
+};
+
+function getSubTotal (tasks, steps) {
+  return tasks.reduce((acc, cur) => {
+    const taskSteps = steps.filter(item => item.taskId === cur.taskId);
+    let unitPrice = taskSteps.reduce((sum, c) => {
+      return sum += c.clientRate ? c.clientRate.value : 0;
+    }, 0);
+    let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
+    if (cur.service.calculationUnit !== 'Words') {
+      totalQuantity = cur.finance.Price.receivables;
             unitPrice = 1;
         }
         return acc + +(unitPrice*totalQuantity);
@@ -234,7 +242,7 @@ function getPdfOfQuote(obj){
     const tasksInfo = getTasksInfoPdf(activeTasks, obj.steps);
     const subTotal = getSubTotal(activeTasks, obj.steps);
   const clientName = obj.customer.officialName || obj.customer.name;
-  const contact = obj.customer.contacts.find(item => item.leadContact);
+  const contact = obj.customer._doc.contact ? obj.customer._doc.contact : obj.customer.contacts.find(item => item.leadContact);
     return `<div class="wrapper pdf" style="width:800px;font-size:12px!important;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     <img src="static/logo.png" alt="">
@@ -743,4 +751,5 @@ module.exports = {
   projectDeliveryMessage,
   projectMiddleCancelledMessage,
   getPdfOfQuote,
+  getMessagesForContacts
 }
