@@ -2,8 +2,6 @@ const { findFittingVendor } = require('../../сalculations/vendor');
 export default {
 	methods: {
 		extendedVendors(index) {
-			// return this.vendors;
-
 			const allSteps = this.currentProject.steps;
 			const industry = this.currentProject.industry;
 			const step = index >= 0 ? allSteps[index] : this.step;
@@ -12,14 +10,6 @@ export default {
 			const targetLanguage = languages.find(item => item.symbol === step.targetLanguage);
 			const stepId = step.serviceStep.step;
 			const vendors = this.vendors;
-
-			console.log('tyt')
-			console.log({
-				sourceLanguage,
-				targetLanguage,
-				step: stepId,
-				industry: industry._id
-			 })
 
 			return findFittingVendor(
 					{
