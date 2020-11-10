@@ -3,17 +3,17 @@ const { User, Clients, Delivery, Projects, Pricelist } = require("../../models")
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
-
 const {
   getProject, createProject, createTasks, createTasksForWordcount, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
   manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
   getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
-  getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate, checkProjectHasMemoqStep, assignProjectManagers
-} = require("../../projects");
+  getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate, checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage
+} = require('../../projects');
+const { sendQuotes } = require('../../projects/emails');
 const {
   upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact,
   stepReassignedNotification, managerNotifyMail, sendEmail, notifyClientProjectCancelled, notifyClientTasksCancelled
-} = require("../../utils");
+} = require('../../utils');
 const { getProjectAfterApprove, setTasksDeliveryStatus, getAfterTasksDelivery, getAfterProjectDelivery, checkPermission, changeManager, changeReviewStage, rollbackReview } = require("../../delivery");
 const { getStepsWithFinanceUpdated, reassignVendor } = require("../../projectSteps");
 const { getTasksWithFinanceUpdated } = require("../../projectTasks");
@@ -242,22 +242,37 @@ router.put("/project-date", async (req, res) => {
 router.get("/quote-message", async (req, res) => {
   const { projectId } = req.query;
   try {
-    const message = await getMessage(projectId, "quote");
+    const message = await getMessage(projectId, 'quote');
     res.send({ message });
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error on getting quote message");
+    res.status(500).send('Error on getting quote message');
   }
 });
 
-router.post("/task-quote-message", async (req, res) => {
+router.post('/send-multiple-quotes', async (req, res) => {
+  try {
+    const { projectId, selectedContacts } = req.body;
+    await sendQuotes(projectId, selectedContacts);
+    const updateProject = await getProjectAfterUpdate({ _id: projectId }, {
+      status: 'Quote sent',
+      isClientOfferClicked: false,
+    });
+    res.send(updateProject);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on sending quotes to multiple contacts');
+  }
+});
+
+router.post('/task-quote-message', async (req, res) => {
   const { projectId, tasks } = req.body;
   try {
     const message = await getMessage(projectId, 'task', tasks);
     res.send({ message });
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error on getting task quote message");
+    res.status(500).send('Error on getting task quote message');
   }
 });
 
@@ -290,33 +305,13 @@ router.post("/project-details", async (req, res) => {
 router.post("/send-quote", async (req, res) => {
   const { id, message } = req.body;
   try {
-    const project = await getProject({ "_id": id });
-    let subject = project.isUrgent ? "URGENT! Decide on a Quote" : "Decide on a Quote";
-    let messageId = "C001.0";
-    if (project.isPriceUpdated) {
-      messageId = "C001.1";
-      subject += " (UPDATED)";
-    }
-    const pdf = await getPdf(project);
-    const attachments = [{ content: fs.createReadStream(pdf), filename: "quote.pdf" }];
-    await clientQuoteEmail({
-      ...project.customer._doc,
-      attachments,
-      subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})`
-    }, message);
-
-    const projectTasks = project.tasks.filter(({status}) => status === 'Created').map((task) => {
-      task.status = 'Quote sent';
-      return task;
-    });
-
-    const updatedProject = await updateProject({ "_id": project.id }, {
-      status: "Quote sent",
+    const project = await getProject({ _id: id });
+    const projectTasks = await sendQuoteMessage(project, message);
+    
+    const updatedProject = await getProjectAfterUpdate({ _id: id }, {
+      status: 'Quote sent',
       isClientOfferClicked: false,
       tasks: projectTasks,
-    });
-    fs.unlink(pdf, (err) => {
-      if (err) console.log(err);
     });
     res.send(updatedProject);
   } catch (err) {

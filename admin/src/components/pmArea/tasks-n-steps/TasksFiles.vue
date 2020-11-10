@@ -23,31 +23,38 @@
             @uploadFiles="uploadRefFiles"
             @deleteFile="(e) => deleteFile(e, 'refFiles')")
     .tasks-files__tooltip Total size must be <= 10Mb, each file can be <= 2Mb
+    ValidationErrors(v-if="showFileSizeWarning"
+      :errors="warnings"
+      :isAbsolute="true"
+      @closeErrors="closeErrors")
 </template>
 
 <script>
-	import FilesUpload from "./tasksFiles/FilesUpload";
-	import {mapActions} from "vuex";
+  import FilesUpload from './tasksFiles/FilesUpload';
+  import ValidationErrors from '../../ValidationErrors';
+  import { mapActions } from 'vuex';
 
-	export default {
-		props: {
-			tasksData: {
-				type: Object
-			}
-		},
-		data() {
-			return {
-				sourceFiles: [],
-				refFiles: [],
-				isSourceFilesShow: false,
-				isRefFilesShow: false,
-				forbiddenExtensions: [
-					"webm", "mpg", "mp2", "mpeg", "mpe", "mpv", "ogg", "mp4", "m4p",
-					"m4v", "avi", "wmv", "mov", "qt", "flv", "swf", "avchd", "jpeg",
-					"png", "gif", "bmp", "tiff", "ppm", "pgm", "jpg", "svg", "bat",
-					"mp3", "aac", "3gp", "aa", "aax", "aiff", "alac", "m4p", "mpc"
-				]
-			}
+  export default {
+    props: {
+      tasksData: {
+        type: Object
+      }
+    },
+    data () {
+      return {
+        sourceFiles: [],
+        refFiles: [],
+        isSourceFilesShow: false,
+        isRefFilesShow: false,
+        forbiddenExtensions: [
+          'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
+          'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
+          'png', 'gif', 'bmp', 'tiff', 'ppm', 'pgm', 'jpg', 'svg', 'bat',
+          'mp3', 'aac', '3gp', 'aa', 'aax', 'aiff', 'alac', 'm4p', 'mpc'
+        ],
+        showFileSizeWarning: false,
+        warnings: ['File is too big. The max size of a file cannot exceed 2 MB'],
+      };
 		},
 		methods: {
 			...mapActions({
@@ -58,16 +65,20 @@
 				return sizesSum / 1000000 <= 10;
 			},
 			uploadSourceFiles({files}) {
-				const filteredFiles = Array.from(files).filter(item => {
-					const {size, name} = item;
-					const extension = name.split(".").pop();
-					return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
-				});
-				if (filteredFiles.length && this.checkFiles(filteredFiles)) {
-					for (let file of filteredFiles) {
-						const isExist = this.sourceFiles.find(item => item.name === file.name);
-						if (!isExist) {
-							this.sourceFiles.push(file);
+        const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2);
+        if (filesBiggerThan2MB.length) {
+          this.showFileSizeWarning = true;
+        }
+        const filteredFiles = Array.from(files).filter(item => {
+          const { size, name } = item;
+          const extension = name.split('.').pop();
+          return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1;
+        });
+        if (filteredFiles.length && this.checkFiles(filteredFiles)) {
+          for (let file of filteredFiles) {
+            const isExist = this.sourceFiles.find(item => item.name === file.name);
+            if (!isExist) {
+              this.sourceFiles.push(file);
 						}
 					}
 				}
@@ -77,16 +88,20 @@
 				this.setDataValue({prop: "sourceFiles", value: this.sourceFiles});
 			},
 			uploadRefFiles({files}) {
-				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 2);
-				if (filteredFiles.length && this.checkFiles(filteredFiles)) {
-					for (let file of files) {
-						const isExist = this.refFiles.find(item => item.name === file.name);
-						if (!isExist) {
-							this.refFiles.push(file);
-						}
-					}
-				}
-				if (!filteredFiles.length) {
+        const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2);
+        if (filesBiggerThan2MB.length) {
+          this.showFileSizeWarning = true;
+        }
+        const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 2);
+        if (filteredFiles.length && this.checkFiles(filteredFiles)) {
+          for (let file of files) {
+            const isExist = this.refFiles.find(item => item.name === file.name);
+            if (!isExist) {
+              this.refFiles.push(file);
+            }
+          }
+        }
+        if (!filteredFiles.length) {
 					this.clearInputFiles(".files-upload__ref-file")
 				}
 				this.setDataValue({prop: "refFiles", value: this.refFiles});
@@ -104,20 +119,24 @@
 				}
 			},
 			clearInputFiles(str) {
-				let inputFiles = document.querySelectorAll(str);
-				for (let elem of inputFiles) {
-					elem.value = "";
-				}
-			},
-			toggleSourceFiles() {
-				this.isSourceFilesShow = !this.isSourceFilesShow;
-			},
-			toggleRefFiles() {
-				this.isRefFilesShow = !this.isRefFilesShow;
-			}
-		},
+        let inputFiles = document.querySelectorAll(str);
+        for (let elem of inputFiles) {
+          elem.value = '';
+        }
+      },
+      toggleSourceFiles () {
+        this.isSourceFilesShow = !this.isSourceFilesShow;
+      },
+      toggleRefFiles () {
+        this.isRefFilesShow = !this.isRefFilesShow;
+      },
+      closeErrors () {
+        this.showFileSizeWarning = false;
+      },
+    },
 		components: {
 			FilesUpload,
+      ValidationErrors
 		},
 		computed: {
 			isWordcount() {
