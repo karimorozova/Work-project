@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getService } = require('../services');
-const { getProject, getProjects, updateProjectStatus, getDeliverablesLink } = require("../projects/");
+const { getProject, getProjects, updateProjectStatusForClientPortalProject, getDeliverablesLink } = require("../projects/");
 const { getProjectDeliverables } = require('../projects/files');
 const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, notifyRequestCancelled } = require('../clientRequests');
 const { getAfterTaskStatusUpdate } = require('../clients');
@@ -187,11 +187,7 @@ router.get('/deleteZip', (req, res) => {
 router.post('/approve-reject', checkClientContact, async (req, res) => {
     const { quote, key } = req.body;
     try {
-        let status = 'Rejected';
-        if(key === 'approve') {
-            status = quote.isStartAccepted ? 'Started' : "Approved";
-        }
-        const updatedQuote = await updateProjectStatus(quote._id, status);
+        const updatedQuote = await updateProjectStatusForClientPortalProject(quote._id, key);
         res.send(updatedQuote);
     } catch(err) {
         console.log(err);

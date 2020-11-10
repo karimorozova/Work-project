@@ -3,7 +3,7 @@ const { storeFiles, getDeliverablesLink, manageDeliveryFile, getPdf } = require(
 const {
   getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, downloadCompletedFiles,
   updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles, updateOtherProject,
-  assignMemoqTranslator, checkProjectHasMemoqStep, assignProjectManagers
+  assignMemoqTranslator, checkProjectHasMemoqStep, assignProjectManagers, updateProjectStatusForClientPortalProject
 } = require('./updates');
 const {
   stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, notifyManagerStepStarted, notifyStepDecisionMade,
@@ -63,5 +63,6 @@ module.exports = {
   checkProjectHasMemoqStep,
   assignProjectManagers,
   getTasksForCustomUnits,
-  getStepsForDuoUnits
+  getStepsForDuoUnits,
+  updateProjectStatusForClientPortalProject
 }

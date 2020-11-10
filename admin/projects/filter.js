@@ -6,12 +6,12 @@ function getFilterdProjectsQuery(filters) {
 	if(filters.projectType === 'Open') {
 		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Closed", "Draft", "Quote sent"] } : filters.statusFilter;
 	} else if(filters.projectType === 'Quote') {
-		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Approved", "Cancelled", "Closed", "Cancelled", "Cancelled Halfway", "In Progress", "Rejected"] } : filters.statusFilter;
+		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Approved", "Cancelled", "Closed", "Cancelled", "Cancelled Halfway", "In progress", "Rejected"] } : filters.statusFilter;
 	} else if(filters.projectType === 'Closed') {
 		status = !filters.statusFilter || filters.statusFilter === 'All' ? "Closed" : filters.statusFilter;
 	}
 
-	let query = { status }
+	let query = { status };
 
 	if(filters.lastDate) {
 		query.startDate = { $lt: new Date(filters.lastDate) };

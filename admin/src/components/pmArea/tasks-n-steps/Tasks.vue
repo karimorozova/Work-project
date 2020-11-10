@@ -157,6 +157,7 @@
 			closePreview() {
 				this.isEditAndSend = false;
 				this.isEditAndSendQuote = false;
+				this.selectedAction = "";
 			},
 			openPreview() {
 				this.isEditAndSend = true;
@@ -300,7 +301,7 @@
 						message: message,
 						tasksIds: this.allTasks.filter(item => item.isChecked && item.status === "Created").map(item => item.taskId)
 					});
-					this.$emit('updateTasks', result.data.tasks)
+					this.$emit('updateTasks', result.data.tasks);
 					this.alertToggle({ message: "Message sent", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
@@ -375,21 +376,19 @@
 			},
 			addedSendQuoteStatus() {
 				const pickedTasks = this.allTasks.filter(i => i.isChecked);
-				const isEveryCreated = pickedTasks.every(item => item.status === "Created")
-				if(isEveryCreated && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
+				const isEveryCreated = pickedTasks.every(item => item.status === "Created");
+				if(isEveryCreated && pickedTasks.length && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
 					this.taskStatuses = ['Cancel', 'Send a Quote']
-				} else if(!pickedTasks.length) {
-					this.taskStatuses = ['Cancel']
-				} else {
-					this.taskStatuses = ['Cancel']
-				}
+				} else if(!pickedTasks.length) this.taskStatuses = ['Cancel'];
+				else this.taskStatuses = ['Cancel']
 			},
+
 			toggleCheck(e, index, val) {
 				this.allTasks[index].isChecked = val;
 				this.setProjectProp({ value: this.allTasks, prop: 'tasks' });
 
 				const count = this.allTasks.filter(i => i.isChecked).length;
-				const ifOneTask = count === 1
+				const ifOneTask = count === 1;
 				ifOneTask ? this.setCurrentTask(this.allTasks.findIndex(i => i.isChecked)) : this.setCurrentTask(-1);
 
 				if(ifOneTask && val) {
@@ -409,12 +408,11 @@
 					acc.push({ ...cur, isChecked: val });
 					return acc;
 				}, []);
+				const isEveryCreated = tasks.every(item => item.status === "Created");
 				this.setProjectProp({ value: tasks, prop: 'tasks' });
-
-				if(tasks.map(task => task.status).includes("Created") && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
+				if(isEveryCreated && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
 					this.taskStatuses = ['Cancel', 'Send a Quote']
 				}
-
 				this.clearTaskDeliveryStatuses();
 			},
 			closeApproveModal() {

@@ -274,6 +274,29 @@ async function reOpenProject(project, ifChangePreviousStatus = true) {
 	}
 }
 
+
+async function updateProjectStatusForClientPortalProject(projectId, action) {
+	const project = await getProject({ "_id": projectId });
+
+	if(action === 'approve') {
+		project.status = 'Approved';
+		project.tasks = changeTasksStatus(project.tasks, 'Approved')
+	} else {
+		project.status = 'Rejected';
+		project.tasks = changeTasksStatus(project.tasks, 'Rejected')
+	}
+
+	function changeTasksStatus(tasks, statusTask) {
+		return tasks.map(task => {
+			task.status = statusTask;
+			return task;
+		})
+	}
+
+	return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, }
+	);
+}
+
 async function updateProjectStatus(id, status, reason) {
 	try {
 		const project = await getProject({ "_id": id });
@@ -364,7 +387,7 @@ async function getApprovedProject(project, status) {
 
 function updateWithApprovedTasks({ taskIds, project }) {
 	const tasks = project.tasks.map(task => {
-		if(task.status === 'Created' && taskIds.indexOf(task.taskId) !== -1) {
+		if((task.status === 'Created' || task.status === 'Quote sent') && taskIds.indexOf(task.taskId) !== -1) {
 			task.status = 'Approved';
 		}
 		return task;
@@ -597,5 +620,6 @@ module.exports = {
 	updateOtherProject,
 	assignMemoqTranslator,
 	assignProjectManagers,
-	checkProjectHasMemoqStep
+	checkProjectHasMemoqStep,
+	updateProjectStatusForClientPortalProject
 };

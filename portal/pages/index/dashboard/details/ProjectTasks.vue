@@ -2,9 +2,9 @@
     .tasks-table
         DataTable(
             :fields="tableFields"
-            :tableData="project.tasks"
-            :bodyClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
-            :tableHeadRowClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
+            :tableData="projectTasks"
+            :bodyClass="projectTasks.length < 10 ? 'tbody_visible-overflow' : ''"
+            :tableHeadRowClass="projectTasks.length < 10 ? 'tbody_visible-overflow' : ''"
         )
             .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
             .tasks-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
@@ -72,13 +72,13 @@ export default {
             return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
         },
         isApproveReject(task) {
-            return task.status === 'Created'
+            return task.status === 'Quote sent'
         },
         isDownload(task) {
             return task.status === 'Ready for Delivery' || task.status === 'Delivered'
         },
         async makeDecision(task, key) {
-            const status = key === 'approve' ? 'Approved' : 'Rejected'
+            const status = key === 'approve' ? 'Approved' : 'Rejected';
             try {
                 await this.updateTaskStatus({task, status});
             } catch(err) { }
@@ -116,7 +116,10 @@ export default {
         ...mapGetters({
             project: "getSelectedProject",
             clientLanguages: "getCombinations"
-        })
+        }),
+      projectTasks(){
+        	return this.project.tasks.filter(({status}) => status !== 'Created');
+      },
     },
     mounted() {
         this.domain = process.env.domain;
@@ -124,7 +127,7 @@ export default {
     components: {
         DataTable,
         ProgressLine
-    }    
+    }
 }
 </script>
 

@@ -304,9 +304,16 @@ router.post("/send-quote", async (req, res) => {
       attachments,
       subject: `${subject} ${project.projectId} - ${project.projectName} (ID ${messageId})`
     }, message);
+
+    const projectTasks = project.tasks.filter(({status}) => status === 'Created').map((task) => {
+      task.status = 'Quote sent';
+      return task;
+    });
+
     const updatedProject = await updateProject({ "_id": project.id }, {
       status: "Quote sent",
-      isClientOfferClicked: false
+      isClientOfferClicked: false,
+      tasks: projectTasks,
     });
     fs.unlink(pdf, (err) => {
       if (err) console.log(err);
