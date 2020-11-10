@@ -237,12 +237,12 @@ function getTaskCode(taskInfo) {
             </tr>`;
 }
 
-function getPdfOfQuote(obj){
-    const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
-    const tasksInfo = getTasksInfoPdf(activeTasks, obj.steps);
-    const subTotal = getSubTotal(activeTasks, obj.steps);
-  const clientName = obj.customer.officialName || obj.customer.name;
-  const contact = obj.customer._doc.contact ? obj.customer._doc.contact : obj.customer.contacts.find(item => item.leadContact);
+function getPdfOfQuote(obj, tasksIds = []){
+    const selectedTasks = !tasksIds.length  ? obj.tasks.filter(item => item.status !== "Cancelled") : obj.tasks.filter(task => tasksIds.includes(task.taskId));
+    const tasksInfo = getTasksInfoPdf(selectedTasks, obj.steps);
+    const subTotal = getSubTotal(selectedTasks, obj.steps);
+    const clientName = obj.customer.officialName || obj.customer.name;
+    const contact = obj.customer._doc.contact ? obj.customer._doc.contact : obj.customer.contacts.find(item => item.leadContact);
     return `<div class="wrapper pdf" style="width:800px;font-size:12px!important;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
                     <img src="static/logo.png" alt="">

@@ -5,11 +5,11 @@ const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../Ñ
 const { getAfterPayablesUpdated } = require("../../Ñalculations/updates");
 const {
   getProject, createProject, createTasks, createTasksForWordcount, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
-  manageDeliveryFile, createTasksFromRequest, setStepsStatus, getMessage, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
+  manageDeliveryFile, createTasksFromRequest, setStepsStatus, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
   getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
   getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate, checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage
 } = require('../../projects');
-const { sendQuotes } = require('../../projects/emails');
+const { sendQuotes, getMessage } = require('../../projects/emails');
 const {
   upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact,
   stepReassignedNotification, managerNotifyMail, sendEmail, notifyClientProjectCancelled, notifyClientTasksCancelled
@@ -322,7 +322,6 @@ router.post("/send-quote", async (req, res) => {
 
 router.post("/send-task-quote", async (req, res) => {
   const { projectId, message, tasksIds } = req.body;
-  console.log(tasksIds);
   try {
     const project = await getProject({ "_id": projectId });
     let subject = project.isUrgent ? "URGENT! Decide on a Quote" : "Decide on a Quote";
@@ -331,7 +330,7 @@ router.post("/send-task-quote", async (req, res) => {
       messageId = "taskQuoteUpdated";
       subject += " (UPDATED)";
     }
-    const pdf = await getPdf(project);
+    const pdf = await getPdf(project, tasksIds);
     const attachments = [{ content: fs.createReadStream(pdf), filename: "quote.pdf" }];
     await clientQuoteEmail({
       ...project.customer._doc,
