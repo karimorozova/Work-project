@@ -1,12 +1,12 @@
 export const INCREASE_REQUEST = (state) => {
-    state.currentRequests++;
+	state.currentRequests++;
 };
 
 export const DECREASE_REQUEST = (state) => {
-    state.currentRequests--;
+	state.currentRequests--;
 };
 
 export const SET_REQUEST_ZERO = (state) => {
-    state.currentRequests = 0;
+	state.currentRequests = 0;
 }
   

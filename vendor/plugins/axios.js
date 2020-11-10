@@ -4,9 +4,6 @@ import Vue from 'vue';
 export default function ({ store, $axios, route }) {
   $axios.onRequest(config => {
     store.dispatch('addRequest');
-    if (config && config.progress === false) {
-      return
-    }
   })
 
   $axios.onResponse(response => {
@@ -14,23 +11,21 @@ export default function ({ store, $axios, route }) {
     if (response && response.config && response.config.progress === false) {
       return
     }
-    if (state.currentRequests <= 0) {
-        state.currentRequests = 0
+    if (state.currentRequests < 0) {
+        store.dispatch('noRequest')
     }
   })
 
   $axios.onError(error => {
-    store.dispatch('delRequest');
     if (error && error.config && error.config.progress === false) {
-      return
+      store.dispatch('noRequest')
     }
   })
 
   $axios.interceptors.request.use(config => {
     if(route.name !== "application") {
       if(document) {
-      const token = Vue.cookie.get("vendor");
-      config.headers.common['token-header'] = token;
+        config.headers.common['token-header'] = Vue.cookie.get("vendor");
       }
     }
     return config;
