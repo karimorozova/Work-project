@@ -7,21 +7,24 @@
         :project="currentProject"
       )
     .project-info__all-info(v-if="originallyLanguages && originallyUnits && originallySteps")
-      TasksAndSteps(
-        :originallyLanguages="originallyLanguages"
-        :originallyUnits="originallyUnits"
-        :originallySteps="originallySteps"
-        :isFinishedStatus="isFinishedStatus"
-        @getMetrics="getMetrics"
-        @setVendor="setVendor"
-        @setDate="setDate"
-        @showErrors="showErrors"
-      )
-        ValidationErrors(v-if="areErrorsExist"
-          :errors="errors"
-          :isAbsolute="isBlockAbsoulte"
-          @closeErrors="closeErrorsBlock"
+      .task-and-steps
+        TasksAndSteps(
+          :originallyLanguages="originallyLanguages"
+          :originallyUnits="originallyUnits"
+          :originallySteps="originallySteps"
+          :isFinishedStatus="isFinishedStatus"
+          @getMetrics="getMetrics"
+          @setVendor="setVendor"
+          @setDate="setDate"
+          @showErrors="showErrors"
         )
+          ValidationErrors(v-if="areErrorsExist"
+            :errors="errors"
+            :isAbsolute="isBlockAbsoulte"
+            @closeErrors="closeErrorsBlock"
+          )
+        .project-info__all-info
+          ProjectFinance
       .project-info__action
         ProjectAction(
           :project="currentProject"
@@ -29,8 +32,7 @@
           @setStatus="setStatus"
           @refreshProject="refreshProject"
         )
-    .project-info__all-info
-      ProjectFinance
+
     .project-info__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :message="message" @send="sendQuote")
 </template>
