@@ -4,6 +4,7 @@
     .step-info__block.size Step ID - {{ step.stepId }}
     .step-info__block
       Vendor(
+        :index="index"
         :step="step"
         :vendors="vendors"
         :vendor="step.vendor"

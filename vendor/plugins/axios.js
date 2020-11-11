@@ -20,7 +20,6 @@ export default function ({ store, $axios, route }) {
   })
 
   $axios.onError(error => {
-    store.dispatch('delRequest');
     if (error && error.config && error.config.progress === false) {
       store.dispatch('noRequest')
     }

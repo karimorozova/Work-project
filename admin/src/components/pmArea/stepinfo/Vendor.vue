@@ -4,13 +4,14 @@
     .step-vendor__info
         .step-vendor__drop-menu(v-if="isVendorSelect")
             PersonSelect(
-                :selectedPerson="currentVendorName(vendor)"
-                :persons="extendedVendors(-1)"
-                :isExtended="isAllShow"
-                :isAdditionalShow="true"
-                @setPerson="setVendor"
-                @togglePersonsData="toggleVendors"
+              :selectedPerson="currentVendorName(vendor)"
+              :persons="extendedVendors(index)"
+              :isExtended="isAllShow"
+              :isAdditionalShow="true"
+              @setPerson="setVendor"
+              @togglePersonsData="toggleVendors"
             )
+
         .step-vendor__current-vendor(v-else) {{ currentVendorName(vendor) }}
             span.step-vendor__no-vendor(v-if="!vendor") No Vendor
         .step-vendor__contacts
@@ -49,6 +50,9 @@ export default {
         },
         originallyLanguages: {
           type: Array
+        },
+        index:{
+          type: Number
         }
     },
     data() {

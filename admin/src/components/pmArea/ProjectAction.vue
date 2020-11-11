@@ -532,7 +532,8 @@
 					result = ["Deliver", "Cancel"];
 				}
         if (this.project.status === 'Closed') {
-          result = ['ReOpen', 'Deliver'];
+	        // result = ['ReOpen', 'Deliver'];
+	        result = ['ReOpen'];
         }
         if (this.project.status === 'Rejected') {
           result = ['ReOpen', 'Cancel'];
