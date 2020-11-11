@@ -32,89 +32,91 @@
 	const Button = () => import("~/components/buttons/Button");
 
 	export default {
-    props: {
-      deliverables: {
-        type: Array,
-        default: () => []
-      },
-    },
-    methods: {
-      ...mapActions([
-        "setJobStatus",
-        "selectJob",
-        "alertToggle",
+		props: {
+			deliverables: {
+				type: Array,
+				default: () => []
+			},
+		},
+		methods: {
+			...mapActions([
+				"setJobStatus",
+				"selectJob",
+				"alertToggle",
 
-      ]),
-      closeEmailAlert () {
-        this.emailAlert = false;
-      },
-      setDeliverables ({ files }) {
-        this.$emit('setDeliverables', { files });
-      },
-      async startJob () {
-        if (!this.job.isVendorRead) return;
-	      try {
-          const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
-          if (type === "CAT Wordcount" && this.getVendor.guid == null) {
-            await this.$axios.post(`/vendor/create-memoq-vendor`, {
-              token: this.getToken
-            });
-            this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
-            this.emailAlert = true;
-          }
-        } catch (err) {
-          this.alertToggle({ message: "Error in creating Vendor in MemoQ", isShow: true, type: "error" });
-        } finally {
-          await this.assignMemoqVendor();
-          await this.setStatus("Started");
-        }
-      },
-      async makeAction (key) {
-        const status = key === "Approve" ? "Accepted" : "Rejected";
-        try {
-          await this.setStatus(status);
-        } catch (err) {
-        }
-      },
-      async setStatus (status) {
-        try {
-          await this.setJobStatus({ jobId: this.job._id, status });
-          const currentJob = this.allJobs.find(item => item._id === this.job._id);
-          this.selectJob(currentJob);
-        } catch (err) {
-          this.alertToggle({ message: "Error in jobs action", isShow: true, type: "error" });
-        }
-      },
-      async assignMemoqVendor () {
-        try {
-          await this.$axios.post('/vendor/assign-translator', {
-            token: this.getToken,
-            stepId: this.job.stepId,
-            projectId: this.job.project_Id
-          });
-        } catch (err) {
-        }
-      },
-      showModal () {
-        this.$emit("showModal");
-      }
-    },
-    data () {
-      return {
-        icons: {
-          Approve: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
-          Reject: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
-        },
-        emailAlert: false,
-      };
-    },
-    computed: {
-      ...mapGetters({
+			]),
+			closeEmailAlert() {
+				this.emailAlert = false;
+			},
+			setDeliverables({ files }) {
+				this.$emit('setDeliverables', { files });
+			},
+			async startJob() {
+				if(!this.job.isVendorRead) return;
+				try {
+					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
+					const memoqUsers = await this.$axios.get(`vendor/get-memoq-users?token=${ this.getToken }`);
+					const memoqUserGuids = memoqUsers.data.map(({ id }) => id);
+					if(type === 'CAT Wordcount' && (this.getVendor.guid == null || !memoqUserGuids.includes(this.getVendor.guid))) {
+						await this.$axios.post(`/vendor/create-memoq-vendor`, {
+							token: this.getToken
+						});
+						this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
+						this.emailAlert = true;
+					}
+				} catch (err) {
+					this.alertToggle({ message: "Error in creating Vendor in MemoQ", isShow: true, type: "error" });
+				} finally {
+					await this.assignMemoqVendor();
+					await this.setStatus("Started");
+				}
+			},
+			async makeAction(key) {
+				const status = key === "Approve" ? "Accepted" : "Rejected";
+				try {
+					await this.setStatus(status);
+				} catch (err) {
+				}
+			},
+			async setStatus(status) {
+				try {
+					await this.setJobStatus({ jobId: this.job._id, status });
+					const currentJob = this.allJobs.find(item => item._id === this.job._id);
+					this.selectJob(currentJob);
+				} catch (err) {
+					this.alertToggle({ message: "Error in jobs action", isShow: true, type: "error" });
+				}
+			},
+			async assignMemoqVendor() {
+				try {
+					await this.$axios.post('/vendor/assign-translator', {
+						token: this.getToken,
+						stepId: this.job.stepId,
+						projectId: this.job.project_Id
+					});
+				} catch (err) {
+				}
+			},
+			showModal() {
+				this.$emit("showModal");
+			}
+		},
+		data() {
+			return {
+				icons: {
+					Approve: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
+					Reject: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
+				},
+				emailAlert: false,
+			};
+		},
+		computed: {
+			...mapGetters({
 				job: "getSelectedJob",
 				allJobs: "getAllJobs",
 				getToken: "getToken",
 				getVendor: "getVendor",
-	      originallyUnits: "getOriginallyUnits",
+				originallyUnits: "getOriginallyUnits",
 			}),
 			isStartButton() {
 				return this.job.status === "Accepted" || this.job.status === "Ready to Start" || this.job.status === "Waiting to Start";
