@@ -94,7 +94,8 @@ export default {
     methods: {
         ...mapActions([
             "alertToggle",
-            "setCurrentProject"
+            "setCurrentProject",
+            "storeCurrentClient"
         ]),
         async setTest(projectId){
             await this.setProjectProp({
@@ -113,6 +114,7 @@ export default {
         },
         async onRowClicked({index}) {
 	        const curProject = await this.$http.get(`/pm-manage/project?id=${this.allProjects[index]._id}`);
+	        this.storeCurrentClient(curProject.data.customer);
           this.$emit("selectProject", {project: curProject.body})
         },
         getId(row) {

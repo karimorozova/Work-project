@@ -52,36 +52,36 @@
 	export default {
 		data() {
 			return {
-        statuses: ['Accepted', 'Draft', 'Open', 'Ready'],
-        errors: [],
-        areErrorsExist: false,
-        isBlockAbsoulte: true,
-        isEditAndSend: false,
-        message: '',
-        mailSubject: '',
-        customer: null,
+				statuses: ['Accepted', 'Draft', 'Open', 'Ready'],
+				errors: [],
+				areErrorsExist: false,
+				isBlockAbsoulte: true,
+				isEditAndSend: false,
+				message: '',
+				mailSubject: '',
+				customer: null,
 
-        originallyLanguages: null,
-        originallyUnits: null,
-        originallySteps: null,
-      }
+				originallyLanguages: null,
+				originallyUnits: null,
+				originallySteps: null,
+			}
 		},
 		methods: {
 			...mapActions([
 				"setProjectProp",
-        'setProjectStatus',
-        'setCurrentProject',
-        'vendorsSetting',
-        'alertToggle',
-        'removeStepVendor',
-        'setStepVendor',
-        'setStepDate',
-        'updateProgress',
-        'updateCurrentProject',
-        'sendClientQuote',
-        'sendProjectDetails',
-        'storeCurrentClient'
-      ]),
+				'setProjectStatus',
+				'setCurrentProject',
+				'vendorsSetting',
+				'alertToggle',
+				'removeStepVendor',
+				'setStepVendor',
+				'setStepDate',
+				'updateProgress',
+				'updateCurrentProject',
+				'sendClientQuote',
+				'sendProjectDetails',
+				'storeCurrentClient'
+			]),
 			async setVendor({ vendor, index }) {
 				if(this.currentProject.steps[index].vendor &&
 						this.currentProject.steps[index].vendor._id === vendor._id) {
@@ -168,8 +168,8 @@
 			},
 			async refreshCustomerInfo() {
 				const client = await this.$http.get(`/clientsapi/client?id=${ this.currentProject.customer._id }`);
-        this.storeCurrentClient();
-        await this.setProjectProp({ prop: 'customer', value: client.body });
+				this.storeCurrentClient(client.data);
+				await this.setProjectProp({ prop: 'customer', value: client.body });
 			},
 			showErrors({ errors }) {
 				this.errors = [...errors];
@@ -205,10 +205,10 @@
 				const { id } = this.$route.params;
 				try {
 					if(!this.currentProject._id) {
-            const curProject = await this.$http.get(`/pm-manage/project?id=${id}`);
-            this.customer = curProject.body.customer;
-            await this.setCurrentProject(curProject.body);
-          }
+						const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
+						this.customer = curProject.body.customer;
+						await this.setCurrentProject(curProject.body);
+					}
 				} catch (err) {
 
 				}
@@ -232,38 +232,40 @@
 			},
 			async getOriginallyUnits() {
 				try {
-          const result = await this.$http.get('/api/units');
-          this.originallyUnits = result.body;
-        } catch (err) {
-          this.alertToggle({
-            message: 'Error in Originally Units',
-            isShow: true,
-            type: 'error',
-          });
-        }
-      },
-      async getCustomer () {
-        try {
-          const client = await this.$http.get(`/clientsapi/client?id=${this.customer._id}`);
-          this.storeCurrentClient(client.data);
-        } catch (err) {
-          this.alertToggle({
-            message: 'Error in Get Customer',
-            isShow: true,
-            type: 'error',
-          });
-        }
-      },
-      async getOriginallySteps () {
-        try {
-          const result = await this.$http.get('/api/steps');
-          this.originallySteps = result.body;
-        } catch (err) {
-          this.alertToggle({
-            message: 'Error in Originally Steps',
-            isShow: true,
-            type: 'error',
-          });
+					const result = await this.$http.get('/api/units');
+					this.originallyUnits = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: 'Error in Originally Units',
+						isShow: true,
+						type: 'error',
+					});
+				}
+			},
+			async getCustomer() {
+				if(!this.currentProject._id) {
+					try {
+						const client = await this.$http.get(`/clientsapi/client?id=${ this.customer._id }`);
+						this.storeCurrentClient(client.data);
+					} catch (err) {
+						this.alertToggle({
+							message: 'Error in Get Customer',
+							isShow: true,
+							type: 'error',
+						});
+					}
+				}
+			},
+			async getOriginallySteps() {
+				try {
+					const result = await this.$http.get('/api/steps');
+					this.originallySteps = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: 'Error in Originally Steps',
+						isShow: true,
+						type: 'error',
+					});
 				}
 			},
 
@@ -289,13 +291,13 @@
 			ProjectSubInformation
 		},
 		async created() {
-      await this.getProject();
-      await this.getVendors();
-      await this.getOriginallyLanguages();
-      await this.getOriginallyUnits();
-      await this.getOriginallySteps();
-      await this.getCustomer();
-    },
+			await this.getProject();
+			await this.getVendors();
+			await this.getOriginallyLanguages();
+			await this.getOriginallyUnits();
+			await this.getOriginallySteps();
+			await this.getCustomer();
+		},
 		beforeRouteEnter(to, from, next) {
 			next(async (vm) => {
 				if(from.name === "client-info") {
