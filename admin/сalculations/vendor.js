@@ -17,23 +17,30 @@ const findFittingVendor = (stepData, vendors, fromFront = false) => {
 	const { sourceLanguage, targetLanguage, step, industry } = stepData;
 	const fittingVendors = [];
 	for (let vendor of vendors) {
-
-    //FROM COMPETENCIES
-		const { _id, competencies } = vendor;
-		if(competencies.length) {
-			for (let { sourceLanguage: source, targetLanguage: target, step: vendorStep, industry: vendorIndustry } of competencies) {
-				source = fromFront ? source._id : source;
-				target = fromFront ? target._id : target;
-				if(
-						source.toString() === sourceLanguage._id.toString() &&
-						target.toString() === targetLanguage._id.toString() &&
-						vendorIndustry.toString() === industry.toString() &&
-						vendorStep.toString() === step.toString()
-				) {
-					fittingVendors.push(fromFront ? vendor : _id);
+		//FROM RATES
+		const { rates } = vendor;
+		if(rates.hasOwnProperty('pricelistTable')) {
+			const { pricelistTable } = rates;
+			if(pricelistTable.length) {
+				for (let rate of pricelistTable) {
+					const sourceRate = fromFront ? rate.sourceLanguage._id : rate.sourceLanguage;
+					const targetRate = fromFront ? rate.targetLanguage._id : rate.targetLanguage;
+					const industryRate = fromFront ? rate.industry._id : rate.industry;
+					const stepRate = fromFront ? rate.step._id : rate.step;
+					if(
+							sourceRate.toString() === sourceLanguage._id.toString() &&
+							targetRate.toString() === targetLanguage._id.toString() &&
+							industryRate.toString() === industry.toString() &&
+							stepRate.toString() === step.toString()
+					) {
+						if(!fittingVendors.map(i => i._id).includes(vendor._id)){
+							fittingVendors.push(fromFront ? vendor : vendor._id);
+						}
+					}
 				}
 			}
 		}
+
 
 		//FROM COMPLETED TEST
 		// const { _id, qualifications } = vendor;

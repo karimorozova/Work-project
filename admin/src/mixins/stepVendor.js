@@ -2,7 +2,6 @@ const { findFittingVendor } = require('../../сalculations/vendor');
 export default {
 	methods: {
 		extendedVendors(index) {
-			return this.vendors
 			const allSteps = this.currentProject.steps;
 			const industry = this.currentProject.industry;
 			const step = index >= 0 ? allSteps[index] : this.step;
@@ -10,8 +9,17 @@ export default {
 			const sourceLanguage = languages.find(item => item.symbol === step.sourceLanguage);
 			const targetLanguage = languages.find(item => item.symbol === step.targetLanguage);
 			const stepId = step.serviceStep.step;
-			const vendors = this.vendors;
+			let vendors = this.vendors;
 
+			const isNowSecondStep = /(\sS02)/.exec(allSteps[index].stepId);
+			if(isNowSecondStep !== null){
+				const currentTwoSteps = allSteps.filter(item => item.taskId === allSteps[index].taskId);
+				const [firstStep] = currentTwoSteps;
+				if(firstStep.vendor !== null){
+					vendors = vendors.filter(item => item._id.toString() !== firstStep.vendor._id.toString())
+				}
+			}
+			
 			return findFittingVendor(
 					{
 						sourceLanguage,
