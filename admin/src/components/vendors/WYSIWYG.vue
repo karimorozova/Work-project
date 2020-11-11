@@ -92,7 +92,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 .background {
   position: fixed;
-  z-index: 100;
+  z-index: 1500;
   top: 0;
   left: 0;
   width: 100%;
@@ -103,7 +103,7 @@ export default {
 }
 .preview {
   position: fixed;
-  z-index: 200;
+  z-index: 1600;
   background-color: $white;
   min-width: 1000px;
   max-width: 100%;

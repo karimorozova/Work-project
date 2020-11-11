@@ -111,38 +111,38 @@
 </template>
 
 <script>
-  import Preview from '../vendors/WYSIWYG';
-  import SelectSingle from '../SelectSingle';
-  import SelectMulti from '../SelectMulti';
-  import Button from '../Button';
-  import { mapGetters, mapActions } from 'vuex';
-  import ApproveModal from '../ApproveModal';
+	import Preview from '../vendors/WYSIWYG';
+	import SelectSingle from '../SelectSingle';
+	import SelectMulti from '../SelectMulti';
+	import Button from '../Button';
+	import { mapGetters, mapActions } from 'vuex';
+	import ApproveModal from '../ApproveModal';
 
-  export default {
-    props: {
-      project: {
-        type: Object
-      }
-    },
-    data () {
-      return {
-        previewMessage: '',
-        selectedAction: '',
-        selectedReason: '',
-        moreInformation: '',
-        reasons: [],
-        managers: [],
-        selectedContacts: [],
-        templatesWysiwyg: [
-          {
-            title: 'tempate',
-            message: '<p>test message</p>'
-          }
-        ],
-        actions: ['Cancel'],
-        approveButtonValue: 'Confirm',
-        alternativeButtonValue: 'Reject',
-        isAlternativeAction: false,
+	export default {
+		props: {
+			project: {
+				type: Object
+			}
+		},
+		data() {
+			return {
+				previewMessage: '',
+				selectedAction: '',
+				selectedReason: '',
+				moreInformation: '',
+				reasons: [],
+				managers: [],
+				selectedContacts: [],
+				templatesWysiwyg: [
+					{
+						title: 'tempate',
+						message: '<p>test message</p>'
+					}
+				],
+				actions: ['Cancel'],
+				approveButtonValue: 'Confirm',
+				alternativeButtonValue: 'Reject',
+				isAlternativeAction: false,
 				isEditAndSend: false,
 				isPay: false,
 				approveAction: false,
@@ -174,14 +174,14 @@
 				this.isEditAndSend = true;
 			},
 			async getCancelMessage() {
-        if (
-          this.project.status === 'In progress' ||
-          this.project.status === 'Draft' ||
-          this.project.status === 'Approved' ||
-          this.project.status === 'Rejected'
-        ) {
-          await this.setStatus('Cancelled', this.selectedReason);
-        }
+				if(
+						this.project.status === 'In progress' ||
+						this.project.status === 'Draft' ||
+						this.project.status === 'Approved' ||
+						this.project.status === 'Rejected'
+				) {
+					await this.setStatus('Cancelled', this.selectedReason);
+				}
 				try {
 					const template = await this.$http.post(
 							"/pm-manage/making-cancel-message",
@@ -207,21 +207,23 @@
 			},
 			async getSendQuoteMessage() {
 				try {
-          if (this.selectedContacts.length > 1) {
-            const result = await this.$http.post(`/pm-manage/send-multiple-quotes`, {
-              projectId: this.project._id,
-              selectedContacts: this.selectedContacts
-            });
-            this.storeProject(result.body);
-            this.selectedAction = '';
-          } else {
-            const template = await this.$http.get(
-              `/pm-manage/quote-message?projectId=${this.project._id}`
-            );
-            this.previewMessage = template.body.message;
-            this.openPreview();
-          }
-        } catch (err) {
+					// if (this.selectedContacts.length > 1) {
+					//   const result = await this.$http.post(`/pm-manage/send-multiple-quotes`, {
+					//     projectId: this.project._id,
+					//     selectedContacts: this.selectedContacts
+					//   });
+					//   this.storeProject(result.body);
+					//   this.selectedAction = '';
+					// } else {
+					// }
+
+					const template = await this.$http.get(
+							`/pm-manage/quote-message?projectId=${ this.project._id }`
+					);
+					this.previewMessage = template.body.message;
+					this.openPreview();
+
+				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
@@ -295,27 +297,27 @@
 			},
 			async reOpenProjectToDraft() {
 				await this.setStatus('Draft', "");
-      },
-      async reOpenProject () {
-        let status;
-        if (this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-          status = 'fromCancelled';
-        } else {
-          status = 'fromClosed';
-        }
-        await this.setStatus(status, '');
-      },
-      async clientQuote (messagesArr) {
-        try {
-          await this.sendClientQuote({ messagesArr });
-          this.alertToggle({
-            message: 'Details sent',
-            isShow: true,
-            type: 'success'
-          });
-        } catch (err) {
-          this.alertToggle({
-            message: err.message,
+			},
+			async reOpenProject() {
+				let status;
+				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
+					status = 'fromCancelled';
+				} else {
+					status = 'fromClosed';
+				}
+				await this.setStatus(status, '');
+			},
+			async clientQuote(message) {
+				try {
+					await this.sendClientQuote({ message });
+					this.alertToggle({
+						message: 'Details sent',
+						isShow: true,
+						type: 'success'
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: err.message,
 						isShow: true,
 						type: "error"
 					});
@@ -430,53 +432,53 @@
 			},
 			async getManagers() {
 				try {
-          const result = await this.$http.get('/users');
-          this.managers = result.data;
-        } catch (err) {
-          this.alertToggle({
-            message: 'Error on getting managers',
-            isShow: true,
-            type: 'error'
-          });
-        }
-      },
-      fillContacts () {
-        return this.currentClient.contacts.map(({ firstName, surname }) => `${firstName} ${surname}`);
-      },
-      setContacts ({ option }) {
-        const selectedOptionIndex = this.selectedContacts.findIndex(name => name === option);
-        if (selectedOptionIndex !== -1) {
-          this.selectedContacts.splice(selectedOptionIndex, 1);
-        } else {
-          this.selectedContacts.push(option);
-        }
-      },
-      ...mapActions({
-        setRequestValue: 'setRequestValue',
-        setProjectValue: 'setProjectValue',
-        alertToggle: 'alertToggle',
-        storeProject: 'setCurrentProject',
-        setProjectStatus: 'setProjectStatus',
-        sendClientQuote: 'sendClientQuote',
-        sendProjectDetails: 'sendProjectDetails',
-        deliverProjectToClient: 'deliverProjectToClient',
-        sendCancelProjectMessage: 'sendCancelProjectMessage'
-      }),
-    },
+					const result = await this.$http.get('/users');
+					this.managers = result.data;
+				} catch (err) {
+					this.alertToggle({
+						message: 'Error on getting managers',
+						isShow: true,
+						type: 'error'
+					});
+				}
+			},
+			fillContacts() {
+				return this.currentClient.contacts.map(({ firstName, surname }) => `${ firstName } ${ surname }`);
+			},
+			setContacts({ option }) {
+				const selectedOptionIndex = this.selectedContacts.findIndex(name => name === option);
+				if(selectedOptionIndex !== -1) {
+					this.selectedContacts.splice(selectedOptionIndex, 1);
+				} else {
+					this.selectedContacts.push(option);
+				}
+			},
+			...mapActions({
+				setRequestValue: 'setRequestValue',
+				setProjectValue: 'setProjectValue',
+				alertToggle: 'alertToggle',
+				storeProject: 'setCurrentProject',
+				setProjectStatus: 'setProjectStatus',
+				sendClientQuote: 'sendClientQuote',
+				sendProjectDetails: 'sendProjectDetails',
+				deliverProjectToClient: 'deliverProjectToClient',
+				sendCancelProjectMessage: 'sendCancelProjectMessage'
+			}),
+		},
 		computed: {
-      ...mapGetters({
-        currentClient: 'getCurrentClient'
-      }),
-      type () {
-        return this.project.projectId ? 'project' : 'request';
-      },
-      accManagers () {
-        let result = [];
-        if (this.managers.length) {
-          result = this.managers.filter(
-            item => item.group.name === 'Account Managers'
-          );
-          result = result.map(item => `${item.firstName} ${item.lastName}`);
+			...mapGetters({
+				currentClient: 'getCurrentClient'
+			}),
+			type() {
+				return this.project.projectId ? 'project' : 'request';
+			},
+			accManagers() {
+				let result = [];
+				if(this.managers.length) {
+					result = this.managers.filter(
+							item => item.group.name === 'Account Managers'
+					);
+					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
 				}
 				return result;
 			},
@@ -523,34 +525,34 @@
 					result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
 				}
 				if(
-          this.project.status === 'Started' ||
-          this.project.status === 'In progress'
+						this.project.status === 'Started' ||
+						this.project.status === 'In progress'
 				) {
 					result = ["Send Project Details", "Cancel"];
 				}
 				if(this.project.status === "Ready for Delivery") {
 					result = ["Deliver", "Cancel"];
 				}
-        if (this.project.status === 'Closed') {
-	        // result = ['ReOpen', 'Deliver'];
-	        result = ['ReOpen'];
-        }
-        if (this.project.status === 'Rejected') {
-          result = ['ReOpen', 'Cancel'];
-        }
-        if (this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-          result = ['ReOpen'];
-        }
-        return result;
-      },
-    },
+				if(this.project.status === 'Closed') {
+					// result = ['ReOpen', 'Deliver'];
+					result = ['ReOpen'];
+				}
+				if(this.project.status === 'Rejected') {
+					result = ['ReOpen', 'Cancel'];
+				}
+				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
+					result = ['ReOpen'];
+				}
+				return result;
+			},
+		},
 		components: {
-      ApproveModal,
-      SelectSingle,
-      SelectMulti,
-      Preview,
-      Button
-    },
+			ApproveModal,
+			SelectSingle,
+			SelectMulti,
+			Preview,
+			Button
+		},
 		async created() {
 			const reasons = await this.$http.get("/api/reasons");
 			for (let key in reasons.data) this.reasons.push(reasons.data[key].reason);

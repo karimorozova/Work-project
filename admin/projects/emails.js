@@ -51,20 +51,20 @@ async function getMessage (projectId, messageTarget, taskIds = []) {
 }
 
 const sendQuotes = async (projectId, selectedContacts) => {
-  try {
-    const project = await Projects.findOne({ _id: projectId })
-      .populate('tasks.service')
-      .populate('customer');
-    const quotesInfoArr = getQuotesInfo(project, selectedContacts);
-    const messagesArr = getMessagesForContacts(quotesInfoArr);
-    for (let i = 0; i < messagesArr.length; i++) {
-      project.customer._doc.contact = quotesInfoArr[i].contact;
-      await sendQuoteMessage(project, messagesArr[i]);
-    }
-  } catch (err) {
-    console.log(err);
-    console.log('Error in sendQuotes');
-  }
+  // try {
+  //   const project = await Projects.findOne({ _id: projectId })
+  //     .populate('tasks.service')
+  //     .populate('customer');
+  //   const quotesInfoArr = getQuotesInfo(project, selectedContacts);
+  //   const messagesArr = getMessagesForContacts(quotesInfoArr);
+  //   for (let i = 0; i < messagesArr.length; i++) {
+  //     project.customer._doc.contact = quotesInfoArr[i].contact;
+  //     await sendQuoteMessage(project, messagesArr[i]);
+  //   }
+  // } catch (err) {
+  //   console.log(err);
+  //   console.log('Error in sendQuotes');
+  // }
 };
 
 const sendQuoteMessage = async (project, message) => {
@@ -88,26 +88,26 @@ const sendQuoteMessage = async (project, message) => {
 };
 
 const getQuotesInfo = (project, selectedContacts) => {
-  const service = project.tasks[0].service;
-  const quotesArr = [];
-  for (let name of selectedContacts) {
-    const nameParts = name.split(' ');
-    const { email } = project.customer.contacts.find(({ firstName, surname }) => `${firstName} ${surname}` === name);
-    const contact = {
-      firstName: nameParts[0],
-      surname: nameParts[1],
-      email,
-    };
-    let quote = {
-      ...project._doc,
-      id: project._id,
-      contact,
-      service: service.title,
-      selectedTasks: [],
-    };
-    quotesArr.push(quote);
-  }
-  return quotesArr;
+  // const service = project.tasks[0].service;
+  // const quotesArr = [];
+  // for (let name of selectedContacts) {
+  //   const nameParts = name.split(' ');
+  //   const { email } = project.customer.contacts.find(({ firstName, surname }) => `${firstName} ${surname}` === name);
+  //   const contact = {
+  //     firstName: nameParts[0],
+  //     surname: nameParts[1],
+  //     email,
+  //   };
+  //   let quote = {
+  //     ...project._doc,
+  //     id: project._id,
+  //     contact,
+  //     service: service.title,
+  //     selectedTasks: [],
+  //   };
+  //   quotesArr.push(quote);
+  // }
+  // return quotesArr;
 };
 
 async function getQuoteInfo (projectId, tasksIds) {

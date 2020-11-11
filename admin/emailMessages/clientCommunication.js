@@ -162,11 +162,11 @@ function messageForClient(obj) {
 }
 
 const getMessagesForContacts = (quotesArr) => {
-  const messagesArr = [];
-  for (let quote of quotesArr) {
-    messagesArr.push(messageForClient(quote));
-  }
-  return messagesArr;
+  // const messagesArr = [];
+  // for (let quote of quotesArr) {
+  //   messagesArr.push(messageForClient(quote));
+  // }
+  // return messagesArr;
 };
 
 function getSubTotal (tasks, steps) {

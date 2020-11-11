@@ -243,7 +243,7 @@
 				}
 			},
 			async getCustomer() {
-				if(!this.currentProject._id) {
+				if(!this.currentClient._id) {
 					try {
 						const client = await this.$http.get(`/clientsapi/client?id=${ this.customer._id }`);
 						this.storeCurrentClient(client.data);
@@ -273,7 +273,8 @@
 		computed: {
 			...mapGetters({
 				currentProject: 'getCurrentProject',
-				allVendors: "getVendors"
+				allVendors: "getVendors",
+				currentClient: 'getCurrentClient'
 			}),
 			isFinishedStatus() {
 				const finishedStatuses = ['Delivered', 'Closed', 'Cancelled', 'Canclled Halfway'];
