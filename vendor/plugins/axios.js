@@ -4,6 +4,9 @@ import Vue from 'vue';
 export default function ({ store, $axios, route }) {
   $axios.onRequest(config => {
     store.dispatch('addRequest');
+    if (config && config.progress === false) {
+      return
+    }
   })
 
   $axios.onResponse(response => {
@@ -17,6 +20,7 @@ export default function ({ store, $axios, route }) {
   })
 
   $axios.onError(error => {
+    store.dispatch('delRequest');
     if (error && error.config && error.config.progress === false) {
       store.dispatch('noRequest')
     }
