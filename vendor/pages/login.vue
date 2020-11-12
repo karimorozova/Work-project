@@ -73,6 +73,7 @@ export default {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-size: cover;
 
     &__required-message {
         position: absolute;
@@ -95,12 +96,7 @@ export default {
         justify-content: center;
         margin-bottom: 10px;
     }
-
-    &__image {
-        width: 269px;
-        height: 76px;
-    }
-
+  
     &__form {
         position: relative;
         padding: 10px;
