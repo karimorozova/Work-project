@@ -52,9 +52,7 @@
 				this.$emit('setDeliverables', { files });
 			},
 			async createMemoqTranslator() {
-				await this.$axios.post(`/vendor/create-memoq-vendor`, { token: this.getToken });
-				this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
-				this.emailAlert = true;
+
 			},
 			async startJob() {
 				if(!this.job.isVendorRead) return;
@@ -66,9 +64,13 @@
 					const typeCAT = type === 'CAT Wordcount';
 
 					if(typeCAT && this.getVendor.guid == null && !memoqUserMails.includes(this.getVendor.email)) {
-						await this.createMemoqTranslator()
-					} else if(typeCAT && this.getVendor.guid && !memoqUserGuids.includes(this.getVendor.guid)) {
-						await this.createMemoqTranslator()
+						await this.$axios.post(`/vendor/create-memoq-vendor`, { token: this.getToken });
+						this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
+						this.emailAlert = true;
+					} else if(typeCAT && this.getVendor.guid && !memoqUserGuids.includes(this.getVendor.guid) && !memoqUserMails.includes(this.getVendor.email)) {
+						await this.$axios.post(`/vendor/create-memoq-vendor`, { token: this.getToken });
+						this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
+						this.emailAlert = true;
 					} else if(typeCAT && this.getVendor.guid == null && memoqUserMails.includes(this.getVendor.email)) {
 						await this.$axios.post(`/vendor/rewrite-quid-for-translator`, {
 							token: this.getToken,
