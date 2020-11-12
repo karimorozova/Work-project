@@ -67,7 +67,7 @@ const sendQuotes = async (projectId, selectedContacts) => {
 	// }
 };
 
-const sendQuoteMessage = async (project, message, arrayOfEmails, taksIds) => {
+const sendQuoteMessage = async (project, message, arrayOfEmails, taksIds = []) => {
 	let subject = project.isUrgent ? 'URGENT! Decide on a Quote' : 'Decide on a Quote';
 	let messageId = 'C001.0';
 	if(project.isPriceUpdated) {
