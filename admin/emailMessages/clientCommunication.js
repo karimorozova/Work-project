@@ -34,7 +34,6 @@ function messageForClient(obj) {
                         style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;">
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;">
-                    <h4 class="contact-name">Dear ${name}</h4>
                     <p class="main_italic main_line15 main_weight600"
                         style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;">
                         ***This is an automated message***<br>

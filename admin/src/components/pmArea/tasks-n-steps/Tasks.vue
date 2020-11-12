@@ -3,7 +3,7 @@
     .tasks__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
     .tasks__preview(v-if="isEditAndSendQuote")
-      Preview(@closePreview="closePreview" :message="previewMessageQuote" @send="sendMessageQuote")
+      PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
     .tasks__action
       .tasks__title Task Action
       .tasks__drop-menu
@@ -101,6 +101,7 @@
 
 <script>
 	import Preview from "../../vendors/WYSIWYG";
+	import PreviewQuote from "../WYSIWYGpmArea";
 	import DataTable from "../../DataTable";
 	import ProgressLine from "../../ProgressLine";
 	import Tabs from "../../Tabs";
@@ -294,11 +295,12 @@
 				}
 				this.closePreview();
 			},
-			async sendMessageQuote(message) {
+			async sendMessageQuote({ message, arrayOfEmails }) {
 				try {
 					const result = await this.$http.post("/pm-manage/send-task-quote", {
 						projectId: this.currentProject._id,
 						message: message,
+						arrayOfEmails: arrayOfEmails,
 						tasksIds: this.allTasks.filter(item => item.isChecked && item.status === "Created").map(item => item.taskId)
 					});
 					this.$emit('updateTasks', result.data.tasks);
@@ -462,6 +464,9 @@
 				currentProject: 'getCurrentProject',
 				user: 'getUser'
 			}),
+			projectClientContacts() {
+				return this.currentProject.clientContacts.map(({ email }) => email)
+			},
 			availableActionsOptions() {
 				return this.taskStatuses
 			},
@@ -481,6 +486,7 @@
 			SelectSingle,
 			ApproveModal,
 			DeliveryReview,
+			PreviewQuote,
 			Tabs
 		}
 	}

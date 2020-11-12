@@ -45,24 +45,24 @@ export const getSteps = async ({ commit, dispatch }) => {
 
 export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
     commit('startRequest')
-    try {      
+    try {
       const {status, reason} = payload;
       const id = state.currentProject._id;
-      const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status, reason}); 
+      const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status, reason});
       await commit('storeCurrentProject', updatedProject.body);
     } catch(err) {
           dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
     } finally {
           commit('endRequest');
-    } 
+    }
   }
 
 export const sendCancelProjectMessage = async ({ commit, state }, payload) => {
     commit('startRequest')
-    try { 
+    try {
         const id = state.currentProject._id;
         const { message } = payload;
-        await Vue.http.put("/pm-manage/send-cancel-message", { id, message }); 
+        await Vue.http.put("/pm-manage/send-cancel-message", { id, message });
     } catch (err) {
         dispatch('alertToggle', { message: err.body, isShow: true, type: "error" });
     } finally {
@@ -155,9 +155,9 @@ export const updateReport = async ({ commit }, payload) => {
 
 export const sendClientQuote = async ({commit, state}, payload) => {
     commit('startRequest');
-    try { 
-        const { message } = payload;
-        const updatedProject = await Vue.http.post('/pm-manage/send-quote', {id: state.currentProject._id, message});
+    try {
+        const { message, arrayOfEmails } = payload;
+        const updatedProject = await Vue.http.post('/pm-manage/send-quote', {id: state.currentProject._id, message, arrayOfEmails});
         await commit('storeCurrentProject', updatedProject.data);
     } catch(err) {
         dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
@@ -168,7 +168,7 @@ export const sendClientQuote = async ({commit, state}, payload) => {
 
 export const sendProjectDetails = async ({commit, state}, payload) => {
     commit('startRequest');
-    try { 
+    try {
         const { message } = payload;
         await Vue.http.post('/pm-manage/project-details', {id: state.currentProject._id, message});
     } catch(err) {
@@ -176,7 +176,7 @@ export const sendProjectDetails = async ({commit, state}, payload) => {
     } finally {
         commit('endRequest');
     }
-} 
+}
 
 export const saveUser = async ({ commit }, payload) => {
     commit('startRequest');
@@ -215,7 +215,7 @@ export const login = ({ commit, state }, payload) => {
     return new Promise(resolve => {
         const {token, group, firstName, lastName, photo} = payload;
         state.userGroup = group;
-        state.user = {firstName, lastName, photo}; 
+        state.user = {firstName, lastName, photo};
         setTimeout(() => {
             let currentDate = Date.now();
             let expiryTime = currentDate + 60000*120;

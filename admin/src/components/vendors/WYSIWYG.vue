@@ -135,7 +135,7 @@ export default {
   }
 
   &__title {
-    font-size: 20px;
+    font-size: 22px;
     text-align: center;
     padding-top: 5px;
   }

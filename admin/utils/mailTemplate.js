@@ -35,6 +35,34 @@ const sendEmail = function (obj, msg, withoutImage = false) {
     })
 }
 
+const clientQuoteToEmails = function (obj, message) {
+  return new Promise( (res, rej) => {
+    let mailOptions = {
+      from: 'Michal <michal@pangea.global>',
+      to: obj.email,
+      subject: obj.subject,
+      text: "plain text",
+      html: message,
+    };
+    mailOptions.attachments = obj.attachments || [];
+    mailOptions.attachments.push({
+      filename: 'logo.png',
+      path: './static/email-logo.png',
+      cid: 'logo@pan'
+    });
+    mailTransporter.sendMail(mailOptions, (error, info) => {
+      mailTransporter.close();
+      if (error) {
+        console.log(error);
+        rej(error);
+      }
+      const messageId = info && info.messageId ? info.messageId : "Error";
+      console.log('Message sent: %s', messageId);
+      res();
+    });
+  })
+};
+
 const clientQuoteEmail = function (obj, msg) {
     const contact = !obj.contact ? obj.contacts.find(item => item.leadContact): obj.contact;
     return new Promise( (res, rej) => {
@@ -90,4 +118,4 @@ const managerNotifyMail = function(obj, msg, subject) {
     })
 }
 
-module.exports = { sendEmail, clientQuoteEmail, managerNotifyMail };
+module.exports = { sendEmail, clientQuoteEmail, managerNotifyMail, clientQuoteToEmails };

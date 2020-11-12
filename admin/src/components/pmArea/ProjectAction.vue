@@ -1,9 +1,11 @@
 <template lang="pug">
   .project-action
+    .project-action__preview(v-if="isEditAndSendQuote")
+      PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageQuotes")
     .project-action__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
 
-    .project-action__title
+    .project-action__title(:style="{'padding-bottom': '5px'}")
       .project-action__title-text Project Action:
       .project-action__title-button(@click="refreshProject")
 
@@ -78,16 +80,16 @@
             :options="projManagers"
             :selectedOption="selectedProjManager"
             @chooseOption="(e) => setManager(e, 'projectManager')")
-      .drops__item(v-if="isAction('Send a Quote')")
-        .drops__label Receive the Quote:
+      //.drops__item(v-if="isAction('Send a Quote')")
+        //.drops__label Receive the Quote:
           img.drops__assigned-icon(v-if="project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
-        .drops__menu
-          SelectMulti(
-            :selectedOptions="selectedContacts"
-            :options="fillContacts()"
-            placeholder="Select Contact"
-            @chooseOptions="setContacts"
-          )
+        //.drops__menu
+          //SelectMulti(
+            //:selectedOptions="selectedContacts"
+            //:options="fillContacts()"
+            //placeholder="Select Contact"
+            //@chooseOptions="setContacts"
+          //)
       slot
     .approve-action(v-if="approveAction")
       ApproveModal(
@@ -117,6 +119,7 @@
 	import Button from '../Button';
 	import { mapGetters, mapActions } from 'vuex';
 	import ApproveModal from '../ApproveModal';
+	import PreviewQuote from "./WYSIWYGpmArea";
 
 	export default {
 		props: {
@@ -132,7 +135,7 @@
 				moreInformation: '',
 				reasons: [],
 				managers: [],
-				selectedContacts: [],
+				// selectedContacts: [],
 				templatesWysiwyg: [
 					{
 						title: 'tempate',
@@ -144,12 +147,24 @@
 				alternativeButtonValue: 'Reject',
 				isAlternativeAction: false,
 				isEditAndSend: false,
+				isEditAndSendQuote: false,
 				isPay: false,
 				approveAction: false,
 				approveActionToDraft: false,
 			};
 		},
 		methods: {
+			...mapActions({
+				setRequestValue: 'setRequestValue',
+				setProjectValue: 'setProjectValue',
+				alertToggle: 'alertToggle',
+				storeProject: 'setCurrentProject',
+				setProjectStatus: 'setProjectStatus',
+				sendClientQuote: 'sendClientQuote',
+				sendProjectDetails: 'sendProjectDetails',
+				deliverProjectToClient: 'deliverProjectToClient',
+				sendCancelProjectMessage: 'sendCancelProjectMessage'
+			}),
 			closeModal() {
 				this.approveAction = false;
 				this.approveActionToDraft = false;
@@ -169,9 +184,13 @@
 			},
 			closePreview() {
 				this.isEditAndSend = false;
+				this.isEditAndSendQuote = false;
 			},
 			openPreview() {
 				this.isEditAndSend = true;
+			},
+			openPreviewQuote() {
+				this.isEditAndSendQuote = true;
 			},
 			async getCancelMessage() {
 				if(
@@ -221,7 +240,7 @@
 							`/pm-manage/quote-message?projectId=${ this.project._id }`
 					);
 					this.previewMessage = template.body.message;
-					this.openPreview();
+					this.openPreviewQuote();
 
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
@@ -236,6 +255,25 @@
 					this.openPreview();
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+				}
+			},
+			async sendMessageQuotes({ message, arrayOfEmails }) {
+				try {
+					await this.clientQuote(message, arrayOfEmails);
+					this.alertToggle({
+						message: "Quote sent",
+						isShow: true,
+						type: "success"
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: err.message,
+						isShow: true,
+						type: "error"
+					});
+				} finally {
+					this.setDefaults();
+					this.closePreview();
 				}
 			},
 			async sendMessage(message) {
@@ -269,9 +307,9 @@
 			async makeApprovedAction(message) {
 				try {
 					switch (this.selectedAction) {
-						case "Send a Quote":
-							await this.clientQuote(message);
-							break;
+							// case "Send a Quote":
+							// 	await this.clientQuote(message);
+							// 	break;
 						case "Send Project Details":
 							await this.projectDetails(message);
 							break;
@@ -307,9 +345,9 @@
 				}
 				await this.setStatus(status, '');
 			},
-			async clientQuote(message) {
+			async clientQuote(message, arrayOfEmails) {
 				try {
-					await this.sendClientQuote({ message });
+					await this.sendClientQuote({ message, arrayOfEmails });
 					this.alertToggle({
 						message: 'Details sent',
 						isShow: true,
@@ -341,10 +379,8 @@
 			},
 			async makeAlterAction() {
 				try {
-					switch (this.selectedAction) {
-						case "Accept/Reject Quote":
-							await this.rejectQuote();
-							break;
+					if(this.selectedAction === "Accept/Reject Quote") {
+						await this.rejectQuote();
 					}
 				} catch (err) {
 					this.alertToggle({
@@ -442,33 +478,25 @@
 					});
 				}
 			},
-			fillContacts() {
-				return this.currentClient.contacts.map(({ firstName, surname }) => `${ firstName } ${ surname }`);
-			},
-			setContacts({ option }) {
-				const selectedOptionIndex = this.selectedContacts.findIndex(name => name === option);
-				if(selectedOptionIndex !== -1) {
-					this.selectedContacts.splice(selectedOptionIndex, 1);
-				} else {
-					this.selectedContacts.push(option);
-				}
-			},
-			...mapActions({
-				setRequestValue: 'setRequestValue',
-				setProjectValue: 'setProjectValue',
-				alertToggle: 'alertToggle',
-				storeProject: 'setCurrentProject',
-				setProjectStatus: 'setProjectStatus',
-				sendClientQuote: 'sendClientQuote',
-				sendProjectDetails: 'sendProjectDetails',
-				deliverProjectToClient: 'deliverProjectToClient',
-				sendCancelProjectMessage: 'sendCancelProjectMessage'
-			}),
+			// fillContacts() {
+			// 	return this.currentClient.contacts.map(({ firstName, surname }) => `${ firstName } ${ surname }`);
+			// },
+			// setContacts({ option }) {
+			// 	const selectedOptionIndex = this.selectedContacts.findIndex(name => name === option);
+			// 	if(selectedOptionIndex !== -1) {
+			// 		this.selectedContacts.splice(selectedOptionIndex, 1);
+			// 	} else {
+			// 		this.selectedContacts.push(option);
+			// 	}
+			// },
 		},
 		computed: {
 			...mapGetters({
 				currentClient: 'getCurrentClient'
 			}),
+			projectClientContacts() {
+				return this.project.clientContacts.map(({ email }) => email)
+			},
 			type() {
 				return this.project.projectId ? 'project' : 'request';
 			},
@@ -518,16 +546,10 @@
 					// result = ["Send a Quote", "Cancel"];
 					result = ["Cancel"];
 				}
-				if(
-						this.project.finance.Price.receivables &&
-						nonStartedStatuses.indexOf(this.project.status) !== -1
-				) {
+				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
 					result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
 				}
-				if(
-						this.project.status === 'Started' ||
-						this.project.status === 'In progress'
-				) {
+				if(this.project.status === 'Started' || this.project.status === 'In progress') {
 					result = ["Send Project Details", "Cancel"];
 				}
 				if(this.project.status === "Ready for Delivery") {
@@ -547,6 +569,7 @@
 			},
 		},
 		components: {
+			PreviewQuote,
 			ApproveModal,
 			SelectSingle,
 			SelectMulti,
@@ -595,22 +618,21 @@
 
     &__text-input {
       width: 191px;
-      margin-top: 10px;
-      border-radius: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
       border: 1px solid #68573e;
       padding: 5px;
       color: #68573e;
       resize: none;
       outline: none;
       box-sizing: border-box;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
 
     &__title {
-      padding-bottom: 5px;
       font-size: 22px;
       border-bottom: 1px solid $brown-border;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -632,6 +654,7 @@
 
     &__confirm {
       display: flex;
+      margin-bottom: 20px;
     }
 
     &__button {
@@ -739,7 +762,7 @@
     }
 
     #sub-line {
-      margin-top: 29px;
+      /*margin-top: 15px;*/
     }
 
     %item-style {
