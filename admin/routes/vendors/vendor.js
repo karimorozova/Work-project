@@ -157,5 +157,20 @@ router.get('/get-memoq-users', checkVendor, async (req, res) => {
 	}
 });
 
+router.post("/rewrite-quid-for-translator", checkVendor, async (req, res) => {
+	const { token, memoqUsers } = req.body;
+	try {
+		const { vendorId } = jwt.verify(token, secretKey);
+		const vendor = await Vendors.findOne({ "_id": vendorId });
+		const { id } = memoqUsers.find(item => item.email === vendor.email);
+		vendor.guid = id;
+		await Vendors.updateOne({ _id: vendorId }, vendor);
+		res.send('Updated');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on assigning vendor as translator');
+	}
+});
+
 
 module.exports = router;

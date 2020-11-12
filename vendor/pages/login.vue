@@ -96,7 +96,7 @@ export default {
         justify-content: center;
         margin-bottom: 10px;
     }
-  
+
     &__form {
         position: relative;
         padding: 10px;

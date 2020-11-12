@@ -51,19 +51,37 @@
 			setDeliverables({ files }) {
 				this.$emit('setDeliverables', { files });
 			},
+			async createMemoqTranslator() {
+				await this.$axios.post(`/vendor/create-memoq-vendor`, { token: this.getToken });
+				this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
+				this.emailAlert = true;
+			},
 			async startJob() {
 				if(!this.job.isVendorRead) return;
 				try {
 					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
 					const memoqUsers = await this.$axios.get(`vendor/get-memoq-users?token=${ this.getToken }`);
 					const memoqUserGuids = memoqUsers.data.map(({ id }) => id);
-					if(type === 'CAT Wordcount' && (this.getVendor.guid == null || !memoqUserGuids.includes(this.getVendor.guid))) {
-						await this.$axios.post(`/vendor/create-memoq-vendor`, {
-							token: this.getToken
+					const memoqUserMails = memoqUsers.data.map(({ email }) => email);
+					const typeCAT = type === 'CAT Wordcount';
+
+					if(typeCAT && this.getVendor.guid == null && !memoqUserMails.includes(this.getVendor.email)) {
+						await this.createMemoqTranslator()
+					} else if(typeCAT && this.getVendor.guid && !memoqUserGuids.includes(this.getVendor.guid)) {
+						await this.createMemoqTranslator()
+					} else if(typeCAT && this.getVendor.guid == null && memoqUserMails.includes(this.getVendor.email)) {
+						await this.$axios.post(`/vendor/rewrite-quid-for-translator`, {
+							token: this.getToken,
+							memoqUsers: memoqUsers.data,
 						});
-						this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
-						this.emailAlert = true;
 					}
+					// if(type === 'CAT Wordcount' && (this.getVendor.guid == null || !memoqUserGuids.includes(this.getVendor.guid))) {
+					// 	await this.$axios.post(`/vendor/create-memoq-vendor`, {
+					// 		token: this.getToken
+					// 	});
+					// 	this.alertToggle({ message: "Vendor is created in MemoQ", isShow: true, type: "success" });
+					// 	this.emailAlert = true;
+					// }
 				} catch (err) {
 					this.alertToggle({ message: "Error in creating Vendor in MemoQ", isShow: true, type: "error" });
 				} finally {
