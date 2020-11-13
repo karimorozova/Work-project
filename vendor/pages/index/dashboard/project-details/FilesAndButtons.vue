@@ -106,6 +106,8 @@
 				try {
 					await this.setStatus(status);
 				} catch (err) {
+				}finally {
+					location.reload();
 				}
 			},
 			async setStatus(status) {

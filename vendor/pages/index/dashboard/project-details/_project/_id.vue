@@ -131,33 +131,28 @@
 			},
 			isForbidden() {
 				let result = {};
-				if(this.currentTask) {
+
+				if(this.currentTask && this.currentStep) {
+					const isRequestStepStatus = this.currentStep.status === 'Request Sent';
 					const { status } = this.currentTask;
-					switch (status) {
-            case 'Approved':
-            case 'Ready to Start':
-            case 'In progress':
-            case 'Pending Approval [DR1]':
-            case 'Pending Approval [DR2]':
-            case 'Delivered':
-              result = {
-                status: false,
-                message: ''
-              };
-              break;
-            case 'Created':
-            case 'Quote sent':
-							result = {
-								status: true,
-								message: "Project or Task hasn't been approved yet."
-							};
-							break;
-						case "Rejected":
-							result = {
-								status: true,
-								message: "Project or Task has rejected."
-							};
-							break;
+					if((status === 'Created' || status === 'Quote sent') && !isRequestStepStatus) {
+						result = {
+							status: true,
+							message: "Project or Task hasn't been approved yet."
+						};
+					} else if(
+							(status === 'Approved' || status === 'Ready to Start' || status === 'In progress' || status === 'Pending Approval [DR1]' || status === 'Pending Approval [DR2]' || status === 'Delivered')
+							&& this.currentStep.status !== 'Rejected'
+					) {
+						result = {
+							status: false,
+							message: ''
+						};
+					} else if(status === 'Rejected' || this.currentStep.status === 'Rejected') {
+						result = {
+							status: true,
+							message: "Project or Task has rejected."
+						};
 					}
 				}
 				return result;
