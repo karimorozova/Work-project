@@ -10,7 +10,7 @@ const { createMemoqUser } = require('../../services/memoqs/users');
 const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunication');
 const { assignMemoqTranslator } = require('../../projects');
 const { getMemoqUsers } = require('../../services/memoqs/users');
-
+const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects');
 
 router.post("/login", async (req, res, next) => {
 	if(req.body.logemail) {
@@ -169,6 +169,17 @@ router.post("/rewrite-quid-for-translator", checkVendor, async (req, res) => {
 	} catch (err) {
 		console.log(err);
 		res.status(500).send('Error on assigning vendor as translator');
+	}
+});
+
+router.post("/reopen-task-workFlowStatus", checkVendor, async (req, res) => {
+	const { projectGuid, documentGuid, workFlowStatus } = req.body;
+	try {
+		await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus);
+		res.status(200).send('Opened!');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on change work flow document status!');
 	}
 });
 

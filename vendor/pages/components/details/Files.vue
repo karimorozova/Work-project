@@ -1,5 +1,15 @@
 <template lang="pug">
   .job-files
+    .job-files__modal(v-if="backStepModal")
+      ApproveModal(
+        text="Our system has detected that you have closed a task before it is complete.  Do you want to continue and make it to the end ?"
+        :isCentered="true"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="reopenStep"
+        @notApprove="closeModal"
+        @close="closeModal"
+      )
     .job-files__table
       DataTable(
         :fields="fields"
@@ -43,6 +53,7 @@
 	import DataTable from "~/components/Tables/DataTable";
 	import ProgressLine from "~/components/ProgressLine";
 	import { mapGetters, mapActions } from 'vuex';
+	import ApproveModal from "../../../components/ApproveModal";
 
 	export default {
 		data() {
@@ -56,7 +67,10 @@
 					{ label: "Target", headerKey: "headerTarget", key: "target", width: "10%", padding: 0 },
 					{ label: "Editor", headerKey: "headerEditor", key: "editor", width: "10%", padding: 0 }
 				],
-				domain: ""
+				domain: "",
+				backStepModal: false,
+				projectGuid: null,
+				documentGuid: null,
 			}
 		},
 		methods: {
@@ -65,6 +79,25 @@
 				getJobs: "getJobs",
 				alertToggle: "alertToggle"
 			}),
+			closeModal() {
+				this.backStepModal = false;
+			},
+			async reopenStep() {
+				try {
+					await this.$axios.post('/vendor/reopen-task-workFlowStatus', {
+						token: this.getToken,
+						projectGuid: this.projectGuid,
+						documentGuid: this.documentGuid,
+						workFlowStatus: 'Review1InProgress',
+					});
+					this.alertToggle({ message: "Work can be continued", isShow: false, type: "error" })
+				} catch (err) {
+					this.alertToggle({ message: "Error in Reopen Task", isShow: false, type: "error" })
+				} finally {
+					this.closeModal();
+					location.reload();
+				}
+			},
 			isTargetLink(file) {
 				return this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
 			},
@@ -112,11 +145,22 @@
 				return files;
 			},
 			async goToMemoqEditor(file) {
-				const { WebTransUrl } = this.job.memocDocs.find(item => item.DocumentName === file.fileName && item.TargetLangCode === this.job.memoqTarget);
-				let link = document.createElement("a");
-				link.target = "_blank";
-				link.href = WebTransUrl;
-				link.click();
+				const { TotalWordCount, Reviewer1ConfirmedWordCount, WorkflowStatus, WebTransUrl, DocumentGuid } =
+						this.job.memocDocs.find(item =>
+								item.DocumentName === file.fileName &&
+								item.TargetLangCode === this.job.memoqTarget
+						);
+
+				if((TotalWordCount !== Reviewer1ConfirmedWordCount) && WorkflowStatus === 'Completed') {
+					this.projectGuid = this.job.memoqProjectId;
+					this.documentGuid = DocumentGuid;
+					this.backStepModal = true;
+				} else {
+					let link = document.createElement("a");
+					link.target = "_blank";
+					link.href = WebTransUrl;
+					link.click();
+				}
 			},
 			async downloadTarget(file) {
 				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
@@ -138,7 +182,8 @@
 		computed: {
 			...mapGetters({
 				job: "getSelectedJob",
-				originallyUnits: "getOriginallyUnits"
+				originallyUnits: "getOriginallyUnits",
+				getToken: "getToken",
 			}),
 			isEditor() {
 				if(this.job) {
@@ -151,6 +196,7 @@
 			},
 		},
 		components: {
+			ApproveModal,
 			DataTable,
 			ProgressLine
 		},
@@ -176,6 +222,13 @@
     padding: 10px;
     width: 100%;
     box-sizing: border-box;
+
+    &__modal {
+      top: 56%;
+      position: absolute;
+      left: 33%;
+      z-index: 500;
+    }
 
     &__image {
       height: 18px;

@@ -301,6 +301,32 @@ async function getProjectAnalysis(projectId) {
 	}
 }
 
+async function setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus) {
+	const xml = `${ xmlHeader }
+                <soapenv:Body>
+	                <ns:SetDocumentWorkflowStatus>
+	                   <ns:serverProjectGuid>${projectGuid}</ns:serverProjectGuid>
+						         <ns:workflowChanges>
+						            <ns:ServerProjectTranslationDocumentWorkflowStatusChange>
+						               <ns:DocumentGuid>${documentGuid}</ns:DocumentGuid>
+						               <ns:WorkflowStatus>${workFlowStatus}</ns:WorkflowStatus>
+						            </ns:ServerProjectTranslationDocumentWorkflowStatusChange>
+						         </ns:workflowChanges>
+	                </ns:SetDocumentWorkflowStatus>
+                </soapenv:Body>
+            </soapenv:Envelope>`;
+	const headers = headerWithoutAction('SetDocumentWorkflowStatus');
+	try {
+		const { response } = await soapRequest({ url, headers, xml });
+		const result = parser.toJson(response.body, { object: true, sanitize: true, trim: true })["s:Envelope"]["s:Body"];
+		return !result["s:Fault"];
+	} catch (err) {
+		console.log("Error in setMemoqDocStatus");
+		console.log(err);
+		throw new Error(err.message);
+	}
+};
+
 async function setMemoqDocStatus({ projectId, docIds, status }) {
 	const docStatusInfo = getDocStatusInfo(docIds, status);
 	const xml = `${ xmlHeader }
@@ -584,4 +610,5 @@ module.exports = {
   setCancelledNameInMemoq,
   updateMemoqProjectsData,
   assignMemoqTranslators,
+	setMemoqDocumentWorkFlowStatus,
 }

@@ -60,8 +60,6 @@
 			async getProjectById(id) {
 				try {
 					const result = await this.$axios.get(`pm-manage/project?id=${ id }`);
-					console.log('err')
-					console.log(result.data)
 					this.project = result.data;
 				} catch (e) {
 				}
