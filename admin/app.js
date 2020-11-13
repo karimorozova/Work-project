@@ -28,7 +28,7 @@ const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 	// console.log(needed);
 // 	console.log(users.filter(i => typeof i.email === 'object'))
 // }
- // deleteMemoqUser('97d8076f-6e07-4145-b0dc-a77f2e9a15e3');
+//  deleteMemoqUser('97d8076f-6e07-4145-b0dc-a77f2e9a15e3');
 // foo();
 // parseGmailMessages();
 

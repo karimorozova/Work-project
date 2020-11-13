@@ -165,7 +165,7 @@ router.post("/rewrite-quid-for-translator", checkVendor, async (req, res) => {
 		const { id } = memoqUsers.find(item => item.email === vendor.email);
 		vendor.guid = id;
 		await Vendors.updateOne({ _id: vendorId }, vendor);
-		res.send('Updated');
+		res.status(200).send('Updated!');
 	} catch (err) {
 		console.log(err);
 		res.status(500).send('Error on assigning vendor as translator');
