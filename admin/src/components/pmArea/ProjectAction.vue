@@ -119,7 +119,7 @@
 	import Button from '../Button';
 	import { mapGetters, mapActions } from 'vuex';
 	import ApproveModal from '../ApproveModal';
-	import PreviewQuote from "./WYSIWYGpmArea";
+	import PreviewQuote from "./WYSIWYGMultiMails";
 
 	export default {
 		props: {

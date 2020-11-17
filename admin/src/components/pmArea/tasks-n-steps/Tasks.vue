@@ -101,7 +101,7 @@
 
 <script>
 	import Preview from "../../vendors/WYSIWYG";
-	import PreviewQuote from "../WYSIWYGpmArea";
+	import PreviewQuote from "../WYSIWYGMultiMails";
 	import DataTable from "../../DataTable";
 	import ProgressLine from "../../ProgressLine";
 	import Tabs from "../../Tabs";
