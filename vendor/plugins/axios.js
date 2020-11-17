@@ -26,6 +26,7 @@ export default function ({ store, $axios, route }) {
 					store.dispatch('delRequest');
 				}
 			}
+			store.dispatch('noRequest')
 		}
 	});
 
