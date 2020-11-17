@@ -21,11 +21,12 @@ export default function ({ store, $axios, route }) {
 
 	$axios.onError(error => {
 		if(error && error.config) {
-			for (let i = 0; i < store.state.currentRequests; i++) {
-				if(store.state.currentRequests !== 0) {
-					store.dispatch('delRequest');
-				}
-			}
+			// for (let i = 0; i < store.state.currentRequests; i++) {
+			// 	if(store.state.currentRequests !== 0) {
+			// 		store.dispatch('delRequest');
+			// 	}
+			// }
+			store.dispatch('delRequest');
 			store.dispatch('noRequest')
 		}
 	});
