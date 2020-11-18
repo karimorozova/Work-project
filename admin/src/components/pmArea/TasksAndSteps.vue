@@ -70,7 +70,8 @@
 				"addProjectTasks",
 				"addProjectWordsTasks",
 				"clearTasksData",
-				"getServices"
+				"getServices",
+				'setCurrentProject',
 			]),
 			updateTasks(data) {
 				this.currentProject.tasks = data;
@@ -103,6 +104,17 @@
 			setDate({ date, prop, index }) {
 				this.$emit("setDate", { date, prop, index });
 			},
+			async refreshMetricsIfStepsWereNotCreated() {
+				let ifNeedRefreshMetrics = false;
+				for (let task of this.currentProject.tasks) {
+					if(!ifNeedRefreshMetrics) if(!this.currentProject.steps.map(({ taskId }) => taskId).includes(task.taskId)) ifNeedRefreshMetrics = true;
+				}
+				if(ifNeedRefreshMetrics) {
+					await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id });
+					const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`);
+					await this.setCurrentProject(updatedProject.body);
+				}
+			},
 			getDataForTasks(dataForTasks) {
 				let tasksData = new FormData();
 				const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : "";
@@ -126,6 +138,8 @@
 				return tasksData;
 			},
 			async addTasks(dataForTasks) {
+				await this.refreshMetricsIfStepsWereNotCreated();
+
 				let tasksData = this.getDataForTasks(dataForTasks);
 				const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))];
 				const { sourceFiles, refFiles } = dataForTasks;
