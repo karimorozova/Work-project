@@ -1,7 +1,7 @@
 const { Clients, Step, Services, Pricelist, Languages, Industries } = require('../models');
-
+const ObjectId = require('mongodb').ObjectID;
 const _ = require('lodash');
-const { multiplyPrices, getArrayDifference } = require('../multipliers/pricelist');
+const { multiplyPrices } = require('../multipliers/pricelist');
 const {
   updateClientLangPairs,
   updateClientStepMultipliers,
@@ -439,29 +439,136 @@ const getPricelistCombinations = (
   ));
 };
 
-Object.fromEntries = l => l.reduce((a, [k,v]) => ({...a, [k]: v}), {});
+Object.fromEntries = l => l.reduce((a, [k, v]) => ({ ...a, [k]: v }), {});
 
-const getServiceDifferences = async (clientId, updatedService, oldService) => {
-  const updatedSourceLanguage = Object.fromEntries(Object.entries(updatedService.sourceLanguage).filter(item => item[0] === 'lang' || item[0] === '_id'));
-
-  const sourceLangDifference = getObjDifferences(updatedSourceLanguage, oldService.sourceLanguage);
-  const targetLangDifference = getArrayDifference(oldService.targetLanguages, updatedService.targetLanguages, '_id');
-  const serviceStepDifference = getArrayDifference(oldService.services, updatedService.services, '_id');
-  const industryDifference = getArrayDifference(oldService.industries, updatedService.industries, '_id');
-  if (sourceLangDifference.lang || targetLangDifference) {
-    await updateClientLangPairs(
-      oldService.sourceLanguage._id,
+const updateClientRatesFromServices = async (client, updatedService, oldService, dataToUpdate) => {
+  const { _id, rates, services } = client;
+  const sourceLangDifference = getSourceLangDifference(updatedService.sourceLanguage, oldService.sourceLanguage._id);
+  const targetLangDifference = getArrDifference(updatedService.targetLanguages, oldService.targetLanguages);
+  const serviceStepDifference = getArrDifference(updatedService.services, oldService.services);
+  const industryDifference = getArrDifference(updatedService.industries, oldService.industries);
+  let updatedBasicPricesTable = rates.basicPricesTable;
+  let updatedStepMultipliersTable = rates.stepMultipliersTable;
+  let updatedIndustryMultipliersTable = rates.industryMultipliersTable;
+  let updatedPricelist = rates.pricelistTable;
+  const compareOldSource = !sourceLangDifference;
+  const compareOldTarget = !targetLangDifference;
+  if (sourceLangDifference || targetLangDifference) {
+    const result = await updateClientLangPairs({
+      client,
       sourceLangDifference,
       targetLangDifference,
-      clientId,
-      updatedService._id);
+      updatedService,
+      oldService,
+      updatedPricelist
+    });
+    updatedBasicPricesTable = result.updatedBasicPricesTable;
+    updatedPricelist.pricelistTable = result.updatedPricelist;
   }
   if (serviceStepDifference) {
-    await updateClientStepMultipliers(serviceStepDifference, clientId, updatedService._id);
+    const result = await updateClientStepMultipliers({
+      client,
+      serviceStepDifference,
+      updatedService,
+      oldService,
+      updatedPricelist,
+      compareOldSource,
+      compareOldTarget
+    });
+    updatedStepMultipliersTable = result.updatedStepMultipliersTable;
+    updatedPricelist.pricelistTable = result.updatedPricelist;
   }
   if (industryDifference) {
-    await updateClientIndustryMultipliers(industryDifference, clientId, updatedService._id);
+    const result = await updateClientIndustryMultipliers({
+      client,
+      industryDifference,
+      updatedService,
+      oldService,
+      updatedPricelist,
+    });
+    updatedIndustryMultipliersTable = result.updatedIndustryMultipliersTable;
+    updatedPricelist.pricelistTable = result.updatedPricelist;
   }
+
+  await Clients.updateOne({ _id }, {
+    rates: {
+      basicPricesTable: updatedBasicPricesTable,
+      stepMultipliersTable: updatedStepMultipliersTable,
+      industryMultipliersTable: updatedIndustryMultipliersTable,
+      pricelistTable: updatedPricelist
+    }
+  });
+
+  function getSourceLangDifference (newSourceLang, oldSourceLang) {
+    if (newSourceLang.toString() !== oldSourceLang.toString()) {
+      return newSourceLang;
+    }
+    return null;
+  }
+
+  function getArrDifference (newItemsArr, oldItemsArr) {
+    oldItemsArr = oldItemsArr.map(({ _id }) => _id);
+    newItemsArr = newItemsArr.map(_id => _id.toString());
+    const differenceArr = _.difference(newItemsArr, oldItemsArr);
+    const oldItem = _.difference(oldItemsArr, newItemsArr)[0];
+    if (differenceArr.length) {
+      return { newItem: differenceArr[0], oldItem };
+    }
+    return null;
+  }
+};
+
+const generateServiceCombinations = async (dataToUpdate, oldServices) => {
+  const servicesCombinations = [];
+  const { services: arrServices } = dataToUpdate;
+  const serviceDataIds = {
+    sourceLanguage: [ObjectId(dataToUpdate.sourceLanguage._id)],
+    targetLanguages: dataToUpdate.targetLanguages.map(item => ObjectId(item._id)),
+    services: dataToUpdate.services.map(item => ObjectId(item._id)),
+    industries: dataToUpdate.industries.map(item => ObjectId(item._id)),
+  };
+
+  serviceDataIds.sourceLanguage.forEach(sourceLanguage => {
+    serviceDataIds.targetLanguages.forEach(targetLanguages => {
+      serviceDataIds.services.forEach(services => {
+        serviceDataIds.industries.forEach(industries => {
+          const isMono = arrServices.find(item => item._id === services.toString()).languageForm;
+          if (isMono === 'Mono') {
+            const isSame = checkForDuplicateRow(oldServices, sourceLanguage, targetLanguages, services, industries);
+            if (!isSame) {
+              servicesCombinations.push({ sourceLanguage: targetLanguages, targetLanguages, services, industries });
+            }
+          } else {
+            servicesCombinations.push({ sourceLanguage, targetLanguages, services, industries });
+          }
+        });
+      });
+    });
+  });
+  return servicesCombinations;
+};
+
+const checkForDuplicateRow = (oldServices, newSourceLang, newTargetLang, newService, newIndustry) => {
+  let isIdentical = false;
+  for (let { sourceLanguage, targetLanguages, services, industries } of oldServices) {
+    const isSameSource = sourceLanguage.toString() === newSourceLang.toString();
+    const isSameTarget = targetLanguages.find(item => item.toString() === newTargetLang.toString());
+    const isSameService = services.find(item => item.toString() === newService.toString());
+    const isSameIndustry = industries.find(item => item.toString() === newIndustry.toString());
+    isIdentical = isSameSource && !!isSameTarget && isSameService && !!isSameIndustry;
+  }
+  return isIdentical;
+};
+
+const getUniqueServiceCombinations = (newServices, oldServices) => {
+  return newServices.filter(newItem => (
+    oldServices.every(oldItem => (
+      newItem.sourceLanguage.toString() !== oldItem.sourceLanguage.toString() ||
+      newItem.targetLanguages.toString() !== oldItem.targetLanguages[0].toString() ||
+      newItem.services.toString() !== oldItem.services[0].toString() ||
+      newItem.industries.toString() !== oldItem.industries[0].toString()
+    ))
+  ));
 };
 
 const getObjDifferences = (obj1, obj2) => {
@@ -581,7 +688,7 @@ async function getClientAfterCombinationsUpdated ({ project, step, rate }) {
 module.exports = {
   updateClientRates,
   addNewRateComponents,
-  getServiceDifferences,
+  updateClientRatesFromServices,
   clearClientRates,
   getStepMultipliersCombinations,
   getNeededCurrency,
@@ -593,4 +700,6 @@ module.exports = {
   changePricelistTable,
   generateNewPricelistCombinations,
   getClientAfterCombinationsUpdated,
+  generateServiceCombinations,
+  getUniqueServiceCombinations
 };
