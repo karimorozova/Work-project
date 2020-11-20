@@ -192,9 +192,9 @@
 				this.areErrorsExist = false;
 			},
 			checkProjectName() {
-				const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/;
-				return regex.test(this.project.projectName);
-			},
+        const regex = /^[0-9A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/;
+        return regex.test(this.project.projectName);
+      },
 			async checkForErrors() {
 				this.errors = [];
 				if(!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.");
