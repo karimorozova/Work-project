@@ -13,6 +13,11 @@
       .row__data
         span(@click="sendToProgressProjects()")
           i.fa.fa-paper-plane(aria-hidden="true")
+    .sub-information__row(v-if="project.status === 'In progress'")
+      .row__title Move to Closed:
+      .row__data
+        span(@click="sendToClosedProjects()")
+          i.fa.fa-paper-plane(aria-hidden="true")
     .sub-information__row(v-if="project.status === 'Closed'")
       .row__title Payment Profile:
       .row__data
@@ -130,29 +135,43 @@
 				alertToggle: "alertToggle",
 			}),
 			async sendToProgressProjects() {
-				try {
-					const result = await this.$http.post('/memoqapi/switch-to-in-progress', {
-						id: this.project._id,
-					});
-					this.$emit('updateProject', result.body)
-				} catch (err) {
-					this.alertToggle({
+        try {
+          const result = await this.$http.post('/memoqapi/switch-to-in-progress', {
+            id: this.project._id,
+          });
+          this.$emit('updateProject', result.body);
+        } catch (err) {
+          this.alertToggle({
             message: 'Error on sending project to In progress projects',
             isShow: true,
             type: 'error',
           });
-				}
-			},
-			copyId() {
-				let id = document.getElementById('id');
-				let elementText = id.textContent;
-				navigator.clipboard.writeText(elementText);
-				try {
-					document.execCommand('copy');
-					this.alertToggle({
-						message: "Text copied successfully",
-						isShow: true,
-						type: "success",
+        }
+      },
+      async sendToClosedProjects () {
+        try {
+          const result = await this.$http.post('/memoqapi/switch-to-closed', {
+            id: this.project._id,
+          });
+          this.$emit('updateProject', result.body);
+        } catch (err) {
+          this.alertToggle({
+            message: 'Error on sending project to Closed projects',
+            isShow: true,
+            type: 'error',
+          });
+        }
+      },
+      copyId () {
+        let id = document.getElementById('id');
+        let elementText = id.textContent;
+        navigator.clipboard.writeText(elementText);
+        try {
+          document.execCommand('copy');
+          this.alertToggle({
+            message: 'Text copied successfully',
+            isShow: true,
+            type: 'success',
 					});
 				} catch (err) {
 					this.alertToggle({

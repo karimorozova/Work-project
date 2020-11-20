@@ -20,13 +20,23 @@ const checkDocumentHasCorrectStructure = (document) => {
     !!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
 };
 
-const isAllTasksFinished = (docs) => {
+const getProjectStatus = (docs) => {
+  let status = 'Quote';
   if (Array.isArray(docs)) {
-    return docs.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished'
-      || DocumentStatus === 'ProofreadingFinished');
+    const inProgressStatus = docs.some(({ DocumentStatus }) => (
+      DocumentStatus === 'TranslationInProgress'
+    ));
+    const completedStatus = docs.every(({ DocumentStatus }) => (
+      DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished'
+    ));
+    if (inProgressStatus) status = 'In progress';
+    if (completedStatus) status = 'Closed';
+    return status;
   }
   const { DocumentStatus } = docs;
-  return DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished';
+  if (DocumentStatus === 'TranslationFinished') status = 'In progress';
+  if (DocumentStatus === 'TranslationFinished') status = 'Closed';
+  return status;
 };
 
 const checkProjectStructure = (clients, vendors, memoqProject, documents) => {
@@ -98,19 +108,10 @@ const findFittingIndustryId = async (industryName) => {
   return neededIndustry;
 };
 
-const getProjectStatus = (documents) => {
-  let status = 'Quote';
-  if (documents !== null && documents !== undefined) {
-    status = isAllTasksFinished(documents) ? 'Closed' : 'In progress';
-  }
-  return status;
-}
-
 module.exports = {
   filterMemoqProjectsVendors,
   checkDocumentHasCorrectStructure,
   findFittingIndustryId,
-  isAllTasksFinished,
+  getProjectStatus,
   checkProjectStructure,
-  getProjectStatus
 };

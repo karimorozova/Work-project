@@ -517,30 +517,30 @@ async function getMemoqFileId(projectId, docId) {
 	}
 }
 
-async function updateMemoqProjectsData() {
-	try {
+async function updateMemoqProjectsData () {
+  try {
     let allProjects = await getMemoqAllProjects();
     const clients = await Clients.find();
     const vendors = await Vendors.find();
     const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
     for (let project of allProjects) {
-	    const { ServerProjectGuid } = project;
-	      if (project.Name.indexOf('PngSys') === -1) {
+      const { ServerProjectGuid } = project;
+      const documents = await getProjectTranslationDocs(ServerProjectGuid);
+      if (project.Name.indexOf('PngSys') === -1 && documents) {
         let users = await getProjectUsers(ServerProjectGuid);
         users = getUpdatedUsers(users);
-        const documents = await getProjectTranslationDocs(ServerProjectGuid);
         let memoqProject = getMemoqProjectData(project, languages);
         memoqProject.status = getProjectStatus(documents);
         const doesHaveCorrectStructure = memoqProject.status !== 'Quote' ?
           checkProjectStructure(clients, vendors, memoqProject, documents) : false;
-				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
+        memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
           false : memoqProject.lockedForRecalculation;
-	      memoqProject.isTest = memoqProject.isTest === undefined ?
-			      false : memoqProject.isTest;
+        memoqProject.isTest = memoqProject.isTest === undefined ?
+          false : memoqProject.isTest;
         memoqProject = doesHaveCorrectStructure ?
           await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
         await MemoqProject.updateOne(
-          { serverProjectGuid: ServerProjectGuid},
+          { serverProjectGuid: ServerProjectGuid },
           { ...memoqProject, users, documents },
           { upsert: true });
       }

@@ -261,7 +261,19 @@ router.post('/switch-to-in-progress', async (req, res) => {
     res.send(updateProject);
   } catch (err) {
     console.log(err);
-    res.status(500).send('Error on switching project\'s status')
+    res.status(500).send('Error on switching project\'s status');
+  }
+});
+
+router.post('/switch-to-closed', async (req, res) => {
+  const { id } = req.body;
+  try {
+    const updateProject = await getProjectAfterUpdate({ _id: id },
+      { status: 'Closed', fromQuote: true });
+    res.send(updateProject);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on switching project\'s status');
   }
 });
 

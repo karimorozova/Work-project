@@ -9,16 +9,16 @@ const { getMemoqProject } = require('./getMemoqProject');
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
 	const clients = await Clients.find();
 	const vendors = await Vendors.find();
-	const { additionalData, neededCustomer } = getUpdatedProjectData(project, clients);
-	if(!neededCustomer) return project;
+	const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
+	if (!neededCustomer) return project;
 	const updatedProject = fromCron ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
 	const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
-	if(!tasks.length && !steps.length) return project;
+	if (!tasks.length && !steps.length) return project;
 	const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
-  const lockedForRecalculation = updatedProject.status === 'Closed';
-  if(fromCron) return { ...updatedProject, tasks, steps, finance, lockedForRecalculation };
+	const lockedForRecalculation = updatedProject.status === 'Closed';
+	if (fromCron) return { ...updatedProject, tasks, steps, finance, lockedForRecalculation };
 	await MemoqProject.updateOne({ _id: project._id },
-    { ...additionalData, tasks, steps, finance, lockedForRecalculation });
+			{ ...additionalData, tasks, steps, finance, lockedForRecalculation });
 	return await getMemoqProject({ _id: project._id });
 };
 
@@ -90,20 +90,20 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
 	return steps;
 };
 
-const getUpdatedProjectData = (project, allClients) => {
+const getUpdatedProjectData = async (project, allClients) => {
 	const { client: memoqClient, fromQuote } = project;
 	const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
-	const industry = findFittingIndustryId(project.domain);
+	const industry = await findFittingIndustryId(project.domain);
 	let additionalData = {};
-	if(neededCustomer) {
+	if (neededCustomer) {
 		additionalData = {
-      customer: ObjectId(neededCustomer._id),
-      status: project.status,
-      projectManager: ObjectId(neededCustomer.projectManager._id),
-      accountManager: ObjectId(neededCustomer.accountManager._id),
-      industry: ObjectId(industry._id),
-      paymentProfile: neededCustomer.billingInfo.paymentType,
-      fromQuote: project.status === 'In progress' ? fromQuote : false,
+			customer: ObjectId(neededCustomer._id),
+			status: project.status,
+			projectManager: ObjectId(neededCustomer.projectManager._id),
+			accountManager: ObjectId(neededCustomer.accountManager._id),
+			industry: ObjectId(industry._id),
+			paymentProfile: neededCustomer.billingInfo.paymentType,
+			fromQuote: project.status === 'In progress' ? fromQuote : false,
     };
 	}
 	return { additionalData, neededCustomer };
