@@ -51,18 +51,17 @@
 			isReadonly() {
 				if(this.project) {
           const statuses = ['Started', 'Approved', 'In progress'];
-
           const { taskId, stepId } = this.job;
           const { steps } = this.project;
-          const stepCurrentByTask = steps.filter(item => item.taskId === taskId);
-          const currentIndex = stepCurrentByTask.findIndex(item => item.stepId === stepId);
-
+					let stepsCurrentByTask = steps.filter(item => item.taskId === taskId);
+					stepsCurrentByTask = stepsCurrentByTask.filter(item => !item.stepId.includes('Canceled'));
+					const currentIndex = stepsCurrentByTask.findIndex(item => item.stepId === stepId);
           if (statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === 'Completed') {
             return true;
           } else if (currentIndex === 0) {
             return false;
-					} else if(currentIndex === 1) {
-						return stepCurrentByTask[0].status !== "Completed";
+					} else if(currentIndex >= 1) {
+						return stepsCurrentByTask[0].status !== "Completed";
 					} else {
 						return true;
 					}

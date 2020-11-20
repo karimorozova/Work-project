@@ -19,7 +19,7 @@ export default {
 					vendors = vendors.filter(item => item._id.toString() !== firstStep.vendor._id.toString())
 				}
 			}
-			
+
 			return findFittingVendor(
 					{
 						sourceLanguage,

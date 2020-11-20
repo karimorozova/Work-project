@@ -47,8 +47,8 @@ const getStepFinanceData = async (projectData, forWords = false) => {
     vendor: vendor ? vendor._id : null,
     finance: {
       Wordcount: {
-        receivables: forWords ? getRelativeQuantity(metrics) : 0,
-        payables: forWords ? +quantity : 0,
+        receivables: forWords ? +quantity : 0,
+        payables: forWords ? getRelativeQuantity(metrics) : 0,
       },
       Price: {
         receivables: +clientRate.value * +quantity,

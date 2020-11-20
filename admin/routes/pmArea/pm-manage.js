@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { User, Clients, Delivery, Projects, Pricelist } = require("../../models");
+const { User, Clients, Delivery, Projects, Pricelist, Units } = require("../../models");
 const { getClient } = require("../../clients");
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
@@ -387,7 +387,9 @@ router.post("/reassign-vendor", async (req, res) => {
 	try {
 		const project = await getProject({ "steps._id": reassignData.step._id });
 		const { steps, tasks } = await reassignVendor(project, reassignData);
+		//
 		const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks });
+		// const updatedProject = await updateProject({"_id": project.id}, {steps, tasks })
 		res.send(updatedProject);
 	} catch (err) {
 		console.log(err);
@@ -423,6 +425,7 @@ router.post("/cancel-tasks", async (req, res) => {
 	try {
 		const project = await getProject({ "_id": projectId });
 		const updatedProject = await getProjectAfterCancelTasks(tasks, project);
+		//MM
 		const wordsCancelledTasks = tasks.filter(item => item.service.calculationUnit === 'Words');
 		if(wordsCancelledTasks.length) {
 			await cancelMemoqDocs(wordsCancelledTasks);
