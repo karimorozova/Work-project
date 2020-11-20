@@ -192,7 +192,7 @@
 				this.areErrorsExist = false;
 			},
 			checkProjectName() {
-        const regex = /^[0-9A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/;
+        const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/;
         return regex.test(this.project.projectName);
       },
 			async checkForErrors() {
