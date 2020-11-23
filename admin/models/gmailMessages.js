@@ -1,12 +1,29 @@
 const mongoose = require('mongoose');
 
 const gmailMessagesSchema = new mongoose.Schema({
-  id: {
-    type: 'String',
-    default: '',
+  labelId: {
+    type: String,
+    trim: true
   },
-  additionalInformation: {}
-
+  name: {
+    type: String,
+    trim: true
+  },
+  messages: [{
+    id: {
+      type: String,
+    },
+    snippet: {
+      type: String,
+    },
+    header: {
+      type: String
+    },
+    isRead: {
+      type: Boolean,
+      default: false
+    }
+  }],
 });
 const GmailMessages = mongoose.model('GmailMessages', gmailMessagesSchema);
 
