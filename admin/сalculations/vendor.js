@@ -14,6 +14,7 @@ const getFittingVendor = async (stepData) => {
 };
 
 const findFittingVendor = (stepData, vendors, fromFront = false) => {
+
 	const { sourceLanguage, targetLanguage, step, industry } = stepData;
 	const fittingVendors = [];
 	for (let vendor of vendors) {
@@ -40,8 +41,6 @@ const findFittingVendor = (stepData, vendors, fromFront = false) => {
 				}
 			}
 		}
-
-
 		//FROM COMPLETED TEST
 		// const { _id, qualifications } = vendor;
 		// if (qualifications.length) {
@@ -57,7 +56,6 @@ const findFittingVendor = (stepData, vendors, fromFront = false) => {
 		//     }
 		//   }
 		// }
-
 	}
 	return fittingVendors;
 };
