@@ -97,8 +97,8 @@
             :disabledPicker="isDatePickDisabled"
             :highlighted="highlighted"
             @scrollDrop="scrollDrop")
-        template(slot="progress" slot-scope="{ row }")
-          ProgressLine(:progress="progress(row.progress)")
+        template(slot="progress" slot-scope="{ row, index }")
+          ProgressLineStep(:progress="progress(row.progress)" :lastProgress="lastProgress(row, index)")
         template(slot="status" slot-scope="{ row }")
           span.steps__step-status {{ row.status | stepsAndTasksStatusFilter }}
         template(slot="receivables" slot-scope="{ row }")
@@ -125,7 +125,11 @@
             :originallyUnits="originallyUnits"
           )
     .steps__reassignment(v-if="isReassignment")
-      Reassignment(@close="closeReassignment" :step="reassignStep")
+      Reassignment(
+        @close="closeReassignment"
+        :step="reassignStep"
+        :index="infoIndex"
+      )
     .steps__approve-action(v-if="isApproveActionShow")
       ApproveModal(
         :text="modalTexts.main"
@@ -159,6 +163,7 @@
 	import scrollDrop from "@/mixins/scrollDrop";
 	import stepVendor from "@/mixins/stepVendor";
 	import { mapGetters, mapActions } from 'vuex';
+	import ProgressLineStep from "../../ProgressLineStep";
 
 	export default {
 		mixins: [scrollDrop, stepVendor],
@@ -219,33 +224,42 @@
 					return `${ step.targetLanguage } / ${ step.packageSize }`;
 				}
 				return `${ step.sourceLanguage } >> ${ step.targetLanguage }`;
-      },
-      // getTotalReceivables(step) {
-      //     console.log(step.finance.Price.receivables)
-      //
-      //     const { finance, clientDiscount } = step;
-      //     // if(clientDiscount) {
-      //     //     return (finance.Price.receivables - finance.Price.receivables*clientDiscount/100).toFixed(2);
-      //     // }
-      //     return finance.Price.receivables;
-      // },
-			progress(prog) {
-				return prog.totalWordCount ? ((prog.wordsDone/prog.totalWordCount)*100).toFixed(2) : prog;
 			},
-      getPrice (row, prop) {
-        const value = row.finance.Price[prop];
-        return value === 0 ? value : value.toFixed(2);
-      },
-      getTotalPayables (step) {
-        const { finance, vendorDiscount } = step;
-        if (vendorDiscount) {
-          return (finance.Price.payables - finance.Price.payables * vendorDiscount / 100).toFixed(2);
-        }
-        return finance.Price.payables;
-      },
-      isEuro (step, prop) {
-        if (step.status === "Cancelled Halfway") {
-          const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables";
+			// getTotalReceivables(step) {
+			//     console.log(step.finance.Price.receivables)
+			//
+			//     const { finance, clientDiscount } = step;
+			//     // if(clientDiscount) {
+			//     //     return (finance.Price.receivables - finance.Price.receivables*clientDiscount/100).toFixed(2);
+			//     // }
+			//     return finance.Price.receivables;
+			// },
+			progress(prog) {
+				return prog.totalWordCount ? ((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : prog;
+			},
+			lastProgress(step, index) {
+				if(step.stepId.includes('R')) {
+					const prevStep = this.currentProject.steps[index - 1];
+					if(prevStep.finance.Price.hasOwnProperty('halfReceivables') && prevStep.finance.Price.halfReceivables > 0) {
+						return ((prevStep.progress.wordsDone / prevStep.progress.totalWordCount) * 100).toFixed(2)
+					}
+				}
+				return 0;
+			},
+			getPrice(row, prop) {
+				const value = row.finance.Price[prop];
+				return value === 0 ? value : value.toFixed(2);
+			},
+			getTotalPayables(step) {
+				const { finance, vendorDiscount } = step;
+				if(vendorDiscount) {
+					return (finance.Price.payables - finance.Price.payables * vendorDiscount / 100).toFixed(2);
+				}
+				return finance.Price.payables;
+			},
+			isEuro(step, prop) {
+				if(step.status === "Cancelled Halfway") {
+					const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables";
 					return step.finance.Price[halfProp];
 				}
 				return step.finance.Price[prop];
@@ -284,6 +298,7 @@
 				this.isStepInfo = true;
 			},
 			showReassignment(index) {
+				this.infoIndex = index;
 				this.reassignStep = { ...this.allSteps[index] };
 				this.isReassignment = true;
 			},
@@ -293,6 +308,7 @@
 			},
 			closeReassignment() {
 				this.isReassignment = false;
+				this.infoIndex = -1;
 			},
 			setVendor({ person }, index) {
 				const { stepId, taskId } = this.allSteps[index];
@@ -369,12 +385,12 @@
 				}
 			},
 			getAcceptedStepStatus() {
-        let status = 'Accepted';
-        if (this.currentProject.status === 'Approved' || this.currentProject.status === 'In progress') {
-          status = 'Ready to Start';
-        }
-        return status;
-      },
+				let status = 'Accepted';
+				if(this.currentProject.status === 'Approved' || this.currentProject.status === 'In progress') {
+					status = 'Ready to Start';
+				}
+				return status;
+			},
 			async notApproveAction() {
 				const checkedSteps = this.getCheckedSteps();
 				if(!checkedSteps.length) {
@@ -471,7 +487,6 @@
 				if(!result.length) {
 					result = ["No action available"];
 				}
-				// console.log(result);
 				return result;
 			},
 			isAllSelected() {
@@ -484,6 +499,7 @@
 			}
 		},
 		components: {
+			ProgressLineStep,
 			DataTable,
 			ProgressLine,
 			PersonSelect,

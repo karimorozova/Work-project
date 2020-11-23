@@ -81,6 +81,8 @@ async function moveMemoqFileToProject(fileId) {
 }
 
 async function updateMemoqProjectUsers(steps) {
+
+	//NEWER WORK??
 	const stepsStatuses = ["Ready to Start", "Waiting to Start", "Started", "Completed"];
 	const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
 	const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
@@ -183,7 +185,7 @@ async function setMemoqProjectUsers(projectId, users) {
                     <ns:userInfos>${ usersInfo }</ns:userInfos>
                 </ns:SetProjectUsers>
                 </soapenv:Body>
-            </soapenv:Envelope>`
+            </soapenv:Envelope>`;
 	const headers = headerWithoutAction('SetProjectUsers');
 	try {
 		const { response } = await soapRequest({ url, headers, xml });
@@ -204,7 +206,7 @@ function getUsersInfo(users) {
                                     <mem:Terminologist>false</mem:Terminologist>
                                 </ns:ProjectRoles>
                                 <ns:UserGuid>${ user.id }</ns:UserGuid>
-                            </ns:ServerProjectUserInfo>\n`
+                            </ns:ServerProjectUserInfo>\n`;
 	return users.reduce((acc, cur) => acc + userInfoXml(cur), "")
 }
 
@@ -220,7 +222,7 @@ async function setMemoqDocsAssignments(projectId, docsInfo) {
                     <ns:assignments>${ docsUserAssignments }</ns:assignments>
                 </ns:SetProjectTranslationDocumentUserAssignments>
             </soapenv:Body>
-            </soapenv:Envelope>`
+            </soapenv:Envelope>`;
 	const headers = headerWithoutAction('SetProjectTranslationDocumentUserAssignments');
 	try {
 		const { response } = await soapRequest({ url, headers, xml });
@@ -258,7 +260,7 @@ async function getProjectTranslationDocs(projectId) {
                     <ns:serverProjectGuid>${ projectId }</ns:serverProjectGuid>
                 </ns:ListProjectTranslationDocuments>
                 </soapenv:Body>
-            </soapenv:Envelope>`
+            </soapenv:Envelope>`;
 	const headers = headerWithoutAction('ListProjectTranslationDocuments');
 	try {
 		const { response } = await soapRequest({ url, headers, xml });
@@ -284,7 +286,7 @@ async function getProjectAnalysis(projectId) {
                     </ns:options>
                 </ns:RunAnalysis>
                 </soapenv:Body>
-            </soapenv:Envelope>`
+            </soapenv:Envelope>`;
 	const headers = headerWithoutAction('RunAnalysis');
 	try {
 		const { response } = await soapRequest({ url, headers, xml });
@@ -336,7 +338,7 @@ async function setMemoqDocStatus({ projectId, docIds, status }) {
                     <ns:workflowChanges>${ docStatusInfo }</ns:workflowChanges>
                 </ns:SetDocumentWorkflowStatus>
                 </soapenv:Body>
-            </soapenv:Envelope>`
+            </soapenv:Envelope>`;
 	const headers = headerWithoutAction('SetDocumentWorkflowStatus');
 	try {
 		const { response } = await soapRequest({ url, headers, xml });

@@ -4,6 +4,7 @@ const { updateProject } = require('../projects/getProjects');
 const { hasActiveRateValue } = require('./general');
 const { getStepFinanceData } = require('./finance');
 const { setTaskFinance } = require('../projects/helpers');
+const { Languages } = require('../models');
 
 
 function setTaskMetrics({ metrics, matrix, prop }) {
@@ -15,20 +16,20 @@ function setTaskMetrics({ metrics, matrix, prop }) {
 }
 
 async function receivablesCalc({ task, project, step }) {
-	try {
-		if (step.serviceStep.symbol !== "translation") {
-			const { cost, rate } = await calcProofingStep({ step, task, project, words: task.metrics.totalWords });
-			return { cost, rate };
-		}
-		const metrics = task.metrics;
-		const rate = await getCustomerRate({ step, industryId: project.industry.id, customerId: project.customer.id, task });
-		;
-		const cost = calcCost(metrics, 'client', rate).toFixed(2);
-		return { cost: +cost, rate };
-	} catch (err) {
-		console.log(err);
-		console.log("Error in receivablesCalc");
-	}
+	// try {
+	// 	if (step.serviceStep.symbol !== "translation") {
+	// 		const { cost, rate } = await calcProofingStep({ step, task, project, words: task.metrics.totalWords });
+	// 		return { cost, rate };
+	// 	}
+	// 	const metrics = task.metrics;
+	// 	const rate = await getCustomerRate({ step, industryId: project.industry.id, customerId: project.customer.id, task });
+	// 	;
+	// 	const cost = calcCost(metrics, 'client', rate).toFixed(2);
+	// 	return { cost: +cost, rate };
+	// } catch (err) {
+	// 	console.log(err);
+	// 	console.log("Error in receivablesCalc");
+	// }
 }
 
 async function getAfterWordcountPayablesUpdated({ project, step }) {
@@ -60,9 +61,9 @@ async function getAfterWordcountPayablesUpdated({ project, step }) {
 	}
 }
 
-function payablesCalc({ metrics, project, step }) {
+async function payablesCalc({ metrics, project, step }) {
 	try {
-		const rate = getRate({ step, project });
+		const rate = await returnVendorRate(step, project);
 		return getStepPayables({ rate, metrics, step });
 	} catch (err) {
 		console.log(err);
@@ -70,13 +71,49 @@ function payablesCalc({ metrics, project, step }) {
 	}
 }
 
+async function returnVendorRate(step, project) {
+	const allLanguages = await Languages.find();
+	let rate = {};
+	if(step.vendor.rates.pricelistTable.length) {
+		const { price } = returnPriceFromVendorRare(
+				step.vendor.rates.pricelistTable,
+				returnIdFromLanguageSymbol(allLanguages, step.sourceLanguage).toString(),
+				returnIdFromLanguageSymbol(allLanguages, step.targetLanguage).toString(),
+				step.serviceStep.step, step.serviceStep.unit, project.industry._id.toString()
+		);
+		rate.value = price;
+		rate.active = true;
+	} else {
+		rate = { value: 0, active: true };
+	}
+
+	return rate;
+
+	function returnIdFromLanguageSymbol(allLanguages, symbol) {
+		return allLanguages.find(item => item.symbol === symbol)._id
+	}
+
+	function returnPriceFromVendorRare(vendorRates, source, target, step, unit, industry) {
+		return vendorRates.find(i => {
+			return i.sourceLanguage._id === source && i.targetLanguage._id === target && i.step._id === step && i.unit._id === unit && i.industry._id === industry
+		});
+	}
+}
+
+
 function getStepPayables({ rate, metrics, step }) {
+
 	let { finance } = step;
 	const rateValue = rate ? rate.value : 0;
-	const payables = step.serviceStep.symbol !== "translation" ?
-			+(metrics.totalWords * rateValue) : calcCost(metrics, 'vendor', rate);
+
+	//MM
+	// const payables = step.serviceStep.title !== "Translation" ? +(metrics.totalWords * rateValue) : calcCost(metrics, 'vendor', rate);
+	//MM
+	// finance.Wordcount.payables = step.serviceStep.title !== "Translation" ? +metrics.totalWords : calculatePayableWords(metrics);
+
+	const payables = +(metrics.totalWords * rateValue);
 	finance.Price.payables = +(payables.toFixed(2));
-	finance.Wordcount.payables = step.serviceStep.symbol !== "translation" ? +metrics.totalWords : calculatePayableWords(metrics);
+	finance.Wordcount.payables = +metrics.totalWords;
 	return { ...step, finance, vendorRate: rate };
 }
 
@@ -89,14 +126,14 @@ function calculatePayableWords(metrics) {
 }
 
 function getRate({ step, project }) {
-	try {
-		const comb = getCombination({ combs: step.vendor.wordsRates, step, industryId: project.industry.id });
-		const rate = comb ? comb.rates[step.serviceStep._id] : "";
-		return rate || "";
-	} catch (err) {
-		console.log(err);
-		console.log("Error in getRate");
-	}
+	// try {
+	// 	const comb = getCombination({ combs: step.vendor.wordsRates, step, industryId: project.industry.id });
+	// 	const rate = comb ? comb.rates[step.serviceStep._id] : "";
+	// 	return rate || "";
+	// } catch (err) {
+	// 	console.log(err);
+	// 	console.log("Error in getRate");
+	// }
 }
 
 function calcCost(metrics, field, rate) {
@@ -104,119 +141,122 @@ function calcCost(metrics, field, rate) {
 	let wordsSum = 0;
 	const rateValue = rate ? rate.value : 0;
 	for (let key in metrics) {
-		if (key !== 'totalWords') {
+		if(key !== 'totalWords') {
 			cost += metrics[key].value * metrics[key][field] * rateValue;
 			wordsSum += metrics[key].value;
 		}
 	}
 	cost += (metrics.totalWords - wordsSum) * rateValue;
-	if (rate && cost < rate.min) {
+	if(rate && cost < rate.min) {
 		cost = rate.min;
 	}
 	return cost;
 }
 
 async function getCustomerRate({ step, industryId, customerId }) {
-	try {
-		const customer = await getClient({ "_id": customerId });
-		const comb = getCombination({ combs: customer.wordsRates, step, industryId });
-		const rate = comb ? comb.rates[step.serviceStep._id] : "";
-		const customerRate = rate || "";
-		return customerRate;
-	} catch (err) {
-		console.log(err);
-		console.log("Error in getCustomerRate");
-	}
+	//MM
+	// try {
+	// 	const customer = await getClient({ "_id": customerId });
+	// 	const comb = getCombination({ combs: customer.wordsRates, step, industryId });
+	// 	const rate = comb ? comb.rates[step.serviceStep._id] : "";
+	// 	return rate || "";
+	// } catch (err) {
+	// 	console.log(err);
+	// 	console.log("Error in getCustomerRate");
+	// }
 }
 
 function getCombination({ combs, step, industryId }) {
-	const filtered = combs.filter(item => {
-		if (step.serviceStep.calcualtionUnit !== 'Packages') {
-			return item.source.symbol === step.sourceLanguage &&
-					item.target.symbol === step.targetLanguage
-		}
-		return item.target.symbol === step.targetLanguage &&
-				item.packageSize === step.packageSize
-	})
-	return filtered.find(item => {
-		const index = item.industries.findIndex(indus => indus.id === industryId || indus._id === industryId);
-		return index !== -1;
-	})
+	//MM
+	// const filtered = combs.filter(item => {
+	// 	if (step.serviceStep.calcualtionUnit !== 'Packages') {
+	// 		return item.source.symbol === step.sourceLanguage &&
+	// 				item.target.symbol === step.targetLanguage
+	// 	}
+	// 	return item.target.symbol === step.targetLanguage &&
+	// 			item.packageSize === step.packageSize
+	// })
+	// return filtered.find(item => {
+	// 	const index = item.industries.findIndex(indus => indus.id === industryId || indus._id === industryId);
+	// 	return index !== -1;
+	// })
 }
 
 async function calcProofingStep({ step, task, project, words }) {
-	try {
-		const rate = await getCustomerRate({ task, step, industryId: project.industry.id, customerId: project.customer.id });
-		let cost = 0;
-		if (rate) {
-			const value = +(words * rate.value).toFixed(2);
-			cost = rate.min && value < rate.min ? rate.min : value;
-		}
-		return { cost, rate }
-	} catch (err) {
-		console.log(err);
-		console.log('Error in calcProofingStep');
-	}
+	// try {
+	// 	const rate = await getCustomerRate({ task, step, industryId: project.industry.id, customerId: project.customer.id });
+	// 	let cost = 0;
+	// 	if(rate) {
+	// 		const value = +(words * rate.value).toFixed(2);
+	// 		cost = rate.min && value < rate.min ? rate.min : value;
+	// 	}
+	// 	return { cost, rate }
+	// } catch (err) {
+	// 	console.log(err);
+	// 	console.log('Error in calcProofingStep');
+	// }
 }
 
 async function setDefaultStepVendors(project, memoqUsers) {
-	try {
-		let { steps, tasks } = project;
-		const activeVendors = await getVendors({ status: 'Active' });
-		for (let i = 0; i < steps.length; i++) {
-			let step = JSON.parse(JSON.stringify(steps[i]))
-			if (step.serviceStep.unit === 'CAT Wordcount' && !step.vendor) {
-				let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
-				let matchedVendors = getMatchedVendors({ activeVendors, steps, index: i, project, memoqUsers });
-				if (matchedVendors.length === 1) {
-					step.vendor = matchedVendors[0];
-					tasks[taskIndex].metrics = step.serviceStep.symbol !== "translation" ? tasks[taskIndex].metrics
-							: setTaskMetrics({ metrics: tasks[taskIndex].metrics, matrix: matchedVendors[0].matrix, prop: 'vendor' });
-					step = payablesCalc({ metrics: tasks[taskIndex].metrics, project, step });
-					tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables + step.finance.Price.payables).toFixed(2);
-					const taskSteps = steps.filter(item => item.taskId === tasks[taskIndex].taskId && item.finance.Wordcount.payables);
-					tasks[taskIndex].finance.Wordcount.payables = taskSteps.reduce((acc, cur) => acc + +cur.finance.Wordcount.payables, 0);
-				}
-			}
-			steps[i] = step
-		}
-		return { steps, tasks };
-	} catch (err) {
-		console.log(err);
-		console.log("Error in setDefaultStepVendors");
-	}
+	// try {
+	//MM
+	//NOT USED??
+	// let { steps, tasks } = project;
+	// const activeVendors = await getVendors({ status: 'Active' });
+	// for (let i = 0; i < steps.length; i++) {
+	// 	let step = JSON.parse(JSON.stringify(steps[i]))
+	// 	if (step.serviceStep.unit === 'CAT Wordcount' && !step.vendor) {
+	// 		let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
+	// 		let matchedVendors = getMatchedVendors({ activeVendors, steps, index: i, project, memoqUsers });
+	// 		if (matchedVendors.length === 1) {
+	// 			step.vendor = matchedVendors[0];
+	// 			tasks[taskIndex].metrics = step.serviceStep.symbol !== "translation" ? tasks[taskIndex].metrics
+	// 					: setTaskMetrics({ metrics: tasks[taskIndex].metrics, matrix: matchedVendors[0].matrix, prop: 'vendor' });
+	// 			step = payablesCalc({ metrics: tasks[taskIndex].metrics, project, step });
+	// 			tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables + step.finance.Price.payables).toFixed(2);
+	// 			const taskSteps = steps.filter(item => item.taskId === tasks[taskIndex].taskId && item.finance.Wordcount.payables);
+	// 			tasks[taskIndex].finance.Wordcount.payables = taskSteps.reduce((acc, cur) => acc + +cur.finance.Wordcount.payables, 0);
+	// 		}
+	// 	}
+	// 	steps[i] = step
+	// }
+	// return { steps, tasks };
+	// } catch (err) {
+	// 	console.log(err);
+	// 	console.log("Error in setDefaultStepVendors");
+	// }
 }
 
 function getMatchedVendors({ activeVendors, steps, index, project, memoqUsers }) {
-	const step = steps[index];
-	const memoqEmails = memoqUsers.map(item => item.email);
-	let availableVendors = activeVendors.filter(item => memoqEmails.indexOf(item.email) !== -1);
-	let temporaryVendors = []
-
-	for (const vendor of availableVendors) {
-
-		temporaryVendors.push(getVendorsWordRates({ vendor, step }))
-	}
-
-
-	return [temporaryVendors.filter(item => item)[0]];
-	if (!availableVendors.length) return [];
-	if (index > 0 && step.taskId === steps[index - 1].taskId) {
-		availableVendors = availableVendors.filter(item => {
-			if (steps[index - 1].vendor) {
-				return item.id !== steps[index - 1].vendor.id;
-			}
-			return item;
-		})
-	}
-	let matchedVendors = [];
-	for (let vendor of availableVendors) {
-		const isMatching = checkForLanguages({ vendor, step, project });
-		if (isMatching) {
-			matchedVendors.push(vendor);
-		}
-	}
-	return matchedVendors;
+	// const step = steps[index];
+	// const memoqEmails = memoqUsers.map(item => item.email);
+	// let availableVendors = activeVendors.filter(item => memoqEmails.indexOf(item.email) !== -1);
+	// let temporaryVendors = []
+	//
+	// for (const vendor of availableVendors) {
+	// 	temporaryVendors.push(getVendorsWordRates({ vendor, step }))
+	// }
+	//
+	// //MM
+	// return [temporaryVendors.filter(item => item)[0]];
+	//
+	// if(!availableVendors.length) return [];
+	// if(index > 0 && step.taskId === steps[index - 1].taskId) {
+	// 	availableVendors = availableVendors.filter(item => {
+	// 		if(steps[index - 1].vendor) {
+	// 			return item.id !== steps[index - 1].vendor.id;
+	// 		}
+	// 		return item;
+	// 	})
+	// }
+	// let matchedVendors = [];
+	// for (let vendor of availableVendors) {
+	// 	const isMatching = checkForLanguages({ vendor, step, project });
+	// 	if(isMatching) {
+	// 		matchedVendors.push(vendor);
+	// 	}
+	// }
+	// return matchedVendors;
 }
 
 function getVendorsWordRates({ vendor, step, project }) {
@@ -225,7 +265,7 @@ function getVendorsWordRates({ vendor, step, project }) {
 
 function checkForLanguages({ vendor, step, project }) {
 	return vendor.wordsRates.find(item => {
-		if (item.source && item.source.symbol === step.sourceLanguage &&
+		if(item.source && item.source.symbol === step.sourceLanguage &&
 				item.target && item.target.symbol === step.targetLanguage) {
 			return hasActiveRateValue({
 				step,
@@ -242,9 +282,9 @@ async function updateProjectCosts(project) {
 		Price: getProjectFinanceData(project, "Price")
 	};
 	let discount = {};
-	if (project.finance.Discount) {
+	if(project.finance.Discount) {
 		discount = { ...project.finance.Discount };
-		discount.receivables = (receivables / 100 * discount.value).toFixed(2);
+		discount.receivables = (discount.receivables / 100 * discount.value).toFixed(2);
 		finance.Price.receivables -= discount.receivables;
 		finance.Discount = discount;
 	}
@@ -271,5 +311,6 @@ function getProjectFinanceData(project, prop) {
 
 module.exports = {
 	receivablesCalc, payablesCalc, setDefaultStepVendors,
-	updateProjectCosts, calcCost, setTaskMetrics, getAfterWordcountPayablesUpdated
+	updateProjectCosts, calcCost, setTaskMetrics, getAfterWordcountPayablesUpdated,
+	returnVendorRate
 };

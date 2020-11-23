@@ -335,8 +335,8 @@
 			progress(task) {
 				let progress = 0;
 				const CATServices = ['Translation', 'SEO Translation', 'Official Translation', 'Localization'];
-				const taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
-
+				let taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
+				taskSteps = taskSteps.filter(item => !item.stepId.includes('Canceled'));
 				if(CATServices.includes(task.service.title)) {
 					const [firstStep, secondStep] = taskSteps;
 					if(taskSteps.length === 2) {
