@@ -11,14 +11,8 @@ export default {
 			const stepId = step.serviceStep.step;
 			let vendors = this.vendors;
 
-			const isNowSecondStep = /(\sS02)/.exec(allSteps[index].stepId);
-			if(isNowSecondStep !== null){
-				const currentTwoSteps = allSteps.filter(item => item.taskId === allSteps[index].taskId);
-				const [firstStep] = currentTwoSteps;
-				if(firstStep.vendor !== null){
-					vendors = vendors.filter(item => item._id.toString() !== firstStep.vendor._id.toString())
-				}
-			}
+			filterVendorByNearStep(/(\sS01)/.exec(allSteps[index].stepId), 'last');
+			filterVendorByNearStep(/(\sS02)/.exec(allSteps[index].stepId), 'first');
 
 			return findFittingVendor(
 					{
@@ -26,7 +20,16 @@ export default {
 						targetLanguage,
 						step: stepId,
 						industry: industry._id
-					}, vendors, true);
+					}, vendors, true
+			);
+
+			function filterVendorByNearStep(isCurrentStep, neededStepIndex) {
+				if(isCurrentStep !== null) {
+					const currentSteps = allSteps.filter(item => item.taskId === allSteps[index].taskId);
+					const currentStep = neededStepIndex === 'last' ? currentSteps[currentSteps.length - 1] : currentSteps[0];
+					vendors = vendors.filter(item => currentStep.vendor !== null ? item._id.toString() !== currentStep.vendor._id.toString() : item);
+				}
+			}
 		},
 		isMainGroup() {
 			return this.userGroup.name === 'Administrators' || this.userGroup.name === 'Developers';

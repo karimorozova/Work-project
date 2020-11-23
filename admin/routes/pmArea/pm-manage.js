@@ -387,9 +387,7 @@ router.post("/reassign-vendor", async (req, res) => {
 	try {
 		const project = await getProject({ "steps._id": reassignData.step._id });
 		const { steps, tasks } = await reassignVendor(project, reassignData);
-		//
 		const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks });
-		// const updatedProject = await updateProject({"_id": project.id}, {steps, tasks })
 		res.send(updatedProject);
 	} catch (err) {
 		console.log(err);

@@ -16,7 +16,7 @@
           .reassignment__drop
             PersonSelect(
               customClass="bordered arrow-20"
-              :persons="vendors"
+              :persons="extendedVendors(index)"
               :selectedPerson="currentVendorName(newVendor)"
               :isExtended="isAllShow"
               :isAdditionalShow="true"
@@ -69,7 +69,10 @@
 			},
 			index: {
 				type: Number,
-			}
+			},
+			originallyLanguages: {
+				type: Array,
+      }
 		},
 		data() {
 			return {

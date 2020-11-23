@@ -9,8 +9,8 @@ const { createOtherProjectFinanceData, getProjectStatus, checkProjectStructure }
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
 const headerWithoutAction = getHeaders('IServerProjectService');
 
-async function getMemoqAllProjects () {
-  const xml = `${xmlHeader}
+async function getMemoqAllProjects() {
+	const xml = `${ xmlHeader }
             <soapenv:Body>
                 <ns:ListProjects>
                 </ns:ListProjects>
@@ -27,6 +27,48 @@ async function getMemoqAllProjects () {
 		throw new Error(err.message);
 	}
 }
+
+async function assignedDefaultTranslator(projectId, step) {
+	const currentUsers = await getProjectUsers(projectId);
+	const currentProjectUsers = currentUsers.map(item => {
+		return { id: item.User.UserGuid, isPm: item.ProjectRoles["a:ProjectManager"] }
+	});
+	currentProjectUsers.push({ isPm: false, id: '5c758a3b-f723-eb11-8d6a-287fcfe08232' });
+	await setMemoqProjectUsers(projectId, currentProjectUsers);
+
+	const stepDocuments = step.memoqDocIds.reduce((acc, curr) => {
+		acc = acc + `<ns:ServerProjectTranslationDocumentUserAssignments>
+							  <ns:DocumentGuid>${ curr }</ns:DocumentGuid>
+							  <ns:UserRoleAssignments>
+							    <ns:TranslationDocumentUserRoleAssignment>
+							        <ns:DeadLine>${ step.deadline }</ns:DeadLine>
+							        <ns:DocumentAssignmentRole>${ step.serviceStep.memoqAssignmentRole }</ns:DocumentAssignmentRole>
+							        <ns:UserGuid>5c758a3b-f723-eb11-8d6a-287fcfe08232</ns:UserGuid>
+							    </ns:TranslationDocumentUserRoleAssignment>
+								</ns:UserRoleAssignments>
+							</ns:ServerProjectTranslationDocumentUserAssignments>`;
+		return acc;
+	}, "");
+	const xml = `${ xmlHeader }
+	            <soapenv:Body>
+	              <ns:SetProjectTranslationDocumentUserAssignments>
+	                  <ns:serverProjectGuid>${ projectId }</ns:serverProjectGuid>
+	                  <ns:assignments>${ stepDocuments }</ns:assignments>
+	              </ns:SetProjectTranslationDocumentUserAssignments>
+	          </soapenv:Body>
+	          </soapenv:Envelope>`;
+	const headers = headerWithoutAction('SetProjectTranslationDocumentUserAssignments');
+	try {
+		const { response } = await soapRequest({ url, headers, xml });
+		const result = parser.toJson(response.body, { object: true, sanitize: true, trim: true })["s:Envelope"]["s:Body"];
+		return !result["s:Fault"];
+	} catch (err) {
+		console.log("Error in assignedDefaultTranslator");
+		console.log(err);
+		throw new Error(err.message);
+	}
+};
+
 
 async function createMemoqProjectWithTemplate(projectData) {
 	const targets = projectData.targets.reduce((acc, cur) => acc + `<arr:string>${ cur.memoq }</arr:string>\n`, '');
@@ -307,11 +349,11 @@ async function setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlo
 	const xml = `${ xmlHeader }
                 <soapenv:Body>
 	                <ns:SetDocumentWorkflowStatus>
-	                   <ns:serverProjectGuid>${projectGuid}</ns:serverProjectGuid>
+	                   <ns:serverProjectGuid>${ projectGuid }</ns:serverProjectGuid>
 						         <ns:workflowChanges>
 						            <ns:ServerProjectTranslationDocumentWorkflowStatusChange>
-						               <ns:DocumentGuid>${documentGuid}</ns:DocumentGuid>
-						               <ns:WorkflowStatus>${workFlowStatus}</ns:WorkflowStatus>
+						               <ns:DocumentGuid>${ documentGuid }</ns:DocumentGuid>
+						               <ns:WorkflowStatus>${ workFlowStatus }</ns:WorkflowStatus>
 						            </ns:ServerProjectTranslationDocumentWorkflowStatusChange>
 						         </ns:workflowChanges>
 	                </ns:SetDocumentWorkflowStatus>
@@ -519,79 +561,79 @@ async function getMemoqFileId(projectId, docId) {
 	}
 }
 
-async function updateMemoqProjectsData () {
-  try {
-    let allProjects = await getMemoqAllProjects();
-    const clients = await Clients.find();
-    const vendors = await Vendors.find();
-    const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
-    for (let project of allProjects) {
-      const { ServerProjectGuid } = project;
-      const documents = await getProjectTranslationDocs(ServerProjectGuid);
-      if (project.Name.indexOf('PngSys') === -1 && documents) {
-        let users = await getProjectUsers(ServerProjectGuid);
-        users = getUpdatedUsers(users);
-        let memoqProject = getMemoqProjectData(project, languages);
-        memoqProject.status = getProjectStatus(documents);
-        const doesHaveCorrectStructure = memoqProject.status !== 'Quote' ?
-          checkProjectStructure(clients, vendors, memoqProject, documents) : false;
-        memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
-          false : memoqProject.lockedForRecalculation;
-        memoqProject.isTest = memoqProject.isTest === undefined ?
-          false : memoqProject.isTest;
-        memoqProject = doesHaveCorrectStructure ?
-          await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
-        await MemoqProject.updateOne(
-          { serverProjectGuid: ServerProjectGuid },
-          { ...memoqProject, users, documents },
-          { upsert: true });
-      }
-    }
-  } catch (err) {
-    console.log('Error in updateMemoqProjectsData');
-    console.log(err);
-    throw new Error(err.message);
-  }
+async function updateMemoqProjectsData() {
+	try {
+		let allProjects = await getMemoqAllProjects();
+		const clients = await Clients.find();
+		const vendors = await Vendors.find();
+		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
+		for (let project of allProjects) {
+			const { ServerProjectGuid } = project;
+			const documents = await getProjectTranslationDocs(ServerProjectGuid);
+			if(project.Name.indexOf('PngSys') === -1 && documents) {
+				let users = await getProjectUsers(ServerProjectGuid);
+				users = getUpdatedUsers(users);
+				let memoqProject = getMemoqProjectData(project, languages);
+				memoqProject.status = getProjectStatus(documents);
+				const doesHaveCorrectStructure = memoqProject.status !== 'Quote' ?
+						checkProjectStructure(clients, vendors, memoqProject, documents) : false;
+				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
+						false : memoqProject.lockedForRecalculation;
+				memoqProject.isTest = memoqProject.isTest === undefined ?
+						false : memoqProject.isTest;
+				memoqProject = doesHaveCorrectStructure ?
+						await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
+				await MemoqProject.updateOne(
+						{ serverProjectGuid: ServerProjectGuid },
+						{ ...memoqProject, users, documents },
+						{ upsert: true });
+			}
+		}
+	} catch (err) {
+		console.log('Error in updateMemoqProjectsData');
+		console.log(err);
+		throw new Error(err.message);
+	}
 }
 
-function getUpdatedUsers (users) {
-  if (Array.isArray(users)) {
-    return users.map(item => {
-      const isPm = item.ProjectRoles['a:ProjectManager'] === 'true';
-      const isTerminologist = item.ProjectRoles['a:Terminologist'] === 'true';
-      return {
-        ...item,
-        ProjectRoles: { isPm, isTerminologist }
-      };
-    });
-  }
-  const isPm = users.ProjectRoles['a:ProjectManager'] === 'true';
-  const isTerminologist = users.ProjectRoles['a:Terminologist'] === 'true';
-  return {
-    ...users,
-    ProjectRoles: { isPm, isTerminologist }
-  };
+function getUpdatedUsers(users) {
+	if(Array.isArray(users)) {
+		return users.map(item => {
+			const isPm = item.ProjectRoles['a:ProjectManager'] === 'true';
+			const isTerminologist = item.ProjectRoles['a:Terminologist'] === 'true';
+			return {
+				...item,
+				ProjectRoles: { isPm, isTerminologist }
+			};
+		});
+	}
+	const isPm = users.ProjectRoles['a:ProjectManager'] === 'true';
+	const isTerminologist = users.ProjectRoles['a:Terminologist'] === 'true';
+	return {
+		...users,
+		ProjectRoles: { isPm, isTerminologist }
+	};
 }
 
-function getMemoqProjectData (project, languages) {
-  const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
-  const targetCodes = typeof project.TargetLanguageCodes['a:string'] === 'string' ? [project.TargetLanguageCodes['a:string']] : project.TargetLanguageCodes['a:string'];
-  const targetLanguages = targetCodes.map(item => {
-    const lang = languages.find(l => l.memoq === item);
-    return lang;
-  });
-  return {
-    name: project.Name,
-    creatorUser: project.CreatorUser,
-    client: project.Client,
-    creationTime: new Date(project.CreationTime),
-    deadline: new Date(project.Deadline),
-    serverProjectGuid: project.ServerProjectGuid,
-    domain: typeof project.Domain === 'string' ? project.Domain : '',
-    client: typeof project.Client === 'string' ? project.Client : '',
-    sourceLanguage,
-    targetLanguages,
-    totalWordCount: project.TotalWordCount,
+function getMemoqProjectData(project, languages) {
+	const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
+	const targetCodes = typeof project.TargetLanguageCodes['a:string'] === 'string' ? [project.TargetLanguageCodes['a:string']] : project.TargetLanguageCodes['a:string'];
+	const targetLanguages = targetCodes.map(item => {
+		const lang = languages.find(l => l.memoq === item);
+		return lang;
+	});
+	return {
+		name: project.Name,
+		creatorUser: project.CreatorUser,
+		client: project.Client,
+		creationTime: new Date(project.CreationTime),
+		deadline: new Date(project.Deadline),
+		serverProjectGuid: project.ServerProjectGuid,
+		domain: typeof project.Domain === 'string' ? project.Domain : '',
+		client: typeof project.Client === 'string' ? project.Client : '',
+		sourceLanguage,
+		targetLanguages,
+		totalWordCount: project.TotalWordCount,
 		projectStatus: project.ProjectStatus
 	}
 }
@@ -601,16 +643,17 @@ module.exports = {
 	moveMemoqFileToProject,
 	createMemoqProjectWithTemplate,
 	setMemoqProjectUsers,
-  getProjectTranslationDocs,
-  getProjectAnalysis,
-  getProjectUsers,
-  setMemoqTranlsators,
-  updateMemoqProjectUsers,
-  setMemoqDocStatus,
-  getMemoqFileId,
-  cancelMemoqDocs,
-  setCancelledNameInMemoq,
-  updateMemoqProjectsData,
-  assignMemoqTranslators,
+	getProjectTranslationDocs,
+	getProjectAnalysis,
+	getProjectUsers,
+	setMemoqTranlsators,
+	updateMemoqProjectUsers,
+	setMemoqDocStatus,
+	getMemoqFileId,
+	cancelMemoqDocs,
+	setCancelledNameInMemoq,
+	updateMemoqProjectsData,
+	assignMemoqTranslators,
 	setMemoqDocumentWorkFlowStatus,
+	assignedDefaultTranslator
 }

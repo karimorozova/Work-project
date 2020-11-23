@@ -1,7 +1,6 @@
 const { payablesCalc, returnVendorRate } = require('../сalculations/wordcount');
-const { getVendorRate } = require('../сalculations/general');
 const { stepMiddleAssignNotification, stepMiddleReassignedNotification } = require('../utils');
-const { updateMemoqProjectUsers } = require('../services/memoqs/projects');
+const { assignedDefaultTranslator } = require('../services/memoqs/projects');
 const { Units } = require('../models');
 
 async function reassignVendor(project, reassignData) {
@@ -15,7 +14,6 @@ async function reassignVendor(project, reassignData) {
 		const newStep = await getNewStep({ isStart, progress, step, vendor, project, task: tasks[taskIndex], allUnits });
 		const updatedStep = updateCurrentStep({ step: stepForUpdatedStep, isStart, isPay, progress, allUnits });
 
-
 		const updatedIndex = steps.findIndex(item => item.stepId === step.stepId);
 		updatedStep.stepId = updatedStep.stepId + '-Canceled';
 
@@ -23,12 +21,11 @@ async function reassignVendor(project, reassignData) {
 
 		//MM
 		// await updateMemoqProjectUsers(steps);
-
+		await assignedDefaultTranslator(tasks[taskIndex].memoqProjectId, newStep);
 		tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
 		tasks[taskIndex].status = "In progress";
-		// await stepMiddleReassignedNotification(updatedStep, reason, isPay);
-		// await stepMiddleAssignNotification(newStep, isStart);
-
+		await stepMiddleReassignedNotification(updatedStep, reason, isPay);
+		await stepMiddleAssignNotification(newStep, isStart);
 
 		return { steps, tasks };
 
@@ -39,7 +36,6 @@ async function reassignVendor(project, reassignData) {
 }
 
 function updateCurrentStep({ step, isStart, isPay, progress, allUnits }) {
-	const { type } = allUnits.find(item => item._id.toString() === step.serviceStep.unit.toString());
 	let updatedStep = step;
 	const { payables, receivables } = updatedStep.finance.Price;
 
@@ -50,7 +46,6 @@ function updateCurrentStep({ step, isStart, isPay, progress, allUnits }) {
 		updatedStep.status = "Cancelled";
 		calculateFinancePriceForOldStep('receivables', 'payables');
 	}
-
 
 	updatedStep.progress = getUpdatedStepProgress(updatedStep, progress, allUnits);
 
@@ -149,9 +144,9 @@ function updateFinanceForNewStep(step, progress) {
 }
 
 function getTaskFinance(steps, taskId) {
-	const taksSteps = steps.filter(item => item.taskId === taskId);
-	const receivables = getSum(taksSteps, 'receivables');
-	const payables = getSum(taksSteps, 'payables');
+	const taskSteps = steps.filter(item => item.taskId === taskId);
+	const receivables = getSum(taskSteps, 'receivables');
+	const payables = getSum(taskSteps, 'payables');
 	return { receivables, payables };
 }
 

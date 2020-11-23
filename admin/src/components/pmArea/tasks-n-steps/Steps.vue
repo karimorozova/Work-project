@@ -129,6 +129,7 @@
         @close="closeReassignment"
         :step="reassignStep"
         :index="infoIndex"
+        :originallyLanguages="originallyLanguages"
       )
     .steps__approve-action(v-if="isApproveActionShow")
       ApproveModal(
