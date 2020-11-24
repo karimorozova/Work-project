@@ -25,26 +25,36 @@ const getNewToken = (oAuth2Client, tokenPath, callback) => {
   });
 };
 
-const getProjectNameFromQuoteProjectMessage = (messageString) => {
-  const projectNameRegex = new RegExp(/(?<=[N-n]ame: ).[^:]\S+/g);
-  const projectDateRegex = new RegExp(/[0-9]{4} (0[1-9]|1[0-2]) (0[1-9]|[1-2][0-9]|3[0-1]) \[[0-9]{2}]/g);
-  const projectDate = messageString.match(projectDateRegex)[0];
-  const projectName = messageString.match(projectNameRegex)[0];
-  return `${projectDate} - ${projectName}`;
+const getProjectName = (headers, labelName) => {
+  const { value } = headers.find(({ name }) => name === 'Subject');
+  switch (labelName) {
+    case 'Project Approved':
+      return nameForApproved(value);
+    case 'Decide on quote':
+      return nameForQuote(value);
+    case 'Project Closed':
+      return nameForClosed(value);
+  }
+
+  function nameForApproved(subject) {
+    const [id] = subject.match(/(\d.*[\d]])/g);
+    const projectName = /[N|n]ame:\s(.*)$/.exec(subject);
+    return `${ id } - ${ projectName[1] }`;
+  }
+
+  function nameForQuote(subject) {
+    const fullProjectName = /:\s(.*)$/.exec(subject);
+    return fullProjectName[1];
+  }
+
+  function nameForClosed(subject) {
+    const fullProjectName = /:\s(.*)$/.exec(subject);
+    return fullProjectName[1];
+  }
 };
 
-const getProjectNameFromInProgressProjectMessage = () => {
-
-};
-
-const getProjectNameFromClosedProjectMessage = (messageString) => {
-  const projectNameRegex = new RegExp(/(?<=project: )((\d|\w).+)[^"]/g);
-  return messageString.match(projectNameRegex)[0];
-};
 
 module.exports = {
   getNewToken,
-  getProjectNameFromQuoteProjectMessage,
-  getProjectNameFromInProgressProjectMessage,
-  getProjectNameFromClosedProjectMessage
+  getProjectName,
 };

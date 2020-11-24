@@ -16,8 +16,9 @@ const gmailMessagesSchema = new mongoose.Schema({
     snippet: {
       type: String,
     },
-    header: {
-      type: String
+    headers: {
+      type: Array,
+      default: []
     },
     isRead: {
       type: Boolean,

@@ -1,11 +1,7 @@
 const { getToken } = require('./authorization');
 const { google: { gmail: gmailApi } } = require('googleapis');
 const { GmailMessages, MemoqProject } = require('../models');
-const {
-  getProjectNameFromQuoteProjectMessage,
-  getProjectNameFromInProgressProjectMessage,
-  getProjectNameFromClosedProjectMessage
-} = require('./helpers');
+const { getProjectName } = require('./helpers');
 
 const saveDefaultLabels = async (auth) => {
   if (!auth) getToken(saveDefaultLabels);
@@ -38,7 +34,7 @@ const saveDefaultLabels = async (auth) => {
 };
 
 const saveMessages = async (auth) => {
-  if (!auth) getToken(saveMessages);
+  if(!auth) getToken(saveMessages);
   else {
     const gmail = gmailApi({ version: 'v1', auth });
     const labels = await GmailMessages.find();
@@ -46,19 +42,21 @@ const saveMessages = async (auth) => {
     for (let id of neededLabelIds) {
       await gmail.users.messages.list({
         userId: 'me',
-        labelIds: `${id}`
+        labelIds: `${ id }`
       }, async (err, res) => {
         for (let { id } of res.data.messages) {
+          const start = 0;
+          const finish = 1000;
           await gmail.users.messages.get({
             userId: 'me', id: id
           }, async (err, res) => {
-            if (err) {
+            if(err) {
               console.log(err);
               console.log('Error on getting messages');
             }
             const message = res.data;
             const doesFit = checkIfFits(message, neededLabelIds);
-            if (doesFit) {
+            if(doesFit) {
               await saveMessageToDB(message, neededLabelIds);
             }
           });
@@ -67,20 +65,20 @@ const saveMessages = async (auth) => {
     }
   }
 
-  async function saveMessageToDB (message, neededLabelIds) {
+  async function saveMessageToDB(message, neededLabelIds) {
     const labels = await GmailMessages.find();
-    const { labelIds, id: messageId, snippet } = message;
+    const { labelIds, id: messageId, snippet, payload } = message;
     const neededLabelIndex = neededLabelIds.findIndex(item => labelIds.includes(item));
     const { _id, messages, name } = labels[neededLabelIndex];
-    // const projectName = name === 'Project Closed' ? getProjectNameFromClosedProjectMessage(snippet)
-    //   : getProjectNameFromMessage(snippet);
     const messageIdsArr = messages.map(({ id: messageId }) => messageId);
-    if (!messageIdsArr.includes(message.id)) {
+
+    if(!messageIdsArr.includes(message.id)) {
       messages.push({
         id: messageId,
         snippet,
+        headers: payload.headers,
         creationTime: new Date(),
-        // projectName
+        projectName: getProjectName(payload.headers, name)
       });
     }
     await GmailMessages.updateOne({ _id }, { messages });
