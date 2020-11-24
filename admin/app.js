@@ -17,6 +17,7 @@ const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/parseOldMemoqProjects');
+const { saveMessages } = require('./gmail');
 const { Pricelist } = require('./models');
 const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 
@@ -29,15 +30,14 @@ const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 // }
 //  deleteMemoqUser('97d8076f-6e07-4145-b0dc-a77f2e9a15e3');
 // foo();
-
 schedule.scheduleJob('0 */3 * * *', async function () {
   console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
   try {
     await updateMemoqProjectsData();
     console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
-	} catch (err) {
-		console.log(err.message);
-	}
+  } catch (err) {
+    console.log(err.message);
+  }
 });
 
 schedule.scheduleJob('30 23 * * *', async function () {

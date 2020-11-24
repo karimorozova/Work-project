@@ -22,6 +22,14 @@ const gmailMessagesSchema = new mongoose.Schema({
     isRead: {
       type: Boolean,
       default: false
+    },
+    projectName: {
+      type: String,
+      default: ''
+    },
+    creationTime: {
+      type: Date,
+      default: Date.now
     }
   }],
 });

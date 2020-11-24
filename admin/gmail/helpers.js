@@ -25,12 +25,26 @@ const getNewToken = (oAuth2Client, tokenPath, callback) => {
   });
 };
 
-const getProjectNameFromMessage = (messageString) => {
-  const projectNameRegex = new RegExp(/(?<=name: ).[^:]*/g);
+const getProjectNameFromQuoteProjectMessage = (messageString) => {
+  const projectNameRegex = new RegExp(/(?<=[N-n]ame: ).[^:]\S+/g);
   const projectDateRegex = new RegExp(/[0-9]{4} (0[1-9]|1[0-2]) (0[1-9]|[1-2][0-9]|3[0-1]) \[[0-9]{2}]/g);
   const projectDate = messageString.match(projectDateRegex)[0];
   const projectName = messageString.match(projectNameRegex)[0];
   return `${projectDate} - ${projectName}`;
 };
 
-module.exports = { getNewToken, getProjectNameFromMessage };
+const getProjectNameFromInProgressProjectMessage = () => {
+
+};
+
+const getProjectNameFromClosedProjectMessage = (messageString) => {
+  const projectNameRegex = new RegExp(/(?<=project: )((\d|\w).+)[^"]/g);
+  return messageString.match(projectNameRegex)[0];
+};
+
+module.exports = {
+  getNewToken,
+  getProjectNameFromQuoteProjectMessage,
+  getProjectNameFromInProgressProjectMessage,
+  getProjectNameFromClosedProjectMessage
+};
