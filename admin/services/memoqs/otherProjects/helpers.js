@@ -14,29 +14,10 @@ const filterMemoqProjectsVendors = users => {
 };
 
 const checkDocumentHasCorrectStructure = (document) => {
-   return document !== null && document.hasOwnProperty('UserAssignments') &&
-    Object.entries(document.UserAssignments).length !== 0 &&
-    document.UserAssignments.constructor === Object &&
-    !!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
-};
-
-const getProjectStatus = (docs) => {
-  let status = 'Quote';
-  if (Array.isArray(docs)) {
-    const inProgressStatus = docs.some(({ DocumentStatus }) => (
-      DocumentStatus === 'TranslationInProgress'
-    ));
-    const completedStatus = docs.every(({ DocumentStatus }) => (
-      DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished'
-    ));
-    if (inProgressStatus) status = 'In progress';
-    if (completedStatus) status = 'Closed';
-    return status;
-  }
-  const { DocumentStatus } = docs;
-  if (DocumentStatus === 'TranslationFinished') status = 'In progress';
-  if (DocumentStatus === 'TranslationFinished') status = 'Closed';
-  return status;
+   return document.hasOwnProperty('UserAssignments') &&
+     Object.entries(document.UserAssignments).length !== 0 &&
+     document.UserAssignments.constructor === Object &&
+     !!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
 };
 
 const checkProjectStructure = (clients, vendors, memoqProject, documents) => {
@@ -112,6 +93,5 @@ module.exports = {
   filterMemoqProjectsVendors,
   checkDocumentHasCorrectStructure,
   findFittingIndustryId,
-  getProjectStatus,
   checkProjectStructure,
 };

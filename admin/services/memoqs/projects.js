@@ -571,22 +571,20 @@ async function updateMemoqProjectsData() {
 			const { ServerProjectGuid } = project;
 			const documents = await getProjectTranslationDocs(ServerProjectGuid);
 			if(project.Name.indexOf('PngSys') === -1 && documents) {
-				let users = await getProjectUsers(ServerProjectGuid);
-				users = getUpdatedUsers(users);
-				let memoqProject = getMemoqProjectData(project, languages);
-				memoqProject.status = getProjectStatus(documents);
-				const doesHaveCorrectStructure = memoqProject.status !== 'Quote' ?
-						checkProjectStructure(clients, vendors, memoqProject, documents) : false;
-				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
-						false : memoqProject.lockedForRecalculation;
-				memoqProject.isTest = memoqProject.isTest === undefined ?
-						false : memoqProject.isTest;
-				memoqProject = doesHaveCorrectStructure ?
-						await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
-				await MemoqProject.updateOne(
-						{ serverProjectGuid: ServerProjectGuid },
-						{ ...memoqProject, users, documents },
-						{ upsert: true });
+        let users = await getProjectUsers(ServerProjectGuid);
+        users = getUpdatedUsers(users);
+        let memoqProject = getMemoqProjectData(project, languages);
+        const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, memoqProject, documents);
+        memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
+          false : memoqProject.lockedForRecalculation;
+        memoqProject.isTest = memoqProject.isTest === undefined ?
+          false : memoqProject.isTest;
+        memoqProject = doesHaveCorrectStructure ?
+          await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
+        await MemoqProject.updateOne(
+          { serverProjectGuid: ServerProjectGuid },
+          { ...memoqProject, users, documents },
+          { upsert: true });
 			}
 		}
 	} catch (err) {
