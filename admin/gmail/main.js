@@ -94,14 +94,44 @@ const saveMessages = async (auth) => {
 
 const updateOtherProjectStatusOnMessages = async () => {
   const labels = await GmailMessages.find();
-  for (let { name, messages } of labels) {
-    const notReadMessages = messages.filter(({ isRead }) => !isRead);
-    for (let { projectName } of notReadMessages) {
-      const project = await MemoqProject.findOne({ name: projectName });
-      if (project) console.log(project);
+  for (let { _id, name, messages } of labels) {
+    for (let i = 0; i < messages.length; i += 1) {
+      let { projectName, isRead } = messages[i];
+      if (!isRead) {
+        const project = await MemoqProject.findOne({ name: projectName });
+        if (project) {
+          isRead = true;
+          messages[i].isRead = true;
+          let status = 'Quote';
+          switch (name) {
+            case 'Project Approved':
+              status = 'In progress';
+              break;
+            case 'Project Closed':
+              status = 'Closed';
+              break;
+          }
+          await MemoqProject.updateOne({ _id: project._id }, { status });
+        }
+      }
     }
+    await GmailMessages.updateOne({ _id }, { messages });
+  }
+};
+
+const filterOldMessages = async () => {
+  const labels = await GmailMessages.find();
+  for (let { _id, messages } of labels) {
+    const filteredMessages = messages.filter(message => {
+      const { creationTime } = message;
+      const currentDate = new Date().getDate();
+      if (currentDate - creationTime.getDate() <= 7) {
+        return message;
+      }
+    });
+    await GmailMessages.updateOne({ _id }, { messages: filteredMessages });
   }
 };
 
 
-module.exports = { saveDefaultLabels, saveMessages, updateOtherProjectStatusOnMessages };
+module.exports = { saveDefaultLabels, saveMessages, updateOtherProjectStatusOnMessages, filterOldMessages };
