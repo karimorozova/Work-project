@@ -18,7 +18,8 @@ const saveDefaultLabels = async (auth) => {
       }
       const { labels } = res.data;
       neededLabels = labels.filter(({ name }) => neededLabelNames.includes(name));
-      await saveLabelsToDB(neededLabels);
+      const sortedLabels = [neededLabels[1],neededLabels[0],neededLabels[2]];
+      await saveLabelsToDB(sortedLabels);
     });
   }
 

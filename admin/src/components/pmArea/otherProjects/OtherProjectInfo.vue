@@ -64,8 +64,7 @@
 						acc.push({ ...curr });
 						return acc
 					}, []);
-					this.projectSteps = tasks.map(item => item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails)
-							.flat();
+					this.projectSteps = tasks.map(item => item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails).flat();
 				} catch (err) {
 					this.alertToggle({
 						message: "Can't get steps",

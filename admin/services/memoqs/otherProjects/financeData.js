@@ -97,7 +97,7 @@ const getUpdatedProjectData = async (project, allClients) => {
   if (neededCustomer) {
     additionalData = {
       customer: ObjectId(neededCustomer._id),
-      status: project.status ? '' : project.status,
+      status: project.status,
       projectManager: ObjectId(neededCustomer.projectManager._id),
       accountManager: ObjectId(neededCustomer.accountManager._id),
       industry: ObjectId(industry._id),
