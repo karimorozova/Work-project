@@ -257,7 +257,7 @@ router.post('/switch-to-in-progress', async (req, res) => {
   const { id } = req.body;
   try {
     const updateProject = await getProjectAfterUpdate({ _id: id },
-      { status: 'In progress', fromQuote: true });
+      { status: 'In progress' });
     res.send(updateProject);
   } catch (err) {
     console.log(err);
@@ -269,7 +269,7 @@ router.post('/switch-to-closed', async (req, res) => {
   const { id } = req.body;
   try {
     const updateProject = await getProjectAfterUpdate({ _id: id },
-      { status: 'Closed', fromQuote: true });
+      { status: 'Closed' });
     res.send(updateProject);
   } catch (err) {
     console.log(err);

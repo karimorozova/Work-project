@@ -7,19 +7,18 @@ const { findFittingIndustryId } = require('./helpers');
 const { getMemoqProject } = require('./getMemoqProject');
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
-	const clients = await Clients.find();
-	const vendors = await Vendors.find();
-	const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
-	if (!neededCustomer) return project;
-	const updatedProject = fromCron ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
-	const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
-	if (!tasks.length && !steps.length) return project;
-	const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
-	const lockedForRecalculation = updatedProject.status === 'Closed';
-	if (fromCron) return { ...updatedProject, tasks, steps, finance, lockedForRecalculation };
-	await MemoqProject.updateOne({ _id: project._id },
-			{ ...additionalData, tasks, steps, finance, lockedForRecalculation });
-	return await getMemoqProject({ _id: project._id });
+  const clients = await Clients.find();
+  const vendors = await Vendors.find();
+  const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
+  if (!neededCustomer) return project;
+  const updatedProject = fromCron ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+  const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
+  if (!tasks.length && !steps.length) return project;
+  const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
+  if (fromCron) return { ...updatedProject, tasks, steps, finance };
+  await MemoqProject.updateOne({ _id: project._id },
+    { ...additionalData, tasks, steps, finance });
+  return await getMemoqProject({ _id: project._id });
 };
 
 const getProjectTasks = async (documents, project, customer, vendors) => {
@@ -91,19 +90,18 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
 };
 
 const getUpdatedProjectData = async (project, allClients) => {
-	const { client: memoqClient, fromQuote } = project;
-	const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
-	const industry = await findFittingIndustryId(project.domain);
-	let additionalData = {};
-	if (neededCustomer) {
-		additionalData = {
-			customer: ObjectId(neededCustomer._id),
-			status: project.status,
-			projectManager: ObjectId(neededCustomer.projectManager._id),
-			accountManager: ObjectId(neededCustomer.accountManager._id),
-			industry: ObjectId(industry._id),
-			paymentProfile: neededCustomer.billingInfo.paymentType,
-			fromQuote: project.status === 'In progress' ? fromQuote : false,
+  const { client: memoqClient } = project;
+  const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
+  const industry = await findFittingIndustryId(project.domain);
+  let additionalData = {};
+  if (neededCustomer) {
+    additionalData = {
+      customer: ObjectId(neededCustomer._id),
+      status: project.status ? '' : project.status,
+      projectManager: ObjectId(neededCustomer.projectManager._id),
+      accountManager: ObjectId(neededCustomer.accountManager._id),
+      industry: ObjectId(industry._id),
+      paymentProfile: neededCustomer.billingInfo.paymentType,
     };
 	}
 	return { additionalData, neededCustomer };

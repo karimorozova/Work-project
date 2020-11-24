@@ -117,10 +117,6 @@ const MemoqProjectSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-  fromQuote: {
-	  type: Boolean,
-    default: false
-  }
 });
 
 const MemoqProject = mongoose.model('MemoqProject', MemoqProjectSchema);
