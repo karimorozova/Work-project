@@ -1,7 +1,7 @@
 const { MemoqProject, Clients, Vendors } = require('../../../models');
 const { checkProjectStructure, getProjectStatus } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
-const { getMemoqProjects } = require('./getMemoqProject');
+const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
 
 const updateAllMemoqProjects = async (querySource) => {
   let query = {};
@@ -47,4 +47,27 @@ const updateMemoqProjectFinance = async (project) => {
   return await createOtherProjectFinanceData({ project, documents });
 };
 
-module.exports = { updateAllMemoqProjects, updateMemoqProjectFinance };
+const updateMemoqProjectStatus = async (_id, direction) => {
+  const { status } = await MemoqProject.findOne({ _id });
+  let updatedStatus;
+  if (direction === 'Forward') {
+    switch (status) {
+      case 'Quote':
+        updatedStatus = 'In progress';
+        break;
+      case 'In progress':
+        updatedStatus = 'Closed';
+    }
+  } else {
+    switch (status) {
+      case 'In progress':
+        updatedStatus = 'Quote';
+        break;
+      case 'Closed':
+        updatedStatus = 'In progress';
+    }
+  }
+  return await getProjectAfterUpdate({ _id }, { status: updatedStatus });
+};
+
+module.exports = { updateAllMemoqProjects, updateMemoqProjectFinance, updateMemoqProjectStatus };

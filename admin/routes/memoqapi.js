@@ -21,7 +21,8 @@ const {
   getFilteredOtherProjects,
   filterMemoqProjectsVendors,
   updateAllMemoqProjects,
-  updateMemoqProjectFinance
+  updateMemoqProjectFinance,
+  updateMemoqProjectStatus
 } = require('../services/memoqs/otherProjects');
 
 router.get('/users', async (req, res) => {
@@ -253,24 +254,11 @@ router.get('/memoq-vendor-aliases', async (req, res) => {
   }
 })
 
-router.post('/switch-to-in-progress', async (req, res) => {
-  const { id } = req.body;
+router.post('/switch-status', async (req, res) => {
+  const { id, direction } = req.body;
   try {
-    const updateProject = await getProjectAfterUpdate({ _id: id },
-      { status: 'In progress' });
-    res.send(updateProject);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on switching project\'s status');
-  }
-});
-
-router.post('/switch-to-closed', async (req, res) => {
-  const { id } = req.body;
-  try {
-    const updateProject = await getProjectAfterUpdate({ _id: id },
-      { status: 'Closed' });
-    res.send(updateProject);
+    const updatedProject = await updateMemoqProjectStatus(id, direction);
+    res.send(updatedProject);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on switching project\'s status');

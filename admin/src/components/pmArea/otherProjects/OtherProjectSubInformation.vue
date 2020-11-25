@@ -11,13 +11,18 @@
     .sub-information__row(v-if="project.status === 'Quote'")
       .row__title Move to In progress:
       .row__data
-        span(@click="sendToProgressProjects()")
+        span(@click="switchProjectStatus('Forward')")
           i.fa.fa-paper-plane(aria-hidden="true")
     .sub-information__row(v-if="project.status === 'In progress'")
       .row__title Move to Closed:
       .row__data
-        span(@click="sendToClosedProjects()")
+        span(@click="switchProjectStatus('Forward')")
           i.fa.fa-paper-plane(aria-hidden="true")
+    .sub-information__row(v-if="project.status === 'In progress' || project.status === 'Closed'")
+      .row__title Roll back status:
+      .row__data
+        span(@click="switchProjectStatus('Backwards')")
+          i.fa.backward(aria-hidden="true")
     .sub-information__row(v-if="project.status === 'Closed'")
       .row__title Payment Profile:
       .row__data
@@ -131,32 +136,19 @@
 			};
 		},
 		methods: {
-			...mapActions({
-				alertToggle: "alertToggle",
-			}),
-			async sendToProgressProjects() {
+      ...mapActions({
+        alertToggle: 'alertToggle',
+      }),
+      async switchProjectStatus (direction) {
         try {
-          const result = await this.$http.post('/memoqapi/switch-to-in-progress', {
+          const result = await this.$http.post('/memoqapi/switch-status', {
             id: this.project._id,
+            direction,
           });
           this.$emit('updateProject', result.body);
         } catch (err) {
           this.alertToggle({
-            message: 'Error on sending project to In progress projects',
-            isShow: true,
-            type: 'error',
-          });
-        }
-      },
-      async sendToClosedProjects () {
-        try {
-          const result = await this.$http.post('/memoqapi/switch-to-closed', {
-            id: this.project._id,
-          });
-          this.$emit('updateProject', result.body);
-        } catch (err) {
-          this.alertToggle({
-            message: 'Error on sending project to Closed projects',
+            message: 'Error on switching progress',
             isShow: true,
             type: 'error',
           });
@@ -466,6 +458,14 @@
         bottom: 0;
       }
     }
+  }
+
+  .backward {
+    background-image: url("../../../assets/images/refresh-icon.png");
+    transform: scale(-1, 1);
+    width: 24px;
+    height: 20px;
+    cursor: pointer;
   }
 
   .fa-info-circle,
