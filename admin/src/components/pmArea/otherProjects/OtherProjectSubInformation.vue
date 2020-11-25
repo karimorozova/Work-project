@@ -12,17 +12,17 @@
       .row__title Move to In progress:
       .row__data
         span(@click="switchProjectStatus('Forward')")
-          i.fa.fa-paper-plane(aria-hidden="true")
+          i.fa.fa-forward(aria-hidden='true')
     .sub-information__row(v-if="project.status === 'In progress'")
       .row__title Move to Closed:
       .row__data
         span(@click="switchProjectStatus('Forward')")
-          i.fa.fa-paper-plane(aria-hidden="true")
+          i.fa.fa-forward(aria-hidden='true')
     .sub-information__row(v-if="project.status === 'In progress' || project.status === 'Closed'")
       .row__title Roll back status:
       .row__data
         span(@click="switchProjectStatus('Backwards')")
-          i.fa.backward(aria-hidden="true")
+          i.fa.fa-backward(aria-hidden="true")
     .sub-information__row(v-if="project.status === 'Closed'")
       .row__title Payment Profile:
       .row__data
@@ -460,11 +460,11 @@
     }
   }
 
-  .backward {
-    background-image: url("../../../assets/images/refresh-icon.png");
-    transform: scale(-1, 1);
-    width: 24px;
-    height: 20px;
+  .fa-backward,
+  .fa-forward {
+    font-size: 18px;
+    color: #938676;
+    transition: all 0.3s;
     cursor: pointer;
   }
 
@@ -473,14 +473,9 @@
     font-size: 18px;
   }
 
-  .fa-paper-plane {
-    font-size: 18px;
-    color: #938676;
-    transition: all 0.3s;
-    cursor: pointer;
-  }
 
-  .fa-paper-plane:hover {
+  .fa-backward:hover,
+  .fa-forward:hover {
     color: #67573E;
   }
 
