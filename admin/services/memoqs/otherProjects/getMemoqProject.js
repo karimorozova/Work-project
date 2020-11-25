@@ -45,6 +45,7 @@ const getMemoqProjectsForClientPortal = async (query) => {
     _doc.projectId = projectId ? projectId[0] : '';
     _doc.projectName = projectName ? projectName[0] : _doc.name;
     _doc.startDate = _doc.creationTime;
+    _doc.fromXTRF = true;
     delete _doc.name;
     delete _doc.creationTime;
     structuredProjects.push(_doc);

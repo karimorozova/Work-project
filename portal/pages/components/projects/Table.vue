@@ -26,7 +26,7 @@
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
                 img.data-table__icon(v-if="row.status === 'Quote sent'" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
             .data-table__data.data-table__progress(slot="progress" slot-scope="{ row, index }")
-                ProgressLine(:progress="progress(row.steps)")
+                ProgressLine(:progress="progress(row.steps, row)")
 </template>
 
 <script>
@@ -73,13 +73,20 @@ export default {
         getDetails({index}) {
             this.$emit("getDetails", { index });
         },
-        progress(steps) {
+        progress(steps, project) {
+          if(project.hasOwnProperty('fromXTRF')) {
+            return project.tasks.length ? project.tasks.reduce((acc, curr) => {
+              acc += curr.progress;
+              return acc
+            }, 0) / project.tasks.length : 0;
+          } else {
             let total = 0;
-            for(let step of steps) {
-                const progress = isNaN(step.progress) ? +(step.progress.wordsDone/step.progress.totalWordCount*100).toFixed(2) : step.progress;
-                total+= progress;
+            for (let step of steps) {
+              const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress;
+              total += progress;
             }
-            return (total/steps.length).toFixed(2);
+            return (total / steps.length).toFixed(2);
+          }
         },
         setFields() {
             if(this.isOpenProjects) {
