@@ -49,9 +49,10 @@ export default {
     align-content: center;
     justify-content: center;
     &__bar {
-        width: 70px;
-        height: 70px;
-        font-size: 12px;
+        width: 85px;
+        height: 85px;
+        font-size: 11px;
+        margin-top: 5px;
     }
     &__circle {
         transition: 0.5s ease-in-out all;

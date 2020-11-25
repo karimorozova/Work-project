@@ -3,7 +3,7 @@
         .projects-table__filters
         .projects-table__table
             DataTable(
-                :fields="tableFields"
+                :fields="fields"
                 :tableData="projects"
                 :bodyClass="projects.length < 12 ? 'tbody_visible-overflow' : ''"
                 :tableHeadRowClass="projects.length < 12 ? 'tbody_visible-overflow' : ''"
@@ -30,11 +30,9 @@
 <script>
 import moment from "moment";
 import DataTable from "../Tables/DataTable";
-import tableFields from "~/mixins/tableFields";
 import { mapActions } from "vuex";
 
 export default {
-    mixins: [tableFields],
     props: {
         projects: {
             type: Array,
@@ -44,15 +42,14 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: Math.floor(970*0.14), padding: "0"},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(970*0.25), padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(970*0.17), padding: "0"},
-                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: Math.floor(970*0.12), padding: "0"},
-                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: Math.floor(970*0.12), padding: "0"},
-                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: Math.floor(970*0.12), padding: "0"},
-                {label: "", headerKey: "headerDownload", key: "download", width: 0, padding: "0"},
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "18%", padding: "0"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "18%", padding: "0"},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "11.5%", padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "11.5%", padding: "0"},
+                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "11.5%", padding: "0"},
+                {label: "", headerKey: "headerDownload", key: "download", width: "11.5%", padding: "0"},
             ],
-            tableWidth: 970,
             domain: ""
         }
     },

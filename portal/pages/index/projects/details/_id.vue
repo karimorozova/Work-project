@@ -94,7 +94,7 @@ export default {
     }
     &__describe {
         width: 25%;
-        background-color: #F6F1EF;
+        background-color: #F4F0EE;
     }
 }
 

@@ -335,8 +335,6 @@
 
         .sel_project_block {
           margin-right: 150px;
-          /*width: 239px;*/
-          /*width: 33%;*/
           background-color: #D15F45;
           border-radius: 14px;
           width: 100%;
@@ -416,18 +414,15 @@
       }
 
       .womanWrapper {
-        margin: 0 3px 7px 15px;
-        border-radius: 30px;
-        width: 33px;
-        height: 33px;
+        margin: 7px 5px 0px 0px;
         position: relative;
-
         &__photo {
           border-radius: 50%;
           background-color: white;
           width: 35px;
           height: 35px;
           object-fit: cover;
+          cursor: default;
         }
 
         .accountMenuWrapper {
@@ -435,11 +430,11 @@
             width: 230px;
             height: 124px;
             background-color: #fff;
-            box-shadow: 1px 1px 11px black;
+            box-shadow: 0 0 10px #67573e9d;
             position: absolute;
             top: 44px;
-            right: -140px;
-            border-radius: 6px;
+            right: -115px;
+            border-radius: 5px;
             z-index: 5;
             overflow: hidden;
 

@@ -1,7 +1,7 @@
 <template lang="pug">
     .data-table
         DataTable(
-            :fields="tableFields"
+            :fields="fields"
             :tableData="projects"
             :bodyClass="projects.length < 7 ? 'tbody_visible-overflow tbody_height-200' : 'tbody_height-200'"
             :tableHeadRowClass="projects.length < 7 ? 'tbody_visible-overflow' : ''"
@@ -14,6 +14,7 @@
             .data-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerTotalCost" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
+
             .data-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.startDate) }}
             .data-table__data(slot="projectId" slot-scope="{ row, index }") {{ row.projectId || row.requestId }}
             .data-table__data(slot="projectName" slot-scope="{ row, index }" :class="{'data-table_break-word': row.projectName.length > 30}") {{ row.projectName }}
@@ -32,10 +33,8 @@
 import DataTable from "~/components/Tables/DataTable";
 import ProgressLine from "~/components/ProgressLine";
 import moment from "moment";
-import tableFields from "~/mixins/tableFields";
 
 export default {
-    mixins: [tableFields],
     props: {
         projects: {
             type: Array,
@@ -49,13 +48,13 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: Math.floor(1010*0.14), padding: "0"},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(1010*0.2), padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(1010*0.16), padding: "0"},
-                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: Math.floor(1010*0.16), padding: "0"},
-                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: Math.floor(1010*0.12), padding: "0"},
-                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: Math.floor(1010*0.12), padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"}
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "18%", padding: "0"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "18%", padding: "0"},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "11.5%", padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "11.5%", padding: "0"},
+                {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "11.5%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "11.5%", padding: "0"}
             ],
             tableWidth: 1010,
             icons: {
@@ -84,7 +83,7 @@ export default {
         },
         setFields() {
             if(this.isOpenProjects) {
-                let progressElement = {...this.fields[this.fields.length-1], label: 'Progress', key: 'progress', width: Math.floor(1010*0.14)};
+                let progressElement = {...this.fields[this.fields.length-1], label: 'Progress', key: 'progress', width: "11.5%"};
                 this.fields.pop();
                 this.fields.splice(3, 0, progressElement);
             }
@@ -115,7 +114,8 @@ export default {
         margin-left: 3px;
     }
     &__icon {
-        margin: 0 5px;
+        height: 20px;
+        margin: 0 6px;
         transition: all 0.2s;
         &:hover {
             transform: scale(1.1);

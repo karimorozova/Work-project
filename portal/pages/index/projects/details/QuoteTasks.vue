@@ -1,7 +1,7 @@
 <template lang="pug">
     .tasks-table
         DataTable(
-            :fields="tableFields"
+            :fields="fields"
             :tableData="project.tasks"
             :bodyClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
             :tableHeadRowClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
@@ -19,19 +19,17 @@
 <script>
 import DataTable from "~/components/Tables/DataTable";
 import { mapGetters, mapActions } from "vuex";
-import tableFields from "~/mixins/tableFields";
 import taskPair from "~/mixins/taskPair";
 
 export default {
-    mixins: [tableFields, taskPair],
+    mixins: [taskPair],
     data() {
         return {
             fields: [
-                {label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: Math.floor(735*0.64), padding: "0"},
-                {label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: Math.floor(735*0.20), padding: "0"},
-                {label: "Cost", headerKey: "headerCost", key: "cost", width: 0, padding: "0"}
+	            { label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "40%", padding: "0" },
+	            { label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "30%", padding: "0" },
+	            { label: "Cost", headerKey: "headerCost", key: "cost", width: "30%", padding: "0" }
             ],
-            tableWidth: 735
         }
     },
     methods: {
