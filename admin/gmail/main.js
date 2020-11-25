@@ -18,7 +18,8 @@ const saveDefaultLabels = async (auth) => {
       }
       const { labels } = res.data;
       neededLabels = labels.filter(({ name }) => neededLabelNames.includes(name));
-      await saveLabelsToDB(neededLabels);
+      const sortedLabels = [neededLabels[1],neededLabels[0],neededLabels[2]];
+      await saveLabelsToDB(sortedLabels);
     });
   }
 
@@ -33,6 +34,8 @@ const saveDefaultLabels = async (auth) => {
   }
 };
 
+const wait = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 const saveMessages = async (auth) => {
   if(!auth) getToken(saveMessages);
   else {
@@ -45,8 +48,7 @@ const saveMessages = async (auth) => {
         labelIds: `${ id }`
       }, async (err, res) => {
         for (let { id } of res.data.messages) {
-          const start = 0;
-          const finish = 1000;
+          await wait(500);
           await gmail.users.messages.get({
             userId: 'me', id: id
           }, async (err, res) => {
@@ -71,14 +73,14 @@ const saveMessages = async (auth) => {
     const neededLabelIndex = neededLabelIds.findIndex(item => labelIds.includes(item));
     const { _id, messages, name } = labels[neededLabelIndex];
     const messageIdsArr = messages.map(({ id: messageId }) => messageId);
-
+    const { value } = payload.headers.find(({ name }) => name === 'Subject');
     if(!messageIdsArr.includes(message.id)) {
       messages.push({
         id: messageId,
         snippet,
-        headers: payload.headers,
+        subject: value,
         creationTime: new Date(),
-        projectName: getProjectName(payload.headers, name)
+        projectName: getProjectName(value, name)
       });
     }
     await GmailMessages.updateOne({ _id }, { messages });
@@ -98,15 +100,17 @@ const updateOtherProjectStatusOnMessages = async () => {
       if (!isRead) {
         const project = await MemoqProject.findOne({ name: projectName });
         if (project) {
-          isRead = true;
           messages[i].isRead = true;
-          let status = 'Quote';
+          let status;
           switch (name) {
             case 'Project Approved':
               status = 'In progress';
               break;
             case 'Project Closed':
               status = 'Closed';
+              break;
+            case 'Decide on quote':
+              status = 'Quote';
               break;
           }
           await MemoqProject.updateOne({ _id: project._id }, { status });

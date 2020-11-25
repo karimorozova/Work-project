@@ -39,7 +39,6 @@ const updateMemoqProjectFinance = async (project) => {
   const clients = await Clients.find();
   const vendors = await Vendors.find();
   const { documents, lockedForRecalculation } = project;
-  project.status = getProjectStatus(documents);
   const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, project, documents);
   if (!doesHaveCorrectStructure && lockedForRecalculation) {
     return project;

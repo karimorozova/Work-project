@@ -25,8 +25,7 @@ const getNewToken = (oAuth2Client, tokenPath, callback) => {
   });
 };
 
-const getProjectName = (headers, labelName) => {
-  const { value } = headers.find(({ name }) => name === 'Subject');
+const getProjectName = (value, labelName) => {
   switch (labelName) {
     case 'Project Approved':
       return nameForApproved(value);

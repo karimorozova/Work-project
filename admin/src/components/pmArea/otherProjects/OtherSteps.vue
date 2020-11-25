@@ -7,54 +7,57 @@
           selectedTab="Steps"
           @setTab="showTab"
         )
-      DataTable(
-        :fields="fields"
-        :tableData="projectSteps"
-        :activeIndex="activeIndex"
-        :bodyClass="['steps-table-body', {'tbody_visible-overflow': projectSteps.length < 3}]"
-        :tableheadRowClass="projectSteps.length < 3 ? 'tbody_visible-overflow' : ''"
-        bodyCellClass="steps-table-cell"
-        bodyRowClass="steps-table-row"
-        v-if="project._id"
-      )
-        template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
-        template(slot="info" slot-scope="{row, index}")
-          div(@click="showStepDetails(index)" :class="{isDisabled: isFinanceData(index), 'steps__info-icon': !isFinanceData(index) }")
-            i.fa.fa-info-circle
-        template(slot="name" slot-scope="{ row }")
-          span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
-        template(slot="language" slot-scope="{ row, index }")
-          span.steps__step-data {{ languagePair(index) }}
-        template(slot="vendor" slot-scope="{ row, index }")
-          span.steps__step-data.steps_no-padding {{ getVendorFullName(index) }}
-        template(slot="start" slot-scope="{ row, index }")
-          span.steps__step-data {{row.DocumentAssignmentRole === 0 || index === 0 ? formateDate(project.creationTime) : formateDate(projectSteps[index-1].DeadLine) }}
-        template(slot="deadline" slot-scope="{ row, index }")
-          span.steps__step-data {{formateDate(row.DeadLine)}}
+      .steps__data(v-if="!projectSteps.length")
+        h3 Steps have not been recorded yet...
+      .steps__data(v-else)
+        DataTable(
+          :fields="fields"
+          :tableData="projectSteps"
+          :activeIndex="activeIndex"
+          :bodyClass="['steps-table-body', {'tbody_visible-overflow': projectSteps.length < 3}]"
+          :tableheadRowClass="projectSteps.length < 3 ? 'tbody_visible-overflow' : ''"
+          bodyCellClass="steps-table-cell"
+          bodyRowClass="steps-table-row"
+          v-if="project._id"
+        )
+          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+            span.tasks__label {{ field.label }}
+          template(slot="info" slot-scope="{row, index}")
+            div(@click="showStepDetails(index)" :class="{isDisabled: isFinanceData(index), 'steps__info-icon': !isFinanceData(index) }")
+              i.fa.fa-info-circle
+          template(slot="name" slot-scope="{ row }")
+            span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
+          template(slot="language" slot-scope="{ row, index }")
+            span.steps__step-data {{ languagePair(index) }}
+          template(slot="vendor" slot-scope="{ row, index }")
+            span.steps__step-data.steps_no-padding {{ getVendorFullName(index) }}
+          template(slot="start" slot-scope="{ row, index }")
+            span.steps__step-data {{row.DocumentAssignmentRole === 0 || index === 0 ? formateDate(project.creationTime) : formateDate(projectSteps[index-1].DeadLine) }}
+          template(slot="deadline" slot-scope="{ row, index }")
+            span.steps__step-data {{formateDate(row.DeadLine)}}
 
-        template(slot="receivables" slot-scope="{ row, index }")
-          .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
-            span.pricelist__list(v-if="project.steps[index].clientRate && !project.steps[index].clientRate.fromUser")
-              img.pricelist__img( src="../../../assets/images/red-info-icon.png")
-            span.pricelist__list(v-else)
+          template(slot="receivables" slot-scope="{ row, index }")
+            .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
+              span.pricelist__list(v-if="project.steps[index].clientRate && !project.steps[index].clientRate.fromUser")
+                img.pricelist__img( src="../../../assets/images/red-info-icon.png")
+              span.pricelist__list(v-else)
 
-            span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
-            span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
+              span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
+              span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
 
-        template(slot="payables" slot-scope="{ row, index }")
-          .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
-            span.pricelist__list(v-if="project.steps[index].vendorRate && !project.steps[index].clientRate.fromUser")
-              img.pricelist__img( src="../../../assets/images/red-info-icon.png")
-            span.pricelist__list(v-else)
+          template(slot="payables" slot-scope="{ row, index }")
+            .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
+              span.pricelist__list(v-if="project.steps[index].vendorRate && !project.steps[index].clientRate.fromUser")
+                img.pricelist__img( src="../../../assets/images/red-info-icon.png")
+              span.pricelist__list(v-else)
 
-            span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
-            span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
+              span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
+              span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
 
-        template(slot="margin" slot-scope="{ row, index }")
-          div(v-if="project.status === 'Closed' && project.steps.length")
-            span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
-            span.steps__step-data {{ project.steps[index].finance.profit }}
+          template(slot="margin" slot-scope="{ row, index }")
+            div(v-if="project.status === 'Closed' && project.steps.length")
+              span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
+              span.steps__step-data {{ project.steps[index].finance.profit }}
 
 
       transition(name="fade")
@@ -154,20 +157,20 @@
 
 		methods: {
 			isFinanceData(index) {
-        if (this.project.status === 'In progress') {
-          return true;
-        }
-        if (this.project.steps.length) {
-          if (this.project.steps[index].vendor === null) {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      },
-			getVendorFullName(index){
+				if(this.project.status === 'In progress') {
+					return true;
+				}
+				if(this.project.steps.length) {
+					if(this.project.steps[index].vendor === null) {
+						return true;
+					}
+				} else {
+					return true;
+				}
+			},
+			getVendorFullName(index) {
 				return this.projectSteps[index].UserInfoHeader.FullName
-      },
+			},
 			getLanguageSymbol(memoqSymbol) {
 				return this.getAllLanguages.find(item => item.memoq === memoqSymbol) === undefined ? '' : this.getAllLanguages.find(item => item.memoq === memoqSymbol).symbol;
 			},
