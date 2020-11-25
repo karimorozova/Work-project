@@ -5,8 +5,9 @@ const {
   updateMemoqProjectFinance,
   updateAllMemoqProjects,
   updateMemoqProjectStatus,
-  parseMessagesAndUpdateProjects
+  parseMessagesAndUpdateProjects,
 } = require('./otherProjectUpdates');
+const { getMemoqProjectsForClientPortal } = require('./getMemoqProject');
 
 module.exports = {
   getFilteredOtherProjects,
@@ -17,5 +18,6 @@ module.exports = {
   updateAllMemoqProjects,
   updateMemoqProjectStatus,
   doesAllTasksFinished,
-  parseMessagesAndUpdateProjects
+  parseMessagesAndUpdateProjects,
+  getMemoqProjectsForClientPortal
 };

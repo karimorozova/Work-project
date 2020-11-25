@@ -28,14 +28,15 @@ export const requestType = ({commit}, payload) => {
 
 export const getProjectsAndRequests = async function({ commit, dispatch, state}) {
   try {
-      const result = await this.$axios.get(`/portal/projects?token=${state.token}`);
-    console.log(result)
-      const { client, user, projects, requests } = result.data; 
-      commit('SET_PROJECTS', projects);
-      commit('SET_REQUESTS', requests);
-      commit('SET_USER', user);
-      commit('SET_CLIENT', client);
-      dispatch('setLangCombinations', client);
+    const result = await this.$axios.get(`/portal/projects?token=${state.token}`);
+    let { client, user, projects, memoqProjects, requests } = result.data;
+    projects.push(...memoqProjects);
+    projects = projects.sort((a, b) => b.startDate - a.startDate);
+    commit('SET_PROJECTS', projects);
+    commit('SET_REQUESTS', requests);
+    commit('SET_USER', user);
+    commit('SET_CLIENT', client);
+    dispatch('setLangCombinations', client);
   } catch(err) {
       console.log(err);
       dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
@@ -59,8 +60,8 @@ export const saveAccountDetails = async function({ commit, dispatch, state }, pa
     }
     formData.append('token', state.token);
     try {
-        const result = await this.$axios.post('/portal/account-details', formData);
-        const { user } = result.data; 
+      const result = await this.$axios.post('/portal/account-details', formData);
+      const { user } = result.data;
         commit('SET_USER', user);
     } catch(err) {
         console.log(err);

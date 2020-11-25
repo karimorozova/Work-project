@@ -55,7 +55,7 @@ const doesCorrelateWithOurVendor = (vendors, userAssignments) => {
     if (vendor) correlates = true;
   }
   return correlates;
-};
+}
 
 const doesAllTasksFinished = (documents) => {
   if (Array.isArray(documents)) {

@@ -8,6 +8,7 @@ const { getProject, getProjects, updateProjectStatusForClientPortalProject, getD
 const { getProjectDeliverables } = require('../projects/files');
 const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, notifyRequestCancelled } = require('../clientRequests');
 const { getAfterTaskStatusUpdate } = require('../clients');
+const { getMemoqProjectsForClientPortal } = require('../services/memoqs/otherProjects');
 const { Clients, Projects } = require('../models');
 const { secretKey } = require('../configs');
 const { upload } = require('../utils/');
@@ -89,12 +90,18 @@ router.post("/reset-pass", async (req, res) => {
 router.get('/projects', checkClientContact, async (req, res) => {
     const { token } = req.query;
     try {
-        const verificationResult = jwt.verify(token, secretKey);
-        const client = await getClient({"_id": verificationResult.clientId})
-        const projects = await getProjects({$and: [{status: {$ne: 'Draft'}}, {"customer": verificationResult.clientId}] });
-        const requests = await getClientRequests({"customer": verificationResult.clientId, status: {$ne: "Cancelled"}});
-        const user = client.contacts.find(item => item.email === verificationResult.contactEmail);
-        res.send({client, user, projects, requests});
+      const verificationResult = jwt.verify(token, secretKey);
+      const client = await getClient({ '_id': verificationResult.clientId });
+      const projects = await getProjects({ $and: [{ status: { $ne: 'Draft' } }, { 'customer': verificationResult.clientId }] });
+      const memoqProjects = await getMemoqProjectsForClientPortal(
+        { $and: [{ customer: verificationResult.clientId }, { status: { $ne: null } }] }
+      );
+      const requests = await getClientRequests({
+        'customer': verificationResult.clientId,
+        status: { $ne: 'Cancelled' }
+      });
+      const user = client.contacts.find(item => item.email === verificationResult.contactEmail);
+      res.send({ client, user, projects, memoqProjects, requests });
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting Projects.");

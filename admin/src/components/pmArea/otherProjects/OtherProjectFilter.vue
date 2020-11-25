@@ -74,10 +74,10 @@
 			};
 		},
 		methods: {
-			...mapActions(["alertToggle"]),
+      ...mapActions(['alertToggle']),
 
-			async getXTRFProjects() {
-				try {
+      async getXTRFProjects () {
+        try {
           console.log(this.$route);
           const result = await this.$http.get(`/memoqapi/update-all-memoq-finance/${this.$route.query.status}`);
           this.$emit('refreshProjects', result.data);
@@ -123,16 +123,16 @@
         date.setHours(23, 0, 0, 0);
         this.$emit('setFilter', { option: date, prop: 'deadlineFilter' });
       },
-			customFormatter(date) {
-				return moment(date).format("DD-MM-YYYY, HH:mm");
-			},
-			startOpen() {
-				this.$refs.startDate.showCalendar();
-			},
-			deadlineOpen() {
-				this.$refs.deadline.showCalendar();
-			},
-			addLang({ lang }, goal) {
+      customFormatter (date) {
+        return moment(date).format('DD-MM-YYYY, HH:mm');
+      },
+      startOpen () {
+        this.$refs.startDate.showCalendar();
+      },
+      deadlineOpen () {
+        this.$refs.deadline.showCalendar();
+      },
+      addLang ({ lang }, goal) {
 				const prop = goal === "sourceFilter" ? "sourceLangs" : "targetLangs";
 				const position = this[prop].indexOf(lang.symbol);
 				if(position !== -1) {
@@ -169,7 +169,6 @@
       display: flex;
       margin-bottom: 20px;
     }
-
     &__body {
       margin-right: 20px;
     }
