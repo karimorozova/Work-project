@@ -35,17 +35,15 @@ const getMemoqProjectsForClientPortal = async (query) => {
     finance: 1,
     accountManager: 1
   };
-  const projects = await MemoqProject.find(query, neededKeysObj).populate('accountManager');
+  const projects = await MemoqProject.find(query, neededKeysObj).populate('accountManager', ['firstName', 'lastName']);
   const structuredProjects = [];
   for (let { _doc } of projects) {
-    const projectIdRegex = new RegExp(/[0-9]{4} (0[1-9]|1[0-2]) (0[1-9]|[1-2][0-9]|3[0-1]) \[[0-9]{2}]/g);
+    const projectIdRegex = new RegExp(/(?<!ABC).*\d]/g);
+    const projectNameRegex = new RegExp(/[A-z][^\[\d\]\s].*/g);
     const projectId = _doc.name.match(projectIdRegex);
-    if (projectId) {
-      _doc.projectId = projectId[0];
-    } else {
-      _doc.projectId = _doc.name;
-    }
-    _doc.projectName = _doc.name;
+    const projectName = _doc.name.match(projectNameRegex);
+    _doc.projectId = projectId ? projectId[0] : '';
+    _doc.projectName = projectName ? projectName[0] : _doc.name;
     _doc.startDate = _doc.creationTime;
     delete _doc.name;
     delete _doc.creationTime;
