@@ -83,13 +83,12 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    min-height: 350px;
-    height: 100%;
+    height: 350px;
     box-sizing: border-box;
+    padding: 20px 0;
     &__header {
         width: 100%;
-        padding: 0 30px 20px;
+        padding: 0 20px 20px;
         box-sizing: border-box;
         border-bottom: 1px solid $light-brown;
         display: flex;
@@ -97,8 +96,8 @@ export default {
         align-items: center;
     }
     &__photo {
-        width: 32px;
-        height: 32px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         border: 1px solid $light-brown;
         margin-bottom: 10px;

@@ -91,7 +91,6 @@ export default {
     border-right: 1px solid $light-brown;
     display: flex;
     flex-direction: column;
-    padding-left: 20px;
     height: 100%;
     box-sizing: border-box;
     position: relative;
@@ -100,14 +99,14 @@ export default {
        display: flex;
        flex-direction: column;
        flex-wrap: wrap;
-       height: 100px;
+      height: 90px;
+      padding: 20px;
     }
     &__currency {
         margin-left: 5px;
     }
     &__tasks {
-        margin-top: 20px;
-        padding-right: 10px;
+      padding: 20px;
     }
     &__buttons {
         display: flex;

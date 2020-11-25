@@ -6,7 +6,7 @@
           slot(:name="field.headerKey" :field="field")
     .table__tbody.scroll(:class="bodyClass")
       .table__tbody-row(:class="rowClass" v-for="(row, index) of tableData" @click="onClick(index)")
-        .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
+        .table__tbody-cell(v-for="field of fields" datasrc="asd" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
     ValidationErrors(v-if="areErrors"
       :errors="errors"
@@ -195,6 +195,10 @@
 
 .tbody_visible-overflow {
   overflow: visible;
+}
+
+.withoutCursor{
+  cursor: default;
 }
 
 .scroll{
