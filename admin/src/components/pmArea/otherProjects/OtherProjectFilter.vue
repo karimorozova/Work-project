@@ -34,8 +34,10 @@
                 @chosenLang="({lang}) => addLang({lang}, 'sourceFilter')")
     .button
       .button__row
-        .button__new-vendor
+        .button__body
           input.button__update-btn(type="submit" value="Update XTRF Projects" @click="getXTRFProjects()")
+        .button__body
+          input.button__update-btn(type="submit" value="Update from messages" @click="parseMessages()")
         //.button__new-vendor(v-if="!isUpload")
           .button__update-btn
             .button__wait
@@ -77,32 +79,50 @@
 			async getXTRFProjects() {
 				try {
           console.log(this.$route);
-					const result = await this.$http.get(`/memoqapi/update-all-memoq-finance/${this.$route.query.status}`);
-					this.$emit('refreshProjects', result.data);
-				} catch (err) {
-					this.alertToggle({
-						message: "Server Error / Cannot update Project",
-						isShow: true,
-						type: "error"
-					});
-				} finally {
-					this.alertToggle({
-						message: "Projects update",
-						isShow: true,
-						type: "success"
-					});
-				}
-			},
-			setStart(event) {
-				const date = event;
-				date.setHours(0, 0, 0, 0);
-				this.$emit("setFilter", { option: date, prop: "startFilter" });
-			},
-			setDeadline(event) {
-				const date = event;
-				date.setHours(23, 0, 0, 0);
-				this.$emit("setFilter", { option: date, prop: "deadlineFilter" });
-			},
+          const result = await this.$http.get(`/memoqapi/update-all-memoq-finance/${this.$route.query.status}`);
+          this.$emit('refreshProjects', result.data);
+        } catch (err) {
+          this.alertToggle({
+            message: 'Server Error / Cannot update Project',
+            isShow: true,
+            type: 'error'
+          });
+        } finally {
+          this.alertToggle({
+            message: 'Projects updated',
+            isShow: true,
+            type: 'success'
+          });
+        }
+      },
+      async parseMessages () {
+        try {
+          const result = await this.$http.get(`/memoqapi/update-project-statuses-from-messages/${this.$route.query.status}`);
+          this.$emit('refreshProjects', result.data);
+        } catch (err) {
+          this.alertToggle({
+            message: 'Server Error / Cannot parse messages',
+            isShow: true,
+            type: 'error'
+          });
+        } finally {
+          this.alertToggle({
+            message: 'Projects updated',
+            isShow: true,
+            type: 'success'
+          });
+        }
+      },
+      setStart (event) {
+        const date = event;
+        date.setHours(0, 0, 0, 0);
+        this.$emit('setFilter', { option: date, prop: 'startFilter' });
+      },
+      setDeadline (event) {
+        const date = event;
+        date.setHours(23, 0, 0, 0);
+        this.$emit('setFilter', { option: date, prop: 'deadlineFilter' });
+      },
 			customFormatter(date) {
 				return moment(date).format("DD-MM-YYYY, HH:mm");
 			},
@@ -146,7 +166,12 @@
 <style lang="scss" scoped>
   .button {
     &__row {
+      display: flex;
       margin-bottom: 20px;
+    }
+
+    &__body {
+      margin-right: 20px;
     }
 
     &__wait {

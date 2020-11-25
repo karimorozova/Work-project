@@ -1,5 +1,5 @@
-const { MemoqProject, Clients, Vendors } = require('../../../models');
-const { checkProjectStructure, getProjectStatus } = require('./helpers');
+const { MemoqProject, Clients, Vendors, GmailMessages } = require('../../../models');
+const { checkProjectStructure } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
 
@@ -8,7 +8,7 @@ const updateAllMemoqProjects = async (querySource) => {
   switch (querySource) {
     case 'In-progress':
       query.status = 'In progress';
-      break
+      break;
     case 'Quote':
       query.status = 'Quote';
       break;
@@ -21,7 +21,6 @@ const updateAllMemoqProjects = async (querySource) => {
   for (let i = 0; i < projects.length; i++) {
     let project = projects[i];
     const { documents, lockedForRecalculation } = project;
-    project.status = getProjectStatus(documents);
     if (!lockedForRecalculation) {
       const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, project, documents);
       if (doesHaveCorrectStructure) {
@@ -33,6 +32,21 @@ const updateAllMemoqProjects = async (querySource) => {
     }
   }
   return await getMemoqProjects(query);
+};
+
+const parseMessagesAndUpdateProjects = async (status) => {
+  let query = status === 'Quote' ? 'Decide on quote' : 'Project Approved';
+  const { messages } = await GmailMessages.findOne({ name: query });
+  for (let i = 0; i < messages.length; i += 1) {
+    let { projectName, isRead } = messages[i];
+    if (!isRead) {
+      const project = await MemoqProject.findOne({ name: projectName });
+      if (project) {
+        messages[i].isRead = true;
+        await MemoqProject.updateOne({ _id: project._id }, { status });
+      }
+    }
+  }
 };
 
 const updateMemoqProjectFinance = async (project) => {
@@ -69,4 +83,9 @@ const updateMemoqProjectStatus = async (_id, direction) => {
   return await getProjectAfterUpdate({ _id }, { status: updatedStatus });
 };
 
-module.exports = { updateAllMemoqProjects, updateMemoqProjectFinance, updateMemoqProjectStatus };
+module.exports = {
+  updateAllMemoqProjects,
+  updateMemoqProjectFinance,
+  updateMemoqProjectStatus,
+  parseMessagesAndUpdateProjects
+};

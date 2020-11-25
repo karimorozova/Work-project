@@ -22,9 +22,10 @@ const {
   filterMemoqProjectsVendors,
   updateAllMemoqProjects,
   updateMemoqProjectFinance,
-  updateMemoqProjectStatus
+  updateMemoqProjectStatus,
+  parseMessagesAndUpdateProjects
 } = require('../services/memoqs/otherProjects');
-
+const { saveMessages } = require('../gmail');
 router.get('/users', async (req, res) => {
 	try {
 		const result = await getMemoqUsers();
@@ -280,11 +281,22 @@ router.post('/update-memoq-finance', async (req, res) => {
 router.get('/update-all-memoq-finance/:from', async (req, res) => {
   const { from } = req.params;
   try {
-    const updateProjects = await updateAllMemoqProjects(from);
-    res.send(updateProjects);
+    const updatedProjects = await updateAllMemoqProjects(from);
+    res.send(updatedProjects);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on updating all other projects');
+  }
+});
+
+router.get('/update-project-statuses-from-messages/:from', async (req, res) => {
+  const { from } = req.params;
+  try {
+    const updatedProjects = await getFilteredOtherProjects({ query: from });
+    res.send(updatedProjects);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on parsing gmail messages');
   }
 });
 

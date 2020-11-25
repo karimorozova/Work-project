@@ -49,13 +49,21 @@ const checkProjectStructure = (clients, vendors, memoqProject, documents) => {
 
 const doesCorrelateWithOurVendor = (vendors, userAssignments) => {
   let correlates = false;
-  for (let i = 0; i < userAssignments.length; i ++) {
+  for (let i = 0; i < userAssignments.length; i++) {
     const { UserInfoHeader: { FullName } } = userAssignments[i];
     const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
     if (vendor) correlates = true;
   }
-  return correlates
-}
+  return correlates;
+};
+
+const doesAllTasksFinished = (documents) => {
+  if (Array.isArray(documents)) {
+    return documents.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished');
+  }
+  const { DocumentStatus } = documents;
+  return DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished';
+};
 
 const findFittingIndustryId = async (industryName) => {
   const neededIndustry = await Industries.findOne({
@@ -94,4 +102,5 @@ module.exports = {
   checkDocumentHasCorrectStructure,
   findFittingIndustryId,
   checkProjectStructure,
+  doesAllTasksFinished
 };

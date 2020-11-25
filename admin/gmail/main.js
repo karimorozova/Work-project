@@ -7,7 +7,7 @@ const saveDefaultLabels = async (auth) => {
   if (!auth) getToken(saveDefaultLabels);
   else {
     let neededLabels = [];
-    const neededLabelNames = ['Project Approved', 'Project Closed', 'Decide on quote'];
+    const neededLabelNames = ['Project Approved', /*'Project Closed',*/ 'Decide on quote'];
     const gmail = gmailApi({ version: 'v1', auth });
     await gmail.users.labels.list({
       userId: 'me',
@@ -18,7 +18,7 @@ const saveDefaultLabels = async (auth) => {
       }
       const { labels } = res.data;
       neededLabels = labels.filter(({ name }) => neededLabelNames.includes(name));
-      const sortedLabels = [neededLabels[1],neededLabels[0],neededLabels[2]];
+      const sortedLabels = [neededLabels[1], neededLabels[0]/*,neededLabels[2]*/];
       await saveLabelsToDB(sortedLabels);
     });
   }
@@ -106,9 +106,9 @@ const updateOtherProjectStatusOnMessages = async () => {
             case 'Project Approved':
               status = 'In progress';
               break;
-            case 'Project Closed':
-              status = 'Closed';
-              break;
+            //case 'Project Closed':
+            //status = 'Closed';
+            //break;
             case 'Decide on quote':
               status = 'Quote';
               break;

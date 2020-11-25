@@ -3,7 +3,7 @@ const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients, Vendors } = require('../../models');
-const { createOtherProjectFinanceData, getProjectStatus, checkProjectStructure } = require('./otherProjects');
+const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished } = require('./otherProjects');
 
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
@@ -571,20 +571,21 @@ async function updateMemoqProjectsData() {
 			const { ServerProjectGuid } = project;
 			const documents = await getProjectTranslationDocs(ServerProjectGuid);
 			if(project.Name.indexOf('PngSys') === -1 && documents) {
-        let users = await getProjectUsers(ServerProjectGuid);
-        users = getUpdatedUsers(users);
-        let memoqProject = getMemoqProjectData(project, languages);
-        const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, memoqProject, documents);
-        memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
-          false : memoqProject.lockedForRecalculation;
-        memoqProject.isTest = memoqProject.isTest === undefined ?
-          false : memoqProject.isTest;
-        memoqProject = doesHaveCorrectStructure ?
-          await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
-        await MemoqProject.updateOne(
-          { serverProjectGuid: ServerProjectGuid },
-          { ...memoqProject, users, documents },
-          { upsert: true });
+				let users = await getProjectUsers(ServerProjectGuid);
+				users = getUpdatedUsers(users);
+				let memoqProject = getMemoqProjectData(project, languages);
+				memoqProject.status = doesAllTasksFinished(documents) ? 'Closed' : null;
+				const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, memoqProject, documents);
+				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
+						false : memoqProject.lockedForRecalculation;
+				memoqProject.isTest = memoqProject.isTest === undefined ?
+						false : memoqProject.isTest;
+				memoqProject = doesHaveCorrectStructure ?
+						await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
+				await MemoqProject.updateOne(
+						{ serverProjectGuid: ServerProjectGuid },
+						{ ...memoqProject, users, documents },
+						{ upsert: true });
 			}
 		}
 	} catch (err) {
