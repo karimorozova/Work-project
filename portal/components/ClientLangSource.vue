@@ -54,7 +54,7 @@ export default {
         }
         span {
             font-size: 15px;            
-            transition: all 0.3s;
+            transition: all 0.2s;
             padding: 3px;
             border-bottom: 0.5px solid #67573E;
             &:last-child {

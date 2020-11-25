@@ -86,6 +86,7 @@ export default {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    border-radius: 5px;
     &__search {
         box-sizing: border-box;
         width: 100%;
@@ -111,7 +112,7 @@ export default {
             border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.4s;
+            transition: all 0.2s;
             &:last-child {
                 border: none;
             }
@@ -141,6 +142,7 @@ export default {
     box-sizing: border-box;
     color: $main-color;
     cursor: pointer;
+    border-radius: 5px;
     .selected {
         width: 80%;
         height: 100%;

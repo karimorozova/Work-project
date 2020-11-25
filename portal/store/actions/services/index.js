@@ -29,6 +29,7 @@ export const requestType = ({commit}, payload) => {
 export const getProjectsAndRequests = async function({ commit, dispatch, state}) {
   try {
       const result = await this.$axios.get(`/portal/projects?token=${state.token}`);
+    console.log(result)
       const { client, user, projects, requests } = result.data; 
       commit('SET_PROJECTS', projects);
       commit('SET_REQUESTS', requests);

@@ -52,176 +52,178 @@
       .clientsMainWrapper__inner
         .breadCrumbs
           span.accountName {{ user.firstName }}
-          span.arrows(v-if="user.firstName") >>
+          span.arrows(v-if="user.firstName")
+            i.fa.fa-angle-double-right(aria-hidden='true')
           span {{ breadCrumb1.toUpperCase() }}
-          span.arrows(v-if="breadCrumb2") >>
-          span(v-if="clientRequestShow") {{ serviceType }}
+          //span.arrows(v-if="breadCrumb2")
+            i.fa.fa-angle-double-right(aria-hidden='true')
+          //span(v-if="clientRequestShow") {{ serviceType }}
         nuxt-child(:client='client' :user="user" :projects="projects" :requests="requests" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 </template>
 
 <script>
-  import ClickOutside from "vue-click-outside";
-  import { mapActions, mapGetters } from "vuex";
+	import ClickOutside from "vue-click-outside";
+	import { mapActions, mapGetters } from "vuex";
 
-  export default {
-    data() {
-      return {
-        companyName: "",
-        clientPortal: "CLIENT PORTAL",
-        navbarList: [
-          {
-            title: "DASHBOARD",
-            path: "/dashboard",
-            imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
-            active: true
-          },
-          {
-            title: "PROJECTS",
-            path: "/projects",
-            imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
-            active: false
-          },
-          {
-            title: "INVOICES",
-            path: "/invoices",
-            imgBrown: require("../assets/images/CATEGORIES/INVOICES.png"),
-            active: false
-          },
-          {
-            title: "DOCUMENTS",
-            path: "/documents",
-            imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
-            imgBrown: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
-            active: false
-          }
-        ],
-        openQuotes: true,
-        openProjects: true,
-        expander: false,
-        accountMenuVisible: false,
-        newProject: [
-          {title: "Translation", path: "/translation"},
-          {title: "Copywriting", path: "/copywriting"},
-          {title: "Marketing", path: "/marketing"}
-        //   {title: "Proofing/QA", path: "/proofing"},
-        //   {title: "Graphic Localization", path: "/graphic-localization"}
-        ],
-        dropdownVisible: false,
-        clientRequestShow: false,
-        serviceType: "",
-        thanksService: "",
-        breadCrumb1: "",
-        breadCrumb2: "",
-        domain: ""
-      };
-    },
-    methods: {
-      mainPageRender() {
-      this.toggleSideBar(true);
-      },
-      toggleSideBar(isFirstRender) {
-        for(let elem of this.navbarList) {
-          if(window.location.toString().indexOf(elem.path) !== -1) {
-            elem.active = true;
-          } else {
-            elem.active = false
-          }
-        }
-      },
-      thankYou(data) {
-        this.clientRequestShow = false;
-        this.thanksService = data;
-        this.$router.push('/confirm-order');
-      },
-      hideAccountMenu() {
-        this.accountMenuVisible = false;
-      },
-      closeRequestsMenu() {
-        this.dropdownVisible = false
-      },
-      signOut() {
-        this.logout();
-        this.$router.push('/login');
+	export default {
+		data() {
+			return {
+				companyName: "",
+				clientPortal: "CLIENT PORTAL",
+				navbarList: [
+					{
+						title: "DASHBOARD",
+						path: "/dashboard",
+						imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
+						active: true
+					},
+					{
+						title: "PROJECTS",
+						path: "/projects",
+						imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
+						active: false
+					},
+					{
+						title: "INVOICES",
+						path: "/invoices",
+						imgBrown: require("../assets/images/CATEGORIES/INVOICES.png"),
+						active: false
+					},
+					{
+						title: "DOCUMENTS",
+						path: "/documents",
+						imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
+						imgBrown: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
+						active: false
+					}
+				],
+				openQuotes: true,
+				openProjects: true,
+				expander: false,
+				accountMenuVisible: false,
+				newProject: [
+					{ title: "Translation", path: "/translation" },
+					{ title: "Copywriting", path: "/copywriting" },
+					{ title: "Marketing", path: "/marketing" }
+					//   {title: "Proofing/QA", path: "/proofing"},
+					//   {title: "Graphic Localization", path: "/graphic-localization"}
+				],
+				dropdownVisible: false,
+				clientRequestShow: false,
+				serviceType: "",
+				thanksService: "",
+				breadCrumb1: "",
+				breadCrumb2: "",
+				domain: ""
+			};
+		},
+		methods: {
+			mainPageRender() {
+				this.toggleSideBar(true);
+			},
+			toggleSideBar(isFirstRender) {
+				for (let elem of this.navbarList) {
+					if(window.location.toString().indexOf(elem.path) !== -1) {
+						elem.active = true;
+					} else {
+						elem.active = false
+					}
+				}
+			},
+			thankYou(data) {
+				this.clientRequestShow = false;
+				this.thanksService = data;
+				this.$router.push('/confirm-order');
+			},
+			hideAccountMenu() {
+				this.accountMenuVisible = false;
+			},
+			closeRequestsMenu() {
+				this.dropdownVisible = false
+			},
+			signOut() {
+				this.logout();
+				this.$router.push('/login');
 
-      },
-      switchSection(index) {
-        this.navbarList.forEach((item, i) => {
-          item.active = i === index;
-        });
-        this.$router.push(this.navbarList[index].path);
-      },
-      showAccountMenu() {
-        this.accountMenuVisible = !this.accountMenuVisible;
-      },
-      showAccountInfo() {
-        this.accountMenuVisible = !this.accountMenuVisible;
-        this.clientRequestShow = false;
-        this.navbarList.forEach(item => {
-          item.active = false;
-        });
-      },
-      showDropdown() {
-        this.dropdownVisible = !this.dropdownVisible;
-      },
-      dataForRequest(ind) {
-        this.serviceType = this.newProject[ind].title;
-        this.navbarList.forEach((item, i) => {
-            item.active = i === 0;
-        });
-        this.$router.push(`/client-request${this.newProject[ind].path}`);
-        this.dropdownVisible = false;
-      },
-      async getServices() {
-        const result = await this.$axios.$get('/api/services?filter=active');
-        result.sort((a, b) => {
-          return a.sortIndex - b.sortIndex
-        });
-        this.servicesGetting(result)
-      },
-      setToken() {
-        const clientToken = this.$cookie.get("client");
-        this.$store.commit("SET_TOKEN", clientToken);
-      },
-      ...mapActions({
-        logout: "logout",
-        requestInfo: "requestInfo",
-        loadLangs: "loadLangs",
-        servicesGetting: "servicesGetting",
-        getProjectsAndRequests: "getProjectsAndRequests",
-      })
-    },
-    watch: {
-      '$route'(to, from) {
-        this.breadCrumb1 = to.path.split('/')[1];
-        this.breadCrumb2 = to.path.split('/')[2];
-        if (!this.breadCrumb2) {
-          this.clientRequestShow = false;
-        } else if (this.breadCrumb1 === 'client-request') {
-          this.breadCrumb1 = 'New Project'
-        }
-      }
-    },
-    mounted() {
-        this.domain = process.env.domain;
-      this.mainPageRender();
-      this.setToken();
-      this.getServices();
-      this.getProjectsAndRequests();
-      this.breadCrumb1 = this.$route.path.split('/')[1];
-      this.breadCrumb2 = this.$route.path.split('/')[2];
-    },
-    directives: {
-      ClickOutside
-    },
-    computed: {
-      ...mapGetters({
-        projects: "getAllProjects",
-        requests: "getAllRequests",
-        user: "getUserInfo",
-        client: "getClientInfo"
-      })
-    }
-  };
+			},
+			switchSection(index) {
+				this.navbarList.forEach((item, i) => {
+					item.active = i === index;
+				});
+				this.$router.push(this.navbarList[index].path);
+			},
+			showAccountMenu() {
+				this.accountMenuVisible = !this.accountMenuVisible;
+			},
+			showAccountInfo() {
+				this.accountMenuVisible = !this.accountMenuVisible;
+				this.clientRequestShow = false;
+				this.navbarList.forEach(item => {
+					item.active = false;
+				});
+			},
+			showDropdown() {
+				this.dropdownVisible = !this.dropdownVisible;
+			},
+			dataForRequest(ind) {
+				this.serviceType = this.newProject[ind].title;
+				this.navbarList.forEach((item, i) => {
+					item.active = i === 0;
+				});
+				this.$router.push(`/client-request${ this.newProject[ind].path }`);
+				this.dropdownVisible = false;
+			},
+			async getServices() {
+				const result = await this.$axios.$get('/api/services?filter=active');
+				result.sort((a, b) => {
+					return a.sortIndex - b.sortIndex
+				});
+				this.servicesGetting(result)
+			},
+			setToken() {
+				const clientToken = this.$cookie.get("client");
+				this.$store.commit("SET_TOKEN", clientToken);
+			},
+			...mapActions({
+				logout: "logout",
+				requestInfo: "requestInfo",
+				loadLangs: "loadLangs",
+				servicesGetting: "servicesGetting",
+				getProjectsAndRequests: "getProjectsAndRequests",
+			})
+		},
+		watch: {
+			'$route'(to, from) {
+				this.breadCrumb1 = to.path.split('/')[1];
+				this.breadCrumb2 = to.path.split('/')[2];
+				if(!this.breadCrumb2) {
+					this.clientRequestShow = false;
+				} else if(this.breadCrumb1 === 'client-request') {
+					this.breadCrumb1 = 'New Project'
+				}
+			}
+		},
+		mounted() {
+			this.domain = process.env.domain;
+			this.mainPageRender();
+			this.setToken();
+			this.getServices();
+			this.getProjectsAndRequests();
+			this.breadCrumb1 = this.$route.path.split('/')[1];
+			this.breadCrumb2 = this.$route.path.split('/')[2];
+		},
+		directives: {
+			ClickOutside
+		},
+		computed: {
+			...mapGetters({
+				projects: "getAllProjects",
+				requests: "getAllRequests",
+				user: "getUserInfo",
+				client: "getClientInfo"
+			})
+		}
+	};
 </script>
 
 <style lang="scss" scoped>
@@ -252,6 +254,7 @@
     height: 6vh;
     width: 100%;
     z-index: 1000;
+
     .company {
       span {
         font-size: 24px;
@@ -267,17 +270,21 @@
       justify-content: flex-start;
       align-items: center;
       margin-left: 150px;
+
       a {
         text-decoration: none;
       }
+
       .clientsPortal {
         color: #fff;
         width: 100%;
       }
+
       .searchWrapper {
         display: flex;
         justify-content: flex-start;
         border: 2px solid #fff;
+
         img {
           padding-right: 514px;
         }
@@ -302,6 +309,7 @@
       @media screen and (max-width: 1330px) {
         margin-right: 85px;
       }
+
       img {
         padding-right: 514px;
       }
@@ -312,10 +320,12 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
+
       .account-menu {
         display: flex;
         align-items: center;
       }
+
       .dropdownWrapper {
         height: 34px;
         width: 239px;
@@ -345,6 +355,7 @@
             display: flex;
             align-items: center;
             position: relative;
+
             span {
               padding-left: 14px;
             }
@@ -356,13 +367,16 @@
             width: 20%;
             justify-content: center;
             align-items: center;
+
             img {
               cursor: pointer;
             }
+
             .rotate {
               transform: rotate(180deg);
             }
           }
+
           &__image {
             padding: 5px;
             cursor: pointer;
@@ -386,6 +400,7 @@
               padding: 15px;
               border-bottom: 0.2px solid #978d7e;
               cursor: pointer;
+
               &:hover {
                 background-color: #ddd3c8;
               }
@@ -406,6 +421,7 @@
         width: 33px;
         height: 33px;
         position: relative;
+
         &__photo {
           border-radius: 50%;
           background-color: white;
@@ -426,6 +442,7 @@
             border-radius: 6px;
             z-index: 5;
             overflow: hidden;
+
             &__info {
               display: flex;
               justify-content: flex-start;
@@ -434,6 +451,7 @@
 
               .icon {
                 margin-left: 10px;
+
                 img {
                   height: 32px;
                 }
@@ -465,8 +483,10 @@
               border-bottom: 1px solid #998e7e;
               cursor: pointer;
               text-decoration: none;
+
               .human_icon {
                 margin-left: 10px;
+
                 img {
                   height: 32px;
                 }
@@ -477,6 +497,7 @@
                 color: #67573e;
                 margin-left: 10px;
               }
+
               &:hover {
                 background-color: #ddd3c8;
               }
@@ -487,8 +508,10 @@
               justify-content: flex-start;
               align-items: center;
               cursor: pointer;
+
               .icon_exit {
                 margin-left: 12px;
+
                 img {
                   height: 32px;
                 }
@@ -499,6 +522,7 @@
                 color: #67573e;
                 margin-left: 7px;
               }
+
               &:hover {
                 background-color: #ddd3c8;
               }
@@ -509,6 +533,7 @@
 
       .chevronWrapper {
         width: 140px;
+
         .chevron {
           position: relative;
           text-align: center;
@@ -535,6 +560,7 @@
           background: #fff;
           transform: skew(0deg, 50deg);
         }
+
         .chevron:after {
           content: "";
           position: absolute;
@@ -556,11 +582,13 @@
     display: flex;
     height: 100%;
     position: relative;
+
     &__inner {
       width: 100%;
       box-sizing: border-box;
-      padding: 30px;
+      padding: 40px;
     }
+
     .maininfoWrapper {
       width: 100%;
     }
@@ -582,6 +610,7 @@
       flex-direction: column;
       width: 100%;
       margin: 0 auto;
+
       .buttonPanel {
         display: flex;
         justify-content: flex-end;
@@ -602,6 +631,7 @@
         }
       }
     }
+
     .clientsNavbar {
       font-family: MyriadPro;
       position: fixed;
@@ -609,6 +639,7 @@
       z-index: 999;
       display: flex;
       min-height: 94vh;
+
       &__sideBar {
         padding: 25px 0;
         background-color: #998e7e;
@@ -616,8 +647,8 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 4px 6px 8px rgba(103, 87, 62, .4);
-        transition: all .5s;
+        box-shadow: 1px 0 10px #998e7e;
+        /*transition: all .2s;*/
         z-index: 2;
         overflow: hidden;
       }
@@ -632,13 +663,16 @@
         text-align: center;
         cursor: pointer;
         z-index: 1;
+
         .icon {
           font-size: 32px;
         }
+
         .openReverse {
           transform: rotate(180deg);
         }
       }
+
       .navbar__ulist {
         list-style: none;
         font-size: 15px;
@@ -648,10 +682,12 @@
         height: 77vh;
         margin-bottom: 0;
         overflow-y: scroll;
-        a{
+
+        a {
           text-decoration: none;
           display: block;
           margin-bottom: 20px;
+
           &:last-child {
             margin-bottom: 120px;
             @media (max-height: 768px) {
@@ -662,35 +698,40 @@
 
         &_item {
           padding-bottom: 10px;
+          padding-top: 5px;
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
           cursor: pointer;
-          transition: all 0.4s;
 
           .intothelist {
             margin-bottom: 78%;
           }
+
           .title {
-            transition: all 0.4s;
             opacity: 0;
             color: #fff;
           }
+
           .showTitle {
             opacity: 1;
           }
+
           .navbar__image {
-              filter: brightness(300%);
+            filter: brightness(300%);
           }
         }
+
         .active {
           background-color: white;
+
           .title {
             color: #978d7e;
           }
+
           .navbar__image {
-              filter: none;
+            filter: none;
           }
         }
 
@@ -698,6 +739,7 @@
           li {
             &:nth-child(2) {
               background-color: white;
+
               .title {
                 color: #978d7e;
               }
@@ -707,7 +749,6 @@
       }
 
       .logoImage {
-        transition: all 0.4s;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -720,7 +761,6 @@
       }
 
       .balloons {
-        transition: all 0.4s;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -737,6 +777,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+
       &__dropMenu {
         display: flex;
         flex-direction: column;
@@ -744,12 +785,12 @@
         align-items: center;
         width: 100%;
         border-radius: 18px;
-        box-shadow: 0 3px 13px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0 10px #67573e9d;
         margin-right: 36px;
         margin-bottom: 10px;
         padding: 0 14px;
         color: #67573e;
-        transition: all 0.2s;
+
         &_select {
           display: flex;
           align-items: center;
@@ -758,16 +799,18 @@
           padding: 1.5%;
           cursor: pointer;
         }
+
         &_item {
           width: 100%;
           padding: 1.5%;
-          transition: all 0.4s;
         }
+
         .reverseImage {
           transform: rotate(180deg);
         }
       }
     }
+
     .borderAngle {
       border-radius: 0;
       border: none;
@@ -777,9 +820,10 @@
 
   .breadCrumbs {
     max-height: 50px;
-    margin: 20px 0;
+    margin: 0px 0px 30px 0;
     color: #67573e;
-    font-size: 20px;
+    font-size: 22px;
+
     .arrows {
       font-size: 16px;
       opacity: 0.6;

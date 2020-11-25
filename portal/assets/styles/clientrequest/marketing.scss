@@ -99,7 +99,7 @@
                     border: 1px solid rgba(102, 86, 61, .5);
                     outline: none;
                     font-family: MyriadPro;
-                    transition: all 0.3s;
+                    transition: all 0.2s;
                     &:focus {
                         box-shadow: 0 0 3px rgba(102, 86, 61, 0.6);
                     }                   
@@ -274,7 +274,7 @@
                             display: flex;
                             align-items: center;
                             cursor: pointer;
-                            transition: all 0.3s;
+                            transition: all 0.2s;
                             position: relative;
                             &_dialect {  
                                 &:before, &:after {
@@ -327,7 +327,7 @@
                                 box-shadow: 0px 0 15px rgba(102, 86, 61, 0.3);
                                 border-radius: 5px;
                                 span {
-                                    transition: all 0.4s;
+                                    transition: all 0.2s;
                                     transform: translateX(3px);
                                 }     
                             }
@@ -372,7 +372,7 @@
                 height: 17px;
                 padding: 6px;
                 overflow: hidden;
-                transition: all 0.3s;
+                transition: all 0.2s;
                 resize: none;
                 font-family: MyriadPro;                
             }
@@ -608,7 +608,7 @@ color: #D15F45;
             color: #F4866E;
             width: 500px;
             top: -15px;
-            transition: all 0.3s;
+            transition: all 0.2s;
             .inner-topics__title & {
                 left: 10px;
                 width: 570px;
@@ -635,7 +635,7 @@ color: #D15F45;
     display: flex;
     position: relative;
     cursor: pointer;
-    transition: all 0.3s;    
+    transition: all 0.2s;
     .toggler {
         position: absolute;
         width: 46%;
@@ -649,7 +649,7 @@ color: #D15F45;
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
         box-shadow: 0 0 3px rgba(0,0,0,0.5);
         z-index: 2;
-        transition: all 0.3s;        
+        transition: all 0.2s;
     }
     .yes, .no {
         border: none;
@@ -657,7 +657,7 @@ color: #D15F45;
         justify-content: center;
         align-items: center;
         color: white;
-        transition: all 0.3s;
+        transition: all 0.2s;
         span {
             padding-top: 3px;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);

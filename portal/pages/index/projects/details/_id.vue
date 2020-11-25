@@ -74,16 +74,16 @@ export default {
     display: flex;
     align-items: center;
     &__data {
-        width: 1020px;
-        box-shadow: 0 0 15px $brown-shadow;
+        width: 1039px;
+        box-shadow: 0 0 10px #67573e9d;
         box-sizing: border-box;
     }
     &__header {
-        padding: 10px 20px 10px 28px;
+        padding: 20px;
         border-bottom: 1px solid $light-brown;
     }
     &__title {
-        font-size: 19px;
+        font-size: 18px;
     }
     &__info {
         display: flex;

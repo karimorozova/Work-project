@@ -111,7 +111,7 @@ export default {
         border-radius: 3px;
         box-sizing: border-box;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
     }
     &__language {
         padding: 2px;
@@ -131,7 +131,7 @@ export default {
     }
     &__name {
         padding-top: 2px;
-        transition: all 0.3s;
+        transition: all 0.2s;
     }
     &__dialects {
         box-sizing: border-box;
@@ -142,7 +142,7 @@ export default {
         padding-left: 20px;
         opacity: 0;
         z-index: -5;
-        transition: all 0.3s;
+        transition: all 0.2s;
     }
     &_translate-0 {
         transform: translateY(0);

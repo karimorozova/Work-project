@@ -103,7 +103,7 @@ export default {
     align-items: center;
     width: 100%;
     border-radius: 18px;
-    box-shadow: 0 3px 13px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px #67573e9d;
     margin-right: 36px;
     margin-bottom: 10px;
     padding: 0 14px;
@@ -115,13 +115,13 @@ export default {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 15px;
+    padding: 20px;
     cursor: pointer;
+    font-size: 18px;
   }
   &__table {
     width: 100%;
-    padding: 10px;
-    transition: all 0.4s;
+    transition: all 0.2s;
   }
   &_cornered {
     border-radius: 0;

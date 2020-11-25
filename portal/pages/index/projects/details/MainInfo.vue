@@ -101,7 +101,6 @@ export default {
        flex-direction: column;
        flex-wrap: wrap;
        height: 100px;
-       padding: 10px 0 10px 8px;
     }
     &__currency {
         margin-left: 5px;

@@ -10,7 +10,8 @@
             span.filters__label Request On
             input.filters__filter(type="text" readonly :value="formatDateFilter('requestFilter')")
             img.filters__icon(src="../../assets/images/calendar.png" @click="(e) => togglePickers(e, 'isRequestOnFilter')")
-            QuotesCalendarDetailed(v-if="isRequestOnFilter" 
+            QuotesCalendarDetailed(
+                v-if="isRequestOnFilter"
                 :datesFilter="requestFilter"
                 @close="(e) => closePickers(e, 'isRequestOnFilter')"
                 @setDate="(e) => setDateFilter(e, 'requestFilter')"
@@ -128,6 +129,8 @@ export default {
     width: 100%;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-bottom: 20px;
+
     &__item {
         width: 31%;
         display: flex;
@@ -143,11 +146,14 @@ export default {
         border: 1px solid $cell-border;
         outline: none;
         width: 65%;
+        border-radius: 5px;
     }
     &__drop-menu {
         position: relative;
         height: 30px;
         width: 65%;
+        border-radius: 5px;
+
     }
     &__icon {
         position: absolute;

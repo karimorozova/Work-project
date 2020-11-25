@@ -28,7 +28,7 @@ export default {
     justify-content: center;
     align-items: center;
     color: white;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .big-toggler {
@@ -37,7 +37,7 @@ export default {
     display: flex;
     position: relative;
     cursor: pointer;
-    transition: all 0.3s;    
+    transition: all 0.2s;
     &__toggler {
         position: absolute;
         width: 46%;
@@ -51,7 +51,7 @@ export default {
         filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
         box-shadow: 0 0 3px rgba(102, 86, 61, 0.6);
         z-index: 2;
-        transition: all 0.3s;        
+        transition: all 0.2s;
     }
     &__text {
         padding-top: 3px;

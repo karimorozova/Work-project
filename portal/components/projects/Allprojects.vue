@@ -111,13 +111,13 @@ export default {
     align-items: flex-start;
     margin: 0 auto;
     &__drop-menu {
-        width: 970px;
+        width: 1010px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
         border-radius: 18px;
-        box-shadow: 0 3px 13px rgba(103, 87, 62, 0.5);
+        box-shadow: 0 0 10px #67573e9d;
         margin-bottom: 10px;
         padding: 0 14px;
         color: #67573e;
@@ -129,8 +129,9 @@ export default {
         align-items: center;
         justify-content: space-between;
         border-radius: 18px;
-        padding: 14px;
+        padding: 20px;
         cursor: pointer;
+        font-size: 18px;
     }
     &__item {
         width: 100%;
