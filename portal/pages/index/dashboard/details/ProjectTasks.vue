@@ -18,9 +18,9 @@
         .tasks-table__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
           img.tasks-table__time-icon(src="../../../../assets/images/time_icon.png")
           .tasks-table__time-data {{ getDeliveredTime(row.deliveredTime) }}
-      .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row }")
-        ProgressLine(:progress="getProgress(row)")
-      .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
+      .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row, index }")
+        ProgressLine(:progress="getProgress(row, index)")
+      .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ getWordcount(row)}}
       template(slot="cost" slot-scope="{ row }")
         .tasks-table__data(v-if="!isCancelledHalfway(row)") {{ row.finance.Price.receivables }}
           .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
@@ -64,6 +64,9 @@
 				alertToggle: "alertToggle",
 				updateTaskStatus: "updateTaskStatus"
 			}),
+      getWordcount(row){
+	      return row.finance.Wordcount.receivables;
+      },
 			isCancelledHalfway(task) {
 				return task.status === 'Cancelled Halfway';
 			},
@@ -101,15 +104,20 @@
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
-			getProgress(task) {
-				const { steps } = this.project;
-				let total = 0;
-				const taskSteps = steps.filter(item => task.taskId === item.taskId);
-				for (let step of taskSteps) {
-					const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress;
-					total += progress;
+			getProgress(task, index) {
+				if(this.project.hasOwnProperty('fromXTRF')) {
+					return this.project.tasks[index].progress;
+				} else {
+					const { steps } = this.project;
+					let total = 0;
+					const taskSteps = steps.filter(item => task.taskId === item.taskId);
+					for (let step of taskSteps) {
+						const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress;
+						total += progress;
+					}
+					return (total / taskSteps.length).toFixed(2);
 				}
-				return (total / taskSteps.length).toFixed(2);
+
 			}
 		},
 		computed: {
@@ -151,14 +159,16 @@
       width: 100%;
       display: flex;
       align-items: center;
-      justify-content: space-around;
+      justify-content: center;
     }
 
     &__icon {
-      cursor: pointer;
+      height: 20px;
       transition: all 0.2s;
+      margin: 0 6px;
 
       &:hover {
+        cursor: pointer;
         transform: scale(1.1);
       }
     }

@@ -74,7 +74,8 @@ export default {
     display: flex;
     align-items: center;
     &__data {
-        width: 1039px;
+        width: 1038px;
+        min-width: 1038px;
         box-shadow: 0 0 10px #67573e9d;
         box-sizing: border-box;
     }

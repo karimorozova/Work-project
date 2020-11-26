@@ -29,13 +29,14 @@ export const requestType = ({commit}, payload) => {
 export const getProjectsAndRequests = async function({ commit, dispatch, state}) {
   try {
     const result = await this.$axios.get(`/portal/projects?token=${state.token}`);
-    let { client, user, projects, memoqProjects, requests } = result.data;
+    let { client, user, projects, memoqProjects, requests, languages } = result.data;
     projects.push(...memoqProjects);
     projects = projects.sort((a, b) => b.startDate - a.startDate);
     commit('SET_PROJECTS', projects);
     commit('SET_REQUESTS', requests);
     commit('SET_USER', user);
     commit('SET_CLIENT', client);
+    commit('SET_LANGUAGES', languages);
     dispatch('setLangCombinations', client);
   } catch(err) {
       console.log(err);
