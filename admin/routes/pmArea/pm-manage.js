@@ -1,6 +1,6 @@
-const router = require("express").Router();
-const { User, Clients, Delivery, Projects, Pricelist, Units } = require("../../models");
-const { getClient } = require("../../clients");
+const router = require('express').Router();
+const { User, Clients, Delivery, Projects, Pricelist, Units, Discounts } = require('../../models');
+const { getClient } = require('../../clients');
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require("../../сalculations/wordcount");
 const { getAfterPayablesUpdated } = require("../../сalculations/updates");
 const {
@@ -1010,14 +1010,36 @@ router.get('/pricelist-new-langs/:id', async (req, res) => {
 });
 
 router.post('/add-new-langs', async (req, res) => {
-	const { pricelistId, langArr } = req.body;
-	try {
-		await pushNewLangs(pricelistId, langArr);
-		const updatedPricelist = await Pricelist.findOne({ _id: pricelistId });
-		res.send(updatedPricelist.newLangPairs);
-	} catch (err) {
-		console.log(err);
-		res.status(500).send('Error on adding new languages');
-	}
+  const { pricelistId, langArr } = req.body;
+  try {
+    await pushNewLangs(pricelistId, langArr);
+    const updatedPricelist = await Pricelist.findOne({ _id: pricelistId });
+    res.send(updatedPricelist.newLangPairs);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on adding new languages');
+  }
+});
+
+router.get('/discounts', async (req, res) => {
+  try {
+    const discounts = await Discounts.find();
+    res.send(discounts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting discounts');
+  }
+});
+
+router.post('/update-discounts', async (req, res) => {
+  const { _id, values } = req.body;
+  try {
+    await Discounts.updateOne({ _id }, { ...values });
+    const updatedDiscounts = await Discounts.find();
+    res.send(updatedDiscounts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating discounts');
+  }
 });
 module.exports = router;
