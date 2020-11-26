@@ -10,7 +10,7 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
     stepsAndUnits,
   } = allInfo;
   try {
-    const { customer: { _id: customer }, industry } = project;
+    const { customer: { _id: customer, discounts }, industry } = project;
     let steps = [];
     let tasksWithoutFinance = await getTasksForCustomUnits({
       ...allInfo,
@@ -27,7 +27,7 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
     const tasks = tasksWithoutFinance.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
-    const projectFinance = getProjectFinance(tasks, project.finance);
+    const projectFinance = getProjectFinance(tasks, project.finance, discounts);
     return await updateProject(
       { _id: project.id },
       { finance: projectFinance, $push: { tasks: tasks, steps: steps } }

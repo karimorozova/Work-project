@@ -341,9 +341,7 @@ const ClientSchema = new mongoose.Schema({
     }
   }],
   discounts: [{
-    type: {
-      type: Schema.Types.ObjectId, ref: 'Discounts',
-    }
+    type: Schema.Types.ObjectId, ref: 'Discounts',
   }],
   matrix: {
     type: Object,
