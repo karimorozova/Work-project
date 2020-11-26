@@ -10,11 +10,11 @@ const discountsSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  type: {
-    type: 'String',
-    enums: ['Surcharge', 'Discount'],
-    required: true
-  },
+  // type: {
+  //   type: 'String',
+  //   enums: ['Surcharge', 'Discount'],
+  //   required: true
+  // },
   isActive: {
     type: Boolean,
     required: true
