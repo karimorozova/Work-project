@@ -292,6 +292,7 @@ router.get('/update-all-memoq-finance/:from', async (req, res) => {
 router.get('/update-project-statuses-from-messages/:from', async (req, res) => {
   const { from } = req.params;
   try {
+	await parseMessagesAndUpdateProjects(from);
     const updatedProjects = await getFilteredOtherProjects({ query: from });
     res.send(updatedProjects);
   } catch (err) {
