@@ -37,20 +37,19 @@
 		},
 		methods: {
 			getLanguagePairs(row) {
-				if(this.project.status === "Requested") {
-					return this.project.packageSize ? `${ row.lang } / ${ this.project.packageSize.size }` : `${ this.project.sourceLanguage.lang } => ${ row.lang }`;
-				}
-				return '?? >> ??'
+				// if(this.project.status === "Requested") {
+				// 	return this.project.packageSize ? `${ row.lang } / ${ this.project.packageSize.size }` : `${ this.project.sourceLanguage.lang } => ${ row.lang }`;
+				// }
+				return `${row.sourceLanguage} >> ${row.targetLanguage}`
 				//MAX
 				//   return this.getQuotePairs(row);
 			},
 			getQuotePairs(task) {
-				let ratesProp = 'monoRates';
-				if(task.service.calculationUnit !== 'Packages') {
-					ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
-				}
-
-				return '?? >> ??'
+				return `${task.sourceLanguage} >> ${task.targetLanguage}`
+				// let ratesProp = 'monoRates';
+				// if(task.service.calculationUnit !== 'Packages') {
+				// 	ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
+				// }
 				//MAX
 				// return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
 			},

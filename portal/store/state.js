@@ -12,7 +12,8 @@ const state = {
   isAlert: false,
   alertType: "success",
   currentRequests: 0,
-  selectedProject: {}
+  selectedProject: {},
+  languages: []
 };
 
 export default state

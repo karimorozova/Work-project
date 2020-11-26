@@ -28,17 +28,21 @@ export default {
             alertToggle: "alertToggle"
         }),
         async getProjectInfo() {
-            const { id } = this.$route.params;
-            try {
-                if(!this.allProjects.length || !this.allRequests.length) {
-                    await this.getProjectsAndRequests();
-                }
-                const projectsAndRequests = [...this.allProjects, ...this.allRequests];
-                const currentProject = projectsAndRequests.find(item => item._id === id);
-                await this.selectProject(currentProject);
-            } catch(err) {
+          const { id } = this.$route.params;
+	        try {
+              //MM
+	            // if(!this.allProjects.length || !this.allRequests.length) {
+	            //     await this.getProjectsAndRequests();
+	            // }
+              if(!this.allProjects.length) {
+                  await this.getProjectsAndRequests();
+              }
+	            const projectsAndRequests = [...this.allProjects, ...this.allRequests];
+	            const currentProject = projectsAndRequests.find(item => item._id === id);
+	            await this.selectProject(currentProject);
+	        } catch(err) {
 
-            }
+	        }
         }
     },
     computed: {
@@ -77,6 +81,7 @@ export default {
     align-items: center;
     &__data {
         width: 1038px;
+        min-width: 1038px;
         box-shadow: 0 0 10px #67573e9d;
         box-sizing: border-box;
     }

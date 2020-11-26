@@ -16,7 +16,7 @@
             QuoteTasks
         .main-info__tasks(v-else)
             ProjectTasks
-        .main-info__buttons(v-if="project.status === 'Quote sent'")
+        .main-info__buttons(v-if="project.status === 'Quote sent' && !project.hasOwnProperty('fromXTRF')")
             .main-info__button
                 Button(value="Approve Quote" buttonClass="tasks-approve" @makeAction="updateQuote('approve')")
             .main-info__button

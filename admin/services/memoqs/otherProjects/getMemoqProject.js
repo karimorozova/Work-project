@@ -33,7 +33,8 @@ const getMemoqProjectsForClientPortal = async (query) => {
     creationTime: 1,
     deadline: 1,
     finance: 1,
-    accountManager: 1
+    accountManager: 1,
+    domain: 1,
   };
   const projects = await MemoqProject.find(query, neededKeysObj).populate('accountManager', ['firstName', 'lastName']);
   const structuredProjects = [];
@@ -46,6 +47,7 @@ const getMemoqProjectsForClientPortal = async (query) => {
     _doc.projectName = projectName ? projectName[0] : _doc.name;
     _doc.startDate = _doc.creationTime;
     _doc.fromXTRF = true;
+    _doc.status =  _doc.status === 'Quote'? 'Quote sent' : _doc.status;
     delete _doc.name;
     delete _doc.creationTime;
     structuredProjects.push(_doc);

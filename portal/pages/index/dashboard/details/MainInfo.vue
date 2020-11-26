@@ -20,7 +20,7 @@
       QuoteTasks
     .main-info__tasks(v-else)
       ProjectTasks
-    .main-info__buttons(v-if="project.status === 'Quote sent'")
+    .main-info__buttons(v-if="project.status === 'Quote sent' && !project.hasOwnProperty('fromXTRF')")
       .main-info__button
         Button(value="Approve Quote" buttonClass="tasks-approve" @makeAction="updateQuote('approve')")
       .main-info__button
@@ -77,16 +77,23 @@
 				}
 			},
 			getTotalProgress() {
-				let total = 0;
-				const { steps } = this.project;
-				if(steps && steps.length) {
-					for (let step of steps) {
-						const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress;
-						total += progress;
+				if(this.project.hasOwnProperty('fromXTRF')){
+					return this.project.tasks.length ? this.project.tasks.reduce((acc, curr) => {
+						acc += curr.progress;
+						return acc
+					}, 0) / this.project.tasks.length : 0;
+        }else{
+					let total = 0;
+					const { steps } = this.project;
+					if(steps && steps.length) {
+						for (let step of steps) {
+							const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress;
+							total += progress;
+						}
+						return +(total / steps.length).toFixed(2);
 					}
-					return +(total / steps.length).toFixed(2);
-				}
-				return 0;
+					return 0;
+        }
 			},
 			showModal() {
 				this.isApproveModal = true;

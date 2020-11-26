@@ -40,6 +40,10 @@ export const SET_CLIENT = (state, payload) => {
     state.clientInfo = payload;
 }
 
+export const SET_LANGUAGES = (state, payload) => {
+    state.languages = payload;
+}
+
 export const SET_PROJECTS = (state, payload) => {
     let projects = [];
     if(payload.length) {
