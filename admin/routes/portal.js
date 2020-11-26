@@ -9,7 +9,7 @@ const { getProjectDeliverables } = require('../projects/files');
 const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, notifyRequestCancelled } = require('../clientRequests');
 const { getAfterTaskStatusUpdate } = require('../clients');
 const { getMemoqProjectsForClientPortal } = require('../services/memoqs/otherProjects');
-const { Clients, Projects } = require('../models');
+const { Clients, Projects, Languages } = require('../models');
 const { secretKey } = require('../configs');
 const { upload } = require('../utils/');
 const { setClientsContactNewPassword, updateAccountDetails } = require('../users');
@@ -100,8 +100,9 @@ router.get('/projects', checkClientContact, async (req, res) => {
         'customer': verificationResult.clientId,
         status: { $ne: 'Cancelled' }
       });
+      const languages = await Languages.find();
       const user = client.contacts.find(item => item.email === verificationResult.contactEmail);
-      res.send({ client, user, projects, memoqProjects, requests });
+      res.send({ client, user, projects, memoqProjects, requests, languages });
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting Projects.");

@@ -24,7 +24,7 @@
                 .data-table__payment(v-if="row.status !== 'Requested'") {{ row.finance.Price.receivables }}
                     span.data-table__currency(v-if="row.finance.Price.receivables") &euro;
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
-                img.data-table__icon(v-if="row.status === 'Quote sent'" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
+                img.data-table__icon(v-if="row.status === 'Quote sent' && !row.hasOwnProperty('fromXTRF')" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
             .data-table__data.data-table__progress(slot="progress" slot-scope="{ row, index }")
                 ProgressLine(:progress="progress(row.steps, row)")
 </template>

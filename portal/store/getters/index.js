@@ -13,3 +13,6 @@ export const getCombinations = state => state.clientLanguages;
 export const getSelectedProject = state => state.selectedProject;
 export const getOrderDetails = state => state.orderDetails;
 export const getClientIndustries = state => state.clientInfo.industries;
+export const clientSourceLanguages = state => state.clientInfo.sourceLanguages;
+export const clientTargetLanguages = state => state.clientInfo.targetLanguages;
+export const allLanguages = state => state.languages;
