@@ -62,7 +62,7 @@ export default {
         },
         isDownload(project) {
             const statuses = ['Ready for Delivery', 'Delivered', 'Closed'];
-            return statuses.indexOf(project.status) !== -1;
+            return statuses.indexOf(project.status) !== -1 && !project.hasOwnProperty('fromXTRF');
         },
         async clientInfo() {
           const token = this.jsess;
