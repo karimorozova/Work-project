@@ -32,9 +32,11 @@ const CurrencyRatio = require('./currencyRatio');
 const OverallView = require('./dashboardOverall');
 const SalesPerformance = require('./dashboardSalesPerformance');
 const GmailMessages = require('./gmailMessages');
+const Discounts = require('./discounts');
 
 const Models = {
   Languages,
+  Discounts,
   Requests,
   Projects,
   User,

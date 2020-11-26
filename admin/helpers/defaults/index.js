@@ -12,9 +12,10 @@ const { defaultTimezones } = require('./defaultTimezones');
 const { defaultIndustries } = require('./defaultIndustries');
 const { defaultServices } = require('./defaultServices');
 const { defaultGroups } = require('./defaultGroups');
-const { defaultCancelReasons } = require("./defaultCancelReasons");
-const { defaultInstructions } = require("./defaultInstructions");
-const { defaultLeadSources } = require("./defaultLeadSources");
+const { defaultCancelReasons } = require('./defaultCancelReasons');
+const { defaultInstructions } = require('./defaultInstructions');
+const { defaultLeadSources } = require('./defaultLeadSources');
+const { defaultDiscounts } = require('./defaultDiscounts');
 
 module.exports = {
   defaultLanguages,
@@ -32,5 +33,6 @@ module.exports = {
   defaultGroups,
   defaultInstructions,
   defaultLeadSources,
-  defaultCancelReasons
+  defaultCancelReasons,
+  defaultDiscounts
 };

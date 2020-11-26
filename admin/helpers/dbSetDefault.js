@@ -16,7 +16,8 @@ const {
   CancelReason,
   Units,
   CurrencyRatio,
-  GmailMessages
+  GmailMessages,
+  Discounts,
 } = require('../models');
 
 const {
@@ -30,12 +31,13 @@ const {
   defaultTimezones,
   defaultGroups,
   defaultSteps,
-  defaultClients,
-  defaultVendors,
+  // defaultClients,
+  // defaultVendors,
   defaultUnits,
   defaultCancelReasons,
   defaultInstructions,
   defaultLeadSources,
+  defaultDiscounts
 } = require('./defaults');
 
 const { saveDefaultLabels } = require('../gmail');
@@ -106,7 +108,20 @@ function fillGroups() {
     });
 }
 
-function fillSteps() {
+async function fillDefaultDiscounts () {
+  const discounts = await Discounts.find();
+  if (!discounts.length) {
+    for (let discount of defaultDiscounts) {
+      await new Discounts(discount).save().then(res => {
+        console.log(`Discount ${discount.name} saved!`);
+      }).catch(err => {
+        console.log('Cannot save discounts' + err.message);
+      });
+    }
+  }
+}
+
+function fillSteps () {
   return Step.find({})
     .then(async steps => {
       if (!steps.length) {
@@ -485,6 +500,7 @@ async function fillDefaultLabels () {
 async function checkCollections () {
   await fillInstructions();
   await fillCancelReasons();
+  await fillDefaultDiscounts();
   await fillLeadSources();
   await fillGroups();
   await fillDefaultLabels();
@@ -498,8 +514,8 @@ async function checkCollections () {
   await industries();
   await fillCurrencyRatio();
   await fillPricelist();
-  await clients();
-  await vendors();
+  // await clients();
+  // await vendors();
 }
 
 module.exports = checkCollections();
