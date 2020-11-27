@@ -8,7 +8,7 @@ const ObjectId = require('mongodb').ObjectID;
 async function createTasksWithPackagesUnit (allInfo) {
   const { project, stepsAndUnits, stepsDates } = allInfo;
   try {
-    const { customer: { _id: customer, discounts }, industry } = project;
+    const { customer: { _id: customer }, industry, discounts } = project;
     const tasksWithoutFinance = await getTasksForCustomUnits({ ...allInfo, projectId: project.projectId });
     let steps = stepsAndUnits.length === 2 ? await getStepsForDuoUnits({
         tasks: tasksWithoutFinance,

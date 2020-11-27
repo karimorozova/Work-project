@@ -4,10 +4,12 @@ const { getClient } = require('../../clients');
 const { setDefaultStepVendors, calcCost, updateProjectCosts } = require('../../сalculations/wordcount');
 const { getAfterPayablesUpdated } = require('../../сalculations/updates');
 const {
-  getProject, createProject, createTasks, createTasksForWordcount, updateProject, getProjectAfterCancelTasks, updateProjectStatus, getProjectWithUpdatedFinance,
-  manageDeliveryFile, createTasksFromRequest, setStepsStatus, getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled,
-  getProjectAfterFinanceUpdated, updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2, notifyStepReopened,
-  getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate, checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage
+  getProject, createProject, createTasks, createTasksForWordcount, updateProject, getProjectAfterCancelTasks,
+  updateProjectStatus, getProjectWithUpdatedFinance, manageDeliveryFile, createTasksFromRequest, setStepsStatus,
+  getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled, getProjectAfterFinanceUpdated,
+  updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2,
+  notifyStepReopened, getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate,
+  checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage, updateProjectFinanceOnDiscountsUpdate
 } = require('../../projects');
 const { sendQuotes, getMessage } = require('../../projects/emails');
 const {
@@ -66,12 +68,14 @@ router.get('/language-pairs', async (req, res) => {
 
 router.post('/new-project', async (req, res) => {
   let project = { ...req.body };
-  const { contacts, billingInfo, projectManager, accountManager } = await Clients.findOne({ '_id': project.customer });
+  const { contacts, billingInfo, projectManager, accountManager, discounts } =
+    await Clients.findOne({ '_id': project.customer }).populate('discounts');
   project.projectManager = projectManager._id;
   project.accountManager = accountManager._id;
   const leadContact = contacts.find(({ leadContact }) => leadContact === true);
   project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';
   project.clientContacts = [leadContact];
+  project.discounts = discounts;
   try {
     const result = await createProject(project);
     res.send(result);
@@ -1064,6 +1068,17 @@ router.post('/delete-discount', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on deleting discount');
+  }
+});
+
+router.post('/update-project-discounts', async (req, res) => {
+  const { _id, updatedDiscounts } = req.body;
+  try {
+    const updatedProject = updateProjectFinanceOnDiscountsUpdate(_id, updatedDiscounts);
+    res.send(updatedProject);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating project\'s discounts');
   }
 });
 module.exports = router;

@@ -20,8 +20,7 @@ async function getProject(obj) {
     .populate('steps.vendor', ['firstName', 'surname', 'email']);
   project.customer = await Clients.findOne({ _id: project.customer })
     .populate('sourceLanguages')
-    .populate('targetLanguages')
-    .populate('discounts');
+    .populate('targetLanguages');
   return project
 }
 

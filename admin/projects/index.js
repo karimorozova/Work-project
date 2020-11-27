@@ -19,7 +19,7 @@ const {
 } = require('./create');
 const { createTasksForWordcount } = require('./taskForWordcount');
 const { getProjectWithUpdatedFinance } = require('./metrics');
-const { getProjectAfterFinanceUpdated } = require('./porjectFinance');
+const { getProjectAfterFinanceUpdated, updateProjectFinanceOnDiscountsUpdate } = require('./porjectFinance');
 
 module.exports = {
   getProject,
@@ -66,5 +66,6 @@ module.exports = {
   getStepsForDuoUnits,
   updateProjectStatusForClientPortalProject,
   sendQuotes,
-  sendQuoteMessage
+  sendQuoteMessage,
+  updateProjectFinanceOnDiscountsUpdate
 }

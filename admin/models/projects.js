@@ -35,6 +35,17 @@ const ProjectsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  discounts: [{
+    name: {
+      type: String,
+      trim: true,
+      required: true
+    },
+    value: {
+      type: Number,
+      required: true
+    },
+  }],
   industry: {
     type: Schema.Types.ObjectId, ref: 'Industries',
   },
@@ -44,7 +55,7 @@ const ProjectsSchema = new mongoose.Schema({
   },
   steps: [{
     vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
-    stepId: "",
+    stepId: '',
     taskId: "",
     serviceStep: {
       step: { type: Schema.Types.ObjectId, ref: 'Step' },

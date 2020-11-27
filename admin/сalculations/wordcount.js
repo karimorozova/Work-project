@@ -277,7 +277,7 @@ function checkForLanguages({ vendor, step, project }) {
 }
 
 async function updateProjectCosts(project) {
-  const { customer: { discounts } } = project;
+  const { discounts } = project;
   let finance = {
     Wordcount: getProjectFinanceData(project, 'Wordcount'),
     Price: getProjectFinanceData(project, 'Price')

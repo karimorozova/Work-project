@@ -10,7 +10,7 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
     stepsAndUnits,
   } = allInfo;
   try {
-    const { customer: { _id: customer, discounts }, industry } = project;
+    const { customer: { _id: customer }, industry, discounts } = project;
     let steps = [];
     let tasksWithoutFinance = await getTasksForCustomUnits({
       ...allInfo,
