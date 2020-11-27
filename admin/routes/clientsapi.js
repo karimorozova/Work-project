@@ -271,6 +271,28 @@ router.post('/rates/rate-combinations/:id', async (req, res) => {
   }
 });
 
+router.put('/toggle-ignore-min-price', async (req, res) => {
+  const { _id, value } = req.body;
+  try {
+    await Clients.updateOne({ _id }, { ignoreMinPrice: value });
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on setting client\'s ignoreMinPrice value');
+  }
+});
+
+router.put('/set-min-price', async (req, res) => {
+  const { _id, value } = req.body;
+  try {
+    await Clients.updateOne({ _id }, { minPrice: value });
+    res.send('Saved');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on setting client\'s min price');
+  }
+});
+
 router.post('/services', async (req, res) => {
   const { clientId, currentData, oldData } = req.body;
   try {
