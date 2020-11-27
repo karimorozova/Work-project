@@ -1,23 +1,24 @@
 <template lang="pug">
 .rates
-    .rates-item
-        .rates-item__title Pricelist:
-        .rates-item__input(v-if="currentClient.defaultPricelist") {{currentClient.defaultPricelist.name}}
-    .rates-item
-        .rates-item__title Currency:
-        .rates-item__input {{currentClient.currency}}
-    .rates-item
-        .rates-item__title Min Price:
-      .rates-item__input
-            .ratio__input
-              input(type="number" v-model="minPrice" v-on:keyup.enter="updateMinPrice" :value="minPrice" )
-                span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
-    .rates-item
-        .rates-item__title Ignore Min Price:
-        .rates-item__input
-            .checkbox
-              input(type="checkbox" id="ignoreMinPrice" v-model="ignoreMinPrice" @change="setTest")
-                label(for="ignoreMinPrice")
+  .rates-item
+    .rates-item__title Pricelist:
+    .rates-item__input(v-if="currentClient.defaultPricelist") {{currentClient.defaultPricelist.name}}
+  .rates-item
+    .rates-item__title Currency:
+    .rates-item__input {{currentClient.currency}}
+  .rates-item
+    .rates-item__title Min Price:
+    .rates-item__input
+      .ratio__input
+        input(type="number" v-model="minPrice" v-on:keyup.enter="updateMinPrice" :value="minPrice" )
+        span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
+  .rates-item
+    .rates-item__title Ignore Min Price:
+    .rates-item__input
+      .checkbox
+        input(type="checkbox" id="ignoreMinPrice" v-model="ignoreMinPrice" @change="setTest")
+        label(for="ignoreMinPrice")
+
 </template>
 <script>
   import { mapGetters, mapActions } from 'vuex';
