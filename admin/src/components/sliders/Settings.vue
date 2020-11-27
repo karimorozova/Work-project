@@ -26,7 +26,7 @@ export default {
         { title: "Services" },
 	      { title: "Units" },
 	      { title: "Pricelists" },
-	      { title: "Discounts" },
+	      { title: "Discounts/Surcharges" },
 	      { title: "Cancellation Reasons" },
         { title: "Instructions" },
         { title: "LQA" },
@@ -59,7 +59,7 @@ export default {
         case "Pricelists":
 		      this.$router.push("/settings/pricelists");
 		      break;
-	      case "Discounts":
+	      case "Discounts/Surcharges":
 		      this.$router.push("/settings/discounts");
 		      break;
         case "Cancellation Reasons":
