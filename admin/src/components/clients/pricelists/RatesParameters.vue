@@ -1,54 +1,82 @@
 <template lang="pug">
 .rates
-    .rates-item
-        .rates-item__title Pricelist:
-        .rates-item__input(v-if="currentClient.defaultPricelist") {{currentClient.defaultPricelist.name}}
-    .rates-item
-        .rates-item__title Currency: 
-        .rates-item__input {{currentClient.currency}}
-    .rates-item
-        .rates-item__title Min Price:
-        .rates-item__input 
-            .ratio__input
-                input(type="number" @change="(e) => changeProperty(e, 'minPrice')" :value="currentClient.minPrice" )
-                span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
-    .rates-item
-        .rates-item__title Ignore Min Price:
-        .rates-item__input
-            .checkbox
-                input(type="checkbox" id="ignoreMinPrice" :checked="currentClient.ignoreMinPrice" @change="setTest")
-                label(for="ignoreMinPrice")
+  .rates-item
+    .rates-item__title Pricelist:
+    .rates-item__input(v-if="currentClient.defaultPricelist") {{currentClient.defaultPricelist.name}}
+  .rates-item
+    .rates-item__title Currency:
+    .rates-item__input {{currentClient.currency}}
+  .rates-item
+    .rates-item__title Min Price:
+    .rates-item__input
+      .ratio__input
+        input(type="number" v-model="minPrice" v-on:keyup.enter="updateMinPrice" :value="minPrice" )
+        span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
+  .rates-item
+    .rates-item__title Ignore Min Price:
+    .rates-item__input
+      .checkbox
+        input(type="checkbox" id="ignoreMinPrice" v-model="ignoreMinPrice" @change="setTest")
+        label(for="ignoreMinPrice")
+
 </template>
 <script>
-import { mapGetters, mapActions } from "vuex";
+  import { mapGetters, mapActions } from 'vuex';
+  import { alertToggle } from '../../../vuex/general/actions';
 
 export default {
   data() {
     return {
-      minPrice: null
+      minPrice: null,
+      ignoreMinPrice: false,
     };
   },
   methods: {
-    ...mapActions(["storeClientProperty"]),
-    changeProperty(e, prop) {
-      this.storeClientProperty({ prop, value: e.target.value });
+    ...mapActions(['storeClientProperty']),
+    async updateMinPrice () {
+      try {
+        await this.$http.put('/clientsapi/set-min-price', {
+          _id: this.currentClient._id,
+          value: this.minPrice,
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: 'Client\'s minimal price is not updated!',
+          isShow: true,
+          type: 'error',
+        });
+      }
+      // this.storeClientProperty({ prop, value: e.target.value });
     },
-    getSymbol(currency) {
-      return currency == "USD"
-        ? "&#36;"
-        : currency == "EUR"
-        ? "&euro;"
-        : "&pound";
+    getSymbol (currency) {
+      return currency == 'USD'
+        ? '&#36;'
+        : currency == 'EUR'
+          ? '&euro;'
+          : '&pound';
     },
-    async setTest() {
-      this.storeClientProperty({
-        prop: "ignoreMinPrice",
-        value: event.target.checked
-      });
+    async setTest () {
+      // this.storeClientProperty({
+      //   prop: "ignoreMinPrice",
+      //   value: event.target.checked
+      // });
+      try {
+        await this.$http.put('/clientsapi/toggle-ignore-min-price', {
+          _id: this.currentClient._id,
+          value: this.ignoreMinPrice,
+        });
+      } catch (err) {
+        this.alertToggle({
+          message: 'Client\'s ignoreMinPrice is not updated!',
+          isShow: true,
+          type: 'error',
+        });
+      }
     }
   },
   mounted() {
     this.minPrice = this.currentClient.minPrice;
+    this.ignoreMinPrice = this.currentClient.ignoreMinPrice;
   },
   computed: {
     ...mapGetters({
