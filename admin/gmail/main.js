@@ -98,7 +98,7 @@ const updateOtherProjectStatusOnMessages = async () => {
     for (let i = 0; i < messages.length; i += 1) {
       let { projectName, isRead } = messages[i];
       if (!isRead) {
-        const project = await MemoqProject.findOne({ name: projectName });
+        const project = await MemoqProject.findOne({ name: projectName, status: { $ne: 'Closed' } });
         if (project) {
           messages[i].isRead = true;
           let status;

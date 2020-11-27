@@ -36,7 +36,7 @@
       .button__row
         .button__body
           input.button__update-btn(type="submit" value="Update XTRF Projects" @click="getXTRFProjects()")
-        .button__body
+        .button__body(v-if="this.$route.query.status !== 'Closed'")
           input.button__update-btn(type="submit" value="Update from messages" @click="parseMessages()")
         //.button__new-vendor(v-if="!isUpload")
           .button__update-btn

@@ -20,6 +20,7 @@ const {
 const { createTasksForWordcount } = require('./taskForWordcount');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 const { getProjectAfterFinanceUpdated, updateProjectFinanceOnDiscountsUpdate } = require('./porjectFinance');
+const { getPriceAfterApplyingDiscounts } = require('./helpers');
 
 module.exports = {
   getProject,
@@ -67,5 +68,6 @@ module.exports = {
   updateProjectStatusForClientPortalProject,
   sendQuotes,
   sendQuoteMessage,
-  updateProjectFinanceOnDiscountsUpdate
+  updateProjectFinanceOnDiscountsUpdate,
+  getPriceAfterApplyingDiscounts
 }

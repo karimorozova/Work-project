@@ -4,17 +4,19 @@ const { getPriceFromPersonRates, getCorrectBasicPrice } = require('../../../сal
 const { defaultFinanceObj } = require('../../../enums');
 const { multiplyPrices } = require('../../../multipliers');
 const { findFittingIndustryId } = require('./helpers');
+const { getPriceAfterApplyingDiscounts } = require('../../../projects');
 const { getMemoqProject } = require('./getMemoqProject');
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
-  const clients = await Clients.find();
+  const clients = await Clients.find().populate('discounts');
   const vendors = await Vendors.find();
   const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
   if (!neededCustomer) return project;
   const updatedProject = fromCron ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
   const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
   if (!tasks.length && !steps.length) return project;
-  const finance = tasks.length ? getProjectFinance(tasks) : defaultFinanceObj;
+  const { discounts } = additionalData;
+  const finance = tasks.length ? getProjectFinance(tasks, discounts) : defaultFinanceObj;
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
   await MemoqProject.updateOne({ _id: project._id },
     { ...additionalData, tasks, steps, finance });
@@ -102,6 +104,7 @@ const getUpdatedProjectData = async (project, allClients) => {
       accountManager: ObjectId(neededCustomer.accountManager._id),
       industry: ObjectId(industry._id),
       paymentProfile: neededCustomer.billingInfo.paymentType,
+      discounts: [...neededCustomer.discounts],
     };
 	}
 	return { additionalData, neededCustomer };
@@ -188,26 +191,26 @@ const getTaskFinance = (taskSteps, TotalWordCount) => {
 	};
 };
 
-const getProjectFinance = (tasks) => {
-	let priceReceivables = 0;
-	let pricePayables = 0;
-	let TotalWordCount = 0;
-	for (let { finance } of tasks) {
-		priceReceivables += +finance.Price.receivables;
-		pricePayables += +finance.Price.payables;
-		TotalWordCount += finance.Wordcount.receivables;
-	}
-	const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
-	const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
+const getProjectFinance = (tasks, discounts) => {
+  let priceReceivables = 0;
+  let pricePayables = 0;
+  let TotalWordCount = 0;
+  for (let { finance } of tasks) {
+    priceReceivables += +finance.Price.receivables;
+    pricePayables += +finance.Price.payables;
+    TotalWordCount += finance.Wordcount.receivables;
+  }
+  const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
+  const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
 	return {
 		Wordcount: {
 			receivables: +TotalWordCount,
 			payables: +TotalWordCount,
 		},
 		Price: {
-			receivables: priceReceivables.toFixed(2),
-			payables: pricePayables.toFixed(2),
-		},
+      receivables: discounts.length ? getPriceAfterApplyingDiscounts(discounts, priceReceivables) : priceReceivables.toFixed(2),
+      payables: pricePayables.toFixed(2),
+    },
 		profit,
 		ROI
 	};
