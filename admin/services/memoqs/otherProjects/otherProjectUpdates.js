@@ -40,7 +40,7 @@ const parseMessagesAndUpdateProjects = async (status) => {
   for (let i = 0; i < messages.length; i += 1) {
     let { projectName, isRead } = messages[i];
     if (!isRead) {
-      const project = await MemoqProject.findOne({ name: projectName });
+      const project = await MemoqProject.findOne({ $and: [{ name: projectName }, { status: { $ne: 'Closed' } }] });
       if (project) {
         messages[i].isRead = true;
         await MemoqProject.updateOne({ _id: project._id }, { status });
