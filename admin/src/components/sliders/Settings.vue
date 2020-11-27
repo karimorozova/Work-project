@@ -26,7 +26,8 @@ export default {
         { title: "Services" },
 	      { title: "Units" },
 	      { title: "Pricelists" },
-        { title: "Cancellation Reasons" },
+	      { title: "Discounts" },
+	      { title: "Cancellation Reasons" },
         { title: "Instructions" },
         { title: "LQA" },
         { title: "Lead Sources" },
@@ -56,8 +57,11 @@ export default {
           this.$router.push("/settings/leadsources");
           break;
         case "Pricelists":
-          this.$router.push("/settings/pricelists");
-          break;
+		      this.$router.push("/settings/pricelists");
+		      break;
+	      case "Discounts":
+		      this.$router.push("/settings/discounts");
+		      break;
         case "Cancellation Reasons":
           this.$router.push("/settings/cancel-reasons");
           break;

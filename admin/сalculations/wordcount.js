@@ -3,7 +3,7 @@ const { getClient } = require('../clients/getClients');
 const { updateProject } = require('../projects/getProjects');
 const { hasActiveRateValue } = require('./general');
 const { getStepFinanceData } = require('./finance');
-const { setTaskFinance } = require('../projects/helpers');
+const { setTaskFinance, getPriceAfterApplyingDiscounts } = require('../projects/helpers');
 const { Languages } = require('../models');
 
 
@@ -277,25 +277,27 @@ function checkForLanguages({ vendor, step, project }) {
 }
 
 async function updateProjectCosts(project) {
-	let finance = {
-		Wordcount: getProjectFinanceData(project, "Wordcount"),
-		Price: getProjectFinanceData(project, "Price")
-	};
-	let discount = {};
-	if(project.finance.Discount) {
-		discount = { ...project.finance.Discount };
-		discount.receivables = (discount.receivables / 100 * discount.value).toFixed(2);
-		finance.Price.receivables -= discount.receivables;
-		finance.Discount = discount;
-	}
-	try {
-		const checkStatuses = ["Quote sent", "Approved"];
-		const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1;
-		return await updateProject({ "_id": project.id }, { tasks: project.tasks, steps: project.steps, finance, isPriceUpdated });
-	} catch (err) {
-		console.log(err);
-		console.log("Error in updateProjectCosts");
-	}
+  const { customer: { discounts } } = project;
+  let finance = {
+    Wordcount: getProjectFinanceData(project, 'Wordcount'),
+    Price: getProjectFinanceData(project, 'Price')
+  };
+  if (discounts.length) {
+    finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, finance.Price.receivables);
+  }
+  try {
+    const checkStatuses = ['Quote sent', 'Approved'];
+    const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1;
+    return await updateProject({ '_id': project.id }, {
+      tasks: project.tasks,
+      steps: project.steps,
+      finance,
+      isPriceUpdated
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Error in updateProjectCosts');
+  }
 }
 
 function getProjectFinanceData(project, prop) {

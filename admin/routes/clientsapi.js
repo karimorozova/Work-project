@@ -97,7 +97,18 @@ router.post('/update-client', upload.any(), async (req, res) => {
     res.send({ client: result });
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error on updating/creating Client");
+    res.status(500).send('Error on updating/creating Client');
+  }
+});
+
+router.post('/update-client-discounts', async (req, res) => {
+  const { _id, updatedArray } = req.body;
+  try {
+    const updatedClient = await getClientAfterUpdate({ _id }, { discounts: updatedArray });
+    res.send(updatedClient);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating client\'s discounts');
   }
 });
 

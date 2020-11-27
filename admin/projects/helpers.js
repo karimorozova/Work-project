@@ -1,6 +1,6 @@
 const { Step, Units } = require('../models');
 const ObjectId = require('mongodb').ObjectID;
-const fs = require("fs");
+const fs = require('fs');
 
 const gatherServiceStepInfo = async (serviceStep) => {
   const { stepId, title, unitId } = typeof serviceStep.step === 'string' ?
@@ -18,10 +18,10 @@ const gatherServiceStepInfo = async (serviceStep) => {
   }
 };
 
-function getProjectFinance (tasks, projectFinance) {
+function getProjectFinance (tasks, projectFinance, discounts) {
   const currentReceivables = projectFinance.Price.receivables || 0;
   const currentPayables = projectFinance.Price.payables || 0;
-  const receivables = +(
+  let receivables = +(
     tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0) +
     +currentReceivables
   ).toFixed(2);
@@ -29,6 +29,7 @@ function getProjectFinance (tasks, projectFinance) {
     tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) +
     +currentPayables
   ).toFixed(2);
+  receivables = discounts.length ? getPriceAfterApplyingDiscounts(discounts, receivables) : receivables;
   return {
     Price: { receivables, payables },
     Wordcount: { ...projectFinance.Wordcount }
@@ -56,7 +57,7 @@ function getFinanceForCustomUnits (task, steps) {
     ...task,
     finance: {
       Price: { receivables, payables },
-      Wordcount: { receivables: "", payables: "" }
+      Wordcount: { receivables: '', payables: '' }
     }
   };
 }
@@ -76,7 +77,7 @@ function createProjectFolder (projectId) {
   return new Promise((resolve, reject) => {
     fs.mkdir(`./dist/projectFiles/${projectId}`, err => {
       if (err) reject(err);
-      resolve("ok");
+      resolve('ok');
     });
   });
 }
@@ -97,6 +98,27 @@ const getStepQuantity = (step) => {
   else return step.quantity;
 };
 
+const getPriceAfterApplyingDiscounts = (clientDiscounts, price) => {
+  let finalPrice = price;
+  clientDiscounts.forEach(discount => {
+    const { value, type } = discount;
+    if (type === 'Discount') {
+      finalPrice = subtractDiscount(value, finalPrice);
+    } else {
+      finalPrice = addSurcharge(value, finalPrice);
+    }
+  });
+  return finalPrice.toFixed(2);
+
+  function subtractDiscount (discount, price) {
+    return price * (1 - discount / 100);
+  }
+
+  function addSurcharge (surcharge, price) {
+    return price * (1 + surcharge / 100);
+  }
+};
+
 module.exports = {
   gatherServiceStepInfo,
   getProjectFinance,
@@ -104,5 +126,6 @@ module.exports = {
   getModifiedFiles,
   createProjectFolder,
   setTaskFinance,
-  getStepQuantity
+  getStepQuantity,
+  getPriceAfterApplyingDiscounts
 };

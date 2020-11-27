@@ -17,6 +17,7 @@ import Pricelists from '@/components/finance/Pricelists'
 import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayout'
 import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
+import TableDiscounts from '@/components/Table/TableDiscounts'
 import TableGroups from '@/components/Table/TableGroups'
 import TableLanguages from '@/components/Table/TableLanguages'
 import TableServices from '@/components/Table/TableServices'
@@ -135,6 +136,11 @@ const router = new Router({
                     component: Settings,
                     props: true,
                     children: [
+                        {
+                            path: 'discounts',
+                            name: 'discounts',
+                            component: TableDiscounts
+                        },
                         {
                             path: 'leadsources',
                             name: 'leadsources',

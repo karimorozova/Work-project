@@ -97,6 +97,9 @@ export default {
         &:last-child {
             border-bottom: 1px solid $beige;
         }
+        &:hover{
+          background: #f2efeb;
+        }
     }
     &__link {
         margin: 0;

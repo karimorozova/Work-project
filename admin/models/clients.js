@@ -330,26 +330,29 @@ const ClientSchema = new mongoose.Schema({
 		},
 		timezone: {
 			type: String,
-			default: ''
-		},
-		notes: {
-			type: String,
-		},
-		leadContact: {
-			type: Boolean,
-			default: false
-		}
-	}],
-	matrix: {
-		type: Object,
-		default: {
-			xTranslated: {
-				text: "X translated",
-				rate: 10,
-				altered: false,
-				notification: ''
-			},
-			repeat: {
+      default: ''
+    },
+    notes: {
+      type: String,
+    },
+    leadContact: {
+      type: Boolean,
+      default: false
+    }
+  }],
+  discounts: [{
+    type: Schema.Types.ObjectId, ref: 'Discounts',
+  }],
+  matrix: {
+    type: Object,
+    default: {
+      xTranslated: {
+        text: 'X translated',
+        rate: 10,
+        altered: false,
+        notification: ''
+      },
+      repeat: {
 				text: "Repetition",
 				rate: 20,
         altered: false,
