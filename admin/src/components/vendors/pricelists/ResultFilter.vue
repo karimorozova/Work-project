@@ -93,7 +93,7 @@
     
     &__drop-menu {
       position: relative;
-      width: 120px;
+      width: 160px;
       height: 50px;
       margin-right: 15px;
     }

@@ -244,7 +244,8 @@
   .price {
     @extend %setting-table;
     background-color: #fff;
-    padding: 20px 0px 20px 5px;
+    padding: 0;
+    padding-left: 5px;
     box-shadow: none;
 
     input[disabled] {

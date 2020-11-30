@@ -55,6 +55,7 @@ async function getClientAfterUpdate (query, update) {
     .populate('rates.basicPricesTable.targetLanguage', ['lang', 'iso1'])
     .populate('timeZone')
     .populate('defaultPricelist', ['name'])
+    .populate('discounts')
     .populate('services.services', ['title', 'steps']);
 }
 

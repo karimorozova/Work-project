@@ -909,7 +909,7 @@
     &__rates {
       box-sizing: border-box;
       margin: 20px 10px 40px 10px;
-      padding: 40px;
+      padding: 40px 40px 20px 40px;
       box-shadow: 0 0 10px #67573e9d;
       font-size: 16px;
     }

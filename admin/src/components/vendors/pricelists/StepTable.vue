@@ -266,7 +266,7 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px 0 0;
+  padding: 0 5px;
   box-shadow: none;
 
   input {

@@ -661,13 +661,19 @@
     &__gen-info,
     &__services,
     &__contacts-info,
-    &__rates,
     &__sales,
     &__documents,
     &__chart,
     &__billing {
       margin: 20px 10px 40px 10px;
       padding: 40px;
+      box-shadow: 0 0 10px #67573e9d;
+      box-sizing: border-box;
+    }
+    &__rates{
+      padding: 0;
+      margin: 20px 10px 40px 10px;
+      padding: 40px 40px 20px 40px!important;
       box-shadow: 0 0 10px #67573e9d;
       box-sizing: border-box;
     }
@@ -690,6 +696,7 @@
 
     &__tables-row {
       display: flex;
+      padding-top: 20px;
 
       .lang-table {
         width: 33%;
