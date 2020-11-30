@@ -4,7 +4,7 @@ const { getPriceFromPersonRates, getCorrectBasicPrice } = require('../../../сal
 const { defaultFinanceObj } = require('../../../enums');
 const { multiplyPrices } = require('../../../multipliers');
 const { findFittingIndustryId } = require('./helpers');
-const { getPriceAfterApplyingDiscounts } = require('../../../projects');
+const { getPriceAfterApplyingDiscounts } = require('../../../projects/helpers');
 const { getMemoqProject } = require('./getMemoqProject');
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
