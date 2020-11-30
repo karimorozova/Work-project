@@ -38,7 +38,6 @@
 </template>
 <script>
 	import { mapGetters, mapActions } from 'vuex';
-	import { alertToggle } from '../../../vuex/general/actions';
 	import Discounts from "./Discounts";
 
 	export default {
@@ -55,7 +54,7 @@
 			};
 		},
 		methods: {
-			...mapActions(['storeClientProperty']),
+			...mapActions(['storeClientProperty', 'alertToggle']),
 			crudActions(actionType) {
 				switch (actionType) {
 					case 'cancel':
@@ -72,9 +71,10 @@
 						_id: this.currentClient._id,
 						value: this.minPrice,
 					});
+					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({
-						message: 'Client\'s minimal price is not updated!',
+						message: 'Client\'s minimum price is not updated!',
 						isShow: true,
 						type: 'error',
 					});
