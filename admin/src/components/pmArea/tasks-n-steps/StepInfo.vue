@@ -78,7 +78,7 @@
 				return files;
 			},
 			refreshFinance({costs}) {
-				console.log("refresh finance", costs);
+				// console.log("refresh finance", costs);
 			},
 			closeInfo() {
 				this.$emit("closeStepInfo");

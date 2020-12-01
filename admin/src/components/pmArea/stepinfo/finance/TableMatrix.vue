@@ -90,6 +90,7 @@
         return arrayOfMetrics;
       },
       calculatedRate (rate, wordCount) {
+	      rate === undefined && this.findCurrentTask();
         const currentNumber = (rate * wordCount) / 100;
         return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(3);
       },

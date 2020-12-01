@@ -46,8 +46,9 @@ async function getAfterWordcountPayablesUpdated({ project, step }) {
 		const { serviceStep, vendor } = step;
 		const { finance, vendorRate } = await getStepFinanceData({
 			customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity
-		});
-		steps[stepIndex].finance.Price = finance.Price;
+		},true);
+
+		steps[stepIndex].finance = finance;
 		steps[stepIndex].vendorRate = vendorRate;
 		const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId);
 		tasks[taskIndex].finance = {

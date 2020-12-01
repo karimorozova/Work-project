@@ -16,7 +16,7 @@ const getStepFinanceData = async (projectData, forWords = false) => {
   const pricelist = await Pricelist.findOne({ _id: defaultPricelist });
   const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage });
   const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage });
-  const { step, unit, size } = serviceStep;
+  const { step, unit, size, title } = serviceStep;
   const dataForComparison = {
     sourceLanguage: sourceId,
     targetLanguage: targetId,
@@ -47,12 +47,12 @@ const getStepFinanceData = async (projectData, forWords = false) => {
     vendor: vendor ? vendor._id : null,
     finance: {
       Wordcount: {
-        receivables: forWords ? +quantity : 0,
-        payables: forWords ? getRelativeQuantity(metrics) : 0,
+        receivables: forWords ?  title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity : 0,
+        payables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity  : 0,
       },
       Price: {
-        receivables: +clientRate.value * +quantity,
-        payables: vendor ? +vendorRate.value * +quantity : 0,
+        receivables: +clientRate.value * (title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity),
+        payables: vendor ? +vendorRate.value * (title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) : 0,
       }
     }
   };
@@ -94,12 +94,12 @@ const getPriceFromPricelist = (pricelist, data, currency, currencyRatio) => {
   return multiplyPrices(basicPrice, stepMultiplier, size, industryMultiplier);
 };
 
-const getRelativeQuantity = (metrics) => {
+const getRelativeQuantity = (metrics, key) => {
   const { totalWords, ...rest } = metrics;
   let counter = 0;
   for (let item in rest) {
     if (rest.hasOwnProperty(item)) {
-      counter += (rest[item].value * rest[item].client) / 100;
+      counter += (rest[item].value * rest[item][key]) / 100;
     }
   }
   return counter;
