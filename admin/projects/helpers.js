@@ -18,10 +18,10 @@ const gatherServiceStepInfo = async (serviceStep) => {
   }
 };
 
-function getProjectFinance (tasks, projectFinance, discounts) {
+function getProjectFinance(tasks, projectFinance) {
   const currentReceivables = projectFinance.Price.receivables || 0;
   const currentPayables = projectFinance.Price.payables || 0;
-  let receivables = +(
+  const receivables = +(
     tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0) +
     +currentReceivables
   ).toFixed(2);
@@ -29,7 +29,6 @@ function getProjectFinance (tasks, projectFinance, discounts) {
     tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) +
     +currentPayables
   ).toFixed(2);
-  receivables = discounts.length ? getPriceAfterApplyingDiscounts(discounts, receivables) : receivables;
   return {
     Price: { receivables, payables },
     Wordcount: { ...projectFinance.Wordcount }
@@ -105,7 +104,7 @@ const getPriceAfterApplyingDiscounts = (clientDiscounts, price) => {
     finalPrice = value < 0 ? subtractDiscount(Math.abs(value), finalPrice) : addSurcharge(value, finalPrice);
   });
 
-  return finalPrice.toFixed(2);
+  return +finalPrice.toFixed(2);
 
   function subtractDiscount (discount, price) {
     return price * (1 - discount / 100);
