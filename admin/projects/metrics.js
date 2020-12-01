@@ -9,31 +9,31 @@ const ObjectId = require('mongodb').ObjectID;
 
 async function updateProjectMetrics(projectId, tasks) {
 	try {
-		const project = await getProject({ "_id": projectId });
-		let { steps, customer, tasks: existingTasks, industry } = project;
-		if(!tasks) tasks = project.tasks.filter(task => !task.hasOwnProperty('metrics'));
-		filterExistingTasks();
-		let isMetricsExist = true;
-		for (let task of tasks) {
-			const { stepsAndUnits } = task;
-			const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
-			if(!!isIncludesWordCount && task.status === "Created") {
-				const analysis = await getProjectAnalysis(task.memoqProjectId);
-				const { AnalysisResultForLang } = analysis;
-				if(analysis && AnalysisResultForLang) {
-					const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
-					task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
-					let newSteps = await getTaskSteps(task, industry, customer);
-					newSteps = checkIsSameVendor(newSteps);
-					const stepWithVendor = newSteps.find(step => step.vendor);
-					if(stepWithVendor) {
-						const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
-						if(vendor) {
-							task.metrics = setTaskMetrics({
-								metrics: task.metrics,
-								matrix: vendor.matrix,
-								prop: 'vendor'
-							});
+    const project = await getProject({ "_id": projectId });
+    let { steps, customer, tasks: existingTasks, industry, discounts } = project;
+    if (!tasks) tasks = project.tasks.filter(task => !task.hasOwnProperty('metrics'));
+    filterExistingTasks();
+    let isMetricsExist = true;
+    for (let task of tasks) {
+      const { stepsAndUnits } = task;
+      const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
+      if (!!isIncludesWordCount && task.status === "Created") {
+        const analysis = await getProjectAnalysis(task.memoqProjectId);
+        const { AnalysisResultForLang } = analysis;
+        if (analysis && AnalysisResultForLang) {
+          const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
+          task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
+          let newSteps = await getTaskSteps(task, industry, customer, discounts);
+          newSteps = checkIsSameVendor(newSteps);
+          const stepWithVendor = newSteps.find(step => step.vendor);
+          if (stepWithVendor) {
+            const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
+            if (vendor) {
+              task.metrics = setTaskMetrics({
+                metrics: task.metrics,
+                matrix: vendor.matrix,
+                prop: 'vendor'
+              });
 						}
 					}
 					task.finance = {
@@ -116,17 +116,17 @@ async function getProjectWithUpdatedFinance(project) {
 	}
 }
 
-async function getTaskSteps(task, industry, customer) {
-	const { sourceLanguage, targetLanguage, metrics, service, stepsAndUnits } = task;
-	const newSteps = [];
-	let counter = 1;
-	for (let i = 0; i < task.stepsDates.length; i++) {
-		let stepsIdCounter = counter < 10 ? `S0${ counter }` : `S${ counter }`;
-		const { _id: stepId } = await Step.findOne({ title: stepsAndUnits[i].step });
-		const { _id: unitId, type } = await Units.findOne({ type: stepsAndUnits[i].unit });
-		const serviceStep = {
-			step: ObjectId(stepId),
-			unit: ObjectId(unitId),
+async function getTaskSteps(task, industry, customer, discounts) {
+  const { sourceLanguage, targetLanguage, metrics, service, stepsAndUnits } = task;
+  const newSteps = [];
+  let counter = 1;
+  for (let i = 0; i < task.stepsDates.length; i++) {
+    let stepsIdCounter = counter < 10 ? `S0${counter}` : `S${counter}`;
+    const { _id: stepId } = await Step.findOne({ title: stepsAndUnits[i].step });
+    const { _id: unitId, type } = await Units.findOne({ type: stepsAndUnits[i].unit });
+    const serviceStep = {
+      step: ObjectId(stepId),
+      unit: ObjectId(unitId),
 			size: stepsAndUnits[i].size || 1,
 			memoqAssignmentRole: i,
 			title: stepsAndUnits[i].step
@@ -134,8 +134,8 @@ async function getTaskSteps(task, industry, customer) {
 		const quantity = getWordcountStepQuantity(type, metrics, stepsAndUnits[i]);
 		const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
 		const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
-			customer, industry, serviceStep, task, vendorId, quantity
-		}, true);
+      customer, industry, serviceStep, task, vendorId, quantity, discounts
+    }, true);
 		const step = {
 			stepId: `${ task.taskId } ${ stepsIdCounter }`,
 			taskId: task.taskId,

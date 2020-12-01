@@ -15,19 +15,21 @@ async function createTasksWithPackagesUnit (allInfo) {
         customer,
         stepsDates,
         stepsAndUnits,
-        industry
+        industry,
+        discounts,
       })
       : await getStepsForMonoStepPackages({
         tasks: tasksWithoutFinance,
         customer,
         stepsDates,
-        industry
+        industry,
+        discounts,
       });
     steps = checkIsSameVendor(steps);
     const tasks = tasksWithoutFinance.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
-    const projectFinance = getProjectFinance(tasks, project.finance, discounts);
+    const projectFinance = getProjectFinance(tasks, project.finance);
     return await updateProject(
       { _id: project.id },
       { finance: projectFinance, $push: { tasks: tasks, steps: steps } }
@@ -38,7 +40,8 @@ async function createTasksWithPackagesUnit (allInfo) {
   }
 }
 
-async function getStepsForMonoStepPackages ({ tasks, stepsDates, industry, customer }, common = false) {
+async function getStepsForMonoStepPackages(
+  { tasks, stepsDates, industry, customer, discounts }, common = false) {
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
@@ -49,7 +52,7 @@ async function getStepsForMonoStepPackages ({ tasks, stepsDates, industry, custo
     const { step, size, quantity } = serviceStep;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
     const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
-      customer, industry, serviceStep, task, vendorId, quantity
+      customer, industry, serviceStep, task, vendorId, quantity, discounts
     });
     steps.push({
       ...task,
