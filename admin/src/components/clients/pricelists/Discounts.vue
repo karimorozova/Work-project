@@ -6,7 +6,7 @@
         .discounts__title-value {{allDiscountsValue}}  &#37;
 
       .discounts__lists
-        .discounts__list(v-for="(item, index) in clientDiscounts")
+        .discounts__list(v-for="(item, index) in enumDiscounts")
 
           .discounts__list-name(v-if="item.name")
             span(:style="textMargin") {{item.name}}
@@ -25,13 +25,13 @@
             span(v-if="item.value") {{item.value}} &#37;
             span(v-if="currentDiscount.value && !item.value") {{currentDiscount.value}} &#37;
 
-          .discounts__list-icons(v-if="ratesParamsIsEdit")
+          .discounts__list-icons(v-if="paramsIsEdit")
             img.icon(v-if="item._id" :src="icons.delete.icon" @click="deleteDiscount(item._id)")
             img.icon(v-else :src="icons.save.icon" @click="checkErrors()")
           .discounts__list-icons(v-else)
             img.opacity(:src="icons.delete.icon")
 
-    .discounts__add(v-if="ratesParamsIsEdit")
+    .discounts__add(v-if="paramsIsEdit")
       Add(@add="addData")
 
 </template>
@@ -45,9 +45,12 @@
 	export default {
 		mixins: [crudIcons],
 		props: {
-			ratesParamsIsEdit: {
+			paramsIsEdit: {
 				type: Boolean
-			}
+			},
+			enum: {
+				type: String
+			},
 		},
 		data() {
 			return {
@@ -56,7 +59,7 @@
 					delete: { icon: require("../../../assets/images/Other/delete-icon-qa-form.png") }
 				},
 				textMargin: { 'padding-left': '5px' },
-				clientDiscounts: [],
+				enumDiscounts: [],
 				allDiscounts: [],
 				currentActive: -1,
 				currentDiscount: {},
@@ -72,16 +75,16 @@
 			},
 			setEditionData(index) {
 				this.currentActive = index;
-				this.currentDiscount = this.clientDiscounts[index];
+				this.currentDiscount = this.enumDiscounts[index];
 			},
 			addData() {
 				if(this.currentActive !== -1) return this.isEditing();
-				this.clientDiscounts.push({
+				this.enumDiscounts.push({
 					name: "",
 					value: "",
 					isActive: true,
 				});
-				this.setEditionData(this.clientDiscounts.length - 1);
+				this.setEditionData(this.enumDiscounts.length - 1);
 				// this.$nextTick(() => this.scrollToEnd());
 			},
 			// scrollToEnd() {
@@ -104,11 +107,11 @@
 				await this.saveChanges();
 			},
 			async saveChanges() {
-				this.clientDiscounts = this.clientDiscounts.filter(({ name }) => name);
-				const updatedArray = this.clientDiscounts;
+				this.enumDiscounts = this.enumDiscounts.filter(({ name }) => name);
+				const updatedArray = this.enumDiscounts;
 				updatedArray.push(this.currentDiscount);
 				try {
-					const result = await this.$http.post('/clientsapi/update-client-discounts', { _id: this.$route.params.id, updatedArray });
+					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray });
 					this.alertToggle({ message: "Discount/Surcharges Saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Discount/Surcharges", isShow: true, type: "error" });
@@ -117,9 +120,9 @@
 				}
 			},
 			async deleteDiscount(id) {
-				this.clientDiscounts = this.clientDiscounts.filter(item => item._id.toString() !== id.toString());
+				this.enumDiscounts = this.enumDiscounts.filter(item => item._id.toString() !== id.toString());
 				try {
-					const result = await this.$http.post('/clientsapi/update-client-discounts', { _id: this.$route.params.id, updatedArray: this.clientDiscounts, });
+					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray: this.enumDiscounts, });
 					this.alertToggle({ message: "Discount/Surcharges Saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({ message: "Error on deleting", isShow: true, type: "error" });
@@ -127,12 +130,12 @@
 					this.cancel();
 				}
 			},
-			async getClientDiscounts() {
+			async getEnumDiscounts() {
 				try {
-					const result = await this.$http.get(`/clientsapi/get-client-discounts/?id=${ this.$route.params.id }`);
-					this.clientDiscounts = result.data.discounts;
+					const result = await this.$http.get(this.setCurrentRoutes.get + `${ this.$route.params.id }`);
+					this.enumDiscounts = result.data.discounts;
 				} catch (err) {
-					this.alertToggle({ message: "Error on getting Client Discounts", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on getting Discounts", isShow: true, type: "error" });
 				}
 			},
 			async getDiscounts() {
@@ -145,19 +148,34 @@
 			},
 		},
 		created() {
-			this.getClientDiscounts();
+			this.getEnumDiscounts();
 			this.getDiscounts();
 		},
 		computed: {
+			setCurrentRoutes() {
+				if(this.enum) switch (this.enum) {
+					case 'client':
+						return {
+							get: '/clientsapi/get-client-discounts/?id=',
+							update: '/clientsapi/update-client-discounts'
+						};
+					case 'PngSysProject':
+						return {
+							get: '/pm-manage/get-project-discounts/?id=',
+							update: '/pm-manage/update-project-discounts'
+						}
+				}
+
+			},
 			filteredDiscounts() {
 				return this.allDiscounts
-						.filter(allItem => !this.clientDiscounts.filter(item => item.name)
+						.filter(allItem => !this.enumDiscounts.filter(item => item.name)
 								.map(item => item.name)
 								.includes(allItem.name))
 						.map(item => item.name);
 			},
 			allDiscountsValue() {
-				return this.clientDiscounts.filter(item => item.name).reduce((acc, curr) => {
+				return this.enumDiscounts.filter(item => item.name).reduce((acc, curr) => {
 					acc += curr.value;
 					return acc
 				}, 0)
@@ -244,10 +262,12 @@
       }
     }
   }
+
   .opacity {
     cursor: default;
     opacity: 0.5;
   }
+
   .icon {
     cursor: pointer;
   }

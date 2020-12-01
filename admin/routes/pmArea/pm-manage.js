@@ -1071,10 +1071,21 @@ router.post('/delete-discount', async (req, res) => {
   }
 });
 
-router.post('/update-project-discounts', async (req, res) => {
-  const { _id, updatedDiscounts } = req.body;
+router.get('/get-project-discounts', async (req, res) => {
+  const { id } = req.query;
   try {
-    const updatedProject = updateProjectFinanceOnDiscountsUpdate(_id, updatedDiscounts);
+    const discounts = await Projects.findOne({ "_id": id }, { discounts: 1 });
+    res.send(discounts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting project discounts');
+  }
+});
+
+router.post('/update-project-discounts', async (req, res) => {
+  const { _id, updatedArray } = req.body;
+  try {
+    const updatedProject = updateProjectFinanceOnDiscountsUpdate(_id, updatedArray);
     res.send(updatedProject);
   } catch (err) {
     console.log(err);

@@ -104,18 +104,17 @@ router.post('/update-client', upload.any(), async (req, res) => {
 router.get('/get-client-discounts', async (req, res) => {
   const { id } = req.query;
   try {
-    const discounts = await Clients.findOne({ "_id": id }, {discounts: 1}).populate('discounts');
+    const discounts = await Clients.findOne({ "_id": id }, { discounts: 1 }).populate('discounts');
     res.send(discounts);
   } catch (err) {
     console.log(err);
-    res.status(500).send('Error on updating client\'s discounts');
+    res.status(500).send('Error on getting client\'s discounts');
   }
 });
 
 router.post('/update-client-discounts', async (req, res) => {
   const { _id, updatedArray } = req.body;
   try {
-    console.log(updatedArray)
     const updatedClient = await getClientAfterUpdate({ _id }, { discounts: updatedArray });
     res.send(updatedClient);
   } catch (err) {

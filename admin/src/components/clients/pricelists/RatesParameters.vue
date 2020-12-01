@@ -31,7 +31,8 @@
               label(for="ignoreMinPrice")
     .dicounts
       Discounts(
-        :ratesParamsIsEdit="ratesParamsIsEdit"
+        :paramsIsEdit="ratesParamsIsEdit",
+        :enum="'client'"
       )
 
 

@@ -1,162 +1,247 @@
 <template lang="pug">
-.project-finance
+  .project-finance
     .project-finance__title(@click="toggleFinance") Finance
-        img.project-finance__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
-    .project-finance__table(v-if="isFinanceShow")
-        DataTable(
-            :fields="fields"
-            :tableData="financeData"
-            bodyRowClass="steps-table-row"
-            bodyClass="tbody_visible-overflow"
-            tableheadRowClass="tbody_visible-overflow"
-        )
-            template(slot="headerTitle" slot-scope="{ field }")
-            template(slot="headerReceivables" slot-scope="{ field }")
-                span.project-finance__label {{ field.label }}
-            template(slot="headerPayables" slot-scope="{ field }")
-                span.project-finance__label {{ field.label }}
-            template(slot="headerMargin" slot-scope="{ field }")
-                span.project-finance__label {{ field.label }}
-            template(slot="title" slot-scope="{ row }")
-                .project-finance__data-title(v-if="row.title !== 'Select'")
-                    span.project-finance__data {{ row.title }}
-                .project-finance__drop-menu(v-if="row.title === 'Select'")
-                    SelectSingle(
-                        placeholder="Select"
-                        :selectedOption="selectedAdditionalOption"
-                        :options="discountOptions"
-                        @chooseOption="setDiscount"
-                    )
-            template(slot="receivables" slot-scope="{ row }")
-                template(v-if="+row.receivables")
-                    span.project-finance__euro-sign(v-if="showEuroSign(row)") &euro;
-                    span.project-finance__data {{ row.receivables }}
-                template(v-if="row.title === 'Select'")
-                    input.project-finance__percent-value(type="number" min="0" max="100" v-model="additionalValue")
-                    span.project-finance__percent %
-            template(slot="payables" slot-scope="{ row }")
-                span(v-if="+row.payables && showEuroSign(row)") &euro;
-                span.project-finance__data(v-if="+row.payables") {{ row.payables }}
-            template(slot="margin" slot-scope="{ row }")
-                span(v-if="+row.margin && showEuroSign(row)") &euro;
-                span.project-finance__data(v-if="+row.margin") {{ row.margin }}
-        .project-finance__add-row
-            Add(@add="addRow")
+      img.project-finance__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
+    .project-finance__content(v-if="true")
+      .project-finance__content-displayBlock
+        .finance-info__bars
+          .bar
+            .bar__green(:style="{width: barsStatistic.receivables.width}")
+            .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
+          .bar
+            .bar__red(:style="{width: barsStatistic.payables.width }")
+            .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
+
+        .project-finance__dashboard
+          .project-finance__dashboardItem
+            .project-finance__dashboardItem-title asdasd
+            .project-finance__dashboardItem-value 23
+          .project-finance__dashboardItem
+            .project-finance__dashboardItem-title asdw3q3dd
+            .project-finance__dashboardItem-value 67
+          .project-finance__dashboardItem
+            .project-finance__dashboardItem-title ergtdfg
+            .project-finance__dashboardItem-value 987
+
+      .project-finance__content-settingBlock
+
+        .minPrice
+          .minPrice-item
+            .minPrice-item__title Receivables Rates:
+            .minPrice-item__input 4545
+          .minPrice-item
+            .minPrice-item__title Minimum Charge:
+            .minPrice-item__input
+              //.ratio__input
+                input(v-if="ratesParamsIsEdit" type="number" v-model="minPrice" v-on:keyup.enter="updateMinPrice" :value="minPrice" )
+                span(v-else) {{ minPrice }}
+                span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
+        .discounts
+          Discounts(
+            :paramsIsEdit="true"
+            :enum="'PngSysProject'"
+          )
+
+      .project-finance__total
+        .project-finance__total-title Total:
+        .project-finance__total-value 345234 &nbsp;&euro;
+
+      //.project-finance__add-row
+        Add(@add="addRow")
 </template>
 
 <script>
-import DataTable from "../DataTable";
-import Add from "../Add";
-import { mapGetters, mapActions } from "vuex";
-import SelectSingle from "../SelectSingle";
+	import DataTable from "../DataTable";
+	import Add from "../Add";
+	import { mapGetters, mapActions } from "vuex";
+	import SelectSingle from "../SelectSingle";
+	import Discounts from "../clients/pricelists/Discounts";
 
-export default {
-    props: {
-    },
-    data() {
-        return {
-            isFinanceShow: false,
-            fields: [
-                {label: "Title", headerKey: "headerTitle", key: "title", width: "25%", cellClass: "project-finance_no-padding"},
-                {label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "25%"},
-                {label: "Payables", headerKey: "headerPayables", key: "payables", width: "25%"},
-                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "25%"},
-            ],
-            discountOptions: ["Discount-1", "Discount-2", "Discount-3"],
-            selectedAdditionalOption: "",
-            additionalValue: 5
-        }
-    },
-    methods: {
-        ...mapActions({
-            alertToggle: "alertToggle",
-            addFinanceProperty: "addFinanceProperty"
-        }),
-        addRow() {
-            this.addFinanceProperty({receivables: "", payables: ""});
-        },
-        toggleFinance() {
-            this.isFinanceShow = !this.isFinanceShow;
-        },
-        setDiscount({option}) {
-            this.selectedAdditionalOption = option;
-        },
-        showEuroSign(data) {
-            return data.title !== 'Wordcount';
-        }
-    },
-    computed: {
-        ...mapGetters({
-            currentProject: "getCurrentProject"
-        }),
-        financeData() {
-            const finance = {...this.currentProject.finance};
-            let result = Object.keys(finance).map(key => {
-                let margin = (finance[key].receivables - finance[key].payables).toFixed(2);
-                return {
-                    title: key,
-                    receivables: finance[key].receivables,
-                    payables: finance[key].payables,
-                    margin: margin
-                    }
-            })
-            return result;
-        }
-    },
-    components: {
-        DataTable,
-        SelectSingle,
-        Add
-    }
-}
+	export default {
+		props: {},
+		data() {
+			return {
+				isFinanceShow: false,
+			}
+		},
+		methods: {
+			...mapActions({
+				alertToggle: "alertToggle",
+				addFinanceProperty: "addFinanceProperty"
+			}),
+			// addRow() {
+			// 	this.addFinanceProperty({ receivables: "", payables: "" });
+			// },
+			toggleFinance() {
+				this.isFinanceShow = !this.isFinanceShow;
+			},
+		},
+		computed: {
+			...mapGetters({
+				currentProject: "getCurrentProject"
+			}),
+			barsStatistic() {
+				if(this.currentProject) {
+					const { finance } = this.currentProject;
+					const { Price } = finance;
+					const payblesPercents = Math.ceil((Price.payables / Price.receivables) * 100);
+
+					return {
+						receivables: {
+							width: Price.receivables === 0 ? '0%' : '100%',
+							price: Price.receivables,
+						},
+						payables: {
+							width: `${ payblesPercents }%`,
+							price: Price.payables
+						}
+					}
+				}
+			},
+			financeData() {
+				// const finance = { ...this.currentProject.finance };
+				// let result = Object.keys(finance).map(key => {
+				// 	let margin = (finance[key].receivables - finance[key].payables).toFixed(2);
+				// 	return {
+				// 		title: key,
+				// 		receivables: finance[key].receivables,
+				// 		payables: finance[key].payables,
+				// 		margin: margin
+				// 	}
+				// })
+				// return result;
+			}
+		},
+		components: {
+			Discounts,
+			DataTable,
+			SelectSingle,
+			Add
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss";
+  @import "../../assets/scss/colors.scss";
 
-.project-finance {
+  .minPrice {
+    display: flex;
+    padding: 16px 30px;
+    background: #f4f0ee;
+    border: 2px solid #938676;
+    flex-direction: column;
+
+    .minPrice-item {
+      width: 300px;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+
+      &__title {
+        width: 150px;
+      }
+    }
+  }
+
+  .project-finance {
     box-sizing: border-box;
     min-width: 1000px;
     box-shadow: 0 0 10px #67573e9d;
     margin: 40px;
 
-    &__title {
-        padding: 20px;
-        font-size: 22px;
+    &__content {
+      padding: 0 20px 20px 20px;
+
+      &-displayBlock {
+        width: 80%;
+      }
+
+      &-settingBlock {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        cursor: pointer;
+        margin-bottom: 20px;
+      }
     }
+
+    &__total {
+      padding-top: 20px;
+      border-top: 2px solid #c7c0b7;
+      display: flex;
+
+      &-title {
+        width: 100px;
+      }
+    }
+
+    &__title {
+      padding: 20px;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
     &__icon {
-        transition: all 0.2s;
+      transition: all 0.2s;
     }
-    &_reverse {
-        transform: rotate(180deg);
+
+    &__dashboard {
+      display: flex;
+      border: 2px solid;
+      border-radius: 10px;
+      align-items: center;
+      margin-bottom: 20px;
     }
-    &__table {
-        padding: 0 20px 20px 20px;
+
+    &__dashboardItem {
+      width: 33%;
+      display: flex;
+      justify-content: center;
+      border-left: 2px solid;
+      padding: 6.5px;
+
+      &:first-child {
+        border-left: none;
+      }
+
+      &-title {
+        min-width: 10%;
+      }
+
+      &-value {
+        min-width: 10%;
+        margin-left: 10px;
+
+      }
     }
-    &__drop-menu {
-        position: relative;
-        height: 26px;
-        top: 0;
+  }
+
+  .bar {
+    display: flex;
+    height: 16px;
+    align-items: center;
+
+    &__amount {
+      margin-left: 5px;
     }
-    &__percent-value {
-        outline: 1px solid $blue-outline;
-        border: none;
-        padding-left: 5px;
-        width: 24px;
-        margin-right: 3px;
-        color: $main-color;
-        &::-webkit-inner-spin-button,
-        &::-webkit-outer-spin-button{
-            -webkit-appearance: none;
-            margin: 0;
-        }
+
+    &__green {
+      background: #4CA553;
+      height: 8px;
     }
-    &__data-title {
-        padding: 7px 6px;
+
+    &__red {
+      background: #D15F46;
+      height: 8px;
     }
-}
+  }
+
+  .finance-info {
+    position: relative;
+
+    &__bars {
+      margin-bottom: 20px;
+    }
+  }
 </style>
