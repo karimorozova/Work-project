@@ -204,6 +204,16 @@ const ProjectsSchema = new mongoose.Schema({
       'Price': {}
     }
   },
+  minimumCharge: {
+    value: {
+      type: Number,
+      default: 0
+    },
+    toIgnore: {
+      type: Boolean,
+      default: false
+    }
+  },
   isAutoDelivery: {
     type: Boolean,
     default: false

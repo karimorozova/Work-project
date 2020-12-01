@@ -47,13 +47,60 @@ function getUpdatedProjectFinance(tasks) {
 
 const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts) => {
   let project = await Projects.findOne({ _id });
-  const { finance, tasks } = project;
-  if (updatedDiscounts.length) {
-    finance.Price.receivables = getPriceAfterApplyingDiscounts(updatedDiscounts, finance.Price.receivables);
-  } else {
-    finance.Price = getProjectFinancePrice(tasks);
-  }
-  return await getProjectAfterUpdate({ _id }, { finance });
+  let { finance, tasks, steps } = project;
+  const {
+    steps: updatedSteps,
+    tasks: updatedTasks,
+    finance: updatedFinance
+  } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts);
+
+  return await getProjectAfterUpdate({ _id }, {
+    finance: updatedFinance,
+    tasks: updatedTasks,
+    steps: updatedSteps,
+    discounts: updatedDiscounts
+  });
 };
+
+const recalculateProjectFinance = (finance, tasks, steps, discounts = []) => {
+  for (let step of steps) {
+    let { finance: { Price: { receivables } }, clientRate: { value } } = step;
+    const multiplier = findStepMultiplier(step);
+    receivables = +multiplier * +value;
+    if (discounts.length) {
+      step.finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables);
+    } else {
+      step.finance.Price.receivables = receivables;
+    }
+  }
+  for (let task of tasks) {
+    const { taskId } = task;
+    const taskSteps = steps.filter(step => step.taskId === taskId);
+    task.finance.Price.receivables = sumReceivables(taskSteps);
+  }
+  finance.Price.receivables = sumReceivables(tasks);
+
+  return { steps, tasks, finance };
+
+  function sumReceivables(arr) {
+    let value = 0;
+    for (let { finance: { Price: { receivables } } } of arr) {
+      value += receivables;
+    }
+    return value;
+  }
+};
+
+const findStepMultiplier = (step) => {
+  if (step.finance.Wordcount.receivables === 0) {
+    if (step._doc.hasOwnProperty('quantity')) {
+      return +step.quantity;
+    } else if (step._doc.hasOwnProperty('hours')) {
+      return +step.hours;
+    }
+  } else {
+    return step.finance.Wordcount.receivables;
+  }
+}
 
 module.exports = { getProjectAfterFinanceUpdated, getUpdatedProjectFinance, updateProjectFinanceOnDiscountsUpdate };
