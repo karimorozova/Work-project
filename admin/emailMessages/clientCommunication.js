@@ -5,6 +5,10 @@ const moment = require('moment');
 
 function messageForClient(obj) {
   const date = Date.now();
+  const { minimumCharge: { value, toIgnore } } = obj;
+  let total = obj.finance.Price.receivables;
+  const fromMinimumCharge = !toIgnore ? (value > total) : false;
+  total = !toIgnore ? (value > total ? value : total) : total;
   const name = `${obj.contact.firstName} ${obj.contact.surname}`;
   const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
   const tasksInfo = obj.selectedTasks.length ? getTasksInfo(obj.selectedTasks, obj.steps) : getTasksInfo(activeTasks, obj.steps);
@@ -125,10 +129,10 @@ function messageForClient(obj) {
                             <tr>
                                 <td class="main_weight600"
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                                Total:</td>
+                                ${fromMinimumCharge ? 'Total (minimum charge)' : 'Total'}:</td>
                                 <td
                                     style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                                    &euro; ${obj.finance.Price.receivables}</td>
+                                    &euro; ${total}</td>
                             </tr>
                         </table>
 
