@@ -103,11 +103,9 @@ const getStepQuantity = (step) => {
 
 const getPriceAfterApplyingDiscounts = (clientDiscounts, price) => {
   let finalPrice = +price;
-  clientDiscounts.forEach(discount => {
-    const { value } = discount;
-    finalPrice = value < 0 ? subtractDiscount(Math.abs(value), finalPrice) : addSurcharge(value, finalPrice);
-  });
 
+  const totalValueDiscount = clientDiscounts.reduce((acc, curr) => acc + +curr.value, 0);
+  finalPrice = totalValueDiscount < 0 ? subtractDiscount(Math.abs(totalValueDiscount), finalPrice) : addSurcharge(totalValueDiscount, finalPrice);
   return +finalPrice.toFixed(2);
 
   function subtractDiscount (discount, price) {
