@@ -133,40 +133,41 @@ async function getTaskSteps(task, industry, customer, discounts) {
     const serviceStep = {
       step: ObjectId(stepId),
       unit: ObjectId(unitId),
-			size: stepsAndUnits[i].size || 1,
-			memoqAssignmentRole: i,
-			title: stepsAndUnits[i].step
-		};
-		const quantity = getWordcountStepQuantity(type, metrics, stepsAndUnits[i]);
-		const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
-		const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
+      size: stepsAndUnits[i].size || 1,
+      memoqAssignmentRole: i,
+      title: stepsAndUnits[i].step
+    };
+    const quantity = getWordcountStepQuantity(type, metrics, stepsAndUnits[i]);
+    const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
+    const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity, discounts
     }, true);
-		const step = {
-			stepId: `${ task.taskId } ${ stepsIdCounter }`,
-			taskId: task.taskId,
-			serviceStep,
-			name: stepsAndUnits[i].step,
-			sourceLanguage,
-			targetLanguage,
-			memoqProjectId: task.memoqProjectId,
-			memoqSource: task.memoqSource,
-			memoqTarget: task.memoqTarget,
-			memoqDocIds: task.memoqDocs.map(({ DocumentGuid }) => DocumentGuid),
-			vendor: ObjectId(vendor),
-			start: task.stepsDates[i].start || task.start,
-			deadline: task.stepsDates[i].deadline,
-			progress: setStepsProgress(serviceStep.symbol, task.memoqDocs),
-			status: "Created",
-			clientRate,
-			finance,
-			vendorRate,
-			totalWords: quantity,
-			check: false,
-			vendorsClickedOffer: [],
-			isVendorRead: false,
-			service
-		};
+    const step = {
+      stepId: `${task.taskId} ${stepsIdCounter}`,
+      taskId: task.taskId,
+      serviceStep,
+      name: stepsAndUnits[i].step,
+      sourceLanguage,
+      targetLanguage,
+      memoqProjectId: task.memoqProjectId,
+      memoqSource: task.memoqSource,
+      memoqTarget: task.memoqTarget,
+      memoqDocIds: task.memoqDocs.map(({ DocumentGuid }) => DocumentGuid),
+      vendor: ObjectId(vendor),
+      start: task.stepsDates[i].start || task.start,
+      deadline: task.stepsDates[i].deadline,
+      progress: setStepsProgress(serviceStep.symbol, task.memoqDocs),
+      status: "Created",
+      clientRate,
+      finance,
+      defaultStepPrice,
+      vendorRate,
+      totalWords: quantity,
+      check: false,
+      vendorsClickedOffer: [],
+      isVendorRead: false,
+      service
+    };
 		if(type !== 'CAT Wordcount' && type !== 'Packages') {
 			delete step.totalWords;
 			Object.assign(step, { hours: stepsAndUnits[i].hours, size: stepsAndUnits[i].size });

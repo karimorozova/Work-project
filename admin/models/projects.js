@@ -108,6 +108,7 @@ const ProjectsSchema = new mongoose.Schema({
         halfPayables: "",
       }
     },
+    defaultStepPrice: 0,
     vendorRate: "",
     // vendorDiscount: "",
     check: false,

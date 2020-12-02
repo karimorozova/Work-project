@@ -51,7 +51,7 @@ async function getStepsForMonoStepPackages(
     serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step, size, quantity } = serviceStep;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
+    const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity, discounts
     });
     steps.push({
@@ -68,6 +68,7 @@ async function getStepsForMonoStepPackages(
       clientRate,
       vendorRate,
       finance,
+      defaultStepPrice,
       check: false,
       vendorsClickedOffer: [],
       isVendorRead: false

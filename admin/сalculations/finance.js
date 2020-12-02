@@ -53,6 +53,7 @@ const getStepFinanceData = async (projectData, forWords = false) => {
       payables: vendor ? +vendorRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) : 0,
     }
   }
+  const defaultStepPrice = finance.Price.receivables;
   if (discounts.length) {
     const { Price: { receivables } } = finance;
     finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables);
@@ -62,6 +63,7 @@ const getStepFinanceData = async (projectData, forWords = false) => {
     vendorRate,
     vendor: vendor ? vendor._id : null,
     finance,
+    defaultStepPrice
   };
 };
 

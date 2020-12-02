@@ -100,7 +100,7 @@ async function getStepsForDuoUnits (allInfo) {
     const key = serviceStep.hasOwnProperty('quantity') ? 'quantity' : 'hours';
     const quantity = serviceStep[key];
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
+    const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity, discounts
     });
     return {
@@ -116,6 +116,7 @@ async function getStepsForDuoUnits (allInfo) {
       vendorRate,
       clientRate,
       finance,
+      defaultStepPrice,
       progress: 0,
       check: false,
       vendorsClickedOffer: [],
@@ -136,7 +137,7 @@ async function getStepsForMonoUnits (allInfo, common = false) {
     const { step, hours, size, title } = serviceStep;
     const stepName = title;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor } = await getStepFinanceData({
+    const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
       customer, industry, serviceStep, task, vendorId, quantity: hours, discounts
     });
     steps.push({
@@ -151,7 +152,8 @@ async function getStepsForMonoUnits (allInfo, common = false) {
       clientRate,
       hours,
       size: size || 1,
-      finance: finance,
+      finance,
+      defaultStepPrice,
       progress: 0,
       check: false,
       vendorsClickedOffer: [],
