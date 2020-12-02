@@ -147,6 +147,11 @@
 				}
 			},
 		},
+		watch: {
+			paramsIsEdit(newValue, oldValue) {
+				if(oldValue && !newValue) this.enumDiscounts = this.enumDiscounts.filter(({ name }) => name);
+			}
+		},
 		created() {
 			this.getEnumDiscounts();
 			this.getDiscounts();
