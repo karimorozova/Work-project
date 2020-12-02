@@ -1085,7 +1085,7 @@ router.get('/get-project-discounts', async (req, res) => {
 router.post('/update-project-discounts', async (req, res) => {
   const { _id, updatedArray } = req.body;
   try {
-    const updatedProject = updateProjectFinanceOnDiscountsUpdate(_id, updatedArray);
+    const updatedProject = await updateProjectFinanceOnDiscountsUpdate(_id, updatedArray);
     res.send(updatedProject);
   } catch (err) {
     console.log(err);

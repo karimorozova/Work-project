@@ -53,14 +53,16 @@ const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts) => {
   const {
     steps: updatedSteps,
     tasks: updatedTasks,
-    finance: updatedFinance
+    finance: updatedFinance,
+    roi
   } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts);
 
   return await getProjectAfterUpdate({ _id }, {
     finance: updatedFinance,
     tasks: updatedTasks,
     steps: updatedSteps,
-    discounts: updatedDiscounts
+    discounts: updatedDiscounts,
+    roi
   });
 };
 
@@ -81,8 +83,8 @@ const recalculateProjectFinance = (finance, tasks, steps, discounts = []) => {
     task.finance.Price.receivables = sumReceivables(taskSteps);
   }
   finance.Price.receivables = sumReceivables(tasks);
-
-  return { steps, tasks, finance };
+  const roi = ((finance.Price.receivables - finance.Price.payables) / finance.Price.payables).toFixed(2);
+  return { steps, tasks, finance, roi };
 
   function sumReceivables(arr) {
     let value = 0;

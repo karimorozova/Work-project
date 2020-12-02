@@ -631,7 +631,7 @@
 
     &__title {
       font-size: 22px;
-      border-bottom: 1px solid $brown-border;
+      border-bottom: 2px solid #C5BFB5;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;

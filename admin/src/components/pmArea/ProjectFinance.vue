@@ -29,7 +29,7 @@
             .project-finance__dashboardItem-value {{financeData.margin}} %
           .project-finance__dashboardItem
             .project-finance__dashboardItem-title ROI:
-            .project-finance__dashboardItem-value ?? %
+            .project-finance__dashboardItem-value {{currentProject.roi || '-' }}
 
       .project-finance__content-settingBlock
         div
@@ -41,14 +41,14 @@
               .minPrice-item__title Minimum Charge:
               .minPrice-item__input
                 .ratio__input
-                  input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" v-on:keyup.enter="updateMinPrice")
+                  input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" v-on:keyup.enter="(e) => updateMinPrice('value', e)")
                   span(v-else) {{ currentProject.minimumCharge.value }}
                   span.ratio__input-symbol(v-html="getSymbol(currentProject.customer.currency)")
             .minPrice-item
               .minPrice-item__title Ignore Min. Charge:
               .rates-item__checkbox
                 .checkbox
-                  input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="updateMinPrice")
+                  input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
                   label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
                   label(v-else for="ignoreMinPrice")
 
@@ -60,7 +60,7 @@
 
       .project-finance__total
         .project-finance__total-title Total:
-        .project-finance__total-value {{ (currentProject.finance.Price.receivables).toFixed(2) }} &nbsp;&euro;
+        .project-finance__total-value {{ detectedFinalPrice }} &nbsp;&euro;
 
 </template>
 
@@ -84,7 +84,8 @@
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
-				addFinanceProperty: "addFinanceProperty"
+				addFinanceProperty: "addFinanceProperty",
+				setCurrentProject: "setCurrentProject"
 			}),
 			crudActions(actionType) {
 				switch (actionType) {
@@ -102,17 +103,17 @@
 			toggleFinance() {
 				this.isFinanceShow = !this.isFinanceShow;
 			},
-			async updateMinPrice(e) {
+			async updateMinPrice(prop, e) {
 				try {
 					const result = await this.$http.post('/pm-manage/update-minimum-charge', {
 						_id: this.currentProject._id,
-						value: +this.$refs.minPrice.value || 0,
-						toIgnore: e.target.checked,
+						value: (+this.$refs.minPrice.value).toFixed(2) || 0,
+						toIgnore: prop === 'value' ? this.currentProject.minimumCharge.toIgnore : e.target.checked,
 					});
-					console.log(result)
-					// this.storeClientProperty({ prop: 'minPrice', value: this.$refs.minPrice.value });
+					this.setCurrentProject(result.data);
 					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" });
 				} catch (err) {
+					console.log(err)
 					this.alertToggle({ message: 'Project minimum price is not updated!', isShow: true, type: 'error' });
 				}
 			},
@@ -121,24 +122,16 @@
 			...mapGetters({
 				currentProject: "getCurrentProject"
 			}),
+			detectedFinalPrice() {
+				const { minimumCharge, finance } = this.currentProject;
+				return minimumCharge.value > finance.Price.receivables && !minimumCharge.toIgnore ?
+						(minimumCharge.value).toFixed(2) :
+						(finance.Price.receivables).toFixed(2);
+			},
 			getStartedReceivables() {
-				return "??"
-				// if(this.currentProject) {
-				// 	const cost = this.currentProject.finance.Price.receivables;
-				// 	const finalValue = this.currentProject.discounts.reduce((acc, curr) => {
-				// 		acc = acc + curr.value;
-				// 		return acc;
-				// 	}, 0);
-				// 	console.log(finalValue)
-				// 	console.log()
-				// 	const foo =  finalValue === 0 ?
-				// 			cost :
-				// 			finalValue > 0 ?
-				// 					cost - (cost * (finalValue / 100)) :
-				// 					cost + (cost * (finalValue / 100));
-				// 	console.log(foo)
-				//   return foo;
-				// }
+				if(this.currentProject) {
+					return this.currentProject.steps.reduce((acc, curr) => acc + curr.defaultStepPrice, 0)
+				}
 			},
 			barsStatistic() {
 				if(this.currentProject) {
@@ -246,7 +239,7 @@
 
     &__total {
       padding-top: 20px;
-      border-top: 2px solid #c7c0b7;
+      border-top: 2px solid #C5BFB5;
       display: flex;
 
       &-title {

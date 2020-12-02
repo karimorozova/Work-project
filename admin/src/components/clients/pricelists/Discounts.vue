@@ -68,7 +68,7 @@
 			}
 		},
 		methods: {
-			...mapActions(['alertToggle']),
+			...mapActions(['alertToggle', 'setCurrentProject']),
 
 			setDiscount({ option }) {
 				this.currentDiscount = this.allDiscounts.find(item => item.name === option);
@@ -112,6 +112,7 @@
 				updatedArray.push(this.currentDiscount);
 				try {
 					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray });
+					this.enum === 'PngSysProject' && this.setCurrentProject(result.data);
 					this.alertToggle({ message: "Discount/Surcharges Saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Discount/Surcharges", isShow: true, type: "error" });
@@ -122,7 +123,8 @@
 			async deleteDiscount(id) {
 				this.enumDiscounts = this.enumDiscounts.filter(item => item._id.toString() !== id.toString());
 				try {
-					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray: this.enumDiscounts, });
+					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray: this.enumDiscounts });
+					this.enum === 'PngSysProject' && this.setCurrentProject(result.data);
 					this.alertToggle({ message: "Discount/Surcharges Saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({ message: "Error on deleting", isShow: true, type: "error" });
