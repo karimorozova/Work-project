@@ -4,13 +4,13 @@ const { getStepFinanceData } = require('../сalculations/finance');
 const { receivablesCalc, setTaskMetrics } = require('../сalculations/wordcount');
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor');
 const { getProjectAnalysis } = require('../services/memoqs/projects');
-const { setTaskFinance } = require('./helpers');
+const { setTaskFinance, getProjectFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
 async function updateProjectMetrics(projectId, tasks) {
 	try {
     const project = await getProject({ "_id": projectId });
-    let { steps, customer, tasks: existingTasks, industry, discounts } = project;
+    let { steps, customer, tasks: existingTasks, industry, discounts, finance } = project;
     if (!tasks) tasks = project.tasks.filter(task => !task.hasOwnProperty('metrics'));
     filterExistingTasks();
     let isMetricsExist = true;
@@ -43,19 +43,25 @@ async function updateProjectMetrics(projectId, tasks) {
 					steps.push(...newSteps);
 				} else {
 					isMetricsExist = false;
-				}
-			}
-		}
+        }
+      }
+    }
 
-		function filterExistingTasks() {
-			const newTasksIds = tasks.map(i => i.taskId);
-			existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
-		}
+    function filterExistingTasks() {
+      const newTasksIds = tasks.map(i => i.taskId);
+      existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
+    }
 
-		existingTasks.push(...tasks);
-
-		return await updateProject({ "_id": projectId }, { tasks: existingTasks, steps, isMetricsExist });
-	} catch (err) {
+    existingTasks.push(...tasks);
+    const { projectFinance, roi } = getProjectFinance(existingTasks, finance);
+    return await updateProject({ "_id": projectId }, {
+      tasks: existingTasks,
+      steps,
+      isMetricsExist,
+      finance: projectFinance,
+      roi
+    });
+  } catch (err) {
 		console.log(err);
 		console.log("Error in updateProjectMetrics");
 	}

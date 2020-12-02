@@ -201,19 +201,19 @@ const getProjectFinance = (tasks, discounts) => {
     TotalWordCount += finance.Wordcount.receivables;
   }
   const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
-  const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
+  const roi = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
 	return {
-		Wordcount: {
-			receivables: +TotalWordCount,
-			payables: +TotalWordCount,
-		},
-		Price: {
+    Wordcount: {
+      receivables: +TotalWordCount,
+      payables: +TotalWordCount,
+    },
+    Price: {
       receivables: discounts.length ? getPriceAfterApplyingDiscounts(discounts, priceReceivables) : priceReceivables.toFixed(2),
       payables: pricePayables.toFixed(2),
     },
-		profit,
-		ROI
-	};
+    profit,
+    roi
+  };
 };
 
 const getPriceFromPricelist = (pricelist, data, currency) => {

@@ -29,10 +29,10 @@ async function createTasksWithPackagesUnit (allInfo) {
     const tasks = tasksWithoutFinance.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
-    const projectFinance = getProjectFinance(tasks, project.finance);
+    const { projectFinance, roi } = getProjectFinance(tasks, project.finance);
     return await updateProject(
       { _id: project.id },
-      { finance: projectFinance, $push: { tasks: tasks, steps: steps } }
+      { finance: projectFinance, roi, $push: { tasks: tasks, steps: steps } }
     );
   } catch (err) {
     console.log(err);
