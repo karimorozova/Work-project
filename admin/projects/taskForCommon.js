@@ -130,7 +130,7 @@ async function getStepsForMonoUnits (allInfo, common = false) {
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
     let { stepsAndUnits, sourceLanguage, targetLanguage } = task;
-    !stepsAndUnits.hasOwnProperty('hours') && (stepsAndUnits[0].hours = 1);
+    !stepsAndUnits.hasOwnProperty('hours') || (stepsAndUnits[0].hours = 1);
     let serviceStep = stepsAndUnits.find(item => item.hours);
     serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step, hours, size, title } = serviceStep;

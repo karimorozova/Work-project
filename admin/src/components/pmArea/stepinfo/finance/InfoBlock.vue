@@ -200,11 +200,20 @@
 			barsStatistic() {
 				const { finance } = this.step;
 				const { Price } = finance;
-				const payblesPercents = Math.ceil((Price.payables / Price.receivables) * 100)
+				let payblesPercents;
+				let receivablesPercents;
+
+				if(Price.receivables >= Price.payables) {
+					payblesPercents = Math.ceil((Price.payables / Price.receivables) * 100);
+					receivablesPercents = Price.receivables === 0 ? '0' : '100'
+				} else {
+					receivablesPercents = Math.ceil((Price.receivables / Price.payables) * 100);
+					payblesPercents = Price.payables === 0 ? '0' : '100'
+				}
 
 				return {
 					receivables: {
-						width: Price.receivables === 0 ? '0%' : '100%',
+						width: `${ receivablesPercents }%`,
 						price: Price.receivables,
 					},
 					payables: {
@@ -213,7 +222,6 @@
 					}
 				}
 			},
-
 			profitAndMargin() {
 				const { finance } = this.step;
 				const { Price } = finance;
@@ -227,8 +235,8 @@
 			},
 
 			financeDataTranslation() {
-				const { clientRate, finance, status, totalWords, vendorRate, quantity, vendor } = this.step
-				const { Wordcount, Price } = finance
+				const { clientRate, finance, status, totalWords, vendorRate, quantity, vendor } = this.step;
+				const { Wordcount, Price } = finance;
 				return {
 					stepStatus: status,
 					vendor,
@@ -247,8 +255,8 @@
 				}
 			},
 			financeDataCAT() {
-				const { clientRate, finance, status, totalWords, vendorRate, quantity, vendor } = this.step
-				const { Wordcount, Price } = finance
+				const { clientRate, finance, status, totalWords, vendorRate, quantity, vendor } = this.step;
+				const { Wordcount, Price } = finance;
 				return {
 					stepStatus: status,
 					vendor,
@@ -268,8 +276,8 @@
 				}
 			},
 			financeDataPackages() {
-				const { clientRate, finance, status, vendorRate, quantity, vendor } = this.step
-				const { Price } = finance
+				const { clientRate, finance, status, vendorRate, quantity, vendor } = this.step;
+				const { Price } = finance;
 				return {
 					title: "Quantity",
 					stepStatus: status,
@@ -287,8 +295,8 @@
 			},
 			financeDataHours() {
 				const currentUnit = this.originallyUnits.find(unit => unit._id.toString() === this.step.serviceStep.unit).type;
-				const { clientRate, finance, status, vendorRate, hours, vendor } = this.step
-				const { Price } = finance
+				const { clientRate, finance, status, vendorRate, hours, vendor } = this.step;
+				const { Price } = finance;
 				return {
 					title: currentUnit === "Hours" ? "Hours" : currentUnit,
 					stepStatus: status,

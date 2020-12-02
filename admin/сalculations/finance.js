@@ -2,20 +2,13 @@ const { CurrencyRatio, Clients, Pricelist, Languages, Vendors } = require('../mo
 
 const { multiplyPrices } = require('../multipliers');
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers');
-const { setTaskMetrics } = require('./wordcount');
 
 const getStepFinanceData = async (projectData, forWords = false) => {
   const { customer, serviceStep, industry, task, vendorId, quantity, discounts } = projectData;
   const { metrics, sourceLanguage, targetLanguage } = task;
   let vendor;
-  let updatedMetrics;
   if (vendorId) {
     vendor = await Vendors.findOne({ _id: vendorId });
-    updatedMetrics = setTaskMetrics({
-      metrics,
-      matrix: vendor.matrix,
-      prop: 'vendor'
-    });
   }
   const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true });
   const client = await Clients.findOne({ _id: customer });
@@ -53,11 +46,11 @@ const getStepFinanceData = async (projectData, forWords = false) => {
   const finance = {
     Wordcount: {
       receivables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity : 0,
-      payables: forWords ? title === 'Translation' ? getRelativeQuantity(updatedMetrics, 'vendor') : +quantity : 0,
+      payables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity : 0,
     },
     Price: {
       receivables: +clientRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity),
-      payables: vendor ? +vendorRate.value * +(title === 'Translation' ? getRelativeQuantity(updatedMetrics, 'vendor') : +quantity) : 0,
+      payables: vendor ? +vendorRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) : 0,
     }
   }
   if (discounts.length) {

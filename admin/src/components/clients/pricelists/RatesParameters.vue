@@ -20,8 +20,8 @@
           .rates-item__title Min Price:
           .rates-item__input
             .ratio__input
-              input(v-if="ratesParamsIsEdit" type="number" v-model="minPrice" v-on:keyup.enter="updateMinPrice" :value="minPrice" )
-              span(v-else) {{ minPrice }}
+              input(v-if="ratesParamsIsEdit" type="number" ref="minPrice" :value="currentClient.minPrice" v-on:keyup.enter="updateMinPrice")
+              span(v-else) {{ currentClient.minPrice }}
               span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
         //.rates-item
           .rates-item__title Ignore Min Price:
@@ -49,7 +49,6 @@
 					edit: { icon: require("../../../assets/images/Other/edit-icon-qa.png") },
 					cancel: { icon: require("../../../assets/images/cancel-icon.png") },
 				},
-				minPrice: null,
 				ignoreMinPrice: false,
 				ratesParamsIsEdit: false,
 			};
@@ -70,8 +69,9 @@
 				try {
 					await this.$http.put('/clientsapi/set-min-price', {
 						_id: this.currentClient._id,
-						value: this.minPrice,
+						value: this.$refs.minPrice.value,
 					});
+					this.storeClientProperty({ prop: 'minPrice', value: this.$refs.minPrice.value });
 					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({
@@ -107,8 +107,8 @@
 			}
 		},
 		mounted() {
-			this.minPrice = this.currentClient.minPrice;
-			this.ignoreMinPrice = this.currentClient.ignoreMinPrice;
+			// this.minPrice = this.currentClient.minPrice;
+			// this.ignoreMinPrice = this.currentClient.ignoreMinPrice;
 		},
 		computed: {
 			...mapGetters({
