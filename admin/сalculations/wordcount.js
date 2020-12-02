@@ -34,29 +34,29 @@ async function receivablesCalc({ task, project, step }) {
 
 async function getAfterWordcountPayablesUpdated({ project, step }) {
 	try {
-		let { tasks, steps, customer, industry } = project;
-		const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
-		const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId);
-		tasks[taskIndex].metrics = setTaskMetrics({
-			metrics: tasks[taskIndex].metrics,
-			matrix: step.vendor.matrix,
-			prop: 'vendor'
-		});
-		const quantity = tasks[taskIndex].metrics.totalWords;
-		const { serviceStep, vendor } = step;
-		const { finance, vendorRate } = await getStepFinanceData({
-			customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity
-		},true);
+    let { tasks, steps, customer, industry, discounts } = project;
+    const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
+    const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId);
+    tasks[taskIndex].metrics = setTaskMetrics({
+      metrics: tasks[taskIndex].metrics,
+      matrix: step.vendor.matrix,
+      prop: 'vendor'
+    });
+    const quantity = tasks[taskIndex].metrics.totalWords;
+    const { serviceStep, vendor } = step;
+    const { finance, vendorRate } = await getStepFinanceData({
+      customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts
+    }, true);
 
-		steps[stepIndex].finance = finance;
-		steps[stepIndex].vendorRate = vendorRate;
-		const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId);
-		tasks[taskIndex].finance = {
-			Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
-			Price: setTaskFinance(taskSteps, 'Price'),
-		};
-		return await updateProjectCosts({ ...project._doc, id: project._id, tasks, steps });
-	} catch (err) {
+    steps[stepIndex].finance = finance;
+    steps[stepIndex].vendorRate = vendorRate;
+    const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId);
+    tasks[taskIndex].finance = {
+      Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
+      Price: setTaskFinance(taskSteps, 'Price'),
+    };
+    return await updateProjectCosts({ ...project._doc, id: project._id, tasks, steps });
+  } catch (err) {
 		console.log(err);
 		console.log('Error in getAfterWordcountPayablesUpdated');
 	}
@@ -278,14 +278,12 @@ function checkForLanguages({ vendor, step, project }) {
 }
 
 async function updateProjectCosts(project) {
-  const { discounts } = project;
   let finance = {
     Wordcount: getProjectFinanceData(project, 'Wordcount'),
     Price: getProjectFinanceData(project, 'Price')
   };
-  if (discounts.length) {
-    finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, finance.Price.receivables);
-  }
+  const { receivables, payables } = finance.Price;
+  const roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0;
   try {
     const checkStatuses = ['Quote sent', 'Approved'];
     const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1;
@@ -293,7 +291,8 @@ async function updateProjectCosts(project) {
       tasks: project.tasks,
       steps: project.steps,
       finance,
-      isPriceUpdated
+      isPriceUpdated,
+      roi
     });
   } catch (err) {
     console.log(err);

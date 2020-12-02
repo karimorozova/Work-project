@@ -4,18 +4,20 @@ const { Projects } = require('../models');
 
 async function getProjectAfterFinanceUpdated ({ project, steps, tasks }) {
   try {
-    let { finance, isPriceUpdated, status, discounts } = project;
-    finance.Price = getProjectFinancePrice(tasks, discounts);
+    let { finance, isPriceUpdated, status } = project;
+    finance.Price = getProjectFinancePrice(tasks);
+    const { receivables, payables } = finance.Price;
+    const roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0;
     const checkStatuses = ['Quote sent', 'Approved'];
     isPriceUpdated = checkStatuses.indexOf(status) !== -1;
-    return await updateProject({ '_id': project.id }, { finance, steps, tasks, isPriceUpdated });
+    return await updateProject({ '_id': project.id }, { finance, steps, tasks, isPriceUpdated, roi });
   } catch (err) {
     console.log(err);
         console.log("Error in getProjectAfterFinanceUpdated");
     }
 }
 
-function getProjectFinancePrice (tasks, discounts = []) {
+function getProjectFinancePrice(tasks) {
   const notCancelledTasks = tasks.filter(item => item.status !== 'Cancelled');
   let receivables = +(notCancelledTasks.reduce((prev, cur) => {
     if (cur.status === 'Cancelled Halfway') {
@@ -29,8 +31,8 @@ function getProjectFinancePrice (tasks, discounts = []) {
     }
     return prev + cur.finance.Price.payables;
     }, 0).toFixed(2));
-  receivables = discounts.length ? getPriceAfterApplyingDiscounts(discounts, receivables) : receivables;
-    return { receivables, payables };
+
+  return { receivables, payables };
 }
 
 function getUpdatedProjectFinance(tasks) {

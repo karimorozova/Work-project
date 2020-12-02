@@ -4,14 +4,14 @@ const { setTaskFinance, getStepQuantity } = require('../projects/helpers');
 
 
 async function getAfterHoursPayablesUpdated ({ project, step }) {
-  let { tasks, steps, customer, industry } = project;
+  let { tasks, steps, customer, industry, discounts } = project;
   const { serviceStep } = step;
   try {
     const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
     const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId);
     const quantity = getStepQuantity(step);
     const { finance, vendorRate } = await getStepFinanceData({
-      customer, industry, serviceStep, task: tasks[taskIndex], vendorId: step.vendor._id, quantity
+      customer, industry, serviceStep, task: tasks[taskIndex], vendorId: step.vendor._id, quantity, discounts
     });
     steps[stepIndex].finance = finance;
     steps[stepIndex].vendorRate = vendorRate;

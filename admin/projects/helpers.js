@@ -29,13 +29,13 @@ function getProjectFinance(tasks, projectFinance) {
     tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) +
     +currentPayables
   ).toFixed(2);
-  const ROI = currentPayables ? ((currentReceivables - currentPayables) / currentPayables).toFixed(2) : 0;
+  const roi = currentPayables ? ((currentReceivables - currentPayables) / currentPayables).toFixed(2) : 0;
   return {
     projectFinance: {
       Price: { receivables, payables },
       Wordcount: { ...projectFinance.Wordcount }
     },
-    ROI
+    roi
   };
 }
 
