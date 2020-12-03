@@ -38,11 +38,11 @@
         template(slot="industry" slot-scope="{ row, index }")
             .clients-table__drop-menu(v-if="currentEditingIndex === index")
                 MultiClientIndustrySelect(
-                    :selectedInd="selectedIndustry"
-                    :filteredIndustries="selectedIndNames" 
-                    :parentInd="index" 
-                    @chosenInd="setIndustry"
-                    @scrollDrop="scrollDrop"
+                  :selectedInd="selectedIndustry"
+                  :filteredIndustries="selectedIndNames"
+                  :parentInd="index"
+                  @chosenInd="setIndustry"
+                  @scrollDrop="scrollDrop"
                 )
             .clients-table__data-cell(v-else)
                 img.clients-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
@@ -98,9 +98,9 @@ export default {
         statusFilter: {
             type: String
         },
-        leadsourceFilter: {
-            type: String
-        },
+      leadSourceFilter: {
+        type: String
+      },
         filterIndustry: {
             type: [String, Object],
             default: ""
@@ -138,17 +138,17 @@ export default {
         }
     },
     methods: {
-        async setTest(clientId){            
-            const client = {
-                id: clientId,
-                isTest: event.target.checked
-            }
-            try {
-                await this.updateClientStatus(client);
-                this.alertToggle({message: "Client status updated", isShow: true, type: "success"});
-            } catch (err) {
-                this.alertToggle({
-                    message: "Server error / Cannot update Client status",
+      async setTest(clientId) {
+        const client = {
+          id: clientId,
+          isTest: event.target.checked
+        }
+        try {
+          await this.updateClientStatus(client);
+          this.alertToggle({ message: "Client status updated", isShow: true, type: "success" });
+        } catch (err) {
+          this.alertToggle({
+            message: "Server error / Cannot update Client status",
                     isShow: true,
                     type: "error"
                 });
@@ -296,7 +296,7 @@ export default {
         ClientLeadsourceSelect,
         MultiClientIndustrySelect,
         Button
-    } 
+    }
 }
 </script>
 

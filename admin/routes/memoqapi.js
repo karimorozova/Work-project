@@ -26,6 +26,7 @@ const {
   parseMessagesAndUpdateProjects
 } = require('../services/memoqs/otherProjects');
 const { saveMessages } = require('../gmail');
+const { updateProjectFinanceOnDiscountsUpdate } = require('../projects');
 router.get('/users', async (req, res) => {
 	try {
 		const result = await getMemoqUsers();
@@ -355,6 +356,39 @@ router.post('/set-recalculation-lock', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on setting recalculation lock');
+  }
+});
+
+router.get('/get-project-discounts', async (req, res) => {
+  const { id } = req.query;
+  try {
+    const discounts = await MemoqProject.findOne({ "_id": id }, { discounts: 1 });
+    res.send(discounts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting project discounts');
+  }
+});
+
+router.post('/update-project-discounts', async (req, res) => {
+  const { _id, updatedArray } = req.body;
+  try {
+    const updatedProject = await updateProjectFinanceOnDiscountsUpdate(_id, updatedArray, MemoqProject);
+    res.send(updatedProject);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating project\'s discounts');
+  }
+});
+
+router.post('/update-minimum-charge', async (req, res) => {
+  const { _id, value, toIgnore } = req.body;
+  try {
+    const updatedProject = await getProjectAfterUpdate({ _id }, { minimumCharge: { value, toIgnore } });
+    res.send(updatedProject);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating project\'s minimum charge!');
   }
 });
 

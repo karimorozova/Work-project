@@ -11,6 +11,13 @@ const { tableKeys } = require('../enums');
 const { getRateInfoFromStepFinance } = require('../pricelist/ratesmanage');
 const { getClient } = require('../clients');
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {String} itemIdentifier
+ * @param {Object} updatedItem
+ * @returns nothing - just updates DB
+ */
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   const client = await Clients.findOne({ _id: clientId });
   const boundPricelist = await Pricelist.findOne({ _id: client.defaultPricelist });
@@ -79,6 +86,15 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
   await Clients.updateOne({ _id: clientId }, { rates: client.rates });
 };
 
+/**
+ *
+ * @param {Array} arr - operation array
+ * @param {Object} replacementItem - replacement item
+ * @param {Object} boundPricelist - pricelist that has been bound to client
+ * @param {String} key - key for selecting needed table
+ * @param {String} personKey - client's name
+ * @returns {Array} returns updated array of objects
+ */
 const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) => {
   const { _id } = replacementItem;
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = boundPricelist;
@@ -108,6 +124,12 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) =>
   return arr;
 };
 
+/**
+ *
+ * @param {Array} arr - operation array
+ * @param {String} searchItemId - id of a needed item
+ * @returns {Number} returns index of needed item
+ */
 const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id.toString() === searchItemId);
 
 /**
@@ -163,7 +185,7 @@ const changePricelistTable = (
   return updatedPricelist;
 };
 /**
- * @param clientId - id of a current client
+ * @param {ObjectId} clientId - id of a current client
  * @param newServicesArr - fresh created services, consists: {
  *   sourceLanguage: {Object},
  *   targetLanguages: {Array},
@@ -255,6 +277,14 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
   );
 };
 
+/**
+ *
+ * @param {ObjectId} sourceLanguageId
+ * @param {ObjectId} targetLanguageId
+ * @param {ObjectId} serviceId
+ * @param {ObjectId} industryId
+ * @returns {Object} returns fullfilled object with all needed information
+ */
 const gatherFullServiceInfo = async (
   {
     sourceLanguage: sourceLanguageId,
@@ -270,6 +300,12 @@ const gatherFullServiceInfo = async (
   };
 };
 
+/**
+ *
+ * @param {Object} basicPriceObj
+ * @param {String} clientCurrency
+ * @returns {Object} returns needed price according to client's currency
+ */
 const getNeededCurrency = (basicPriceObj, clientCurrency) => {
   const { euroBasicPrice, usdBasicPrice, gbpBasicPrice } = basicPriceObj;
   if (clientCurrency === 'EUR') {
@@ -281,18 +317,39 @@ const getNeededCurrency = (basicPriceObj, clientCurrency) => {
   }
 };
 
+/**
+ *
+ * @param {Array} arr - operation array
+ * @param {ObjectId} sourceLangId
+ * @param {ObjectId} targetLangId
+ * @returns {Object} returns object with needed language pair
+ */
 const getNeededLangPair = (arr, sourceLangId, targetLangId) => (
   arr.find(item => (
     item.sourceLanguage.toString() === sourceLangId.toString() &&
     item.targetLanguage.toString() === targetLangId.toString()
   )));
 
+/**
+ *
+ * @param {Array} arr - operation array
+ * @param {Object} step - step object
+ * @param {Object} unit - unit object
+ * @param {Number} size - size to find same
+ * @returns {Object} - returns object of a needed step row
+ */
 const getNeededStepRow = (arr, step, unit, size) => (
   arr.find(item => (
     `${item.step} ${item.unit} ${item.size}` === `${step._id} ${unit._id} ${size}`
   ))
 );
 
+/**
+ *
+ * @param {Object} newService - object of a new service
+ * @param {Object} rates - rates object
+ * @returns {Object} - returns unique service steps and industries
+ */
 const getUniqueServiceItems = async (newService, rates) => {
   const { services: newServices, industries: newIndustries } = newService;
   const { stepMultipliersTable, industryMultipliersTable } = rates;
@@ -318,6 +375,11 @@ const getUniqueServiceItems = async (newService, rates) => {
   };
 };
 
+/**
+ *
+ * @param {Array} newServices - array of a new services
+ * @returns {Array} - returns unique step-unit rows
+ */
 const getStepUnitCombinations = async (newServices) => {
   const stepUnitCombinations = [];
   for (let { steps } of newServices) {
@@ -333,6 +395,12 @@ const getStepUnitCombinations = async (newServices) => {
 };
 
 //TODO: Add clients currencies for combinations
+/**
+ *
+ * @param {ObjectId} _id - step's id
+ * @param {Array} stepMultipliersTable
+ * @returns {Array} - returns array of step combinations
+ */
 const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable }) => {
   const stepUnitSizeCombinations = [];
   const { calculationUnit } = await Step.findOne({ _id });
@@ -373,6 +441,14 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
   return stepUnitSizeCombinations;
 };
 
+/**
+ *
+ * @param {Array} newBasicPriceRows - new basic price rows
+ * @param {Array} newStepMultiplierRows - new step multiplier rows
+ * @param {Array} newIndustryMultiplierRows - new industry multiplier rows
+ * @param {Array} oldPricelistTable - old pricelist table
+ * @returns {Array} - returns fullfilled pricelist table
+ */
 const generateNewPricelistCombinations = (
   newBasicPriceRows,
   newStepMultiplierRows,
@@ -397,6 +473,15 @@ const generateNewPricelistCombinations = (
   return oldPricelistTable;
 };
 
+/**
+ *
+ * @param {Array} basicPricesTable - basic prices rows
+ * @param {Array} stepMultipliersTable - step multiplier rows
+ * @param {Array} industryMultipliersTable - industry multiplier rows
+ * @param {Array} oldPricelistTable - old pricelist table
+ * @param {Boolean} fromDelete - key that variates from true to false
+ * @returns {Array} returns unique pricelist combinations
+ */
 const getPricelistCombinations = (
   basicPricesTable,
   stepMultipliersTable,
@@ -441,6 +526,14 @@ const getPricelistCombinations = (
 
 Object.fromEntries = l => l.reduce((a, [k, v]) => ({ ...a, [k]: v }), {});
 
+/**
+ *
+ * @param {Object} client
+ * @param {Object} updatedService - new service entity
+ * @param {Object} oldService - old service entity
+ * @param {Object} dataToUpdate
+ * @returns nothing - just updates a client
+ */
 const updateClientRatesFromServices = async (client, updatedService, oldService, dataToUpdate) => {
   const { _id, rates, services } = client;
   const sourceLangDifference = getSourceLangDifference(updatedService.sourceLanguage, oldService.sourceLanguage._id);
@@ -499,14 +592,26 @@ const updateClientRatesFromServices = async (client, updatedService, oldService,
     }
   });
 
-  function getSourceLangDifference (newSourceLang, oldSourceLang) {
+  /**
+   *
+   * @param {ObjectId} newSourceLang - object id of a new source lang
+   * @param {ObjectId} oldSourceLang - object id of an old source lang
+   * @returns {null|*}
+   */
+  function getSourceLangDifference(newSourceLang, oldSourceLang) {
     if (newSourceLang.toString() !== oldSourceLang.toString()) {
       return newSourceLang;
     }
     return null;
   }
 
-  function getArrDifference (newItemsArr, oldItemsArr) {
+  /**
+   *
+   * @param {Array} newItemsArr
+   * @param {Array} oldItemsArr
+   * @returns {null | {newItem: {Object}, oldItem: {Object}}}
+   */
+  function getArrDifference(newItemsArr, oldItemsArr) {
     oldItemsArr = oldItemsArr.map(({ _id }) => _id);
     newItemsArr = newItemsArr.map(_id => _id.toString());
     const differenceArr = _.difference(newItemsArr, oldItemsArr);
@@ -518,6 +623,12 @@ const updateClientRatesFromServices = async (client, updatedService, oldService,
   }
 };
 
+/**
+ *
+ * @param {Object} dataToUpdate
+ * @param {Array} oldServices
+ * @returns {Array} - array of combinations
+ */
 const generateServiceCombinations = async (dataToUpdate, oldServices) => {
   const servicesCombinations = [];
   const { services: arrServices } = dataToUpdate;
@@ -548,6 +659,15 @@ const generateServiceCombinations = async (dataToUpdate, oldServices) => {
   return servicesCombinations;
 };
 
+/**
+ *
+ * @param {Array} oldServices - services arr
+ * @param {ObjectId} newSourceLang - id of a new source language
+ * @param {ObjectId} newTargetLang - id of a new target language
+ * @param {ObjectId} newService - id of a new service
+ * @param {ObjectId} newIndustry - id of a new industry
+ * @returns {Boolean}
+ */
 const checkForDuplicateRow = (oldServices, newSourceLang, newTargetLang, newService, newIndustry) => {
   let isIdentical = false;
   for (let { sourceLanguage, targetLanguages, services, industries } of oldServices) {
@@ -560,6 +680,12 @@ const checkForDuplicateRow = (oldServices, newSourceLang, newTargetLang, newServ
   return isIdentical;
 };
 
+/**
+ *
+ * @param {Array} newServices
+ * @param {Array} oldServices
+ * @returns {Array} returns filtered services that fit to conditions
+ */
 const getUniqueServiceCombinations = (newServices, oldServices) => {
   return newServices.filter(newItem => (
     oldServices.every(oldItem => (
@@ -571,6 +697,12 @@ const getUniqueServiceCombinations = (newServices, oldServices) => {
   ));
 };
 
+/**
+ *
+ * @param {Object} obj1
+ * @param {Object} obj2
+ * @returns {Object} returns differences of a two objects
+ */
 const getObjDifferences = (obj1, obj2) => {
   let diffs = {};
   let key;
@@ -588,6 +720,12 @@ const getObjDifferences = (obj1, obj2) => {
   return diffs;
 };
 
+/**
+ *
+ * @param {Object} client
+ * @param {Object} rowToDelete
+ * @returns {Object} returns updated tables
+ */
 const clearClientRates = (client, rowToDelete) => {
   const { rates, services } = client;
   let { pricelistTable } = rates;
@@ -626,6 +764,14 @@ const clearClientRates = (client, rowToDelete) => {
   };
 };
 
+/**
+ *
+ * @param {Object} rates
+ * @param {Array} services
+ * @param {ObjectId} rowToDeleteId
+ * @param {String} langPair
+ * @returns {Array} returns filtered table
+ */
 const filterRedundantLangPair = (rates, services, rowToDeleteId, langPair) => {
   const { basicPricesTable } = rates;
   const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString());
@@ -640,6 +786,14 @@ const filterRedundantLangPair = (rates, services, rowToDeleteId, langPair) => {
   return basicPricesTable;
 };
 
+/**
+ *
+ * @param {Object} rates
+ * @param {Array} services
+ * @param {ObjectId} rowToDeleteId
+ * @param {Object} serviceToDelete
+ * @returns {Array} returns an updated table array
+ */
 const filterRedundantSteps = (rates, services, rowToDeleteId, serviceToDelete) => {
   const { stepMultipliersTable } = rates;
   const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString());
@@ -662,6 +816,14 @@ const filterRedundantSteps = (rates, services, rowToDeleteId, serviceToDelete) =
   }
 };
 
+/**
+ *
+ * @param {Object} rates
+ * @param {Array} services
+ * @param {ObjectId} rowToDeleteId
+ * @param {Object} industryToDelete
+ * @returns {Array} returns an updated table array
+ */
 const filterRedundantIndustry = (rates, services, rowToDeleteId, industryToDelete) => {
   const { industryMultipliersTable } = rates;
   const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString());
@@ -674,6 +836,13 @@ const filterRedundantIndustry = (rates, services, rowToDeleteId, industryToDelet
   return industryMultipliersTable;
 };
 
+/**
+ *
+ * @param {Object} project
+ * @param {Object} step
+ * @param {Object} rate
+ * @returns nothing, just updates client's rates
+ */
 async function getClientAfterCombinationsUpdated ({ project, step, rate }) {
   try {
     const rateInfo = await getRateInfoFromStepFinance({ project, step, rate });

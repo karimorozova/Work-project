@@ -107,16 +107,37 @@ const MemoqProjectSchema = new mongoose.Schema({
 		type: Schema.Types.ObjectId, ref: 'User'
 	},
 	accountManager: {
-		type: Schema.Types.ObjectId, ref: 'User'
-	},
-	finance: {},
-	billingDate: {
-		type: Date,
-	},
-	lockedForRecalculation: {
-		type: Boolean,
-		default: false
-	},
+    type: Schema.Types.ObjectId, ref: 'User'
+  },
+  finance: {},
+  billingDate: {
+    type: Date,
+  },
+  lockedForRecalculation: {
+    type: Boolean,
+    default: false
+  },
+  discounts: [{
+    name: {
+      type: String,
+      trim: true,
+      required: true
+    },
+    value: {
+      type: Number,
+      required: true
+    },
+  }],
+  minimumCharge: {
+    value: {
+      type: Number,
+      default: 0
+    },
+    toIgnore: {
+      type: Boolean,
+      default: false
+    }
+  },
 });
 
 const MemoqProject = mongoose.model('MemoqProject', MemoqProjectSchema);

@@ -9,6 +9,13 @@ const {
   getUniqueServiceCombinations
 } = require('./clientRates');
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {Object} dataToUpdate
+ * @param {Object} oldData
+ * @returns {Object} returns an updated client
+ */
 const updateClientService = async (clientId, dataToUpdate, oldData) => {
   try {
     let client = await Clients.findOne({ _id: clientId }).populate('defaultPricelist');
@@ -36,6 +43,12 @@ const updateClientService = async (clientId, dataToUpdate, oldData) => {
   }
 };
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {ObjectId} serviceId
+ * @returns {Object} returns an updated client
+ */
 const deleteClientService = async (clientId, serviceId) => {
   try {
     const client = await Clients.findOne({ _id: clientId })

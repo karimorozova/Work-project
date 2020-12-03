@@ -13,14 +13,14 @@
                     .clients-filters__item
                         label Lead Source:
                         .clients-filters__drop-menu
-                            ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="leadsourceFilter" @chosenLeadsource="chosenLeadsource")
+                            ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="leadSourceFilter" @chosenLeadsource="chosenLeadsource")
                 .clients-filters__row-button
                     input.add-button(type="submit" value="Add client" @click="addClient")
             ClientsTable(
                 :clients="allClients"
                 :nameFilter="nameFilter"
                 :statusFilter="statusFilter"
-                :leadsourceFilter="leadsourceFilter"
+              :leadSourceFilter="leadSourceFilter"
                 :filterIndustry="industryFilter"
                 @showClientDetails="showClientDetails"
                 @update="update"
@@ -44,16 +44,16 @@ export default {
     },
     data() {
         return {
-            nameFilter: "",
-            industryFilter: {name: 'All'},
-            leadsourceFilter: "All",
-            isAllIndustyFilter: true,
-            isAllStatusExist: true,
-            isAllLeadExist: true,
-            isDataRemain: true,
-            lastId: "",
-            typingTimer: "",
-            doneTypingInterval: 800
+          nameFilter: "",
+          industryFilter: { name: 'All' },
+          leadSourceFilter: "All",
+          isAllIndustyFilter: true,
+          isAllStatusExist: true,
+          isAllLeadExist: true,
+          isDataRemain: true,
+          lastId: "",
+          typingTimer: "",
+          doneTypingInterval: 800
         }
     },
     methods: {
@@ -112,8 +112,8 @@ export default {
             }
         },
         async chosenLeadsource({leadSource}) {
-            this.leadsourceFilter = leadSource;
-            await this.getCustomers();
+          this.leadSourceFilter = leadSource;
+          await this.getCustomers();
         },
         async chosenStatus({status}) {
             this.statusFilter = status;
@@ -135,11 +135,11 @@ export default {
         }),
         filters() {
             return {
-                nameFilter: this.nameFilter,
-                industryFilter: this.industryFilter,
-                leadsourceFilter: this.leadsourceFilter,
-                statusFilter: this.statusFilter,
-                lastId: this.lastId
+              nameFilter: this.nameFilter,
+              industryFilter: this.industryFilter,
+              leadSourceFilter: this.leadSourceFilter,
+              statusFilter: this.statusFilter,
+              lastId: this.lastId
             }
         }
     },

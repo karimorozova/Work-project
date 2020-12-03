@@ -1,6 +1,11 @@
 const { Step, Services, Units } = require('../models');
 const { multiplyPrices } = require('../multipliers');
 
+/**
+ *
+ * @param {Object} operationObj
+ * @returns {Object} returns an updated basic prices table and
+ */
 const updateClientLangPairs = async (operationObj) => {
   let { client, sourceLangDifference, targetLangDifference, updatedService, oldService, updatedPricelist } = operationObj;
   const { services, rates, defaultPricelist, currency } = client;
@@ -44,7 +49,12 @@ const updateClientLangPairs = async (operationObj) => {
 
   return { updatedBasicPricesTable: basicPricesTable, updatedPricelist };
 
-  async function pushNewLangCombination (newService) {
+  /**
+   *
+   * @param {Object} newService
+   * @returns nothing - pushes new combinations into pricelist table
+   */
+  async function pushNewLangCombination(newService) {
     const { sourceLanguage, targetLanguages, services, industries } = newService;
     const langPairCombinations = pushNewLangPair(sourceLanguage, targetLanguages[0], true);
     const stepMultiplierCombinations = await getStepMultipliers(services[0]);
@@ -66,7 +76,12 @@ const updateClientLangPairs = async (operationObj) => {
     });
   }
 
-  async function getStepMultipliers (serviceId) {
+  /**
+   *
+   * @param {ObjectId}serviceId
+   * @returns {Array} - returns an array of step multipliers
+   */
+  async function getStepMultipliers(serviceId) {
     const stepMultipliers = [];
     const { steps } = await Services.findOne({ _id: serviceId });
     for (let i = 0; i < steps.length; i++) {
@@ -102,7 +117,12 @@ const updateClientLangPairs = async (operationObj) => {
     return stepMultipliers;
   }
 
-  function getIndustryMultipliers (industryId) {
+  /**
+   *
+   * @param {ObjectId} industryId
+   * @returns {Array} returns an array of industry multipliers
+   */
+  function getIndustryMultipliers(industryId) {
     const industryMultipliers = [];
     const sameDefaultIndustryRow = defaultPricelist.industryMultipliersTable.find(({ industry }) => (
       industry.toString() === industryId.toString()
@@ -114,7 +134,14 @@ const updateClientLangPairs = async (operationObj) => {
     return industryMultipliers;
   }
 
-  function pushNewLangPair (newSourceLanguage, newTargetLanguage, toReturn = false) {
+  /**
+   *
+   * @param {ObjectId} newSourceLanguage
+   * @param {ObjectId} newTargetLanguage
+   * @param {Boolean} toReturn - boolean value which decides return array or not
+   * @returns {Array} - also depends on toReturn value
+   */
+  function pushNewLangPair(newSourceLanguage, newTargetLanguage, toReturn = false) {
     const sameDefaultPair = defaultPricelist.basicPricesTable.find(row => (
       `${row.sourceLanguage} ${row.targetLanguage}` === `${newSourceLanguage} ${newTargetLanguage}`
     ));
@@ -158,7 +185,13 @@ const updateClientLangPairs = async (operationObj) => {
     }
   }
 
-  function findSameLangPair (sourceLanguage, targetLanguage) {
+  /**
+   *
+   * @param {ObjectId} sourceLanguage
+   * @param {ObjectId} targetLanguage
+   * @returns {Object} returns fitting row
+   */
+  function findSameLangPair(sourceLanguage, targetLanguage) {
     return otherServices.find(row => {
       const { targetLanguages } = row;
       const otherLangPairs = targetLanguages.map(lang => `${row.sourceLanguage} - ${lang}`);
@@ -168,7 +201,15 @@ const updateClientLangPairs = async (operationObj) => {
     });
   }
 
-  function replaceOldLanguage (table, newLanguage, key, needNewLangCompare = false) {
+  /**
+   *
+   * @param {Array} table
+   * @param {ObjectId} newLanguage
+   * @param {String} key - key name to get value
+   * @param {Boolean} needNewLangCompare - affects on comparing source language value
+   * @returns {Array} returns changed array
+   */
+  function replaceOldLanguage(table, newLanguage, key, needNewLangCompare = false) {
     return table.map(row => {
       const { sourceLanguage, targetLanguage } = row;
       if (`${sourceLanguage} ${targetLanguage}` === `${needNewLangCompare ?
@@ -180,6 +221,11 @@ const updateClientLangPairs = async (operationObj) => {
   }
 };
 
+/**
+ *
+ * @param {Object} operationObj
+ * @returns {Object} returns updated step multipliers and pricelist tables
+ */
 const updateClientStepMultipliers = async (operationObj) => {
   const {
     client, serviceStepDifference, oldService, updatedService, updatedPricelist, compareOldSource,
@@ -221,7 +267,11 @@ const updateClientStepMultipliers = async (operationObj) => {
 
   return { updatedStepMultipliersTable: stepMultipliersTable, updatedPricelist };
 
-  function pushNewStepCombination (newService) {
+  /**
+   *
+   * @param {Object} newService
+   */
+  function pushNewStepCombination(newService) {
     const { sourceLanguage, targetLanguages, industries } = newService;
     const langPairCombinations = getLangPairsObjs(sourceLanguage, targetLanguages[0]);
     const stepMultiplierCombinations = pushNewSteps(newUniqueStepRows, true);
@@ -243,7 +293,13 @@ const updateClientStepMultipliers = async (operationObj) => {
     });
   }
 
-  function getLangPairsObjs (sourceLanguage, targetLanguage) {
+  /**
+   *
+   * @param {ObjectId} sourceLanguage
+   * @param {ObjectId} targetLanguage
+   * @returns {Array} returns an array of needed lang pairs and their cost
+   */
+  function getLangPairsObjs(sourceLanguage, targetLanguage) {
     const sameDefaultPair = defaultPricelist.basicPricesTable.find(row => (
       `${row.sourceLanguage} ${row.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
     ));
@@ -273,7 +329,12 @@ const updateClientStepMultipliers = async (operationObj) => {
     }
   }
 
-  function getIndustryMultipliers (industryId) {
+  /**
+   *
+   * @param {ObjectId} industryId
+   * @returns {Array} returns industry multipliers array
+   */
+  function getIndustryMultipliers(industryId) {
     const industryMultipliers = [];
     const sameDefaultIndustryRow = defaultPricelist.industryMultipliersTable.find(({ industry }) => (
       industry.toString() === industryId.toString()
@@ -285,7 +346,13 @@ const updateClientStepMultipliers = async (operationObj) => {
     return industryMultipliers;
   }
 
-  function pushNewSteps (newStepsArr, toReturn = false) {
+  /**
+   *
+   * @param {Array} newStepsArr
+   * @param {Boolean} toReturn - affects on rather function needs to return or not
+   * @returns {Array} if toReturn = true - returns array of step multipliers or just pushes combinations in existing array
+   */
+  function pushNewSteps(newStepsArr, toReturn = false) {
     let arrToReturn = [];
     for (let { stepId, unitId, size } of newStepsArr) {
       const row = defaultPricelist.stepMultipliersTable.find(row => (
@@ -310,13 +377,23 @@ const updateClientStepMultipliers = async (operationObj) => {
     return arrToReturn;
   }
 
-  function deleteOldUniqueStepCombinations (indexesArr) {
+  /**
+   *
+   * @param {Array} indexesArr
+   */
+  function deleteOldUniqueStepCombinations(indexesArr) {
     for (let index of indexesArr) {
       updatedPricelist.splice(indexesArr, 1);
     }
   }
 
-  async function deleteOldUniqueSteps (table, stepsArr) {
+  /**
+   *
+   * @param {Array} table
+   * @param {Array} stepsArr
+   * @returns {Array} returns filtered table
+   */
+  async function deleteOldUniqueSteps(table, stepsArr) {
     const stepCombinationRows = [];
     for (let step of stepsArr) {
       const { calculationUnit } = await Step.findOne({ _id: step }).populate('calculationUnit');
@@ -335,7 +412,12 @@ const updateClientStepMultipliers = async (operationObj) => {
     ));
   }
 
-  async function findUniqueOldSteps (serviceId) {
+  /**
+   *
+   * @param {ObjectId} serviceId
+   * @returns {Array} - returns unique step rows
+   */
+  async function findUniqueOldSteps(serviceId) {
     let uniqueStepRows = [];
     const otherServiceSteps = [];
     const clientServicesFromServicesArr = otherServices.map(({ services }) => services);
@@ -352,7 +434,14 @@ const updateClientStepMultipliers = async (operationObj) => {
     return uniqueStepRows;
   }
 
-  async function findUniqOldStepCombinationIndexes (serviceId, compareOldSource, compareOldTarget) {
+  /**
+   *
+   * @param {ObjectId} serviceId
+   * @param {Boolean} compareOldSource - affects on comparing item
+   * @param {Boolean} compareOldTarget - affects on comparing item
+   * @returns {Array} returns unique indexes of step combinations
+   */
+  async function findUniqOldStepCombinationIndexes(serviceId, compareOldSource, compareOldTarget) {
     const uniqueOldStepCombinationIndexes = [];
     const { steps } = await Services.findOne({ _id: serviceId });
     for (let { step: serviceStep } of steps) {
@@ -368,7 +457,12 @@ const updateClientStepMultipliers = async (operationObj) => {
     return uniqueOldStepCombinationIndexes;
   }
 
-  async function findUniqueStepRows (serviceId) {
+  /**
+   *
+   * @param {ObjectId} serviceId
+   * @returns {Array} - returns unique step rows
+   */
+  async function findUniqueStepRows(serviceId) {
     let uniqueStepRows = [];
     const { steps } = await Services.findOne({ _id: serviceId });
     for (let i = 0; i < steps.length; i++) {
@@ -389,7 +483,13 @@ const updateClientStepMultipliers = async (operationObj) => {
     }
     return uniqueStepRows;
 
-    function findUniqueStepTableRow (stepId, unitId) {
+    /**
+     *
+     * @param {ObjectId} stepId
+     * @param {ObjectId} unitId
+     * @returns {Boolean} - returns that every item fits the conditions
+     */
+    function findUniqueStepTableRow(stepId, unitId) {
       return stepMultipliersTable.every(row => {
         if (row.step.toString() !== stepId.toString() || row.unit.toString() !== unitId.toString()) {
           return row;
@@ -398,7 +498,12 @@ const updateClientStepMultipliers = async (operationObj) => {
     }
   }
 
-  function findSameService (service) {
+  /**
+   *
+   * @param {ObjectId} service
+   * @returns {Object} - returns fitting row
+   */
+  function findSameService(service) {
     return otherServices.find(row => {
       const serviceIdsArr = row.services.map(item => item.toString());
       if (serviceIdsArr.includes(service)) {
@@ -408,6 +513,11 @@ const updateClientStepMultipliers = async (operationObj) => {
   }
 };
 
+/**
+ *
+ * @param {Object} operationObj
+ * @returns {Object} returns updated industry and pricelist tables
+ */
 const updateClientIndustryMultipliers = async (operationObj) => {
   let { client, industryDifference, oldService, updatedService, updatedPricelist } = operationObj;
   const { services, rates, defaultPricelist, currency } = client;
@@ -431,7 +541,12 @@ const updateClientIndustryMultipliers = async (operationObj) => {
 
   return { updatedIndustryMultipliersTable: industryMultipliersTable, updatedPricelist };
 
-  async function pushNewLangCombination (newService) {
+  /**
+   *
+   * @param {Object} newService
+   * @returns nothing - just pushes rows into existing array
+   */
+  async function pushNewLangCombination(newService) {
     const { sourceLanguage, targetLanguages, services } = newService;
     const langPairCombinations = getLangPairsObjs(sourceLanguage, targetLanguages[0]);
     const stepMultiplierCombinations = await getStepMultipliers(services[0]);
@@ -453,7 +568,12 @@ const updateClientIndustryMultipliers = async (operationObj) => {
     });
   }
 
-  async function getStepMultipliers (serviceId) {
+  /**
+   *
+   * @param {ObjectId} serviceId
+   * @returns {Array} returns fullfilled array of step multipliers
+   */
+  async function getStepMultipliers(serviceId) {
     const stepMultipliers = [];
     const { steps } = await Services.findOne({ _id: serviceId });
     for (let i = 0; i < steps.length; i++) {
@@ -489,7 +609,13 @@ const updateClientIndustryMultipliers = async (operationObj) => {
     return stepMultipliers;
   }
 
-  function getLangPairsObjs (sourceLanguage, targetLanguage) {
+  /**
+   *
+   * @param {ObjectId} sourceLanguage
+   * @param {ObjectId} targetLanguage
+   * @returns {Array} - returns lang pair and their cost
+   */
+  function getLangPairsObjs(sourceLanguage, targetLanguage) {
     const sameDefaultPair = defaultPricelist.basicPricesTable.find(row => (
       `${row.sourceLanguage} ${row.targetLanguage}` === `${sourceLanguage} ${targetLanguage}`
     ));
@@ -513,7 +639,12 @@ const updateClientIndustryMultipliers = async (operationObj) => {
     }
   }
 
-  function pushNewIndustry (toReturn = false) {
+  /**
+   *
+   * @param {Boolean} toReturn
+   * @returns {Array | } - if toReturn = true - returns industries and their multipliers array
+   */
+  function pushNewIndustry(toReturn = false) {
     const arrToReturn = [];
     const sameDefaultIndustryRow = defaultPricelist.industryMultipliersTable.find(({ industry }) => (
       industry.toString() === newIndustry.toString()
@@ -531,7 +662,12 @@ const updateClientIndustryMultipliers = async (operationObj) => {
     return arrToReturn;
   }
 
-  function findSameIndustry (industry) {
+  /**
+   *
+   * @param {ObjectId} industry
+   * @returns {Object} returns fitting row
+   */
+  function findSameIndustry(industry) {
     return otherServices.find(row => {
       const industryIdsArr = row.industries.map(item => item.toString());
       if (industryIdsArr.includes(industry)) {
@@ -540,7 +676,14 @@ const updateClientIndustryMultipliers = async (operationObj) => {
     });
   }
 
-  function replaceOldIndustry (table, newIndustry, oldIndustry) {
+  /**
+   *
+   * @param {Array} table
+   * @param {ObjectId} newIndustry
+   * @param {ObjectId} oldIndustry
+   * @returns {Array} - returns updated table
+   */
+  function replaceOldIndustry(table, newIndustry, oldIndustry) {
     return table.map(row => {
       const { industry } = row;
       if (industry.toString() === oldIndustry.toString()) {

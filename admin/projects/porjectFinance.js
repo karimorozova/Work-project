@@ -1,4 +1,5 @@
 const { updateProject, getProjectAfterUpdate } = require('./getProjects');
+const { getProjectAfterUpdate: getMemoqProjectAfterUpdate } = require('../services/memoqs/otherProjects/getMemoqProject');
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
 const { Projects } = require('../models');
 
@@ -47,8 +48,8 @@ function getUpdatedProjectFinance(tasks) {
   return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) };
 }
 
-const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts) => {
-  let project = await Projects.findOne({ _id });
+const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tableName = Projects) => {
+  let project = await tableName.findOne({ _id });
   let { finance, tasks, steps } = project;
   const {
     steps: updatedSteps,
@@ -56,14 +57,18 @@ const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts) => {
     finance: updatedFinance,
     roi
   } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts);
-
-  return await getProjectAfterUpdate({ _id }, {
+  const itemsToUpdate = {
     finance: updatedFinance,
     tasks: updatedTasks,
     steps: updatedSteps,
     discounts: updatedDiscounts,
     roi
-  });
+  };
+  if (tableName === Projects) {
+    return await getProjectAfterUpdate({ _id }, { ...itemsToUpdate });
+  } else {
+    return await getMemoqProjectAfterUpdate({ _id }, { ...itemsToUpdate });
+  }
 };
 
 const recalculateProjectFinance = (finance, tasks, steps, discounts = []) => {
