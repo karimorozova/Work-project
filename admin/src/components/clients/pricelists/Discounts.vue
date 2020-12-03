@@ -106,13 +106,17 @@
 				}
 				await this.saveChanges();
 			},
+      updateEnumData(result){
+	      this.enum === 'PngSysProject' && this.setCurrentProject(result.data);
+	      this.enum === 'XTRFProject' && this.$emit('updateXTRFProject', result.data);
+      },
 			async saveChanges() {
 				this.enumDiscounts = this.enumDiscounts.filter(({ name }) => name);
 				const updatedArray = this.enumDiscounts;
 				updatedArray.push(this.currentDiscount);
 				try {
 					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray });
-					this.enum === 'PngSysProject' && this.setCurrentProject(result.data);
+          this.updateEnumData(result);
 					this.alertToggle({ message: "Discount/Surcharges Saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Discount/Surcharges", isShow: true, type: "error" });
@@ -124,7 +128,7 @@
 				this.enumDiscounts = this.enumDiscounts.filter(item => item._id.toString() !== id.toString());
 				try {
 					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray: this.enumDiscounts });
-					this.enum === 'PngSysProject' && this.setCurrentProject(result.data);
+					this.updateEnumData(result);
 					this.alertToggle({ message: "Discount/Surcharges Saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({ message: "Error on deleting", isShow: true, type: "error" });
@@ -170,6 +174,11 @@
 						return {
 							get: '/pm-manage/get-project-discounts/?id=',
 							update: '/pm-manage/update-project-discounts'
+						};
+					case 'XTRFProject':
+						return {
+							get: '/memoqapi/get-project-discounts/?id=',
+							update: '/memoqapi/update-project-discounts'
 						}
 				}
 

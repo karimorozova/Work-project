@@ -23,19 +23,19 @@
       .row__data
         span(@click="switchProjectStatus('Backwards')")
           i.fa.fa-backward(aria-hidden="true")
-    .sub-information__row(v-if="project.status === 'Closed'")
+    .sub-information__row(v-if="project.hasOwnProperty('customer')")
       .row__title Payment Profile:
       .row__data
         input.row__input(type="text" :value="project.paymentProfile" disabled)
 
-    .sub-information__row(v-if="project.status === 'Closed'")
+    .sub-information__row(v-if="project.hasOwnProperty('customer')")
       .row__title Urgent:
       .row__data
         .checkbox
           input#urgent(type="checkbox", :checked="project.isUrgent" disabled)
           label(for="urgent")
 
-    .client-table(v-if="project.status === 'Closed'")
+    .client-table(v-if="project.hasOwnProperty('customer')")
       SettingsTable(
         :fields="fields",
         :tableData="projectClientContacts",
@@ -80,7 +80,7 @@
                 :class="{ 'client-table_opacity': isActive(key, index) }"
               )
 
-    span(v-if="project.status === 'Closed'")
+    span(v-if="project.hasOwnProperty('customer')")
       Add(@add="addData")
 
 </template>
@@ -136,34 +136,34 @@
 			};
 		},
 		methods: {
-      ...mapActions({
-        alertToggle: 'alertToggle',
-      }),
-      async switchProjectStatus (direction) {
-        try {
-          const result = await this.$http.post('/memoqapi/switch-status', {
-            id: this.project._id,
-            direction,
-          });
-          this.$emit('updateProject', result.body);
-        } catch (err) {
-          this.alertToggle({
-            message: 'Error on switching progress',
-            isShow: true,
-            type: 'error',
-          });
-        }
-      },
-      copyId () {
-        let id = document.getElementById('id');
-        let elementText = id.textContent;
-        navigator.clipboard.writeText(elementText);
-        try {
-          document.execCommand('copy');
-          this.alertToggle({
-            message: 'Text copied successfully',
-            isShow: true,
-            type: 'success',
+			...mapActions({
+				alertToggle: 'alertToggle',
+			}),
+			async switchProjectStatus(direction) {
+				try {
+					const result = await this.$http.post('/memoqapi/switch-status', {
+						id: this.project._id,
+						direction,
+					});
+					this.$emit('updateProject', result.body);
+				} catch (err) {
+					this.alertToggle({
+						message: 'Error on switching progress',
+						isShow: true,
+						type: 'error',
+					});
+				}
+			},
+			copyId() {
+				let id = document.getElementById('id');
+				let elementText = id.textContent;
+				navigator.clipboard.writeText(elementText);
+				try {
+					document.execCommand('copy');
+					this.alertToggle({
+						message: 'Text copied successfully',
+						isShow: true,
+						type: 'success',
 					});
 				} catch (err) {
 					this.alertToggle({
@@ -462,7 +462,7 @@
 
   .fa-backward,
   .fa-forward {
-    font-size: 18px;
+    font-size: 16px;
     color: #938676;
     transition: all 0.3s;
     cursor: pointer;

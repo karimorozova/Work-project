@@ -23,9 +23,9 @@
           :project="project"
           @refreshCurrProject="refreshProject"
         )
-    .project-info__all-info(v-if="project.status === 'Closed' && project.hasOwnProperty('finance')")
-      OtherProjectFinance(
-        :project="project"
+    .project-info__all-info(v-if="project.hasOwnProperty('finance')")
+      OtherProjectFinanceBlock(
+        @updateXTRFProject="updateProject"
       )
 
 </template>
@@ -36,7 +36,7 @@
 	import { mapActions } from "vuex";
 	import OtherProjectSubInformation from "./OtherProjectSubInformation";
 	import OtherProjectAction from "./OtherProjectAction";
-	import OtherProjectFinance from "./OtherProjectFinance";
+	import OtherProjectFinanceBlock from "./OtherProjectFinanceBlock";
 
 	export default {
 		data() {
@@ -100,11 +100,11 @@
 			});
 		},
 		components: {
-			OtherProjectFinance,
 			OtherProjectAction,
 			OtherProjectSubInformation,
 			OtherProjectDetails,
-			OtherTasksAndSteps
+			OtherTasksAndSteps,
+			OtherProjectFinanceBlock
 		}
 	};
 </script>

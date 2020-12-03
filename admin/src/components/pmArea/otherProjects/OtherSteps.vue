@@ -37,7 +37,7 @@
             span.steps__step-data {{formateDate(row.DeadLine)}}
 
           template(slot="receivables" slot-scope="{ row, index }")
-            .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
+            .pricelist__block(v-if="project.steps.length")
               span.pricelist__list(v-if="project.steps[index].clientRate && !project.steps[index].clientRate.fromUser")
                 img.pricelist__img( src="../../../assets/images/red-info-icon.png")
               span.pricelist__list(v-else)
@@ -46,7 +46,7 @@
               span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
 
           template(slot="payables" slot-scope="{ row, index }")
-            .pricelist__block(v-if="project.status === 'Closed' && project.steps.length")
+            .pricelist__block(v-if="project.steps.length")
               span.pricelist__list(v-if="project.steps[index].vendorRate && !project.steps[index].clientRate.fromUser")
                 img.pricelist__img( src="../../../assets/images/red-info-icon.png")
               span.pricelist__list(v-else)
@@ -55,7 +55,7 @@
               span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
 
           template(slot="margin" slot-scope="{ row, index }")
-            div(v-if="project.status === 'Closed' && project.steps.length")
+            div(v-if="project.steps.length")
               span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
               span.steps__step-data {{ project.steps[index].finance.profit }}
 
