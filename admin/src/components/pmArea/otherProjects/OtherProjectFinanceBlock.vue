@@ -1,7 +1,7 @@
 <template lang="pug">
   .project-finance
     .project-finance__title(@click="toggleFinance") Finance
-      img.project-finance__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
+      img.project-finance__icon(src="../../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
     .project-finance__content(v-if="isFinanceShow")
 
       .project-finance__content-displayBlock
@@ -23,13 +23,13 @@
           .project-finance__dashboardItem
             .project-finance__dashboardItem-title Profit:
             .project-finance__dashboardItem-value {{financeData.profit}}
-              span(v-html="getSymbol(currentProject.customer.currency)")
+              span(v-if="project.hasOwnProperty('customer')" v-html="getSymbol(project.customer.currency)")
           .project-finance__dashboardItem
             .project-finance__dashboardItem-title Margin:
             .project-finance__dashboardItem-value {{financeData.margin}} %
           .project-finance__dashboardItem
             .project-finance__dashboardItem-title ROI:
-            .project-finance__dashboardItem-value {{currentProject.roi || '-' }}
+            .project-finance__dashboardItem-value {{project.roi || '-' }}
 
       .project-finance__content-settingBlock
         div
@@ -41,23 +41,23 @@
               .minPrice-item__title Minimum Charge:
               .minPrice-item__input
                 .ratio__input
-                  input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" v-on:keyup.enter="(e) => updateMinPrice('value', e)")
-                  span(v-else) {{ currentProject.minimumCharge.value }}
-                  span.ratio__input-symbol(v-html="getSymbol(currentProject.customer.currency)")
+                  input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="project.minimumCharge.value || 0" v-on:keyup.enter="(e) => updateMinPrice('value', e)")
+                  span(v-else) {{ project.minimumCharge.value || 0 }}
+                  span.ratio__input-symbol(v-if="project.hasOwnProperty('customer')" v-html="getSymbol(project.customer.currency)")
             .minPrice-item
               .minPrice-item__title Ignore Min. Charge:
               .rates-item__checkbox
                 .checkbox
-                  input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
+                  input(type="checkbox" id="ignoreMinPrice" :checked="project.minimumCharge.toIgnore || false" @change="(e) => updateMinPrice('bool', e)")
                   label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
                   label(v-else for="ignoreMinPrice")
 
         .discounts
           Discounts(
             :paramsIsEdit="paramsIsEdit"
-            :enum="'PngSysProject'"
+            :enum="'XTRFProject'"
+            @updateXTRFProject="updateXTRFProject"
           )
-
       .project-finance__total
         .project-finance__total-title Total:
         .project-finance__total-value {{ detectedFinalPrice }} &nbsp;&euro;
@@ -65,28 +65,27 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
-	import Discounts from "../clients/pricelists/Discounts";
+	import { mapActions } from 'vuex';
+	import Discounts from "../../clients/pricelists/Discounts";
 
 	export default {
-		props: {},
 		data() {
 			return {
 				icons: {
-					edit: { icon: require("../../assets/images/Other/edit-icon-qa.png") },
-					cancel: { icon: require("../../assets/images/cancel-icon.png") },
+					edit: { icon: require("../../../assets/images/Other/edit-icon-qa.png") },
+					cancel: { icon: require("../../../assets/images/cancel-icon.png") },
 				},
 				isFinanceShow: false,
 				paramsIsEdit: false,
+				project: {},
 				checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.4)' },
 			}
 		},
 		methods: {
-			...mapActions({
-				alertToggle: "alertToggle",
-				addFinanceProperty: "addFinanceProperty",
-				setCurrentProject: "setCurrentProject"
-			}),
+			...mapActions(['alertToggle']),
+			toggleFinance() {
+				this.isFinanceShow = !this.isFinanceShow;
+			},
 			crudActions(actionType) {
 				switch (actionType) {
 					case 'cancel':
@@ -97,44 +96,41 @@
 						break;
 				}
 			},
+			async getProject() {
+				try {
+					const result = await this.$http.get(`/memoqapi/other-project?id=${ this.$route.params.id }`);
+					this.project = result.data;
+				} catch (err) {
+				}
+			},
 			getSymbol(currency) {
 				return currency === 'USD' ? '&nbsp;&#36;' : currency === 'EUR' ? '&nbsp;&euro;' : '&nbsp;&pound';
 			},
-			toggleFinance() {
-				this.isFinanceShow = !this.isFinanceShow;
-			},
 			async updateMinPrice(prop, e) {
 				try {
-					const result = await this.$http.post('/pm-manage/update-minimum-charge', {
-						_id: this.currentProject._id,
+					const result = await this.$http.post('/memoqapi/update-minimum-charge', {
+						_id: this.project._id,
 						value: (+this.$refs.minPrice.value).toFixed(2) || 0,
-						toIgnore: prop === 'value' ? this.currentProject.minimumCharge.toIgnore : e.target.checked,
+						toIgnore: prop === 'value' ? this.project.minimumCharge.toIgnore : e.target.checked,
 					});
-					this.setCurrentProject(result.data);
+					this.project = result.data;
 					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" });
 				} catch (err) {
 					this.alertToggle({ message: 'Project minimum price is not updated!', isShow: true, type: 'error' });
 				}
 			},
+			updateXTRFProject(data) {
+				this.project = data;
+				this.$emit('updateXTRFProject', data);
+			}
+		},
+		created() {
+			this.getProject()
 		},
 		computed: {
-			...mapGetters({
-				currentProject: "getCurrentProject"
-			}),
-			detectedFinalPrice() {
-				const { minimumCharge, finance } = this.currentProject;
-				return minimumCharge.value > finance.Price.receivables && !minimumCharge.toIgnore ?
-						(minimumCharge.value).toFixed(2) :
-						(finance.Price.receivables).toFixed(2);
-			},
-			getStartedReceivables() {
-				if(this.currentProject) {
-					return this.currentProject.steps.reduce((acc, curr) => acc + curr.defaultStepPrice, 0)
-				}
-			},
 			barsStatistic() {
-				if(this.currentProject) {
-					const { finance } = this.currentProject;
+				if(this.project) {
+					const { finance } = this.project;
 					const { Price } = finance;
 					let payblesPercents;
 					let receivablesPercents;
@@ -150,70 +146,84 @@
 					return {
 						receivables: {
 							width: `${ receivablesPercents }%`,
-							price: Price.receivables.toFixed(2),
+							price: (+Price.receivables).toFixed(2),
 						},
 						payables: {
 							width: `${ payblesPercents }%`,
-							price: Price.payables.toFixed(2)
+							price: (+Price.payables).toFixed(2)
 						}
 					}
 				}
 			},
 			financeData() {
-				const finance = { ...this.currentProject.finance };
+				const finance = { ...this.project.finance };
 				const { Price } = finance;
 				return {
-					profit: (Price.receivables - Price.payables).toFixed(2),
-					margin: ((1 - (Price.payables / Price.receivables)) * 100).toFixed(2)
+					profit: (+Price.receivables - +Price.payables).toFixed(2),
+					margin: ((1 - (+Price.payables / +Price.receivables)) * 100).toFixed(2)
 				};
-			}
+			},
+			getStartedReceivables() {
+				return 999999;
+				// if(this.project) {
+				// 	return this.project.steps.reduce((acc, curr) => acc + curr.defaultStepPrice, 0)
+				// }
+			},
+			detectedFinalPrice() {
+				if(this.project.finance && this.project.minimumCharge){
+					const { minimumCharge, finance } = this.project;
+					return minimumCharge.value > finance.Price.receivables && !minimumCharge.toIgnore ?
+							(minimumCharge.value).toFixed(2) :
+							(finance.Price.receivables).toFixed(2);
+        }else{
+					return '-'
+        }
+			},
 		},
-		components: {
-			Discounts,
-		}
+		components: { Discounts },
 	}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors";
 
-    .actionsButton {
+  .actionsButton {
+    display: flex;
+    position: absolute;
+    right: -195px;
+
+    &__icon {
+      margin-left: 5px;
+    }
+  }
+
+  .defaultIcon {
+    cursor: pointer;
+  }
+
+  .opacity {
+    opacity: .5;
+    cursor: default;
+  }
+
+  .minPrice {
+    display: flex;
+    padding: 16px 30px;
+    background: #f4f0ee;
+    border: 2px solid #938676;
+    flex-direction: column;
+    margin-right: 40px;
+
+    .minPrice-item {
+      width: 300px;
+      min-height: 30px;
       display: flex;
-      position: absolute;
-      right: -195px;
+      align-items: center;
 
-      &__icon {
-        margin-left: 5px;
+      &__title {
+        width: 150px;
       }
     }
-
-    .defaultIcon {
-      cursor: pointer;
-    }
-
-    .opacity {
-      opacity: .5;
-      cursor: default;
-    }
-
-    .minPrice {
-      display: flex;
-      padding: 16px 30px;
-      background: #f4f0ee;
-      border: 2px solid #938676;
-      flex-direction: column;
-      margin-right: 40px;
-
-      .minPrice-item {
-        width: 300px;
-        min-height: 30px;
-        display: flex;
-        align-items: center;
-
-        &__title {
-          width: 150px;
-        }
-      }
   }
 
   .project-finance {
@@ -221,6 +231,10 @@
     min-width: 1000px;
     box-shadow: 0 0 10px #67573e9d;
     margin: 40px;
+
+    &_reverse {
+      transform: rotate(180deg);
+    }
 
     &__content {
       padding: 0 20px 20px 20px;
@@ -257,9 +271,6 @@
 
     &__icon {
       transition: all 0.1s;
-    }
-    &_reverse {
-      transform: rotate(180deg);
     }
 
     &__dashboard {
