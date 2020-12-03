@@ -1,6 +1,12 @@
 const { getClientRates } = require('../clients');
 const { getVendor } = require('../vendors');
 
+/**
+ *
+ * @param {Array} pricelistTable
+ * @param {Object} filters
+ * @returns {Array} - returns filtered pricelist table
+ */
 const getFilteredPricelist = (pricelistTable, filters) => {
   const { sourceFilter, targetFilter, stepFilter, unitFilter, industryFilter } = filters;
   if (sourceFilter) {
@@ -21,6 +27,13 @@ const getFilteredPricelist = (pricelistTable, filters) => {
   return pricelistTable;
 };
 
+/**
+ *
+ * @param {ObjectId} personId
+ * @param {Object} filters
+ * @param {Boolean} fromVendor
+ * @returns {Array | []} - returns rather spliced or empty array
+ */
 const getRatePricelist = async (personId, filters, fromVendor = false) => {
   const { countFilter } = filters;
   const neededQuery = fromVendor ? getVendor : getClientRates;

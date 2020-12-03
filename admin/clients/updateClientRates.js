@@ -2,6 +2,12 @@ const { Units, Clients, Step, Industries } = require('../models');
 const { getArrayDifference, getSizeDifference, activityChange } = require('../multipliers/pricelist');
 const { differenceOperationType } = require('../enums/differenceOperationType');
 
+/**
+ *
+ * @param {String} key
+ * @param {Object} oldMultiplier
+ * @returns nothing - updates rates
+ */
 const updateRates = async (key, oldMultiplier) => {
   switch (key) {
     default:
@@ -47,6 +53,14 @@ const updateRates = async (key, oldMultiplier) => {
   }
 };
 
+/**
+ *
+ * @param {Object} difference
+ * @param {Array} itemsToAdd
+ * @param {Array} itemsToDelete
+ * @param {Object} oldStep
+ * @returns nothing - just updates client's rates
+ */
 const checkStepDifference = async ({ difference, itemsToAdd, itemsToDelete }, oldStep) => {
   const clients = await Clients.find();
   switch (difference) {
@@ -140,6 +154,14 @@ const checkStepDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
   }
 };
 
+/**
+ *
+ * @param {Object}difference
+ * @param {Array} itemsToAdd
+ * @param {Array} itemsToDelete
+ * @param {Object} oldUnit
+ * @returns nothing - just updates client's rates
+ */
 const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, oldUnit) => {
   const clients = await Clients.find();
   switch (difference) {
@@ -259,6 +281,13 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
   }
 };
 
+/**
+ *
+ * @param {ObjectId} oldUnit
+ * @param {Array} updatedSteps
+ * @param {Object} sizeDifferences
+ * @return nothing - just updates client's rates
+ */
 const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
   const { sizeDifference, newSizes, deletedSizes } = sizeDifferences;
   const clients = await Clients.find();

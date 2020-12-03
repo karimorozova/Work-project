@@ -1,6 +1,11 @@
 const { Clients } = require('../models/');
 const { getClientsFilteringQuery } = require('./filter');
 
+/**
+ *
+ * @param {Object} obj - query for searching needed client
+ * @returns {Object} returns client with populated(fullfilled) rows
+ */
 async function getClient (obj) {
   return await Clients.findOne(obj)
     .populate('industries', ['name', 'icon'])
@@ -20,6 +25,11 @@ async function getClient (obj) {
     .populate('services.services', ['title', 'steps']);
 }
 
+/**
+ *
+ * @param {Object} obj - query for searching needed clients
+ * @returns {Object} returns clients with populated(fullfilled) rows
+ */
 async function getClients (obj) {
   return await Clients.find(obj)
     .populate('industries', ['name', 'icon'])
@@ -39,6 +49,12 @@ async function getClients (obj) {
     .populate('services.services', ['title', 'steps']);
 }
 
+/**
+ *
+ * @param {Object} query - query for searching needed client
+ * @param {Object} update - object that includes changed values
+ * @returns {Object} - returns an updated client with populated rows
+ */
 async function getClientAfterUpdate (query, update) {
   return await Clients.findOneAndUpdate(query, update, { new: true })
     .populate('industries', ['name', 'icon'])
@@ -59,6 +75,11 @@ async function getClientAfterUpdate (query, update) {
     .populate('services.services', ['title', 'steps']);
 }
 
+/**
+ *
+ * @param {Object} filters - filters for getting needed clients
+ * @returns {Array} - returns filtered, sorted and limited value of clients
+ */
 async function gerFilteredClients (filters) {
   try {
     const query = getClientsFilteringQuery(filters);
@@ -70,6 +91,11 @@ async function gerFilteredClients (filters) {
   }
 }
 
+/**
+ *
+ * @param {Object} obj - query to search needed client
+ * @returns {Object} - returns client with populated rate values
+ */
 const getClientRates = async (obj) => {
   return Clients.findOne(obj)
     .populate('rates.industryMultipliersTable.industry')
@@ -84,6 +110,10 @@ const getClientRates = async (obj) => {
     .populate('rates.pricelistTable.industry');
 };
 
+/**
+ *
+ * @returns {Array} - returns an array of clients with needed values
+ */
 const getClientsForNewProject = () => {
   return Clients.find({ $or: [{ status: 'Active' }, { status: 'Potential' }] }, { _id: 1, name: 1, industries: 1 })
     .populate('industries');

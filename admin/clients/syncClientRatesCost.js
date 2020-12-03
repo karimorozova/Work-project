@@ -3,6 +3,13 @@ const { tableKeys } = require('../enums/ratesTableKeys');
 const { getNeededCurrency, getNeededLangPair, getNeededStepRow } = require('./clientRates');
 const { multiplyPrices } = require('../multipliers');
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {String} tableKey
+ * @param {Object} row
+ * @returns nothing - synchronizes client's rates with bound pricelist
+ */
 const syncClientRatesCost = async (clientId, tableKey, row) => {
   const { currency, rates, defaultPricelist } = await Clients.findOne({ _id: clientId });
   const {
@@ -26,6 +33,16 @@ const syncClientRatesCost = async (clientId, tableKey, row) => {
   }
 };
 
+/**
+ *
+ * @param {Object} row
+ * @param {Array} basicPricesTable
+ * @param {Object} rates
+ * @param {ObjectId} subjectId
+ * @param {String} currency
+ * @param {Boolean} fromVendor
+ * @returns nothing - just updates vendor or client;
+ */
 const synchronizeBasicPrice = async (row, basicPricesTable, rates, subjectId, currency, fromVendor = false) => {
   const { _id, sourceLanguage, targetLanguage, basicPrice } = row;
   const neededSubject = fromVendor ? Vendors : Clients;
@@ -43,6 +60,13 @@ const synchronizeBasicPrice = async (row, basicPricesTable, rates, subjectId, cu
   await neededSubject.updateOne({ _id: subjectId }, { rates });
 };
 
+/**
+ *
+ * @param {Object} row
+ * @param {Number} syncedPrice
+ * @param {Object} rates
+ * @returns {Array} - returns an array of client's pricelist table
+ */
 const recalculateFromNewPrice = (row, syncedPrice, rates) => {
   const { sourceLanguage, targetLanguage } = row;
   let { stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
@@ -62,6 +86,15 @@ const recalculateFromNewPrice = (row, syncedPrice, rates) => {
   return pricelistTable;
 };
 
+/**
+ *
+ * @param {Object} row
+ * @param {Array} stepMultipliersTable
+ * @param {Object} rates
+ * @param {ObjectId} subjectId
+ * @param {Boolean} fromVendor
+ * @returns nothing - just updates vendor or client;
+ */
 const synchronizeStepMultiplier = async (row, stepMultipliersTable, rates, subjectId, fromVendor = false) => {
   const { _id, step, unit, size, multiplier } = row;
   const neededSubject = fromVendor ? Vendors : Clients;
@@ -75,6 +108,15 @@ const synchronizeStepMultiplier = async (row, stepMultipliersTable, rates, subje
   await neededSubject.updateOne({ _id: subjectId }, { rates });
 };
 
+/**
+ *
+ * @param {Object} row
+ * @param {Array} industryMultipliersTable
+ * @param {Object} rates
+ * @param {ObjectId} subjectId
+ * @param {Boolean} fromVendor
+ * @returns nothing - just updates vendor or client;
+ */
 const synchronizeIndustryMultiplier = async (row, industryMultipliersTable, rates, subjectId, fromVendor = false) => {
   const { _id, industry, multiplier } = row;
   const neededSubject = fromVendor ? Vendors : Clients;
@@ -88,6 +130,14 @@ const synchronizeIndustryMultiplier = async (row, industryMultipliersTable, rate
   await neededSubject.updateOne({ _id: subjectId }, { rates });
 };
 
+/**
+ *
+ * @param {Object} row
+ * @param {Object} rates
+ * @param {ObjectId} subjectId
+ * @param {Boolean} fromVendor
+ * @returns nothing - just updates vendor or client;
+ */
 const synchronizePricelistTable = async (row, rates, subjectId, fromVendor = false) => {
   const { _id, sourceLanguage, targetLanguage, step, unit, size, industry } = row;
   const neededSubject = fromVendor ? Vendors : Clients;
@@ -104,6 +154,15 @@ const synchronizePricelistTable = async (row, rates, subjectId, fromVendor = fal
   rates.pricelistTable[neededPricelistRowIndex].notification = '';
   await neededSubject.updateOne({ _id: subjectId }, { rates });
 };
+
+/**
+ *
+ * @param {Object} row
+ * @param {Number} syncedMultiplier
+ * @param {Object} rates
+ * @param {String} key
+ * @returns {Array} - returns an updated pricelist table
+ */
 const recalculateFromNewMultiplier = (row, syncedMultiplier, rates, key) => {
   let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
   switch (key) {

@@ -1,6 +1,10 @@
 const { Pricelist, Clients } = require('../../models');
 const ObjectId = require('mongodb').ObjectID;
 
+/**
+ *
+ * @returns nothing - just sets client's default pricelist
+ */
 const setDefaultPricelist = async () => {
   const clients = await Clients.find();
   const pricelist = await Pricelist.find();

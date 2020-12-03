@@ -2,6 +2,11 @@ const { Pricelist, Clients, Languages } = require('../models');
 const { getDefaultBasicPrices, getDefaultStepMultipliers, getDefaultIndustryMultipliers } = require('../helpers/defaults/defaultPriceLists');
 const ObjectId = require('mongodb').ObjectID;
 
+/**
+ *
+ * @param {Object} pricelist
+ * @returns nothing - just creates a new pricelist document
+ */
 async function saveNewPricelist (pricelist) {
   let {
     name, isActive, isClientDefault, isVendorDefault, basicPricesTable,
@@ -27,6 +32,12 @@ async function saveNewPricelist (pricelist) {
   }
 }
 
+/**
+ *
+ * @param {ObjectId} id
+ * @param {Boolean} isVendorDefault
+ * @returns {Boolean} - if pricelist has been deleted - returns true, else - false
+ */
 async function deletePricelist (id, isVendorDefault) {
   try {
     const isUsingByClient = await checkClientUsage(id);
@@ -53,6 +64,12 @@ const checkClientUsage = async (pricelistId) => {
   ));
 };
 
+/**
+ *
+ * @param {ObjectId} pricelistId
+ * @param {Array} userNewLangs
+ * @returns {Array} - returns new lang pairs array
+ */
 const checkPricelistLangPairs = async (pricelistId, userNewLangs) => {
   const { basicPricesTable } = pricelistId ?
     await Pricelist.findOne({ _id: pricelistId })
@@ -78,6 +95,12 @@ const checkPricelistLangPairs = async (pricelistId, userNewLangs) => {
   return newLangPairs;
 };
 
+/**
+ *
+ * @param {ObjectId} pricelistId
+ * @param {Array} langsToAdd
+ * @returns nothing - just updates needed pricelist with new lang pairs
+ */
 const replenishPricelistLangs = async (pricelistId, langsToAdd) => {
   const { _id, newLangPairs: existingLangPairs } = pricelistId ? await Pricelist.findOne({ _id: pricelistId })
     : await Pricelist.findOne({ isVendorDefault: true });

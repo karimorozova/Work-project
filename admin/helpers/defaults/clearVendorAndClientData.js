@@ -1,5 +1,9 @@
 const { Vendors, Clients } = require('../../models');
 
+/**
+ *
+ * @returns nothing - just clears client's and vendor's collections
+ */
 const clearVendorAndClientData = async () => {
   const vendors = await Vendors.find();
   const clients = await Clients.find();

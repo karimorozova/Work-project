@@ -2,6 +2,12 @@ const { Pricelist } = require('../models');
 const { tableKeys } = require('../enums');
 const { postNotifications } = require('./relatedUsersNotifications');
 
+/**
+ *
+ * @param {Object} industryToUpdate
+ * @param {ObjectId} priceListId
+ * @returns nothing - just updates needed pricelist table
+ */
 const updateIndustryMultipliers = async (industryToUpdate, priceListId) => {
   try {
     const { industryMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, {

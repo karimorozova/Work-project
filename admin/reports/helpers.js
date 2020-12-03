@@ -1,3 +1,9 @@
+/**
+ *
+ * @param {Array} reports
+ * @param {Object} filters
+ * @returns {Array} - returns filtered or non-filtered reports
+ */
 const filterTierReport = (reports, filters) => {
   let result;
   const filterKeys = Object.keys(filters);
@@ -35,6 +41,11 @@ const filterTierReport = (reports, filters) => {
   return result;
 };
 
+/**
+ *
+ * @param {Array} lqaReport
+ * @returns {{availableVendors: {Array}, availableTargets: {Array}, availableSources: {Array}}}
+ */
 const getLqaReportFilterOptions = (lqaReport) => {
   const allSourceLanguages = [];
   const allTargetLanguages = [];
@@ -56,6 +67,11 @@ const getLqaReportFilterOptions = (lqaReport) => {
   };
 };
 
+/**
+ *
+ * @param {Object} filters
+ * @returns {Object} - returns query for DB
+ */
 const getFilteringQueryForLqaReport = async (filters) => {
   const { industryFilter, vendorFilter } = filters;
   let query = {
@@ -79,6 +95,14 @@ const getFilteringQueryForLqaReport = async (filters) => {
   return query;
 };
 
+/**
+ *
+ * @param {Array} vendorsArr
+ * @param {Object} sourceLanguage
+ * @param {Object} targetLanguage
+ * @param {Object} industry
+ * @returns {Array} - returns vendor's data
+ */
 const getVendorsData = (vendorsArr, sourceLanguage, targetLanguage, industry) => {
   const data = [];
   for (let { name, vendorId, wordCount, tier } of vendorsArr) {

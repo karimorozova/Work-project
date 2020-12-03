@@ -3,6 +3,13 @@ const ObjectId = require('mongodb').ObjectID;
 const { tableKeys } = require('../enums');
 const { postNotifications } = require('./relatedUsersNotifications');
 
+/**
+ *
+ * @param {Array} filteredBasicPrices
+ * @param {Object} filters
+ * @param {Boolean} needToSplice
+ * @returns {Array} - returns filtered array
+ */
 const getFilteredBasicPrice = async (filteredBasicPrices, filters, needToSplice) => {
   const { countFilter } = filters;
   if (filters.sourceFilter) {
@@ -21,6 +28,14 @@ const getFilteredBasicPrice = async (filteredBasicPrices, filters, needToSplice)
   if (needToSplice) filteredBasicPrices = filteredBasicPrices.splice(countFilter, 25);
   return filteredBasicPrices.filter(row => row.isActive === true);
 }
+
+/**
+ *
+ * @param {Object} filters
+ * @param {ObjectId} priceListId
+ * @param {Boolean} needToSplice
+ * @returns {Array} - returns filtered array
+ */
 const getFilteredBasicPrices = async (filters, priceListId, needToSplice = true) => {
   try {
     const { basicPricesTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, basicPricesTable: 1 })
@@ -33,6 +48,12 @@ const getFilteredBasicPrices = async (filters, priceListId, needToSplice = true)
   }
 };
 
+/**
+ *
+ * @param {Object} basicPriceToUpdate
+ * @param {ObjectId} priceListId
+ * @returns nothing - just updates needed pricelist table
+ */
 const updateBasicPrices = async (basicPriceToUpdate, priceListId) => {
   try {
     const { basicPricesTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, basicPricesTable: 1 });
@@ -49,6 +70,12 @@ const updateBasicPrices = async (basicPriceToUpdate, priceListId) => {
   }
 }
 
+/**
+ *
+ * @param {String} USD
+ * @param {String} GBP
+ * @returns nothing - just updates needed pricelist table
+ */
 const updateBasicPriceValue = async ({ USD, GBP }) => {
   try {
     const pricelists = await Pricelist.find();
@@ -82,6 +109,12 @@ const updateBasicPriceValue = async ({ USD, GBP }) => {
   }
 }
 
+/**
+ *
+ * @param {ObjectId} pricelistId
+ * @param {Array} newLangs
+ * @returns nothing - just updates needed pricelist table
+ */
 const pushNewLangs = async (pricelistId, newLangs) => {
   let { basicPricesTable, newLangPairs } = await Pricelist.findOne({ _id: pricelistId });
   const currencyRatio = await CurrencyRatio.find();

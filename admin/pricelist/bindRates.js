@@ -1,6 +1,14 @@
 const { Pricelist, Clients } = require('../models');
 const { multiplyPrices } = require('../multipliers');
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {ObjectId} defaultPricelistId
+ * @param {Object} objToBind
+ * @param {String} key
+ * @returns nothing - just updates client
+ */
 const bindClientRates = async (clientId, defaultPricelistId, objToBind, key) => {
   const { rates, currency, defaultPricelist } = await Clients.findOne({ _id: clientId });
   const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates;
@@ -33,6 +41,13 @@ const bindClientRates = async (clientId, defaultPricelistId, objToBind, key) => 
   await Clients.updateOne({ _id: clientId }, { rates });
 };
 
+/**
+ *
+ * @param {Array} basicPriceTable
+ * @param {Object} obj
+ * @param {String} currency
+ * @returns {Object} - returns updated object
+ */
 const getUpdatedBasicPriceRow = (basicPriceTable, obj, currency) => {
   const relatedRow = basicPriceTable.find(item => (
     item.sourceLanguage === obj.sourceLanguage &&
@@ -57,6 +72,12 @@ const getUpdatedBasicPriceRow = (basicPriceTable, obj, currency) => {
   }
 };
 
+/**
+ *
+ * @param {Array} stepMultipliersTable
+ * @param {Object} obj
+ * @returns {Object} - returns updated object
+ */
 const getUpdatedStepMultiplierRow = (stepMultipliersTable, obj) => {
   const relatedRow = stepMultipliersTable.find(item => (
     item.step === obj.step &&
@@ -72,6 +93,12 @@ const getUpdatedStepMultiplierRow = (stepMultipliersTable, obj) => {
   }
 };
 
+/**
+ *
+ * @param {Array} industryMultipliersTable
+ * @param {Object} obj
+ * @returns {Object} - returns updated object
+ */
 const getUpdatedIndustryMultiplierRow = (industryMultipliersTable, obj) => {
   const relatedRow = industryMultipliersTable.find(item => (
     item.industry === obj.industry
@@ -85,6 +112,14 @@ const getUpdatedIndustryMultiplierRow = (industryMultipliersTable, obj) => {
   }
 };
 
+/**
+ *
+ * @param {Array} basicPricesTable
+ * @param {Array} stepMultipliersTable
+ * @param {Array} industryMultipliersTable
+ * @param {Object} objToBind
+ * @returns {Object} - returns updated object
+ */
 const getUpdatedPricelistRow = (basicPricesTable, stepMultipliersTable, industryMultipliersTable, objToBind) => {
   const { basicPrice } = basicPricesTable.find(({ sourceLanguage, targetLanguage }) => (
     sourceLanguage === obj.sourceLanguage &&

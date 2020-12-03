@@ -4,6 +4,11 @@ const { getStepFinanceData } = require('../сalculations/finance');
 const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
+/**
+ *
+ * @param {Object} allInfo
+ * @returns {Object} - returns an updated project
+ */
 async function createTasksAndStepsForCustomUnits (allInfo) {
   const {
     project,
@@ -25,12 +30,12 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
     }
     steps = checkIsSameVendor(steps);
     const tasks = tasksWithoutFinance.map(item =>
-        getFinanceForCustomUnits(item, steps)
+      getFinanceForCustomUnits(item, steps)
     );
     const { projectFinance, roi } = getProjectFinance(tasks, project.finance);
     return await updateProject(
       { _id: project.id },
-        { finance: projectFinance, roi, $push: { tasks: tasks, steps: steps } }
+      { finance: projectFinance, roi, $push: { tasks: tasks, steps: steps } }
     );
   } catch (err) {
     console.log(err);
@@ -38,6 +43,11 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
   }
 }
 
+/**
+ *
+ * @param {Object} tasksInfo
+ * @returns {Array} - returns array of new tasks
+ */
 async function getTasksForCustomUnits (tasksInfo) {
   const {
     stepsAndUnits,
@@ -75,6 +85,11 @@ async function getTasksForCustomUnits (tasksInfo) {
   return tasks;
 }
 
+/**
+ *
+ * @param {Object} allInfo
+ * @returns {Array} - returns array of new steps
+ */
 async function getStepsForDuoUnits (allInfo) {
   const { tasks, stepsAndUnits, stepsDates, industry, customer, discounts } = allInfo;
   const steps = [];
@@ -125,6 +140,12 @@ async function getStepsForDuoUnits (allInfo) {
   }
 }
 
+/**
+ *
+ * @param {Object} allInfo
+ * @param {Boolean}common
+ * @returns {Array} - returns array of new steps
+ */
 async function getStepsForMonoUnits (allInfo, common = false) {
   let { tasks, stepsDates, industry, customer, discounts } = allInfo;
   const steps = [];

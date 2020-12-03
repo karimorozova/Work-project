@@ -2,26 +2,29 @@ const { Projects } = require('../models');
 const { getProject } = require('./getProjects');
 const { createTasksWithPackagesUnit } = require('./taskForPackages');
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon');
-// const { getFittingVendor } = require('../сalculations/vendor');
-// const { getStepFinanceData } = require('../сalculations/finance');
 const { storeFiles } = require('./files');
-const { getModifiedFiles, createProjectFolder, gatherServiceStepInfo } = require('./helpers');
+const { getModifiedFiles, createProjectFolder } = require('./helpers');
 
 const moment = require('moment');
 
+/**
+ *
+ * @param {Object} project
+ * @returns {Object}
+ */
 async function createProject (project) {
   let todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
   let todayEnd = new Date(todayStart);
   todayEnd.setUTCHours(23, 59, 59, 0);
   try {
-    const todaysProjects = await Projects.find({
+    const todayProjects = await Projects.find({
       startDate: { $gte: todayStart, $lt: todayEnd }
     });
     const nextNumber =
-      todaysProjects.length < 10
-        ? "[0" + (todaysProjects.length + 1) + "]"
-        : "[" + (todaysProjects.length + 1) + "]";
+      todayProjects.length < 10
+        ? "[0" + (todayProjects.length + 1) + "]"
+        : "[" + (todayProjects.length + 1) + "]";
     project.status = project.status || "Draft";
     project.projectId =
       "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
@@ -37,6 +40,12 @@ async function createProject (project) {
   }
 }
 
+/**
+ *
+ * @param {Object} tasksInfo
+ * @param {Array} refFiles
+ * @returns {Object}
+ */
 async function createTasks ({ tasksInfo, refFiles }) {
   try {
     const stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits);
@@ -74,6 +83,13 @@ async function createTasks ({ tasksInfo, refFiles }) {
   }
 }
 
+/**
+ *
+ * @param {Object} project
+ * @param {Object} dataForTasks
+ * @param {Boolean} isWords
+ * @returns {Object}
+ */
 async function createTasksFromRequest ({ project, dataForTasks, isWords }) {
   const stepsAndUnits = JSON.parse(dataForTasks.stepsAndUnits);
   let newTasksInfo = { ...dataForTasks };

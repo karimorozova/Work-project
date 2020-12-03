@@ -3,6 +3,13 @@ const fs = require('fs');
 const { Clients } = require('../models');
 const { getClientAfterUpdate } = require('./getClients');
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {Object} client - object that includes updated values
+ * @param {Array} files - client's files
+ * @returns {Object} - returns an updated client
+ */
 async function updateClientInfo({ clientId, client, files }) {
   const { contacts } = client;
   let updatingClient = { ...client };
@@ -18,6 +25,13 @@ async function updateClientInfo({ clientId, client, files }) {
   }
 }
 
+/**
+ *
+ * @param {Array} photoFiles
+ * @param {Array} contacts
+ * @param {ObjectId} clientId
+ * @returns {Array} - returns filtered client's contacts
+ */
 async function attachPhotos({ photoFiles, contacts, clientId }) {
   let clientContacts = [...contacts];
   try {
@@ -43,6 +57,13 @@ async function attachPhotos({ photoFiles, contacts, clientId }) {
   }
 }
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {String} path
+ * @param {String} category
+ * @returns {Object} - returns an updated client
+ */
 async function removeClientDoc ({ clientId, path, category }) {
   try {
     const client = await Clients.findOne({ _id: clientId });
@@ -59,6 +80,12 @@ async function removeClientDoc ({ clientId, path, category }) {
   }
 }
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {String} category
+ * @returns {Object} - returns an updated client
+ */
 async function saveClientDocumentDefault({ clientId, category }) {
   try {
     const client = await Clients.findOne({ _id: clientId });
@@ -72,6 +99,16 @@ async function saveClientDocumentDefault({ clientId, category }) {
   }
 }
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {Object} file
+ * @param {String} category
+ * @param {String} oldFilePath
+ * @param {String} oldName
+ * @param {String} oldCategory
+ * @returns {Object} - returns an updated client
+ */
 async function saveClientDocument({ clientId, file, category, oldFilePath, oldName, oldCategory }) {
   try {
     if (!file) {
@@ -104,6 +141,12 @@ async function saveClientDocument({ clientId, file, category, oldFilePath, oldNa
   }
 }
 
+/**
+ *
+ * @param {String} oldPath
+ * @param {String} newPath
+ * @returns {Promise<String>}
+ */
 function removeOldClientFile(oldPath, newPath) {
   if (oldPath === newPath || !oldPath) return;
   return new Promise((resolve, reject) => {

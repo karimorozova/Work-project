@@ -5,6 +5,11 @@ const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = r
 const { getStepsForDuoUnits, getTasksForCustomUnits } = require('./taskForCommon');
 const ObjectId = require('mongodb').ObjectID;
 
+/**
+ *
+ * @param {Object} allInfo
+ * @returns {Object} - returns an updated project
+ */
 async function createTasksWithPackagesUnit (allInfo) {
   const { project, stepsAndUnits, stepsDates } = allInfo;
   try {
@@ -40,6 +45,16 @@ async function createTasksWithPackagesUnit (allInfo) {
   }
 }
 
+/**
+ *
+ * @param {Array} tasks
+ * @param {Array} stepsDates
+ * @param {Object} industry
+ * @param {Object} customer
+ * @param {Array} discounts
+ * @param {Boolean} common
+ * @returns {Array} - returns steps array
+ */
 async function getStepsForMonoStepPackages(
   { tasks, stepsDates, industry, customer, discounts }, common = false) {
   const steps = [];

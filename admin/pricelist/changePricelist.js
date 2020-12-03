@@ -1,5 +1,12 @@
 const { Clients, Vendors } = require('../models');
 
+/**
+ *
+ * @param {ObjectId}subjectId
+ * @param {Object} pricelistItem
+ * @param {Boolean} fromVendor
+ * @returns nothing - but updates vendor's or client's rates
+ */
 const changeMainRatePricelist = async (subjectId, pricelistItem, fromVendor = false) => {
   try {
     const { _id: rowId, price, altered, notification } = pricelistItem;

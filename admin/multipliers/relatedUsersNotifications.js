@@ -1,6 +1,13 @@
 const { Pricelist, Clients, Vendors } = require('../models');
 const { tableKeys } = require('../enums');
 
+/**
+ *
+ * @param {ObjectId} pricelistId
+ * @param {Object} updatedRow
+ * @param {String} key
+ * @returns nothing - just calls various functions
+ */
 const postNotifications = async (pricelistId, updatedRow, key) => {
   const { isVendorDefault } = await Pricelist.findOne({ _id: pricelistId });
   let relatedClients = await Clients.find({ defaultPricelist: pricelistId });

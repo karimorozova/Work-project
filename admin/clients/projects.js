@@ -5,6 +5,13 @@ const { setTasksDeliveryStatus } = require("../delivery/approve");
 const { Clients } = require('../models');
 
 
+/**
+ *
+ * @param {Object} task
+ * @param {Object} project
+ * @param {String} status
+ * @returns {Object} - returns an updated project
+ */
 async function getAfterTaskStatusUpdate({ task, project, status }) {
   let updatedProject = {};
   try {
@@ -25,6 +32,12 @@ async function getAfterTaskStatusUpdate({ task, project, status }) {
   }
 }
 
+/**
+ *
+ * @param {Array} taskIds
+ * @param {Object} project
+ * @returns nothing - just updates project
+ */
 async function getWithApprovedTasks({ taskIds, project }) {
   try {
     const { tasks, steps } = updateWithApprovedTasks({ taskIds, project });
@@ -35,6 +48,12 @@ async function getWithApprovedTasks({ taskIds, project }) {
   }
 }
 
+/**
+ *
+ * @param {Array} taskIds
+ * @param {Object} project
+ * @returns nothing - just updates project
+ */
 async function getWithRejectedTasks({ taskIds, project }) {
   const tasks = project.tasks.map(task => {
     if (taskIds.indexOf(task.taskId) !== -1) {
@@ -50,6 +69,12 @@ async function getWithRejectedTasks({ taskIds, project }) {
   }
 }
 
+/**
+ *
+ * @param {ObjectId} clientId
+ * @param {Date} newDate
+ * @returns nothing - just updates needed client
+ */
 const updateClientProjectDate = async (clientId, newDate) => {
   const { otherInfo } = await Clients.findOne({ _id: clientId });
   let { firstProjectDate } = otherInfo;

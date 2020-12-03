@@ -2,6 +2,13 @@ const { Pricelist, Step, Units } = require('../models');
 const { tableKeys } = require('../enums');
 const { postNotifications } = require('./relatedUsersNotifications');
 
+/**
+ *
+ * @param {Array} stepMultipliersTable
+ * @param {Object} filters
+ * @param {Boolean} needToSplice
+ * @returns {Array}
+ */
 const getFilteredStepMultipliers = async (stepMultipliersTable, filters, needToSplice) => {
   const { countFilter } = filters;
   if (filters.stepFilter) {
@@ -35,6 +42,13 @@ const getFilteredStepMultipliers = async (stepMultipliersTable, filters, needToS
   return stepMultipliersTable;
 };
 
+/**
+ *
+ * @param {Object} filters
+ * @param {ObjectId} priceListId
+ * @param {Boolean} needToSplice
+ * @returns {Array}
+ */
 const getFilteredStepMultiplier = async (filters, priceListId, needToSplice = true) => {
   try {
     let { stepMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, stepMultipliersTable: 1 })
@@ -48,6 +62,12 @@ const getFilteredStepMultiplier = async (filters, priceListId, needToSplice = tr
   }
 };
 
+/**
+ *
+ * @param {Object} stepToUpdate
+ * @param {ObjectId} priceListId
+ * @returns nothing - just updates pricelist table
+ */
 const updateStepMultipliers = async (stepToUpdate, priceListId) => {
   try {
     let { stepMultipliersTable } = await Pricelist.findOne({ _id: priceListId }, { _id: 0, stepMultipliersTable: 1 })
@@ -63,6 +83,12 @@ const updateStepMultipliers = async (stepToUpdate, priceListId) => {
   }
 }
 
+/**
+ *
+ * @param {String} USD
+ * @param {String} GBP
+ * @returns nothing - just updates pricelist table
+ */
 const updateStepPriceValue = async ({ USD, GBP }) => {
   try {
     const pricelists = await Pricelist.find();

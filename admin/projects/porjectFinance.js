@@ -3,6 +3,13 @@ const { getProjectAfterUpdate: getMemoqProjectAfterUpdate } = require('../servic
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
 const { Projects } = require('../models');
 
+/**
+ *
+ * @param {Object} project
+ * @param {Array} steps
+ * @param {Array} tasks
+ * @returns {Object} - returns an updated project
+ */
 async function getProjectAfterFinanceUpdated ({ project, steps, tasks }) {
   try {
     let { finance, isPriceUpdated, status } = project;
@@ -14,10 +21,15 @@ async function getProjectAfterFinanceUpdated ({ project, steps, tasks }) {
     return await updateProject({ '_id': project.id }, { finance, steps, tasks, isPriceUpdated, roi });
   } catch (err) {
     console.log(err);
-        console.log("Error in getProjectAfterFinanceUpdated");
-    }
+    console.log("Error in getProjectAfterFinanceUpdated");
+  }
 }
 
+/**
+ *
+ * @param {Array}tasks
+ * @returns {{receivables: number, payables: number}}
+ */
 function getProjectFinancePrice(tasks) {
   const notCancelledTasks = tasks.filter(item => item.status !== 'Cancelled');
   let receivables = +(notCancelledTasks.reduce((prev, cur) => {
@@ -31,13 +43,18 @@ function getProjectFinancePrice(tasks) {
       return prev + cur.finance.Price.halfPayables;
     }
     return prev + cur.finance.Price.payables;
-    }, 0).toFixed(2));
+  }, 0).toFixed(2));
 
   return { receivables, payables };
 }
 
+/**
+ *
+ * @param {Array} tasks
+ * @returns {{receivables: number, payables: number}}
+ */
 function getUpdatedProjectFinance(tasks) {
-    let receivables = 0;
+  let receivables = 0;
   let payables = 0;
   for (let task of tasks) {
     if (task.status !== 'Cancelled') {
@@ -48,6 +65,13 @@ function getUpdatedProjectFinance(tasks) {
   return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) };
 }
 
+/**
+ *
+ * @param {ObjectId}_id
+ * @param {Array} updatedDiscounts
+ * @param {Object} tableName
+ * @returns nothing - just updates memoq or our project
+ */
 const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tableName = Projects) => {
   let project = await tableName.findOne({ _id });
   let { finance, tasks, steps } = project;
@@ -71,10 +95,19 @@ const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tabl
   }
 };
 
+/**
+ *
+ * @param {Object} finance
+ * @param {Array} tasks
+ * @param {Array} steps
+ * @param {Array} discounts
+ * @returns {{steps: [], roi: String, tasks: [], finance: {}}}
+ */
 const recalculateProjectFinance = (finance, tasks, steps, discounts = []) => {
   for (let step of steps) {
     let { finance: { Price: { receivables } }, clientRate: { value } } = step;
     const multiplier = findStepMultiplier(step);
+    if (!value) value = 0
     receivables = +multiplier * +value;
     if (discounts.length) {
       step.finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables);
@@ -88,18 +121,23 @@ const recalculateProjectFinance = (finance, tasks, steps, discounts = []) => {
     task.finance.Price.receivables = sumReceivables(taskSteps);
   }
   finance.Price.receivables = sumReceivables(tasks);
-  const roi = ((finance.Price.receivables - finance.Price.payables) / finance.Price.payables).toFixed(2);
+  const roi = ((+finance.Price.receivables - +finance.Price.payables) / +finance.Price.payables).toFixed(2);
   return { steps, tasks, finance, roi };
 
   function sumReceivables(arr) {
     let value = 0;
     for (let { finance: { Price: { receivables } } } of arr) {
-      value += receivables;
+      value += +receivables;
     }
     return value;
   }
 };
 
+/**
+ *
+ * @param {Object} step
+ * @returns {number}
+ */
 const findStepMultiplier = (step) => {
   if (step.finance.Wordcount.receivables === 0) {
     if (step._doc.hasOwnProperty('quantity')) {
