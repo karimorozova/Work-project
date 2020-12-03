@@ -5,7 +5,7 @@
     .project-finance__content(v-if="isFinanceShow")
 
       .project-finance__content-displayBlock
-        .actionsButton
+        .actionsButton(v-if="!project.lockedForRecalculation")
           .actionsButton__icon
             img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
             img.opacity(v-else :src="icons.edit.icon")
@@ -29,7 +29,7 @@
             .project-finance__dashboardItem-value {{financeData.margin}} %
           .project-finance__dashboardItem
             .project-finance__dashboardItem-title ROI:
-            .project-finance__dashboardItem-value {{project.roi || '-' }}
+            .project-finance__dashboardItem-value {{project.finance.roi || '-' }}
 
       .project-finance__content-settingBlock
         div
@@ -69,6 +69,11 @@
 	import Discounts from "../../clients/pricelists/Discounts";
 
 	export default {
+		props: {
+			isUpdateProject: {
+				type: Boolean,
+			}
+		},
 		data() {
 			return {
 				icons: {
@@ -124,6 +129,11 @@
 				this.$emit('updateXTRFProject', data);
 			}
 		},
+		watch: {
+			isUpdateProject(newValue) {
+				newValue && this.getProject()
+			},
+		},
 		created() {
 			this.getProject()
 		},
@@ -135,22 +145,22 @@
 					let payblesPercents;
 					let receivablesPercents;
 
-					if(Price.receivables >= Price.payables) {
-						payblesPercents = Math.ceil((Price.payables / Price.receivables) * 100);
-						receivablesPercents = Price.receivables === 0 ? '0' : '100'
+					if(+Price.receivables >= +Price.payables) {
+						payblesPercents = Math.ceil((+Price.payables / +Price.receivables) * 100);
+						receivablesPercents = +Price.receivables === 0 ? '0' : '100'
 					} else {
-						receivablesPercents = Math.ceil((Price.receivables / Price.payables) * 100);
-						payblesPercents = Price.payables === 0 ? '0' : '100'
+						receivablesPercents = Math.ceil((+Price.receivables / +Price.payables) * 100);
+						payblesPercents = +Price.payables === 0 ? '0' : '100'
 					}
 
 					return {
 						receivables: {
 							width: `${ receivablesPercents }%`,
-							price: (+Price.receivables).toFixed(2),
+							price: +Price.receivables
 						},
 						payables: {
 							width: `${ payblesPercents }%`,
-							price: (+Price.payables).toFixed(2)
+							price: +Price.payables
 						}
 					}
 				}
@@ -159,25 +169,24 @@
 				const finance = { ...this.project.finance };
 				const { Price } = finance;
 				return {
-					profit: (+Price.receivables - +Price.payables).toFixed(2),
-					margin: ((1 - (+Price.payables / +Price.receivables)) * 100).toFixed(2)
+					profit: (+Price.receivables - +Price.payables),
+					margin: ((1 - (+Price.payables / +Price.receivables)) * 100)
 				};
 			},
 			getStartedReceivables() {
-				return 999999;
-				// if(this.project) {
-				// 	return this.project.steps.reduce((acc, curr) => acc + curr.defaultStepPrice, 0)
-				// }
+				if(this.project) {
+					return this.project.steps.reduce((acc, curr) => acc + +curr.finance.priceReceivables, 0).toFixed(2)
+				}
 			},
 			detectedFinalPrice() {
-				if(this.project.finance && this.project.minimumCharge){
+				if(this.project.finance && this.project.minimumCharge) {
 					const { minimumCharge, finance } = this.project;
 					return minimumCharge.value > finance.Price.receivables && !minimumCharge.toIgnore ?
-							(minimumCharge.value).toFixed(2) :
-							(finance.Price.receivables).toFixed(2);
-        }else{
+							+minimumCharge.value :
+							+finance.Price.receivables;
+				} else {
 					return '-'
-        }
+				}
 			},
 		},
 		components: { Discounts },

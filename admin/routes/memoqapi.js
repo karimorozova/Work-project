@@ -10,7 +10,7 @@ const {
   getProjectUsers,
   getMemoqFileId
 } = require('../services/memoqs/projects');
-const { getProjectAfterUpdate } = require('../services/memoqs/otherProjects/getMemoqProject');
+const { getProjectAfterUpdate, getMemoqProject } = require('../services/memoqs/otherProjects/getMemoqProject');
 const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require('../services/memoqs/files');
 const { getMemoqTemplates } = require("../services/memoqs/resources");
 const { assignProjectManagers } = require('../projects/updates');
@@ -270,7 +270,7 @@ router.post('/switch-status', async (req, res) => {
 router.post('/update-memoq-finance', async (req, res) => {
   const { id } = req.body;
   try {
-    const neededProject = await MemoqProject.findOne({ _id: id });
+    const neededProject = await getMemoqProject({ _id: id });
     const updatedProject = await updateMemoqProjectFinance(neededProject);
     res.send(updatedProject);
   } catch (err) {

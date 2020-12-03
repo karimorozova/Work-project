@@ -78,7 +78,7 @@
 					const result = await this.$http.post('/memoqapi/set-recalculation-lock', {
 						projectId: this.project._id,
 						value: !action,
-					})
+					});
 					this.$emit('updateProject', result.body)
 					this.alertToggle({
 						message: `Project ${ message }`,

@@ -568,9 +568,9 @@ async function updateMemoqProjectsData() {
 		const vendors = await Vendors.find();
 		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
 		for (let project of allProjects) {
-			const { ServerProjectGuid } = project;
+			const { ServerProjectGuid , sourceLanguage } = project;
 			const documents = await getProjectTranslationDocs(ServerProjectGuid);
-			if(project.Name.indexOf('PngSys') === -1 && documents) {
+			if(project.Name.indexOf('PngSys') === -1 && documents && sourceLanguage) {
 				let users = await getProjectUsers(ServerProjectGuid);
 				users = getUpdatedUsers(users);
 				let memoqProject = getMemoqProjectData(project, languages);

@@ -26,6 +26,7 @@
     .project-info__all-info(v-if="project.hasOwnProperty('finance')")
       OtherProjectFinanceBlock(
         @updateXTRFProject="updateProject"
+        :isUpdateProject="isUpdateProject"
       )
 
 </template>
@@ -44,7 +45,8 @@
 				project: {},
 				projectId: "",
 				projectName: "",
-				projectSteps: []
+				projectSteps: [],
+				isUpdateProject: false,
 			};
 		},
 		methods: {
@@ -54,6 +56,10 @@
 			},
 			updateProject(data) {
 				this.project = data;
+				this.isUpdateProject = true;
+				setTimeout(() => {
+					this.isUpdateProject = false;
+				}, 500)
 			},
 			async getProjectSteps(id) {
 				try {
