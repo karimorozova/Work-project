@@ -21,14 +21,37 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   if (!neededCustomer) return project;
   const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } :
     { ...project._doc, ...additionalData };
-  const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
-  if (!tasks.length && !steps.length) return project;
+  let { tasks, steps } = project;
+  const emptyTasksOrSteps = !tasks.length || !steps.length;
+  if (!tasks || !steps || emptyTasksOrSteps) {
+    const newData = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
+    tasks = newData.tasks;
+    steps = newData.steps;
+    if (!steps.length) return project;
+  }
+  if (!steps.every(step => step.vendor)) {
+    steps = await checkAndCorrectStepStructure(steps, tasks, documents);
+  }
   const { discounts } = additionalData;
   const finance = tasks.length ? getProjectFinance(tasks, discounts) : defaultFinanceObj;
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
   await MemoqProject.updateOne({ _id: project._id },
     { ...additionalData, tasks, steps, finance });
   return await getMemoqProject({ _id: project._id });
+
+  async function checkAndCorrectStepStructure(steps, tasks, documents) {
+    const neededStepIndex = steps.findIndex(({ vendor }) => !vendor);
+    const neededDocumentIndex = tasks.findIndex(({ taskId }) => taskId === steps[neededStepIndex].taskId);
+    const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = documents[neededDocumentIndex];
+    const indexRegex = new RegExp(/(?<=S)[0-9][0-9]/g);
+    let index = indexRegex.exec(steps[neededStepIndex].stepId)[0];
+    index = index === '01' ? 0 : 1;
+    const { UserInfoHeader: { FullName } } = memoqVendorsArr[index];
+    const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
+    steps[neededStepIndex].vendorRate = await getStepUserRate(vendor, project, steps[neededStepIndex].name, tasks[neededDocumentIndex])
+    steps[neededStepIndex].vendor = vendor;
+    return steps;
+  }
 };
 
 /**
@@ -95,7 +118,7 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
   const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
   for (let i = 0; i < memoqVendorsArr.length; i += 1) {
     const { DocumentAssignmentRole, UserInfoHeader: { FullName } } = memoqVendorsArr[i];
-    const stepName = +DocumentAssignmentRole ? 'Revising' : 'Translation';
+    const stepName = !!+DocumentAssignmentRole ? 'Revising' : 'Translation';
     const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
     const clientRate = await getStepUserRate(customer, project, stepName, task);
     const vendorRate = await getStepUserRate(vendor, project, stepName, task);

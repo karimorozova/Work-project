@@ -294,7 +294,7 @@ router.get('/update-project-statuses-from-messages/:from', async (req, res) => {
   const { from } = req.params;
   try {
     await parseMessagesAndUpdateProjects(from);
-    const updatedProjects = await getFilteredOtherProjects({ query: from });
+    const updatedProjects = await getFilteredOtherProjects({ status: from });
     res.send(updatedProjects);
   } catch (err) {
     console.log(err);
