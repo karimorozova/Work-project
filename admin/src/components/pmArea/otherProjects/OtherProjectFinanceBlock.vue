@@ -156,11 +156,11 @@
 					return {
 						receivables: {
 							width: `${ receivablesPercents }%`,
-							price: +Price.receivables
+							price: parseFloat(Price.receivables).toFixed(2)
 						},
 						payables: {
 							width: `${ payblesPercents }%`,
-							price: +Price.payables
+							price:  parseFloat(Price.payables).toFixed(2)
 						}
 					}
 				}
@@ -169,8 +169,8 @@
 				const finance = { ...this.project.finance };
 				const { Price } = finance;
 				return {
-					profit: (+Price.receivables - +Price.payables),
-					margin: ((1 - (+Price.payables / +Price.receivables)) * 100)
+					profit: (+Price.receivables - +Price.payables).toFixed(2),
+					margin: ((1 - (+Price.payables / +Price.receivables)) * 100).toFixed(2)
 				};
 			},
 			getStartedReceivables() {
@@ -183,7 +183,7 @@
 					const { minimumCharge, finance } = this.project;
 					return minimumCharge.value > finance.Price.receivables && !minimumCharge.toIgnore ?
 							+minimumCharge.value :
-							+finance.Price.receivables;
+							+parseFloat(finance.Price.receivables).toFixed(2);
 				} else {
 					return '-'
 				}
