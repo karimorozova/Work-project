@@ -198,10 +198,10 @@ const getStepUserRate = async (user, project, stepName, task) => {
  * @returns {{}}
  */
 const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords, discounts) => {
-  const priceReceivables = clientRate ? (clientRate.value * WeightedWords).toFixed(2) : 0;
-  const pricePayables = vendorRate ? (vendorRate.value * WeightedWords).toFixed(2) : 0;
+  const priceReceivables = clientRate ? +(clientRate.value * WeightedWords).toFixed(2) : 0;
+  const pricePayables = vendorRate ? +(vendorRate.value * WeightedWords).toFixed(2) : 0;
   const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
-  const ROI = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
+  const ROI = pricePayables && pricePayables !== 0 ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
   return {
     Wordcount: {
       receivables: +WeightedWords,
