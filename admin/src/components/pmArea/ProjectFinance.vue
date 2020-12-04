@@ -76,7 +76,7 @@
 					edit: { icon: require("../../assets/images/Other/edit-icon-qa.png") },
 					cancel: { icon: require("../../assets/images/cancel-icon.png") },
 				},
-				isFinanceShow: false,
+				isFinanceShow: true,
 				paramsIsEdit: false,
 				checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.4)' },
 			}
@@ -116,6 +116,16 @@
 					this.alertToggle({ message: 'Project minimum price is not updated!', isShow: true, type: 'error' });
 				}
 			},
+			detectedHigherMinPrice() {
+				if(this.currentProject.hasOwnProperty('minimumCharge') &&
+						this.currentProject.minimumCharge.value > this.currentProject.finance.Price.receivables &&
+						!this.currentProject.minimumCharge.toIgnore
+				) {
+					return +this.currentProject.minimumCharge.value;
+				} else {
+					return +this.currentProject.finance.Price.receivables;
+				}
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -124,12 +134,12 @@
 			detectedFinalPrice() {
 				const { minimumCharge, finance } = this.currentProject;
 				return minimumCharge.value > finance.Price.receivables && !minimumCharge.toIgnore ?
-						(minimumCharge.value).toFixed(2) :
-						(finance.Price.receivables).toFixed(2);
+						+minimumCharge.value :
+						parseFloat(finance.Price.receivables).toFixed(2);
 			},
 			getStartedReceivables() {
 				if(this.currentProject) {
-					return this.currentProject.steps.reduce((acc, curr) => acc + curr.defaultStepPrice, 0)
+					return this.currentProject.steps.reduce((acc, curr) => acc + curr.defaultStepPrice, 0).toFixed(2)
 				}
 			},
 			barsStatistic() {
@@ -138,23 +148,24 @@
 					const { Price } = finance;
 					let payblesPercents;
 					let receivablesPercents;
+					let basePrice = this.detectedHigherMinPrice();
 
-					if(Price.receivables >= Price.payables) {
-						payblesPercents = Math.ceil((Price.payables / Price.receivables) * 100);
-						receivablesPercents = Price.receivables === 0 ? '0' : '100'
+					if(basePrice >= Price.payables) {
+						payblesPercents = Math.ceil((Price.payables / basePrice) * 100);
+						receivablesPercents = basePrice === 0 ? '0' : '100'
 					} else {
-						receivablesPercents = Math.ceil((Price.receivables / Price.payables) * 100);
-						payblesPercents = Price.payables === 0 ? '0' : '100'
+						receivablesPercents = Math.ceil((basePrice / Price.payables) * 100);
+						payblesPercents = +Price.payables === 0 ? '0' : '100'
 					}
 
 					return {
 						receivables: {
 							width: `${ receivablesPercents }%`,
-							price: Price.receivables.toFixed(2),
+							price: parseFloat(basePrice).toFixed(2),
 						},
 						payables: {
 							width: `${ payblesPercents }%`,
-							price: Price.payables.toFixed(2)
+							price: parseFloat(Price.payables).toFixed(2)
 						}
 					}
 				}
@@ -162,9 +173,10 @@
 			financeData() {
 				const finance = { ...this.currentProject.finance };
 				const { Price } = finance;
+				let basePrice = this.detectedHigherMinPrice();
 				return {
-					profit: (Price.receivables - Price.payables).toFixed(2),
-					margin: ((1 - (Price.payables / Price.receivables)) * 100).toFixed(2)
+					profit: (basePrice - Price.payables).toFixed(2),
+					margin: ((1 - (Price.payables / basePrice)) * 100).toFixed(2)
 				};
 			}
 		},
@@ -177,43 +189,43 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
 
-    .actionsButton {
-      display: flex;
-      position: absolute;
-      right: -195px;
+  .actionsButton {
+    display: flex;
+    position: absolute;
+    right: -195px;
 
-      &__icon {
-        margin-left: 5px;
+    &__icon {
+      margin-left: 5px;
+    }
+  }
+
+  .defaultIcon {
+    cursor: pointer;
+  }
+
+  .opacity {
+    opacity: .5;
+    cursor: default;
+  }
+
+  .minPrice {
+    display: flex;
+    padding: 16px 30px;
+    background: #f4f0ee;
+    border: 2px solid #938676;
+    flex-direction: column;
+    margin-right: 40px;
+
+    .minPrice-item {
+      width: 300px;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+
+      &__title {
+        width: 150px;
       }
     }
-
-    .defaultIcon {
-      cursor: pointer;
-    }
-
-    .opacity {
-      opacity: .5;
-      cursor: default;
-    }
-
-    .minPrice {
-      display: flex;
-      padding: 16px 30px;
-      background: #f4f0ee;
-      border: 2px solid #938676;
-      flex-direction: column;
-      margin-right: 40px;
-
-      .minPrice-item {
-        width: 300px;
-        min-height: 30px;
-        display: flex;
-        align-items: center;
-
-        &__title {
-          width: 150px;
-        }
-      }
   }
 
   .project-finance {
@@ -258,6 +270,7 @@
     &__icon {
       transition: all 0.1s;
     }
+
     &_reverse {
       transform: rotate(180deg);
     }

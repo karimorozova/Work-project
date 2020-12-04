@@ -80,7 +80,7 @@
 					edit: { icon: require("../../../assets/images/Other/edit-icon-qa.png") },
 					cancel: { icon: require("../../../assets/images/cancel-icon.png") },
 				},
-				isFinanceShow: false,
+				isFinanceShow: true,
 				paramsIsEdit: false,
 				project: {},
 				checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.4)' },
@@ -124,6 +124,16 @@
 					this.alertToggle({ message: 'Project minimum price is not updated!', isShow: true, type: 'error' });
 				}
 			},
+			detectedHigherMinPrice() {
+				if(this.project.hasOwnProperty('minimumCharge') &&
+						+this.project.minimumCharge.value > +this.project.finance.Price.receivables &&
+						!this.project.minimumCharge.toIgnore
+				) {
+					return +this.project.minimumCharge.value;
+				} else {
+					return +this.project.finance.Price.receivables;
+				}
+			},
 			updateXTRFProject(data) {
 				this.project = data;
 				this.$emit('updateXTRFProject', data);
@@ -144,23 +154,24 @@
 					const { Price } = finance;
 					let payblesPercents;
 					let receivablesPercents;
+					let basePrice = this.detectedHigherMinPrice();
 
-					if(+Price.receivables >= +Price.payables) {
-						payblesPercents = Math.ceil((+Price.payables / +Price.receivables) * 100);
-						receivablesPercents = +Price.receivables === 0 ? '0' : '100'
+					if(basePrice >= +Price.payables) {
+						payblesPercents = Math.ceil((+Price.payables / basePrice) * 100);
+						receivablesPercents = basePrice === 0 ? '0' : '100'
 					} else {
-						receivablesPercents = Math.ceil((+Price.receivables / +Price.payables) * 100);
+						receivablesPercents = Math.ceil((basePrice / +Price.payables) * 100);
 						payblesPercents = +Price.payables === 0 ? '0' : '100'
 					}
 
 					return {
 						receivables: {
 							width: `${ receivablesPercents }%`,
-							price: parseFloat(Price.receivables).toFixed(2)
+							price: basePrice.toFixed(2)
 						},
 						payables: {
 							width: `${ payblesPercents }%`,
-							price:  parseFloat(Price.payables).toFixed(2)
+							price: parseFloat(Price.payables).toFixed(2)
 						}
 					}
 				}
@@ -168,9 +179,11 @@
 			financeData() {
 				const finance = { ...this.project.finance };
 				const { Price } = finance;
+				let basePrice = this.detectedHigherMinPrice();
+
 				return {
-					profit: (+Price.receivables - +Price.payables).toFixed(2),
-					margin: ((1 - (+Price.payables / +Price.receivables)) * 100).toFixed(2)
+					profit: (basePrice - +Price.payables).toFixed(2),
+					margin: ((1 - (+Price.payables / basePrice)) * 100).toFixed(2)
 				};
 			},
 			getStartedReceivables() {
