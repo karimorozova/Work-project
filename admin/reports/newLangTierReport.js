@@ -2,6 +2,10 @@ const { MemoqProject, Languages, LangTier } = require('../models');
 const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
 const { fillLangTierReportWithLocal } = require('../projects/langTierReport');
 
+/**
+ *
+ * @returns nothing - cleans old collection and fills it with new data
+ */
 const newLangReport = async () => {
   const languages = await Languages.find();
   let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }] });
@@ -15,55 +19,55 @@ const newLangReport = async () => {
   }
 
   function distributeIndustries (industryKey, sourceLanguage, documents) {
-		const doesIndustryExists = reports.find(row => row.industry === industryKey);
-		if(doesIndustryExists === undefined) {
-			reports.push({
-				industry: industryKey,
-				source: [returnSourceObj(languages, sourceLanguage.memoq, 1, documents)]
-			});
-		} else {
-			const neededReport = reports.findIndex(item => item.industry === industryKey);
+    const doesIndustryExists = reports.find(row => row.industry === industryKey);
+    if(doesIndustryExists === undefined) {
+      reports.push({
+        industry: industryKey,
+        source: [returnSourceObj(languages, sourceLanguage.memoq, 1, documents)]
+      });
+    } else {
+      const neededReport = reports.findIndex(item => item.industry === industryKey);
 
-			const sameSourceIndex = reports[neededReport].source.findIndex(({ lang }) => (
-					lang === findLanguageGroup(languages, sourceLanguage.memoq
-					)));
+      const sameSourceIndex = reports[neededReport].source.findIndex(({ lang }) => (
+        lang === findLanguageGroup(languages, sourceLanguage.memoq
+        )));
 
-			if(sameSourceIndex === -1) {
-				reports[neededReport].source.push(returnSourceObj(languages, sourceLanguage.memoq, 1, documents));
-			} else {
-				reports[neededReport].source[sameSourceIndex].targets.push(...findAllTargets(documents));
-			}
-		}
-	}
+      if(sameSourceIndex === -1) {
+        reports[neededReport].source.push(returnSourceObj(languages, sourceLanguage.memoq, 1, documents));
+      } else {
+        reports[neededReport].source[sameSourceIndex].targets.push(...findAllTargets(documents));
+      }
+    }
+  }
 
-	await LangTier.deleteMany();
-	await postReports();
-	await fillLangTierReportWithLocal();
+  await LangTier.deleteMany();
+  await postReports();
+  await fillLangTierReportWithLocal();
 
-	async function postReports() {
-		const result = [];
-		for (let report of reports) {
-			const { source } = report;
-			report.source = source.map(item => {
-				let unitedTargets = [];
-				for (let { lang, wordcount } of item.targets) {
-					const sameTargetIndex = unitedTargets.findIndex(row => row.lang === lang);
-					if(sameTargetIndex !== -1) {
-						unitedTargets[sameTargetIndex].wordcount += wordcount;
-					} else {
-						unitedTargets.push({
-							lang,
-							wordcount
-						});
-					}
-				}
-				item.targets = unitedTargets;
-				return item;
-			});
-			result.push(report);
-		}
-		await LangTier.create(result);
-	}
+  async function postReports() {
+    const result = [];
+    for (let report of reports) {
+      const { source } = report;
+      report.source = source.map(item => {
+        let unitedTargets = [];
+        for (let { lang, wordcount } of item.targets) {
+          const sameTargetIndex = unitedTargets.findIndex(row => row.lang === lang);
+          if(sameTargetIndex !== -1) {
+            unitedTargets[sameTargetIndex].wordcount += wordcount;
+          } else {
+            unitedTargets.push({
+              lang,
+              wordcount
+            });
+          }
+        }
+        item.targets = unitedTargets;
+        return item;
+      });
+      result.push(report);
+    }
+    await LangTier.create(result);
+  }
 
   function returnSourceObj (languages, source, client, targets) {
     return { lang: findLanguageGroup(languages, source), clients: client, targets: findAllTargets(targets) };

@@ -7,6 +7,11 @@ const {
 } = require('./helpers');
 
 //// Tier report ////
+/**
+ *
+ * @param {Array} reports
+ * @returns {Array} - returns filled array of tier reports
+ */
 const rebuildTierReportsStructure = (reports) => {
   try {
     let languagesArray = [];
@@ -54,6 +59,11 @@ const rebuildTierReportsStructure = (reports) => {
 
 
 //// Lqa report /////
+/**
+ *
+ * @param {Object} filters
+ * @returns {Array} - returns array of xtrf lqa reports
+ */
 const getXtrfLqaReport = async (filters) => {
   let { sourceFilter, targetFilter, vendorFilter, countFilter, skipCount, tierFilter, industryFilter } = filters;
   const languages = await Languages.find();
@@ -126,7 +136,11 @@ const getXtrfLqaReport = async (filters) => {
     console.log('Error in getXtrfLqaReport');
   }
 
-  async function getReport () {
+  /**
+   *
+   * @returns {Array} returns report with populated(filled from other collections) data
+   */
+  async function getReport() {
     return await XtrfLqa.find(filterQuery, dataLimitQuery).skip(skipCount).limit(countFilter)
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
@@ -136,6 +150,11 @@ const getXtrfLqaReport = async (filters) => {
 }
 
 // Upcoming LQA
+/**
+ *
+ * @param {Object} filters
+ * @returns {Array} - returns filtered report
+ */
 const getXtrfUpcomingReport = async (filters) => {
   const { nameFilter, tierFilter, industryFilter } = filters;
   try {

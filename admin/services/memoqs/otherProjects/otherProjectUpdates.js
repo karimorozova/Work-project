@@ -3,6 +3,11 @@ const { checkProjectStructure } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
 
+/**
+ *
+ * @param {String} querySource - describes status of progress
+ * @returns {Array} - returns updated(if fits) projects
+ */
 const updateAllMemoqProjects = async (querySource) => {
   let query = {};
   switch (querySource) {
@@ -34,6 +39,11 @@ const updateAllMemoqProjects = async (querySource) => {
   return await getMemoqProjects(query);
 };
 
+/**
+ *
+ * @param {String} status - describes status of progress for a correct query
+ * @returns nothing - runs on array and updates fitting projects
+ */
 const parseMessagesAndUpdateProjects = async (status) => {
   let query = status === 'Quote' ? 'Decide on quote' : 'Project Approved';
   const { messages } = await GmailMessages.findOne({ name: query });
@@ -49,6 +59,11 @@ const parseMessagesAndUpdateProjects = async (status) => {
   }
 };
 
+/**
+ *
+ * @param project
+ * @returns {Object} - returns either updated or same project
+ */
 const updateMemoqProjectFinance = async (project) => {
   const clients = await Clients.find();
   const vendors = await Vendors.find();
@@ -60,6 +75,12 @@ const updateMemoqProjectFinance = async (project) => {
   return await createOtherProjectFinanceData({ project, documents });
 };
 
+/**
+ *
+ * @param {ObjectId} _id
+ * @param {String} direction - describes a direction for update
+ * @returns {Object} - returns project with updated status
+ */
 const updateMemoqProjectStatus = async (_id, direction) => {
   const { status } = await MemoqProject.findOne({ _id });
   let updatedStatus;

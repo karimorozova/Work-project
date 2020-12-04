@@ -19,6 +19,10 @@ const fs = require('fs');
  wordcountPayablesIndex = 10;
  wordcountReceivablesIndex = 11;
  */
+/**
+ *
+ * @returns nothing - clean old LQA report and fills it with new data
+ */
 const parseAndWriteLQAReport = async () => {
   const reports = await XtrfLqa.find();
   if (reports.length) await XtrfLqa.remove();
@@ -78,7 +82,12 @@ const parseAndWriteLQAReport = async () => {
   }
   console.log('Saved!');
 
-  function getVendorsData (vendorsObj) {
+  /**
+   *
+   * @param {Object} vendorsObj
+   * @returns {Array} - returns rather empty array or array of vendors
+   */
+  function getVendorsData(vendorsObj) {
     if (!vendorsObj) return [];
     else {
       const vendorsArr = [];
@@ -106,7 +115,13 @@ const parseAndWriteLQAReport = async () => {
     }
   }
 
-  function getLangISO1 (langPair, langIndex) {
+  /**
+   *
+   * @param {String} langPair
+   * @param {Number} langIndex
+   * @returns {String} - returns lang's iso
+   */
+  function getLangISO1(langPair, langIndex) {
     const langPairArr = langPair.split(' » ');
     let langIso = langPairArr[langIndex].split('-');
     langIso[0] = langIso[0].toLowerCase();
@@ -114,7 +129,12 @@ const parseAndWriteLQAReport = async () => {
     return langIso;
   }
 
-  function getInitialPairInfo (cur) {
+  /**
+   *
+   * @param {Array} cur
+   * @returns {Object} - returns info about industry
+   */
+  function getInitialPairInfo(cur) {
     const industry = findIndustry(cur[4]);
     const startDate = getCorrectTime(cur[5]);
     const deadline = getCorrectTime(cur[6]);

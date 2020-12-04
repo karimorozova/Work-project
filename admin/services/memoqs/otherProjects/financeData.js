@@ -19,8 +19,8 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   const vendors = await Vendors.find();
   const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
   if (!neededCustomer) return project;
-  // const updatedProject = fromCron ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
-  const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+  const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } :
+    { ...project._doc, ...additionalData };
   const { tasks, steps } = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
   if (!tasks.length && !steps.length) return project;
   const { discounts } = additionalData;
@@ -153,8 +153,8 @@ const getStepUserRate = async (user, project, stepName, task) => {
   const { industry } = project;
   let { sourceLanguage, targetLanguage } = task;
   if(user) {
-    const { rates: { pricelistTable }, currency } = user;
-    const pricelist = user.hasOwnProperty('defaultPricelist') ?
+    const { rates: { pricelistTable }, defaultPricelist, currency } = user;
+    const pricelist = defaultPricelist ?
       await Pricelist.findOne({ _id: user.defaultPricelist })
       : await Pricelist.findOne({ isVendorDefault: true });
     const source = await Languages.findOne({ symbol: sourceLanguage });
