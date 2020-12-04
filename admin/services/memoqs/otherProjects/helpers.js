@@ -26,36 +26,24 @@ const checkProjectStructure = (clients, vendors, memoqProject, documents) => {
   return !!doesCorrelateWithOurClient && doesHaveVendorsDocs;
 
   function doesHaveVendors (vendors, docs) {
-    let doesCorrelateWithOurVendors = false;
     if (Array.isArray(docs)) {
-      const hasCorrectStructure = docs.every(document => checkDocumentHasCorrectStructure(document));
-      if (hasCorrectStructure) {
-        for (let { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } of docs) {
-          doesCorrelateWithOurVendors = doesCorrelateWithOurVendor(vendors, memoqVendorsArr)
-        }
-        return doesCorrelateWithOurVendors;
-      }
-      return doesCorrelateWithOurVendors;
+      return docs.every(document => checkDocumentHasCorrectStructure(document));
+    } else {
+      return checkDocumentHasCorrectStructure(docs);
     }
-    const hasCorrectStructure = checkDocumentHasCorrectStructure(docs);
-    if (hasCorrectStructure) {
-      const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = docs;
-      doesCorrelateWithOurVendors = doesCorrelateWithOurVendor(vendors, memoqVendorsArr)
-      return doesCorrelateWithOurVendors;
-    }
-    return doesCorrelateWithOurVendors
   }
 };
 
-const doesCorrelateWithOurVendor = (vendors, userAssignments) => {
-  let correlates = false;
-  for (let i = 0; i < userAssignments.length; i++) {
-    const { UserInfoHeader: { FullName } } = userAssignments[i];
-    const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
-    if (vendor) correlates = true;
-  }
-  return correlates;
-}
+//MM
+// const doesCorrelateWithOurVendor = (vendors, userAssignments) => {
+//   let correlates = false;
+//   for (let i = 0; i < userAssignments.length; i++) {
+//     const { UserInfoHeader: { FullName } } = userAssignments[i];
+//     const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
+//     if (vendor) correlates = true;
+//   }
+//   return correlates;
+// }
 
 const doesAllTasksFinished = (documents) => {
   if (Array.isArray(documents)) {
