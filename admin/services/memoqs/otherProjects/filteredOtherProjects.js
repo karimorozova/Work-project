@@ -7,7 +7,7 @@ const { MemoqProject } = require('../../../models');
  */
 function getFilteredProjectQuery(filters) {
   let query = {
-    status: filters.query,
+    status: filters.query === 'In-progress' ? 'In progress' : filters.query,
   };
   if (filters.lastDate) {
     query.creationTime = { $lt: new Date(filters.lastDate) };
@@ -50,8 +50,8 @@ function getFilteredProjectQuery(filters) {
  */
 async function getFilteredOtherProjects(filters) {
   try {
-    const filteredProjects = getFilteredProjectQuery(filters);
-    return await MemoqProject.find(filteredProjects).sort({ creationTime: -1 }).limit(25);
+    const query = getFilteredProjectQuery(filters);
+    return await MemoqProject.find(query).sort({ creationTime: -1 }).limit(25);
   } catch (err) {
     console.log(err.message);
     console.log('Error in getFilteredOtherProjects');

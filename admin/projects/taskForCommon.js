@@ -15,11 +15,11 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
     stepsAndUnits,
   } = allInfo;
   try {
-    const { customer: { _id: customer }, industry, discounts } = project;
+    const { customer: { _id: customer }, _id, industry, discounts, finance, projectId, minimumCharge } = project;
     let steps = [];
     let tasksWithoutFinance = await getTasksForCustomUnits({
       ...allInfo,
-      projectId: project.projectId,
+      projectId,
     });
     if (stepsAndUnits.length === 2) {
       steps = await getStepsForDuoUnits(
@@ -32,10 +32,9 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
     const tasks = tasksWithoutFinance.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
-    const { projectFinance, roi } = getProjectFinance(tasks, project.finance);
+    const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);
     return await updateProject(
-      { _id: project.id },
-      { finance: projectFinance, roi, $push: { tasks: tasks, steps: steps } }
+      { _id }, { finance: projectFinance, roi, $push: { tasks, steps } }
     );
   } catch (err) {
     console.log(err);

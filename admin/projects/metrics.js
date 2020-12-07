@@ -16,7 +16,7 @@ const ObjectId = require('mongodb').ObjectID;
 async function updateProjectMetrics(projectId, tasks) {
   try {
     const project = await getProject({ "_id": projectId });
-    let { steps, customer, tasks: existingTasks, industry, discounts, finance } = project;
+    let { steps, customer, tasks: existingTasks, industry, discounts, finance, minimumCharge } = project;
     if (!tasks) tasks = project.tasks.filter(task => !task.hasOwnProperty('metrics'));
     filterExistingTasks();
     let isMetricsExist = true;
@@ -59,7 +59,7 @@ async function updateProjectMetrics(projectId, tasks) {
     }
 
     existingTasks.push(...tasks);
-    const { projectFinance, roi } = getProjectFinance(existingTasks, finance);
+    const { projectFinance, roi } = getProjectFinance(existingTasks, finance, minimumCharge);
     return await updateProject({ "_id": projectId }, {
       tasks: existingTasks,
       steps,

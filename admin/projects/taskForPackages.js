@@ -13,8 +13,8 @@ const ObjectId = require('mongodb').ObjectID;
 async function createTasksWithPackagesUnit (allInfo) {
   const { project, stepsAndUnits, stepsDates } = allInfo;
   try {
-    const { customer: { _id: customer }, industry, discounts } = project;
-    const tasksWithoutFinance = await getTasksForCustomUnits({ ...allInfo, projectId: project.projectId });
+    const { customer: { _id: customer }, _id, industry, discounts, projectId, finance, minimumCharge } = project;
+    const tasksWithoutFinance = await getTasksForCustomUnits({ ...allInfo, projectId });
     let steps = stepsAndUnits.length === 2 ? await getStepsForDuoUnits({
         tasks: tasksWithoutFinance,
         customer,
@@ -34,10 +34,9 @@ async function createTasksWithPackagesUnit (allInfo) {
     const tasks = tasksWithoutFinance.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
-    const { projectFinance, roi } = getProjectFinance(tasks, project.finance);
+    const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);
     return await updateProject(
-      { _id: project.id },
-      { finance: projectFinance, roi, $push: { tasks: tasks, steps: steps } }
+      { _id }, { finance: projectFinance, roi, $push: { tasks, steps } }
     );
   } catch (err) {
     console.log(err);

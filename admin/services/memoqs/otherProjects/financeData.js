@@ -21,7 +21,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   if (!neededCustomer) return project;
   const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } :
     { ...project._doc, ...additionalData };
-  let { tasks, steps } = project;
+  let { tasks, steps, minimumCharge } = project;
   const emptyTasksOrSteps = !tasks.length || !steps.length;
   if (!tasks || !steps || emptyTasksOrSteps) {
     const newData = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
@@ -32,8 +32,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   if (!steps.every(step => step.vendor)) {
     steps = await checkAndCorrectStepStructure(steps, tasks, documents);
   }
-  const { discounts } = additionalData;
-  const finance = tasks.length ? getProjectFinance(tasks, discounts) : defaultFinanceObj;
+  const finance = tasks.length ? getProjectFinance(tasks, minimumCharge) : defaultFinanceObj;
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
   await MemoqProject.updateOne({ _id: project._id },
     { ...additionalData, tasks, steps, finance });
@@ -263,7 +262,7 @@ const getTaskFinance = (taskSteps, TotalWordCount) => {
 	};
 };
 
-const getProjectFinance = (tasks) => {
+const getProjectFinance = (tasks, minimumCharge) => {
   let priceReceivables = 0;
   let pricePayables = 0;
   let TotalWordCount = 0;
@@ -273,8 +272,14 @@ const getProjectFinance = (tasks) => {
     TotalWordCount += finance.Wordcount.receivables;
   }
   const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
-  const roi = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
-	return {
+  let roi = pricePayables ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
+  if (minimumCharge) {
+    const { value, toIgnore } = minimumCharge;
+    if (!toIgnore && value > priceReceivables) {
+      roi = pricePayables ? ((value - pricePayables) / pricePayables).toFixed(2) : 0
+    }
+  }
+  return {
     Wordcount: {
       receivables: +TotalWordCount,
       payables: +TotalWordCount,

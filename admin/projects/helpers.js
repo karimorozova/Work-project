@@ -18,7 +18,7 @@ const gatherServiceStepInfo = async (serviceStep) => {
   }
 };
 
-function getProjectFinance(tasks, projectFinance) {
+function getProjectFinance(tasks, projectFinance, minimumCharge) {
   const currentReceivables = projectFinance.Price.receivables || 0;
   const currentPayables = projectFinance.Price.payables || 0;
   const receivables = +(
@@ -29,7 +29,13 @@ function getProjectFinance(tasks, projectFinance) {
     tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) +
     +currentPayables
   ).toFixed(2);
-  const roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0;
+  let roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0;
+  if (minimumCharge) {
+    const { value, toIgnore } = minimumCharge;
+    if (!toIgnore && value > receivables) {
+      roi = payables ? ((value - payables) / payables).toFixed(2) : 0
+    }
+  }
   return {
     projectFinance: {
       Price: { receivables, payables },

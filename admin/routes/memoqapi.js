@@ -25,7 +25,6 @@ const {
   updateMemoqProjectStatus,
   parseMessagesAndUpdateProjects
 } = require('../services/memoqs/otherProjects');
-const { saveMessages } = require('../gmail');
 const { updateProjectFinanceOnDiscountsUpdate } = require('../projects');
 router.get('/users', async (req, res) => {
 	try {
@@ -294,7 +293,7 @@ router.get('/update-project-statuses-from-messages/:from', async (req, res) => {
   const { from } = req.params;
   try {
     await parseMessagesAndUpdateProjects(from);
-    const updatedProjects = await getFilteredOtherProjects({ status: from });
+    const updatedProjects = await getFilteredOtherProjects({ query: from });
     res.send(updatedProjects);
   } catch (err) {
     console.log(err);
