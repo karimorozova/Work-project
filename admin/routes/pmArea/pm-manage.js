@@ -244,23 +244,6 @@ router.put('/project-date', async (req, res) => {
   }
 });
 
-
-router.post('/send-multiple-quotes', async (req, res) => {
-  // try {
-  //   const { projectId, selectedContacts } = req.body;
-  //   await sendQuotes(projectId, selectedContacts);
-  //   const updateProject = await getProjectAfterUpdate({ _id: projectId }, {
-  //     status: 'Quote sent',
-  //     isClientOfferClicked: false,
-  //   });
-  //   res.send(updateProject);
-  // } catch (err) {
-  //   console.log(err);
-  //   res.status(500).send('Error on sending quotes to multiple contacts');
-  // }
-});
-
-
 router.get('/project-details', async (req, res) => {
   const { projectId } = req.query;
   try {

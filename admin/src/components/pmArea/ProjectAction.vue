@@ -226,16 +226,6 @@
 			},
 			async getSendQuoteMessage() {
 				try {
-					// if (this.selectedContacts.length > 1) {
-					//   const result = await this.$http.post(`/pm-manage/send-multiple-quotes`, {
-					//     projectId: this.project._id,
-					//     selectedContacts: this.selectedContacts
-					//   });
-					//   this.storeProject(result.body);
-					//   this.selectedAction = '';
-					// } else {
-					// }
-
 					const template = await this.$http.get(
 							`/pm-manage/quote-message?projectId=${ this.project._id }`
 					);

@@ -29,7 +29,7 @@
 		data() {
 			return {
 				selectedMails: [],
-				editorData: this.message,
+				editorData: this.message.replace('cid:logo@pan', '../../../static/email-logo.png'),
 				editorConfig: {
 					uiColor: "#F4F0EE",
 					allowedContent: true
@@ -37,15 +37,15 @@
 			};
 		},
 		methods: {
-			getSelectedMails(data){
+			getSelectedMails(data) {
 				this.selectedMails = data;
-      },
+			},
 			closePreview() {
 				this.$emit("closePreview");
 			},
 			send() {
 				this.$emit("send", {
-					message: this.editorData,
+					message: this.editorData.replace('../../../static/email-logo.png', 'cid:logo@pan'),
 					arrayOfEmails: this.selectedMails,
 				});
 			},
@@ -96,7 +96,7 @@
     align-items: center;
     box-sizing: border-box;
 
-    &__mails{
+    &__mails {
       width: 100%;
       margin-top: 10px;
       margin-bottom: -12px;
