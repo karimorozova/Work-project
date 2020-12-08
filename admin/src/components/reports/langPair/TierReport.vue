@@ -45,13 +45,13 @@
             .tier__data {{ row.target }}
           template(slot="all" slot-scope="{ row, index }")
             .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('allTier') ? row.allTier.tier : '-' }}
-            .tier__data.tier_orange(v-else) Clients: {{ row.hasOwnProperty('allTier') ? row.allTier.clients : '-' }}; &nbsp; &nbsp; Words: {{row.hasOwnProperty('allTier') ? row.allTier.wordcount : '-' }}
+            .tier__data.tier_orange(v-else)   Words: {{row.hasOwnProperty('allTier') ? row.allTier.wordcount : '-' }}
           template(slot="fin" slot-scope="{ row, index }")
             .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('financeTier') ? row.financeTier.tier : '-' }}
-            .tier__data.tier_orange(v-else) Clients: {{ row.hasOwnProperty('financeTier') ? row.financeTier.clients : '-' }}; &nbsp; &nbsp; Words: {{ row.hasOwnProperty('financeTier') ? row.financeTier.wordcount : '-' }}
+            .tier__data.tier_orange(v-else) Words: {{ row.hasOwnProperty('financeTier') ? row.financeTier.wordcount : '-' }}
           template(slot="game" slot-scope="{ row, index }")
             .tier__data(v-if="activeIndex !== index") Tier {{ row.hasOwnProperty('gameTier') ? row.gameTier.tier : '-' }}
-            .tier__data.tier_orange(v-else) Clients: {{ row.hasOwnProperty('gameTier') ? row.gameTier.clients : '-' }}; &nbsp; &nbsp; Words: {{ row.hasOwnProperty('gameTier') ? row.gameTier.wordcount : '-' }}
+            .tier__data.tier_orange(v-else)  Words: {{ row.hasOwnProperty('gameTier') ? row.gameTier.wordcount : '-' }}
 </template>
 
 <script>
