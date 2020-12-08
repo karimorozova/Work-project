@@ -11,7 +11,6 @@ const newLangReport = async () => {
   let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }] });
   projects = projects.filter(item => item.sourceLanguage);
   const reports = [];
-
   for (let { domain, sourceLanguage, documents } of projects) {
     const industryGroup = findIndustry(domain);
     industryGroup && sourceLanguage && distributeIndustries(industryGroup, sourceLanguage, documents);
@@ -74,9 +73,10 @@ const newLangReport = async () => {
   }
 
   function findLanguageGroup (allLanguages, memoqSymbol) {
-    return allLanguages.find(lang => {
+    let language = allLanguages.find(lang => {
       return findLanguageByMemoqLanguageCode(lang, memoqSymbol);
-    }).group;
+    });
+    return language ? language.group : memoqSymbol;
   }
 
   function findAllTargets (documents) {
