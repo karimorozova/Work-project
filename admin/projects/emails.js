@@ -15,7 +15,7 @@ const {
 	messageForClientSendQuote,
 	emailMessageForContact,
 	taskReadyMessage,
-	taskDeliveryMessage
+	taskDeliveryMessage,
 } = require('../emailMessages/clientCommunication');
 const {
 	stepCancelledMessage,
