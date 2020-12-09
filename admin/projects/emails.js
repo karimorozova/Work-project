@@ -16,6 +16,7 @@ const {
 	emailMessageForContact,
 	taskReadyMessage,
 	taskDeliveryMessage,
+	messageForClientSendCostQuote,
 } = require('../emailMessages/clientCommunication');
 const {
 	stepCancelledMessage,
@@ -53,9 +54,27 @@ async function stepCancelNotifyVendor(steps) {
 	}
 }
 
-async function getMessage(projectId, messageTarget, taskIds = []) {
+const allUnitsAndSteps = async () => {
 	const allUnits = await Units.find();
 	const allSettingsSteps = await Step.find();
+	return {
+		allUnits, allSettingsSteps
+	}
+};
+
+async function getCostMessage(projectId) {
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
+	try {
+		let quote = await getQuoteInfo(projectId, []);
+		return messageForClientSendCostQuote(quote, allUnits, allSettingsSteps)
+	} catch (err) {
+		console.log(err);
+		console.log('Error in getMessage');
+	}
+}
+
+async function getMessage(projectId, messageTarget, taskIds = []) {
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
 	try {
 		let quote = await getQuoteInfo(projectId, taskIds);
 		switch (messageTarget) {
@@ -71,9 +90,27 @@ async function getMessage(projectId, messageTarget, taskIds = []) {
 	}
 }
 
+const sendCostQuoteMessage = async (project, message, arrayOfEmails,) => {
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
+	let subject = 'Cost Quote';
+	let messageId = 'C001.3';
+
+	for (let contactEmail of arrayOfEmails) {
+		const pdf = await getPdf(allUnits, allSettingsSteps, project);
+		const attachments = [{ content: fs.createReadStream(pdf), filename: 'quote.pdf' }];
+		await clientQuoteToEmails({
+			email: contactEmail,
+			attachments,
+			subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`
+		}, dynamicClientName(message, contactEmail, project));
+		fs.unlink(pdf, (err) => {
+			if(err) console.log(err);
+		});
+	}
+};
+
 const sendQuoteMessage = async (project, message, arrayOfEmails, tasksIds = []) => {
-	const allUnits = await Units.find();
-	const allSettingsSteps = await Step.find();
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
 	let subject = project.isUrgent ? 'URGENT! Decide on a Quote' : 'Decide on a Quote';
 	let messageId = 'C001.0';
 	if(project.isPriceUpdated) {
@@ -88,23 +125,23 @@ const sendQuoteMessage = async (project, message, arrayOfEmails, tasksIds = []) 
 			email: contactEmail,
 			attachments,
 			subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`
-		}, dynamicClientName(message, contactEmail));
+		}, dynamicClientName(message, contactEmail, project));
 		fs.unlink(pdf, (err) => {
 			if(err) console.log(err);
 		});
 	}
-
-	function dynamicClientName(message, contactEmail) {
-		const currentContactIndex = project.clientContacts.findIndex(item => item.email === contactEmail);
-		if(currentContactIndex !== -1) {
-			const { firstName, surname } = project.clientContacts[currentContactIndex];
-			const clientName = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`;
-			return message.replace(`<div id="client-name-row">&nbsp;</div>`, clientName)
-		} else {
-			return message;
-		}
-	}
 };
+
+function dynamicClientName(message, contactEmail, project) {
+	const currentContactIndex = project.clientContacts.findIndex(item => item.email === contactEmail);
+	if(currentContactIndex !== -1) {
+		const { firstName, surname } = project.clientContacts[currentContactIndex];
+		const clientName = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`;
+		return message.replace(`<div id="client-name-row">&nbsp;</div>`, clientName)
+	} else {
+		return message;
+	}
+}
 
 async function getQuoteInfo(projectId, tasksIds) {
 	try {
@@ -307,5 +344,7 @@ module.exports = {
 	notifyReadyForDr2,
 	notifyStepReopened,
 	notifyVendorStepStart,
-	sendQuoteMessage
+	sendQuoteMessage,
+	getCostMessage,
+	sendCostQuoteMessage
 };

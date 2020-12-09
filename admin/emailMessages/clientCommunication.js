@@ -165,6 +165,144 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
             </div>`;
 }
 
+//Generate message for Project Cost Quote
+function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
+	const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
+	const { minimumCharge: { value, toIgnore } } = obj;
+	let total = obj.selectedTasks.length ?
+			obj.selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0) :
+			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0);
+	const fromMinimumCharge = !toIgnore ? (value > total) : false;
+	const tasksInfo = obj.selectedTasks.length ?
+			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
+			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps);
+	const tasksInfoArr = obj.selectedTasks.length ?
+			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true) :
+			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true);
+	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0);
+	const taskInfoWithoutDiscountsArr = obj.selectedTasks.length ?
+			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true) :
+			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true, true);
+	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0);
+
+	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2);
+	let detailHeader = "Please see below the estimated quote details:";
+
+	return `<div class="wrapper"
+                style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;">
+                <header style="background-color:#66563E;text-align:center;">
+                    <img class="logo" src="cid:logo@pan" alt="pangea"
+                        style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;">
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;">
+                    <div id="client-name-row"></div>
+                    <p class="main_italic main_line15 main_weight600"
+                        style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;">
+                        ***This is an automated message***<br>
+                        This message is sent to you on behalf of ${ obj.accountManager.firstName } ${ obj.accountManager.lastName }</p>
+                    <p>${ detailHeader }</p>
+                    <div class="details" style="width: 95%; margin-top:0;margin-bottom:15px;margin-right:auto;margin-left:auto;">
+                        <h4 class="details__title">Quote Details:</h4>
+                        <div style="overflow-x:auto;">
+	                        <table class="details__table"
+	                            style="color:#66563E; width: 100%; border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
+	                            <tr>
+	                                <td class="main_weight600"
+	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    Name:</td>
+	                                <td
+	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    ${ obj.projectName }</td>
+	                            </tr>
+	                            <tr>
+	                                <td class="main_weight600"
+	                                    style="border:none; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    ID:</td>
+	                                <td
+	                                    style="border:none; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    ${ obj.projectId }</td>
+	                            </tr>
+	                            <tr>
+	                                <td class="main_weight600"
+	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    Industry:</td>
+	                                <td
+	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    ${ obj.industry.name }</td>
+	                            </tr>
+	                            <tr>
+	                                <td class="main_weight600"
+	                                    style="border:none; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    Estimated delivery date:</td>
+	                                <td
+	                                    style="border:none; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    ${ moment(obj.deadline).format('LLL') }</td>
+	                            </tr>
+	                        </table>
+                        </div>
+                        </br>
+                        <div style="overflow-x:auto;">
+	                        <table class="details__table"
+	                            style="width:100%;color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
+	                            <tr>
+	                                <td class="main_weight600"
+	                                    style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                    Service</td>
+	                                <td class="main_weight600"
+	                                    style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                    Language</td>
+	                                <td class="main_weight600"
+	                                    style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                    Step</td>
+	                                <td class="main_weight600"
+	                                    style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                    Unit</td>
+	                                <td class="main_weight600"
+	                                    style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                    Unit Price</td>
+	                                <td class="main_weight600"
+	                                    style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                    Quantity</td>
+																	${ showCostHeader(fromMinimumCharge) }
+	                            </tr>
+	                            ${ tasksInfo }
+	         										${ generateTotalRow(taskInfoSubTotal, fromMinimumCharge) }
+	                        </table>
+                        </div>
+                        </br>
+                        <div style="overflow-x:auto;">
+	                        <table class="details__table"
+	                            style="color:#66563E;width: 60%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
+															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) }
+	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge) }
+	                            <tr>
+	                                <td class="main_weight600"
+	                                    style="color:#fff; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                Total:</td>
+	                                <td
+	                                    style="color:#fff; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+	                                    &euro; ${ total }</td>
+	                            </tr>
+	                        </table>
+												</div>
+                    </div>
+                    <p>
+                    	This is a Cost Quote and provides only estimation.
+										</p>
+                    <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;">
+                        <span class="main_line15-red" style="background-color:#F4F0EE;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;">
+                            Should anything change in the files or instructions, so will the deadline and charges.
+                        </span>
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global"
+                        style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;">www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
 //Make template for .pdf file
 function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 	const selectedTasks = !tasksIds.length ? obj.tasks.filter(item => item.status !== "Cancelled") : obj.tasks.filter(task => tasksIds.includes(task.taskId));
@@ -796,4 +934,5 @@ module.exports = {
 	projectDeliveryMessage,
 	projectMiddleCancelledMessage,
 	getPdfOfQuote,
+	messageForClientSendCostQuote
 }

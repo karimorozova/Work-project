@@ -2,6 +2,8 @@
   .project-action
     .project-action__preview(v-if="isEditAndSendQuote")
       PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageQuotes")
+    .project-action__preview(v-if="isEditAndSendCostQuote")
+      PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageCostQuotes")
     .project-action__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
 
@@ -34,6 +36,9 @@
     .project-action__setting(v-if="isAction('Send a Quote')")
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getSendQuoteMessage")
+    .project-action__setting(v-if="isAction('Cost Quote')")
+      .project-action__confirm
+        Button(:value="'Edit & Send'" @clicked="getSendCostQuoteMessage")
     .project-action__setting(v-if="isAction('Deliver')")
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getDeliveryMessage")
@@ -151,6 +156,7 @@
 				isPay: false,
 				approveAction: false,
 				approveActionToDraft: false,
+				isEditAndSendCostQuote: false,
 			};
 		},
 		methods: {
@@ -163,7 +169,8 @@
 				sendClientQuote: 'sendClientQuote',
 				sendProjectDetails: 'sendProjectDetails',
 				deliverProjectToClient: 'deliverProjectToClient',
-				sendCancelProjectMessage: 'sendCancelProjectMessage'
+				sendCancelProjectMessage: 'sendCancelProjectMessage',
+				sendClientCostQuote: 'sendClientCostQuote',
 			}),
 			closeModal() {
 				this.approveAction = false;
@@ -185,12 +192,16 @@
 			closePreview() {
 				this.isEditAndSend = false;
 				this.isEditAndSendQuote = false;
+				this.isEditAndSendCostQuote = false;
 			},
 			openPreview() {
 				this.isEditAndSend = true;
 			},
 			openPreviewQuote() {
 				this.isEditAndSendQuote = true;
+			},
+			openPreviewCostQuote() {
+				this.isEditAndSendCostQuote = true;
 			},
 			async getCancelMessage() {
 				if(
@@ -224,6 +235,18 @@
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
+			async getSendCostQuoteMessage() {
+				try {
+					const template = await this.$http.get(
+							`/pm-manage/quote-cost-message?projectId=${ this.project._id }`
+					);
+					this.previewMessage = template.body.message;
+					this.openPreviewCostQuote();
+
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+				}
+			},
 			async getSendQuoteMessage() {
 				try {
 					const template = await this.$http.get(
@@ -245,6 +268,25 @@
 					this.openPreview();
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+				}
+			},
+			async sendMessageCostQuotes({ message, arrayOfEmails }) {
+				try {
+					await this.sendClientCostQuote({ message, arrayOfEmails });
+					this.alertToggle({
+						message: "Cost Quote sent",
+						isShow: true,
+						type: "success"
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: err.message,
+						isShow: true,
+						type: "error"
+					});
+				} finally {
+					this.setDefaults();
+					this.closePreview();
 				}
 			},
 			async sendMessageQuotes({ message, arrayOfEmails }) {
@@ -537,7 +579,7 @@
 					result = ["Cancel"];
 				}
 				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
-					result = ["Send a Quote", "Accept/Reject Quote", "Cancel"];
+					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel"];
 				}
 				if(this.project.status === 'Started' || this.project.status === 'In progress') {
 					result = ["Send Project Details", "Cancel"];

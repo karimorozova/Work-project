@@ -9,9 +9,9 @@ const {
   getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled, getProjectAfterFinanceUpdated,
   updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2,
   notifyStepReopened, getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate,
-  checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage, updateProjectFinanceOnDiscountsUpdate
+  checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage, sendCostQuoteMessage, updateProjectFinanceOnDiscountsUpdate
 } = require('../../projects');
-const { sendQuotes, getMessage } = require('../../projects/emails');
+const { sendQuotes, getMessage, getCostMessage } = require('../../projects/emails');
 const {
   upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact,
   stepReassignedNotification, managerNotifyMail, sendEmail, notifyClientProjectCancelled, notifyClientTasksCancelled
@@ -281,6 +281,17 @@ router.get('/quote-message', async (req, res) => {
   }
 });
 
+router.get('/quote-cost-message', async (req, res) => {
+  const { projectId } = req.query;
+  try {
+    const message = await getCostMessage(projectId, 'quote');
+    res.send({ message });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting quote message');
+  }
+});
+
 router.post('/task-quote-message', async (req, res) => {
   const { projectId, tasks } = req.body;
   try {
@@ -291,7 +302,17 @@ router.post('/task-quote-message', async (req, res) => {
     res.status(500).send('Error on getting task quote message');
   }
 });
-
+router.post('/send-cost-quote', async (req, res) => {
+  const { id, message, arrayOfEmails } = req.body;
+  try {
+    const project = await getProject({ _id: id });
+    await sendCostQuoteMessage(project, message, arrayOfEmails);
+    res.send('updatedProject');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on sending the Quote');
+  }
+});
 router.post('/send-quote', async (req, res) => {
   const { id, message, arrayOfEmails } = req.body;
   try {
