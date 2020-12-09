@@ -8,7 +8,7 @@ const {
 const {
   stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, notifyManagerStepStarted, notifyStepDecisionMade,
   sendClientDeliveries, notifyDeliverablesDownloaded, notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
-  notifyVendorStepStart, sendQuotes, sendQuoteMessage
+  notifyVendorStepStart, sendQuotes, sendQuoteMessage, sendCostQuoteMessage
 } = require('./emails');
 const {
   createProject,
@@ -68,6 +68,7 @@ module.exports = {
   updateProjectStatusForClientPortalProject,
   sendQuotes,
   sendQuoteMessage,
+  sendCostQuoteMessage,
   updateProjectFinanceOnDiscountsUpdate,
   getPriceAfterApplyingDiscounts
 }
