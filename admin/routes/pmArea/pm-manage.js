@@ -309,9 +309,9 @@ router.post('/task-quote-message', async (req, res) => {
 router.post('/send-cost-quote', async (req, res) => {
   const { id, message, arrayOfEmails } = req.body;
   try {
-    const project = await getProject({ _id: id });
+    const project = await getProjectAfterUpdate({ _id: id }, {status: 'Cost Quote'});
     await sendCostQuoteMessage(project, message, arrayOfEmails);
-    res.send('updatedProject');
+    res.send(project);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on sending the Quote');

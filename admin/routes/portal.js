@@ -92,7 +92,7 @@ router.get('/projects', checkClientContact, async (req, res) => {
     try {
       const verificationResult = jwt.verify(token, secretKey);
       const client = await getClient({ '_id': verificationResult.clientId });
-      const projects = await getProjects({ $and: [{ status: { $ne: 'Draft' } }, { 'customer': verificationResult.clientId }] });
+      const projects = await getProjects({ $and: [{ status: { $nin: ['Draft', 'Cost Quote'] } }, { 'customer': verificationResult.clientId }] });
       const memoqProjects = await getMemoqProjectsForClientPortal(
         { $and: [{ customer: verificationResult.clientId }, { status: { $ne: null } }] }
       );

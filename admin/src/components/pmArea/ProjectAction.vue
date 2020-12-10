@@ -212,6 +212,7 @@
 						this.project.status === "Quote sent" ||
 						this.project.status === "Approved" ||
 						this.project.status === "Rejected" ||
+						this.project.status === "Cost Quote" ||
 						this.project.status === "Requested"
 				) {
 					return "Cancelled"
@@ -569,6 +570,7 @@
 				let result = this.actions;
 				const nonStartedStatuses = [
 					"Draft",
+          "Cost Quote",
 					"Quote sent",
 					"Requested",
 					"Cancelled"

@@ -379,7 +379,7 @@
 			addedSendQuoteStatus() {
 				const pickedTasks = this.allTasks.filter(i => i.isChecked);
 				const isEveryCreated = pickedTasks.every(item => item.status === "Created");
-				if(isEveryCreated && pickedTasks.length && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
+				if(isEveryCreated && pickedTasks.length && this.currentProject.status !== "Draft" && this.currentProject.status !== "Cost Quote" && this.currentProject.status !== "Rejected") {
 					this.taskStatuses = ['Cancel', 'Send a Quote']
 				} else if(!pickedTasks.length) this.taskStatuses = ['Cancel'];
 				else this.taskStatuses = ['Cancel']
@@ -412,7 +412,7 @@
 				}, []);
 				const isEveryCreated = tasks.every(item => item.status === "Created");
 				this.setProjectProp({ value: tasks, prop: 'tasks' });
-				if(isEveryCreated && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
+				if(isEveryCreated && this.currentProject.status !== "Draft" && this.currentProject.status !== "Cost Quote" && this.currentProject.status !== "Rejected") {
 					this.taskStatuses = ['Cancel', 'Send a Quote']
 				}
 				this.clearTaskDeliveryStatuses();

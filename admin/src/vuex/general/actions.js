@@ -155,8 +155,8 @@ export const sendClientCostQuote = async ({commit, state, dispatch}, payload) =>
     commit('startRequest');
     try {
         const { message, arrayOfEmails } = payload;
-        await Vue.http.post('/pm-manage/send-cost-quote', {id: state.currentProject._id, message, arrayOfEmails});
-        // await commit('storeCurrentProject', updatedProject.data);
+        const updatedProject =  await Vue.http.post('/pm-manage/send-cost-quote', {id: state.currentProject._id, message, arrayOfEmails});
+        await commit('storeCurrentProject', updatedProject.data);
     } catch(err) {
         dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
     } finally {
