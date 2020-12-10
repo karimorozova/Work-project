@@ -147,7 +147,7 @@
   .rates {
     display: flex;
     padding: 16px 30px;
-    background: #f4f0ee;
+    background: #F2EFEB;
     border: 2px solid #938676;
     flex-direction: column;
 

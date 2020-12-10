@@ -221,7 +221,7 @@
       height: 30px;
       line-height: 30px;
       padding-left: 5px;
-      background: #f4f0ee;
+      background: #F2EFEB;
       border-bottom: 1px solid #938676;
       display: flex;
 

@@ -29,7 +29,9 @@
 		data() {
 			return {
 				selectedMails: [],
-				editorData: this.message.replace('cid:logo@pan', '../../../static/email-logo.png'),
+				editorData: this.message.includes('cid:logo@pan') ?
+						this.message.replace('cid:logo@pan', '../../../static/email-logo.png') :
+						this.message,
 				editorConfig: {
 					uiColor: "#F4F0EE",
 					allowedContent: true
@@ -45,7 +47,9 @@
 			},
 			send() {
 				this.$emit("send", {
-					message: this.editorData.replace('../../../static/email-logo.png', 'cid:logo@pan'),
+					message: this.editorData.includes('static/email-logo.png') ?
+							this.editorData.replace('../../../static/email-logo.png', 'cid:logo@pan') :
+							this.editorData,
 					arrayOfEmails: this.selectedMails,
 				});
 			},
