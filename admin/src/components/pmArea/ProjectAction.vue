@@ -193,6 +193,9 @@
 				this.isEditAndSend = false;
 				this.isEditAndSendQuote = false;
 				this.isEditAndSendCostQuote = false;
+				this.previewMessage = "";
+				this.selectedAction = "";
+				this.selectedReason = "";
 			},
 			openPreview() {
 				this.isEditAndSend = true;
@@ -444,7 +447,7 @@
 					});
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
-				}finally {
+				} finally {
 					this.selectedReason = "";
 				}
 			},

@@ -24,13 +24,13 @@
         span {{ row.status }}
       template(slot="receivables" slot-scope="{ row }")
         span(v-if="row.finance && row.finance.Price.receivables") &euro;
-          span {{ row.finance.Price.receivables }}
+          span {{ toFixedFinalCost( row.finance.Price.receivables ) }}
       template(slot="payables" slot-scope="{ row }")
         span(v-if="row.finance && row.finance.Price.payables") &euro;
-          span {{ row.finance.Price.payables }}
+          span {{ toFixedFinalCost( row.finance.Price.payables ) }}
       template(slot="roi" slot-scope="{ row }")
-         span(v-if="row.finance && row.finance.ROI") {{ row.finance.ROI }}
-         span(v-else)
+        span(v-if="row.finance && row.finance.ROI") {{ row.finance.ROI }}
+        span(v-else)
       template(slot="startDate" slot-scope="{ row }")
         span {{formateDate(row.creationTime)}}
       template(slot="deadline" slot-scope="{ row }")
@@ -44,166 +44,169 @@
 </template>
 
 <script>
-  import DataTable from "../../DataTable";
-  import moment from "moment";
-  import { mapActions } from "vuex";
+	import DataTable from "../../DataTable";
+	import moment from "moment";
+	import { mapActions } from "vuex";
 
-  export default {
-    props: {
-      allProjects: {
-        type: Array
-      }
-    },
-    data () {
-      return {
-        fields: [
-          {
-            label: "ID",
-            headerKey: "headerProjectId",
-            key: "projectId",
-            width: "10%"
-          },
-          {
-            label: "Project Name",
-            headerKey: "headerProjectId",
-            key: "projectName",
-            width: "12%"
-          },
-          {
-            label: "Client Name",
-            headerKey: "headerClientName",
-            key: "clientName",
-            width: "10%"
-          },
-          {
-            label: "Languages",
-            headerKey: "headerLanguages",
-            key: "languages",
-            width: "12%"
-          },
-          {
-            label: "Status",
-            headerKey: "headerStatus",
-            key: "status",
-            width: "8%"
-          },
-          {
-            label: "Receivables",
-            headerKey: "headerReceivables",
-            key: "receivables",
-            width: "6%"
-          },
-          {
-            label: "Payables",
-            headerKey: "headerPayables",
-            key: "payables",
-            width: "6%"
-          },
-          {
-            label: "ROI",
-            headerKey: "headerRoi",
-            key: "roi",
-            width: "6%"
-          },
-          {
-            label: "Start date",
-            headerKey: "headerStartDate",
-            key: "startDate",
-            width: "8%"
-          },
-          {
-            label: "Deadline",
-            headerKey: "headerDeadline",
-            key: "deadline",
-            width: "8%"
-          },
-          {
-            label: "Project Manager",
-            headerKey: "headerProjectManager",
-            key: "projectManager",
-            width: "10%"
-          },
-          {
-            label: "Test",
-            headerKey: "headerTest",
-            key: "projectTest",
-            width: "4%"
-          }
-        ]
-      };
-    },
-    methods: {
-      ...mapActions(["alertToggle"]),
-      async setTest (projectId) {
-        await this.setProjectProp({
-          projectId: projectId,
-          prop: "isTest",
-          value: event.target.checked
-        });
-      },
-      async setProjectProp ({ projectId, prop, value }) {
-        try {
-          const result = await this.$http.put("/pm-manage/other-project-prop", {
-            projectId,
-            prop,
-            value
-          });
-          this.alertToggle({
-            message: "Project type changed",
-            isShow: true,
-            type: "success"
-          });
-        } catch (err) {
-          this.alertToggle({
-            message: "Server Error / Cannot update status Project",
-            isShow: true,
-            type: "error"
-          });
-        }
-      },
-      getProjectIdName (row, type) {
-        let id = /(.*])\s- /gm.exec(row.name);
-        let clientName = / - (.*)/gm.exec(row.name);
-        if (type === "id") {
-          if (id !== null) {
-            return id[1];
-          }
-        } else {
-          if (clientName !== null) {
-            return clientName[1];
-          }else{
-          	return row.name;
-          }
-        }
-      },
-      async onRowClicked ({ index }) {
-        this.$router.push(`/other-project-details/${this.allProjects[index]._id}`);
-      },
-      formateDate: time => moment(time).format("DD-MM-YYYY"),
-      projectLangs (row) {
-        const targets = row.targetLanguages
-          .filter(item => item)
-          .map(item => item.symbol);
-        let languages = "";
-        targets.forEach(element => {
-          languages += `${row.sourceLanguage.symbol} >> ${element}<br>`;
-        });
-        return languages;
-      },
-      nameOfProjectManager (row) {
-        return row.users
-          .filter(item => item.ProjectRoles.isPm === true)
-          .map(item => item.User.FullName)
-          .reduce((prev, cur) => prev + cur + "; ", "");
-      },
-      bottomScrolled () {
-        this.$emit("bottomScrolled");
-      }
-    },
-    components: {
-      DataTable
-    }
-  };
+	export default {
+		props: {
+			allProjects: {
+				type: Array
+			}
+		},
+		data() {
+			return {
+				fields: [
+					{
+						label: "ID",
+						headerKey: "headerProjectId",
+						key: "projectId",
+						width: "10%"
+					},
+					{
+						label: "Project Name",
+						headerKey: "headerProjectId",
+						key: "projectName",
+						width: "12%"
+					},
+					{
+						label: "Client Name",
+						headerKey: "headerClientName",
+						key: "clientName",
+						width: "10%"
+					},
+					{
+						label: "Languages",
+						headerKey: "headerLanguages",
+						key: "languages",
+						width: "12%"
+					},
+					{
+						label: "Status",
+						headerKey: "headerStatus",
+						key: "status",
+						width: "8%"
+					},
+					{
+						label: "Receivables",
+						headerKey: "headerReceivables",
+						key: "receivables",
+						width: "6%"
+					},
+					{
+						label: "Payables",
+						headerKey: "headerPayables",
+						key: "payables",
+						width: "6%"
+					},
+					{
+						label: "ROI",
+						headerKey: "headerRoi",
+						key: "roi",
+						width: "6%"
+					},
+					{
+						label: "Start date",
+						headerKey: "headerStartDate",
+						key: "startDate",
+						width: "8%"
+					},
+					{
+						label: "Deadline",
+						headerKey: "headerDeadline",
+						key: "deadline",
+						width: "8%"
+					},
+					{
+						label: "Project Manager",
+						headerKey: "headerProjectManager",
+						key: "projectManager",
+						width: "10%"
+					},
+					{
+						label: "Test",
+						headerKey: "headerTest",
+						key: "projectTest",
+						width: "4%"
+					}
+				]
+			};
+		},
+		methods: {
+			...mapActions(["alertToggle"]),
+			async setTest(projectId) {
+				await this.setProjectProp({
+					projectId: projectId,
+					prop: "isTest",
+					value: event.target.checked
+				});
+			},
+			toFixedFinalCost(num) {
+				return num && parseFloat(num).toFixed(2);
+			},
+			async setProjectProp({ projectId, prop, value }) {
+				try {
+					const result = await this.$http.put("/pm-manage/other-project-prop", {
+						projectId,
+						prop,
+						value
+					});
+					this.alertToggle({
+						message: "Project type changed",
+						isShow: true,
+						type: "success"
+					});
+				} catch (err) {
+					this.alertToggle({
+						message: "Server Error / Cannot update status Project",
+						isShow: true,
+						type: "error"
+					});
+				}
+			},
+			getProjectIdName(row, type) {
+				let id = /(.*])\s- /gm.exec(row.name);
+				let clientName = / - (.*)/gm.exec(row.name);
+				if(type === "id") {
+					if(id !== null) {
+						return id[1];
+					}
+				} else {
+					if(clientName !== null) {
+						return clientName[1];
+					} else {
+						return row.name;
+					}
+				}
+			},
+			async onRowClicked({ index }) {
+				this.$router.push(`/other-project-details/${ this.allProjects[index]._id }`);
+			},
+			formateDate: time => moment(time).format("DD-MM-YYYY"),
+			projectLangs(row) {
+				const targets = row.targetLanguages
+						.filter(item => item)
+						.map(item => item.symbol);
+				let languages = "";
+				targets.forEach(element => {
+					languages += `${ row.sourceLanguage.symbol } >> ${ element }<br>`;
+				});
+				return languages;
+			},
+			nameOfProjectManager(row) {
+				return row.users
+						.filter(item => item.ProjectRoles.isPm === true)
+						.map(item => item.User.FullName)
+						.reduce((prev, cur) => prev + cur + "; ", "");
+			},
+			bottomScrolled() {
+				this.$emit("bottomScrolled");
+			}
+		},
+		components: {
+			DataTable
+		}
+	};
 </script>
 
 <style lang="scss" scoped>
