@@ -9,9 +9,9 @@ const {
   getDeliverablesLink, getAfterReopenSteps, notifyVendorsProjectCancelled, getProjectAfterFinanceUpdated,
   updateProjectProgress, updateNonWordsTaskTargetFiles, storeFiles, notifyProjectDelivery, notifyReadyForDr2,
   notifyStepReopened, getPdf, notifyVendorStepStart, updateOtherProject, getProjectAfterUpdate,
-  checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage, updateProjectFinanceOnDiscountsUpdate
+  checkProjectHasMemoqStep, assignProjectManagers, sendQuoteMessage, sendCostQuoteMessage, updateProjectFinanceOnDiscountsUpdate
 } = require('../../projects');
-const { sendQuotes, getMessage } = require('../../projects/emails');
+const { sendQuotes, getMessage, getCostMessage } = require('../../projects/emails');
 const {
   upload, clientQuoteEmail, stepVendorsRequestSending, sendEmailToContact,
   stepReassignedNotification, managerNotifyMail, sendEmail, notifyClientProjectCancelled, notifyClientTasksCancelled
@@ -219,6 +219,7 @@ router.put('/send-cancel-message', async (req, res) => {
   try {
     const project = await getProject({ '_id': id });
     await notifyClientProjectCancelled(project, message);
+
     if (project.status === 'Cancelled') {
       const wordsTasks = project.tasks.filter(item => item.service.title === 'Translation');
       if (wordsTasks.length) {
@@ -226,6 +227,7 @@ router.put('/send-cancel-message', async (req, res) => {
         await setCancelledNameInMemoq(wordsTasks, `${project.projectId} - ${project.projectName}`);
       }
     }
+
     res.send('Message sent');
   } catch (err) {
     console.log(err);
@@ -243,23 +245,6 @@ router.put('/project-date', async (req, res) => {
     res.status(500).send('Internal server error / Cannot change Project\'s deadline');
   }
 });
-
-
-router.post('/send-multiple-quotes', async (req, res) => {
-  // try {
-  //   const { projectId, selectedContacts } = req.body;
-  //   await sendQuotes(projectId, selectedContacts);
-  //   const updateProject = await getProjectAfterUpdate({ _id: projectId }, {
-  //     status: 'Quote sent',
-  //     isClientOfferClicked: false,
-  //   });
-  //   res.send(updateProject);
-  // } catch (err) {
-  //   console.log(err);
-  //   res.status(500).send('Error on sending quotes to multiple contacts');
-  // }
-});
-
 
 router.get('/project-details', async (req, res) => {
   const { projectId } = req.query;
@@ -298,6 +283,17 @@ router.get('/quote-message', async (req, res) => {
   }
 });
 
+router.get('/quote-cost-message', async (req, res) => {
+  const { projectId } = req.query;
+  try {
+    const message = await getCostMessage(projectId, 'quote');
+    res.send({ message });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on getting quote message');
+  }
+});
+
 router.post('/task-quote-message', async (req, res) => {
   const { projectId, tasks } = req.body;
   try {
@@ -308,7 +304,17 @@ router.post('/task-quote-message', async (req, res) => {
     res.status(500).send('Error on getting task quote message');
   }
 });
-
+router.post('/send-cost-quote', async (req, res) => {
+  const { id, message, arrayOfEmails } = req.body;
+  try {
+    const project = await getProject({ _id: id });
+    await sendCostQuoteMessage(project, message, arrayOfEmails);
+    res.send('updatedProject');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on sending the Quote');
+  }
+});
 router.post('/send-quote', async (req, res) => {
   const { id, message, arrayOfEmails } = req.body;
   try {
@@ -868,9 +874,10 @@ function getAccManagerAndContact (project) {
 }
 
 router.post('/making-cancel-message', async (req, res) => {
+  const { cancelStatus } = req.body;
   const { accManager, contact } = getAccManagerAndContact(req.body);
   try {
-    const message = req.body.status === 'Cancelled Halfway' ?
+    const message = cancelStatus === 'Cancelled Halfway' ?
       await projectMiddleCancelledMessage({ ...req.body, accManager, contact })
       : await projectCancelledMessage({ ...req.body, accManager, contact });
     res.send({ message });
