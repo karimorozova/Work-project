@@ -219,6 +219,7 @@ router.put('/send-cancel-message', async (req, res) => {
   try {
     const project = await getProject({ '_id': id });
     await notifyClientProjectCancelled(project, message);
+
     if (project.status === 'Cancelled') {
       const wordsTasks = project.tasks.filter(item => item.service.title === 'Translation');
       if (wordsTasks.length) {
@@ -226,6 +227,7 @@ router.put('/send-cancel-message', async (req, res) => {
         await setCancelledNameInMemoq(wordsTasks, `${project.projectId} - ${project.projectName}`);
       }
     }
+
     res.send('Message sent');
   } catch (err) {
     console.log(err);
@@ -872,9 +874,10 @@ function getAccManagerAndContact (project) {
 }
 
 router.post('/making-cancel-message', async (req, res) => {
+  const { cancelStatus } = req.body;
   const { accManager, contact } = getAccManagerAndContact(req.body);
   try {
-    const message = req.body.status === 'Cancelled Halfway' ?
+    const message = cancelStatus === 'Cancelled Halfway' ?
       await projectMiddleCancelledMessage({ ...req.body, accManager, contact })
       : await projectCancelledMessage({ ...req.body, accManager, contact });
     res.send({ message });

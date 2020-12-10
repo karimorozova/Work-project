@@ -748,9 +748,9 @@ function projectCancelledMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                		<div id="client-name-row">&nbsp;</div>
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
-                    <h4 class="contact-name">Dear ${ obj.contact.firstName } ${ obj.contact.surname }</h4>
                     <p>
                         We are sorry to update you , but project <strong>${ obj.projectId } - ${ obj.projectName }</strong> has been cancelled.
                     </p>
@@ -775,9 +775,9 @@ function projectMiddleCancelledMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+		                <div id="client-name-row">&nbsp;</div>
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
-                    <h4 class="contact-name">Dear ${ obj.contact.firstName } ${ obj.contact.surname }</h4>
                     <p>
                         We would like to inform you that project <strong>${ obj.projectId } - ${ obj.projectName }</strong> has been cancelled in the middle of the work.
                     </p>

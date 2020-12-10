@@ -57,8 +57,8 @@ export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
     }
   }
 
-export const sendCancelProjectMessage = async ({ commit, state }, payload) => {
-    commit('startRequest')
+export const sendCancelProjectMessage = async ({ commit, state, dispatch }, payload) => {
+    commit('startRequest');
     try {
         const id = state.currentProject._id;
         const { message } = payload;

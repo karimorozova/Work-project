@@ -203,19 +203,25 @@
 			openPreviewCostQuote() {
 				this.isEditAndSendCostQuote = true;
 			},
-			async getCancelMessage() {
+			getCancelStatus() {
 				if(
-						this.project.status === 'In progress' ||
 						this.project.status === 'Draft' ||
-						this.project.status === 'Approved' ||
-						this.project.status === 'Rejected'
+						this.project.status === "Quote sent" ||
+						this.project.status === "Approved" ||
+						this.project.status === "Rejected" ||
+						this.project.status === "Requested"
 				) {
-					await this.setStatus('Cancelled', this.selectedReason);
+					return "Cancelled"
+				} else {
+					return "Cancelled Halfway"
 				}
+			},
+			async getCancelMessage() {
+				let cancelStatus = this.getCancelStatus();
 				try {
 					const template = await this.$http.post(
 							"/pm-manage/making-cancel-message",
-							{ ...this.project, reason: this.selectedReason, isPay: this.isPay }
+							{ ...this.project, cancelStatus, reason: this.selectedReason, isPay: this.isPay }
 					);
 					this.previewMessage = template.body.message;
 					this.openPreview();
@@ -332,16 +338,13 @@
 				this.isAlternativeAction = false;
 				if(this.selectedAction === "Accept/Reject Quote") {
 					this.approveButtonValue = "Accept";
-					(this.alternativeButtonValue = "Reject"),
-							(this.isAlternativeAction = true);
+					(this.alternativeButtonValue = "Reject");
+					(this.isAlternativeAction = true);
 				}
 			},
 			async makeApprovedAction(message) {
 				try {
 					switch (this.selectedAction) {
-							// case "Send a Quote":
-							// 	await this.clientQuote(message);
-							// 	break;
 						case "Send Project Details":
 							await this.projectDetails(message);
 							break;
@@ -425,12 +428,14 @@
 				}
 			},
 			async cancelProjectMessage(message) {
-				if(
-						this.project.status === "Delivered" ||
-						this.project.status === "Closed"
-				)
+				let cancelStatus = this.getCancelStatus();
+				if(this.project.status === "Delivered" || this.project.status === "Closed")
 					return;
 				try {
+					await this.setProjectStatus({
+						status: cancelStatus,
+						reason: this.selectedReason || "",
+					});
 					await this.sendCancelProjectMessage({ message });
 					this.alertToggle({
 						message: "Letter sent successfully",
@@ -439,6 +444,8 @@
 					});
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+				}finally {
+					this.selectedReason = "";
 				}
 			},
 			async setStatus(status, reason) {
@@ -510,17 +517,6 @@
 					});
 				}
 			},
-			// fillContacts() {
-			// 	return this.currentClient.contacts.map(({ firstName, surname }) => `${ firstName } ${ surname }`);
-			// },
-			// setContacts({ option }) {
-			// 	const selectedOptionIndex = this.selectedContacts.findIndex(name => name === option);
-			// 	if(selectedOptionIndex !== -1) {
-			// 		this.selectedContacts.splice(selectedOptionIndex, 1);
-			// 	} else {
-			// 		this.selectedContacts.push(option);
-			// 	}
-			// },
 		},
 		computed: {
 			...mapGetters({
