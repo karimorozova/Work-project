@@ -39,14 +39,22 @@
               .minPrice-item
                 .minPrice-item__title Receivables Rates:
                 .minPrice-item__input {{ getStartedReceivables }}
-              .minPrice-item
-                .minPrice-item__title Minimum Charge:
-                .minPrice-item__input
-                  .ratio__input
-                    input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" v-on:keyup.enter="(e) => updateMinPrice('value', e)")
-                    span(v-else) {{ currentProject.minimumCharge.value }}
-                    span.ratio__input-symbol(v-html="getSymbol(currentProject.customer.currency)")
-              .minPrice-item
+              .minPrice-item__forIgnore
+                .minPrice-item
+                  .minPrice-item__title Minimum Charge:
+                  .minPrice-item__input
+                    .ratio__input
+                      input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" @change="(e) => updateMinPrice('value', e)")
+                      span(v-else) {{ currentProject.minimumCharge.value }}
+                      span.ratio__input-symbol(v-html="getSymbol(currentProject.customer.currency)")
+                .minPrice-item-check
+                  .minPrice-item-check__title Ignore:
+                  .rates-item__checkbox
+                    .checkbox
+                      input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
+                      label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
+                      label(v-else for="ignoreMinPrice")
+              //.minPrice-item
                 .minPrice-item__title Ignore Min. Charge:
                 .rates-item__checkbox
                   .checkbox
@@ -217,12 +225,23 @@
     border: 2px solid #938676;
     flex-direction: column;
     margin-right: 40px;
-
+    .minPrice-item-check {
+      min-height: 30px;
+      display: flex;
+      padding-right: 10px;
+      align-items: center;
+      &__title {
+        width: 60px;
+    }
+    }
     .minPrice-item {
-      width: 300px;
+      width: 230px;
       min-height: 30px;
       display: flex;
       align-items: center;
+      &__forIgnore{
+        display: flex;
+      }
 
       &__title {
         width: 150px;
@@ -399,7 +418,7 @@
     color: #67573e;
     height: 22px;
     border-radius: 5px;
-    width: 70px;
+    width: 50px;
     border: 1px solid #67573e;
   }
 

@@ -127,7 +127,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 60%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) }
-	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge) }
+	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
 	                                    style="color:#fff; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -274,7 +274,7 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 60%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) }
-	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge) }
+	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
 	                                    style="color:#fff; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -403,7 +403,7 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 100%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) }
-	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge) }
+	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
 	                                    style="color:#fff; width: 88%; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -418,6 +418,9 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 
 //Check min price in Project
 function generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) {
+	const TMDiscount = taskInfoSubTotal - taskInfoWithoutDiscounts;
+	const TMRow = TMDiscount > 0 ? `<td class="main_weight600" style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;"> TM Discount:</td> 
+<td style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;"> &euro; ${ TMDiscount.toFixed(2) }</td>` : `<td style="display: none;"></td><td style="display: none;"></td>`;
 	return !fromMinimumCharge ? `<tr>
             <td class="main_weight600"
                 style="border:none;background: #F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -427,12 +430,7 @@ function generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDisc
                 &euro; ${ taskInfoSubTotal.toFixed(2) }</td>
         </tr>
         <tr>
-            <td class="main_weight600"
-                style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                TM Discount:</td>
-            <td
-                style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                &euro; ${ (taskInfoSubTotal - taskInfoWithoutDiscounts).toFixed(2) }</td>
+ 						${ TMRow }
         </tr>` : `<tr style="display: none"></tr>`
 }
 
@@ -444,10 +442,12 @@ function showCostHeader(fromMinimumCharge) {
 }
 
 //generate discounts and amounts
-function discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge) {
+function discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) {
+	const TMDiscount = taskInfoSubTotal - taskInfoWithoutDiscounts;
+	const startIndex = TMDiscount > 0 ? 2 : 1;
 	return obj.discounts.length && !fromMinimumCharge ?
 			obj.discounts.reduce((acc, curr, index) => {
-				let color = (index + 2) % 2 ? '#fff' : '#F4F0EE';
+				let color = (index + startIndex) % 2 ? '#fff' : '#F4F0EE';
 				acc += `<tr><td class="main_weight600"
 				style="border:none;background: ${ color };padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
 						${ curr.name }</td>

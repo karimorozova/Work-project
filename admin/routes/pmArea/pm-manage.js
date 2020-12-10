@@ -68,7 +68,7 @@ router.get('/language-pairs', async (req, res) => {
 
 router.post('/new-project', async (req, res) => {
   let project = { ...req.body };
-  const { contacts, billingInfo, projectManager, accountManager, discounts } =
+  const { contacts, billingInfo, projectManager, accountManager, discounts, minPrice } =
     await Clients.findOne({ '_id': project.customer }).populate('discounts');
   project.projectManager = projectManager._id;
   project.accountManager = accountManager._id;
@@ -76,6 +76,8 @@ router.post('/new-project', async (req, res) => {
   project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';
   project.clientContacts = [leadContact];
   project.discounts = discounts;
+  project.minimumCharge = { value:minPrice, toIgnore: false};
+
   try {
     const result = await createProject(project);
     res.send(result);
