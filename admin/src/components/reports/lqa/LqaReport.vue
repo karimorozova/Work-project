@@ -20,10 +20,23 @@
       )
     .lqa__languages
       .lqa__language(v-for="{languagePair, sourceLanguage, targetLanguage, industries: { Finance, iGaming } } in reportData")
-        .lqa__text {{ languagePair }}
-          .lqa__industry(v-if="Finance.vendors.length") Finance
+        .lqa__text
+          b {{ languagePair }}
+          .lqa__industry(v-if="Finance.vendors.length")
+            .lqa__tier-industry
+              b Industry: &nbsp;
+              |Finance
+              |&nbsp; &nbsp;
+              b Tier: &nbsp;
+              |1
             Table(v-if="Finance.vendors.length" :vendorsData="Finance.vendors")
-          .lqa__industry(v-if="iGaming.vendors.length") iGaming
+          .lqa__industry(v-if="iGaming.vendors.length")
+            .lqa__tier-industry
+              b Industry: &nbsp;
+              |iGaming
+              |&nbsp; &nbsp;
+              b Tier: &nbsp;
+              |1
             Table(v-if="iGaming.vendors.length" :vendorsData="iGaming.vendors")
 
       //.lqa__form(v-if="false")
@@ -160,13 +173,17 @@
 
     &__text {
       font-size: 22px;
-      font-weight: bold;
       margin-bottom: 10px;
     }
 
     &__industry {
-      font-size: 20px;
+      font-size: 14px;
+    }
+
+    &__tier-industry{
+      margin: 15px 0;
     }
   }
+
 
 </style>
