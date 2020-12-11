@@ -287,7 +287,7 @@
 		},
 		computed: {
 			industriesList() {
-				let result = this.industries;
+				let result = [];
 				if(this.project.customer.name) {
 					const industries = this.project.customer.industries;
 					if(industries[0].name) {
