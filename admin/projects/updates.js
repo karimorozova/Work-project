@@ -3,7 +3,7 @@ const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor, notifyVendorStepStart } = require('./emails');
 const { notifyManagerProjectStarts } = require('../utils');
 const { pmMail } = require('../utils/mailtopm');
-const { getUpdatedProjectFinance } = require('./porjectFinance');
+const { getUpdatedProjectFinanceToZero, getProjectFinancePrice } = require('./porjectFinance');
 const {
 	getProjectTranslationDocs,
 	getProjectUsers,
@@ -49,12 +49,12 @@ async function updateProjectProgress(project, isCatTool) {
  */
 async function getProjectAfterCancelTasks(tasks, project) {
   try {
+
     const { changedTasks, changedSteps, stepIdentify } = await cancelTasks(tasks, project);
-    const Price = getUpdatedProjectFinance(changedTasks);
+    const Price = getProjectFinancePrice(project.tasks);
     const notifySteps = stepIdentify.length ? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1) : changedSteps;
     await stepCancelNotifyVendor(notifySteps);
-    return await updateProject({ "_id": project.id },
-      { tasks: changedTasks, steps: changedSteps, finance: { ...project.finance, Price } });
+    return await updateProject({ "_id": project.id }, { tasks: changedTasks, steps: changedSteps, finance: { ...project.finance, Price } });
   } catch (err) {
     console.log(err);
     console.log("Error in getProjectAfterCancelTasks");
@@ -108,17 +108,18 @@ function cancelSteps({ stepIdentify, steps }) {
         newStatus = "Cancelled Halfway";
         let finance = getStepNewFinance(item);
         return { ...item._doc, previousStatus: item.status, status: newStatus, finance };
+      }else{
+        item.finance = {
+          Wordcount: {
+            receivables: 0,
+            payables: 0
+          },
+          Price: {
+            receivables: 0,
+            payables: 0
+          }
+        };
       }
-      item.finance = {
-        Wordcount: {
-          receivables: 0,
-          payables: 0
-        },
-        Price: {
-          receivables: 0,
-          payables: 0
-        }
-      };
       item.previousStatus = item.status;
       item.status = newStatus;
     }
@@ -142,10 +143,9 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
       if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
         task.previousStatus = task.status;
         task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
-        task.previousStatus = task.status;
         if(task.status === "Cancelled Halfway") {
           task.finance = getTaskNewFinance(changedSteps, task);
-          task.targetFiles = await getTaskTarfgetFiles({ task, projectId, stepName: 'halfway' });
+          task.targetFiles = await getTaskTargetFiles({ task, projectId, stepName: 'halfway' });
         } else {
           task.finance = {
             Wordcount: {
@@ -175,7 +175,7 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
  * @param {String} stepName
  * @returns {Array} - returns array of target files
  */
-async function getTaskTarfgetFiles({ task, projectId, stepName }) {
+async function getTaskTargetFiles({ task, projectId, stepName }) {
   let targetFiles = [];
   const { memoqDocs, memoqProjectId } = task;
   try {
@@ -190,7 +190,7 @@ async function getTaskTarfgetFiles({ task, projectId, stepName }) {
     return targetFiles;
   } catch (err) {
     console.log(err);
-    console.log("Error in getTaskTarfgetFiles");
+    console.log("Error in getTaskTargetFiles");
     throw new Error(err.message);
   }
 }
@@ -205,7 +205,7 @@ async function downloadCompletedFiles(stepId) {
     let { id, steps, tasks } = await getProject({ "steps._id": stepId });
     const step = steps.find(item => item.id === stepId);
     const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
-    tasks[taskIndex].targetFiles = await getTaskTarfgetFiles({
+    tasks[taskIndex].targetFiles = await getTaskTargetFiles({
       task: tasks[taskIndex],
       projectId: id,
       stepName: step.name
@@ -400,18 +400,20 @@ async function updateProjectStatusForClientPortalProject(projectId, action) {
 async function updateProjectStatus(id, status, reason) {
   try {
     const project = await getProject({ "_id": id });
-
     if(status === 'fromCancelled') return await reOpenProject(project);
     if(status === 'fromClosed') return await reOpenProject(project, false);
-    if(status !== "Cancelled") return await setNewProjectDetails(project, status, reason);
+    if(status !== "Cancelled" && status !== "Cancelled Halfway") return await setNewProjectDetails(project, status, reason);
 
     const { tasks, steps } = project;
     const notifySteps = steps.length ? steps.map(item => {
       return { ...item._doc };
     }) : [];
     const { changedTasks, changedSteps } = await cancelTasks(tasks, project);
-    const projectStatus = getProjectNewStatus(changedTasks, status);
-    const Price = getUpdatedProjectFinance(changedTasks);
+    //MM
+    // const projectStatus = getProjectNewStatus(changedTasks, status);
+    const projectStatus = status;
+    //MM - сбрасывает цену проекта на 0 или на сумму отменненых тасков на пол пути.
+    const Price = getUpdatedProjectFinanceToZero(changedTasks);
     if(notifySteps.length) {
       await stepCancelNotifyVendor(notifySteps);
     }
@@ -432,6 +434,21 @@ async function updateProjectStatus(id, status, reason) {
     throw new Error(err.message);
   }
 }
+
+// /**
+//  *
+//  * @param {Array} changedTasks
+//  * @param {String} status
+//  * @returns {string} - returns project's status
+//  */
+// function getProjectNewStatus(changedTasks, status) {
+//   const notFullyCancelledTask = changedTasks.find(item => {
+//     return item.status === "Cancelled Halfway" ||
+//         item.status === "Ready for Delivery" ||
+//         item.status === "Delivered";
+//   });
+//   return notFullyCancelledTask ? "Cancelled Halfway" : status;
+// }
 
 /**
  *
@@ -535,20 +552,6 @@ function getApprovedStepStatus(stepTask, step) {
   return 'Waiting to Start';
 }
 
-/**
- *
- * @param {Array} changedTasks
- * @param {String} status
- * @returns {string} - returns project's status
- */
-function getProjectNewStatus(changedTasks, status) {
-  const notFullyCancelledTask = changedTasks.find(item => {
-    return item.status === "Cancelled Halfway" ||
-      item.status === "Ready for Delivery" ||
-      item.status === "Delivered";
-  });
-  return notFullyCancelledTask ? "Cancelled Halfway" : status;
-}
 
 /**
  *

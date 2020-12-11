@@ -113,7 +113,7 @@ function requestMessageForVendor(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.vendor.firstName }</h4>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p>
                         Step ${ obj.stepId } ${ obj.serviceStep.title } has been assigned to you.
                     </p>
@@ -175,8 +175,8 @@ function stepCancelledMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.vendor.firstName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         We would like to information you that step: ${ obj.stepId } ${ obj.serviceStep.title } has been cancelled.
                     </p>
                 </div>
@@ -194,11 +194,11 @@ function stepMiddleCancelledMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.vendor.firstName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         We would like to inform you that step: ${ obj.stepId } ${ obj.serviceStep.title } has been cancelled in the middle.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         You will be paid ${ fee } &euro;, which is according to relative work you have completed.
                     </p>
                 </div>
@@ -215,8 +215,8 @@ function vendorReassignmentMessage(obj, reason) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.vendor.firstName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         We would like to update you that ${ obj.stepId } ${ obj.serviceStep.title } has been reassigned to a different vendor. 
                     </p>
                 </div>
@@ -241,12 +241,12 @@ function vendorMiddleReassignmentMessage(obj, reason, isPay) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.vendor.firstName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         Step ${ obj.stepId } (${ obj.serviceStep.title }) has been reassigned to another vendor.
                     </p>
-                    <p>Reason: ${ reason }</p>
-                    <p>
+                    <p style="font-weight: 400;">Reason: ${ reason }</p>
+                    <p style="font-weight: 400;">
                         ${ payText }
                     </p>
                 </div>
@@ -266,14 +266,14 @@ function vendorMiddleAssignmentMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.step.vendor.firstName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.step.vendor.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         Step: ${ obj.step.stepId } has been reassigned to you. 
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         ${ mainMessage }
                     </p>
-                    <p>An availability email with all the details of the project will be sent to you shortly.</p>
+                    <p style="font-weight: 400;">An availability email with all the details of the project will be sent to you shortly.</p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -289,11 +289,11 @@ function stepReopenedMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.vendor.firstName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
+                    <p style="font-weight: 400;">
                          Step: ${ obj.stepId } ${ obj.serviceStep.title } has been reopened.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         Reason: ${ reason }
                     </p>
                 </div>
@@ -310,14 +310,14 @@ function stepReadyToStartMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Hello ${ obj.step.vendor.firstName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.step.vendor.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         Step ${ obj.step.stepId }: ${ obj.project.projectName } is now ready to start.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         You can access the system or click on the link below and enter the task directly.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         <a href="https://vendor.pangea.global/dashboard/project-details/${ obj.step.id }" target="_blank">Open job: ${ obj.step.stepId }: ${ obj.project.projectName }</a>
                     </p>
                 </div>
@@ -334,9 +334,9 @@ function sendMemoqCredentials(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Hello ${ obj.firstName }</h4>
-										<p>Your account on Memoq has been created.</p>
-										<p>
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
+										<p style="font-weight: 400;">Your account on Memoq has been created.</p>
+										<p style="font-weight: 400;">
 											<div>Your credentials:</div>
 											<div>Login: ${ obj.email }</div>
 											<div>Password: 1234</div>

@@ -53,7 +53,7 @@ function getProjectFinancePrice(tasks) {
  * @param {Array} tasks
  * @returns {{receivables: number, payables: number}}
  */
-function getUpdatedProjectFinance(tasks) {
+function getUpdatedProjectFinanceToZero(tasks) {
   let receivables = 0;
   let payables = 0;
   for (let task of tasks) {
@@ -150,4 +150,4 @@ const findStepMultiplier = (step) => {
   }
 }
 
-module.exports = { getProjectAfterFinanceUpdated, getUpdatedProjectFinance, updateProjectFinanceOnDiscountsUpdate };
+module.exports = { getProjectAfterFinanceUpdated, getUpdatedProjectFinanceToZero, updateProjectFinanceOnDiscountsUpdate, getProjectFinancePrice };

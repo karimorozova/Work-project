@@ -198,7 +198,7 @@
 					this.reviewForDelivery(this.pickedTask);
 				} else if(option === 'Send a Quote') {
 					await this.getSendQuoteMessage();
-				} else {
+				} else if(option === 'Cancel' || option === 'Deliver') {
 					this.setModalTexts(option);
 					this.isApproveActionShow = true;
 				}
@@ -249,11 +249,11 @@
 				this.unCheckAllTasks();
 			},
 			async cancelTasks(tasks) {
-				const validStatuses = ["Created", "Started", "Approved"];
+				const validStatuses = ["Created", "Started", "Quote sent", "In progress", "Approved"];
 				const filteredTasks = tasks.filter(item => validStatuses.indexOf(item.status) !== -1);
 				if(!filteredTasks.length) return;
 				try {
-					if(this.allTasks === tasks.length) {
+					if(this.allTasks.length === tasks.length) {
 						await this.setProjectStatus({ status: "Cancelled" });
 					} else {
 						const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id });
@@ -264,6 +264,7 @@
 				} catch (err) {
 					this.alertToggle({ message: "Server error / Cannot cancel chosen tasks", isShow: true, type: "error" })
 				}
+
 			},
 			async messageTemplateFormation(filteredTasks) {
 				const tasksIds = filteredTasks.map(item => item.taskId);
@@ -379,7 +380,7 @@
 			addedSendQuoteStatus() {
 				const pickedTasks = this.allTasks.filter(i => i.isChecked);
 				const isEveryCreated = pickedTasks.every(item => item.status === "Created");
-				if(isEveryCreated && pickedTasks.length && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
+				if(isEveryCreated && pickedTasks.length && this.currentProject.status !== "Draft" && this.currentProject.status !== "Cost Quote" && this.currentProject.status !== "Rejected") {
 					this.taskStatuses = ['Cancel', 'Send a Quote']
 				} else if(!pickedTasks.length) this.taskStatuses = ['Cancel'];
 				else this.taskStatuses = ['Cancel']
@@ -412,7 +413,7 @@
 				}, []);
 				const isEveryCreated = tasks.every(item => item.status === "Created");
 				this.setProjectProp({ value: tasks, prop: 'tasks' });
-				if(isEveryCreated && this.currentProject.status !== "Draft" && this.currentProject.status !== "Rejected") {
+				if(isEveryCreated && this.currentProject.status !== "Draft" && this.currentProject.status !== "Cost Quote" && this.currentProject.status !== "Rejected") {
 					this.taskStatuses = ['Cancel', 'Send a Quote']
 				}
 				this.clearTaskDeliveryStatuses();

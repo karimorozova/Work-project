@@ -20,7 +20,7 @@
           .rates-item__title Min Price:
           .rates-item__input
             .ratio__input
-              input(v-if="ratesParamsIsEdit" type="number" ref="minPrice" :value="currentClient.minPrice" v-on:keyup.enter="updateMinPrice")
+              input(v-if="ratesParamsIsEdit" type="number" ref="minPrice" :value="currentClient.minPrice" @change="updateMinPrice")
               span(v-else) {{ currentClient.minPrice }}
               span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
         //.rates-item
@@ -147,7 +147,7 @@
   .rates {
     display: flex;
     padding: 16px 30px;
-    background: #f4f0ee;
+    background: #F2EFEB;
     border: 2px solid #938676;
     flex-direction: column;
 

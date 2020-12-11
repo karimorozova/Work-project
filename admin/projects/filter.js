@@ -4,7 +4,7 @@ function getFilterdProjectsQuery(filters) {
 
 	let status;
 	if(filters.projectType === 'Open') {
-		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Closed", "Draft", "Quote sent"] } : filters.statusFilter;
+		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Closed", "Draft", "Quote sent", "Cost Quote"] } : filters.statusFilter;
 	} else if(filters.projectType === 'Quote') {
 		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Approved", "Cancelled", "Closed", "Cancelled", "Cancelled Halfway", "In progress", "Rejected"] } : filters.statusFilter;
 	} else if(filters.projectType === 'Closed') {

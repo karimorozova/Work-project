@@ -85,6 +85,10 @@
 				return this.allEmails.filter(item => this.validEmail(item)).filter(item => !this.selectedEmails.includes(item))
 			}
 		},
+		beforeDestroy() {
+			this.$refs.input.removeEventListener('focusin', () => true, false);
+			document.removeEventListener('click', () => true, false)
+		},
 		created() {
 			this.allEmails = this.emails;
 		},

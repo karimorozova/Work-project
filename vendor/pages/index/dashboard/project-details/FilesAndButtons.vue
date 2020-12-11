@@ -70,15 +70,14 @@
 			},
 			async startJob() {
 				if(!this.job.isVendorRead) return;
+				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
 				try {
-					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
 					const memoqUsers = await this.$axios.get(`vendor/get-memoq-users?token=${ this.getToken }`);
 					const memoqUserGuids = memoqUsers.data.map(({ id }) => id);
 					const memoqUserMails = memoqUsers.data.map(({ email }) => email);
 					const typeCAT = type === 'CAT Wordcount';
 					const noUserGuidInMemoq = !memoqUserGuids.includes(this.getVendor.guid);
 					const includesEmailInMemoq = memoqUserMails.includes(this.getVendor.email);
-
 					switch (true) {
 						case typeCAT && this.getVendor.guid === null && !includesEmailInMemoq:
 							await this.createMemoqTranslator();
@@ -97,7 +96,9 @@
 					console.log(err);
 					this.alertToggle({ message: "Error in creating Vendor in MemoQ or guid recovering!", isShow: true, type: "error" });
 				} finally {
-					await this.assignMemoqVendor();
+					if(type === 'CAT Wordcount'){
+						await this.assignMemoqVendor();
+          }
 					await this.setStatus("Started");
 				}
 			},

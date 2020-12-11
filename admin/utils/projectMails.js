@@ -1,5 +1,5 @@
 const { User, Projects, Services } = require('../models');
-const { managerNotifyMail, sendEmail, clientQuoteEmail } = require('./mailTemplate');
+const { managerNotifyMail, sendEmail, clientQuoteEmail, clientQuoteToEmails } = require('./mailTemplate');
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage, vendorMiddleAssignmentMessage } = require("../emailMessages/vendorCommunication");
@@ -185,23 +185,42 @@ function getAccManagerAndContact(project) {
 
 async function notifyClientProjectCancelled(project, template) {
     try {
-        const { contact } = getAccManagerAndContact(project);
         const message = template;
         const messageId = project.status === "Cancelled" ? "C005.0" : "C008.0";
         const subject = project.status === "Cancelled" ? "Project cancelled" : "Project has been cancelled in the middle of the work";
-        await clientQuoteEmail({contact, subject: `${subject}: ${project.projectId} - ${project.projectName} (ID ${messageId})`}, message);
+
+        for (let contactEmail of project.clientContacts.map(item => item.email)) {
+            await clientQuoteToEmails({
+                email: contactEmail,
+                subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`
+            }, dynamicClientName(message, contactEmail, project));
+        }
     } catch(err) {
         console.log(err);
         console.log('Error in notifyClientProjectCancelled');
     }
 }
 
+function dynamicClientName(message, contactEmail, project) {
+    const currentContactIndex = project.clientContacts.findIndex(item => item.email === contactEmail);
+    if(currentContactIndex !== -1) {
+        const { firstName, surname } = project.clientContacts[currentContactIndex];
+        const clientName = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`;
+        return message.replace(`<div id="client-name-row">&nbsp;</div>`, clientName)
+    } else {
+        return message;
+    }
+}
+
 async function notifyClientTasksCancelled(project, template) {    
     try { 
-        const { contact } = getAccManagerAndContact(project);
+        // const { contact } = getAccManagerAndContact(project);
         const message = template;
         const subject = `Task(s) has been cancelled in the middle of the work (ID C008.1)`;
-        await clientQuoteEmail({contact, subject}, message);
+
+        for (let contactEmail of project.clientContacts.map(item => item.email)) {
+            await sendEmail({ to: contactEmail, subject }, dynamicClientName(message, contactEmail, project))
+        }
     } catch(err) {
         console.log(err);
         console.log('Error in notifyClientTasksCancelled');

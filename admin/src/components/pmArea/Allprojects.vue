@@ -96,7 +96,7 @@
 				if(name === 'open-projects') {
 					this.statuses = ["All", "Approved", "Cancelled", "Cancelled Halfway", "In progress", "Rejected"]
 				} else if(name === 'quote-projects') {
-					this.statuses = ["All", "Draft", "Quote sent"]
+					this.statuses = ["All", "Draft", "Quote sent", "Cost Quote"]
 				} else {
 					this.statuses = ["Closed"]
 				}

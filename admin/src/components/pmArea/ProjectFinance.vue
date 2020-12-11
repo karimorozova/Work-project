@@ -3,64 +3,74 @@
     .project-finance__title(@click="toggleFinance") Finance
       img.project-finance__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
     .project-finance__content(v-if="isFinanceShow")
+      .project-finance__empty(v-if="!currentProject.tasks.length")
+        b No information available.
+      .project-finance__noEmpty(v-else)
+        .project-finance__content-displayBlock
+          .actionsButton
+            .actionsButton__icon
+              img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+              img.opacity(v-else :src="icons.edit.icon")
+            .actionsButton__icon
+              img.defaultIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+              img.opacity(v-else :src="icons.cancel.icon")
+          .finance-info__bars
+            .bar
+              .bar__green(:style="{ width: barsStatistic.receivables.width }")
+              .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
+            .bar
+              .bar__red(:style="{ width: barsStatistic.payables.width }")
+              .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
+          .project-finance__dashboard
+            .project-finance__dashboardItem
+              .project-finance__dashboardItem-title Profit:
+              .project-finance__dashboardItem-value {{financeData.profit}}
+                span(v-html="getSymbol(currentProject.customer.currency)")
+            .project-finance__dashboardItem
+              .project-finance__dashboardItem-title Margin:
+              .project-finance__dashboardItem-value {{financeData.margin}} %
+            .project-finance__dashboardItem
+              .project-finance__dashboardItem-title ROI:
+              .project-finance__dashboardItem-value {{currentProject.roi || '-' }}
 
-      .project-finance__content-displayBlock
-        .actionsButton
-          .actionsButton__icon
-            img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
-            img.opacity(v-else :src="icons.edit.icon")
-          .actionsButton__icon
-            img.defaultIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-            img.opacity(v-else :src="icons.cancel.icon")
-        .finance-info__bars
-          .bar
-            .bar__green(:style="{ width: barsStatistic.receivables.width }")
-            .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
-          .bar
-            .bar__red(:style="{ width: barsStatistic.payables.width }")
-            .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
-        .project-finance__dashboard
-          .project-finance__dashboardItem
-            .project-finance__dashboardItem-title Profit:
-            .project-finance__dashboardItem-value {{financeData.profit}}
-              span(v-html="getSymbol(currentProject.customer.currency)")
-          .project-finance__dashboardItem
-            .project-finance__dashboardItem-title Margin:
-            .project-finance__dashboardItem-value {{financeData.margin}} %
-          .project-finance__dashboardItem
-            .project-finance__dashboardItem-title ROI:
-            .project-finance__dashboardItem-value {{currentProject.roi || '-' }}
+        .project-finance__content-settingBlock
+          div
+            .minPrice
+              .minPrice-item
+                .minPrice-item__title Receivables Rates:
+                .minPrice-item__input {{ getStartedReceivables }}
+              .minPrice-item__forIgnore
+                .minPrice-item
+                  .minPrice-item__title Minimum Charge:
+                  .minPrice-item__input
+                    .ratio__input
+                      input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" @change="(e) => updateMinPrice('value', e)")
+                      span(v-else) {{ currentProject.minimumCharge.value }}
+                      span.ratio__input-symbol(v-html="getSymbol(currentProject.customer.currency)")
+                .minPrice-item-check
+                  .minPrice-item-check__title Ignore:
+                  .rates-item__checkbox
+                    .checkbox
+                      input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
+                      label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
+                      label(v-else for="ignoreMinPrice")
+              //.minPrice-item
+                .minPrice-item__title Ignore Min. Charge:
+                .rates-item__checkbox
+                  .checkbox
+                    input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
+                    label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
+                    label(v-else for="ignoreMinPrice")
 
-      .project-finance__content-settingBlock
-        div
-          .minPrice
-            .minPrice-item
-              .minPrice-item__title Receivables Rates:
-              .minPrice-item__input {{ getStartedReceivables }}
-            .minPrice-item
-              .minPrice-item__title Minimum Charge:
-              .minPrice-item__input
-                .ratio__input
-                  input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" v-on:keyup.enter="(e) => updateMinPrice('value', e)")
-                  span(v-else) {{ currentProject.minimumCharge.value }}
-                  span.ratio__input-symbol(v-html="getSymbol(currentProject.customer.currency)")
-            .minPrice-item
-              .minPrice-item__title Ignore Min. Charge:
-              .rates-item__checkbox
-                .checkbox
-                  input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
-                  label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
-                  label(v-else for="ignoreMinPrice")
+          .discounts
+            Discounts(
+              :paramsIsEdit="paramsIsEdit"
+              :enum="'PngSysProject'"
+            )
 
-        .discounts
-          Discounts(
-            :paramsIsEdit="paramsIsEdit"
-            :enum="'PngSysProject'"
-          )
-
-      .project-finance__total
-        .project-finance__total-title Total:
-        .project-finance__total-value {{ detectedFinalPrice }} &nbsp;&euro;
+        .project-finance__total
+          .project-finance__total-title Total:
+          .project-finance__total-value {{ detectedFinalPrice }} &nbsp;&euro;
 
 </template>
 
@@ -211,16 +221,27 @@
   .minPrice {
     display: flex;
     padding: 16px 30px;
-    background: #f4f0ee;
+    background: #F2EFEB;
     border: 2px solid #938676;
     flex-direction: column;
     margin-right: 40px;
-
+    .minPrice-item-check {
+      min-height: 30px;
+      display: flex;
+      padding-right: 10px;
+      align-items: center;
+      &__title {
+        width: 60px;
+    }
+    }
     .minPrice-item {
-      width: 300px;
+      width: 230px;
       min-height: 30px;
       display: flex;
       align-items: center;
+      &__forIgnore{
+        display: flex;
+      }
 
       &__title {
         width: 150px;
@@ -397,7 +418,7 @@
     color: #67573e;
     height: 22px;
     border-radius: 5px;
-    width: 70px;
+    width: 50px;
     border: 1px solid #67573e;
   }
 

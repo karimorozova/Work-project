@@ -70,7 +70,7 @@ function getParsedFiles(taskFiles) {
 
 async function manageDeliveryFile({fileData, file}) {
     const { path, taskId, isOriginal, projectId } = fileData;
-    const additionFileInfo = `DR-${taskId.replace(/\s+/g, '')}`
+    const additionFileInfo = `DR-${taskId.replace(/\s+/g, '')}`;
     try {
         const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/\s+/g, '_')}`;
         await moveFile(file, `./dist${newPath}`);
@@ -88,14 +88,14 @@ async function manageDeliveryFile({fileData, file}) {
     }
 }
 
-async function getPdf(project, tasksIds = []) {
+async function getPdf(allUnits, allSettingsSteps, project, tasksIds = []) {
     try {
-        const html = await getPdfOfQuote(project, tasksIds);
+        const html = await getPdfOfQuote(allUnits, allSettingsSteps, project, tasksIds);
         var options = { width: '820', height: '900', orientation: "landscape", base: apiUrl };
         return new Promise((resolve, reject) => {
             htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function(err, res) {
                 if (err) {
-                    console.log(err)
+                    console.log(err);
                     reject(err);
                 }
                 resolve('./dist/uploads/htmlpdf.pdf');

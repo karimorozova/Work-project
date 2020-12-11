@@ -1,17 +1,37 @@
-const { Projects } = require('../models');
-const { sendEmail, managerNotifyMail, clientQuoteEmail, clientQuoteToEmails } = require('../utils/mailTemplate');
 const {
-	managerTaskCompleteNotificationMessage, deliverablesDownloadedMessage, stepStartedMessage,
-	stepCompletedMessage, stepDecisionMessage, readyForDr2Message
+	sendEmail,
+	managerNotifyMail,
+	clientQuoteToEmails
+} = require('../utils/mailTemplate');
+const {
+	managerTaskCompleteNotificationMessage,
+	deliverablesDownloadedMessage,
+	stepStartedMessage,
+	stepCompletedMessage,
+	stepDecisionMessage,
+	readyForDr2Message
 } = require("../emailMessages/internalCommunication");
 const {
-	messageForClient, emailMessageForContact, taskReadyMessage, taskDeliveryMessage, getMessagesForContacts
+	messageForClientSendQuote,
+	emailMessageForContact,
+	taskReadyMessage,
+	taskDeliveryMessage,
+	messageForClientSendCostQuote,
 } = require('../emailMessages/clientCommunication');
-const { stepCancelledMessage, stepMiddleCancelledMessage, stepReopenedMessage, stepReadyToStartMessage } = require('../emailMessages/vendorCommunication');
+const {
+	stepCancelledMessage,
+	stepMiddleCancelledMessage,
+	stepReopenedMessage,
+	stepReadyToStartMessage
+} = require('../emailMessages/vendorCommunication');
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
-const { User } = require("../models");
-const { getDeliverablesLink, getProjectDeliverables, getPdf } = require("./files");
+const { User, Units, Step } = require("../models");
+const {
+	getDeliverablesLink,
+	getProjectDeliverables,
+	getPdf
+} = require("./files");
 const fs = require('fs');
 
 async function stepCancelNotifyVendor(steps) {
@@ -34,13 +54,33 @@ async function stepCancelNotifyVendor(steps) {
 	}
 }
 
+const allUnitsAndSteps = async () => {
+	const allUnits = await Units.find();
+	const allSettingsSteps = await Step.find();
+	return {
+		allUnits, allSettingsSteps
+	}
+};
+
+async function getCostMessage(projectId) {
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
+	try {
+		let quote = await getQuoteInfo(projectId, []);
+		return messageForClientSendCostQuote(quote, allUnits, allSettingsSteps)
+	} catch (err) {
+		console.log(err);
+		console.log('Error in getMessage');
+	}
+}
+
 async function getMessage(projectId, messageTarget, taskIds = []) {
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
 	try {
 		let quote = await getQuoteInfo(projectId, taskIds);
 		switch (messageTarget) {
 			case 'quote':
 			case 'task':
-				return messageForClient(quote);
+				return messageForClientSendQuote(quote, allUnits, allSettingsSteps);
 			default:
 				return emailMessageForContact(quote);
 		}
@@ -50,24 +90,27 @@ async function getMessage(projectId, messageTarget, taskIds = []) {
 	}
 }
 
-const sendQuotes = async (projectId, selectedContacts) => {
-	// try {
-	//   const project = await Projects.findOne({ _id: projectId })
-	//     .populate('tasks.service')
-	//     .populate('customer');
-	//   const quotesInfoArr = getQuotesInfo(project, selectedContacts);
-	//   const messagesArr = getMessagesForContacts(quotesInfoArr);
-	//   for (let i = 0; i < messagesArr.length; i++) {
-	//     project.customer._doc.contact = quotesInfoArr[i].contact;
-	//     await sendQuoteMessage(project, messagesArr[i]);
-	//   }
-	// } catch (err) {
-	//   console.log(err);
-	//   console.log('Error in sendQuotes');
-	// }
+const sendCostQuoteMessage = async (project, message, arrayOfEmails,) => {
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
+	let subject = 'Cost Quote';
+	let messageId = 'C001.3';
+
+	for (let contactEmail of arrayOfEmails) {
+		const pdf = await getPdf(allUnits, allSettingsSteps, project);
+		const attachments = [{ content: fs.createReadStream(pdf), filename: 'quote.pdf' }];
+		await clientQuoteToEmails({
+			email: contactEmail,
+			attachments,
+			subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`
+		}, dynamicClientName(message, contactEmail, project));
+		fs.unlink(pdf, (err) => {
+			if(err) console.log(err);
+		});
+	}
 };
 
-const sendQuoteMessage = async (project, message, arrayOfEmails, taksIds = []) => {
+const sendQuoteMessage = async (project, message, arrayOfEmails, tasksIds = []) => {
+	const { allUnits, allSettingsSteps } = await allUnitsAndSteps();
 	let subject = project.isUrgent ? 'URGENT! Decide on a Quote' : 'Decide on a Quote';
 	let messageId = 'C001.0';
 	if(project.isPriceUpdated) {
@@ -76,43 +119,29 @@ const sendQuoteMessage = async (project, message, arrayOfEmails, taksIds = []) =
 	}
 
 	for (let contactEmail of arrayOfEmails) {
-		const pdf = taksIds.length ? await getPdf(project, taksIds) : await getPdf(project);
-
+		const pdf = tasksIds.length ? await getPdf(allUnits, allSettingsSteps, project, tasksIds) : await getPdf(allUnits, allSettingsSteps, project);
 		const attachments = [{ content: fs.createReadStream(pdf), filename: 'quote.pdf' }];
 		await clientQuoteToEmails({
 			email: contactEmail,
 			attachments,
 			subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`
-		}, message);
+		}, dynamicClientName(message, contactEmail, project));
 		fs.unlink(pdf, (err) => {
 			if(err) console.log(err);
 		});
 	}
-
 };
 
-const getQuotesInfo = (project, selectedContacts) => {
-	// const service = project.tasks[0].service;
-	// const quotesArr = [];
-	// for (let name of selectedContacts) {
-	//   const nameParts = name.split(' ');
-	//   const { email } = project.customer.contacts.find(({ firstName, surname }) => `${firstName} ${surname}` === name);
-	//   const contact = {
-	//     firstName: nameParts[0],
-	//     surname: nameParts[1],
-	//     email,
-	//   };
-	//   let quote = {
-	//     ...project._doc,
-	//     id: project._id,
-	//     contact,
-	//     service: service.title,
-	//     selectedTasks: [],
-	//   };
-	//   quotesArr.push(quote);
-	// }
-	// return quotesArr;
-};
+function dynamicClientName(message, contactEmail, project) {
+	const currentContactIndex = project.clientContacts.findIndex(item => item.email === contactEmail);
+	if(currentContactIndex !== -1) {
+		const { firstName, surname } = project.clientContacts[currentContactIndex];
+		const clientName = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`;
+		return message.replace(`<div id="client-name-row">&nbsp;</div>`, clientName)
+	} else {
+		return message;
+	}
+}
 
 async function getQuoteInfo(projectId, tasksIds) {
 	try {
@@ -121,10 +150,6 @@ async function getQuoteInfo(projectId, tasksIds) {
 		let quote = { ...project._doc, id: project.id };
 		quote.selectedTasks = tasksIds.length ? project.tasks.filter(task => tasksIds.includes(task.taskId)) : [];
 		quote.service = service.title;
-		const { contacts } = project.customer;
-		quote.contact = contacts.find(item => item.leadContact);
-		quote.firstName = quote.contact.firstName;
-		quote.surname = quote.contact.surname;
 		return quote;
 	} catch (err) {
 		console.log(err);
@@ -220,14 +245,15 @@ async function notifyDeliverablesDownloaded(taskId, project) {
 }
 
 async function notifyProjectDelivery(project, template) {
-	const { customer } = project;
-	const contact = customer.contacts.find(item => item.leadContact);
+	const notifyContacts = project.clientContacts.map(({ email }) => email);
 	const message = template;
 	const subject = `Delivery: ${ project.projectId } - ${ project.projectName } (ID C006.0)`;
 	try {
 		const deliverables = project.deliverables || await getProjectDeliverables(project);
 		const attachments = [{ filename: "deliverables.zip", path: `./dist${ deliverables }` }];
-		await sendEmail({ to: contact.email, attachments, subject }, message);
+		for (let contact of notifyContacts) {
+			await sendEmail({ to: contact, attachments, subject }, dynamicClientName(message, contact, project));
+		}
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyProjectDelivery");
@@ -319,6 +345,7 @@ module.exports = {
 	notifyReadyForDr2,
 	notifyStepReopened,
 	notifyVendorStepStart,
-	sendQuotes,
-	sendQuoteMessage
+	sendQuoteMessage,
+	getCostMessage,
+	sendCostQuoteMessage
 };
