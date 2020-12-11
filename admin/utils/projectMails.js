@@ -214,10 +214,13 @@ function dynamicClientName(message, contactEmail, project) {
 
 async function notifyClientTasksCancelled(project, template) {    
     try { 
-        const { contact } = getAccManagerAndContact(project);
+        // const { contact } = getAccManagerAndContact(project);
         const message = template;
         const subject = `Task(s) has been cancelled in the middle of the work (ID C008.1)`;
-        await clientQuoteEmail({contact, subject}, message);
+
+        for (let contactEmail of project.clientContacts.map(item => item.email)) {
+            await sendEmail({ to: contactEmail, subject }, dynamicClientName(message, contactEmail, project))
+        }
     } catch(err) {
         console.log(err);
         console.log('Error in notifyClientTasksCancelled');

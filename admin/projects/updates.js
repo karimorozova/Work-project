@@ -3,7 +3,7 @@ const { getProject, updateProject } = require('./getProjects');
 const { stepCancelNotifyVendor, notifyVendorStepStart } = require('./emails');
 const { notifyManagerProjectStarts } = require('../utils');
 const { pmMail } = require('../utils/mailtopm');
-const { getUpdatedProjectFinance } = require('./porjectFinance');
+const { getUpdatedProjectFinanceToZero, getProjectFinancePrice } = require('./porjectFinance');
 const {
 	getProjectTranslationDocs,
 	getProjectUsers,
@@ -49,12 +49,12 @@ async function updateProjectProgress(project, isCatTool) {
  */
 async function getProjectAfterCancelTasks(tasks, project) {
   try {
+
     const { changedTasks, changedSteps, stepIdentify } = await cancelTasks(tasks, project);
-    const Price = getUpdatedProjectFinance(changedTasks);
+    const Price = getProjectFinancePrice(project.tasks);
     const notifySteps = stepIdentify.length ? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1) : changedSteps;
     await stepCancelNotifyVendor(notifySteps);
-    return await updateProject({ "_id": project.id },
-      { tasks: changedTasks, steps: changedSteps, finance: { ...project.finance, Price } });
+    return await updateProject({ "_id": project.id }, { tasks: changedTasks, steps: changedSteps, finance: { ...project.finance, Price } });
   } catch (err) {
     console.log(err);
     console.log("Error in getProjectAfterCancelTasks");
@@ -108,17 +108,18 @@ function cancelSteps({ stepIdentify, steps }) {
         newStatus = "Cancelled Halfway";
         let finance = getStepNewFinance(item);
         return { ...item._doc, previousStatus: item.status, status: newStatus, finance };
+      }else{
+        item.finance = {
+          Wordcount: {
+            receivables: 0,
+            payables: 0
+          },
+          Price: {
+            receivables: 0,
+            payables: 0
+          }
+        };
       }
-      item.finance = {
-        Wordcount: {
-          receivables: 0,
-          payables: 0
-        },
-        Price: {
-          receivables: 0,
-          payables: 0
-        }
-      };
       item.previousStatus = item.status;
       item.status = newStatus;
     }
@@ -142,7 +143,6 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
       if(tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
         task.previousStatus = task.status;
         task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status;
-        task.previousStatus = task.status;
         if(task.status === "Cancelled Halfway") {
           task.finance = getTaskNewFinance(changedSteps, task);
           task.targetFiles = await getTaskTargetFiles({ task, projectId, stepName: 'halfway' });
@@ -412,7 +412,8 @@ async function updateProjectStatus(id, status, reason) {
     //MM
     // const projectStatus = getProjectNewStatus(changedTasks, status);
     const projectStatus = status;
-    const Price = getUpdatedProjectFinance(changedTasks);
+    //MM - сбрасывает цену проекта на 0 или на сумму отменненых тасков на пол пути.
+    const Price = getUpdatedProjectFinanceToZero(changedTasks);
     if(notifySteps.length) {
       await stepCancelNotifyVendor(notifySteps);
     }
