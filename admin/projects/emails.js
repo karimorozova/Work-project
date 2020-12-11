@@ -252,7 +252,7 @@ async function notifyProjectDelivery(project, template) {
 		const deliverables = project.deliverables || await getProjectDeliverables(project);
 		const attachments = [{ filename: "deliverables.zip", path: `./dist${ deliverables }` }];
 		for (let contact of notifyContacts) {
-			await sendEmail({ to: contact.email, attachments, subject }, dynamicClientName(message, contact, project));
+			await sendEmail({ to: contact, attachments, subject }, dynamicClientName(message, contact, project));
 		}
 	} catch (err) {
 		console.log(err);
