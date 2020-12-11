@@ -16,10 +16,11 @@
         @setSourceFilter="setSourceFilter"
         @setIndustryFilter="setIndustryFilter"
         @setVendorFilter="setVendorFilter"
+        @updateReport="updateReport"
       )
     .lqa__languages
-      .lqa__language(v-for="{ sourceLanguage, targetLanguage, industries: { Finance, iGaming } } in reportData")
-        .lqa__text {{ sourceLanguage }} >> {{ targetLanguage }}
+      .lqa__language(v-for="{languagePair, sourceLanguage, targetLanguage, industries: { Finance, iGaming } } in reportData")
+        .lqa__text {{ languagePair }}
           .lqa__industry(v-if="Finance.vendors.length") Finance
             Table(v-if="Finance.vendors.length" :vendorsData="Finance.vendors")
           .lqa__industry(v-if="iGaming.vendors.length") iGaming
@@ -107,6 +108,9 @@
         this.industryFilter = option;
         await this.getReport(this.filters);
       },
+      async updateReport({value}){
+        this.reportData = value
+      }
 		},
 		computed: {
 			filters() {

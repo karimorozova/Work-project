@@ -56,7 +56,7 @@
               @chooseOption="setIndustryFilter"
             )
       .report-filters__item
-    //.report-filters__row
+    .report-filters__row
       .button
         .button__row
           input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReports()")
@@ -88,7 +88,8 @@
 		methods: {
       async updateReports () {
         try {
-          await this.$http.get('/reportsapi/restore-old-xtrf-lqa-report');
+          const report = await this.$http.get('/reportsapi/restore-memoq-lqa-report');
+          this.$emit('updateReport', { value: report.body });
           this.alertToggle({ message: 'Started to restore...' });
         } catch (err) {
           this.alertToggle({ message: 'Error on restoring old files', isShow: true, type: 'error' });

@@ -8,6 +8,9 @@ const {
 } = require('../reports');
 const { newLangReport } = require('../reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('../reports/parseOldMemoqProjects');
+
+const {newLQAStatusReport} = require('../reports/newLQAStatusReport')
+
 const { upload } = require('../utils');
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
 const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, LangTier } = require("../models");
@@ -194,6 +197,16 @@ router.get('/restore-old-xtrf-lqa-report', async (req, res) => {
   try {
     await parseAndWriteLQAReport();
     res.send('Restored!');
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Erron on restoring old xtrf-lqa reports!');
+  }
+});
+
+router.get('/restore-memoq-lqa-report', async (req, res) => {
+  try {
+    const report = await newLQAStatusReport();
+    res.send(report);
   } catch (err) {
     console.log(err);
     res.status(500).send('Erron on restoring old xtrf-lqa reports!');

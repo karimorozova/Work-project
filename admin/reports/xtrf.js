@@ -74,10 +74,11 @@ const getXtrfLqaReport = async (filters) => {
   try {
     let result = [];
     const xtrfLqaReport = await getReport();
-    for (let { sourceLanguage, targetLanguage, industries } of xtrfLqaReport) {
+    for (let { sourceLanguage, targetLanguage, industries, languagePair } of xtrfLqaReport) {
       sourceLanguage = sourceLanguage ? sourceLanguage.lang : 'no language data';
       targetLanguage = targetLanguage ? targetLanguage.lang : 'no language data';
       result.push({
+        languagePair,
         sourceLanguage,
         targetLanguage,
         industries
