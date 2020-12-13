@@ -177,7 +177,7 @@
     }
 
     &__industry {
-      font-size: 14px;
+      font-size: 16px;
     }
 
     &__tier-industry{
