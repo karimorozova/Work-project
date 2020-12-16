@@ -104,8 +104,8 @@ function requestMessageForVendor(obj) {
 	const langPair = obj.sourceLanguage ? `${ obj.sourceLanguage } >> ${ obj.targetLanguage }; ` : `${ obj.targetLanguage } / ${ obj.packageSize }; `;
 	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '2h' });
 	const stepId = obj.stepId.replace(/ /g, '%20');
-	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ obj.finance.Price.payables } &euro;</a>`
-	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ obj.finance.Price.payables } &euro;</a>`
+	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
+	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
 	const start = obj.start.split('T')[0].split('-').reverse().join('-');
 	const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-');
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -117,50 +117,52 @@ function requestMessageForVendor(obj) {
                     <p>
                         Step ${ obj.stepId } ${ obj.serviceStep.title } has been assigned to you.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         Here are the needed details:
                     </p>
-                    <div class="details" style="width:90%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;" >
+                    <div class="details" style="width:95%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;" >
                         <table class="details__table" style="color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;" >
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >ID:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.stepId }</td>
+                                <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >ID:</td>
+                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.stepId }</td>
                             </tr>
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Work type:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.serviceStep.title }</td>
+                                <td class="main_weight600" style="padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Work type:</td>
+                                <td style="font-weight: 400;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.serviceStep.title }</td>
                             </tr>
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Language:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ langPair }</td>
+                                <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Language:</td>
+                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ langPair }</td>
                             </tr>
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Industry:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.industry }</td>
+                                <td class="main_weight600" style="padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Industry:</td>
+                                <td style="font-weight: 400;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.industry }</td>
                             </tr>
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Wordcount:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.finance.Wordcount.payables }</td>
+                                <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Wordcount:</td>
+                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.finance.Wordcount.payables }</td>
                             </tr>
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Deadline:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ deadline }</td>
+                                <td class="main_weight600" style="padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Deadline:</td>
+                                <td style="font-weight: 400;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ deadline }</td>
                             </tr>
                             <tr>
-                                <td class="main_weight600" style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Cost:</td>
-                                <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.finance.Price.payables } &euro;</td>
+                                <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Cost:</td>(
+                         ).toFixed(2       <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ (obj.finance.Price.payables).toFixed(2) } &euro;</td>
                             </tr>
                         </table>
                     </div>
                     <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;" >
                         By clicking on one of the links below, you can accept or reject the job.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         You can accept the quote by clicking the link below:  
                     </p>
-                    I accept - ${ acceptQuote }
-                    <p>or</p>
-                    I reject - ${ declineQuote }
+                    
+                    <span style="font-weight: 400;">I accept - ${ acceptQuote }</span>
+                    <p style="font-weight: 400;">or</p>
+                    <span style="font-weight: 400;">I reject - ${ declineQuote }</span>
+                    
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -199,7 +201,7 @@ function stepMiddleCancelledMessage(obj) {
                         We would like to inform you that step: ${ obj.stepId } ${ obj.serviceStep.title } has been cancelled in the middle.
                     </p>
                     <p style="font-weight: 400;">
-                        You will be paid ${ fee } &euro;, which is according to relative work you have completed.
+                        You will be paid ${ fee || obj.finance.Price.payables || 0 } &euro;, which is according to relative work you have completed.
                     </p>
                 </div>
                 <footer>
@@ -227,15 +229,16 @@ function vendorReassignmentMessage(obj, reason) {
             </div>`;
 }
 
-function vendorMiddleReassignmentMessage(obj, reason, isPay) {
-	const fee = isPay ? obj.finance.Price.halfPayables : obj.finance.Price.payables;
-	const progress = obj.serviceStep.calculationUnit === "Words" ?
+function vendorMiddleReassignmentMessage(allUnits, obj, reason, isPay) {
+	const { type } = allUnits.find(({ _id }) => _id.toString() === obj.serviceStep.unit.toString());
+	const progress = type === "CAT Wordcount" ?
 			(obj.progress.wordsDone / obj.progress.totalWordCount * 100).toFixed(2)
-			: obj.progress
+			: obj.progress;
+	const fee = obj.finance.Price.halfPayables ? obj.finance.Price.halfPayables : obj.finance.Price.payables;
 	const payText = isPay ?
-			`<p>You will be paid according to your partial completion of the step.</p>
-        <p>You have completed ${ progress } % of the task and your fee for this step is: ${ fee } &euro;</p>`
-			: ""
+			`<p style="font-weight: 400;">You will be paid according to your partial completion of the step.</p>
+        <p style="font-weight: 400;">You have completed ${ progress } % of the task and your fee for this step is: ${ fee } &euro;</p>`
+			: "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -259,8 +262,8 @@ function vendorMiddleReassignmentMessage(obj, reason, isPay) {
 
 function vendorMiddleAssignmentMessage(obj) {
 	const mainMessage = obj.isStart ?
-			"Although someone else has worked on this step, you shall start the task from the brining."
-			: "You should continue your work from the place it has been stopped."
+			"Although someone else has worked on this step, you shall start the task from the beginning."
+			: "You should continue your work from the place it has been stopped.";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -283,7 +286,7 @@ function vendorMiddleAssignmentMessage(obj) {
 }
 
 function stepReopenedMessage(obj) {
-	const reason = obj.reason || "";
+	const reason = obj.reason ? `<p style="font-weight: 400;">Reason: ${ obj.reason }</p>` : "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -293,9 +296,7 @@ function stepReopenedMessage(obj) {
                     <p style="font-weight: 400;">
                          Step: ${ obj.stepId } ${ obj.serviceStep.title } has been reopened.
                     </p>
-                    <p style="font-weight: 400;">
-                        Reason: ${ reason }
-                    </p>
+                    ${reason}
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -318,7 +319,7 @@ function stepReadyToStartMessage(obj) {
                         You can access the system or click on the link below and enter the task directly.
                     </p>
                     <p style="font-weight: 400;">
-                        <a href="https://vendor.pangea.global/dashboard/project-details/${ obj.step.id }" target="_blank">Open job: ${ obj.step.stepId }: ${ obj.project.projectName }</a>
+                        <a style="color: #D15F46;" href="https://vendor.pangea.global/dashboard/" target="_blank">Open job: ${ obj.step.stepId }: ${ obj.project.projectName }</a>
                     </p>
                 </div>
                 <footer>

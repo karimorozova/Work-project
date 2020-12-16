@@ -38,12 +38,10 @@ async function stepCancelNotifyVendor(steps) {
 	try {
 		for (let step of steps) {
 			if(step.vendor && step.status !== "Completed") {
-				const message = step.status !== "Started" ?
-						stepCancelledMessage(step)
-						: stepMiddleCancelledMessage(step);
+				const message = ifStepStarted(step.status) ? stepMiddleCancelledMessage(step) : stepCancelledMessage(step);
 				step["to"] = step.vendor.email;
-				const id = step.status !== "Started" ? "V004.0" : "V003.0";
-				const subject = step.status !== "Started" ? "Step cancelled" : "Step cancelled in the middle";
+				const id = ifStepStarted(step.status) ? "V004.0" : "V003.0";
+				const subject = ifStepStarted(step.status)  ?  "Step cancelled in the middle" : "Step cancelled";
 				step.subject = `${ subject }: ${ step.stepId } (${ step.serviceStep.title }) (ID ${ id })`;
 				await sendEmail(step, message);
 			}
@@ -51,6 +49,10 @@ async function stepCancelNotifyVendor(steps) {
 	} catch (err) {
 		console.log(err);
 		console.log("Error in stepCancelNotifyVendor");
+	}
+	function ifStepStarted(status){
+		const startStepStatuses = ['Started', 'In progress'];
+		return startStepStatuses.includes(status)
 	}
 }
 
@@ -208,7 +210,6 @@ async function notifyClientTaskReady({ taskId, project, contacts }) {
 }
 
 async function sendClientDeliveries({ taskId, project, contacts }) {
-	const notifyContacts = project.customer.contacts.filter(item => contacts.indexOf(item.email) !== -1);
 	try {
 		const accManager = await User.findOne({ "_id": project.accountManager.id });
 		const task = project.tasks.find(item => item.taskId === taskId);
@@ -216,7 +217,8 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 		const deliverables = task.deliverables || await getDeliverablesLink({ taskId, taskFiles: task.targetFiles, projectId: project.id });
 		const content = fs.createReadStream(`./dist${ deliverables }`);
 		const attachments = [{ filename: "deliverables.zip", content }];
-		for (let contact of notifyContacts) {
+
+		for (let contact of contacts) {
 			const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id });
 			await sendEmail({ to: contact.email, attachments, subject }, message);
 		}
@@ -315,7 +317,7 @@ async function notifyVendorStepStart(steps, allSteps, project) {
 				return item.status === 'Ready to Start' && stepIds.indexOf(item.id) !== -1;
 			}
 			return item.status === 'Ready to Start';
-		})
+		});
 		if(notifyingSteps.length) {
 			for (let step of notifyingSteps) {
 				const message = stepReadyToStartMessage({ step, project });

@@ -85,7 +85,7 @@
 
     .tasks__approve-action(v-if="isApproveActionShow")
       ApproveModal(
-        :isCheckbox="true"
+        :isCheckbox="isAppearCheckBox()"
         :text="modalTexts.main"
         :approveValue="modalTexts.approve"
         :notApproveValue="modalTexts.notApprove"
@@ -96,7 +96,7 @@
 
       )
     .tasks__review(v-if="isDeliveryReview")
-      DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updatereviewTask")
+      DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updateReviewTask")
 </template>
 
 <script>
@@ -145,12 +145,15 @@
 				previewMessageQuote: "",
 				reviewTask: [],
 				isPay: false,
+				validCancelStatuses: ["Created", "Started", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval"],
 				reason: "",
-				taskStatuses: [],
-				pickedTask: null,
+				// pickedTask: null,
 			}
 		},
 		methods: {
+			isAppearCheckBox() {
+				return this.selectedAction === 'Cancel';
+			},
 			getTaskPrice(row, prop) {
 				const value = row.finance.Price[prop];
 				return value === 0 ? value : value.toFixed(2);
@@ -195,7 +198,8 @@
 			async setAction({ option }) {
 				this.selectedAction = option;
 				if(option === 'Delivery Review [1]' || option === 'Delivery Review [2]') {
-					this.reviewForDelivery(this.pickedTask);
+					this.reviewForDelivery(...this.currentProject.tasks.filter(item => item.isChecked));
+					this.isDeliveryReview = true;
 				} else if(option === 'Send a Quote') {
 					await this.getSendQuoteMessage();
 				} else if(option === 'Cancel' || option === 'Deliver') {
@@ -214,7 +218,7 @@
 				});
 				this.storeProject({ ...this.currentProject, tasks: unchecked });
 			},
-			updatereviewTask({ tasksIds }) {
+			updateReviewTask({ tasksIds }) {
 				this.reviewTask = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1);
 			},
 			setModalTexts(option) {
@@ -249,8 +253,7 @@
 				this.unCheckAllTasks();
 			},
 			async cancelTasks(tasks) {
-				const validStatuses = ["Created", "Started", "Quote sent", "In progress", "Approved"];
-				const filteredTasks = tasks.filter(item => validStatuses.indexOf(item.status) !== -1);
+				const filteredTasks = tasks.filter(item => this.validCancelStatuses.indexOf(item.status) !== -1);
 				if(!filteredTasks.length) return;
 				try {
 					if(this.allTasks.length === tasks.length) {
@@ -335,6 +338,7 @@
 			},
 			progress(task) {
 				let progress = 0;
+				//MM
 				const CATServices = ['Translation', 'SEO Translation', 'Official Translation', 'Localization'];
 				let taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
 				taskSteps = taskSteps.filter(item => !item.stepId.includes('Canceled'));
@@ -363,60 +367,16 @@
 
 				return progress.toFixed(2);
 			},
-			pushStatusFoCurrentTask(status) {
-				if(status === 'Pending Approval [DR1]') {
-					this.taskStatuses.push('Delivery Review [1]')
-				} else if(status === 'Pending Approval [DR2]') {
-					this.taskStatuses.push('Delivery Review [2]')
-				}
-			},
-			clearTaskDeliveryStatuses() {
-				this.taskStatuses = this.taskStatuses
-						.filter(item => item !== 'Delivery Review [1]' && item !== 'Delivery Review [2]')
-			},
-			setCurrentTask(index) {
-				index >= 0 ? this.pickedTask = this.allTasks[index] : this.pickedTask = null
-			},
-			addedSendQuoteStatus() {
-				const pickedTasks = this.allTasks.filter(i => i.isChecked);
-				const isEveryCreated = pickedTasks.every(item => item.status === "Created");
-				if(isEveryCreated && pickedTasks.length && this.currentProject.status !== "Draft" && this.currentProject.status !== "Cost Quote" && this.currentProject.status !== "Rejected") {
-					this.taskStatuses = ['Cancel', 'Send a Quote']
-				} else if(!pickedTasks.length) this.taskStatuses = ['Cancel'];
-				else this.taskStatuses = ['Cancel']
-			},
-
 			toggleCheck(e, index, val) {
 				this.allTasks[index].isChecked = val;
 				this.setProjectProp({ value: this.allTasks, prop: 'tasks' });
-
-				const count = this.allTasks.filter(i => i.isChecked).length;
-				const ifOneTask = count === 1;
-				ifOneTask ? this.setCurrentTask(this.allTasks.findIndex(i => i.isChecked)) : this.setCurrentTask(-1);
-
-				if(ifOneTask && val) {
-					const { status } = this.allTasks[index];
-					this.pushStatusFoCurrentTask(status)
-				} else if(ifOneTask && !val) {
-					const { status } = this.allTasks.filter(item => item.isChecked)[0];
-					this.pushStatusFoCurrentTask(status)
-				} else if(count > 1 || !count) {
-					this.clearTaskDeliveryStatuses();
-				}
-
-				this.addedSendQuoteStatus();
 			},
 			toggleAll(e, val) {
 				const tasks = this.allTasks.reduce((acc, cur) => {
 					acc.push({ ...cur, isChecked: val });
 					return acc;
 				}, []);
-				const isEveryCreated = tasks.every(item => item.status === "Created");
 				this.setProjectProp({ value: tasks, prop: 'tasks' });
-				if(isEveryCreated && this.currentProject.status !== "Draft" && this.currentProject.status !== "Cost Quote" && this.currentProject.status !== "Rejected") {
-					this.taskStatuses = ['Cancel', 'Send a Quote']
-				}
-				this.clearTaskDeliveryStatuses();
 			},
 			closeApproveModal() {
 				this.isApproveActionShow = false;
@@ -425,7 +385,6 @@
 			closeReview() {
 				this.isDeliveryReview = false;
 				this.selectedAction = "";
-				this.clearTaskDeliveryStatuses();
 			},
 			async downloadFiles(task) {
 				try {
@@ -442,15 +401,10 @@
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
-			availableActions() {
-				let result = ["Cancel"];
-				const approvedTask = this.allTasks.find(item => item.status === 'Ready for Delivery');
-				if(approvedTask) {
-					if(result.indexOf('Deliver') === -1) {
-						result.push('Deliver')
-					}
-				}
-				this.taskStatuses.push(...result)
+			isEvery(taskStatus) {
+				return this.currentProject.tasks
+						.filter(item => item.isChecked)
+						.every(({ status }) => status === taskStatus);
 			},
 			...mapActions({
 				alertToggle: "alertToggle",
@@ -458,7 +412,7 @@
 				storeProject: "setCurrentProject",
 				setProjectStatus: "setProjectStatus",
 				deliverTasks: "deliverTasks",
-			})
+			}),
 		},
 		computed: {
 			...mapGetters({
@@ -469,15 +423,24 @@
 				return this.currentProject.clientContacts.map(({ email }) => email)
 			},
 			availableActionsOptions() {
-				return this.taskStatuses
+				const { status, tasks } = this.currentProject;
+				const checkedTasks = tasks.filter(item => item.isChecked);
+				if(checkedTasks.length) {
+					if(this.isEvery('Created')) {
+						if(status !== "Draft" && status !== "Cost Quote" && status !== "Rejected") {
+							return ['Send a Quote', 'Cancel']
+						}
+						return ['Cancel']
+					} else if(this.isEvery("Ready for Delivery")) return ['Deliver'];
+					else if(this.isEvery("Pending Approval [DR1]") && checkedTasks.length === 1) return ['Delivery Review [1]'];
+					else if(this.isEvery('Pending Approval [DR2]') && checkedTasks.length === 1) return ['Delivery Review [2]'];
+					else if(checkedTasks.every(({ status }) => this.validCancelStatuses.includes(status))) return ['Cancel'];
+				}
 			},
 			isAllSelected() {
 				const unchecked = this.currentProject.tasks.find(item => !item.isChecked);
 				return !unchecked;
 			}
-		},
-		mounted() {
-			this.availableActions();
 		},
 		components: {
 			DataTable,

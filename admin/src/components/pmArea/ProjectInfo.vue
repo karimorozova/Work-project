@@ -208,6 +208,7 @@
 						const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
 						this.customer = curProject.body.customer;
 						await this.setCurrentProject(curProject.body);
+						await this.storeCurrentClient(curProject.body.customer);
 					}
 				} catch (err) {
 
@@ -242,20 +243,21 @@
 					});
 				}
 			},
-			async getCustomer() {
-				if(!this.currentClient._id) {
-					try {
-						const client = await this.$http.get(`/clientsapi/client?id=${ this.customer._id }`);
-						this.storeCurrentClient(client.data);
-					} catch (err) {
-						this.alertToggle({
-							message: 'Error in Get Customer',
-							isShow: true,
-							type: 'error',
-						});
-					}
-				}
-			},
+      //MM For refactor
+			// async getCustomer() {
+			// 	if(!this.currentClient._id) {
+			// 		try {
+			// 			const client = await this.$http.get(`/clientsapi/client?id=${ this.customer._id }`);
+			// 			await this.storeCurrentClient(client.data);
+			// 		} catch (err) {
+			// 			this.alertToggle({
+			// 				message: 'Error in Get Customer',
+			// 				isShow: true,
+			// 				type: 'error',
+			// 			});
+			// 		}
+			// 	}
+			// },
 			async getOriginallySteps() {
 				try {
 					const result = await this.$http.get('/api/steps');
@@ -297,7 +299,7 @@
 			await this.getOriginallyLanguages();
 			await this.getOriginallyUnits();
 			await this.getOriginallySteps();
-			await this.getCustomer();
+			// await this.getCustomer();
 		},
 		beforeRouteEnter(to, from, next) {
 			next(async (vm) => {
