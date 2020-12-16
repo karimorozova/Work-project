@@ -1,8 +1,9 @@
-const { Languages, Vendors, Clients, Industries, XtrfLqa } = require('../models');
+const {Languages, Vendors, Clients, Industries, XtrfLqa} = require('../models');
 const readXlsxFile = require('read-excel-file/node');
 const ObjectId = require('mongodb').ObjectID;
-const { findIndustry } = require('./newLangTierReport');
-const { getLqaSpecificTierForVendor } = require('../reports/xtrf');
+const {findIndustry} = require('./newLangTierReport');
+const {getLqaSpecificTierForVendor} = require('../reports/helpers');
+const _ = require('lodash');
 const fs = require('fs');
 
 /*
@@ -24,13 +25,12 @@ const fs = require('fs');
  * @returns nothing - clean old LQA report and fills it with new data
  */
 const parseAndWriteLQAReport = async () => {
-  const reports = await XtrfLqa.find();
-  if (reports.length) await XtrfLqa.remove();
   const vendors = await Vendors.find();
   const languages = await Languages.find();
   const clients = await Clients.find();
-  const financeIndustry = await Industries.findOne({ name: 'Finance' });
-  const iGamingIndustry = await Industries.findOne({ name: 'iGaming' });
+  const allIndustry = await Industries.find()
+  const otherIndustry = await Industries.findOne({name: 'Other'})
+
   let data = [];
   let filesArr = [];
   fs.readdirSync('./static/oldMemoqProjects').forEach(file => {
@@ -43,38 +43,29 @@ const parseAndWriteLQAReport = async () => {
 
   let report = data.reduce((acc, cur) => {
     if (cur[10] > 0 && cur[2] === 'translation') {
-      acc[cur[3]] = !acc[cur[3]] ?
-        getInitialPairInfo(cur)
-        :
-        gatherInfo(cur, acc[cur[3]]);
+
+      acc[cur[3]] = !acc[cur[3]]
+        ? getInitialPairInfo(cur)
+        : gatherInfo(cur, acc[cur[3]]);
     }
     return acc;
   }, {});
   const newReports = [];
+
   for (let key of Object.keys(report)) {
-    const { Finance, iGaming } = report[key];
     const sourceLangSymbol = key.split(' » ')[0];
     const targetLangSymbol = key.split(' » ')[1];
     const sourceIso = getLangISO1(key, 0);
     const targetIso = getLangISO1(key, 1);
-    const sourceLanguage = languages.find(({ iso1 }) => iso1 === sourceIso)
-      || languages.find(({ symbol, xtm }) => symbol === sourceLangSymbol || xtm === sourceLangSymbol);
-    const targetLanguage = languages.find(({ iso1 }) => iso1 === targetIso) ||
-      languages.find(({ symbol, xtm }) => symbol === targetLangSymbol || xtm === targetLangSymbol);
+    const sourceLanguage = languages.find(({iso1}) => iso1 === sourceIso)
+      || languages.find(({symbol, xtm}) => symbol === sourceLangSymbol || xtm === sourceLangSymbol);
+    const targetLanguage = languages.find(({iso1}) => iso1 === targetIso) ||
+      languages.find(({symbol, xtm}) => symbol === targetLangSymbol || xtm === targetLangSymbol);
     newReports.push({
-      langPair: key,
+      languagePair: getLanguagePair(sourceLanguage, targetLanguage),
       sourceLanguage: sourceLanguage ? ObjectId(sourceLanguage._id) : null,
       targetLanguage: targetLanguage ? ObjectId(targetLanguage._id) : null,
-      industries: {
-        Finance: {
-          industryId: ObjectId(financeIndustry._id),
-          vendors: getVendorsData(Finance)
-        },
-        iGaming: {
-          industryId: ObjectId(iGamingIndustry._id),
-          vendors: getVendorsData(iGaming)
-        }
-      }
+      industries: getResultIndustries(report[key], allIndustry)
     });
   }
   for (let report of newReports) {
@@ -135,7 +126,7 @@ const parseAndWriteLQAReport = async () => {
    * @returns {Object} - returns info about industry
    */
   function getInitialPairInfo(cur) {
-    const industry = findIndustry(cur[4]);
+    const industry = cur[4];
     const startDate = getCorrectTime(cur[5]);
     const deadline = getCorrectTime(cur[6]);
     return {
@@ -158,20 +149,14 @@ const parseAndWriteLQAReport = async () => {
   }
 
   function gatherInfo (cur, languagePairData) {
-    const { Finance, iGaming } = languagePairData;
     let result = {};
-    if (Finance) {
-      result.Finance = Finance;
+
+    for (let a of Object.keys(languagePairData)){
+      result[a] = languagePairData[a]
     }
-    if (iGaming) {
-      result.iGaming = iGaming;
-    }
-    const industry = findIndustry(cur[4]);
-    if (industry === 'Finance') {
-      result.Finance = getIndustryData(Finance, cur);
-    } else if (industry === 'iGaming') {
-      result.iGaming = getIndustryData(iGaming, cur);
-    }
+
+    result[cur[4]] = getIndustryData(languagePairData[cur[4]], cur);
+
     return result;
   }
 
@@ -237,11 +222,34 @@ const parseAndWriteLQAReport = async () => {
     return industryData;
   }
 
-  function getCorrectTime (dateString) {
+  function getCorrectTime(dateString) {
     let dateArr = dateString.split(' ');
     dateArr.pop();
     dateArr = dateArr.join('T');
     return new Date(dateArr);
+  }
+
+  function getResultIndustries(vendor, allIndustries) {
+    let industries = [];
+    for (let industryName of Object.keys(vendor)){
+
+      const vendorIndustry =  _.find(allIndustries, {name: industryName}) || otherIndustry;
+      const vendorIndustryGroup =  _.find(allIndustries, {name: findIndustry(industryName)}) || otherIndustry;
+
+      industries.push({
+        industry: ObjectId(vendorIndustry._id),
+        industryGroup: ObjectId(vendorIndustryGroup._id),
+        vendors: getVendorsData(vendor[industryName])
+      })
+    }
+    return industries;
+  }
+
+  function getLanguagePair(sourceLanguage, targetLanguage) {
+    // console.log(sourceLanguage.lang || 'null', targetLanguage.lang || 'null')
+    const sourceLang = sourceLanguage ? sourceLanguage.lang : 'No Data'
+    const targetLang = targetLanguage ? targetLanguage.lang : 'No Data'
+    return sourceLang + " >> " + targetLang
   }
 };
 

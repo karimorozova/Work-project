@@ -20,7 +20,7 @@ const { parseAndWriteLQAReport } = require('./reports/parseOldMemoqProjects');
 const { saveMessages, updateOtherProjectStatusOnMessages, filterOldMessages } = require('./gmail');
 const { Pricelist } = require('./models');
 const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
-
+const { XtrfLqa } = require('./models');
 
 // const foo = async () => {
 // 	const users = await getMemoqUsers();
@@ -79,6 +79,13 @@ schedule.scheduleJob('30 23 * * *', async function () {
     console.log(err.message);
   }
 });
+
+(async () => {
+  const countLQAReports = await XtrfLqa.countDocuments()
+  if (countLQAReports <= 0 ){
+    parseAndWriteLQAReport()
+  }
+})()
 
 
 const allowedOrigins = [

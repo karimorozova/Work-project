@@ -67,24 +67,21 @@ const XtrfLqaSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId, ref: 'Language',
     default: null
   },
-  industries: {
-    Finance: {
-      industryId: {
+  industries: [
+    {
+      industry: {
         type: Schema.Types.ObjectId,
         ref: 'Industries',
         default: null
       },
-      vendors: vendorsArr,
-    },
-    iGaming: {
-      industryId: {
+      industryGroup: {
         type: Schema.Types.ObjectId,
         ref: 'Industries',
         default: null
       },
       vendors: vendorsArr,
     }
-  },
+  ],
 });
 
 const XtrfLqa = mongoose.model('XtrfLqa', XtrfLqaSchema);
