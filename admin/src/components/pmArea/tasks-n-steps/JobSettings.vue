@@ -8,7 +8,7 @@
             .hours-steps__packages-title {{currentJob.unit}}
               input.hours-steps__input(
                 type="number" min="1" max="1000"
-                :value="currentJob.hours ? currentJob.hours : null" placeholder="Hours" @change="(e) => setHours(e, currentJob.step)")
+                :value="currentJob.hours ? currentJob.hours : null" @change="(e) => setHours(e, currentJob.step)")
           .hours-steps__packages-item
             .hours-steps__packages-item
               .hours-steps__sub-title Size
