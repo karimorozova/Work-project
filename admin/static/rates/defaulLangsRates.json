@@ -1,0 +1,1452 @@
+[
+  {
+    "source": "Afrikaans",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Amharic",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Macedonian",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Mongolian",
+    "target": "English (United Kingdom)",
+    "value": 0.121
+  },
+  {
+    "source": "Swahili",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Yoruba",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Zulu",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Hausa",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Arabic",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Arabic (Morocco)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Arabic (Egypt)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Arabic (Saudi Arabia)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Azerbaijani (Latin)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Bulgarian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Belarusian",
+    "target": "English (United Kingdom)",
+    "value": 0.121
+  },
+  {
+    "source": "Bengali (India)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Bosnian (Cyrillic)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Bosnian (Latin)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Czech",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Danish",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "Dutch",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "Flemish",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "Dutch (Netherlands)",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "German",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "German (Switzerland)",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "German (Austria)",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "German (Germany)",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Greek",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "English",
+    "target": "English (United Kingdom)",
+    "value": 0.165
+  },
+  {
+    "source": "English",
+    "target": "English",
+    "value": 0.150
+  },
+  {
+    "source": "English (United States)",
+    "target": "English (United Kingdom)",
+    "value": 0.165
+  },
+  {
+    "source": "English (United States)",
+    "target": "English (United States)",
+    "value": 0.150
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "English (United Kingdom)",
+    "value": 0.165
+  },
+  {
+    "source": "Spanish (Spain)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Spanish (Latin America)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Spanish (Argentina)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Spanish (Mexico)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Spanish (Colombian)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Estonian",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Farsi (Persian)",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Finnish",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "French",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "French (France)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "French (Belgium)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "French (Canada)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "French (Switzerland)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Hebrew",
+    "target": "English (United Kingdom)",
+    "value": 0.165
+  },
+  {
+    "source": "Hindi",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Croatian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Hungarian",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Armenian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Indonesian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Icelandic",
+    "target": "English (United Kingdom)",
+    "value": 0.143
+  },
+  {
+    "source": "Italian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Italian (Italy)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Italian (Switzerland)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Japanese",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "Georgian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Kazakh",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Korean",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Lithuanian",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Latvian",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Moldavian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Marathi",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Malay",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Norwegian (Bokmaal)",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "Punjabi",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Polish",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Portuguese (Brazil)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Portuguese (Portugal)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Romanian",
+    "target": "English (United Kingdom)",
+    "value": 0.121
+  },
+  {
+    "source": "Russian",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Slovak",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Slovenian",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Serbian (Latin)",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Swedish (Sweden)",
+    "target": "English (United Kingdom)",
+    "value": 0.160
+  },
+  {
+    "source": "Telugu",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Thai",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Turkmen",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Tagalog",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Turkish",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Ukrainian",
+    "target": "English (United Kingdom)",
+    "value": 0.121
+  },
+  {
+    "source": "Urdu",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Uzbek",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Vietnamese",
+    "target": "English (United Kingdom)",
+    "value": 0.110
+  },
+  {
+    "source": "Chinese Simplified",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Chinese (China)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Chinese (Singapore)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Chinese Traditional",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Chinese (Hong Kong)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Chinese (Macao)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Chinese (Taiwan)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Burmese",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Filipino",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Haitian Creole",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Khmer",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Kurdish (Arabic)",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Lao",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Maltese",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "Nepali",
+    "target": "English (United Kingdom)",
+    "value": 0.132
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Afrikaans",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Amharic",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Macedonian",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Mongolian",
+    "value": 0.110
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Swahili",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Yoruba",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Zulu",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Hausa",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Arabic",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Arabic (Morocco)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Arabic (Egypt)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Arabic (Saudi Arabia)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Azerbaijani (Latin)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Bulgarian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Belarusian",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Bengali (India)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Bosnian (Cyrillic)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Bosnian (Latin)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Czech",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Danish",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Dutch",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Flemish",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Dutch (Netherlands)",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "German",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "German (Switzerland)",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "German (Austria)",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "German (Germany)",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Greek",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Spanish (Spain)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Spanish (Latin America)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Spanish (Argentina)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Spanish (Mexico)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Spanish (Colombian)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Estonian",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Farsi (Persian)",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Finnish",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "French",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "French (France)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "French (Belgium)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "French (Canada)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "French (Switzerland)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Hebrew",
+    "value": 0.150
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Hindi",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Croatian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Hungarian",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Armenian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Indonesian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Icelandic",
+    "value": 0.130
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Italian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Italian (Italy)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Italian (Switzerland)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Japanese",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Georgian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Kazakh",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Korean",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Lithuanian",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Latvian",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Moldavian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Marathi",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Malay",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Norwegian (Bokmaal)",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Punjabi",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Polish",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Portuguese (Brazil)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Portuguese (Portugal)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Romanian",
+    "value": 0.110
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Russian",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Slovak",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Slovenian",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Serbian (Latin)",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Swedish (Sweden)",
+    "value": 0.145
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Telugu",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Thai",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Turkmen",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Tagalog",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Turkish",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Ukrainian",
+    "value": 0.110
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Urdu",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Uzbek",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Vietnamese",
+    "value": 0.100
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Chinese Simplified",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Chinese (China)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Chinese (Singapore)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Chinese Traditional",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Chinese (Hong Kong)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Chinese (Macao)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Chinese (Taiwan)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Burmese",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Filipino",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Haitian Creole",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Khmer",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Kurdish (Arabic)",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Lao",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Maltese",
+    "value": 0.120
+  },
+  {
+    "source": "English (United Kingdom)",
+    "target": "Nepali",
+    "value": 0.120
+  },
+  {
+    "source": "Afrikaans",
+    "target": "Afrikaans",
+    "value": 0.150
+  },
+  {
+    "source": "Amharic",
+    "target": "Amharic",
+    "value": 0.150
+  },
+  {
+    "source": "Macedonian",
+    "target": "Macedonian",
+    "value": 0.150
+  },
+  {
+    "source": "Mongolian",
+    "target": "Mongolian",
+    "value": 0.150
+  },
+  {
+    "source": "Swahili",
+    "target": "Swahili",
+    "value": 0.150
+  },
+  {
+    "source": "Yoruba",
+    "target": "Yoruba",
+    "value": 0.150
+  },
+  {
+    "source": "Zulu",
+    "target": "Zulu",
+    "value": 0.150
+  },
+  {
+    "source": "Hausa",
+    "target": "Hausa",
+    "value": 0.150
+  },
+  {
+    "source": "Arabic",
+    "target": "Arabic",
+    "value": 0.120
+  },
+  {
+    "source": "Arabic (Morocco)",
+    "target": "Arabic (Morocco)",
+    "value": 0.150
+  },
+  {
+    "source": "Arabic (Egypt)",
+    "target": "Arabic (Egypt)",
+    "value": 0.150
+  },
+  {
+    "source": "Arabic (Saudi Arabia)",
+    "target": "Arabic (Saudi Arabia)",
+    "value": 0.150
+  },
+  {
+    "source": "Azerbaijani (Latin)",
+    "target": "Azerbaijani (Latin)",
+    "value": 0.150
+  },
+  {
+    "source": "Bulgarian",
+    "target": "Bulgarian",
+    "value": 0.150
+  },
+  {
+    "source": "Belarusian",
+    "target": "Belarusian",
+    "value": 0.150
+  },
+  {
+    "source": "Bengali (India)",
+    "target": "Bengali (India)",
+    "value": 0.150
+  },
+  {
+    "source": "Bosnian (Cyrillic)",
+    "target": "Bosnian (Cyrillic)",
+    "value": 0.150
+  },
+  {
+    "source": "Bosnian (Latin)",
+    "target": "Bosnian (Latin)",
+    "value": 0.150
+  },
+  {
+    "source": "Czech",
+    "target": "Czech",
+    "value": 0.150
+  },
+  {
+    "source": "Danish",
+    "target": "Danish",
+    "value": 0.150
+  },
+  {
+    "source": "Dutch",
+    "target": "Dutch",
+    "value": 0.150
+  },
+  {
+    "source": "Flemish",
+    "target": "Flemish",
+    "value": 0.150
+  },
+  {
+    "source": "Dutch (Netherlands)",
+    "target": "Dutch (Netherlands)",
+    "value": 0.150
+  },
+  {
+    "source": "German",
+    "target": "German",
+    "value": 0.150
+  },
+  {
+    "source": "German (Switzerland)",
+    "target": "German (Switzerland)",
+    "value": 0.150
+  },
+  {
+    "source": "German (Austria)",
+    "target": "German (Austria)",
+    "value": 0.150
+  },
+  {
+    "source": "German (Germany)",
+    "target": "German (Germany)",
+    "value": 0.150
+  },
+  {
+    "source": "Greek",
+    "target": "Greek",
+    "value": 0.150
+  },
+  {
+    "source": "Spanish (Spain)",
+    "target": "Spanish (Spain)",
+    "value": 0.150
+  },
+  {
+    "source": "Spanish (Latin America)",
+    "target": "Spanish (Latin America)",
+    "value": 0.150
+  },
+  {
+    "source": "Spanish (Argentina)",
+    "target": "Spanish (Argentina)",
+    "value": 0.150
+  },
+  {
+    "source": "Spanish (Mexico)",
+    "target": "Spanish (Mexico)",
+    "value": 0.150
+  },
+  {
+    "source": "Spanish (Colombian)",
+    "target": "Spanish (Colombian)",
+    "value": 0.150
+  },
+  {
+    "source": "Estonian",
+    "target": "Estonian",
+    "value": 0.150
+  },
+  {
+    "source": "Farsi (Persian)",
+    "target": "Farsi (Persian)",
+    "value": 0.150
+  },
+  {
+    "source": "Finnish",
+    "target": "Finnish",
+    "value": 0.150
+  },
+  {
+    "source": "French",
+    "target": "French",
+    "value": 0.150
+  },
+  {
+    "source": "French (France)",
+    "target": "French (France)",
+    "value": 0.150
+  },
+  {
+    "source": "French (Belgium)",
+    "target": "French (Belgium)",
+    "value": 0.150
+  },
+  {
+    "source": "French (Canada)",
+    "target": "French (Canada)",
+    "value": 0.150
+  },
+  {
+    "source": "French (Switzerland)",
+    "target": "French (Switzerland)",
+    "value": 0.150
+  },
+  {
+    "source": "Hebrew",
+    "target": "Hebrew",
+    "value": 0.150
+  },
+  {
+    "source": "Hindi",
+    "target": "Hindi",
+    "value": 0.150
+  },
+  {
+    "source": "Croatian",
+    "target": "Croatian",
+    "value": 0.150
+  },
+  {
+    "source": "Hungarian",
+    "target": "Hungarian",
+    "value": 0.150
+  },
+  {
+    "source": "Armenian",
+    "target": "Armenian",
+    "value": 0.150
+  },
+  {
+    "source": "Indonesian",
+    "target": "Indonesian",
+    "value": 0.150
+  },
+  {
+    "source": "Icelandic",
+    "target": "Icelandic",
+    "value": 0.150
+  },
+  {
+    "source": "Italian",
+    "target": "Italian",
+    "value": 0.150
+  },
+  {
+    "source": "Italian (Italy)",
+    "target": "Italian (Italy)",
+    "value": 0.150
+  },
+  {
+    "source": "Italian (Switzerland)",
+    "target": "Italian (Switzerland)",
+    "value": 0.150
+  },
+  {
+    "source": "Japanese",
+    "target": "Japanese",
+    "value": 0.190
+  },
+  {
+    "source": "Georgian",
+    "target": "Georgian",
+    "value": 0.190
+  },
+  {
+    "source": "Kazakh",
+    "target": "Kazakh",
+    "value": 0.190
+  },
+  {
+    "source": "Korean",
+    "target": "Korean",
+    "value": 0.190
+  },
+  {
+    "source": "Lithuanian",
+    "target": "Lithuanian",
+    "value": 0.190
+  },
+  {
+    "source": "Latvian",
+    "target": "Latvian",
+    "value": 0.190
+  },
+  {
+    "source": "Moldavian",
+    "target": "Moldavian",
+    "value": 0.190
+  },
+  {
+    "source": "Marathi",
+    "target": "Marathi",
+    "value": 0.190
+  },
+  {
+    "source": "Malay",
+    "target": "Malay",
+    "value": 0.190
+  },
+  {
+    "source": "Norwegian (Bokmaal)",
+    "target": "Norwegian (Bokmaal)",
+    "value": 0.150
+  },
+  {
+    "source": "Punjabi",
+    "target": "Punjabi",
+    "value": 0.150
+  },
+  {
+    "source": "Polish",
+    "target": "Polish",
+    "value": 0.150
+  },
+  {
+    "source": "Portuguese (Brazil)",
+    "target": "Portuguese (Brazil)",
+    "value": 0.150
+  },
+  {
+    "source": "Portuguese (Portugal)",
+    "target": "Portuguese (Portugal)",
+    "value": 0.150
+  },
+  {
+    "source": "Romanian",
+    "target": "Romanian",
+    "value": 0.150
+  },
+  {
+    "source": "Russian",
+    "target": "Russian",
+    "value": 0.120
+  },
+  {
+    "source": "Slovak",
+    "target": "Slovak",
+    "value": 0.150
+  },
+  {
+    "source": "Slovenian",
+    "target": "Slovenian",
+    "value": 0.150
+  },
+  {
+    "source": "Serbian (Latin)",
+    "target": "Serbian (Latin)",
+    "value": 0.150
+  },
+  {
+    "source": "Swedish (Sweden)",
+    "target": "Swedish (Sweden)",
+    "value": 0.150
+  },
+  {
+    "source": "Telugu",
+    "target": "Telugu",
+    "value": 0.150
+  },
+  {
+    "source": "Thai",
+    "target": "Thai",
+    "value": 0.150
+  },
+  {
+    "source": "Turkmen",
+    "target": "Turkmen",
+    "value": 0.150
+  },
+  {
+    "source": "Tagalog",
+    "target": "Tagalog",
+    "value": 0.150
+  },
+  {
+    "source": "Turkish",
+    "target": "Turkish",
+    "value": 0.150
+  },
+  {
+    "source": "Ukrainian",
+    "target": "Ukrainian",
+    "value": 0.150
+  },
+  {
+    "source": "Urdu",
+    "target": "Urdu",
+    "value": 0.150
+  },
+  {
+    "source": "Uzbek",
+    "target": "Uzbek",
+    "value": 0.150
+  },
+  {
+    "source": "Vietnamese",
+    "target": "Vietnamese",
+    "value": 0.150
+  },
+  {
+    "source": "Chinese Simplified",
+    "target": "Chinese Simplified",
+    "value": 0.150
+  },
+  {
+    "source": "Chinese (China)",
+    "target": "Chinese (China)",
+    "value": 0.150
+  },
+  {
+    "source": "Chinese (Singapore)",
+    "target": "Chinese (Singapore)",
+    "value": 0.150
+  },
+  {
+    "source": "Chinese Traditional",
+    "target": "Chinese Traditional",
+    "value": 0.150
+  },
+  {
+    "source": "Chinese (Hong Kong)",
+    "target": "Chinese (Hong Kong)",
+    "value": 0.150
+  },
+  {
+    "source": "Chinese (Macao)",
+    "target": "Chinese (Macao)",
+    "value": 0.150
+  },
+  {
+    "source": "Chinese (Taiwan)",
+    "target": "Chinese (Taiwan)",
+    "value": 0.150
+  },
+  {
+    "source": "Burmese",
+    "target": "Burmese",
+    "value": 0.150
+  },
+  {
+    "source": "Filipino",
+    "target": "Filipino",
+    "value": 0.150
+  },
+  {
+    "source": "Haitian Creole",
+    "target": "Haitian Creole",
+    "value": 0.150
+  },
+  {
+    "source": "Khmer",
+    "target": "Khmer",
+    "value": 0.150
+  },
+  {
+    "source": "Kurdish (Arabic)",
+    "target": "Kurdish (Arabic)",
+    "value": 0.150
+  },
+  {
+    "source": "Lao",
+    "target": "Lao",
+    "value": 0.150
+  },
+  {
+    "source": "Maltese",
+    "target": "Maltese",
+    "value": 0.150
+  },
+  {
+    "source": "Nepali",
+    "target": "Nepali",
+    "value": 0.150
+  }
+]

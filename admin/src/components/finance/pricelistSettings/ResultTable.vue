@@ -1,5 +1,5 @@
 <template lang="pug">
-.price 
+.price
     ResultFilter(
       :source="sourceFilter"
       :target="targetFilter"
@@ -24,7 +24,7 @@
     )
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .price-title {{ field.label }}
-            
+
         template(slot="sourceLang" slot-scope="{ row, index }")
             .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
         template(slot="targetLang" slot-scope="{ row, index }")
@@ -63,8 +63,8 @@
 
         //- template(slot="minGbp" slot-scope="{ row, index }")
         //-     .price__data(v-if="currentActive !== index")
-        //-         span(id="minGbp") {{row.gbpMinPrice}} 
-        //-         label(for="minGbp") &pound;   
+        //-         span(id="minGbp") {{row.gbpMinPrice}}
+        //-         label(for="minGbp") &pound;
 
     .price__empty(v-if="!dataArray.length") Nothing found...                                               
 </template>
@@ -266,10 +266,9 @@ export default {
 .price {
   @extend %setting-table;
   background-color: #fff;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
   box-shadow: none;
 
- 
   input {
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
