@@ -4,12 +4,16 @@ const {
   getXtrfLqaReport,
   getXtrfUpcomingReport
 } = require('./xtrf');
-
+const {UpdateLQAFromProject} = require('./newLQAStatusFromProject')
+const {newLQAStatusReport, getTier} = require('./newLQAStatusReport')
 
 module.exports = {
   filterTierReport,
   rebuildTierReportsStructure,
   getXtrfLqaReport,
   getXtrfUpcomingReport,
-  getLqaReportFilterOptions
+  getLqaReportFilterOptions,
+  UpdateLQAFromProject,
+  newLQAStatusReport,
+  getTier
 };

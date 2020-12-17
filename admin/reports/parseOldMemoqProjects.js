@@ -98,7 +98,7 @@ const parseAndWriteLQAReport = async () => {
         });
         vendorsArr.push({
           ...vendorInfo,
-          vendorId: ourVendor ? ObjectId(ourVendor._id) : null,
+          vendor: ourVendor ? ObjectId(ourVendor._id) : null,
           otherInfo,
         });
       }

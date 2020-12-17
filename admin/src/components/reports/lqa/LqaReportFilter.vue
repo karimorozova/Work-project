@@ -95,6 +95,15 @@
           this.alertToggle({ message: 'Error on restoring old files', isShow: true, type: 'error' });
         }
       },
+      async updateReportsFromProjects() {
+        try {
+          const report = await this.$http.get('/reportsapi/restore-project-lqa-report');
+          this.$emit('updateReport', { value: report.body });
+          this.alertToggle({ message: 'Started to restore...' });
+        } catch (err) {
+          this.alertToggle({ message: 'Error on restoring old files', isShow: true, type: 'error' });
+        }
+      },
       setTierFilter ({ option }) {
         this.$emit('setTierFilter', { value: this.tiers[option] });
       },

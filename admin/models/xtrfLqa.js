@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const vendorsArr = [{
-  vendorId: {
+  vendor: {
     type: Schema.Types.ObjectId, ref: 'Vendor',
     default: null
   },

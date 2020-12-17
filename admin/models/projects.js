@@ -129,6 +129,10 @@ const ProjectsSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isInLQAReports: {
+    type: Boolean,
+    default: false
+  },
   customer: {
     type: Schema.Types.ObjectId, ref: 'Clients'
   },

@@ -91,11 +91,8 @@ const newLQAStatusReport = async () => {
   return await XtrfLqa.find().populate('sourceLanguage', 'lang').populate('targetLanguage','lang');
 }
 
-function findIndustryId() {
 
-}
-
-function getTier(industry, worldCount) {
+const getTier = (industry, worldCount) => {
   const tierValues = {max: 30000, min: 5000}
 
   switch (true) {
@@ -115,5 +112,6 @@ function getLanguageByMemoqLangCode(languages, TargetLangCode) {
 }
 
 module.exports = {
-  newLQAStatusReport
+  newLQAStatusReport,
+  getTier
 }
