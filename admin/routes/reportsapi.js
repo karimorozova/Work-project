@@ -1,16 +1,19 @@
 const router = require('express').Router();
 const {
-  rebuildTierReportsStructure,
-  getXtrfLqaReport,
-  getXtrfUpcomingReport,
-  filterTierReport,
-  getLqaReportFilterOptions
+	rebuildTierReportsStructure,
+	getXtrfLqaReport,
+	getXtrfUpcomingReport,
+	filterTierReport,
+	getLqaReportFilterOptions,
+	newLQAStatusFromXTRFProjects,
+	UpdateLQAFromProject,
+	newLangReport
 } = require('../reports');
-const { newLangReport } = require('../reports/newLangTierReport');
-const { parseAndWriteLQAReport } = require('../reports/parseOldMemoqProjects');
-const { UpdateLQAFromProject } = require('../reports/newLQAStatusFromProjects');
 
-const {newLQAStatusReport} = require('../reports/newLQAStatusFromXTRFProjects')
+//
+// const { newLangReport } = require('../reports/newLangTierReport');
+// const { parseAndWriteLQAReport } = require('../reports/parseOldMemoqProjects');
+// const { UpdateLQAFromProject } = require('../reports/newLQAStatusFromProjects');
 
 const { upload } = require('../utils');
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
@@ -48,12 +51,12 @@ router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, 
 router.post('/xtrf-tier-report', async (req, res) => {
 	const { filters } = req.body;
 	try {
-    const reports = await LangTier.find();
-    const structuredReports = rebuildTierReportsStructure(reports);
-    const filteredReports = filterTierReport(structuredReports, filters);
-    const result = { filteredReports, structuredReports };
-    res.send(result);
-  } catch (err) {
+		const reports = await LangTier.find();
+		const structuredReports = rebuildTierReportsStructure(reports);
+		const filteredReports = filterTierReport(structuredReports, filters);
+		const result = { filteredReports, structuredReports };
+		res.send(result);
+	} catch (err) {
 		console.log(err);
 		res.status(500).send("Error on getting reports");
 	}
@@ -81,7 +84,6 @@ router.post('/xtrf-lqa', upload.fields([{ name: 'reportFiles' }]), async (req, r
 });
 
 
-
 router.get('/rewrite-xtrf-tier-report', async (req, res) => {
 	try {
 		await newLangReport();
@@ -93,39 +95,39 @@ router.get('/rewrite-xtrf-tier-report', async (req, res) => {
 });
 
 router.post('/xtrf-lqa-report', async (req, res) => {
-  const { filters } = req.body;
-  try {
-    const reports = await getXtrfLqaReport(filters);
-    res.send(reports);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on getting reports');
-  }
+	const { filters } = req.body;
+	try {
+		const reports = await getXtrfLqaReport(filters);
+		res.send(reports);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting reports');
+	}
 });
 
 router.get('/xtrf-lqa-reports-filter-options', async (req, res) => {
-  try {
-    const lqaReport = await XtrfLqa.find()
-      .populate('sourceLanguage')
-      .populate('targetLanguage');
+	try {
+		const lqaReport = await XtrfLqa.find()
+				.populate('sourceLanguage')
+				.populate('targetLanguage');
 
-    const filterOptions = getLqaReportFilterOptions(lqaReport);
-    res.send(filterOptions);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on getting lqa report options');
-  }
+		const filterOptions = getLqaReportFilterOptions(lqaReport);
+		res.send(filterOptions);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting lqa report options');
+	}
 });
 
 router.post('/xtrf-upcoming-lqa-report', async (req, res) => {
-  const { filters } = req.body;
-  try {
-    const reports = await getXtrfUpcomingReport(filters);
-    res.send(reports);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on getting upcoming reports');
-  }
+	const { filters } = req.body;
+	try {
+		const reports = await getXtrfUpcomingReport(filters);
+		res.send(reports);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting upcoming reports');
+	}
 });
 
 router.post('/xtrf-prices', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
@@ -184,43 +186,35 @@ router.post('/new-xtrf-vendor', async (req, res) => {
 		return acc;
 	}, {});
 	try {
-    const xtrfLang = await XtrfReportLang.findOne({ lang: language });
-    const vendor = await XtrfVendor.create({ name, language: xtrfLang, basicPrices, tqis });
-    await XtrfLqa.create({ vendor, wordcounts: { Finance: 0, iGaming: 0, General: 0 } });
-    res.send('saved');
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on saving new xtrf vendor');
-  }
+		const xtrfLang = await XtrfReportLang.findOne({ lang: language });
+		const vendor = await XtrfVendor.create({ name, language: xtrfLang, basicPrices, tqis });
+		await XtrfLqa.create({ vendor, wordcounts: { Finance: 0, iGaming: 0, General: 0 } });
+		res.send('saved');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on saving new xtrf vendor');
+	}
 });
 
 router.get('/restore-old-xtrf-lqa-report', async (req, res) => {
-  try {
-    await parseAndWriteLQAReport();
-    res.send('Restored!');
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Erron on restoring old xtrf-lqa reports!');
-  }
+	try {
+		await parseAndWriteLQAReport();
+		res.send('Restored!');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Erron on restoring old xtrf-lqa reports!');
+	}
 });
 
 router.get('/restore-memoq-lqa-report', async (req, res) => {
-  try {
-    const report = await newLQAStatusReport();
-    res.send(report);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Erron on restoring old xtrf-lqa reports!');
-  }
+	try {
+		await UpdateLQAFromProject();
+		const result = await newLQAStatusFromXTRFProjects();
+		res.send(result);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Erron on restoring old xtrf-lqa reports!');
+	}
 });
 
-router.get('/restore-project-lqa-report', async (req, res) => {
-  try {
-    const report = await UpdateLQAFromProject();
-    res.send(report);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Erron on restoring old xtrf-lqa reports!');
-  }
-});
 module.exports = router;

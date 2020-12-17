@@ -1,116 +1,120 @@
-const {MemoqProject, Languages, XtrfLqa, Industries} = require('../models');
-const {findIndustry} = require('./newLangTierReport')
-const {findLanguageByMemoqLanguageCode} = require('../helpers/commonFunctions');
-const { ObjectId} = require('mongodb');
+const { MemoqProject, Languages, XtrfLqa, Industries, Vendors } = require('../models');
+const { findIndustry } = require('./newLangTierReport')
+const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
+const { ObjectId } = require('mongodb');
 const _ = require('lodash')
 const newLQAStatusFromXTRFProjects = async () => {
 
-  let projects = await MemoqProject.find({isInLQAReports: {$ne: true}});
-  let reports = await XtrfLqa.find()
-  const languages = await Languages.find();
-  const allIndustries = await Industries.find()
-  const otherIndustry = await Industries.findOne({name: 'Other'})
+	let projects = await MemoqProject.find({ isInLQAReports: { $ne: true } });
+	let reports = await XtrfLqa.find()
+	const languages = await Languages.find();
+	const allIndustries = await Industries.find()
+	const otherIndustry = await Industries.findOne({ name: 'Other' })
+	const allVendors = await Vendors.find();
 
-  for (project of projects) {
-    if (!project) {
-      continue;
-    }
+	for (project of projects) {
+		if(!project) {
+			continue;
+		}
 
-    let {domain,serverProjectGuid , documents, sourceLanguage} = project;
-    const projectIndustry =  _.find(allIndustries, {name: domain}) || otherIndustry;
-    const projectIndustryGroup =  _.find(allIndustries, {name: findIndustry(domain)}) || otherIndustry;
-    await MemoqProject.findOneAndUpdate({serverProjectGuid}, {isInLQAReports: true})
+		let { domain, serverProjectGuid, documents, sourceLanguage } = project;
+		const projectIndustry = _.find(allIndustries, { name: domain }) || otherIndustry;
+		const projectIndustryGroup = _.find(allIndustries, { name: findIndustry(domain) }) || otherIndustry;
+		await MemoqProject.findOneAndUpdate({ serverProjectGuid }, { isInLQAReports: true })
 
-    for ({
-      TotalWordCount,
-      TargetLangCode,
-      UserAssignments: {TranslationDocumentUserRoleAssignmentDetails: users}
-    } of documents) {
-      let targetLanguage = getLanguageByMemoqLangCode(languages, TargetLangCode) || TargetLangCode;
+		for ({
+			TotalWordCount,
+			TargetLangCode,
+			UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: users }
+		} of documents) {
+			let targetLanguage = getLanguageByMemoqLangCode(languages, TargetLangCode) || TargetLangCode;
 
-      const user = _.filter(users, (user) => user.DocumentAssignmentRole === '0').shift();
+			const user = _.filter(users, (user) => user.DocumentAssignmentRole === '0').shift();
 
-      if (!user || !targetLanguage) {
-        continue;
-      }
+			if(!user || !targetLanguage) {
+				continue;
+			}
 
-      const languagePair = sourceLanguage.lang + " >> " + targetLanguage.lang;
-      const index = _.findIndex(reports, {languagePair});
+			const languagePair = sourceLanguage.lang + " >> " + targetLanguage.lang;
+			const index = _.findIndex(reports, { languagePair });
 
-      const userInfo = {
-        name: user.UserInfoHeader.FullName,
-        wordCount: TotalWordCount,
-        // tier: getTier(domain, TotalWordCount)
-      }
-      if (index < 0) {
-        reports.push({
-          languagePair,
-          sourceLanguage: sourceLanguage._id,
-          targetLanguage: targetLanguage._id,
-          industries:
-            [
-              {
-                industry: ObjectId(projectIndustry._id),
-                industryGroup: ObjectId(projectIndustryGroup._id),
-                vendors: [userInfo]
-              }
-            ]
+			const vendorAliases = allVendors.map(({ _id, aliases }) => ({ _id, aliases }));
+			const vendorId = vendorAliases.find(({ aliases }) => aliases.includes(user.UserInfoHeader.FullName));
+			const userInfo = {
+				vendor: vendorId ? vendorId._id : null,
+				name: user.UserInfoHeader.FullName,
+				wordCount: TotalWordCount,
+				// tier: getTier(domain, TotalWordCount)
+			}
+			if(index < 0) {
+				reports.push({
+					languagePair,
+					sourceLanguage: sourceLanguage._id,
+					targetLanguage: targetLanguage._id,
+					industries:
+							[
+								{
+									industry: ObjectId(projectIndustry._id),
+									industryGroup: ObjectId(projectIndustryGroup._id),
+									vendors: [userInfo]
+								}
+							]
 
-        })
-        continue;
-      }
+				})
+				continue;
+			}
 
-      const indexIndustry = _.findIndex(reports[index].industries, {industry: projectIndustry._id})
+			const indexIndustry = _.findIndex(reports[index].industries, { industry: projectIndustry._id })
 
-      if (indexIndustry < 0 ) {
-        reports[index].industries.push(
-            {
-              industry: ObjectId(projectIndustry._id),
-              industryGroup: ObjectId(projectIndustryGroup._id),
-              vendors: [userInfo]
-            }
-          )
-        continue;
-      }
+			if(indexIndustry < 0) {
+				reports[index].industries.push(
+						{
+							industry: ObjectId(projectIndustry._id),
+							industryGroup: ObjectId(projectIndustryGroup._id),
+							vendors: [userInfo]
+						}
+				)
+				continue;
+			}
 
-      const indexVendor = _.findIndex(reports[index].industries[indexIndustry].vendors, {name: user.UserInfoHeader.FullName});
+			const indexVendor = _.findIndex(reports[index].industries[indexIndustry].vendors, { name: user.UserInfoHeader.FullName });
 
-      if (indexVendor < 0) {
-        reports[index].industries[indexIndustry].vendors.push(userInfo);
-        continue;
-      }
+			if(indexVendor < 0) {
+				reports[index].industries[indexIndustry].vendors.push(userInfo);
+				continue;
+			}
 
-      const wordCount = reports[index].industries[indexIndustry].vendors[indexVendor].wordCount;
-      reports[index].industries[indexIndustry].vendors[indexVendor].wordCount = +wordCount + +TotalWordCount;
-      reports[index].industries[indexIndustry].vendors[indexVendor].tier = getTier(projectIndustryGroup.name, wordCount);
-    }
-  }
+			const wordCount = reports[index].industries[indexIndustry].vendors[indexVendor].wordCount;
+			reports[index].industries[indexIndustry].vendors[indexVendor].wordCount = +wordCount + +TotalWordCount;
+			reports[index].industries[indexIndustry].vendors[indexVendor].tier = getTier(projectIndustryGroup.name, wordCount);
+		}
+	}
 
-  await XtrfLqa.create(reports);
-  return await XtrfLqa.find().populate('sourceLanguage', 'lang').populate('targetLanguage','lang');
+	await XtrfLqa.create(reports);
+	return await XtrfLqa.find().populate('sourceLanguage', 'lang').populate('targetLanguage', 'lang');
 }
 
 
 const getTier = (industry, worldCount) => {
-  const tierValues = {max: 30000, min: 5000}
+	const tierValues = { max: 30000, min: 5000 }
 
-  switch (true) {
-    case tierValues.max < +worldCount:
-      return 1;
-    case tierValues.min > +worldCount:
-      return 3;
-    default:
-      return 2;
-  }
+	switch (true) {
+		case tierValues.max < +worldCount:
+			return 1;
+		case tierValues.min > +worldCount:
+			return 3;
+		default:
+			return 2;
+	}
 }
 
 function getLanguageByMemoqLangCode(languages, TargetLangCode) {
-  return languages.find(lang => {
-    return findLanguageByMemoqLanguageCode(lang, TargetLangCode);
-  });
+	return languages.find(lang => {
+		return findLanguageByMemoqLanguageCode(lang, TargetLangCode);
+	});
 }
 
 module.exports = {
-  newLQAStatusReport: newLQAStatusFromXTRFProjects,
-  getTier
+	newLQAStatusFromXTRFProjects,
+	getTier
 }
