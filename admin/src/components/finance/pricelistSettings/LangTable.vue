@@ -88,42 +88,42 @@ export default {
           label: "Source Lang",
           headerKey: "headerSourceLang",
           key: "sourceLang",
-          width: "17.5%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "Target Lang",
           headerKey: "headerTargetLang",
           key: "targetLang",
-          width: "17.5%",
+          width: "20%",
           padding: "0"
         },
         {
           label: "Basic price (Euro)",
           headerKey: "headerBasicPriceEUR",
           key: "eur",
-          width: "15%",
+          width: "14%",
           padding: "0"
         },
         {
           label: "Basic price (USD)",
           headerKey: "headerBasicPriceUSD",
           key: "usd",
-          width: "15%",
+          width: "14%",
           padding: "0"
         },
         {
           label: "Basic price (GBP)",
           headerKey: "headerBasicPriceGBP",
           key: "gbp",
-          width: "15%",
+          width: "14%",
           padding: "0"
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          width: "20%",
+          width: "18%",
           padding: "0"
         }
       ],
@@ -339,7 +339,7 @@ export default {
 
 .price {
   @extend %setting-table;
-  width: 38%;
+  width: 42%;
   background-color: #fff;
   padding: 20px 10px 20px 20px;
   box-shadow: none;
