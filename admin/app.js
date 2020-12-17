@@ -30,62 +30,60 @@ const { XtrfLqa } = require('./models');
 // }
 //  deleteMemoqUser('97d8076f-6e07-4145-b0dc-a77f2e9a15e3');
 // foo();
+// updateMemoqProjectsData();
 schedule.scheduleJob('0 */3 * * *', async function () {
-  console.log('------ Start updating memoq projects data: ', `${new Date()} ------`);
-  try {
-    await updateMemoqProjectsData();
-    console.log('------ Finish updating memoq projects data ', `${new Date()} ------`);
-  } catch (err) {
-    console.log(err.message);
-  }
+	console.log('------ Start updating memoq projects data: ', `${ new Date() } ------`);
+	try {
+		await updateMemoqProjectsData();
+		console.log('------ Finish updating memoq projects data ', `${ new Date() } ------`);
+	} catch (err) {
+		console.log(err.message);
+	}
 });
 
 schedule.scheduleJob('0 */1 * * *', async function () {
-  console.log('------ Start updating gmail messages collection: ', `${new Date()} ------`);
-  try {
-    await saveMessages();
-    console.log('------ Finish updating gmail messages collection ', `${new Date()} ------`);
-  } catch (err) {
-    console.log(err.message);
-  }
+	console.log('------ Start updating gmail messages collection: ', `${ new Date() } ------`);
+	try {
+		await saveMessages();
+		console.log('------ Finish updating gmail messages collection ', `${ new Date() } ------`);
+	} catch (err) {
+		console.log(err.message);
+	}
 });
 
 schedule.scheduleJob('0 0 */2 * *', async function () {
-  console.log('------ Start filtering old gmail messages: ', `${new Date()} ------`);
-  try {
-    await filterOldMessages();
-    console.log('------ Finish filtering old gmail messages ', `${new Date()} ------`);
-  } catch (err) {
-    console.log(err.message);
-  }
+	console.log('------ Start filtering old gmail messages: ', `${ new Date() } ------`);
+	try {
+		await filterOldMessages();
+		console.log('------ Finish filtering old gmail messages ', `${ new Date() } ------`);
+	} catch (err) {
+		console.log(err.message);
+	}
 });
 
 schedule.scheduleJob('0 */2 * * *', async function () {
-  console.log('------ Start updating memoq projects statuses based on gmail messages: ', `${new Date()} ------`);
-  try {
-    await updateOtherProjectStatusOnMessages();
-    console.log('------ Finish updating memoq projects statuses based on gmail messages ', `${new Date()} ------`);
-  } catch (err) {
-    console.log(err.message);
-  }
+	console.log('------ Start updating memoq projects statuses based on gmail messages: ', `${ new Date() } ------`);
+	try {
+		await updateOtherProjectStatusOnMessages();
+		console.log('------ Finish updating memoq projects statuses based on gmail messages ', `${ new Date() } ------`);
+	} catch (err) {
+		console.log(err.message);
+	}
 });
 
 schedule.scheduleJob('30 23 * * *', async function () {
-  console.log('------- Start updating lang tier data: ', `${new Date()} -------`);
-  try {
-    await newLangReport();
-    console.log('------- Finish updating lang tier data: ', `${new Date()} --------`);
-  } catch (err) {
-    console.log(err.message);
-  }
+	console.log('------- Start updating lang tier data: ', `${ new Date() } -------`);
+	try {
+		await newLangReport();
+		console.log('------- Finish updating lang tier data: ', `${ new Date() } --------`);
+	} catch (err) {
+		console.log(err.message);
+	}
 });
-
 (async () => {
-  const countLQAReports = await XtrfLqa.countDocuments()
-  if (countLQAReports <= 0 ){
-    parseAndWriteLQAReport()
-  }
-})()
+	const countLQAReports = await XtrfLqa.countDocuments();
+	if(countLQAReports <= 0) parseAndWriteLQAReport()
+})();
 
 
 const allowedOrigins = [

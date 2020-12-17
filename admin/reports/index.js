@@ -4,8 +4,8 @@ const {
   getXtrfLqaReport,
   getXtrfUpcomingReport
 } = require('./xtrf');
-const {UpdateLQAFromProject} = require('./newLQAStatusFromProject')
-const {newLQAStatusReport, getTier} = require('./newLQAStatusReport')
+const {UpdateLQAFromProject} = require('./newLQAStatusFromProjects')
+const {newLQAStatusReport, getTier} = require('./newLQAStatusFromXTRFProjects')
 
 module.exports = {
   filterTierReport,

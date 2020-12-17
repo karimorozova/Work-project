@@ -8,9 +8,9 @@ const {
 } = require('../reports');
 const { newLangReport } = require('../reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('../reports/parseOldMemoqProjects');
-const { UpdateLQAFromProject } = require('../reports/newLQAStatusFromProject');
+const { UpdateLQAFromProject } = require('../reports/newLQAStatusFromProjects');
 
-const {newLQAStatusReport} = require('../reports/newLQAStatusReport')
+const {newLQAStatusReport} = require('../reports/newLQAStatusFromXTRFProjects')
 
 const { upload } = require('../utils');
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");

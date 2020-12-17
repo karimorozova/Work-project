@@ -22,7 +22,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } :
     { ...project._doc, ...additionalData };
   let { tasks, steps, minimumCharge } = project;
-  const emptyTasksOrSteps = !tasks.length || !steps.length;
+  const emptyTasksOrSteps =  tasks && !tasks.length || steps && !steps.length;
   if (!tasks || !steps || emptyTasksOrSteps) {
     const newData = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
     tasks = newData.tasks;
@@ -157,7 +157,8 @@ const getUpdatedProjectData = async (project, allClients) => {
       accountManager: ObjectId(neededCustomer.accountManager._id),
       industry: ObjectId(industry._id),
       paymentProfile: neededCustomer.billingInfo.paymentType,
-      discounts: !project._doc.hasOwnProperty('discounts') ? [...neededCustomer.discounts] : project._doc.discounts,
+      discounts: []
+      // discounts: project.hasOwnProperty('_doc') && !project._doc.hasOwnProperty('discounts') ? [...neededCustomer.discounts] : project._doc.hasOwnProperty('discounts') ? project._doc.discounts : [],
     };
   }
   return { additionalData, neededCustomer };

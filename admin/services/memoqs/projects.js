@@ -576,10 +576,11 @@ async function updateMemoqProjectsData() {
 				let memoqProject = getMemoqProjectData(project, languages);
 				memoqProject.status = doesAllTasksFinished(documents) ? 'Closed' : null;
 				const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, memoqProject, documents);
-				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ?
-						false : memoqProject.lockedForRecalculation;
-				memoqProject.isTest = memoqProject.isTest === undefined ?
-						false : memoqProject.isTest;
+
+				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ? false : memoqProject.lockedForRecalculation;
+				memoqProject.isTest = memoqProject.isTest === undefined ? false : memoqProject.isTest;
+				memoqProject.isInLQAReports = memoqProject.isInLQAReports === undefined ? false : memoqProject.isInLQAReports;
+
 				memoqProject = doesHaveCorrectStructure ?
 						await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
 				await MemoqProject.updateOne(

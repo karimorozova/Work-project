@@ -3,7 +3,7 @@ const {findIndustry} = require('./newLangTierReport')
 const {findLanguageByMemoqLanguageCode} = require('../helpers/commonFunctions');
 const { ObjectId} = require('mongodb');
 const _ = require('lodash')
-const newLQAStatusReport = async () => {
+const newLQAStatusFromXTRFProjects = async () => {
 
   let projects = await MemoqProject.find({isInLQAReports: {$ne: true}});
   let reports = await XtrfLqa.find()
@@ -19,7 +19,7 @@ const newLQAStatusReport = async () => {
     let {domain,serverProjectGuid , documents, sourceLanguage} = project;
     const projectIndustry =  _.find(allIndustries, {name: domain}) || otherIndustry;
     const projectIndustryGroup =  _.find(allIndustries, {name: findIndustry(domain)}) || otherIndustry;
-    await MemoqProject.findOneAndUpdate({serverProjectGuid}, {isInLQAReports: true})
+    // await MemoqProject.findOneAndUpdate({serverProjectGuid}, {isInLQAReports: true})
 
     for ({
       TotalWordCount,
@@ -40,7 +40,7 @@ const newLQAStatusReport = async () => {
       const userInfo = {
         name: user.UserInfoHeader.FullName,
         wordCount: TotalWordCount,
-        tier: getTier(domain, TotalWordCount)
+        // tier: getTier(domain, TotalWordCount)
       }
       if (index < 0) {
         reports.push({
@@ -85,9 +85,8 @@ const newLQAStatusReport = async () => {
       reports[index].industries[indexIndustry].vendors[indexVendor].tier = getTier(projectIndustryGroup.name, wordCount);
     }
   }
-  for (let report of reports) {
-    await new XtrfLqa(report).save();
-  }
+
+  await XtrfLqa.create(reports);
   return await XtrfLqa.find().populate('sourceLanguage', 'lang').populate('targetLanguage','lang');
 }
 
@@ -112,6 +111,6 @@ function getLanguageByMemoqLangCode(languages, TargetLangCode) {
 }
 
 module.exports = {
-  newLQAStatusReport,
+  newLQAStatusReport: newLQAStatusFromXTRFProjects,
   getTier
 }
