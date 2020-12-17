@@ -15,8 +15,10 @@ async function UpdateLQAFromProject () {
   const allIndustries = await Industries.find()
   const otherIndustry = await Industries.findOne({name: "Other"})
   const allLanguages = await Languages.find()
-
+  const allXtrfLqa = await XtrfLqa.find()
   let results = projects.reduce((result, project) => {
+    result = !result.length ? allXtrfLqa.length ? allXtrfLqa : []  : result
+    console.log(result);
 
     const { industry , steps } = project
 
@@ -34,6 +36,7 @@ async function UpdateLQAFromProject () {
       const languagePair = projectSourceLang.lang + " >> " + projectTargetLang.lang
 
       const findLangPairId = _.findIndex(result, {languagePair});
+      console.log(findLangPairId)
 
       const userInfo = {
         name: vendor.firstName,
@@ -84,6 +87,27 @@ async function UpdateLQAFromProject () {
 
     return result
   },[])
+  // console.log(results)
+  // let b = [{
+  //   languagePair: "test",
+  //   sourceLanguage:null,
+  //   targetLanguage: null,
+  //   industries: [  ]
+  //
+  // }]
+  // await XtrfLqa.updateMany({}, {$set: b}, {multi: true})
+
+  // await  XtrfLqa.updateMany({}, {results})
+
+  // for (let result of results) {
+  //   let a = await XtrfLqa.findOneAndUpdate({languagePair: result.languagePair},{result})
+  //   if(!a)
+  //     await new XtrfLqa(result).save()
+  // }
+  for(let result of results) {
+    await new XtrfLqa(result).save()
+  }
+  // await  XtrfLqa.save(...results)
 
 
   await Projects.updateMany({$and: [{status: 'Closed'}, {isTest: {$ne: true}}, {isInLQAReports: {$ne: true}}]}, {isInLQAReports: true})

@@ -60,6 +60,9 @@
       .button
         .button__row
           input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReports()")
+      .button
+        .button__row
+          input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReportsFromProjects()")
 
 </template>
 
