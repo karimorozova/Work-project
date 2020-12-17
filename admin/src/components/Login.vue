@@ -1,73 +1,76 @@
 <template lang="pug">
-.login
+  .login
     .login__main
-        .login__logo
-            img.login__image(src="../assets/images/new-logo.png")
-        form.login__form(@submit.prevent="checkFields")
-            .login__required-message(v-if="isAllFieldsError") All fields are required!
-            .login__email
-                input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
-            .login__password
-                input.login__input(type="password" v-model='form.logpassword' placeholder='Password' :class="{'login_shadow': form.logpassword}")
-            .login__checkbox
-                input.login__checkbox-input(type="checkbox")
-                label.login__checkbox-label Remember me
-            button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
+      .login__logo
+        img.login__image(src="../assets/images/new-logo.png")
+      form.login__form(@submit.prevent="checkFields")
+        .login__required-message(v-if="isAllFieldsError") All fields are required!
+        .login__email
+          input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
+        .login__password
+          input.login__input(type="password" v-model='form.logpassword' placeholder='Password' :class="{'login_shadow': form.logpassword}")
+        .login__textrow
+          .login__checkbox
+            input.login__checkbox-input(type="checkbox")
+            label.login__checkbox-label Remember me
+          .login__fogotContainer
             router-link.login__forgot(to="/forgot") Forgot Your Password?
+        button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
+
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+	import { mapGetters, mapActions } from "vuex";
 
-export default {
-    data() {
-        return {
-            form: {
-                logemail: "",
-                logpassword: ""
-            },
-            isAllFieldsError: false
-        };
-    },
-    methods: {
-        async checkFields() {
-            if(!this.form.logemail || !this.form.logpassword) {
-                return this.isAllFieldsError = true;
-            }
-            await this.sendForm();
-        },
-        async sendForm() {
-            try {
-                this.isAllFieldsError = false;
-                const loginResult = await this.$http.post('/login', this.form);
-                await this.loggingIn(loginResult.body);
-                this.alertToggle({message: "You are logged in", isShow: true, type: "success"});
-                this.$router.push("/")
-            } catch (err) {
-                this.alertToggle({message: err.body, isShow: true, type: "error"});
-            }
-        },
-        async logout() {
-            try {
-                await this.loggingOut();
-                this.$router.push("/login");
-            } catch (err) {
-                this.alertToggle({message: "Cannot log out", isShow: true, type: "error"})
-            }
-        },
-        ...mapActions({
-            alertToggle: "alertToggle",
-            loggingIn: "login",
-            loggingOut: "logout"
-        })
-    }
-};
+	export default {
+		data() {
+			return {
+				form: {
+					logemail: "",
+					logpassword: ""
+				},
+				isAllFieldsError: false
+			};
+		},
+		methods: {
+			async checkFields() {
+				if(!this.form.logemail || !this.form.logpassword) {
+					return this.isAllFieldsError = true;
+				}
+				await this.sendForm();
+			},
+			async sendForm() {
+				try {
+					this.isAllFieldsError = false;
+					const loginResult = await this.$http.post('/login', this.form);
+					await this.loggingIn(loginResult.body);
+					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
+					this.$router.push("/")
+				} catch (err) {
+					this.alertToggle({ message: err.body, isShow: true, type: "error" });
+				}
+			},
+			async logout() {
+				try {
+					await this.loggingOut();
+					this.$router.push("/login");
+				} catch (err) {
+					this.alertToggle({ message: "Cannot log out", isShow: true, type: "error" })
+				}
+			},
+			...mapActions({
+				alertToggle: "alertToggle",
+				loggingIn: "login",
+				loggingOut: "logout"
+			})
+		}
+	};
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/scss/colors.scss";
+  @import "../assets/scss/colors.scss";
 
-.login {
+  .login {
     background-image: url("../assets/images/signin-background.jpg");
     display: flex;
     justify-content: center;
@@ -75,129 +78,148 @@ export default {
     height: 100vh;
     background-size: cover;
 
+    &__textrow {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
     &__required-message {
-        position: absolute;
-        top: 10px;
-        font-size: 18px;
-        color: $red;
+      position: absolute;
+      top: 12px;
+      font-size: 16px;
+      color: #D15F45;
     }
 
     &__main {
-        position: absolute;
-        margin-left: -250px;
-        left: 50%;
-        top: 50%;
-        margin-top: -266px;
-        width: 476px;
+      position: absolute;
+      margin-left: -250px;
+      left: 50%;
+      top: 50%;
+      margin-top: -266px;
+      width: 476px;
     }
 
     &__logo {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
     }
 
     &__form {
-        position: relative;
-        padding: 10px;
-        width: 100%;
-        background-color: #fff;
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        align-items: center;
-        box-sizing: border-box;
+      position: relative;
+      padding: 40px;
+      width: 100%;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
     }
 
     &__warning {
-        margin-bottom: 5px;
-        padding-top: 5px;
+      margin-bottom: 5px;
+      padding-top: 5px;
     }
 
     &__warning-message {
-        color: #ff0000;
-        padding-left: 20px;
+      color: #ff0000;
+      padding-left: 20px;
     }
 
     &__email,
     &__password {
-        width: 85%;
-        margin: 10px 0;
+      width: 100%;
+      margin-bottom: 20px;
     }
 
     &__input {
-        box-sizing: border-box;
-        margin-top: 20px;
-        height: 41px;
-        width: 100%;
-        font-size: 20px;
-        color: #66563d;
-        padding-left: 10px;
-        padding-right: 10px;
-        border-radius: 8px;
+      box-sizing: border-box;
+      height: 40px;
+      width: 100%;
+      font-size: 18px;
+      color: #66563d;
+      padding-left: 10px;
+      padding-right: 10px;
+      border-radius: 8px;
+      border: 2px solid #dedede;
+
+      &::-webkit-input-placeholder {
+        opacity: 0.38;
+      }
+
+      &:focus {
         border: 2px solid #dedede;
-
-        &::-webkit-input-placeholder {
-            opacity: 0.38;
-        }
-
-        &:focus {
-            box-shadow: 0 0 4px #66563D;
-            outline: none;
-        }
+        box-shadow: inset 1px 2px 4px rgba(0, 0, 0, 0.01),
+        0px 0px 6px rgba(0, 0, 0, 0.2);
+        outline: none;
+      }
     }
 
     &__checkbox {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: center;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
 
-        &-input {
-            width: 13px;
-            height: 13px;
-            margin-left: 30px;
-        }
+      &-input {
+        width: 14px;
+        height: 14px;
+      }
 
-        &-label {
-            font-size: 15px;
-            color: #2d2d2d;
-            margin-bottom: 0;
-            margin-left: 5px;
-        }
+      &-label {
+        font-size: 16px;
+        color: #67573E;
+        margin-bottom: 0;
+        margin-left: 6px;
+      }
     }
 
     &__button {
-        width: 142px;
-        height: 35px;
-        border-radius: 8px;
-        font-size: 20px;
-        background-color: $green;
-        color: $white;
-        opacity: 0.5;
+      width: 165px;
+      height: 36px;
+      border-radius: 8px;
+      font-size: 18px;
+      background-color: $green;
+      color: $white;
+      opacity: 0.5;
+      outline: none;
+      border: none;
+      transition: .1s ease;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+
+      &:active {
+        transform: scale(.98);
+      }
+
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+      }
     }
 
     &__forgot {
-        color: #4280d3;
-        font-size: 20px;
-        margin: 10px 0;
-        cursor: pointer;
-        align-self: flex-start;
-        padding-left: 30px;
-        text-decoration: none;
+      color: $green;
+      font-size: 16px;
+      cursor: pointer;
+      align-self: flex-start;
+      text-decoration: none;
+      transition: .1s ease;
 
-        &:hover {
-            text-decoration: underline;
-        }
+      &:hover {
+        text-decoration: underline;
+      }
     }
 
     &_shadow {
-        box-shadow: 0 0 10px #66563d;
+      box-shadow: inset 1px 2px 4px rgba(0, 0, 0, 0.01),
+      0px 0px 6px rgba(0, 0, 0, 0.2);
     }
 
     &_button-backgr {
-        opacity: 1;
+      opacity: 1;
     }
-}
+  }
 </style>
