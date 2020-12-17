@@ -197,7 +197,7 @@ export default {
 
 .price {
   @extend %setting-table;
-  width: 20%;
+  width: 22%;
   margin-top: 55px;
   background-color: #fff;
   padding: 20px 20px 20px 10px;
