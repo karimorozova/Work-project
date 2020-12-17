@@ -97,7 +97,7 @@
       box-sizing: border-box;
       border-radius: 8px;
       border: 2px solid #dedede;
-      margin-top: 15px;
+      margin-top: 20px;
 
       &::-webkit-input-placeholder {
         opacity: 0.4;
@@ -154,13 +154,14 @@
 
     &__success {
       background-color: $white;
-      padding: 20px;
+      padding: 40px;
       box-sizing: border-box;
       color: $main-color;
     }
 
     &__message {
-      font-size: 20px;
+      font-size: 18px;
+      margin-bottom: 20px;
     }
 
     &_opacity-1 {

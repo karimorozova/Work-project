@@ -3,7 +3,6 @@ const { managerNotifyMail, sendEmail, clientQuoteEmail, clientQuoteToEmails } = 
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage, vendorMiddleAssignmentMessage } = require("../emailMessages/vendorCommunication");
-const { getClient } = require('../clients');
 
 async function notifyManagerProjectRejected(project) {
 	try {
@@ -18,18 +17,15 @@ async function notifyManagerProjectRejected(project) {
 
 async function notifyManagerProjectStarts(project) {
 	try {
-		const customer = await getClient({ "_id": project.customer.id });
-		if(project.isStartAccepted) {
-			const projectManager = await User.findOne({ "_id": project.projectManager.id });
-			const salesManager = await User.findOne({ "_id": customer.salesManager._id });
-			const steps = await notifyVendorsProjectAccepted(project.steps);
-			await Projects.updateOne({ "_id": project.id }, { steps });
-			const notAssignedStep = steps.find(item => !item.vendor);
-			if(notAssignedStep) {
-				await managerEmailsSend({ project, projectManager, salesManager });
-			}
+		const projectManager = await User.findOne({ "_id": project.projectManager.id });
+		const accountManager = await User.findOne({ "_id": project.accountManager._id });
+		const steps = await notifyVendorsProjectAccepted(project.steps, project);
+		await Projects.updateOne({ "_id": project.id }, { steps });
+		const notAssignedStep = steps.find(item => !item.vendor);
+		if(notAssignedStep) {
+			await managerEmailsSend({ project, projectManager, accountManager });
 		} else {
-			await notifyMangerProjectAppoved(project);
+			await notifyMangerProjectAppoved({ project, projectManager, accountManager })
 		}
 	} catch (err) {
 		console.log(err);
@@ -37,18 +33,19 @@ async function notifyManagerProjectStarts(project) {
 	}
 }
 
-async function notifyMangerProjectAppoved(project) {
+async function notifyMangerProjectAppoved({ project, projectManager, accountManager }) {
 	try {
-		const accManager = await User.findOne({ "_id": project.accountManager.id });
-		const message = managerProjectAcceptedMessage({ ...project._doc, accManager: accManager.firstName });
-		await managerNotifyMail(accManager, message, `Quote Accepted ${ project.projectId } - ${ project.projectName } (ID C002.0)`);
+		const messageAM = managerProjectAcceptedMessage({ ...project._doc, accManager: accountManager.firstName });
+		const messagePM = managerProjectAcceptedMessage({ ...project._doc, accManager: projectManager.firstName });
+		await managerNotifyMail(accountManager, messageAM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (ID C002.0)`);
+		await managerNotifyMail(projectManager, messagePM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (ID C002.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyMangerProjectAppoved");
 	}
 }
 
-async function notifyVendorsProjectAccepted(projectSteps) {
+async function notifyVendorsProjectAccepted(projectSteps, project) {
 	let steps = [];
 	try {
 		for (let step of projectSteps) {
@@ -66,14 +63,14 @@ async function notifyVendorsProjectAccepted(projectSteps) {
 	}
 }
 
-async function managerEmailsSend({ project, projectManager, salesManager }) {
+async function managerEmailsSend({ project, projectManager, accountManager }) {
 	try {
 		const pmMessageObj = { ...project._doc, user: { ...projectManager._doc, id: projectManager.id } };
-		const smMessageObj = { ...project._doc, user: { ...salesManager._doc, id: salesManager.id } };
+		const smMessageObj = { ...project._doc, user: { ...accountManager._doc, id: accountManager.id } };
 		const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
 		const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
 		await managerNotifyMail(projectManager, pmMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (ID I001.0)`);
-		await managerNotifyMail(salesManager, smMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (ID I001.0)`);
+		await managerNotifyMail(accountManager, smMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (ID I001.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in managerEmailsSend");
@@ -134,13 +131,13 @@ async function stepEmailToVendor(project, step) {
 	try {
 		let steps = [...project.steps];
 		await sendRequestToVendor(project, step);
-      return steps.map(item => {
-        if(step.taskId === item.taskId && step.name === item.name) {
-            item.status = "Request Sent";
-            return item;
-        }
-        return item;
-    });
+		return steps.map(item => {
+			if(step.taskId === item.taskId && step.name === item.name) {
+				item.status = "Request Sent";
+				return item;
+			}
+			return item;
+		});
 	} catch (err) {
 		console.log(err);
 		console.log("Error in stepEmailToVendor")

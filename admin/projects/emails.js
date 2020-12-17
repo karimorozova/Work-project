@@ -265,6 +265,7 @@ async function notifyProjectDelivery(project, template) {
 async function notifyManagerStepStarted(project, step) {
 	const subject = `Step started: ${ step.stepId } - ${ project.projectName } (ID I002.0)`;
 	const message = stepStartedMessage({ ...project._doc, step });
+
 	try {
 		await sendEmail({ to: project.projectManager.email, subject }, message);
 	} catch (err) {
