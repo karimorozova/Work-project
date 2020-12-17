@@ -19,7 +19,7 @@ const newLQAStatusFromXTRFProjects = async () => {
     let {domain,serverProjectGuid , documents, sourceLanguage} = project;
     const projectIndustry =  _.find(allIndustries, {name: domain}) || otherIndustry;
     const projectIndustryGroup =  _.find(allIndustries, {name: findIndustry(domain)}) || otherIndustry;
-    // await MemoqProject.findOneAndUpdate({serverProjectGuid}, {isInLQAReports: true})
+    await MemoqProject.findOneAndUpdate({serverProjectGuid}, {isInLQAReports: true})
 
     for ({
       TotalWordCount,

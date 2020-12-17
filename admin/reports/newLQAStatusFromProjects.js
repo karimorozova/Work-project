@@ -39,7 +39,7 @@ async function UpdateLQAFromProject() {
 				vendor: vendor.id,
 				email: vendor.email,
 				wordCount: totalWords,
-				tier: getTier(industry.name, totalWords)
+				// tier: getTier(industry.name, totalWords)
 			}
 
 			const industriesInfo = {
