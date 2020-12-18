@@ -8,7 +8,7 @@
     )
       .lqa-table__header-title.lqa-table__header(v-for="{label, headerKey} in fields" :slot="headerKey" slot-scope="{ field }") {{ label }}
       .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.name }}
-      .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordCount }}
+      .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordCount | roundWordCount}}
       .lqa-table__header(slot="tqi" slot-scope="{ row }")
         span soon...
       .lqa-table__header(slot="lqa1" slot-scope="{ row }")

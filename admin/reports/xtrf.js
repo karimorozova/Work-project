@@ -84,6 +84,9 @@ const getXtrfLqaReport = async (filters) => {
         industries
       });
     }
+
+    groupXtrfLqaByIndustryGroup(result)
+
     if (sourceFilter) {
       result = result.filter(({ sourceLanguage }) => sourceLanguage === sourceFilter);
     }
@@ -145,6 +148,8 @@ const getXtrfLqaReport = async (filters) => {
     return await XtrfLqa.find(filterQuery, dataLimitQuery).skip(skipCount).limit(countFilter)
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
+      .populate('industries.industry', ['name'])
+      .populate('industries.industryGroup', ['name'])
       .populate('industries.Finance.industryId', ['name'])
       .populate('industries.iGaming.industryId', ['name']);
   }
@@ -187,8 +192,41 @@ const getXtrfUpcomingReport = async (filters) => {
   }
 };
 
+function groupXtrfLqaByIndustryGroup(result) {
+  return result.map(lqaReport => {
+    lqaReport.industries = lqaReport.industries.reduce((gByIndustryGroup, industry) => {
+      const {industryGroup, vendors} = industry
+
+      const findIndustryId = gByIndustryGroup.findIndex(industryG => industryG.industryGroup.name === industryGroup.name);
+      if (findIndustryId < 0) {
+        gByIndustryGroup.push(industry)
+        return gByIndustryGroup;
+      }
+
+      gByIndustryGroup[findIndustryId].vendors = vendors.reduce((resVendors, vendor)=> {
+        const {name} = vendor
+        const findVendorId = resVendors.findIndex(vendor => vendor.name === name)
+
+        if (findVendorId < 0) {
+          resVendors.push(vendor)
+          return resVendors
+        }
+
+        const wordCount = resVendors[findVendorId].wordCount
+        resVendors[findVendorId].wordCount = wordCount + vendor.wordCount
+
+        return resVendors
+      }, gByIndustryGroup[findIndustryId].vendors)
+
+      return gByIndustryGroup
+    }, [])
+    return lqaReport;
+  })
+}
+
 module.exports = {
   rebuildTierReportsStructure,
   getXtrfLqaReport,
   getXtrfUpcomingReport,
+  groupXtrfLqaByIndustryGroup,
 };

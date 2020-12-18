@@ -73,9 +73,30 @@ schedule.scheduleJob('30 23 * * *', async function () {
 		console.log(err.message);
 	}
 });
+
+schedule.scheduleJob('30 0 * * *', async function () {
+  console.log('------ Start updating LQA reports from MemoqProjects data: ', `${ new Date() } ------`);
+  try {
+    await newLQAStatusFromXTRFProjects();
+    console.log('------ Finish updating LQA reports from MemoqProjects data ', `${ new Date() } ------`);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+schedule.scheduleJob('40 0 * * *', async function () {
+  console.log('------ Start updating LQA reports from projects data: ', `${ new Date() } ------`);
+  try {
+    await UpdateLQAFromProject();
+    console.log('------ Finish updating LQA reports from Projects data ', `${ new Date() } ------`);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
 (async () => {
 	const countLQAReports = await XtrfLqa.countDocuments();
-	if(countLQAReports <= 0) await parseAndWriteLQAReport()
+	if(countLQAReports <= 0) parseAndWriteLQAReport()
 })();
 
 

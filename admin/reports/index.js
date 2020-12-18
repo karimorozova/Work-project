@@ -2,7 +2,8 @@ const { filterTierReport, getLqaReportFilterOptions } = require("./helpers");
 const {
   rebuildTierReportsStructure,
   getXtrfLqaReport,
-  getXtrfUpcomingReport
+  getXtrfUpcomingReport,
+  groupXtrfLqaByIndustryGroup
 } = require("./xtrf");
 const { UpdateLQAFromProject } = require("./newLQAStatusFromProjects");
 const {
@@ -20,5 +21,6 @@ module.exports = {
   UpdateLQAFromProject,
   newLQAStatusFromXTRFProjects,
   getTier,
-  newLangReport
+  newLangReport,
+  groupXtrfLqaByIndustryGroup,
 };

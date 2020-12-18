@@ -34,3 +34,7 @@ Vue.filter("otherProjectsIndustryFilter", (str) => {
 			return str
 	}
 });
+
+Vue.filter("roundWordCount", (str) => {
+  return Math.round(+str)
+});

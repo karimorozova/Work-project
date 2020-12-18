@@ -1,11 +1,12 @@
 const { findIndustry } = require("./newLangTierReport");
 const { XtrfLqa, Projects, Industries, Languages } = require('../models')
 const { getTier } = require('./newLQAStatusFromXTRFProjects')
+const {groupXtrfLqaByIndustryGroup} = require('./index')
 const _ = require('lodash')
 const { ObjectId } = require('mongodb')
 
 async function UpdateLQAFromProject() {
-	const projects = await Projects.find({ $and: [{ status: 'Closed' }, { isTest: { $ne: true } }, { isInLQAReports: { $ne: true } }] })
+  const projects = await Projects.find({ $and: [{ status: 'Closed' }, { isTest: { $ne: true } }, { isInLQAReports: { $ne: true } }] })
 			.populate('industry')
 			.populate('steps.serviceStep.unit')
 			.populate('steps.vendor');
@@ -84,7 +85,8 @@ async function UpdateLQAFromProject() {
 	}, []);
 
 	await XtrfLqa.create(results);
-	await Projects.updateMany({ $and: [{ status: 'Closed' }, { isTest: { $ne: true } }, { isInLQAReports: { $ne: true } }] }, { isInLQAReports: false })
+
+	await Projects.updateMany({ $and: [{ status: 'Closed' }, { isTest: { $ne: true } }, { isInLQAReports: { $ne: true } }] }, { isInLQAReports: true })
 
 	function findOrDefault(obj, search, defaultValue) {
 		return _.find(obj, search) || defaultValue

@@ -7,7 +7,8 @@ const {
 	getLqaReportFilterOptions,
 	newLQAStatusFromXTRFProjects,
 	UpdateLQAFromProject,
-	newLangReport
+	newLangReport,
+  groupXtrfLqaByIndustryGroup
 } = require('../reports');
 
 //
@@ -210,6 +211,7 @@ router.get('/restore-memoq-lqa-report', async (req, res) => {
 	try {
 		await UpdateLQAFromProject();
 		const result = await newLQAStatusFromXTRFProjects();
+    groupXtrfLqaByIndustryGroup(result)
 		res.send(result);
 	} catch (err) {
 		console.log(err);

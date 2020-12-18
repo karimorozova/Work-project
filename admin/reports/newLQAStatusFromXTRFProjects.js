@@ -21,7 +21,6 @@ const newLQAStatusFromXTRFProjects = async () => {
 		const projectIndustry = _.find(allIndustries, { name: domain }) || otherIndustry;
 		const projectIndustryGroup = _.find(allIndustries, { name: findIndustry(domain) }) || otherIndustry;
 		await MemoqProject.findOneAndUpdate({ serverProjectGuid }, { isInLQAReports: true })
-
 		for ({
 			TotalWordCount,
 			TargetLangCode,
@@ -91,7 +90,7 @@ const newLQAStatusFromXTRFProjects = async () => {
 	}
 
 	await XtrfLqa.create(reports);
-	return await XtrfLqa.find().populate('sourceLanguage', 'lang').populate('targetLanguage', 'lang');
+	return await XtrfLqa.find().populate('sourceLanguage', 'lang').populate('targetLanguage', 'lang').populate('industries.industryGroup', ['name']);
 }
 
 

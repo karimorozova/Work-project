@@ -19,25 +19,17 @@
         @updateReport="updateReport"
       )
     .lqa__languages
-      .lqa__language(v-for="{languagePair, sourceLanguage, targetLanguage, industries: { Finance, iGaming } } in reportData")
+      .lqa__language(v-for="{languagePair, industries } in reportData")
         .lqa__text
           b {{ languagePair }}
-          .lqa__industry(v-if="Finance.vendors.length")
+          .lqa__industry(v-for="{vendors, industryGroup} in industries")
             .lqa__tier-industry
               b Industry: &nbsp;
-              |Finance
+              | {{industryGroup.name}}
               |&nbsp; &nbsp;
               b Tier: &nbsp;
               |1
-            Table(v-if="Finance.vendors.length" :vendorsData="Finance.vendors")
-          .lqa__industry(v-if="iGaming.vendors.length")
-            .lqa__tier-industry
-              b Industry: &nbsp;
-              |iGaming
-              |&nbsp; &nbsp;
-              b Tier: &nbsp;
-              |1
-            Table(v-if="iGaming.vendors.length" :vendorsData="iGaming.vendors")
+            Table(v-if="vendors.length" :vendorsData="vendors")
 
       //.lqa__form(v-if="false")
         NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
