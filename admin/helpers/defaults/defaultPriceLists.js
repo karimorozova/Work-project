@@ -93,6 +93,8 @@ const getDefaultIndustryMultipliers = async () => {
 function getStepMultiplier(allSteps, stepId) {
 	const { title } = allSteps.find(({ _id }) => _id.toString() === stepId.toString());
 	switch (title) {
+		case "Proofreading":
+			return 50;
 		case "Revising":
 			return 30;
 		case "Review":

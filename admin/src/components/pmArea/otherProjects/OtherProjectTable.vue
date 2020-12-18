@@ -4,8 +4,8 @@
       :fields="fields"
       :bodyCellClass="'other-project-cell'"
       :tableData="allProjects"
-      :bodyClass="['other-all-projects', {'tbody_visible-overflow': allProjects.length < 9}]"
-      :tableheadRowClass="allProjects.length < 9 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['other-all-projects', {'tbody_visible-overflow': allProjects.length < 6}]"
+      :tableheadRowClass="allProjects.length < 6 ? 'tbody_visible-overflow' : ''"
       @onRowClicked="onRowClicked"
       @bottomScrolled="bottomScrolled"
     )
