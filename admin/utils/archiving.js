@@ -9,7 +9,7 @@ const archiveFile = ({outputPath, originFile}) => {
         });
         output.on('close', () => {
             console.log(archive.pointer() + ' total bytes');
-            console.log('archiver has been finalized and the output file descriptor has closed.');
+            console.log('archiveFile has been finalized and the output file descriptor has closed.');
             resolve();
         });
         output.on('end', () => {
@@ -36,7 +36,7 @@ const archiveMultipleFiles = ({outputPath, files}) => {
         });
         output.on('close', () => {
             console.log(archive.pointer() + ' total bytes');
-            console.log('archiver has been finalized and the output file descriptor has closed.');
+            console.log('archiveMultipleFiles has been finalized and the output file descriptor has closed.');
             resolve();
         });
         output.on('end', () => {
