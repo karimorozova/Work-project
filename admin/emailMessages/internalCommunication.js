@@ -38,22 +38,21 @@ function managerAssignmentNotifyingMessage(obj) {
             </div>`;
 }
 
-function managerTaskCompleteNotificationMessage(obj) {
-	const lastName = obj.projectManager.lastName || "";
-	const pair = obj.task.sourceLanguage ? `${ obj.task.sourceLanguage } >> ${ obj.task.targetLanguage }` : `${ obj.task.targetLanguage } / ${ obj.task.packageSize }`;
+//Template for Message for Ready to DR1
+function managerTaskCompleteNotificationMessage(obj, user) {
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.projectManager.firstName } ${ lastName }</span></p>  
-                    <p>
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         Task ${ obj.task.taskId } from project ${ obj.projectId } - ${ obj.projectName } is completed and ready for DR1.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         Project deadline is: ${ obj.deadline }
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         Please, make the review or assign another PM to do it.
                     </p>
                 </div>
@@ -64,6 +63,7 @@ function managerTaskCompleteNotificationMessage(obj) {
             </div>`;
 }
 
+//Delivery Task Template
 function deliverablesDownloadedMessage(obj) {
 	const lastName = obj.manager.lastName || "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -72,7 +72,7 @@ function deliverablesDownloadedMessage(obj) {
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.manager.firstName } ${ lastName }</span></p>  
-                    <p>
+                    <p style="font-weight: 400;">
                         Task ${ obj.taskId } from project ${ obj.project_id } - %%quote name%% has been reviewed and delivered by %%name%%
                     </p>
                 </div>
@@ -239,7 +239,7 @@ function stepStartedMessage(obj, user) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ user.firstName } ${ user.lastName || "" }</h4>
+                   	<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Vendor ${ obj.step.vendor.firstName } ${ vendorSurname } just start the step: ${ obj.step.stepId } from ${ obj.projectId } - ${ obj.projectName }.
                     </p>
@@ -254,17 +254,17 @@ function stepStartedMessage(obj, user) {
             </div>`;
 }
 
-function stepCompletedMessage(obj) {
-	const lastName = obj.accountManager.lastName || "";
+//Generate template for PM/AM if Vendor complete job.
+function stepCompletedMessage(obj, user) {
 	const vendorSurname = obj.step.vendor.surname || "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.accountManager.firstName } ${ lastName }</h4>
-                    <p>
-                        Vendor ${ obj.step.vendor } ${ vendorSurname } just completed the step: ${ obj.step.stepId } from ${ obj.projectId } - ${ obj.projectName }.  
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
+                    <p style="font-weight: 400;">
+                        Vendor ${ obj.step.vendor.firstName } ${ vendorSurname } just completed the step: ${ obj.step.stepId } from ${ obj.projectId } - ${ obj.projectName }.  
                     </p>
                 </div>
                 <footer>
@@ -293,8 +293,8 @@ function requestCancelledMessage(obj) {
             </div>`;
 }
 
-function stepDecisionMessage(obj) {
-	const lastName = obj.project.accountManager.lastName || "";
+//Generate template for PM/AM if Vendor Accept or Reject the job.
+function stepDecisionMessage(obj, user) {
 	const vendorSurname = obj.step.vendor.surname;
 	const decision = obj.decision === "accept" ? "approved" : "rejected";
 	const reason = obj.reason || "";
@@ -303,13 +303,13 @@ function stepDecisionMessage(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.project.accountManager.firstName } ${ lastName }</h4>
-                    <p>
+                 		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         Vendor ${ obj.step.vendor.firstName } ${ vendorSurname } has ${ decision } the assigned step: ${ obj.step.stepId } from ${ obj.project.projectId } - ${ obj.project.projectName } Project.
                     </p>
-                    <p>
+                    <div style="font-weight: 400;">
                         ${ reason }
-                    </p>
+                    </div>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -318,21 +318,21 @@ function stepDecisionMessage(obj) {
             </div>`;
 }
 
-function readyForDr2Message(obj) {
-	const lastName = obj.dr2Manager.lastName || "";
+//Template for Message for Ready to DR2
+function readyForDr2Message(obj, user) {
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.dr2Manager.firstName } ${ lastName }</h4>
-                    <p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
+                    <p style="font-weight: 400;">
                         The Delivery Review for ${ obj.taskId } from project ${ obj.projectId } - ${ obj.projectName } has been finished. 
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         Please, do the Delivery Review 2
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         Project deadline is: ${ obj.deadline }
                     </p>
                 </div>
@@ -343,7 +343,8 @@ function readyForDr2Message(obj) {
             </div>`;
 }
 
-function managerDr1Reassign(obj) {
+//Template for DR has been reassigned
+function managerDr1Reassign(obj, DRNumber) {
 	const lastNamePrevManager = obj.prevManager.lastName || "";
 	const lastNameNextManager = obj.manager.lastName || "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -351,9 +352,9 @@ function managerDr1Reassign(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.prevManager.firstName } ${ lastNamePrevManager }</h4>
-                    <p>
-                        The Delivery Review 1 for ${ obj.taskId } from project ${ obj.project.projectId } - ${ obj.project.projectName } has been reassigned to ${ obj.manager.firstName } ${ lastNameNextManager }.
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.prevManager.firstName } ${ lastNamePrevManager }</span></p>
+                    <p style="font-width: 400;">
+                        The Delivery Review ${DRNumber} for ${ obj.taskId } from project ${ obj.project.projectId } - ${ obj.project.projectName } has been reassigned to ${ obj.manager.firstName } ${ lastNameNextManager }.
                     </p>
                 </div>
                 <footer>
@@ -363,18 +364,19 @@ function managerDr1Reassign(obj) {
             </div>`;
 }
 
-function managerDr1Assigned(obj) {
+// Template the DR has been assigned to you.
+function managerDr1Assigned(obj, DRNumber) {
 	const lastName = obj.manager.lastName || "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                    <h4 class="contact-name">Dear ${ obj.manager.firstName } ${ lastName }</h4>
-                    <p>
-                        Delivery review 1 for ${ obj.taskId } from project ${ obj.project.projectId } - ${ obj.project.projectName } has been assigned to you.
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.manager.firstName } ${ lastName }</span></p>
+                    <p style="font-weight: 400;">
+                        Delivery review ${DRNumber} for ${ obj.taskId } from project ${ obj.project.projectId } - ${ obj.project.projectName } has been assigned to you.
                     </p>
-                    <p>
+                    <p style="font-weight: 400;">
                         Project deadline is: ${ obj.project.deadline }
                     </p>
                 </div>

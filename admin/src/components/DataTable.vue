@@ -206,7 +206,9 @@ export default {
   max-height: 120px;
   overflow-y: auto;
 }
-
+.vendor-table-cell{
+  max-height: 120px;
+}
 .reports__table {
   margin-bottom: 0;
 }
