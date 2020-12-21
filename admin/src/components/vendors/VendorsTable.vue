@@ -185,7 +185,6 @@
 				return arr.reduce((acc, curr) => acc + curr + '<br>', '')
 			},
 			getLanguagePairs(vendor) {
-				console.log('COMP', vendor.competencies)
 				const isId = vendor.competencies.length && vendor.competencies[0].sourceLanguage.hasOwnProperty('_id');
 				return {
 					duoLanguagesPairs: returnLangPairs('duo', this.getAllLanguages),

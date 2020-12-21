@@ -41,7 +41,7 @@ async function stepCancelNotifyVendor(steps) {
 				const message = ifStepStarted(step.status) ? stepMiddleCancelledMessage(step) : stepCancelledMessage(step);
 				step["to"] = step.vendor.email;
 				const id = ifStepStarted(step.status) ? "V004.0" : "V003.0";
-				const subject = ifStepStarted(step.status)  ?  "Step cancelled in the middle" : "Step cancelled";
+				const subject = ifStepStarted(step.status) ? "Step cancelled in the middle" : "Step cancelled";
 				step.subject = `${ subject }: ${ step.stepId } (${ step.serviceStep.title }) (ID ${ id })`;
 				await sendEmail(step, message);
 			}
@@ -50,7 +50,8 @@ async function stepCancelNotifyVendor(steps) {
 		console.log(err);
 		console.log("Error in stepCancelNotifyVendor");
 	}
-	function ifStepStarted(status){
+
+	function ifStepStarted(status) {
 		const startStepStatuses = ['Started', 'In progress'];
 		return startStepStatuses.includes(status)
 	}
@@ -159,36 +160,51 @@ async function getQuoteInfo(projectId, tasksIds) {
 	}
 }
 
+
 async function stepCompletedNotifyPM(project, step) {
+	const { projectManager, accManager } = await getAMPMbyProject(project);
 	const subject = `Step completed: ${ step.stepId } ${ project.projectName } (ID I003.0)`;
-	const message = stepCompletedMessage({ ...project._doc, step });
+	const messagePM = stepCompletedMessage({ ...project._doc, step }, projectManager);
+	const messageAM = stepCompletedMessage({ ...project._doc, step }, accManager);
 	try {
-		await sendEmail({ to: project.projectManager.email, subject }, message);
+		await sendEmail({ to: project.projectManager.email, subject }, messagePM);
+		await sendEmail({ to: project.accountManager.email, subject }, messageAM);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in stepCompletedNotifyPM");
 	}
 }
 
-async function taskCompleteNotifyPM(project, task) {
+async function notifyReadyForDr2({ dr2Manager, project, taskId }) {
+	const { projectManager, accManager } = await getAMPMbyProject(project);
+	const messagePM = await readyForDr2Message({ ...project._doc, dr2Manager, taskId }, projectManager);
+	const messageAM = await readyForDr2Message({ ...project._doc, dr2Manager, taskId }, accManager);
 	try {
-		const manager = await User.findOne({ "_id": project.projectManager.id }, { email: 1 });
-		const message = await getPMnotificationMessage(project, task);
-		await managerNotifyMail(manager, message, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (ID I008.0)`);
+		await managerNotifyMail({ email: project.projectManager.email }, messagePM, `Task is ready for DR2: ${ taskId } - ${ project.projectName } (I008.1)`);
+		await managerNotifyMail({ email: project.accountManager.email }, messageAM, `Task is ready for DR2: ${ taskId } - ${ project.projectName } (I008.1)`);
+	} catch (err) {
+		console.log(err);
+		console.log("Error in notifyReadyForDr2");
+	}
+}
+
+async function taskCompleteNotifyPM(project, task) {
+	const { projectManager, accManager } = await getAMPMbyProject(project);
+	const messagePM = await getPMnotificationMessage(project, task, projectManager);
+	const messageAM = await getPMnotificationMessage(project, task, accManager);
+	try {
+		await managerNotifyMail({ email: project.projectManager.email }, messagePM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (ID I008.0)`);
+		await managerNotifyMail({ email: project.accountManager.email }, messageAM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (ID I008.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in taskCompleteNotifyPM");
 	}
 }
 
-async function getPMnotificationMessage(project, task) {
+async function getPMnotificationMessage(project, task, user) {
 	try {
 		const service = await getService({ "_id": task.service });
-		return message = managerTaskCompleteNotificationMessage({
-			...project._doc,
-			service: service.title,
-			task
-		})
+		return managerTaskCompleteNotificationMessage({ ...project._doc, service: service.title, task }, user)
 	} catch (err) {
 		console.log(err);
 		console.log("Error in getPMnotificationMessage");
@@ -230,16 +246,13 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 
 async function notifyDeliverablesDownloaded(taskId, project) {
 	try {
-		const projectManager = await User.findOne({ "_id": project.projectManager.id });
-		const accManager = await User.findOne({ "_id": project.customer.accountManager._id });
-		const pmMessage = deliverablesDownloadedMessage({
-			manager: projectManager, taskId, project_id: project.projectId
-		})
-		const accManagerMessage = deliverablesDownloadedMessage({
-			manager: accManager, taskId, project_id: project.projectId
-		})
-		await managerNotifyMail(projectManager, pmMessage, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
-		await managerNotifyMail(accManager, accManagerMessage, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
+		console.log('ERROR')
+		// const { projectManager, accManager } = await getAMPMbyProject(project);
+
+		// const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, project_id: project.projectId });
+		// const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, project_id: project.projectId });
+		// await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
+		// await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyDeliverablesDownloaded");
@@ -263,11 +276,13 @@ async function notifyProjectDelivery(project, template) {
 }
 
 async function notifyManagerStepStarted(project, step) {
+	const { projectManager, accManager } = await getAMPMbyProject(project);
 	const subject = `Step started: ${ step.stepId } - ${ project.projectName } (ID I002.0)`;
-	const message = stepStartedMessage({ ...project._doc, step });
-
+	const messagePM = stepStartedMessage({ ...project._doc, step }, projectManager);
+	const messageAM = stepStartedMessage({ ...project._doc, step }, accManager);
 	try {
-		await sendEmail({ to: project.projectManager.email, subject }, message);
+		await sendEmail({ to: project.projectManager.email, subject }, messagePM);
+		await sendEmail({ to: project.accountManager.email, subject }, messageAM);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyManagerStepStarted");
@@ -275,24 +290,25 @@ async function notifyManagerStepStarted(project, step) {
 }
 
 async function notifyStepDecisionMade({ project, step, decision }) {
-	const message = stepDecisionMessage({ project, step, decision });
+	const { projectManager, accManager } = await getAMPMbyProject(project);
 	const messageId = decision === 'accept' ? 'I006.0' : 'I007.0';
 	const subject = `Vendor ${ decision === 'accept' ? 'approved' : 'rejected' } the job: ${ step.stepId } - ${ project.projectName } (ID ${ messageId })`;
+	const messagePM = stepDecisionMessage({ project, step, decision }, projectManager);
+	const messageAM = stepDecisionMessage({ project, step, decision }, accManager);
 	try {
-		await sendEmail({ to: project.projectManager.email, subject }, message);
+		await sendEmail({ to: project.projectManager.email, subject }, messagePM);
+		await sendEmail({ to: project.accountManager.email, subject }, messageAM);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyManagerStepStarted");
 	}
 }
 
-async function notifyReadyForDr2({ dr2Manager, project, taskId }) {
-	const message = readyForDr2Message({ ...project._doc, dr2Manager, taskId });
-	try {
-		await managerNotifyMail(dr2Manager, message, `Task is ready for DR2: ${ taskId } - ${ project.projectName } (I008.1)`);
-	} catch (err) {
-		console.log(err);
-		console.log("Error in notifyReadyForDr2");
+async function getAMPMbyProject(project) {
+	const { projectManager, accountManager } = project;
+	return {
+		projectManager: await User.findOne({ "_id": projectManager.id }),
+		accManager: await User.findOne({ "_id": accountManager._id }),
 	}
 }
 

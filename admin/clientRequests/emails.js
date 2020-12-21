@@ -13,8 +13,9 @@ async function clientRequestNotification(request, prop) {
       }) : managerRequestNotifyingMessage({ ...request._doc, user: request.accountManager });
       const messageId = prop ? 'I005.0' : 'I004.0';
       const subject = prop ?
-        `Request assigned: ${request.requestId} ${request.projectName} (${messageId})`
-        : `Client ${request.customer.name} has send a request (${messageId})`;
+          `Request assigned: ${request.requestId} ${request.projectName} (${messageId})` :
+          `Client ${request.customer.name} has send a request (${messageId})`;
+
       const manager = prop ? request[prop] : request.accountManager;
       await managerNotifyMail(manager, msg, subject);
     } catch(err) {

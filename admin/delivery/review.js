@@ -73,17 +73,18 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
 }
 
 async function changeManager({projectId, taskId, prevManager, manager, prop, isAdmin, status , project}) {
+    const DRNumber = prop === "dr1Manager" ? '1' : '2';
     const key = `tasks.$.${prop}`;
     const updateQuery = {[key]: manager._id};
-    const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager});
-    const messageToNew = managerDr1Assigned({taskId, project, manager});
+    const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, DRNumber);
+    const messageToNew = managerDr1Assigned({taskId, project, manager}, DRNumber);
     try {
         await Delivery.updateOne({projectId, "tasks.taskId": taskId}, updateQuery);
         const isDr1 = prop === "dr1Manager";
         const isDr2 = status === "dr2" && prop === "dr2Manager";
         if(isAdmin && (isDr1 || isDr2)) {
-            await managerNotifyMail(prevManager, messageToPrev, `DR1 has been reassigned: ${taskId} (I009.0)`);
-            await managerNotifyMail(manager, messageToNew, `The DR1 has been assigned to you: ${taskId} (I009.1)`);
+            await managerNotifyMail(prevManager, messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
+            await managerNotifyMail(manager, messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
         }
     } catch(err) {
 
