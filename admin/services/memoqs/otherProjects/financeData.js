@@ -39,17 +39,23 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   return await getMemoqProject({ _id: project._id });
 
   async function checkAndCorrectStepStructure(steps, tasks, documents) {
+    let memoqVendorsArr;
     const neededStepIndex = steps.findIndex(({ vendor }) => !vendor);
     const neededDocumentIndex = tasks.findIndex(({ taskId }) => taskId === steps[neededStepIndex].taskId);
-    const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = documents[neededDocumentIndex];
-    const indexRegex = new RegExp(/(?<=S)[0-9][0-9]/g);
-    let index = indexRegex.exec(steps[neededStepIndex].stepId)[0];
-    index = index === '01' ? 0 : 1;
-    const { UserInfoHeader: { FullName } } = memoqVendorsArr[index];
-    const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
-    steps[neededStepIndex].vendorRate = await getStepUserRate(vendor, project, steps[neededStepIndex].name, tasks[neededDocumentIndex])
-    steps[neededStepIndex].vendor = vendor;
-    return steps;
+
+    if(documents.length){
+      memoqVendorsArr = documents[neededDocumentIndex].UserAssignments.TranslationDocumentUserRoleAssignmentDetails
+      const indexRegex = new RegExp(/(?<=S)[0-9][0-9]/g);
+      let index = indexRegex.exec(steps[neededStepIndex].stepId)[0];
+      index = index === '01' ? 0 : 1;
+      const { UserInfoHeader: { FullName } } = memoqVendorsArr[index];
+      const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
+      steps[neededStepIndex].vendorRate = await getStepUserRate(vendor, project, steps[neededStepIndex].name, tasks[neededDocumentIndex])
+      steps[neededStepIndex].vendor = vendor;
+      return steps;
+    }
+
+
   }
 };
 
@@ -75,11 +81,12 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
     let idNumber = tasksLength < 10 ? `T0${i + 1}` : `T${i + 1}`;
     let taskId = taskName + `${idNumber}`;
     let targetLanguage = targetLanguages.filter(item => item).find(lang => lang.memoq === TargetLangCode);
-    targetLanguage = targetLanguage ? targetLanguage : { symbol: '' }
+    targetLanguage = targetLanguage ? targetLanguage : { symbol: '' };
+    const sourceLang = sourceLanguage ? sourceLanguage : { symbol: '' };
     const taskSteps = await getTaskSteps(
       {
         taskId,
-        sourceLanguage: sourceLanguage.symbol,
+        sourceLanguage: sourceLang.symbol,
         targetLanguage: targetLanguage.symbol,
       },
       project, documents[i], customer, vendors
@@ -149,7 +156,8 @@ const getUpdatedProjectData = async (project, allClients) => {
   const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
   const industry = await findFittingIndustryId(project.domain);
   let additionalData = {};
-  if (neededCustomer) {
+  if(neededCustomer) {
+    additionalData.discounts = project.hasOwnProperty('discounts') ? project.discounts : [...neededCustomer.discounts];
     additionalData = {
       customer: ObjectId(neededCustomer._id),
       status: project.status,
@@ -157,8 +165,6 @@ const getUpdatedProjectData = async (project, allClients) => {
       accountManager: ObjectId(neededCustomer.accountManager._id),
       industry: ObjectId(industry._id),
       paymentProfile: neededCustomer.billingInfo.paymentType,
-      discounts: []
-      // discounts: project.hasOwnProperty('_doc') && !project._doc.hasOwnProperty('discounts') ? [...neededCustomer.discounts] : project._doc.hasOwnProperty('discounts') ? project._doc.discounts : [],
     };
   }
   return { additionalData, neededCustomer };
