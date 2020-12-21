@@ -314,9 +314,9 @@ export default {
         position: relative;
     }
     &__industry-icon {
-        width: 19px;
-        height: 19px;
-        margin-right: 3px;
+        width: 21px;
+        height: 21px;
+        margin-right: 5px;
     }
     &__icons {
         padding-top: 5px;
