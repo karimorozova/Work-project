@@ -28,7 +28,7 @@
               | {{industryGroup.name}}
               |&nbsp; &nbsp;
               b Tier: &nbsp;
-              |1
+              |-
             Table(v-if="vendors.length" :vendorsData="vendors")
 
       //.lqa__form(v-if="false")

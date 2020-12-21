@@ -10,10 +10,6 @@ const vendorsArr = [{
     type: 'String',
     default: ''
   },
-  tier: {
-    type: Number,
-    default: 0
-  },
   email: {
     type: 'String',
     default: ''
@@ -66,6 +62,10 @@ const XtrfLqaSchema = new mongoose.Schema({
   targetLanguage: {
     type: Schema.Types.ObjectId, ref: 'Language',
     default: null
+  },
+  tier: {
+    type: Number,
+    default: 0
   },
   industries: [
     {

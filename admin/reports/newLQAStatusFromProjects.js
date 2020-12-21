@@ -1,7 +1,6 @@
 const { findIndustry } = require("./newLangTierReport");
 const { XtrfLqa, Projects, Industries, Languages } = require('../models')
 const { getTier } = require('./newLQAStatusFromXTRFProjects')
-const {groupXtrfLqaByIndustryGroup} = require('./index')
 const _ = require('lodash')
 const { ObjectId } = require('mongodb')
 
@@ -40,7 +39,6 @@ async function UpdateLQAFromProject() {
 				vendor: vendor.id,
 				email: vendor.email,
 				wordCount: totalWords,
-				// tier: getTier(industry.name, totalWords)
 			}
 
 			const industriesInfo = {
@@ -54,6 +52,7 @@ async function UpdateLQAFromProject() {
 					languagePair,
 					sourceLanguage: ObjectId(projectSourceLang._id),
 					targetLanguage: ObjectId(projectTargetLang._id),
+          tier: 0,
 					industries: [industriesInfo]
 
 				})

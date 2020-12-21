@@ -166,14 +166,15 @@ const getXtrfUpcomingReport = async (filters) => {
   try {
     const lqaReport = await XtrfLqa.find()
       .populate('sourceLanguage', ['lang'])
-      .populate('targetLanguage', ['lang']);
+      .populate('targetLanguage', ['lang'])
+      .populate('industries.industryGroup', ['name']);
     let result = [];
     for (let { sourceLanguage, targetLanguage, industries } of lqaReport) {
-      const { Finance, iGaming } = industries;
-      const { vendors: financeVendors } = Finance;
-      const { vendors: igamingVendors } = iGaming;
-      result.push(...getVendorsData(financeVendors, sourceLanguage, targetLanguage, 'Finance'));
-      result.push(...getVendorsData(igamingVendors, sourceLanguage, targetLanguage, 'iGaming'));
+      industries
+        .filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
+        .forEach(industry => {
+          result.push(...getVendorsData(industry.vendors, sourceLanguage, targetLanguage, industry.industryGroup.name))
+        })
     }
     if (industryFilter) {
       result = result.filter(({ industry }) => industry === industryFilter);

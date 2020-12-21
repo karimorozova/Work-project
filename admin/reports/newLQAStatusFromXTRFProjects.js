@@ -5,7 +5,7 @@ const { ObjectId } = require('mongodb');
 const _ = require('lodash')
 const newLQAStatusFromXTRFProjects = async () => {
 
-	let projects = await MemoqProject.find({ isInLQAReports: { $ne: true } });
+	let projects = await MemoqProject.find({ isInLQAReports: { $ne: true }, creationTime: {$gte: "2020-10-01" }});
 	let reports = await XtrfLqa.find()
 	const languages = await Languages.find();
 	const allIndustries = await Industries.find()
@@ -39,17 +39,22 @@ const newLQAStatusFromXTRFProjects = async () => {
 
 			const vendorAliases = allVendors.map(({ _id, aliases }) => ({ _id, aliases }));
 			const vendorId = vendorAliases.find(({ aliases }) => aliases.includes(user.UserInfoHeader.FullName));
+
+      if(!vendorId || !vendorId._id){
+        continue;
+      }
+
 			const userInfo = {
 				vendor: vendorId ? vendorId._id : null,
 				name: user.UserInfoHeader.FullName,
 				wordCount: TotalWordCount,
-				// tier: getTier(domain, TotalWordCount)
 			}
 			if(index < 0) {
 				reports.push({
 					languagePair,
 					sourceLanguage: sourceLanguage._id,
 					targetLanguage: targetLanguage._id,
+          tier: 0,
 					industries:
 							[
 								{
