@@ -77,8 +77,8 @@ async function getVendorAfterUpdate(query, update) {
     .populate("assessments.targetLanguage", ['lang'])
     .populate("assessments.industries.industry", ['name'])
     .populate("assessments.industries.steps.step", ['title'])
-    .populate('competencies.sourceLanguage', ['lang'])
-    .populate('competencies.targetLanguage', ['lang'])
+    .populate('competencies.sourceLanguage', ['lang', 'symbol'])
+    .populate('competencies.targetLanguage', ['lang', 'symbol'])
     .populate('competencies.industry', ['name'])
     .populate('competencies.step', ['title'])
     .populate('competencies.step.calculationUnit', ['type'])
@@ -104,6 +104,7 @@ async function getFilteredVendors(filters) {
 
     return Vendors.populate(vendors, [
       "industries",
+      "native",
     ])
   } catch (err) {
     console.log(err);

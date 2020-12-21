@@ -85,6 +85,8 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	//MM
+	//need refactor change/delete
 	basicRate: {
 		type: String,
 		default: '',
@@ -95,6 +97,7 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	//end
 	experienceYears: {
 		type: String,
 		default: '',
@@ -144,7 +147,6 @@ const VendorSchema = new mongoose.Schema({
 		industry: {
 			type: Schema.Types.ObjectId, ref: 'Industries',
 		}
-
 	}],
 	qualifications: [{
 		source: {
