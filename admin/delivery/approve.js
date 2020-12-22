@@ -1,10 +1,10 @@
-const { updateProject, notifyClientTaskReady, sendClientDeliveries } = require('../projects');
+const { updateProject, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded } = require('../projects');
 
-async function getProjectAfterApprove({taskId, project, isDeliver, contacts}) {
+async function getProjectAfterApprove({taskId, project, isDeliver, contacts , user}) {
     try {
         if(isDeliver) {
             await sendClientDeliveries({taskId, project, contacts});
-            return await setTasksDeliveryStatus({taskId, project, status: "Delivered"})
+            return await setTasksDeliveryStatus({taskId, project, status: "Delivered", user})
         }
         await notifyClientTaskReady({taskId, project, contacts});
         return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery"});
@@ -14,14 +14,15 @@ async function getProjectAfterApprove({taskId, project, isDeliver, contacts}) {
     }
 }
 
-async function setTasksDeliveryStatus({taskId, project, status}) {
-    const updatedTasks = getUpdatedTasks({taskId, tasks: project.tasks, status});
+async function setTasksDeliveryStatus({taskId, project, status, user}) {
+    const updatedTasks = getUpdatedTasks({taskId, tasks: project.tasks, status , user});
     let projectStatus = project.status;
     if(status === "Ready for Delivery") {
         projectStatus = getProjectStatus({tasks: updatedTasks, status, projectStatus});
     }
     if(status === "Delivered") {
         projectStatus = getProjectStatus({tasks: updatedTasks, status, projectStatus});
+        await notifyDeliverablesDownloaded(taskId, project, user);
     }
     try {
         return await updateProject({"_id": project._id}, { tasks: updatedTasks, status: projectStatus});
@@ -38,11 +39,13 @@ function getProjectStatus({tasks, status, projectStatus}) {
     return otherStatusTask ? projectStatus : newProjectStatus;
 }
 
-function getUpdatedTasks({taskId, tasks, status}) {
+function getUpdatedTasks({taskId, tasks, status, user}) {
+
     return tasks.map(task => {
         if(taskId === task.taskId) {
             task.status = status;
             if(status === "Delivered") {
+                task.deliveredBy = user;
                 task.isDelivered = true;
                 task.deliveredTime = task.deliveredTime || new Date();
             }

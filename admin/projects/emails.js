@@ -160,7 +160,6 @@ async function getQuoteInfo(projectId, tasksIds) {
 	}
 }
 
-
 async function stepCompletedNotifyPM(project, step) {
 	const { projectManager, accManager } = await getAMPMbyProject(project);
 	const subject = `Step completed: ${ step.stepId } ${ project.projectName } (ID I003.0)`;
@@ -212,10 +211,9 @@ async function getPMnotificationMessage(project, task, user) {
 }
 
 async function notifyClientTaskReady({ taskId, project, contacts }) {
-	const notifyContacts = project.customer.contacts.filter(item => contacts.indexOf(item.email) !== -1);
 	const task = project.tasks.find(item => item.taskId === taskId);
 	try {
-		for (let contact of notifyContacts) {
+		for (let contact of contacts) {
 			const message = taskReadyMessage({ task, contact, project });
 			await sendEmail({ to: contact.email, subject: `Task is ready: ${ taskId } - ${ task.service.title } (ID C006.2)` }, message);
 		}
@@ -233,7 +231,6 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 		const deliverables = task.deliverables || await getDeliverablesLink({ taskId, taskFiles: task.targetFiles, projectId: project.id });
 		const content = fs.createReadStream(`./dist${ deliverables }`);
 		const attachments = [{ filename: "deliverables.zip", content }];
-
 		for (let contact of contacts) {
 			const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id });
 			await sendEmail({ to: contact.email, attachments, subject }, message);
@@ -244,15 +241,13 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 	}
 }
 
-async function notifyDeliverablesDownloaded(taskId, project) {
+async function notifyDeliverablesDownloaded(taskId, project, user) {
 	try {
-		console.log('ERROR')
-		// const { projectManager, accManager } = await getAMPMbyProject(project);
-
-		// const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, project_id: project.projectId });
-		// const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, project_id: project.projectId });
-		// await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
-		// await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
+		const { projectManager, accManager } = await getAMPMbyProject(project);
+		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, project_id: project.projectId }, user);
+		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, project_id: project.projectId }, user);
+		await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
+		await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyDeliverablesDownloaded");

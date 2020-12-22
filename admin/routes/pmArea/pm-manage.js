@@ -626,10 +626,10 @@ router.post('/rollback-review', async (req, res) => {
 });
 
 router.post('/tasks-approve-notify', async (req, res) => {
-	const { taskId, isDeliver, contacts } = req.body;
+	const { taskId, isDeliver, contacts, user } = req.body;
 	try {
 		const project = await getProject({ 'tasks.taskId': taskId });
-		const updatedProject = await getProjectAfterApprove({ taskId, project, isDeliver, contacts });
+		const updatedProject = await getProjectAfterApprove({ taskId, project, isDeliver, contacts, user });
 		res.send(updatedProject);
 	} catch (err) {
 		console.log(err);
