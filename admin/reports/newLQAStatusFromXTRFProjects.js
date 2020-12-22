@@ -40,10 +40,6 @@ const newLQAStatusFromXTRFProjects = async () => {
 			const vendorAliases = allVendors.map(({ _id, aliases }) => ({ _id, aliases }));
 			const vendorId = vendorAliases.find(({ aliases }) => aliases.includes(user.UserInfoHeader.FullName));
 
-      if(!vendorId || !vendorId._id){
-        continue;
-      }
-
 			const userInfo = {
 				vendor: vendorId ? vendorId._id : null,
 				name: user.UserInfoHeader.FullName,

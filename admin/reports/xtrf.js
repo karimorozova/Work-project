@@ -134,7 +134,7 @@ const getXtrfLqaReport = async (filters) => {
         });
       }
     }
-    return result;
+    return result.filter(({industries})=> industries.length);
   } catch (err) {
     console.log(err);
     console.log('Error in getXtrfLqaReport');
@@ -173,7 +173,34 @@ const getXtrfUpcomingReport = async (filters) => {
       industries
         .filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
         .forEach(industry => {
-          result.push(...getVendorsData(industry.vendors, sourceLanguage, targetLanguage, industry.industryGroup.name))
+          const vendorsNotNull =  industry.vendors.filter(({vendor})=> vendor !== null)
+
+          vendorsNotNull.forEach(vendor => {
+            const vendorTargetLanguage = targetLanguage ? targetLanguage.lang : 'no language data';
+            const { name, vendorId, wordCount, tier } = vendor
+
+            const vendorInData = result.find((vendor) => {
+              return vendor.name === name
+                && vendor.sourceLanguage === sourceLanguage.lang
+                && vendor.targetLanguage === vendorTargetLanguage
+                && vendor.industry === industry.industryGroup.name
+            })
+
+            if (!vendorInData) {
+              result.push({
+                name,
+                vendorId,
+                wordCount,
+                tier,
+                sourceLanguage: sourceLanguage.lang,
+                targetLanguage: vendorTargetLanguage,
+                industry: industry.industryGroup.name,
+              });
+              return;
+            }
+
+            vendorInData.wordCount += wordCount
+          })
         })
     }
     if (industryFilter) {
@@ -197,14 +224,17 @@ function groupXtrfLqaByIndustryGroup(result) {
   return result.map(lqaReport => {
     lqaReport.industries = lqaReport.industries.reduce((gByIndustryGroup, industry) => {
       const {industryGroup, vendors} = industry
+      const notNullVendor = vendors.filter(({vendor})=> vendor)
+      if(!industryGroup || !notNullVendor.length) return gByIndustryGroup
 
       const findIndustryId = gByIndustryGroup.findIndex(industryG => industryG.industryGroup.name === industryGroup.name);
       if (findIndustryId < 0) {
+        industry.vendors = notNullVendor
         gByIndustryGroup.push(industry)
         return gByIndustryGroup;
       }
 
-      gByIndustryGroup[findIndustryId].vendors = vendors.reduce((resVendors, vendor)=> {
+      gByIndustryGroup[findIndustryId].vendors = notNullVendor.reduce((resVendors, vendor)=> {
         const {name} = vendor
         const findVendorId = resVendors.findIndex(vendor => vendor.name === name)
 
