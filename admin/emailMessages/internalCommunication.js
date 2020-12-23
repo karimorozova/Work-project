@@ -64,7 +64,7 @@ function managerTaskCompleteNotificationMessage(obj, user) {
 }
 
 //Delivery Task Template
-function deliverablesDownloadedMessage(obj) {
+function deliverablesDownloadedMessage(obj, user) {
 	const lastName = obj.manager.lastName || "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
@@ -73,7 +73,7 @@ function deliverablesDownloadedMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.manager.firstName } ${ lastName }</span></p>  
                     <p style="font-weight: 400;">
-                        Task ${ obj.taskId } from project ${ obj.project_id } - %%quote name%% has been reviewed and delivered by %%name%%
+                        Task ${ obj.taskId } from project ${ obj.project_id } - ${ obj.projectName} has been reviewed and delivered by ${user.firstName} ${user.lastName || ""}
                     </p>
                 </div>
                 <footer>

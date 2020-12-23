@@ -11,6 +11,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	let total = obj.selectedTasks.length ?
 			obj.selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0) :
 			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0);
+
 	const fromMinimumCharge = !toIgnore ? (value > total) : false;
 	const tasksInfo = obj.selectedTasks.length ?
 			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
@@ -31,14 +32,14 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 		detailHeader = "Your quote has been updated - please see below the quote details:";
 	}
 	const reason = obj.reason ? `<p>Reason ${ obj.reason }</p><p>Please see below the updated quote details</p>` : "";
-	let acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/acceptquote?projectId=${ obj.id }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
-	let declineQuote = '<a href=' + `${ apiUrl }/projectsapi/declinequote?projectId=${ obj.id }&to=${ date }t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
+	let acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-acceptquote?projectId=${ obj.id }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
+	let declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-declinequote?projectId=${ obj.id }&to=${ date }t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
 	if(obj.selectedTasks.length) {
 		let taskIdsString = '';
 		obj.selectedTasks.forEach(task => taskIdsString += `${ task.taskId };`);
 		taskIdsString = taskIdsString.replace(/[' ']/g, '%');
-		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
-		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
+		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
+		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
 	}
 
 	return `<div class="wrapper"
@@ -152,9 +153,8 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
                     I accept - ${ acceptQuote }
                     <p>or</p>
                     I reject - ${ declineQuote }
-                    <p><span class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;">Please note:</span>once
-                        accepting the quote, the project will start
-                        automatically.<br>
+                    <p><span class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;">Please note:</span><br>
+                    		<span style="font-weight: 600; padding: 2px 0; background: #EBBA46">The quote does not include VAT</span><br>
                         In case of any questions, please do not hesitate to contact us :-)</p>
                 </div>
                 <footer>
@@ -294,6 +294,9 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
                             Should anything change in the files or instructions, so will the deadline and charges.
                         </span>
                     </p>
+                    <p>
+                    	<span style="font-weight: 600; padding: 2px 0; background: #EBBA46">Please note: The quote does not include VAT</span><br>
+										</p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -500,7 +503,7 @@ function getTasksInfo(fromMinimumCharge, tasks, steps, allUnits, allSettingsStep
 				task: curTask.service.title,
 				langPair: `${ langPair }`,
 				jobType: title,
-				unitPrice: curStep.clientRate.value.toFixed(2),
+				unitPrice: curStep.clientRate.value.toFixed(3),
 				unit: type,
 				quantity: totalQuantity,
 				cost,

@@ -510,7 +510,7 @@ export default {
 
         .navbar__menu {
             list-style: none;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             padding: 0;
             width: 177px;

@@ -225,7 +225,8 @@
 					await this.approveWithOption({
 						taskId: this.task.taskId,
 						isDeliver: this.isDeliver,
-						contacts: this.contacts
+						contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
+						user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id },
 					});
 				} catch (err) {
 				} finally {
@@ -279,6 +280,9 @@
 			}
 		},
 		computed: {
+			...mapGetters({
+				getUser: "getUser"
+			}),
 			isAllChecked() {
 				const uncheckedFiles = this.files.filter(item => !item.isFileApproved);
 				const uncheckedInstructions = this.instructions.filter(item => !item.isChecked);

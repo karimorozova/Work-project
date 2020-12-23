@@ -3,127 +3,163 @@ const { Projects } = require('../models');
 const { getProject, updateProjectStatus } = require('../projects');
 const { emitter } = require('../events');
 const { getProjectManageToken } = require("../middleware");
+const {
+	generateTemplateForAcceptQuote,
+	generateTemplateForRejectQuote,
+	generateTemplateForAlertAcceptQuote,
+	generateTemplateForAlertRejectQuote,
+	generateTemplateForDefaultMessage,
+	generateTemplateForTasksAcceptOrRejectQuote,
+	generateTemplateForAlertForTasksAcceptOrRejectQuote,
+	generateTemplateForTasksAcceptOrRejectVendor,
+	generateTemplateForAlertTasksAcceptOrRejectVendor
+} = require("../emailMessages/otherCommunication");
 
-router.get('/accept-decline-tasks-quote', getProjectManageToken,  async (req, res) => {
-    let { to: mailDate, tasksIds, prop, projectId } = req.query;
-  const date = new Date().getTime();
-    const expiry = date - mailDate;
-    try {
-        if(expiry > 900000) {
-            res.set('Content-Type', 'text/html');
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
-        } else {
-          const project = await getProject({ "_id": projectId });
-          let { tasks, steps } = project;
-          tasksIds = tasksIds.replace(/[%]/g, ' ');
-          tasksIds = tasksIds.split(';');
-          tasksIds.pop();
-          if (prop === 'Rejected') {
-            const neededSteps = steps.filter(step => tasksIds.includes(step.taskId)).map(step => step._id);
-            steps = steps.map(step => {
-              if (neededSteps.includes(step._id)) {
-                step.status = prop;
-              }
-              return step;
-            });
-          }
-          tasks = tasks.map(task => {
-            if (task.status === 'Quote sent' && tasksIds.includes(task.taskId)) {
-              task.status = prop;
-            }
-            return task;
-          });
-          await Projects.updateOne({ "_id": projectId }, { isClientOfferClicked: true, tasks, steps });
-          prop === 'Rejected' ? emitter.emit('projectRejectedNotification', project) : emitter.emit('projectApprovedNotification', project);
-          res.set('Content-Type', 'text/html');
-          res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`);
-        }
-    } catch(err) {
-        console.log(err);
-        res.set('Content-Type', 'text/html')
-        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
-    }
+router.get('/pangea-re-survey-page-accept-decline-tasks-quote', getProjectManageToken, async (req, res) => {
+	const originalUrl = req.originalUrl.replace('pangea-re-survey-page-', '');
+	let { projectId, prop, tasksIds } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	tasksIds = tasksIds.replace(/[%]/g, ' ');
+	tasksIds = tasksIds.split(';');
+	tasksIds.pop();
+	const template = generateTemplateForTasksAcceptOrRejectQuote(currentProject, tasksIds, prop, originalUrl);
+	res.send(template)
 });
 
+router.get('/accept-decline-tasks-quote', getProjectManageToken, async (req, res) => {
+	let { to: mailDate, tasksIds, prop, projectId } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	const date = new Date().getTime();
+	const expiry = date - mailDate;
+	try {
+		if(expiry > 900000) {
+			res.send(generateTemplateForDefaultMessage('Sorry! The link is already expired.'))
+		} else {
+			const project = await getProject({ "_id": projectId });
+			let { tasks, steps } = project;
+			tasksIds = tasksIds.replace(/[%]/g, ' ');
+			tasksIds = tasksIds.split(';');
+			tasksIds.pop();
+			if(prop === 'Rejected') {
+				const neededSteps = steps.filter(step => tasksIds.includes(step.taskId)).map(step => step._id);
+				steps = steps.map(step => {
+					if(neededSteps.includes(step._id)) {
+						step.status = prop;
+					}
+					return step;
+				});
+			}
+			tasks = tasks.map(task => {
+				if(task.status === 'Quote sent' && tasksIds.includes(task.taskId)) {
+					task.status = prop;
+				}
+				return task;
+			});
+			await Projects.updateOne({ "_id": projectId }, { isClientOfferClicked: true, tasks, steps });
+			prop === 'Rejected' ?
+					emitter.emit('projectRejectedNotification', project) :
+					emitter.emit('projectApprovedNotification', project);
+			res.send(generateTemplateForAlertForTasksAcceptOrRejectQuote(currentProject, tasksIds, prop))
+		}
+	} catch (err) {
+		console.log(err);
+		res.send(generateTemplateForDefaultMessage('Sorry. Try again later.'))
+	}
+});
+
+router.get('/pangea-re-survey-page-acceptquote', getProjectManageToken, async (req, res) => {
+	const originalUrl = req.originalUrl.replace('pangea-re-survey-page-', '');
+	const { projectId } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	const template = generateTemplateForAcceptQuote(currentProject, `${ originalUrl }`);
+	res.send(template)
+})
+
 router.get('/acceptquote', getProjectManageToken, async (req, res) => {
-    const {to: mailDate, projectId } = req.query;
-    const date = new Date().getTime();
-    const expiry = date - mailDate;
-    try {
-        if(expiry > 900000) {
-            res.set('Content-Type', 'text/html');
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
-        } else {
-            const project = await getProject({"_id": projectId});
-            if(project.isClientOfferClicked || project.status !== "Quote sent") {
-                res.set('Content-Type', 'text/html');
-                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Link is not valid anymore.</p></body>`)
-            }
-            const status = project.isStartAccepted ? "Started" : "Approved";
-            await updateProjectStatus(projectId, status);
-            await Projects.updateOne({"_id": projectId}, {$set: {isClientOfferClicked: true}});
-            emitter.emit('projectApprovedNotification', project);
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you. We'll contact you as soon as possible.</p></body>`)
-        }
-    } catch(err) {
-            console.log(err);
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
-        }
+	const { to: mailDate, projectId } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	const date = new Date().getTime();
+	const expiry = date - mailDate;
+	try {
+		if(expiry > 900000) {
+			res.send(generateTemplateForDefaultMessage('Sorry! The link is already expired.'))
+		} else {
+			const project = await getProject({ "_id": projectId });
+			if(project.isClientOfferClicked || project.status !== "Quote sent") {
+				return res.send(generateTemplateForDefaultMessage('Sorry. Link is not valid anymore.'))
+			}
+			const status = project.isStartAccepted ? "Started" : "Approved";
+			await updateProjectStatus(projectId, status);
+			await Projects.updateOne({ "_id": projectId }, { $set: { isClientOfferClicked: true } });
+			emitter.emit('projectApprovedNotification', project);
+			res.send(generateTemplateForAlertAcceptQuote(currentProject))
+		}
+	} catch (err) {
+		console.log(err);
+		res.send(generateTemplateForDefaultMessage('Sorry. Acception failed! Try again later.'))
+	}
+})
+
+router.get('/pangea-re-survey-page-declinequote', async (req, res) => {
+	const originalUrl = req.originalUrl.replace('pangea-re-survey-page-', '');
+	const { projectId } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	const template = generateTemplateForRejectQuote(currentProject, `${ originalUrl }`);
+	res.send(template)
 })
 
 router.get('/declinequote', async (req, res) => {
-    const {to: mailDate, projectId } = req.query;
-    const date = new Date().getTime();
-    const expiry = date - mailDate;
-    try {
-        if(expiry > 900000) {
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
-        } else {
-            const project = await getProject({"_id": projectId});
-            if(project.isClientOfferClicked || project.status !== "Quote sent") {
-                res.set('Content-Type', 'text/html');
-                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Link is not valid anymore.</p></body>`)
-            }
-            const client = {...project.customer._doc, id: project.customer.id};
-            emitter.emit('projectRejectedNotification', project);
-            await Projects.updateOne({"_id": projectId}, {$set: {status: "Rejected", isClientOfferClicked: true}});
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you! We'll contact you if any changes.</p></body>`)
-        }
-    } catch(err) {
-        console.log(err);
-        res.set('Content-Type', 'text/html')
-        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Try again later.</p></body>`)
-    }
+	const { to: mailDate, projectId } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	const date = new Date().getTime();
+	const expiry = date - mailDate;
+	try {
+		if(expiry > 900000) {
+			res.send(generateTemplateForDefaultMessage('Sorry! The link is already expired.'))
+		} else {
+			const project = await getProject({ "_id": projectId });
+			if(project.isClientOfferClicked || project.status !== "Quote sent") {
+				return res.send(generateTemplateForDefaultMessage('Sorry. Link is not valid anymore.'))
+			}
+			emitter.emit('projectRejectedNotification', project);
+			await Projects.updateOne({ "_id": projectId }, { $set: { status: "Rejected", isClientOfferClicked: true } });
+			res.send(generateTemplateForAlertRejectQuote(currentProject))
+		}
+	} catch (err) {
+		console.log(err);
+		res.send(generateTemplateForDefaultMessage('Sorry. Try again later.'))
+	}
+})
+
+router.get('/pangea-re-survey-page-step-decision', getProjectManageToken, async (req, res) => {
+	const originalUrl = req.originalUrl.replace('pangea-re-survey-page-', '');
+	const { projectId, decision, stepId } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	const template = generateTemplateForTasksAcceptOrRejectVendor(currentProject, stepId, decision, originalUrl);
+	res.send(template)
 })
 
 router.get('/step-decision', getProjectManageToken, async (req, res) => {
-    const { decision, vendorId, projectId, stepId, to } = req.query;
-    const date = Date.now();
-    try {
-        if((date - +to) > 900000) {
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry! The link is already expired.</p></body>`)
-        } else {
-            const project = await getProject({"_id": projectId});
-            let steps = [...project.steps];
-            let index = steps.findIndex(item => item.stepId === stepId);
-            if(steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
-                res.set('Content-Type', 'text/html');
-                return res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. You've already made your decision.</p></body>`)
-            }
-            emitter.emit('stepAcceptAction', {project, index, vendorId, decision});
-            res.set('Content-Type', 'text/html')
-            res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Thank you.</p></body>`)
-        }
-    } catch(err) {
-        console.log(err);
-        res.set('Content-Type', 'text/html')
-        res.send(`<body onload="javascript:setTimeout('self.close()',5000);"><p>Sorry. Acception failed! Try again later.</p></body>`)
-    }
+	const { decision, vendorId, projectId, stepId, to } = req.query;
+	const [currentProject] = await Projects.find({ "_id": projectId }).populate('industry');
+	const date = Date.now();
+	try {
+		if((date - +to) > 900000) {
+			res.send(generateTemplateForDefaultMessage('Sorry! The link is already expired.'))
+		} else {
+			const project = await getProject({ "_id": projectId });
+			let steps = [...project.steps];
+			let index = steps.findIndex(item => item.stepId === stepId);
+			if(steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
+				return res.send(generateTemplateForDefaultMessage('Sorry. You\'ve already made your decision.'))
+			}
+			emitter.emit('stepAcceptAction', { project, index, vendorId, decision });
+			res.send(generateTemplateForAlertTasksAcceptOrRejectVendor(currentProject, stepId, decision))
+		}
+	} catch (err) {
+		console.log(err);
+		res.send(generateTemplateForDefaultMessage('Sorry. Acception failed! Try again later.'));
+	}
 })
 
 module.exports = router;
