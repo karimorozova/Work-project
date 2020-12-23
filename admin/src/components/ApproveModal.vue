@@ -108,7 +108,7 @@
     box-shadow: 0 0 10px #67573e9d;
     background-color: $white;
     max-width: 300px;
-    font-size: 18px;
+    font-size: 16px;
 
     &__buttons {
       margin-top: 10px;
