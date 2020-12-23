@@ -16,11 +16,11 @@
           .lqa-vendors-table__header(slot="headerTargetLang" slot-scope="{ field }") {{ field.label }}
           .lqa-vendors-table__data(slot="vendor" slot-scope="{ row }") {{ row.name }}
           .lqa-vendors-table__data(slot="words" slot-scope="{ row }") {{ presentWordcount(row.wordCount) | roundWordCount }}
-          .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industry }}
+          .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industries }}
           .lqa-vendors-table__data(slot="tier" slot-scope="{ row }") {{ row.tier || '-'}}
           .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{  row.LQA }}
-          .lqa-vendors-table__data(slot="sourceLanguage" slot-scope="{ row }") {{ row.sourceLanguage }}
-          .lqa-vendors-table__data(slot="targetLanguage" slot-scope="{ row }") {{ row.targetLanguage }}
+          .lqa-vendors-table__data(slot="sourceLanguage" slot-scope="{ row }") {{ row.sourceLang }}
+          .lqa-vendors-table__data(slot="targetLanguage" slot-scope="{ row }") {{ row.targetLang }}
 </template>
 
 <script>
