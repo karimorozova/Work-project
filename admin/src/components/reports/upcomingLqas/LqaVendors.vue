@@ -24,6 +24,7 @@
                 @saveVendorLqa="saveVendorLqa"
                 :uploadForm="true"
             )
+        | {{selectedVendor}}
 </template>
 
 <script>
