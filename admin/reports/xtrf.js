@@ -1,4 +1,4 @@
-const { Languages, XtrfLqa } = require('../models');
+const { Languages, XtrfLqa, Vendor } = require('../models');
 const {
   getFilteringQueryForLqaReport,
   getVendorsData,
@@ -145,10 +145,11 @@ const getXtrfLqaReport = async (filters) => {
    * @returns {Array} returns report with populated(filled from other collections) data
    */
   async function getReport() {
-    return await XtrfLqa.find(filterQuery, dataLimitQuery).skip(skipCount).limit(countFilter)
+    return await XtrfLqa.find(filterQuery, dataLimitQuery)
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
       .populate('industries.industry', ['name'])
+      .populate('industries.vendors.vendor', ['name'])
       .populate('industries.industryGroup', ['name'])
       .populate('industries.Finance.industryId', ['name'])
       .populate('industries.iGaming.industryId', ['name']);
@@ -167,34 +168,42 @@ const getXtrfUpcomingReport = async (filters) => {
     const lqaReport = await XtrfLqa.find()
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
+      .populate('industries.vendors.vendor', ['assessments'])
       .populate('industries.industryGroup', ['name']);
     let result = [];
-    for (let { sourceLanguage, targetLanguage, industries } of lqaReport) {
+    for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries } of lqaReport) {
       industries
         .filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
         .forEach(industry => {
           const vendorsNotNull =  industry.vendors.filter(({vendor})=> vendor !== null)
 
-          vendorsNotNull.forEach(vendor => {
-            const vendorTargetLanguage = targetLanguage ? targetLanguage.lang : 'no language data';
-            const { name, vendorId, wordCount, tier } = vendor
+          vendorsNotNull.forEach(vendorNotNull => {
+            const vendorTargetLang = targetLang ? targetLang.lang : 'no language data';
+            const { name, vendor, wordCount, tier} = vendorNotNull
 
-            const vendorInData = result.find((vendor) => {
-              return vendor.name === name
-                && vendor.sourceLanguage === sourceLanguage.lang
-                && vendor.targetLanguage === vendorTargetLanguage
-                && vendor.industry === industry.industryGroup.name
+            // const assessment =  vendor.assessments;
+            // const steps = getSteps(assessment)
+
+
+
+            const vendorInData = result.find((vendorNotNull) => {
+              return vendorNotNull.name === name
+                && vendorNotNull.sourceLang === sourceLang.lang
+                && vendorNotNull.targetLang === vendorTargetLang
+                && vendorNotNull.industries === industry.industryGroup.name
             })
 
             if (!vendorInData) {
               result.push({
                 name,
-                vendorId,
+                vendor,
                 wordCount,
                 tier,
-                sourceLanguage: sourceLanguage.lang,
-                targetLanguage: vendorTargetLanguage,
-                industry: industry.industryGroup.name,
+                steps,
+                sourceLang: sourceLang.lang,
+                targetLang: vendorTargetLang,
+                industries: industry.industryGroup.name,
+                step: 'Translate'
               });
               return;
             }
@@ -202,6 +211,11 @@ const getXtrfUpcomingReport = async (filters) => {
             vendorInData.wordCount += wordCount
           })
         })
+      // function getSteps(assessment) {
+      //   if (!assessment.length) return;
+      //
+      //   const steps = assessment[0].industries[0].steps[0]
+      // }
     }
     if (industryFilter) {
       result = result.filter(({ industry }) => industry === industryFilter);
@@ -235,6 +249,7 @@ function groupXtrfLqaByIndustryGroup(result) {
       }
 
       gByIndustryGroup[findIndustryId].vendors = notNullVendor.reduce((resVendors, vendor)=> {
+        if(!vendor) return resVendors;
         const {name} = vendor
         const findVendorId = resVendors.findIndex(vendor => vendor.name === name)
 

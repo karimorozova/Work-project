@@ -17,7 +17,7 @@
         .lqa-vendors__table(v-if="this.reportData.length")
           Table(:vendorsData="allVendors" @selectVendor="selectVendor")
         .lqa-vendors__form(v-if="isForm")
-            VendorLqaForm(
+          VendorLqa(
                 :vendorData="selectedVendor"
                 :languages="languages"
                 @closeForm="closeForm"
@@ -29,7 +29,7 @@
 <script>
 import Filters from "../Filters";
 import Table from "./Table";
-import VendorLqaForm from "./VendorLqaForm";
+import VendorLqa from "../../vendors/VendorLqa";
 import { mapActions } from "vuex";
 
 export default {
@@ -80,7 +80,7 @@ export default {
             await this.getReport();
         },
       selectVendor ({ vendor }) {
-        this.selectedVendor = vendor;
+        this.selectedVendor = {vendor};
         this.isForm = true;
       },
         closeForm() {
@@ -138,7 +138,7 @@ export default {
     components: {
         Filters,
         Table,
-        VendorLqaForm
+      VendorLqa
     },
     mounted() {
         this.getReport();

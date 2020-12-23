@@ -1,5 +1,6 @@
 <template lang="pug">
-  .lqa(@scroll="handleBodyScroll")
+<!--  .lqa(@scroll="handleBodyScroll")-->
+  .lqa
     .lqa__filters
       LqaReportFilter(
         :isLqa="false"
