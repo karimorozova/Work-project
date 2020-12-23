@@ -104,8 +104,8 @@ function requestMessageForVendor(obj) {
 	const langPair = obj.sourceLanguage ? `${ obj.sourceLanguage } >> ${ obj.targetLanguage }; ` : `${ obj.targetLanguage } / ${ obj.packageSize }; `;
 	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '2h' });
 	const stepId = obj.stepId.replace(/ /g, '%20');
-	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
-	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
+	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
+	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
 	const start = obj.start.split('T')[0].split('-').reverse().join('-');
 	const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-');
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -140,7 +140,7 @@ function requestMessageForVendor(obj) {
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Wordcount:</td>
-                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.finance.Wordcount.payables }</td>
+                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.finance.Wordcount.payables || '-' }</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Deadline:</td>
