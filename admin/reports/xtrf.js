@@ -199,7 +199,7 @@ const getXtrfUpcomingReport = async (filters) => {
                 vendor,
                 wordCount,
                 tier,
-                steps,
+                // steps,
                 sourceLang: sourceLang.lang,
                 targetLang: vendorTargetLang,
                 industries: industry.industryGroup.name,
