@@ -1,6 +1,7 @@
 const { MemoqProject, Languages, LangTier } = require('../models');
 const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
 const { fillLangTierReportWithLocal } = require('../projects/langTierReport');
+const moment = require('moment')
 
 /**
  *
@@ -8,7 +9,9 @@ const { fillLangTierReportWithLocal } = require('../projects/langTierReport');
  */
 const newLangReport = async () => {
   const languages = await Languages.find();
-  let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }] });
+  const dateStartNovember = "2020-12-01"
+  // const dateTwoMonthAgo = moment().subtract(2, 'months').format('YYYY-MM-DD');
+  let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }, {creationTime: {$gte: dateStartNovember}}] });
   projects = projects.filter(item => item.sourceLanguage);
   const reports = [];
   for (let { domain, sourceLanguage, documents } of projects) {

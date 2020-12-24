@@ -212,7 +212,7 @@ router.get('/restore-memoq-lqa-report', async (req, res) => {
 		await UpdateLQAFromProject();
 		const result = await newLQAStatusFromXTRFProjects();
     groupXtrfLqaByIndustryGroup(result)
-		res.send(result);
+		res.send(result.filter(({industries})=> industries.length));
 	} catch (err) {
 		console.log(err);
 		res.status(500).send('Erron on restoring old xtrf-lqa reports!');

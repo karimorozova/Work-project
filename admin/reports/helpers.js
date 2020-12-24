@@ -106,15 +106,29 @@ const getFilteringQueryForLqaReport = async (filters) => {
 const getVendorsData = (vendorsArr, sourceLanguage, targetLanguage, industry) => {
   const data = [];
   for (let { name, vendorId, wordCount, tier } of vendorsArr) {
-    data.push({
-      name,
-      vendorId,
-      wordCount,
-      tier,
-      sourceLanguage: sourceLanguage.lang,
-      targetLanguage: targetLanguage ? targetLanguage.lang : 'no language data',
-      industry
-    });
+    const targetLanguages = targetLanguage ? targetLanguage.lang : 'no language data';
+
+    const vendorInData = data.find((vendor) => {
+      return vendor.vendorId === vendorId
+              && vendor.sourceLanguage === sourceLanguage.lang
+              && vendor.targetLanguage === targetLanguages
+              && vendor.industry === industry
+    })
+
+    if (!vendorInData) {
+      data.push({
+        name,
+        vendorId,
+        wordCount,
+        tier,
+        sourceLanguage: sourceLanguage.lang,
+        targetLanguage: targetLanguages,
+        industry
+      });
+      continue;
+    }
+
+    vendorInData.wordCount += wordCount
   }
   return data;
 };

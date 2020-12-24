@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const vendorsArr = [{
   vendor: {
-    type: Schema.Types.ObjectId, ref: 'Vendor',
+    type: Schema.Types.ObjectId, ref: 'Vendors',
     default: null
   },
   name: {
@@ -20,7 +20,7 @@ const vendorsArr = [{
   },
   otherInfo: [{
     clientId: {
-      type: Schema.Types.ObjectId, ref: 'Client',
+      type: Schema.Types.ObjectId, ref: 'Clients',
       default: null
     },
     clientName: {
