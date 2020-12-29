@@ -8,7 +8,8 @@ const {
 	newLQAStatusFromXTRFProjects,
 	UpdateLQAFromProject,
 	newLangReport,
-  groupXtrfLqaByIndustryGroup
+  groupXtrfLqaByIndustryGroup,
+  UpdateLqaAliases,
 } = require('../reports');
 
 //
@@ -218,5 +219,34 @@ router.get('/restore-memoq-lqa-report', async (req, res) => {
 		res.status(500).send('Erron on restoring old xtrf-lqa reports!');
 	}
 });
+
+router.get('/restore-lqa-report-aliases', async (req, res) => {
+  try {
+    const result = await UpdateLqaAliases();
+    groupXtrfLqaByIndustryGroup(result)
+    res.send(result.filter(({industries})=> industries.length));
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Erron on restoring old xtrf-lqa reports!');
+  }
+});
+
+router.post('/reports-vendor-assessment', upload.fields([{ name: 'assessmentFile' }]), async (req, res) => {
+  const assessment = JSON.parse(req.body.assessment);
+  const { vendorId } = req.body;
+  const files = req.files["assessmentFile"];
+  try {
+    const updatedVendor = await updateVendorAssessment({
+      vendorId,
+      assessment,
+      file: files[0]
+    });
+    res.send(updatedVendor);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error on saving Vendor's assessment");
+  }
+});
+
 
 module.exports = router;

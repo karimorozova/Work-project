@@ -49,7 +49,10 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["alertToggle"]),
+        ...mapActions({
+          alertToggle: "alertToggle",
+          storeAssessment: "storeCurrentVendorAssessment",
+        }),
         async getReport() {
             try {
                 const result = await this.$http.post("/reportsapi/xtrf-upcoming-lqa-report", { filters: this.filters });
@@ -80,23 +83,43 @@ export default {
             await this.getReport();
         },
       selectVendor ({ vendor }) {
-        this.selectedVendor = {vendor};
+        this.selectedVendor = {vendor, ...vendor.modalLqa};
         this.isForm = true;
       },
         closeForm() {
             this.isForm = false;
         },
-        async saveVendorLqa({vendorData}) {
-            try {
-                console.log(vendorData);
-                // await this.$http.post("/reportsapi/xtrf-vendor-lqa", { vendorData });
-                await this.getReport();
-            } catch(err) {
-                this.alertToggle({message: "Error on updating Vendor's LQA", isShow: true, type: "error"});
-            } finally {
-                this.closeForm();
-            }
-        }
+      async saveVendorLqa({ vendorData }) {
+        // const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex } = vendorData;
+        // const assessment = {
+        //   ...this.currentAssessment,
+        //   isNew: false,
+        //   step,
+        //   source,
+        //   target,
+        //   mainIndex,
+        //   industryIndex,
+        //   stepIndex,
+        //   [this.currentField]: { fileName: "", path: "", grade },
+        // };
+        // let formData = new FormData();
+        // formData.append("vendorId", this.currentVendor._id);
+        // formData.append("assessment", JSON.stringify(assessment));
+        // formData.append("assessmentFile", file);
+        //
+        // try {
+        //   const result = await this.storeAssessment(formData);
+        //   this.alertToggle({
+        //     message: "Assessment saved",
+        //     isShow: true,
+        //     type: "success",
+        //   });
+        // } catch (err) {
+        // } finally {
+        //   this.$emit("refreshAssessment");
+        //   this.closeForm();
+        // }
+      },
     },
     computed: {
         allVendors() {
@@ -149,9 +172,12 @@ export default {
 
 <style lang="scss" scoped>
 .lqa-vendors {
-  box-sizing: border-box;
-  padding: 40px 40px 0 40px;
-  position: relative;
+  margin: 40px 40px 40px 20px;
+  width: 1100px;
+  box-shadow: 0 0 10px rgba(104, 87, 62, .5);
+  padding: 20px;
+  max-height: 750px;
+  overflow-y: auto;
   &__form {
     width: 70%;
     position: absolute;
