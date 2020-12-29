@@ -149,7 +149,7 @@ const getXtrfLqaReport = async (filters) => {
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
       .populate('industries.industry', ['name'])
-      .populate('industries.vendors.vendor', ['name'])
+      .populate('industries.vendors.vendor')
       .populate('industries.industryGroup', ['name'])
       .populate('industries.Finance.industryId', ['name'])
       .populate('industries.iGaming.industryId', ['name']);
@@ -169,7 +169,8 @@ const getXtrfUpcomingReport = async (filters) => {
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
       .populate('industries.vendors.vendor', ['assessments'])
-      .populate('industries.industryGroup', ['name']);
+      .populate('industries.industryGroup', ['name'])
+      .populate('industries.industry', ['name']);
     let result = [];
     for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries } of lqaReport) {
       industries
@@ -179,12 +180,23 @@ const getXtrfUpcomingReport = async (filters) => {
 
           vendorsNotNull.forEach(vendorNotNull => {
             const vendorTargetLang = targetLang ? targetLang.lang : 'no language data';
-            const { name, vendor, wordCount, tier} = vendorNotNull
-
-            // const assessment =  vendor.assessments;
-            // const steps = getSteps(assessment)
-
-
+            const { name, wordCount, tier} = vendorNotNull
+            const assessment =  vendorNotNull.vendor.assessments;
+            const vendorId = vendorNotNull.vendor._id;
+            const steps = getSteps(assessment, industry.industry._id)
+            const stepInfo = getStepInfo(steps)
+            let vendorInfo = {
+              name,
+              wordCount,
+              tier,
+              steps,
+              sourceLang: sourceLang.lang,
+              targetLang: vendorTargetLang,
+              industries: industry.industryGroup.name,
+              vendorId,
+              step: 'Translations',
+            }
+            vendorInfo = {...vendorInfo, ...stepInfo}
 
             const vendorInData = result.find((vendorNotNull) => {
               return vendorNotNull.name === name
@@ -194,28 +206,40 @@ const getXtrfUpcomingReport = async (filters) => {
             })
 
             if (!vendorInData) {
-              result.push({
-                name,
-                vendor,
-                wordCount,
-                tier,
-                // steps,
-                sourceLang: sourceLang.lang,
-                targetLang: vendorTargetLang,
-                industries: industry.industryGroup.name,
-                step: 'Translate'
-              });
+              result.push(vendorInfo);
               return;
             }
 
             vendorInData.wordCount += wordCount
           })
         })
-      // function getSteps(assessment) {
-      //   if (!assessment.length) return;
-      //
-      //   const steps = assessment[0].industries[0].steps[0]
-      // }
+      function getSteps(assessment, industryId) {
+        if (!assessment.length) return null;
+        const assessmentByIndustry = assessment[0]
+          .industries
+          .find(({industry: assessmentIndustry}) => {
+            return assessmentIndustry._id.toString() ===  industryId.toString()
+          })
+
+        return assessmentByIndustry ? assessmentByIndustry.steps : null;
+      }
+      function getStepInfo (steps){
+        if (!steps) return {lqaNumber: '-', modalLqa: {isTqi: false}}
+        const lastStep = steps.pop()
+        const {tqi, lqa1, lqa2, lqa3} = lastStep
+        if (lqa3 && lqa3.grade) {
+          return { lqaNumber: '3', modalLqa: {isLqa3: true}}
+        }
+        if (lqa2 && lqa2.grade) {
+          return { lqaNumber: '2',modalLqa: {isLqa2: true}}
+        }
+        if (lqa1 && lqa1.grade) {
+          return {lqaNumber: '1',modalLqa: {isLqa1: true}}
+        }
+        if (tqi && tqi.grade) {
+          return { lqaNumber: 'TQI', modalLqa: {isTqi: true}}
+        }
+      }
     }
     if (industryFilter) {
       result = result.filter(({ industry }) => industry === industryFilter);

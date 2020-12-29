@@ -38,7 +38,7 @@
                             :options="tierNames"
                             :selectedOption="tierFilter"
                             @chooseOption="setTierFilter"
-                        )                
+                        )
         .report-filters__row(v-if="isLqa")
             .report-filters__item.report-filters_width-300(:class="{'report-filters_width-280': !isTarget}")
                 LabelVal(text="Vendor Name:" customClass="new-chart-label")
@@ -121,8 +121,8 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .report-filters {
-    width: 70%;
-    max-width: 1030px;
+    //width: 70%;
+    //max-width: 1030px;
     &__row {
         width: 100%;
         display: flex;
@@ -152,7 +152,7 @@ export default {
         justify-content: flex-start;
     }
     &_right-margin-80 {
-        margin-right: 80px; 
+        margin-right: 80px;
     }
     &_width-300 {
         width: 300px;

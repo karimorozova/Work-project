@@ -49,21 +49,23 @@ const filterTierReport = (reports, filters) => {
 const getLqaReportFilterOptions = (lqaReport) => {
   const allSourceLanguages = [];
   const allTargetLanguages = [];
-  const allVendors = [];
+  const allVendors = new Set();
+
   for (let { sourceLanguage, targetLanguage, industries } of lqaReport) {
-    const { Finance, iGaming } = industries;
-    const { vendors: financeVendors } = Finance;
-    const { vendors: iGamingVendors } = iGaming;
-    allSourceLanguages.push(sourceLanguage.lang);
-    targetLanguage && allTargetLanguages.push(targetLanguage.lang);
-    const financeVendorNames = financeVendors.map(vendor => vendor.name);
-    const igamingVendorNames = iGamingVendors.map(vendor => vendor.name);
-    allVendors.push(...financeVendorNames, ...igamingVendorNames);
+    industries.map(({vendors})=> {
+      vendors
+        .filter(({vendor}) => vendor)
+        .forEach(({name})=>{
+          allSourceLanguages.push(sourceLanguage.lang);
+          targetLanguage && allTargetLanguages.push(targetLanguage.lang);
+          allVendors.add(name)
+        })
+    })
   }
   return {
     availableSources: Array.from(new Set(allSourceLanguages)),
     availableTargets: Array.from(new Set(allTargetLanguages)),
-    availableVendors: Array.from(new Set(allVendors)),
+    availableVendors: Array.from(allVendors),
   };
 };
 

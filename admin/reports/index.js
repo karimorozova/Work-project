@@ -6,6 +6,7 @@ const {
   groupXtrfLqaByIndustryGroup
 } = require("./xtrf");
 const { UpdateLQAFromProject } = require("./newLQAStatusFromProjects");
+const { UpdateLqaAliases } = require("./newLQAStatusUpdateAliases")
 const {
   newLQAStatusFromXTRFProjects,
   getTier
@@ -23,4 +24,5 @@ module.exports = {
   getTier,
   newLangReport,
   groupXtrfLqaByIndustryGroup,
+  UpdateLqaAliases,
 };
