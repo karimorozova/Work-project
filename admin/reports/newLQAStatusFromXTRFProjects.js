@@ -91,7 +91,11 @@ const newLQAStatusFromXTRFProjects = async () => {
 	}
 
 	await XtrfLqa.create(reports);
-	return await XtrfLqa.find().populate('sourceLanguage', 'lang').populate('targetLanguage', 'lang').populate('industries.industryGroup', ['name']);
+	return await XtrfLqa
+    .find()
+    .populate('sourceLanguage', 'lang')
+    .populate('targetLanguage', 'lang')
+    .populate('industries.industryGroup', ['name']);
 }
 
 

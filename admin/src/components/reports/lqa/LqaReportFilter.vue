@@ -60,6 +60,7 @@
       .button
         .button__row
           input.button__update-btn(type="submit" value="Update LQA Status Reports" @click="updateReports()")
+          input.button__update-btn.button__update-aliases-btn(type="submit" value="Update Aliases" @click="updateAliases()")
 
 </template>
 
@@ -89,6 +90,15 @@
       async updateReports () {
         try {
           const report = await this.$http.get('/reportsapi/restore-memoq-lqa-report');
+          this.$emit('updateReport', { value: report.body });
+          this.alertToggle({ message: 'Started to restore...' });
+        } catch (err) {
+          this.alertToggle({ message: 'Error on restoring old files', isShow: true, type: 'error' });
+        }
+      },
+      async updateAliases () {
+        try {
+          const report = await this.$http.get('/reportsapi/restore-lqa-report-aliases');
           this.$emit('updateReport', { value: report.body });
           this.alertToggle({ message: 'Started to restore...' });
         } catch (err) {
@@ -129,6 +139,9 @@
   @import "../../../assets/scss/colors.scss";
 
   .button {
+    &__update-aliases-btn{
+      margin-left: 15px;
+    }
     &__update-btn {
       width: 194px;
       height: 34px;
