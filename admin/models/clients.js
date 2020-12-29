@@ -179,18 +179,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Number,
 				default: 1,
 			},
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      },
-      isActive: {
-        type: Boolean
-      }
+			altered: {
+				type: Boolean,
+				default: false,
+			},
+			notification: {
+				type: String,
+				default: '',
+				trim: true
+			},
+			isActive: {
+				type: Boolean
+			}
 		}],
 		stepMultipliersTable: [{
 			step: {
@@ -210,18 +210,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Boolean,
 				default: false
 			},
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      },
-      isActive: {
-        type: Boolean
-      }
+			altered: {
+				type: Boolean,
+				default: false,
+			},
+			notification: {
+				type: String,
+				default: '',
+				trim: true
+			},
+			isActive: {
+				type: Boolean
+			}
 		}],
 		industryMultipliersTable: [{
 			industry: {
@@ -231,18 +231,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Number,
 				default: 100,
 			},
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      },
-      isActive: {
-        type: Boolean
-      }
+			altered: {
+				type: Boolean,
+				default: false,
+			},
+			notification: {
+				type: String,
+				default: '',
+				trim: true
+			},
+			isActive: {
+				type: Boolean
+			}
 		}],
 		pricelistTable: [{
 			sourceLanguage: {
@@ -267,18 +267,18 @@ const ClientSchema = new mongoose.Schema({
 				type: Number,
 				default: 1
 			},
-      altered: {
-        type: Boolean,
-        default: false,
-      },
-      notification: {
-        type: String,
-        default: '',
-        trim: true
-      },
-      isActive: {
-        type: Boolean
-      }
+			altered: {
+				type: Boolean,
+				default: false,
+			},
+			notification: {
+				type: String,
+				default: '',
+				trim: true
+			},
+			isActive: {
+				type: Boolean
+			}
 		}]
 	},
 	contacts: [{
@@ -330,74 +330,74 @@ const ClientSchema = new mongoose.Schema({
 		},
 		timezone: {
 			type: String,
-      default: ''
-    },
-    notes: {
-      type: String,
-    },
-    leadContact: {
-      type: Boolean,
-      default: false
-    }
-  }],
-  discounts: [{
-    type: Schema.Types.ObjectId, ref: 'Discounts',
-  }],
-  matrix: {
-    type: Object,
-    default: {
-      xTranslated: {
-        text: 'X translated',
-        rate: 10,
-        altered: false,
-        notification: ''
-      },
-      repeat: {
+			default: ''
+		},
+		notes: {
+			type: String,
+		},
+		leadContact: {
+			type: Boolean,
+			default: false
+		}
+	}],
+	discounts: [{
+		type: Schema.Types.ObjectId, ref: 'Discounts',
+	}],
+	matrix: {
+		type: Object,
+		default: {
+			xTranslated: {
+				text: 'X translated',
+				rate: 10,
+				altered: false,
+				notification: ''
+			},
+			repeat: {
 				text: "Repetition",
 				rate: 20,
-        altered: false,
+				altered: false,
 				notification: ''
 			},
 			contextMatch: {
 				text: "Context match",
 				rate: 20,
-        altered: false,
+				altered: false,
 				notification: ''
 			},
 			repeat100: {
 				text: "100%",
 				rate: 20,
-        altered: false,
+				altered: false,
 				notification: ''
 			},
 			repeat50: {
 				text: "50-74%",
 				rate: 100,
-        altered: false,
+				altered: false,
 				notification: ''
 			},
 			repeat75: {
 				text: "75-84%",
 				rate: 80,
-        altered: false,
+				altered: false,
 				notification: ''
 			},
 			repeat85: {
 				text: "85-94%",
 				rate: 60,
-        altered: false,
+				altered: false,
 				notification: ''
 			},
 			repeat95: {
 				text: "95-99%",
 				rate: 25,
-        altered: false,
+				altered: false,
 				notification: ''
 			},
 			noMatch: {
 				text: "No match",
 				rate: 100,
-        altered: false,
+				altered: false,
 				notification: ''
 			}
 		}
@@ -423,7 +423,23 @@ const ClientSchema = new mongoose.Schema({
 			type: String,
 			trim: true
 		}
-	}
+	},
+	notes: [{
+		user: {},
+		createdAt: {
+			type: Date,
+			default: new Date()
+		},
+		updatedAT: {
+			type: Date,
+			default: new Date()
+		},
+		message: {
+			type: String,
+			default: ''
+		}
+	}],
+
 }, { minimize: false });
 
 ClientSchema.statics.authenticate = function (email, password, callback) {

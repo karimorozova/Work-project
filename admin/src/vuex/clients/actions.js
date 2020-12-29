@@ -1,5 +1,28 @@
 import Vue from "vue";
 
+export const updateClientNotes = async ({commit, dispatch, state}, payload) => {
+    commit("startRequest");
+    try {
+        const result = await Vue.http.post('/clientsapi/update-notes', payload);
+        dispatch('storeCurrentClient', result.body);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
+        commit("endRequest");
+    }
+}
+
+export const deleteClientNotes = async ({commit, dispatch, state}, payload) => {
+    commit("startRequest");
+    try {
+        const result = await Vue.http.post('/clientsapi/delete-notes', payload);
+        dispatch('storeCurrentClient', result.body);
+    } catch(err) {
+        dispatch('alertToggle', {message: err.response.data, isShow: true, type: "error"});
+    } finally {
+        commit("endRequest");
+    }
+}
 export const addNewClient = ({commit, rootState}, payload) => {
     rootState.a.customers.push(payload);
 }
