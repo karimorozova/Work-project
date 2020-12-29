@@ -16,6 +16,10 @@
           :timezones="timezones"
           :allClientAliases="aliases"
         )
+      .title(v-if="currentClient._id") Notes & Comments
+      .client-info__notes(v-if="currentClient._id")
+          ClientsNotes()
+
       .title(v-if="currentClient._id") Contact Details
       .client-info__contacts-info(v-if="currentClient._id")
         ContactsInfo(
@@ -126,6 +130,7 @@
 	import ResultTable from "./pricelists/ResultTable";
 	import { mapGetters, mapActions } from "vuex";
 	import DiscountChart from "./DiscountChart";
+	import ClientsNotes from "./ClientsNotes";
 
 	export default {
 		props: {
@@ -153,11 +158,10 @@
 				timezones: [],
 				currentDocuments: [],
 				clientDataInCreated: {
-					sourceLanguages:[],
-          targetLanguages: [],
-        },
+					sourceLanguages: [],
+					targetLanguages: [],
+				},
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/,
-
 
 
 				isApproveModal: false,
@@ -369,11 +373,11 @@
 				if(isSameEmailsExists) {
 					this.errors.push("A client with such Email already exists, the client's Email should be unique!");
 				}
-        if(this.currentClient.website){
-        	if(this.websiteRegEx.exec(this.currentClient.website) === null){
-		        this.errors.push("The website field must contain a link");
-          }
-        }
+				if(this.currentClient.website) {
+					if(this.websiteRegEx.exec(this.currentClient.website) === null) {
+						this.errors.push("The website field must contain a link");
+					}
+				}
 				if(this.errors.length) {
 					this.areErrorsExist = true;
 					this.isSaveClicked = true;
@@ -582,13 +586,13 @@
 			}),
 			sourceLanguagesClientData() {
 				if(this.clientDataInCreated.sourceLanguages.length) {
-          return this.clientDataInCreated.sourceLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b));
-        }
+					return this.clientDataInCreated.sourceLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b));
+				}
 			},
-			targetLanguagesClientData(){
-			  if(this.clientDataInCreated.targetLanguages.length) {
-          return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b));
-        }
+			targetLanguagesClientData() {
+				if(this.clientDataInCreated.targetLanguages.length) {
+					return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b));
+				}
 			},
 
 		},
@@ -610,6 +614,7 @@
 			ClientDocuments,
 			OtherClientInformation,
 			RatesParameters,
+			ClientsNotes
 		},
 		created() {
 			this.getClientInfo();
@@ -642,14 +647,16 @@
       margin-top: 120px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);
+
     }
 
     &__date {
       margin-top: 146px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);
+
     }
   }
 
@@ -657,6 +664,12 @@
     padding: 40px;
     width: 1020px;
     position: relative;
+
+    &__notes {
+      margin: 20px 10px 40px 10px;
+      box-sizing: border-box;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);
+    }
 
     &__gen-info,
     &__services,
@@ -667,14 +680,16 @@
     &__billing {
       margin: 20px 10px 40px 10px;
       padding: 40px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);
       box-sizing: border-box;
     }
-    &__rates{
+
+    &__rates {
       padding: 0;
       margin: 20px 10px 40px 10px;
-      padding: 40px 40px 20px 40px!important;
-      box-shadow: 0 0 10px #67573e9d;
+      padding: 40px 40px 20px 40px !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);
+
       box-sizing: border-box;
     }
 
