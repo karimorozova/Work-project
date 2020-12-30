@@ -6,7 +6,7 @@
       :bodyClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
       :tableheadRowClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
     )
-      .lqa-table__header-title.lqa-table__header(v-for="{label, headerKey} in fields" :slot="headerKey" slot-scope="{ field }") {{ label }}
+      .lqa-table__header(v-for="{label, headerKey} in fields" :slot="headerKey" slot-scope="{ field }") {{ label }}
       .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.name }}
       .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordCount | roundWordCount}}
       .lqa-table__header(slot="tqi" slot-scope="{ row }")
@@ -17,6 +17,9 @@
         span soon...
       .lqa-table__header(slot="lqa3" slot-scope="{ row }")
         span soon...
+      .lqa-table__header(slot="link" slot-scope="{ row }")
+        a(:href="getVendorProfileLink(row.vendor._id)" target="_blank" style="position: relative")
+          i.fa.fa-external-link.icon-link
 
 </template>
 
@@ -30,16 +33,21 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Vendor Name", headerKey: "headerVendor", key: "vendor", width: "40%"},
+					{ label: "Vendor Name", headerKey: "headerVendor", key: "vendor", width: "35%"},
 					{ label: "Wordcount", headerKey: "headerWords", key: "wordcount", width: "12%", style: {fontWeight: 'bold'}},
 					{ label: "TQI", headerKey: "headerTqi", key: "tqi", width: "12%", style: {fontWeight: 'bold'}},
 					{ label: "LQA 1", headerKey: "headerLqa1", key: "lqa1", width: "12%", style: {fontWeight: 'bold'}},
 					{ label: "LQA 2", headerKey: "headerLqa2", key: "lqa2", width: "12%", style: {fontWeight: 'bold'}},
-					{ label: "LQA 3", headerKey: "headerLqa3", key: "lqa3", width: "12%", style: {fontWeight: 'bold'}}
+					{ label: "LQA 3", headerKey: "headerLqa3", key: "lqa3", width: "12%", style: {fontWeight: 'bold'}},
+					{ label: "", headerKey: "headerLink", key: "link", width: "5%", style: {fontWeight: 'bold'}},
 				]
 			}
 		},
-		methods: {},
+		methods: {
+      getVendorProfileLink(vendorId) {
+        return '/vendors/details/' + vendorId
+      }
+    },
 		components: {
 			DataTable
 		}
@@ -50,8 +58,18 @@
 
   .lqa-table {
     margin-top: 3px;
-  }
-  .lqa-table__header-title{
-    font-size: 18px;
+
+    a{
+      color: #67573e;
+      text-decoration: none;
+
+      .icon-link {
+        position: absolute;
+        right: -17px;
+        top: 10px;
+        font-size: 18px;
+        cursor: pointer;
+      }
+    }
   }
 </style>

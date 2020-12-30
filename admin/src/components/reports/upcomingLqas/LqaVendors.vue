@@ -15,15 +15,9 @@
                 @setLqaFilter="(e) => setFilter(e, 'lqaFilter')"
             )
         .lqa-vendors__table(v-if="this.reportData.length")
-          Table(:vendorsData="allVendors" @selectVendor="selectVendor")
+          Table(:vendorsData="allVendors" @selectVendor="openForm")
         .lqa-vendors__form(v-if="isForm")
-          VendorLqa(
-                :vendorData="selectedVendor"
-                :languages="languages"
-                @closeForm="closeForm"
-                @saveVendorLqa="saveVendorLqa"
-                :uploadForm="true"
-            )
+          VendorLqa(:vendorData="lqaData", @closeForm="closeForm()", @saveVendorLqa="saveVendorLqa")
 </template>
 
 <script>
@@ -46,6 +40,7 @@ export default {
             isForm: false,
             selectedVendor: null,
             languages: null,
+            currentAssessment: ''
         }
     },
     methods: {
@@ -86,11 +81,33 @@ export default {
         this.selectedVendor = {vendor, ...vendor.modalLqa};
         this.isForm = true;
       },
-        closeForm() {
-            this.isForm = false;
-        },
+      closeForm() {
+          this.isForm = false;
+      },
+      openForm({ vendor }) {
+        const { sourceLang, targetLang, industry, step, name, field, ids} = vendor;
+        this.selectedVendor = vendor;
+
+        this.lqaData = {
+          vendor: {
+            name: name,
+            industries: industry,
+            sourceLang,
+            targetLang,
+            step,
+            ids,
+          },
+          step: step,
+          sourceLanguage: sourceLang,
+          targetLanguage: targetLang,
+          industries: industry,
+          [`is${field}`]: true,
+          // stepIndex: index,
+        };
+        this.isForm = true;
+      },
       async saveVendorLqa({ vendorData }) {
-        // const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex } = vendorData;
+        // const { file, grade, source, target, step, ids: {mainIndex, industryIndex, stepIndex} } = vendorData;
         // const assessment = {
         //   ...this.currentAssessment,
         //   isNew: false,
@@ -103,7 +120,7 @@ export default {
         //   [this.currentField]: { fileName: "", path: "", grade },
         // };
         // let formData = new FormData();
-        // formData.append("vendorId", this.currentVendor._id);
+        // formData.append("vendorId", this.selectedVendor.vendorId);
         // formData.append("assessment", JSON.stringify(assessment));
         // formData.append("assessmentFile", file);
         //

@@ -237,7 +237,7 @@ const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords, d
       payables: +WeightedWords,
     },
     Price: {
-      receivables: discounts.length ? getPriceAfterApplyingDiscounts(discounts, priceReceivables) : +priceReceivables,
+      receivables: discounts && discounts.length ? getPriceAfterApplyingDiscounts(discounts, priceReceivables) : +priceReceivables,
       payables: +pricePayables,
     },
     profit,
