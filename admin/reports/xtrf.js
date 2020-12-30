@@ -68,9 +68,9 @@ const getXtrfLqaReport = async (filters) => {
   let { sourceFilter, targetFilter, vendorFilter, countFilter, skipCount, tierFilter, industryFilter } = filters;
   const languages = await Languages.find();
   const filterQuery = await getFilteringQueryForLqaReport(filters, languages);
-  countFilter = sourceFilter || targetFilter || vendorFilter ? 0 : countFilter;
-  skipCount = sourceFilter || targetFilter || vendorFilter ? 0 : skipCount;
-  const dataLimitQuery = { 'industries.Finance.vendors.otherInfo': 0, 'industries.iGaming.vendors.otherInfo': 0 };
+  // countFilter = sourceFilter || targetFilter || vendorFilter ? 0 : countFilter;
+  // skipCount = sourceFilter || targetFilter || vendorFilter ? 0 : skipCount;
+  // const dataLimitQuery = { 'industries.Finance.vendors.otherInfo': 0, 'industries.iGaming.vendors.otherInfo': 0 };
   try {
     let result = [];
     const xtrfLqaReport = await getReport();
@@ -145,7 +145,8 @@ const getXtrfLqaReport = async (filters) => {
    * @returns {Array} returns report with populated(filled from other collections) data
    */
   async function getReport() {
-    return await XtrfLqa.find(filterQuery, dataLimitQuery)
+    // return await XtrfLqa.find(filterQuery, dataLimitQuery)
+    return await XtrfLqa.find(filterQuery)
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
       .populate('industries.industry', ['name'])

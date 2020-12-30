@@ -21,6 +21,7 @@ const XtrfTier = require('./xtrfTier');
 const XtrfReportLang = require('./xtrfReportLang');
 const XtrfVendor = require('./xtrfVendor');
 const XtrfLqa = require('./xtrfLqa');
+const XtrfLqaGrouped = require('./xtrfLqaGrouped');
 const XtrfPrice = require('./xtrfPrice');
 const Delivery = require('./delivery');
 const TierLqa = require('./tierLqa');
@@ -59,6 +60,7 @@ const Models = {
   XtrfReportLang,
   XtrfVendor,
   XtrfLqa,
+  XtrfLqaGrouped,
   XtrfPrice,
   Delivery,
   TierLqa,
