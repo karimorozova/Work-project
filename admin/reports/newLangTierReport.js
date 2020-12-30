@@ -8,11 +8,16 @@ const moment = require('moment')
  * @returns nothing - cleans old collection and fills it with new data
  */
 const newLangReport = async () => {
+
   const languages = await Languages.find();
   const dateStartNovember = "2020-11-01"
   const dateEndNovember = "2020-11-30"
   // const dateTwoMonthAgo = moment().subtract(2, 'months').format('YYYY-MM-DD');
-  let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }, {creationTime: {$gte: dateStartNovember}}, {creationTime: {$lte: dateEndNovember}}] });
+  // let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }, {creationTime: {$gte: dateStartNovember}}, {creationTime: {$lte: dateEndNovember}}] });
+  let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }, {deadline: {$gte: dateStartNovember}}, {deadline: {$lte: dateEndNovember}}] });
+
+  // console.log(projects.filter(item => item.name === '2020 10 29 [17] - Theme and Common settings'))
+
   projects = projects.filter(item => item.sourceLanguage);
   const reports = [];
   for (let { domain, sourceLanguage, documents } of projects) {
@@ -91,6 +96,7 @@ const newLangReport = async () => {
       }
     ));
   }
+
 };
 
 const findIndustry = (domain) => {
