@@ -25,8 +25,8 @@ const rebuildTierReportsStructure = (reports) => {
             .findIndex(item => item.source === curr.lang && item.target === target.lang);
           const industryObj = {
             [objName]: {
-              tier: getTierFromWordcount(Math.ceil(target.wordcount / 5), objName, curr.clients),
-              wordcount: Math.ceil(target.wordcount / 5),
+              tier: getTierFromWordcount(Math.ceil(target.wordcount / 1), objName, curr.clients),
+              wordcount: Math.ceil(target.wordcount / 1),
               clients: curr.clients
             }
           };
