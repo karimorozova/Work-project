@@ -426,4 +426,36 @@ router.get('/all-clients-emails', async (req, res) => {
   }
 });
 
+router.post('/update-notes', async (req, res) => {
+  const { user, notesId, message, clientId } = req.body;
+  try {
+    const [client] = await Clients.find({ "_id": clientId });
+    if(!notesId) {
+      client.notes.push({ user, message })
+    } else {
+      const currNoteInx = client.notes.findIndex(({ _id }) => _id.toString() === notesId.toString());
+      const { user: oldUser } = client.notes[currNoteInx];
+      client.notes.splice(currNoteInx, 1, { user: oldUser, message, updatedAT:  Date.now()})
+    }
+    const updatedClient = await getClientAfterUpdate({ "_id" :clientId }, {notes: client.notes});
+    res.send(updatedClient);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on client notes');
+  }
+});
+
+router.post('/delete-notes', async (req, res) => {
+  const { index, clientId } = req.body;
+  try {
+    const [client] = await Clients.find({ "_id": clientId });
+    client.notes.splice(index, 1);
+    const updatedClient = await getClientAfterUpdate({ "_id" :clientId }, {notes: client.notes});
+    res.send(updatedClient);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on client notes');
+  }
+});
+
 module.exports = router;
