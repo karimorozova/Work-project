@@ -86,13 +86,14 @@ const newLangReport = async () => {
       return findLanguageByMemoqLanguageCode(lang, memoqSymbol);
     });
     return language ? language.group : memoqSymbol;
+    // return language ? language.lang : memoqSymbol;
   }
 
   function findAllTargets (documents) {
-    return documents.map(({ TargetLangCode, TotalWordCount }) => (
+    return documents.map(({ TargetLangCode, WeightedWords }) => (
       {
         lang: findLanguageGroup(languages, TargetLangCode),
-        wordcount: +TotalWordCount
+        wordcount: +WeightedWords
       }
     ));
   }

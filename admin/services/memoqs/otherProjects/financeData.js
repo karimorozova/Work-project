@@ -95,7 +95,7 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
       taskId,
       start: project.creationTime,
       deadline: project.deadline,
-      sourceLanguage: sourceLanguage.symbol,
+      sourceLanguage: sourceLang.symbol,
       targetLanguage: targetLanguage.symbol,
       status: WorkflowStatus,
       progress: 100,

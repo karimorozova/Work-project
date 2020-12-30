@@ -567,6 +567,8 @@ async function updateMemoqProjectsData() {
 		const clients = await Clients.find();
 		const vendors = await Vendors.find();
 		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
+
+
 		for (let project of allProjects) {
 			const { ServerProjectGuid } = project;
 			const documents = await getProjectTranslationDocs(ServerProjectGuid);
@@ -581,14 +583,13 @@ async function updateMemoqProjectsData() {
 				memoqProject.isTest = memoqProject.isTest === undefined ? false : memoqProject.isTest;
 				memoqProject.isInLQAReports = memoqProject.isInLQAReports === undefined ? false : memoqProject.isInLQAReports;
 
-				memoqProject = doesHaveCorrectStructure ?
-						await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
-				await MemoqProject.updateOne(
-						{ serverProjectGuid: ServerProjectGuid },
-						{ ...memoqProject, users, documents },
-						{ upsert: true });
+				memoqProject = doesHaveCorrectStructure ? await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
+
+
+				await MemoqProject.updateOne({ serverProjectGuid: ServerProjectGuid }, { ...memoqProject, users, documents }, { upsert: true })
 			}
 		}
+
 	} catch (err) {
 		console.log('Error in updateMemoqProjectsData');
 		console.log(err);

@@ -24,6 +24,7 @@ const { XtrfLqa } = require('./models');
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./reports');
 
 
+// updateMemoqProjectsData();
 schedule.scheduleJob('0 */3 * * *', async function () {
 	console.log('------ Start updating memoq projects data: ', `${ new Date() } ------`);
 	try {
