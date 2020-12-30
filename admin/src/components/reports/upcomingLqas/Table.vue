@@ -17,8 +17,8 @@
           .lqa-vendors-table__data(slot="tier" slot-scope="{ row }") {{ row.tier || '-'}}
           .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{  row.lqaNumber }}
           .lqa-vendors-table__data(slot="link" slot-scope="{ row }")
-            a(:href="getVendorProfileLink(row.vendorId)" target="_blank" style="position: relative;")
-              i.fa.fa-external-link.icon-link
+            span.icon-link(@click.stop="routeToVendor(row.vendorId)")
+              i.fa.fa-external-link
 
 </template>
 
@@ -39,17 +39,15 @@ export default {
               { label: 'Industry', headerKey: 'headerIndustry', key: 'industry', width: '10%' },
               { label: 'Tier', headerKey: 'headerTier', key: 'tier', width: '5%' },
               { label: 'LQA#', headerKey: 'headerLqa', key: 'lqa', width: '5%' },
-              { label: '', headerKey: 'headerLink', key: 'link', width: '5%' },
+              { label: '', headerKey: 'headerLink', key: 'link', width: '5%'},
             ]
         }
     },
     methods: {
-        // getLqaNumber(row) {
-        //     let result = 1;
-        //     if(row.isLqa2) result = 2;
-        //     result = row.isLqa3 ? 3 : result;
-        //     return result;
-        // },
+	    routeToVendor(vendorId){
+		    const route = this.$router.resolve({ path: `/vendors/details/${ vendorId }` });
+		    window.open(route.href, "_blank");
+	    },
         presentWordcount(words) {
             if(words.toString().indexOf(".") !== -1) {
                 return words.toFixed(2);
@@ -73,26 +71,18 @@ export default {
 
 .lqa-vendors-table {
     margin: 10px 0 20px;
+
     &_red {
         color: red;
     }
+
     &_green {
         color: green;
     }
 
-    a{
-      color: #67573e;
-      text-decoration: none;
-
-      .icon-link {
-        position: absolute;
-        right: -17px;
-        top: 10px;
-        font-size: 18px;
-        cursor: pointer;
-      }
+    .icon-link {
+      font-size: 18px;
     }
-
 }
 
 </style>

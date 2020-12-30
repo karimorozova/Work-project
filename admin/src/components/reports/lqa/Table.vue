@@ -34,12 +34,12 @@
 			return {
 				fields: [
 					{ label: "Vendor Name", headerKey: "headerVendor", key: "vendor", width: "35%"},
-					{ label: "Wordcount", headerKey: "headerWords", key: "wordcount", width: "12%", style: {fontWeight: 'bold'}},
-					{ label: "TQI", headerKey: "headerTqi", key: "tqi", width: "12%", style: {fontWeight: 'bold'}},
-					{ label: "LQA 1", headerKey: "headerLqa1", key: "lqa1", width: "12%", style: {fontWeight: 'bold'}},
-					{ label: "LQA 2", headerKey: "headerLqa2", key: "lqa2", width: "12%", style: {fontWeight: 'bold'}},
-					{ label: "LQA 3", headerKey: "headerLqa3", key: "lqa3", width: "12%", style: {fontWeight: 'bold'}},
-					{ label: "", headerKey: "headerLink", key: "link", width: "5%", style: {fontWeight: 'bold'}},
+					{ label: "Wordcount", headerKey: "headerWords", key: "wordcount", width: "12%"},
+					{ label: "TQI", headerKey: "headerTqi", key: "tqi", width: "12%"},
+					{ label: "LQA 1", headerKey: "headerLqa1", key: "lqa1", width: "12%"},
+					{ label: "LQA 2", headerKey: "headerLqa2", key: "lqa2", width: "12%"},
+					{ label: "LQA 3", headerKey: "headerLqa3", key: "lqa3", width: "12%"},
+					{ label: "", headerKey: "headerLink", key: "link", width: "5%"},
 				]
 			}
 		},
@@ -64,11 +64,7 @@
       text-decoration: none;
 
       .icon-link {
-        position: absolute;
-        right: -17px;
-        top: 10px;
         font-size: 18px;
-        cursor: pointer;
       }
     }
   }
