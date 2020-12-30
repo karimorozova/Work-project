@@ -170,9 +170,9 @@ const getXtrfUpcomingReport = async (filters) => {
       .populate('targetLanguage', ['lang'])
       .populate('industries.vendors.vendor', ['assessments'])
       .populate('industries.industryGroup', ['name'])
-      .populate('industries.industry', ['name']);
+      .populate('industries.industry', ['name',"_id"]);
     let result = [];
-    for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries } of lqaReport) {
+    for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries, _id} of lqaReport) {
       industries
         .filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
         .forEach(industry => {
@@ -192,7 +192,9 @@ const getXtrfUpcomingReport = async (filters) => {
               steps,
               sourceLang: sourceLang.lang,
               targetLang: vendorTargetLang,
-              industries: industry.industryGroup.name,
+              // ids: {mainIndex: _id, industryIndex: industry.industry._id, stepIndex: null},
+              industry: industry.industryGroup.name,
+              industryIndex: industry.industryGroup._id,
               vendorId,
               step: 'Translations',
             }
@@ -224,20 +226,20 @@ const getXtrfUpcomingReport = async (filters) => {
         return assessmentByIndustry ? assessmentByIndustry.steps : null;
       }
       function getStepInfo (steps){
-        if (!steps) return {lqaNumber: '-', modalLqa: {isTqi: false}}
+        if (!steps) return {lqaNumber: '-',field: "tqi"}
         const lastStep = steps.pop()
         const {tqi, lqa1, lqa2, lqa3} = lastStep
         if (lqa3 && lqa3.grade) {
-          return { lqaNumber: '3', modalLqa: {isLqa3: true}}
+          return { lqaNumber: '3', field: "Lqa3"}
         }
         if (lqa2 && lqa2.grade) {
-          return { lqaNumber: '2',modalLqa: {isLqa2: true}}
+          return { lqaNumber: '2',field: "Lqa2"}
         }
         if (lqa1 && lqa1.grade) {
-          return {lqaNumber: '1',modalLqa: {isLqa1: true}}
+          return {lqaNumber: '1',field: "Lqa1"}
         }
         if (tqi && tqi.grade) {
-          return { lqaNumber: 'TQI', modalLqa: {isTqi: true}}
+          return { lqaNumber: 'TQI', field: "Tqi"}
         }
       }
     }
