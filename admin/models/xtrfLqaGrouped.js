@@ -17,10 +17,40 @@ const vendorsArr = [{
   wordCount: {
     type: Number,
     default: 0
-  }
+  },
+  otherInfo: [{
+    clientId: {
+      type: Schema.Types.ObjectId, ref: 'Clients',
+      default: null
+    },
+    clientName: {
+      type: 'String',
+      default: ''
+    },
+    startDate: {
+      type: Date,
+      default: new Date()
+    },
+    deadline: {
+      type: Date,
+      default: new Date()
+    },
+    projectId: {
+      type: 'String',
+      default: ''
+    },
+    wordcountPayables: {
+      type: Number,
+      default: 0,
+    },
+    wordcountReceivables: {
+      type: Number,
+      default: 0
+    }
+  }]
 }];
 
-const XtrfLqaSchema = new mongoose.Schema({
+const c = new mongoose.Schema({
   languagePair: {
     type: String,
     trim: true,
@@ -54,6 +84,6 @@ const XtrfLqaSchema = new mongoose.Schema({
   ],
 });
 
-const XtrfLqaGrouped = mongoose.model('XtrfLqaGrouped', XtrfLqaSchema);
+const XtrfLqaGrouped = mongoose.model('XtrfLqaGrouped', c);
 
 module.exports = XtrfLqaGrouped;

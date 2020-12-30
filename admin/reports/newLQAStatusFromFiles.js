@@ -7,20 +7,7 @@ const {groupXtrfLqaByIndustryGroup} = require('../reports');
 const _ = require('lodash');
 const fs = require('fs');
 
-/*
- nameIndex = 0;
- emailIndex = 1;
- stepIndex = 2;
- languagePairIndex = 3;
- industryIndex = 4;
- startDateIndex = 5;
- deadLineIndex = 6;
- projectIdIndex = 7;
- projectNameIndex = 8;
- clientNameIndex = 9;
- wordcountPayablesIndex = 10;
- wordcountReceivablesIndex = 11;
- */
+
 /**
  *
  * @returns nothing - clean old LQA report and fills it with new data
@@ -30,7 +17,7 @@ const parseAndWriteLQAReport = async () => {
   const languages = await Languages.find();
   const clients = await Clients.find();
   const allIndustry = await Industries.find()
-  const otherIndustry = await Industries.findOne({name: 'Other'})
+  const otherIndustry = await Industries.findOne({name: 'Other'});
 
   let data = [];
   let filesArr = [];
@@ -72,8 +59,9 @@ const parseAndWriteLQAReport = async () => {
 
   await XtrfLqa.create(newReports);
 
-  groupXtrfLqaByIndustryGroup(newReports)
-  await XtrfLqaGrouped.create(newReports);
+  // const foo = groupXtrfLqaByIndustryGroup(newReports);
+  //
+  // await XtrfLqaGrouped.create(foo);
 
   console.log('Saved!');
 

@@ -1,11 +1,13 @@
-const { MemoqProject, Languages, XtrfLqa, Industries, Vendors } = require('../models');
+const { MemoqProject, Languages, XtrfLqa, Industries, Vendors, XtrfLqaGrouped } = require('../models');
 const { findIndustry } = require('./newLangTierReport')
 const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
 const { ObjectId } = require('mongodb');
+const { groupXtrfLqaByIndustryGroup } = require('../reports/xtrf');
 const _ = require('lodash')
 const newLQAStatusFromXTRFProjects = async () => {
 
-	let projects = await MemoqProject.find({ isInLQAReports: { $ne: true }, creationTime: {$gte: "2020-10-01" }});
+	// let projects = await MemoqProject.find({ isInLQAReports: { $ne: true }, creationTime: {$gte: "2020-10-01" }});
+	let projects = await MemoqProject.find({ creationTime: {$gte: "2020-10-01" }});
 	let reports = await XtrfLqa.find()
 	const languages = await Languages.find();
 	const allIndustries = await Industries.find()
@@ -82,7 +84,7 @@ const newLQAStatusFromXTRFProjects = async () => {
 			if(indexVendor < 0) {
 				reports[index].industries[indexIndustry].vendors.push(userInfo);
 				continue;
-			}
+			}``
 
 			const wordCount = reports[index].industries[indexIndustry].vendors[indexVendor].wordCount;
 			reports[index].industries[indexIndustry].vendors[indexVendor].wordCount = +wordCount + +TotalWordCount;
@@ -90,7 +92,13 @@ const newLQAStatusFromXTRFProjects = async () => {
 		}
 	}
 
+
 	await XtrfLqa.create(reports);
+	const newReports = reports.map( ({_id, ...rest}) => rest);
+	const newReportsGrouped = groupXtrfLqaByIndustryGroup(newReports);
+	await XtrfLqaGrouped.deleteMany();
+	await XtrfLqaGrouped.create(newReportsGrouped);
+
 	return await XtrfLqa
     .find()
     .populate('sourceLanguage', 'lang')
