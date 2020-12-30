@@ -196,7 +196,7 @@ const getXtrfUpcomingReport = async (filters) => {
               industry: industry.industryGroup.name,
               industryIndex: industry.industryGroup._id,
               vendorId,
-              step: 'Translations',
+              step: 'Translation',
             }
             vendorInfo = {...vendorInfo, ...stepInfo}
 
