@@ -1,8 +1,9 @@
-const {Languages, Vendors, Clients, Industries, XtrfLqa} = require('../models');
+const {Languages, Vendors, Clients, Industries, XtrfLqa, XtrfLqaGrouped} = require('../models');
 const readXlsxFile = require('read-excel-file/node');
 const ObjectId = require('mongodb').ObjectID;
 const {findIndustry} = require('./newLangTierReport');
 const {getLqaSpecificTierForVendor} = require('../reports/helpers');
+const {groupXtrfLqaByIndustryGroup} = require('../reports');
 const _ = require('lodash');
 const fs = require('fs');
 
@@ -68,9 +69,12 @@ const parseAndWriteLQAReport = async () => {
       industries: getResultIndustries(report[key], allIndustry)
     });
   }
-  for (let report of newReports) {
-    await new XtrfLqa(report).save();
-  }
+
+  await XtrfLqa.create(newReports);
+
+  groupXtrfLqaByIndustryGroup(newReports)
+  await XtrfLqaGrouped.create(newReports);
+
   console.log('Saved!');
 
   /**
