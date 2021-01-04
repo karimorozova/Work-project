@@ -45,13 +45,26 @@ const checkProjectStructure = (clients, vendors, memoqProject, documents) => {
 //   return correlates;
 // }
 
-const doesAllTasksFinished = (documents) => {
-  if (Array.isArray(documents)) {
-    return documents.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished');
+const defineProjectStatus = (docStatus) => {
+  switch (docStatus) {
+    case 'TranslationInProgress':
+    case 'ProofreadingInProgress' :
+      return 'In progress';
+    case 'TranslationFinished' :
+    case 'ProofreadingFinished' :
+      return 'Closed';
+    default:
+      return null;
   }
-  const { DocumentStatus } = documents;
-  return DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished';
 };
+
+// const doesAllTasksFinished = (documents) => {
+//   if (Array.isArray(documents)) {
+//     return documents.every(({ DocumentStatus }) => DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished');
+//   }
+//   const { DocumentStatus } = documents;
+//   return DocumentStatus === 'TranslationFinished' || DocumentStatus === 'ProofreadingFinished';
+// };
 
 const findFittingIndustryId = async (industryName) => {
   const neededIndustry = await Industries.findOne({
@@ -90,5 +103,6 @@ module.exports = {
   checkDocumentHasCorrectStructure,
   findFittingIndustryId,
   checkProjectStructure,
-  doesAllTasksFinished
+  // doesAllTasksFinished,
+  defineProjectStatus
 };

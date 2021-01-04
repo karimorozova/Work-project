@@ -3,7 +3,7 @@ const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients, Vendors } = require('../../models');
-const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished } = require('./otherProjects');
+const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished, defineProjectStatus } = require('./otherProjects');
 
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
@@ -68,7 +68,6 @@ async function assignedDefaultTranslator(projectId, step) {
 		throw new Error(err.message);
 	}
 };
-
 
 async function createMemoqProjectWithTemplate(projectData) {
 	const targets = projectData.targets.reduce((acc, cur) => acc + `<arr:string>${ cur.memoq }</arr:string>\n`, '');
@@ -568,23 +567,21 @@ async function updateMemoqProjectsData() {
 		const vendors = await Vendors.find();
 		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
 
-
 		for (let project of allProjects) {
-			const { ServerProjectGuid } = project;
+			const { ServerProjectGuid, DocumentStatus } = project;
 			const documents = await getProjectTranslationDocs(ServerProjectGuid);
-			if(project.Name.indexOf('PngSys') === -1 && documents) {
+			if(project.Name.indexOf('PngSys') === -1 && !!documents) {
 				let users = await getProjectUsers(ServerProjectGuid);
 				users = getUpdatedUsers(users);
 				let memoqProject = getMemoqProjectData(project, languages);
-				memoqProject.status = doesAllTasksFinished(documents) ? 'Closed' : null;
-				const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, memoqProject, documents);
 
+				memoqProject.status = defineProjectStatus(DocumentStatus);
 				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ? false : memoqProject.lockedForRecalculation;
 				memoqProject.isTest = memoqProject.isTest === undefined ? false : memoqProject.isTest;
 				memoqProject.isInLQAReports = memoqProject.isInLQAReports === undefined ? false : memoqProject.isInLQAReports;
 
+				const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, memoqProject, documents);
 				memoqProject = doesHaveCorrectStructure ? await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
-
 
 				await MemoqProject.updateOne({ serverProjectGuid: ServerProjectGuid }, { ...memoqProject, users, documents }, { upsert: true })
 			}
@@ -619,14 +616,10 @@ function getUpdatedUsers(users) {
 function getMemoqProjectData(project, languages) {
 	const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
 	const targetCodes = typeof project.TargetLanguageCodes['a:string'] === 'string' ? [project.TargetLanguageCodes['a:string']] : project.TargetLanguageCodes['a:string'];
-	const targetLanguages = targetCodes.map(item => {
-		const lang = languages.find(l => l.memoq === item);
-		return lang;
-	});
+	const targetLanguages = targetCodes.map(item => languages.find(l => l.memoq === item));
 	return {
 		name: project.Name,
 		creatorUser: project.CreatorUser,
-		client: project.Client,
 		creationTime: new Date(project.CreationTime),
 		deadline: new Date(project.Deadline),
 		serverProjectGuid: project.ServerProjectGuid,
@@ -635,7 +628,9 @@ function getMemoqProjectData(project, languages) {
 		sourceLanguage,
 		targetLanguages,
 		totalWordCount: project.TotalWordCount,
-		projectStatus: project.ProjectStatus
+		projectStatus: project.ProjectStatus,
+		weightedWords : project.WeightedWords,
+		documentStatus : project.DocumentStatus,
 	}
 }
 
