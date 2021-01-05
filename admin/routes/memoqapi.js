@@ -245,14 +245,16 @@ router.get('/memoq-client-aliases', async (req, res) => {
 	}
 })
 
-router.get('/memoq-vendor-aliases', async (req, res) => {
+router.get('/memoq-vendor-aliases/:vendorId', async (req, res) => {
+	const { vendorId } = req.params;
   try {
     let users = await MemoqProject.find({}, { _id: 0, documents: 1 });
     const result = filterMemoqProjectsVendors(users);
-    // const allVendor = await Vendors.find();
-    // const existsAliases = allVendor.filter(item => item.aliases.length).map(item => item.aliases);
-    // res.send(result.filter(item => !_.flattenDeep(existsAliases).includes(item)));
-	  res.send(result);
+    const allVendor = await Vendors.find();
+	  let existsAliases = _.flattenDeep(allVendor.filter(({ aliases }) => aliases.length).map(({ aliases }) => aliases));
+	  const {aliases: currAliases} = allVendor.find(({_id}) => _id.toString() === vendorId.toString());
+	  currAliases.length && (existsAliases = existsAliases.filter(item => !currAliases.includes(item)));
+    res.send(result.filter(item => !existsAliases.includes(item)));
   } catch (err) {
     console.log(err);
     res.status(500).send(err);
