@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { upload, sendEmail } = require('../utils');
-const { User, MemoqProject } = require('../models');
+const { User, MemoqProject, Vendors } = require('../models');
 const { downloadCompletedFiles } = require('../projects');
 const {
   getMemoqAllProjects,
@@ -26,6 +26,7 @@ const {
   parseMessagesAndUpdateProjects
 } = require('../services/memoqs/otherProjects');
 const { updateProjectFinanceOnDiscountsUpdate } = require('../projects');
+const _ = require('lodash');
 router.get('/users', async (req, res) => {
 	try {
 		const result = await getMemoqUsers();
@@ -248,7 +249,10 @@ router.get('/memoq-vendor-aliases', async (req, res) => {
   try {
     let users = await MemoqProject.find({}, { _id: 0, documents: 1 });
     const result = filterMemoqProjectsVendors(users);
-    res.send(result);
+    // const allVendor = await Vendors.find();
+    // const existsAliases = allVendor.filter(item => item.aliases.length).map(item => item.aliases);
+    // res.send(result.filter(item => !_.flattenDeep(existsAliases).includes(item)));
+	  res.send(result);
   } catch (err) {
     console.log(err);
     res.status(500).send(err);
