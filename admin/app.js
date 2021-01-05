@@ -12,95 +12,12 @@ const db = mongoose.connection;
 const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
-const schedule = require('node-schedule');
-const checkCollections = require('./helpers/dbSetDefault');
+require('./helpers/dbSetDefault');
+require('./schedule');
 
-const { updateMemoqProjectsData } = require('./services/memoqs/projects');
-const { newLangReport } = require('./reports/newLangTierReport');
-const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles');
-const { saveProjectStatuses, updateOtherProjectStatusOnMessages, filterOldMessages } = require('./gmail');
-const { Pricelist } = require('./models');
-const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
-const { XtrfLqa } = require('./models');
-const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./reports');
-
+// const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 
 // saveProjectStatuses();
-schedule.scheduleJob('0 */3 * * *', async function () {
-	console.log('------ Start updating memoq projects data: ', `${ new Date() } ------`);
-	try {
-		await updateMemoqProjectsData();
-		console.log('------ Finish updating memoq projects data ', `${ new Date() } ------`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob('0 */1 * * *', async function () {
-	console.log('------ Start updating gmail messages collection: ', `${ new Date() } ------`);
-	try {
-		// await saveProjectStatuses();
-		console.log('------ Finish updating gmail messages collection ', `${ new Date() } ------`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob('0 0 */2 * *', async function () {
-	console.log('------ Start filtering old gmail messages: ', `${ new Date() } ------`);
-	try {
-		await filterOldMessages();
-		console.log('------ Finish filtering old gmail messages ', `${ new Date() } ------`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-// schedule.scheduleJob('0 */2 * * *', async function () {
-// 	console.log('------ Start updating memoq projects statuses based on gmail messages: ', `${ new Date() } ------`);
-// 	try {
-// 		await updateOtherProjectStatusOnMessages();
-// 		console.log('------ Finish updating memoq projects statuses based on gmail messages ', `${ new Date() } ------`);
-// 	} catch (err) {
-// 		console.log(err.message);
-// 	}
-// });
-
-schedule.scheduleJob('30 23 * * *', async function () {
-	console.log('------- Start updating lang tier data: ', `${ new Date() } -------`);
-	try {
-		await newLangReport();
-		console.log('------- Finish updating lang tier data: ', `${ new Date() } --------`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob('30 0 * * *', async function () {
-  console.log('------ Start updating LQA reports from MemoqProjects data: ', `${ new Date() } ------`);
-  try {
-    await newLQAStatusFromXTRFProjects();
-    console.log('------ Finish updating LQA reports from MemoqProjects data ', `${ new Date() } ------`);
-  } catch (err) {
-    console.log(err.message);
-  }
-});
-
-schedule.scheduleJob('40 0 * * *', async function () {
-  console.log('------ Start updating LQA reports from projects data: ', `${ new Date() } ------`);
-  try {
-    await UpdateLQAFromProject();
-    console.log('------ Finish updating LQA reports from Projects data ', `${ new Date() } ------`);
-  } catch (err) {
-    console.log(err.message);
-  }
-});
-
-(async () => {
-	const countLQAReports = await XtrfLqa.countDocuments();
-	if(countLQAReports <= 0) parseAndWriteLQAReport()
-})();
-
 
 const allowedOrigins = [
 	"https://admin.pangea.global",
@@ -142,21 +59,15 @@ app.use(cookieParser());
 app.use((req, res, next) => {
 	const origin = req.headers.origin;
 	res.header("Access-Control-Allow-Methods", "GET, PUT, OPTIONS");
-	res.header(
-			"Access-Control-Allow-Headers",
-			"Origin, Content-Type, Authorization, token-header"
-	);
+	res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, token-header");
 	res.header("Access-Control-Allow-Credentials", true);
 
 	const index = allowedOrigins.indexOf(origin);
-	if(index > -1) {
-		res.setHeader("Access-Control-Allow-Origin", allowedOrigins[index]);
-	}
+	if(index > -1) res.setHeader("Access-Control-Allow-Origin", allowedOrigins[index]);
 
 	return next();
 });
 
-// include routes
 const routes = require("./routes");
 app.use("/", routes);
 
@@ -168,5 +79,5 @@ app.use(history({ verbose: true, index: '/' }));
 app.use(checkRoutes);
 
 app.listen(port, () => {
-	console.log(`Server is working on: ${ port }`);
+	console.log(`✈  Server is working on: ${ port }`);
 });
