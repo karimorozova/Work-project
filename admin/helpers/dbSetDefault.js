@@ -16,7 +16,6 @@ const {
   CancelReason,
   Units,
   CurrencyRatio,
-  GmailMessages,
   Discounts,
 } = require('../models');
 
@@ -484,26 +483,12 @@ async function fillPricelist() {
   }
 }
 
-async function fillDefaultLabels () {
-  try {
-    const labels = await GmailMessages.find();
-    if (!labels.length) {
-      await saveDefaultLabels();
-      console.log('Default labels are saved!');
-    }
-  } catch (err) {
-    console.log(err);
-    console.log('Error on filling gmail labels');
-  }
-}
-
 async function checkCollections () {
   await fillInstructions();
   await fillCancelReasons();
   await fillDefaultDiscounts();
   await fillLeadSources();
   await fillGroups();
-  await fillDefaultLabels();
   await users();
   await fillUnits();
   await fillSteps();

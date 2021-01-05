@@ -12,20 +12,20 @@ const db = mongoose.connection;
 const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
-const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const schedule = require('node-schedule');
 const checkCollections = require('./helpers/dbSetDefault');
+
+const { updateMemoqProjectsData } = require('./services/memoqs/projects');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles');
-const { saveMessages, updateOtherProjectStatusOnMessages, filterOldMessages } = require('./gmail');
+const { saveProjectStatuses, updateOtherProjectStatusOnMessages, filterOldMessages } = require('./gmail');
 const { Pricelist } = require('./models');
 const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 const { XtrfLqa } = require('./models');
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./reports');
 
 
-// updateMemoqProjectsData();
-// saveMessages();
+// saveProjectStatuses();
 schedule.scheduleJob('0 */3 * * *', async function () {
 	console.log('------ Start updating memoq projects data: ', `${ new Date() } ------`);
 	try {
@@ -39,7 +39,7 @@ schedule.scheduleJob('0 */3 * * *', async function () {
 schedule.scheduleJob('0 */1 * * *', async function () {
 	console.log('------ Start updating gmail messages collection: ', `${ new Date() } ------`);
 	try {
-		await saveMessages();
+		// await saveProjectStatuses();
 		console.log('------ Finish updating gmail messages collection ', `${ new Date() } ------`);
 	} catch (err) {
 		console.log(err.message);
@@ -56,15 +56,15 @@ schedule.scheduleJob('0 0 */2 * *', async function () {
 	}
 });
 
-schedule.scheduleJob('0 */2 * * *', async function () {
-	console.log('------ Start updating memoq projects statuses based on gmail messages: ', `${ new Date() } ------`);
-	try {
-		await updateOtherProjectStatusOnMessages();
-		console.log('------ Finish updating memoq projects statuses based on gmail messages ', `${ new Date() } ------`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
+// schedule.scheduleJob('0 */2 * * *', async function () {
+// 	console.log('------ Start updating memoq projects statuses based on gmail messages: ', `${ new Date() } ------`);
+// 	try {
+// 		await updateOtherProjectStatusOnMessages();
+// 		console.log('------ Finish updating memoq projects statuses based on gmail messages ', `${ new Date() } ------`);
+// 	} catch (err) {
+// 		console.log(err.message);
+// 	}
+// });
 
 schedule.scheduleJob('30 23 * * *', async function () {
 	console.log('------- Start updating lang tier data: ', `${ new Date() } -------`);

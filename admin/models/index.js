@@ -32,8 +32,8 @@ const Units = require('./units');
 const CurrencyRatio = require('./currencyRatio');
 const OverallView = require('./dashboardOverall');
 const SalesPerformance = require('./dashboardSalesPerformance');
-const GmailMessages = require('./gmailMessages');
 const Discounts = require('./discounts');
+const GmailProjectsStatuses = require('./gmailProjectsStatuses');
 
 const Models = {
   Languages,
@@ -71,7 +71,7 @@ const Models = {
   CurrencyRatio,
   OverallView,
   SalesPerformance,
-  GmailMessages
+  GmailProjectsStatuses
 };
 
 module.exports = Models;

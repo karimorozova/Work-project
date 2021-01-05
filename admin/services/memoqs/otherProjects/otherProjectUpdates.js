@@ -1,4 +1,4 @@
-const { MemoqProject, Clients, Vendors, GmailMessages } = require('../../../models');
+const { MemoqProject, Clients, Vendors } = require('../../../models');
 const { checkProjectStructure } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
@@ -45,18 +45,18 @@ const updateAllMemoqProjects = async (querySource) => {
  * @returns nothing - runs on array and updates fitting projects
  */
 const parseMessagesAndUpdateProjects = async (status) => {
-  let query = status === 'Quote' ? 'Decide on quote' : 'Project Approved';
-  const { messages } = await GmailMessages.findOne({ name: query });
-  for (let i = 0; i < messages.length; i += 1) {
-    let { projectName, isRead } = messages[i];
-    if (!isRead) {
-      const project = await MemoqProject.findOne({ $and: [{ name: projectName }, { status: { $ne: 'Closed' } }] });
-      if (project) {
-        messages[i].isRead = true;
-        await MemoqProject.updateOne({ _id: project._id }, { status });
-      }
-    }
-  }
+  // let query = status === 'Quote' ? 'Decide on quote' : 'Project Approved';
+  // const { messages } = await GmailMessages.findOne({ name: query });
+  // for (let i = 0; i < messages.length; i += 1) {
+  //   let { projectName, isRead } = messages[i];
+  //   if (!isRead) {
+  //     const project = await MemoqProject.findOne({ $and: [{ name: projectName }, { status: { $ne: 'Closed' } }] });
+  //     if (project) {
+  //       messages[i].isRead = true;
+  //       await MemoqProject.updateOne({ _id: project._id }, { status });
+  //     }
+  //   }
+  // }
 };
 
 /**
