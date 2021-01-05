@@ -17,6 +17,16 @@ const MemoqProjectSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	weightedWords: {
+		type: String,
+		default: '',
+		trim: true
+	},
+	documentStatus: {
+		type: String,
+		default: '',
+		trim: true
+	},
   industry: {
     type: Schema.Types.ObjectId, ref: 'Industries'
   },

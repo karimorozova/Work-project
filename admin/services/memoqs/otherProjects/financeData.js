@@ -19,8 +19,9 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   const vendors = await Vendors.find();
   const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
   if (!neededCustomer) return project;
-  const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } :
-    { ...project._doc, ...additionalData };
+
+  const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+
   let { tasks, steps, minimumCharge } = project;
   const emptyTasksOrSteps =  tasks && !tasks.length || steps && !steps.length;
   if (!tasks || !steps || emptyTasksOrSteps) {
@@ -33,9 +34,10 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
     steps = await checkAndCorrectStepStructure(steps, tasks, documents);
   }
   const finance = tasks.length ? getProjectFinance(tasks, minimumCharge) : defaultFinanceObj;
+
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
-  await MemoqProject.updateOne({ _id: project._id },
-    { ...additionalData, tasks, steps, finance });
+  await MemoqProject.updateOne({ _id: project._id }, { ...additionalData, tasks, steps, finance });
+
   return await getMemoqProject({ _id: project._id });
 
   async function checkAndCorrectStepStructure(steps, tasks, documents) {
