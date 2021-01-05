@@ -58,10 +58,9 @@ const parseAndWriteLQAReport = async () => {
   }
 
   await XtrfLqa.create(newReports);
-
-  // const foo = groupXtrfLqaByIndustryGroup(newReports);
-  //
-  // await XtrfLqaGrouped.create(foo);
+  // const groupedReports = groupXtrfLqaByIndustryGroup(newReports);
+  // await XtrfLqaGrouped.create(groupedReports);
+  // await XtrfLqaGrouped.create(groupedReports.filter(({industries}) => industries.length > 0));
 
   console.log('Saved!');
 

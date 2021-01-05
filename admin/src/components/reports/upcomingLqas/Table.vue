@@ -13,7 +13,7 @@
           .lqa-vendors-table__data(slot="sourceLanguage" slot-scope="{ row }") {{ row.sourceLang }}
           .lqa-vendors-table__data(slot="targetLanguage" slot-scope="{ row }") {{ row.targetLang }}
           .lqa-vendors-table__data(slot="words" slot-scope="{ row }") {{ presentWordcount(row.wordCount) | roundWordCount }}
-          .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industry }}
+          .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industry.name }}
           .lqa-vendors-table__data(slot="tier" slot-scope="{ row }") {{ row.tier || '-'}}
           .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{  row.lqaNumber }}
           .lqa-vendors-table__data(slot="link" slot-scope="{ row }")

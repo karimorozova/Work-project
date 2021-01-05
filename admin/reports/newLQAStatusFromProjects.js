@@ -1,7 +1,9 @@
 const { findIndustry } = require("./newLangTierReport");
-const { XtrfLqa, Projects, Industries, Languages } = require('../models')
+const { XtrfLqa, Projects, Industries, Languages, XtrfLqaGrouped } = require('../models')
 const { getTier } = require('./newLQAStatusFromXTRFProjects')
 const _ = require('lodash')
+const {groupXtrfLqaByIndustryGroup} = require("../reports/xtrf");
+
 const { ObjectId } = require('mongodb')
 
 async function UpdateLQAFromProject() {
@@ -84,6 +86,14 @@ async function UpdateLQAFromProject() {
 	}, []);
 
 	await XtrfLqa.create(results);
+
+  // const newReports = results.map( report => {
+  //   delete report._doc.__v
+  //   return report._doc
+  // });
+  // const reportsGroupedByIndustry = groupXtrfLqaByIndustryGroup(newReports);
+  // await XtrfLqaGrouped.deleteMany();
+  // await XtrfLqaGrouped.create(reportsGroupedByIndustry);
 
 	await Projects.updateMany({ $and: [{ status: 'Closed' }, { isTest: { $ne: true } }, { isInLQAReports: { $ne: true } }] }, { isInLQAReports: true })
 

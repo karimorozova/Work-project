@@ -94,7 +94,10 @@ const newLQAStatusFromXTRFProjects = async () => {
 
 
 	await XtrfLqa.create(reports);
-	const newReports = reports.map( ({_id, ...rest}) => rest);
+  const newReports = reports.map( report => {
+   delete report._doc.__v
+    return report._doc
+  });
 	const newReportsGrouped = groupXtrfLqaByIndustryGroup(newReports);
 	await XtrfLqaGrouped.deleteMany();
 	await XtrfLqaGrouped.create(newReportsGrouped);
