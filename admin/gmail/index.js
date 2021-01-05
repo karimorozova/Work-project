@@ -1,3 +1,3 @@
-const { saveDefaultLabels, saveMessages, updateOtherProjectStatusOnMessages, filterOldMessages } = require('./main');
+const { saveProjectStatuses, } = require('./main');
 
-module.exports = { saveDefaultLabels, saveMessages, updateOtherProjectStatusOnMessages, filterOldMessages };
+module.exports = { saveProjectStatuses };
