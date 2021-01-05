@@ -1,4 +1,4 @@
-const { Languages, XtrfLqa, Vendor } = require('../models');
+const { Languages, XtrfLqa, Vendor, Step} = require('../models');
 const {
   getFilteringQueryForLqaReport,
   getVendorsData,
@@ -97,11 +97,7 @@ const getXtrfLqaReport = async (filters) => {
 
     if (vendorFilter) {
       result = result.map(row => {
-        let { Finance, iGaming } = row.industries;
-        const { vendors: financeVendors } = Finance;
-        const { vendors: igamingVendors } = iGaming;
-        Finance.vendors = financeVendors.filter(({ name }) => name === vendorFilter);
-        iGaming.vendors = igamingVendors.filter(({ name }) => name === vendorFilter);
+        row.industries.map(({vendors}) => vendors.filter(({ name }) => name === vendorFilter))
         return row;
       });
     }
@@ -118,19 +114,11 @@ const getXtrfLqaReport = async (filters) => {
     if (industryFilter) {
       if (industryFilter !== 'All') {
         result = result.map(item => {
-          const { Finance, iGaming } = item.industries;
-          switch (industryFilter) {
-            case 'Finance':
-              iGaming.vendors = [];
-              return item;
-            case 'iGaming':
-              Finance.vendors = [];
-              return item;
-            case 'Other':
-              Finance.vendors = [];
-              iGaming.vendors = [];
-              return item;
-          }
+          item.industries =  item.industries.filter(({industryGroup}) => {
+            // console.log({indN: industryGroup.name, industryFilter})
+            return industryGroup.name === industryFilter
+          } );
+          return item
         });
       }
     }
@@ -171,21 +159,36 @@ const getXtrfUpcomingReport = async (filters) => {
       .populate('targetLanguage', ['lang'])
       .populate('industries.vendors.vendor', ['assessments'])
       .populate('industries.industryGroup', ['name'])
-      .populate('industries.industry', ['name',"_id"]);
+      .populate('industries.industry', ['name',"_id"])
+      .populate('industries.vendors.vendor.assessments.industries.steps.step');
+    const translationStep = await Step.findOne({title: 'Translation'},{title: 1})
     let result = [];
-    for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries, _id} of lqaReport) {
+    for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries} of lqaReport) {
       industries
         .filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
         .forEach(industry => {
-          const vendorsNotNull =  industry.vendors.filter(({vendor})=> vendor !== null)
+          const vendorsNotNull = industry.vendors.filter(({vendor})=> vendor !== null)
 
           vendorsNotNull.forEach(vendorNotNull => {
             const vendorTargetLang = targetLang ? targetLang.lang : 'no language data';
-            const { name, wordCount, tier} = vendorNotNull
-            const assessment =  vendorNotNull.vendor.assessments;
-            const vendorId = vendorNotNull.vendor._id;
-            const steps = getSteps(assessment, industry.industry._id)
-            const stepInfo = getStepInfo(steps)
+            const { name, wordCount, tier, vendor} = vendorNotNull
+            const assessmentIndex =
+              vendor
+                .assessments
+                .findIndex(({targetLanguage, sourceLanguage}) =>
+                  (
+                    sourceLanguage.toString() === sourceLang._id.toString()
+                    && targetLanguage.toString() === targetLang._id.toString()
+                  )
+                )
+            const langPairAssessment = assessmentIndex >= 0 ?  vendor.assessments[assessmentIndex] : null
+            const vendorId = vendor._id;
+            const industryIndex = getAssessmentIndustryIndex(langPairAssessment, industry.industryGroup._id)
+            const assessmentIndustry = industryIndex >= 0 ? langPairAssessment.industries[industryIndex] : null
+            const steps = assessmentIndustry ? assessmentIndustry.steps : null
+
+            const stepInfo = getStep(steps)
+
             let vendorInfo = {
               name,
               wordCount,
@@ -193,11 +196,15 @@ const getXtrfUpcomingReport = async (filters) => {
               steps,
               sourceLang: sourceLang.lang,
               targetLang: vendorTargetLang,
-              // ids: {mainIndex: _id, industryIndex: industry.industry._id, stepIndex: null},
-              industry: industry.industryGroup.name,
-              industryIndex: industry.industryGroup._id,
+              sourceLangInfo: sourceLang,
+              targetLangInfo: targetLang,
+              industry:  {name: industry.industryGroup.name, _id: industry.industryGroup._id },
               vendorId,
-              step: 'Translation',
+              mainIndex: assessmentIndex,
+              industryIndex,
+              stepIndex: 0,
+              assessmentId: assessmentIndustry ? assessmentIndustry._id : null,
+              step: translationStep,
             }
             vendorInfo = {...vendorInfo, ...stepInfo}
 
@@ -205,7 +212,7 @@ const getXtrfUpcomingReport = async (filters) => {
               return vendorNotNull.name === name
                 && vendorNotNull.sourceLang === sourceLang.lang
                 && vendorNotNull.targetLang === vendorTargetLang
-                && vendorNotNull.industries === industry.industryGroup.name
+                && vendorNotNull.industry.name === industry.industryGroup.name
             })
 
             if (!vendorInData) {
@@ -216,31 +223,31 @@ const getXtrfUpcomingReport = async (filters) => {
             vendorInData.wordCount += wordCount
           })
         })
-      function getSteps(assessment, industryId) {
-        if (!assessment.length) return null;
-        const assessmentByIndustry = assessment[0]
-          .industries
-          .find(({industry: assessmentIndustry}) => {
-            return assessmentIndustry._id.toString() ===  industryId.toString()
-          })
 
-        return assessmentByIndustry ? assessmentByIndustry.steps : null;
+      function getAssessmentIndustryIndex(assessment, industryId) {
+        if (!assessment) return -1;
+        return assessment
+          .industries
+          .findIndex(({industry}) => {
+            return industry._id.toString() === industryId.toString()
+          });
       }
-      function getStepInfo (steps){
-        if (!steps) return {lqaNumber: '-',field: "tqi"}
-        const lastStep = steps.pop()
+
+      function getStep (steps){
+        if (!steps || !steps.length) return {lqaNumber: 'TQI',field: "tqi"}
+        const [lastStep] = steps
         const {tqi, lqa1, lqa2, lqa3} = lastStep
         if (lqa3 && lqa3.grade) {
-          return { lqaNumber: '3', field: "Lqa3"}
+          return { lqaNumber: '', field: "done"}
         }
         if (lqa2 && lqa2.grade) {
-          return { lqaNumber: '2',field: "Lqa2"}
+          return { lqaNumber: '3',field: "Lqa3"}
         }
         if (lqa1 && lqa1.grade) {
-          return {lqaNumber: '1',field: "Lqa1"}
+          return {lqaNumber: '2',field: "Lqa2"}
         }
         if (tqi && tqi.grade) {
-          return { lqaNumber: 'TQI', field: "Tqi"}
+          return { lqaNumber: '1', field: "Lqa1"}
         }
       }
     }
@@ -260,9 +267,30 @@ const getXtrfUpcomingReport = async (filters) => {
     console.log('Error in getXtrfUpcomingReport');
   }
 };
+// function getAssessmentInfo(result) {
+//   return  result.map((lqaReport)=> {
+//     const {sourceLanguage: lqaSourceLang, targetLanguage: lqaTargetLang} = lqaReport
+//     lqaReport.industries = lqaReport.industries.map(industry => {
+//       const {industryGroup, vendors} = industry
+//       vendors.map(vendorOne => {
+//         const assessments =  vendorOne
+//           .vendor
+//           .assessments
+//           .find(({sourceLanguage, targetLanguage}) =>
+//             (
+//               sourceLanguage === lqaSourceLang._id.toString()
+//               && targetLanguage === lqaTargetLang._id.toString()
+//             )
+//           )
+//         console.log(assessments);
+//       })
+//     })
+//   })
+// }
 
 function groupXtrfLqaByIndustryGroup(result) {
   return result.map(lqaReport => {
+    const {sourceLanguage: lqaSourceLang, targetLanguage: lqaTargetLang} = lqaReport
     lqaReport.industries = lqaReport.industries.reduce((gByIndustryGroup, industry) => {
       const {industryGroup, vendors} = industry
       const notNullVendor = vendors.filter(({vendor})=> vendor)
@@ -276,7 +304,7 @@ function groupXtrfLqaByIndustryGroup(result) {
       }
 
       gByIndustryGroup[findIndustryId].vendors = notNullVendor.reduce((resVendors, vendor)=> {
-        if(!vendor) return resVendors;
+        // if(!vendor) return resVendors;
         const {name} = vendor
         const findVendorId = resVendors.findIndex(vendor => vendor.name === name)
 

@@ -113,7 +113,7 @@ async function updateVendorAssessment({ vendorId, assessment, file }) {
 async function saveAssessmentFile({ assessment, file, vendorId }) {
   try {
     const qaKey = Object.keys(assessment).find(item => assessment[item].grade && !assessment[item].path);
-    const path = `/vendorsDocs/${vendorId}/${qaKey}${assessment.targetLanguage}-${file.filename}`;
+    const path = `/vendorsDocs/${vendorId}/${qaKey}${assessment.targetLanguage || assessment.target.lang}-${file.filename}`;
     await moveFile(file, `./dist${path}`);
     return { qaKey, path, fileName: file.filename };
   } catch (err) {

@@ -85,57 +85,128 @@ export default {
           this.isForm = false;
       },
       openForm({ vendor }) {
-        const { sourceLang, targetLang, industry, step, name, field, ids} = vendor;
+        const {
+          sourceLang,
+          targetLang,
+          sourceLangInfo,
+          targetLangInfo,
+          industry,
+          step,
+          name,
+          field,
+          steps,
+          assessmentId,
+          mainIndex,
+          industryIndex,
+          wordCount,
+          stepIndex,
+        } = vendor;
+
+        if (wordCount <= 10000) {
+          const canNextStep = ['tqi'].includes(field)
+          if (!canNextStep) return;
+        }
+        if (wordCount <= 50000) {
+          const canNextStep = ['tqi', 'Lqa1'].includes(field)
+          if (!canNextStep) return;
+        }
+        if (wordCount <= 100000) {
+          const canNextStep = ['tqi','Lqa1', 'Lqa2'].includes(field)
+          if (!canNextStep) return;
+        }
+
+        if(field === "done") return;
+
         this.selectedVendor = vendor;
 
         this.lqaData = {
           vendor: {
             name: name,
-            industries: industry,
+            industries: industry.name,
             sourceLang,
             targetLang,
-            step,
-            ids,
+            step: step.title,
           },
-          step: step,
+          step,
+          steps,
           sourceLanguage: sourceLang,
           targetLanguage: targetLang,
-          industries: industry,
+          industry,
+          field,mainIndex,
+          industryIndex,
+          stepIndex,
+          assessmentId,
+          sourceLangInfo,
+          targetLangInfo,
           [`is${field}`]: true,
           // stepIndex: index,
         };
         this.isForm = true;
       },
       async saveVendorLqa({ vendorData }) {
-        // const { file, grade, source, target, step, ids: {mainIndex, industryIndex, stepIndex} } = vendorData;
-        // const assessment = {
-        //   ...this.currentAssessment,
-        //   isNew: false,
-        //   step,
-        //   source,
-        //   target,
-        //   mainIndex,
-        //   industryIndex,
-        //   stepIndex,
-        //   [this.currentField]: { fileName: "", path: "", grade },
-        // };
-        // let formData = new FormData();
-        // formData.append("vendorId", this.selectedVendor.vendorId);
-        // formData.append("assessment", JSON.stringify(assessment));
-        // formData.append("assessmentFile", file);
-        //
-        // try {
-        //   const result = await this.storeAssessment(formData);
-        //   this.alertToggle({
-        //     message: "Assessment saved",
-        //     isShow: true,
-        //     type: "success",
-        //   });
-        // } catch (err) {
-        // } finally {
-        //   this.$emit("refreshAssessment");
-        //   this.closeForm();
-        // }
+        const {
+          file,
+          grade,
+          sourceLangInfo,
+          targetLangInfo,
+          sourceLanguage: source,
+          targetLanguage: target,
+          step,
+          steps,
+          industry,
+          field,
+          assessmentId,
+          mainIndex,
+          industryIndex,
+          stepIndex,
+        } = vendorData;
+        let assessment = {}
+        if(field === "tqi") {
+          assessment = {
+            step: [step],
+            target: targetLangInfo,
+            industry: [industry],
+            source : sourceLangInfo,
+            tqi: { fileName: "", path: "", grade },
+            lqa1: {},
+            lqa2: {},
+            lqa3: {},
+            isNew: true,
+          };
+        }else{
+          assessment = {
+            _id: assessmentId,
+            isNew: false,
+            step,
+            steps,
+            source,
+            target,
+            industry,
+            mainIndex,
+            industryIndex,
+            stepIndex,
+            [field.toLowerCase()]: { fileName: "", path: "", grade },
+          };
+        }
+
+        let formData = new FormData();
+        formData.append("vendorId", this.selectedVendor.vendorId);
+        formData.append("assessment", JSON.stringify(assessment));
+        formData.append("assessmentFile", file);
+
+        try {
+          const result = await this.storeAssessment(formData);
+          this.alertToggle({
+            message: "Assessment saved",
+            isShow: true,
+            type: "success",
+          });
+        } catch (err) {
+        } finally {
+          this.getReport()
+          this.$emit("refreshAssessment");
+          this.closeForm();
+        }
       },
     },
     computed: {

@@ -30,7 +30,7 @@
               |&nbsp; &nbsp;
               b Tier: &nbsp;
               |-
-            Table(v-if="vendors.length" :vendorsData="vendors")
+            Table(v-if="vendors.length" :additionalInformation="{languagePair, industryGroup}" :vendorsData="vendors")
 
       //.lqa__form(v-if="false")
         NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")

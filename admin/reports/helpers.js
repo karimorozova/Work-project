@@ -78,14 +78,14 @@ const getFilteringQueryForLqaReport = async (filters) => {
   const { industryFilter, vendorFilter } = filters;
   let query = {
     $or: [
-      { 'industries.Finance.vendors': { $not: { $size: 0 } } },
-      { 'industries.iGaming.vendors': { $not: { $size: 0 } } }
+      { 'industries.vendors': { $not: { $size: 0 } } },
+      { 'industries.vendors': { $not: { $size: 0 } } }
     ]
   };
   if (filters.vendorFilter) {
     query.$or = [
-      { 'industries.Finance.vendors.name': { $in: [`${vendorFilter}`] } },
-      { 'industries.iGaming.vendors.name': { $in: [`${vendorFilter}`] } }
+      { 'industries.vendors.name': { $in: [`${vendorFilter}`] } },
+      { 'industries.vendors.name': { $in: [`${vendorFilter}`] } }
     ];
   }
   if (filters.industryFilter) {
