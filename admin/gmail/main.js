@@ -74,13 +74,13 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 const saveFinalProjectsStatusToDB = async (csvStr, allProjectsStatuses) => {
 	if(Object.values(csvStr).length) {
 		let [projectId, projectName, status] = Object.values(csvStr);
-		status = status === 'Open' ? 'In progress' : status;
+		const newStatus = status === 'Open' ? 'In progress' : 'Closed';
 		const name = `${ projectId } - ${ projectName }`;
+
 		const existingObjInx = allProjectsStatuses.findIndex(({ name: n }) => n.trim() === name.trim());
 		if(existingObjInx !== -1) {
 			const currObj = allProjectsStatuses[existingObjInx];
-			currObj.status = status;
-			await GmailProjectsStatuses.updateOne({ _id: currObj._id }, { currObj })
+			await GmailProjectsStatuses.updateOne({ name: currObj.name.trim() },  {status: newStatus})
 		} else {
 			await GmailProjectsStatuses.create({ name, status })
 		}
