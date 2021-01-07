@@ -57,10 +57,10 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 																await saveProjectsStatusToDB(data, result, status);
 															}
 														}).on('end', () => {
-															fs.unlink('./dist/emails/File.csv', (err) => {
-																if(err) throw err;
-																console.log('successfully file DELETED! for label =>', labelId);
-															});
+															// fs.unlink('./dist/emails/File.csv', (err) => {
+															// 	if(err) throw err;
+															// 	console.log('successfully file DELETED! for label =>', labelId);
+															// });
 														});
 													});
 												}

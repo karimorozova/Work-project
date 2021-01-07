@@ -2,6 +2,7 @@ const { MemoqProject, GmailProjectsStatuses, Clients, Vendors } = require('../..
 const { checkProjectStructure } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
+const {saveOtherProjectStatuses} = require("../../../gmail");
 
 /**
  *
@@ -44,6 +45,11 @@ const updateAllMemoqProjects = async (querySource) => {
  */
 const updateStatusesForOtherProjects = async () => {
   let allProjectsStatuses = await GmailProjectsStatuses.find();
+  if(!allProjectsStatuses.length) {
+    await saveOtherProjectStatuses();
+    allProjectsStatuses = await GmailProjectsStatuses.find();
+  }
+
   allProjectsStatuses = allProjectsStatuses.filter(({ isRead }) => !isRead);
 
   const readProjectsByStatusAndUpdateOtherProjects = async (status) => {
