@@ -8,6 +8,7 @@ const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles');
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./reports');
 
+// downloadFromMemoqProjectsData();
 schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"));
 
 schedule.scheduleJob('5 10-18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"));

@@ -11,7 +11,9 @@ const saveOtherProjectStatuses = async (auth) => {
 	else {
 		const gmail = gmailApi({ version: 'v1', auth });
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_4897832564654206611', 'Quote');
+		await wait(10000);
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_1714380902505568051', "In progress");
+		await wait(10000);
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_8132819458511673536', "");
 	}
 };
@@ -29,7 +31,7 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 			},
 			async (err, res) => {
 				for (let { id } of res.data.messages.slice(0, 10)) {
-					await wait(2000);
+					await wait(500);
 					await gmail.users.messages.get({
 								userId: 'me',
 								id: id
