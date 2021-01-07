@@ -1,3 +1,3 @@
-const { saveProjectStatuses, } = require('./main');
+const { saveOtherProjectStatuses, } = require('./main');
 
-module.exports = { saveProjectStatuses };
+module.exports = { saveOtherProjectStatuses };

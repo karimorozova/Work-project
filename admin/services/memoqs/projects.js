@@ -560,35 +560,34 @@ async function getMemoqFileId(projectId, docId) {
 	}
 }
 
-async function updateMemoqProjectsData() {
+async function downloadFromMemoqProjectsData() {
 	try {
 		let allProjects = await getMemoqAllProjects();
 		const clients = await Clients.find();
 		const vendors = await Vendors.find();
 		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
+		const allProjectsInSystem = await MemoqProject.find();
 
 		for (let project of allProjects) {
-			const { ServerProjectGuid, DocumentStatus } = project;
+			const { ServerProjectGuid } = project;
 			const documents = await getProjectTranslationDocs(ServerProjectGuid);
 			if(project.Name.indexOf('PngSys') === -1 && !!documents) {
+				const isProjectExistInSystem = allProjectsInSystem.map(({ serverProjectGuid }) => serverProjectGuid).includes(ServerProjectGuid);
 				let users = await getProjectUsers(ServerProjectGuid);
 				users = getUpdatedUsers(users);
-				let memoqProject = getMemoqProjectData(project, languages);
 
-				memoqProject.status = defineProjectStatus(DocumentStatus);
-				memoqProject.lockedForRecalculation = memoqProject.lockedForRecalculation === undefined ? false : memoqProject.lockedForRecalculation;
-				memoqProject.isTest = memoqProject.isTest === undefined ? false : memoqProject.isTest;
-				memoqProject.isInLQAReports = memoqProject.isInLQAReports === undefined ? false : memoqProject.isInLQAReports;
-
-				const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, memoqProject, documents);
-				memoqProject = doesHaveCorrectStructure ? await createOtherProjectFinanceData({ project: memoqProject, documents }, true) : memoqProject;
-
+				let memoqProject = getMemoqProjectData(project, languages, isProjectExistInSystem);
+				if(!isProjectExistInSystem) {
+					memoqProject = checkProjectStructure(clients, vendors, memoqProject, documents) ?
+							await createOtherProjectFinanceData({ project: memoqProject, documents }, true) :
+							memoqProject;
+				}
 				await MemoqProject.updateOne({ serverProjectGuid: ServerProjectGuid }, { ...memoqProject, users, documents }, { upsert: true })
 			}
 		}
 
 	} catch (err) {
-		console.log('Error in updateMemoqProjectsData');
+		console.log('Error in downloadFromMemoqProjectsData');
 		console.log(err);
 		throw new Error(err.message);
 	}
@@ -613,11 +612,11 @@ function getUpdatedUsers(users) {
 	};
 }
 
-function getMemoqProjectData(project, languages) {
+function getMemoqProjectData(project, languages, isProjectExistInSystem) {
 	const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
 	const targetCodes = typeof project.TargetLanguageCodes['a:string'] === 'string' ? [project.TargetLanguageCodes['a:string']] : project.TargetLanguageCodes['a:string'];
 	const targetLanguages = targetCodes.map(item => languages.find(l => l.memoq === item));
-	return {
+	const obj = {
 		name: project.Name,
 		creatorUser: project.CreatorUser,
 		creationTime: new Date(project.CreationTime),
@@ -629,9 +628,17 @@ function getMemoqProjectData(project, languages) {
 		targetLanguages,
 		totalWordCount: project.TotalWordCount,
 		projectStatus: project.ProjectStatus,
-		weightedWords : project.WeightedWords,
-		documentStatus : project.DocumentStatus,
-	}
+		weightedWords: project.WeightedWords,
+		documentStatus: project.DocumentStatus,
+	};
+	const additionalObj = {
+		status: defineProjectStatus(project.DocumentStatus),
+		lockedForRecalculation: false,
+		isTest: false,
+		isInLQAReports: false,
+	};
+
+	return isProjectExistInSystem ? obj : Object.assign(obj, additionalObj);
 }
 
 module.exports = {
@@ -648,7 +655,7 @@ module.exports = {
 	getMemoqFileId,
 	cancelMemoqDocs,
 	setCancelledNameInMemoq,
-	updateMemoqProjectsData,
+	downloadFromMemoqProjectsData,
 	assignMemoqTranslators,
 	setMemoqDocumentWorkFlowStatus,
 	assignedDefaultTranslator

@@ -5,7 +5,7 @@ const {
 	updateMemoqProjectFinance,
 	updateAllMemoqProjects,
 	updateMemoqProjectStatus,
-	parseMessagesAndUpdateProjects,
+	updateStatusesForOtherProjects,
 } = require('./otherProjectUpdates');
 const { getMemoqProjectsForClientPortal } = require('./getMemoqProject');
 
@@ -18,7 +18,7 @@ module.exports = {
 	updateAllMemoqProjects,
 	updateMemoqProjectStatus,
 	// doesAllTasksFinished,
-	parseMessagesAndUpdateProjects,
+	updateStatusesForOtherProjects,
 	getMemoqProjectsForClientPortal,
   defineProjectStatus
 };

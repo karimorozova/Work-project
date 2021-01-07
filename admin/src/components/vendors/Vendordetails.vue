@@ -481,14 +481,14 @@
 			},
 			async sendQuote(message) {
 				try {
-          await this.$http.post(`/vendorsapi/send-email`, {
-            message,
-            vendorId: this.vendorId
-          });
-          this.alertToggle({ message: 'Message sent!' });
-        } catch (err) {
-          this.alertToggle({ message: err.message, isShow: true, type: 'error' });
-        }
+					await this.$http.post(`/vendorsapi/send-email`, {
+						message,
+						vendorId: this.vendorId
+					});
+					this.alertToggle({ message: 'Message sent!' });
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: 'error' });
+				}
 				this.closePreview();
 			},
 			closeLangPairs() {
@@ -720,7 +720,7 @@
 			},
 			async getAliases() {
 				try {
-					const result = await this.$http.get("/memoqapi/memoq-vendor-aliases");
+					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`);
 					this.aliases = result.body;
 				} catch (err) {
 					this.alertToggle({

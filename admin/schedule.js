@@ -1,91 +1,47 @@
 const schedule = require("node-schedule");
+const moment = require('moment');
 const { XtrfLqa } = require('./models');
-const { updateMemoqProjectsData } = require("./services/memoqs/projects");
-const { saveProjectStatuses, updateOtherProjectStatusOnMessages, filterOldMessages } = require('./gmail');
+const { downloadFromMemoqProjectsData } = require("./services/memoqs/projects");
+const { updateStatusesForOtherProjects } = require("./services/memoqs/otherProjects");
+const { saveOtherProjectStatuses } = require('./gmail');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles');
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./reports');
+
+schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"));
+
+schedule.scheduleJob('5 10-18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"));
+schedule.scheduleJob('10 10-18 * * *', async () => await scheduleJobBody(updateStatusesForOtherProjects(), "Save project statuses from Gmail API"));
+
+schedule.scheduleJob('40 0 * * *', async () => await scheduleJobBody(UpdateLQAFromProject(), "Updating LQA reports from projects data"));
+schedule.scheduleJob('30 0 * * *', async () => await scheduleJobBody(newLQAStatusFromXTRFProjects(), "Updating LQA reports from MemoqProjects data"));
+schedule.scheduleJob('30 23 * * *', async () => await scheduleJobBody(newLangReport(), "Updating lang tier data"));
+
+schedule.scheduleJob('*/1 * * * *', async () => await scheduleJobBody(console.log('a'), "Updating lang tier data"));
+
 
 (async () => {
 	const countLQAReports = await XtrfLqa.countDocuments();
 	if(countLQAReports <= 0) parseAndWriteLQAReport()
 })();
 
-
-schedule.scheduleJob("0 */3 * * *", async function () {
-	const scheduleName = "Updating memoq projects";
-	console.log(`✐ Start schedule: ${ scheduleName }`, `${ new Date() };`);
+const scheduleJobBody = async (fnc, scheduleName) => {
+	console.log(
+			'\x1b[33m',
+			`Start schedule: "${ scheduleName }"`,
+			`At: ${ moment(new Date()).format("DD.MM.yyy, hh:mm:ss") };`,
+			'\x1b[0m'
+	);
 	try {
-		await updateMemoqProjectsData();
-		console.log(`✔ Finish schedule: ${ scheduleName }`, `${ new Date() };`);
+		await fnc;
 	} catch (err) {
 		console.log(err.message);
+	} finally {
+		console.log(
+				'\x1b[33m',
+				`Finish schedule: "${ scheduleName }"`,
+				`At: ${ moment(new Date()).format("DD.MM.yyy, hh:mm:ss") };`,
+				'\x1b[0m'
+		);
 	}
-});
-
-schedule.scheduleJob("0 */1 * * *", async function () {
-	const scheduleName = "";
-	console.log(`✐ Start schedule: ${ scheduleName }`, `${ new Date() };`);
-	try {
-		// await saveProjectStatuses();
-		console.log(`✔ Finish schedule: ${ scheduleName }`, `${ new Date() };`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob("0 0 */2 * *", async function () {
-	const scheduleName = "";
-	console.log(`✐ Start schedule: ${ scheduleName }`, `${ new Date() };`);
-	try {
-		// await filterOldMessages();
-		console.log(`✔ Finish schedule: ${ scheduleName }`, `${ new Date() };`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob("0 0 */2 * *", async function () {
-	const scheduleName = "";
-	console.log(`✐ Start schedule: ${ scheduleName }`, `${ new Date() };`);
-	try {
-		// await updateOtherProjectStatusOnMessages();
-		console.log(`✔ Finish schedule: ${ scheduleName }`, `${ new Date() };`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob('30 23 * * *', async function () {
-	const scheduleName = "Updating lang tier data";
-	console.log(`✐ Start schedule: ${ scheduleName }`, `${ new Date() };`);
-	try {
-		await newLangReport();
-		console.log(`✔ Finish schedule: ${ scheduleName }`, `${ new Date() };`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob('30 0 * * *', async function () {
-	const scheduleName = "Updating LQA reports from MemoqProjects data";
-	console.log(`✐ Start schedule: ${ scheduleName }`, `${ new Date() };`);
-	try {
-		await newLQAStatusFromXTRFProjects();
-		console.log(`✔ Finish schedule: ${ scheduleName }`, `${ new Date() };`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
-schedule.scheduleJob('40 0 * * *', async function () {
-	const scheduleName = "Updating LQA reports from projects data";
-	console.log(`✐ Start schedule: ${ scheduleName }`, `${ new Date() };`);
-	try {
-		await UpdateLQAFromProject();
-		console.log(`✔ Finish schedule: ${ scheduleName }`, `${ new Date() };`);
-	} catch (err) {
-		console.log(err.message);
-	}
-});
-
+};

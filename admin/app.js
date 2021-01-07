@@ -17,7 +17,8 @@ require('./schedule');
 
 // const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 
-// saveProjectStatuses();
+// const { saveOtherProjectStatuses } = require('./gmail');
+// saveOtherProjectStatuses();
 
 const allowedOrigins = [
 	"https://admin.pangea.global",
@@ -79,5 +80,5 @@ app.use(history({ verbose: true, index: '/' }));
 app.use(checkRoutes);
 
 app.listen(port, () => {
-	console.log(`✈  Server is working on: ${ port }`);
+	console.log('\x1b[32m', `✈  Server is working on: ${ port }`, '\x1b[0m');
 });
