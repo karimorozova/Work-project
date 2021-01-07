@@ -76,7 +76,7 @@ const saveFinalProjectsStatusToDB = async (csvStr, allProjectsStatuses) => {
 		let [projectId, projectName, status] = Object.values(csvStr);
 		status = status === 'Open' ? 'In progress' : status;
 		const name = `${ projectId } - ${ projectName }`;
-		const existingObjInx = allProjectsStatuses.findIndex(({ name: n }) => n === name.trim());
+		const existingObjInx = allProjectsStatuses.findIndex(({ name: n }) => n.trim() === name.trim());
 		if(existingObjInx !== -1) {
 			const currObj = allProjectsStatuses[existingObjInx];
 			currObj.status = status;
@@ -91,7 +91,7 @@ const saveProjectsStatusToDB = async (csvStr, allProjectsStatuses, status) => {
 	if(Object.values(csvStr).length) {
 		const [projectId, projectName] = Object.values(csvStr);
 		const name = `${ projectId } - ${ projectName }`;
-		const findIndex = allProjectsStatuses.findIndex(({ name: n, status: s }) => n === name.trim() && s === status);
+		const findIndex = allProjectsStatuses.findIndex(({ name: n, status: s }) => n.trim() === name.trim() && s.trim() === status.trim());
 		if(findIndex === -1) await GmailProjectsStatuses.create({ name, status })
 	}
 };

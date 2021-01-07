@@ -54,7 +54,7 @@ const updateStatusesForOtherProjects = async () => {
 
       if(allProjects.findIndex(({name}) => name === fromStatusName) !== -1 ) {
         await GmailProjectsStatuses.updateOne({"_id": fromStatusId}, { isRead: true });
-        await MemoqProject.updateOne({"name": fromStatusName}, { fromStatus });
+        await MemoqProject.updateOne({"name": fromStatusName}, { status: fromStatus });
       }
     }
   };
