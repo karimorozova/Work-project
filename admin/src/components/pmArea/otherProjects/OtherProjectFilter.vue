@@ -35,18 +35,11 @@
     .button
       .button__row
         .button__body
-          input.button__update-btn(type="submit" value="Update XTRF Projects" @click="getXTRFProjects()")
-        .button__body(v-if="this.$route.query.status !== 'Closed'")
-          input.button__update-btn(type="submit" value="Update from messages" @click="parseMessages()")
-        //.button__new-vendor(v-if="!isUpload")
-          .button__update-btn
-            .button__wait
-              .button__text Loading data
-              .lds-ring
-                div
-                div
-                div
-                div
+          input.button__update-btn(type="submit" :value="detectedStatusForButton(this.$route.query.status)" @click="getXTRFProjects()")
+
+        .button__body
+          input.button__update-btn(type="submit" value="Update XTRF Projects statuses" @click="parseMessages()")
+
 </template>
 
 <script>
@@ -74,65 +67,75 @@
 			};
 		},
 		methods: {
-      ...mapActions(['alertToggle']),
+			...mapActions(['alertToggle']),
 
-      async getXTRFProjects () {
-        try {
-          console.log(this.$route);
-          const result = await this.$http.get(`/memoqapi/update-all-memoq-finance/${this.$route.query.status}`);
-          this.$emit('refreshProjects', result.data);
-        } catch (err) {
-          this.alertToggle({
-            message: 'Server Error / Cannot update Project',
-            isShow: true,
-            type: 'error'
-          });
-        } finally {
-          this.alertToggle({
-            message: 'Projects updated',
-            isShow: true,
-            type: 'success'
-          });
-        }
-      },
-      async parseMessages () {
-        try {
-          const result = await this.$http.get(`/memoqapi/update-project-statuses-from-messages/${this.$route.query.status}`);
-          this.$emit('refreshProjects', result.data);
-        } catch (err) {
-          this.alertToggle({
-            message: 'Server Error / Cannot parse messages',
-            isShow: true,
-            type: 'error'
-          });
-        } finally {
-          this.alertToggle({
-            message: 'Projects updated',
-            isShow: true,
-            type: 'success'
-          });
-        }
-      },
-      setStart (event) {
-        const date = event;
-        date.setHours(0, 0, 0, 0);
-        this.$emit('setFilter', { option: date, prop: 'startFilter' });
-      },
-      setDeadline (event) {
-        const date = event;
-        date.setHours(23, 0, 0, 0);
-        this.$emit('setFilter', { option: date, prop: 'deadlineFilter' });
-      },
-      customFormatter (date) {
-        return moment(date).format('DD-MM-YYYY, HH:mm');
-      },
-      startOpen () {
-        this.$refs.startDate.showCalendar();
-      },
-      deadlineOpen () {
-        this.$refs.deadline.showCalendar();
-      },
-      addLang ({ lang }, goal) {
+			detectedStatusForButton(status) {
+				switch (status) {
+					case 'In-progress':
+						return 'Update the financial part XTRF Open Projects';
+					case 'Quote':
+						return 'Update the financial part XTRF Quotes';
+					case 'Closed':
+						return 'Update the financial part XTRF Closed Projects';
+				}
+			},
+			async getXTRFProjects() {
+				try {
+					console.log(this.$route);
+					const result = await this.$http.get(`/memoqapi/update-all-memoq-finance/${ this.$route.query.status }`);
+					this.$emit('refreshProjects', result.data);
+				} catch (err) {
+					this.alertToggle({
+						message: 'Server Error / Cannot update Project',
+						isShow: true,
+						type: 'error'
+					});
+				} finally {
+					this.alertToggle({
+						message: 'Projects updated',
+						isShow: true,
+						type: 'success'
+					});
+				}
+			},
+			async parseMessages() {
+				try {
+					const result = await this.$http.get(`/memoqapi/update-project-statuses-from-messages/${ this.$route.query.status }`);
+					this.$emit('refreshProjects', result.data);
+				} catch (err) {
+					this.alertToggle({
+						message: 'Server Error / Cannot parse messages',
+						isShow: true,
+						type: 'error'
+					});
+				} finally {
+					this.alertToggle({
+						message: 'Projects updated',
+						isShow: true,
+						type: 'success'
+					});
+				}
+			},
+			setStart(event) {
+				const date = event;
+				date.setHours(0, 0, 0, 0);
+				this.$emit('setFilter', { option: date, prop: 'startFilter' });
+			},
+			setDeadline(event) {
+				const date = event;
+				date.setHours(23, 0, 0, 0);
+				this.$emit('setFilter', { option: date, prop: 'deadlineFilter' });
+			},
+			customFormatter(date) {
+				return moment(date).format('DD-MM-YYYY, HH:mm');
+			},
+			startOpen() {
+				this.$refs.startDate.showCalendar();
+			},
+			deadlineOpen() {
+				this.$refs.deadline.showCalendar();
+			},
+			addLang({ lang }, goal) {
 				const prop = goal === "sourceFilter" ? "sourceLangs" : "targetLangs";
 				const position = this[prop].indexOf(lang.symbol);
 				if(position !== -1) {
@@ -169,6 +172,7 @@
       display: flex;
       margin-bottom: 20px;
     }
+
     &__body {
       margin-right: 20px;
     }
@@ -184,23 +188,25 @@
     }
 
     &__update-btn {
-      width: 168px;
+      width: auto;
+      padding: 0 15px;
       height: 34px;
-      color: #fff;
+      color: white;
       font-size: 14px;
-      border-radius: 10px;
-      box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
+      border-radius: 8px;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .12), 0 1px 5px 0 rgba(0, 0, 0, .2);
       background-color: #D15F45;
-      border: 1px solid #D15F45;
-      cursor: pointer;
-      outline: 0;
-      line-height: 32px;
+      border: none;
+      transition: .1s ease;
+      outline: none;
+
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+      }
 
       &:active {
         transform: scale(.98);
-        outline: none !important;
-        outline-color: none;
-        border: none;
       }
     }
   }

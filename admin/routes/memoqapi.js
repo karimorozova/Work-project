@@ -23,7 +23,7 @@ const {
   updateAllMemoqProjects,
   updateMemoqProjectFinance,
   updateMemoqProjectStatus,
-  parseMessagesAndUpdateProjects
+  updateStatusesForOtherProjects
 } = require('../services/memoqs/otherProjects');
 const { updateProjectFinanceOnDiscountsUpdate } = require('../projects');
 const _ = require('lodash');
@@ -296,15 +296,17 @@ router.get('/update-all-memoq-finance/:from', async (req, res) => {
 });
 
 router.get('/update-project-statuses-from-messages/:from', async (req, res) => {
-  const { from } = req.params;
-  try {
-    await parseMessagesAndUpdateProjects(from);
+  let { from } = req.params;
+	try {
+		from = from === 'In-progress' ? 'In progress' : from;
+    await updateStatusesForOtherProjects(from);
     const updatedProjects = await getFilteredOtherProjects({ query: from });
     res.send(updatedProjects);
   } catch (err) {
     console.log(err);
     res.status(500).send('Error on parsing gmail messages');
   }
+
 });
 
 router.post('/client-contact', async (req, res) => {

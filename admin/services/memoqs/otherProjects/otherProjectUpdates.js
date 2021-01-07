@@ -1,4 +1,4 @@
-const { MemoqProject, Clients, Vendors } = require('../../../models');
+const { MemoqProject, GmailProjectsStatuses, Clients, Vendors } = require('../../../models');
 const { checkProjectStructure } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
@@ -20,6 +20,7 @@ const updateAllMemoqProjects = async (querySource) => {
     case 'Closed':
       query.status = 'Closed';
   }
+
   const projects = await MemoqProject.find(query);
   const clients = await Clients.find();
   const vendors = await Vendors.find();
@@ -29,10 +30,7 @@ const updateAllMemoqProjects = async (querySource) => {
     if (!lockedForRecalculation) {
       const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, project, documents);
       if (doesHaveCorrectStructure) {
-        await createOtherProjectFinanceData({
-          project,
-          documents
-        });
+        await createOtherProjectFinanceData({ project, documents });
       }
     }
   }
@@ -44,19 +42,24 @@ const updateAllMemoqProjects = async (querySource) => {
  * @param {String} status - describes status of progress for a correct query
  * @returns nothing - runs on array and updates fitting projects
  */
-const parseMessagesAndUpdateProjects = async (status) => {
-  // let query = status === 'Quote' ? 'Decide on quote' : 'Project Approved';
-  // const { messages } = await GmailMessages.findOne({ name: query });
-  // for (let i = 0; i < messages.length; i += 1) {
-  //   let { projectName, isRead } = messages[i];
-  //   if (!isRead) {
-  //     const project = await MemoqProject.findOne({ $and: [{ name: projectName }, { status: { $ne: 'Closed' } }] });
-  //     if (project) {
-  //       messages[i].isRead = true;
-  //       await MemoqProject.updateOne({ _id: project._id }, { status });
-  //     }
-  //   }
-  // }
+const updateStatusesForOtherProjects = async () => {
+  let allProjectsStatuses = await GmailProjectsStatuses.find();
+  allProjectsStatuses = allProjectsStatuses.filter(({ isRead }) => !isRead);
+
+  const readProjectsByStatusAndUpdateOtherProjects = async (status) => {
+    const filteredByStatus = (filter) => allProjectsStatuses.filter(({ status: s }) => s === filter);
+    for (let {
+      name: fromStatusName,
+      _id: fromStatusId,
+      status: fromStatus
+    } of filteredByStatus(status)){
+      await GmailProjectsStatuses.updateOne({"_id": fromStatusId}, { isRead: true });
+      await MemoqProject.updateOne({"name": fromStatusName}, { fromStatus });
+    }
+  };
+  await readProjectsByStatusAndUpdateOtherProjects('Quote');
+  await readProjectsByStatusAndUpdateOtherProjects('In progress');
+  await readProjectsByStatusAndUpdateOtherProjects('Closed');
 };
 
 /**
@@ -108,5 +111,5 @@ module.exports = {
   updateAllMemoqProjects,
   updateMemoqProjectFinance,
   updateMemoqProjectStatus,
-  parseMessagesAndUpdateProjects
+  updateStatusesForOtherProjects
 };

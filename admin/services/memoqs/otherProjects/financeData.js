@@ -56,8 +56,6 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
       steps[neededStepIndex].vendor = vendor;
       return steps;
     }
-
-
   }
 };
 
