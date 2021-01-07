@@ -17,8 +17,6 @@ schedule.scheduleJob('40 0 * * *', async () => await scheduleJobBody(UpdateLQAFr
 schedule.scheduleJob('30 0 * * *', async () => await scheduleJobBody(newLQAStatusFromXTRFProjects(), "Updating LQA reports from MemoqProjects data"));
 schedule.scheduleJob('30 23 * * *', async () => await scheduleJobBody(newLangReport(), "Updating lang tier data"));
 
-schedule.scheduleJob('*/1 * * * *', async () => await scheduleJobBody(console.log('a'), "Updating lang tier data"));
-
 
 (async () => {
 	const countLQAReports = await XtrfLqa.countDocuments();
