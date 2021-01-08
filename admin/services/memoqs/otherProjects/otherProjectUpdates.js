@@ -2,6 +2,7 @@ const { MemoqProject, GmailProjectsStatuses, Clients, Vendors } = require('../..
 const { checkProjectStructure } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
+const {saveOtherProjectStatuses} = require("../../../gmail");
 
 /**
  *
@@ -37,24 +38,24 @@ const updateAllMemoqProjects = async (querySource) => {
   return await getMemoqProjects(query);
 };
 
-/**
- *
- * @param {String} status - describes status of progress for a correct query
- * @returns nothing - runs on array and updates fitting projects
- */
+
 const updateStatusesForOtherProjects = async () => {
   let allProjectsStatuses = await GmailProjectsStatuses.find();
+  let allProjects =  await MemoqProject.find();
+  if(!allProjectsStatuses.length) {
+    await saveOtherProjectStatuses();
+    allProjectsStatuses = await GmailProjectsStatuses.find();
+  }
   allProjectsStatuses = allProjectsStatuses.filter(({ isRead }) => !isRead);
 
   const readProjectsByStatusAndUpdateOtherProjects = async (status) => {
     const filteredByStatus = (filter) => allProjectsStatuses.filter(({ status: s }) => s === filter);
-    for (let {
-      name: fromStatusName,
-      _id: fromStatusId,
-      status: fromStatus
-    } of filteredByStatus(status)){
-      await GmailProjectsStatuses.updateOne({"_id": fromStatusId}, { isRead: true });
-      await MemoqProject.updateOne({"name": fromStatusName}, { fromStatus });
+    for (let { name: fromStatusName, _id: fromStatusId, status: fromStatus } of filteredByStatus(status)){
+
+      if(allProjects.findIndex(({name}) => name === fromStatusName) !== -1 ) {
+        await GmailProjectsStatuses.updateOne({"_id": fromStatusId}, { isRead: true });
+        await MemoqProject.updateOne({"name": fromStatusName}, { status: fromStatus });
+      }
     }
   };
   await readProjectsByStatusAndUpdateOtherProjects('Quote');

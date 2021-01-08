@@ -11,7 +11,9 @@ const saveOtherProjectStatuses = async (auth) => {
 	else {
 		const gmail = gmailApi({ version: 'v1', auth });
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_4897832564654206611', 'Quote');
+		await wait(10000);
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_1714380902505568051', "In progress");
+		await wait(10000);
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_8132819458511673536', "");
 	}
 };
@@ -29,7 +31,7 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 			},
 			async (err, res) => {
 				for (let { id } of res.data.messages.slice(0, 10)) {
-					await wait(2000);
+					await wait(500);
 					await gmail.users.messages.get({
 								userId: 'me',
 								id: id
@@ -55,10 +57,10 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 																await saveProjectsStatusToDB(data, result, status);
 															}
 														}).on('end', () => {
-															fs.unlink('./dist/emails/File.csv', (err) => {
-																if(err) throw err;
-																console.log('successfully file DELETED! for label =>', labelId);
-															});
+															// fs.unlink('./dist/emails/File.csv', (err) => {
+															// 	if(err) throw err;
+															// 	console.log('successfully file DELETED! for label =>', labelId);
+															// });
 														});
 													});
 												}
@@ -72,13 +74,13 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 const saveFinalProjectsStatusToDB = async (csvStr, allProjectsStatuses) => {
 	if(Object.values(csvStr).length) {
 		let [projectId, projectName, status] = Object.values(csvStr);
-		status = status === 'Open' ? 'In progress' : status;
+		const newStatus = status === 'Open' ? 'In progress' : 'Closed';
 		const name = `${ projectId } - ${ projectName }`;
-		const existingObjInx = allProjectsStatuses.findIndex(({ name: n }) => n === name.trim());
+
+		const existingObjInx = allProjectsStatuses.findIndex(({ name: n }) => n.trim() === name.trim());
 		if(existingObjInx !== -1) {
 			const currObj = allProjectsStatuses[existingObjInx];
-			currObj.status = status;
-			await GmailProjectsStatuses.updateOne({ _id: currObj._id }, { currObj })
+			await GmailProjectsStatuses.updateOne({ name: currObj.name.trim() },  {status: newStatus})
 		} else {
 			await GmailProjectsStatuses.create({ name, status })
 		}
@@ -89,7 +91,7 @@ const saveProjectsStatusToDB = async (csvStr, allProjectsStatuses, status) => {
 	if(Object.values(csvStr).length) {
 		const [projectId, projectName] = Object.values(csvStr);
 		const name = `${ projectId } - ${ projectName }`;
-		const findIndex = allProjectsStatuses.findIndex(({ name: n, status: s }) => n === name.trim() && s === status);
+		const findIndex = allProjectsStatuses.findIndex(({ name: n, status: s }) => n.trim() === name.trim() && s.trim() === status.trim());
 		if(findIndex === -1) await GmailProjectsStatuses.create({ name, status })
 	}
 };
