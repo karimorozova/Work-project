@@ -21,15 +21,17 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   if (!neededCustomer) return project;
 
   const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+  let steps = checkKeyInObject('steps');
+  let tasks = checkKeyInObject('tasks');
+  let  minimumCharge = project.hasOwnProperty('minimumCharge') ? project.minimumCharge : false;
 
-  let { tasks, steps, minimumCharge } = project;
-  const emptyTasksOrSteps =  tasks && !tasks.length || steps && !steps.length;
-  if (!tasks || !steps || emptyTasksOrSteps) {
+  if (true) {
     const newData = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
     tasks = newData.tasks;
     steps = newData.steps;
     if (!steps.length) return project;
   }
+
   if (!steps.every(step => step.vendor)) {
     steps = await checkAndCorrectStepStructure(steps, tasks, documents);
   }
@@ -37,7 +39,6 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
 
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
   await MemoqProject.updateOne({ _id: project._id }, { ...additionalData, tasks, steps, finance });
-
   return await getMemoqProject({ _id: project._id });
 
   async function checkAndCorrectStepStructure(steps, tasks, documents) {
@@ -46,7 +47,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
     const neededDocumentIndex = tasks.findIndex(({ taskId }) => taskId === steps[neededStepIndex].taskId);
 
     if(documents.length){
-      memoqVendorsArr = documents[neededDocumentIndex].UserAssignments.TranslationDocumentUserRoleAssignmentDetails
+      memoqVendorsArr = documents[neededDocumentIndex].UserAssignments.TranslationDocumentUserRoleAssignmentDetails;
       const indexRegex = new RegExp(/(?<=S)[0-9][0-9]/g);
       let index = indexRegex.exec(steps[neededStepIndex].stepId)[0];
       index = index === '01' ? 0 : 1;
@@ -56,6 +57,10 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
       steps[neededStepIndex].vendor = vendor;
       return steps;
     }
+  }
+
+  function checkKeyInObject(key){
+    return project.hasOwnProperty(key) ? project[key] : []
   }
 };
 
@@ -157,10 +162,10 @@ const getUpdatedProjectData = async (project, allClients) => {
   const industry = await findFittingIndustryId(project.domain);
   let additionalData = {};
   if(neededCustomer) {
-    additionalData.discounts = project.hasOwnProperty('discounts') ? project.discounts : [...neededCustomer.discounts];
+    const discounts = project.hasOwnProperty('discounts') ? project.discounts : [...neededCustomer.discounts];
     additionalData = {
       customer: ObjectId(neededCustomer._id),
-      status: project.status,
+      discounts,
       projectManager: ObjectId(neededCustomer.projectManager._id),
       accountManager: ObjectId(neededCustomer.accountManager._id),
       industry: ObjectId(industry._id),

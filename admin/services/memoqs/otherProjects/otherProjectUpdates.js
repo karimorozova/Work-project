@@ -90,7 +90,8 @@ const updateMemoqProjectFinance = async (project) => {
   if (!doesHaveCorrectStructure || lockedForRecalculation) {
     return project;
   }
-  return await createOtherProjectFinanceData({ project, documents });
+
+  return await createOtherProjectFinanceData({ project: project._doc, documents });
 };
 
 /**
