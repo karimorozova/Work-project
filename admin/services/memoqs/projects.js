@@ -3,7 +3,7 @@ const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients, Vendors } = require('../../models');
-const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished, defineProjectStatus } = require('./otherProjects');
+const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished, defineProjectStatus, clearGarbageProjects } = require('./otherProjects');
 
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
@@ -590,6 +590,8 @@ async function downloadFromMemoqProjectsData() {
 		console.log('Error in downloadFromMemoqProjectsData');
 		console.log(err);
 		throw new Error(err.message);
+	} finally {
+		await clearGarbageProjects();
 	}
 }
 

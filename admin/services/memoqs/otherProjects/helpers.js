@@ -1,4 +1,28 @@
-const { Industries } = require('../../../models');
+const { Industries, MemoqProject, GmailProjectsStatuses } = require('../../../models');
+const moment = require('moment');
+
+const clearGarbageProjects = async () => {
+  const isSquareBrackets = /(\[\d.*\])/gm;
+  const stringId = /(\d.*[\d]] -)/gm;
+  let date = Date.now();
+  const dayInTimestampMilliseconds = 86400 * 1000;
+  const date40DayAgo = Math.floor(date - (dayInTimestampMilliseconds * 40));
+
+  let allProjectStatuses = await GmailProjectsStatuses.find();
+  let allProjectsInSystem = await MemoqProject.find({
+    creationTime: { $gte: (moment(date40DayAgo).format('YYYY-MM-DD')).toString() }
+  });
+
+  allProjectsInSystem = allProjectsInSystem.filter(({ name }) => !!name.match(isSquareBrackets));
+  for ({ _id, name } of allProjectsInSystem){
+    let [ strId ] = name.match(stringId);
+    const isExistProjectInXTRF = allProjectStatuses
+        .map(({ name }) => !!name.match(isSquareBrackets) && name.match(stringId) && name.match(stringId)[0])
+        .includes(strId);
+
+    if(!isExistProjectInXTRF) await MemoqProject.deleteOne( { "_id" : _id } )
+  }
+};
 
 const filterMemoqProjectsVendors = users => {
   const documents = users.map(i => i.documents).reduce((a, b) => a.concat(b), []);
@@ -104,5 +128,6 @@ module.exports = {
   findFittingIndustryId,
   checkProjectStructure,
   // doesAllTasksFinished,
-  defineProjectStatus
+  defineProjectStatus,
+  clearGarbageProjects
 };
