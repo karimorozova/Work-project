@@ -15,8 +15,8 @@ const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./report
 
 schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"));
 
-schedule.scheduleJob('10 10-18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"));
-schedule.scheduleJob('15 10-18 * * *', async () => await scheduleJobBody(updateStatusesForOtherProjects(), "Save project statuses from Gmail API"));
+schedule.scheduleJob('25 10-18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"));
+schedule.scheduleJob('33 10-18 * * *', async () => await scheduleJobBody(updateStatusesForOtherProjects(), "Save project statuses from Gmail API"));
 
 schedule.scheduleJob('40 0 * * *', async () => await scheduleJobBody(UpdateLQAFromProject(), "Updating LQA reports from projects data"));
 schedule.scheduleJob('30 0 * * *', async () => await scheduleJobBody(newLQAStatusFromXTRFProjects(), "Updating LQA reports from MemoqProjects data"));
