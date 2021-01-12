@@ -5,7 +5,7 @@ const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients, Vendors } = require('../../models');
 const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished, defineProjectStatus, clearGarbageProjects } = require('./otherProjects');
 const { findLanguageByMemoqLanguageCode } = require('../../helpers/commonFunctions');
-
+const moment = require('moment');
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
 const headerWithoutAction = getHeaders('IServerProjectService');
@@ -566,7 +566,7 @@ async function downloadFromMemoqProjectsData() {
 		let allProjects = await getMemoqAllProjects();
 		const clients = await Clients.find();
 		const vendors = await Vendors.find();
-		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1, xtm: 1, iso: 1, iso2: 1});
+		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1, xtm: 1, iso: 1, iso2: 1 });
 		const allProjectsInSystem = await MemoqProject.find();
 
 		for (let project of allProjects) {
@@ -615,12 +615,16 @@ function getUpdatedUsers(users) {
 	};
 }
 
+
+let sameProjectDates = [];
+
 function getMemoqProjectData(project, languages, isProjectExistInSystem) {
 	const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
 	const targetCodes = typeof project.TargetLanguageCodes['a:string'] === 'string' ? [project.TargetLanguageCodes['a:string']] : project.TargetLanguageCodes['a:string'];
 	const targetLanguages = targetCodes.map(item => languages.find(lang => findLanguageByMemoqLanguageCode(lang, item)));
+
 	const obj = {
-		name: project.Name,
+		name: detectProjectName(),
 		creatorUser: project.CreatorUser,
 		creationTime: new Date(project.CreationTime),
 		deadline: new Date(project.Deadline),
@@ -642,6 +646,19 @@ function getMemoqProjectData(project, languages, isProjectExistInSystem) {
 	};
 
 	return isProjectExistInSystem ? obj : Object.assign(obj, additionalObj);
+
+	function detectProjectName() {
+		const { Name, CreationTime } = project;
+		if(/(\d.*[\d]] -)/gm.exec(Name) === null) {
+			const date = moment(CreationTime).format('YYYY MM DD');
+			const pushState = () => sameProjectDates.push(date);
+			const clearState = () => sameProjectDates = [];
+			!sameProjectDates.length ? pushState() : sameProjectDates.includes(date) ? pushState() : (clearState(), pushState());
+			const numberToday = sameProjectDates.length < 10 ? `[0${ sameProjectDates.length }]` : `[${ sameProjectDates.length }]`;
+			return `WP ${ date } ${ numberToday } - ${ project.Name }`;
+		}
+		return project.Name || 'Untitled project';
+	}
 }
 
 module.exports = {
