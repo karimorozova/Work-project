@@ -37,7 +37,7 @@
         .button__body
           input.button__update-btn(type="submit" :value="detectedStatusForButton(this.$route.query.status)" @click="getXTRFProjects()")
 
-        .button__body
+        //.button__body
           input.button__update-btn(type="submit" value="Update XTRF Projects statuses" @click="parseMessages()")
 
 </template>

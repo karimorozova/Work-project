@@ -1,7 +1,7 @@
 const { MemoqProject, Languages, LangTier } = require('../models');
 const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
 const { fillLangTierReportWithLocal } = require('../projects/langTierReport');
-const moment = require('moment')
+const moment = require('moment');
 
 /**
  *
@@ -10,13 +10,12 @@ const moment = require('moment')
 const newLangReport = async () => {
 
   const languages = await Languages.find();
-  const dateStartNovember = "2020-11-01"
-  const dateEndNovember = "2020-11-30"
-  // const dateTwoMonthAgo = moment().subtract(2, 'months').format('YYYY-MM-DD');
-  // let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }, {creationTime: {$gte: dateStartNovember}}, {creationTime: {$lte: dateEndNovember}}] });
-  let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }, {deadline: {$gte: dateStartNovember}}, {deadline: {$lte: dateEndNovember}}] });
+  // const dateStartNovember = "2020-11-01"
+  // const dateEndNovember = "2020-11-30"
 
-  // console.log(projects.filter(item => item.name === '2020 10 29 [17] - Theme and Common settings'))
+  const date4MonthAgo = moment().subtract(4, 'months').format('YYYY-MM-DD');
+  const today = moment().format('YYYY-MM-DD');
+  let projects = await MemoqProject.find({ $and: [{ status: 'Closed' }, { isTest: false }, {deadline: {$gte: date4MonthAgo}}, {deadline: {$lte: today}}] });
 
   projects = projects.filter(item => item.sourceLanguage);
   const reports = [];
@@ -107,19 +106,12 @@ const findIndustry = (domain) => {
     case 'iGaming':
     case 'iGaming (Casino, Slot games, Gambling, etc.)':
     case 'Video Games':
-    case 'Food, Beverage & Tobacco':
     case 'Lottery':
-    case 'Other':
       return 'iGaming';
     case 'CFDs and Online Trading':
     case 'ICOs & Cryptocurrency':
-    case 'PR Agency':
-    case 'Real Estate':
-    case 'Law':
-    case 'Marketing':
     case 'Forex':
     case 'ICO':
-    case 'Education':
     case 'Finance':
       return 'Finance';
   }

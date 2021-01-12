@@ -3,7 +3,8 @@ const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients, Vendors } = require('../../models');
-const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished, defineProjectStatus } = require('./otherProjects');
+const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished, defineProjectStatus, clearGarbageProjects } = require('./otherProjects');
+const { findLanguageByMemoqLanguageCode } = require('../../helpers/commonFunctions');
 
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
@@ -565,7 +566,7 @@ async function downloadFromMemoqProjectsData() {
 		let allProjects = await getMemoqAllProjects();
 		const clients = await Clients.find();
 		const vendors = await Vendors.find();
-		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1 });
+		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1, xtm: 1, iso: 1, iso2: 1});
 		const allProjectsInSystem = await MemoqProject.find();
 
 		for (let project of allProjects) {
@@ -590,6 +591,8 @@ async function downloadFromMemoqProjectsData() {
 		console.log('Error in downloadFromMemoqProjectsData');
 		console.log(err);
 		throw new Error(err.message);
+	} finally {
+		await clearGarbageProjects();
 	}
 }
 
@@ -615,14 +618,14 @@ function getUpdatedUsers(users) {
 function getMemoqProjectData(project, languages, isProjectExistInSystem) {
 	const sourceLanguage = languages.find(item => item.memoq === project.SourceLanguageCode);
 	const targetCodes = typeof project.TargetLanguageCodes['a:string'] === 'string' ? [project.TargetLanguageCodes['a:string']] : project.TargetLanguageCodes['a:string'];
-	const targetLanguages = targetCodes.map(item => languages.find(l => l.memoq === item));
+	const targetLanguages = targetCodes.map(item => languages.find(lang => findLanguageByMemoqLanguageCode(lang, item)));
 	const obj = {
 		name: project.Name,
 		creatorUser: project.CreatorUser,
 		creationTime: new Date(project.CreationTime),
 		deadline: new Date(project.Deadline),
 		serverProjectGuid: project.ServerProjectGuid,
-		domain: typeof project.Domain === 'string' ? project.Domain : '',
+		domain: typeof project.Domain === 'string' ? project.Domain : 'Finance',
 		client: typeof project.Client === 'string' ? project.Client : '',
 		sourceLanguage,
 		targetLanguages,

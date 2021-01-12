@@ -28,7 +28,7 @@ const scheduleJobBody = async (fnc, scheduleName) => {
 	console.log(
 			'\x1b[33m',
 			`Start schedule: "${ scheduleName }"`,
-			`At: ${ moment(new Date()).format("DD.MM.yyy, hh:mm:ss") };`,
+			`At: ${ moment(new Date()).format("DD.MM.YYYY, hh:mm:ss") };`,
 			'\x1b[0m'
 	);
 	try {
@@ -39,7 +39,7 @@ const scheduleJobBody = async (fnc, scheduleName) => {
 		console.log(
 				'\x1b[33m',
 				`Finish schedule: "${ scheduleName }"`,
-				`At: ${ moment(new Date()).format("DD.MM.yyy, hh:mm:ss") };`,
+				`At: ${ moment(new Date()).format("DD.MM.YYYY, hh:mm:ss") };`,
 				'\x1b[0m'
 		);
 	}

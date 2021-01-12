@@ -40,6 +40,8 @@ const updateAllMemoqProjects = async (querySource) => {
 
 
 const updateStatusesForOtherProjects = async () => {
+  const isSquareBrackets = /(\[\d.*\])/gm;
+  const stringId = /(\d.*[\d]] -)/gm;
   let allProjectsStatuses = await GmailProjectsStatuses.find();
   let allProjects =  await MemoqProject.find();
   if(!allProjectsStatuses.length) {
@@ -49,12 +51,24 @@ const updateStatusesForOtherProjects = async () => {
   allProjectsStatuses = allProjectsStatuses.filter(({ isRead }) => !isRead);
 
   const readProjectsByStatusAndUpdateOtherProjects = async (status) => {
-    const filteredByStatus = (filter) => allProjectsStatuses.filter(({ status: s }) => s === filter);
-    for (let { name: fromStatusName, _id: fromStatusId, status: fromStatus } of filteredByStatus(status)){
+    const filteredByStatus = (filter) => allProjectsStatuses
+        .filter(({ status: s, name }) => s === filter && !!name.match(isSquareBrackets));
 
-      if(allProjects.findIndex(({name}) => name === fromStatusName) !== -1 ) {
+    for (let { name: fromStatusName, _id: fromStatusId, status: fromStatus } of filteredByStatus(status)){
+      let fromStatusStrId = '';
+      if(!!fromStatusName.match(stringId)) (fromStatusStrId = fromStatusName.match(stringId)[0]);
+
+      const idx = allProjects.findIndex(({name}) => {
+        let fromProjectStrId = !!name.match(isSquareBrackets) ? name.match(stringId)[0] : '';
+        if(fromProjectStrId){
+          return fromProjectStrId === fromStatusStrId
+        }
+      });
+
+      if(idx !== -1 ) {
+        const { _id }  = allProjects[idx];
         await GmailProjectsStatuses.updateOne({"_id": fromStatusId}, { isRead: true });
-        await MemoqProject.updateOne({"name": fromStatusName}, { status: fromStatus });
+        await MemoqProject.updateOne({"_id": _id}, { status: fromStatus });
       }
     }
   };
@@ -76,7 +90,8 @@ const updateMemoqProjectFinance = async (project) => {
   if (!doesHaveCorrectStructure || lockedForRecalculation) {
     return project;
   }
-  return await createOtherProjectFinanceData({ project, documents });
+
+  return await createOtherProjectFinanceData({ project: project._doc, documents });
 };
 
 /**

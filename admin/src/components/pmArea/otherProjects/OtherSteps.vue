@@ -22,8 +22,9 @@
         )
           template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             span.tasks__label {{ field.label }}
+
           template(slot="info" slot-scope="{row, index}")
-            div(@click="showStepDetails(index)" :class="{isDisabled: isFinanceData(index), 'steps__info-icon': !isFinanceData(index) }")
+            div(@click="showStepDetails(index)" :class="{isDisabled: isNoFinanceData(index), 'steps__info-icon': !isNoFinanceData(index) }")
               i.fa.fa-info-circle
           template(slot="name" slot-scope="{ row }")
             span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
@@ -156,10 +157,7 @@
 		},
 
 		methods: {
-			isFinanceData(index) {
-				if(this.project.status === 'In progress') {
-					return true;
-				}
+			isNoFinanceData(index) {
 				if(this.project.steps.length) {
 					if(this.project.steps[index].vendor === null) {
 						return true;
@@ -179,7 +177,7 @@
 				return `${ this.project.sourceLanguage.symbol } >> ${ secondLang }`
 			},
 			showStepDetails(index) {
-				if(this.project.status === 'Closed' && !this.isFinanceData(index)) {
+				if(!this.isNoFinanceData(index)) {
 					this.infoIndex = index;
 					this.isStepInfo = true;
 				}
