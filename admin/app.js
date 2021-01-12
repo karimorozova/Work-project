@@ -17,8 +17,6 @@ require('./schedule');
 
 // const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 
-// const { saveOtherProjectStatuses } = require('./gmail');
-// saveOtherProjectStatuses();
 
 const allowedOrigins = [
 	"https://admin.pangea.global",
