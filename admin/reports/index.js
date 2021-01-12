@@ -1,4 +1,4 @@
-const { filterTierReport, getLqaReportFilterOptions } = require("./helpers");
+const { filterTierReport, getLqaReportFilterOptions, canNextLQAStep, getGroupedXtrfReports } = require("./helpers");
 const {
   rebuildTierReportsStructure,
   getXtrfLqaReport,
@@ -25,4 +25,6 @@ module.exports = {
   newLangReport,
   groupXtrfLqaByIndustryGroup,
   UpdateLqaAliases,
+  canNextLQAStep,
+  getGroupedXtrfReports,
 };

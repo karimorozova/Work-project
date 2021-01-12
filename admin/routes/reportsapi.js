@@ -19,7 +19,7 @@ const {
 
 const { upload } = require('../utils');
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
-const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, LangTier } = require("../models");
+const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, XtrfLqaGrouped, LangTier } = require("../models");
 convertExcel = require('excel-as-json').processFile;
 
 router.get('/languages', async (req, res) => {
@@ -109,7 +109,7 @@ router.post('/xtrf-lqa-report', async (req, res) => {
 
 router.get('/xtrf-lqa-reports-filter-options', async (req, res) => {
 	try {
-		const lqaReport = await XtrfLqa.find()
+		const lqaReport = await XtrfLqaGrouped.find()
 				.populate('sourceLanguage')
 				.populate('targetLanguage');
 
@@ -212,7 +212,6 @@ router.get('/restore-memoq-lqa-report', async (req, res) => {
 	try {
 		await UpdateLQAFromProject();
 		const result = await newLQAStatusFromXTRFProjects();
-    groupXtrfLqaByIndustryGroup(result)
 		res.send(result.filter(({industries})=> industries.length));
 	} catch (err) {
 		console.log(err);
@@ -223,7 +222,6 @@ router.get('/restore-memoq-lqa-report', async (req, res) => {
 router.get('/restore-lqa-report-aliases', async (req, res) => {
   try {
     const result = await UpdateLqaAliases();
-    groupXtrfLqaByIndustryGroup(result)
     res.send(result.filter(({industries})=> industries.length));
   } catch (err) {
     console.log(err);

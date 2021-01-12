@@ -1,13 +1,16 @@
-const {XtrfLqa, Vendors } = require('../models');
+const {groupXtrfLqaByIndustryGroup} = require("./xtrf");
+const {XtrfLqa, XtrfLqaGrouped, Vendors } = require('../models');
 
 
 async function UpdateLqaAliases() {
   const vendors = await Vendors.find({},{aliases: 1})
   const xtrfLqas = await XtrfLqa
     .find()
-    .populate('sourceLanguage', 'lang')
-    .populate('targetLanguage', 'lang')
-    .populate('industries.industryGroup', ['name']);
+    .populate('sourceLanguage', ['lang'])
+    .populate('targetLanguage', ['lang'])
+    .populate('industries.industry', ['name'])
+    .populate('industries.vendors.vendor', ['assessments'])
+    .populate('industries.industryGroup', ['name'])
   const updatedXtrfLqas = xtrfLqas.map(xtrfLqa=> {
      xtrfLqa.industries = xtrfLqa.industries.map(oneIndustry => {
       oneIndustry.vendors =  oneIndustry.vendors.map(oneVendor =>  {
@@ -22,7 +25,14 @@ async function UpdateLqaAliases() {
     return xtrfLqa
   })
   await XtrfLqa.create(updatedXtrfLqas)
-  return updatedXtrfLqas;
+  const newReports = updatedXtrfLqas.map( report => {
+    delete report._doc._id
+    return report._doc
+  });
+  const newReportsGrouped = groupXtrfLqaByIndustryGroup(newReports);
+  await XtrfLqaGrouped.deleteMany();
+  await XtrfLqaGrouped.create(newReportsGrouped);
+  return newReportsGrouped;
 }
 
 module.exports = {UpdateLqaAliases}

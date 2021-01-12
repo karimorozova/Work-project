@@ -49,6 +49,7 @@ const parseAndWriteLQAReport = async () => {
       || languages.find(({symbol, xtm}) => symbol === sourceLangSymbol || xtm === sourceLangSymbol);
     const targetLanguage = languages.find(({iso1}) => iso1 === targetIso) ||
       languages.find(({symbol, xtm}) => symbol === targetLangSymbol || xtm === targetLangSymbol);
+    if (!sourceLanguage || !targetLanguage) continue;
     newReports.push({
       languagePair: getLanguagePair(sourceLanguage, targetLanguage),
       sourceLanguage: sourceLanguage ? ObjectId(sourceLanguage._id) : null,
@@ -58,8 +59,8 @@ const parseAndWriteLQAReport = async () => {
   }
 
   await XtrfLqa.create(newReports);
-  // const groupedReports = groupXtrfLqaByIndustryGroup(newReports);
-  // await XtrfLqaGrouped.create(groupedReports);
+  const groupedReports = groupXtrfLqaByIndustryGroup(newReports);
+  await XtrfLqaGrouped.create(groupedReports);
   // await XtrfLqaGrouped.create(groupedReports.filter(({industries}) => industries.length > 0));
 
   console.log('Saved!');

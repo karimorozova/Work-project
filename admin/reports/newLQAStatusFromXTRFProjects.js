@@ -6,8 +6,7 @@ const { groupXtrfLqaByIndustryGroup } = require('../reports/xtrf');
 const _ = require('lodash')
 const newLQAStatusFromXTRFProjects = async () => {
 
-	// let projects = await MemoqProject.find({ isInLQAReports: { $ne: true }, creationTime: {$gte: "2020-10-01" }});
-	let projects = await MemoqProject.find({ creationTime: {$gte: "2020-10-01" }});
+	let projects = await MemoqProject.find({ isInLQAReports: { $ne: true }, creationTime: {$gte: "2020-10-01" }});
 	let reports = await XtrfLqa.find()
 	const languages = await Languages.find();
 	const allIndustries = await Industries.find()
@@ -32,7 +31,7 @@ const newLQAStatusFromXTRFProjects = async () => {
 
 			const user = _.filter(users, (user) => user.DocumentAssignmentRole === '0').shift();
 
-			if(!user || !targetLanguage) {
+			if(!user || !targetLanguage || !sourceLanguage) {
 				continue;
 			}
 
@@ -95,17 +94,18 @@ const newLQAStatusFromXTRFProjects = async () => {
 
 	await XtrfLqa.create(reports);
   const newReports = reports.map( report => {
-   delete report._doc.__v
     return report._doc
   });
 	const newReportsGrouped = groupXtrfLqaByIndustryGroup(newReports);
 	await XtrfLqaGrouped.deleteMany();
 	await XtrfLqaGrouped.create(newReportsGrouped);
 
-	return await XtrfLqa
+	return await XtrfLqaGrouped
     .find()
-    .populate('sourceLanguage', 'lang')
-    .populate('targetLanguage', 'lang')
+    .populate('sourceLanguage', ['lang'])
+    .populate('targetLanguage', ['lang'])
+    .populate('industries.industry', ['name'])
+    .populate('industries.vendors.vendor', ['assessments'])
     .populate('industries.industryGroup', ['name']);
 }
 
