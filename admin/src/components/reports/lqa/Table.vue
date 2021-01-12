@@ -182,7 +182,7 @@
       getVendorProfileLink(vendorId) {
         return '/vendors/details/' + vendorId
       },
-      getAssessmentInfo(assessment){
+      getAssessmentInfo(assessment) {
         const languages = this.additionalInformation.languagePair.split(' >> ')
         const industryGroup = this.additionalInformation.industryGroup
         const sourceLang = this.findLanguageByTitle(languages[0])
@@ -208,7 +208,9 @@
         const foundAssessment = assessment[langPairIndex].industries[industryIndex] || null
 
 
-        this.assessmentsInfo = {foundAssessment, langPairIndex, industryIndex}
+        // this.assessmentsInfo = {foundAssessment, langPairIndex, industryIndex}
+
+        return {foundAssessment, langPairIndex, industryIndex}
       }
     },
     computed: {

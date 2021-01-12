@@ -3,8 +3,8 @@
         DataTable(
           :fields="fields"
           :tableData="vendorsData"
-          :bodyClass="vendorsData.length < 24 ? 'tbody_visible-overflow height-700' : 'height-700'"
-          :tableheadRowClass="vendorsData.length < 24 ? 'tbody_visible-overflow' : ''"
+          :bodyClass="vendorsData.length < 20 ? 'tbody_visible-overflow height-700' : 'height-700'"
+          :tableheadRowClass="vendorsData.length < 20 ? 'tbody_visible-overflow' : ''"
           @onRowClicked="selectVendor"
         )
           .lqa-vendors-table__header(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }") {{ field.label }}
