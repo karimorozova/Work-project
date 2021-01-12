@@ -1,6 +1,7 @@
 const findLanguageByMemoqLanguageCode = (lang, memoqSymbol) => {
 	switch (memoqSymbol) {
 		case 'spa-PE':
+		case 'spa':
 			memoqSymbol = 'spa-ES';
 			break
 	}
