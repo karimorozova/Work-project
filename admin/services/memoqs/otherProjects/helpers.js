@@ -91,6 +91,7 @@ const defineProjectStatus = (docStatus) => {
 // };
 
 const findFittingIndustryId = async (industryName) => {
+  industryName = industryName.trim();
   const neededIndustry = await Industries.findOne({
     name: { $regex: new RegExp(`${industryName}`, 'i') }
   });
@@ -110,12 +111,16 @@ const findFittingIndustryId = async (industryName) => {
       case 'Forex':
         return await Industries.findOne({ name: 'CFDs & Online Trading' });
       case 'Lottery':
+      case 'iGaming':
         return await Industries.findOne({ name: 'iGaming' });
+      case 'Finance':
+        return await Industries.findOne({ name: 'Finance' });
       case 'Media, Broadcasting & Publishing':
       case 'PR Agency':
         return await Industries.findOne({ name: 'Marketing' });
-      default:
       case '':
+        return await Industries.findOne({ name: 'Other' });
+      default:
         return await Industries.findOne({ name: 'Other' });
     }
   }

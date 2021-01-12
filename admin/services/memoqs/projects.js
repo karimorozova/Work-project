@@ -625,7 +625,7 @@ function getMemoqProjectData(project, languages, isProjectExistInSystem) {
 		creationTime: new Date(project.CreationTime),
 		deadline: new Date(project.Deadline),
 		serverProjectGuid: project.ServerProjectGuid,
-		domain: typeof project.Domain === 'string' ? project.Domain : '',
+		domain: typeof project.Domain === 'string' ? project.Domain : 'Finance',
 		client: typeof project.Client === 'string' ? project.Client : '',
 		sourceLanguage,
 		targetLanguages,

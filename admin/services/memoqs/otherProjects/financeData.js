@@ -19,18 +19,17 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   const vendors = await Vendors.find();
   const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
   if (!neededCustomer) return project;
+  if(project.lockedForRecalculation) return project;
 
   const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
   let steps = checkKeyInObject('steps');
   let tasks = checkKeyInObject('tasks');
   let  minimumCharge = project.hasOwnProperty('minimumCharge') ? project.minimumCharge : false;
 
-  if (true) {
-    const newData = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
-    tasks = newData.tasks;
-    steps = newData.steps;
-    if (!steps.length) return project;
-  }
+  const newData = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
+  tasks = newData.tasks;
+  steps = newData.steps;
+  if (!steps.length) return project;
 
   if (!steps.every(step => step.vendor)) {
     steps = await checkAndCorrectStepStructure(steps, tasks, documents);
@@ -158,6 +157,7 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
  */
 const getUpdatedProjectData = async (project, allClients) => {
   const { client: memoqClient } = project;
+
   const neededCustomer = allClients.find(client => client.aliases.includes(memoqClient));
   const industry = await findFittingIndustryId(project.domain);
   let additionalData = {};
