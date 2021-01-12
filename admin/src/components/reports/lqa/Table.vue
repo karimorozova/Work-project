@@ -9,34 +9,41 @@
       :tableheadRowClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
     )
       .lqa-table__header(v-for="{label, headerKey} in fields" :slot="headerKey" slot-scope="{ field }") {{ label }}
-      .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.name }}
-      .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordCount | roundWordCount}}
-      .lqa-table__header(slot="tqi" slot-scope="{ row }")
+
+      .lqa-table__data(slot="vendor" slot-scope="{ row }") {{ row.name }}
+
+      .lqa-table__data(slot="wordcount" slot-scope="{ row }") {{ row.wordCount | roundWordCount}}
+
+      .lqa-table__data(slot="tqi" slot-scope="{ row }")
         a(v-if="getTQIInfo(row).path" :href="domain + getTQIInfo(row).path" class="lqa-table__link" target="_blank")
-          | {{getTQIInfo(row).grade}}
+          span {{ getTQIInfo(row).grade }}
           img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
         .lqa-table__upload(v-if="!getTQIInfo(row).grade")
           .lqa-table__load-file(@click="openForm(getTQIInfo(row))")
-      .lqa-table__header(slot="lqa1" slot-scope="{ row }")
+
+      .lqa-table__data(slot="lqa1" slot-scope="{ row }")
         a(v-if="getLQAOneInfo(row).path" :href="domain + getLQAOneInfo(row).path" class="lqa-table__link" target="_blank")
-          | {{getLQAOneInfo(row).grade}}
+          span {{ getLQAOneInfo(row).grade }}
           img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
         .lqa-table__upload(v-if="!getLQAOneInfo(row).grade && getTQIInfo(row).grade")
           .lqa-table__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
-      .lqa-table__header(slot="lqa2" slot-scope="{ row }")
+
+      .lqa-table__data(slot="lqa2" slot-scope="{ row }")
         a(v-if="getLQATwoInfo(row).path" :href="domain + getLQATwoInfo(row).path" class="lqa-table__link" target="_blank")
-          | {{getLQATwoInfo(row).grade}}
+          span {{ getLQATwoInfo(row).grade }}
           img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
         .lqa-table__upload(v-if="!getLQATwoInfo(row).grade && getLQAOneInfo(row).grade")
           .lqa-table__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
-      .lqa-table__header(slot="lqa3" slot-scope="{ row }")
+
+      .lqa-table__data(slot="lqa3" slot-scope="{ row }")
         a(v-if="getLQAThreeInfo(row).path" :href="domain + getLQAThreeInfo(row).path" class="lqa-table__link" target="_blank")
           .dowlowad
-            | {{getLQAThreeInfo(row).grade}}
+            span {{ getLQAThreeInfo(row).grade }}
             img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
         .lqa-table__upload(v-if="!getLQAThreeInfo(row).grade && getLQATwoInfo(row).grade")
           .lqa-table__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
-      .lqa-table__header(slot="link" slot-scope="{ row }")
+
+      .lqa-table__data(slot="link" slot-scope="{ row }")
         a(:href="getVendorProfileLink(row.vendor._id)" target="_blank" style="position: relative")
           i.fa.fa-external-link.icon-link
 
@@ -238,7 +245,6 @@
         font-size: 18px;
       }
     }
-
     &__download {
       height: 21px;
       width: 21px;

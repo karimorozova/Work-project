@@ -30,7 +30,7 @@
               |&nbsp; &nbsp;
               b Tier: &nbsp;
               |-
-            Table(v-if="vendors.length" :additionalInformation="{languagePair, industryGroup}" :vendorsData="vendors")
+            Table(v-if="vendors.length" :additionalInformation="{languagePair, industryGroup}" :vendorsData="foo(vendors)")
 
       //.lqa__form(v-if="false")
         NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
@@ -66,6 +66,10 @@
 		},
 		methods: {
       ...mapActions(['alertToggle']),
+      foo(v){
+	      console.log(v)
+      	return v
+      },
       async handleBodyScroll (e) {
         const element = e.target;
         if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
