@@ -1,19 +1,22 @@
 const { Industries, MemoqProject, GmailProjectsStatuses } = require('../../../models');
 const moment = require('moment');
 
-const clearGarbageProjects = async () => {
+const clearGarbageProjects = async (filterAll = false) => {
   const isSquareBrackets = /(\[\d.*\])/gm;
   const stringId = /(\d.*[\d]] -)/gm;
+  const stringIdForWP = /(WP \d.*[\d]] -)/gm;
   let date = Date.now();
   const dayInTimestampMilliseconds = 86400 * 1000;
   const date40DayAgo = Math.floor(date - (dayInTimestampMilliseconds * 40));
+  const lastDate = filterAll ? '2020-01-01' : date40DayAgo;
 
   let allProjectStatuses = await GmailProjectsStatuses.find();
   let allProjectsInSystem = await MemoqProject.find({
-    creationTime: { $gte: (moment(date40DayAgo).format('YYYY-MM-DD')).toString() }
+    creationTime: { $gte: (moment(lastDate).format('YYYY-MM-DD')).toString() }
   });
 
-  allProjectsInSystem = allProjectsInSystem.filter(({ name }) => !!name.match(isSquareBrackets));
+  allProjectsInSystem = allProjectsInSystem.filter(({ name }) => !!name.match(isSquareBrackets) && !name.match(stringIdForWP));
+
   for ({ _id, name } of allProjectsInSystem){
     let [ strId ] = name.match(stringId);
     const isExistProjectInXTRF = allProjectStatuses

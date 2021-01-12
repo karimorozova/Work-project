@@ -2,13 +2,17 @@ const schedule = require("node-schedule");
 const moment = require('moment');
 const { XtrfLqa } = require('./models');
 const { downloadFromMemoqProjectsData } = require("./services/memoqs/projects");
-const { updateStatusesForOtherProjects } = require("./services/memoqs/otherProjects");
+const { updateStatusesForOtherProjects, clearGarbageProjects } = require("./services/memoqs/otherProjects");
 const { saveOtherProjectStatuses } = require('./gmail');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles');
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./reports');
 
+// saveOtherProjectStatuses()
 // downloadFromMemoqProjectsData();
+// clearGarbageProjects(true);
+// updateStatusesForOtherProjects()
+
 schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"));
 
 schedule.scheduleJob('10 10-18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"));
