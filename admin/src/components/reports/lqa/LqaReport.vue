@@ -1,6 +1,5 @@
 <template lang="pug">
-<!--  .lqa(@scroll="handleBodyScroll")-->
-  .lqa
+  .lqa(@scroll="handleBodyScroll")
     .lqa__filters
       LqaReportFilter(
         :isLqa="false"
@@ -18,6 +17,7 @@
         @setIndustryFilter="setIndustryFilter"
         @setVendorFilter="setVendorFilter"
         @updateReport="updateReport"
+        @updateAliases="updateAliases"
       )
     .lqa__languages
       .lqa__language(v-for="{languagePair, industries } in reportData")
@@ -115,6 +115,9 @@
         await this.getReport(this.filters);
       },
       async updateReport({value}){
+        this.reportData = value
+      },
+      async updateAliases({value}){
         this.reportData = value
       }
 		},

@@ -77,6 +77,7 @@ const getLqaReportFilterOptions = (lqaReport) => {
 const getFilteringQueryForLqaReport = async (filters) => {
   const { industryFilter, vendorFilter } = filters;
   let query = {
+     'industries': { $exists: true, $not: {$size: 0} } ,
     $or: [
       { 'industries.vendors': { $not: { $size: 0 } } },
       { 'industries.vendors': { $not: { $size: 0 } } }
@@ -174,6 +175,75 @@ const personalFlat = (arr) => (
   arr.reduce((acc, curr) => Array.isArray(curr) ? [...acc, ...personalFlat(curr)] : [...acc, curr], [])
 );
 
+const tiersInfo = {
+  1:[
+    {
+      minWordCount: 100000,
+      allowSteps: ['tqi','Lqa1', 'Lqa2', 'Lqa3']
+    },
+    {
+      minWordCount: 50000,
+      allowSteps: ['tqi','Lqa1', 'Lqa2']
+    },
+    {
+      minWordCount: 10000,
+      allowSteps: ['tqi','Lqa1']
+    },
+    {
+      minWordCount: 0,
+      allowSteps: ['tqi'],
+    },
+  ],
+  2:[
+    {
+      minWordCount: 50000,
+      allowSteps: ['tqi','Lqa1', 'Lqa2', 'Lqa3']
+    },
+    {
+      minWordCount: 25000,
+      allowSteps: ['tqi','Lqa1', 'Lqa2']
+    },
+    {
+      minWordCount: 5000,
+      allowSteps: ['tqi','Lqa1']
+    },
+    {
+      minWordCount: 0,
+      allowSteps: ['tqi'],
+    },
+  ],
+  3:[
+    {
+      minWordCount: 10000,
+      allowSteps: ['tqi','Lqa1', 'Lqa2', 'Lqa3']
+    },
+    {
+      minWordCount: 5000,
+      allowSteps: ['tqi','Lqa1', 'Lqa2']
+    },
+    {
+      minWordCount: 1000,
+      allowSteps: ['tqi','Lqa1']
+    },
+    {
+      minWordCount: 0,
+      allowSteps: ['tqi'],
+    },
+  ],
+}
+
+const canNextLQAStep = (wordCount, nextStep, tier) => {
+  const a = tiersInfo[tier]
+  const index = a.find(({minWordCount}) =>  {
+    return  minWordCount <= Math.round(wordCount)
+  });
+  return index ? !index.allowSteps.includes(nextStep) : true
+}
+
+const getGroupedXtrfReports = (reports) => {
+  console.log(reports);
+}
+
 module.exports = {
   filterTierReport,
   getLqaReportFilterOptions,
@@ -181,5 +251,7 @@ module.exports = {
   getVendorsData,
   getLqaSpecificTierForVendor,
   getTierFromWordcount,
-  personalFlat
+  personalFlat,
+  canNextLQAStep,
+  getGroupedXtrfReports,
 };

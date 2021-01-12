@@ -99,10 +99,10 @@
       async updateAliases () {
         try {
           const report = await this.$http.get('/reportsapi/restore-lqa-report-aliases');
-          this.$emit('updateReport', { value: report.body });
-          this.alertToggle({ message: 'Started to restore...' });
+          this.$emit('updateAliases', { value: report.body });
+          this.alertToggle({ message: 'Started to update...' });
         } catch (err) {
-          this.alertToggle({ message: 'Error on restoring old files', isShow: true, type: 'error' });
+          this.alertToggle({ message: 'Error on updating aliases', isShow: true, type: 'error' });
         }
       },
       setTierFilter ({ option }) {

@@ -29,8 +29,10 @@ async function UpdateLQAFromProject() {
 
 			if(type !== 'CAT Wordcount' || title !== 'Translation') return;
 
-			const projectSourceLang = findOrDefault(allLanguages, { symbol: sourceLanguage }, { _id: null, lang: 'No Data' });
-			const projectTargetLang = findOrDefault(allLanguages, { symbol: targetLanguage }, { _id: null, lang: 'No Data' });
+			const projectSourceLang = findOrDefault(allLanguages, { symbol: sourceLanguage }, null);
+			const projectTargetLang = findOrDefault(allLanguages, { symbol: targetLanguage }, null);
+
+			if (!projectSourceLang || !projectTargetLang) return;
 
 			const languagePair = projectSourceLang.lang + " >> " + projectTargetLang.lang
 
@@ -86,14 +88,6 @@ async function UpdateLQAFromProject() {
 	}, []);
 
 	await XtrfLqa.create(results);
-
-  // const newReports = results.map( report => {
-  //   delete report._doc.__v
-  //   return report._doc
-  // });
-  // const reportsGroupedByIndustry = groupXtrfLqaByIndustryGroup(newReports);
-  // await XtrfLqaGrouped.deleteMany();
-  // await XtrfLqaGrouped.create(reportsGroupedByIndustry);
 
 	await Projects.updateMany({ $and: [{ status: 'Closed' }, { isTest: { $ne: true } }, { isInLQAReports: { $ne: true } }] }, { isInLQAReports: true })
 
