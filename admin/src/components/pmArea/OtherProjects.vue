@@ -19,14 +19,14 @@
 <script>
 	import OtherProjectTable from './otherProjects/OtherProjectTable';
 	import OtherProjectFilter from './otherProjects/OtherProjectFilter';
-	import { mapGetters, mapActions } from 'vuex';
+	import { mapActions } from 'vuex';
 
 	export default {
 		data() {
 			return {
 				allProjects: [],
-				isDataRemain: true,
-				lastDate: new Date(),
+				isDataRemain: false,
+				lastDate: null,
 				filters: {
 					clientFilter: '',
 					pmFilter: '',
@@ -56,12 +56,18 @@
 				await this.getProjects(this.allFilters);
 			},
 			async getProjects(filters) {
+				let lastDate = new Date();
+				lastDate.setDate(lastDate.getDate() + 1);
+				this.isDataRemain = true;
 				try {
-					const result = await this.$http.post(
-							'/memoqapi/other-projects',
-							filters,
+					const result = await this.$http.post('/memoqapi/other-projects', {
+								...filters,
+								lastDate
+							}
 					);
 					this.allProjects = result.data;
+					this.lastDate = result.data && result.data.length ? result.data[result.data.length - 1].creationTime : "";
+					this.isDataRemain = result.data.length === 25;
 				} catch (err) {
 					this.alertToggle({
 						message: 'Can\'t get projects',
@@ -77,11 +83,8 @@
 						lastDate: this.lastDate
 					});
 					this.allProjects.push(...result.data);
-					this.isDataRemain = result.body.length === 25;
-					this.lastDate =
-							result.body && result.body.length
-									? result.body[result.body.length - 1].creationTime
-									: '';
+					this.isDataRemain = result.data.length === 25;
+					this.lastDate = result.data && result.data.length ? result.data[result.data.length - 1].creationTime : "";
 				}
 			}
 		},
@@ -123,7 +126,7 @@
   .other-projects {
     margin: 40px 40px 40px 20px;
     width: 1100px;
-    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     padding: 20px;
     height: calc(100% - 140px);
   }
