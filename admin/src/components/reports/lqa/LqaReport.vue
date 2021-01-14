@@ -20,17 +20,17 @@
         @updateAliases="updateAliases"
       )
     .lqa__languages
-      .lqa__language(v-for="{languagePair, industries } in reportData")
+      .lqa__language(v-for="{languagePair, industries, step } in reportData")
         .lqa__text
           b {{ languagePair }}
           .lqa__industry(v-for="{vendors, industryGroup} in industries")
             .lqa__tier-industry
               b Industry: &nbsp;
-              | {{industryGroup.name}}
-              |&nbsp; &nbsp;
+              span {{industryGroup.name}}
+              span &nbsp; &nbsp;
               b Tier: &nbsp;
-              |-
-            Table(v-if="vendors.length" :additionalInformation="{languagePair, industryGroup}" :vendorsData="vendors")
+              span -
+            Table(v-if="vendors.length" :vendorsData="getVendorsWithInfo(vendors, languagePair, industryGroup,step)" @refreshAssessment="getReport(filters)")
 
       //.lqa__form(v-if="false")
         NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
@@ -39,7 +39,7 @@
 <script>
 	import NewVendor from "../NewVendor";
 	import Table from "./Table";
-	import { mapActions } from "vuex";
+	import { mapGetters, mapActions } from "vuex";
 	import LqaReportFilter from "./LqaReportFilter";
 
 	export default {
@@ -53,7 +53,6 @@
         industryFilter: 'All',
         tierFilter: 'All',
         vendorFilter: 'All',
-
         availableSources: ['All'],
         availableTargets: ['All'],
         availableVendors: ['All'],
@@ -66,6 +65,44 @@
 		},
 		methods: {
       ...mapActions(['alertToggle']),
+      findLanguageByTitle(title) {
+        return this.allLanguages.find(language=> language.lang === title)
+      },
+      getVendorsWithInfo(vendors, languagePair, industryGroup, step){
+        return vendors.map((vendor) => {
+          vendor.assessmentInfo = this.getAssessmentInfo(vendor.vendor.assessments, languagePair, industryGroup)
+          vendor.step = step
+          return vendor
+        })
+      },
+      getAssessmentInfo(assessment, languagePair, industryGroup) {
+        const languages = languagePair.split(' >> ')
+        const sourceLang = this.findLanguageByTitle(languages[0])
+        const targetLang = this.findLanguageByTitle(languages[1])
+        const sourceLangId = sourceLang ? sourceLang._id : null
+        const targetLangId = targetLang ? targetLang._id : null
+
+        const basicAssessmentInfo = {languages: {sourceLanguage: sourceLang, targetLanguage: targetLang}, industryGroup}
+
+        if (!targetLang || !assessment || !assessment.length) return {...basicAssessmentInfo}
+
+        const langPairIndex = assessment.findIndex(({sourceLanguage, targetLanguage}) =>
+          (
+            sourceLanguage.toString() === sourceLangId.toString()
+            && targetLanguage.toString() === targetLangId.toString()
+          )
+        )
+
+        if (!assessment[langPairIndex] || !assessment[langPairIndex].industries.length) return {...basicAssessmentInfo}
+
+        const industryIndex = assessment[langPairIndex].industries.findIndex(({industry}) => {
+          return industry === industryGroup._id.toString()
+        })
+
+        const foundAssessment = assessment[langPairIndex].industries[industryIndex] || null
+
+        return {foundAssessment,langPairIndex, industryIndex, ...basicAssessmentInfo}
+      },
       async handleBodyScroll (e) {
         const element = e.target;
         if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
@@ -122,6 +159,9 @@
       }
 		},
 		computed: {
+      ...mapGetters({
+        allLanguages: 'getAllLanguages',
+      }),
 			filters() {
 				let result = {};
 				if(this.targetFilter !== 'All') {

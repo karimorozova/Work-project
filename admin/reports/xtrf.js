@@ -68,6 +68,7 @@ const rebuildTierReportsStructure = (reports) => {
 const getXtrfLqaReport = async (filters) => {
   let { sourceFilter, targetFilter, vendorFilter, countFilter, skipCount, tierFilter, industryFilter } = filters;
   const languages = await Languages.find();
+  const step = await Step.findOne({title: 'Translation'},{title: 1})
   const filterQuery = await getFilteringQueryForLqaReport(filters, languages);
   countFilter = sourceFilter || targetFilter || vendorFilter ? 0 : countFilter;
   skipCount = sourceFilter || targetFilter || vendorFilter ? 0 : skipCount;
@@ -82,7 +83,8 @@ const getXtrfLqaReport = async (filters) => {
         languagePair,
         sourceLanguage,
         targetLanguage,
-        industries
+        industries,
+        step,
       });
     }
 

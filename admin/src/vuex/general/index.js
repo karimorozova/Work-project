@@ -19,7 +19,63 @@ const state = {
     alertMessage: '',
     requestCounter: 0,
     currentVendor: {},
-    user: {}
+    user: {},
+    tiersInfo: {
+        1:[
+            {
+                minWordCount: 100000,
+                allowSteps: ['tqi','lqa1', 'lqa2', 'lqa3']
+            },
+            {
+                minWordCount: 50000,
+                allowSteps: ['tqi','lqa1', 'lqa2']
+            },
+            {
+                minWordCount: 10000,
+                allowSteps: ['tqi','lqa1']
+            },
+            {
+                minWordCount: 0,
+                allowSteps: ['tqi'],
+            },
+        ],
+        2:[
+            {
+                minWordCount: 50000,
+                allowSteps: ['tqi','lqa1', 'lqa2', 'lqa3']
+            },
+            {
+                minWordCount: 25000,
+                allowSteps: ['tqi','lqa1', 'lqa2']
+            },
+            {
+                minWordCount: 5000,
+                allowSteps: ['tqi','lqa1']
+            },
+            {
+                minWordCount: 0,
+                allowSteps: ['tqi'],
+            },
+        ],
+        3:[
+            {
+                minWordCount: 10000,
+                allowSteps: ['tqi','lqa1', 'lqa2', 'lqa3']
+            },
+            {
+                minWordCount: 5000,
+                allowSteps: ['tqi','lqa1', 'lqa2']
+            },
+            {
+                minWordCount: 1000,
+                allowSteps: ['tqi','lqa1']
+            },
+            {
+                minWordCount: 0,
+                allowSteps: ['tqi'],
+            },
+        ],
+    }
 };
 
 export const generalStore = {

@@ -9,34 +9,41 @@
       :tableheadRowClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
     )
       .lqa-table__header(v-for="{label, headerKey} in fields" :slot="headerKey" slot-scope="{ field }") {{ label }}
-      .lqa-table__header(slot="vendor" slot-scope="{ row }") {{ row.name }}
-      .lqa-table__header(slot="wordcount" slot-scope="{ row }") {{ row.wordCount | roundWordCount}}
-      .lqa-table__header(slot="tqi" slot-scope="{ row }")
-        a(v-if="getTQIInfo(row).path" :href="domain + getTQIInfo(row).path" class="lqa-table__link" target="_blank")
-          | {{getTQIInfo(row).grade}}
+
+      .lqa-table__data(slot="vendor" slot-scope="{ row }") {{ row.name }}
+
+      .lqa-table__data(slot="wordcount" slot-scope="{ row }") {{ row.wordCount | roundWordCount}}
+
+      .lqa-table__data(slot="tqi" slot-scope="{ row }")
+        a(v-if="getStepInfo(row,'tqi').path" :href="domain + getStepInfo(row, 'tqi').path" class="lqa-table__link" target="_blank")
+          span {{ getStepInfo(row, 'tqi').grade }}
           img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
-        .lqa-table__upload(v-if="!getTQIInfo(row).grade")
-          .lqa-table__load-file(@click="openForm(getTQIInfo(row))")
-      .lqa-table__header(slot="lqa1" slot-scope="{ row }")
-        a(v-if="getLQAOneInfo(row).path" :href="domain + getLQAOneInfo(row).path" class="lqa-table__link" target="_blank")
-          | {{getLQAOneInfo(row).grade}}
+        .lqa-table__upload(v-if="canNextStep(row,'tqi')")
+          .lqa-table__load-file(@click="openForm({field: 'tqi', row})")
+
+      .lqa-table__data(slot="lqa1" slot-scope="{ row }")
+        a(v-if="getStepInfo(row,'lqa1').path" :href="domain + getStepInfo(row,'lqa1').path" class="lqa-table__link" target="_blank")
+          span {{ getStepInfo(row,'lqa1').grade }}
           img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
-        .lqa-table__upload(v-if="!getLQAOneInfo(row).grade && getTQIInfo(row).grade")
-          .lqa-table__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
-      .lqa-table__header(slot="lqa2" slot-scope="{ row }")
-        a(v-if="getLQATwoInfo(row).path" :href="domain + getLQATwoInfo(row).path" class="lqa-table__link" target="_blank")
-          | {{getLQATwoInfo(row).grade}}
+        .lqa-table__upload(v-if="canNextStep(row,'lqa1', 'tqi')")
+          .lqa-table__load-file(@click="openForm({field: 'Lqa1', row})")
+
+      .lqa-table__data(slot="lqa2" slot-scope="{ row }")
+        a(v-if="getStepInfo(row,'lqa2').path" :href="domain + getStepInfo(row,'lqa2').path" class="lqa-table__link" target="_blank")
+          span {{ getStepInfo(row,'lqa2').grade }}
           img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
-        .lqa-table__upload(v-if="!getLQATwoInfo(row).grade && getLQAOneInfo(row).grade")
-          .lqa-table__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
-      .lqa-table__header(slot="lqa3" slot-scope="{ row }")
-        a(v-if="getLQAThreeInfo(row).path" :href="domain + getLQAThreeInfo(row).path" class="lqa-table__link" target="_blank")
+        .lqa-table__upload(v-if="canNextStep(row,'lqa2', 'lqa1')")
+          .lqa-table__load-file(@click="openForm({field: 'Lqa2', row})")
+
+      .lqa-table__data(slot="lqa3" slot-scope="{ row }")
+        a(v-if="getStepInfo(row,'lqa3').path" :href="domain + getStepInfo(row,'lqa3').path" class="lqa-table__link" target="_blank")
           .dowlowad
-            | {{getLQAThreeInfo(row).grade}}
+            span {{ getStepInfo(row,'lqa3').grade }}
             img(:class="'lqa-table__download'" src="../../../assets/images/download-big-b.png")
-        .lqa-table__upload(v-if="!getLQAThreeInfo(row).grade && getLQATwoInfo(row).grade")
-          .lqa-table__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
-      .lqa-table__header(slot="link" slot-scope="{ row }")
+        .lqa-table__upload(v-if="canNextStep(row,'lqa3', 'lqa2')")
+          .lqa-table__load-file(@click="openForm({field: 'Lqa3', row})")
+
+      .lqa-table__data(slot="link" slot-scope="{ row }")
         a(:href="getVendorProfileLink(row.vendor._id)" target="_blank" style="position: relative")
           i.fa.fa-external-link.icon-link
 
@@ -46,12 +53,11 @@
 <script>
 	import DataTable from "@/components/DataTable";
   import VendorLqa from "../../vendors/VendorLqa";
-  import { mapGetters } from "vuex";
+  import { mapGetters, mapActions } from "vuex";
 
 	export default {
     props: {
       vendorsData: { type: Array, default: () => [] },
-      additionalInformation: {type: Object}
     },
     data() {
       return {
@@ -66,53 +72,79 @@
         ],
         domain: "http://localhost:3001",
         isForm: false,
-        assessmentsInfo: {}
+        currentAssessment: {}
       }
     },
     methods: {
-      openForm(row) {
-        // console.log(row)
-        // const stepData = this.assessmentData[mainIndex];
-        // const { sourceLanguage, targetLanguage, industries } = row.vendor;
-        // this.currentAssessment = industries[index];
-        // const currentStep = this.currentAssessment.steps[industryIndex].step;
-        // this.currentIndex = index;
-        // this.currentField = field.toLowerCase();
-        //
-        // this.lqaData = {
-        //   vendor: {
-        //     name: row.name,
-            // industry: this.currentAssessment.industry.name,
-            //     sourceLang: sourceLanguage.lang,
-            //     targetLang: targetLanguage.lang,
-            //     step: currentStep.title,
-          // },
-          //   step: currentStep.title,
-          //   sourceLanguage: sourceLanguage,
-          //   targetLanguage: targetLanguage,
-          //   industry: industries[index].industry,
-          //   [`is${field}`]: true,
-          //   mainIndex,
-          //   industryIndex,
-          //   stepIndex: index,
-        // };
+      ...mapActions({
+        storeAssessment: "storeCurrentVendorAssessment",
+      }),
+      openForm({field,row}) {
+        const { sourceLanguage, targetLanguage } = row.assessmentInfo.languages;
+        this.currentAssessment = row.assessmentInfo.foundAssessment
+        const step = row.step
+        const industry = row.assessmentInfo.industryGroup
+        const mainIndex = row.assessmentInfo.langPairIndex
+        const industryIndex = row.assessmentInfo.industryIndex
+        this.currentField = field.toLowerCase();
+        this.lqaData = {
+          vendor: {
+
+            name: row.name,
+            industries: industry.name,
+                sourceLang: sourceLanguage.lang,
+                targetLang: targetLanguage.lang,
+                step: step.title,
+          },
+            step: step,
+            vendorId: row.vendor._id,
+            source: sourceLanguage,
+            target: targetLanguage,
+            industry: industry,
+            [`is${field}`]: true,
+            field,
+            mainIndex,
+            industryIndex,
+            stepIndex: 0,
+        };
+
         this.isForm = true;
       },
       async saveVendorLqa({ vendorData }) {
-        const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex } = vendorData;
-        const assessment = {
-          ...this.currentAssessment,
-          isNew: false,
+
+        const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex, vendorId, industry} = vendorData;
+        let assessment;
+        const baseAssessmentInfo = {
           step,
-          source,
           target,
-          mainIndex,
-          industryIndex,
-          stepIndex,
-          [this.currentField]: { fileName: "", path: "", grade },
+          industry,
+          source,
         };
+        if (this.currentField === "tqi") {
+          assessment = {
+            ...baseAssessmentInfo,
+            step:[step],
+            industry: [industry],
+            tqi: { fileName: "", path: "", grade },
+            lqa1: {},
+            lqa2: {},
+            lqa3: {},
+            isNew: true,
+          };
+        } else {
+          assessment = {
+            ...baseAssessmentInfo,
+            ...this.currentAssessment,
+            isNew: false,
+            mainIndex,
+            industryIndex,
+            stepIndex,
+            [this.currentField]: { fileName: "", path: "", grade },
+          };
+        }
+
         let formData = new FormData();
-        formData.append("vendorId", this.currentVendor._id);
+        formData.append("vendorId", vendorId);
         formData.append("assessment", JSON.stringify(assessment));
         formData.append("assessmentFile", file);
 
@@ -132,90 +164,36 @@
       closeForm(field) {
         this.isForm = false;
       },
-      getStepLink(assessment, step) {
-        // const languages = this.additionalInformation.languagePair.split(' >> ')
-        // const industryGroup = this.additionalInformation.industryGroup
-        // const sourceLang = this.findLanguageByTitle(languages[0])
-        // const targetLang = this.findLanguageByTitle(languages[1])
-        // const sourceLangId = sourceLang ? sourceLang._id : null
-        // const targetLangId = targetLang ? targetLang._id : null
-        //
-        // if (!targetLang || !assessment || !assessment.length) return null
-        //
-        // const assessmentLangPair = assessment.find(({sourceLanguage, targetLanguage}) =>
-        //   (
-        //     sourceLanguage.toString() === sourceLangId.toString()
-        //     && targetLanguage.toString() === targetLangId.toString()
-        //   )
-        // )
-        //
-        // if (!assessmentLangPair || !assessmentLangPair.industries.length) return null;
-        //
-        // const assessmentIndustry = assessmentLangPair.industries.find(({industry}) => {
-        //   return industry === industryGroup._id.toString()
-        // })
-        const assessmentIndustry =  this.getAssessmentInfo(assessment)
-        //
-        return assessmentIndustry && assessmentIndustry.foundAssessment ? assessmentIndustry.foundAssessment.steps[0][step] : null
-        // return assessmentIndustry  ? assessmentIndustry.steps[0][step] : null
-
+      getStepInfo(row, step) {
+        const assessmentInfo = row.assessmentInfo
+        if (!assessmentInfo || !assessmentInfo.foundAssessment) return false
+        return assessmentInfo.foundAssessment.steps[0][step] || false
       },
 
-      getTQIInfo(row) {
-        return this.getStepLink(row.vendor.assessments,'tqi') || false
-      },
-      getLQAOneInfo(row) {
-        return this.getStepLink(row.vendor.assessments,'lqa1') || false
-      },
-      getLQATwoInfo(row) {
-        return this.getStepLink(row.vendor.assessments,'lqa2') || false
-      },
-      getLQAThreeInfo(row) {
-        return this.getStepLink(row.vendor.assessments,'lqa3') || false
-      },
-
-      findLanguageByTitle(title) {
-        return this.allLanguages.find(language=>{
-          return language.lang === title
-        })
-      },
       getVendorProfileLink(vendorId) {
         return '/vendors/details/' + vendorId
       },
-      getAssessmentInfo(assessment) {
-        const languages = this.additionalInformation.languagePair.split(' >> ')
-        const industryGroup = this.additionalInformation.industryGroup
-        const sourceLang = this.findLanguageByTitle(languages[0])
-        const targetLang = this.findLanguageByTitle(languages[1])
-        const sourceLangId = sourceLang ? sourceLang._id : null
-        const targetLangId = targetLang ? targetLang._id : null
+      canNextStep(row, step, previousStep = ''){
+        if( this.getStepInfo(row,step).grade) return false
+        if (previousStep.length > 0){
+          if(!this.getStepInfo(row,previousStep).grade) return false
 
-        if (!targetLang || !assessment || !assessment.length) return null
+        }
+        return this.canNextLQAStepByTier(row.wordCount, step, 1)
 
-        const langPairIndex = assessment.findIndex(({sourceLanguage, targetLanguage}) =>
-          (
-            sourceLanguage.toString() === sourceLangId.toString()
-            && targetLanguage.toString() === targetLangId.toString()
-          )
-        )
-
-        if (!assessment[langPairIndex] || !assessment[langPairIndex].industries.length) return null;
-
-        const industryIndex = assessment[langPairIndex].industries.findIndex(({industry}) => {
-          return industry === industryGroup._id.toString()
-        })
-
-        const foundAssessment = assessment[langPairIndex].industries[industryIndex] || null
-
-
-        // this.assessmentsInfo = {foundAssessment, langPairIndex, industryIndex}
-
-        return {foundAssessment, langPairIndex, industryIndex}
+      },
+      canNextLQAStepByTier(wordCount, nextStep, tier) {
+        const a = this.tiersInfo[tier]
+        const index = a.find(({minWordCount}) =>  {
+          return  minWordCount <= Math.round(wordCount)
+        });
+        return index ? index.allowSteps.includes(nextStep) : false
       }
     },
     computed: {
 		  ...mapGetters({
-        allLanguages: 'getAllLanguages'
+        allLanguages: 'getAllLanguages',
+        tiersInfo: 'getTiersInfo'
       }),
     },
 		components: {
@@ -238,7 +216,6 @@
         font-size: 18px;
       }
     }
-
     &__download {
       height: 21px;
       width: 21px;
