@@ -592,7 +592,7 @@ async function downloadFromMemoqProjectsData() {
 		console.log(err);
 		throw new Error(err.message);
 	} finally {
-		await clearGarbageProjects();
+		await clearGarbageProjects(true);
 	}
 }
 
