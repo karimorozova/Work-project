@@ -185,11 +185,12 @@
 			formateDate: time => moment(time).format("DD-MM-YYYY"),
 			projectLangs(row) {
 				const targets = row.targetLanguages
-						.filter(item => item)
-						.map(item => item.symbol);
+						// .filter(item => item)
+						.map(item => item ? item.symbol : '??');
+
 				let languages = "";
 				targets.forEach(element => {
-					languages += `${ row.sourceLanguage.symbol } >> ${ element }<br>`;
+					languages += `${ row.sourceLanguage ? row.sourceLanguage.symbol : '??'} >> ${ element }<br>`;
 				});
 				return languages;
 			},
