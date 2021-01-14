@@ -17,15 +17,19 @@
           .finance-info__bars
             .bar
               .bar__green(:style="{ width: barsStatistic.receivables.width }")
-              .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
+              .bar__amount
+                span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
+                span {{barsStatistic.receivables.price}}
             .bar
               .bar__red(:style="{ width: barsStatistic.payables.width }")
-              .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
+              .bar__amount
+                span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
+                span {{barsStatistic.payables.price}}
           .project-finance__dashboard
             .project-finance__dashboardItem
               .project-finance__dashboardItem-title Profit:
               .project-finance__dashboardItem-value {{financeData.profit}}
-                span(v-html="getSymbol(currentProject.customer.currency)")
+                span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
             .project-finance__dashboardItem
               .project-finance__dashboardItem-title Margin:
               .project-finance__dashboardItem-value {{financeData.margin}} %
@@ -46,7 +50,7 @@
                     .ratio__input
                       input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" @change="(e) => updateMinPrice('value', e)")
                       span(v-else) {{ currentProject.minimumCharge.value }}
-                      span.ratio__input-symbol(v-html="getSymbol(currentProject.customer.currency)")
+                      span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
                 .minPrice-item-check
                   .minPrice-item-check__title Ignore:
                   .rates-item__checkbox
@@ -54,13 +58,6 @@
                       input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
                       label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
                       label(v-else for="ignoreMinPrice")
-              //.minPrice-item
-                .minPrice-item__title Ignore Min. Charge:
-                .rates-item__checkbox
-                  .checkbox
-                    input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
-                    label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
-                    label(v-else for="ignoreMinPrice")
 
           .discounts
             Discounts(
@@ -70,15 +67,19 @@
 
         .project-finance__total
           .project-finance__total-title Total:
-          .project-finance__total-value {{ detectedFinalPrice }} &nbsp;&euro;
+          .project-finance__total-value
+            span {{ detectedFinalPrice }}
+            span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
 
 </template>
 
 <script>
 	import { mapGetters, mapActions } from "vuex";
 	import Discounts from "../clients/pricelists/Discounts";
+  import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 	export default {
+  	mixins: [currencyIconDetected],
 		props: {},
 		data() {
 			return {
@@ -106,9 +107,6 @@
 						this.paramsIsEdit = true;
 						break;
 				}
-			},
-			getSymbol(currency) {
-				return currency === 'USD' ? '&nbsp;&#36;' : currency === 'EUR' ? '&nbsp;&euro;' : '&nbsp;&pound';
 			},
 			toggleFinance() {
 				this.isFinanceShow = !this.isFinanceShow;
@@ -252,7 +250,7 @@
   .project-finance {
     box-sizing: border-box;
     min-width: 1000px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
     margin: 40px;
 
     &__content {
@@ -271,8 +269,9 @@
 
     &__total {
       padding-top: 20px;
-      border-top: 2px solid #C5BFB5;
+      border-top: 1px solid #C5BFB5;
       display: flex;
+      font-weight: bold;
 
       &-title {
         width: 60px;

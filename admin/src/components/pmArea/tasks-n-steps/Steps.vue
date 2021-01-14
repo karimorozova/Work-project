@@ -102,16 +102,19 @@
         template(slot="status" slot-scope="{ row }")
           span.steps__step-status {{ row.status | stepsAndTasksStatusFilter }}
         template(slot="receivables" slot-scope="{ row }")
-          span.steps__money(v-if="isEuro(row, 'receivables') || row.finance.Price.receivables === 0") &euro;&nbsp;
+          span.steps__money(v-if="isEuro(row, 'receivables') || row.finance.Price.receivables === 0")
+          span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span.steps__step-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
           span.steps__step-data(v-if="row.finance.Price.halfReceivables") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          span.steps__money(v-if="isEuro(row, 'payables') || row.finance.Price.payables === 0") &euro;&nbsp;
+          span.steps__money(v-if="isEuro(row, 'payables') || row.finance.Price.payables === 0")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span.steps__step-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
             span.steps__step-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
         template(slot="margin" slot-scope="{ row }")
-          span.steps__money(v-if="marginCalc(row)") &euro;&nbsp;
+          span.steps__money(v-if="marginCalc(row)")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span.steps__step-data(v-if="marginCalc(row)") {{ marginCalc(row) }}
       transition(name="fade")
         .steps__info(v-if="isStepInfo")
@@ -123,6 +126,7 @@
             @closeStepInfo="closeStepInfo"
             :originallyLanguages="originallyLanguages"
             :originallyUnits="originallyUnits"
+            :projectCurrency="currentProject.projectCurrency"
           )
     .steps__reassignment(v-if="isReassignment")
       Reassignment(
@@ -163,11 +167,13 @@
 	import moment from "moment";
 	import scrollDrop from "@/mixins/scrollDrop";
 	import stepVendor from "@/mixins/stepVendor";
+	import currencyIconDetected from "../../../mixins/currencyIconDetected";
+
 	import { mapGetters, mapActions } from 'vuex';
 	import ProgressLineStep from "../../ProgressLineStep";
 
 	export default {
-		mixins: [scrollDrop, stepVendor],
+		mixins: [scrollDrop, stepVendor, currencyIconDetected],
 		props: {
 			allSteps: {
 				type: Array
@@ -533,7 +539,7 @@
 
     &__title {
       margin-bottom: 5px;
-      font-size: 18px;
+      font-size: 16px;
     }
 
     &__drop-menu {
@@ -549,7 +555,7 @@
       width: 80%;
       z-index: 50;
       background-color: $white;
-      box-shadow: 0 0 10px $brown-shadow;
+      box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
       margin-bottom: 120px;
     }
 

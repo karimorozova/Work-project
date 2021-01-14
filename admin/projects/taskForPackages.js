@@ -22,6 +22,7 @@ async function createTasksWithPackagesUnit (allInfo) {
         stepsAndUnits,
         industry,
         discounts,
+        projectId: _id,
       })
       : await getStepsForMonoStepPackages({
         tasks: tasksWithoutFinance,
@@ -29,12 +30,14 @@ async function createTasksWithPackagesUnit (allInfo) {
         stepsDates,
         industry,
         discounts,
+        projectId: _id,
       });
     steps = checkIsSameVendor(steps);
     const tasks = tasksWithoutFinance.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
     const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);
+
     return await updateProject(
       { _id }, { finance: projectFinance, roi, $push: { tasks, steps } }
     );
@@ -52,10 +55,10 @@ async function createTasksWithPackagesUnit (allInfo) {
  * @param {Object} customer
  * @param {Array} discounts
  * @param {Boolean} common
+ * @param {string} projectId
  * @returns {Array} - returns steps array
  */
-async function getStepsForMonoStepPackages(
-  { tasks, stepsDates, industry, customer, discounts }, common = false) {
+async function getStepsForMonoStepPackages({ tasks, stepsDates, industry, customer, discounts, projectId }, common = false) {
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
@@ -65,8 +68,8 @@ async function getStepsForMonoStepPackages(
     serviceStep = await gatherServiceStepInfo(serviceStep);
     const { step, size, quantity } = serviceStep;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
-      customer, industry, serviceStep, task, vendorId, quantity, discounts
+    const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } = await getStepFinanceData({
+      customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId
     });
     steps.push({
       ...task,
@@ -85,7 +88,9 @@ async function getStepsForMonoStepPackages(
       defaultStepPrice,
       check: false,
       vendorsClickedOffer: [],
-      isVendorRead: false
+      isVendorRead: false,
+      nativeFinance,
+      nativeVendorRate,
     });
   }
   return steps;

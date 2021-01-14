@@ -85,16 +85,6 @@
             :options="projManagers"
             :selectedOption="selectedProjManager"
             @chooseOption="(e) => setManager(e, 'projectManager')")
-      //.drops__item(v-if="isAction('Send a Quote')")
-        //.drops__label Receive the Quote:
-          img.drops__assigned-icon(v-if="project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
-        //.drops__menu
-          //SelectMulti(
-            //:selectedOptions="selectedContacts"
-            //:options="fillContacts()"
-            //placeholder="Select Contact"
-            //@chooseOptions="setContacts"
-          //)
       slot
     .approve-action(v-if="approveAction")
       ApproveModal(
@@ -140,7 +130,6 @@
 				moreInformation: '',
 				reasons: [],
 				managers: [],
-				// selectedContacts: [],
 				templatesWysiwyg: [
 					{
 						title: 'tempate',
@@ -576,7 +565,6 @@
 					"Cancelled"
 				];
 				if(this.project.status === "Approved") {
-					// result = ["Send a Quote", "Cancel"];
 					result = ["Cancel"];
 				}
 				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
@@ -589,7 +577,6 @@
 					result = ["Deliver", "Cancel"];
 				}
 				if(this.project.status === 'Closed') {
-					// result = ['ReOpen', 'Deliver'];
 					result = ['ReOpen'];
 				}
 				if(this.project.status === 'Rejected') {
@@ -627,7 +614,7 @@
 
   .project-action {
     padding: 20px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
     box-sizing: border-box;
     width: 390px;
     display: flex;
@@ -664,7 +651,7 @@
 
     &__title {
       font-size: 22px;
-      border-bottom: 2px solid #C5BFB5;
+      border-bottom: 1px solid #C5BFB5;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
@@ -794,9 +781,6 @@
       }
     }
 
-    #sub-line {
-      /*margin-top: 15px;*/
-    }
 
     %item-style {
       display: flex;

@@ -1,10 +1,11 @@
-const { CurrencyRatio, Clients, Pricelist, Languages, Vendors } = require('../models');
+const { CurrencyRatio, Clients, Pricelist, Languages, Vendors, Projects } = require('../models');
 
 const { multiplyPrices } = require('../multipliers');
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers');
 
 const getStepFinanceData = async (projectData, forWords = false) => {
-  const { customer, serviceStep, industry, task, vendorId, quantity, discounts } = projectData;
+  const { customer, serviceStep, industry, task, vendorId, quantity, discounts, projectId } = projectData;
+  const { crossRate, projectCurrency } = await Projects.findOne({"_id": projectId});
   const { metrics, sourceLanguage, targetLanguage } = task;
   let vendor;
   if (vendorId) {
@@ -38,33 +39,55 @@ const getStepFinanceData = async (projectData, forWords = false) => {
     value: clientPrice,
     active: true,
   };
-  const vendorRate = vendorPrice !== 0 ? {
-    value: vendorPrice,
-    active: true
-  } : "";
 
-  const finance = {
-    Wordcount: {
-      receivables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity : 0,
-      payables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity : 0,
-    },
-    Price: {
-      receivables: +clientRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity),
-      payables: vendor ? +vendorRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) : 0,
-    }
-  }
+  const vendorRate = vendorPrice !== 0 ? { value: rateExchange('EUR', +vendorPrice), active: true } : "";
+  const nativeVendorRate = vendorPrice !== 0 ? { value: vendorPrice, active: true } : "";
+
+  const finance = stepFinance(false);
+  const nativeFinance = stepFinance(true);
+
   const defaultStepPrice = finance.Price.receivables;
   if (discounts.length) {
     const { Price: { receivables } } = finance;
     finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables);
   }
+
   return {
     clientRate,
     vendorRate,
+    nativeVendorRate,
     vendor: vendor ? vendor._id : null,
     finance,
+    nativeFinance,
     defaultStepPrice
   };
+
+  function stepFinance(isNative){
+    return {
+      Wordcount: {
+        receivables: forWords ?
+            title === 'Translation' ?
+                getRelativeQuantity(metrics, 'client') :
+                +quantity : 0,
+        payables: forWords ?
+            title === 'Translation' ?
+                getRelativeQuantity(metrics, 'vendor') :
+                +quantity : 0,
+      },
+      Price: {
+        receivables: +clientRate.value *
+            +(title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity),
+        payables: vendor ?
+            isNative ? +nativeVendorRate.value : +vendorRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) :
+            0,
+      }
+    }
+  }
+
+  function rateExchange(vendorCurrency, nativeRate){
+    return +(nativeRate * crossRate[vendorCurrency][projectCurrency]).toFixed(3)
+  }
+
 };
 
 

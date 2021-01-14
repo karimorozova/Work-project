@@ -31,7 +31,7 @@ async function updateProjectMetrics(projectId, tasks) {
 				if(analysis && AnalysisResultForLang) {
 					const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
 					task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
-					let newSteps = await getTaskSteps(task, industry, customer, discounts);
+					let newSteps = await getTaskSteps(task, industry, customer, discounts, projectId);
 					newSteps = checkIsSameVendor(newSteps);
 					const stepWithVendor = newSteps.find(step => step.vendor);
 					if(stepWithVendor) {
@@ -55,13 +55,9 @@ async function updateProjectMetrics(projectId, tasks) {
 			}
 		}
 
-		function filterExistingTasks() {
-			const newTasksIds = tasks.map(i => i.taskId);
-			existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
-		}
-
 		existingTasks.push(...tasks);
 		const { projectFinance, roi } = getProjectFinance(existingTasks, finance, minimumCharge);
+
 		return await updateProject({ "_id": projectId }, {
 			tasks: existingTasks,
 			steps,
@@ -69,6 +65,12 @@ async function updateProjectMetrics(projectId, tasks) {
 			finance: projectFinance,
 			roi
 		});
+
+		function filterExistingTasks() {
+			const newTasksIds = tasks.map(i => i.taskId);
+			existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
+		}
+
 	} catch (err) {
 		console.log(err);
 		console.log("Error in updateProjectMetrics");
@@ -153,9 +155,10 @@ async function getProjectWithUpdatedFinance(project) {
  * @param industry
  * @param customer
  * @param discounts
+ * @param projectId
  * @returns {Promise<[]>}
  */
-async function getTaskSteps(task, industry, customer, discounts) {
+async function getTaskSteps(task, industry, customer, discounts, projectId) {
 	let { sourceLanguage, targetLanguage, metrics, service, stepsAndUnits } = task;
 
 	const newSteps = [];
@@ -181,8 +184,8 @@ async function getTaskSteps(task, industry, customer, discounts) {
 			});
 		}
 		const quantity = getWordcountStepQuantity(type, metrics, stepsAndUnits[i]);
-		const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
-			customer, industry, serviceStep, task, vendorId, quantity, discounts
+		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } = await getStepFinanceData({
+			customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId
 		}, true);
 		const step = {
 			stepId: `${ task.taskId } ${ stepsIdCounter }`,
@@ -208,7 +211,9 @@ async function getTaskSteps(task, industry, customer, discounts) {
 			check: false,
 			vendorsClickedOffer: [],
 			isVendorRead: false,
-			service
+			service,
+			nativeFinance,
+			nativeVendorRate
 		};
 		if(type !== 'CAT Wordcount' && type !== 'Packages') {
 			delete step.totalWords;

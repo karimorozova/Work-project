@@ -34,7 +34,7 @@ async function receivablesCalc({ task, project, step }) {
 
 async function getAfterWordcountPayablesUpdated({ project, step }) {
 	try {
-    let { tasks, steps, customer, industry, discounts } = project;
+    let { tasks, steps, customer, industry, discounts, _id: projectId } = project;
     const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
     const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId);
     tasks[taskIndex].metrics = setTaskMetrics({
@@ -44,12 +44,16 @@ async function getAfterWordcountPayablesUpdated({ project, step }) {
     });
     const quantity = tasks[taskIndex].metrics.totalWords;
     const { serviceStep, vendor } = step;
-    const { finance, vendorRate } = await getStepFinanceData({
-      customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts
+    const { finance, vendorRate, nativeFinance, nativeVendorRate } = await getStepFinanceData({
+      customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts, projectId
     }, true);
 
     steps[stepIndex].finance = finance;
     steps[stepIndex].vendorRate = vendorRate;
+
+		steps[stepIndex].nativeFinance = nativeFinance;
+		steps[stepIndex].nativeVendorRate = nativeVendorRate;
+
     const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId);
     tasks[taskIndex].finance = {
       Wordcount: setTaskFinance(taskSteps, 'Wordcount'),

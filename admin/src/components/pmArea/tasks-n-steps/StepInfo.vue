@@ -15,6 +15,7 @@
         :step="step"
         @refreshFinance="refreshFinance"
         :originallyUnits="originallyUnits"
+        :projectCurrency="projectCurrency"
       )
     .step-info__block
       Files(
@@ -50,7 +51,10 @@
 			},
 			originallyUnits: {
 				type: Array
-			}
+			},
+			projectCurrency: {
+				type: String,
+      }
 		},
 		data() {
 			return {

@@ -69,15 +69,18 @@
               img.tasks__time-icon(src="../../../assets/images/time_icon.png")
               .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
         template(slot="receivables" slot-scope="{ row }")
-          span.tasks__money(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0") &euro;&nbsp;
+          span.tasks__money(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span.tasks__task-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
           span.tasks__task-data(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
         template(slot="payables" slot-scope="{ row }")
-          span.tasks__money(v-if="row.finance.Price.payables || row.finance.Price.payables === 0") &euro;&nbsp;
+          span.tasks__money(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span.tasks__task-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
           span.tasks__task-data(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
         template(slot="margin" slot-scope="{ row }")
-          span.tasks__money(v-if="marginCalc(row.finance.Price)") &euro;&nbsp;
+          span.tasks__money(v-if="marginCalc(row.finance.Price)")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span.tasks__task-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
         template(slot="delivery" slot-scope="{ row }")
           img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
@@ -107,6 +110,7 @@
 	import Tabs from "../../Tabs";
 	import SelectSingle from "../../SelectSingle";
 	import CheckBox from "@/components/CheckBox";
+	import currencyIconDetected from "../../../mixins/currencyIconDetected";
 
 	const ApproveModal = () => import("../../ApproveModal");
 	const DeliveryReview = () => import("./DeliveryReview");
@@ -114,6 +118,7 @@
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			allTasks: {
 				type: Array
@@ -469,7 +474,7 @@
 
     &__title {
       margin-bottom: 5px;
-      font-size: 18px;
+      font-size: 16px;
     }
 
     &__drop-menu {

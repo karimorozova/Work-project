@@ -21,16 +21,20 @@
 
       .table__body-row
         .table__tbody-cell Rate
-        .table__tbody-cell(v-if="!isEditing") {{ financeData.receivables.rate }} &euro;
+        .table__tbody-cell(v-if="!isEditing") {{ financeData.receivables.rate }}
+          span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
         input.details__editing-data(v-else type="number" v-model.number="currentData.receivables.rate")
-        .table__tbody-cell(v-if="!isEditing && financeData.vendor") {{ financeData.payables.rate }} &euro;
+        .table__tbody-cell(v-if="!isEditing && financeData.vendor") {{ financeData.payables.rate }}
+          span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
         .table__tbody-cell(v-else-if="!financeData.vendor")
         input.details__editing-data(v-else type="number" v-model.number="currentData.payables.rate")
 
       .table__body-row
         .table__tbody-cell Price
-        .table__tbody-cell {{ financeData.receivables.total }} &euro;
-        .table__tbody-cell(v-if="financeData.vendor") {{ financeData.payables.total }} &euro;
+        .table__tbody-cell {{ financeData.receivables.total }}
+          span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
+        .table__tbody-cell(v-if="financeData.vendor") {{ financeData.payables.total }}
+          span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
         .table__tbody-cell(v-else)
 
 
@@ -42,8 +46,10 @@
 	import LabelVal from "@/components/LabelVal";
 	import ValidationErrors from "../../../ValidationErrors";
 	import {mapGetters} from "vuex";
+	import currencyIconDetected from "../../../../mixins/currencyIconDetected";
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			financeData: {
 				type: Object
@@ -57,6 +63,9 @@
 			cancelSave: {
 				type: Boolean,
 				default: false,
+			},
+			projectCurrency: {
+				type: String,
 			}
 		},
 		data() {

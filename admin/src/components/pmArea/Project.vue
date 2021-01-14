@@ -154,13 +154,11 @@
 			async setSameDate(e) {
 				this.isBilling = e.target.checked;
 				if(!this.project._id) {
-					e.target.checked
-							? this.project.billingDate = this.project.deadline
-							: this.project.billingDate = this.project.billingDate
+					this.project.billingDate = e.target.checked ? this.project.deadline : this.project.billingDate
 				} else {
-					e.target.checked
-							? this.updateProjectDate(this.$refs.deadline.value, 'billingDate')
-							: this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
+					e.target.checked ?
+              this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
+              this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
 				}
 			},
 			async setClientNumber(e) {
@@ -215,7 +213,7 @@
 			},
 			async clientCreateProjectDate() {
 				const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY');
-				const result = await this.$http.post('/clientsapi/client-project-date', {
+        await this.$http.post('/clientsapi/client-project-date', {
 					date: formatDate,
 					clientId: this.project.customer
 				});
@@ -268,18 +266,12 @@
 				if(id !== undefined) {
 					const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
 					await this.setCurrentProject(curProject.body);
-				} else {
-					return;
 				}
 			},
-			isbillingDate() {
-				if(this.$refs.deadline.value == "") {
+			isBillingDate() {
+				if(this.$refs.deadline.value === "") {
 					this.isBilling = false;
-				} else if(this.$refs.deadline.value == this.$refs.billingDate.value) {
-					this.isBilling = true;
-				} else {
-					this.isBilling = false;
-				}
+				} else this.isBilling = this.$refs.deadline.value === this.$refs.billingDate.value;
 			},
 			setIsBillingTrue() {
 				this.isBilling = true;
@@ -316,7 +308,7 @@
 			await this.getProjectData();
 			this.getCustomers();
 			this.getIndustries();
-			this.isbillingDate();
+			this.isBillingDate();
 			!this.project._id && this.setIsBillingTrue();
 		}
 	}
@@ -353,7 +345,7 @@
     &__all-info {
       width: 960px;
       padding: 20px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
     }
 
     &__info-row {
@@ -380,7 +372,6 @@
       outline: none;
 
       &:focus {
-        box-shadow: 0 0 5px #68573E;
       }
     }
 
@@ -425,7 +416,6 @@
       outline: none;
 
       &:focus {
-        box-shadow: 0 0 5px #68573E;
       }
     }
 
@@ -441,7 +431,6 @@
       padding-right: 30px;
 
       &:focus {
-        box-shadow: 0 0 5px #68573E;
       }
     }
 
@@ -461,7 +450,6 @@
       box-sizing: border-box;
 
       &:focus {
-        box-shadow: 0 0 5px #68573E;
       }
     }
 

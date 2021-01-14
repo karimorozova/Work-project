@@ -32,6 +32,7 @@
         span.projects-table__label {{ field.label }}
       template(slot="headerTest" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
+
       template(slot="projectId" slot-scope="{ row }")
         span {{ getId(row) }}
       template(slot="clientName" slot-scope="{ row }")
@@ -43,10 +44,12 @@
       template(slot="status" slot-scope="{ row }")
         span {{ row.status }}
       template(slot="receivables" slot-scope="{ row }")
-        span(v-if="row.finance && row.finance.Price.receivables") &euro;
+        span(v-if="row.finance && row.finance.Price.receivables")
+          span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
           span {{ toFixedFinalCost(row.finance.Price.receivables )}}
       template(slot="payables" slot-scope="{ row }")
-        span(v-if="row.finance && row.finance.Price.payables") &euro;
+        span(v-if="row.finance && row.finance.Price.payables")
+          span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
           span {{ toFixedFinalCost(row.finance.Price.payables ) }}
       template(slot="roi" slot-scope="{ row }")
         span {{ row.roi }}
@@ -66,8 +69,10 @@
 <script>
 	import DataTable from "../DataTable";
 	import { mapActions } from "vuex";
+	import iconsCurrency from "../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [iconsCurrency],
 		props: {
 			allProjects: {
 				type: Array
@@ -86,8 +91,8 @@
 					{ label: "ROI", headerKey: "headerRoi", key: "roi", width: "6%" },
 					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "8%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "8%" },
-					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "9%" },
-					{ label: "Test", headerKey: "headerTest", key: "projectTest", width: "5%" },
+					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "10%" },
+					{ label: "Test", headerKey: "headerTest", key: "projectTest", width: "4%" },
 				],
 			}
 		},
@@ -101,7 +106,7 @@
 				await this.setProjectProp({
 					projectId: projectId,
 					prop: 'isTest',
-					value: e.target.checked
+					value: event.target.checked
 				});
 			},
 			toFixedFinalCost(num) {

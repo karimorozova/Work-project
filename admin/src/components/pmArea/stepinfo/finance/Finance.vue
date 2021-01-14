@@ -5,6 +5,7 @@
       InfoBlock(
         :step="step"
         :originallyUnits="originallyUnits"
+        :projectCurrency="projectCurrency"
       )
 </template>
 
@@ -21,6 +22,9 @@
 			originallyUnits: {
 				type: Array
 			},
+			projectCurrency: {
+				type: String,
+			}
 		},
 		data() {
 			return {
@@ -30,9 +34,6 @@
 		methods: {
 			toggleMainInfo() {
 				this.isMainInfo = !this.isMainInfo;
-			},
-			showMoney(row, key) {
-				return row.title !== "Wordcount" && row[key];
 			},
 		},
 		components: {

@@ -125,6 +125,7 @@
 
 				projectClientContacts: [],
 				currentClientContact: "",
+				oldClientContact:"",
 				message: "",
 
 				isTableDropMenu: true,
@@ -238,6 +239,7 @@
 				this.currentActive = -1;
 				this.isDeleting = false;
 				this.currentClientContact = "";
+				this.oldClientContact = "";
 			},
 			async manageDeleteClick(index) {
 				if(!this.projectClientContacts[index]._id) {
@@ -251,7 +253,7 @@
 			async deleteData() {
 				try {
 					const result = await this.$http.delete(
-							`/pm-manage/client-contact/${ this.project._id }/${ this.projectClientContacts[this.deleteIndex]._id }`
+							`/memoqapi/client-contact/${ this.project._id }/${ this.projectClientContacts[this.deleteIndex]._id }`
 					);
 					this.projectClientContacts = result.data.clientContacts;
 					this.alertToggle({
@@ -289,6 +291,7 @@
 					const result = await this.$http.post("/memoqapi/client-contact", {
 						projectId: this.project._id,
 						contact: this.currentClientContact,
+						oldContact: this.oldClientContact,
 					});
 					this.projectClientContacts = result.data.clientContacts;
 					this.alertToggle({
@@ -326,6 +329,7 @@
 			setEditingData(index) {
 				this.currentActive = index;
 				this.currentClientContact = this.projectClientContacts[index];
+				this.oldClientContact = this.currentClientContact;
 			},
 			setClientContact({ option }) {
 				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option);
@@ -341,9 +345,6 @@
 				}
 			},
 		},
-		// mounted() {
-		//
-		// },
 		created() {
 			this.getClientContacts();
 		},

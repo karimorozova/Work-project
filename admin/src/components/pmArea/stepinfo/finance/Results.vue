@@ -3,7 +3,8 @@
     .step-finance__summary
       .step-finance__summary-value
         span Profit:
-        span.step-finance__money(v-if="step.vendor") {{ isNaNCalculationValue(+profitAndMargin.profit) }} &euro;
+        span.step-finance__money(v-if="step.vendor") {{ isNaNCalculationValue(+profitAndMargin.profit) }}
+          span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
         span.step-finance__money(v-else) --
     .step-finance__summary
       .step-finance__summary-value
@@ -18,18 +19,23 @@
 </template>
 
 <script>
+  import currencyIconDetected from "../../../../mixins/currencyIconDetected";
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			step: {
 				type: Object,
 			},
 			profitAndMargin:{
 				type: Object,
-      }
+      },
+			projectCurrency: {
+				type: String,
+			}
 		},
 		methods: {
 			isNaNCalculationValue(value) {
-				return isNaN(value) ? '0' : value
+				return isNaN(value) ? '0' : (value).toFixed(2)
 			}
 		},
 	};

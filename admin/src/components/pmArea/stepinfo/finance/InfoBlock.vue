@@ -5,10 +5,14 @@
         .finance-info__bars
           .bar
             .bar__green(:style="{width: barsStatistic.receivables.width}")
-            .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
+            .bar__amount
+              span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
+              span {{barsStatistic.receivables.price}}
           .bar
             .bar__red(:style="{width: barsStatistic.payables.width }")
-            .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
+            .bar__amount
+              span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
+              span {{barsStatistic.payables.price}}
 
         DetailsTranslation(
           v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'"
@@ -17,6 +21,7 @@
           :cancelSave="cancelSave"
           :selectedTab="selectedTab"
           @save="checkRateChange"
+          :projectCurrency="projectCurrency"
         )
         DetailsOtherCAT(
           v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name !== 'Translation'"
@@ -25,6 +30,7 @@
           :cancelSave="cancelSave"
           :selectedTab="selectedTab"
           @save="checkRateChange"
+          :projectCurrency="projectCurrency"
         )
         DetailsPackages(
           v-if="getUnitTypeByUnitId === 'Packages'"
@@ -33,6 +39,7 @@
           :cancelSave="cancelSave"
           :selectedTab="selectedTab"
           @save="checkRateChange"
+          :projectCurrency="projectCurrency"
         )
         DetailsHours(
           v-if="getUnitTypeByUnitId !== 'CAT Wordcount' && getUnitTypeByUnitId !== 'Packages'"
@@ -41,9 +48,14 @@
           :cancelSave="cancelSave"
           :selectedTab="selectedTab"
           @save="checkRateChange"
+          :projectCurrency="projectCurrency"
         )
       .finance-info__result
-        Results(:step="step" :profitAndMargin="profitAndMargin")
+        Results(
+          :step="step"
+          :projectCurrency="projectCurrency"
+          :profitAndMargin="profitAndMargin"
+          )
 
     .finance-info__modal(v-if="isModal")
       ApproveModal(
@@ -72,14 +84,19 @@
 	import TableMatrix from "./TableMatrix"
 	import Results from "./Results";
 	import DetailsOtherCAT from "./DetailsOtherCAT";
+	import iconCurrency from "../../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [iconCurrency],
 		props: {
 			step: {
 				type: Object
 			},
 			originallyUnits: {
 				type: Array
+			},
+			projectCurrency: {
+				type: String,
 			}
 		},
 		data() {
@@ -214,11 +231,11 @@
 				return {
 					receivables: {
 						width: `${ receivablesPercents }%`,
-						price: Price.receivables,
+						price: (Price.receivables).toFixed(2),
 					},
 					payables: {
 						width: `${ payblesPercents }%`,
-						price: Price.payables
+						price: (Price.payables).toFixed(2)
 					}
 				}
 			},

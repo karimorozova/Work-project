@@ -1,4 +1,4 @@
-const { Projects } = require('../models');
+const { Projects, Clients, CurrencyRatio } = require('../models');
 const { getProject } = require('./getProjects');
 const { createTasksWithPackagesUnit } = require('./taskForPackages');
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon');
@@ -12,31 +12,61 @@ const moment = require('moment');
  * @param {Object} project
  * @returns {Object}
  */
-async function createProject (project) {
+async function createProject(project) {
   let todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
   let todayEnd = new Date(todayStart);
   todayEnd.setUTCHours(23, 59, 59, 0);
+
   try {
-    const todayProjects = await Projects.find({
-      startDate: { $gte: todayStart, $lt: todayEnd }
-    });
-    const nextNumber =
-      todayProjects.length < 10
-        ? "[0" + (todayProjects.length + 1) + "]"
-        : "[" + (todayProjects.length + 1) + "]";
+    const { USD, GBP } = await CurrencyRatio.findOne();
+    const { contacts, billingInfo, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
+    const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lt: todayEnd } });
+    const nextNumber = todayProjects.length < 10 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]";
+
     project.status = project.status || "Draft";
-    project.projectId =
-      "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
+    project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
+    project.projectManager = projectManager._id;
+    project.accountManager = accountManager._id;
+    project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';
+    project.clientContacts = [contacts.find(({ leadContact }) => leadContact)];
+    project.discounts = discounts;
+    project.minimumCharge = { value: minPrice, toIgnore: false };
+    project.crossRate = calculateCrossRate(USD, GBP);
+    project.projectCurrency = currency;
+
     const createdProject = await Projects.create({
       ...project,
       startDate: new Date()
     });
+
     await createProjectFolder(createdProject.id);
     return await getProject({ _id: createdProject.id });
+
   } catch (err) {
     console.log(err);
     console.log("Error in createProject");
+  }
+
+  function calculateCrossRate(USD, GBP) {
+    const EUR = 1;
+    return {
+      EUR: { EUR, USD, GBP },
+      USD: {
+        USD: 1,
+        EUR: dividedValue(EUR, USD),
+        GBP: dividedValue(GBP, USD),
+      },
+      GBP: {
+        GBP: 1,
+        EUR: dividedValue(EUR, GBP),
+        USD: dividedValue(USD, GBP),
+      }
+    };
+
+    function dividedValue(A, B) {
+      return +(A / B).toFixed(2);
+    }
   }
 }
 

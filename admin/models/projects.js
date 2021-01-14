@@ -1,6 +1,33 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const USD = {
+  type: Number,
+  default: 0
+};
+const EUR = {
+  type: Number,
+  default: 0
+};
+const GBP = {
+  type: Number,
+  default: 0
+};
+const stepFinance = {
+  'Wordcount': {
+    receivables: "",
+    payables: "",
+    halfReceivables: "",
+    halfPayables: "",
+  },
+  'Price': {
+    receivables: "",
+    payables: "",
+    halfReceivables: "",
+    halfPayables: "",
+  }
+};
+
 const ProjectsSchema = new mongoose.Schema({
   projectId: {
     type: String,
@@ -92,25 +119,12 @@ const ProjectsSchema = new mongoose.Schema({
     progress: "",
     status: "",
     clientRate: {},
-    // clientDiscount: "",
     targetFile: "",
-    finance: {
-      'Wordcount': {
-        receivables: "",
-        payables: "",
-        halfReceivables: "",
-        halfPayables: "",
-      },
-      'Price': {
-        receivables: "",
-        payables: "",
-        halfReceivables: "",
-        halfPayables: "",
-      }
-    },
+    finance: stepFinance,
+    nativeFinance: stepFinance,
     defaultStepPrice: 0,
     vendorRate: "",
-    // vendorDiscount: "",
+    nativeVendorRate: "",
     check: false,
     vendorsClickedOffer: Array,
     isVendorRead: { type: Boolean, default: false },
@@ -234,7 +248,28 @@ const ProjectsSchema = new mongoose.Schema({
   isTest: {
     type: Boolean,
     default: false
-  }
+  },
+	projectCurrency: {
+    type: String,
+    default: ''
+  },
+  crossRate: {
+		EUR: {
+      EUR,
+			USD,
+			GBP,
+		},
+		USD: {
+      USD,
+			EUR,
+			GBP,
+		},
+		GBP: {
+      GBP,
+			USD,
+			EUR,
+		},
+	}
 }, { minimize: false, strict: false });
 
 const Projects = mongoose.model('Projects', ProjectsSchema);

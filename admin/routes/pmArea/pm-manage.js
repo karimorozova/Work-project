@@ -68,16 +68,6 @@ router.get('/language-pairs', async (req, res) => {
 
 router.post('/new-project', async (req, res) => {
 	let project = { ...req.body };
-	const { contacts, billingInfo, projectManager, accountManager, discounts, minPrice } =
-			await Clients.findOne({ '_id': project.customer }).populate('discounts');
-	project.projectManager = projectManager._id;
-	project.accountManager = accountManager._id;
-	const leadContact = contacts.find(({ leadContact }) => leadContact === true);
-	project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';
-	project.clientContacts = [leadContact];
-	project.discounts = discounts;
-	project.minimumCharge = { value: minPrice, toIgnore: false };
-
 	try {
 		const result = await createProject(project);
 		res.send(result);
@@ -934,12 +924,12 @@ router.post('/payment-profile', async (req, res) => {
 });
 
 router.post('/client-contact', async (req, res) => {
-	const { projectId, contact } = req.body;
+	const { projectId, contact, oldContact : {_id: oldContact} } = req.body;
 	try {
-		const { clientContacts } = await Projects.findOne({ _id: projectId });
-		const existingContact = clientContacts.findIndex(item => item._id.toString() === contact._id.toString());
-		if(existingContact !== -1) {
-			clientContacts.splice(existingContact, 1, contact);
+		let { clientContacts } = await Projects.findOne({ _id: projectId });
+		if(oldContact) {
+			const oldIdxContact = clientContacts.findIndex(item => item._id.toString() === oldContact.toString());
+			clientContacts.splice(oldIdxContact, 1, contact);
 		} else {
 			clientContacts.push(contact);
 		}

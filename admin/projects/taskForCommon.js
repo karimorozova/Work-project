@@ -33,6 +33,7 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
       getFinanceForCustomUnits(item, steps)
     );
     const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);
+
     return await updateProject(
       { _id }, { finance: projectFinance, roi, $push: { tasks, steps } }
     );
@@ -90,7 +91,7 @@ async function getTasksForCustomUnits (tasksInfo) {
  * @returns {Array} - returns array of new steps
  */
 async function getStepsForDuoUnits (allInfo) {
-  const { tasks, stepsAndUnits, stepsDates, industry, customer, discounts } = allInfo;
+  const { tasks, stepsAndUnits, stepsDates, industry, customer, discounts, projectId } = allInfo;
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks.length > 1 ? tasks[i] : tasks[0];
@@ -114,8 +115,8 @@ async function getStepsForDuoUnits (allInfo) {
     const key = serviceStep.hasOwnProperty('quantity') ? 'quantity' : 'hours';
     const quantity = serviceStep[key];
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
-      customer, industry, serviceStep, task, vendorId, quantity, discounts
+    const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } = await getStepFinanceData({
+      customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId
     });
     return {
       ...task,
@@ -135,6 +136,8 @@ async function getStepsForDuoUnits (allInfo) {
       check: false,
       vendorsClickedOffer: [],
       isVendorRead: false,
+      nativeFinance,
+      nativeVendorRate,
     };
   }
 }
@@ -146,7 +149,7 @@ async function getStepsForDuoUnits (allInfo) {
  * @returns {Array} - returns array of new steps
  */
 async function getStepsForMonoUnits (allInfo, common = false) {
-  let { tasks, stepsDates, industry, customer, discounts } = allInfo;
+  let { tasks, stepsDates, industry, customer, discounts, projectId } = allInfo;
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
@@ -157,8 +160,8 @@ async function getStepsForMonoUnits (allInfo, common = false) {
     const { step, hours, size, title } = serviceStep;
     const stepName = title;
     const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry });
-    const { finance, clientRate, vendorRate, vendor, defaultStepPrice } = await getStepFinanceData({
-      customer, industry, serviceStep, task, vendorId, quantity: hours, discounts
+    const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } = await getStepFinanceData({
+      customer, industry, serviceStep, task, vendorId, quantity: hours, discounts, projectId
     });
     steps.push({
       ...task,
@@ -177,7 +180,9 @@ async function getStepsForMonoUnits (allInfo, common = false) {
       progress: 0,
       check: false,
       vendorsClickedOffer: [],
-      isVendorRead: false
+      isVendorRead: false,
+      nativeFinance,
+      nativeVendorRate,
     });
   }
   return steps;

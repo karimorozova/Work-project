@@ -106,6 +106,7 @@
 
 				projectClientContacts: [],
 				currentClientContact: "",
+				oldClientContact: "",
 				message: "",
 
 				isTableDropMenu: true,
@@ -204,12 +205,12 @@
 				this.currentActive = -1;
 				this.isDeleting = false;
 				this.currentClientContact = "";
+				this.oldClientContact = "";
 			},
 			async manageDeleteClick(index) {
 				if (!this.projectClientContacts[index]._id) {
 					this.projectClientContacts.splice(index, 1);
 					this.setDefaults();
-					return;
 				} else {
 					this.deleteIndex = index;
 					this.isDeleting = true;
@@ -256,6 +257,7 @@
 					const result = await this.$http.post("/pm-manage/client-contact", {
 						projectId: this.project._id,
 						contact: this.currentClientContact,
+            oldContact: this.oldClientContact,
 					});
 					this.projectClientContacts = result.data.clientContacts;
 					this.alertToggle({
@@ -277,7 +279,6 @@
 				if (!this.projectClientContacts[index]._id) {
 					this.projectClientContacts.splice(index, 1);
 					this.setDefaults();
-					return;
 				} else {
 					this.setDefaults();
 				}
@@ -294,6 +295,7 @@
 			setEditingData(index) {
 				this.currentActive = index;
 				this.currentClientContact = this.projectClientContacts[index];
+				this.oldClientContact = this.currentClientContact;
 			},
 			setClientContact({option}) {
 				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option);
@@ -367,7 +369,7 @@
   .sub-information {
     box-sizing: border-box;
     padding: 20px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
     display: flex;
     flex-direction: column;
     align-items: flex-start;

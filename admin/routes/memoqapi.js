@@ -310,21 +310,21 @@ router.get('/update-project-statuses-from-messages/:from', async (req, res) => {
 });
 
 router.post('/client-contact', async (req, res) => {
-  const { projectId, contact } = req.body;
-  try {
-    const { clientContacts } = await MemoqProject.findOne({ _id: projectId });
-    const existingContact = clientContacts.findIndex(item => item._id.toString() === contact._id.toString());
-    if (existingContact !== -1) {
-      clientContacts.splice(existingContact, 1, contact);
-    } else {
-      clientContacts.push(contact);
-    }
-    const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
-    res.send(project);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('Error on updating/creating client contact');
-  }
+	const { projectId, contact, oldContact : {_id: oldContact} } = req.body;
+	try {
+		const { clientContacts } = await MemoqProject.findOne({ _id: projectId });
+		if(oldContact) {
+			const oldIdxContact = clientContacts.findIndex(item => item._id.toString() === oldContact.toString());
+			clientContacts.splice(oldIdxContact, 1, contact);
+		} else {
+			clientContacts.push(contact);
+		}
+		const project = await getProjectAfterUpdate({ _id: projectId }, { clientContacts });
+		res.send(project);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on updating/creating client contact');
+	}
 });
 
 router.delete('/client-contact/:projectId/:contactId', async (req, res) => {
