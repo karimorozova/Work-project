@@ -8,7 +8,8 @@ const clearGarbageProjects = async (filterAll = false) => {
   let date = Date.now();
   const dayInTimestampMilliseconds = 86400 * 1000;
   const date40DayAgo = Math.floor(date - (dayInTimestampMilliseconds * 40));
-  const lastDate = filterAll ? '2020-01-01' : date40DayAgo;
+  const date150DayAgo = Math.floor(date - (dayInTimestampMilliseconds * 170));
+  const lastDate = filterAll ? date150DayAgo : date40DayAgo;
 
   let allProjectStatuses = await GmailProjectsStatuses.find();
   let allProjectsInSystem = await MemoqProject.find({

@@ -15,6 +15,8 @@ const saveOtherProjectStatuses = async (auth) => {
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_1714380902505568051', "In progress");
 		await wait(10000);
 		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_8132819458511673536', "");
+		await wait(10000);
+		await saveAttachmentDataFromMessagesByLabelId(gmail, 'Label_2632527857332050649', "");
 	}
 };
 const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) => {
@@ -22,9 +24,8 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 	// await gmail.users.labels.list({
 	// 		userId: 'me',
 	// 	},async (err, res) => {
-	// 	console.log(res.data.labels.find(item => item.name === 'XTRF Project Status'));
+	// 	console.log(res.data.labels.find(item => item.name === 'XTRF Rejected Quotes'));
 	// })
-
 	await gmail.users.messages.list({
 				userId: 'me',
 				labelIds: labelId
@@ -51,19 +52,7 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 														fs.createReadStream('./dist/emails/File.csv').pipe(csv(
 																{ separator: '\t' }
 														)).on('data', async (data) => {
-															if(labelId === 'Label_8132819458511673536') {
-																try {
-																	allProjectsStatuses = await saveFinalProjectsStatusToDB(data, allProjectsStatuses);
-																} catch (err) {
-																	console.log(err)
-																}
-															} else {
-																try {
-																	allProjectsStatuses = await saveProjectsStatusToDB(data, allProjectsStatuses, status);
-																} catch (err) {
-																	console.log(err)
-																}
-															}
+															allProjectsStatuses = await callFunctionsByCondition(data, allProjectsStatuses, status);
 														}).on('end', () => {
 															console.log('successfully file READ! for label =>', labelId);
 															// fs.unlink('./dist/emails/File.csv', (err) => {
@@ -77,7 +66,49 @@ const saveAttachmentDataFromMessagesByLabelId = async (gmail, labelId, status) =
 								}
 							});
 				}
-			})
+			});
+
+	async function callFunctionsByCondition(data, allProjectsStatuses, status) {
+		switch (labelId) {
+			case 'Label_8132819458511673536':
+				try {
+					return allProjectsStatuses = await saveFinalProjectsStatusToDB(data, allProjectsStatuses);
+				} catch (e) {
+					console.log(e)
+				}
+				break;
+			case 'Label_2632527857332050649':
+				try {
+					return allProjectsStatuses = await clearRejectedProjects(data, allProjectsStatuses);
+				} catch (e) {
+					console.log(e)
+				}
+				break;
+			default:
+				try {
+					return allProjectsStatuses = await saveProjectsStatusToDB(data, allProjectsStatuses, status);
+				} catch (e) {
+					console.log(e)
+				}
+				break;
+		}
+	}
+};
+
+const clearRejectedProjects = async (csvStr, allProjectsStatuses) => {
+	if(Object.values(csvStr).length) {
+		const localAllProjectsStatuses = allProjectsStatuses;
+		const [projectId, projectName] = Object.values(csvStr);
+		const name = `${ projectId } - ${ projectName }`;
+		const idx = localAllProjectsStatuses.findIndex(({ name: n }) => n.trim() === name.trim());
+		if(idx !== -1) {
+			const { name: idxName } = localAllProjectsStatuses[idx];
+			localAllProjectsStatuses.slice(idx, 1);
+			await GmailProjectsStatuses.deleteOne({ name: idxName })
+		}
+		return localAllProjectsStatuses
+	}
+	return allProjectsStatuses;
 };
 
 const saveFinalProjectsStatusToDB = async (csvStr, allProjectsStatuses) => {
