@@ -1,87 +1,81 @@
-const { Units } = require('../models');
+const { Units } = require('../models')
+const { rateExchangeProjectOntoVendor } = require('../helpers/commonFunctions')
 
-/**
- *
- * @param {Object} step
- * @param {Object} project
- * @returns {Array} - returns array of updated steps
- */
-async function getStepsWithFinanceUpdated (step, project) {
-  let { steps } = project;
-  const task = project.tasks.find(item => item.taskId === step.taskId);
-  const unitType = await checkUnitType(step.serviceStep.unit);
-  const { receivables, payables } = unitType === 'CAT Wordcount' ? getWordsPrices(step, task.metrics) : getPrices(step, unitType);
-  const stepIndex = steps.findIndex(item => item.id === step._id);
-  steps[stepIndex] = {
-    ...step,
-    finance: {
-      ...step.finance, Price: { receivables, payables }
-    }
-  };
-  return steps;
+
+async function getStepsWithFinanceUpdated(step, project) {
+	let { steps, crossRate, projectCurrency } = project
+	const unitType = await checkUnitType(step.serviceStep.unit)
+	const stepIdx = steps.findIndex(({ id }) => id === step._id)
+	const {
+		receivables,
+		payables,
+		nativePaybles,
+		nativeRate
+	} = unitType === 'CAT Wordcount' ?
+			getWordcountPricesAndRates(step, { crossRate, projectCurrency }) :
+			getCommonUnitPricesAndRates(step, unitType, { crossRate, projectCurrency })
+
+	steps[stepIdx] = {
+		...step,
+		finance: { ...step.finance, Price: { receivables, payables } },
+		nativeFinance: { ...step.finance, Price: { receivables, payables: nativePaybles } },
+		nativeVendorRate: { value: nativeRate }
+	}
+
+	return steps
 }
 
-/**
- *
- * @param {Object} step
- * @param {String} unitType
- * @returns {{receivables: {Number}, payables: {Number}}}
- */
-function getPrices (step, unitType) {
-  const { clientRate, vendorRate, finance } = step;
-  let receivables = +finance.Price.receivables;
-  let payables = +finance.Price.payables;
 
-  if (clientRate) {
-    if (unitType === 'CAT Wordcount') {
-      receivables = +(step.totalWords * clientRate.value).toFixed(2);
-    } else if (unitType === 'Packages') {
-      receivables = +(step.quantity * clientRate.value).toFixed(2);
-    } else {
-      receivables = +(step.hours * clientRate.value).toFixed(2);
-    }
-  }
-  if (vendorRate) {
-    if (unitType === 'CAT Wordcount') {
-      payables = +(step.totalWords * vendorRate.value).toFixed(2);
-    } else if (unitType === 'Packages') {
-      payables = +(step.quantity * vendorRate.value).toFixed(2);
-    } else {
-      payables = +(step.hours * vendorRate.value).toFixed(2);
-    }
-  }
-  return { receivables, payables };
+function getCommonUnitPricesAndRates(step, unitType, { crossRate, projectCurrency }) {
+	let {
+		clientRate,
+		vendorRate,
+		finance: { Price: { receivables, payables } },
+		nativeFinance: { Price: { payables: nativePaybles } }
+	} = step
+	let nativeRate
+
+	if (clientRate) {
+		const { value } = clientRate
+		receivables = detectedUnitType(unitType, value)
+	}
+	if (vendorRate) {
+		const { value } = vendorRate
+		payables = detectedUnitType(unitType, value)
+		nativeRate = rateExchangeProjectOntoVendor(projectCurrency, 'EUR', +vendorRate.value, crossRate)
+		nativePaybles = detectedUnitType(unitType, nativeRate)
+	}
+
+	function detectedUnitType(unitType, value) {
+		return unitType === 'Packages' ? sumValues(step.quantity, value) : sumValues(step.hours, value)
+	}
+
+	return { receivables, payables, nativeRate, nativePaybles }
 }
 
-/**
- *
- * @param {Object} step
- * @returns {{receivables: {Number}, payables: {Number}}}
- */
-function getWordsPrices (step) {
-  const { clientRate, vendorRate } = step;
-  let receivables = 0;
-  let payables = 0;
-  //MAX
-  // if (step.name === "Translation") {
-  receivables = +step.finance.Wordcount.receivables * clientRate.value;
-  const doesStepHasVendorRate = vendorRate.hasOwnProperty('value');
-  payables = doesStepHasVendorRate ? +step.finance.Wordcount.payables * +vendorRate.value : 0;
-  // }
-  return {
-    receivables: parseFloat(receivables.toFixed(2)),
-    payables: parseFloat(payables.toFixed(2))
-  };
+
+function getWordcountPricesAndRates(step, { crossRate, projectCurrency }) {
+	const {
+		clientRate,
+		vendorRate,
+		finance: { Wordcount }
+	} = step
+	const doesStepHasVendorRate = vendorRate.hasOwnProperty('value')
+	const nativeRate = doesStepHasVendorRate ? rateExchangeProjectOntoVendor(projectCurrency, 'EUR', +vendorRate.value, crossRate) : 0
+
+	return {
+		receivables: sumValues(Wordcount.receivables, clientRate.value),
+		payables: doesStepHasVendorRate ? sumValues(Wordcount.payables, vendorRate.value) : 0,
+		nativePaybles: sumValues(Wordcount.payables, nativeRate),
+		nativeRate
+	}
 }
 
-/**
- *
- * @param {ObjectId} unitId
- * @returns {String} - returns type value
- */
+const sumValues = (A, B) => +(A * B).toFixed(2)
+
 const checkUnitType = async (unitId) => {
-  const { type } = await Units.findOne({ _id: unitId });
-  return type;
-};
+	const { type } = await Units.findOne({ _id: unitId })
+	return type
+}
 
-module.exports = { getStepsWithFinanceUpdated };
+module.exports = { getStepsWithFinanceUpdated }
