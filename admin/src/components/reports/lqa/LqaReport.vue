@@ -125,6 +125,7 @@
       async getReport (filters) {
         try {
           const result = await this.$http.post('/reportsapi/xtrf-lqa-report', { filters });
+          this.isDataRemain = result.data.length === 10;
           this.reportData = result.data;
         } catch (err) {
           this.alertToggle({ message: 'Error on getting LQA report', isShow: true, type: 'error' });
@@ -133,22 +134,27 @@
 
       async setTierFilter ({ value }) {
         this.tierFilter = value;
+        this.skipCount = 0
         await this.getReport(this.filters);
       },
 			async setSourceFilter({ option }) {
         this.sourceFilter = option;
+        this.skipCount = 0
         await this.getReport(this.filters);
       },
 			async setTargetFilter({ option }) {
         this.targetFilter = option;
+        this.skipCount = 0
         await this.getReport(this.filters);
       },
 			async setVendorFilter({ option }) {
         this.vendorFilter = option;
+        this.skipCount = 0
         await this.getReport(this.filters);
       },
 			async setIndustryFilter({ option }) {
         this.industryFilter = option;
+        this.skipCount = 0
         await this.getReport(this.filters);
       },
       async updateReport({value}){
@@ -163,6 +169,7 @@
         allLanguages: 'getAllLanguages',
       }),
 			filters() {
+        console.log('main filter working')
 				let result = {};
 				if(this.targetFilter !== 'All') {
 					result.targetFilter = this.targetFilter;
@@ -202,10 +209,11 @@
   .lqa {
     margin: 40px 40px 40px 20px;
     width: 1100px;
-    box-shadow: 0 0 10px rgba(104, 87, 62, .5);
+    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
     padding: 20px;
     max-height: 750px;
     overflow-y: auto;
+    min-height: 280px;
 
     &__text {
       font-size: 22px;
