@@ -2,7 +2,7 @@
   .tasks-langs
     .source
       .tasks-langs__title-source Source Language:
-        Asterisk(:customStyle="sourceAsteriskStyle")
+        span.asterisk *
       .source__drop-menu
         SelectSingle(
           placeholder="Language",
@@ -12,7 +12,7 @@
         )
     .target
       .tasks-langs__title-target Target Language(s):
-        Asterisk(:customStyle="targetAsteriskStyle")
+        span.asterisk *
       .select-lang-wrapper
         .target__from
           span.target__search-value(v-model="langSearchValue", v-if="isSearching && langSearchValue") {{ langSearchValue }}
@@ -37,26 +37,27 @@
 </template>
 
 <script>
-	import SelectSingle from "../../SelectSingle";
-	import Asterisk from "../../Asterisk";
-	import Languages from "@/components/finance/langs/Languages";
-	import Arrows from "@/components/finance/langs/Arrows";
-	import {mapGetters, mapActions} from "vuex";
-	import TasksLanguages from "../../../mixins/TasksLanguages";
+	import SelectSingle from "../../SelectSingle"
+	import Languages from "@/components/finance/langs/Languages"
+	import Arrows from "@/components/finance/langs/Arrows"
+	import { mapGetters, mapActions } from "vuex"
+	import TasksLanguages from "../../../mixins/TasksLanguages"
 
 	export default {
 		mixins: [TasksLanguages],
 		props: {
 			originallyLanguages: {
-				type: Array,
+				type: Array
 			},
 			sourceLanguages: {
 				type: Array
-      },
-			isRequest: {type: Boolean},
+			},
+			isRequest: {
+				type: Boolean
+			},
 			setPossibleTargetsAction: {
 				type: Boolean
-      }
+			}
 		},
 		data() {
 			return {
@@ -65,157 +66,147 @@
 				targetAll: [],
 				targetChosen: [],
 				languagePairs: [],
-				sourceAsteriskStyle: {right: "15px", top: "-2px"},
-				targetAsteriskStyle: {right: "16px", top: "-2px"},
 				langSearchValue: "",
-				isSearching: false,
-			};
+				isSearching: false
+			}
 		},
 		methods: {
 			...mapActions({
 				storeProject: "setCurrentProject",
-				setDataValue: "setTasksDataValue",
+				setDataValue: "setTasksDataValue"
 			}),
-			sortLangs(arrProp) {
+			sortLanguages(arrProp) {
 				this[arrProp].sort((a, b) => {
-					if (a.lang < b.lang) return -1;
-					if (a.lang > b.lang) return 1;
-				});
+					if (a.lang < b.lang) return -1
+					if (a.lang > b.lang) return 1
+				})
 			},
-			getDistinctLangs(langs) {
-				if (!langs.length) return [];
-				return langs.filter(
-					(obj, index, self) =>
-						self.map((item) => item.lang).indexOf(obj.lang) === index
-				);
-			},
-			setSource({option}) {
-				const {symbol} = this.originallyLanguages.find(
-					(item) => item.lang === option
-				);
-				this.$emit("setSourceLanguage", {symbol: symbol});
-				this.setPossibleTargets();
-				this.targetChosen = [];
+			setSource({ option }) {
+				const { symbol } = this.originallyLanguages.find((item) => item.lang === option)
+				this.$emit("setSourceLanguage", { symbol: symbol })
+				this.targetChosen = []
 			},
 
 			setPossibleTargets() {
 				if (this.tasksData.hasOwnProperty('service')) {
-					this.targetAll = this.getClientLanguagesByServices('targetLanguages')
-				}
-				if (this.targetAll.length) {
-					this.setUniqueLangs("targetAll");
-					this.sortLangs("targetAll");
+					const { source, service } = this.tasksData
+					const { customer: { services }, industry } = this.currentProject
+
+					this.targetAll = services
+							.filter(({ industries, services, sourceLanguage }) =>
+									services[0] === service._id &&
+									industries[0] === industry._id &&
+									sourceLanguage === source._id
+							)
+							.map(({ targetLanguages }) =>
+									this.originallyLanguages.find(({ _id }) => targetLanguages[0] === _id)
+							)
 				}
 			},
-			setUniqueLangs(arrProp) {
-				this[arrProp] = this[arrProp].reduce(
-					(acc, cur) =>
-						acc.findIndex((el) => el._id === cur._id) < 0 ? [...acc, cur] : acc,
-					[]
-				);
-			},
+			// setUniqueLanguages(arrProp) {
+			// 	this[arrProp] = this[arrProp].reduce((acc, cur) => acc.findIndex((el) => el._id === cur._id) < 0 ? [...acc, cur] : acc, [])
+			// },
 			emitTargets() {
-				this.$emit("setTargets", {targets: this.targetChosen});
+				this.$emit("setTargets", { targets: this.targetChosen })
 			},
-			forceMoveFromAll({index}) {
-				const lang = this.targetAll.splice(index, 1);
-				this.targetChosen.push(lang[0]);
-				this.emitTargets();
-				this.sortLangs("targetChosen");
+			forceMoveFromAll({ index }) {
+				const lang = this.targetAll.splice(index, 1)
+				this.targetChosen.push(lang[0])
+				this.emitTargets()
+				this.sortLanguages("targetChosen")
 			},
-			forceMoveFromChosen({index}) {
-				const lang = this.targetChosen.splice(index, 1);
-				this.targetAll.push(lang[0]);
-				this.emitTargets();
-				this.sortLangs("targetAll");
+			forceMoveFromChosen({ index }) {
+				const lang = this.targetChosen.splice(index, 1)
+				this.targetAll.push(lang[0])
+				this.emitTargets()
+				this.sortLanguages("targetAll")
 			},
 			moveTargets(e, from, to) {
-				const checked = this[from].filter((item) => item.check);
-				this[from] = this[from].filter((item) => !item.check);
-				this[to].push(...checked);
-				this.sortLangs(from);
-				this.sortLangs(to);
-				this.clearChecks(to);
-				this.emitTargets();
+				const checked = this[from].filter((item) => item.check)
+				this[from] = this[from].filter((item) => !item.check)
+				this[to].push(...checked)
+				this.sortLanguages(from)
+				this.sortLanguages(to)
+				this.clearChecks(to)
+				this.emitTargets()
 			},
-			searchValue({value}, prop) {
-				this.langSearchValue += value.toLowerCase();
-				this[prop].filter(
-					(item) => item.lang.toLowerCase().indexOf(this.langSearchValue) !== -1
-				);
+			searchValue({ value }, prop) {
+				this.langSearchValue += value.toLowerCase()
+				this[prop].filter(item => item.lang.toLowerCase().indexOf(this.langSearchValue) !== -1)
 			},
 			slice() {
-				this.langSearchValue = this.langSearchValue.slice(0, -1);
+				this.langSearchValue = this.langSearchValue.slice(0, -1)
 			},
 			clearChecks(prop) {
-				this[prop].forEach((item) => (item.check = false));
-				this.langSearchValue = "";
+				this[prop].forEach((item) => (item.check = false))
+				this.langSearchValue = ""
 			},
 			clearSearch(e, prop) {
-				this.clearChecks(prop);
+				this.clearChecks(prop)
 			},
-			sortBySearch({value}, prop) {
-				if (!value) return this.sortLangs(prop);
-				const val = value.toLowerCase();
+			sortBySearch({ value }, prop) {
+				if (!value) return this.sortLanguages(prop)
+				const val = value.toLowerCase()
 				for (let index in this[prop]) {
-					const n = val.length;
+					const n = val.length
 					if (this[prop][index].lang.toLowerCase().slice(0, n) === val) {
-						let replaceLang = this[prop].splice(index, 1);
-						this[prop].unshift(replaceLang[0]);
+						let replaceLang = this[prop].splice(index, 1)
+						this[prop].unshift(replaceLang[0])
 					}
 				}
-			},
-			setRequestLanguages() {
-				const {symbol} = this.currentProject.sourceLanguage;
-				this.$emit("setSourceLanguage", {symbol});
-				this.setDataValue({
-					prop: "source",
-					value: this.currentProject.sourceLanguage,
-				});
-				this.setDataValue({
-					prop: "targets",
-					value: this.currentProject.targetLanguages,
-				});
-				this.targetChosen = [...this.currentProject.targetLanguages];
-				this.targetAll = this.getFilteredTargets(this.targetChosen);
-				this.sortLangs("targetChosen");
-			},
-			getFilteredTargets(langs) {
-				const symbols = langs.length ? langs.map((item) => item.symbol) : [];
-				return symbols.length
-					? this.targetAll.filter((item) => symbols.indexOf(item.symbol) === -1)
-					: this.targetAll;
-			},
+			}
+
+			//refactor
+			// getDistinctLangs(langs) {
+			// 	if (!langs.length) return []
+			// 	return langs.filter((obj, index, self) => self.map((item) => item.lang).indexOf(obj.lang) === index)
+			// },
+			// setRequestLanguages() {
+			// 	const { symbol } = this.currentProject.sourceLanguage
+			// 	this.$emit("setSourceLanguage", { symbol })
+			// 	this.setDataValue({
+			// 		prop: "source",
+			// 		value: this.currentProject.sourceLanguage
+			// 	})
+			// 	this.setDataValue({
+			// 		prop: "targets",
+			// 		value: this.currentProject.targetLanguages
+			// 	})
+			// 	this.targetChosen = [...this.currentProject.targetLanguages]
+			// 	this.targetAll = this.getFilteredTargets(this.targetChosen)
+			// 	this.sortLanguages("targetChosen")
+			// },
+			// getFilteredTargets(langs) {
+			// 	const symbols = langs.length ? langs.map((item) => item.symbol) : []
+			// 	return symbols.length
+			// 			? this.targetAll.filter((item) => symbols.indexOf(item.symbol) === -1)
+			// 			: this.targetAll
+			// }
 		},
 		watch: {
 			setPossibleTargetsAction(val) {
-				if(val){
-					this.setPossibleTargets();
-				}
+				if (val) this.setPossibleTargets()
 			}
 		},
 		computed: {
 			...mapGetters({
 				currentProject: "getCurrentProject",
-				tasksData: "getTasksData",
+				tasksData: "getTasksData"
 			}),
 			possibleSourceLanguages() {
 				if (this.currentProject._id) {
 					if (this.tasksData.hasOwnProperty('service')) {
-						return this.getClientLanguagesByServices('sourceLanguage').map(
-						  (item) => item.lang
-						);
+						return this.getClientLanguagesByServices('sourceLanguage').map(item => item.lang)
 					}
 				}
-			},
+			}
 		},
 		components: {
 			Languages,
 			Arrows,
-			Asterisk,
-			SelectSingle,
-		},
-	};
+			SelectSingle
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -279,5 +270,9 @@
   .select-lang-wrapper {
     @extend %flex-row;
     justify-content: space-between;
+  }
+
+  .asterisk {
+    color: red;
   }
 </style>

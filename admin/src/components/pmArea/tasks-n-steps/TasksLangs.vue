@@ -2,7 +2,7 @@
   .tasks-langs
     .tasks-langs__item
       .tasks-langs__title Target Language:
-        Asterisk(:customStyle="asteriskStyle")
+        span.asterisk *
       .tasks-langs__drop-menu
         SelectSingle(
           placeholder="Language",
@@ -13,61 +13,60 @@
 </template>
 
 <script>
-	import LanguagesSelect from "@/components/LanguagesSelect";
-	import Asterisk from "@/components/Asterisk";
-	import SelectSingle from "@/components/SelectSingle";
-	import { mapGetters, mapActions } from "vuex";
-	import taskData from "@/mixins/taskData";
-	import TasksLanguages from "../../../mixins/TasksLanguages";
+	import LanguagesSelect from "@/components/LanguagesSelect"
+	import SelectSingle from "@/components/SelectSingle"
+	import { mapGetters, mapActions } from "vuex"
+	import taskData from "@/mixins/taskData"
+	import TasksLanguages from "../../../mixins/TasksLanguages"
 
 
 	export default {
 		mixins: [taskData, TasksLanguages],
 		props: {
 			originallyLanguages: {
-				type: Array,
+				type: Array
 			},
 			targetLanguages: {
-				type: Array,
+				type: Array
 			}
 		},
 		data() {
 			return {
 				targets: [],
-				languagePairs: [],
-				asteriskStyle: { top: "-4px" },
-			};
+				languagePairs: []
+			}
 		},
 		methods: {
 			...mapActions({
 				setDataValue: "setTasksDataValue",
-				alertToggle: "alertToggle",
+				alertToggle: "alertToggle"
 			}),
 			setLanguage({ option }) {
-				this.$emit("setTargets", { targets: [this.originallyLanguages.find((item) => item.lang === option)] });
-				const { symbol } = this.originallyLanguages.find((item) => item.lang === option);
-				this.$emit("setSourceLanguage", { symbol: symbol });
-			},
+				this.$emit("setTargets", {
+					targets: [this.originallyLanguages.find(item => item.lang === option)]
+				})
+				const { symbol } = this.originallyLanguages.find(item => item.lang === option)
+				this.$emit("setSourceLanguage", { symbol: symbol })
+			}
 		},
 		computed: {
 			...mapGetters({
 				currentProject: "getCurrentProject",
-				tasksData: "getTasksData",
+				tasksData: "getTasksData"
 			}),
 			possibleTargetLanguages() {
-				if(this.currentProject._id) {
-					if(this.tasksData.hasOwnProperty('service')) {
-						return this.getClientLanguagesByServices('targetLanguages').map(i => i.lang);
+				if (this.currentProject._id) {
+					if (this.tasksData.hasOwnProperty('service')) {
+						return this.getClientLanguagesByServices('targetLanguages').map(i => i.lang)
 					}
 				}
-			},
+			}
 		},
 		components: {
 			LanguagesSelect,
 			SelectSingle,
-			Asterisk,
-		},
-	};
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -96,5 +95,9 @@
     &__input {
       width: 191px;
     }
+  }
+
+  .asterisk {
+    color: red;
   }
 </style>
