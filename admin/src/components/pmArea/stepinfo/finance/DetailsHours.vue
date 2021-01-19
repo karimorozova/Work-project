@@ -31,9 +31,9 @@
 
       .table__body-row
         .table__tbody-cell Price
-        .table__tbody-cell {{ (financeData.receivables.total).toFixed(2) }}
+        .table__tbody-cell {{ financeData.receivables.total && (financeData.receivables.total).toFixed(2) }}
           span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
-        .table__tbody-cell(v-if="financeData.vendor") {{ (financeData.payables.total).toFixed(2) }}
+        .table__tbody-cell(v-if="financeData.vendor") {{ financeData.receivables.total && (financeData.payables.total).toFixed(2) }}
           span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
         .table__tbody-cell(v-else)
 
