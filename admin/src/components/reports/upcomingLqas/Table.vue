@@ -3,11 +3,17 @@
         DataTable(
           :fields="fields"
           :tableData="vendorsData"
-          :bodyClass="vendorsData.length < 20 ? 'tbody_visible-overflow height-700' : 'height-700'"
-          :tableheadRowClass="vendorsData.length < 20 ? 'tbody_visible-overflow' : ''"
+          :bodyClass="vendorsData.length < 14 ? 'tbody_visible-overflow height-500' : 'height-500'"
+          :tableheadRowClass="vendorsData.length < 14 ? 'tbody_visible-overflow' : ''"
           @onRowClicked="selectVendor"
         )
           .lqa-vendors-table__header(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }") {{ field.label }}
+            img.lqa-vendors-table__icon(
+              v-if='field.sort'
+              :class="{'sort_icon_rotate': isAscSort[field.valueName] }"
+              src="../../../assets/images/open-arrow_white.png"
+              @click="sort(field.valueName)"
+            )
 
           .lqa-vendors-table__data(slot="vendor" slot-scope="{ row }") {{ row.name }}
           .lqa-vendors-table__data(slot="sourceLanguage" slot-scope="{ row }") {{ row.sourceLang }}
@@ -32,15 +38,17 @@ export default {
     data() {
         return {
             fields: [
-              { label: 'Vendor Name', headerKey: 'headerVendor', key: 'vendor', width: '25%' },
-              { label: 'Source Language', headerKey: 'headerSourceLang', key: 'sourceLanguage', width: '20%' },
+              { label: 'Vendor Name', headerKey: 'headerVendor', key: 'vendor', width: '25%'},
+              { label: 'Source Language', headerKey: 'headerSourceLang', key: 'sourceLanguage', width: '20%'},
               { label: 'Target Language', headerKey: 'headerTargetLang', key: 'targetLanguage', width: '20%' },
-              { label: 'Wordcount', headerKey: 'headerWords', key: 'words', width: '10%' },
+              { label: 'Wordcount', headerKey: 'headerWords', key: 'words', width: '10%', valueName: 'wordCount', sort: true},
               { label: 'Industry', headerKey: 'headerIndustry', key: 'industry', width: '10%' },
               { label: 'Tier', headerKey: 'headerTier', key: 'tier', width: '5%' },
-              { label: 'LQA#', headerKey: 'headerLqa', key: 'lqa', width: '5%' },
-              { label: '', headerKey: 'headerLink', key: 'link', width: '5%'},
-            ]
+              { label: 'LQA', headerKey: 'headerLqa', key: 'lqa', width: '6%', valueName: 'lqaNumber', sort: true},
+              { label: '', headerKey: 'headerLink', key: 'link', width: '4%'},
+            ],
+            activeSort: '',
+            isAscSort: {}
         }
     },
     methods: {
@@ -59,6 +67,11 @@ export default {
         },
       getVendorProfileLink(vendorId) {
           return '/vendors/details/' + vendorId
+      },
+      sort(field) {
+        this.isAscSort[field] = !this.isAscSort[field] ? true : !this.isAscSort[field]
+        this.activeSort = field
+        this.$emit('sortByField', {field: this.activeSort, isAscSort: this.isAscSort[field]});
       }
     },
     components: {
@@ -71,6 +84,15 @@ export default {
 
 .lqa-vendors-table {
     margin: 10px 0 20px;
+
+    &__icon{
+      margin-left: 10px;
+      cursor: pointer;
+
+      &.sort_icon_rotate {
+        transform: rotate(180deg);
+      }
+    }
 
     &_red {
         color: red;

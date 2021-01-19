@@ -278,6 +278,9 @@ export default {
 .height-700 {
   max-height: 700px;
 }
+.height-500 {
+  max-height: 500px;
+}
 .pricelist-icon-header {
   background: white;
 }

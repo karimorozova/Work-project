@@ -190,6 +190,9 @@
         return index ? index.allowSteps.includes(nextStep) : false
       }
     },
+    mounted() {
+      this.domain = __WEBPACK__API_URL__;
+    },
     computed: {
 		  ...mapGetters({
         allLanguages: 'getAllLanguages',

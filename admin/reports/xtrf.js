@@ -70,9 +70,9 @@ const getXtrfLqaReport = async (filters) => {
   const languages = await Languages.find();
   const step = await Step.findOne({title: 'Translation'},{title: 1})
   const filterQuery = await getFilteringQueryForLqaReport(filters, languages);
-  countFilter = sourceFilter || targetFilter || vendorFilter ? 0 : countFilter;
-  skipCount = sourceFilter || targetFilter || vendorFilter ? 0 : skipCount;
-  const dataLimitQuery = { 'industries.Finance.vendors.otherInfo': 0, 'industries.iGaming.vendors.otherInfo': 0 };
+  countFilter = (sourceFilter || targetFilter || vendorFilter) ? 0 : countFilter;
+  skipCount = (sourceFilter || targetFilter || vendorFilter) ? 0 : skipCount;
+  const dataLimitQuery = { 'industries.vendors.otherInfo': 0 };
   try {
     let result = [];
     const xtrfLqaReport = await getReport();
@@ -99,7 +99,10 @@ const getXtrfLqaReport = async (filters) => {
 
     if (vendorFilter) {
       result = result.map(row => {
-        row.industries.map(({vendors}) => vendors.filter(({ name }) => name === vendorFilter))
+        row.industries =  row.industries.map((industry) =>  {
+          industry.vendors = industry.vendors.filter(({ name }) => name === vendorFilter)
+          return industry
+        }).filter(({vendors})=> vendors.length)
         return row;
       });
     }
@@ -153,28 +156,41 @@ const getXtrfLqaReport = async (filters) => {
  * @returns {Array} - returns filtered report
  */
 const getXtrfUpcomingReport = async (filters) => {
-  const { nameFilter, tierFilter, industryFilter } = filters;
+  const { vendorFilter, sourceFilter, tierFilter, targetFilter, industryFilter, lqaFilter } = filters;
+	const allSource = new Set().add('All')
+	const allTarget = new Set().add('All')
+	const allIndustry = new Set().add('All')
+	const allVendor = new Set().add('All')
   try {
-    const lqaReport = await XtrfLqaGrouped.find()
+    const lqaReport = await XtrfLqaGrouped.find({},{ 'industries.vendors.otherInfo': 0 })
       .populate('sourceLanguage', ['lang'])
       .populate('targetLanguage', ['lang'])
       .populate('industries.vendors.vendor', ['assessments'])
       .populate('industries.industryGroup', ['name'])
       .populate('industries.industry', ['name',"_id"])
-      .populate('industries.vendors.vendor.assessments.industries.steps.step');
+      // .populate('industries.vendors.vendor.assessments.industries.steps.step');
     const translationStep = await Step.findOne({title: 'Translation'},{title: 1})
-    let result = [];
+    let result = []
+    let filters = {}
     for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries} of lqaReport) {
       const sourceLangID = sourceLang ? sourceLang._id.toString() : null
       const targetLangID = targetLang ? targetLang._id.toString() : null
+
       industries
         .filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
         .forEach(industry => {
           const vendorsNotNull = industry.vendors.filter(({vendor})=> vendor !== null)
 
+	        allIndustry.add(industry.industryGroup.name)
+          if (targetLang && sourceLang) {
+            allSource.add(sourceLang.lang)
+            allTarget.add(targetLang.lang)
+          }
+
           vendorsNotNull.forEach(vendorNotNull => {
             const vendorTargetLang = targetLang ? targetLang.lang : 'no language data';
             const { name, wordCount, tier, vendor} = vendorNotNull
+            allVendor.add(name)
             const assessmentIndex =
               vendor
                 .assessments
@@ -257,16 +273,27 @@ const getXtrfUpcomingReport = async (filters) => {
       }
     }
     if (industryFilter) {
-      result = result.filter(({ industry }) => industry === industryFilter);
+      result = result.filter(({ industry }) => industry.name === industryFilter);
     }
-    if (nameFilter) {
-      const nameRegex = new RegExp(nameFilter, 'i');
-      result = result.filter(({ name }) => nameRegex.test(name));
+    if (vendorFilter) {
+      result = result.filter(({ name }) => name === vendorFilter);
+    }
+    if (targetFilter) {
+      result = result.filter(({ targetLang }) => targetLang === targetFilter);
+    }
+    if (sourceFilter) {
+      result = result.filter(({ sourceLang }) =>{
+      return sourceLang === sourceFilter
+      })
     }
     if (tierFilter) {
       result = result.filter(({ tier }) => tier === tierFilter);
     }
-    return result;
+    if (lqaFilter) {
+      result = result.filter(({ field }) => field.toLowerCase() === lqaFilter);
+    }
+    filters = {sources: Array.from(allSource), targets: Array.from(allTarget), industries:  Array.from(allIndustry), vendors: Array.from(allVendor)}
+    return {result, filters};
   } catch (err) {
     console.log(err);
     console.log('Error in getXtrfUpcomingReport');
