@@ -20,7 +20,7 @@
 </template>
 
 <script>
-	import { mapActions } from "vuex";
+	import { mapActions, mapGetters } from "vuex";
 
 	export default {
 		data() {
@@ -29,12 +29,13 @@
 					logemail: "",
 					logpassword: "",
 				},
-				isAllFieldsError: false
+				isAllFieldsError: false,
+				previousLink: null,
 			};
 		},
 		methods: {
 			async checkFields() {
-				if(!this.form.logemail || !this.form.logpassword) {
+				if (!this.form.logemail || !this.form.logpassword) {
 					return this.isAllFieldsError = true;
 				}
 				await this.sendForm();
@@ -45,11 +46,16 @@
 						...this.form
 					});
 					this.login(result);
-					this.$router.push("/");
+
+          !!result && !!this.getPreviousLink && this.getPreviousLink !== '/login' ?
+            this.$router.push(this.getPreviousLink) :
+            this.$router.push('/dashboard')
+
+
 					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
 				} catch (err) {
 					let message = err.message;
-					if(err.response && err.response.data) {
+					if (err.response && err.response.data) {
 						message = err.response.data;
 					}
 					this.alertToggle({ message, isShow: true, type: "error" });
@@ -63,8 +69,13 @@
 				login: "login",
 				setOriginallyUnits: "setOriginallyUnits",
 			})
-		}
-	};
+		},
+		computed: {
+			...mapGetters({
+				getPreviousLink: "getPreviousLink"
+			})
+		},
+	}
 </script>
 
 <style lang="scss" scoped>

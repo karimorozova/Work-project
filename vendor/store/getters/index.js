@@ -13,3 +13,4 @@ export const getPackages = state => state.packages;
 export const getAllJobs = state => state.jobs;
 export const getSelectedJob = state => state.selectedJob;
 export const getOriginallyUnits = state => state.originallyUnits;
+export const getPreviousLink = state => state.previousLink;
