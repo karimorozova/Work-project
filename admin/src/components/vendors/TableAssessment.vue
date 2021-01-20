@@ -26,25 +26,25 @@
               a(:href="domain + row.tqi.path")
                 img(:class="'assessment__download'", src="../../assets/images/download-big-b.png")
 
-          template(slot="lqa1", slot-scope="{ row, index }") {{canNextAssessment(mainItem, industryData, 'lqa1')}}
+          template(slot="lqa1", slot-scope="{ row, index }")
             div(v-if="row.lqa1.grade", :class="'assessment__grade'") {{ row.lqa1.grade }}
               a(:href="domain + row.lqa1.path")
                 img(:class="'assessment__download'", src="../../assets/images/download-big-b.png")
-            .assessment__upload(v-if="canNextAssessment(mainItem, industryData, 'lqa1')")
+            .assessment__upload(v-if="true")
               .assessment__load-file(@click="openForm({ field: 'testet', index, mainIndex, industryIndex })")
 
           template(slot="lqa2", slot-scope="{ row, index }")
             div(v-if="row.lqa2.grade", :class="'assessment__grade'") {{ row.lqa2.grade }}
               a(:href="domain + row.lqa2.path")
                 img(:class="'assessment__download'", src="../../assets/images/download-big-b.png")
-            .assessment__upload(v-if="!row.lqa2.grade && row.lqa1.grade && canNextAssessment(mainItem, industryData, 'lqa2')")
+            .assessment__upload(v-if="!row.lqa2.grade && row.lqa1.grade && true")
               .assessment__load-file(@click="openForm({ field: 'Lqa2', index, mainIndex, industryIndex })")
 
           template(slot="lqa3", slot-scope="{ row, index }")
             div(v-if="row.lqa3.grade", :class="'assessment__grade'") {{ row.lqa3.grade }}
               a(:href="domain + row.lqa3.path")
                 img(:class="'assessment__download'", src="../../assets/images/download-big-b.png")
-            .assessment__upload(v-if="!row.lqa3.grade && row.lqa2.grade && canNextAssessment(mainItem, industryData, 'lqa3')")
+            .assessment__upload(v-if="!row.lqa3.grade && row.lqa2.grade && true")
               .assessment__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
 </template>
 
@@ -121,17 +121,14 @@ export default {
       alertToggle: "alertToggle",
       storeAssessment: "storeCurrentVendorAssessment",
     }),
-    async canNextAssessment(assessmentInfo,industryData, nextStep) {
-      const languagePair =  assessmentInfo.sourceLanguage.lang + ' >> ' + assessmentInfo.targetLanguage.lang
-      const industry = industryData.industryGroup.name
-      const vendorId = this.currentVendor._id
-      try{
-        const { canNextAssessment } = await this.$http.post(`/vendorsapi/can-next-assessment`, {languagePair, industry, vendorId, nextStep });
-        return canNextAssessment
-      } catch (e) {
-        console.log(e)
-      }
-
+    canNextAssessment(assessmentInfo, industryData, nextStep) {
+    //   const languagePair =  assessmentInfo.sourceLanguage.lang + ' >> ' + assessmentInfo.targetLanguage.lang
+    //   const industry = industryData.name
+    //   const vendorId = this.currentVendor._id
+    //   const { canNextAssessment } = await this.$http.post(`/vendorsapi/get-vendor-wordcount-from-reports`, {languagePair, industry, vendorId, nextStep });
+	  //   console.log('canNextAssessment', canNextAssessment)
+    //
+      return false
     },
     async saveVendorLqa({ vendorData }) {
       const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex } = vendorData;
@@ -197,6 +194,14 @@ export default {
       };
       this.isForm = true;
     },
+	  async getVendorReports(){
+		  try{
+			  const result = await this.$http.get(`/vendorsapi/get-vendor-wordcount-from-reports/${this.$route.params.id}`);
+			  console.log(result.data)
+		  }catch(err){
+
+		  }
+    }
   },
   components: {
     SettingsTable,
@@ -205,6 +210,9 @@ export default {
   mounted() {
     this.domain = __WEBPACK__API_URL__;
   },
+  created() {
+  	this.getVendorReports()
+  }
 };
 </script>
 
