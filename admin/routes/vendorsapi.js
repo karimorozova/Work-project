@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
+const { canUpdateAssessment } = require("../vendors/getVendorAssessments")
 const { getRatePricelist, changeMainRatePricelist } = require('../pricelist');
 const { updateProject, getProject } = require('../projects');
 const {
@@ -486,6 +487,20 @@ router.post('/get-message', async (req, res) => {
     console.log(err);
     res.status(500).send('Error on getting quote message');
   }
+});
+
+router.post('/can-next-assessment', async (req, res) => {
+	// const { languagePair, industry, vendorId, nextStep } = req.body;
+
+	try {		// const canNextAssessment = await canUpdateAssessment(languagePair, industry, vendorId, nextStep);
+		// console.log({canNextAssessment})
+
+
+		res.send('{ canNextAssessment })');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting quote message');
+	}
 });
 
 router.get('/create-memoq-vendor/:id', async (req, res) => {
