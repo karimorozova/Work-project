@@ -1,6 +1,7 @@
 const apiUrl = require("../helpers/apiurl")
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
+const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 
 function applicationMessage(obj) {
 	let cvFiles = ""
@@ -99,14 +100,13 @@ function applicationMessage(obj) {
 }
 
 function requestMessageForVendor(obj) {
-	console.log(obj)
 	const date = Date.now()
 	const expiryDate = new Date(date + 900000)
 	const langPair = obj.sourceLanguage ? `${ obj.sourceLanguage } >> ${ obj.targetLanguage }; ` : `${ obj.targetLanguage } / ${ obj.packageSize }; `
 	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '2h' })
 	const stepId = obj.stepId.replace(/ /g, '%20')
-	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
-	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
+	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
 	const start = obj.start.split('T')[0].split('-').reverse().join('-')
 	const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-')
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -141,7 +141,7 @@ function requestMessageForVendor(obj) {
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Wordcount:</td>
-                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.finance.Wordcount.payables || '-' }</td>
+                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.nativeFinance.Wordcount.payables || '-' }</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Deadline:</td>
@@ -149,7 +149,7 @@ function requestMessageForVendor(obj) {
                             </tr>
                             <tr>
                              <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Cost:</td>
-                             <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ (obj.finance.Price.payables).toFixed(2) } &euro;</td>
+                             <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</td>
                             </tr>
                         </table>
                     </div>
@@ -191,7 +191,7 @@ function stepCancelledMessage(obj) {
 }
 
 function stepMiddleCancelledMessage(obj) {
-	const fee = obj.status === "Completed" ? obj.finance.Price.payables : obj.finance.Price.halfPayables
+	const fee = obj.status === "Completed" ? obj.nativeFinance.Price.payables : obj.nativeFinance.Price.halfPayables
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -202,7 +202,7 @@ function stepMiddleCancelledMessage(obj) {
                         We would like to inform you that step: ${ obj.stepId } ${ obj.serviceStep.title } has been cancelled in the middle.
                     </p>
                     <p style="font-weight: 400;">
-                        You will be paid ${ fee || obj.finance.Price.payables || 0 } &euro;, which is according to relative work you have completed.
+                        You will be paid ${ fee || obj.nativeFinance.Price.payables || 0 } ${ returnIconCurrencyByStringCode('EUR') } which is according to relative work you have completed.
                     </p>
                 </div>
                 <footer>
@@ -233,12 +233,12 @@ function vendorReassignmentMessage(obj, reason) {
 function vendorMiddleReassignmentMessage(allUnits, obj, reason, isPay) {
 	const { type } = allUnits.find(({ _id }) => _id.toString() === obj.serviceStep.unit.toString())
 	const progress = type === "CAT Wordcount" ?
-			(obj.progress.wordsDone / obj.progress.totalWordCount * 100).toFixed(2)
-			: obj.progress
-	const fee = obj.finance.Price.halfPayables ? obj.finance.Price.halfPayables : obj.finance.Price.payables
+			(obj.progress.wordsDone / obj.progress.totalWordCount * 100).toFixed(2) :
+			obj.progress
+	const fee = obj.nativeFinance.Price.halfPayables ? obj.nativeFinance.Price.halfPayables : obj.nativeFinance.Price.payables
 	const payText = isPay ?
 			`<p style="font-weight: 400;">You will be paid according to your partial completion of the step.</p>
-        <p style="font-weight: 400;">You have completed ${ progress } % of the task and your fee for this step is: ${ fee } &euro;</p>`
+        <p style="font-weight: 400;">You have completed ${ progress } % of the task and your fee for this step is: ${ fee } ${ returnIconCurrencyByStringCode('EUR') }</p>`
 			: ""
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >

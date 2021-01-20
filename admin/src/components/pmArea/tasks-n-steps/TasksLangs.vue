@@ -42,11 +42,9 @@
 				alertToggle: "alertToggle"
 			}),
 			setLanguage({ option }) {
-				this.$emit("setTargets", {
-					targets: [this.originallyLanguages.find(item => item.lang === option)]
-				})
-				const { symbol } = this.originallyLanguages.find(item => item.lang === option)
-				this.$emit("setSourceLanguage", { symbol: symbol })
+				const language = this.originallyLanguages.find(item => item.lang === option)
+				this.$emit("setTargets", { targets: [language] })
+				this.$emit("setSourceLanguage", { symbol: language.symbol })
 			}
 		},
 		computed: {
@@ -64,7 +62,7 @@
 		},
 		components: {
 			LanguagesSelect,
-			SelectSingle,
+			SelectSingle
 		}
 	}
 </script>

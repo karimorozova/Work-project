@@ -103,9 +103,6 @@
 							)
 				}
 			},
-			// setUniqueLanguages(arrProp) {
-			// 	this[arrProp] = this[arrProp].reduce((acc, cur) => acc.findIndex((el) => el._id === cur._id) < 0 ? [...acc, cur] : acc, [])
-			// },
 			emitTargets() {
 				this.$emit("setTargets", { targets: this.targetChosen })
 			},
@@ -154,39 +151,19 @@
 						this[prop].unshift(replaceLang[0])
 					}
 				}
+			},
+			runPossibleTargets() {
+				this.setPossibleTargets()
+				this.targetChosen = []
 			}
-
-			//refactor
-			// getDistinctLangs(langs) {
-			// 	if (!langs.length) return []
-			// 	return langs.filter((obj, index, self) => self.map((item) => item.lang).indexOf(obj.lang) === index)
-			// },
-			// setRequestLanguages() {
-			// 	const { symbol } = this.currentProject.sourceLanguage
-			// 	this.$emit("setSourceLanguage", { symbol })
-			// 	this.setDataValue({
-			// 		prop: "source",
-			// 		value: this.currentProject.sourceLanguage
-			// 	})
-			// 	this.setDataValue({
-			// 		prop: "targets",
-			// 		value: this.currentProject.targetLanguages
-			// 	})
-			// 	this.targetChosen = [...this.currentProject.targetLanguages]
-			// 	this.targetAll = this.getFilteredTargets(this.targetChosen)
-			// 	this.sortLanguages("targetChosen")
-			// },
-			// getFilteredTargets(langs) {
-			// 	const symbols = langs.length ? langs.map((item) => item.symbol) : []
-			// 	return symbols.length
-			// 			? this.targetAll.filter((item) => symbols.indexOf(item.symbol) === -1)
-			// 			: this.targetAll
-			// }
 		},
 		watch: {
 			setPossibleTargetsAction(val) {
-				if (val) this.setPossibleTargets()
+				if (val) this.runPossibleTargets()
 			}
+		},
+		created() {
+			this.runPossibleTargets()
 		},
 		computed: {
 			...mapGetters({

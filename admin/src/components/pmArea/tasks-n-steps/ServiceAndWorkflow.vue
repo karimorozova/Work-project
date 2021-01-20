@@ -55,266 +55,234 @@
 </template>
 
 <script>
-	import SelectSingle from "../../SelectSingle";
-	import Asterisk from "../../Asterisk";
-	import StepsDefaultDateModified from "./StepsDefaultDateModified";
-	import {mapGetters, mapActions} from "vuex";
-	import setDefaultTasksService from "@/mixins/setDefaultTasksService";
-	import TasksLanguages from "../../../mixins/TasksLanguages";
+	import SelectSingle from "../../SelectSingle"
+	import Asterisk from "../../Asterisk"
+	import StepsDefaultDateModified from "./StepsDefaultDateModified"
+	import { mapGetters, mapActions } from "vuex"
+	import setDefaultTasksService from "@/mixins/setDefaultTasksService"
+	import TasksLanguages from "../../../mixins/TasksLanguages"
 
 	export default {
-    mixins: [setDefaultTasksService, TasksLanguages],
-    props: {
-      originallyLanguages: {
-        type: Array,
-      },
-      originallyUnits: {
-        type: Array,
-      },
-      originallySteps: {
-        type: Array,
-      },
-      templates: {
-        type: Array,
-      }
-    },
-    data () {
-      return {
-        isNeedToStoreService: true,
-        service: "",
-        workflowSteps: [
-          { name: "1 Step", id: 2890 },
-          { name: "2 Steps", id: 2917 },
-        ],
-        stepsCounter: 2,
-        stepsDates: [
-					{start: new Date(), deadline: ""},
-					{start: "", deadline: new Date()},
+		mixins: [setDefaultTasksService, TasksLanguages],
+		props: {
+			originallyLanguages: {
+				type: Array
+			},
+			originallyUnits: {
+				type: Array
+			},
+			originallySteps: {
+				type: Array
+			},
+			templates: {
+				type: Array
+			}
+		},
+		data() {
+			return {
+				isNeedToStoreService: true,
+				service: "",
+				workflowSteps: [
+					{ name: "1 Step", id: 2890 },
+					{ name: "2 Steps", id: 2917 }
 				],
-				asteriskStyle: {top: "-2px"},
-				positionStyle: {"margin-top": "3px"},
+				stepsCounter: 2,
+				stepsDates: [
+					{ start: new Date(), deadline: "" },
+					{ start: "", deadline: new Date() }
+				],
+				asteriskStyle: { top: "-2px" },
+				positionStyle: { "margin-top": "3px" },
 				isError: false,
 				stepsAndUnits: [],
 				stepsAndUnitsMono: [],
-				workFlowOption: null,
-			};
+				workFlowOption: null
+			}
 		},
 		methods: {
 			...mapActions({
-				setDataValue: "setTasksDataValue",
+				setDataValue: "setTasksDataValue"
 			}),
 			showError() {
-				this.isError = true;
+				this.isError = true
 				setTimeout(() => {
-					this.isError = false;
-				}, 4000);
+					this.isError = false
+				}, 4000)
 			},
-			setDate({date, prop}, count) {
-				this.stepsDates[count - 1][prop] = date;
+			setDate({ date, prop }, count) {
+				this.stepsDates[count - 1][prop] = date
 				if (this.stepsDates[count] && prop === "deadline") {
-					this.stepsDates[count].start = date;
-					const deadline = new Date(this.stepsDates[count].deadline);
+					this.stepsDates[count].start = date
+					const deadline = new Date(this.stepsDates[count].deadline)
 					if (date - deadline > 0) {
-						this.stepsDates[count].deadline = date;
+						this.stepsDates[count].deadline = date
 					}
 				}
 				if (this.selectedWorkflow.id === 2890) {
-					this.setDataValue({prop: "stepsDates", value: this.stepsDates[0]});
+					this.setDataValue({ prop: "stepsDates", value: this.stepsDates[0] })
 				} else {
-					this.setDataValue({prop: "stepsDates", value: this.stepsDates});
+					this.setDataValue({ prop: "stepsDates", value: this.stepsDates })
 				}
 			},
-			async setDefaultStepsAndUnits(option) {
-				let defaultStepsAndUnits;
-				const currentSteps = this.services.find(
-					(item) => item.title === this.service
-				);
-
-				let firstUnit = returnUnit(0, this.originallySteps);
-				let secondStep = returnUnit(1, this.originallySteps);
+			setDefaultStepsAndUnits(option) {
+				let defaultStepsAndUnits
+				const currentSteps = this.services.find(item => item.title === this.service)
 
 				if (option === "2 Steps") {
-
-          if (this.service === "Translation") {
-            const unitsObjects = this.originallyUnits.filter(item => {
-              return currentSteps.steps[0].step.calculationUnit.some(item2 => {
-                return item._id.toString() === item2.toString();
-              });
-            });
-
-            const firstUnitCAT = unitsObjects
-              .find(item => item.type === "CAT Wordcount");
-            if (firstUnitCAT.hasOwnProperty('type')) {
-              firstUnit = firstUnitCAT.type;
-            }
-          }
-
-          defaultStepsAndUnits = [
-            {
-              step: currentSteps.steps[0].step.title,
-              unit: firstUnit,
-              stepCounter: 1,
-              size: null,
-            },
-            {
-              step: currentSteps.steps[1].step.title,
-							unit: secondStep,
-							stepCounter: 2,
-							size: null,
+					let firstUnit = returnUnit(0, this.originallySteps)
+					let secondUnit = returnUnit(1, this.originallySteps)
+					if (this.service === "Translation") {
+						const unitsObjects = this.originallyUnits.filter(item => {
+							return currentSteps.steps[0].step.calculationUnit.some(item2 => {
+								return item._id.toString() === item2.toString()
+							})
+						})
+						const firstUnitCAT = unitsObjects.find(item => item.type === "CAT Wordcount")
+						if (firstUnitCAT.hasOwnProperty('type')) {
+							firstUnit = firstUnitCAT.type
+						}
+					}
+					defaultStepsAndUnits = [
+						{
+							step: currentSteps.steps[0].step.title,
+							unit: firstUnit,
+							stepCounter: 1,
+							size: null
 						},
-					];
-          this.stepsAndUnits = defaultStepsAndUnits;
-        } else {
-          let firstUnit = returnUnit(0, this.originallySteps);
-          defaultStepsAndUnits = [
-            {
-              step: currentSteps.steps[0].step.title,
-              unit: firstUnit,
-              stepCounter: 1,
-              size: null,
-            },
-          ];
-          this.stepsAndUnitsMono = defaultStepsAndUnits;
-        }
-        this.setDataValue({ prop: "stepsAndUnits", value: defaultStepsAndUnits });
+						{
+							step: currentSteps.steps[1].step.title,
+							unit: secondUnit,
+							stepCounter: 2,
+							size: null
+						}
+					]
+					this.stepsAndUnits = defaultStepsAndUnits
+				} else {
+					let firstUnit = returnUnit(0, this.originallySteps)
+					defaultStepsAndUnits = [
+						{
+							step: currentSteps.steps[0].step.title,
+							unit: firstUnit,
+							stepCounter: 1,
+							size: null
+						}
+					]
+					this.stepsAndUnitsMono = defaultStepsAndUnits
+				}
 
-        function returnUnit (index, array) {
-          return array.find((item) => item.title === currentSteps.steps[index].step.title
-          ).calculationUnit[0].type;
-        }
-      },
-      setDefaultTemplate () {
-        let catUnit = this.tasksData.stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
-        if (catUnit) {
-          let stepsAndUnits = this.tasksData.stepsAndUnits;
-          let template = {
-            template: {
-              ...this.templates[0]
-            }
-          };
-          Object.assign(stepsAndUnits[catUnit.stepCounter - 1], stepsAndUnits[catUnit.stepCounter - 1], template);
-          this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits });
-        }
-      },
+				this.setDataValue({ prop: "stepsAndUnits", value: defaultStepsAndUnits })
 
-      async setService ({ option }) {
-        const value = this.services.find((item) => item.title === option);
-        const languageFormValue = value.languageForm;
-        if (!value.steps.length) {
-          return this.showError();
-        }
-        this.service = option;
-        this.setDataValue({ prop: "service", value });
-        if (value.languageForm === "Mono" || value.steps.length === 1) {
-          await this.setWorkflow({ option: "1 Step" });
-        } else {
-          await this.setWorkflow({ option: "2 Steps" });
-        }
-        if (value) {
-          this.setStartedLanguages(languageFormValue);
-        }
-      },
-      async setWorkflow ({ option }) {
-        const value = this.workflowSteps.find((item) => item.name === option);
-        this.workFlowOption = option;
+				function returnUnit(index, array) {
+					return array.find((item) => item.title === currentSteps.steps[index].step.title
+					).calculationUnit[0].type
+				}
+			},
+			setDefaultTemplate() {
+				let catUnit = this.tasksData.stepsAndUnits.find(item => item.unit === 'CAT Wordcount')
+				if (catUnit) {
+					let stepsAndUnits = this.tasksData.stepsAndUnits
+					let template = {
+						template: {
+							...this.templates[0]
+						}
+					}
+					Object.assign(stepsAndUnits[catUnit.stepCounter - 1], stepsAndUnits[catUnit.stepCounter - 1], template)
+					this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
+				}
+			},
 
-        await this.setDefaultStepsAndUnits(option);
-        this.setDefaultTemplate();
-
-        this.setDataValue({ prop: "workflow", value });
-        if (value.id === 2890) {
-          let stepDates = {
-            ...this.stepsDates[0],
-            deadline: this.currentProject.deadline,
-          };
-          this.stepsDates = [
-            {
-              start: this.currentProject.startDate,
-              deadline: this.currentProject.deadline,
-            },
-            { start: "", deadline: "" },
-          ];
-          this.setDataValue({ prop: "stepsDates", value: [stepDates] });
-        } else {
-          this.setDefaultStepDates();
-        }
-      },
-
-      storeDefaultService (service) {
-        this.setDataValue({ prop: "service", value: service });
-        // this.setDefaultStepsAndUnits(this.workFlowOption);
-      },
-
-      setDefaultStepDates () {
-        this.stepsDates = [
-          { start: this.currentProject.startDate, deadline: "" },
-          { start: "", deadline: this.currentProject.deadline },
-        ];
-        this.setDataValue({ prop: "stepsDates", value: this.stepsDates });
-      },
-      pushStepAndUnit (data) {
-        if (this.selectedWorkflow.id === 2890) {
-          if (!this.stepsAndUnitsMono.length) {
-            this.stepsAndUnitsMono.push(data);
+			setService({ option }) {
+				const service = this.services.find((item) => item.title === option)
+				this.service = service.title
+				if (!service.steps.length) return this.showError()
+				this.setDataValue({ prop: "service", value: service })
+				const countStepsInService = service.steps.length === 1 ? "1 Step" : "2 Steps"
+				this.setWorkflow({ option: countStepsInService })
+				this.setDefaultLanguages(service)
+			},
+			setWorkflow({ option }) {
+				const workflowSteps = this.workflowSteps.find((item) => item.name === option)
+				this.workFlowOption = workflowSteps.name
+				this.setDataValue({ prop: "workflow", value: workflowSteps })
+				this.setDefaultStepsAndUnits(this.workFlowOption)
+				this.setDefaultTemplate()
+				workflowSteps.id === 2890 ? this.setNotDefaultStepDates() : this.setDefaultStepDates()
+			},
+			setNotDefaultStepDates() {
+				this.stepsDates = [
+					{ start: this.currentProject.startDate, deadline: this.currentProject.deadline },
+					{ start: "", deadline: "" }
+				]
+				let stepDates = { ...this.stepsDates[0], deadline: this.currentProject.deadline }
+				this.setDataValue({ prop: "stepsDates", value: [stepDates] })
+			},
+			setDefaultStepDates() {
+				this.stepsDates = [
+					{ start: this.currentProject.startDate, deadline: "" },
+					{ start: "", deadline: this.currentProject.deadline }
+				]
+				this.setDataValue({ prop: "stepsDates", value: this.stepsDates })
+			},
+			pushStepAndUnit(data) {
+				if (this.selectedWorkflow.id === 2890) {
+					if (!this.stepsAndUnitsMono.length) {
+						this.stepsAndUnitsMono.push(data)
 					}
 					this.stepsAndUnitsMono.forEach((element, index) => {
 						element.step === data.step
-							? (this.stepsAndUnitsMono[index].unit = data.unit)
-							: false;
-					});
+								? (this.stepsAndUnitsMono[index].unit = data.unit)
+								: false
+					})
 					this.setDataValue({
 						prop: "stepsAndUnits",
-						value: this.stepsAndUnitsMono,
-					});
+						value: this.stepsAndUnitsMono
+					})
 				}
 				if (this.selectedWorkflow.id === 2917) {
 					if (!this.stepsAndUnits.length) {
-						this.stepsAndUnits.push(data);
+						this.stepsAndUnits.push(data)
 					}
 					this.stepsAndUnits.forEach((element, index, array) => {
 						if (element.step === data.step) {
-							this.stepsAndUnits[index].unit = data.unit;
+							this.stepsAndUnits[index].unit = data.unit
 						}
 						if (array.map((element) => element.step).indexOf(data.step) === -1) {
-							this.stepsAndUnits.push(data);
+							this.stepsAndUnits.push(data)
 						}
-					});
-					this.setDataValue({prop: "stepsAndUnits", value: this.stepsAndUnits});
+					})
+					this.setDataValue({ prop: "stepsAndUnits", value: this.stepsAndUnits })
 				}
-			},
+			}
 		},
 		computed: {
 			...mapGetters({
 				services: "getVuexServices",
 				tasksData: "getTasksData",
-				currentProject: "getCurrentProject",
+				currentProject: "getCurrentProject"
 			}),
 			selectedWorkflow() {
-				return this.tasksData.workflow ? this.tasksData.workflow : {name: ""};
+				return this.tasksData.workflow ? this.tasksData.workflow : { name: "" }
 			},
 			workflowStepsNames() {
-				let result = this.workflowSteps.map((item) => item.name);
+				let result = this.workflowSteps.map((item) => item.name)
 				if (this.tasksData.service && this.tasksData.service.steps.length < 2) {
-					result.pop();
+					result.pop()
 				}
-				return result;
+				return result
 			},
 			allServices() {
 				if (this.services.length) {
-					return this.clientsServicesForWorkflow().map((i) => i.title);
+					return this.currentClientServices().map((i) => i.title)
 				}
-				return [];
-			},
-		},
-		created() {
-			this.setDefaultStepDates();
+				return []
+			}
 		},
 		components: {
 			SelectSingle,
 			Asterisk,
-			StepsDefaultDateModified,
-		},
-	};
+			StepsDefaultDateModified
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
