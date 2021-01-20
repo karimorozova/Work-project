@@ -2,6 +2,7 @@ import { ALERTING_MESSAGE } from "./alerts";
 import { SET_TOKEN } from "./auth";
 import { INCREASE_REQUEST, DECREASE_REQUEST } from "./requests";
 import { REPLACE_QUOTE, SET_PROJECT } from "./projects";
+import { SET_PREVIOUS_LINK } from "./helpers"
 import {
 	DETAILS,
 	DETFILES_TO_DETAILS,
@@ -47,5 +48,6 @@ export {
 	SET_ORDER_DETAILS,
 	SET_DETAIL,
 	SET_NESTED_DETAIL,
-	REMOVE_FILE
+	REMOVE_FILE,
+	SET_PREVIOUS_LINK
 };

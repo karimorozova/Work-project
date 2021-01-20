@@ -39,5 +39,6 @@ const state = {
   isAlert: false,
   alertType: "success",
   originallyUnits: [],
+  previousLink : ''
 };
 export default state
