@@ -30,7 +30,6 @@
 					logpassword: "",
 				},
 				isAllFieldsError: false,
-				previousLink: null,
 			};
 		},
 		methods: {
