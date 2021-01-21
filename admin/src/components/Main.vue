@@ -303,8 +303,7 @@
         color: #fff;
         width: 100%;
         font-size: 24px;
-        font-family: Myriad400;
-        font-weight: 700;
+        font-family: Myriad600;
       }
     }
 
@@ -543,6 +542,8 @@
 
           .title {
             color: #fff;
+            font-family: Myriad900;
+
           }
 
           .image {
@@ -561,6 +562,7 @@
 
           .title {
             color: #978d7e;
+            font-family: Myriad900;
           }
 
           .image {

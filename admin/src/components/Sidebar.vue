@@ -78,7 +78,7 @@ export default {
         display: flex;
         justify-content: center;
         padding: 44px 0;
-        font-weight: 700;
+        font-family: Myriad900;
     }
     &__inner {
         display: flex;
@@ -105,7 +105,7 @@ export default {
         margin: 0;
         text-align: center;
         font-size: 14px;
-        font-weight: 600;
+        font-family: Myriad600;
     }
     &_active-link {
         background-color: $active-background;
