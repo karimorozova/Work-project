@@ -36,11 +36,11 @@
 </template>
 
 <script>
-	import TasksData from "./tasks-n-steps/TasksData";
-	import Button from "../Button";
-	import Tasks from "./tasks-n-steps/Tasks";
-	import Steps from "./tasks-n-steps/Steps";
-	import { mapGetters, mapActions } from 'vuex';
+	import TasksData from "./tasks-n-steps/TasksData"
+	import Button from "../Button"
+	import Tasks from "./tasks-n-steps/Tasks"
+	import Steps from "./tasks-n-steps/Steps"
+	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
 		props: {
@@ -53,7 +53,7 @@
 			},
 			originallySteps: {
 				type: Array
-			},
+			}
 		},
 		data() {
 			return {
@@ -71,138 +71,138 @@
 				"addProjectWordsTasks",
 				"clearTasksData",
 				"getServices",
-				'setCurrentProject',
+				'setCurrentProject'
 			]),
 			updateTasks(data) {
-				this.currentProject.tasks = data;
+				this.currentProject.tasks = data
 			},
 			setDefaultIsTaskData() {
-				if(!this.currentProject.tasks || !this.currentProject.tasks.length) {
-					this.isTaskData = true;
+				if (!this.currentProject.tasks || !this.currentProject.tasks.length) {
+					this.isTaskData = true
 				}
 			},
 			toggleTaskData() {
-				if(this.currentProject.status !== 'Delivered') {
-					this.isTaskData = !this.isTaskData;
+				if (this.currentProject.status !== 'Delivered') {
+					this.isTaskData = !this.isTaskData
 				}
 			},
 			setValue({ option, prop }) {
-				this[prop] = option;
+				this[prop] = option
 			},
 			showTab({ tab }) {
-				if(tab === 'Tasks') {
-					this.isStepsShow = false;
-					this.isTasksShow = true;
+				if (tab === 'Tasks') {
+					this.isStepsShow = false
+					this.isTasksShow = true
 				} else {
-					this.isStepsShow = true;
-					this.isTasksShow = false;
+					this.isStepsShow = true
+					this.isTasksShow = false
 				}
 			},
 			setVendor({ vendor, index }) {
 				this.$emit("setVendor", { vendor, index })
 			},
 			setDate({ date, prop, index }) {
-				this.$emit("setDate", { date, prop, index });
+				this.$emit("setDate", { date, prop, index })
 			},
 			async refreshMetricsIfStepsWereNotCreated() {
-				let ifNeedRefreshMetrics = false;
+				let ifNeedRefreshMetrics = false
 				for (let task of this.currentProject.tasks) {
-					if(!ifNeedRefreshMetrics) if(!this.currentProject.steps.map(({ taskId }) => taskId).includes(task.taskId)) ifNeedRefreshMetrics = true;
+					if (!ifNeedRefreshMetrics) if (!this.currentProject.steps.map(({ taskId }) => taskId).includes(task.taskId)) ifNeedRefreshMetrics = true
 				}
-				if(ifNeedRefreshMetrics) {
-					await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id });
-					const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`);
-					await this.setCurrentProject(updatedProject.body);
+				if (ifNeedRefreshMetrics) {
+					await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id })
+					const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`)
+					await this.setCurrentProject(updatedProject.body)
 				}
 			},
 			getDataForTasks(dataForTasks) {
-				let tasksData = new FormData();
-				const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : "";
+				let tasksData = new FormData()
+				const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : ""
 
-				tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits));
-				tasksData.append('customerName', this.currentProject.customer.name);
-				if(dataForTasks.stepsAndUnits.find(item => item.template)) {
-					tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id);
+				tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits))
+				tasksData.append('customerName', this.currentProject.customer.name)
+				if (dataForTasks.stepsAndUnits.find(item => item.template)) {
+					tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id)
 				}
-				tasksData.append('workflow', dataForTasks.workflow.id);
-				tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates));
-				tasksData.append('service', JSON.stringify(dataForTasks.service));
-				tasksData.append('source', source);
-				tasksData.append('targets', JSON.stringify(dataForTasks.targets));
-				tasksData.append('projectId', this.currentProject._id);
-				tasksData.append('projectName', `${ this.currentProject.projectId } - ${ this.currentProject.projectName }`);
-				tasksData.append('industry', this.currentProject.industry.name.replace('&', 'and'));
-				tasksData.append('packageSize', dataForTasks.packageSize);
-				tasksData.append('quantity', dataForTasks.quantity);
-				tasksData.append('projectManager', this.currentProject.projectManager._id);
-				return tasksData;
+				tasksData.append('workflow', dataForTasks.workflow.id)
+				tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates))
+				tasksData.append('service', JSON.stringify(dataForTasks.service))
+				tasksData.append('source', source)
+				tasksData.append('targets', JSON.stringify(dataForTasks.targets))
+				tasksData.append('projectId', this.currentProject._id)
+				tasksData.append('projectName', `${ this.currentProject.projectId } - ${ this.currentProject.projectName }`)
+				tasksData.append('industry', this.currentProject.industry.name.replace('&', 'and'))
+				tasksData.append('packageSize', dataForTasks.packageSize)
+				tasksData.append('quantity', dataForTasks.quantity)
+				tasksData.append('projectManager', this.currentProject.projectManager._id)
+				return tasksData
 			},
 			async addTasks(dataForTasks) {
-				await this.refreshMetricsIfStepsWereNotCreated();
+				await this.refreshMetricsIfStepsWereNotCreated()
 
-				let tasksData = this.getDataForTasks(dataForTasks);
-				const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))];
-				const { sourceFiles, refFiles } = dataForTasks;
+				let tasksData = this.getDataForTasks(dataForTasks)
+				const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))]
+				const { sourceFiles, refFiles } = dataForTasks
 
-				if(sourceFiles && sourceFiles.length) {
-					this.translateFilesAmount = sourceFiles.length;
+				if (sourceFiles && sourceFiles.length) {
+					this.translateFilesAmount = sourceFiles.length
 					for (let file of sourceFiles) {
-						tasksData.append('sourceFiles', file);
+						tasksData.append('sourceFiles', file)
 					}
 				}
-				if(refFiles && refFiles.length) {
+				if (refFiles && refFiles.length) {
 					for (let file of refFiles) {
-						tasksData.append('refFiles', file);
+						tasksData.append('refFiles', file)
 					}
 				}
 
 				for (const iterator of calculationUnit) {
-					if(iterator === 'CAT Wordcount') {
+					if (iterator === 'CAT Wordcount') {
 						try {
-							const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`);
-							const { creatorUserId } = memoqCreatorUser.data;
-							if(!creatorUserId) throw new Error("No such user in memoq");
-							tasksData.append('creatorUserId', creatorUserId);
-							this.isInfo = true;
+							const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
+							const { creatorUserId } = memoqCreatorUser.data
+							if (!creatorUserId) throw new Error("No such user in memoq")
+							tasksData.append('creatorUserId', creatorUserId)
+							this.isInfo = true
 						} catch (err) {
-							this.alertToggle({ message: err.message, isShow: true, type: "error" });
+							this.alertToggle({ message: err.message, isShow: true, type: "error" })
 						}
 					}
 				}
 
-				if(calculationUnit.includes('CAT Wordcount')) {
-					await this.saveProjectWordsTasks(tasksData);
+				if (calculationUnit.includes('CAT Wordcount')) {
+					await this.saveProjectWordsTasks(tasksData)
 				} else {
-					await this.saveProjectTasks(tasksData);
+					await this.saveProjectTasks(tasksData)
 				}
 			},
 			async saveProjectTasks(tasksData) {
 				try {
-					await this.addProjectTasks(tasksData);
-					this.isTaskData = false;
-					this.clearTasksData();
+					await this.addProjectTasks(tasksData)
+					this.isTaskData = false
+					this.clearTasksData()
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				} finally {
-					this.isInfo = false;
+					this.isInfo = false
 				}
 			},
 			async saveProjectWordsTasks(tasksData) {
 				try {
-					await this.addProjectWordsTasks(tasksData);
-					this.isTaskData = false;
-					this.clearTasksData();
+					await this.addProjectWordsTasks(tasksData)
+					this.isTaskData = false
+					this.clearTasksData()
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				} finally {
-					this.isInfo = false;
+					this.isInfo = false
 				}
 			},
 			getMetrics() {
-				this.$emit("getMetrics");
+				this.$emit("getMetrics")
 			},
 			showErrors({ errors }) {
-				this.$emit("showErrors", { errors });
+				this.$emit("showErrors", { errors })
 			}
 		},
 		computed: {
@@ -212,12 +212,12 @@
 				fileCounter: 'getTranslateFileCounter'
 			}),
 			metricsButton() {
-				const wordsUnit = this.currentProject.tasks.find(item => item.service.calculationUnit === 'Words');
+				const wordsUnit = this.currentProject.tasks.find(item => item.service.calculationUnit === 'Words')
 				return !wordsUnit || this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
 			},
 			isDisabled() {
-				const statuses = ["Closed", "Cancelled"];
-				return statuses.indexOf(this.currentProject.status) !== -1;
+				const statuses = ["Closed", "Cancelled"]
+				return statuses.indexOf(this.currentProject.status) !== -1
 			}
 		},
 		components: {
@@ -227,10 +227,10 @@
 			Steps
 		},
 		created() {
-			this.getServices();
+			this.getServices()
 		},
 		mounted() {
-			this.setDefaultIsTaskData();
+			this.setDefaultIsTaskData()
 		}
 	}
 </script>
@@ -244,7 +244,7 @@
     width: 1000px;
     padding: 20px;
     margin: 0 40px;
-    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     position: relative;
 
     &__info {
@@ -260,7 +260,7 @@
       right: 0;
       width: 300px;
       border: 1px solid $main-color;
-      box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
 
     &__file-counter {

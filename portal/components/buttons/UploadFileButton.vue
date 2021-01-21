@@ -79,7 +79,7 @@ export default {
         position: relative;
         color: $white;
         font-size: 15px;
-        font-family: MyriadPro;
+        font-family: Myriad400;
         text-align: center;
     }
     &__input {
@@ -93,7 +93,7 @@ export default {
         font-size: 0;
         width: 195px;
         height: 38px;
-        font-family: MyriadPro;
+        font-family: Myriad400;
         @media (max-width: 550px) {
             width: 140px;
             right: 0;

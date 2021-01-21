@@ -1,67 +1,45 @@
-import { mapActions } from "vuex";
+import { mapActions } from "vuex"
 
 export default {
 	methods: {
 		...mapActions({
 			getServices: "getServices",
 			alertToggle: "alertToggle",
+			setTasksDataValue: "setTasksDataValue"
 		}),
-		clientsServicesForWorkflow: function () {
+		currentClientServices() {
+			const { industry, customer: { services } } = this.currentProject
 			const arrayOfClientServices = [
 				...new Set(
-						this.currentProject.customer.services
-								.map((service) => service.services)
-								.flat()
-				),
-			];
-			return this.services.filter((a) =>
-					arrayOfClientServices.some((b) => a._id.toString() === b)
-			);
+						services
+								.filter(({ industries }) => industries[0] === industry._id)
+								.map(({ services }) => services).flat()
+				)
+			]
+			return this.services.filter((a) => arrayOfClientServices.some((b) => a._id.toString() === b)
+			)
 		},
-		setStartedLanguages(languageFormValue) {
-			if(languageFormValue === undefined) {
-				languageFormValue = this.clientsServicesForWorkflow().find((i) => true).languageForm
-			}
-			if(languageFormValue === 'Duo') {
-				if(this.getClientLanguagesByServices('sourceLanguage').length) {
-					// if(this.getClientLanguagesByServices('sourceLanguage').length === 1){
-					this.$emit("setSourceLanguage", { symbol: this.getClientLanguagesByServices('sourceLanguage')[0].symbol });
-				}
-			} else if(languageFormValue === 'Mono') {
-				if(this.getClientLanguagesByServices('targetLanguages').length) {
-					// if(this.getClientLanguagesByServices('targetLanguages').length === 1){
-					const [firstElem] = this.getClientLanguagesByServices('targetLanguages');
-					this.$emit("setTargets", { targets: [firstElem] });
-					this.$emit("setSourceLanguage", { symbol: firstElem.symbol });
-
-				}
+		setDefaultLanguages({ languageForm }) {
+			const [language] = this.getClientLanguagesByServices('sourceLanguage')
+			const { symbol } = language
+			if (languageForm === 'Duo') {
+				this.$emit("setSourceLanguage", { symbol })
+			} else {
+				this.$emit("setTargets", { targets: [language] })
+				this.$emit("setSourceLanguage", { symbol })
 			}
 		},
-		async setDefaultService() {
-			try {
-				if(!this.services.length) {
-					await this.getServices();
-				}
-			} catch (err) {
-				this.alertToggle({
-					message: "Error on getting services from DB",
-					isShow: true,
-					type: "error",
-				});
-			}
-			if(this.services.length) {
-				const service = this.clientsServicesForWorkflow().find((i) => true);
-				this.service = service.title;
-				const option = service.steps.length === 1 ? "1 Step" : "2 Steps";
-				await this.setWorkflow({ option });
-				this.storeDefaultService(service);
-			}
-			if(this.services.length) {
-				this.setStartedLanguages();
-			}
-		},
+		setDefaultService() {
+			const service = this.currentClientServices().find(i => i)
+			this.service = service.title
+			if (!service.steps.length) return this.showError()
+			this.setDataValue({ prop: "service", value: service })
+			const countStepsInService = service.steps.length === 1 ? "1 Step" : "2 Steps"
+			this.setWorkflow({ option: countStepsInService })
+			this.setDefaultLanguages(service)
+		}
 	},
 	created() {
-		this.setDefaultService();
-	},
-};
+		this.setDefaultService()
+	}
+}

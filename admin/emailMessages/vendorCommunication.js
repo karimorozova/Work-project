@@ -1,46 +1,47 @@
-const apiUrl = require("../helpers/apiurl");
-const jwt = require('jsonwebtoken');
-const { secretKey } = require('../configs');
+const apiUrl = require("../helpers/apiurl")
+const jwt = require('jsonwebtoken')
+const { secretKey } = require('../configs')
+const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 
 function applicationMessage(obj) {
-	let cvFiles = "";
-	let languagePairs = "";
-	let software = "";
-	let industries = "";
-	let coverLetterFiles = "";
-	let educations = "";
-	let positions = "";
-	if(obj.cvFiles.length) {
+	let cvFiles = ""
+	let languagePairs = ""
+	let software = ""
+	let industries = ""
+	let coverLetterFiles = ""
+	let educations = ""
+	let positions = ""
+	if (obj.cvFiles.length) {
 		cvFiles = obj.cvFiles.reduce((acc, cur, index) => {
 			return acc + `<a href="${ apiUrl }${ cur }" download target='_self'>cvFile${ index + 1 }</a>; `
 		}, "")
 	}
-	if(obj.coverLetterFiles.length) {
+	if (obj.coverLetterFiles.length) {
 		coverLetterFiles = obj.coverLetterFiles.reduce((acc, cur, index) => {
 			return acc + `<a href="${ apiUrl }${ cur }" download target='_self'>coverLetterFile${ index + 1 }</a>; `
 		}, "")
 	}
-	if(obj.languagePairs) {
+	if (obj.languagePairs) {
 		languagePairs = obj.languagePairs.reduce((acc, cur) => {
 			return acc + cur.source + ' >> ' + cur.target + "; "
 		}, "")
 	}
-	if(obj.industries) {
+	if (obj.industries) {
 		industries = obj.industries.reduce((acc, cur) => {
 			return acc + cur.name + "; "
 		}, "")
 	}
-	if(obj.positions) {
+	if (obj.positions) {
 		positions = obj.positions.reduce((acc, cur) => {
 			return acc + cur + "; "
 		}, "")
 	}
-	if(obj.technicalComp.softwares) {
+	if (obj.technicalComp.softwares) {
 		software = obj.technicalComp.softwares.reduce((acc, cur) => {
 			return acc + cur + "; "
 		}, "")
 	}
-	if(obj.educations) {
+	if (obj.educations) {
 		educations = obj.educations.reduce((acc, cur) => {
 			return acc + `${ cur.study }/${ cur.field }/${ cur.institute }/${ cur.grade } <br>`
 		}, "")
@@ -99,15 +100,15 @@ function applicationMessage(obj) {
 }
 
 function requestMessageForVendor(obj) {
-	const date = Date.now();
-	const expiryDate = new Date(date + 900000);
-	const langPair = obj.sourceLanguage ? `${ obj.sourceLanguage } >> ${ obj.targetLanguage }; ` : `${ obj.targetLanguage } / ${ obj.packageSize }; `;
-	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '2h' });
-	const stepId = obj.stepId.replace(/ /g, '%20');
-	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
-	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.finance.Price.payables).toFixed(2) } &euro;</a>`
-	const start = obj.start.split('T')[0].split('-').reverse().join('-');
-	const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-');
+	const date = Date.now()
+	const expiryDate = new Date(date + 900000)
+	const langPair = obj.sourceLanguage ? `${ obj.sourceLanguage } >> ${ obj.targetLanguage }; ` : `${ obj.targetLanguage } / ${ obj.packageSize }; `
+	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '2h' })
+	const stepId = obj.stepId.replace(/ /g, '%20')
+	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	const start = obj.start.split('T')[0].split('-').reverse().join('-')
+	const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-')
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -140,7 +141,7 @@ function requestMessageForVendor(obj) {
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Wordcount:</td>
-                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.finance.Wordcount.payables || '-' }</td>
+                                <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ obj.nativeFinance.Wordcount.payables || '-' }</td>
                             </tr>
                             <tr>
                                 <td class="main_weight600" style="padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Deadline:</td>
@@ -148,7 +149,7 @@ function requestMessageForVendor(obj) {
                             </tr>
                             <tr>
                              <td class="main_weight600" style="background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;" >Cost:</td>
-                             <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ (obj.finance.Price.payables).toFixed(2) } &euro;</td>
+                             <td style="font-weight: 400;background:#F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;" >${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</td>
                             </tr>
                         </table>
                     </div>
@@ -168,7 +169,7 @@ function requestMessageForVendor(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function stepCancelledMessage(obj) {
@@ -186,11 +187,11 @@ function stepCancelledMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function stepMiddleCancelledMessage(obj) {
-	const fee = obj.status === "Completed" ? obj.finance.Price.payables : obj.finance.Price.halfPayables;
+	const fee = obj.status === "Completed" ? obj.nativeFinance.Price.payables : obj.nativeFinance.Price.halfPayables
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -201,14 +202,14 @@ function stepMiddleCancelledMessage(obj) {
                         We would like to inform you that step: ${ obj.stepId } ${ obj.serviceStep.title } has been cancelled in the middle.
                     </p>
                     <p style="font-weight: 400;">
-                        You will be paid ${ fee || obj.finance.Price.payables || 0 } &euro;, which is according to relative work you have completed.
+                        You will be paid ${ fee || obj.nativeFinance.Price.payables || 0 } ${ returnIconCurrencyByStringCode('EUR') } which is according to relative work you have completed.
                     </p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function vendorReassignmentMessage(obj, reason) {
@@ -226,19 +227,19 @@ function vendorReassignmentMessage(obj, reason) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function vendorMiddleReassignmentMessage(allUnits, obj, reason, isPay) {
-	const { type } = allUnits.find(({ _id }) => _id.toString() === obj.serviceStep.unit.toString());
+	const { type } = allUnits.find(({ _id }) => _id.toString() === obj.serviceStep.unit.toString())
 	const progress = type === "CAT Wordcount" ?
-			(obj.progress.wordsDone / obj.progress.totalWordCount * 100).toFixed(2)
-			: obj.progress;
-	const fee = obj.finance.Price.halfPayables ? obj.finance.Price.halfPayables : obj.finance.Price.payables;
+			(obj.progress.wordsDone / obj.progress.totalWordCount * 100).toFixed(2) :
+			obj.progress
+	const fee = obj.nativeFinance.Price.halfPayables ? obj.nativeFinance.Price.halfPayables : obj.nativeFinance.Price.payables
 	const payText = isPay ?
 			`<p style="font-weight: 400;">You will be paid according to your partial completion of the step.</p>
-        <p style="font-weight: 400;">You have completed ${ progress } % of the task and your fee for this step is: ${ fee } &euro;</p>`
-			: "";
+        <p style="font-weight: 400;">You have completed ${ progress } % of the task and your fee for this step is: ${ fee } ${ returnIconCurrencyByStringCode('EUR') }</p>`
+			: ""
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -257,13 +258,13 @@ function vendorMiddleReassignmentMessage(allUnits, obj, reason, isPay) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function vendorMiddleAssignmentMessage(obj) {
 	const mainMessage = obj.isStart ?
 			"Although someone else has worked on this step, you shall start the task from the beginning."
-			: "You should continue your work from the place it has been stopped.";
+			: "You should continue your work from the place it has been stopped."
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -282,11 +283,11 @@ function vendorMiddleAssignmentMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function stepReopenedMessage(obj) {
-	const reason = obj.reason ? `<p style="font-weight: 400;">Reason: ${ obj.reason }</p>` : "";
+	const reason = obj.reason ? `<p style="font-weight: 400;">Reason: ${ obj.reason }</p>` : ""
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -296,13 +297,13 @@ function stepReopenedMessage(obj) {
                     <p style="font-weight: 400;">
                          Step: ${ obj.stepId } ${ obj.serviceStep.title } has been reopened.
                     </p>
-                    ${reason}
+                    ${ reason }
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function stepReadyToStartMessage(obj) {
@@ -326,7 +327,7 @@ function stepReadyToStartMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function sendMemoqCredentials(obj) {

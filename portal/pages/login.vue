@@ -20,7 +20,7 @@
 </template>
 
 <script>
-	import { mapActions } from "vuex";
+	import { mapActions, mapGetters } from "vuex";
 
 	export default {
 		data() {
@@ -46,7 +46,11 @@
 						...this.form
 					});
 					this.login(result.clientToken);
-					this.$router.push("/");
+
+					!!result.clientToken && !!this.getPreviousLink && this.getPreviousLink !== '/login' ?
+							this.$router.push(this.getPreviousLink) :
+							this.$router.push('/dashboard')
+
 					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
 				} catch (err) {
 					let message = err.message;
@@ -63,6 +67,11 @@
 				alertToggle: "alertToggle",
 				login: "login",
 			})
+		},
+		computed: {
+			...mapGetters({
+				getPreviousLink: 'getPreviousLink'
+      })
 		}
 	};
 </script>
@@ -70,13 +79,8 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors.scss";
 
-  @font-face {
-    font-family: MyriadPro;
-    src: url('/assets/fonts/MyriadPro-Regular.otf');
-  }
-
   .login {
-    font-family: MyriadPro;
+    font-family: Myriad400;
     background-image: url("/assets/images/signin-background.jpg");
     display: flex;
     justify-content: center;

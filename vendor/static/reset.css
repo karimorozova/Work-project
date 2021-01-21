@@ -2,7 +2,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	font-family: MyriadPro;
+	font-family: Myriad400;
 }
 
 html {
@@ -11,11 +11,11 @@ html {
 
 input, textarea {
     color: #67573E;
-    font-family: MyriadPro;
+    font-family: Myriad400;
 }
 
 button {
-    font-family: MyriadPro;
+    font-family: Myriad400;
 }
 
 blockquote, q {
@@ -27,6 +27,8 @@ input[type="checkbox"] {
 }
 
 @font-face {
-    font-family: MyriadPro;
-    src: url('~/assets/fonts/MyriadPro-Regular.otf');
+    font-family: 'Myriad400';
+    font-style: normal;
+    font-weight: normal;
+    src: url('../assets/fonts/MYRIADPRO-REGULAR.woff') format('woff');
 }

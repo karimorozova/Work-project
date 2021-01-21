@@ -322,7 +322,7 @@
       padding: 0 20px;
     }
     .orderInfo {
-      font-family: MyriadPro;
+      font-family: Myriad400;
       color: #66563D;
       transition: all 0.7s;
       @media (max-width: 1424px) {
@@ -370,7 +370,7 @@
         .choice {
           margin-top: 5px;
           color: #D15F45;
-          font-family: MyriadPro;
+          font-family: Myriad400;
         }
         &-languages {
           p {

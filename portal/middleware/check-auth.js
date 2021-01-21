@@ -1,4 +1,5 @@
 import { getClientTokenFromHeaders, getClientTokenFromDocument } from "~/utils/auth.js";
+import { setPreviousLink } from "../store/actions"
 
 export default function ({ store, req, redirect, route }) {
     if(route.name === "request-quote" || route.name === "forgot") return
@@ -8,6 +9,7 @@ export default function ({ store, req, redirect, route }) {
     if(!token) {
         if(route.path === "/login") {
         } else {
+            setPreviousLink(store, route.path)
             return redirect("/login")
         }
     }

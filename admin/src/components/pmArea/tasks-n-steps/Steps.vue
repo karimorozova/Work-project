@@ -102,16 +102,16 @@
         template(slot="status" slot-scope="{ row }")
           span.steps__step-status {{ row.status | stepsAndTasksStatusFilter }}
         template(slot="receivables" slot-scope="{ row }")
-          span.steps__money(v-if="isEuro(row, 'receivables') || row.finance.Price.receivables === 0")
-          span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span.steps__step-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
-          span.steps__step-data(v-if="row.finance.Price.halfReceivables") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
+          span.steps__money(v-if="isShowValue(row, 'receivables')")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span.steps__step-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+            span.steps__step-data(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          span.steps__money(v-if="isEuro(row, 'payables') || row.finance.Price.payables === 0")
+          span.steps__money(v-if="isShowValue(row, 'payables')")
             span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span.steps__step-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
-            span.steps__step-data(v-if="row.finance.Price.halfPayables") {{ row.finance.Price.halfPayables }}
+            span.steps__step-data(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
         template(slot="margin" slot-scope="{ row }")
           span.steps__money(v-if="marginCalc(row)")
             span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
@@ -264,12 +264,13 @@
 				}
 				return finance.Price.payables;
 			},
-			isEuro(step, prop) {
+			isShowValue(step, prop) {
 				if(step.status === "Cancelled Halfway") {
 					const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables";
-					return step.finance.Price[halfProp];
+					const val = step.finance.Price[halfProp];
+					return val === 0 ? true : step.finance.Price[halfProp];
 				}
-				return step.finance.Price[prop];
+				return step.finance.Price[prop] === 0 ? true : step.finance.Price[prop];
 			},
 			isScrollDrop(drop, elem) {
 				return drop && elem.clientHeight >= 320;

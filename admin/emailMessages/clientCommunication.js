@@ -1,45 +1,46 @@
-const apiUrl = require("../helpers/apiurl");
-const jwt = require('jsonwebtoken');
-const { secretKey } = require('../configs');
-const moment = require('moment');
+const apiUrl = require("../helpers/apiurl")
+const jwt = require('jsonwebtoken')
+const { secretKey } = require('../configs')
+const moment = require('moment')
+const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 
 //Generate message for Project Quote
 function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
-	const date = Date.now();
-	const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
-	const { minimumCharge: { value, toIgnore } } = obj;
+	const date = Date.now()
+	const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled")
+	const { minimumCharge: { value, toIgnore } } = obj
 	let total = obj.selectedTasks.length ?
 			obj.selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0) :
-			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0);
+			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0)
 
-	const fromMinimumCharge = !toIgnore ? (value > total) : false;
+	const fromMinimumCharge = !toIgnore ? (value > total) : false
 	const tasksInfo = obj.selectedTasks.length ?
-			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
-			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps);
+			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
+			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps)
 	const tasksInfoArr = obj.selectedTasks.length ?
-			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true) :
-			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true);
-	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0);
+			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true) :
+			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true)
+	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0)
 	const taskInfoWithoutDiscountsArr = obj.selectedTasks.length ?
-			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true) :
-			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true, true);
-	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0);
-	const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' });
+			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true) :
+			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true, true)
+	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0)
+	const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' })
 
-	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2);
-	let detailHeader = "Please see below the quote details:";
-	if(obj.isPriceUpdated) {
-		detailHeader = "Your quote has been updated - please see below the quote details:";
+	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2)
+	let detailHeader = "Please see below the quote details:"
+	if (obj.isPriceUpdated) {
+		detailHeader = "Your quote has been updated - please see below the quote details:"
 	}
-	const reason = obj.reason ? `<p>Reason ${ obj.reason }</p><p>Please see below the updated quote details</p>` : "";
-	let acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-acceptquote?projectId=${ obj.id }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
-	let declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-declinequote?projectId=${ obj.id }&to=${ date }t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
-	if(obj.selectedTasks.length) {
-		let taskIdsString = '';
-		obj.selectedTasks.forEach(task => taskIdsString += `${ task.taskId };`);
-		taskIdsString = taskIdsString.replace(/[' ']/g, '%');
-		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
-		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } &euro;</a>`;
+	const reason = obj.reason ? `<p>Reason ${ obj.reason }</p><p>Please see below the updated quote details</p>` : ""
+	let acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-acceptquote?projectId=${ obj.id }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
+	let declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-declinequote?projectId=${ obj.id }&to=${ date }t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
+	if (obj.selectedTasks.length) {
+		let taskIdsString = ''
+		obj.selectedTasks.forEach(task => taskIdsString += `${ task.taskId };`)
+		taskIdsString = taskIdsString.replace(/[' ']/g, '%')
+		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ obj.finance.Price.receivables } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
+		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
 	}
 
 	return `<div class="wrapper"
@@ -120,14 +121,14 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 																	${ showCostHeader(fromMinimumCharge) }
 	                            </tr>
 	                            ${ tasksInfo }
-	         										${ generateTotalRow(taskInfoSubTotal, fromMinimumCharge) }
+	         										${ generateTotalRow(taskInfoSubTotal, fromMinimumCharge, obj) }
 	                        </table>
                         </div>
                         </br>
                         <div style="overflow-x:auto;">
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 60%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
-															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) }
+															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) }
 	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
@@ -135,7 +136,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	                                Total:</td>
 	                                <td
 	                                    style="color:#fff; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-	                                    &euro; ${ total }</td>
+	                                   ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ total }</td>
 	                            </tr>
 	                        </table>
 												</div>
@@ -162,31 +163,31 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
                     <a class="footer__link" href="https://www.pangea.global"
                         style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;">www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 //Generate message for Project Cost Quote
 function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
-	const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled");
-	const { minimumCharge: { value, toIgnore } } = obj;
+	const activeTasks = obj.tasks.filter(item => item.status !== "Cancelled")
+	const { minimumCharge: { value, toIgnore } } = obj
 	let total = obj.selectedTasks.length ?
 			obj.selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0) :
-			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0);
-	const fromMinimumCharge = !toIgnore ? (value > total) : false;
+			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0)
+	const fromMinimumCharge = !toIgnore ? (value > total) : false
 	const tasksInfo = obj.selectedTasks.length ?
-			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
-			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps);
+			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
+			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps)
 	const tasksInfoArr = obj.selectedTasks.length ?
-			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true) :
-			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true);
-	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0);
+			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true) :
+			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true)
+	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0)
 	const taskInfoWithoutDiscountsArr = obj.selectedTasks.length ?
-			getTasksInfo(fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true) :
-			getTasksInfo(fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true, true);
-	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0);
+			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true) :
+			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true, true)
+	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0)
 
-	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2);
-	let detailHeader = "Please see below the estimated quote details:";
+	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2)
+	let detailHeader = "Please see below the estimated quote details:"
 
 	return `<div class="wrapper"
                 style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;">
@@ -266,14 +267,14 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
 																	${ showCostHeader(fromMinimumCharge) }
 	                            </tr>
 	                            ${ tasksInfo }
-	         										${ generateTotalRow(taskInfoSubTotal, fromMinimumCharge) }
+	         										${ generateTotalRow(taskInfoSubTotal, fromMinimumCharge, obj) }
 	                        </table>
                         </div>
                         </br>
                         <div style="overflow-x:auto;">
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 60%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
-															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) }
+															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) }
 	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
@@ -281,7 +282,7 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
 	                                Total:</td>
 	                                <td
 	                                    style="color:#fff; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-	                                    &euro; ${ total }</td>
+	                                    ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ total }</td>
 	                            </tr>
 	                        </table>
 												</div>
@@ -303,22 +304,22 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
                     <a class="footer__link" href="https://www.pangea.global"
                         style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;">www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 //Make template for .pdf file
 function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
-	const selectedTasks = !tasksIds.length ? obj.tasks.filter(item => item.status !== "Cancelled") : obj.tasks.filter(task => tasksIds.includes(task.taskId));
-	const { minimumCharge: { value, toIgnore } } = obj;
-	let total = selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0);
-	const fromMinimumCharge = !toIgnore ? (value > total) : false;
-	const tasksInfo = getTasksInfo(fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps);
-	const tasksInfoArr = getTasksInfo(fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps, true);
-	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0);
-	const taskInfoWithoutDiscountsArr = getTasksInfo(fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true);
-	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0);
-	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2);
-	const clientName = obj.customer.officialName || obj.customer.name;
+	const selectedTasks = !tasksIds.length ? obj.tasks.filter(item => item.status !== "Cancelled") : obj.tasks.filter(task => tasksIds.includes(task.taskId))
+	const { minimumCharge: { value, toIgnore } } = obj
+	let total = selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0)
+	const fromMinimumCharge = !toIgnore ? (value > total) : false
+	const tasksInfo = getTasksInfo(obj, fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps)
+	const tasksInfoArr = getTasksInfo(obj, fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps, true)
+	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0)
+	const taskInfoWithoutDiscountsArr = getTasksInfo(obj, fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true)
+	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0)
+	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2)
+	const clientName = obj.customer.officialName || obj.customer.name
 
 	return `<div class="wrapper pdf" style="width:800px; margin: 0 auto; font-size:14px!important;font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="border: 1px solid #66563D;text-align:center;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;" >
@@ -400,12 +401,12 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 																	${ showCostHeader(fromMinimumCharge) }
 	                            </tr>
 	                        		${ tasksInfo }
-	         										${ generateTotalRow(taskInfoSubTotal, fromMinimumCharge) }
+	         										${ generateTotalRow(taskInfoSubTotal, fromMinimumCharge, obj) }
 
 	                        </table>
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 100%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
-															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) }
+															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) }
 	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
@@ -413,24 +414,24 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 	                                Total:</td>
 	                                <td
 	                                    style="color:#fff; background: #66563E;border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-	                                    &euro; ${ total }</td>
+	                                    ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ total }</td>
 	                            </tr>
 	                        </table>
-            </div>`;
+            </div>`
 }
 
 //Check min price in Project
-function generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge) {
-	const TMDiscount = taskInfoSubTotal - taskInfoWithoutDiscounts;
+function generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) {
+	const TMDiscount = taskInfoSubTotal - taskInfoWithoutDiscounts
 	const TMRow = TMDiscount > 0 ? `<td class="main_weight600" style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;"> TM Discount:</td> 
-<td style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;"> &euro; ${ TMDiscount.toFixed(2) }</td>` : `<td style="display: none;"></td><td style="display: none;"></td>`;
+<td style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;"> ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ TMDiscount.toFixed(2) }</td>` : `<td style="display: none;"></td><td style="display: none;"></td>`
 	return !fromMinimumCharge ? `<tr>
             <td class="main_weight600"
                 style="border:none;background: #F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                 Sub-total:</td>
             <td
                 style="border:none;background: #F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                &euro; ${ taskInfoSubTotal.toFixed(2) }</td>
+                ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ taskInfoSubTotal.toFixed(2) }</td>
         </tr>
         <tr>
  						${ TMRow }
@@ -446,23 +447,23 @@ function showCostHeader(fromMinimumCharge) {
 
 //generate discounts and amounts
 function discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) {
-	const TMDiscount = taskInfoSubTotal - taskInfoWithoutDiscounts;
-	const startIndex = TMDiscount > 0 ? 2 : 1;
+	const TMDiscount = taskInfoSubTotal - taskInfoWithoutDiscounts
+	const startIndex = TMDiscount > 0 ? 2 : 1
 	return obj.discounts.length && !fromMinimumCharge ?
 			obj.discounts.reduce((acc, curr, index) => {
-				let color = (index + startIndex) % 2 ? '#fff' : '#F4F0EE';
+				let color = (index + startIndex) % 2 ? '#fff' : '#F4F0EE'
 				acc += `<tr><td class="main_weight600"
 				style="border:none;background: ${ color };padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
 						${ curr.name }</td>
 						<td style="border:none;background: ${ color };padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                &euro; ${ ((taskInfoWithoutDiscounts * curr.value) / 100).toFixed(2) }</td></tr>`;
-				return acc;
+                ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ ((taskInfoWithoutDiscounts * curr.value) / 100).toFixed(2) }</td></tr>`
+				return acc
 			}, '') :
-			`<tr style="display: none;"></tr>`;
+			`<tr style="display: none;"></tr>`
 }
 
 //Show or hide SubTotal row
-function generateTotalRow(taskInfoSubTotal, fromMinimumCharge) {
+function generateTotalRow(taskInfoSubTotal, fromMinimumCharge, obj) {
 	return !fromMinimumCharge ? `<tr>
             <td class="main_weight600"
                   style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
@@ -474,30 +475,30 @@ function generateTotalRow(taskInfoSubTotal, fromMinimumCharge) {
                   <td style="background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;"></td>
 					 <td class="main_weight600" 
 					 style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
-                 &euro; ${ taskInfoSubTotal.toFixed(2) }</td>
+                 ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ taskInfoSubTotal.toFixed(2) }</td>
 					</tr>` : `<tr style="display: none;"></tr>`
 }
 
 //Task information for Project Quote
-function getTasksInfo(fromMinimumCharge, tasks, steps, allUnits, allSettingsSteps, onlyInformation = false, sumForTMDiscounts = false) {
+function getTasksInfo(obj, fromMinimumCharge, tasks, steps, allUnits, allSettingsSteps, onlyInformation = false, sumForTMDiscounts = false) {
 	const tasksInfo = tasks.reduce((acc, curTask, index) => {
-		const taskSteps = steps.filter(item => item.taskId === curTask.taskId);
-		const langPair = curTask.sourceLanguage ? `${ curTask.sourceLanguage } >> ${ curTask.targetLanguage }` : `${ curTask.targetLanguage } / ${ curTask.packageSize }`;
-		let cost;
-		let totalQuantity;
+		const taskSteps = steps.filter(item => item.taskId === curTask.taskId)
+		const langPair = curTask.sourceLanguage ? `${ curTask.sourceLanguage } >> ${ curTask.targetLanguage }` : `${ curTask.targetLanguage } / ${ curTask.packageSize }`
+		let cost
+		let totalQuantity
 		for (let curStep of taskSteps) {
-			const { type } = allUnits.find(({ _id }) => _id.toString() === curStep.serviceStep.unit.toString());
-			const { title } = allSettingsSteps.find(({ _id }) => _id.toString() === curStep.serviceStep.step.toString());
-			if(type === 'CAT Wordcount') {
-				cost = sumForTMDiscounts ? curStep.finance.Wordcount.receivables * curStep.clientRate.value : curStep.totalWords * curStep.clientRate.value;
-				totalQuantity = curStep.totalWords;
+			const { type } = allUnits.find(({ _id }) => _id.toString() === curStep.serviceStep.unit.toString())
+			const { title } = allSettingsSteps.find(({ _id }) => _id.toString() === curStep.serviceStep.step.toString())
+			if (type === 'CAT Wordcount') {
+				cost = sumForTMDiscounts ? curStep.finance.Wordcount.receivables * curStep.clientRate.value : curStep.totalWords * curStep.clientRate.value
+				totalQuantity = curStep.totalWords
 			} else {
-				if(type === 'Packages') {
-					totalQuantity = curStep.quantity;
+				if (type === 'Packages') {
+					totalQuantity = curStep.quantity
 				} else {
-					totalQuantity = curStep.hours;
+					totalQuantity = curStep.hours
 				}
-				cost = curStep.defaultStepPrice;
+				cost = curStep.defaultStepPrice
 			}
 			acc.push({
 				task: curTask.service.title,
@@ -510,17 +511,17 @@ function getTasksInfo(fromMinimumCharge, tasks, steps, allUnits, allSettingsStep
 				color: (index + 2) % 2 ? '#fff' : '#F4F0EE'
 			})
 		}
-		return [...acc];
-	}, []);
-	let result = "";
+		return [...acc]
+	}, [])
+	let result = ""
 	for (let info of tasksInfo) {
-		result += getTaskCode(fromMinimumCharge, info);
+		result += getTaskCode(obj, fromMinimumCharge, info)
 	}
-	return onlyInformation ? tasksInfo : result;
+	return onlyInformation ? tasksInfo : result
 }
 
 //List of Steps for Quote message body
-function getTaskCode(fromMinimumCharge, taskInfo) {
+function getTaskCode(obj, fromMinimumCharge, taskInfo) {
 	return `<tr>
                 <td
                     style="background: ${ taskInfo.color };border: none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
@@ -536,119 +537,26 @@ function getTaskCode(fromMinimumCharge, taskInfo) {
                     ${ taskInfo.unit }</td>
                 <td
                     style="background: ${ taskInfo.color };border: none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
-                    &euro; ${ taskInfo.unitPrice }</td>
+                    ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ taskInfo.unitPrice }</td>
                 <td
                     style="background: ${ taskInfo.color };border: none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                     ${ taskInfo.quantity }</td>
-              	${ showCost(fromMinimumCharge, taskInfo) }
-            </tr>`;
+              	${ showCost(obj, fromMinimumCharge, taskInfo) }
+            </tr>`
 
-	function showCost(fromMinimumCharge, taskInfo) {
+	function showCost(obj, fromMinimumCharge, taskInfo) {
 		return !fromMinimumCharge ? `
-		   <td style="background: ${ taskInfo.color };border: none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;"> &euro; ${ taskInfo.cost.toFixed(2) }</td>` :
+		   <td style="background: ${ taskInfo.color };border: none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;"> ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ taskInfo.cost.toFixed(2) }</td>` :
 				`<td style="display: none"></td>`
 	}
 }
 
-// function getSubTotal(tasks, steps) {
-// 	return tasks.reduce((acc, cur) => {
-// 		const taskSteps = steps.filter(item => item.taskId === cur.taskId);
-// 		let unitPrice = taskSteps.reduce((sum, c) => {
-// 			return sum += c.clientRate ? c.clientRate.value : 0;
-// 		}, 0);
-// 		let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
-// 		if(cur.service.calculationUnit !== 'Words') {
-// 			totalQuantity = cur.finance.Price.receivables;
-// 			unitPrice = 1;
-// 		}
-// 		return acc + +(unitPrice * totalQuantity);
-// 	}, 0);
-// }
-// function getTasksInfoPdf(tasks, steps) {
-// 	const tasksInfo = tasks.reduce((acc, cur) => {
-// 		const taskSteps = steps.filter(item => item.taskId === cur.taskId);
-// 		const unitPrice = taskSteps.reduce((sum, c) => {
-// 			return sum += c.clientRate ? c.clientRate.value : 0;
-// 		}, 0);
-// 		const langPair = cur.sourceLanguage ? `${ cur.sourceLanguage } >> ${ cur.targetLanguage }` : `${ cur.targetLanguage } / ${ cur.packageSize }`;
-// 		let totalQuantity = cur.metrics ? cur.metrics.totalWords : 0;
-// 		let cost = unitPrice * totalQuantity;
-// 		if(cur.service.calculationUnit !== 'Words') {
-// 			totalQuantity = cur.service.calculationUnit === 'Hours' ? taskSteps[0].quantity : 1;
-// 			cost = cur.finance.Price.receivables;
-// 		}
-// 		acc.push({
-// 			task: cur.service.title,
-// 			langPair: `${ langPair }`,
-// 			unitPrice: unitPrice,
-// 			unit: cur.service.calculationUnit,
-// 			quantity: totalQuantity,
-// 			cost
-// 		})
-// 		return [...acc];
-// 	}, [])
-//
-// 	function groupByKey(array, key) {
-// 		return array.reduce((result, currentValue) => {
-// 			(result[currentValue[key]] = result[currentValue[key]] || []).push(
-// 					currentValue);
-// 			return result;
-// 		}, {});
-// 	}
-//
-// 	let result = "";
-// 	let languageGroup = groupByKey(tasksInfo, 'langPair');
-//
-// 	for (let language in languageGroup) {
-// 		result += getUniqueLanguage(language);
-// 		let taskGroup = groupByKey(languageGroup[language], 'task');
-// 		for (let task in taskGroup) {
-// 			result += getUniqueTask(task);
-// 			for (let info in taskGroup[task]) {
-// 				result += getTaskCodePdf(taskGroup[task][info]);
-// 			}
-// 		}
-// 	}
-// 	return result;
-// }
-// function getUniqueLanguage(language) {
-// 	return `<tr>
-//                 <td style="border-right-width:0px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//                 <td class="language" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;background-color:#DED8C8;background-image:none;background-repeat:repeat;background-position:top left;background-attachment:scroll;font-weight:bold;" >
-//                 ${ language }</td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//             </tr>`;
-// }
-//
-// function getUniqueTask(task) {
-// 	return `<tr>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//                 <td class="task" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;background-color:#F4C040;background-image:none;background-repeat:repeat;background-position:top left;background-attachment:scroll;font-weight:bold;" >
-//                 ${ task }</td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" ></td>
-//             </tr>`;
-// }
-//
-// function getTaskCodePdf(taskInfo) {
-// 	return `<tr>
-//                 <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" >${ taskInfo.quantity }</td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" >${ taskInfo.unit }</td>
-//                 <td style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;" >${ taskInfo.task }</td>
-//                 <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>${ taskInfo.unitPrice }</td>
-//                 <td class="table__text-right" style="border-right-width:1px;border-right-style:solid;border-right-color:#66563D;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;text-align:right;" ><span style="padding-right: 5px;" >&euro;</span>${ taskInfo.cost.toFixed(2) }</td>
-//             </tr>`
-// }
-
 function emailMessageForContact(obj) {
-	const surname = obj.surname || "";
+	const surname = obj.surname || ""
 	const langPairs = obj.tasks.reduce((acc, cur) => {
-		const pair = cur.sourceLanguage ? `${ cur.sourceLanguage } >> ${ cur.targetLanguage }; ` : `${ cur.targetLanguage } / ${ cur.packageSize }; `;
-		return acc + pair;
-	}, "");
+		const pair = cur.sourceLanguage ? `${ cur.sourceLanguage } >> ${ cur.targetLanguage }; ` : `${ cur.targetLanguage } / ${ cur.packageSize }; `
+		return acc + pair
+	}, "")
 	return `<div class="message-wrapper" style="width: 960px;border: 1px solid rgb(129, 129, 129);">
             <h3 class="clientName" style="margin-top: 0;padding: 30px;background-color: rgb(250, 250, 250);">Dear ${ obj.firstName } ${ surname },</h3>
             <div class="all-info" style="padding: 0 15px 0 30px;">
@@ -689,12 +597,12 @@ function emailMessageForContact(obj) {
                 <h2 class="contact" style="border-bottom: 1px solid rgb(29, 29, 29);">Contact Pangea Translation Services (Cyprus) LTD</h2>
                 <a href="http://pangea.global" target="_blank"><img src="cid:logo@pan" style="width: 50%; margin-left: 145px;"></a>
             </div>
-        </div>`;
+        </div>`
 }
 
 // Return template for Task ready for Delivery
 function taskReadyMessage(obj) {
-	const am = `${ obj.project.accountManager.firstName } ${ obj.project.accountManager.lastName }`;
+	const am = `${ obj.project.accountManager.firstName } ${ obj.project.accountManager.lastName }`
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -717,7 +625,7 @@ function taskReadyMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 // Return template for Task for Delivery
@@ -744,7 +652,7 @@ function taskDeliveryMessage(obj) {
                         <hr size="15" color="#66563E">
                         <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                     </footer>
-                </div>`;
+                </div>`
 }
 
 function projectCancelledMessage(obj) {
@@ -770,11 +678,11 @@ function projectCancelledMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function projectMiddleCancelledMessage(obj) {
-	const isPayRow = obj.isPay ? `<p>You will need to pay a partial amount of <strong>${ obj.finance.Price.receivables } &euro;</strong></p>` : `<p>You will not be charged for this project.</p>`;
+	const isPayRow = obj.isPay ? `<p>You will need to pay a partial amount of <strong>${ obj.finance.Price.receivables } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</strong></p>` : `<p>You will not be charged for this project.</p>`
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -797,9 +705,10 @@ function projectMiddleCancelledMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 
 }
+
 //MM Not used
 // function tasksCancelledMessage(obj) {
 // 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -821,34 +730,34 @@ function projectMiddleCancelledMessage(obj) {
 //             </div>`;
 // }
 
-function listOfPaymentTasks(taskList, steps) {
-	let tableBody = "";
+function listOfPaymentTasks(obj, taskList, steps) {
+	let tableBody = ""
 	for (let task of taskList) {
-		const taskSteps = steps.filter(item => item.taskId === task.taskId);
-		const porgress = getTaskProgress(task, taskSteps);
+		const taskSteps = steps.filter(item => item.taskId === task.taskId)
+		const porgress = getTaskProgress(task, taskSteps)
 		tableBody += `<tr>
                         <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${ task.taskId }</td>
                         <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${ porgress }%</td>
-                        <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${ task.finance.Price.halfReceivables } EUR</td>
+                        <td style="border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">${ task.finance.Price.halfReceivables } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</td>
                     </tr>`
 	}
-	return tableBody;
+	return tableBody
 }
 
 function listOfTasks(taskList) {
-	let list = "";
+	let list = ""
 	for (let task of taskList) {
 		list += `<li>${ task.taskId }</li>`
 	}
-	return list;
+	return list
 }
 
 function tasksMiddleCancelledMessage(obj) {
-	const paymentTasks = listOfPaymentTasks(obj.tasks, obj.project.steps)
-	const listTasks = listOfTasks(obj.tasks);
+	const paymentTasks = listOfPaymentTasks(obj, obj.tasks, obj.project.steps)
+	const listTasks = listOfTasks(obj.tasks)
 	const isPayHead = obj.isPay ? `<p>The following tasks have been completed partially and payment will be as following</p>` : `<p>You will not be charged for the following tasks:</p>`
-	let isPayRow;
-	if(obj.isPay) {
+	let isPayRow
+	if (obj.isPay) {
 		isPayRow = `<table style="width:100%;color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
             <thead>
                 <tr>
@@ -885,7 +794,7 @@ function tasksMiddleCancelledMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 //When Project Ready to Delivery
@@ -915,17 +824,17 @@ function projectDeliveryMessage(obj) {
                     <hr size="15" color="#66563E">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
                 </footer>
-            </div>`;
+            </div>`
 }
 
 function getTaskProgress(task, steps) {
-	if(task.hasOwnProperty('metrcis')) {
+	if (task.hasOwnProperty('metrcis')) {
 		return steps.reduce((init, cur) => {
-			return init + (cur.progress.wordsDone / cur.progress.totalWordCount) * 100 / steps.length;
-		}, 0).toFixed(2);
+			return init + (cur.progress.wordsDone / cur.progress.totalWordCount) * 100 / steps.length
+		}, 0).toFixed(2)
 	}
 	return Math.round(steps.reduce((init, cur) => {
-		return init + cur.progress / steps.length;
+		return init + cur.progress / steps.length
 	}, 0))
 }
 

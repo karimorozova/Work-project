@@ -31,7 +31,7 @@ export default {
 
 <style lang='scss'>
 body {
-  font-family: MyriadPro;
+  font-family: Myriad400;
   color: #67573E;
 }
 .b-log-in,
@@ -80,6 +80,36 @@ body {
     background-clip: content-box;
   }
 }
+
+@font-face {
+  font-family: 'Myriad300';
+  font-style: normal;
+  font-weight: normal;
+  src: url('./assets/fonts/MYRIADPRO-LIGHT.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Myriad400';
+  font-style: normal;
+  font-weight: normal;
+  src: url('./assets/fonts/MYRIADPRO-REGULAR.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Myriad600';
+  font-style: normal;
+  font-weight: normal;
+  src:  url('./assets/fonts/MYRIADPRO-SEMIBOLD.woff') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Myriad900';
+  font-style: normal;
+  font-weight: normal;
+  src: url('./assets/fonts/MYRIADPRO-BOLD.woff') format('woff');
+}
+
 /* Custom scroll-bar */
 #app {
   /* ------- If buttons needed ---------
