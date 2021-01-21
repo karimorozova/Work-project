@@ -157,7 +157,6 @@ export default {
         margin-top: 10px;
         color: #66563D;
         outline: none;
-        font-family: MyriadPro;
         &:focus {
             box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
         }

@@ -8,7 +8,7 @@
 
     .container {
         position: relative;
-        font-family: MyriadPro;
+        font-family: Myriad400;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -50,7 +50,7 @@
                                 border-radius: 7px;
                                 border: 1px solid rgba(102, 86, 61, 0.5);
                                 outline: none;
-                                font-family: MyriadPro;
+                                font-family: Myriad400;
                                 transition: all 0.2s;
                                 &:focus {
                                     box-shadow: 0 0 5px rgba(102, 86, 61, 0.5);
@@ -366,7 +366,7 @@
                 .inner-ta {
                     margin-bottom: 20px;
                     .ta-block2 {
-                        font-family: MyriadPro;
+                        font-family: Myriad400;
                         border-radius: 8px;
                         outline: none;
                         width: 98%;
@@ -407,7 +407,7 @@
                 }
                 .in-block3 {
                     input {
-                        font-family: MyriadPro;
+                        font-family: Myriad400;
                         border-radius: 8px;
                         outline: none;
                         width: 98%;
@@ -424,7 +424,7 @@
                 }
                 .in-block4 {
                     input {
-                        font-family: MyriadPro;
+                        font-family: Myriad400;
                         border-radius: 8px;
                         outline: none;
                         width: 98%;
@@ -468,7 +468,7 @@
                             .in-block5 {
                                 width: 55%;
                                     textarea {
-                                        font-family: MyriadPro;
+                                        font-family: Myriad400;
                                         border-radius: 8px;
                                         outline: none;
                                         width: 100%;
@@ -622,7 +622,7 @@
                                         position: relative;
                                         color: #fff;
                                         font-size: 15px;
-                                        font-family: MyriadPro;
+                                        font-family: Myriad400;
                                         text-align: center;
                                     }
                                     input {
@@ -634,7 +634,7 @@
                                         opacity: 0;
                                         filter: alpha(opacity=0);
                                         font-size: 50px;
-                                        font-family: MyriadPro;
+                                        font-family: Myriad400;
                                         width: 170px;
                                     }
                             }
@@ -684,7 +684,7 @@
                         display: none;
                     }
                     .textarea_vis {
-                        font-family: MyriadPro;
+                        font-family: Myriad400;
                         display: block;
                         border-radius: 8px;
                         border-style: ridge;
@@ -770,7 +770,7 @@
                         margin-left: 10px;
                         border: 1px solid rgba(102, 86, 61, 0.7);
                         border-radius: 5px;
-                        font-family: MyriadPro;
+                        font-family: Myriad400;
                         outline: none;        
                     }
                     &__check {
@@ -904,7 +904,7 @@
                             margin-left: 10px;
                             border: 1px solid rgba(102, 86, 61, 0.7);
                             border-radius: 5px;
-                            font-family: MyriadPro;
+                            font-family: Myriad400;
                             outline: none;        
                         }
                         &__check {
@@ -1110,7 +1110,7 @@
 }
 
 .orderInfoCopy {
-font-family: MyriadPro;
+font-family: Myriad400;
 color: #66563D;
 transition: all 0.7s;
 margin-left: 30px;
@@ -1153,7 +1153,7 @@ align-items: center;
     .check {
     margin-top: 5px;
     color: #D15F45;
-    font-family: MyriadPro;
+    font-family: Myriad400;
     }
     &-languages {
     p {
@@ -1303,7 +1303,7 @@ align-items: center;
             margin-left: 10px;
             border: 1px solid rgba(102, 86, 61, 0.7);
             border-radius: 5px;
-            font-family: MyriadPro;
+            font-family: Myriad400;
             outline: none;        
         }
         &__check {

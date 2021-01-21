@@ -66,7 +66,7 @@ export default {
     box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
     display: flex;
     flex-direction: column;
-    font-family: MyriadPro;
+    font-family: Myriad400;
     color: #67573e;
     font-size: 22px;
     transition: all 1s;

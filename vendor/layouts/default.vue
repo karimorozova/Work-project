@@ -29,7 +29,7 @@ export default {
 
 <style>
 body {
-  font-family: MyriadPro;
+  font-family: Myriad400;
 }
 
 .slide-fade-enter-active {
@@ -41,15 +41,6 @@ body {
 .slide-fade-enter, .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
-}
-
-@font-face {
-  font-family: MyriadPro;
-  src: url("../assets/fonts/MyriadPro-Regular.otf");
-}
-@font-face {
-  font-family: MyriadBold;
-  src: url("../assets/fonts/MyriadPro-Bold.otf");
 }
 
 ::-webkit-scrollbar {
@@ -124,5 +115,12 @@ body {
 }
 
 -----------  */
+
+@font-face {
+  font-family: 'Myriad400';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../assets/fonts/MYRIADPRO-REGULAR.woff') format('woff');
+}
 
 </style>

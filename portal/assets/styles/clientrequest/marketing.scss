@@ -98,7 +98,7 @@
                     border-radius: 7px;
                     border: 1px solid rgba(102, 86, 61, .5);
                     outline: none;
-                    font-family: MyriadPro;
+                    font-family: Myriad400;
                     transition: all 0.2s;
                     &:focus {
                         box-shadow: 0 0 3px rgba(102, 86, 61, 0.6);
@@ -306,7 +306,7 @@
                                 font-size: 14px
                             }
                             .toneInput {
-                                font-family: MyriadPro;
+                                font-family: Myriad400;
                                 outline: none;
                                 width: 100px;
                                 margin-left: 10px;
@@ -362,7 +362,7 @@
                 border-radius: 7px;
                 height: 17px;
                 padding: 6px;
-                font-family: MyriadPro;             
+                font-family: Myriad400;
             }
             textarea {
                 outline: none;
@@ -374,7 +374,7 @@
                 overflow: hidden;
                 transition: all 0.2s;
                 resize: none;
-                font-family: MyriadPro;                
+                font-family: Myriad400;
             }
             .inner-topics {
                 &__textField {
@@ -388,7 +388,7 @@
                         height: 17px;
                         border: 1px solid #66563D;
                         border-radius: 7px;
-                        font-family: MyriadPro;                         
+                        font-family: Myriad400;
                     }
                     button {
                         font-size: 16px;
@@ -453,7 +453,7 @@
                         border: none;
                         outline: none;
                         border: 1px solid rgba(102, 86, 61, 0.7);
-                        font-family: MyriadPro;             
+                        font-family: Myriad400;
                     }
                     ::-webkit-input-placeholder {
                         text-align: center;
@@ -491,7 +491,7 @@
                             position: relative;
                             color: #fff;
                             font-size: 15px;
-                            font-family: MyriadPro;
+                            font-family: Myriad400;
                             text-align: center;
                         }
                         input {
@@ -503,7 +503,7 @@
                             opacity: 0;
                             filter: alpha(opacity=0);
                             font-size: 50px;
-                            font-family: MyriadPro;
+                            font-family: Myriad400;
                         }
                     }
                     .under {
@@ -536,7 +536,7 @@
                 margin-left: 10px;
                 border: 1px solid rgba(102, 86, 61, 0.7);
                 border-radius: 5px;
-                font-family: MyriadPro;          
+                font-family: Myriad400;
             }
             &__check {
                 border-radius: 0;

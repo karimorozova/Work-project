@@ -58,14 +58,4 @@ export default {
     margin: 100px;
     color: red;
 }
-
-@font-face {
-  font-family: MyriadPro;
-  src: url("../../assets/fonts/MyriadPro-Regular.otf");
-}
-@font-face {
-  font-family: MyriadBold;
-  src: url("../../assets/fonts/MyriadPro-Bold.otf");
-}
-
 </style>

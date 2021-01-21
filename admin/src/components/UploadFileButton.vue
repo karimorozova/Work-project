@@ -64,7 +64,7 @@ export default {
         position: relative;
         color: #fff;
         font-size: 15px;
-        font-family: MyriadPro;
+        font-family: Myriad400;
         text-align: center;
         .tasks-data & {
             padding-top: 7px;
@@ -86,7 +86,7 @@ export default {
         opacity: 0;
         filter: alpha(opacity=0);
         font-size: 30px;
-        font-family: MyriadPro;
+        font-family: Myriad400;
     }
 }
 </style>

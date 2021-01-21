@@ -79,13 +79,8 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors.scss";
 
-  @font-face {
-    font-family: MyriadPro;
-    src: url('/assets/fonts/MyriadPro-Regular.otf');
-  }
-
   .login {
-    font-family: MyriadPro;
+    font-family: Myriad400;
     background-image: url("/assets/images/signin-background.jpg");
     display: flex;
     justify-content: center;

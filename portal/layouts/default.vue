@@ -29,7 +29,7 @@
 
 <style>
   body {
-    font-family: MyriadPro;
+    font-family: Myriad400;
   }
 
   .slide-fade-enter-active {
@@ -41,15 +41,6 @@
   .slide-fade-enter, .slide-fade-leave-to {
     transform: translateX(20px);
     opacity: 0;
-  }
-
-  @font-face {
-    font-family: MyriadPro;
-    src: url("../assets/fonts/MyriadPro-Regular.otf");
-  }
-  @font-face {
-    font-family: MyriadBold;
-    src: url("../assets/fonts/MyriadPro-Bold.otf");
   }
 
   ::-webkit-scrollbar {
@@ -82,6 +73,35 @@
   ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(103, 87, 62, 0.6);
     background-clip: content-box;
+  }
+
+  @font-face {
+    font-family: 'Myriad300';
+    font-style: normal;
+    font-weight: normal;
+    src: url('../assets/fonts/MYRIADPRO-LIGHT.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Myriad400';
+    font-style: normal;
+    font-weight: normal;
+    src: url('../assets/fonts/MYRIADPRO-REGULAR.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Myriad600';
+    font-style: normal;
+    font-weight: normal;
+    src: url('../assets/fonts/MYRIADPRO-SEMIBOLD.woff') format('woff');
+  }
+
+
+  @font-face {
+    font-family: 'Myriad900';
+    font-style: normal;
+    font-weight: normal;
+    src: url('../assets/fonts/MYRIADPRO-BOLD.woff') format('woff');
   }
 
   /* ------- If buttons needed ---------

@@ -35,13 +35,9 @@
 </script>
 
 <style lang="scss" scoped>
-  @font-face {
-    font-family: MyriadPro;
-    src: url('/assets/fonts/MyriadPro-Regular.otf');
-  }
   .restoreMain {
     background-image: url("../assets/images/image-background.jpg");
-    font-family: MyriadPro;
+    font-family: Myriad400;
   }
 
   .restoreWrapper {
@@ -80,7 +76,7 @@
           border-radius: 8px;
           border: 2px solid #dedede;
           margin: 1% 0 3% 9%;
-          font-family: MyriadPro;
+          font-family: Myriad400;
           &::-webkit-input-placeholder {
             opacity: 0.38;
           }
@@ -111,7 +107,7 @@
           background-color: #84ca8e;
           color: #66563d;
           margin-right: 5%;
-          font-family: MyriadPro!important;
+          font-family: Myriad400!important;
         }
 
         &__backLabel {
