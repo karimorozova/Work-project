@@ -1,21 +1,36 @@
 const { XtrfLqaGrouped, Vendors } = require("../models");
 const {canNextLQAStep} = require("../reports/helpers")
 
-const getVendorReportWordcount = async (vendorId) => {
-	const assessments = await Vendors.findOne({ _id: vendorId });
-	let allReports = await XtrfLqaGrouped.findOne({languagePair})
-	// return allReports.map();
+const getVendorAssessmentsWordCount = async (vendorId) => {
+	const { assessments } = await Vendors.findOne({ _id: vendorId })
+			.populate('assessments.sourceLanguage', 'lang' )
+			.populate('assessments.targetLanguage', 'lang')
+			.populate('assessments.industries.industry', ['name'])
 
-	// return assessments
-	// const assessmentLangPair = industries.find(({industryGroup}) => industryGroup === industry)
-	// if (!assessmentLangPair) return 0
-	// const assessmentIndustry = assessmentLangPair.vendors.find(({vendor})=> vendor === vendorId)
-	// return assessmentIndustry.wordCount;
+	const allReports = await XtrfLqaGrouped.find({},{'industries.vendors.otherInfo': 0})
+
+	return assessments.reduce((wordCountAssessments, { sourceLanguage, targetLanguage, industries }) => {
+		const langPair = sourceLanguage.lang + ' >> ' + targetLanguage.lang
+
+		industries.forEach(({industry}) => {
+			const assessmentWordCount = getAssessmentWordCount(allReports ,langPair, industry._id, vendorId)
+
+			if (!assessmentWordCount) return wordCountAssessments
+			wordCountAssessments.push({langPair,industry: industry.name, wordCount: assessmentWordCount})
+
+			return wordCountAssessments
+		})
+		return wordCountAssessments
+	},[])
+}
+function getAssessmentWordCount(xtrfReports,langPair, industry, vendorId) {
+	const assessmentLangPair = xtrfReports.find(report => report.languagePair === langPair)
+	if (!assessmentLangPair) return 0
+	const assessmentIndustry = assessmentLangPair.industries.find(({industryGroup}) => industryGroup._id.toString() === industry.toString())
+	if (!assessmentIndustry) return 0
+	const assessmentVendor = assessmentIndustry.vendors.find(({vendor}) => vendor.toString() === vendorId)
+	return assessmentVendor ? Math.round(assessmentVendor.wordCount) : 0;
 }
 
-// const getVendorReportWordcount = (languagePair, industry, vendorId, nextStep) => {
-//  const wordCount = getVendorWordCount(languagePair, industry, vendorId)
-// 	return canNextLQAStep(wordCount, nextStep, 1)
 
-
-module.exports = { getVendorReportWordcount }
+module.exports = { getVendorAssessmentsWordCount }

@@ -2,7 +2,6 @@ const router = require('express').Router();
 const { upload, stepEmailToVendor } = require('../utils');
 const mv = require('mv');
 const fse = require('fs-extra');
-const { getVendorReportWordcount } = require("../vendors/getVendorAssessments")
 const { getRatePricelist, changeMainRatePricelist } = require('../pricelist');
 const { updateProject, getProject } = require('../projects');
 const {
@@ -21,8 +20,9 @@ const {
   deleteVendorCompetencies,
   updateVendorsRatePrices,
   syncVendorRatesCost,
-  createRateRowFromQualification,
-  getVendorAfterCombinationsUpdated,
+	getVendorAssessmentsWordCount,
+	createRateRowFromQualification,
+	getVendorAfterCombinationsUpdated,
 } = require('../vendors');
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users');
 const { Vendors, Projects } = require('../models');
@@ -492,7 +492,7 @@ router.post('/get-message', async (req, res) => {
 router.get('/get-vendor-wordcount-from-reports/:id', async (req, res) => {
 		const { id } = req.params;
 	try {
-		const result = await getVendorReportWordcount(id);
+		const result = await getVendorAssessmentsWordCount(id);
 		res.send(result);
 	} catch (err) {
 		console.log(err);

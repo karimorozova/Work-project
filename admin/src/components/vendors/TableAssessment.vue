@@ -3,9 +3,9 @@
   .assessment__form(v-if="isForm")
     VendorLqa(:vendorData="lqaData", @closeForm="closeForm()", @saveVendorLqa="saveVendorLqa")
 
-  .assessment__item(v-for="(mainItem, mainIndex) in assessmentData")
-    .assessment__languages {{ mainItem.sourceLanguage.lang }} >> {{ mainItem.targetLanguage.lang }}
-    .assessment__industry(v-for="(industryData, industryIndex) in mainItem.industries")
+  .assessment__item(v-for="(assessment, mainIndex) in assessmentData")
+    .assessment__languages {{ assessment.sourceLanguage.lang }} >> {{ assessment.targetLanguage.lang }}
+    .assessment__industry(v-for="(industryData, industryIndex) in assessment.industries")
       .assessment__industry-title {{ industryData.industry.name }}
       .assessment__table
         SettingsTable(
@@ -30,21 +30,21 @@
             div(v-if="row.lqa1.grade", :class="'assessment__grade'") {{ row.lqa1.grade }}
               a(:href="domain + row.lqa1.path")
                 img(:class="'assessment__download'", src="../../assets/images/download-big-b.png")
-            .assessment__upload(v-if="true")
-              .assessment__load-file(@click="openForm({ field: 'testet', index, mainIndex, industryIndex })")
+            .assessment__upload(v-if="canNextAssessment(assessment, industryData, row, 'lqa1', 'tqi')")
+              .assessment__load-file(@click="openForm({ field: 'Lqa1', index, mainIndex, industryIndex })")
 
           template(slot="lqa2", slot-scope="{ row, index }")
             div(v-if="row.lqa2.grade", :class="'assessment__grade'") {{ row.lqa2.grade }}
               a(:href="domain + row.lqa2.path")
                 img(:class="'assessment__download'", src="../../assets/images/download-big-b.png")
-            .assessment__upload(v-if="!row.lqa2.grade && row.lqa1.grade && true")
+            .assessment__upload(v-if="canNextAssessment(assessment, industryData, row, 'lqa2', 'lqa1')")
               .assessment__load-file(@click="openForm({ field: 'Lqa2', index, mainIndex, industryIndex })")
 
           template(slot="lqa3", slot-scope="{ row, index }")
             div(v-if="row.lqa3.grade", :class="'assessment__grade'") {{ row.lqa3.grade }}
               a(:href="domain + row.lqa3.path")
                 img(:class="'assessment__download'", src="../../assets/images/download-big-b.png")
-            .assessment__upload(v-if="!row.lqa3.grade && row.lqa2.grade && true")
+            .assessment__upload(v-if="canNextAssessment(assessment, industryData, row,'lqa3', 'lqa2')")
               .assessment__load-file(@click="openForm({ field: 'Lqa3', index, mainIndex, industryIndex })")
 </template>
 
@@ -114,6 +114,7 @@ export default {
       isDeleting: false,
       deleteIndex: -1,
       domain: "http://localhost:3001",
+      assessmentsWordCount: [],
     };
   },
   methods: {
@@ -121,35 +122,46 @@ export default {
       alertToggle: "alertToggle",
       storeAssessment: "storeCurrentVendorAssessment",
     }),
-    canNextAssessment(assessmentInfo, industryData, nextStep) {
-    //   const languagePair =  assessmentInfo.sourceLanguage.lang + ' >> ' + assessmentInfo.targetLanguage.lang
-    //   const industry = industryData.name
-    //   const vendorId = this.currentVendor._id
-    //   const { canNextAssessment } = await this.$http.post(`/vendorsapi/get-vendor-wordcount-from-reports`, {languagePair, industry, vendorId, nextStep });
-	  //   console.log('canNextAssessment', canNextAssessment)
-    //
-      return false
+    canNextLQAStepByTier(wordCount, nextStep, tier) {
+      const tierInfo = this.tiersInfo[tier]
+      const index = tierInfo.find(({minWordCount}) =>  {
+        return  minWordCount <= Math.round(wordCount)
+      });
+      return index ? index.allowSteps.includes(nextStep) : false
+    },
+    canNextAssessment(assessment, industryData, row, nextStep, previousStep) {
+      if (row[nextStep].grade || !row[previousStep].grade) return false
+
+      const {sourceLanguage, targetLanguage} = assessment
+      const languagePair = sourceLanguage.lang + ' >> ' + targetLanguage.lang
+      const industryName = industryData.industry.name
+
+      if (!this.assessmentsWordCount.length) return false
+      const wordCount = this.assessmentsWordCount
+          .find(({langPair, industry}) => langPair === languagePair && industry === industryName).wordCount
+
+      return this.canNextLQAStepByTier(wordCount, nextStep, 1)
     },
     async saveVendorLqa({ vendorData }) {
-      const { file, grade, source, target, step, mainIndex, industryIndex, stepIndex } = vendorData;
+      const { file, grade, sourceLanguage, targetLanguage, step, mainIndex, industryIndex, stepIndex } = vendorData;
       const assessment = {
         ...this.currentAssessment,
         isNew: false,
         step,
-        source,
-        target,
+        source: sourceLanguage,
+        target: targetLanguage,
         mainIndex,
         industryIndex,
         stepIndex,
         [this.currentField]: { fileName: "", path: "", grade },
       };
       let formData = new FormData();
-      formData.append("vendorId", this.currentVendor._id);
+      formData.append("vendorId", this.$route.params.id);
       formData.append("assessment", JSON.stringify(assessment));
       formData.append("assessmentFile", file);
 
       try {
-        const result = await this.storeAssessment(formData);
+        await this.storeAssessment(formData);
         this.alertToggle({
           message: "Assessment saved",
           isShow: true,
@@ -170,8 +182,8 @@ export default {
     openForm({ field, index, mainIndex, industryIndex }) {
       const stepData = this.assessmentData[mainIndex];
       const { sourceLanguage, targetLanguage, industries } = stepData;
-      this.currentAssessment = industries[index];
-      const currentStep = this.currentAssessment.steps[industryIndex].step;
+      this.currentAssessment = industries[industryIndex];
+      const currentStep = this.currentAssessment.steps[index].step;
       this.currentIndex = index;
       this.currentField = field.toLowerCase();
 
@@ -186,7 +198,7 @@ export default {
         step: currentStep.title,
         sourceLanguage: sourceLanguage,
         targetLanguage: targetLanguage,
-        industry: industries[index].industry,
+        industry: industries[industryIndex].industry,
         [`is${field}`]: true,
         mainIndex,
         industryIndex,
@@ -196,12 +208,17 @@ export default {
     },
 	  async getVendorReports(){
 		  try{
-			  const result = await this.$http.get(`/vendorsapi/get-vendor-wordcount-from-reports/${this.$route.params.id}`);
-			  console.log(result.data)
-		  }catch(err){
-
+        const res = await this.$http.get(`/vendorsapi/get-vendor-wordcount-from-reports/${this.$route.params.id}`)
+        this.assessmentsWordCount = res.body
+      }catch(err){
+        console.log(err)
 		  }
     }
+  },
+  computed: {
+    ...mapGetters({
+      tiersInfo: 'getTiersInfo'
+    }),
   },
   components: {
     SettingsTable,
@@ -306,6 +323,7 @@ export default {
   &__grade {
     padding: 8.5px 0 0 5px;
     display: flex;
+    justify-content: center;
   }
 }
 </style>
