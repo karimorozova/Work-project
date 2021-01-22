@@ -70,8 +70,8 @@ const getXtrfLqaReport = async (filters) => {
   const languages = await Languages.find();
   const step = await Step.findOne({title: 'Translation'},{title: 1})
   const filterQuery = await getFilteringQueryForLqaReport(filters, languages);
-  countFilter = (sourceFilter || targetFilter || vendorFilter) ? 0 : countFilter;
-  skipCount = (sourceFilter || targetFilter || vendorFilter) ? 0 : skipCount;
+  countFilter = (sourceFilter || targetFilter || vendorFilter || industryFilter) ? 0 : countFilter;
+  skipCount = (sourceFilter || targetFilter || vendorFilter || industryFilter) ? 0 : skipCount;
   const dataLimitQuery = { 'industries.vendors.otherInfo': 0 };
   try {
     let result = [];
@@ -120,7 +120,6 @@ const getXtrfLqaReport = async (filters) => {
       if (industryFilter !== 'All') {
         result = result.map(item => {
           item.industries =  item.industries.filter(({industryGroup}) => {
-            // console.log({indN: industryGroup.name, industryFilter})
             return industryGroup.name === industryFilter
           } );
           return item

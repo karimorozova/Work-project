@@ -22,13 +22,13 @@
     .lqa__languages
       .lqa__language(v-for="{languagePair, industries, step } in reportData")
         .lqa__text
-          b {{ languagePair }}
+          span.lqa__semi-bold  {{ languagePair }}
           .lqa__industry(v-for="{vendors, industryGroup} in industries")
             .lqa__tier-industry
-              b Industry: &nbsp;
+              span.lqa__semi-bold Industry: &nbsp;
               span {{industryGroup.name}}
               span &nbsp; &nbsp;
-              b Tier: &nbsp;
+              span.lqa__semi-bold Tier: &nbsp;
               span -
             Table(v-if="vendors.length" :vendorsData="getVendorsWithInfo(vendors, languagePair, industryGroup,step)" @refreshAssessment="getReport(filters)")
 
@@ -214,7 +214,12 @@
     max-height: 750px;
     overflow-y: auto;
     min-height: 280px;
-
+    &__bold {
+      font-family: 'Myriad900';
+    }
+    &__semi-bold {
+      font-family: 'Myriad600';
+    }
     &__text {
       font-size: 22px;
       margin-bottom: 10px;

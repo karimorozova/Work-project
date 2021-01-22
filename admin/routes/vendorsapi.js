@@ -20,8 +20,9 @@ const {
   deleteVendorCompetencies,
   updateVendorsRatePrices,
   syncVendorRatesCost,
-  createRateRowFromQualification,
-  getVendorAfterCombinationsUpdated,
+	getVendorAssessmentsWordCount,
+	createRateRowFromQualification,
+	getVendorAfterCombinationsUpdated,
 } = require('../vendors');
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users');
 const { Vendors, Projects } = require('../models');
@@ -486,6 +487,17 @@ router.post('/get-message', async (req, res) => {
     console.log(err);
     res.status(500).send('Error on getting quote message');
   }
+});
+
+router.get('/get-vendor-wordcount-from-reports/:id', async (req, res) => {
+		const { id } = req.params;
+	try {
+		const result = await getVendorAssessmentsWordCount(id);
+		res.send(result);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting quote message');
+	}
 });
 
 router.get('/create-memoq-vendor/:id', async (req, res) => {
