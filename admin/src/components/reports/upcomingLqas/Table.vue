@@ -22,7 +22,7 @@
           .lqa-vendors-table__data(slot="industry" slot-scope="{ row }") {{ row.industry.name }}
           .lqa-vendors-table__data(slot="tier" slot-scope="{ row }") {{ row.tier || '-'}}
           .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{  row.lqaNumber }}
-          .lqa-vendors-table__data(slot="link" slot-scope="{ row }")
+          .lqa-vendors-table__data.center(slot="link" slot-scope="{ row }")
             span.icon-link(@click.stop="routeToVendor(row.vendorId)")
               i.fa.fa-external-link
 
@@ -92,6 +92,9 @@ export default {
       &.sort_icon_rotate {
         transform: rotate(180deg);
       }
+    }
+    &__data.center {
+      text-align: center;
     }
 
     &_red {

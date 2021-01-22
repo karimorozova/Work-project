@@ -43,7 +43,7 @@
         .lqa-table__upload(v-if="canNextStep(row,'lqa3', 'lqa2')")
           .lqa-table__load-file(@click="openForm({field: 'Lqa3', row})")
 
-      .lqa-table__data(slot="link" slot-scope="{ row }")
+      .lqa-table__data.center(slot="link" slot-scope="{ row }")
         a(:href="getVendorProfileLink(row.vendor._id)" target="_blank" style="position: relative")
           i.fa.fa-external-link.icon-link
 
@@ -218,6 +218,9 @@
       .icon-link {
         font-size: 18px;
       }
+    }
+    &__data.center {
+      text-align: center;
     }
     &__download {
       height: 21px;
