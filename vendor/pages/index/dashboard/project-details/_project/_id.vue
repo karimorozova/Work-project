@@ -1,14 +1,14 @@
 <template lang="pug">
-  .details
+  .details OPEN
     .details__data(v-if="job._id")
       .details__header
         .details__title Project Details
       .details__info
         .details__main
           MainInfo
-        .details__describe
+        //.details__describe
           OtherInfo
-      .details__files
+      //.details__files
         FilesAndButtons(
           :deliverables="targetFiles"
           @showModal="showModal"
@@ -27,13 +27,13 @@
 </template>
 
 <script>
-	import MainInfo from "../MainInfo";
-	import OtherInfo from "../OtherInfo";
-	import FilesAndButtons from "../FilesAndButtons";
+	import MainInfo from "../MainInfo"
+	import OtherInfo from "../OtherInfo"
+	import FilesAndButtons from "../FilesAndButtons"
 
-	const Forbidden = () => import("../../../../components/details/Forbidden");
-	const ApproveModal = () => import("~/components/ApproveModal");
-	import { mapGetters, mapActions } from "vuex";
+	const Forbidden = () => import("../../../../components/details/Forbidden")
+	const ApproveModal = () => import("~/components/ApproveModal")
+	import { mapGetters, mapActions } from "vuex"
 
 	export default {
 		data() {
@@ -44,7 +44,7 @@
 				message: "",
 				project: null,
 				currentStep: {},
-				currentTask: {},
+				currentTask: {}
 			}
 		},
 		methods: {
@@ -52,109 +52,113 @@
 				getJobs: "getJobs",
 				selectJob: "selectJob",
 				alertToggle: "alertToggle",
-				setJobStatus: "setJobStatus",
+				setJobStatus: "setJobStatus"
 			}),
 			closeModal() {
-				this.isApproveModal = false;
+				this.isApproveModal = false
 			},
 			async getProjectById(id) {
 				try {
-					const result = await this.$axios.get(`pm-manage/project?id=${ id }`);
-					this.project = result.data;
+					const result = await this.$axios.post(`vendor/project`, {
+					id,
+					token: this.getToken,
+					})
+					this.project = JSON.parse(window.atob(result.data))
 				} catch (e) {
 				}
 			},
 			showModal() {
-				this.isApproveModal = true;
+				this.isApproveModal = true
 			},
 			setCurrentJob() {
-				const currentJob = this.allJobs.find(item => item._id === this.job._id);
-				this.selectJob(currentJob);
+				const currentJob = this.allJobs.find(item => item._id === this.job._id)
+				this.selectJob(currentJob)
 			},
 			setDeliverables({ files }) {
-				this.targetFiles = files;
+				this.targetFiles = files
 			},
 			async completeJob() {
-				this.closeModal();
+				this.closeModal()
 				try {
-					await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] });
-					this.setCurrentJob();
-					this.targetFiles = [];
+					await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
+					this.setCurrentJob()
+					this.targetFiles = []
 				} catch (err) {
 				}
 			},
 			async refreshProgress() {
 				try {
-					if(!this.job._id) {
-						await this.getJobInfo();
+					if (!this.job._id) {
+						await this.getJobInfo()
 					}
-					if(this.job.status !== "Started") return;
+					if (this.job.status !== "Started") return
 					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
-					const isCatTool = type === 'CAT Wordcount';
-					await this.$axios.post('/pm-manage/update-progress', { projectId: this.job.project_Id, isCatTool });
-					await this.getJobs();
-					this.setCurrentJob();
-					this.alertToggle({ message: "Progress updated", isShow: true, type: "success" });
+					const isCatTool = type === 'CAT Wordcount'
+					await this.$axios.post('/vendor/update-progress', { token:this.getToken, projectId: this.job.project_Id, isCatTool })
+					await this.getJobs()
+					this.setCurrentJob()
+					this.alertToggle({ message: "Progress updated", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: err.response.data, isShow: true, type: "error" });
+					this.alertToggle({ message: err.response.data, isShow: true, type: "error" })
 
 				}
 			},
 			async getJobInfo() {
-				const { id } = this.$route.params;
+				const { id } = this.$route.params
 				try {
-					if(!this.allJobs.length) {
-						await this.getJobs();
+					if (!this.allJobs.length) {
+						await this.getJobs()
 					}
-					const currentJob = this.allJobs.find(item => item._id === id);
-					await this.selectJob(currentJob);
+					const currentJob = this.allJobs.find(item => item._id === id)
+					await this.selectJob(currentJob)
 				} catch (err) {
 				}
 			},
 			async getStepFromProject(stepId) {
-				this.currentStep = await this.project.steps.find(item => item._id === stepId);
+				this.currentStep = await this.project.steps.find(item => item._id === stepId)
 			},
 			async getTaskFromProject(taskId) {
-				this.currentTask = await this.project.tasks.find(item => item.taskId === taskId);
-			},
+				this.currentTask = await this.project.tasks.find(item => item.taskId === taskId)
+			}
 		},
 		computed: {
 			...mapGetters({
 				job: "getSelectedJob",
 				allJobs: "getAllJobs",
 				originallyUnits: "getOriginallyUnits",
+				getToken: "getToken"
 			}),
 			buttonValue() {
 				return "Start"
 			},
 			isForbidden() {
-				let result = {};
+				let result = {}
 
-				if(this.currentTask && this.currentStep) {
-					const isRequestStepStatus = this.currentStep.status === 'Request Sent';
-					const { status } = this.currentTask;
-					if((status === 'Created' || status === 'Quote sent') && !isRequestStepStatus) {
+				if (this.currentTask && this.currentStep) {
+					const isRequestStepStatus = this.currentStep.status === 'Request Sent'
+					const { status } = this.currentTask
+					if ((status === 'Created' || status === 'Quote sent') && !isRequestStepStatus) {
 						result = {
 							status: true,
 							message: "Project or Task hasn't been approved yet."
-						};
-					} else if(
+						}
+					} else if (
 							(status === 'Approved' || status === 'Ready to Start' || status === 'In progress' || status === 'Pending Approval [DR1]' || status === 'Pending Approval [DR2]' || status === 'Delivered')
 							&& this.currentStep.status !== 'Rejected'
 					) {
 						result = {
 							status: false,
 							message: ''
-						};
-					} else if(status === 'Rejected' || this.currentStep.status === 'Rejected') {
+						}
+					} else if (status === 'Rejected' || this.currentStep.status === 'Rejected') {
 						result = {
 							status: true,
 							message: "Project or Task has rejected."
-						};
+						}
 					}
 				}
-				return result;
-			},
+				return result
+			}
 		},
 		components: {
 			MainInfo,
@@ -164,15 +168,15 @@
 			Forbidden
 		},
 		mounted() {
-			this.refreshProgress();
+			this.refreshProgress()
 		},
 		async created() {
-			await this.getProjectById(this.$route.params.project);
-			if(this.project) {
-				await this.getStepFromProject(this.$route.params.id);
-				await this.getTaskFromProject(this.currentStep.taskId);
+			await this.getProjectById(this.$route.params.project)
+			if (this.project) {
+				await this.getStepFromProject(this.$route.params.id)
+				await this.getTaskFromProject(this.currentStep.taskId)
 			}
-		},
+		}
 	}
 </script>
 
@@ -185,20 +189,21 @@
     padding: 30px;
 
     &__data {
-      width: 920px;
+      width: 1040px;
       margin-top: 10px;
-      box-shadow: 0 0 15px $brown-shadow;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       box-sizing: border-box;
       position: relative;
     }
 
     &__header {
-      padding: 10px 20px 10px 28px;
+      padding: 10px 20px;
       border-bottom: 1px solid $light-brown;
     }
 
     &__title {
       font-size: 20px;
+      font-family: Myriad400;
     }
 
     &__info {
@@ -211,7 +216,7 @@
 
     &__describe {
       width: 30%;
-      background-color: #F6F1EF;
+      background-color: azure;
     }
 
     &__modal {

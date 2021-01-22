@@ -1,7 +1,7 @@
 <template lang="pug">
     .mono-table 
         DataTable(
-            :fields="tableFields"
+            :fields="fields"
             :tableData="filteredRates"
             bodyClass="tbody_height-150"
             :isRateTable="true"
@@ -95,21 +95,21 @@ export default {
             }
             return result;
         },
-        tableFields() {
-            let fields = this.fields.map(item => item);
-            fields = fields.filter(item => !item.isStepTitle);
-            for(let i = 0; i < this.packagesSteps.length; i++) {
-                fields.push({
-                    label: this.packagesSteps[i].title, 
-                    headerKey: `headStep${i+1}`, 
-                    key: this.packagesSteps[i].symbol, 
-                    width: "229px", 
-                    padding: "0", 
-                    isStepTitle: true
-                })
-            }
-            return fields;
-        },
+        // tableFields() {
+        //     let fields = this.fields.map(item => item);
+        //     fields = fields.filter(item => !item.isStepTitle);
+        //     for(let i = 0; i < this.packagesSteps.length; i++) {
+        //         fields.push({
+        //             label: this.packagesSteps[i].title,
+        //             headerKey: `headStep${i+1}`,
+        //             key: this.packagesSteps[i].symbol,
+        //             width: "229px",
+        //             padding: "0",
+        //             isStepTitle: true
+        //         })
+        //     }
+        //     return fields;
+        // },
         stepsIds() {
             return this.steps.filter(item => item.calculationUnit === "Packages").map(item => item._id);
         },

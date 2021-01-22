@@ -24,7 +24,7 @@ export default {
 
 .pair {
     display: flex;
-    font-size: 16px;
+    font-size: 14px;
     align-items: center;
     justify-content: flex-start;
     &__label {

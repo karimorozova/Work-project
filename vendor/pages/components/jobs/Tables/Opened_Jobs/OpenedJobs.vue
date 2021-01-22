@@ -1,7 +1,7 @@
 <template lang="pug">
   .jobs__table
     DataTable(
-      :fields="tableFields"
+      :fields="fields"
       :tableData="jobs"
       :errors="errors"
       :areErrors="areErrors"
@@ -52,33 +52,30 @@
 </template>
 
 <script>
-	import DataTable from "~/components/Tables/DataTable";
-	import ProgressLine from "~/components/ProgressLine";
-	import moment from "moment";
-	import ClickOutside from "vue-click-outside";
-	import { mapGetters, mapActions } from "vuex";
-	import tableFields from "~/mixins/tableFields";
+	import DataTable from "~/components/Tables/DataTable"
+	import ProgressLine from "~/components/ProgressLine"
+	import moment from "moment"
+	import ClickOutside from "vue-click-outside"
+	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		mixins: [tableFields],
 		props: {
 			jobs: {
 				type: Array
-			},
+			}
 		},
 		data() {
 			return {
 				fields: [
-					{ label: "Job ID", headerKey: "headerJobId", key: "jobId", width: Math.floor(1042 * 0.16), padding: "0" },
-					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(1042 * 0.18), padding: "0" },
-					{ label: "Type", headerKey: "headerType", key: "type", width: Math.floor(1042 * 0.1), padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: Math.floor(1042 * 0.12), padding: "0" },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: Math.floor(1042 * 0.1), padding: "0" },
-					{ label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: Math.floor(1042 * 0.12), padding: "0" },
-					{ label: "Total Amount", headerKey: "headerAmount", key: "amount", width: Math.floor(1042 * 0.12), padding: "0" },
-					{ label: "Action", headerKey: "headerIcons", key: "icons", width: 0, padding: "0" },
+					{ label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "20%", padding: "0" },
+					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "20%", padding: "0" },
+					{ label: "Type", headerKey: "headerType", key: "type", width: "10%", padding: "0" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "10.6%", padding: "0" },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "10.6%", padding: "0" },
+					{ label: "Deadline", headerKey: "headerDeadLine", key: "deadLine", width: "10.6%", padding: "0" },
+					{ label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "10%", padding: "0" },
+					{ label: "Action", headerKey: "headerIcons", key: "icons", width: "8.2%", padding: "0" }
 				],
-				tableWidth: 1042,
 				areErrors: false,
 				errors: [],
 				isDeleting: false,
@@ -94,38 +91,38 @@
 				alertToggle: "alertToggle"
 			}),
 			makeAction(index, key) {
-				this.$emit('makeAction', { index, key });
+				this.$emit('makeAction', { index, key })
 			},
 			chooseJob({ index }) {
-				this.selectJob(this.jobs[index]);
-				this.$router.push(`/dashboard/project-details/${this.jobs[index].project_Id}/${ this.jobs[index]._id }`);
+				this.selectJob(this.jobs[index])
+				this.$router.push(`/dashboard/project-details/${ this.jobs[index].project_Id }/${ this.jobs[index]._id }`)
 			},
 			closeErrors() {
-				this.areErrors = false;
+				this.areErrors = false
 			},
 			formatDeadline(date) {
 				return moment(date).format('DD-MMM-YYYY')
 			},
 			isApproveReject(row) {
-				return row.status === "Request Sent" || row.status === "Created" || row.status === "Quote sent";
+				return row.status === "Request Sent" || row.status === "Created" || row.status === "Quote sent"
 			},
 			isEnterIcon(status) {
-				const statuses = ["Accepted", "Ready to Start", "Started"];
-				return statuses.indexOf(status) !== -1;
+				const statuses = ["Accepted", "Ready to Start", "Started"]
+				return statuses.indexOf(status) !== -1
 			},
 			isCompleteIcon(row) {
-				return this.progress(row.progress) >= 100 && row.status === "Started";
+				return this.progress(row.progress) >= 100 && row.status === "Started"
 			},
 			progress(prog) {
-				return prog.totalWordCount ? ((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : prog;
+				return prog.totalWordCount ? ((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : prog
 			},
 			showModal(index) {
-				this.$emit("showModal", { index });
+				this.$emit("showModal", { index })
 			}
 		},
 		filters: {
-      stepStatusFilter: (status) => status === 'Started' ? 'In progress' : status
-    },
+			stepStatusFilter: (status) => status === 'Started' ? 'In progress' : status
+		},
 		components: {
 			DataTable,
 			ProgressLine
@@ -140,11 +137,6 @@
   @import "../../../../../assets/scss/colors.scss";
 
   .jobs {
-    &__table {
-      padding-top: 10px;
-      width: 1042px;
-      margin: 0 auto;
-    }
 
     &__data {
       height: 32px;
@@ -155,7 +147,7 @@
     }
 
     &__icons {
-      padding-top: 3px;
+      padding-top: 6px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -166,6 +158,7 @@
       cursor: pointer;
       margin-right: 8px;
       transition: transform 0.1s ease-out;
+
 
       &:hover {
         transform: scale(1.1);

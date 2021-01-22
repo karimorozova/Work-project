@@ -6,10 +6,10 @@
           label.inner-label Job Type:
           .filters__drop-menu.job-type
             SelectSingle(
-                :options="options"
-                :selectedOption="jobTypeFilter"
-                @chooseOption="setJobTypeFIlter"
-                customClass="account"
+              :options="options"
+              :selectedOption="jobTypeFilter"
+              @chooseOption="setJobTypeFIlter"
+              customClass="account"
             )
       .filterBlock
         .filterBlock__item.deadline
@@ -28,100 +28,100 @@
           label.inner-label Invoice Date
           .filters__drop-menu.invoice-date
             SelectSingle(
-            :options="invoiceDates"
-            :selectedOption="invoiceDateFilter"
-            @chooseOption="(option)=>{$emit('setInvoiceDateFilter',option)}"
-            customClass="account"
+              :options="invoiceDates"
+              :selectedOption="invoiceDateFilter"
+              @chooseOption="(option)=>{$emit('setInvoiceDateFilter',option)}"
+              customClass="account"
             )
 </template>
 
 <script>
-  import Calendar from "~/components/Calendar";
-  import SelectSingle from "~/components/dropdowns/SelectSingle.vue";
-  import {mapGetters, mapActions} from "vuex";
+	import Calendar from "~/components/Calendar"
+	import SelectSingle from "~/components/dropdowns/SelectSingle.vue"
+	import { mapGetters, mapActions } from "vuex"
 
-  export default {
-    props: {
-      jobTypeFilter: {
-        type: String
-      },
-      invoiceDateFilter: {
-        type: String
-      },
-      startFilter: {
-        type: String
-      },
-      deadFilter: {
-        type: String
-      },
-    },
-    data() {
-      return {
-        currentFormVisible: false,
-        currentFormVisibleOther: false,
-        invoiceDates: [],
-        options: [],
-        steps: [],
-        uniqJobInvoiceDates: [],
-      }
-    },
-    methods: {
-      ...mapActions({
-        getJobs: "getJobs"
-      }),
-      showDetailedCalendar() {
-        this.currentFormVisible = !this.currentFormVisible;
-        if (this.currentFormVisible) {
-          this.currentFormVisibleOther = false;
-        }
-      },
-      showDetailedCalendarOther() {
-        this.currentFormVisibleOther = !this.currentFormVisibleOther;
-        if (this.currentFormVisibleOther) {
-          this.currentFormVisible = false;
-        }
-      },
-      setJobTypeFIlter({option}) {
-        if(option !== 'All') {
-          const step = this.steps.find(item => item.title === option);
-          return this.$emit('setJobTypeFilter', { step });
-        }
-        this.$emit('setJobTypeFilter', { step: 'All' });
-      },
-      async getSteps() {
-          try {
-              const result = await this.$axios.get("/api/steps");
-              this.steps = result.data;
-              this.options = result.data.map(item => item.title);
-              this.options.unshift("All");
-          } catch(err) {
+	export default {
+		props: {
+			jobTypeFilter: {
+				type: String
+			},
+			invoiceDateFilter: {
+				type: String
+			},
+			startFilter: {
+				type: String
+			},
+			deadFilter: {
+				type: String
+			}
+		},
+		data() {
+			return {
+				currentFormVisible: false,
+				currentFormVisibleOther: false,
+				invoiceDates: [],
+				options: [],
+				steps: [],
+				uniqJobInvoiceDates: []
+			}
+		},
+		methods: {
+			...mapActions({
+				getJobs: "getJobs"
+			}),
+			showDetailedCalendar() {
+				this.currentFormVisible = !this.currentFormVisible
+				if (this.currentFormVisible) {
+					this.currentFormVisibleOther = false
+				}
+			},
+			showDetailedCalendarOther() {
+				this.currentFormVisibleOther = !this.currentFormVisibleOther
+				if (this.currentFormVisibleOther) {
+					this.currentFormVisible = false
+				}
+			},
+			setJobTypeFIlter({ option }) {
+				if (option !== 'All') {
+					const step = this.steps.find(item => item.title === option)
+					return this.$emit('setJobTypeFilter', { step })
+				}
+				this.$emit('setJobTypeFilter', { step: 'All' })
+			},
+			async getSteps() {
+				try {
+					const result = await this.$axios.get("/api/steps")
+					this.steps = result.data
+					this.options = result.data.map(item => item.title)
+					this.options.unshift("All")
+				} catch (err) {
 
-          }
-      }
-    },
-    computed: {
-      ...mapGetters({
-        jobs: "getAllJobs"
-      })
-    },
-    components: {
-      Calendar,
-      SelectSingle
-    },
-    created() {
-        this.getSteps();
-    },
-    mounted() {
-      this.getJobs();
-      this.uniqJobInvoiceDates = _.uniqBy(this.jobs, 'invoiceDate');
-      this.uniqJobInvoiceDates.unshift({invoiceDate: "All"});
-      this.uniqJobInvoiceDates.map((job) => {
-        this.invoiceDates.push(job.invoiceDate)
-      });
+				}
+			}
+		},
+		computed: {
+			...mapGetters({
+				jobs: "getAllJobs"
+			})
+		},
+		components: {
+			Calendar,
+			SelectSingle
+		},
+		created() {
+			this.getSteps()
+		},
+		mounted() {
+			this.getJobs()
+			this.uniqJobInvoiceDates = _.uniqBy(this.jobs, 'invoiceDate')
+			this.uniqJobInvoiceDates.unshift({ invoiceDate: "All" })
+			this.uniqJobInvoiceDates.map((job) => {
+				this.invoiceDates.push(job.invoiceDate)
+			})
 
-      this.invoiceDates = this.invoiceDates.filter((option) => option !== undefined);
-    }
-  }
+			this.invoiceDates = this.invoiceDates.filter((option) => option !== undefined)
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -150,7 +150,6 @@
     width: 100%;
 
     &__filters {
-      padding: 0 10px;
       display: flex;
       justify-content: space-between;
 
@@ -162,7 +161,7 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 15px;
+          margin-bottom: 20px;
 
           .inner-label {
             margin-bottom: 0;

@@ -135,7 +135,7 @@ const middleware = {
             '/reports',
             '/xtrf',
             '/translation-request',
-            '/zoho-code'
+            '/zoho-code',
         ];
         for(let route of routesArray) {
             let length = route.length;

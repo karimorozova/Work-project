@@ -62,8 +62,8 @@
 </template>
 
 <script>
-	import ClickOutside from "vue-click-outside";
-	import { mapActions, mapGetters } from "vuex";
+	import ClickOutside from "vue-click-outside"
+	import { mapActions, mapGetters } from "vuex"
 
 	export default {
 		data() {
@@ -115,102 +115,102 @@
 				breadCrumb1: "",
 				breadCrumb2: "",
 				domain: ""
-			};
+			}
 		},
 		methods: {
 			mainPageRender() {
-				this.toggleSideBar(true);
+				this.toggleSideBar(true)
 			},
 			toggleSideBar(isFirstRender) {
 				for (let elem of this.navbarList) {
-					if(window.location.toString().indexOf(elem.path) !== -1) {
-						elem.active = true;
+					if (window.location.toString().indexOf(elem.path) !== -1) {
+						elem.active = true
 					} else {
 						elem.active = false
 					}
 				}
 			},
 			thankYou(data) {
-				this.clientRequestShow = false;
-				this.thanksService = data;
-				this.$router.push('/confirm-order');
+				this.clientRequestShow = false
+				this.thanksService = data
+				this.$router.push('/confirm-order')
 			},
 			hideAccountMenu() {
-				this.accountMenuVisible = false;
+				this.accountMenuVisible = false
 			},
 			closeRequestsMenu() {
 				this.dropdownVisible = false
 			},
 			signOut() {
-				this.logout();
-				this.$router.push('/login');
+				this.logout()
+				this.$router.push('/login')
 
 			},
 			switchSection(index) {
 				this.navbarList.forEach((item, i) => {
-					item.active = i === index;
-				});
-				this.$router.push(this.navbarList[index].path);
+					item.active = i === index
+				})
+				this.$router.push(this.navbarList[index].path)
 			},
 			showAccountMenu() {
-				this.accountMenuVisible = !this.accountMenuVisible;
+				this.accountMenuVisible = !this.accountMenuVisible
 			},
 			showAccountInfo() {
-				this.accountMenuVisible = !this.accountMenuVisible;
-				this.clientRequestShow = false;
+				this.accountMenuVisible = !this.accountMenuVisible
+				this.clientRequestShow = false
 				this.navbarList.forEach(item => {
-					item.active = false;
-				});
+					item.active = false
+				})
 			},
 			showDropdown() {
-				this.dropdownVisible = !this.dropdownVisible;
+				this.dropdownVisible = !this.dropdownVisible
 			},
 			dataForRequest(ind) {
-				this.serviceType = this.newProject[ind].title;
+				this.serviceType = this.newProject[ind].title
 				this.navbarList.forEach((item, i) => {
-					item.active = i === 0;
-				});
-				this.$router.push(`/client-request${ this.newProject[ind].path }`);
-				this.dropdownVisible = false;
+					item.active = i === 0
+				})
+				this.$router.push(`/client-request${ this.newProject[ind].path }`)
+				this.dropdownVisible = false
 			},
 			async getServices() {
-				const result = await this.$axios.$get('/api/services?filter=active');
+				const result = await this.$axios.$get('/api/services?filter=active')
 				result.sort((a, b) => {
 					return a.sortIndex - b.sortIndex
-				});
+				})
 				this.servicesGetting(result)
 			},
 			setToken() {
-				const clientToken = this.$cookie.get("client");
-				this.$store.commit("SET_TOKEN", clientToken);
+				const clientToken = this.$cookie.get("client")
+				this.$store.commit("SET_TOKEN", clientToken)
 			},
 			...mapActions({
 				logout: "logout",
 				requestInfo: "requestInfo",
 				loadLangs: "loadLangs",
 				servicesGetting: "servicesGetting",
-				getProjectsAndRequests: "getProjectsAndRequests",
+				getProjectsAndRequests: "getProjectsAndRequests"
 			})
 		},
 		watch: {
 			'$route'(to, from) {
-				this.breadCrumb1 = to.path.split('/')[1];
-				this.breadCrumb2 = to.path.split('/')[2];
-				if(!this.breadCrumb2) {
-					this.clientRequestShow = false;
-				} else if(this.breadCrumb1 === 'client-request') {
+				this.breadCrumb1 = to.path.split('/')[1]
+				this.breadCrumb2 = to.path.split('/')[2]
+				if (!this.breadCrumb2) {
+					this.clientRequestShow = false
+				} else if (this.breadCrumb1 === 'client-request') {
 					this.breadCrumb1 = 'New Project'
 				}
 			}
 		},
 		mounted() {
-			this.domain = process.env.domain;
-			this.mainPageRender();
-			this.setToken();
-			this.getServices();
-			this.getProjectsAndRequests();
-			this.breadCrumb1 = this.$route.path.split('/')[1];
-			this.breadCrumb2 = this.$route.path.split('/')[2];
+			this.domain = process.env.domain
+			this.mainPageRender()
+			this.setToken()
+			this.getServices()
+			this.getProjectsAndRequests()
+			this.breadCrumb1 = this.$route.path.split('/')[1]
+			this.breadCrumb2 = this.$route.path.split('/')[2]
 		},
 		directives: {
 			ClickOutside
@@ -223,7 +223,7 @@
 				client: "getClientInfo"
 			})
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -416,6 +416,7 @@
       .womanWrapper {
         margin: 7px 5px 0px 0px;
         position: relative;
+
         &__photo {
           border-radius: 50%;
           background-color: white;
@@ -581,7 +582,7 @@
     &__inner {
       width: 100%;
       box-sizing: border-box;
-      padding: 40px;
+      padding: 30px;
     }
 
     .maininfoWrapper {
@@ -642,8 +643,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 1px 0 10px #998e7e;
-        /*transition: all .2s;*/
+        box-shadow: 0 0 10px rgba(104, 87, 62, 0.6);
         z-index: 2;
         overflow: hidden;
       }
@@ -670,7 +670,7 @@
 
       .navbar__ulist {
         list-style: none;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
         padding: 0;
         width: 167px;
@@ -706,6 +706,7 @@
 
           .title {
             opacity: 0;
+            font-family: Myriad900;
             color: #fff;
           }
 
@@ -722,6 +723,7 @@
           background-color: white;
 
           .title {
+            font-family: Myriad900;
             color: #978d7e;
           }
 

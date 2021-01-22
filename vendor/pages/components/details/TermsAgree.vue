@@ -11,7 +11,7 @@
 
 <script>
 	import CheckBox from "~/components/CheckBox";
-	import { mapActions } from "vuex";
+	import { mapActions, mapGetters } from "vuex";
 
 	export default {
 		props: {
@@ -41,13 +41,16 @@
 			},
 			async getProjectById() {
 				try {
-					const result = await this.$axios.get(`pm-manage/project?id=${ this.job.project_Id }`)
+					const result = await this.$axios.post(`vendor/project`,{ id: this.job.project_Id, token: this.getToken  })
 					this.project = result.data;
 				} catch (e) {
 				}
 			},
 		},
 		computed: {
+			...mapGetters({
+				getToken: 'getToken'
+      }),
 			isReadonly() {
 				if(this.project) {
           const statuses = ['Started', 'Approved', 'In progress'];
