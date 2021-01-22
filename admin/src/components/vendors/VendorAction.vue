@@ -30,7 +30,7 @@ export default {
 
   &__title {
     font-size: 18px;
-    font-weight: 600;
+    font-family: 'Myriad600';
     border-bottom: 1px solid #938676;
     padding-bottom: 5px;
   }

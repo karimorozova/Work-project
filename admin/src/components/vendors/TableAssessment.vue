@@ -245,20 +245,20 @@ export default {
 
   &__languages {
     font-size: 18px;
-    font-weight: bold;
+    font-family: 'Myriad600';
     padding-bottom: 7px;
   }
   &__industry {
     &-title {
       font-size: 16px;
-      font-weight: bold;
+      font-family: 'Myriad600';
       padding-bottom: 7px;
     }
   }
   &__subtitle {
     font-size: 14px;
     padding-bottom: 4px;
-    font-weight: 600;
+    font-family: 'Myriad600';
   }
   &__pair {
     font-size: 18px;
