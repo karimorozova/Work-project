@@ -117,7 +117,7 @@ export default {
         justify-content: space-between;
         align-items: center;
         border-radius: 18px;
-        box-shadow: 0 0 10px #67573e9d;
+        box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
         margin-bottom: 10px;
         padding: 0 14px;
         color: #67573e;

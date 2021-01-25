@@ -16,19 +16,21 @@
       .tasks-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
       .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
       .tasks-table__data(slot="cost" slot-scope="{ row }") {{ row.finance.Price.receivables }}
-        .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+        .tasks-table__currency(v-if="row.finance.Price.receivables")
+          span(v-html="currencyIconDetected(project.projectCurrency)")
       .tasks-table__data.tasks-table_centered(slot="download" slot-scope="{ row }")
         img.tasks-table__icon(v-if="isDownload(row)" src="../../../../assets/images/download.png" @click="download(row)")
 
 </template>
 
 <script>
-	import DataTable from "~/components/Tables/DataTable";
-	import { mapGetters, mapActions } from "vuex";
-	import taskPair from "~/mixins/taskPair";
+	import DataTable from "~/components/Tables/DataTable"
+	import { mapGetters, mapActions } from "vuex"
+	import taskPair from "~/mixins/taskPair"
+	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 
 	export default {
-		mixins: [taskPair],
+		mixins: [taskPair, currencyIconDetected],
 		data() {
 			return {
 				fields: [
@@ -39,30 +41,30 @@
 					{ label: " ", headerKey: "headerDownload", key: "download", width: "20%", padding: "0" }
 				],
 				tableWidth: 735,
-				domain: "",
+				domain: ""
 			}
 		},
 		methods: {
 			isDownload(task) {
-				const statuses = ['Ready for Delivery', 'Delivered'];
-				return statuses.indexOf(task.status) !== -1;
+				const statuses = ['Ready for Delivery', 'Delivered']
+				return statuses.indexOf(task.status) !== -1
 			},
 			async download(task) {
 				try {
-					let href = task.deliverables;
-					if(!href) {
-						const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`);
-						href = result.data.link;
+					let href = task.deliverables
+					if (!href) {
+						const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`)
+						href = result.data.link
 					}
-					let link = document.createElement('a');
-					link.href = this.domain + href;
-					link.target = "_blank";
-					link.click();
-					if(task.status === "Ready for Delivery") {
-						await this.updateTaskStatus({ task, status: 'Delivered' });
+					let link = document.createElement('a')
+					link.href = this.domain + href
+					link.target = "_blank"
+					link.click()
+					if (task.status === "Ready for Delivery") {
+						await this.updateTaskStatus({ task, status: 'Delivered' })
 					}
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			}
 		},
@@ -76,7 +78,7 @@
 			DataTable
 		},
 		mounted() {
-			this.domain = process.env.domain;
+			this.domain = process.env.domain
 		}
 	}
 </script>
