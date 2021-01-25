@@ -26,11 +26,9 @@
 
     &__label {
       font-family: Myriad600;
+      margin-right: 6px;
     }
 
-    &__value {
-      margin-left: 10px;
-    }
   }
 
   .pair_column-flex {

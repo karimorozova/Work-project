@@ -9,21 +9,21 @@
         .personal__item
             LabelInput(name="Phone" :value="accountInfo.phone" @input="(e) => setInputValue(e, 'phone')")
         .personal__item
-            LabelDrop(name="Time Zone")
+            LabelDrop(name="Time Zone:")
                 SelectSingle(
                     :selectedOption="accountInfo.timezone" 
                     :options="zones" 
                     customClass="account"
                     @chooseOption="(e) => setProperty(e, 'timezone')")
         .personal__item
-            LabelDrop(name="Native Language")
+            LabelDrop(name="Native Language:")
                 SelectSingle(
                     :selectedOption="nativeLang" 
                     :options="langs" 
                     customClass="account"
                     @chooseOption="(e) => setProperty(e, 'native')")
         .personal__item
-            LabelDrop(name="Gender")
+            LabelDrop(name="Gender:")
                 SelectSingle(
                     :selectedOption="accountInfo.gender" 
                     :options="genders" 

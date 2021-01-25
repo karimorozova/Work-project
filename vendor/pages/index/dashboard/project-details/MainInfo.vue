@@ -1,7 +1,7 @@
 <template lang="pug">
   .main-info
     JobData(:job="job")
-    //Instructions(:job="job")
+    Instructions(:job="job")
 </template>
 
 <script>
@@ -26,12 +26,9 @@
   @import "../../../../assets/scss/colors.scss";
 
   .main-info {
-    border-right: 1px solid $light-brown;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    position: relative;
-    background: lavender;
   }
 
 </style>

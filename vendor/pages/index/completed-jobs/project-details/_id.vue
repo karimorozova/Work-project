@@ -1,14 +1,14 @@
 <template lang="pug">
-  .details CLOSED
+  .details
     .details__data(v-if="job._id")
       .details__header
         .details__title Project Details
       .details__info
         .details__main
           MainInfo
-        //.details__describe
+        .details__describe
           OtherInfo
-      //.details__files
+      .details__files
         Files
 </template>
 
@@ -75,7 +75,7 @@
 
     &__header {
       padding: 10px 20px;
-      border-bottom: 1px solid $light-brown;
+      border-bottom: 1px solid rgb(197, 191, 181);
     }
 
     &__title {
@@ -92,7 +92,7 @@
 
     &__describe {
       width: 30%;
-      background-color: azure;
+      background-color: #F2EFEB;
     }
   }
 

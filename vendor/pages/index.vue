@@ -25,6 +25,10 @@
                 .vendor-portal__list-label Sign Out
         .vendor-portal__arrow-block
           .vendor-portal__arrow(@click="showAccountMenu")
+            img(v-if="!this.isAccountMenu" src="../assets/images/down-icon.png")
+            img(v-else src="../assets/images/up-icon.png")
+
+
     .vendor-portal__main
       .vendor-portal__nav
         .vendor-portal__sidebar
@@ -180,6 +184,7 @@
     &__account {
       display: flex;
       align-items: center;
+      height: 6vh;
     }
 
     &__dropdown-wrapper {
@@ -221,13 +226,13 @@
     }
 
     &__account-block {
-      width: 192px;
+      width: 200px;
       background-color: #fff;
-      box-shadow: 1px 1px 11px black;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       position: absolute;
       top: 44px;
-      right: -140px;
-      border-radius: 6px;
+      right: -120px;
+      border-radius: 8px;
       z-index: 5;
       overflow: hidden;
       box-sizing: border-box;
@@ -236,16 +241,14 @@
     &__info {
       display: flex;
       justify-content: flex-start;
-      border-bottom: 1px solid #998e7e;
+      border-bottom: 1px solid #c5bfb5;
+      height: 36px;
       padding: 5px 0;
     }
 
     &__icon {
-      margin-left: 10px;
-
-      img {
-        height: 32px;
-      }
+      width: 40px;
+      text-align: center;
     }
 
     &__personal {
@@ -253,72 +256,36 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      margin-left: 10px;
-    }
-
-    &__personal-data {
-      font-size: 12px;
     }
 
     &__item {
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      border-bottom: 1px solid #998e7e;
+      border-bottom: 1px solid #c5bfb5;
       cursor: pointer;
+      height: 36px;
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       &:hover {
-        background-color: #ddd3c8;
+        background-color: #f2efeb;
       }
     }
 
     &__list-label {
-      font-size: 12px;
       color: #67573e;
-      margin-left: 10px;
     }
 
     &__arrow-block {
-      width: 140px;
+      width: 150px;
     }
 
     &__arrow {
-      position: relative;
-      text-align: center;
-      padding: 12px 12px 12px 12px;
-      margin-bottom: 6px;
-      height: 16px;
-      width: 16px;
       cursor: pointer;
-      transform: rotate(180deg);
-
-      &:before {
-        content: "";
-        position: absolute;
-        top: 15px;
-        height: 8%;
-        width: 29%;
-        background: #fff;
-        transform: skew(0deg, 50deg);
-      }
-
-      &:after {
-        content: "";
-        position: absolute;
-        top: 15px;
-        height: 8%;
-        left: 8px;
-        width: 29%;
-        background: #fff;
-        transform: skew(0deg, -50deg);
-      }
-
-      @media screen and (max-width: 1450px) {
-        margin-right: 43px;
-      }
-      @media screen and (max-width: 1350px) {
-        margin-right: 23px;
-      }
+      margin-left: 10px;
     }
 
     &__main {

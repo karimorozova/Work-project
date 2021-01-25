@@ -11,6 +11,7 @@ const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunicatio
 const { assignMemoqTranslator, getProject, updateProjectProgress } = require('../../projects')
 const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
+const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
 
 router.post("/login", async (req, res, next) => {
 	if (req.body.logemail) {
@@ -57,7 +58,7 @@ router.get("/info", checkVendor, async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
 		const vendor = await getVendor({ "_id": verificationResult.vendorId })
-		res.send(vendor)
+		res.send(Buffer.from(JSON.stringify(vendor)).toString('base64'))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Vendor info. Try later.")
@@ -77,8 +78,8 @@ router.post("/info", checkVendor, upload.fields([{ name: 'photo' }]), async (req
 			info.photo = await getPhotoLink(id, photoFile)
 			await removeOldVendorFile(oldPath, info.photo)
 		}
-		vendor = await getVendorAfterUpdate({ "_id": id }, { ...info })
-		res.send(vendor)
+		const vendor = await getVendorAfterUpdate({ "_id": id }, { ...info })
+		res.send(Buffer.from(JSON.stringify(vendor)).toString('base64'))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on saving data. Try later.")
@@ -90,7 +91,7 @@ router.get("/jobs", checkVendor, async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
 		const jobs = await getJobs(verificationResult.vendorId)
-		res.send(jobs)
+		res.send(Buffer.from(JSON.stringify(jobs)).toString('base64'))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting jobs.")
@@ -149,8 +150,8 @@ router.post("/assign-translator", checkVendor, async (req, res) => {
 
 router.get('/get-memoq-users', checkVendor, async (req, res) => {
 	try {
-		const result = await getMemoqUsers()
-		res.send(result)
+		const users = await getMemoqUsers()
+		res.send(Buffer.from(JSON.stringify(users)).toString('base64'))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on getting Memoq Users')
@@ -199,12 +200,24 @@ router.post('/update-progress', checkVendor, async (req, res) => {
 	try {
 		const project = await getProject({ '_id': projectId })
 		const result = await updateProjectProgress(project, isCatTool)
-		res.send(result)
+		res.send('updateProjectProgress')
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on getting metrics ')
 	}
 })
 
+router.get("/vendor-rates", checkVendor, async (req, res) => {
+	const { token } = req.query
+	try {
+		const { vendorId } = jwt.verify(token, secretKey)
+		const { rates: { pricelistTable } } = await getVendor({ "_id": vendorId })
+
+		res.send(pricelistTable)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on assigning vendor as translator')
+	}
+})
 
 module.exports = router

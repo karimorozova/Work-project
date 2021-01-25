@@ -1,6 +1,5 @@
 <template lang="pug">
   .job-data
-
     .data-block
       .data-block__item
         LabelValue(title="Start Date" :isColon="true" :value="outputData.start")
@@ -8,9 +7,12 @@
         LabelValue(title="Job Type" :isColon="true" :value="outputData.name")
       .data-block__item
         LabelValue(title="Source Language" :isColon="true" :value="outputData.source")
-      .data-block__item
-        LabelValue(title="xxx" :isColon="true" :value="1")
-
+      .data-block__item(v-if="isWordcount")
+        LabelValue(title="Total Wordcount" :isColon="true" :value="outputData.quantity")
+      .data-block__item(v-if="isPackageUnit")
+        LabelValue(title="Quantity" :isColon="true" :value="outputData.quantity")
+      .data-block__item(v-if="!isPackageUnit && !isWordcount")
+        LabelValue(:title="customUnit" :isColon="true" :value="this.job.hours")
     .data-block
       .data-block__item
         LabelValue(title="Deadline" :isColon="true" :value="outputData.deadline")
@@ -18,30 +20,8 @@
         LabelValue(title="Industry" :isColon="true" :value="outputData.industry")
       .data-block__item
         LabelValue(title="Target Language" :isColon="true" :value="outputData.target")
-      .data-block__item
-        LabelValue(title="xxx" :isColon="true" :value="1")
-    //.data-block
-      .data-block__item
-        LabelValue(title="Project Name" :isColon="true" :value="job.projectName")
-      .data-block__item
-        LabelValue(title="Job ID" :isColon="true" :value="job.stepId")
       .data-block__item(v-if="isWordcount")
-        LabelValue(v-if="job.finance" title="Total Wordcount" :isColon="true" :value="job.finance.Wordcount.receivables")
-
-    //.data-block
-      .data-block__item
-        LabelValue(title="Status" :isColon="true" :value="job.status | stepStatusFilter")
-
-      .data-block__item(v-if="job.status !== 'Cancelled Halfway'")
-        LabelValue(v-if="job.finance" title="Total Cost" :isColon="true" :value="job.finance.Price.payables")
-          span.job-data__currency(v-if="job.finance && job.finance.Price.payables") &euro;
-      .data-block__item(v-else)
-        LabelValue(title="Total Cost" :isColon="true" :value="job.finance.Price.halfPayables")
-          span.job-data__currency(v-if="job.finance && job.finance.Price.payables") &euro;
-
-      .data-block__item(v-if="isWordcount")
-        LabelValue(v-if="job.finance" title="Weighted Wordcount" :isColon="true" :value="job.finance.Wordcount.payables")
-
+        LabelValue(title="Weighted Wordcount" :isColon="true" :value="outputData.payables")
     .data-block
       .data-block__progress
         Progress(:percent="progress")
@@ -63,14 +43,16 @@
 				units: "getOriginallyUnits"
 			}),
 			outputData() {
-				const { start, deadline, name, industry, fullSourceLanguage, fullTargetLanguage } = this.job
+				const { start, quantity, deadline, name, industry, fullSourceLanguage, fullTargetLanguage, finance: { Wordcount: { payables } } } = this.job
 				return {
 					start: moment(start).format('DD-MM-YYYY HH:mm'),
 					deadline: moment(deadline).format('DD-MM-YYYY HH:mm'),
 					name,
 					industry: industry.name,
 					source: fullSourceLanguage.lang,
-					target: fullTargetLanguage.lang
+					target: fullTargetLanguage.lang,
+					payables,
+					quantity
 				}
 			},
 			progress() {
@@ -78,18 +60,27 @@
 					return this.job.progress.totalWordCount ? +(this.job.progress.wordsDone / this.job.progress.totalWordCount * 100).toFixed(2) : this.job.progress
 				}
 			},
+			currentUnit() {
+				if (this.units) {
+					return this.units.find(i => i._id.toString() === this.job.serviceStep.unit)
+				}
+			},
+			customUnit() {
+				const { type } = this.currentUnit
+				return type
+			},
+			isPackageUnit() {
+				if (this.units) {
+					const { type } = this.currentUnit
+					return type === "Packages"
+				}
+			},
 			isWordcount() {
 				if (this.units) {
-					const { type } = this.units.find(i => i._id.toString() === this.job.serviceStep.unit)
+					const { type } = this.currentUnit
 					return type === "CAT Wordcount"
 				}
 			}
-		},
-		filters: {
-			stepStatusFilter: (status) => status === 'Started' ? 'In progress' : status
-		},
-		mounted() {
-			console.log(this.job)
 		},
 		components: {
 			LabelValue,
@@ -102,7 +93,7 @@
   @import "../../../assets/scss/colors.scss";
 
   .job-data {
-    border-bottom: 1px solid $light-brown;
+    border-bottom: 1px solid rgb(197, 191, 181);
     display: flex;
     justify-content: space-between;
     padding: 20px 20px 0 20px;
@@ -114,7 +105,7 @@
 
   .data-block {
     height: 100%;
-    width: 40%;
+    width: 42%;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -124,20 +115,9 @@
       margin-bottom: 20px;
     }
 
-    /*&__progress {*/
-    /*  display: flex;*/
-    /*  vertical-align: baseline;*/
-    /*}*/
-
-    /*&:first-child {*/
-    /*  width: 35%;*/
-    /*}*/
-
     &:last-child {
-      width: 20%;
+      width: 16%;
       height: 130px;
-      /*display: flex;*/
-      /*align-items: flex-start;*/
     }
   }
 

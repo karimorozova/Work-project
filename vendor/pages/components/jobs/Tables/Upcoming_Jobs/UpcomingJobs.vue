@@ -36,8 +36,9 @@
       template(slot="deadLine" slot-scope="{ row, index }")
         .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
       template(slot="amount" slot-scope="{ row, index }")
-        .jobs__data {{ row.finance.Price.payables }}
-          span.jobs__currency(v-if="row.finance.Price.payables") &euro;
+        .jobs__data {{ row.nativeFinance.Price.payables }}
+          span.jobs__currency(v-if="row.nativeFinance.Price.payables")
+          span(v-html='returnIconCurrencyByStringCode("EUR")')
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="isApproveReject(row)")
           img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")
@@ -47,8 +48,10 @@
 	import DataTable from "~/components/Tables/DataTable"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
+	import currencyIconDetected from "../../../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			jobs: {
 				type: Array
@@ -111,7 +114,7 @@
   .jobs {
 
     &__data {
-      height: 32px;
+      height: 30px;
       padding: 0 5px;
       display: flex;
       align-items: center;
@@ -126,7 +129,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding-top: 6px;
+      padding-top: 5px;
       img{
         height: 20px;
       }

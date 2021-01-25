@@ -41,8 +41,9 @@
       template(slot="deadLine" slot-scope="{ row, index }")
         .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
       template(slot="amount" slot-scope="{ row, index }")
-        .jobs__data {{ row.finance.Price.payables }}
-          span.jobs__currency(v-if="row.finance.Price.payables") &euro;
+        .jobs__data {{ row.nativeFinance.Price.payables }}
+          span.jobs__currency(v-if="row.nativeFinance.Price.payables")
+          span(v-html='returnIconCurrencyByStringCode("EUR")')
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="!isApproveReject(row)")
           img.jobs__icon(v-if="isCompleteIcon(row)" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
@@ -57,8 +58,10 @@
 	import moment from "moment"
 	import ClickOutside from "vue-click-outside"
 	import { mapGetters, mapActions } from "vuex"
+	import currencyIconDetected from "../../../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			jobs: {
 				type: Array
@@ -139,7 +142,7 @@
   .jobs {
 
     &__data {
-      height: 32px;
+      height: 30px;
       padding: 0 5px;
       display: flex;
       align-items: center;
@@ -147,7 +150,7 @@
     }
 
     &__icons {
-      padding-top: 6px;
+      padding-top: 5px;
       display: flex;
       justify-content: center;
       align-items: center;

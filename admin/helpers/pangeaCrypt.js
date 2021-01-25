@@ -31,7 +31,22 @@ const pangeaDecoder = (string) => {
 	return string
 }
 
+const projectDecodeFinancePart = (project) => {
+	const stepsFields = ['finance', 'nativeFinance', 'clientRate', 'vendorRate', 'nativeVendorRate']
+
+	project.steps = project.steps.reduce((acc, curr) => {
+		for (let field of stepsFields) {
+			curr[field] = pangeaEncoder(JSON.stringify(curr[field]))
+		}
+		acc.push(curr)
+		return acc
+	}, [])
+
+	return project
+}
+
 module.exports = {
 	pangeaEncoder,
-	pangeaDecoder
+	pangeaDecoder,
+	projectDecodeFinancePart
 }

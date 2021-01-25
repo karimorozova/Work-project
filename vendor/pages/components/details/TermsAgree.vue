@@ -10,8 +10,8 @@
 </template>
 
 <script>
-	import CheckBox from "~/components/CheckBox";
-	import { mapActions, mapGetters } from "vuex";
+	import CheckBox from "~/components/CheckBox"
+	import { mapActions, mapGetters } from "vuex"
 
 	export default {
 		props: {
@@ -19,7 +19,7 @@
 				type: Object
 			},
 			allJobs: {
-				type: Array,
+				type: Array
 			}
 		},
 		data() {
@@ -32,41 +32,42 @@
 				setStepTermsAgreement: "setStepTermsAgreement"
 			}),
 			async toggle(e, bool) {
-				if(this.job.status === "Started"){
-					bool = true;
-        }
+				if (this.job.status === "Started") {
+					bool = true
+				}
 				try {
-						await this.setStepTermsAgreement({ jobId: this.job._id, value: bool });
-				} catch (err) {}
+					await this.setStepTermsAgreement({ jobId: this.job._id, value: bool })
+				} catch (err) {
+				}
 			},
 			async getProjectById() {
 				try {
-					const result = await this.$axios.post(`vendor/project`,{ id: this.job.project_Id, token: this.getToken  })
-					this.project = result.data;
+					const result = await this.$axios.post(`vendor/project`, { id: this.job.project_Id, token: this.getToken })
+					this.project = JSON.parse(window.atob(result.data))
 				} catch (e) {
 				}
-			},
+			}
 		},
 		computed: {
 			...mapGetters({
 				getToken: 'getToken'
-      }),
+			}),
 			isReadonly() {
-				if(this.project) {
-          const statuses = ['Started', 'Approved', 'In progress'];
-          const { taskId, stepId } = this.job;
-          const { steps } = this.project;
-					let stepsCurrentByTask = steps.filter(item => item.taskId === taskId);
-					stepsCurrentByTask = stepsCurrentByTask.filter(item => !item.stepId.includes('Canceled'));
-					const currentIndex = stepsCurrentByTask.findIndex(item => item.stepId === stepId);
-          if (statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === 'Completed') {
-            return true;
-          } else if (currentIndex === 0) {
-            return false;
-					} else if(currentIndex >= 1) {
-						return stepsCurrentByTask[0].status !== "Completed";
+				if (this.project) {
+					const statuses = ['Started', 'Approved', 'In progress']
+					const { taskId, stepId } = this.job
+					const { steps } = this.project
+					let stepsCurrentByTask = steps.filter(item => item.taskId === taskId)
+					stepsCurrentByTask = stepsCurrentByTask.filter(item => !item.stepId.includes('Canceled'))
+					const currentIndex = stepsCurrentByTask.findIndex(item => item.stepId === stepId)
+					if (statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === 'Completed') {
+						return true
+					} else if (currentIndex === 0) {
+						return false
+					} else if (currentIndex >= 1) {
+						return stepsCurrentByTask[0].status !== "Completed"
 					} else {
-						return true;
+						return true
 					}
 				}
 			}
@@ -88,12 +89,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px 0;
-
-    &__text {
-      margin: 10px 0;
-      /*font-size: 14px;*/
-    }
+    padding-bottom: 20px;
 
     &__check {
       margin-right: 10px;

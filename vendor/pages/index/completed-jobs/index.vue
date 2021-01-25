@@ -46,8 +46,9 @@
             template(slot="deadline" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
-                span.jobs__currency(v-if="row.finance.Price.payables") &euro;
+              .jobs__data(v-if="currentActive !== index") {{ row.nativeFinance.Price.payables }}
+                span.jobs__currency(v-if="row.nativeFinance.Price.payables")
+                span(v-html='returnIconCurrencyByStringCode("EUR")')
             template(slot="invoiceDate" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.invoiceDate }}
     nuxt-child
@@ -58,8 +59,10 @@
 	import DataTable from "~/components/Tables/DataTable"
 	import Filters from "../../components/jobs/Tables/Completed_Jobs/Filters"
 	import { mapGetters, mapActions } from "vuex"
+	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins:[currencyIconDetected],
 		data() {
 			return {
 				fields: [
@@ -212,7 +215,7 @@
         position: relative;
 
         &__data, &__editing-data {
-          height: 32px;
+          height: 30px;
           padding: 0 5px;
           display: flex;
           align-items: center;
