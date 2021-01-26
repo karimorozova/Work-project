@@ -16,8 +16,8 @@
         .benchmark__languages
             .benchmark__language(v-for="report in reportData")
                 h3.benchmark__text Target Language: {{ report.target }}
-                .benchmark__industry(v-if="report.financeReports.length")
-                    h4.benchmark__text Industry: Finance,  Tier {{ report.finance }}, Benchmark &euro; {{ getPrice(report.prices, 'Finance') }}
+                .benchmark__industry
+                    h4.benchmark__text Industry: Finance,  Tier {{ report.industries.industry }}, Benchmark &euro; {{ getPrice(report.prices, 'report.industries.industry') }}
                     Table(:vendorsData="report.financeReports" :benchmarkPrice="getPrice(report.prices, 'Finance')" field="Finance")
                 .benchmark__industry(v-if="report.gamingReports.length")
                     h4.benchmark__text Industry: iGaming,  Tier {{ report.game }}, Benchmark &euro; {{ getPrice(report.prices, 'iGaming') }}
@@ -51,7 +51,8 @@ export default {
     methods: {
         async getReport() {
             try {
-                const result = await this.$http.post("/reportsapi/xtrf-lqa-report" ,{ filters: this.filters});
+                const result = await this.$http.post("/reportsapi/vendor-benchmark-cost" ,{ filters: this.filters});
+              // console.log(result.body)
                 this.reportData = result.body;
                 if(this.isLanguages) {
                     this.languages = this.reportData.map(item => item.target);
@@ -69,14 +70,14 @@ export default {
             this.nameFilter = value;
             await this.getReport();
         },
-        async setFilter({value}, prop) {
-            this[prop] = value;
-            await this.getReport();
-        },
-        async setFilter({value}, prop) {
-            this[prop] = value;
-            await this.getReport();
-        },
+        // async setFilter({value}, prop) {
+        //     this[prop] = value;
+        //     await this.getReport();
+        // },
+        // async setFilter({value}, prop) {
+        //     this[prop] = value;
+        //     await this.getReport();
+        // },
         async setTargetFilter({lang}) {
             if(lang !== 'All') {
                 this.targetFilter = this.targetFilter.filter(item => item !== 'All');
