@@ -24,9 +24,19 @@
 
         .names-info__item
           label.names-info__label VAT:
-          span.checkbox
-            input(type="checkbox" id="vat" :checked="client.billingInfo.vat" @change="setVAT")
-            label(for="vat")
+          .vat-fields
+            span.checkbox.vatbox
+              input(type="checkbox" id="vat" :checked="client.billingInfo.vat" @change="setVAT")
+              label(for="vat")
+
+            input(
+              type="text"
+              v-if="client.billingInfo.vat"
+              id="vatId"
+              :value="client.billingInfo.vatId"
+              @change="(e) => changeProperty(e, 'vatId')"
+              :class="{'names-info_error-shadow': errorFields.indexOf('vatId') !== -1}"
+            )
 
         .names-info__item
           label.names-info__label Due Date:
@@ -52,9 +62,10 @@
             label(for="invoiceSending")
 
         .names-info__item
-          label.names-info__label Payment type:
+          label.names-info__label.names-info_asterisk Payment type:
           .names-info__drop
             SelectSingle(
+              :class="{'names-info_error-shadow': errorFields.indexOf('payment') !== -1}"
               placeholder="Select"
               :selectedOption="client.billingInfo.paymentType"
               :options="['PPP','Pre-Payment','Monthly','50%/50%']"
@@ -75,8 +86,8 @@
 </template>
 
 <script>
-	import SelectSingle from "../SelectSingle";
-	import {mapGetters} from "vuex";
+	import SelectSingle from "../SelectSingle"
+	import { mapGetters } from "vuex"
 
 	export default {
 		props: {
@@ -90,18 +101,18 @@
 		},
 		data() {
 			return {
-				isSame: false,
-			};
+				isSame: false
+			}
 		},
 		methods: {
 			changeProperty(e, prop) {
-				this.$emit("changeProperty", {prop, value: e.target.value});
+				this.$emit("changeProperty", { prop, value: e.target.value })
 			},
 			setInvoiceSending(e) {
 				this.$emit("changeProperty", {
 					prop: "invoiceSending",
 					value: e.target.checked
-				});
+				})
 			},
 			isSetSame(currentEnum) {
 				this.client.billingInfo.contactName = currentEnum.name
@@ -112,36 +123,36 @@
 				this.isSame = e.target.checked
 				if (this.isSame) {
 					if (Object.keys(this.currentClient).length === 0) {
-						this.isSetSame(this.client);
+						this.isSetSame(this.client)
 					} else {
-						this.isSetSame(this.currentClient);
+						this.isSetSame(this.currentClient)
 					}
 				} else {
-					this.client.billingInfo.contactName = this.client.billingInfo.officialCompanyName = this.client.billingInfo.email = "";
+					this.client.billingInfo.contactName = this.client.billingInfo.officialCompanyName = this.client.billingInfo.email = ""
 				}
 			},
 			setVAT(e) {
 				this.$emit("changeProperty", {
 					prop: "vat",
 					value: e.target.checked
-				});
+				})
 			},
-			setPayment({option}) {
+			setPayment({ option }) {
 				this.$emit("changeProperty", {
 					prop: "paymentType",
 					value: option
-				});
+				})
 			},
 			isSameInformation() {
 				if (this.client.name || this.client.officialCompanyName || this.client.email) {
 					this.isSame = this.client.billingInfo.contactName === this.client.name &&
-						this.client.billingInfo.officialCompanyName === this.client.officialCompanyName &&
-						this.client.billingInfo.email === this.client.email;
+							this.client.billingInfo.officialCompanyName === this.client.officialCompanyName &&
+							this.client.billingInfo.email === this.client.email
 				}
 			}
 		},
 		created() {
-			this.isSameInformation();
+			this.isSameInformation()
 		},
 		computed: {
 			...mapGetters({
@@ -151,7 +162,7 @@
 		components: {
 			SelectSingle
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -162,7 +173,7 @@
 
     &__block {
       display: flex;
-      border-bottom: 1px solid #938676;
+      border-bottom: 1px solid #c5bfb5;
       padding-bottom: 10px;
 
       &-title {
@@ -235,7 +246,7 @@
       }
 
       input {
-        color: rgba(103, 87, 62, 0.5);
+        color: #67573e;
         border: 1px solid #67573e;
         border-radius: 5px;
         padding: 0 5px;
@@ -243,10 +254,6 @@
         width: 191px;
         height: 30px;
         box-sizing: border-box;
-
-        &:focus {
-          color: #67573e;
-        }
       }
     }
 
@@ -330,6 +337,10 @@
     width: 70px;
   }
 
+  #vatId {
+    width: 162px;
+  }
+
   #same-checkbox {
     margin-top: -6px;
   }
@@ -337,6 +348,16 @@
   #vat,
   #invoiceSending {
     width: 0;
+  }
+
+  .vatbox {
+    width: 28px;
+  }
+
+  .vat-fields {
+    display: flex;
+    width: 191px;
+    height: 30px;
   }
 
   p {

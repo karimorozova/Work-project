@@ -110,6 +110,10 @@ const ClientSchema = new mongoose.Schema({
 			type: Boolean,
 			default: false
 		},
+		vatId: {
+			type: String,
+			default: ''
+		},
 		dueDate: {
 			type: String,
 			trim: true

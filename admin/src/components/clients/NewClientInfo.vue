@@ -41,7 +41,8 @@
       .title Billing Informations
       .new-client-info__billing
         ClientBillInfo(:client="client" :errorFields="billErrors" @changeProperty="setBillInfo")
-      ValidationErrors(v-if="areErrorsExist"
+      ValidationErrors(
+        v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrorsBlock"
       )
@@ -54,18 +55,20 @@
 </template>
 
 <script>
-	import NewRates from './clientInfo/NewRates';
-	import NewClientDocuments from './NewClientDocuments';
+	import NewRates from './clientInfo/NewRates'
+	import NewClientDocuments from './NewClientDocuments'
 	import NewGeneral from './clientInfo/NewGeneral'
-	import Button from "../Button";
-	import ValidationErrors from "../ValidationErrors";
-	import ContactsInfo from './ContactsInfo';
-	import ClientSalesInfo from './ClientSalesInfo';
-	import ClientBillInfo from './ClientBillInfo';
+	import Button from "../Button"
+	import ValidationErrors from "../ValidationErrors"
+	import ContactsInfo from './ContactsInfo'
+	import ClientSalesInfo from './ClientSalesInfo'
+	import ClientBillInfo from './ClientBillInfo'
 	import NewSideGeneral from './clientInfo/NewSideGeneral'
-	import { mapGetters, mapActions } from "vuex";
+	import { mapGetters, mapActions } from "vuex"
+	import vatChecker from "../../mixins/Client/vatChecker"
 
 	export default {
+		mixins: [vatChecker],
 		props: {
 			client: {
 				type: Object
@@ -98,62 +101,62 @@
 				contractFile: [],
 				ndaFile: [],
 				documentsFiles: [],
-				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/,
+				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
 
 			}
 		},
 		created() {
-			this.getLangs();
-			this.getTimezones();
+			this.getLangs()
+			this.getTimezones()
 		},
 		methods: {
 			async getLangs() {
 				try {
-					const result = await this.$http.get("/api/languages");
-					this.languages = Array.from(result.body);
+					const result = await this.$http.get("/api/languages")
+					this.languages = Array.from(result.body)
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Languages",
 						isShow: true,
 						type: "error"
-					});
+					})
 				}
 			},
 			async getTimezones() {
 				try {
-					const result = await this.$http.get("/api/timezones");
-					this.timezones = result.body;
+					const result = await this.$http.get("/api/timezones")
+					this.timezones = result.body
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Timezones",
 						isShow: true,
 						type: "error"
-					});
+					})
 				}
 			},
 			loadFile({ files, prop }) {
-				this.$emit("loadFile", { files, prop });
+				this.$emit("loadFile", { files, prop })
 			},
 			cancel() {
-				this.$router.push("/clients");
+				this.$router.push("/clients")
 			},
 			approveContactDelete({ index }) {
-				this.client.contacts.splice(index, 1);
-				if(this.client.contacts.length === 1) {
-					this.client.contacts[0].leadContact = true;
+				this.client.contacts.splice(index, 1)
+				if (this.client.contacts.length === 1) {
+					this.client.contacts[0].leadContact = true
 				} else {
-					const lead = this.client.contacts.find(item => item.leadContact);
-					if(!lead) this.setLeadContact({ index: 0 });
+					const lead = this.client.contacts.find(item => item.leadContact)
+					if (!lead) this.setLeadContact({ index: 0 })
 				}
 			},
 			setLeadSource({ leadSource }) {
-				this.client.leadSource = leadSource;
+				this.client.leadSource = leadSource
 			},
 			setBillInfo({ prop, value }) {
-				this.client.billingInfo[prop] = value;
+				this.client.billingInfo[prop] = value
 			},
 			contactDetails({ contactIndex }) {
-				this.$router.push({ name: "_contact", params: { index: contactIndex } });
+				this.$router.push({ name: "_contact", params: { index: contactIndex } })
 
 			},
 			addNewContact() {
@@ -161,106 +164,113 @@
 			},
 			setLeadContact({ index }) {
 				for (let contact of this.client.contacts) {
-					contact.leadContact = false;
+					contact.leadContact = false
 				}
-				this.client.contacts[index].leadContact = true;
+				this.client.contacts[index].leadContact = true
 			},
 			saveContactUpdates({ index, contact }) {
-				this.client.contacts[index] = contact;
+				this.client.contacts[index] = contact
 			},
 			closeErrorsBlock() {
-				this.areErrorsExist = false;
+				this.areErrorsExist = false
 			},
 			clearErrors() {
-				this.errors = [];
-				this.billErrors = [];
-				this.isLeadEmpty = false;
+				this.errors = []
+				this.billErrors = []
+				this.isLeadEmpty = false
 			},
 			contactLeadError() {
-				return this.client.contacts.find(item => item.leadContact);
+				return this.client.contacts.find(item => item.leadContact)
 			},
 			async checkForErrors() {
-				this.clearErrors();
-				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-				if(!this.client.name) this.errors.push('Company name cannot be empty.');
-				if(!this.client.industries.length) this.errors.push('Please, choose at least one industry.');
-				if(!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.');
-				if(!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.');
-				if(!this.client.contacts.length) this.errors.push('Please, add at least one contact.');
-				if(!this.client.currency.length) this.errors.push('Please, add currency.');
-				if(this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.');
-				if(!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.');
-				if(!this.client.status) this.errors.push('Please, choose status.');
-				if(!this.client.leadSource) {
-					this.errors.push('Please, choose lead source.');
-					this.isLeadEmpty = true;
+				this.clearErrors()
+				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+				if (!this.client.name) this.errors.push('Company name cannot be empty.')
+				if (!this.client.industries.length) this.errors.push('Please, choose at least one industry.')
+				if (!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.')
+				if (!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.')
+				if (!this.client.contacts.length) this.errors.push('Please, add at least one contact.')
+				if (!this.client.currency.length) this.errors.push('Please, add currency.')
+				if (this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.')
+				if (!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.')
+				if (!this.client.status) this.errors.push('Please, choose status.')
+				if (!this.client.leadSource) {
+					this.errors.push('Please, choose lead source.')
+					this.isLeadEmpty = true
 				}
-				if(!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) {
-					this.errors.push('Please provide a valid email in General Information.');
-				}
-				if(!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
-					this.errors.push('Please provide a valid email in Billing Informations.');
-					this.billErrors.push('email');
-				}
-				if(!this.client.accountManager || !this.client.salesManager || !this.client.projectManager) this.errors.push('All managers should be assigned.');
 
-				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email);
-				if(isSameEmailsExists) {
-					this.errors.push("A client with such Email already exists, the client's Email should be unique!");
+				this.vatChecker({ newClient: true })
+
+				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) {
+					this.errors.push('Please provide a valid email in General Information.')
 				}
-				if(this.client.website) {
-					if(this.websiteRegEx.exec(this.client.website) === null) {
-						this.errors.push("The website field must contain a link");
+				if (this.client.billingInfo.paymentType === '') {
+					this.errors.push('Please, add Payment type.')
+					this.billErrors.push('payment')
+				}
+				if (!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
+					this.errors.push('Please provide a valid email in Billing Informations.')
+					this.billErrors.push('email')
+				}
+				if (!this.client.accountManager || !this.client.salesManager || !this.client.projectManager) this.errors.push('All managers should be assigned.')
+
+				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email)
+				if (isSameEmailsExists) {
+					this.errors.push("A client with such Email already exists, the client's Email should be unique!")
+				}
+				if (this.client.website) {
+					if (this.websiteRegEx.exec(this.client.website) === null) {
+						this.errors.push("The website field must contain a link")
 					}
 				}
 				const filesSize = this.documentsFiles.filter(item => item.file)
-				if(filesSize.length) {
-					if(filesSize.map(item => item.file).map(item => item.size).some(item => item > 40000000)) {
-						this.errors.push("The file should not exceed 40 MB!");
+				if (filesSize.length) {
+					if (filesSize.map(item => item.file).map(item => item.size).some(item => item > 40000000)) {
+						this.errors.push("The file should not exceed 40 MB!")
 					}
 				}
 
-				if(this.errors.length) {
-					this.areErrorsExist = true;
-					this.isSaveClicked = true;
+				if (this.errors.length) {
+					this.areErrorsExist = true
+					this.isSaveClicked = true
 					return
 				}
-				await this.saveClient();
+				await this.saveClient()
 			},
 
 			async checkSameClientEmails(clientEmail) {
-				const clientMails = await this.$http.get('/clientsapi/all-clients-emails');
+				const clientMails = await this.$http.get('/clientsapi/all-clients-emails')
 				const arrayOfMails = clientMails.body
-						.map(key => key.email);
-				return arrayOfMails.includes(clientEmail);
+						.map(key => key.email)
+				return arrayOfMails.includes(clientEmail)
 			},
 
 			uploadFiles(data) {
-				this.documentsFiles = data;
+				this.documentsFiles = data
 			},
 			async saveClient() {
-				let sendData = new FormData();
+				let sendData = new FormData()
 
-				if(this.client.timeZone === '') {
+				if (this.client.timeZone === '') {
 					this.client.timeZone = null
 				}
-				if(this.client.nativeLanguage === '') {
+				if (this.client.nativeLanguage === '') {
 					this.client.nativeLanguage = null
 				}
 
-				sendData.append('client', JSON.stringify(this.client));
+				sendData.append('client', JSON.stringify(this.client))
 				for (let i = 0; i < this.contactsPhotos.length; i++) {
-					sendData.append('photos', this.contactsPhotos[i]);
+					sendData.append('photos', this.contactsPhotos[i])
 				}
 				for (const document of this.documentsFiles) {
 					sendData.append(document.category, document.file)
 				}
 				try {
-					const result = await this.$http.post('/clientsapi/update-client', sendData);
-					const newClient = { ...result.body.client };
-					await this.addNewClient(newClient);
-					this.alertToggle({ message: "New Client saved", isShow: true, type: "success" });
-					this.$router.push(`/clients/details/${ newClient._id }`);
+					const result = await this.$http.post('/clientsapi/update-client', sendData)
+					const newClient = { ...result.body.client }
+					await this.addNewClient(newClient)
+					this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
+					this.$router.push(`/clients/details/${ newClient._id }`)
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
 				}
@@ -275,14 +285,14 @@
 				allClients: "getClients"
 			}),
 			selectedIndNames() {
-				let result = [];
-				if(this.client.industries.length) {
+				let result = []
+				if (this.client.industries.length) {
 					for (let ind of this.client.industries) {
-						result.push(ind.name);
+						result.push(ind.name)
 					}
 				}
-				return result;
-			},
+				return result
+			}
 		},
 		components: {
 			NewGeneral,
@@ -310,14 +320,14 @@
       margin-top: 120px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
 
     &__date {
       margin-top: 40px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
   }
 
@@ -329,7 +339,7 @@
     &__gen-info, &__rates, &__documents, &__contacts-info, &__sales, &__billing {
       margin: 20px 10px 40px 10px;
       padding: 40px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       box-sizing: border-box;
     }
 
