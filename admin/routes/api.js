@@ -22,7 +22,6 @@ const { getFilteredClientRequests } = require('../clientRequests');
 const { getServices } = require('../services/');
 const reqq = require('request');
 const { getAllCountries } = require('../helpers/countries');
-const { updateLanguage } = require('../settings');
 const { createNewRequest } = require("../requests");
 const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('../units');
 const { insertStepsIntoUnits, changeStepsInUnits } = require('../steps');
@@ -158,19 +157,6 @@ router.get('/timezones', async (req, res) => {
   }
 });
 
-router.put('/languages/:id', upload.fields([{name: "flag"}]), async (req, res) => {
-  const { active, icon } = req.body;
-  const flag = req.files["flag"];
-  const { id }= req.params;
-  const isActive = !!active;
-  try {
-    await updateLanguage({id, icon, isActive, flag});
-    res.send('Updated');
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Something went wrong while Language saving');
-  }
-});
 
 router.get('/countries', (req, res) => {
   try {

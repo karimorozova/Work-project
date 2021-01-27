@@ -87,6 +87,7 @@
   }
 
   .validation_absolute {
+
     .validation__errors {
       position: absolute;
       background: transparent;
@@ -105,18 +106,18 @@
     }
 
     .validation__messages {
-      box-shadow: 0 0 5px $red;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       background-color: white;
       padding: 20px;
+      border: 2px solid $orange;
     }
 
     .validation__close {
       transform: rotate(45deg);
       position: absolute;
-      top: 0;
-      right: 8px;
-      font-size: 24px;
-      font-weight: 700;
+      top: 5px;
+      right: 15px;
+      font-size: 28px;
       cursor: pointer;
     }
   }

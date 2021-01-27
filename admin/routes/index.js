@@ -18,6 +18,7 @@ const vendorsapiRouter = require('./vendorsapi');
 const projectsRouter = require('./projectsapi');
 const memoqapiRouter = require('./memoqapi');
 const multipliers = require('./pricelists/multipliers');
+const settings  = require('./settings')
 
 router.use('/', admin);
 router.use('/api', apiRouter);
@@ -36,5 +37,10 @@ router.use('/vendorsapi', requiresLogin, vendorsapiRouter);
 router.use('/vendors/application', vendorApplicationRouter);
 router.use('/projectsapi', requiresLogin, projectsRouter);
 router.use('/memoqapi', memoqapiRouter);
+
+//ADMIN
+router.use('/api-settings', requiresLogin, settings)
+//ADMIN
+
 
 module.exports = router;

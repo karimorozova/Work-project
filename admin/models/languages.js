@@ -22,19 +22,22 @@ const LanguageSchema = new mongoose.Schema({
   },
   active: {
     type: Boolean,
-    default: true
+    default: false,
   },
   xtm: {
     type: String,
-    default: ''
+    default: '',
+    trim: true
   },
   iso1: {
     type: String,
-    default: ''
+    default: '',
+    trim: true
   },
   iso2: {
     type: String,
-    default: ''
+    default: '',
+    trim: true
   },
   children: {
     type: Boolean,
@@ -42,11 +45,13 @@ const LanguageSchema = new mongoose.Schema({
   },
   parent: {
     type: String,
-    default: ""
+    default: "",
+    trim: true
   },
   china: {
     type: String,
-    default: ""
+    default: "",
+    trim: true
   },
   crud: {
     type: Boolean,
@@ -60,6 +65,7 @@ const LanguageSchema = new mongoose.Schema({
   direction: {
     type: String,
     default: 'both',
+    trim: true
   },
   check: {
     type: Boolean,

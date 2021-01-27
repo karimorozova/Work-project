@@ -1,37 +1,37 @@
 @import "../scss/colors.scss";
 
 %setting-table {
-    background-color: $white;
-    padding: 20px;
-    box-shadow: 0 0 10px $main-color;
-    position: relative;
+  background-color: $white;
+  padding: 20px;
+  box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+  position: relative;
 }
 
 %table-data {
-    height: 32px;
-    padding: 0 5px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
+  height: 32px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 %table-text-input {
-    box-sizing: border-box;
-    width: 100%;
-    border: none;
-    outline: none;
-    color: $main-color;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  outline: none;
+  color: $main-color;
 }
 
 %table-icons {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 %table-icon {
-    cursor: pointer;
-    opacity: 0.5;
-    margin-right: 8px;
+  cursor: pointer;
+  opacity: 0.5;
+  margin-right: 8px;
 }
