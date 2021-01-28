@@ -1,8 +1,22 @@
 const { payablesCalc, returnVendorRate } = require('../сalculations/wordcount')
 const { stepMiddleAssignNotification, stepMiddleReassignedNotification } = require('../utils')
 const { assignedDefaultTranslator } = require('../services/memoqs/projects')
-const { Units } = require('../models')
+const { Units, Projects } = require('../models')
 const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
+
+async function removeVendorFromStep(projectData) {
+	const { stepId, projectId } = projectData
+	const project = await Projects.findOne({ _id: projectId })
+	let { steps } = project
+	const idx = steps.findIndex(({ stepId: sId }) => sId === stepId)
+	if (idx !== -1) {
+		steps[idx].nativeFinance.Price.payables = steps[idx].finance.Price.payables = steps[idx].nativeFinance.Wordcount.payables = steps[idx].finance.Wordcount.payables = 0
+		steps[idx].nativeVendorRate = steps[idx].vendorRate = ""
+		steps[idx].vendor = null
+		await Projects.updateOne({ _id: projectId }, { steps })
+		return steps[idx]
+	}
+}
 
 
 async function reassignVendor(project, reassignData) {
@@ -24,13 +38,13 @@ async function reassignVendor(project, reassignData) {
 		//MM
 		// await updateMemoqProjectUsers(steps);
 
-		await assignedDefaultTranslator(tasks[taskIndex].memoqProjectId, newStep);
-		tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId);
-		tasks[taskIndex].status = "In progress";
-		await stepMiddleReassignedNotification(updatedStep, reason, isPay);
-		await stepMiddleAssignNotification(newStep, isStart);
+		await assignedDefaultTranslator(tasks[taskIndex].memoqProjectId, newStep)
+		tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId)
+		tasks[taskIndex].status = "In progress"
+		await stepMiddleReassignedNotification(updatedStep, reason, isPay)
+		await stepMiddleAssignNotification(newStep, isStart)
 
-		return { steps, tasks };
+		return { steps, tasks }
 
 	} catch (err) {
 		console.log(err)
@@ -162,14 +176,14 @@ function updateFinanceForNewStep(step, progress) {
 			...nativeFinance,
 			Price: {
 				receivables: +receivables.toFixed(2),
-				payables: +nativePayables,
+				payables: +nativePayables
 			}
 		},
 		finance: {
 			...finance,
 			Price: {
 				receivables: +receivables.toFixed(2),
-				payables : +payables,
+				payables: +payables
 			}
 		}
 	}
@@ -196,4 +210,4 @@ function getSum(steps, prop) {
 	}, 0)
 }
 
-module.exports = { reassignVendor }
+module.exports = { reassignVendor, removeVendorFromStep }

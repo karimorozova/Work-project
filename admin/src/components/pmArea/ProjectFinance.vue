@@ -74,22 +74,22 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
-	import Discounts from "../clients/pricelists/Discounts";
-  import currencyIconDetected from "../../mixins/currencyIconDetected"
+	import { mapGetters, mapActions } from "vuex"
+	import Discounts from "../clients/pricelists/Discounts"
+	import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 	export default {
-  	mixins: [currencyIconDetected],
+		mixins: [currencyIconDetected],
 		props: {},
 		data() {
 			return {
 				icons: {
 					edit: { icon: require("../../assets/images/Other/edit-icon-qa.png") },
-					cancel: { icon: require("../../assets/images/cancel-icon.png") },
+					cancel: { icon: require("../../assets/images/cancel-icon.png") }
 				},
 				isFinanceShow: true,
 				paramsIsEdit: false,
-				checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.4)' },
+				checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.4)' }
 			}
 		},
 		methods: {
@@ -101,37 +101,37 @@
 			crudActions(actionType) {
 				switch (actionType) {
 					case 'cancel':
-						this.paramsIsEdit = false;
-						break;
+						this.paramsIsEdit = false
+						break
 					case 'edit':
-						this.paramsIsEdit = true;
-						break;
+						this.paramsIsEdit = true
+						break
 				}
 			},
 			toggleFinance() {
-				this.isFinanceShow = !this.isFinanceShow;
+				this.isFinanceShow = !this.isFinanceShow
 			},
 			async updateMinPrice(prop, e) {
 				try {
 					const result = await this.$http.post('/pm-manage/update-minimum-charge', {
 						_id: this.currentProject._id,
 						value: (+this.$refs.minPrice.value).toFixed(2) || 0,
-						toIgnore: prop === 'value' ? this.currentProject.minimumCharge.toIgnore : e.target.checked,
-					});
-					this.setCurrentProject(result.data);
-					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" });
+						toIgnore: prop === 'value' ? this.currentProject.minimumCharge.toIgnore : e.target.checked
+					})
+					this.setCurrentProject(result.data)
+					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: 'Project minimum price is not updated!', isShow: true, type: 'error' });
+					this.alertToggle({ message: 'Project minimum price is not updated!', isShow: true, type: 'error' })
 				}
 			},
 			detectedHigherMinPrice() {
-				if(this.currentProject.hasOwnProperty('minimumCharge') &&
+				if (this.currentProject.hasOwnProperty('minimumCharge') &&
 						this.currentProject.minimumCharge.value > this.currentProject.finance.Price.receivables &&
 						!this.currentProject.minimumCharge.toIgnore
 				) {
-					return +this.currentProject.minimumCharge.value;
+					return +this.currentProject.minimumCharge.value
 				} else {
-					return +this.currentProject.finance.Price.receivables;
+					return +this.currentProject.finance.Price.receivables
 				}
 			}
 		},
@@ -140,36 +140,36 @@
 				currentProject: "getCurrentProject"
 			}),
 			detectedFinalPrice() {
-				const { minimumCharge, finance } = this.currentProject;
+				const { minimumCharge, finance } = this.currentProject
 				return minimumCharge.value > finance.Price.receivables && !minimumCharge.toIgnore ?
 						+minimumCharge.value :
-						parseFloat(finance.Price.receivables).toFixed(2);
+						parseFloat(finance.Price.receivables).toFixed(2)
 			},
 			getStartedReceivables() {
-				if(this.currentProject) {
+				if (this.currentProject) {
 					return this.currentProject.steps.reduce((acc, curr) => acc + curr.defaultStepPrice, 0).toFixed(2)
 				}
 			},
 			barsStatistic() {
-				if(this.currentProject) {
-					const { finance } = this.currentProject;
-					const { Price } = finance;
-					let payblesPercents;
-					let receivablesPercents;
-					let basePrice = this.detectedHigherMinPrice();
+				if (this.currentProject) {
+					const { finance } = this.currentProject
+					const { Price } = finance
+					let payblesPercents
+					let receivablesPercents
+					let basePrice = this.detectedHigherMinPrice()
 
-					if(basePrice >= Price.payables) {
-						payblesPercents = Math.ceil((Price.payables / basePrice) * 100);
+					if (basePrice >= Price.payables) {
+						payblesPercents = Math.ceil((Price.payables / basePrice) * 100)
 						receivablesPercents = basePrice === 0 ? '0' : '100'
 					} else {
-						receivablesPercents = Math.ceil((basePrice / Price.payables) * 100);
+						receivablesPercents = Math.ceil((basePrice / Price.payables) * 100)
 						payblesPercents = +Price.payables === 0 ? '0' : '100'
 					}
 
 					return {
 						receivables: {
 							width: `${ receivablesPercents }%`,
-							price: parseFloat(basePrice).toFixed(2),
+							price: parseFloat(basePrice).toFixed(2)
 						},
 						payables: {
 							width: `${ payblesPercents }%`,
@@ -179,17 +179,17 @@
 				}
 			},
 			financeData() {
-				const finance = { ...this.currentProject.finance };
-				const { Price } = finance;
-				let basePrice = this.detectedHigherMinPrice();
+				const finance = { ...this.currentProject.finance }
+				const { Price } = finance
+				let basePrice = this.detectedHigherMinPrice()
 				return {
 					profit: (basePrice - Price.payables).toFixed(2),
 					margin: ((1 - (Price.payables / basePrice)) * 100).toFixed(2)
-				};
+				}
 			}
 		},
 		components: {
-			Discounts,
+			Discounts
 		}
 	}
 </script>
@@ -223,21 +223,25 @@
     border: 2px solid #938676;
     flex-direction: column;
     margin-right: 40px;
+
     .minPrice-item-check {
       min-height: 30px;
       display: flex;
       padding-right: 10px;
       align-items: center;
+
       &__title {
         width: 60px;
+      }
     }
-    }
+
     .minPrice-item {
       width: 230px;
       min-height: 30px;
       display: flex;
       align-items: center;
-      &__forIgnore{
+
+      &__forIgnore {
         display: flex;
       }
 
@@ -250,7 +254,7 @@
   .project-finance {
     box-sizing: border-box;
     min-width: 1000px;
-    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     margin: 40px;
 
     &__content {
@@ -271,7 +275,7 @@
       padding-top: 20px;
       border-top: 1px solid #C5BFB5;
       display: flex;
-      font-weight: bold;
+      font-family: Myriad900;
 
       &-title {
         width: 60px;
