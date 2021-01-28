@@ -3,8 +3,9 @@
     .project__all-info
       .project__info-row
         input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
-        input.project__name(v-if="!existProjectAccessChangeName" type="text" :value="nameOfProject" placeholder="Project Name" disabled)
-        input.project__name(v-else type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
+        span.project__nameBody(v-else)
+          input.project__name(v-if="!existProjectAccessChangeName" type="text" :value="nameOfProject" placeholder="Project Name" disabled)
+          input.project__name(v-else type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
       .project__info-row
         .project__date
           LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
@@ -293,8 +294,7 @@
 			existProjectAccessChangeName() {
 				if (this.project) {
 					const { status } = this.project
-					const availableStatus = status === 'Draft' || status === 'Quote sent'
-					return availableStatus
+					return status === 'Draft' || status === 'Quote sent'
 				}
 			},
 			industriesList() {
@@ -379,6 +379,9 @@
         color: #68573E;
         opacity: 0.47;
       }
+    }
+    &__nameBody{
+      width: 100%;
     }
 
     &__name {
