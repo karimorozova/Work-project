@@ -47,9 +47,9 @@
 </template>
 
 <script>
-	import LabelValue from "../LabelValue";
-	import moment from "moment";
-	import { mapActions } from "vuex";
+	import LabelValue from "../LabelValue"
+	import moment from "moment"
+	import { mapActions } from "vuex"
 	import '../../../filters/OtherProjectsFilters'
 
 
@@ -65,32 +65,32 @@
 		data() {
 			return {
 				isTest: false
-			};
+			}
 		},
 		methods: {
 			goToClientInfo(id) {
-				const route = this.$router.resolve({ path: `/clients/details/${ id }` });
-				window.open(route.href, "_blank");
+				const route = this.$router.resolve({ path: `/clients/details/${ id }` })
+				window.open(route.href, "_blank")
 			},
 			async toggleLock(action) {
-				const message = !action ? 'locked' : 'unlocked';
+				const message = !action ? 'locked' : 'unlocked'
 				try {
 					const result = await this.$http.post('/memoqapi/set-recalculation-lock', {
 						projectId: this.project._id,
-						value: !action,
-					});
+						value: !action
+					})
 					this.$emit('updateProject', result.body)
 					this.alertToggle({
 						message: `Project ${ message }`,
 						isShow: true,
 						type: "success"
-					});
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Server Error / Cannot locked Project",
 						isShow: true,
 						type: "error"
-					});
+					})
 				}
 			},
 			...mapActions(["alertToggle"]),
@@ -100,7 +100,7 @@
 					projectId: projectId,
 					prop: "isTest",
 					value: event.target.checked
-				});
+				})
 			},
 			async setProjectProp({ projectId, prop, value }) {
 				try {
@@ -108,28 +108,32 @@
 						projectId,
 						prop,
 						value
-					});
+					})
 					this.alertToggle({
 						message: "Project type changed",
 						isShow: true,
 						type: "success"
-					});
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Server Error / Cannot update status Project",
 						isShow: true,
 						type: "error"
-					});
+					})
 				}
 			}
 		},
 		components: {
 			LabelValue
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
+  input:disabled {
+    background-color: #F2EFEB;
+  }
+
   .project {
     padding: 40px;
     display: flex;
@@ -176,7 +180,7 @@
       font-size: 22px;
       padding: 0 5px;
       height: 44px;
-      width: 35%;
+      width: 40%;
       border-radius: 5px;
       color: #68573E;
       border: 1px solid #68573E;
