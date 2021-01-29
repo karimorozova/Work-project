@@ -6,7 +6,7 @@ const { updateStatusesForOtherProjects, clearGarbageProjects } = require("./serv
 const { saveOtherProjectStatuses } = require('./gmail');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles');
-const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects } = require('./reports');
+const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmarkCost } = require('./reports');
 
 // saveOtherProjectStatuses()
 // downloadFromMemoqProjectsData();
@@ -21,6 +21,7 @@ schedule.scheduleJob('33 10-18 * * *', async () => await scheduleJobBody(updateS
 schedule.scheduleJob('40 0 * * *', async () => await scheduleJobBody(UpdateLQAFromProject(), "Updating LQA reports from projects data"));
 schedule.scheduleJob('30 0 * * *', async () => await scheduleJobBody(newLQAStatusFromXTRFProjects(), "Updating LQA reports from MemoqProjects data"));
 schedule.scheduleJob('30 23 * * *', async () => await scheduleJobBody(newLangReport(), "Updating lang tier data"));
+schedule.scheduleJob('30 01 * * *', async () => await scheduleJobBody(updateVendorBenchmarkCost(), "Updating vendor benchmark cost"));
 
 
 (async () => {

@@ -26,12 +26,12 @@ const vendorBenchmarkCost = new mongoose.Schema({
         {
           step: {
             type: Schema.Types.ObjectId,
-            ref: 'Industries',
+            ref: 'Step',
             default: null
           },
           unit: {
             type: Schema.Types.ObjectId,
-            ref: 'Industries',
+            ref: 'Units',
             default: null
           },
           benchmark: {

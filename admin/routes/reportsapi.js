@@ -10,7 +10,8 @@ const {
 	newLangReport,
   groupXtrfLqaByIndustryGroup,
   UpdateLqaAliases,
-	saveVendorBenchmarkCost,
+	updateVendorBenchmarkCost,
+	getVendorBenchmarkCost
 } = require('../reports');
 
 //
@@ -108,12 +109,20 @@ router.post('/xtrf-lqa-report', async (req, res) => {
 	}
 });
 
-//TODO: Routes BenchmarkReport
 router.post('/vendor-benchmark-cost', async (req, res) => {
 	const { filters } = req.body;
 	try {
-		const reports = await saveVendorBenchmarkCost();
-		console.log(reports)
+		const reports = await getVendorBenchmarkCost(filters);
+		res.send(reports);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting reports');
+	}
+});
+
+router.post('/update-vendor-benchmark-cost', async (req, res) => {
+	try {
+		const reports = await updateVendorBenchmarkCost();
 		res.send(reports);
 	} catch (err) {
 		console.log(err);
