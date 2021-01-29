@@ -99,7 +99,7 @@ const updateVendorBenchmarkCost = async () => {
 }
 
 const getVendorBenchmarkCost = async (filters) => {
-	let { sourceFilter, targetFilter, vendorFilter, stepFilter, unitFilter} = filters
+	let { sourceFilter, targetFilter, vendorFilter, stepFilter, unitFilter, industryFilter} = filters
 	let VendorsBenchmarkInfo = await VendorBenchmarkCost.find()
 			.populate('sourceLanguage', 'lang')
 			.populate('targetLanguage', 'lang')
@@ -148,7 +148,14 @@ const getVendorBenchmarkCost = async (filters) => {
 				return benchmarkIndustry
 			}).filter(({stepInfo}) => stepInfo.length)
 			return vendorsBenchmark;
-		}).filter(({industries}) => industries.length);
+		});
+	}
+
+	if (industryFilter) {
+		VendorsBenchmarkInfo = VendorsBenchmarkInfo.map(vendorsBenchmark => {
+			vendorsBenchmark.industries =  vendorsBenchmark.industries.filter(({ industry }) => industry.name === industryFilter)
+			return vendorsBenchmark;
+		});
 	}
 
 	if (stepFilter) {
@@ -180,7 +187,7 @@ const getVendorBenchmarkCost = async (filters) => {
 		allUnits: Array.from(allUnits),
 	}
 
-	return { vendorInfo: VendorsBenchmarkInfo, benchmarkFilters }
+	return { vendorInfo: VendorsBenchmarkInfo.filter(({industries}) => industries.length), benchmarkFilters }
 }
 
 module.exports = { updateVendorBenchmarkCost, getVendorBenchmarkCost }

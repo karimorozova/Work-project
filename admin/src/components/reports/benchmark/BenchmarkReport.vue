@@ -37,7 +37,7 @@
               span.benchmark__bold Unit: &nbsp;
               span {{unit.type}} &nbsp; &nbsp; &nbsp;
               span.benchmark__bold Benchmark: &nbsp;
-              span {{benchmark}} &nbsp; &nbsp;
+              span € {{benchmark.toFixed(3)}} &nbsp; &nbsp;
 
               Table(:vendorsData="vendorInfo" :benchmarkPrice="benchmark")
     //.benchmark__form(v-if="false")
