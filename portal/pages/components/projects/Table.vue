@@ -22,7 +22,8 @@
             .data-table__data(slot="status" slot-scope="{ row, index }") {{ row.status }}
             .data-table__data(slot="totalCost" slot-scope="{ row, index }")
                 .data-table__payment(v-if="row.status !== 'Requested'") {{ row.finance.Price.receivables }}
-                    span.data-table__currency(v-if="row.finance.Price.receivables") &euro;
+                    span.data-table__currency(v-if="row.finance.Price.receivables")
+                    span(v-html="currencyIconDetected(row.projectCurrency)")
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
                 img.data-table__icon(v-if="row.status === 'Quote sent' && !row.hasOwnProperty('fromXTRF')" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
             .data-table__data.data-table__progress(slot="progress" slot-scope="{ row, index }")
@@ -33,8 +34,10 @@
 import DataTable from "~/components/Tables/DataTable";
 import ProgressLine from "~/components/ProgressLine";
 import moment from "moment";
+import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 export default {
+	  mixins: [currencyIconDetected],
     props: {
         projects: {
             type: Array,

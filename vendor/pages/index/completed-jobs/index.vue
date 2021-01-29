@@ -1,7 +1,7 @@
 <template lang="pug">
   .closed-jobs
     .jobs_block
-      h3 Completed Jobs
+      .jobs_block__title Completed Jobs
       .jobs
         Filters(
           :startFilter="startFilter"
@@ -15,7 +15,7 @@
         )
         .jobs__table
           DataTable(
-            :fields="tableFields"
+            :fields="fields"
             :tableData="completedJobs"
             :errors="errors"
             :areErrors="areErrors"
@@ -46,149 +46,146 @@
             template(slot="deadline" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ formatDeadline(row.deadline) }}
             template(slot="amount" slot-scope="{ row, index }")
-              .jobs__data(v-if="currentActive !== index") {{ row.finance.Price.payables }}
-                span.jobs__currency(v-if="row.finance.Price.payables") &euro;
+              .jobs__data(v-if="currentActive !== index") {{ row.nativeFinance.Price.payables }}
+                span.jobs__currency(v-if="row.nativeFinance.Price.payables")
+                span(v-html='returnIconCurrencyByStringCode("EUR")')
             template(slot="invoiceDate" slot-scope="{ row, index }")
               .jobs__data(v-if="currentActive !== index") {{ row.invoiceDate }}
     nuxt-child
 </template>
 
 <script>
-  import moment from 'moment';
-  import DataTable from "~/components/Tables/DataTable";
-  import Filters from "../../components/jobs/Tables/Completed_Jobs/Filters";
-  import { mapGetters, mapActions } from "vuex";
-  import tableFields from "~/mixins/tableFields";
+	import moment from 'moment'
+	import DataTable from "~/components/Tables/DataTable"
+	import Filters from "../../components/jobs/Tables/Completed_Jobs/Filters"
+	import { mapGetters, mapActions } from "vuex"
+	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
-  export default {
-    mixins: [tableFields],
-    data() {
-      return {
-        fields: [
-          {label: "Job ID", headerKey: "headerJobId", key: "jobId", width: Math.floor(1042*0.18), padding: "0"},
-          {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: Math.floor(1042*0.22), padding: "0"},
-          {label: "Type", headerKey: "headerType", key: "type", width: Math.floor(1042*0.14), padding: "0"},
-          {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: Math.floor(1042*0.18), padding: "0"},
-          {label: "Total Amount", headerKey: "headerAmount", key: "amount", width: Math.floor(1042*0.14), padding: "0"},
-          {label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: 0, padding: "0"},
-        ],
-        tableWidth: 1042,
-        isTableDropMenu: true,
-        currentActive: -1,
-        areErrors: false,
-        errors: [],
-        isDeleting: false,
-        deleteIndex: -1,
-        startDateFilter: {from: "", to: ""},
-        deadlineFilter: {from: "", to: ""},
-        jobTypeFilter: "All",
-        invoiceDateFilter: "All"
-      }
-    },
-    methods: {
-      ...mapActions({
-        getJobs: "getJobs",
-        selectJob: "selectJob",
-        alertToggle: "alertToggle"
-      }),
-      chooseJob({index}) {
-        this.selectJob(this.completedJobs[index]);
-        this.$router.push(`/completed-jobs/project-details/${this.completedJobs[index]._id}`);
-      },
-      closeErrors() {
-        this.areErrors = false;
-      },
-      setDefaults() {
-        return true
-      },
-      async checkErrors(index) {
+	export default {
+		mixins:[currencyIconDetected],
+		data() {
+			return {
+				fields: [
+					{ label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "20%", padding: "0" },
+					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "20%", padding: "0" },
+					{ label: "Type", headerKey: "headerType", key: "type", width: "15%", padding: "0" },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "15%", padding: "0" },
+					{ label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "15%", padding: "0" },
+					{ label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "15%", padding: "0" }
+				],
+				isTableDropMenu: true,
+				currentActive: -1,
+				areErrors: false,
+				errors: [],
+				isDeleting: false,
+				deleteIndex: -1,
+				startDateFilter: { from: "", to: "" },
+				deadlineFilter: { from: "", to: "" },
+				jobTypeFilter: "All",
+				invoiceDateFilter: "All"
+			}
+		},
+		methods: {
+			...mapActions({
+				getJobs: "getJobs",
+				selectJob: "selectJob",
+				alertToggle: "alertToggle"
+			}),
+			chooseJob({ index }) {
+				this.selectJob(this.completedJobs[index])
+				this.$router.push(`/completed-jobs/project-details/${ this.completedJobs[index]._id }`)
+			},
+			closeErrors() {
+				this.areErrors = false
+			},
+			async checkErrors(index) {
 
-      },
-      requestOnFilterStartDate(data) {
-        if (data.isTouched) {
-          this.startDateFilter = {from: data.from, to: data.to};
-          this.filterJobs();
-        }
-        this.currentFormVisible = false;
-      },
-      requestOnFilterDeadline(data) {
-        if (data.isTouched) {
-          this.deadlineFilter = {from: data.from, to: data.to};
-          this.filterJobs();
-        }
-        this.currentFormVisibleOther = false;
+			},
+			requestOnFilterStartDate(data) {
+				if (data.isTouched) {
+					this.startDateFilter = { from: data.from, to: data.to }
+					this.filterJobs()
+				}
+				this.currentFormVisible = false
+			},
+			requestOnFilterDeadline(data) {
+				if (data.isTouched) {
+					this.deadlineFilter = { from: data.from, to: data.to }
+					this.filterJobs()
+				}
+				this.currentFormVisibleOther = false
 
-      },
+			},
 
-      setFilter({option}, prop) {
-        this[prop] = option;
-        this.filterJobs();
-      },
-      setJobTypeFIlter({step}) {
-        this.jobTypeFilter = step.title || step;
-        if(step !== 'All') {
-            this.filterJobs = this.completedJobs.filter(item => item.serviceStep.symbol === step.symbol);
-        } else {
-            this.filteredJobs = this.completedJobs;    
-        }
-      },
+			setFilter({ option }, prop) {
+				this[prop] = option
+				this.filterJobs()
+			},
+			setJobTypeFIlter({ step }) {
+				this.jobTypeFilter = step.title || step
+				if (step !== 'All') {
+					this.filterJobs = this.completedJobs.filter(item => item.serviceStep.symbol === step.symbol)
+				} else {
+					this.filteredJobs = this.completedJobs
+				}
+			},
 
-      filterJobs() {
-        this.filteredJobs = this.completedJobs;
+			filterJobs() {
+				this.filteredJobs = this.completedJobs
 
-        if (this.invoiceDateFilter && this.invoiceDateFilter !== 'All') {
-          this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter)
-        }
+				if (this.invoiceDateFilter && this.invoiceDateFilter !== 'All') {
+					this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter)
+				}
 
-        if (this.deadlineFilter.from) {
-          this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.deadline).format() >= moment(this.deadlineFilter.from).format()) && (moment(item.deadline).format() <= moment(this.deadlineFilter.to).format())))
-        }
+				if (this.deadlineFilter.from) {
+					this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.deadline).format() >= moment(this.deadlineFilter.from).format()) && (moment(item.deadline).format() <= moment(this.deadlineFilter.to).format())))
+				}
 
-        if (this.startDateFilter.from) {
-          this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.start).format() >= moment(this.startDateFilter.from).format()) && (moment(item.start).format() <= moment(this.startDateFilter.to).format())))
-        }
-      },
-      formatDeadline(date) {
-        if (date) {
-          return moment(date).format('DD-MMM-YYYY')
-        }
-        return ''
-      },
-    },
-    computed: {
-      ...mapGetters({
-        jobs: "getAllJobs"
-      }),
-      startFilter() {
-        let result = "";
-        if (this.startDateFilter.from) {
-          result = moment(this.startDateFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.startDateFilter.to).format('DD-MM-YYYY');
-        }
-        return result
-      },
-      deadFilter() {
-        let result = "";
-        if (this.deadlineFilter.from) {
-          result = moment(this.deadlineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadlineFilter.to).format('DD-MM-YYYY');
-        }
-        return result
-      },
-      completedJobs() {
-        let result = [];
-        if(this.jobs.length) {
-          result = this.jobs.filter(job => job.status === "Completed" || job.status === "Cancelled" ||job.status === "Cancelled Halfway");
-        }
-        return result;
-      }
-    },
-    components: {
-      DataTable,
-      Filters
-    },
-     mounted() {
-      this.getJobs();
-    }
-  }
+				if (this.startDateFilter.from) {
+					this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.start).format() >= moment(this.startDateFilter.from).format()) && (moment(item.start).format() <= moment(this.startDateFilter.to).format())))
+				}
+			},
+			formatDeadline(date) {
+				if (date) {
+					return moment(date).format('DD-MMM-YYYY')
+				}
+				return ''
+			}
+		},
+		computed: {
+			...mapGetters({
+				jobs: "getAllJobs"
+			}),
+			startFilter() {
+				let result = ""
+				if (this.startDateFilter.from) {
+					result = moment(this.startDateFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.startDateFilter.to).format('DD-MM-YYYY')
+				}
+				return result
+			},
+			deadFilter() {
+				let result = ""
+				if (this.deadlineFilter.from) {
+					result = moment(this.deadlineFilter.from).format('DD-MM-YYYY') + ' / ' + moment(this.deadlineFilter.to).format('DD-MM-YYYY')
+				}
+				return result
+			},
+			completedJobs() {
+				let result = []
+				if (this.jobs.length) {
+					result = this.jobs.filter(job => job.status === "Completed" || job.status === "Cancelled" || job.status === "Cancelled Halfway")
+				}
+				return result
+			}
+		},
+		components: {
+			DataTable,
+			Filters
+		},
+		mounted() {
+			this.getJobs()
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -201,24 +198,24 @@
     .jobs_block {
       color: $main-color;
 
+      &__title {
+        margin: 20px 0;
+        font-family: Myriad400;
+        font-size: 20px;
+      }
+
       .jobs {
-        width: 1062px;
+        width: 1040px;
         height: auto;
         background-color: $white;
-        box-shadow: 0 0 10px $main-color;
+        box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
         box-sizing: border-box;
-        padding-top: 15px;
-
-        &__table {
-          width: 1042px;
-          padding: 5px;
-          margin: 0 auto;
-        }
+        padding: 20px 20px 0.1px 20px;
 
         position: relative;
 
         &__data, &__editing-data {
-          height: 32px;
+          height: 30px;
           padding: 0 5px;
           display: flex;
           align-items: center;

@@ -13,7 +13,7 @@
         .other-info__item
             LabelInput(name="Status" :value="accountInfo.status"  :isReadonly="isReadonly")
         .other-info__item
-            LabelDrop(name="Industries")
+            LabelDrop(name="Industries:")
                 MultiVendorIndustrySelect(:selectedInd="vendorIndustries" :filteredIndustries="industriesNames" @chosenInd="setIndutries")
 </template>
 

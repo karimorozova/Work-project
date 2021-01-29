@@ -1,5 +1,6 @@
 <template lang="pug">
   .job-files
+
     .job-files__modal(v-if="backStepModal")
       ApproveModal(
         text="Our system has detected that you have closed a task before it is complete.  Do you want to continue and make it to the end ?"
@@ -10,7 +11,8 @@
         @notApprove="closeModal"
         @close="closeModal"
       )
-    .job-files__table
+
+    .job-files__table(v-if="jobFiles.length")
       DataTable(
         :fields="fields"
         :tableData="jobFiles"
@@ -47,30 +49,31 @@
         template(slot="editor" slot-scope="{ row, index }")
           .job-files__editor(v-if="isEditor && row.category === 'Source file'")
             img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToMemoqEditor(row)")
+
 </template>
 
 <script>
-	import DataTable from "~/components/Tables/DataTable";
-	import ProgressLine from "~/components/ProgressLine";
-	import { mapGetters, mapActions } from 'vuex';
-	import ApproveModal from "../../../components/ApproveModal";
+	import DataTable from "~/components/Tables/DataTable"
+	import ProgressLine from "~/components/ProgressLine"
+	import { mapGetters, mapActions } from 'vuex'
+	import ApproveModal from "../../../components/ApproveModal"
 
 	export default {
 		data() {
 			return {
 				jobFiles: [],
 				fields: [
-					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "35%", padding: 0 },
-					{ label: "Category", headerKey: "headerCategory", key: "category", width: "20%", padding: 0 },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "15%", padding: 0 },
-					{ label: "Source", headerKey: "headerSource", key: "source", width: "10%", padding: 0 },
-					{ label: "Target", headerKey: "headerTarget", key: "target", width: "10%", padding: 0 },
-					{ label: "Editor", headerKey: "headerEditor", key: "editor", width: "10%", padding: 0 }
+					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "35.8%", padding: 0 },
+					{ label: "Category", headerKey: "headerCategory", key: "category", width: "17.5%", padding: 0 },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "17.5%", padding: 0 },
+					{ label: "Source", headerKey: "headerSource", key: "source", width: "10.1%", padding: 0 },
+					{ label: "Target", headerKey: "headerTarget", key: "target", width: "10.1%", padding: 0 },
+					{ label: "Editor", headerKey: "headerEditor", key: "editor", width: "9%", padding: 0 }
 				],
 				domain: "",
 				backStepModal: false,
 				projectGuid: null,
-				documentGuid: null,
+				documentGuid: null
 			}
 		},
 		methods: {
@@ -80,7 +83,7 @@
 				alertToggle: "alertToggle"
 			}),
 			closeModal() {
-				this.backStepModal = false;
+				this.backStepModal = false
 			},
 			async reopenStep() {
 				try {
@@ -88,18 +91,18 @@
 						token: this.getToken,
 						projectGuid: this.projectGuid,
 						documentGuid: this.documentGuid,
-						workFlowStatus: 'Review1InProgress',
-					});
+						workFlowStatus: 'Review1InProgress'
+					})
 					this.alertToggle({ message: "Work can be continued", isShow: false, type: "error" })
 				} catch (err) {
 					this.alertToggle({ message: "Error in Reopen Task", isShow: false, type: "error" })
 				} finally {
-					this.closeModal();
-					location.reload();
+					this.closeModal()
+					location.reload()
 				}
 			},
 			isTargetLink(file) {
-				return this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway';
+				return this.job.status === 'Completed' || this.job.status === 'Cancelled Halfway'
 			},
 			getProgress(file) {
 				return this.getMemoqFilesProgress(file.fileName)
@@ -107,34 +110,34 @@
 				// return !this.job.memoqProjectId ? +this.job.progress : this.getMemoqFilesProgress(file.fileName);
 			},
 			getMemoqFilesProgress(fileName) {
-				if(this.job.status !== 'Completed') {
-					const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName);
+				if (this.job.status !== 'Completed') {
+					const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName)
 					const value = (100 * this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2)
 					return +value
-				} else if(this.job.status === 'Completed') {
-					return 100;
+				} else if (this.job.status === 'Completed') {
+					return 100
 				} else {
-					this.job.progress;
+					this.job.progress
 				}
 			},
 			toggleFilesShow() {
-				this.isFilesShown = !this.isFilesShown;
+				this.isFilesShown = !this.isFilesShown
 			},
 			fillJobFiles() {
-				if(this.job.sourceFiles) {
-					this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"));
+				if (this.job.sourceFiles) {
+					this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
 				}
-				if(this.job.refFiles) {
-					this.jobFiles.push(...this.jobFilesFiller(this.job.refFiles, "Reference file"));
+				if (this.job.refFiles) {
+					this.jobFiles.push(...this.jobFilesFiller(this.job.refFiles, "Reference file"))
 				}
 			},
 			jobFilesFiller(arr, category) {
-				let files = [];
+				let files = []
 				for (let file of arr) {
-					const nameArr = file.split('/');
-					const filePath = this.domain + file.split('./dist')[1];
-					const fileName = nameArr[nameArr.length - 1];
-					const targetFile = this.job.taskTargetFiles ? this.job.taskTargetFiles.find(item => item.fileName === fileName) : "";
+					const nameArr = file.split('/')
+					const filePath = this.domain + file.split('./dist')[1]
+					const fileName = nameArr[nameArr.length - 1]
+					const targetFile = this.job.taskTargetFiles ? this.job.taskTargetFiles.find(item => item.fileName === fileName) : ""
 					files.push({
 						fileName,
 						category: category,
@@ -142,58 +145,58 @@
 						target: targetFile ? targetFile.path : ""
 					})
 				}
-				return files;
+				return files
 			},
 			async goToMemoqEditor(file) {
 				const { TotalWordCount, Reviewer1ConfirmedWordCount, WorkflowStatus, WebTransUrl, DocumentGuid } =
 						this.job.memocDocs.find(item =>
 								item.DocumentName === file.fileName &&
 								item.TargetLangCode === this.job.memoqTarget
-						);
+						)
 
-				if((TotalWordCount !== Reviewer1ConfirmedWordCount) && WorkflowStatus === 'Completed') {
-					this.projectGuid = this.job.memoqProjectId;
-					this.documentGuid = DocumentGuid;
-					this.backStepModal = true;
+				if ((TotalWordCount !== Reviewer1ConfirmedWordCount) && WorkflowStatus === 'Completed') {
+					this.projectGuid = this.job.memoqProjectId
+					this.documentGuid = DocumentGuid
+					this.backStepModal = true
 				} else {
-					let link = document.createElement("a");
-					link.target = "_blank";
-					link.href = WebTransUrl;
-					link.click();
+					let link = document.createElement("a")
+					link.target = "_blank"
+					link.href = WebTransUrl
+					link.click()
 				}
 			},
 			async downloadTarget(file) {
 				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
-				if(type !== 'CAT Wordcount') {
-					return this.createLinkAndDownolad(this.job.targetFile.split('./dist')[1]);
+				if (type !== 'CAT Wordcount') {
+					return this.createLinkAndDownolad(this.job.targetFile.split('./dist')[1])
 				}
-				this.createLinkAndDownolad(file.target);
+				this.createLinkAndDownolad(file.target)
 			},
 			createLinkAndDownolad(href) {
-				let link = document.createElement('a');
-				link.href = this.domain + href;
-				link.target = "_blank";
-				link.click();
+				let link = document.createElement('a')
+				link.href = this.domain + href
+				link.target = "_blank"
+				link.click()
 			},
 			isCATWordcount(unitId) {
 				return this.originallyUnits.find(item => item._id.toString() === unitId).type === 'CAT Wordcount'
-			},
+			}
 		},
 		computed: {
 			...mapGetters({
 				job: "getSelectedJob",
 				originallyUnits: "getOriginallyUnits",
-				getToken: "getToken",
+				getToken: "getToken"
 			}),
 			isEditor() {
-				if(this.job) {
-					const { status, serviceStep } = this.job;
-					return status === "Started" && this.isCATWordcount(serviceStep.unit);
+				if (this.job) {
+					const { status, serviceStep } = this.job
+					return status === "Started" && this.isCATWordcount(serviceStep.unit)
 				}
 			},
 			isCAT() {
-				return this.isCATWordcount(this.job.serviceStep.unit);
-			},
+				return this.isCATWordcount(this.job.serviceStep.unit)
+			}
 		},
 		components: {
 			ApproveModal,
@@ -201,8 +204,8 @@
 			ProgressLine
 		},
 		mounted() {
-			this.domain = process.env.domain;
-			this.fillJobFiles();
+			this.domain = process.env.domain
+			this.fillJobFiles()
 		}
 	}
 </script>
@@ -218,8 +221,8 @@
   }
 
   .job-files {
-    box-shadow: 0 0 5px $brown-shadow;
-    padding: 10px;
+    border-top: 1px solid rgb(197, 191, 181);
+    padding: 20px;
     width: 100%;
     box-sizing: border-box;
 

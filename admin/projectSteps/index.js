@@ -1,7 +1,8 @@
-const { getStepsWithFinanceUpdated } = require("./finance");
-const { reassignVendor } = require("./assignment");
+const { getStepsWithFinanceUpdated } = require("./finance")
+const { reassignVendor, removeVendorFromStep } = require("./assignment")
 
-module.exports = { 
-    getStepsWithFinanceUpdated,
-    reassignVendor
+module.exports = {
+	getStepsWithFinanceUpdated,
+	reassignVendor,
+	removeVendorFromStep
 }

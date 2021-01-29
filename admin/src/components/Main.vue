@@ -503,7 +503,7 @@
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 1px 0px 10px #998E7E;
+        box-shadow: 0 0 10px rgba(104, 87, 62, 0.6);
         transition: all 0.5s;
         z-index: 2;
         overflow: hidden;
@@ -528,6 +528,7 @@
 
         &_item {
           padding-bottom: 10px;
+          padding-top: 5px;
           display: flex;
           flex-direction: column;
           justify-content: center;

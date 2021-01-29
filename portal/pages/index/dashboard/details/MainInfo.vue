@@ -13,7 +13,8 @@
           LabelValue(title="Status" :isColon="isColon" :value="project.status")
         .data-block__item
           LabelValue(v-if="project.finance" title="Total Cost" :isColon="isColon" :value="receivables")
-            span.main-info__currency(v-if="project.finance.Price.receivables && project.status !== 'Requested'") &euro;
+            span.main-info__currency(v-if="project.finance.Price.receivables && project.status !== 'Requested'")
+            span(v-html="currencyIconDetected(project.projectCurrency)")
       .data-block(v-if="!isQuote")
         Progress(:percent="getTotalProgress()")
     .main-info__tasks(v-if="isQuote")
@@ -40,16 +41,18 @@
 </template>
 
 <script>
-	import LabelValue from "~/components/LabelValue";
-	import Button from "~/components/buttons/Button";
-	import ApproveModal from "~/components/ApproveModal";
-	import Progress from "~/components/Progress";
-	import ClickOutside from "vue-click-outside";
-	import QuoteTasks from "./QuoteTasks";
-	import ProjectTasks from "./ProjectTasks";
-	import { mapGetters, mapActions } from "vuex";
+	import LabelValue from "~/components/LabelValue"
+	import Button from "~/components/buttons/Button"
+	import ApproveModal from "~/components/ApproveModal"
+	import Progress from "~/components/Progress"
+	import ClickOutside from "vue-click-outside"
+	import QuoteTasks from "./QuoteTasks"
+	import ProjectTasks from "./ProjectTasks"
+	import { mapGetters, mapActions } from "vuex"
+	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		data() {
 			return {
 				isColon: true,
@@ -70,42 +73,42 @@
 			}),
 			async updateQuote(key) {
 				try {
-					await this.updateQuoteStatus({ quote: this.project, key });
-					const updatedQuote = this.allProjects.find(item => item._id === this.project._id);
-					this.selectProject(updatedQuote);
+					await this.updateQuoteStatus({ quote: this.project, key })
+					const updatedQuote = this.allProjects.find(item => item._id === this.project._id)
+					this.selectProject(updatedQuote)
 				} catch (err) {
 				}
 			},
 			getTotalProgress() {
-				if(this.project.hasOwnProperty('fromXTRF')){
+				if (this.project.hasOwnProperty('fromXTRF')) {
 					return this.project.tasks.length ? this.project.tasks.reduce((acc, curr) => {
-						acc += curr.progress;
+						acc += curr.progress
 						return acc
-					}, 0) / this.project.tasks.length : 0;
-        }else{
-					let total = 0;
-					const { steps } = this.project;
-					if(steps && steps.length) {
+					}, 0) / this.project.tasks.length : 0
+				} else {
+					let total = 0
+					const { steps } = this.project
+					if (steps && steps.length) {
 						for (let step of steps) {
-							const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress;
-							total += progress;
+							const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress
+							total += progress
 						}
-						return +(total / steps.length).toFixed(2);
+						return +(total / steps.length).toFixed(2)
 					}
-					return 0;
-        }
+					return 0
+				}
 			},
 			showModal() {
-				this.isApproveModal = true;
+				this.isApproveModal = true
 			},
 			closeModal() {
-				this.isApproveModal = false;
+				this.isApproveModal = false
 			},
 			async cancelQuote() {
-				this.isApproveModal = false;
+				this.isApproveModal = false
 				try {
-					await this.cancelCurrentQuote({ id: this.project._id, status: this.project.status });
-					this.$router.push('/dashboard');
+					await this.cancelCurrentQuote({ id: this.project._id, status: this.project.status })
+					this.$router.push('/dashboard')
 				} catch (err) {
 				}
 			}
@@ -117,11 +120,11 @@
 				allRequests: "getAllRequests"
 			}),
 			isQuote() {
-				const statuses = ['Quote sent', 'Requested'];
+				const statuses = ['Quote sent', 'Requested']
 				return statuses.indexOf(this.project.status) !== -1
 			},
 			receivables() {
-				return this.project.status !== 'Requested' ? this.project.finance.Price.receivables : "-";
+				return this.project.status !== 'Requested' ? this.project.finance.Price.receivables : "-"
 			}
 		},
 		components: {
@@ -136,7 +139,7 @@
 			ClickOutside
 		},
 		mounted() {
-			this.domain = process.env.domain;
+			this.domain = process.env.domain
 		}
 	}
 </script>

@@ -112,7 +112,7 @@ export default {
     box-shadow: -10px 0 10px 10px $brown-shadow;
   }
   &__table {
-    margin: 40px;
+    margin: 40px 40px 40px 20px;
   }
   &__inner {
     width: 100%;

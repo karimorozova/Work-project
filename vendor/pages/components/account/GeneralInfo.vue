@@ -1,44 +1,46 @@
 <template lang="pug">
-    .general
-        .general__block
-            VendorPhoto
-        .general__block
-            Personal
-        .general__block
-            OtherInfo
+  .general
+    .general__photo-block
+      VendorPhoto
+    .general__block
+      Personal
+    .general__block
+      OtherInfo
 </template>
 
 <script>
-import VendorPhoto from "./general/VendorPhoto";
-import Personal from "./general/Personal";
-import OtherInfo from "./general/OtherInfo";
+	import VendorPhoto from "./general/VendorPhoto"
+	import Personal from "./general/Personal"
+	import OtherInfo from "./general/OtherInfo"
 
-export default {
-    components: {
-        VendorPhoto,
-        Personal,
-        OtherInfo
-    }    
-}
+	export default {
+		components: {
+			VendorPhoto,
+			Personal,
+			OtherInfo
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors.scss";
 
-.general {
+  .general {
     box-sizing: border-box;
-    margin: 20px 10px 40px 10px;
     padding: 20px;
-    box-shadow: 0 0 15px $brown-shadow;
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     width: 1040px;
     display: flex;
     justify-content: space-between;
-    &__block {
-        width: 30%;
-        &:first-child {
-            max-width: 180px;
-        }
+
+    &__photo-block {
+      width: 25%;
     }
-}
+
+    &__block {
+      width: 32%;
+
+    }
+  }
 
 </style>

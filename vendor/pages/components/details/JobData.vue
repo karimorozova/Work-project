@@ -2,31 +2,37 @@
   .job-data
     .data-block
       .data-block__item
-        LabelValue(title="Project Name" :isColon="true" :value="job.projectName")
+        LabelValue(title="Start Date" :isColon="true" :value="outputData.start")
       .data-block__item
-        LabelValue(title="Job ID" :isColon="true" :value="job.stepId")
+        LabelValue(title="Job Type" :isColon="true" :value="outputData.name")
+      .data-block__item
+        LabelValue(title="Source Language" :isColon="true" :value="outputData.source")
       .data-block__item(v-if="isWordcount")
-        LabelValue(v-if="job.finance" title="Total Wordcount" :isColon="true" :value="job.finance.Wordcount.receivables")
+        LabelValue(title="Total Wordcount" :isColon="true" :value="outputData.quantity")
+      .data-block__item(v-if="isPackageUnit")
+        LabelValue(title="Quantity" :isColon="true" :value="outputData.quantity")
+      .data-block__item(v-if="!isPackageUnit && !isWordcount")
+        LabelValue(:title="customUnit" :isColon="true" :value="this.job.hours")
     .data-block
       .data-block__item
-        LabelValue(title="Status" :isColon="true" :value="job.status | stepStatusFilter")
-      .data-block__item(v-if="job.status !== 'Cancelled Halfway'")
-        LabelValue(v-if="job.finance" title="Total Cost" :isColon="true" :value="job.finance.Price.payables")
-          span.job-data__currency(v-if="job.finance && job.finance.Price.payables") &euro;
-      .data-block__item(v-else)
-        LabelValue(title="Total Cost" :isColon="true" :value="job.finance.Price.halfPayables")
-          span.job-data__currency(v-if="job.finance && job.finance.Price.payables") &euro;
+        LabelValue(title="Deadline" :isColon="true" :value="outputData.deadline")
+      .data-block__item
+        LabelValue(title="Industry" :isColon="true" :value="outputData.industry")
+      .data-block__item
+        LabelValue(title="Target Language" :isColon="true" :value="outputData.target")
       .data-block__item(v-if="isWordcount")
-        LabelValue(v-if="job.finance" title="Weighted Wordcount" :isColon="true" :value="job.finance.Wordcount.payables")
+        LabelValue(title="Weighted Wordcount" :isColon="true" :value="outputData.payables")
     .data-block
       .data-block__progress
         Progress(:percent="progress")
+
 </template>
 
 <script>
-	import LabelValue from "../jobs/LabelValue";
-	import Progress from "~/components/Progress";
-	import { mapGetters } from "vuex";
+	import LabelValue from "../jobs/LabelValue"
+	import Progress from "~/components/Progress"
+	import { mapGetters } from "vuex"
+	import moment from "moment"
 
 	export default {
 		props: {
@@ -34,23 +40,48 @@
 		},
 		computed: {
 			...mapGetters({
-        units: "getOriginallyUnits",
-      }),
+				units: "getOriginallyUnits"
+			}),
+			outputData() {
+				const { start, quantity, deadline, name, industry, fullSourceLanguage, fullTargetLanguage, finance: { Wordcount: { payables } } } = this.job
+				return {
+					start: moment(start).format('DD-MM-YYYY HH:mm'),
+					deadline: moment(deadline).format('DD-MM-YYYY HH:mm'),
+					name,
+					industry: industry.name,
+					source: fullSourceLanguage.lang,
+					target: fullTargetLanguage.lang,
+					payables,
+					quantity
+				}
+			},
 			progress() {
-				if(this.job.progress) {
-					return this.job.progress.totalWordCount ? +(this.job.progress.wordsDone / this.job.progress.totalWordCount * 100).toFixed(2) : this.job.progress;
+				if (this.job.progress) {
+					return this.job.progress.totalWordCount ? +(this.job.progress.wordsDone / this.job.progress.totalWordCount * 100).toFixed(2) : this.job.progress
+				}
+			},
+			currentUnit() {
+				if (this.units) {
+					return this.units.find(i => i._id.toString() === this.job.serviceStep.unit)
+				}
+			},
+			customUnit() {
+				const { type } = this.currentUnit
+				return type
+			},
+			isPackageUnit() {
+				if (this.units) {
+					const { type } = this.currentUnit
+					return type === "Packages"
 				}
 			},
 			isWordcount() {
-				if(this.units){
-				  const { type } = 	this.units.find(i => i._id.toString() === this.job.serviceStep.unit)
-				  return type === "CAT Wordcount";
-        }
+				if (this.units) {
+					const { type } = this.currentUnit
+					return type === "CAT Wordcount"
+				}
 			}
 		},
-		filters: {
-      stepStatusFilter: (status) => status === 'Started' ? 'In progress' : status
-    },
 		components: {
 			LabelValue,
 			Progress
@@ -62,11 +93,10 @@
   @import "../../../assets/scss/colors.scss";
 
   .job-data {
-    border-bottom: 1px solid $light-brown;
+    border-bottom: 1px solid rgb(197, 191, 181);
     display: flex;
     justify-content: space-between;
-    height: 125px;
-    padding: 10px 0 10px 8px;
+    padding: 20px 20px 0 20px;
 
     &__currency {
       margin-left: 5px;
@@ -75,20 +105,19 @@
 
   .data-block {
     height: 100%;
-    width: 30%;
+    width: 42%;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     position: relative;
 
-    &:first-child {
-      width: 35%;
+    &__item {
+      margin-bottom: 20px;
     }
 
     &:last-child {
-      width: 20%;
-      display: flex;
-      align-items: flex-start;
+      width: 16%;
+      height: 130px;
     }
   }
 

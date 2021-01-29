@@ -1,8 +1,10 @@
 <template lang="pug">
   .files-buttons
     Files
+
     .files-buttons__upload(v-if="isFileUpload")
       UploadDeliverable(@setDeliverables="setDeliverables")
+
     .files-buttons__terms(v-if="job.status !== 'Completed' && job.status !== 'Request Sent' ")
       TermsAgree(v-if="job._id" :job="job")
 
@@ -24,100 +26,101 @@
 </template>
 
 <script>
-	import Files from "../../../components/details/Files";
-	import { mapActions, mapGetters } from "vuex";
+	import Files from "../../../components/details/Files"
+	import { mapActions, mapGetters } from "vuex"
 
-	const TermsAgree = () => import("../../../components/details/TermsAgree");
-	const UploadDeliverable = () => import("../../../components/details/UploadDeliverable");
-	const Button = () => import("~/components/buttons/Button");
+	const TermsAgree = () => import("../../../components/details/TermsAgree")
+	const UploadDeliverable = () => import("../../../components/details/UploadDeliverable")
+	const Button = () => import("~/components/buttons/Button")
 
 	export default {
 		props: {
 			deliverables: {
 				type: Array,
 				default: () => []
-			},
+			}
 		},
 		methods: {
 			...mapActions([
 				"setJobStatus",
 				"selectJob",
-				"alertToggle",
+				"alertToggle"
 
 			]),
 			closeEmailAlert() {
-				this.emailAlert = false;
+				this.emailAlert = false
 			},
 			setDeliverables({ files }) {
-				this.$emit('setDeliverables', { files });
+				this.$emit('setDeliverables', { files })
 			},
 			async createMemoqTranslator() {
 				await this.$axios.post(`/vendor/create-memoq-vendor`, {
 					token: this.getToken
-				});
+				})
 				this.alertToggle({
 					message: "Vendor is created in MemoQ",
 					isShow: true,
 					type: "success"
-				});
-				this.emailAlert = true;
+				})
+				this.emailAlert = true
 			},
 			async rewriteGuid(memoqUsers) {
 				await this.$axios.post(`/vendor/rewrite-quid-for-translator`, {
 					token: this.getToken,
-					memoqUsers,
-				});
+					memoqUsers
+				})
 			},
 			async startJob() {
-				if(!this.job.isVendorRead) return;
-				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit);
+				if (!this.job.isVendorRead) return
+				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
 				try {
-					const memoqUsers = await this.$axios.get(`vendor/get-memoq-users?token=${ this.getToken }`);
-					const memoqUserGuids = memoqUsers.data.map(({ id }) => id);
-					const memoqUserMails = memoqUsers.data.map(({ email }) => email);
-					const typeCAT = type === 'CAT Wordcount';
-					const noUserGuidInMemoq = !memoqUserGuids.includes(this.getVendor.guid);
-					const includesEmailInMemoq = memoqUserMails.includes(this.getVendor.email);
+					const memoqUsers = await this.$axios.get(`vendor/get-memoq-users?token=${ this.getToken }`)
+					const memoqUsersData = JSON.parse(window.atob(memoqUsers.data))
+					const memoqUserGuids = memoqUsersData.map(({ id }) => id)
+					const memoqUserMails = memoqUsersData.map(({ email }) => email)
+					const typeCAT = type === 'CAT Wordcount'
+					const noUserGuidInMemoq = !memoqUserGuids.includes(this.getVendor.guid)
+					const includesEmailInMemoq = memoqUserMails.includes(this.getVendor.email)
 					switch (true) {
 						case typeCAT && this.getVendor.guid === null && !includesEmailInMemoq:
-							await this.createMemoqTranslator();
-							break;
+							await this.createMemoqTranslator()
+							break
 						case typeCAT && !!this.getVendor.guid && noUserGuidInMemoq && !includesEmailInMemoq:
-							this.createMemoqTranslator();
-							break;
+							this.createMemoqTranslator()
+							break
 						case typeCAT && this.getVendor.guid === null && includesEmailInMemoq:
-							await this.rewriteGuid(memoqUsers.data);
-							break;
+							await this.rewriteGuid(memoqUsersData)
+							break
 						case typeCAT && !!this.getVendor.guid && noUserGuidInMemoq && includesEmailInMemoq:
-							await this.rewriteGuid(memoqUsers.data);
-							break;
+							await this.rewriteGuid(memoqUsersData)
+							break
 					}
 				} catch (err) {
-					console.log(err);
-					this.alertToggle({ message: "Error in creating Vendor in MemoQ or guid recovering!", isShow: true, type: "error" });
+					console.log(err)
+					this.alertToggle({ message: "Error in creating Vendor in MemoQ or guid recovering!", isShow: true, type: "error" })
 				} finally {
-					if(type === 'CAT Wordcount'){
-						await this.assignMemoqVendor();
-          }
-					await this.setStatus("Started");
+					if (type === 'CAT Wordcount') {
+						await this.assignMemoqVendor()
+					}
+					await this.setStatus("Started")
 				}
 			},
 			async makeAction(key) {
-				const status = key === "Approve" ? "Accepted" : "Rejected";
+				const status = key === "Approve" ? "Accepted" : "Rejected"
 				try {
-					await this.setStatus(status);
+					await this.setStatus(status)
 				} catch (err) {
-				}finally {
-					location.reload();
+				} finally {
+					location.reload()
 				}
 			},
 			async setStatus(status) {
 				try {
-					await this.setJobStatus({ jobId: this.job._id, status });
-					const currentJob = this.allJobs.find(item => item._id === this.job._id);
-					this.selectJob(currentJob);
+					await this.setJobStatus({ jobId: this.job._id, status })
+					const currentJob = this.allJobs.find(item => item._id === this.job._id)
+					this.selectJob(currentJob)
 				} catch (err) {
-					this.alertToggle({ message: "Error in jobs action", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error in jobs action", isShow: true, type: "error" })
 				}
 			},
 			async assignMemoqVendor() {
@@ -126,12 +129,12 @@
 						token: this.getToken,
 						stepId: this.job.stepId,
 						projectId: this.job.project_Id
-					});
+					})
 				} catch (err) {
 				}
 			},
 			showModal() {
-				this.$emit("showModal");
+				this.$emit("showModal")
 			}
 		},
 		data() {
@@ -140,8 +143,8 @@
 					Approve: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
 					Reject: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
 				},
-				emailAlert: false,
-			};
+				emailAlert: false
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -149,38 +152,38 @@
 				allJobs: "getAllJobs",
 				getToken: "getToken",
 				getVendor: "getVendor",
-				originallyUnits: "getOriginallyUnits",
+				originallyUnits: "getOriginallyUnits"
 			}),
 			isStartButton() {
-				return this.job.status === "Accepted" || this.job.status === "Ready to Start" || this.job.status === "Waiting to Start";
+				return this.job.status === "Accepted" || this.job.status === "Ready to Start" || this.job.status === "Waiting to Start"
 			},
 			progress() {
-				if(this.job.progress && this.job.progress.totalWordCount) {
-					return +(this.job.progress.wordsDone / this.job.progress.totalWordCount * 100).toFixed(2);
+				if (this.job.progress && this.job.progress.totalWordCount) {
+					return +(this.job.progress.wordsDone / this.job.progress.totalWordCount * 100).toFixed(2)
 				}
-				return this.job.progress;
+				return this.job.progress
 			},
 			isButton() {
-				const statuses = ['Accepted', 'Ready to Start', 'Waiting to Start'];
-				return statuses.indexOf(this.job.status) !== -1 || this.progress >= 100;
+				const statuses = ['Accepted', 'Ready to Start', 'Waiting to Start']
+				return statuses.indexOf(this.job.status) !== -1 || this.progress >= 100
 			},
 			areIcons() {
-				const statuses = ["Created", "Request Sent", "Quote sent"];
-				return statuses.indexOf(this.job.status) !== -1;
+				const statuses = ["Created", "Request Sent", "Quote sent"]
+				return statuses.indexOf(this.job.status) !== -1
 			},
 			isFileUpload() {
-				const { type } = this.originallyUnits.find(item => item._id === this.job.serviceStep.unit);
-				return this.job.status === 'Started' && type !== 'CAT Wordcount';
+				const { type } = this.originallyUnits.find(item => item._id === this.job.serviceStep.unit)
+				return this.job.status === 'Started' && type !== 'CAT Wordcount'
 			},
 			isCompleteButton() {
-				const { type } = this.originallyUnits.find(item => item._id === this.job.serviceStep.unit);
-				if(type === 'CAT Wordcount') {
-					const { title } = this.job.serviceStep;
-					const statusWord = title === 'Translation' ? 'Translation' : 'Review1';
-					const notFinishedStatus = this.job.memocDocs.find(item => item.WorkflowStatus.indexOf(statusWord) !== -1);
-					return this.progress >= 100 && !notFinishedStatus;
+				const { type } = this.originallyUnits.find(item => item._id === this.job.serviceStep.unit)
+				if (type === 'CAT Wordcount') {
+					const { title } = this.job.serviceStep
+					const statusWord = title === 'Translation' ? 'Translation' : 'Review1'
+					const notFinishedStatus = this.job.memocDocs.find(item => item.WorkflowStatus.indexOf(statusWord) !== -1)
+					return this.progress >= 100 && !notFinishedStatus
 				}
-				return !!this.deliverables.length;
+				return !!this.deliverables.length
 
 			}
 		},
@@ -197,12 +200,11 @@
   @import "../../../../assets/scss/colors.scss";
 
   .files-buttons {
-    padding-bottom: 20px;
     display: flex;
     flex-direction: column;
 
     &__upload {
-      padding: 5px;
+      padding: 0px 20px 20px 20px;
       box-sizing: border-box;
     }
 
@@ -220,13 +222,14 @@
       display: flex;
       justify-content: center;
       position: relative;
+      padding-bottom: 20px;
     }
 
     &__icons {
       width: 12%;
       align-self: center;
       justify-content: space-between;
-      padding: 25px 0 15px 0;
+      padding: 0px 0 30px 0;
     }
 
     &__icon {

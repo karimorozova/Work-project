@@ -3,7 +3,9 @@
     .project__all-info
       .project__info-row
         input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
-        input.project__name(v-else type="text" :value="nameOfProject" placeholder="Project Name" disabled)
+        span.project__nameBody(v-else)
+          input.project__name(v-if="!existProjectAccessChangeName" type="text" :value="nameOfProject" placeholder="Project Name" disabled)
+          input.project__name(v-else type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
       .project__info-row
         .project__date
           LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
@@ -80,19 +82,19 @@
 </template>
 
 <script>
-	import SelectSingle from "../SelectSingle";
-	import SelectMulti from "../SelectMulti";
-	import ValidationErrors from "../ValidationErrors";
-	import Datepicker from "../Datepicker";
-	import LabelValue from "./LabelValue";
-	import Button from "../Button";
-	import moment from "moment";
-	import { mapGetters, mapActions } from "vuex";
+	import SelectSingle from "../SelectSingle"
+	import SelectMulti from "../SelectMulti"
+	import ValidationErrors from "../ValidationErrors"
+	import Datepicker from "../Datepicker"
+	import LabelValue from "./LabelValue"
+	import Button from "../Button"
+	import moment from "moment"
+	import { mapGetters, mapActions } from "vuex"
 
 	export default {
 		props: {
 			project: {
-				type: Object,
+				type: Object
 			}
 		},
 		data() {
@@ -114,7 +116,7 @@
 				isRequiredField: true,
 				errors: [],
 				areErrorsExist: false,
-				clients: [],
+				clients: []
 			}
 		},
 		methods: {
@@ -123,178 +125,195 @@
 				"setProjectDate",
 				"setCurrentProject"
 			]),
+			async changeProjectName(projectName) {
+				this.errors = []
+				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+				if (this.errors.length) {
+					this.areErrorsExist = true
+					return
+				}
+				if (!this.errors.length) {
+					await this.setProjectProp({ prop: 'projectName', value: projectName })
+				}
+			},
 			customFormatter(date) {
-				return moment(date).format('DD-MM-YYYY, HH:mm');
+				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			async updateProjectDate(e, prop) {
-				if(this.project._id) {
-					if(prop === 'deadline' && this.isBilling) {
-						const date = { ['billingDate']: e };
-						await this.setDate('billingDate', date);
+				if (this.project._id) {
+					if (prop === 'deadline' && this.isBilling) {
+						const date = { ['billingDate']: e }
+						await this.setDate('billingDate', date)
 					}
-					const date = { [prop]: e };
-					await this.setDate(prop, date);
+					const date = { [prop]: e }
+					await this.setDate(prop, date)
 				} else {
-					if(prop === 'deadline' && this.isBilling) {
+					if (prop === 'deadline' && this.isBilling) {
 						this.project.billingDate = e
 					}
 				}
 			},
 			async setDate(prop, date) {
-				if(prop === 'startDate' && this.project.tasks.length) return;
-				await this.setProjectDate({ date, projectId: this.project._id });
+				if (prop === 'startDate' && this.project.tasks.length) return
+				await this.setProjectDate({ date, projectId: this.project._id })
 			},
 			async setTest(e) {
-				if(!this.project._id) {
+				if (!this.project._id) {
 					this.isTest = e.target.checked
 				} else {
-					await this.setProjectProp({ prop: 'isTest', value: e.target.checked });
+					await this.setProjectProp({ prop: 'isTest', value: e.target.checked })
 				}
 			},
 			async setSameDate(e) {
-				this.isBilling = e.target.checked;
-				if(!this.project._id) {
+				this.isBilling = e.target.checked
+				if (!this.project._id) {
 					this.project.billingDate = e.target.checked ? this.project.deadline : this.project.billingDate
 				} else {
 					e.target.checked ?
-              this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
-              this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
+							this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
+							this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
 				}
 			},
 			async setClientNumber(e) {
-				const { value } = e.target;
-				if(!this.project._id) {
-					return this.$emit('setValue', { prop: 'clientProjectNumber', option: value });
+				const { value } = e.target
+				if (!this.project._id) {
+					return this.$emit('setValue', { prop: 'clientProjectNumber', option: value })
 				}
-				await this.setProjectProp({ prop: 'clientProjectNumber', value });
+				await this.setProjectProp({ prop: 'clientProjectNumber', value })
 			},
 			async setProjectProp({ prop, value }) {
 				try {
-					const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop, value });
-					await this.setCurrentProject(result.body);
+					const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop, value })
+					await this.setCurrentProject(result.body)
 					this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
 				}
 			},
 			setValue({ option }, prop) {
-				this.$emit('setValue', { option, prop });
-				if(prop === 'customer' && option.industries.length === 1) {
-					this.selectedIndustry = option.industries[0];
+				this.$emit('setValue', { option, prop })
+				if (prop === 'customer' && option.industries.length === 1) {
+					this.selectedIndustry = option.industries[0]
 				}
 			},
 			setIndustry({ option }) {
-				this.selectedIndustry = option;
+				this.selectedIndustry = option
 			},
 			closeErrors() {
-				this.areErrorsExist = false;
+				this.areErrorsExist = false
 			},
 			checkProjectName() {
-        const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/;
-        return regex.test(this.project.projectName);
-      },
+				const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/
+				return regex.test(this.project.projectName)
+			},
 			async checkForErrors() {
-				this.errors = [];
-				if(!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.");
-				if(!this.project.startDate) this.errors.push("Please, set the start date.");
-				if(!this.project.deadline) this.errors.push("Please, set the deadline date.");
-				if(!this.project.customer.name) this.errors.push("Please, select a Client.");
-				if(!this.selectedIndustry) this.errors.push("Please, choose an industry.");
-				if(this.errors.length) {
-					this.areErrorsExist = true;
+				this.errors = []
+				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+				if (!this.project.startDate) this.errors.push("Please, set the start date.")
+				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
+				if (!this.project.customer.name) this.errors.push("Please, select a Client.")
+				if (!this.selectedIndustry) this.errors.push("Please, choose an industry.")
+				if (this.errors.length) {
+					this.areErrorsExist = true
 					return
 				}
 				try {
-					await this.createProject();
-					await this.clientCreateProjectDate();
+					await this.createProject()
+					await this.clientCreateProjectDate()
 				} catch (err) {
-					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" });
+					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
 				}
 			},
 			async clientCreateProjectDate() {
-				const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY');
-        await this.$http.post('/clientsapi/client-project-date', {
+				const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY')
+				await this.$http.post('/clientsapi/client-project-date', {
 					date: formatDate,
 					clientId: this.project.customer
-				});
+				})
 			},
 			async createProject() {
-				this.project.dateFormatted = moment(this.project.startDate).format('YYYY MM DD');
-				this.project.industry = this.selectedIndustry._id;
-				const customer = { ...this.project.customer };
-				this.project.customer = customer._id;
-				this.project.isTest = this.isTest;
+				this.project.dateFormatted = moment(this.project.startDate).format('YYYY MM DD')
+				this.project.industry = this.selectedIndustry._id
+				const customer = { ...this.project.customer }
+				this.project.customer = customer._id
+				this.project.isTest = this.isTest
 				try {
-					const newProject = await this.$http.post("/pm-manage/new-project", this.project);
-					this.$emit('projectCreated', { project: newProject.body, customer: customer });
-					this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" });
+					const newProject = await this.$http.post("/pm-manage/new-project", this.project)
+					this.$emit('projectCreated', { project: newProject.body, customer: customer })
+					this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" });
+					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
 				}
 			},
 			async getIndustries() {
-				const industries = await this.$http.get('/api/industries');
-				this.industries = industries.body;
+				const industries = await this.$http.get('/api/industries')
+				this.industries = industries.body
 			},
 			startOpen() {
-				this.$refs.start.showCalendar();
+				this.$refs.start.showCalendar()
 			},
 			deadlineOpen() {
-				this.$refs.deadline.showCalendar();
+				this.$refs.deadline.showCalendar()
 			},
 			billingOpen() {
-				this.$refs.billingDate.showCalendar();
+				this.$refs.billingDate.showCalendar()
 			},
 			goToClientInfo() {
-				const route = this.$router.resolve({ path: `/clients/details/${ this.project.customer._id }` });
-				window.open(route.href, "_blank");
+				const route = this.$router.resolve({ path: `/clients/details/${ this.project.customer._id }` })
+				window.open(route.href, "_blank")
 			},
 			async getCustomers() {
 				try {
-					if(!this.project._id) {
-						if(!this.clients.length) {
-              let result = await this.$http.get(`/active-clients`);
-              this.clients = [...result.body];
-            }
+					if (!this.project._id) {
+						if (!this.clients.length) {
+							let result = await this.$http.get(`/active-clients`)
+							this.clients = [...result.body]
+						}
 					}
 				} catch (err) {
-					this.alertToggle({ message: "Error on getting customers", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on getting customers", isShow: true, type: "error" })
 				}
 			},
 			async getProjectData() {
-				const { id } = this.$route.params;
-				if(id !== undefined) {
-					const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
-					await this.setCurrentProject(curProject.body);
+				const { id } = this.$route.params
+				if (id !== undefined) {
+					const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
+					await this.setCurrentProject(curProject.body)
 				}
 			},
 			isBillingDate() {
-				if(this.$refs.deadline.value === "") {
-					this.isBilling = false;
-				} else this.isBilling = this.$refs.deadline.value === this.$refs.billingDate.value;
+				if (this.$refs.deadline.value === "") {
+					this.isBilling = false
+				} else this.isBilling = this.$refs.deadline.value === this.$refs.billingDate.value
 			},
 			setIsBillingTrue() {
-				this.isBilling = true;
+				this.isBilling = true
 			}
 		},
 		computed: {
-			industriesList() {
-				let result = [];
-				if(this.project.customer.name) {
-					const industries = this.project.customer.industries;
-					if(industries[0].name) {
-						return result = industries;
-					}
-					return result = result.filter(item => industries.indexOf(item._id) !== -1);
+			existProjectAccessChangeName() {
+				if (this.project) {
+					const { status } = this.project
+					return status === 'Draft' || status === 'Quote sent'
 				}
-				return result;
+			},
+			industriesList() {
+				let result = []
+				if (this.project.customer.name) {
+					const industries = this.project.customer.industries
+					if (industries[0].name) {
+						return result = industries
+					}
+					return result = result.filter(item => industries.indexOf(item._id) !== -1)
+				}
+				return result
 			},
 			nameOfProject() {
-				return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName;
+				return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName
 			},
 			disabledPicker() {
-				return !!(this.project._id && this.project.tasks && this.project.tasks.length);
-			},
+				return !!(this.project._id && this.project.tasks && this.project.tasks.length)
+			}
 		},
 		components: {
 			SelectSingle,
@@ -305,16 +324,17 @@
 			ValidationErrors
 		},
 		async created() {
-			await this.getProjectData();
-			this.getCustomers();
-			this.getIndustries();
-			this.isBillingDate();
-			!this.project._id && this.setIsBillingTrue();
+			await this.getProjectData()
+			this.getCustomers()
+			this.getIndustries()
+			this.isBillingDate()
+			!this.project._id && this.setIsBillingTrue()
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+
   .project {
     padding: 40px;
     display: flex;
@@ -345,7 +365,7 @@
     &__all-info {
       width: 960px;
       padding: 20px;
-      box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
 
     &__info-row {
@@ -360,12 +380,15 @@
         opacity: 0.47;
       }
     }
+    &__nameBody{
+      width: 100%;
+    }
 
     &__name {
       font-size: 22px;
       padding: 0 5px;
       height: 44px;
-      width: 35%;
+      width: 40%;
       border-radius: 5px;
       color: #68573E;
       border: 1px solid #68573E;
@@ -530,8 +553,10 @@
         }
       }
     }
+  }
 
-
+  input:disabled {
+    background-color: #F2EFEB;
   }
 
 </style>

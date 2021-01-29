@@ -23,9 +23,11 @@
       .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ getWordcount(row)}}
       template(slot="cost" slot-scope="{ row }")
         .tasks-table__data(v-if="!isCancelledHalfway(row)") {{ row.finance.Price.receivables }}
-          .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+          .tasks-table__currency(v-if="row.finance.Price.receivables")
+            span(v-html="currencyIconDetected(project.projectCurrency)")
         .tasks-table__data(v-if="isCancelledHalfway(row)") {{ row.finance.Price.halfReceivables }}
-          .tasks-table__currency(v-if="row.finance.Price.halfReceivables") &euro;
+          .tasks-table__currency(v-if="row.finance.Price.halfReceivables")
+            span(v-html="currencyIconDetected(project.projectCurrency)")
       .tasks-table__data.tasks-table_centered(slot="icons" slot-scope="{ row }")
         .tasks-table__icons(v-if="isApproveReject(row)")
           img.tasks-table__icon(v-for="(icon, key) in icons" :src="icon.src" @click="makeDecision(row, key)")
@@ -34,14 +36,15 @@
 </template>
 
 <script>
-	import DataTable from "~/components/Tables/DataTable";
-	import ProgressLine from "~/components/ProgressLine";
-	import moment from "moment";
-	import { mapGetters, mapActions } from "vuex";
-	import taskPair from "~/mixins/taskPair";
+	import DataTable from "~/components/Tables/DataTable"
+	import ProgressLine from "~/components/ProgressLine"
+	import moment from "moment"
+	import { mapGetters, mapActions } from "vuex"
+	import taskPair from "~/mixins/taskPair"
+	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 
 	export default {
-		mixins: [taskPair],
+		mixins: [taskPair, currencyIconDetected],
 		data() {
 			return {
 				fields: [
@@ -64,14 +67,14 @@
 				alertToggle: "alertToggle",
 				updateTaskStatus: "updateTaskStatus"
 			}),
-      getWordcount(row){
-	      return row.finance.Wordcount.receivables;
-      },
+			getWordcount(row) {
+				return row.finance.Wordcount.receivables
+			},
 			isCancelledHalfway(task) {
-				return task.status === 'Cancelled Halfway';
+				return task.status === 'Cancelled Halfway'
 			},
 			getDeliveredTime(date) {
-				return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : "";
+				return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : ""
 			},
 			isApproveReject(task) {
 				return task.status === 'Quote sent'
@@ -80,42 +83,42 @@
 				return task.status === 'Ready for Delivery' || task.status === 'Delivered'
 			},
 			async makeDecision(task, key) {
-				const status = key === 'approve' ? 'Approved' : 'Rejected';
+				const status = key === 'approve' ? 'Approved' : 'Rejected'
 				try {
-					await this.updateTaskStatus({ task, status });
+					await this.updateTaskStatus({ task, status })
 				} catch (err) {
 				}
 			},
 			async download(task) {
 				try {
-					let href = task.deliverables;
-					if(!href) {
-						const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`);
-						href = result.data.link;
+					let href = task.deliverables
+					if (!href) {
+						const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`)
+						href = result.data.link
 					}
-					let link = document.createElement('a');
-					link.href = this.domain + href;
-					link.target = "_blank";
-					link.click();
-					if(task.status === "Ready for Delivery") {
-						await this.updateTaskStatus({ task, status: 'Delivered' });
+					let link = document.createElement('a')
+					link.href = this.domain + href
+					link.target = "_blank"
+					link.click()
+					if (task.status === "Ready for Delivery") {
+						await this.updateTaskStatus({ task, status: 'Delivered' })
 					}
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			getProgress(task, index) {
-				if(this.project.hasOwnProperty('fromXTRF')) {
-					return this.project.tasks[index].progress;
+				if (this.project.hasOwnProperty('fromXTRF')) {
+					return this.project.tasks[index].progress
 				} else {
-					const { steps } = this.project;
-					let total = 0;
-					const taskSteps = steps.filter(item => task.taskId === item.taskId);
+					const { steps } = this.project
+					let total = 0
+					const taskSteps = steps.filter(item => task.taskId === item.taskId)
 					for (let step of taskSteps) {
-						const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress;
-						total += progress;
+						const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress
+						total += progress
 					}
-					return (total / taskSteps.length).toFixed(2);
+					return (total / taskSteps.length).toFixed(2)
 				}
 
 			}
@@ -126,11 +129,11 @@
 				clientLanguages: "getCombinations"
 			}),
 			projectTasks() {
-				return this.project.tasks.filter(({ status }) => status !== 'Created');
-			},
+				return this.project.tasks.filter(({ status }) => status !== 'Created')
+			}
 		},
 		mounted() {
-			this.domain = process.env.domain;
+			this.domain = process.env.domain
 		},
 		components: {
 			DataTable,
@@ -203,7 +206,7 @@
       padding: 3px;
       border-radius: 3px;
       margin-left: 22px;
-      box-shadow: 0 0 10px $brown-shadow;
+      box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
       opacity: 0;
       z-index: -2;
       transition: all 0.2s;

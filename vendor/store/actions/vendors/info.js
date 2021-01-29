@@ -10,7 +10,9 @@ export const saveVendorInfo = async function ({commit, dispatch, state}, payload
             infoData.append("photo", state.accountInfo.photoFile[0]);
         }
         const result = await this.$axios.post('/vendor/info', infoData);
-        commit("SET_VENDOR", result.data);
+        const decode = window.atob(result.data)
+        const data = JSON.parse(decode)
+        commit("SET_VENDOR", data);
         commit("SET_ACCOUNT_INFO");
         commit("SET_NEW_PASSWORD", "");
         commit("SET_CONFIRMED_PASSWORD", "");

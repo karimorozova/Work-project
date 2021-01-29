@@ -12,7 +12,7 @@
             .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePair(row) }}
             .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ row.finance.Wordcount.receivables }}
             .tasks-table__data(slot="cost" slot-scope="{ row }") {{ row.finance.Price.receivables }}
-                .tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+                .tasks-table__currency(v-if="row.finance.Price.receivables") IJH;
 
 </template>
 

@@ -27,8 +27,8 @@ export default {
 <style lang="scss" scoped>
     .check-box {
         &__image {
-            height: 25px;
-            width: 25px;
+            height: 20px;
+            width: 20px;
         }
         &_opacity {
             cursor: no-drop;

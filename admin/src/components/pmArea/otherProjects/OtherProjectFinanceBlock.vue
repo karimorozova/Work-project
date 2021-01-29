@@ -276,6 +276,7 @@
       padding-top: 20px;
       border-top: 2px solid #C5BFB5;
       display: flex;
+      font-family: Myriad900;
 
       &-title {
         width: 60px;

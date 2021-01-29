@@ -30,6 +30,7 @@ export default {
 <style>
 body {
   font-family: Myriad400;
+  font-size: 14px;
 }
 
 .slide-fade-enter-active {
@@ -117,10 +118,31 @@ body {
 -----------  */
 
 @font-face {
+  font-family: 'Myriad300';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../assets/fonts/MYRIADPRO-LIGHT.woff') format('woff');
+}
+
+@font-face {
   font-family: 'Myriad400';
   font-style: normal;
   font-weight: normal;
   src: url('../assets/fonts/MYRIADPRO-REGULAR.woff') format('woff');
 }
 
+@font-face {
+  font-family: 'Myriad600';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../assets/fonts/MYRIADPRO-SEMIBOLD.woff') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Myriad900';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../assets/fonts/MYRIADPRO-BOLD.woff') format('woff');
+}
 </style>

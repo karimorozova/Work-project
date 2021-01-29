@@ -16,7 +16,8 @@
         .tasks-table__finance(v-else) -
       .tasks-table__data(slot="cost" slot-scope="{ row }")
         .tasks-table__finance(v-if="project.status !== 'Requested'") {{ row.finance.Price.receivables }}
-          span.tasks-table__currency(v-if="row.finance.Price.receivables") &euro;
+          span.tasks-table__currency(v-if="row.finance.Price.receivables")
+          span(v-html="currencyIconDetected(project.projectCurrency)")
         .tasks-table__finance(v-else) -
 
 </template>
@@ -24,8 +25,10 @@
 <script>
 	import DataTable from "~/components/Tables/DataTable";
 	import { mapGetters, mapActions } from "vuex";
+	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		data() {
 			return {
 				fields: [
