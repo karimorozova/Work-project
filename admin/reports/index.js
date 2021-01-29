@@ -12,6 +12,7 @@ const {
   getTier
 } = require("./newLQAStatusFromXTRFProjects");
 const { newLangReport } = require("./newLangTierReport");
+const { updateVendorBenchmarkCost, getVendorBenchmarkCost} = require("./newVendorCostBenchmark")
 
 module.exports = {
   filterTierReport,
@@ -27,4 +28,6 @@ module.exports = {
   UpdateLqaAliases,
   canNextLQAStep,
   getGroupedXtrfReports,
+  updateVendorBenchmarkCost,
+  getVendorBenchmarkCost,
 };

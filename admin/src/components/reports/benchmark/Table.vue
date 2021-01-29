@@ -9,9 +9,9 @@
             .benchmark-table__header(slot="headerVendor" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__header(slot="headerPrice" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__header(slot="headerMargin" slot-scope="{ field }") {{ field.label }}
-            .benchmark-table__data(slot="vendor" slot-scope="{ row }") {{ row.name }}
-            //- .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") {{ row.vendor.basicPrices[field] }}
-            //- .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.vendor.basicPrices[field])") {{ getMargin(row.vendor.basicPrices[field]) }}
+            .benchmark-table__data(slot="vendor" slot-scope="{ row }") {{ row.vendorName }}
+            .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") {{ row.baseRate.toFixed(3) }}
+            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.margin)" ) {{ row.margin }}
 </template>
 
 <script>
@@ -36,8 +36,9 @@ export default {
         getMargin(vendorPrice) {
             return (this.benchmarkPrice - vendorPrice).toFixed(2);
         },
-        getMarginClass(vendorPrice) {
-            return this.benchmarkPrice < +vendorPrice ? 'benchmark-table_red' : 'benchmark-table_green';
+        getMarginClass(margin) {
+          if (margin === 0) return ''
+          return 0 > + margin ? 'benchmark-table_red' : 'benchmark-table_green';
         }
     },
     components: {
@@ -49,13 +50,13 @@ export default {
 <style lang="scss" scoped>
 
 .benchmark-table {
-    max-width: 730px;
+    //max-width: 730px;
     margin: 10px 0 20px;
     &_red {
-        color: red;
+        color: #d15f45;
     }
     &_green {
-        color: green;
+        color: #4ca553;
     }
 }
 

@@ -10,6 +10,8 @@ const {
 	newLangReport,
   groupXtrfLqaByIndustryGroup,
   UpdateLqaAliases,
+	updateVendorBenchmarkCost,
+	getVendorBenchmarkCost
 } = require('../reports');
 
 //
@@ -100,6 +102,27 @@ router.post('/xtrf-lqa-report', async (req, res) => {
 	const { filters } = req.body;
 	try {
 		const reports = await getXtrfLqaReport(filters);
+		res.send(reports);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting reports');
+	}
+});
+
+router.post('/vendor-benchmark-cost', async (req, res) => {
+	const { filters } = req.body;
+	try {
+		const reports = await getVendorBenchmarkCost(filters);
+		res.send(reports);
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('Error on getting reports');
+	}
+});
+
+router.post('/update-vendor-benchmark-cost', async (req, res) => {
+	try {
+		const reports = await updateVendorBenchmarkCost();
 		res.send(reports);
 	} catch (err) {
 		console.log(err);
