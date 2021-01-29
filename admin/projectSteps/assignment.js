@@ -13,6 +13,7 @@ async function removeVendorFromStep(projectData) {
 		steps[idx].nativeFinance.Price.payables = steps[idx].finance.Price.payables = steps[idx].nativeFinance.Wordcount.payables = steps[idx].finance.Wordcount.payables = 0
 		steps[idx].nativeVendorRate = steps[idx].vendorRate = ""
 		steps[idx].vendor = null
+		steps[idx].vendorsClickedOffer = []
 		await Projects.updateOne({ _id: projectId }, { steps })
 		return steps[idx]
 	}
