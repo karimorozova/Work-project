@@ -4,7 +4,7 @@
       WYSIWYG(@closePreview="closeWYSIWYG", :message="message", @send="sendMessage")
     .sub-information__project( id="id") {{ project.projectId }}
       span(class="click-copy" @click="copyId")
-        i.fa.fa-clone(aria-hidden="true")
+        i.fa.fa-files-o(aria-hidden="true")
     .sub-information__row
       .row__title Project Status:
       .row__data {{ project.status }}
@@ -72,18 +72,18 @@
 </template>
 
 <script>
-	import {mapActions} from "vuex";
-	import Add from "../Add";
-	import scrollDrop from "@/mixins/scrollDrop";
-	import crudIcons from "@/mixins/crudIcons";
-	import SettingsTable from "../Table/SettingsTable";
-	import SelectSingle from "@/components/SelectSingle";
-	import WYSIWYG from "../vendors/WYSIWYG";
+	import { mapActions } from "vuex"
+	import Add from "../Add"
+	import scrollDrop from "@/mixins/scrollDrop"
+	import crudIcons from "@/mixins/crudIcons"
+	import SettingsTable from "../Table/SettingsTable"
+	import SelectSingle from "@/components/SelectSingle"
+	import WYSIWYG from "../vendors/WYSIWYG"
 
 	export default {
 		mixins: [scrollDrop, crudIcons],
 		props: {
-			project: {type: Object},
+			project: { type: Object }
 		},
 		data() {
 			return {
@@ -93,15 +93,15 @@
 						headerKey: "headerClient",
 						key: "client",
 						width: "50%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
 						width: "50%",
-						padding: "0",
-					},
+						padding: "0"
+					}
 				],
 
 				projectClientContacts: [],
@@ -114,252 +114,252 @@
 				errors: [],
 				isDeleting: false,
 				currentActive: -1,
-				isEditAndSend: false,
-			};
+				isEditAndSend: false
+			}
 		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle",
+				alertToggle: "alertToggle"
 			}),
 			copyId() {
-				let id = document.getElementById('id');
-				let elementText = id.textContent;
-				navigator.clipboard.writeText(elementText);
+				let id = document.getElementById('id')
+				let elementText = id.textContent
+				navigator.clipboard.writeText(elementText)
 				try {
-					document.execCommand('copy');
+					document.execCommand('copy')
 					this.alertToggle({
 						message: "Text copied successfully",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Text not copied",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			openWYSIWYG(index) {
-				this.isEditAndSend = true;
-				this.setEditingData(index);
+				this.isEditAndSend = true
+				this.setEditingData(index)
 			},
 			closeWYSIWYG() {
-				this.isEditAndSend = false;
-				this.setDefaults();
+				this.isEditAndSend = false
+				this.setDefaults()
 			},
 			async sendMessage(message) {
 				try {
 					const result = await this.$http.post("/pm-manage/contact-email", {
 						projectId: this.project._id,
 						contactId: this.currentClientContact._id,
-						template: message,
-					});
+						template: message
+					})
 					this.alertToggle({
 						message: "Message sent successfully",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Error! Message not sent",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				} finally {
-					this.closeWYSIWYG();
-					this.setDefaults();
+					this.closeWYSIWYG()
+					this.setDefaults()
 				}
 			},
 			async makeAction(index, key) {
 				if (this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing();
+					return this.isEditing()
 				}
 				switch (key) {
 					case "edit":
-						this.setEditingData(index);
-						break;
+						this.setEditingData(index)
+						break
 					case "cancel":
-						this.manageCancelEdition(index);
-						break;
+						this.manageCancelEdition(index)
+						break
 					case "delete":
 						if (this.projectClientContacts.length <= 1) {
-							this.errors = [];
+							this.errors = []
 							this.errors.push('Can\'t be deleted')
 							if (this.errors.length) {
-								this.areErrors = true;
-								return;
+								this.areErrors = true
+								return
 							}
 						} else {
-							this.manageDeleteClick(index);
+							this.manageDeleteClick(index)
 						}
-						break;
+						break
 					default:
-						await this.checkErrors(index);
+						await this.checkErrors(index)
 				}
 			},
 			closeErrors() {
-				this.areErrors = false;
+				this.areErrors = false
 			},
 			setDefaults() {
-				this.currentActive = -1;
-				this.isDeleting = false;
-				this.currentClientContact = "";
-				this.oldClientContact = "";
+				this.currentActive = -1
+				this.isDeleting = false
+				this.currentClientContact = ""
+				this.oldClientContact = ""
 			},
 			async manageDeleteClick(index) {
 				if (!this.projectClientContacts[index]._id) {
-					this.projectClientContacts.splice(index, 1);
-					this.setDefaults();
+					this.projectClientContacts.splice(index, 1)
+					this.setDefaults()
 				} else {
-					this.deleteIndex = index;
-					this.isDeleting = true;
+					this.deleteIndex = index
+					this.isDeleting = true
 				}
 			},
 			async deleteData() {
 				try {
 					const result = await this.$http.delete(
-						`/pm-manage/client-contact/${this.project._id}/${this.projectClientContacts[this.deleteIndex]._id}`
-					);
-					this.projectClientContacts = result.data.clientContacts;
+							`/pm-manage/client-contact/${ this.project._id }/${ this.projectClientContacts[this.deleteIndex]._id }`
+					)
+					this.projectClientContacts = result.data.clientContacts
 					this.alertToggle({
 						message: "Project client contact removed",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on Deleting project client contact",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				} finally {
-					this.setDefaults();
+					this.setDefaults()
 				}
 			},
 			async checkErrors(index) {
-				if (this.currentActive === -1) return;
-				this.errors = [];
+				if (this.currentActive === -1) return
+				this.errors = []
 				if (this.projectClientContacts.find((item) => item.firstName === this.currentClientContact.firstName)) {
-					this.errors.push("Such contact exists");
+					this.errors.push("Such contact exists")
 				}
 				if (!this.currentClientContact.hasOwnProperty("firstName")) {
-					this.errors.push("Сhoose сlient сontact");
+					this.errors.push("Сhoose сlient сontact")
 				}
 				if (this.errors.length) {
-					this.areErrors = true;
-					return;
+					this.areErrors = true
+					return
 				}
-				await this.manageSaveClick(index);
+				await this.manageSaveClick(index)
 			},
 			async manageSaveClick(index) {
 				try {
 					const result = await this.$http.post("/pm-manage/client-contact", {
 						projectId: this.project._id,
 						contact: this.currentClientContact,
-            oldContact: this.oldClientContact,
-					});
-					this.projectClientContacts = result.data.clientContacts;
+						oldContact: this.oldClientContact
+					})
+					this.projectClientContacts = result.data.clientContacts
 					this.alertToggle({
 						message: "Saved project client contact",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on Saving project client contact",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				} finally {
-					this.setDefaults();
+					this.setDefaults()
 				}
 			},
 			manageCancelEdition(index) {
 				if (!this.projectClientContacts[index]._id) {
-					this.projectClientContacts.splice(index, 1);
-					this.setDefaults();
+					this.projectClientContacts.splice(index, 1)
+					this.setDefaults()
 				} else {
-					this.setDefaults();
+					this.setDefaults()
 				}
 			},
 			addData() {
 				if (this.currentActive !== -1) {
-					return this.isEditing();
+					return this.isEditing()
 				}
 				this.projectClientContacts.push({
-					projectClientContact: "",
-				});
-				this.setEditingData(this.projectClientContacts.length - 1);
+					projectClientContact: ""
+				})
+				this.setEditingData(this.projectClientContacts.length - 1)
 			},
 			setEditingData(index) {
-				this.currentActive = index;
-				this.currentClientContact = this.projectClientContacts[index];
-				this.oldClientContact = this.currentClientContact;
+				this.currentActive = index
+				this.currentClientContact = this.projectClientContacts[index]
+				this.oldClientContact = this.currentClientContact
 			},
-			setClientContact({option}) {
-				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option);
+			setClientContact({ option }) {
+				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option)
 			},
-			async setPayment({option}) {
+			async setPayment({ option }) {
 				try {
 					const result = await this.$http.post("/pm-manage/payment-profile", {
 						projectId: this.project._id,
-						paymentProfile: option,
-					});
-					this.project.paymentProfile = result.data.paymentProfile;
+						paymentProfile: option
+					})
+					this.project.paymentProfile = result.data.paymentProfile
 					this.alertToggle({
 						message: "Project payment profile updated",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Cannot update project payment profile",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async setUrgentStatus() {
 				try {
 					const result = await this.$http.post("/pm-manage/urgent", {
 						projectId: this.project._id,
-						isUrgent: event.target.checked,
-					});
+						isUrgent: event.target.checked
+					})
 					this.alertToggle({
 						message: "Urgent status updated",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Cannot update Urgent status",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			getClientContacts() {
-				this.projectClientContacts = this.project.clientContacts;
-			},
+				this.projectClientContacts = this.project.clientContacts
+			}
 		},
 		computed: {
 			clientData() {
 				if (this.project) {
-					return this.project.customer.contacts.map((i) => i.firstName);
+					return this.project.customer.contacts.map((i) => i.firstName)
 				}
-			},
+			}
 		},
 		created() {
-			this.project && this.getClientContacts();
+			this.project && this.getClientContacts()
 		},
 		components: {
 			Add,
 			SettingsTable,
 			SelectSingle,
-			WYSIWYG,
-		},
-	};
+			WYSIWYG
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -369,7 +369,7 @@
   .sub-information {
     box-sizing: border-box;
     padding: 20px;
-    box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -526,11 +526,11 @@
   }
 
   .click-copy {
-    margin-left: 20px;
+    margin-left: 15px;
     font-size: 18px;
     cursor: pointer;
-    transition: all 0.2s;
-    opacity: 0.7;
+    transition: ease 0.2s;
+    opacity: 0.8;
   }
 
   .click-copy:hover {

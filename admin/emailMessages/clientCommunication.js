@@ -25,7 +25,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true) :
 			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true, true)
 	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0)
-	const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '2h' })
+	const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '21d' })
 
 	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2)
 	let detailHeader = "Please see below the quote details:"
@@ -43,8 +43,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ obj.finance.Price.receivables } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
 	}
 
-	return `<div class="wrapper"
-                style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;">
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;">
                 <header style="background-color:#66563E;text-align:center;">
                     <img class="logo" src="cid:logo@pan" alt="pangea"
                         style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;">
@@ -511,7 +510,7 @@ function getTasksInfo(obj, fromMinimumCharge, tasks, steps, allUnits, allSetting
 				color: (index + 2) % 2 ? '#fff' : '#F4F0EE'
 			})
 		}
-		return [...acc]
+		return [ ...acc ]
 	}, [])
 	let result = ""
 	for (let info of tasksInfo) {

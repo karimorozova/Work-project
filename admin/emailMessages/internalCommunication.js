@@ -295,7 +295,7 @@ function requestCancelledMessage(obj) {
 
 //Generate template for PM/AM if Vendor Accept or Reject the job.
 function stepDecisionMessage(obj, user) {
-	const vendorSurname = obj.step.vendor.surname;
+	const vendorSurname = obj.step.vendor.surname || "";
 	const decision = obj.decision === "accept" ? "approved" : "rejected";
 	const reason = obj.reason || "";
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
