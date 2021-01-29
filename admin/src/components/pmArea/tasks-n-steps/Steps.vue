@@ -338,7 +338,7 @@
 			},
 			setVendor({ person }, index) {
 				const { stepId, taskId } = this.allSteps[index]
-				const doesHaveAccess = this.userGroup.name === "Administrators" || this.userGroup.name === "Developers" || this.userGroup.name === Project Managers"
+				const doesHaveAccess = this.userGroup.name === "Administrators" || this.userGroup.name === "Developers" || this.userGroup.name === "Project Managers"
 				const relatedStep = this.allSteps.find(item => item.stepId !== stepId && item.taskId === taskId)
 				if (doesHaveAccess) {
 					this.$emit("setVendor", { vendor: person, index })
