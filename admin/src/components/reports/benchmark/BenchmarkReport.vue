@@ -6,8 +6,8 @@
         :allSources="filtersData.allSourceLang"
         :allTargets="filtersData.allTargetLang"
         :allVendors="filtersData.allVendors"
-        :allSteps="filtersData.allSteps"
-        :allUnits="filtersData.allUnits"
+        :allSteps="filtersData.allSteps.filter(item => item === 'Translation')"
+        :allUnits="filtersData.allUnits.filter(item => item === 'CAT Wordcount')"
         :allIndustries="filtersData.allIndustries"
         :targetFilter="targetFilter"
         :sourceFilter="sourceFilter"
@@ -24,11 +24,12 @@
         @showNewVendorForm="showNewVendorForm"
         @updateBenchmark="getBenchmark"
       )
-    .benchmark__languages.height-500
+
+    .benchmark__languages
       .benchmark__language(v-for="{sourceLanguage, targetLanguage, industries} in reportData")
         .benchmark__info
           span.benchmark__language-pair.benchmark__bold {{sourceLanguage.lang + ' >> ' + targetLanguage.lang}}
-          h4.benchmark__industry(v-for="{industry, stepInfo } in industries")
+          .benchmark__industry(v-for="{industry, stepInfo } in industries")
             .benchmark__step-info(v-for=" {step, benchmark,vendorInfo, unit} in stepInfo")
               span.benchmark__bold Industry: &nbsp;
               span {{industry.name}} &nbsp; &nbsp;
@@ -146,11 +147,6 @@ export default {
 h3, h4 {
   margin: 0;
   padding: 0;
-}
-
-.height-500 {
-  max-height: 550px;
-  overflow-x: auto;
 }
 
 .benchmark {
