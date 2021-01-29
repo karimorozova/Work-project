@@ -144,9 +144,9 @@ const getVendorBenchmarkCost = async (filters) => {
 				benchmarkIndustry.stepInfo = benchmarkIndustry.stepInfo.map((benchmarkVendor ) =>{
 					benchmarkVendor.vendorInfo = benchmarkVendor.vendorInfo.filter(({ vendorName }) => vendorName === vendorFilter)
 					return benchmarkVendor
-				}).filter(({vendorInfo}) => vendorInfo.length)
+				})
 				return benchmarkIndustry
-			}).filter(({stepInfo}) => stepInfo.length)
+			})
 			return vendorsBenchmark;
 		});
 	}
@@ -187,7 +187,17 @@ const getVendorBenchmarkCost = async (filters) => {
 		allUnits: Array.from(allUnits),
 	}
 
-	return { vendorInfo: VendorsBenchmarkInfo.filter(({industries}) => industries.length), benchmarkFilters }
+
+
+	const filteredVendorsBenchmarkInfo = VendorsBenchmarkInfo.filter(Benchmark => {
+		Benchmark.industries = Benchmark.industries.filter(benchmarkIndustries => {
+			benchmarkIndustries.stepInfo = benchmarkIndustries.stepInfo.filter(({vendorInfo}) => vendorInfo.length)
+			return benchmarkIndustries.stepInfo.length
+		})
+		return Benchmark.industries.length
+	})
+
+	return { vendorInfo: filteredVendorsBenchmarkInfo, benchmarkFilters }
 }
 
 module.exports = { updateVendorBenchmarkCost, getVendorBenchmarkCost }
