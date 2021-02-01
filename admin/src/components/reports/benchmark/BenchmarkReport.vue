@@ -6,8 +6,8 @@
         :allSources="filtersData.allSourceLang"
         :allTargets="filtersData.allTargetLang"
         :allVendors="filtersData.allVendors"
-        :allSteps="filtersData.allSteps.filter(item => item === 'Translation')"
-        :allUnits="filtersData.allUnits.filter(item => item === 'CAT Wordcount')"
+        :allSteps="filtersData.allSteps"
+        :allUnits="filtersData.allUnits"
         :allIndustries="filtersData.allIndustries"
         :targetFilter="targetFilter"
         :sourceFilter="sourceFilter"
@@ -60,12 +60,12 @@ export default {
     return {
       reportData: [],
       filtersData: {},
-      sourceFilter: "English (United Kingdom)",
-      targetFilter: "All",
-      industryFilter: "All",
-      vendorFilter: "All",
-      stepFilter: "Translation",
-      unitFilter: "CAT Wordcount",
+      sourceFilter: ["English (United Kingdom)"],
+      targetFilter: ["All"],
+      industryFilter: ["All"],
+      vendorFilter: ["All"],
+      stepFilter: ["Translation"],
+      unitFilter: ["CAT Wordcount"],
       languages: [],
       isLanguages: true
     }
