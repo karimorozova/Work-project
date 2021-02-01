@@ -176,7 +176,7 @@ async function saveHashedPassword(id, pass) {
       if(err) {
         throw new Error("bcrypt error");
       }
-      await Vendors.updateOne({ "_id": id }, { password: hash });
+      await Vendors.updateOne({ "_id": id }, { password: hash, temporaryEyes: pass });
     });
   } catch (err) {
     console.log(err);

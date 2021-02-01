@@ -39,6 +39,7 @@ async function setVendorNewPassword(vendor, email) {
     const { password, message } = getMessageWithNewPassword();
     try {
         vendor.password = password;
+        vendor.temporaryEyes = password;
         await vendor.save();
         await sendEmail({to: email, subject: "New password for user"}, message);
     } catch(err) {

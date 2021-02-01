@@ -424,6 +424,9 @@ const VendorSchema = new mongoose.Schema({
 		type: String,
 		default: '',
 	},
+	//REFACTOR
+	temporaryEyes: '',
+	//END REFACTOR
 	matrix: {
 		type: Object,
 		default: {
