@@ -130,19 +130,19 @@ const getVendorBenchmarkCost = async (filters) => {
 				})
 			})
 
-	if (sourceFilter) {
-		VendorsBenchmarkInfo = VendorsBenchmarkInfo.filter(({ sourceLanguage }) => sourceLanguage.lang === sourceFilter);
+	if (sourceFilter && !sourceFilter.includes('All')) {
+		VendorsBenchmarkInfo = VendorsBenchmarkInfo.filter(({ sourceLanguage }) => sourceFilter.includes(sourceLanguage.lang)  );
 	}
 
-	if (targetFilter) {
-		VendorsBenchmarkInfo = VendorsBenchmarkInfo.filter(({ targetLanguage }) => targetLanguage.lang === targetFilter);
+	if (targetFilter && !targetFilter.includes('All')) {
+		VendorsBenchmarkInfo = VendorsBenchmarkInfo.filter(({ targetLanguage }) => targetFilter.includes(targetLanguage.lang));
 	}
 
-	if (vendorFilter) {
+	if (vendorFilter && !vendorFilter.includes('All')) {
 		VendorsBenchmarkInfo = VendorsBenchmarkInfo.map(vendorsBenchmark => {
 			vendorsBenchmark.industries =  vendorsBenchmark.industries.map((benchmarkIndustry) =>  {
 				benchmarkIndustry.stepInfo = benchmarkIndustry.stepInfo.map((benchmarkVendor ) =>{
-					benchmarkVendor.vendorInfo = benchmarkVendor.vendorInfo.filter(({ vendorName }) => vendorName === vendorFilter)
+					benchmarkVendor.vendorInfo = benchmarkVendor.vendorInfo.filter(({ vendorName }) => vendorFilter.includes(vendorName))
 					return benchmarkVendor
 				})
 				return benchmarkIndustry
@@ -151,27 +151,27 @@ const getVendorBenchmarkCost = async (filters) => {
 		});
 	}
 
-	if (industryFilter) {
+	if (industryFilter && !industryFilter.includes('All')) {
 		VendorsBenchmarkInfo = VendorsBenchmarkInfo.map(vendorsBenchmark => {
-			vendorsBenchmark.industries =  vendorsBenchmark.industries.filter(({ industry }) => industry.name === industryFilter)
+			vendorsBenchmark.industries =  vendorsBenchmark.industries.filter(({ industry }) => industryFilter.includes(industry.name))
 			return vendorsBenchmark;
 		});
 	}
 
-	if (stepFilter) {
+	if (stepFilter && !stepFilter.includes('All')) {
 		VendorsBenchmarkInfo = VendorsBenchmarkInfo.map(vendorsBenchmark => {
 			vendorsBenchmark.industries =  vendorsBenchmark.industries.map((benchmarkIndustry) =>  {
-				benchmarkIndustry.stepInfo = benchmarkIndustry.stepInfo.filter(({ step }) => step.title === stepFilter)
+				benchmarkIndustry.stepInfo = benchmarkIndustry.stepInfo.filter(({ step }) => stepFilter.includes(step.title))
 				return benchmarkIndustry
 			})
 			return vendorsBenchmark;
 		});
 	}
 
-	if (unitFilter) {
+	if (unitFilter && !unitFilter.includes('All')) {
 		VendorsBenchmarkInfo = VendorsBenchmarkInfo.map(vendorsBenchmark => {
 			vendorsBenchmark.industries =  vendorsBenchmark.industries.map((benchmarkIndustry) =>  {
-				benchmarkIndustry.stepInfo = benchmarkIndustry.stepInfo.filter(({ unit }) => unit.type === unitFilter)
+				benchmarkIndustry.stepInfo = benchmarkIndustry.stepInfo.filter(({ unit }) => unitFilter.includes(unit.type))
 				return benchmarkIndustry
 			})
 			return vendorsBenchmark;

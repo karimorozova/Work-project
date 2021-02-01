@@ -4,65 +4,75 @@
       .report-filters__item
         LabelVal(text="Source Language:" customClass="new-chart-label")
           .report-filters__drop
-            SelectSingle(
-              placeholder="Select"
-              :hasSearch="true"
-              customClass="height-32"
-              :options="allSources"
-              :selectedOption="sourceFilter"
-              @chooseOption="setSourceFilter"
+            SelectMulti(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :hasSearch="true",
+              :selectedOptions="sourceFilter",
+              :options="allSources",
+              @chooseOptions="(e) => setFilter(e, 'sourceFilter')"
+              :allOptionsButtons="false"
             )
       .report-filters__item
         LabelVal(text="Target Language:" customClass="new-chart-label")
           .report-filters__drop
-            SelectSingle(
-              placeholder="Select"
-              :hasSearch="true"
-              customClass="height-32"
-              :options="allTargets"
-              :selectedOption="targetFilter"
-              @chooseOption="setTargetFilter"
+            SelectMulti(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :hasSearch="true",
+              :selectedOptions="targetFilter",
+              :options="allTargets",
+              @chooseOptions="(e) => setFilter(e, 'targetFilter')"
+              :allOptionsButtons="false"
             )
       .report-filters__item
         LabelVal(text="Step:" customClass="new-chart-label")
           .report-filters__drop
-            SelectSingle(
-              customClass="height-32"
-              :options="allSteps"
-              :selectedOption="stepFilter"
-              @chooseOption="setStepFilter"
+            SelectMulti(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :hasSearch="true",
+              :selectedOptions="stepFilter",
+              :options="allSteps",
+              @chooseOptions="(e) => setFilter(e, 'stepFilter')"
+              :allOptionsButtons="false"
             )
     .report-filters__row
       .report-filters__item
         LabelVal(text="Vendor Name:" customClass="new-chart-label")
           .report-filters__drop
-            SelectSingle(
-              placeholder="Select"
-              :hasSearch="true"
-              customClass="height-32"
-              :options="allVendors"
-              :selectedOption="vendorFilter"
-              @chooseOption="setVendorFilter"
+            SelectMulti(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :hasSearch="true",
+              :selectedOptions="vendorFilter",
+              :options="allVendors",
+              @chooseOptions="(e) => setFilter(e, 'vendorFilter')"
+              :allOptionsButtons="false"
             )
       .report-filters__item
         LabelVal(text="Industries:" customClass="new-chart-label")
           .report-filters__drop
-            SelectSingle(
-              placeholder="Select"
-              :hasSearch="true"
-              customClass="height-32"
-              :options="allIndustries"
-              :selectedOption="industryFilter"
-              @chooseOption="setIndustryFilter"
+            SelectMulti(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :hasSearch="true",
+              :selectedOptions="industryFilter",
+              :options="allIndustries",
+              @chooseOptions="(e) => setFilter(e, 'industryFilter')"
+              :allOptionsButtons="false"
             )
       .report-filters__item
         LabelVal(text="Unit:" customClass="new-chart-label")
           .report-filters__drop
-            SelectSingle(
-              customClass="height-32"
-              :options="allUnits"
-              :selectedOption="unitFilter"
-              @chooseOption="setUnitFilter"
+            SelectMulti(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :hasSearch="true",
+              :selectedOptions="unitFilter",
+              :options="allUnits",
+              @chooseOptions="(e) => setFilter(e, 'unitFilter')"
+              :allOptionsButtons="false"
             )
     .report-filters__row
       .button
@@ -73,18 +83,18 @@
 
 <script>
 	import LabelVal from "@/components/LabelVal";
-	import SelectSingle from "@/components/SelectSingle";
 	import Button from "@/components/Button";
+  import SelectMulti from "../../SelectMulti"
 
 	export default {
 		props: {
-			targetFilter: { type: String },
-			sourceFilter: { type: String },
-			tierFilter: { type: String },
-			vendorFilter: { type: String },
-			industryFilter: { type: String },
-			stepFilter: { type: String },
-			unitFilter: { type: String },
+			targetFilter: { type: Array, default: () => [] },
+			sourceFilter: { type: Array, default: () => [] },
+			tierFilter: { type: Array, default: () => [] },
+			vendorFilter: { type: Array, default: () => [] },
+			industryFilter: { type: Array, default: () => [] },
+			stepFilter: { type: Array, default: () => [] },
+			unitFilter: { type: Array, default: () => [] },
 			allSources: { type: Array, default: () => [] },
 			allTargets: { type: Array, default: () => [] },
 			allVendors: { type: Array, default: () => [] },
@@ -102,34 +112,24 @@
           // this.alertToggle({ message: 'Error on updating benchmark', isShow: true, type: 'error' });
         }
       },
-      async updateAliases () {
-        try {
-          const report = await this.$http.get('/reportsapi/restore-lqa-report-aliases');
-          this.$emit('updateAliases', { value: report.body });
-          this.alertToggle({ message: 'Started to update...' });
-        } catch (err) {
-          this.alertToggle({ message: 'Error on updating aliases', isShow: true, type: 'error' });
-        }
-      },
-      setTargetFilter ({ option }) {
-        this.$emit('setTargetFilter', { option });
-      },
-      setSourceFilter ({ option }) {
-        this.$emit('setSourceFilter', { option });
-      },
-      setIndustryFilter ({ option }) {
-				this.$emit("setIndustryFilter", { option });
-			},
-			setVendorFilter({ option }) {
-				this.$emit("setVendorFilter", { option });
-			},
-      setStepFilter ({ option }) {
-        this.$emit('setStepFilter', { option });
-      },
-      setUnitFilter ({ option }) {
-        this.$emit('setUnitFilter', { option });
-      },
+      setFilter ({ option }, field) {
+        const eventName = 'set' + field[0].toUpperCase() + field.substring(1)
 
+        if (option === 'All'){
+          this.$emit(eventName, { option: ["All"] });
+          return
+        }
+
+        const position = this[field].findIndex((item) => item === option)
+
+        if (position !== -1) {
+          this[field].splice(position, 1);
+        } else {
+          this[field].push(option);
+        }
+
+        this.$emit(eventName, { option: this[field].filter(items => items !== 'All') });
+      },
 		},
 		computed: {
 			tierNames() {
@@ -137,8 +137,8 @@
 			}
 		},
 		components: {
+      SelectMulti,
 			LabelVal,
-			SelectSingle,
 			Button
 		}
 	}

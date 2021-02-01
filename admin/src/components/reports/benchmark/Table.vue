@@ -50,7 +50,7 @@ export default {
 <style lang="scss" scoped>
 
 .benchmark-table {
-    //max-width: 730px;
+    max-width: 55%;
     margin: 10px 0 20px;
     &_red {
         color: #d15f45;
