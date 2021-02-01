@@ -234,7 +234,7 @@ router.post('/step-target', checkVendor, upload.fields([{ name: 'targetFile' }])
 			jobId,
 			fileName: targetFile[0].filename
 		})
-		res.send(updatedProject)
+		res.send(true)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error / Cannot add Target file to the Steps array of Project')
