@@ -62,7 +62,7 @@ export default {
       filtersData: {},
       sourceFilter: ["English (United Kingdom)"],
       targetFilter: ["All"],
-      industryFilter: ["All"],
+      industryFilter: ["iGaming", "Finance"],
       vendorFilter: ["All"],
       stepFilter: ["Translation"],
       unitFilter: ["CAT Wordcount"],
