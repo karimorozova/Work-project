@@ -134,7 +134,7 @@
 	import vatChecker from "../../mixins/Client/vatChecker"
 
 	export default {
-		mixins: [vatChecker],
+		mixins: [ vatChecker ],
 		props: {
 			contactsPhotos: {
 				type: Array,
@@ -228,13 +228,13 @@
 				this.isRefreshResultTable = true
 				setTimeout(() => {
 					this.isRefreshResultTable = false
-				}, 2000)
+				}, 1000)
 			},
 			updateRates(action) {
 				this.isRefreshAfterServiceUpdate = action
 				setTimeout(() => {
 					this.isRefreshAfterServiceUpdate = !action
-				}, 2000)
+				}, 1000)
 			},
 			loadFile({ files, prop }) {
 				this.$emit("loadFile", { files, prop })

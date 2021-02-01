@@ -285,39 +285,39 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
-	import FinanceMatrix from "../FinanceMatrix";
-	import VendorCompetencies from "./VendorCompetencies";
-	import ResultTable from "./pricelists/ResultTable";
-	import IndustryTable from "./pricelists/IndustryTable";
-	import StepTable from "./pricelists/StepTable";
-	import LangTable from "./pricelists/LangTable";
-	import CKEditor from "ckeditor4-vue";
-	import WYSIWYG from "./WYSIWYG";
-	import VendorAction from "./VendorAction";
-	import VendorCandidate from "./VendorCandidate";
-	import TableQualifications from "./TableQualifications";
-	import TableProfessionalExperience from "./TableProfessionalExperience";
-	import TableEducation from "./TableEducation";
-	import TableDocuments from "./TableDocuments";
-	import TableAssessment from "./TableAssessment";
-	import ClickOutside from "vue-click-outside";
-	import VendorStatusSelect from "./VendorStatusSelect";
-	import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
-	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
-	import NativeLanguageSelect from "./NativeLanguageSelect";
-	import TimezoneSelect from "../clients/TimezoneSelect";
-	import ValidationErrors from "../ValidationErrors";
-	import SelectSingle from "../SelectSingle";
-	import Asterisk from "../Asterisk";
-	import Addseverallangs from "../finance/Addseverallangs";
-	import AvailablePairs from "../finance/pricelists/AvailablePairs";
-	import photoPreview from "@/mixins/photoPreview";
-	import ApproveModal from "../ApproveModal";
-	import SelectMulti from "../SelectMulti";
+	import { mapGetters, mapActions } from "vuex"
+	import FinanceMatrix from "../FinanceMatrix"
+	import VendorCompetencies from "./VendorCompetencies"
+	import ResultTable from "./pricelists/ResultTable"
+	import IndustryTable from "./pricelists/IndustryTable"
+	import StepTable from "./pricelists/StepTable"
+	import LangTable from "./pricelists/LangTable"
+	import CKEditor from "ckeditor4-vue"
+	import WYSIWYG from "./WYSIWYG"
+	import VendorAction from "./VendorAction"
+	import VendorCandidate from "./VendorCandidate"
+	import TableQualifications from "./TableQualifications"
+	import TableProfessionalExperience from "./TableProfessionalExperience"
+	import TableEducation from "./TableEducation"
+	import TableDocuments from "./TableDocuments"
+	import TableAssessment from "./TableAssessment"
+	import ClickOutside from "vue-click-outside"
+	import VendorStatusSelect from "./VendorStatusSelect"
+	import VendorLeadsourceSelect from "./VendorLeadsourceSelect"
+	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect"
+	import NativeLanguageSelect from "./NativeLanguageSelect"
+	import TimezoneSelect from "../clients/TimezoneSelect"
+	import ValidationErrors from "../ValidationErrors"
+	import SelectSingle from "../SelectSingle"
+	import Asterisk from "../Asterisk"
+	import Addseverallangs from "../finance/Addseverallangs"
+	import AvailablePairs from "../finance/pricelists/AvailablePairs"
+	import photoPreview from "@/mixins/photoPreview"
+	import ApproveModal from "../ApproveModal"
+	import SelectMulti from "../SelectMulti"
 
 	export default {
-		mixins: [photoPreview],
+		mixins: [ photoPreview ],
 		data() {
 			return {
 				languages: [],
@@ -346,7 +346,7 @@
 				isApproveModal: false,
 				asteriskStyle: { top: "0px" },
 				photoFile: [],
-				genders: ["Male", "Female", "Other"],
+				genders: [ "Male", "Female", "Other" ],
 				errors: [],
 				langPairs: [],
 				addSeveralPriceId: "",
@@ -357,15 +357,15 @@
 					allowedContent: true,
 					uiColor: "#F4F0EE",
 					resize_minHeight: "130",
-					height: 167,
+					height: 167
 				},
 				templatesWysiwyg: [
 					{
 						title: "tempate",
-						message: "<p>test message</p>",
-					},
-				],
-			};
+						message: "<p>test message</p>"
+					}
+				]
+			}
 		},
 		methods: {
 			...mapActions({
@@ -377,35 +377,35 @@
 				updateIndustry: "updateIndustry",
 				getDuoCombinations: "getVendorDuoCombinations",
 				updateVendorStatus: "updateVendorStatus",
-				setVendorsMatrixData: "setVendorsMatrixData",
+				setVendorsMatrixData: "setVendorsMatrixData"
 			}),
 			setAlias({ option }) {
-				if(this.currentVendor.hasOwnProperty('aliases')) {
-					if(this.currentVendor.aliases.length) {
+				if (this.currentVendor.hasOwnProperty('aliases')) {
+					if (this.currentVendor.aliases.length) {
 						this.currentVendorAliases = this.currentVendor.aliases
 					}
 				}
-				const position = this.currentVendorAliases.indexOf(option);
+				const position = this.currentVendorAliases.indexOf(option)
 
-				if(position !== -1) {
-					this.currentVendorAliases.splice(position, 1);
-					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases });
+				if (position !== -1) {
+					this.currentVendorAliases.splice(position, 1)
+					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases })
 				} else {
-					this.currentVendorAliases.push(option);
-					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases });
+					this.currentVendorAliases.push(option)
+					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases })
 				}
 			},
 			async approveModal() {
 				await this.memoqVendorAction(this.memoqAction)
-				this.approveMemoqVendorAction = false;
+				this.approveMemoqVendorAction = false
 				this.memoqAction = ''
 			},
 			openMemoqModal(action) {
-				this.memoqAction = action;
-				this.approveMemoqVendorAction = !!action;
+				this.memoqAction = action
+				this.approveMemoqVendorAction = !!action
 			},
 			async memoqVendorAction(action) {
-				if(action === 'Saved') {
+				if (action === 'Saved') {
 					await this.sendVendorToMemoq(`/vendorsapi/create-memoq-vendor/${ this.currentVendor._id }`, action)
 				} else {
 					await this.sendVendorToMemoq(`/vendorsapi/delete-memoq-vendor/${ this.currentVendor._id }`, action)
@@ -417,341 +417,341 @@
 					this.alertToggle({
 						message: `Vendor in Memoq are ${ action }`,
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on action with Memoq & Vendor",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async updateQualifications() {
-				this.isRefreshQualificationTable = true;
+				this.isRefreshQualificationTable = true
 				setTimeout(() => {
-					this.isRefreshQualificationTable = false;
-				}, 2000);
+					this.isRefreshQualificationTable = false
+				}, 2000)
 			},
 			async setMatrixData({ value, key }) {
 				try {
-					await this.setVendorsMatrixData({ value, key });
-					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" });
+					await this.setVendorsMatrixData({ value, key })
+					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
 				}
 			},
 			refreshResultTable() {
-				this.isRefreshResultTable = true;
+				this.isRefreshResultTable = true
 				setTimeout(() => {
-					this.isRefreshResultTable = false;
-				}, 2000);
+					this.isRefreshResultTable = false
+				}, 1000)
 			},
 			updateRates(action) {
-				this.isRefreshAfterServiceUpdate = action;
+				this.isRefreshAfterServiceUpdate = action
 				setTimeout(() => {
-					this.isRefreshAfterServiceUpdate = !action;
-				}, 2000);
+					this.isRefreshAfterServiceUpdate = !action
+				}, 1000)
 			},
 			async setTest() {
 				const vendor = {
 					id: this.currentVendor._id,
-					isTest: e.target.checked,
-				};
+					isTest: e.target.checked
+				}
 				try {
-					await this.updateVendorStatus(vendor);
+					await this.updateVendorStatus(vendor)
 					this.alertToggle({
 						message: "Vendor status updated",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Server error / Cannot update Vendor status",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			closePreview() {
-				this.isEditAndSend = false;
+				this.isEditAndSend = false
 			},
 			openPreview() {
-				this.isEditAndSend = true;
+				this.isEditAndSend = true
 			},
 			async sendQuote(message) {
 				try {
 					await this.$http.post(`/vendorsapi/send-email`, {
 						message,
 						vendorId: this.vendorId
-					});
-					this.alertToggle({ message: 'Message sent!' });
+					})
+					this.alertToggle({ message: 'Message sent!' })
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: 'error' });
+					this.alertToggle({ message: err.message, isShow: true, type: 'error' })
 				}
-				this.closePreview();
+				this.closePreview()
 			},
 			closeLangPairs() {
-				this.isAvailablePairs = false;
+				this.isAvailablePairs = false
 			},
 			deleteVendor() {
-				this.isApproveModal = true;
+				this.isApproveModal = true
 			},
 			cancelApprove() {
-				this.isApproveModal = false;
+				this.isApproveModal = false
 			},
 			closeErrors() {
-				this.areErrorsExist = false;
+				this.areErrorsExist = false
 			},
 			validateEmail() {
-				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-				return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase());
+				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+				return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase())
 			},
 			setPhone(e) {
-				const { value } = e.target;
-				const regex = /^[0-9]+$/;
-				const characters = value.split("").filter((item) => regex.test(item));
-				const clearedValue = characters.join("");
-				const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
-				this.$refs.phone.value = phoneValue;
-				this.updateVendorProp({ prop: "phone", value: phoneValue });
+				const { value } = e.target
+				const regex = /^[0-9]+$/
+				const characters = value.split("").filter((item) => regex.test(item))
+				const clearedValue = characters.join("")
+				const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue
+				this.$refs.phone.value = phoneValue
+				this.updateVendorProp({ prop: "phone", value: phoneValue })
 			},
 			async checkEmail() {
-				if(this.validateEmail()) {
-					return this.errors.push("Please provide a valid email.");
+				if (this.validateEmail()) {
+					return this.errors.push("Please provide a valid email.")
 				}
-				if(this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
+				if (this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
 					try {
-						const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.currentVendor.email }`);
-						const isUnique = !result.data;
-						isUnique ? "" : this.errors.push("The email you've entered is already used in our system!");
+						const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.currentVendor.email }`)
+						const isUnique = !result.data
+						isUnique ? "" : this.errors.push("The email you've entered is already used in our system!")
 					} catch (err) {
 						this.alertToggle({
 							message: "Error on email uniqueness checking",
 							isShow: true,
-							type: "error",
-						});
+							type: "error"
+						})
 					}
 				}
 			},
 			async checkForErrors() {
-				const textReg = /^[-\sa-zA-Z]+$/;
+				const textReg = /^[-\sa-zA-Z]+$/
 				try {
-					this.errors = [];
-					if(!this.currentVendor.firstName || !textReg.test(this.currentVendor.firstName))
-						this.errors.push("Please, enter valid first name.");
-					if(/^\s+$/.exec(this.currentVendor.firstName)) {
+					this.errors = []
+					if (!this.currentVendor.firstName || !textReg.test(this.currentVendor.firstName))
+						this.errors.push("Please, enter valid first name.")
+					if (/^\s+$/.exec(this.currentVendor.firstName)) {
 						this.errors.push("Please, enter valid first name.")
 					}
-					if(this.currentVendor.surname && !textReg.test(this.currentVendor.surname))
-						this.errors.push("Please, enter valid surname.");
-					if(!this.currentVendor.industries.length) this.errors.push("Please, choose at least one industry.");
-					if(!this.currentVendor.status) this.errors.push("Please, choose status.");
-					await this.checkEmail();
-					if(this.errors.length) {
-						this.areErrorsExist = true;
-						this.isSaveClicked = true;
-						return;
+					if (this.currentVendor.surname && !textReg.test(this.currentVendor.surname))
+						this.errors.push("Please, enter valid surname.")
+					if (!this.currentVendor.industries.length) this.errors.push("Please, choose at least one industry.")
+					if (!this.currentVendor.status) this.errors.push("Please, choose status.")
+					await this.checkEmail()
+					if (this.errors.length) {
+						this.areErrorsExist = true
+						this.isSaveClicked = true
+						return
 					}
-					await this.updateVendor();
+					await this.updateVendor()
 				} catch (err) {
 				}
 			},
 			async updateVendor() {
-				let sendData = new FormData();
-				sendData.append("vendor", JSON.stringify(this.currentVendor));
-				sendData.append("photo", this.photoFile[0]);
+				let sendData = new FormData()
+				sendData.append("vendor", JSON.stringify(this.currentVendor))
+				sendData.append("photo", this.photoFile[0])
 				try {
-					await this.updateCurrentVendor(sendData);
-					this.oldEmail = this.currentVendor.email;
+					await this.updateCurrentVendor(sendData)
+					this.oldEmail = this.currentVendor.email
 					this.alertToggle({
 						message: "Vendor info updated",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: "Server error / Cannot update Vendor info",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				} finally {
 					this.closeErrors()
 				}
 			},
 			updateProp(e, prop) {
-				const value = e.target.value;
-				this.updateVendorProp({ prop, value });
+				const value = e.target.value
+				this.updateVendorProp({ prop, value })
 			},
 			updateGender({ option }) {
-				this.updateVendorProp({ prop: "gender", value: option });
+				this.updateVendorProp({ prop: "gender", value: option })
 			},
 			updateProfessionalLevel({ option }) {
-				this.updateVendorProp({ prop: "professionalLevel", value: option });
+				this.updateVendorProp({ prop: "professionalLevel", value: option })
 			},
 			setTimezone(data) {
-				this.updateVendorProp({ prop: "timezone", value: data });
+				this.updateVendorProp({ prop: "timezone", value: data })
 			},
 			setNative({ lang }) {
-				this.updateVendorProp({ prop: "native", value: lang });
+				this.updateVendorProp({ prop: "native", value: lang })
 			},
 			chosenStatus({ option }) {
-				this.updateVendorProp({ prop: "status", value: option });
+				this.updateVendorProp({ prop: "status", value: option })
 			},
 			cancel() {
-				this.$router.go(-1);
+				this.$router.go(-1)
 			},
 			async approveVendorDelete() {
-				this.isApproveModal = false;
-				if(!this.currentVendor._id) {
-					return this.cancel();
+				this.isApproveModal = false
+				if (!this.currentVendor._id) {
+					return this.cancel()
 				}
 				try {
-					const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ this.currentVendor._id }`);
-					if(isAssigned.body) {
+					const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ this.currentVendor._id }`)
+					if (isAssigned.body) {
 						return this.alertToggle({
 							message: "The vendor was assigned to a step and cannot be deleted.",
 							isShow: true,
-							type: "error",
-						});
+							type: "error"
+						})
 					}
-					await this.deleteCurrentVendor({ id: this.currentVendor._id });
+					await this.deleteCurrentVendor({ id: this.currentVendor._id })
 					this.alertToggle({
 						message: "Vendor removed",
 						isShow: true,
-						type: "success",
-					});
-					this.$router.go(-1);
+						type: "success"
+					})
+					this.$router.go(-1)
 				} catch (err) {
 					this.alertToggle({
 						message: "Server error / Cannot delete the Vendor",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			chosenInd({ industry }) {
-				this.updateIndustry(industry);
+				this.updateIndustry(industry)
 			},
 			setDetailsTablesData() {
-				this.educationData = Array.from(this.currentVendor.educations);
-				this.professionalExperienceData = Array.from(this.currentVendor.profExperiences);
-				this.qualificationData = Array.from(this.currentVendor.qualifications);
-				this.documentsData = Array.from(this.currentVendor.documents);
-				this.assessmentData = Array.from(this.currentVendor.assessments);
+				this.educationData = Array.from(this.currentVendor.educations)
+				this.professionalExperienceData = Array.from(this.currentVendor.profExperiences)
+				this.qualificationData = Array.from(this.currentVendor.qualifications)
+				this.documentsData = Array.from(this.currentVendor.documents)
+				this.assessmentData = Array.from(this.currentVendor.assessments)
 			},
 			async getVendor() {
-				this.vendorId = this.$route.params.id;
-				const id = this.$route.params.id;
+				this.vendorId = this.$route.params.id
+				const id = this.$route.params.id
 				try {
-					if(!this.currentVendor._id) {
-						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`);
-						await this.storeCurrentVendor(vendor.body);
-						this.oldEmail = this.currentVendor.email;
+					if (!this.currentVendor._id) {
+						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+						await this.storeCurrentVendor(vendor.body)
+						this.oldEmail = this.currentVendor.email
 					}
-					this.setDetailsTablesData();
+					this.setDetailsTablesData()
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on getting Vendor's info",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async getLangs() {
 				try {
-					const result = await this.$http.get("/api/languages");
-					this.languages = Array.from(result.body);
+					const result = await this.$http.get("/api/languages")
+					this.languages = Array.from(result.body)
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Languages",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async getIndustries() {
 				try {
-					const result = await this.$http.get("/api/industries");
-					this.industries = result.body;
+					const result = await this.$http.get("/api/industries")
+					this.industries = result.body
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Industries",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async getServices() {
 				try {
-					const result = await this.$http.get("/api/services");
-					this.services = result.body;
+					const result = await this.$http.get("/api/services")
+					this.services = result.body
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Services",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async getUnits() {
 				try {
-					const result = await this.$http.get("/api/units");
-					this.units = result.body;
+					const result = await this.$http.get("/api/units")
+					this.units = result.body
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Units",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async getSteps() {
 				try {
-					const result = await this.$http.get("/api/steps");
-					this.steps = result.body;
+					const result = await this.$http.get("/api/steps")
+					this.steps = result.body
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Steps",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
 			},
 			async getAliases() {
 				try {
-					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`);
-					this.aliases = result.body;
+					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
+					this.aliases = result.body
 				} catch (err) {
 					this.alertToggle({
 						message: "Error in Aliases",
 						isShow: true,
-						type: "error",
-					});
+						type: "error"
+					})
 				}
-			},
+			}
 		},
 		computed: {
 			...mapGetters({
-				currentVendor: "getCurrentVendor",
+				currentVendor: "getCurrentVendor"
 			}),
 			vendorAliases() {
-				if(this.aliases) {
-					return this.aliases;
+				if (this.aliases) {
+					return this.aliases
 				}
 			},
 			selectedIndNames() {
-				let result = [];
-				if(this.currentVendor.industries && this.currentVendor.industries.length) {
+				let result = []
+				if (this.currentVendor.industries && this.currentVendor.industries.length) {
 					for (let ind of this.currentVendor.industries) {
-						result.push(ind.name);
+						result.push(ind.name)
 					}
 				}
-				return result;
+				return result
 			},
 			optionProfessionalLevel() {
-				return this.currentVendor.hasOwnProperty("professionalLevel") ? this.currentVendor.professionalLevel : "";
-			},
+				return this.currentVendor.hasOwnProperty("professionalLevel") ? this.currentVendor.professionalLevel : ""
+			}
 		},
 		components: {
 			SelectMulti,
@@ -780,27 +780,27 @@
 			StepTable,
 			IndustryTable,
 			ResultTable,
-			FinanceMatrix,
+			FinanceMatrix
 		},
 		directives: {
-			ClickOutside,
+			ClickOutside
 		},
 		created() {
-			this.getVendor();
-			this.getLangs();
-			this.getUnits();
-			this.getSteps();
-			this.getIndustries();
-			this.getServices();
-			this.getAliases();
+			this.getVendor()
+			this.getLangs()
+			this.getUnits()
+			this.getSteps()
+			this.getIndustries()
+			this.getServices()
+			this.getAliases()
 		},
 		mounted() {
-			this.oldEmail = this.currentVendor.email;
+			this.oldEmail = this.currentVendor.email
 		},
 		beforeDestroy() {
-			this.storeCurrentVendor({});
-		},
-	};
+			this.storeCurrentVendor({})
+		}
+	}
 </script>
 
 
@@ -857,13 +857,13 @@
       padding: 20px;
       margin-top: 120px;
       width: 350px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
 
     &__action {
       margin-top: 40px;
       width: 390px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
   }
 
@@ -876,7 +876,7 @@
       box-sizing: border-box;
       margin: 20px 10px 40px 10px;
       padding: 40px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       position: relative;
     }
 
@@ -884,7 +884,7 @@
       box-sizing: border-box;
       margin: 20px 10px 40px 10px;
       padding: 40px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       position: relative;
     }
 
@@ -910,7 +910,7 @@
       box-sizing: border-box;
       margin: 20px 10px 40px 10px;
       padding: 40px 40px 20px 40px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       font-size: 16px;
     }
 
@@ -939,7 +939,7 @@
     box-sizing: border-box;
     margin: 20px 10px 40px 10px;
     padding: 40px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
   }
 
   .gen-info {

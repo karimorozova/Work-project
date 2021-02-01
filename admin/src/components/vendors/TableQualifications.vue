@@ -68,32 +68,32 @@
 </template>
 
 <script>
-	import WYSIWYG from "./WYSIWYG";
-	import { mapGetters, mapActions } from "vuex";
-	import SettingsTable from "../Table/SettingsTable";
-	import SelectSingle from "../SelectSingle";
-	import scrollDrop from "@/mixins/scrollDrop";
-	import crudIcons from "@/mixins/crudIcons";
-	import VendorLqa from "./VendorLqa";
+	import WYSIWYG from "./WYSIWYG"
+	import { mapGetters, mapActions } from "vuex"
+	import SettingsTable from "../Table/SettingsTable"
+	import SelectSingle from "../SelectSingle"
+	import scrollDrop from "@/mixins/scrollDrop"
+	import crudIcons from "@/mixins/crudIcons"
+	import VendorLqa from "./VendorLqa"
 
 	export default {
-		mixins: [scrollDrop, crudIcons],
+		mixins: [ scrollDrop, crudIcons ],
 		props: {
 			qualificationData: {
 				type: Array,
-				default: () => [],
+				default: () => []
 			},
 			assessmentData: {
 				type: Array,
-				default: () => [],
+				default: () => []
 			},
 			currentVendor: {
-				type: Object,
+				type: Object
 			},
 			refresh: {
 				type: Boolean,
-				default: false,
-			},
+				default: false
+			}
 		},
 		data() {
 			return {
@@ -103,60 +103,60 @@
 						headerKey: "headerSource",
 						key: "source",
 						width: "14%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Target",
 						headerKey: "headerTarget",
 						key: "target",
 						width: "14%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
 						width: "14%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
 						width: "14%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Test Status",
 						headerKey: "headerStatus",
 						key: "status",
 						width: "14%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Progress",
 						headerKey: "headerProgress",
 						key: "progress",
 						width: "14%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "TQI",
 						headerKey: "headerTQI",
 						key: "tqi",
 						width: "4%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
 						width: "13%",
-						padding: "0",
-					},
+						padding: "0"
+					}
 				],
 				lqaData: {
-					isTqi: true,
+					isTqi: true
 				},
 				targets: [],
 				vendorTests: [],
@@ -180,8 +180,8 @@
 				currentActive: -1,
 				isForm: false,
 				isEditAndSend: false,
-				statusStage: -1,
-			};
+				statusStage: -1
+			}
 		},
 		methods: {
 			...mapActions({
@@ -189,110 +189,110 @@
 				storeQualification: "storeCurrentVendorQualification",
 				deleteQualification: "deleteCurrentVendorQualification",
 				storeAssessment: "storeCurrentVendorAssessment",
-				storeCurrentVendor: "storeCurrentVendor",
+				storeCurrentVendor: "storeCurrentVendor"
 			}),
 			presentArrays(Arr, key) {
-				if(!Arr.length) return "";
-				return Arr.reduce((acc, cur) => acc + `${ cur[key] }; `, "");
+				if (!Arr.length) return ""
+				return Arr.reduce((acc, cur) => acc + `${ cur[key] }; `, "")
 			},
 
 			closePreview() {
-				this.isEditAndSend = false;
+				this.isEditAndSend = false
 			},
 			openPreview() {
-				this.isEditAndSend = true;
+				this.isEditAndSend = true
 			},
 			async sendMessage(message) {
 				try {
-					await this.manageSaveClick(this.currentActive, message);
+					await this.manageSaveClick(this.currentActive, message)
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
-				this.closePreview();
+				this.closePreview()
 			},
 			async makeAction(index, key) {
-				if(this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing();
+				if (this.currentActive !== -1 && this.currentActive !== index) {
+					return this.isEditing()
 				}
 				switch (key) {
 					case "edit":
-						this.setEditingData(index);
-						break;
+						this.setEditingData(index)
+						break
 					case "cancel":
-						this.manageCancelEdition(index);
-						break;
+						this.manageCancelEdition(index)
+						break
 					case "delete":
-						this.manageDeleteClick(index);
-						break;
+						this.manageDeleteClick(index)
+						break
 					default:
-						await this.checkErrors(index);
+						await this.checkErrors(index)
 				}
 			},
 			setEditingData(index) {
-				this.currentActive = index;
-				this.currentSource = this.qualificationData[index].source;
-				this.currentTarget = this.qualificationData[index].target;
-				this.currentIndustries = this.qualificationData[index].industries;
-				this.currentStatus = this.qualificationData[index].status;
-				this.currentSteps = this.qualificationData[index].steps;
-				this.currentTqi = this.qualificationData[index].tqi;
-				this.currentTestType = this.qualificationData[index].testType;
+				this.currentActive = index
+				this.currentSource = this.qualificationData[index].source
+				this.currentTarget = this.qualificationData[index].target
+				this.currentIndustries = this.qualificationData[index].industries
+				this.currentStatus = this.qualificationData[index].status
+				this.currentSteps = this.qualificationData[index].steps
+				this.currentTqi = this.qualificationData[index].tqi
+				this.currentTestType = this.qualificationData[index].testType
 			},
 			manageCancelEdition(index) {
-				this.$emit("refreshQualifications");
-				this.setDefaults();
+				this.$emit("refreshQualifications")
+				this.setDefaults()
 			},
 			setDefaults() {
-				this.currentActive = -1;
-				this.isDeleting = false;
-				this.currentSource = [];
-				this.currentTarget = "";
-				this.currentIndustries = [];
-				this.currentStatus = "";
-				this.currentTqi = null;
-				this.currentSteps = [];
+				this.currentActive = -1
+				this.isDeleting = false
+				this.currentSource = []
+				this.currentTarget = ""
+				this.currentIndustries = []
+				this.currentStatus = ""
+				this.currentTqi = null
+				this.currentSteps = []
 			},
 
 			async checkErrors(index) {
-				if(this.currentActive === -1) return;
-				this.errors = [];
-				if(!this.currentStatus) this.errors.push("Status should not be empty!");
-				if(this.errors.length) {
-					this.areErrors = true;
-					return;
+				if (this.currentActive === -1) return
+				this.errors = []
+				if (!this.currentStatus) this.errors.push("Status should not be empty!")
+				if (this.errors.length) {
+					this.areErrors = true
+					return
 				}
 
-				if(this.currentStatus === "Passed") {
-					this.handleLqa(index);
-				} else if(this.currentStatus === "Test Sent") {
+				if (this.currentStatus === "Passed") {
+					this.handleLqa(index)
+				} else if (this.currentStatus === "Test Sent") {
 					const template = await this.$http.post(`/vendorsapi/get-message`, {
 						...this.currentVendor,
 						industries: this.currentIndustries,
 						target: this.currentTarget,
-						source: this.currentSource,
-					});
-					this.previewMessage = template.body.message;
-					this.openPreview();
+						source: this.currentSource
+					})
+					this.previewMessage = template.body.message
+					this.openPreview()
 				} else {
-					await this.manageSaveClick(index);
+					await this.manageSaveClick(index)
 				}
 			},
 
 			getAvailableTest() {
-				if(!this.vendorTests.length) return null;
+				if (!this.vendorTests.length) return null
 				return this.vendorTests.find(
 						(test) =>
 								test.source._id.toString() === this.currentSource._id.toString() &&
 								test.targets.map((target) => target._id.toString()).includes(this.currentTarget._id.toString()) &&
 								test.industries.find((industry) => this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)) &&
 								test.steps.find((step) => this.currentSteps.some((currentStep) => step._id.toString() === currentStep._id.toString()))
-				);
+				)
 			},
 
 			handleLqa(index) {
-				if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)) {
-					this.setDefaults();
-					return;
+				if (this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)) {
+					this.setDefaults()
+					return
 				}
 				this.lqaData = {
 					vendor: {
@@ -300,13 +300,13 @@
 						industries: this.presentArrays(this.currentIndustries, 'name'),
 						sourceLang: this.currentSource.lang,
 						targetLang: this.currentTarget.lang,
-						step: this.presentArrays(this.currentSteps, "title"),
-					},
-				};
-				this.openForm(index);
+						step: this.presentArrays(this.currentSteps, "title")
+					}
+				}
+				this.openForm(index)
 			},
 			async saveVendorLqa({ vendorData }) {
-				const { file, grade } = vendorData;
+				const { file, grade } = vendorData
 				let assessment = {
 					step: this.currentSteps,
 					target: this.currentTarget,
@@ -316,47 +316,47 @@
 					lqa1: {},
 					lqa2: {},
 					lqa3: {},
-					isNew: true,
-				};
+					isNew: true
+				}
 
 				//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
-				assessment.step = assessment.step.filter(step => step.title === "Translation");
+				assessment.step = assessment.step.filter(step => step.title === "Translation")
 				//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
 
-				let formData = new FormData();
-				formData.append("vendorId", this.currentVendor._id);
-				formData.append("assessment", JSON.stringify(assessment));
-				formData.append("assessmentFile", file);
+				let formData = new FormData()
+				formData.append("vendorId", this.currentVendor._id)
+				formData.append("assessment", JSON.stringify(assessment))
+				formData.append("assessmentFile", file)
 
-				this.currentTqi = vendorData.grade;
+				this.currentTqi = vendorData.grade
 
 				try {
 					//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
-          if(assessment.step.length) await this.storeAssessment(formData);
+					if (assessment.step.length) await this.storeAssessment(formData)
 					//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
 
-					await this.sendToRates();
-					await this.manageSaveClick(this.currentActive);
+					await this.sendToRates()
+					await this.manageSaveClick(this.currentActive)
 				} catch (err) {
 				} finally {
-					this.$emit("updateRates", true);
-					this.closeForm();
+					this.$emit("updateRates", true)
+					this.closeForm()
 				}
 			},
 
 			isSampleStatus(dataStatus, currentStatus) {
-				return dataStatus === currentStatus;
+				return dataStatus === currentStatus
 			},
 
 			async manageSaveClick(index, message) {
-				if(this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)) {
-					this.setDefaults();
-					return;
+				if (this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)) {
+					this.setDefaults()
+					return
 				}
 				const tqi =
 						this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
 								? 0
-								: this.currentTqi;
+								: this.currentTqi
 
 				let qualification = {
 					testId: this.qualificationData[index].testId,
@@ -366,47 +366,47 @@
 					status: this.currentStatus,
 					source: this.currentSource,
 					testType: this.currentTestType,
-					tqi: tqi,
-				};
+					tqi: tqi
+				}
 
-				const test = this.getAvailableTest();
+				const test = this.getAvailableTest()
 				try {
 					await this.storeQualification({
 						vendor: this.currentVendor,
 						index,
 						qualification,
 						testPath: test ? test.path : "",
-						message: message ? message : "",
-					});
+						message: message ? message : ""
+					})
 					this.alertToggle({
 						message: "Qualification saved",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 				} finally {
-					this.manageCancelEdition();
+					this.manageCancelEdition()
 				}
 			},
 
 			async manageDeleteClick(index) {
-				this.deleteIndex = index;
-				this.isDeleting = true;
+				this.deleteIndex = index
+				this.isDeleting = true
 			},
 			async deleteData() {
 				try {
 					await this.deleteQualification({
 						vendorId: this.currentVendor._id,
-						index: this.deleteIndex,
-					});
+						index: this.deleteIndex
+					})
 					this.alertToggle({
 						message: "Qualification removed",
 						isShow: true,
-						type: "success",
-					});
+						type: "success"
+					})
 				} catch (err) {
 				} finally {
-					this.manageCancelEdition();
+					this.manageCancelEdition()
 				}
 			},
 
@@ -415,133 +415,133 @@
 					source: this.currentSource,
 					target: this.currentTarget,
 					steps: this.currentSteps,
-					industries: this.currentIndustries,
-				};
+					industries: this.currentIndustries
+				}
 				await this.$http.post('/vendorsapi/qualification-rates/' + this.currentVendor._id, {
-					qualification,
-				});
+					qualification
+				})
 			},
 
 			setStatus({ option }) {
-				this.currentStatus = option;
+				this.currentStatus = option
 			},
 			closeErrors() {
-				this.areErrors = false;
+				this.areErrors = false
 			},
 			closeForm() {
-				this.isForm = false;
+				this.isForm = false
 			},
 			openForm() {
-				this.isForm = true;
+				this.isForm = true
 			},
 			async getTests() {
 				try {
-					const result = await this.$http.get("/vendorsapi/lang-tests");
-					this.vendorTests = result.body;
+					const result = await this.$http.get("/vendorsapi/lang-tests")
+					this.vendorTests = result.body
 				} catch (err) {
-					this.alertToggle({ message: "Error on getting tests", isShow: true });
+					this.alertToggle({ message: "Error on getting tests", isShow: true })
 				}
 			},
 			setStatusStage(status) {
 				switch (status) {
 					case "Test Sent":
 					case "Sample Requested":
-						return 2;
+						return 2
 					case "Test Received":
 					case "Sample Received":
-						return 3;
+						return 3
 					case "Test In Review":
 					case "Sample In Review":
-						return 4;
+						return 4
 					case "Passed":
 					case "Not Passed":
-						return 5;
+						return 5
 					default:
-						return 1;
+						return 1
 				}
-			},
+			}
 		},
 		watch: {
 			async refresh() {
-				if(this.refresh) {
+				if (this.refresh) {
 					try {
-						const id = this.$route.params.id;
-						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`);
-						await this.storeCurrentVendor(vendor.body);
+						const id = this.$route.params.id
+						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+						await this.storeCurrentVendor(vendor.body)
 					} catch (err) {
 					} finally {
-						this.$emit("refreshQualifications");
+						this.$emit("refreshQualifications")
 					}
 				}
-			},
+			}
 		},
 		computed: {
 			...mapGetters({
-				currentVendorQualifications: "getCurrentVendorQualifications",
+				currentVendorQualifications: "getCurrentVendorQualifications"
 			}),
 			TestWorkflowStatusesSample() {
-				let result = [];
+				let result = []
 				switch (this.qualificationData[this.currentActive].status) {
 					case "Created":
 					case "Re-Test":
-						result.push("Sample Requested");
-						break;
+						result.push("Sample Requested")
+						break
 					case "Sample Requested":
-						result.push("Sample Received");
-						break;
+						result.push("Sample Received")
+						break
 					case "Sample Received":
-						result.push("Sample In Review");
-						break;
+						result.push("Sample In Review")
+						break
 					case "Sample In Review":
-						result.push("Passed", "Not Passed");
-						break;
+						result.push("Passed", "Not Passed")
+						break
 					case "Passed":
-						result.push("Not Passed");
-						break;
+						result.push("Not Passed")
+						break
 					case "Not Passed":
-						result.push("Re-Test");
-						break;
+						result.push("Re-Test")
+						break
 				}
-				return result;
+				return result
 			},
 			TestWorkflowStatusesTest() {
-				let result = [];
+				let result = []
 				switch (this.qualificationData[this.currentActive].status) {
 					case "Created":
 					case "Re-Test":
-						result.push("Test Sent");
-						break;
+						result.push("Test Sent")
+						break
 					case "Test Sent":
-						result.push("Test Received");
-						break;
+						result.push("Test Received")
+						break
 					case "Test Received":
-						result.push("Test In Review");
-						break;
+						result.push("Test In Review")
+						break
 					case "Test In Review":
-						result.push("Passed", "Not Passed");
-						break;
+						result.push("Passed", "Not Passed")
+						break
 					case "Passed":
-						result.push("Not Passed");
-						break;
+						result.push("Not Passed")
+						break
 					case "Not Passed":
-						result.push("Re-Test");
-						break;
+						result.push("Re-Test")
+						break
 				}
-				return result;
-			},
+				return result
+			}
 		},
 		components: {
 			WYSIWYG,
 			SettingsTable,
 			SelectSingle,
-			VendorLqa,
+			VendorLqa
 		},
 		created() {
-			this.getTests();
+			this.getTests()
 		},
 		mounted() {
-		},
-	};
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -552,7 +552,7 @@
     @extend %setting-table;
     margin: 20px 10px 40px;
     width: 920px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     padding: 40px;
 
     &__data {

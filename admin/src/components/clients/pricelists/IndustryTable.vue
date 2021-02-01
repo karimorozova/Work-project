@@ -56,12 +56,12 @@
 
 </template>
 <script>
-	import DataTable from "../../DataTable";
-	import crudIcons from "@/mixins/crudIcons";
-	import { mapGetters, mapActions } from "vuex";
+	import DataTable from "../../DataTable"
+	import crudIcons from "@/mixins/crudIcons"
+	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		mixins: [crudIcons],
+		mixins: [ crudIcons ],
 		props: {
 			tableData: {
 				type: Array
@@ -109,10 +109,10 @@
 				isDeleting: false,
 				deleteIndex: -1,
 				currentActive: -1
-			};
+			}
 		},
 		created() {
-			this.getIndustries();
+			this.getIndustries()
 		},
 		methods: {
 			...mapActions({
@@ -120,73 +120,73 @@
 			}),
 			async getRowPrice(index) {
 				try {
-					const result = await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
+					await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
 						tableKey: "Industry Multipliers Table",
 						row: this.dataArray[index]
 					})
+					const result = await this.$http.post(`/clientsapi/client-rate-by-key`, { id: this.clientId, key: 'industryMultipliersTable' })
+					this.dataArray = result.data
+					this.setDefaults()
+					this.refreshResultTable()
 				} catch (err) {
-					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" });
-				} finally {
-					this.refreshResultTable();
-					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`);
-					this.dataArray = client.data.rates.industryMultipliersTable;
+					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
 			async getIndustries() {
-				this.dataArray = this.tableData;
+				this.dataArray = this.tableData
 			},
 			async makeAction(index, key) {
-				if(this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing();
+				if (this.currentActive !== -1 && this.currentActive !== index) {
+					return this.isEditing()
 				}
 				switch (key) {
 					case "edit":
-						this.setEditingData(index);
-						break;
+						this.setEditingData(index)
+						break
 					case "cancel":
-						this.manageCancelEdition();
-						break;
+						this.manageCancelEdition()
+						break
 					case "delete":
-						alert("delete");
-						break;
+						alert("delete")
+						break
 					default:
-						await this.checkErrors(index);
+						await this.checkErrors(index)
 				}
 			},
 			setEditingData(index) {
-				this.currentActive = index;
-				this.currentIndustryObj = this.dataArray[index].industry;
-				this.currentIndustry = this.dataArray[index].industry.icon;
-				this.currentMultiplier = this.dataArray[index].multiplier;
+				this.currentActive = index
+				this.currentIndustryObj = this.dataArray[index].industry
+				this.currentIndustry = this.dataArray[index].industry.icon
+				this.currentMultiplier = this.dataArray[index].multiplier
 			},
 			manageCancelEdition() {
-				this.setDefaults();
-				this.isDeleting = false;
+				this.setDefaults()
+				this.isDeleting = false
 			},
 			setDefaults() {
-				this.currentActive = -1;
-				this.isDeleting = false;
+				this.currentActive = -1
+				this.isDeleting = false
 			},
 			async checkErrors(index) {
-				if(this.currentActive === -1) return;
-				this.errors = [];
-				if(this.currentMultiplier == "") return;
-				if(Math.sign(this.currentMultiplier) == -1) return;
-				if(this.errors.length) {
-					this.areErrors = true;
-					return;
+				if (this.currentActive === -1) return
+				this.errors = []
+				if (this.currentMultiplier == "") return
+				if (Math.sign(this.currentMultiplier) == -1) return
+				if (this.errors.length) {
+					this.areErrors = true
+					return
 				}
-				await this.manageSaveClick(index);
+				await this.manageSaveClick(index)
 			},
 			refreshResultTable() {
-				this.$emit("refreshResultTable");
+				this.$emit("refreshResultTable")
 			},
 			async manageSaveClick(index) {
-				if(this.currentActive === -1) return;
+				if (this.currentActive === -1) return
 				try {
-					const id = this.dataArray[index]._id;
-					const serviceId = this.dataArray[index].serviceId;
-					const result = await this.$http.post(
+					const id = this.dataArray[index]._id
+					const serviceId = this.dataArray[index].serviceId
+					await this.$http.post(
 							"/clientsapi/rates/" + this.clientId,
 							{
 								itemIdentifier: "Industry Multipliers Table",
@@ -198,35 +198,34 @@
 									altered: true
 								}
 							}
-					);
+					)
 					this.alertToggle({
 						message: "Saved successfully",
 						isShow: true,
 						type: "success"
-					});
+					})
 					const updatedData = await this.$http.get(
 							"/clientsapi/rates/" + this.clientId
-					);
-					this.dataArray[index] =
-							updatedData.body.industryMultipliersTable[index];
-					this.setDefaults();
-					this.refreshResultTable();
+					)
+					this.dataArray[index] = updatedData.body.industryMultipliersTable[index]
+					this.setDefaults()
+					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on getting Industry",
 						isShow: true,
 						type: "error"
-					});
+					})
 				}
 			},
 			closeErrors() {
-				this.areErrors = false;
+				this.areErrors = false
 			}
 		},
 		computed: {
 			manageIcons() {
-				const { delete: del, ...result } = this.icons;
-				return result;
+				const { delete: del, ...result } = this.icons
+				return result
 			},
 			...mapGetters({
 				currentClient: "getCurrentClient"
@@ -234,16 +233,16 @@
 		},
 		watch: {
 			async refresh() {
-				if(this.refresh) {
-					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`);
-					this.dataArray = client.data.rates.industryMultipliersTable;
+				if (this.refresh) {
+					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
+					this.dataArray = client.data.rates.industryMultipliersTable
 				}
 			}
 		},
 		components: {
 			DataTable
 		}
-	};
+	}
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
