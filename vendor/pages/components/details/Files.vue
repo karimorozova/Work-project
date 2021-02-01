@@ -149,12 +149,9 @@
 			},
 			async goToMemoqEditor(file) {
 				const { TotalWordCount, Reviewer1ConfirmedWordCount, WorkflowStatus, WebTransUrl, DocumentGuid } =
-						this.job.memocDocs.find(item =>
-								item.DocumentName === file.fileName &&
-								item.TargetLangCode === this.job.memoqTarget
-						)
+						this.job.memocDocs.find(item => item.DocumentName === file.fileName && item.TargetLangCode === this.job.memoqTarget)
 
-				if ((TotalWordCount !== Reviewer1ConfirmedWordCount) && WorkflowStatus === 'Completed') {
+				if ((TotalWordCount !== Reviewer1ConfirmedWordCount) && WorkflowStatus === 'Completed' && this.job.name === 'Revising') {
 					this.projectGuid = this.job.memoqProjectId
 					this.documentGuid = DocumentGuid
 					this.backStepModal = true

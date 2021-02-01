@@ -12,6 +12,8 @@ const { assignMemoqTranslator, getProject, updateProjectProgress } = require('..
 const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
 const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
+const { storeFiles, updateNonWordsTaskTargetFiles, downloadCompletedFiles } = require('../../projects')
+
 
 router.post("/login", async (req, res, next) => {
 	if (req.body.logemail) {
@@ -65,7 +67,7 @@ router.get("/info", checkVendor, async (req, res) => {
 	}
 })
 
-router.post("/info", checkVendor, upload.fields([{ name: 'photo' }]), async (req, res) => {
+router.post("/info", checkVendor, upload.fields([ { name: 'photo' } ]), async (req, res) => {
 	let info = JSON.parse(req.body.info)
 	let { id, password } = req.body
 	const photoFile = req.files["photo"]
@@ -217,6 +219,36 @@ router.get("/vendor-rates", checkVendor, async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on assigning vendor as translator')
+	}
+})
+
+router.post('/step-target', checkVendor, upload.fields([{ name: 'targetFile' }]), async (req, res) => {
+	const { jobId } = req.body
+	try {
+		const project = await getProject({ 'steps._id': jobId })
+		const { targetFile } = req.files
+		const paths = await storeFiles(targetFile, project.id)
+		const updatedProject = await updateNonWordsTaskTargetFiles({
+			project,
+			path: paths[0],
+			jobId,
+			fileName: targetFile[0].filename
+		})
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error / Cannot add Target file to the Steps array of Project')
+	}
+})
+
+router.post('/target-files', async (req, res) => {
+	const { stepId } = req.body;
+	try {
+		await downloadCompletedFiles(stepId);
+		res.send("Files downloaded");
+	} catch (err) {
+		console.log(err);
+		res.status(500).send(err.message);
 	}
 })
 

@@ -16,10 +16,10 @@ export const setJobStatus = async function ({ commit, dispatch, state }, payload
 			let fileData = new FormData()
 			fileData.append('jobId', jobId)
 			fileData.append('targetFile', targetFile)
-			await this.$axios.post('/pm-manage/step-target', fileData)
+			await this.$axios.post('/vendor/step-target', fileData)
 		}
 		if (status === "Completed" && !targetFile) {
-			await this.$axios.post('/memoqapi/target-files', { stepId: jobId })
+			await this.$axios.post('/vendor/target-files', { stepId: jobId })
 		}
 		await this.$axios.post('/vendor/job', { jobId, status })
 		await dispatch("getJobs")
