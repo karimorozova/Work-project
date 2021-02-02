@@ -1,5 +1,108 @@
 <template lang="pug">
   .languages
+    .languages__setting(v-if="isWpLanguage")
+      span.languages__setting-close(@click="closeSettings") &#215;
+      .title-language
+        img.languages__flag(:src="wpLanguage.icon")
+        span &ensp;
+        span {{ wpLanguage.lang }} &ensp;
+      .languages__settingContent
+        .languages__settingBody
+          .languages__settingRow
+            .checkbox
+              input#individual(
+                type="checkbox",
+                ref="individual"
+                :checked="languageType.isIndividual",
+                @change="(e) => setWpLanguageSetting(e,'individual')"
+              )
+              label(for="individual")
+            .option Individual language
+          .languages__settingRow
+            .checkbox
+              input#parent(
+                type="checkbox",
+                ref="parent"
+                :checked="languageType.isParent",
+                @change="(e) => setWpLanguageSetting(e, 'parent')"
+              )
+              label(for="parent")
+            .option Parent language
+          .languages__settingRow
+            .checkbox
+              input#child(
+                type="checkbox",
+                ref="child"
+                :checked="languageType.isChild",
+                @change="(e) => setWpLanguageSetting(e,'child')"
+              )
+              label(for="child")
+            .option Сhild language
+
+          .languages__settingDrop(v-if="languageType.isChild")
+            .select-single-title Choose parent language:
+            .select-single
+              SelectSingle(
+                :hasSearch="true"
+                placeholder="Select"
+                :options="languages.map(i => i.lang)"
+                :selectedOption="selectedWpLang"
+                @chooseOption="selectWpLang"
+              )
+        .languages__settingSpliter
+        .languages__settingScheme
+          .languages__schemeBox
+            .individual(v-if="languageType.isIndividual")
+              .individual__title
+                div.language-row
+                  img(:src="languages[4].icon")
+                  span.language-image-title {{ languages[4].lang }}
+              .individual__title
+                div.language-row(:class="{currentLanguage: true}")
+                  img(:src="wpLanguage.icon")
+                  span.language-image-title {{ wpLanguage.lang }}
+              .individual__title
+                div.language-row
+                  img(:src="languages[29].icon")
+                  span.language-image-title {{ languages[29].lang }}
+              .individual__title
+                div.language-row
+                  img(:src="languages[66].icon")
+                  span.language-image-title {{ languages[66].lang }}
+
+            .child(v-if="languageType.isChild")
+              .parent__title
+                div.language-row
+                  span(v-if="languageChildTitle.icon")
+                    img(:src="languageChildTitle.icon")
+                  span.language-image-title {{ languageChildTitle.lang }}
+                div(v-for="item in languageChildInList")
+                  div.language-row
+                    span &#8735;
+                    img(:src="item.icon")
+                    span.language-image-title(:class="{currentLanguage: item.lang === wpLanguage.lang}") {{ item.lang }}
+
+            .parent(v-if="languageType.isParent")
+              .parent__title
+                div.language-row
+                  img(:src="wpLanguage.icon")
+                  span.language-image-title(:class="{currentLanguage: true}") {{ wpLanguage.lang }}
+                div(v-if="languagesParents.length")
+                  div(v-for="item in languagesParents")
+                    div.language-row
+                      span &#8735;
+                      img(:src="item.icon")
+                      span.language-image-title {{ item.lang }}
+                div.language-row(v-else)
+                  span &#8735;
+                  span.language-image-title The childs is not set yet
+
+      .save-setting
+        Button(
+          value="Save"
+          @clicked="saveWpSetting"
+        )
+
     .languages__table
       SettingsTable(
         :fields="fields"
@@ -97,6 +200,10 @@
         template(slot="icons" slot-scope="{ row, index }")
           .languages__icons(v-if="isAdmin")
             img.languages__icon(
+              src="../../assets/images/refresh-icon.png"
+              @click="openSettings(index)"
+            )
+            img.languages__icon(
               v-if="key !== 'delete'"
               v-for="(icon, key) in icons"
               :src="icon.icon"
@@ -116,21 +223,23 @@
 	import crudIcons from "@/mixins/crudIcons"
 	import Add from "../Add"
 	import scrollEnd from "../../mixins/scrollEnd"
+	import SelectSingle from "../SelectSingle"
+	import Button from "../Button"
 
 	export default {
-		mixins: [crudIcons, scrollEnd],
+		mixins: [ crudIcons, scrollEnd ],
 		data() {
 			return {
 				fields: [
 					{ label: "Icon", headerKey: "headerIcon", key: "icon", width: "10%", padding: "0" },
-					{ label: "Name", headerKey: "headerName", key: "name", width: "17%", padding: "0" },
-					{ label: "Group", headerKey: "headerGroup", key: "group", width: "17%", padding: "0" },
+					{ label: "Name", headerKey: "headerName", key: "name", width: "16%", padding: "0" },
+					{ label: "Group", headerKey: "headerGroup", key: "group", width: "16%", padding: "0" },
 					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "10%", padding: "0" },
 					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", width: "10%", padding: "0" },
 					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", width: "10%", padding: "0" },
 					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", width: "10%", padding: "0" },
 					{ label: "Active", headerKey: "headerActive", key: "active", width: "6%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "10%", padding: "0" }
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0" }
 				],
 				languages: [],
 				currentActive: -1,
@@ -140,6 +249,9 @@
 				isTooltip2: false,
 				areErrors: false,
 				errors: [],
+
+				wpLanguage: null,
+				isWpLanguage: false,
 
 				currentId: null,
 				currentIcon: null,
@@ -157,6 +269,61 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			async saveWpSetting() {
+				try {
+					await this.$http.put('/api-settings/language-setting', {
+						obj: this.wpLanguage
+					})
+					this.alertToggle({
+						message: "Language Setting saved!",
+						isShow: true,
+						type: "success"
+					})
+				} catch (err) {
+					this.alertToggle({
+						message: "Error on Languages setting",
+						isShow: true,
+						type: "error"
+					})
+				} finally {
+					await this.getLanguages()
+					this.cancel()
+					this.closeSettings()
+				}
+			},
+			selectWpLang({ option }) {
+				const { symbol } = this.languages.find(({ lang }) => lang === option)
+				this.wpLanguage.parent = symbol
+			},
+			setWpLanguageSetting(event, key) {
+				if (!event.target.checked) {
+					this.$refs.individual.checked = true
+					key = 'individual'
+				}
+				switch (key) {
+					case 'individual':
+						this.wpLanguage = { ...this.wpLanguage, children: false, parent: "", direction: "in" }
+						break
+					case 'parent':
+						this.wpLanguage = { ...this.wpLanguage, children: true, parent: "", direction: "both" }
+						break
+					case 'child':
+						this.wpLanguage = { ...this.wpLanguage, children: false, parent: "Select", direction: "in" }
+						break
+				}
+			},
+			openSettings(index) {
+				if (this.isWpLanguage) {
+					this.wpLanguage = this.languages[index]
+				} else {
+					this.isWpLanguage = true
+					this.wpLanguage = this.languages[index]
+				}
+			},
+			closeSettings() {
+				this.isWpLanguage = false
+				this.wpLanguage = null
+			},
 			async makeAction(index, key) {
 				if (this.currentActive !== -1 && this.currentActive !== index) {
 					return this.isEditing()
@@ -328,15 +495,45 @@
 			...mapGetters({
 				user: 'getUser'
 			}),
+			languageType() {
+				const { children, parent, direction } = this.wpLanguage
+				let isIndividual, isParent, isChild = false
+
+				if (children) isParent = true
+				if (parent) isChild = true
+				if (!parent && !children) isIndividual = true
+
+				return { isIndividual, isParent, isChild }
+			},
+			selectedWpLang() {
+				if (this.wpLanguage.parent === 'Select') return ""
+				const { lang } = this.languages.find(({ symbol }) => symbol === this.wpLanguage.parent)
+				return lang
+			},
+			languageChildTitle() {
+				if (this.wpLanguage.parent === 'Select') return { lang: "The parent is not set yet", icon: false }
+				const { lang, icon } = this.languages.find(({ symbol }) => symbol === this.wpLanguage.parent)
+				return { lang, icon }
+			},
+			languageChildInList() {
+				const allChilds = this.languages.filter(({ parent }) => parent === this.wpLanguage.parent)
+				if (allChilds.findIndex(({ lang }) => lang === this.wpLanguage.lang) === -1) allChilds.push(this.wpLanguage)
+				return allChilds
+			},
+			languagesParents() {
+				return this.languages.filter(({ parent }) => parent === this.wpLanguage.symbol)
+			},
 			isAdmin() {
 				if (this.user) {
 					const { group: { name } } = this.user
-          return name === 'Administrators' || name === 'Developers'
+					return name === 'Administrators' || name === 'Developers'
 				}
 
 			}
 		},
 		components: {
+			Button,
+			SelectSingle,
 			Add,
 			SettingsTable
 		},
@@ -351,10 +548,74 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
   @import "../../assets/styles/settingsTable";
+  @import "../../assets/scss/checkbox";
 
   .languages {
     @extend %setting-table;
     width: 1040px;
+
+    &__settingSpliter {
+      width: 1px;
+      background: #C5BFB5;
+      margin: 0 20px;
+    }
+
+    &__settingDrop {
+      display: flex;
+      flex-direction: column;
+      width: 191px;
+      position: relative;
+    }
+
+    &__settingScheme {
+      width: 191px;
+    }
+
+    &__settingBody {
+      width: 191px;
+    }
+
+    &__settingRow {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    &__settingContent {
+      display: flex;
+    }
+
+    &__setting {
+      position: absolute;
+      background: white;
+      padding: 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      z-index: 999;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 300px;
+
+      &-close {
+        position: absolute;
+        top: 5px;
+        right: 7px;
+        font-size: 22px;
+        cursor: pointer;
+        height: 22px;
+        width: 22px;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        font-family: Myriad900;
+        opacity: 0.8;
+        transition: ease 0.2s;
+
+        &:hover {
+          opacity: 1
+        }
+      }
+    }
 
     &__header {
       position: relative;
@@ -408,6 +669,7 @@
       width: 32px;
       height: 22px;
       object-fit: cover;
+      image-rendering: pixelated;
     }
 
     &__pagination {
@@ -519,6 +781,10 @@
 
   }
 
+  .option {
+    margin-left: 6px;
+  }
+
   input {
     width: 100%;
     border: none;
@@ -526,4 +792,46 @@
     color: inherit;
   }
 
+  .title-language {
+    height: 26px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .select-single {
+    height: 30px;
+  }
+
+  .save-setting {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .select-single-title {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .language-image-title {
+    margin-left: 3px;
+  }
+
+  .currentLanguage {
+    font-family: Myriad900;
+  }
+
+  .language-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+
+    img {
+      width: 32px;
+      height: 22px;
+      image-rendering: pixelated;
+    }
+  }
 </style>
