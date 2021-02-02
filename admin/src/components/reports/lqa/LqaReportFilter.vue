@@ -68,6 +68,7 @@
 	import LabelVal from "@/components/LabelVal";
 	import SelectSingle from "@/components/SelectSingle";
 	import Button from "@/components/Button";
+	import { mapActions } from "vuex"
 
 	export default {
 		props: {
@@ -87,6 +88,9 @@
       }
 		},
 		methods: {
+			...mapActions({
+				alertToggle: 'alertToggle'
+			}),
       async updateReports () {
         try {
           const report = await this.$http.get('/reportsapi/restore-memoq-lqa-report');

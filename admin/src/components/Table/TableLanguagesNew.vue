@@ -198,9 +198,9 @@
             )
 
         template(slot="icons" slot-scope="{ row, index }")
-          .languages__icons(v-if="isAdmin")
+          .languages__icons(v-if="isAdmin && row.lang !== 'English (United Kingdom)'")
             img.languages__icon(
-              src="../../assets/images/refresh-icon.png"
+              src="../../assets/images/settings-icon.png"
               @click="openSettings(index)"
               :class="{'languages_opacity': true}"
             )

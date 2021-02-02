@@ -169,7 +169,6 @@
         allLanguages: 'getAllLanguages',
       }),
 			filters() {
-        console.log('main filter working')
 				let result = {};
 				if(this.targetFilter !== 'All') {
 					result.targetFilter = this.targetFilter;
