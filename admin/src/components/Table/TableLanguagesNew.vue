@@ -202,6 +202,7 @@
             img.languages__icon(
               src="../../assets/images/refresh-icon.png"
               @click="openSettings(index)"
+              :class="{'languages_opacity': true}"
             )
             img.languages__icon(
               v-if="key !== 'delete'"
