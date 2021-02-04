@@ -35,6 +35,7 @@ const SalesPerformance = require('./dashboardSalesPerformance');
 const Discounts = require('./discounts');
 const GmailProjectsStatuses = require('./gmailProjectsStatuses');
 const VendorBenchmarkCost = require('./vendorBenchmarkCost');
+const TierInfo = require('./tierInfo');
 
 const Models = {
   Languages,
@@ -74,6 +75,7 @@ const Models = {
   SalesPerformance,
   GmailProjectsStatuses,
   VendorBenchmarkCost,
+  TierInfo,
 };
 
 module.exports = Models;

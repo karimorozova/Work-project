@@ -35,7 +35,7 @@
 				type: Array
 			},
 			tableData: {
-				type: Array
+				type: [Array, Object]
 			},
 			activeIndex: {
 				type: Number
@@ -109,7 +109,7 @@
 
     &__tbody {
       max-height: 600px;
-      overflow-y: scroll;
+      overflow-y: auto;
       margin-bottom: 20px;
       border: 0.5px solid $cell-border;
       border-bottom: 1px solid $cell-border;
@@ -155,7 +155,7 @@
     }
 
     &__thead-row {
-      overflow-y: scroll;
+      overflow-y: auto;
     }
 
     &_scroll-padding {
