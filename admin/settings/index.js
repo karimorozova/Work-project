@@ -1,6 +1,7 @@
 const { createNewIndustry, updateIndustry, deleteIndustryFiles } = require('./industries');
 const { updateLanguage } = require('./languages');
-const  { createNewService, updateService, deleteServiceIcon } = require('./services');
+const { createNewService, updateService, deleteServiceIcon } = require('./services');
+const { getTierInfo, updateTierInfo } = require('./tierAndLqa')
 
 module.exports = {
     createNewIndustry,
@@ -9,5 +10,7 @@ module.exports = {
     updateLanguage,
     createNewService, 
     updateService, 
-    deleteServiceIcon
+    deleteServiceIcon,
+    getTierInfo,
+    updateTierInfo,
 }
