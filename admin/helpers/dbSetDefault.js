@@ -17,6 +17,7 @@ const {
   Units,
   CurrencyRatio,
   Discounts,
+  TierInfo
 } = require('../models');
 
 const {
@@ -36,7 +37,8 @@ const {
   defaultCancelReasons,
   defaultInstructions,
   defaultLeadSources,
-  defaultDiscounts
+  defaultDiscounts,
+  defaultTierInfo
 } = require('./defaults');
 
 const { saveDefaultLabels } = require('../gmail');
@@ -483,6 +485,17 @@ async function fillPricelist() {
   }
 }
 
+async function fillTierInfo() {
+  try {
+    const tierInfoCount = await TierInfo.countDocuments()
+    if (tierInfoCount > 0) return
+    await TierInfo.create(defaultTierInfo)
+  } catch (e) {
+
+  }
+}
+
+
 async function checkCollections () {
   await fillInstructions();
   await fillCancelReasons();
@@ -499,6 +512,7 @@ async function checkCollections () {
   await industries();
   await fillCurrencyRatio();
   await fillPricelist();
+  await fillTierInfo()
   // await clients();
   // await vendors();
 }

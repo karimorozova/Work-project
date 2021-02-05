@@ -16,6 +16,7 @@ const { defaultCancelReasons } = require('./defaultCancelReasons');
 const { defaultInstructions } = require('./defaultInstructions');
 const { defaultLeadSources } = require('./defaultLeadSources');
 const { defaultDiscounts } = require('./defaultDiscounts');
+const { defaultTierInfo } = require('./defaultTierInfo');
 
 module.exports = {
   defaultLanguages,
@@ -34,5 +35,6 @@ module.exports = {
   defaultInstructions,
   defaultLeadSources,
   defaultCancelReasons,
-  defaultDiscounts
+  defaultDiscounts,
+  defaultTierInfo,
 };
