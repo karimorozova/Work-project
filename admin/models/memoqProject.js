@@ -1,5 +1,18 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+
+const USD = {
+	type: Number,
+	default: 0
+}
+const EUR = {
+	type: Number,
+	default: 0
+}
+const GBP = {
+	type: Number,
+	default: 0
+}
 
 const MemoqProjectSchema = new mongoose.Schema({
 	name: {
@@ -27,9 +40,9 @@ const MemoqProjectSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-  industry: {
-    type: Schema.Types.ObjectId, ref: 'Industries'
-  },
+	industry: {
+		type: Schema.Types.ObjectId, ref: 'Industries'
+	},
 	paymentProfile: {
 		type: String,
 		default: '',
@@ -39,21 +52,21 @@ const MemoqProjectSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-  isInLQAReports: {
-    type: Boolean,
-    default: false
-  },
+	isInLQAReports: {
+		type: Boolean,
+		default: false
+	},
 	customer: {
 		type: Schema.Types.ObjectId, ref: 'Clients'
 	},
 	clientContacts: [],
 	creationTime: {
 		type: Date,
-		default: new Date(),
+		default: new Date()
 	},
 	deadline: {
 		type: Date,
-		default: new Date(),
+		default: new Date()
 	},
 	projectStatus: {
 		type: String,
@@ -102,9 +115,9 @@ const MemoqProjectSchema = new mongoose.Schema({
 	},
 	tasks: {
 		type: Array,
-		default: [],
+		default: []
 	},
-	steps: [{
+	steps: [ {
 		vendor: {
 			type: Schema.Types.ObjectId, ref: 'Vendors',
 			default: null
@@ -118,45 +131,68 @@ const MemoqProjectSchema = new mongoose.Schema({
 		totalWords: '',
 		clientRate: '',
 		vendorRate: '',
+		nativeVendorRate: '',
 		finance: {},
-	}],
+		nativeFinance: {}
+	} ],
 	projectManager: {
 		type: Schema.Types.ObjectId, ref: 'User'
 	},
 	accountManager: {
-    type: Schema.Types.ObjectId, ref: 'User'
-  },
-  finance: {},
-  billingDate: {
-    type: Date,
-  },
-  lockedForRecalculation: {
-    type: Boolean,
-    default: false
-  },
-  discounts: [{
-    name: {
-      type: String,
-      trim: true,
-      required: true
-    },
-    value: {
-      type: Number,
-      required: true
-    },
-  }],
-  minimumCharge: {
-    value: {
-      type: Number,
-      default: 0
-    },
-    toIgnore: {
-      type: Boolean,
-      default: false
-    }
-  },
-});
+		type: Schema.Types.ObjectId, ref: 'User'
+	},
+	finance: {},
+	billingDate: {
+		type: Date
+	},
+	lockedForRecalculation: {
+		type: Boolean,
+		default: false
+	},
+	discounts: [ {
+		name: {
+			type: String,
+			trim: true,
+			required: true
+		},
+		value: {
+			type: Number,
+			required: true
+		}
+	} ],
+	minimumCharge: {
+		value: {
+			type: Number,
+			default: 0
+		},
+		toIgnore: {
+			type: Boolean,
+			default: false
+		}
+	},
+	projectCurrency: {
+		type: String,
+		default: ''
+	},
+	crossRate: {
+		EUR: {
+			EUR,
+			USD,
+			GBP
+		},
+		USD: {
+			USD,
+			EUR,
+			GBP
+		},
+		GBP: {
+			GBP,
+			USD,
+			EUR
+		}
+	}
+})
 
-const MemoqProject = mongoose.model('MemoqProject', MemoqProjectSchema);
+const MemoqProject = mongoose.model('MemoqProject', MemoqProjectSchema)
 
-module.exports = MemoqProject;
+module.exports = MemoqProject

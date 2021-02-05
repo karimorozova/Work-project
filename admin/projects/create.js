@@ -4,6 +4,7 @@ const { createTasksWithPackagesUnit } = require('./taskForPackages');
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon');
 const { storeFiles } = require('./files');
 const { getModifiedFiles, createProjectFolder } = require('./helpers');
+const { calculateCrossRate } = require('../helpers/commonFunctions')
 
 const moment = require('moment');
 
@@ -46,27 +47,6 @@ async function createProject(project) {
   } catch (err) {
     console.log(err);
     console.log("Error in createProject");
-  }
-
-  function calculateCrossRate(USD, GBP) {
-    const EUR = 1;
-    return {
-      EUR: { EUR, USD, GBP },
-      USD: {
-        USD: 1,
-        EUR: dividedValue(EUR, USD),
-        GBP: dividedValue(GBP, USD),
-      },
-      GBP: {
-        GBP: 1,
-        EUR: dividedValue(EUR, GBP),
-        USD: dividedValue(USD, GBP),
-      }
-    };
-
-    function dividedValue(A, B) {
-      return +(A / B).toFixed(2);
-    }
   }
 }
 

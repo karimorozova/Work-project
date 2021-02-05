@@ -1,4 +1,4 @@
-const { Clients, Vendors, Languages, Pricelist, Step, Units, MemoqProject } = require('../../../models');
+const { Clients, Vendors, Languages, Pricelist, Step, Units, MemoqProject, CurrencyRatio } = require('../../../models');
 const ObjectId = require('mongodb').ObjectID;
 const { getPriceFromPersonRates, getCorrectBasicPrice } = require('../../../сalculations/finance');
 const { defaultFinanceObj } = require('../../../enums');
@@ -7,10 +7,12 @@ const { findFittingIndustryId } = require('./helpers');
 const { getPriceAfterApplyingDiscounts } = require('../../../projects/helpers');
 const { getMemoqProject } = require('./getMemoqProject');
 const { setTaskMetrics, getRelativeQuantity } = require('../../../helpers/projectMetrics')
+const { calculateCrossRate, rateExchangeVendorOntoProject } = require('../../../helpers/commonFunctions')
 
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
   const clients = await Clients.find().populate('discounts');
   const vendors = await Vendors.find();
+  const { USD, GBP } = await CurrencyRatio.findOne();
   const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
 
   //RETURN
@@ -18,15 +20,18 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   //RETURN
   if(project.lockedForRecalculation) return project;
 
-  const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+  let updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+  updatedProject = updateCurrencyProject(updatedProject, clients, { USD, GBP })
+
   let steps = checkKeyInObject('steps');
   let tasks = checkKeyInObject('tasks');
   let  minimumCharge = project.hasOwnProperty('minimumCharge') ? project.minimumCharge : false;
 
-  console.log('tyt')
   const newData = await getProjectTasksAndSteps(documents, updatedProject, neededCustomer, vendors);
   tasks = newData.tasks;
   steps = newData.steps;
+
+  //RETURN
   if (!steps.length) return project;
 
   if (!steps.every(step => step.vendor)) {
@@ -38,7 +43,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   //RETURN
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
   //RETURN
-  await MemoqProject.updateOne({ _id: project._id }, { ...additionalData, tasks, steps, finance });
+  await MemoqProject.updateOne({ _id: project._id }, { ...updatedProject, tasks, steps, finance });
   return await getMemoqProject({ _id: project._id });
 
   async function checkAndCorrectStepStructure(steps, tasks, documents) {
@@ -126,7 +131,15 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
     const stepName = !!+DocumentAssignmentRole ? 'Revising' : 'Translation';
     const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
     const clientRate = await getStepUserRate(customer, project, stepName, task);
-    const vendorRate = await getStepUserRate(vendor, project, stepName, task);
+    console.log(project.projectCurrency)
+    const nativeVendorRate = await getStepUserRate(vendor, project, stepName, task)
+    let vendorRate = ''
+    if(nativeVendorRate){
+      vendorRate = {
+        ...nativeVendorRate,
+        value: rateExchangeVendorOntoProject(project.projectCurrency, 'EUR', +nativeVendorRate.value, project.crossRate)
+      }
+    }
     steps.push({
       taskId,
       stepId: `${taskId} S0${i + 1}`,
@@ -137,6 +150,7 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
       quantity: TotalWordCount,
       clientRate,
       vendorRate,
+      nativeVendorRate,
       vendor: vendor ? ObjectId(vendor._id) : null,
     });
   }
@@ -330,6 +344,14 @@ const getPriceFromPricelist = (pricelist, data, currency) => {
 	}
 	return 0;
 };
+
+const updateCurrencyProject = (project, clients, { USD, GBP }) => {
+  const { customer } = project
+  const { currency } = clients.find(({_id}) => _id === customer)
+  project.crossRate = calculateCrossRate(USD, GBP);
+  project.projectCurrency = currency
+  return project
+}
 
 module.exports = {
 	createOtherProjectFinanceData
