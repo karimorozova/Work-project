@@ -29,19 +29,29 @@
       .finance-info__result
         Results(:step="step" :profitAndMargin="profitAndMargin")
 
+    .finance-info__tabs(v-if="step.name === 'Translation'")
+      Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
+    TableMatrix(
+      v-if="step.name === 'Translation' && project && step"
+      :project="project"
+      :step="step"
+      :selectedTab="selectedTab"
+    )
+
     //.finance-info__modal(v-if="isModal")
       ApproveModal(
-        :text="'Are you sure you wish to change the default ' + rateOwner + ' rate'"
-        approveValue="Yes"
-        notApproveValue="Cancel"
-        @approve="approveAction"
-        @notApprove="noSave"
-        @close="noSave"
+        //:text="'Are you sure you wish to change the default ' + rateOwner + ' rate'"
+        //approveValue="Yes"
+        //notApproveValue="Cancel"
+        //@approve="approveAction"
+        //@notApprove="noSave"
+        //@close="noSave"
       )
 
     //.finance-info__tabs(v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'")
       Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
     //TableMatrix(v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'", :step="step" :selectedTab="selectedTab")
+
 
 </template>
 
@@ -60,6 +70,9 @@
 			step: {
 				type: Object
 			},
+      project:{
+				type: Object
+      },
 			originallyUnits: {
 				type: Array
 			}
@@ -85,15 +98,15 @@
 		},
 		methods: {
 			...mapActions({
-				updateStepFinance: "updateStepFinance",
-				updateClientRate: "updateClientRate",
-				updateVendorRate: "updateVendorRate",
+				// updateStepFinance: "updateStepFinance",
+				// updateClientRate: "updateClientRate",
+				// updateVendorRate: "updateVendorRate",
 				alertToggle: "alertToggle",
 			}),
-			// setTab({ index }) {
-			// 	if(!this.step.vendor && index === 1) return;
-			// 	this.selectedTab = this.tabs[index];
-			// },
+			setTab({ index }) {
+				if(!this.step.vendor && index === 1) return;
+				this.selectedTab = this.tabs[index];
+			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false;
 				this.errors = [];

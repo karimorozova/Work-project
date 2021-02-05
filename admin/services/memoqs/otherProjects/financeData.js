@@ -23,6 +23,7 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   let tasks = checkKeyInObject('tasks');
   let  minimumCharge = project.hasOwnProperty('minimumCharge') ? project.minimumCharge : false;
 
+  console.log('tyt')
   const newData = await getProjectTasksAndSteps(documents, updatedProject, neededCustomer, vendors);
   tasks = newData.tasks;
   steps = newData.steps;
@@ -47,6 +48,8 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
 
     if(documents.length){
       memoqVendorsArr = documents[neededDocumentIndex].UserAssignments.TranslationDocumentUserRoleAssignmentDetails;
+      memoqVendorsArr = Array.isArray(memoqVendorsArr) ? memoqVendorsArr : [memoqVendorsArr]
+
       const indexRegex = new RegExp(/(?<=S)[0-9][0-9]/g);
       let index = indexRegex.exec(steps[neededStepIndex].stepId)[0];
       index = index === '01' ? 0 : 1;
@@ -75,7 +78,7 @@ const getProjectTasksAndSteps = async (documents, project, customer, vendors) =>
   let tasksLength = documents.length + 1;
   for (let i = 0; i < documents.length; i += 1) {
     const { WorkflowStatus, TargetLangCode, TotalWordCount, metrics } = documents[i];
-    let idNumber = tasksLength < 10 ? `T0${i + 1}` : `T${i + 1}`;
+    let idNumber = tasksLength < 10 ? ` T0${i + 1}` : ` T${i + 1}`;
     let taskId = taskName + `${idNumber}`;
     let targetLanguage = targetLanguages.filter(item => item).find(lang => lang.memoq === TargetLangCode);
     targetLanguage = targetLanguage ? targetLanguage : { symbol: '' };
@@ -115,7 +118,9 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
   const { taskId, sourceLanguage, targetLanguage } = task;
   const { TotalWordCount } = document;
   const steps = [];
-  const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
+  let { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
+  memoqVendorsArr = Array.isArray(memoqVendorsArr) ? memoqVendorsArr : [memoqVendorsArr]
+
   for (let i = 0; i < memoqVendorsArr.length; i += 1) {
     const { DocumentAssignmentRole, UserInfoHeader: { FullName } } = memoqVendorsArr[i];
     const stepName = !!+DocumentAssignmentRole ? 'Revising' : 'Translation';

@@ -105,7 +105,10 @@ const MemoqProjectSchema = new mongoose.Schema({
 		default: [],
 	},
 	steps: [{
-		vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
+		vendor: {
+			type: Schema.Types.ObjectId, ref: 'Vendors',
+			default: null
+		},
 		stepId: '',
 		taskId: '',
 		name: '',

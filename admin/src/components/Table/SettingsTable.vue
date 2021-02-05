@@ -139,6 +139,7 @@
       padding: 7px 5px 5px 6px;
       border: 1px solid $cell-border;
       border-right: none;
+      min-height: 32px;
 
       &:last-child {
         border-right: 0.5px solid $cell-border;

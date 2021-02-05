@@ -669,7 +669,6 @@ async function updateMemoqProjectsData() {
 
 	for (let project of allProjectsInSystem) {
 		let { _id, documents, serverProjectGuid } = project
-		console.log(serverProjectGuid,project.name)
 		documents = await documentsWithMetrics(documents, serverProjectGuid)
 
 		project = checkProjectStructure(clients, vendors, project, documents) ?
