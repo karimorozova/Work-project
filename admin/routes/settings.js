@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const fs = require('fs')
 const { upload } = require('../utils/')
-const { updateLanguage, getTierInfo, updateTierInfo } = require('../settings')
+const { updateLanguage, getTierInfo, updateTierInfo, getIndustryTier, updateIndustryTier } = require('../settings')
 const { Languages } = require('../models')
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
@@ -41,6 +41,27 @@ router.put('/update-tier-info', async (req, res) => {
 	try {
 		await updateTierInfo(updatedTierInfo)
 		res.send('success')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on language setting saving')
+	}
+})
+
+router.get('/industry-tier', async (req, res) => {
+	try {
+		const tierInfo = await getIndustryTier()
+		res.send(tierInfo)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on language setting saving')
+	}
+})
+
+router.put('/update-industry-tier', async (req, res) => {
+	let { updatedIndustryTier } = req.body
+	try {
+		const tierInfo = await updateIndustryTier(updatedIndustryTier)
+		res.send(tierInfo)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on language setting saving')

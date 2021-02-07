@@ -1,5 +1,6 @@
 const { Industries } = require('../models');
 const { moveFile } = require('../utils');
+const { createIndustryTier } = require('./tierAndLqa')
 const fs = require('fs');
 
 async function createNewIndustry(obj) {
@@ -7,6 +8,7 @@ async function createNewIndustry(obj) {
         const { icon, generic } = await getFilesInfo(obj);
         const { name, active } = obj;
         const { id } = await Industries.create({icon, name, generic, active});
+        await createIndustryTier(id)
         return id;
     } catch(err) {
         console.log(err);

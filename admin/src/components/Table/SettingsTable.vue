@@ -155,7 +155,7 @@
     }
 
     &__thead-row {
-      overflow-y: auto;
+      overflow-y: scroll;
     }
 
     &_scroll-padding {

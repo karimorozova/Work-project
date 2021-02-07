@@ -30,6 +30,7 @@ export default {
 	      { title: "Cancellation Reasons" },
         { title: "Instructions" },
         { title: "LQA" },
+        {title: "Industry Tiers"},
         { title: "Lead Sources" },
       ],
       sidebarTitle: "SETTINGS",
@@ -67,6 +68,9 @@ export default {
           break;
         case "LQA":
           this.$router.push("/settings/tiers-lqas");
+          break;
+        case "Industry Tiers":
+          this.$router.push("/settings/industry-lqas");
           break;
         case "Instructions":
           this.$router.push("/settings/instructions");
