@@ -12,6 +12,26 @@ const findLanguageByMemoqLanguageCode = (lang, memoqSymbol) => {
 	else if (lang.symbol === memoqSymbol) return true
 }
 
+function calculateCrossRate(USD, GBP) {
+	const EUR = 1;
+	return {
+		EUR: { EUR, USD, GBP },
+		USD: {
+			USD: 1,
+			EUR: dividedValue(EUR, USD),
+			GBP: dividedValue(GBP, USD),
+		},
+		GBP: {
+			GBP: 1,
+			EUR: dividedValue(EUR, GBP),
+			USD: dividedValue(USD, GBP),
+		}
+	};
+
+	function dividedValue(A, B) {
+		return +(A / B).toFixed(2);
+	}
+}
 
 const rateExchangeVendorOntoProject = (projectCurrency, vendorCurrency, nativeRate, crossRateTable) => {
 	return +(nativeRate * crossRateTable[vendorCurrency][projectCurrency]).toFixed(3)
@@ -57,6 +77,7 @@ module.exports = {
 	getUniqueServicesBySteps,
 	returnIconCurrencyByStringCode,
 	rateExchangeVendorOntoProject,
-	rateExchangeProjectOntoVendor
+	rateExchangeProjectOntoVendor,
+	calculateCrossRate
 
 }

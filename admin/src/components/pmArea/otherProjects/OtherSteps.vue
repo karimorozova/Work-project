@@ -8,7 +8,7 @@
           @setTab="showTab"
         )
       .steps__data(v-if="!projectSteps.length")
-        h3 Steps have not been recorded yet...
+        | Steps have not been recorded yet...
       .steps__data(v-else)
         DataTable(
           :fields="fields"
@@ -73,11 +73,11 @@
 </template>
 
 <script>
-	import DataTable from "../../DataTable";
-	import Tabs from "../../Tabs";
-	import moment from "moment";
-	import OtherStepInfo from "./OtherStepInfo";
-	import { mapGetters } from "vuex";
+	import DataTable from "../../DataTable"
+	import Tabs from "../../Tabs"
+	import moment from "moment"
+	import OtherStepInfo from "./OtherStepInfo"
+	import { mapGetters } from "vuex"
 
 	export default {
 		props: {
@@ -90,7 +90,7 @@
 		},
 		data() {
 			return {
-				tabs: ["Tasks", "Steps"],
+				tabs: [ "Tasks", "Steps" ],
 				stepsTargetLanguages: [],
 				fields: [
 					{
@@ -152,59 +152,59 @@
 					}
 				],
 				infoIndex: -1,
-				isStepInfo: false,
-			};
+				isStepInfo: false
+			}
 		},
 
 		methods: {
 			isNoFinanceData(index) {
-				if(this.project.steps.length) {
-					if(this.project.steps[index].vendor === null) {
-						return true;
+				if (this.project.steps.length) {
+					if (this.project.steps[index].vendor === null) {
+						return true
 					}
 				} else {
-					return true;
+					return true
 				}
 			},
 			getVendorFullName(index) {
 				return this.projectSteps[index].UserInfoHeader.FullName
 			},
 			getLanguageSymbol(memoqSymbol) {
-				return this.getAllLanguages.find(item => item.memoq === memoqSymbol) === undefined ? '' : this.getAllLanguages.find(item => item.memoq === memoqSymbol).symbol;
+				return this.getAllLanguages.find(item => item.memoq === memoqSymbol) === undefined ? '' : this.getAllLanguages.find(item => item.memoq === memoqSymbol).symbol
 			},
 			languagePair(index) {
-				let secondLang = this.projectSteps[index].langSymbol !== null ? this.getLanguageSymbol(this.projectSteps[index].langSymbol) : '';
+				let secondLang = this.projectSteps[index].langSymbol !== null ? this.getLanguageSymbol(this.projectSteps[index].langSymbol) : ''
 				return `${ this.project.sourceLanguage.symbol } >> ${ secondLang }`
 			},
 			showStepDetails(index) {
-				if(!this.isNoFinanceData(index)) {
-					this.infoIndex = index;
-					this.isStepInfo = true;
+				if (!this.isNoFinanceData(index)) {
+					this.infoIndex = index
+					this.isStepInfo = true
 				}
 			},
 			closeStepInfo() {
-				this.isStepInfo = false;
-				this.infoIndex = -1;
+				this.isStepInfo = false
+				this.infoIndex = -1
 			},
 			formateDate: time => moment(time).format('DD-MM-YYYY'),
 			getStepName: num => (num === '0' ? 'Translation' : 'Revision'),
 			showTab({ index }) {
 				return this.tabs[index] === "Steps"
 						? true
-						: this.$emit("showTab", { tab: this.tabs[index] });
+						: this.$emit("showTab", { tab: this.tabs[index] })
 			}
 		},
 		computed: {
 			...mapGetters({
-				getAllLanguages: 'getAllLanguages',
-			}),
+				getAllLanguages: 'getAllLanguages'
+			})
 		},
 		components: {
 			OtherStepInfo,
 			DataTable,
 			Tabs
-		},
-	};
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -216,18 +216,17 @@
     }
 
     &__list {
-      height: 20px;
-      width: 20px;
+      height: 18px;
+      width: 18px;
     }
 
     &__img {
-      height: 20px;
-      width: 20px;
-      margin-top: -2px;
-      margin-right: 2px;
+      height: 18px;
+      width: 18px;
+      margin-top: -1px;
+      margin-left: -1px;
     }
   }
-
 
   .steps {
     display: flex;
@@ -259,7 +258,7 @@
       width: 80%;
       z-index: 50;
       background-color: $white;
-      box-shadow: 0 0 10px $brown-shadow;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
 
     &__info-icon {
@@ -376,5 +375,9 @@
     margin-top: 3px;
     margin-left: 12px;
     cursor: not-allowed !important;
+  }
+
+  .fa-info-circle {
+    font-size: 16px;
   }
 </style>

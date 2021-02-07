@@ -14,6 +14,7 @@
         :step="step"
         @refreshFinance="refreshFinance"
         :originallyUnits="originallyUnits"
+        :project="project"
       )
 </template>
 

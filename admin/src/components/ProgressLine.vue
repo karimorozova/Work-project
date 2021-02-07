@@ -9,12 +9,12 @@
 	export default {
 		props: {
 			progress: {
-				type: [Number, String]
+				type: [ Number, String ]
 			}
 		},
 		computed: {
 			currentProgress() {
-				return !isNaN(this.progress) ? this.progress : 0;
+				return !isNaN(this.progress) ? this.progress : 0
 			}
 		}
 	}
@@ -26,9 +26,10 @@
   .progress-line {
     width: 100%;
     height: 15px;
-    border: 1px solid $brown-border;
+    border: 1px solid #938676;
     position: relative;
     box-sizing: border-box;
+
     &__tooltip {
       position: absolute;
       width: 100%;
@@ -38,16 +39,19 @@
       display: flex;
       justify-content: center;
     }
+
     &:hover {
       .progress-line__tooltip {
         opacity: 1;
       }
     }
+
     &__filler {
       background-color: $green;
       height: 100%;
       max-width: 100%;
     }
+
     &__value {
       background-color: $white;
       color: $main-color;

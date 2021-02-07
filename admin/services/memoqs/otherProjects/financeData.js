@@ -1,4 +1,4 @@
-const { Clients, Vendors, Languages, Pricelist, Step, Units, MemoqProject } = require('../../../models');
+const { Clients, Vendors, Languages, Pricelist, Step, Units, MemoqProject, CurrencyRatio } = require('../../../models');
 const ObjectId = require('mongodb').ObjectID;
 const { getPriceFromPersonRates, getCorrectBasicPrice } = require('../../../сalculations/finance');
 const { defaultFinanceObj } = require('../../../enums');
@@ -6,38 +6,44 @@ const { multiplyPrices } = require('../../../multipliers');
 const { findFittingIndustryId } = require('./helpers');
 const { getPriceAfterApplyingDiscounts } = require('../../../projects/helpers');
 const { getMemoqProject } = require('./getMemoqProject');
+const { setTaskMetrics, getRelativeQuantity } = require('../../../helpers/projectMetrics')
+const { calculateCrossRate, rateExchangeVendorOntoProject } = require('../../../helpers/commonFunctions')
 
-/**
- *
- * @param {Object} project
- * @param {Array} documents
- * @param {Boolean} fromCron
- * @returns {Object} - returns an updated memoq project
- */
 const createOtherProjectFinanceData = async ({ project, documents }, fromCron = false) => {
   const clients = await Clients.find().populate('discounts');
   const vendors = await Vendors.find();
+  const { USD, GBP } = await CurrencyRatio.findOne();
   const { additionalData, neededCustomer } = await getUpdatedProjectData(project, clients);
+
+  //RETURN
   if (!neededCustomer) return project;
+  //RETURN
   if(project.lockedForRecalculation) return project;
 
-  const updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+  let updatedProject = project.hasOwnProperty('name') ? { ...project, ...additionalData } : { ...project._doc, ...additionalData };
+  updatedProject = updateCurrencyProject(updatedProject, clients, { USD, GBP })
+
   let steps = checkKeyInObject('steps');
   let tasks = checkKeyInObject('tasks');
   let  minimumCharge = project.hasOwnProperty('minimumCharge') ? project.minimumCharge : false;
 
-  const newData = await getProjectTasks(documents, updatedProject, neededCustomer, vendors);
+  const newData = await getProjectTasksAndSteps(documents, updatedProject, neededCustomer, vendors);
   tasks = newData.tasks;
   steps = newData.steps;
+
+  //RETURN
   if (!steps.length) return project;
 
   if (!steps.every(step => step.vendor)) {
     steps = await checkAndCorrectStepStructure(steps, tasks, documents);
   }
+
   const finance = tasks.length ? getProjectFinance(tasks, minimumCharge) : defaultFinanceObj;
 
+  //RETURN
   if (fromCron) return { ...updatedProject, tasks, steps, finance };
-  await MemoqProject.updateOne({ _id: project._id }, { ...additionalData, tasks, steps, finance });
+  //RETURN
+  await MemoqProject.updateOne({ _id: project._id }, { ...updatedProject, tasks, steps, finance });
   return await getMemoqProject({ _id: project._id });
 
   async function checkAndCorrectStepStructure(steps, tasks, documents) {
@@ -47,6 +53,8 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
 
     if(documents.length){
       memoqVendorsArr = documents[neededDocumentIndex].UserAssignments.TranslationDocumentUserRoleAssignmentDetails;
+      memoqVendorsArr = Array.isArray(memoqVendorsArr) ? memoqVendorsArr : [memoqVendorsArr]
+
       const indexRegex = new RegExp(/(?<=S)[0-9][0-9]/g);
       let index = indexRegex.exec(steps[neededStepIndex].stepId)[0];
       index = index === '01' ? 0 : 1;
@@ -63,15 +71,8 @@ const createOtherProjectFinanceData = async ({ project, documents }, fromCron = 
   }
 };
 
-/**
- *
- * @param {Array} documents
- * @param {Object} project
- * @param {Object} customer
- * @param {Array} vendors
- * @returns {{steps: {Array}, tasks: {Array}}} - returns an array of new tasks and steps
- */
-const getProjectTasks = async (documents, project, customer, vendors) => {
+
+const getProjectTasksAndSteps = async (documents, project, customer, vendors) => {
   const { sourceLanguage, targetLanguages, name } = project;
   const taskName = name && /(.*])\s- /gm.exec(name) ? /(.*])\s- /gm.exec(name)[1] : null;
   const tasks = [];
@@ -81,57 +82,64 @@ const getProjectTasks = async (documents, project, customer, vendors) => {
   }
   let tasksLength = documents.length + 1;
   for (let i = 0; i < documents.length; i += 1) {
-    const { WorkflowStatus, TargetLangCode, TotalWordCount } = documents[i];
-    let idNumber = tasksLength < 10 ? `T0${i + 1}` : `T${i + 1}`;
+    const { WorkflowStatus, TargetLangCode, TotalWordCount, metrics } = documents[i];
+    let idNumber = tasksLength < 10 ? ` T0${i + 1}` : ` T${i + 1}`;
     let taskId = taskName + `${idNumber}`;
     let targetLanguage = targetLanguages.filter(item => item).find(lang => lang.memoq === TargetLangCode);
     targetLanguage = targetLanguage ? targetLanguage : { symbol: '' };
     const sourceLang = sourceLanguage ? sourceLanguage : { symbol: '' };
-    const taskSteps = await getTaskSteps(
-      {
-        taskId,
-        sourceLanguage: sourceLang.symbol,
-        targetLanguage: targetLanguage.symbol,
-      },
-      project, documents[i], customer, vendors
-    );
+    const taskStepsWithOutFinance = await getTaskSteps({ taskId, sourceLanguage: sourceLang.symbol, targetLanguage: targetLanguage.symbol, }, project, documents[i], customer, vendors);
+
+    let newMetrics = setTaskMetrics({metrics, matrix: customer.matrix, prop: "client" })
+    const { vendor } = taskStepsWithOutFinance.find(({name}) => name === 'Translation')
+    if(vendor){
+      const { matrix } = vendors.find(({_id}) => _id.toString() === vendor.toString())
+      newMetrics = setTaskMetrics({metrics, matrix: matrix, prop: "vendor" })
+    }
+
+    const finalSteps = getTaskStepsFinance(taskStepsWithOutFinance, newMetrics, project)
+
     const task = {
       taskId,
+      metrics,
       start: project.creationTime,
       deadline: project.deadline,
       sourceLanguage: sourceLang.symbol,
       targetLanguage: targetLanguage.symbol,
       status: WorkflowStatus,
-      progress: 100,
-      finance: taskSteps.length ? getTaskFinance(taskSteps, TotalWordCount) : defaultFinanceObj,
+      progress: 0,
+      finance: finalSteps.length ? getTaskFinance(finalSteps, TotalWordCount) : defaultFinanceObj,
     };
     tasks.push(task);
-    steps.push(...taskSteps);
+    steps.push(...finalSteps);
   }
 
   return { tasks, steps };
+
+
 };
 
-/**
- *
- * @param {Object} task
- * @param {Object} project
- * @param {Object} document
- * @param {Object} customer
- * @param {Array} vendors
- * @returns {Array} - returns new steps for project
- */
 const getTaskSteps = async (task, project, document, customer, vendors) => {
   const { taskId, sourceLanguage, targetLanguage } = task;
-  const { TotalWordCount, WeightedWords } = document;
+  const { TotalWordCount } = document;
   const steps = [];
-  const { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
+  let { UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: memoqVendorsArr } } = document;
+  memoqVendorsArr = Array.isArray(memoqVendorsArr) ? memoqVendorsArr : [memoqVendorsArr]
+
   for (let i = 0; i < memoqVendorsArr.length; i += 1) {
     const { DocumentAssignmentRole, UserInfoHeader: { FullName } } = memoqVendorsArr[i];
     const stepName = !!+DocumentAssignmentRole ? 'Revising' : 'Translation';
     const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
     const clientRate = await getStepUserRate(customer, project, stepName, task);
-    const vendorRate = await getStepUserRate(vendor, project, stepName, task);
+    console.log(project.projectCurrency)
+    const nativeVendorRate = await getStepUserRate(vendor, project, stepName, task)
+    let vendorRate = ''
+    if(nativeVendorRate){
+      vendorRate = {
+        ...nativeVendorRate,
+        value: rateExchangeVendorOntoProject(project.projectCurrency, 'EUR', +nativeVendorRate.value, project.crossRate)
+      }
+    }
     steps.push({
       taskId,
       stepId: `${taskId} S0${i + 1}`,
@@ -139,22 +147,38 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
       targetLanguage,
       name: stepName,
       totalWords: TotalWordCount,
-      quantity: WeightedWords,
+      quantity: TotalWordCount,
       clientRate,
       vendorRate,
+      nativeVendorRate,
       vendor: vendor ? ObjectId(vendor._id) : null,
-      finance: getStepFinance(clientRate, vendorRate, TotalWordCount, WeightedWords, project.discounts),
     });
   }
   return steps;
 };
 
-/**
- *
- * @param {Object} project
- * @param {Array} allClients
- * @returns {{neededCustomer: {Object}, additionalData: {Object}}}
- */
+const getTaskStepsFinance = (steps, metrics, project) => {
+  for (let i = 0; i < steps.length ; i++) {
+    const  {clientRate, vendorRate, totalWords, name}  = steps[i]
+    steps[i].finance = name === 'Translation' ?
+        getStepFinance({
+          clientRate,
+          vendorRate,
+          WeightedWordsClient: getRelativeQuantity(metrics, 'client').toFixed(2),
+          WeightedWordsVendor: getRelativeQuantity(metrics, 'vendor').toFixed(2),
+          discounts: project.discounts
+        }) :
+        getStepFinance({
+          clientRate,
+          vendorRate,
+          WeightedWordsClient: totalWords,
+          WeightedWordsVendor: totalWords,
+          discounts: project.discounts
+        })
+  }
+  return steps
+}
+
 const getUpdatedProjectData = async (project, allClients) => {
   const { client: memoqClient } = project;
 
@@ -175,14 +199,6 @@ const getUpdatedProjectData = async (project, allClients) => {
   return { additionalData, neededCustomer };
 };
 
-/**
- *
- * @param {Object} user
- * @param {Object} project
- * @param {String} stepName
- * @param {Object} task
- * @returns {'' | {Object}} - returns empty string if user doesn't exist or object with data
- */
 const getStepUserRate = async (user, project, stepName, task) => {
   const { industry } = project;
   let { sourceLanguage, targetLanguage } = task;
@@ -222,24 +238,27 @@ const getStepUserRate = async (user, project, stepName, task) => {
   return '';
 };
 
-/**
- *
- * @param {Object} clientRate
- * @param {Object} vendorRate
- * @param {Number} TotalWordCount
- * @param {Number} WeightedWords
- * @param {Array} discounts
- * @returns {{}}
- */
-const getStepFinance = (clientRate, vendorRate, TotalWordCount, WeightedWords, discounts) => {
-  const priceReceivables = clientRate ? +(clientRate.value * WeightedWords).toFixed(2) : 0;
-  const pricePayables = vendorRate ? +(vendorRate.value * WeightedWords).toFixed(2) : 0;
-  const profit = pricePayables ? (priceReceivables - pricePayables).toFixed(2) : 0;
-  const ROI = pricePayables && pricePayables !== 0 ? ((priceReceivables - pricePayables) / pricePayables).toFixed(2) : 0;
+const getStepFinance = ({clientRate, vendorRate, WeightedWordsClient, WeightedWordsVendor, discounts}) => {
+  const priceReceivables = clientRate ?
+      +(clientRate.value * WeightedWordsClient).toFixed(2) :
+      0;
+
+  const pricePayables = vendorRate ?
+      +(vendorRate.value * WeightedWordsVendor).toFixed(2) :
+      0;
+
+  const profit = pricePayables ?
+      (priceReceivables - pricePayables).toFixed(2) :
+      0;
+
+  const ROI = pricePayables && pricePayables !== 0 ?
+      ((priceReceivables - pricePayables) / pricePayables).toFixed(2) :
+      0;
+
   return {
     Wordcount: {
-      receivables: +WeightedWords,
-      payables: +WeightedWords,
+      receivables: WeightedWordsClient,
+      payables: WeightedWordsVendor,
     },
     Price: {
       receivables: discounts && discounts.length ? getPriceAfterApplyingDiscounts(discounts, priceReceivables) : +priceReceivables,
@@ -325,6 +344,14 @@ const getPriceFromPricelist = (pricelist, data, currency) => {
 	}
 	return 0;
 };
+
+const updateCurrencyProject = (project, clients, { USD, GBP }) => {
+  const { customer } = project
+  const { currency } = clients.find(({_id}) => _id === customer)
+  project.crossRate = calculateCrossRate(USD, GBP);
+  project.projectCurrency = currency
+  return project
+}
 
 module.exports = {
 	createOtherProjectFinanceData
