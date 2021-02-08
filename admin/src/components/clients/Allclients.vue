@@ -170,7 +170,7 @@ export default {
         padding: 20px;
         font-size: 14px;
         font-weight: normal;
-        box-shadow: 0 0 10px rgba(103, 87, 62, 0.5);
+        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
 }
 

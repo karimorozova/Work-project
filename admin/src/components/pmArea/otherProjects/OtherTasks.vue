@@ -12,8 +12,8 @@
         :fields="fields"
         :tableData="project.documents"
         bodyRowClass="steps-table-row"
-        :bodyClass="['steps-table-body', {'tbody_visible-overflow': project.documents.length < 3}]"
-        :tableheadRowClass="project.documents.length < 3 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="['steps-table-body', {'tbody_visible-overflow': project.documents.length < 10}]"
+        :tableheadRowClass="project.documents.length < 10 ? 'tbody_visible-overflow' : ''"
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -33,15 +33,18 @@
           .tasks__task-status {{ row.DocumentStatus | otherProjectsTaskStatus }}
         template(slot="receivables" slot-scope="{ row, index }")
           .tasks__task-status(v-if="project.tasks !== undefined && project.tasks[index] !== undefined")
-            span(v-if="project.tasks[index].finance.Price.receivables") &euro;&nbsp;
+            span(v-if="project.tasks[index].finance.Price.receivables")
+              span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
             span {{ project.tasks[index].finance.Price.receivables }}
         template(slot="payables" slot-scope="{ row, index }")
           .tasks__task-status(v-if="project.tasks !== undefined && project.tasks[index] !== undefined")
-            span(v-if="project.tasks[index].finance.Price.payables") &euro;&nbsp;
+            span(v-if="project.tasks[index].finance.Price.payables")
+              span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
             span {{ project.tasks[index].finance.Price.payables }}
         template(slot="margin" slot-scope="{ row, index }")
           .tasks__task-status(v-if="project.tasks !== undefined && project.tasks[index] !== undefined")
-            span(v-if="project.tasks[index].finance.profit") &euro;&nbsp;
+            span(v-if="project.tasks[index].finance.profit")
+              span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
             span {{ project.tasks[index].finance.profit }}
 
 </template>
@@ -53,8 +56,10 @@
 	import moment from 'moment';
 	import '../../../filters/OtherProjectsFilters'
 	import { mapGetters, mapActions } from 'vuex';
+	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			project: {
 				type: Object
@@ -70,7 +75,7 @@
 						label: 'Task ID',
 						headerKey: 'headerTaskid',
 						key: 'taskId',
-						width: '15.5%'
+						width: '17%'
 					},
 					{
 						label: 'Language',
@@ -100,7 +105,7 @@
 						label: 'Status',
 						headerKey: 'headerStatus',
 						key: 'status',
-						width: '16.5%'
+						width: '15%'
 					},
 					{
 						label: 'Receivables',

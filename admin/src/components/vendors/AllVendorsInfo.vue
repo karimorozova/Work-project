@@ -157,7 +157,7 @@ export default {
         padding: 20px;
         box-sizing: border-box;
         min-height: 150px;
-        box-shadow: 0 0 10px $brown-shadow;
+        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
     &__new-vendor {
         display: flex;

@@ -6,6 +6,7 @@ const {
 	updateAllMemoqProjects,
 	updateMemoqProjectStatus,
 	updateStatusesForOtherProjects,
+	replaceQueryStatus
 } = require('./otherProjectUpdates');
 const { getMemoqProjectsForClientPortal } = require('./getMemoqProject');
 
@@ -21,5 +22,6 @@ module.exports = {
 	updateStatusesForOtherProjects,
 	getMemoqProjectsForClientPortal,
   defineProjectStatus,
-	clearGarbageProjects
+	clearGarbageProjects,
+	replaceQueryStatus
 };

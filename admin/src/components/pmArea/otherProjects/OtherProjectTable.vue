@@ -14,29 +14,42 @@
 
       template(slot="projectId" slot-scope="{ row }")
         span {{ getProjectIdName(row, 'id') }}
+
       template(slot="projectName" slot-scope="{ row }")
         span {{ getProjectIdName(row, "name") }}
+
       template(slot="clientName" slot-scope="{ row }")
         span {{ row.client }}
+
       template(slot="languages" slot-scope="{ row }")
         span(v-html="projectLangs(row)")
+
       template(slot="status" slot-scope="{ row }")
         span {{ row.status }}
+
       template(slot="receivables" slot-scope="{ row }")
-        span(v-if="row.finance && row.finance.Price.receivables") &euro;
+        span(v-if="row.finance && row.finance.Price.receivables")
+          span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
           span {{ toFixedFinalCost( row.finance.Price.receivables ) }}
+
       template(slot="payables" slot-scope="{ row }")
-        span(v-if="row.finance && row.finance.Price.payables") &euro;
+        span(v-if="row.finance && row.finance.Price.payables")
+          span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
           span {{ toFixedFinalCost( row.finance.Price.payables ) }}
+
       template(slot="roi" slot-scope="{ row }")
-        span(v-if="row.finance && row.finance.ROI") {{ row.finance.ROI }}
-        span(v-else)
+        span(v-if="row.finance && row.finance.roi")
+          span {{ row.finance.roi }}
+
       template(slot="startDate" slot-scope="{ row }")
         span {{formateDate(row.creationTime)}}
+
       template(slot="deadline" slot-scope="{ row }")
         span {{formateDate(row.deadline)}}
+
       template(slot="projectManager" slot-scope="{ row }")
         span {{nameOfProjectManager(row)}}
+
       template(slot="projectTest" slot-scope="{ row, index }")
         .checkbox(@click.stop="")
           input(type="checkbox" class="test" :id="'test' + (index + 1)" :checked="row.isTest" @click.stop="setTest(row._id)")
@@ -47,8 +60,10 @@
 	import DataTable from "../../DataTable";
 	import moment from "moment";
 	import { mapActions } from "vuex";
+	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			allProjects: {
 				type: Array
@@ -91,19 +106,19 @@
 						label: "Receivables",
 						headerKey: "headerReceivables",
 						key: "receivables",
-						width: "6%"
+						width: "7%"
 					},
 					{
 						label: "Payables",
 						headerKey: "headerPayables",
 						key: "payables",
-						width: "6%"
+						width: "7%"
 					},
 					{
 						label: "ROI",
 						headerKey: "headerRoi",
 						key: "roi",
-						width: "6%"
+						width: "5%"
 					},
 					{
 						label: "Start date",
@@ -118,10 +133,10 @@
 						width: "8%"
 					},
 					{
-						label: "Project Manager",
+						label: "PM",
 						headerKey: "headerProjectManager",
 						key: "projectManager",
-						width: "10%"
+						width: "9%"
 					},
 					{
 						label: "Test",

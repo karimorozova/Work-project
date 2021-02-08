@@ -2,14 +2,9 @@ const { MemoqProject, GmailProjectsStatuses, Clients, Vendors } = require('../..
 const { checkProjectStructure } = require('./helpers');
 const { createOtherProjectFinanceData } = require('./financeData');
 const { getMemoqProjects, getProjectAfterUpdate } = require('./getMemoqProject');
-const {saveOtherProjectStatuses} = require("../../../gmail");
+const { saveOtherProjectStatuses } = require("../../../gmail");
 
-/**
- *
- * @param {String} querySource - describes status of progress
- * @returns {Array} - returns updated(if fits) projects
- */
-const updateAllMemoqProjects = async (querySource) => {
+const replaceQueryStatus = (querySource) => {
   let query = {};
   switch (querySource) {
     case 'In-progress':
@@ -21,6 +16,11 @@ const updateAllMemoqProjects = async (querySource) => {
     case 'Closed':
       query.status = 'Closed';
   }
+  return query
+}
+
+const updateAllMemoqProjects = async (querySource) => {
+  let query = replaceQueryStatus(querySource);
 
   const projects = await MemoqProject.find(query);
   const clients = await Clients.find();
@@ -77,15 +77,11 @@ const updateStatusesForOtherProjects = async () => {
   await readProjectsByStatusAndUpdateOtherProjects('Closed');
 };
 
-/**
- *
- * @param project
- * @returns {Object} - returns either updated or same project
- */
+
 const updateMemoqProjectFinance = async (project) => {
   const clients = await Clients.find();
   const vendors = await Vendors.find();
-  const { documents, lockedForRecalculation } = project;
+  let { documents, lockedForRecalculation } = project;
   const doesHaveCorrectStructure = checkProjectStructure(clients, vendors, project, documents);
   if (!doesHaveCorrectStructure || lockedForRecalculation) {
     return project;
@@ -94,12 +90,6 @@ const updateMemoqProjectFinance = async (project) => {
   return await createOtherProjectFinanceData({ project: project._doc, documents });
 };
 
-/**
- *
- * @param {ObjectId} _id
- * @param {String} direction - describes a direction for update
- * @returns {Object} - returns project with updated status
- */
 const updateMemoqProjectStatus = async (_id, direction) => {
   const { status } = await MemoqProject.findOne({ _id });
   let updatedStatus;
@@ -127,5 +117,6 @@ module.exports = {
   updateAllMemoqProjects,
   updateMemoqProjectFinance,
   updateMemoqProjectStatus,
-  updateStatusesForOtherProjects
+  updateStatusesForOtherProjects,
+  replaceQueryStatus,
 };
