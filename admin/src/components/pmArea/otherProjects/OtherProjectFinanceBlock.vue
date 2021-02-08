@@ -15,10 +15,15 @@
         .finance-info__bars
           .bar
             .bar__green(:style="{ width: barsStatistic.receivables.width }")
-            .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
+            .bar__amount
+              span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
+              span {{barsStatistic.receivables.price}}
           .bar
             .bar__red(:style="{ width: barsStatistic.payables.width }")
-            .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
+            .bar__amount
+              span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
+              span {{barsStatistic.payables.price}}
+
         .project-finance__dashboard
           .project-finance__dashboardItem
             .project-finance__dashboardItem-title Profit:
@@ -60,15 +65,19 @@
           )
       .project-finance__total
         .project-finance__total-title Total:
-        .project-finance__total-value {{ detectedFinalPrice }} &nbsp;&euro;
+        .project-finance__total-value
+          span {{ detectedFinalPrice }}
+          span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
 
 </template>
 
 <script>
 	import { mapActions } from 'vuex';
 	import Discounts from "../../clients/pricelists/Discounts";
+	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			isUpdateProject: {
 				type: Boolean,

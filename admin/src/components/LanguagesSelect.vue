@@ -1,18 +1,18 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outClick" :class="customClass" @click="showLangs")
+    .drop-select(v-click-outside="outClick" :class="customClass")
         .select
             span.selected(v-if="selectedLangs.length === 1" :class="{'no-opacity': selectedLangs.length}" @click="showLangs") {{ selectedLangs[0] }}
             span.selected(v-if="!selectedLangs.length") {{ placeholder }}
             .selected(v-if="selectedLangs.length > 1" :class="{'no-opacity': selectedLangs.length}")
                 span(v-for="lang in selectedLangs") {{ lang }}; &nbsp;
-            .arrow-button(@click="showLangs")
-                img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': isOpened}" @click="showLangs")
+            .arrow-button(@click="(e) => showLangs(e)")
+                img(src="../assets/images/open-close-arrow-brown.png" :class="{'reverse-Icon': isOpened}")
         input.search(v-if="isOpened" v-model="searchLang" placeholder="Search")
         .drop(v-if="isOpened")
             .drop__item( v-for="(language, index) in filteredLangs" @click="changeLang(index)")
                 .checkbox
-                    .checkbox__check(:class="{checked: selectedLangs.indexOf(language.symbol) != -1}")
-                span.drop__name(:class="{'left-pad': !isCheckboxShown}") {{ language.lang }}
+                    .checkbox__check(:class="{checked: selectedLangs.indexOf(language.symbol) !== -1}")
+                span.drop__name {{ language.lang }}
 </template>
 
 <script>
@@ -125,7 +125,7 @@ export default {
             }
             if(result.length) {
                 result = result.filter(item => {
-                    if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
+                    if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) !== -1) {
                         return item
                     }
                 })
@@ -239,7 +239,7 @@ export default {
                 background-color: rgba(191, 176, 157, 0.363);
             }
             .all-projects__filters & {
-                font-size: 12px;
+                font-size: 14px;
             }
         }
         &__name {

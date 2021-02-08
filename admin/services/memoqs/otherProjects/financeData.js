@@ -131,7 +131,6 @@ const getTaskSteps = async (task, project, document, customer, vendors) => {
     const stepName = !!+DocumentAssignmentRole ? 'Revising' : 'Translation';
     const vendor = vendors.find(vendor => vendor.aliases.includes(FullName));
     const clientRate = await getStepUserRate(customer, project, stepName, task);
-    console.log(project.projectCurrency)
     const nativeVendorRate = await getStepUserRate(vendor, project, stepName, task)
     let vendorRate = ''
     if(nativeVendorRate){

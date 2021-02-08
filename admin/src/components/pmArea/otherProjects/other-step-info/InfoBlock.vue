@@ -5,10 +5,14 @@
         .finance-info__bars
           .bar
             .bar__green(:style="{width: barsStatistic.receivables.width}")
-            .bar__amount &euro;&nbsp;{{barsStatistic.receivables.price}}
+            .bar__amount
+              span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
+              span {{barsStatistic.receivables.price}}
           .bar
             .bar__red(:style="{width: barsStatistic.payables.width }")
-            .bar__amount &euro;&nbsp;{{barsStatistic.payables.price}}
+            .bar__amount
+              span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
+              span {{barsStatistic.payables.price}}
 
         DetailsTranslation(
           v-if="step.name === 'Translation'"
@@ -17,6 +21,7 @@
           :cancelSave="cancelSave"
           :selectedTab="selectedTab"
           @save="checkRateChange"
+          :project="project"
         )
         DetailsOtherCAT(
           v-if="step.name === 'Revising'"
@@ -25,6 +30,7 @@
           :cancelSave="cancelSave"
           :selectedTab="selectedTab"
           @save="checkRateChange"
+          :project="project"
         )
       .finance-info__result
         Results(:step="step" :profitAndMargin="profitAndMargin")
@@ -64,8 +70,10 @@
 	import { mapActions } from "vuex";
 	import TableMatrix from "./TableMatrix"
 	import Results from "./Results";
+	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			step: {
 				type: Object

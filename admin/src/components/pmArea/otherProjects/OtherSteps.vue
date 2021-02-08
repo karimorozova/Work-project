@@ -8,14 +8,14 @@
           @setTab="showTab"
         )
       .steps__data(v-if="!projectSteps.length")
-        | Steps have not been recorded yet...
+        p Steps have not been recorded yet...
       .steps__data(v-else)
         DataTable(
           :fields="fields"
           :tableData="projectSteps"
           :activeIndex="activeIndex"
-          :bodyClass="['steps-table-body', {'tbody_visible-overflow': projectSteps.length < 3}]"
-          :tableheadRowClass="projectSteps.length < 3 ? 'tbody_visible-overflow' : ''"
+          :bodyClass="['steps-table-body', {'tbody_visible-overflow': projectSteps.length < 10}]"
+          :tableheadRowClass="projectSteps.length < 10 ? 'tbody_visible-overflow' : ''"
           bodyCellClass="steps-table-cell"
           bodyRowClass="steps-table-row"
           v-if="project._id"
@@ -41,23 +41,26 @@
             .pricelist__block(v-if="project.steps.length")
               span.pricelist__list(v-if="project.steps[index].clientRate && !project.steps[index].clientRate.fromUser")
                 img.pricelist__img( src="../../../assets/images/red-info-icon.png")
-              span.pricelist__list(v-else)
+              span(v-else)
 
-              span(v-if="project.steps[index].finance.Price.receivables") &euro;&nbsp;
+              span(v-if="project.steps[index].finance.Price.receivables")
+                span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               span.steps__step-data {{ project.steps[index].finance.Price.receivables  }}
 
           template(slot="payables" slot-scope="{ row, index }")
             .pricelist__block(v-if="project.steps.length")
               span.pricelist__list(v-if="project.steps[index].vendorRate && !project.steps[index].clientRate.fromUser")
                 img.pricelist__img( src="../../../assets/images/red-info-icon.png")
-              span.pricelist__list(v-else)
+              span(v-else)
 
-              span(v-if="project.steps[index].finance.Price.payables") &euro;&nbsp;
+              span(v-if="project.steps[index].finance.Price.payables")
+                span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               span.steps__step-data {{ project.steps[index].finance.Price.payables  }}
 
           template(slot="margin" slot-scope="{ row, index }")
             div(v-if="project.steps.length")
-              span(v-if="project.steps[index].finance.profit") &euro;&nbsp;
+              span(v-if="project.steps[index].finance.profit")
+                span(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               span.steps__step-data {{ project.steps[index].finance.profit }}
 
 
@@ -78,8 +81,10 @@
 	import moment from "moment"
 	import OtherStepInfo from "./OtherStepInfo"
 	import { mapGetters } from "vuex"
+	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [currencyIconDetected],
 		props: {
 			project: {
 				type: Object

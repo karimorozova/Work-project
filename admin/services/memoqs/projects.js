@@ -789,5 +789,6 @@ module.exports = {
 	downloadFromMemoqProjectsData,
 	assignMemoqTranslators,
 	setMemoqDocumentWorkFlowStatus,
-	assignedDefaultTranslator
+	assignedDefaultTranslator,
+	documentsWithMetrics
 }

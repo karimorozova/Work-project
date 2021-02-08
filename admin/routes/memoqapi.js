@@ -2,31 +2,48 @@ const router = require('express').Router();
 const { upload, sendEmail } = require('../utils');
 const { User, MemoqProject, Vendors } = require('../models');
 const { downloadCompletedFiles } = require('../projects');
+
 const {
   getMemoqAllProjects,
   createMemoqProjectWithTemplate,
   getProjectTranslationDocs,
   getProjectAnalysis,
   getProjectUsers,
-  getMemoqFileId
+  getMemoqFileId,
+	documentsWithMetrics
 } = require('../services/memoqs/projects');
-const { getProjectAfterUpdate, getMemoqProject } = require('../services/memoqs/otherProjects/getMemoqProject');
-const { moveMemoqFileToProject, addProjectFile, exportMemoqFile, getMemoqFileChunks } = require('../services/memoqs/files');
+
+const { getProjectAfterUpdate,
+	getMemoqProject
+} = require('../services/memoqs/otherProjects/getMemoqProject');
+
+const {
+	moveMemoqFileToProject,
+	addProjectFile,
+	exportMemoqFile,
+	getMemoqFileChunks
+} = require('../services/memoqs/files');
+
 const { getMemoqTemplates } = require("../services/memoqs/resources");
 const { assignProjectManagers } = require('../projects/updates');
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
 const { updateProjectMetrics } = require("../projects/metrics");
+
 const {
   getFilteredOtherProjects,
   filterMemoqProjectsVendors,
   updateAllMemoqProjects,
   updateMemoqProjectFinance,
   updateMemoqProjectStatus,
-  updateStatusesForOtherProjects
+  updateStatusesForOtherProjects,
+	replaceQueryStatus
 } = require('../services/memoqs/otherProjects');
+
 const { updateProjectFinanceOnDiscountsUpdate } = require('../projects');
 const _ = require('lodash');
+
+
 router.get('/users', async (req, res) => {
 	try {
 		const result = await getMemoqUsers();
@@ -276,6 +293,12 @@ router.post('/update-memoq-finance', async (req, res) => {
   const { id } = req.body;
   try {
     const neededProject = await getMemoqProject({ _id: id });
+		let { documents } = neededProject
+	  if(!documents.every(item => item.hasOwnProperty('metrics'))){
+		  documents = await documentsWithMetrics(documents, neededProject.serverProjectGuid)
+	  }
+	  neededProject.documents = documents
+
     const updatedProject = await updateMemoqProjectFinance(neededProject);
     res.send(updatedProject);
   } catch (err) {
@@ -287,6 +310,14 @@ router.post('/update-memoq-finance', async (req, res) => {
 router.get('/update-all-memoq-finance/:from', async (req, res) => {
   const { from } = req.params;
   try {
+	  const query = replaceQueryStatus(from)
+	  const projects = await MemoqProject.find(query);
+	  for (let { _id ,documents, serverProjectGuid} of projects){
+		  if(!documents.every(item => item.hasOwnProperty('metrics'))){
+			  documents = await documentsWithMetrics(documents, serverProjectGuid)
+			  await MemoqProject.updateOne({"_id": _id}, {documents})
+		  }
+	  }
     const updatedProjects = await updateAllMemoqProjects(from);
     res.send(updatedProjects);
   } catch (err) {

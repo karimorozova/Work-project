@@ -28,6 +28,7 @@
 				isDataRemain: false,
 				lastDate: null,
 				filters: {
+					idFilter: '',
 					clientFilter: '',
 					pmFilter: '',
 					startFilter: '',
@@ -91,6 +92,7 @@
 		computed: {
 			allFilters() {
 				return {
+					idFilter: this.filters.idFilter,
 					clientFilter: this.filters.clientFilter,
 					pmFilter: this.filters.pmFilter,
 					startFilter: this.filters.startFilter,

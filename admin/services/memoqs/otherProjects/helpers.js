@@ -33,8 +33,13 @@ const filterMemoqProjectsVendors = users => {
   let usersFullName = [];
   documents.forEach((item) => {
     if (checkDocumentHasCorrectStructure(item)) {
-      item = item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.map(i => i.UserInfoHeader)
-        .map(i => i.FullName);
+      const structuredItem = Array.isArray(item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails) ?
+          item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails :
+          [item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails]
+
+      item = structuredItem
+          .map(i => i.UserInfoHeader)
+          .map(i => i.FullName);
       usersFullName.push(item);
     }
   });

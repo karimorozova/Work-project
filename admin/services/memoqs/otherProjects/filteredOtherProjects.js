@@ -12,6 +12,10 @@ function getFilteredProjectQuery(filters) {
   if (filters.lastDate) {
     query.creationTime = { $lt: new Date(filters.lastDate) };
   }
+  if (filters.idFilter) {
+    const filter = filters.idFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    query.name = { '$regex': new RegExp( filter , 'i') };
+  }
   if (filters.clientFilter) {
     query.client = { '$regex': new RegExp(`${filters.clientFilter}`, 'i') };
   }
