@@ -7,7 +7,7 @@ async function getTierInfo() {
         tierInfo.forEach(tier => {
             tier.lqas.forEach(lqa => {
                 if (lqa.lqaName === 'tqi') return
-                result[lqa.lqaName] = {...result[lqa.lqaName], ['tier' + tier.tier]: lqa.minWordCount }
+                result[tier.tier] = {...result[tier.tier], [lqa.lqaName]: lqa.minWordCount }
             })
         })
         return result;
@@ -19,16 +19,12 @@ async function getTierInfo() {
 
 async function updateTierInfo(updatedInfo) {
     try {
-        const tierInfo = await TierInfo.find().sort({'tier': 1});
-        tierInfo.forEach(tier => {
-            const findedTier = tier.lqas.find(lqa => {
-                return lqa.lqaName === updatedInfo.index
-            } )
-            if (findedTier.minWordCount === updatedInfo['currentTier' + tier.tier]) return
-            findedTier.minWordCount = updatedInfo['currentTier' + tier.tier]
-
-            tier.save()
+        const tierInfo = await TierInfo.findOne({tier: updatedInfo.index});
+        tierInfo.lqas.map(lqa => {
+            lqa.minWordCount =  updatedInfo[lqa.lqaName]
+            return lqa
         })
+        tierInfo.save()
     } catch(err){
         console.log(err);
         console.log('Error in updateTierInfo func');
