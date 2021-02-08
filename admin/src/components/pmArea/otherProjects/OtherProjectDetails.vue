@@ -160,7 +160,7 @@
     &__all-info {
       width: 960px;
       padding: 20px;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     }
 
     &__info-row {
@@ -350,9 +350,9 @@
   }
 
   .fa {
-    font-size: 26px;
+    font-size: 20px;
     color: #938676;
-    transition: all 0.3s;
+    transition: ease 0.2s;
     cursor: pointer;
   }
 

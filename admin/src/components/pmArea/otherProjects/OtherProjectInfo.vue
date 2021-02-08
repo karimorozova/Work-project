@@ -32,12 +32,12 @@
 </template>
 
 <script>
-	import OtherProjectDetails from "./OtherProjectDetails";
-	import OtherTasksAndSteps from "./OtherTasksAndSteps";
-	import { mapActions } from "vuex";
-	import OtherProjectSubInformation from "./OtherProjectSubInformation";
-	import OtherProjectAction from "./OtherProjectAction";
-	import OtherProjectFinanceBlock from "./OtherProjectFinanceBlock";
+	import OtherProjectDetails from "./OtherProjectDetails"
+	import OtherTasksAndSteps from "./OtherTasksAndSteps"
+	import { mapActions } from "vuex"
+	import OtherProjectSubInformation from "./OtherProjectSubInformation"
+	import OtherProjectAction from "./OtherProjectAction"
+	import OtherProjectFinanceBlock from "./OtherProjectFinanceBlock"
 
 	export default {
 		data() {
@@ -46,64 +46,74 @@
 				projectId: "",
 				projectName: "",
 				projectSteps: [],
-				isUpdateProject: false,
-			};
+				isUpdateProject: false
+			}
 		},
 		methods: {
-			...mapActions(["alertToggle"]),
+			...mapActions([ "alertToggle" ]),
 			refreshProject(project) {
 				this.project = project
 			},
 			updateProject(data) {
-				this.project = data;
-				this.isUpdateProject = true;
+				this.project = data
+				this.isUpdateProject = true
 				setTimeout(() => {
-					this.isUpdateProject = false;
+					this.isUpdateProject = false
 				}, 500)
 			},
 			async getProjectSteps(id) {
 				try {
-					const result = await this.$http.get(`/memoqapi/other-project?id=${ id }`);
-					const tasks = result.data.documents.reduce((acc, curr) => {
-						for (let i = 0; i < 2; i++)
-							curr.UserAssignments.TranslationDocumentUserRoleAssignmentDetails[i].langSymbol = curr.TargetLangCode
-						acc.push({ ...curr });
-						return acc
-					}, []);
-					this.projectSteps = tasks.map(item => item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails).flat();
+					const result = await this.$http.get(`/memoqapi/other-project?id=${ id }`)
+					const { data: { documents } } = result
+					let steps = []
+					if (documents.every(item => !Array.isArray(item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails))) {
+						steps = documents.reduce((acc, curr) => {
+							curr.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.langSymbol = curr.TargetLangCode
+							acc.push({ ...curr })
+							return acc
+						}, [])
+					} else {
+						steps = documents.reduce((acc, curr) => {
+							for (let i = 0; i < 2; i++)
+								curr.UserAssignments.TranslationDocumentUserRoleAssignmentDetails[i].langSymbol = curr.TargetLangCode
+							acc.push({ ...curr })
+							return acc
+						}, [])
+					}
+					this.projectSteps = steps.map(item => item.UserAssignments.TranslationDocumentUserRoleAssignmentDetails).flat()
 				} catch (err) {
 					this.alertToggle({
 						message: "Can't get steps",
 						isShow: true,
 						type: "error"
-					});
+					})
 				}
 			},
 			async getProject(id) {
 				try {
-					const result = await this.$http.get(`/memoqapi/other-project?id=${ id }`);
-					this.project = result.data;
+					const result = await this.$http.get(`/memoqapi/other-project?id=${ id }`)
+					this.project = result.data
 					this.projectId = /(.*])\s- /gm.exec(result.data.name) ?
 							/(.*])\s- /gm.exec(result.data.name)[1] :
-							'';
+							''
 					this.projectName = / - (.*)/gm.exec(result.data.name) ?
 							/ - (.*)/gm.exec(result.data.name)[1] :
-							result.data.name;
+							result.data.name
 
 				} catch (err) {
 					this.alertToggle({
 						message: "Can't get project",
 						isShow: true,
 						type: "error"
-					});
+					})
 				}
 			}
 		},
 		beforeRouteEnter(to, from, next) {
 			next(vm => {
-				vm.getProject(to.params.id);
-				vm.getProjectSteps(to.params.id);
-			});
+				vm.getProject(to.params.id)
+				vm.getProjectSteps(to.params.id)
+			})
 		},
 		components: {
 			OtherProjectAction,
@@ -112,7 +122,7 @@
 			OtherTasksAndSteps,
 			OtherProjectFinanceBlock
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -132,13 +142,6 @@
       display: flex;
       align-items: flex-start;
       box-sizing: border-box;
-    }
-
-    &__action {
-      /*width: 20%;*/
-      /*@media (max-width: 1600px) {*/
-      /*  width: 23%;*/
-      /*}*/
     }
 
     &__preview {

@@ -5,6 +5,7 @@
       InfoBlock(
         :step="step"
         :originallyUnits="originallyUnits"
+        :project="project"
       )
 </template>
 
@@ -17,6 +18,9 @@
 			step: {
 				type: Object
       },
+			project: {
+				type: Object
+			},
 			originallyUnits: {
 				type: Array
 			},

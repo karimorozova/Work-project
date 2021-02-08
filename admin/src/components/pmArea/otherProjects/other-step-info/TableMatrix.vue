@@ -9,6 +9,7 @@
     )
       template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
         .tableMatrix__head-title {{ field.label }}
+
       template(slot="empty", slot-scope="{ row, index }")
         .tableMatrix__data {{ row.text }}
       template(slot="1", slot-scope="{ row, index }")
@@ -22,9 +23,9 @@
 </template>
 
 <script>
-	import DataTable from "../../../DataTable";
-	import {mapGetters} from "vuex";
-	import {isInteger} from "lodash";
+	import DataTable from "../../../DataTable"
+	import { mapGetters } from "vuex"
+	import { isInteger } from "lodash"
 
 	export default {
 		props: {
@@ -32,8 +33,11 @@
 				type: Object
 			},
 			selectedTab: {
-				type: String,
+				type: String
 			},
+			project: {
+				type: Object
+			}
 		},
 		data() {
 			return {
@@ -42,28 +46,28 @@
 						label: "",
 						headerKey: "headerEmpty",
 						key: "empty",
-						width: "25%",
+						width: "25%"
 					},
 					{
 						label: "%",
 						headerKey: "headerTranslated",
 						key: "1",
-						width: "25%",
+						width: "25%"
 					},
 					{
 						label: "Source Word",
 						headerKey: "headerRepetitions",
 						key: "2",
-						width: "25%",
+						width: "25%"
 					},
 					{
 						label: "Rate",
 						headerKey: "headerContextMatch",
 						key: "3",
-						width: "25%",
-					},
+						width: "25%"
+					}
 				],
-				tableData: [],
+				tableData: []
 			}
 		},
 		components: {
@@ -71,46 +75,41 @@
 		},
 		methods: {
 			findCurrentTask() {
-				return this.currentProject.tasks.find(task => task.taskId === this.step.taskId)
-      },
-      getStepMetrics () {
-        const { metrics } = this.findCurrentTask();
-        return metrics;
-      },
-      changeFormatForMetrics () {
-        let arrayOfMetrics = [];
-        const subtitles = {
-          subtitles: ["%", "Source Word", "Rate"]
-        };
-        for (let iterator in this.getStepMetrics()) {
-          arrayOfMetrics.push(
-            Object.assign(this.getStepMetrics()[iterator], subtitles)
-          );
-        }
-        return arrayOfMetrics;
-      },
-      calculatedRate (rate, wordCount) {
-        const currentNumber = (rate * wordCount) / 100;
-        return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(3);
-      },
-      buildMatrixArray () {
-        let matrixArr = this.changeFormatForMetrics();
-        if (!matrixArr[matrixArr.length - 1].hasOwnProperty('client')) {
-          matrixArr.pop();
-        }
-        this.tableData = matrixArr;
-      }
-    },
-    computed: {
-      ...mapGetters({
-        currentProject: "getCurrentProject",
-      }),
-    },
-    mounted () {
-      this.buildMatrixArray();
-    }
+				return this.project.tasks.find(task => task.taskId === this.step.taskId)
+			},
+			getStepMetrics() {
+				const { metrics } = this.findCurrentTask()
+				return metrics
+			},
+			changeFormatForMetrics() {
+				let arrayOfMetrics = []
+				const subtitles = {
+					subtitles: [ "%", "Source Word", "Rate" ]
+				}
+				for (let iterator in this.getStepMetrics()) {
+					arrayOfMetrics.push(
+							Object.assign(this.getStepMetrics()[iterator], subtitles)
+					)
+				}
+				return arrayOfMetrics
+			},
+			calculatedRate(rate, wordCount) {
+				const currentNumber = (rate * wordCount) / 100
+				return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(1)
+			},
+			buildMatrixArray() {
+				let matrixArr = this.changeFormatForMetrics()
+				if (!matrixArr[matrixArr.length - 1].hasOwnProperty('client')) {
+					matrixArr.pop()
+				}
+				this.tableData = matrixArr
+			}
+		},
+		mounted() {
+			this.buildMatrixArray()
+		}
 
-  }
+	}
 </script>
 
 <style lang="scss" scoped>

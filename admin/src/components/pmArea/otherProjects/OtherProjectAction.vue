@@ -5,6 +5,7 @@
       .drops__label Update project:
       .drops__menu
         .drops__refresh-button(@click="refreshProject")
+          img(src="../../../assets/images/refresh-icon.png")
 
     .drops__item
       .drops__label Account Manager:
@@ -26,53 +27,53 @@
 </template>
 
 <script>
-	import SelectSingle from "../../SelectSingle";
-	import Button from "../../Button";
-	import { mapActions } from "vuex";
-	import ApproveModal from "../../ApproveModal";
+	import SelectSingle from "../../SelectSingle"
+	import Button from "../../Button"
+	import { mapActions } from "vuex"
+	import ApproveModal from "../../ApproveModal"
 
 	export default {
 		props: {
 			project: {
 				type: Object
-			},
+			}
 		},
 		data() {
 			return {
-				managers: [],
-			};
+				managers: []
+			}
 		},
 		methods: {
 			async refreshProject() {
 				try {
 					const result = await this.$http.post('/memoqapi/update-memoq-finance', {
 						id: this.project._id
-					});
-					this.$emit('refreshCurrProject', result.data);
+					})
+					this.$emit('refreshCurrProject', result.data)
 				} catch (err) {
 					this.alertToggle({
 						message: "Server Error / Cannot update Project",
 						isShow: true,
 						type: "error"
-					});
+					})
 				} finally {
 					this.alertToggle({
 						message: "Project update",
 						isShow: true,
 						type: "success"
-					});
+					})
 				}
 			},
 			...mapActions({
-				alertToggle: "alertToggle",
+				alertToggle: "alertToggle"
 			})
 		},
 		components: {
 			ApproveModal,
 			SelectSingle,
 			Button
-		},
-	};
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -80,7 +81,7 @@
 
   .project-action {
     padding: 20px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     box-sizing: border-box;
     width: 390px;
     display: flex;
@@ -92,10 +93,14 @@
       position: relative;
 
       &__refresh-button {
-        background-image: url("../../../assets/images/refresh-icon.png");
-        width: 24px;
-        height: 20px;
+        width: 20px;
         cursor: pointer;
+        margin-top: 5px;
+        height: 20px;
+
+        img {
+          width: 100%;
+        }
       }
 
       &__menu {

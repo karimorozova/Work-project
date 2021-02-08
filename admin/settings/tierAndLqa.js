@@ -1,4 +1,4 @@
-const { TierInfo } = require('../models');
+const { TierInfo, IndustryTierInfo } = require('../models');
 
 async function getTierInfo() {
     try {
@@ -13,7 +13,7 @@ async function getTierInfo() {
         return result;
     } catch(err) {
         console.log(err);
-        console.log("Error in createNewIndustry function");
+        console.log("Error in getTierInfo function");
     }
 }
 
@@ -31,8 +31,53 @@ async function updateTierInfo(updatedInfo) {
         })
     } catch(err){
         console.log(err);
-        console.log('Error in deleteIndustryFiles func');
+        console.log('Error in updateTierInfo func');
     }
 }
 
-module.exports = { getTierInfo, updateTierInfo };
+async function getIndustryTier() {
+    try {
+        const industryTier = await IndustryTierInfo.find({industry: {$ne: null}}).sort({'industry.name': 1}).populate('industry', 'name')
+        const industryTierAllIndustry = await IndustryTierInfo.findOne({industry:  null})
+
+        const allIndustry = {
+            industry: {name: "All industry"},
+            _id: industryTierAllIndustry._id,
+            tier1: industryTierAllIndustry.tier1,
+            tier3: industryTierAllIndustry.tier3
+        }
+
+        return [allIndustry, ...industryTier]
+    } catch (e) {
+        console.log(err);
+        console.log('Error in getIndustryTier func');
+    }
+}
+
+async function updateIndustryTier(industryUpdate) {
+    const industryId = industryUpdate.index || null
+    try {
+        const industryTier = await IndustryTierInfo.findOne({industry: industryId})
+        industryTier.tier1 = industryUpdate.currentTier1
+        industryTier.tier3 = industryUpdate.currentTier3
+
+        await industryTier.save()
+
+    } catch (e) {
+        console.log(err);
+        console.log('Error in updateIndustryTier func');
+    }
+}
+
+async function createIndustryTier(industryId){
+    const tierAllIndustry = await IndustryTierInfo.findOne({industry:  null})
+    const newTierIndustry = {
+        industry: industryId,
+        tier1: tierAllIndustry.tier1,
+        tier3: tierAllIndustry.tier3
+    }
+
+    await IndustryTierInfo.create(newTierIndustry)
+}
+
+module.exports = { getTierInfo, updateTierInfo, getIndustryTier, updateIndustryTier, createIndustryTier };

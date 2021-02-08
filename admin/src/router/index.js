@@ -60,6 +60,7 @@ import VendorsCandidatesTests from '@/components/vendors/VendorsCandidatesTests'
 import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
+import IndustryLqa from '@/components/Table/IndustryLqa'
 import { store } from '../vuex/store'
 
 Vue.use(Router)
@@ -185,6 +186,11 @@ const router = new Router({
                             path: 'tiers-lqas',
                             name: 'tiers-lqas',
                             component: TierLqas
+                        },
+                        {
+                            path: 'industry-lqas',
+                            name: 'industry-lqas',
+                            component: IndustryLqa,
                         },
                         {
                             path: 'pricelist/:id',

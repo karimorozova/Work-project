@@ -251,7 +251,7 @@
   .project-finance {
     box-sizing: border-box;
     min-width: 1000px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
     margin: 40px;
 
     &_reverse {

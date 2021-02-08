@@ -45,7 +45,8 @@ const checkDocumentHasCorrectStructure = (document) => {
    return document.hasOwnProperty('UserAssignments') &&
      Object.entries(document.UserAssignments).length !== 0 &&
      document.UserAssignments.constructor === Object &&
-     !!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length;
+       (!!document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails.length ||
+           typeof document.UserAssignments.TranslationDocumentUserRoleAssignmentDetails === 'object');
 };
 
 const checkProjectStructure = (clients, vendors, memoqProject, documents) => {

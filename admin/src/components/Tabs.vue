@@ -1,50 +1,49 @@
 <template lang="pug">
-.tabs
+  .tabs
     .tabs__option(v-for="(tab, index) in tabs" @click="setTab(index)" :class="{'tabs_active': tab === selectedTab}") {{ tab }}
 </template>
 
 <script>
-export default {
-    props: {
-        tabs: {
-            type: Array
-        },
-        selectedTab: {
-            type: String
-        }
-    },
-    methods: {
-        setTab(index) {
-            this.$emit('setTab', { index });
-        }
-    }
-}
+	export default {
+		props: {
+			tabs: {
+				type: Array
+			},
+			selectedTab: {
+				type: String
+			}
+		},
+		methods: {
+			setTab(index) {
+				this.$emit('setTab', { index })
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/scss/colors.scss";
+  @import "../assets/scss/colors.scss";
 
-.tabs {
+  .tabs {
     display: flex;
     margin-top: 10px;
+
     &__option {
-        padding: 5px;
-        width: 10%;
-        min-width: 107px;
-        font-size: 14px;
-        border: 1px solid $brown-border;
-        border-bottom: none;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 3px;
-        background-color: $table-row-zebra-background;
-        box-shadow: inset 0 0 3px $brown-shadow;
-        cursor: pointer;
-        opacity: 0.6;
-        z-index: 0;
+      padding: 5px 7px;
+      min-width: 110px;
+      font-size: 14px;
+      border: 1px solid #938676;
+      border-bottom: none;
+      border-top-right-radius: 10px;
+      background-color: #f2efeb;
+      cursor: pointer;
+      opacity: 0.6;
+      z-index: 0;
     }
+
     &_active {
-        background-color: $white;
-        opacity: 1;
+      background-color: $white;
+      opacity: 1;
     }
-}
+  }
 </style>

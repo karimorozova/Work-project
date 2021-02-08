@@ -5,7 +5,9 @@ const { getMemoqUsers } = require('./users');
 const { MemoqProject, Languages, Clients, Vendors } = require('../../models');
 const { createOtherProjectFinanceData, checkProjectStructure, doesAllTasksFinished, defineProjectStatus, clearGarbageProjects } = require('./otherProjects');
 const { findLanguageByMemoqLanguageCode } = require('../../helpers/commonFunctions');
+const { getMemoqMetrics, getMemoqMetricsForUndefinedDocuments } = require('../../helpers/projectMetrics')
 const moment = require('moment');
+const _ = require("lodash");
 
 const url = 'https://memoq.pangea.global:8080/memoQServices/ServerProject/ServerProjectService';
 const headerWithoutAction = getHeaders('IServerProjectService');
@@ -530,6 +532,48 @@ async function renameMemoqProject(projectId, name) {
 //     }
 // }
 
+async function listAnalysisReports(projectId) {
+	const xml = `${ xmlHeader }
+                <soapenv:Body>
+						      <ns:ListAnalysisReports>
+						         <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+						      </ns:ListAnalysisReports>
+                </soapenv:Body>
+            </soapenv:Envelope>`
+	const headers = headerWithoutAction('ListAnalysisReports');
+	try {
+		const { response } = await soapRequest({ url, headers, xml });
+		const result = parser.toJson(response.body, { object: true, sanitize: true, trim: true })["s:Envelope"]["s:Body"];
+		return result.ListAnalysisReportsResponse.ListAnalysisReportsResult.AnalysisReportInfo
+	} catch (err) {
+		console.log("Error in listAnalysisReports");
+		console.log(err);
+		return []
+		// throw new Error(err.message);
+	}
+}
+
+async function getAnalysisReportData(projectId, reportId) {
+	const xml = `${ xmlHeader }
+                <soapenv:Body>
+                      <ns:GetAnalysisReportData>
+							         <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+							         <ns:reportId>${reportId}</ns:reportId>
+							      </ns:GetAnalysisReportData>
+                </soapenv:Body>
+            </soapenv:Envelope>`
+	const headers = headerWithoutAction('GetAnalysisReportData');
+	try {
+		const { response } = await soapRequest({ url, headers, xml });
+		const result = parser.toJson(response.body, { object: true, sanitize: true, trim: true })["s:Envelope"]["s:Body"];
+		return result.GetAnalysisReportDataResponse.GetAnalysisReportDataResult.ResultsForTargetLangs
+	} catch (err) {
+		console.log("Error in GetAnalysisReportData");
+		console.log(err);
+		throw new Error(err.message);
+	}
+}
+
 async function getMemoqFileId(projectId, docId) {
 	const xml = `${ xmlHeader }
             <soapenv:Body>
@@ -561,38 +605,105 @@ async function getMemoqFileId(projectId, docId) {
 	}
 }
 
+async function documentsWithMetrics(documents, ServerProjectGuid){
+	let reportsIds = await listAnalysisReports(ServerProjectGuid)
+
+	if(documents.every(item => item.hasOwnProperty('metrics'))) return documents
+	if(!Array.isArray(reportsIds)) reportsIds = [reportsIds]
+
+	const [firstElem] = reportsIds
+	if(firstElem === undefined){
+		for (let i = 0; i < documents.length; i++) {
+			documents[i].metrics = getMemoqMetricsForUndefinedDocuments(documents[i].WeightedWords)
+		}
+		return  documents
+	}
+
+	let preTranslationIds = reportsIds
+			.filter(({CreatedBy}) => CreatedBy === '*pre-translation*')
+			.map(({ID}) => ID )
+
+	if (!preTranslationIds.length){
+		preTranslationIds = reportsIds
+				.filter(({CreatedBy}) => CreatedBy)
+				.map(({ID}) => ID)
+	}
+
+	const totalArrayOfDocuments = await preTranslationIds
+			.reduce(async (acc, curr) => {
+				const { AnalysisResultForLang } = await getAnalysisReportData(ServerProjectGuid, curr)
+				if(AnalysisResultForLang) (await acc).push(AnalysisResultForLang)
+				return acc
+			}, [])
+
+	let AnalysisResultForEachDocument = _.flatten(totalArrayOfDocuments)
+			.map(({ByDocument}) => ByDocument.AnalysisReportForDocument)
+
+	if (AnalysisResultForEachDocument.some(item => Array.isArray(item))){
+		AnalysisResultForEachDocument = _.flatten(AnalysisResultForEachDocument)
+	}
+
+	for (let i = 0; i < documents.length; i++) {
+		const docMetrics = AnalysisResultForEachDocument
+				.find(item => item.DocumentGuid === documents[i].DocumentGuid)
+
+		if(docMetrics){
+			const { Summary } = docMetrics;
+			const metrics = Object.keys(Summary).reduce((acc, cur) => {
+				const { SourceWordCount } = Summary[cur];
+				return cur !== 'Fragments' ? { ...acc, [cur]: +SourceWordCount } : acc
+			}, {});
+			documents[i].metrics = getMemoqMetrics(metrics)
+		}else{
+			documents[i].metrics = getMemoqMetricsForUndefinedDocuments(documents[i].WeightedWords)
+		}
+	}
+
+	return documents
+}
+
+async function updateMemoqProjectsData() {
+	const clients = await Clients.find();
+	const vendors = await Vendors.find();
+	const allProjectsInSystem = await MemoqProject.find();
+
+	for (let project of allProjectsInSystem) {
+		let { _id, documents, serverProjectGuid } = project
+		documents = await documentsWithMetrics(documents, serverProjectGuid)
+
+		project = checkProjectStructure(clients, vendors, project, documents) ?
+				await createOtherProjectFinanceData({ project: project, documents }, true) :
+				project;
+		project.documents = documents
+		await MemoqProject.updateOne({ _id: _id }, project)
+	}
+}
+
 async function downloadFromMemoqProjectsData() {
 	try {
 		let allProjects = await getMemoqAllProjects();
-		const clients = await Clients.find();
-		const vendors = await Vendors.find();
 		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1, xtm: 1, iso: 1, iso2: 1 });
 		const allProjectsInSystem = await MemoqProject.find();
 
 		for (let project of allProjects) {
 			const { ServerProjectGuid } = project;
-			const documents = await getProjectTranslationDocs(ServerProjectGuid);
+			let documents = await getProjectTranslationDocs(ServerProjectGuid);
 			if(project.Name.indexOf('PngSys') === -1 && !!documents) {
 				const isProjectExistInSystem = allProjectsInSystem.map(({ serverProjectGuid }) => serverProjectGuid).includes(ServerProjectGuid);
 				let users = await getProjectUsers(ServerProjectGuid);
 				users = getUpdatedUsers(users);
-
 				let memoqProject = getMemoqProjectData(project, languages, isProjectExistInSystem);
-				if(!isProjectExistInSystem) {
-					memoqProject = checkProjectStructure(clients, vendors, memoqProject, documents) ?
-							await createOtherProjectFinanceData({ project: memoqProject, documents }, true) :
-							memoqProject;
-				}
+
 				await MemoqProject.updateOne({ serverProjectGuid: ServerProjectGuid }, { ...memoqProject, users, documents }, { upsert: true })
 			}
 		}
-
 	} catch (err) {
 		console.log('Error in downloadFromMemoqProjectsData');
 		console.log(err);
 		throw new Error(err.message);
 	} finally {
 		await clearGarbageProjects(true);
+		await updateMemoqProjectsData()
 	}
 }
 

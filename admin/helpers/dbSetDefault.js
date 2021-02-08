@@ -17,7 +17,8 @@ const {
   Units,
   CurrencyRatio,
   Discounts,
-  TierInfo
+  TierInfo,
+  IndustryTierInfo
 } = require('../models');
 
 const {
@@ -38,7 +39,8 @@ const {
   defaultInstructions,
   defaultLeadSources,
   defaultDiscounts,
-  defaultTierInfo
+  defaultTierInfo,
+  defaultIndustryTierInfo,
 } = require('./defaults');
 
 const { saveDefaultLabels } = require('../gmail');
@@ -495,6 +497,21 @@ async function fillTierInfo() {
   }
 }
 
+async function fillIndustryTierInfo() {
+  try {
+    const industryTierCount = await IndustryTierInfo.countDocuments()
+    if (industryTierCount > 0) return
+    let result = [defaultIndustryTierInfo]
+    const industries = await Industries.find()
+    industries.forEach(industry => {
+      result.push({...defaultIndustryTierInfo, industry: industry._id})
+    })
+    await IndustryTierInfo.create(result)
+  } catch (e) {
+
+  }
+}
+
 
 async function checkCollections () {
   await fillInstructions();
@@ -513,6 +530,7 @@ async function checkCollections () {
   await fillCurrencyRatio();
   await fillPricelist();
   await fillTierInfo()
+  await fillIndustryTierInfo()
   // await clients();
   // await vendors();
 }
