@@ -1,10 +1,10 @@
 <template lang="pug">
   .table
     .table__thead(:class="headerClass")
-      .table__thead-row(:class="{'tbody_visible-overflow': tableData.length < rowCount}")
+      .table__thead-row(:class="{'tbody_visible-overflow': (tableData.length || 1) < rowCount }")
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="[bodyClass, {'tbody_visible-overflow': tableData.length < rowCount}]")
+    .table__tbody(:class="[bodyClass, {'tbody_visible-overflow': (tableData.length || 1) < rowCount  }]")
       .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
@@ -109,7 +109,7 @@
 
     &__tbody {
       max-height: 600px;
-      overflow-y: auto;
+      overflow-y: scroll;
       margin-bottom: 20px;
       border: 0.5px solid $cell-border;
       border-bottom: 1px solid $cell-border;

@@ -5,6 +5,7 @@
       :tableData="industryTier"
       :errors="errors"
       :areErrors="areErrors"
+      :rowCount="17"
       @closeErrors="closeErrors"
     )
       .industrylqas__head-title(slot="headerCategory" slot-scope="{ field }") {{ field.label }}
@@ -14,31 +15,34 @@
       .industrylqas__data(slot="category" slot-scope="{ row, index }") {{row.industry.name}}
       template(slot="tier1" slot-scope="{ row, index }")
         .industrylqas__data.center(v-if="currentActive !== index")
-          span  Over
+          span.industrylqas__secondary-text  Over
           span.industrylqas_bold.industrylqas__output {{row.tier1}}
-          span  Wordcount
+          span.industrylqas__secondary-text  Wordcount
         .industrylqas__editing-data(v-else)
-          span Over
+          span.industrylqas__secondary-text Over
           input.industrylqas_bold.industrylqas__data-input(type="number" v-model="currentTier1")
-          span Wordcount
+          span.industrylqas__secondary-text Wordcount
       template(slot="tier2" slot-scope="{ row, index }")
-        .industrylqas__no-editable-data Between
+        .industrylqas__no-editable-data
+          span.industrylqas__secondary-text Between
           span.industrylqas_bold.industrylqas__output {{row.tier3}}
-          span to
+          span.industrylqas__secondary-text to
           span.industrylqas_bold.industrylqas__output {{row.tier1}}
-          span Wordcount
+          span.industrylqas__secondary-text Wordcount
       template(slot="tier3" slot-scope="{ row, index }")
         .industrylqas__data.center(v-if="currentActive !== index")
-          span Under
+          span.industrylqas__secondary-text Under
           span.industrylqas_bold.industrylqas__output {{row.tier3}}
-          span Wordcount
+          span.industrylqas__secondary-text Wordcount
         .industrylqas__editing-data(v-else)
-          span Under
+          span.industrylqas__secondary-text Under
           input.industrylqas_bold.industrylqas__data-input(type="number" v-model="currentTier3")
-          span Wordcount
+          span.industrylqas__secondary-text Wordcount
       template(slot="icons" slot-scope="{ row, index }")
-        .industrylqas__icons
+        .industrylqas__icons(v-if="isAdmin")
           img.industrylqas__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'industrylqas_opacity': isActive(key, index)}")
+        .industrylqas__icons(v-else)
+          img(src="../../assets/images/lock.png")
 
 </template>
 
@@ -52,9 +56,9 @@ export default {
   data() {
     return {
       fields: [
-        { label: "Name", headerKey: "headerCategory", key: "category", width: "20%", padding: "0" },
+        { label: "Name", headerKey: "headerCategory", key: "category", width: "23%", padding: "0" },
         { label: "Tier 1", headerKey: "headerLqa1", key: "tier1", width: "20%", padding: "0" },
-        { label: "Tier 2", headerKey: "headerLqa2", key: "tier2", width: "30%", padding: "0" },
+        { label: "Tier 2", headerKey: "headerLqa2", key: "tier2", width: "27%", padding: "0" },
         { label: "Tier 3", headerKey: "headerLqa3", key: "tier3", width: "20%", padding: "0" },
         { label: "", headerKey: "headerLqa3", key: "icons", width: "10%", padding: "0" }
       ],
@@ -149,9 +153,18 @@ export default {
     SettingsTable
   },
   computed: {
+    ...mapGetters({
+      user: 'getUser'
+    }),
     manageIcons() {
       const { "delete": del, ...result } = this.icons
       return result
+    },
+    isAdmin() {
+      if (this.user && this.user.group) {
+        const { group: { name } } = this.user
+        return name === 'Administrators' || name === 'Developers'
+      }
     }
   },
   created() {
@@ -214,6 +227,10 @@ export default {
     }
   }
 
+  &__secondary-text{
+    opacity: 0.6;
+  }
+
   &__icons {
     padding-top: 3px;
     display: flex;
@@ -224,7 +241,7 @@ export default {
   &__icon {
     cursor: pointer;
     opacity: 0.5;
-    margin-right: 8px;
+    margin: 0 3px;
   }
 
   &_opacity {
