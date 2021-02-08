@@ -11,19 +11,19 @@
       .tierlqas__head-title(slot="headerLqa1" slot-scope="{ field }") {{ field.label }}
       .tierlqas__head-title(slot="headerLqa2" slot-scope="{ field }") {{ field.label }}
       .tierlqas__head-title(slot="headerLqa3" slot-scope="{ field }") {{ field.label }}
-      .tierlqas__data(slot="category" slot-scope="{ row, index }") {{index}}
+      .tierlqas__data(slot="category" slot-scope="{ row, index }") Tier {{index}}
       template(slot="tier1" slot-scope="{ row, index }")
-        .tierlqas__data(v-if="currentActive !== index") {{row.tier1}}
+        .tierlqas__data(v-if="currentActive !== index") {{row['Lqa 1']}}
         .tierlqas__editing-data(v-else)
-          input.tierlqas__data-input(type="number" v-model="currentTier1")
+          input.tierlqas__data-input(type="number" v-model="currentLqa1")
       template(slot="tier2" slot-scope="{ row, index }")
-        .tierlqas__data(v-if="currentActive !== index") {{row.tier2}}
+        .tierlqas__data(v-if="currentActive !== index") {{row['Lqa 2']}}
         .tierlqas__editing-data(v-else)
-          input.tierlqas__data-input(type="number" v-model="currentTier2")
+          input.tierlqas__data-input(type="number" v-model="currentLqa2")
       template(slot="tier3" slot-scope="{ row, index }")
-        .tierlqas__data(v-if="currentActive !== index") {{row.tier3}}
+        .tierlqas__data(v-if="currentActive !== index") {{row['Lqa 3']}}
         .tierlqas__editing-data(v-else)
-          input.tierlqas__data-input(type="number" v-model="currentTier3")
+          input.tierlqas__data-input(type="number" v-model="currentLqa3")
       template(slot="icons" slot-scope="{ row, index }")
         .tierlqas__icons
           img.tierlqas__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'tierlqas_opacity': isActive(key, index)}")
@@ -41,9 +41,9 @@ export default {
     return {
       fields: [
         { label: "Name", headerKey: "headerCategory", key: "category", width: "25%", padding: "0" },
-        { label: "Tier 1", headerKey: "headerLqa1", key: "tier1", width: "25%", padding: "0" },
-        { label: "Tier 2", headerKey: "headerLqa2", key: "tier2", width: "25%", padding: "0" },
-        { label: "Tier 3", headerKey: "headerLqa3", key: "tier3", width: "25%", padding: "0" },
+        { label: "Lqa 1", headerKey: "headerLqa1", key: "tier1", width: "25%", padding: "0" },
+        { label: "Lqa 2", headerKey: "headerLqa2", key: "tier2", width: "25%", padding: "0" },
+        { label: "Lqa 3", headerKey: "headerLqa3", key: "tier3", width: "25%", padding: "0" },
         { label: "", headerKey: "headerLqa3", key: "icons", width: "25%", padding: "0" }
       ],
       tierInfo: {},
@@ -87,17 +87,17 @@ export default {
     },
     setEditingData(index) {
       this.currentActive = index;
-      this.currentTier1 = this.tierInfo[index].tier1
-      this.currentTier2 = this.tierInfo[index].tier2
-      this.currentTier3 = this.tierInfo[index].tier3
+      this.currentLqa1 = this.tierInfo[index]['Lqa 1']
+      this.currentLqa2 = this.tierInfo[index]['Lqa 2']
+      this.currentLqa3 = this.tierInfo[index]['Lqa 3']
     },
 
     async checkErrors(index){
       if(this.currentActive === -1) return;
       this.errors = [];
-      if(!this.currentTier1 || !this.isDigit(this.currentTier1)) this.errors.push("Please, enter numeric value tier 1");
-      if(!this.currentTier2 || !this.isDigit(this.currentTier2)) this.errors.push("Please, enter numeric value tier 2");
-      if(!this.currentTier3 || !this.isDigit(this.currentTier3)) this.errors.push("Please, enter numeric value tier 3");
+      if(!this.currentLqa1 || !this.isDigit(this.currentLqa1)) this.errors.push("Please, enter numeric value tier 1");
+      if(!this.currentLqa2 || !this.isDigit(this.currentLqa2)) this.errors.push("Please, enter numeric value tier 2");
+      if(!this.currentLqa3 || !this.isDigit(this.currentLqa3)) this.errors.push("Please, enter numeric value tier 3");
       if(this.errors.length) {
         return this.areErrors = true;
       }
@@ -106,9 +106,9 @@ export default {
     async saveTierInfo(index) {
       const updatedTierInfo = {
         index,
-        currentTier1: this.currentTier1,
-        currentTier2: this.currentTier2,
-        currentTier3: this.currentTier3,
+        ["Lqa 1"]: this.currentLqa1,
+        ["Lqa 2"]: this.currentLqa2,
+        ["Lqa 3"]: this.currentLqa3,
       }
       try {
         await this.$http.put("/api-settings/update-tier-info", {updatedTierInfo});
@@ -127,9 +127,9 @@ export default {
     },
     setDefaults() {
       this.currentActive = -1;
-      this.currentTier1 = ''
-      this.currentTier2 = ''
-      this.currentTier3 = ''
+      this.currentLqa1 = ''
+      this.currentLqa2 = ''
+      this.currentLqa3 = ''
     },
     ...mapActions({
       alertToggle: "alertToggle"
@@ -156,7 +156,7 @@ export default {
 
 .tierlqas {
   @extend %setting-table;
-  width: 900px;
+  width: 550px;
 
   &__data, &__editing-data {
     height: 32px;
@@ -196,7 +196,7 @@ export default {
   &__icon {
     cursor: pointer;
     opacity: 0.5;
-    margin-right: 8px;
+    margin: 0 4px;
   }
 
   &_opacity {
