@@ -216,7 +216,7 @@
     &__drop-menu {
       position: relative;
       width: 166px;
-      height: 28px;
+      height: 32px;
     }
 
     &_medium-menu {
@@ -229,8 +229,8 @@
 
     &__text-input {
       padding: 0 5px;
-      width: 150px;
-      height: 28px;
+      width: 154px;
+      height: 30px;
       outline: none;
       border: 1px solid #68573E;
       border-radius: 5px;

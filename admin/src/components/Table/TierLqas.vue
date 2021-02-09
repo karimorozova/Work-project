@@ -41,9 +41,9 @@ export default {
     return {
       fields: [
         { label: "Name", headerKey: "headerCategory", key: "category", width: "25%", padding: "0" },
-        { label: "Lqa 1", headerKey: "headerLqa1", key: "tier1", width: "25%", padding: "0" },
-        { label: "Lqa 2", headerKey: "headerLqa2", key: "tier2", width: "25%", padding: "0" },
-        { label: "Lqa 3", headerKey: "headerLqa3", key: "tier3", width: "25%", padding: "0" },
+        { label: "LQA 1", headerKey: "headerLqa1", key: "tier1", width: "25%", padding: "0" },
+        { label: "LQA 2", headerKey: "headerLqa2", key: "tier2", width: "25%", padding: "0" },
+        { label: "LQA 3", headerKey: "headerLqa3", key: "tier3", width: "25%", padding: "0" },
         { label: "", headerKey: "headerLqa3", key: "icons", width: "25%", padding: "0" }
       ],
       tierInfo: {},

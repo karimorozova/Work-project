@@ -96,6 +96,7 @@
 
   .table {
     width: 100%;
+    cursor: default;
 
     &__thead {
       border: 0.5px solid $thead-background;

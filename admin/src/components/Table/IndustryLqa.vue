@@ -56,11 +56,11 @@ export default {
   data() {
     return {
       fields: [
-        { label: "Name", headerKey: "headerCategory", key: "category", width: "23%", padding: "0" },
+        { label: "Name", headerKey: "headerCategory", key: "category", width: "19%", padding: "0" },
         { label: "Tier 1", headerKey: "headerLqa1", key: "tier1", width: "20%", padding: "0" },
-        { label: "Tier 2", headerKey: "headerLqa2", key: "tier2", width: "27%", padding: "0" },
+        { label: "Tier 2", headerKey: "headerLqa2", key: "tier2", width: "30%", padding: "0" },
         { label: "Tier 3", headerKey: "headerLqa3", key: "tier3", width: "20%", padding: "0" },
-        { label: "", headerKey: "headerLqa3", key: "icons", width: "10%", padding: "0" }
+        { label: "", headerKey: "headerLqa3", key: "icons", width: "11%", padding: "0" }
       ],
       industryTier: {},
       currentActive: -1,
@@ -179,17 +179,16 @@ export default {
 
 .industrylqas {
   @extend %setting-table;
-  width: 900px;
+  width: 950px;
 
   &__data, &__editing-data{
     height: 32px;
-    padding: 0 10px;
+    padding: 0 5px;
     display: flex;
     align-items: center;
     box-sizing: border-box;
     &.center {
-      text-align: center;
-      justify-content: space-between;
+      justify-content: center;
     }
   }
 
@@ -199,12 +198,10 @@ export default {
     display: flex;
     align-items: center;
     box-sizing: border-box;
-    text-align: center;
-    justify-content: center;
   }
 
   &__editing-data {
-    justify-content: space-between;
+    /*justify-content: space-between;*/
     box-shadow: inset 0 0 7px $brown-shadow
 
   }
@@ -252,6 +249,8 @@ export default {
   }
   &__output{
     padding: 0 5px;
+    width: 55px;
+    text-align: center;
   }
 }
 </style>

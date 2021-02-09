@@ -268,7 +268,7 @@
 
     &__text-input {
       padding: 0 5px;
-      width: 166px;
+      width: 154px;
       height: 30px;
       outline: none;
       border: 1px solid #68573e;
