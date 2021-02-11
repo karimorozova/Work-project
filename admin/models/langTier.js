@@ -23,6 +23,10 @@ const LangTierSchema = new mongoose.Schema({
         wordcount: {
           type: Number,
           default: 0
+        },
+        tier: {
+          type: Number,
+          default: 0
         }
       }]
     }]

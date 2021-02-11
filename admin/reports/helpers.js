@@ -4,6 +4,9 @@
  * @param {Object} filters
  * @returns {Array} - returns filtered or non-filtered reports
  */
+
+const { TierInfo } = require('../models')
+
 const filterTierReport = (reports, filters) => {
   let result;
   const filterKeys = Object.keys(filters);
@@ -232,9 +235,9 @@ const tiersInfo = {
   ],
 }
 
-const canNextLQAStep = (wordCount, nextStep, tier) => {
-  const a = tiersInfo[tier]
-  const index = a.find(({minWordCount}) =>  {
+const canNextLQAStep = async (wordCount, nextStep, tier) => {
+  const tierInfo = await TierInfo.findOne({tier})
+  const index = tierInfo.lqas.sort((a, b) => b.minWordCount - a.minWordCount).find(({minWordCount}) =>  {
     return  minWordCount <= Math.round(wordCount)
   });
   return index ? !index.allowSteps.includes(nextStep) : true

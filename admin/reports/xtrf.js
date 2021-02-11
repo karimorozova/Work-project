@@ -1,4 +1,4 @@
-const { Languages, XtrfLqa, Vendor, Step,XtrfLqaGrouped} = require('../models');
+const { Languages, XtrfLqa, Vendor, Step, XtrfLqaGrouped, IndustryTierInfo, TierInfo, LangTier } = require('../models');
 const {
   getFilteringQueryForLqaReport,
   getVendorsData,
@@ -26,7 +26,7 @@ const rebuildTierReportsStructure = (reports) => {
             .findIndex(item => item.source === curr.lang && item.target === target.lang);
           const industryObj = {
             [objName]: {
-              tier: getTierFromWordcount(Math.ceil(target.wordcount / 4), objName, curr.clients),
+              tier: target.tier,
               wordcount: Math.ceil(target.wordcount / 4),
               clients: curr.clients
             }
@@ -67,6 +67,16 @@ const rebuildTierReportsStructure = (reports) => {
  */
 const getXtrfLqaReport = async (filters) => {
   let { sourceFilter, targetFilter, vendorFilter, countFilter, skipCount, tierFilter, industryFilter } = filters;
+  const AllTiersInfo = await TierInfo.find()
+
+  const tiersInfo = AllTiersInfo.reduce((acc, tierInfo) => {
+    acc[tierInfo.tier] = tierInfo.lqas.sort((a,b)=> b.minWordCount - a.minWordCount )
+    return acc
+  },{})
+
+  const AllindustryTier = await LangTier.find()
+  const industryTiers = getRebuildIndustryTier(AllindustryTier)
+
   const languages = await Languages.find();
   const step = await Step.findOne({title: 'Translation'},{title: 1})
   const filterQuery = await getFilteringQueryForLqaReport(filters, languages);
@@ -77,13 +87,13 @@ const getXtrfLqaReport = async (filters) => {
     let result = [];
     const xtrfLqaReport = await getReport();
     for (let { sourceLanguage, targetLanguage, industries } of xtrfLqaReport) {
-      sourceLanguage = sourceLanguage ? sourceLanguage.lang : 'no language data';
-      targetLanguage = targetLanguage ? targetLanguage.lang : 'no language data';
-      const languagePair = sourceLanguage + ' >> ' + targetLanguage
+      sourceLanguageLang = sourceLanguage ? sourceLanguage.lang : 'no language data';
+      targetLanguageLang = targetLanguage ? targetLanguage.lang : 'no language data';
+      const languagePair = sourceLanguageLang + ' >> ' + targetLanguageLang
       result.push({
         languagePair,
-        sourceLanguage,
-        targetLanguage,
+        sourceLanguage: sourceLanguage.group,
+        targetLanguage: targetLanguage.group,
         industries,
         step,
       });
@@ -127,7 +137,9 @@ const getXtrfLqaReport = async (filters) => {
         });
       }
     }
-    return result.filter(({industries})=> industries.length);
+    const resultData = {data: result.filter(({industries})=> industries.length), industryTiers, tiersInfo }
+
+    return resultData;
   } catch (err) {
     console.log(err);
     console.log('Error in getXtrfLqaReport');
@@ -139,8 +151,8 @@ const getXtrfLqaReport = async (filters) => {
    */
   async function getReport() {
     return await XtrfLqaGrouped.find(filterQuery ,dataLimitQuery).skip(skipCount).limit(countFilter)
-      .populate('sourceLanguage', ['lang'])
-      .populate('targetLanguage', ['lang'])
+      .populate('sourceLanguage', ['lang', 'group'])
+      .populate('targetLanguage', ['lang', 'group'])
       .populate('industries.industry', ['name'])
       .populate('industries.vendors.vendor', ['assessments'])
       .populate('industries.industryGroup', ['name'])
@@ -163,22 +175,23 @@ const getXtrfUpcomingReport = async (filters) => {
 	const allVendor = new Set().add('All')
   try {
     const lqaReport = await XtrfLqaGrouped.find({},{ 'industries.vendors.otherInfo': 0 })
-      .populate('sourceLanguage', ['lang'])
-      .populate('targetLanguage', ['lang'])
+      .populate('sourceLanguage', ['lang', 'group'])
+      .populate('targetLanguage', ['lang', 'group'])
       .populate('industries.vendors.vendor', ['assessments'])
       .populate('industries.industryGroup', ['name'])
       .populate('industries.industry', ['name',"_id"])
       // .populate('industries.vendors.vendor.assessments.industries.steps.step');
     const translationStep = await Step.findOne({title: 'Translation'},{title: 1})
-    let result = []
+    const AllIndustryTier = await LangTier.find()
+    const industryTier = getRebuildIndustryTier(AllIndustryTier)
+	  let result = []
     let filters = {}
     for (let { sourceLanguage: sourceLang, targetLanguage: targetLang, industries} of lqaReport) {
       const sourceLangID = sourceLang ? sourceLang._id.toString() : null
       const targetLangID = targetLang ? targetLang._id.toString() : null
 
-      industries
-        .filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
-        .forEach(industry => {
+      const filteredIndustry = await industries.filter(industry => (industry.industryGroup.name === 'Finance' || industry.industryGroup.name === 'iGaming'))
+      for(const industry of filteredIndustry){
           const vendorsNotNull = industry.vendors.filter(({vendor})=> vendor !== null)
 
 	        allIndustry.add(industry.industryGroup.name)
@@ -186,10 +199,11 @@ const getXtrfUpcomingReport = async (filters) => {
             allSource.add(sourceLang.lang)
             allTarget.add(targetLang.lang)
           }
+          for(const vendorNotNull of vendorsNotNull){
 
-          vendorsNotNull.forEach(vendorNotNull => {
             const vendorTargetLang = targetLang ? targetLang.lang : 'no language data';
-            const { name, wordCount, tier, vendor} = vendorNotNull
+            const { name, wordCount,  vendor} = vendorNotNull
+	          const tier = getIndustryTier(industryTier, industry.industry.name, sourceLang.group, targetLang.group);
             allVendor.add(name)
             const assessmentIndex =
               vendor
@@ -207,8 +221,7 @@ const getXtrfUpcomingReport = async (filters) => {
             const steps = assessmentIndustry ? assessmentIndustry.steps : null
 
             const stepInfo = getStep(steps)
-
-            if (canNextLQAStep(wordCount, stepInfo.field, 1)) return;
+            if (await canNextLQAStep(wordCount, stepInfo.field, tier)) continue;
 
             let vendorInfo = {
               name,
@@ -238,12 +251,12 @@ const getXtrfUpcomingReport = async (filters) => {
 
             if (!vendorInData) {
               result.push(vendorInfo);
-              return;
+              continue;
             }
 
             vendorInData.wordCount += wordCount
-          })
-        })
+          }
+        }
 
       function getAssessmentIndustryIndex(assessment, industryId) {
         if (!assessment) return -1;
@@ -299,6 +312,13 @@ const getXtrfUpcomingReport = async (filters) => {
     console.log('Error in getXtrfUpcomingReport');
   }
 };
+
+function getIndustryTier(industryTier, industryName, sourceGroupLang, targetGroupLang) {
+  const industryTiers = industryTier[industryName]
+  if (!industryTiers) return 1
+  const industryInfo = industryTiers.find(({sourceLang, targetLang}) => sourceGroupLang === sourceLang && targetGroupLang == targetLang)
+  return  industryInfo.tier
+}
 // function getAssessmentInfo(result) {
 //   return  result.map((lqaReport)=> {
 //     const {sourceLanguage: lqaSourceLang, targetLanguage: lqaTargetLang} = lqaReport
@@ -364,6 +384,20 @@ function groupXtrfLqaByIndustryGroup(result) {
     }, [])
     return gropedByLangPair;
   }, [])
+}
+
+function getRebuildIndustryTier(industriesTier) {
+  result = {}
+  for (let { industry, source: sources } of industriesTier) {
+    result[industry] = []
+    for(let { targets, lang: sourceLang } of sources){
+      for(let { lang: targetLang, tier } of targets) {
+        result[industry].push({sourceLang, targetLang, tier })
+      }
+    }
+
+  }
+  return result
 }
 
 module.exports = {

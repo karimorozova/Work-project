@@ -1,4 +1,4 @@
-const { LangTier, Projects, Languages } = require('../models');
+const { LangTier, Projects, Languages, IndustryTierInfo } = require('../models');
 
 const fillLangTierReportWithLocal = async () => {
   const date = new Date();
@@ -12,6 +12,7 @@ const fillLangTierReportWithLocal = async () => {
   }).populate('industry', ['name']);
   const langTierReports = await LangTier.find();
   const localLanguages = await Languages.find();
+  const industryTierInfo = await IndustryTierInfo.find().populate('industry', 'name')
 
   finishedProjects = finishedProjects.filter(({ industry }) => industry.name === 'iGaming' || industry.name === 'Finance');
   for (let { steps, industry } of finishedProjects) {
@@ -23,6 +24,18 @@ const fillLangTierReportWithLocal = async () => {
         recalculateWordcount(reportIndex, sourceLanguage, targetLanguage, finance);
         recalculateWordcount(reportAllIndex, sourceLanguage, targetLanguage, finance);
 
+      }
+    }
+
+    for (let langTierReport of langTierReports) {
+      const { industry, source: sources } = langTierReport
+
+      for( let source of sources) {
+        for( let target of source.targets){
+
+          target.tier = getIndustryTier(industryTierInfo, industry, target.wordcount)
+
+        }
       }
     }
 
@@ -49,6 +62,19 @@ const fillLangTierReportWithLocal = async () => {
         }
       }
     }
+  }
+  function getIndustryTier(industryTierInfo, industry, wordcount) {
+
+    let tiers
+    if (industry === 'All') {
+      tiers = industryTierInfo.find(industryTier => industryTier.industry === null)
+    } else {
+      tiers = industryTierInfo.filter(industryTier => industryTier.industry !== null).find(industryTier => industryTier.industry.name === industry)
+    }
+
+    if ((tiers.tier1*4) > wordcount && (tiers.tier3*4) < wordcount) return 2
+    if ((tiers.tier3*4) > wordcount) return 3
+    return 1
   }
 };
 

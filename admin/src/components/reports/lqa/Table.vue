@@ -58,6 +58,8 @@
 	export default {
     props: {
       vendorsData: { type: Array, default: () => [] },
+      industryTier: 0,
+      tiersInfo: {1: {}, 2: {}, 3: {}}
     },
     data() {
       return {
@@ -174,20 +176,25 @@
         return '/vendors/details/' + vendorId
       },
       canNextStep(row, step, previousStep = ''){
+        const reformStepName = this.reformStep(step)
         if( this.getStepInfo(row,step).grade) return false
         if (previousStep.length > 0){
           if(!this.getStepInfo(row,previousStep).grade) return false
 
         }
-        return this.canNextLQAStepByTier(row.wordCount, step, 1)
+        return this.canNextLQAStepByTier(row.wordCount, reformStepName, this.industryTier || 1)
 
       },
       canNextLQAStepByTier(wordCount, nextStep, tier) {
-        const a = this.tiersInfo[tier]
-        const index = a.find(({minWordCount}) =>  {
+        const tierInfo = this.tiersInfo[tier]
+        const index = tierInfo.find(({minWordCount}) =>  {
           return  minWordCount <= Math.round(wordCount)
         });
         return index ? index.allowSteps.includes(nextStep) : false
+      },
+      reformStep(step) {
+        if (step === 'tqi') return step
+        return step.charAt(0).toUpperCase() + step.slice(1);
       }
     },
     mounted() {
@@ -196,7 +203,6 @@
     computed: {
 		  ...mapGetters({
         allLanguages: 'getAllLanguages',
-        tiersInfo: 'getTiersInfo'
       }),
     },
 		components: {
