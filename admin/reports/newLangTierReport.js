@@ -50,6 +50,7 @@ const newLangReport = async () => {
   await LangTier.deleteMany();
   await postReports();
   await fillLangTierReportWithLocal();
+  await calculateWordcount()
 
   async function postReports() {
     const result = [];
@@ -95,6 +96,35 @@ const newLangReport = async () => {
         wordcount: +WeightedWords
       }
     ));
+  }
+
+  async function calculateWordcount() {
+    const tierInfo = await LangTier.find()
+
+    for (let langTierReport of tierInfo) {
+      const { industry, source: sources } = langTierReport
+
+      for( let source of sources) {
+        for( let target of source.targets){
+          target.tier = getIndustryTier(industryTierInfo, industry, target.wordcount)
+        }
+      }
+    }
+
+    await LangTier.create(tierInfo)
+
+    function getIndustryTier(industryTierInfo, industry, wordcount) {
+
+      let tiers
+      if (industry === 'All') {
+        tiers = industryTierInfo.find(industryTier => industryTier.industry === null)
+      } else {
+        tiers = industryTierInfo.filter(industryTier => industryTier.industry !== null).find(industryTier => industryTier.industry.name === industry)
+      }
+      if ((tiers.tier1*4) > wordcount && (tiers.tier3*4) < wordcount) return 2
+      if ((tiers.tier3*4) > wordcount) return 3
+      return 1
+    }
   }
 
 };
