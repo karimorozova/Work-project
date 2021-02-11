@@ -1,4 +1,4 @@
-const { MemoqProject, Languages, LangTier } = require('../models');
+const { MemoqProject, Languages, LangTier, IndustryTierInfo } = require('../models');
 const { findLanguageByMemoqLanguageCode } = require('../helpers/commonFunctions');
 const { fillLangTierReportWithLocal } = require('../projects/langTierReport');
 const moment = require('moment');
@@ -99,6 +99,8 @@ const newLangReport = async () => {
   }
 
   async function calculateWordcount() {
+    const industryTierInfo = await IndustryTierInfo.find().populate('industry', 'name')
+
     const tierInfo = await LangTier.find()
 
     for (let langTierReport of tierInfo) {
