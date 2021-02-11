@@ -12,7 +12,6 @@ const fillLangTierReportWithLocal = async () => {
   }).populate('industry', ['name']);
   const langTierReports = await LangTier.find();
   const localLanguages = await Languages.find();
-  const industryTierInfo = await IndustryTierInfo.find().populate('industry', 'name')
   finishedProjects = finishedProjects.filter(({ industry }) => industry.name === 'iGaming' || industry.name === 'Finance');
   for (let { steps, industry } of finishedProjects) {
     const reportIndex = langTierReports.findIndex(i => i.industry === industry.name);
