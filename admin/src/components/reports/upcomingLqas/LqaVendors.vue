@@ -64,8 +64,9 @@ export default {
     async getReport() {
       try {
         const result = await this.$http.post("/reportsapi/xtrf-upcoming-lqa-report", { filters: this.filters })
-        this.reportData = result.data.result
-        this.filterInfo = result.data.filters
+        const {result: resReportData, filters} = result.data
+        this.reportData = resReportData
+        this.filterInfo = filters
 
       } catch (err) {
         this.alertToggle({ message: "Error on getting LQA report", isShow: true, type: "error" })

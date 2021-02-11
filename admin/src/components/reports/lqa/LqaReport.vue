@@ -20,7 +20,7 @@
         @updateAliases="updateAliases"
       )
     .lqa__languages
-      .lqa__language(v-for="{languagePair, industries, step } in reportData")
+      .lqa__language(v-for="{languagePair, sourceLanguage, targetLanguage, industries, step } in reportData")
         .lqa__text
           span.lqa__semi-bold  {{ languagePair }}
           .lqa__industry(v-for="{vendors, industryGroup} in industries")
@@ -29,8 +29,8 @@
               span {{industryGroup.name}}
               span &nbsp; &nbsp;
               span.lqa__semi-bold Tier: &nbsp;
-              span -
-            Table(v-if="vendors.length" :vendorsData="getVendorsWithInfo(vendors, languagePair, industryGroup,step)" @refreshAssessment="getReport(filters)")
+              span {{getTier(industryGroup.name, sourceLanguage, targetLanguage ) || '-' }}
+            Table(v-if="vendors.length" :vendorsData="getVendorsWithInfo(vendors, languagePair, industryGroup,step)"  :industryTier="getTier(industryGroup.name, sourceLanguage, targetLanguage )" :tiersInfo="tiersInfo" @refreshAssessment="refreshData()")
 
       //.lqa__form(v-if="false")
         NewVendor(:languages="allXtrfLangs" @close="closeForm" @saveVendor="saveVendor")
@@ -61,6 +61,8 @@
         filterCount: 10,
         skipCount: 0,
         isDataRemain: true,
+        industriesTiers: [],
+        tiersInfo: [],
       }
 		},
 		methods: {
@@ -109,10 +111,15 @@
           if (this.isDataRemain) {
             this.skipCount += 10;
             const result = await this.$http.post('/reportsapi/xtrf-lqa-report', { filters: this.filters });
-            this.isDataRemain = result.data.length === 10;
-            this.reportData.push(...result.data);
+            const {data} = result.data
+            this.isDataRemain = data.length === 10;
+            this.reportData.push(...data);
           }
         }
+      },
+      async refreshData() {
+        this.skipCount = 0
+        await this.getReport({ countFilter: 10, skipCount: 0 })
       },
       async getFilterOptions () {
         const result = await this.$http.get('/reportsapi/xtrf-lqa-reports-filter-options');
@@ -125,11 +132,23 @@
       async getReport (filters) {
         try {
           const result = await this.$http.post('/reportsapi/xtrf-lqa-report', { filters });
-          this.isDataRemain = result.data.length === 10;
-          this.reportData = result.data;
+          const {data, industryTiers, tiersInfo} =  result.body
+
+          this.isDataRemain = data.length === 10;
+          this.reportData = data;
+          this.industriesTiers = industryTiers;
+          this.tiersInfo = tiersInfo;
+
         } catch (err) {
           this.alertToggle({ message: 'Error on getting LQA report', isShow: true, type: 'error' });
         }
+      },
+
+      getTier(industry, sourceGroupLang, targetGroupLang) {
+        const industryTiers = this.industriesTiers[industry]
+        if (!industryTiers) return 0
+        const findTier =  industryTiers.find(({sourceLang, targetLang}) => sourceLang === sourceGroupLang && targetLang === targetGroupLang)
+        return findTier.tier
       },
 
       async setTierFilter ({ value }) {

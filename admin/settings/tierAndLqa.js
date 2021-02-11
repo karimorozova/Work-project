@@ -21,7 +21,7 @@ async function updateTierInfo(updatedInfo) {
     try {
         const tierInfo = await TierInfo.findOne({tier: updatedInfo.index});
         tierInfo.lqas.map(lqa => {
-            lqa.minWordCount =  updatedInfo[lqa.lqaName]
+            if( lqa.lqaName !== 'tqi')  lqa.minWordCount = updatedInfo[lqa.lqaName]
             return lqa
         })
         tierInfo.save()
