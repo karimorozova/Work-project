@@ -2,33 +2,43 @@ const { Delivery } = require("../models");
 const { managerNotifyMail } = require("../utils/mailTemplate");
 const { managerDr1Assigned , managerDr1Reassign } = require("../emailMessages/internalCommunication");
 
-
+const dr1Instructions = [
+    {step: "dr1", text: "Check files/work on Memoq to ensure all segments were translated and mark in green", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "Run a QA to see if there are any warnings or comments left by the vendors", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "If there are any failures in the QA- please contact the vendors to modify the output, and re start the PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "Check that the terms are translated according to the client's instructions, and that any character limitations have been followed", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "If QA pass - Complete PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "Open file to see if all is OK", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "If file is word/excel/powerpoint/HTML (visual files) - send for sanity checkup to either translator or revisor", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "Check Client's brief/instructions ", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+    {step: "dr1", text: "Prepare & deliver file to AM", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+]
 const dr2Instructions = [
-    {step: "dr2", text: "Check Language combinations", isChecked: false},
-    {step: "dr2", text: "Check File Type", isChecked: false},
-    {step: "dr2", text: "Check Number of files", isChecked: false},
-    {step: "dr2", text: "Check source & target files", isChecked: false},
-    {step: "dr2", text: "Beyond Compare", isChecked: false},
-    {step: "dr2", text: "Were Instructions followed", isChecked: false},
-    {step: "dr2", text: "Terms", isChecked: false},
-    {step: "dr2", text: "TOV", isChecked: false},
-    {step: "dr2", text: "Other instructions", isChecked: false},
-    {step: "dr2", text: "Check Client Type (PPP, Prepayment, Monthly)", isChecked: false}        
+    {step: "dr2", text: "Check files/work on Memoq to ensure all segments were translated and mark in green", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Run a QA to see if there are any warnings or comments left by the vendors", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "If there are any failures in the QA- please contact the vendors to modify the output, and re start the PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Check that the terms are translated according to the client's instructions, and that any character limitations have been followed", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "If QA pass - Complete PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Open file to see if all is OK", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "If file is word/excel/powerpoint/HTML (visual files) - send for sanity checkup to either translator or revisor", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Check Client's brief/instructions ", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Prepare & deliver file to AM", title: "Download deliverables", isChecked: false, isNotRelevant: false},
 ]
 
 async function checkPermission({projectId, taskId, userId}) {
-    let reviewStatus = "available";
     try {
         let review = await Delivery.findOne({projectId, "tasks.taskId": taskId})
-            .populate("tasks.dr1Manager").populate("tasks.dr2Manager")
+            .populate("tasks.dr1Manager")
+            .populate("tasks.dr2Manager")
+
         const { status, dr1Manager, dr2Manager, files, instructions } = getTaskData(review, taskId);
         const isCheckedFile = !!files.find(item => item.isFileApproved);
-        const isCheckedInstruction = !!instructions.find(item => item.isChecked && item.step === status);
+        const isCheckedInstruction = !!instructions.find(item => item.isChecked && item.isNotRelevant && item.step === status);
         if(!isCheckedFile && !isCheckedInstruction) {
             review = await checkForReassign({status, dr1Manager, dr2Manager, projectId, taskId, userId}) || review;
         }
-        reviewStatus = getCorrectStatus({review, userId, taskId});
-        return reviewStatus;
+        return getCorrectStatus({review, userId, taskId});
+
     } catch(err) {
         console.log(err);
         console.log("Error in checkPermission");
@@ -41,10 +51,9 @@ function getTaskData(review, taskId) {
 
 function getCorrectStatus({review, userId, taskId}) {
     const {status, dr1Manager, dr2Manager} = getTaskData(review, taskId)
-    if(status === "dr1" && userId !== dr1Manager.id
-         || status === "dr2" && (userId !== dr2Manager.id || userId === dr1Manager.id)
-        ) { 
-            return "forbidden";
+
+    if((status === "dr1" && userId !== dr1Manager.id) || (status === "dr2" && userId !== dr2Manager.id)){
+        return "forbidden";
     }
     return "available";
 }
@@ -94,10 +103,10 @@ async function changeManager({projectId, taskId, prevManager, manager, prop, isA
 async function changeReviewStage({projectId, taskId}) {
     try {
         await Delivery.updateOne(
-            {projectId, "tasks.taskId": taskId}, 
+            {projectId, "tasks.taskId": taskId},
             {
-                "tasks.$[i].isAssigned": true, 
-                "tasks.$[i].status": "dr2", 
+                "tasks.$[i].isAssigned": true,
+                "tasks.$[i].status": "dr2",
                 "tasks.$[i].timestamp": new Date(),
                 $push: {"tasks.$[i].instructions": {$each: dr2Instructions}},
                 "tasks.$[i].files.$[j].isFileApproved": false
@@ -113,11 +122,11 @@ async function changeReviewStage({projectId, taskId}) {
 async function rollbackReview({projectId, taskId, manager}) {
     await Delivery.bulkWrite([
         {
-            updateOne: 
+            updateOne:
                 {
-                    filter: {projectId, "tasks.taskId": taskId}, 
+                    filter: {projectId, "tasks.taskId": taskId},
                     update: {
-                        "tasks.$[i].isAssigned": false, 
+                        "tasks.$[i].isAssigned": false,
                         "tasks.$[i].status": "dr1",
                         "tasks.$[i].dr1Manager": manager,
                         $pull: {"tasks.$[i].instructions": {step: "dr2"}},
@@ -127,16 +136,17 @@ async function rollbackReview({projectId, taskId, manager}) {
                 }
         },
         {
-            updateOne: 
+            updateOne:
                 {
-                    filter: {projectId, "tasks.taskId": taskId}, 
+                    filter: {projectId, "tasks.taskId": taskId},
                     update: {
                         "tasks.$[i].instructions.$[k].isChecked": false,
+                        "tasks.$[i].instructions.$[j].isNotRelevant": false,
                     },
-                    arrayFilters: [{"i.taskId": taskId}, {"k.isChecked": true}]
+                    arrayFilters: [{"i.taskId": taskId}, {"k.isChecked": true}, {"j.isNotRelevant": true}]
                 }
         }
     ])
 }
 
-module.exports = { checkPermission, changeManager, changeReviewStage, rollbackReview }
+module.exports = { checkPermission, changeManager, changeReviewStage, rollbackReview, dr1Instructions }

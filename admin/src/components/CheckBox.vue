@@ -39,15 +39,14 @@ export default {
     display: flex;
     align-items: center;
     .checkbox__image {
-        width: 23px;
+        width: 18px;
     }
 }
 
 .tasks-n-steps {
-    text-align: center;
-    height: 16px;
+    height: 18px;
     .checkbox__image {
-        width: 16px;
+        width: 18px;
     }
 }
 

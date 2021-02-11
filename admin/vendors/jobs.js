@@ -1,7 +1,7 @@
 const { getProjects, getProject, taskCompleteNotifyPM, notifyManagerStepStarted, stepCompletedNotifyPM } = require('../projects')
 const { Projects, Delivery, Languages } = require('../models')
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
-
+const { dr1Instructions } = require('../delivery')
 async function getJobs(id) {
 	const allLanguages = await Languages.find()
 	try {
@@ -142,10 +142,6 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 async function addToDelivery(project, task) {
 	const files = getTaskTargetFiles(task)
 	const pair = task.sourceLanguage ? `${ task.sourceLanguage } >> ${ task.targetLanguage }` : `${ task.targetLanguage } / ${ task.packageSize }`
-	const instructions = [
-		{ text: "Download and check file", isChecked: false },
-		{ text: "Make sure to convert all doc files into PDF", isChecked: false }
-	]
 	try {
 		await Delivery.updateOne({ projectId: project.id }, {
 			$push: {
@@ -155,7 +151,7 @@ async function addToDelivery(project, task) {
 					status: task.deliveryStatus,
 					pair,
 					taskId: task.taskId,
-					instructions,
+					instructions: dr1Instructions,
 					files
 				}
 			}

@@ -181,7 +181,7 @@ router.post('/new-project', async (req, res) => {
 	}
 })
 
-router.post('/project-tasks', upload.fields([{ name: 'sourceFiles' }, { name: 'refFiles' }]), async (req, res) => {
+router.post('/project-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
 		let tasksInfo = { ...req.body }
 		if (tasksInfo.source) {
@@ -248,8 +248,8 @@ router.post('/update-matrix', async (req, res) => {
 		let stepIndex = project.steps.findIndex(item => {
 			return item.name === step.name && item.taskId === step.taskId
 		})
-		let tasks = [...project.tasks]
-		let steps = [...project.steps]
+		let tasks = [ ...project.tasks ]
+		let steps = [ ...project.steps ]
 		tasks[taskIndex].metrics[key][prop] = +value / 100
 		const cost = calcCost(tasks[taskIndex].metrics, prop, rate)
 		steps[stepIndex].finance.Price[costName] = cost
@@ -610,9 +610,20 @@ router.post('/change-manager', async (req, res) => {
 router.post('/approve-instruction', async (req, res) => {
 	const { taskId, projectId, instruction } = req.body
 	try {
-		await Delivery.updateOne({ projectId, 'tasks.taskId': taskId, 'tasks.instructions.text': instruction.text },
-				{ 'tasks.$[i].instructions.$[j].isChecked': !instruction.isChecked },
-				{ arrayFilters: [{ 'i.taskId': taskId }, { 'j.text': instruction.text }] })
+		await Delivery.updateOne(
+				{
+					projectId,
+					'tasks.taskId': taskId,
+					'tasks.instructions.text': instruction.text,
+					'tasks.instructions.step': instruction.step
+				},
+				{
+					'tasks.$[i].instructions.$[j].isChecked': instruction.isChecked,
+					'tasks.$[i].instructions.$[j].isNotRelevant': instruction.isNotRelevant
+				},
+				{
+					arrayFilters: [ { 'i.taskId': taskId }, { 'j.text': instruction.text } ]
+				})
 		res.send('done')
 	} catch (err) {
 		console.log(err)
@@ -623,9 +634,17 @@ router.post('/approve-instruction', async (req, res) => {
 router.post('/approve-files', async (req, res) => {
 	const { taskId, isFileApproved, paths } = req.body
 	try {
-		await Delivery.updateOne({ 'tasks.taskId': taskId, 'tasks.files.path': { $in: paths } },
-				{ 'tasks.$[i].files.$[j].isFileApproved': isFileApproved },
-				{ arrayFilters: [{ 'i.taskId': taskId }, { 'j.path': { $in: paths } }] })
+		await Delivery.updateOne(
+				{
+					'tasks.taskId': taskId,
+					'tasks.files.path': { $in: paths }
+				},
+				{
+					'tasks.$[i].files.$[j].isFileApproved': isFileApproved
+				},
+				{
+					arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': { $in: paths } } ]
+				})
 		res.send('done')
 	} catch (err) {
 		console.log(err)
@@ -633,25 +652,37 @@ router.post('/approve-files', async (req, res) => {
 	}
 })
 
-router.post('/target', upload.fields([{ name: 'targetFile' }]), async (req, res) => {
+router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
 	const fileData = { ...req.body }
 	try {
 		const files = req.files['targetFile']
 		const newPath = await manageDeliveryFile({ fileData, file: files[0] })
-		if (fileData.path) {
-			await Delivery.updateOne({ 'tasks.taskId': fileData.taskId, 'tasks.files.path': fileData.path },
+		if (!!fileData.path) {
+			await Delivery.updateOne(
+					{
+						'projectId': fileData.projectId,
+						'tasks.taskId': fileData.taskId,
+						'tasks.files.path': fileData.path
+					},
 					{
 						'tasks.$[i].files.$[j]': {
-							isFileApproved: false, isOriginal: false, fileName: files[0].filename, path: newPath
+							isFileApproved: false,
+							isOriginal: false,
+							fileName: files[0].filename,
+							path: newPath
 						}
 					},
-					{ arrayFilters: [{ 'i.taskId': fileData.taskId }, { 'j.path': fileData.path }] })
+					{ arrayFilters: [ { 'i.taskId': fileData.taskId }, { 'j.path': fileData.path } ] })
 		} else {
-			await Delivery.updateOne({ 'tasks.taskId': fileData.taskId },
+			await Delivery.updateOne(
+					{
+						'projectId': fileData.projectId,
+						'tasks.taskId': fileData.taskId
+					},
 					{
 						$push: {
 							'tasks.$.files': {
-								isFileApproved: true,
+								isFileApproved: false,
 								isOriginal: false,
 								fileName: files[0].filename,
 								path: newPath
@@ -669,9 +700,14 @@ router.post('/target', upload.fields([{ name: 'targetFile' }]), async (req, res)
 router.post('/remove-dr-file', async (req, res) => {
 	const { taskId, path, isOriginal } = req.body
 	try {
-		await Delivery.updateOne({ 'tasks.taskId': taskId, 'tasks.files.path': path },
+		await Delivery.updateOne(
+				{
+					'tasks.taskId': taskId,
+					'tasks.files.path': path
+				},
 				{ $pull: { 'tasks.$[i].files': { path } } },
-				{ arrayFilters: [{ 'i.taskId': taskId }] })
+				{ arrayFilters: [ { 'i.taskId': taskId } ] }
+		)
 		if (!isOriginal) {
 			fs.unlink(`./dist${ path }`, (err) => {
 				if (err) throw(err)
@@ -707,11 +743,15 @@ router.post('/rollback-review', async (req, res) => {
 	try {
 		await rollbackReview({ taskId, projectId, manager })
 		const message = `Delivery review of the task ${ taskId } is assigned to you.`
+		//rollback template
 		await managerNotifyMail(manager, message, 'Task delivery review assignment notification (I016)')
-		const updatedProject = await updateProject({
-			'_id': projectId,
-			'tasks.taskId': taskId
-		}, { 'tasks.$.status': 'Pending Approval [DR1]' })
+		const updatedProject = await updateProject(
+				{
+					'_id': projectId,
+					'tasks.taskId': taskId
+				}, {
+					'tasks.$.status': 'Pending Approval [DR1]'
+				})
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -816,7 +856,7 @@ router.post('/step-finance', async (req, res) => {
 	}
 })
 
-router.post('/request-file', upload.fields([{ name: 'newFile' }]), async (req, res) => {
+router.post('/request-file', upload.fields([ { name: 'newFile' } ]), async (req, res) => {
 	const { id, oldFile } = req.body
 	const files = req.files['newFile']
 	const existingFile = JSON.parse(oldFile)
@@ -943,7 +983,7 @@ router.post('/request-tasks', async (req, res) => {
 	}
 })
 
-router.post('/step-target', upload.fields([{ name: 'targetFile' }]), async (req, res) => {
+router.post('/step-target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
 	const { jobId } = req.body
 	try {
 		const project = await getProject({ 'steps._id': jobId })
@@ -1105,8 +1145,8 @@ router.get('/pricelist-new-langs/:id', async (req, res) => {
 	const { id } = req.params
 	try {
 		const { newLangPairs } = await Pricelist.findOne({ _id: id })
-				.populate('newLangPairs.source', ['lang'])
-				.populate('newLangPairs.target', ['lang'])
+				.populate('newLangPairs.source', [ 'lang' ])
+				.populate('newLangPairs.target', [ 'lang' ])
 
 		res.send(newLangPairs)
 	} catch (err) {

@@ -31,7 +31,7 @@ export default {
     padding: 30px 20px 30px 40px;
     box-shadow: 0 0 15px $brown-shadow;
     background-color: $white;
-    color: $green-success;
+    color: $green-approve;
     &_error {
         position: relative;
         color: $orange;
@@ -56,7 +56,7 @@ export default {
         &:before {
             position: absolute;
             content: "";
-            border: 1px solid $green-success;
+            border: 1px solid $green-approve;
             height: 11px;
             transform: rotate(-45deg);
             left: -20px;
@@ -66,7 +66,7 @@ export default {
         &:after {
             position: absolute;
             content: "";
-            border: 1px solid $green-success;
+            border: 1px solid $green-approve;
             height: 11px;
             transform: rotate(30deg);
             left: -14px;

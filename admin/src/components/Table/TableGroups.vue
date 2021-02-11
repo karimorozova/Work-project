@@ -20,9 +20,9 @@
             .groups__editing-data(v-else) 
                 input.groups__input(type="text" v-model="currentGroupName")
         template(slot="icons" slot-scope="{ row, index }")
-            .groups__icons
+            //.groups__icons
                 img.groups__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'groups_opacity': isActive(key, index)}")
-    Add(@add="addGroup")
+    //Add(@add="addGroup")
 </template>
 
 <script>

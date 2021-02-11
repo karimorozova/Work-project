@@ -24,6 +24,7 @@
         :tableheadRowClass="allSteps.length < 10 ? 'tbody_visible-overflow' : ''"
         bodyCellClass="steps-table-cell"
         bodyRowClass="steps-table-row"
+        :headCellClass="'padding-with-check-box'"
       )
         template(slot="headerCheck" slot-scope="{ field }")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
