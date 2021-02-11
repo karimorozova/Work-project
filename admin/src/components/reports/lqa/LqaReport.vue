@@ -148,7 +148,7 @@
         const industryTiers = this.industriesTiers[industry]
         if (!industryTiers) return 0
         const findTier =  industryTiers.find(({sourceLang, targetLang}) => sourceLang === sourceGroupLang && targetLang === targetGroupLang)
-        return findTier.tier
+        return !findTier ? 1 : findTier.tier
       },
 
       async setTierFilter ({ value }) {
