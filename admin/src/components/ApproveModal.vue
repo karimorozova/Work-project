@@ -1,40 +1,17 @@
 <template lang="pug">
   .approve-modal
     .approve-modal__text {{ text }}
-    .approve-modal__extra-choice(v-if="isCheckbox")
-      .approve-modal__drop-menu
-        SelectSingle(
-          :selectedOption="selectedReason"
-          :options="reasons"
-          placeholder="Select Reason"
-          @chooseOption="setReason"
-        )
-      .approve-modal__payment
-        .approve-modal__payment-span
-          span Partial Payment
-        .approve-modal__checkbox
-          label.switch
-            input(type='checkbox' :checked="isPay" v-model="isPay")
-            span.slider.round
-
-      .approve-modal__buttons
-        .approve-modal__button(@click="returnData")
-          Button(:value="approveValue")
-        .approve-modal__button(@click.stop="notApprove")
-          Button(:value="notApproveValue")
-      span.approve-modal__close(@click.stop="close") +
-
-    .approve-modal__buttons(v-if="!isCheckbox")
+    .approve-modal__buttons
       .approve-modal__button(@click.stop="approve")
         Button(:value="approveValue")
       .approve-modal__button(@click.stop="notApprove")
         Button(:value="notApproveValue")
-    span.approve-modal__close(@click.stop="close") +
+    span.approve-modal__close(@click.stop="close") &#215;
 </template>
 
 <script>
-	import Button from "./Button";
-	import SelectSingle from "./SelectSingle";
+	import Button from "./Button"
+	import SelectSingle from "./SelectSingle"
 
 	export default {
 		props: {
@@ -46,40 +23,25 @@
 			},
 			notApproveValue: {
 				type: String
-			},
-			isCheckbox: {
-				type: Boolean,
-				default: false
 			}
 		},
 		data() {
-			return {
-				reasons: [],
-				selectedReason: "",
-				isPay: false
-			};
+			return {}
 		},
 		methods: {
 			approve() {
-				this.$emit("approve");
-			},
-			returnData() {
-				this.approve();
-				this.$emit("returnData", { reason: this.selectedReason, isPay: this.isPay });
+				this.$emit("approve")
 			},
 			notApprove() {
-				this.$emit("notApprove");
+				this.$emit("notApprove")
 			},
 			close() {
-				this.$emit("close");
-			},
-			setReason({ option }) {
-				this.selectedReason = option;
+				this.$emit("close")
 			},
 			onKeyDown(e) {
-				e.keyCode === 27 && this.notApprove();
-				e.keyCode === 13 && this.approve();
-			},
+				e.keyCode === 27 && this.notApprove()
+				e.keyCode === 13 && this.approve()
+			}
 		},
 		components: {
 			Button,
@@ -89,11 +51,9 @@
 			document.removeEventListener('keydown', this.onKeyDown)
 		},
 		async created() {
-			const reasons = await this.$http.get("/api/reasons");
-			for (let key in reasons.data) this.reasons.push(reasons.data[key].reason);
 			document.addEventListener('keydown', this.onKeyDown)
 		}
-	};
+	}
 </script>
 
 <style lang="scss">
@@ -105,7 +65,7 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     background-color: $white;
     max-width: 300px;
     font-size: 16px;
@@ -121,98 +81,21 @@
 
     &__close {
       position: absolute;
-      top: 2px;
-      right: 8px;
-      transform: rotate(45deg);
-      cursor: pointer;
+      top: 5px;
+      right: 7px;
       font-size: 22px;
-      font-weight: bold;
-    }
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
 
-    &__drop-menu {
-      width: 191px;
-      height: 28px;
-      position: relative;
-      margin-bottom: 20px;
-      margin-top: 20px;
-    }
-
-    &__payment {
-      margin-bottom: 10px;
-
-      &-span {
-        vertical-align: sub;
-        display: inline-block;
-        font-size: 18px;
-      }
-    }
-
-    &__extra-choice {
-      display: contents;
-    }
-
-    &__checkbox {
-      display: inline-flex;
-
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 28px;
-        margin-left: 28px;
-
-        input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-      }
-
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ebebe4;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-
-        &:before {
-          position: absolute;
-          content: "";
-          height: 19px;
-          width: 19px;
-          left: 7px;
-          bottom: 5px;
-          background-color: #fff;
-          transition: 0.4s;
-        }
-      }
-
-      input {
-        &:checked {
-          + {
-            .slider {
-              background-color: #67573e;
-
-              &:before {
-                -webkit-transform: translateX(26px);
-                -ms-transform: translateX(26px);
-                transform: translateX(26px);
-              }
-            }
-          }
-        }
-      }
-
-      .slider.round {
-        border-radius: 28px;
-
-        &:before {
-          border-radius: 50%;
-        }
+      &:hover {
+        opacity: 1
       }
     }
   }

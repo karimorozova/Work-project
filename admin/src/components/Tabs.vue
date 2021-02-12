@@ -26,7 +26,6 @@
 
   .tabs {
     display: flex;
-    margin-top: 10px;
 
     &__option {
       padding: 5px 7px;

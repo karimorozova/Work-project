@@ -305,4 +305,9 @@ export default {
   border: 1px solid #938676;
   border-right: none;
 }
+  .padding-with-check-box{
+    padding: 5px 5px 5px 6px;
+    align-items: center;
+    display: flex;
+  }
 </style>

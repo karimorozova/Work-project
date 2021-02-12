@@ -28,6 +28,7 @@
         :tableheadRowClass="allTasks.length < 10 ? 'tbody_visible-overflow' : ''"
         @onRowClicked="onRowClicked"
         :bodyCellClass="'steps-cell'"
+        :headCellClass="'padding-with-check-box'"
       )
         template(slot="headerCheck" slot-scope="{ field }")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
@@ -87,7 +88,7 @@
           img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
 
     .tasks__approve-action(v-if="isApproveActionShow")
-      ApproveModal(
+      ApproveModalPayment(
         :isCheckbox="isAppearCheckBox()"
         :text="modalTexts.main"
         :approveValue="modalTexts.approve"
@@ -116,6 +117,7 @@
 	const DeliveryReview = () => import("./DeliveryReview");
 	import moment from "moment";
 	import { mapGetters, mapActions } from 'vuex';
+	import ApproveModalPayment from "../../ApproveModalPayment"
 
 	export default {
 		mixins: [currencyIconDetected],
@@ -448,6 +450,7 @@
 			}
 		},
 		components: {
+			ApproveModalPayment,
 			DataTable,
 			Preview,
 			ProgressLine,
@@ -498,7 +501,7 @@
 
     &__review {
       position: absolute;
-      top: -350px;
+      top: -230px;
       right: 0;
       left: 0;
       bottom: 0;
@@ -507,6 +510,8 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
+      height: fit-content;
+      padding-bottom: 150px;
     }
 
     &__task-status {

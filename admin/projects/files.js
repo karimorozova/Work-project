@@ -70,15 +70,18 @@ function getParsedFiles(taskFiles) {
 
 async function manageDeliveryFile({fileData, file}) {
     const { path, taskId, isOriginal, projectId } = fileData;
-    const additionFileInfo = `DR-${taskId.replace(/\s+/g, '')}`;
+    console.log(path, taskId, isOriginal, projectId)
+
+    const additionFileInfo = `${Math.floor(Math.random()*10000)}DR-${taskId.replace(/\s+/g, '')}`;
     try {
-        const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/\s+/g, '_')}`;
+        const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
+
         await moveFile(file, `./dist${newPath}`);
-        if(path && path !== newPath && isOriginal === "false") {
+        if(!!path && path !== newPath && isOriginal === "false") {
             fs.unlink(`./dist${path}`, (err) => {
                 if(err) throw(err);
-                return newPath;
             });
+            return newPath;
         } else {
             return newPath;
         }
