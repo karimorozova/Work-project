@@ -209,17 +209,18 @@
       left: 86%;
       bottom: 45px;
       width: 100px;
-      height: 32px;
-      border-radius: 8px;
+      height: 30px;
+      border-radius: 7px;
       font-size: 14px;
-      background-color: #938676;
-      color: #fff;
+      background-color: #fff;
+      color: #938676;
       outline: none;
       border: none;
-      transition: .1s ease;
+      transition: 0.2s ease-out;
       text-align: center;
-      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-      line-height: 32px;
+      line-height: 30px;
+      letter-spacing: 0.2px;
+      border: 2px solid #938676;
 
       &:active {
         transform: scale(.98);
@@ -227,7 +228,7 @@
 
       &:hover {
         cursor: pointer;
-        box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+        background: #f2efeb;
       }
     }
 

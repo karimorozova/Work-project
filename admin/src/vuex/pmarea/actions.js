@@ -98,7 +98,7 @@ export const approveInstruction = async ({ dispatch }, payload) => {
 	try {
 		const { taskId, projectId, instruction } = payload;
 		await Vue.http.post("/pm-manage/approve-instruction", { taskId, projectId, instruction });
-		dispatch('alertToggle', { message: "Updated", isShow: true, type: "success" });
+		dispatch('alertToggle', { message: "Instruction updated!", isShow: true, type: "success" });
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
@@ -111,7 +111,7 @@ export const approveDeliveryFile = async ({ dispatch }, payload) => {
 	try {
 		const { taskId, isFileApproved, paths } = payload;
 		await Vue.http.post("/pm-manage/approve-files", { taskId, isFileApproved, paths });
-		dispatch('alertToggle', { message: "Updated", isShow: true, type: "success" });
+		dispatch('alertToggle', { message: "File check updated!", isShow: true, type: "success" });
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
@@ -123,7 +123,7 @@ export const removeDrFile = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
 		await Vue.http.post("/pm-manage/remove-dr-file", { ...payload });
-		dispatch('alertToggle', { message: "File removed", isShow: true, type: "success" })
+		dispatch('alertToggle', { message: "File removed!", isShow: true, type: "success" })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
@@ -135,7 +135,7 @@ export const uploadTarget = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
 		await Vue.http.post("/pm-manage/target", payload);
-		dispatch('alertToggle', { message: "Updated", isShow: true, type: "success" })
+		dispatch('alertToggle', { message: "Files updated!", isShow: true, type: "success" })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
@@ -148,7 +148,7 @@ export const changeReviewManager = async ({ dispatch }, payload) => {
 	try {
 		const { taskId, projectId, prevManager, manager, prop, isAdmin, status } = payload;
 		await Vue.http.post("/pm-manage/change-manager", { taskId, projectId, prevManager, manager, prop, isAdmin, status });
-		dispatch('alertToggle', { message: "Success", isShow: true, type: "success" })
+		dispatch('alertToggle', { message: "Successfully changed!", isShow: true, type: "success" })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
@@ -162,7 +162,7 @@ export const rollBackReview = async ({ dispatch }, payload) => {
 		const { taskId, projectId, manager } = payload;
 		const updatedProject = await Vue.http.post("/pm-manage/rollback-review", { taskId, projectId, manager });
 		await dispatch('setCurrentProject', updatedProject.data);
-		dispatch('alertToggle', { message: "Success", isShow: true, type: "success" })
+		dispatch('alertToggle', { message: "Successfully rolled back!", isShow: true, type: "success" })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
@@ -176,7 +176,7 @@ export const assignDr2 = async ({ dispatch }, payload) => {
 		const { taskId, projectId, dr2Manager } = payload;
 		const updatedProject = await Vue.http.post("/pm-manage/assign-dr2", { taskId, projectId, dr2Manager });
 		await dispatch('setCurrentProject', updatedProject.data);
-		dispatch('alertToggle', { message: "Success", isShow: true, type: "success" })
+		dispatch('alertToggle', { message: "Successfully completed stage!", isShow: true, type: "success" })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {

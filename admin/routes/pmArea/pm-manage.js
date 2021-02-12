@@ -651,6 +651,27 @@ router.post('/approve-files', async (req, res) => {
 		res.status(500).send('Error on approve files')
 	}
 })
+router.get('/delivery-comments/:projectId', async (req, res) => {
+	const { projectId } = req.params
+	try {
+		const comments = await Delivery.findOne({ 'projectId': projectId }, { comments: 1 })
+		res.send(comments)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on approve files')
+	}
+})
+router.post('/delivery-comments', async (req, res) => {
+	const { projectId, taskStatus, comment } = req.body
+	try {
+		const query = `comments.${ taskStatus }.comment`
+		await Delivery.updateOne({ 'projectId': projectId }, { [query]: comment })
+		res.send('done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on approve files')
+	}
+})
 
 router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
 	const fileData = { ...req.body }

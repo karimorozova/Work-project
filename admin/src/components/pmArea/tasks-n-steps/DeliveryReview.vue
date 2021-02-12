@@ -1,6 +1,5 @@
 <template lang="pug">
   .review
-    //.review__forbidden(v-if="isReviewing")
     span.review__close(@click="close") &#215;
 
     .review__modal(v-if="isModal")
@@ -21,25 +20,41 @@
       )
 
     span.relative
-      .review__title.review_left-align {{ checklistTile }} Checklist
+      .review_left-align {{ checklistTile }} Checklist
       .review__forbidden(v-if="isReviewing")
 
     .review__check
       .review__forbidden(v-if="isReviewing")
-      .review__check-item(v-for="instruction in instructions")
-        Check(
-          @toggleApproval="toggleList"
-          :instruction="instruction"
-          :isApproved="instruction.isNotRelevant"
-          :type="'isNotRelevant'"
-        )
-        Check(
-          @toggleApproval="toggleList"
-          :instruction="instruction"
-          :isApproved="instruction.isChecked"
-          :type="'isChecked'"
-        )
-        span {{ instruction.text }}
+      .review__headers
+        .review__headers-item Check
+        .review__headers-item Not Relevant
+      .review__checkTitle(v-for="(group, index) in  Object.keys(groupedInstructions)")
+        .review__checkSubTitle(:class="{marginTop: !!index}") {{ group }}
+        .review__check-item(v-for="instruction in groupedInstructions[group]")
+          .review__check-itemText
+            span.icon-start-line
+              i.fa.fa-angle-double-right(aria-hidden='true')
+            span {{ instruction.text }}
+          .review__check-itemCheck
+            Check(
+              @toggleApproval="toggleList"
+              :instruction="instruction"
+              :isApproved="instruction.isChecked"
+              :type="'isChecked'"
+            )
+          .review__check-itemCheck
+            Check(
+              @toggleApproval="toggleList"
+              :instruction="instruction"
+              :isApproved="instruction.isNotRelevant"
+              :type="'isNotRelevant'"
+            )
+      .review__checkTitle
+        .review__checkSubTitle(:class="{marginTop: true}") Comments
+        .review__notes
+          ckeditor(v-model="editorData" :config="editorConfig")
+          .notes__button(@click="sendMessage") Save &nbsp;
+            i.fa.fa-paper-plane(aria-hidden='true')
 
     span.relative
       .split-line
@@ -91,14 +106,16 @@
         )
 
 
-
 </template>
 
 <script>
+	import CKEditor from "ckeditor4-vue"
 	import { mapGetters, mapActions } from "vuex"
 	import Drops from "../review/Drops"
 	import Table from "../review/Table"
 	import Check from "../review/Check"
+	import _ from "lodash"
+	import editorConfig from "../../../mixins/editorConfig"
 
 	const Options = () => import("../review/Options")
 	const CheckBox = () => import("@/components/CheckBox")
@@ -106,6 +123,7 @@
 	const RollbackModal = () => import("../review/RollbackModal")
 
 	export default {
+		mixins: [ editorConfig ],
 		props: {
 			task: { type: Object },
 			user: { type: Object },
@@ -113,6 +131,7 @@
 		},
 		data() {
 			return {
+				editorData: "",
 				areFilesChecked: false,
 				areFilesConverted: false,
 				areOptions: true,
@@ -143,6 +162,18 @@
 				"rollBackReview",
 				"alertToggle"
 			]),
+			async sendMessage() {
+				try {
+					await this.$http.post('/pm-manage/delivery-comments', {
+						projectId: this.project._id,
+						taskStatus: this.task.status === 'Pending Approval [DR2]' ? 'dr2' : 'dr1',
+						comment: this.editorData
+					})
+					this.alertToggle({ message: "Comment updated!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Comment not updated!", isShow: true, type: "error" })
+				}
+			},
 			close() {
 				this.$emit("close")
 			},
@@ -301,10 +332,13 @@
 				this.isDeliver = this.isDr1 ? false : this.areOptions
 
 				try {
-					const result = await this.$http.post("/pm-manage/delivery-data", { projectId: this.project._id, taskId: this.task.taskId })
-						this.files = result.data.files.map(item => {
-							return { ...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false }
-						})
+					const result = await this.$http.post("/pm-manage/delivery-data", {
+						projectId: this.project._id,
+						taskId: this.task.taskId
+					})
+					this.files = result.data.files.map(item => {
+						return { ...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false }
+					})
 					this.dr1Manager = result.data.dr1Manager
 					this.dr2Manager = result.data.dr2Manager
 					this.instructions = result.data.instructions.filter(item => item.step === result.data.status)
@@ -312,6 +346,9 @@
 						this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
 						this.timestamp = result.data.timestamp
 					}
+					const commentsData = await this.$http.get('/pm-manage/delivery-comments/' + this.project._id)
+					const { comments } = commentsData.data
+					this.editorData = this.task.status === 'Pending Approval [DR2]' ? comments.dr2.comment : comments.dr1.comment
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
 				}
@@ -321,6 +358,9 @@
 			...mapGetters({
 				getUser: "getUser"
 			}),
+			groupedInstructions() {
+				return _.groupBy(this.instructions, 'title')
+			},
 			isAllChecked() {
 				this.toggleOptions()
 				const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
@@ -344,7 +384,8 @@
 			Options,
 			CheckBox,
 			Button,
-			RollbackModal
+			RollbackModal,
+			ckeditor: CKEditor.component
 		},
 		mounted() {
 			this.checkPermission()
@@ -366,6 +407,15 @@
     position: relative;
     width: 800px;
 
+    &__checkSubTitle {
+      border-bottom: 1px solid #c5bfb5;
+      font-family: Myriad600;
+      width: 78%;
+      margin-bottom: 10px;
+      padding-bottom: 2px;
+    }
+
+
     &__title {
       font-size: 22px;
       text-align: center;
@@ -385,7 +435,7 @@
       align-items: center;
       font-family: Myriad900;
       opacity: 0.8;
-      transition: ease 0.2s;
+      transition: ease 0.1s;
 
       &:hover {
         opacity: 1
@@ -397,7 +447,31 @@
     }
 
     &__check-item {
-      /*margin-bottom: 6px;*/
+      display: flex;
+      margin-top: 6px;
+    }
+
+    &__headers {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+
+      &-item {
+        width: 11%;
+        display: flex;
+        justify-content: center;
+        font-family: 'Myriad600';
+      }
+    }
+
+    &__check-itemText {
+      width: 78%;
+    }
+
+    &__check-itemCheck {
+      width: 11%;
+      justify-content: center;
+      display: flex;
     }
 
     &__options {
@@ -427,8 +501,10 @@
     }
 
     &_left-align {
-      font-size: 22px;
-      margin-bottom: 20px;
+      font-size: 20px;
+      text-align: left;
+      border-bottom: 1px solid #c5bfb5;
+      padding-bottom: 3px;
     }
 
     &__modal {
@@ -456,13 +532,51 @@
   }
 
   .split-line {
-    background-color: #c5bfb5;
-    margin: 39.5px 0;
-    padding: 0.5px;
+    background-color: #ffffff;
+    margin: 19px 0;
+    padding: 1px;
     position: relative;
   }
 
   .relative {
     position: relative
+  }
+
+  .icon-start-line {
+    margin-right: 6px;
+  }
+
+  .marginTop {
+    margin-top: 20px;
+  }
+
+  .notes {
+    &__button {
+      position: absolute;
+      left: 83%;
+      bottom: 45px;
+      width: 100px;
+      height: 30px;
+      border-radius: 7px;
+      font-size: 14px;
+      background-color: #fff;
+      color: #938676;
+      outline: none;
+      border: none;
+      transition: 0.2s ease-out;
+      text-align: center;
+      line-height: 30px;
+      letter-spacing: 0.2px;
+      border: 2px solid #938676;
+
+      &:active {
+        transform: scale(.98);
+      }
+
+      &:hover {
+        cursor: pointer;
+        background: #f2efeb;
+      }
+    }
   }
 </style>

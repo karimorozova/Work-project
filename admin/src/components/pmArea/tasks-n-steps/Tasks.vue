@@ -510,6 +510,8 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
+      height: fit-content;
+      padding-bottom: 150px;
     }
 
     &__task-status {
