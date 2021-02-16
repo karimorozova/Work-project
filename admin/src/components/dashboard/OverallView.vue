@@ -1,115 +1,101 @@
 <template lang="pug">
-.overallView
-  .overallView__col
-    .col__title Today
-    .col__table
-      TableMargin(:tableData="tableMarginToday")
-    .col__chart
-      PieChart(:pieChartTitles="pieChartTitles", :pieChartParams="pieChartToday")
-    .col__table
-      TableClientReceivables(:tableData="tableClientReceivablesToday")
-  .overallView__spaceLine
-    .overallView__spaceLine-line
+  .overallView
+    .overallView__col
+      .col__title Today
+      .col__table.shadow
+        DatapickerWrapper(btnText="Accept" @updateFilter="updateData")
+          Datepicker(
+            :dateMinutes="0"
+            :dateHours="0"
+            @selected="(e) => setDate(e, 'startDateDay')"
+            calendarClass="vendor__calendar-custom"
+            :inline="true"
+            monday-first=true
+          )
+          Datepicker(
+            :dateMinutes="23"
+            :dateHours="59"
+            @selected="(e) => setDate(e, 'endDateDay')"
+            calendarClass="vendor__calendar-custom"
+            :inline="true"
+            monday-first=true
+          )
+        TableMargin(:tableData="tableMarginToday")
+        TableClientReceivables(:tableData="tableClientReceivablesToday")
+    .overallView__spaceLine
+      .overallView__spaceLine-line
+    .overallView__col
+      .col__title Month
+      .col__table.shadow
+        DatapickerWrapper(btnText="Accept" @updateFilter="updateData")
+          Datepicker(
+            @selected="(e) => setDate(e, 'startDateMonth')"
+            calendarClass="vendor__calendar-custom"
+            :inline="true"
+            monday-first=true
+          )
+          Datepicker(
+            @selected="(e) => setDate(e, 'endDateMonth')"
+            calendarClass="vendor__calendar-custom"
+            :inline="true"
+            monday-first=true
+          )
 
-  .overallView__col
-    .col__title This Month
-    .col__table
-      TableMargin(:tableData="tableMarginMonth")
-    .col__chart
-      PieChart(:pieChartTitles="pieChartTitles", :pieChartParams="pieChartMonth")
-    .col__table
-      TableClientReceivables(:tableData="tableClientReceivablesMonth")
+        TableMargin(:tableData="tableMarginMonth")
+        TableClientReceivables(:tableData="tableClientReceivablesMonth")
+
 </template>
 <script>
-import TableMargin from "./OverallViewChildrens/TableMargin";
-import TableClientReceivables from "./OverallViewChildrens/TableClientReceivables";
-import PieChart from "./OverallViewChildrens/PieChart";
+import TableMargin from "./OverallViewChildrens/TableMargin"
+import TableClientReceivables from "./OverallViewChildrens/TableClientReceivables"
+import PieChart from "./OverallViewChildrens/PieChart"
+import Datepicker from "../Datepicker"
+import DatapickerWrapper from "../DatapickerWrapper"
 
 export default {
   data() {
     return {
-      pieChartTitles: [
-        {
-          title: "Current Clients",
-          color: "#d15f45",
-        },
-        {
-          title: "New Business",
-          color: "#ff8376",
-        },
-      ],
-      tableMarginToday: [
-        {
-          receivables: 123,
-          payable: 123,
-          margin: 123,
-        },
-      ],
-      tableMarginMonth: [
-        {
-          receivables: 234,
-          payable: 234,
-          margin: 234,
-        },
-      ],
-      tableClientReceivablesToday: [
-        {
-          client: "UFX.com",
-          receivables: 123,
-        },
-        {
-          client: "Playtika",
-          receivables: 123,
-        },
-        {
-          client: "Bestmart",
-          receivables: 123,
-        },
-      ],
-      tableClientReceivablesMonth: [
-        {
-          client: "UFX.com",
-          receivables: 345,
-        },
-        {
-          client: "Playtika",
-          receivables: 345,
-        },
-        {
-          client: "Bestmart",
-          receivables: 345,
-        },
-      ],
-      pieChartToday: {
-        chartData: {
-          labels: ["800", "200"],
-          series: [80, 20],
-        },
-        chartOptions: {
-          showLabel: true,
-          width: 250,
-          height: 250,
-        },
-      },
-      pieChartMonth: {
-        chartData: {
-          labels: ["600", "400"],
-          series: [60, 40],
-        },
-        chartOptions: {
-          showLabel: true,
-          width: 250,
-          height: 250,
-        },
-      },
-    };
+      startDateDay: null,
+      startDateMonth: null,
+      endDateDay: null,
+      endDateMonth: null,
+      isDatepickers: false,
+      tableMarginToday: [],
+      tableMarginMonth: [],
+      tableClientReceivablesToday: [],
+      tableClientReceivablesMonth: []
+    }
+  },
+  methods: {
+    updateData() {
+      this.getFinanceData()
+    },
+    async getFinanceData() {
+      const result = await this.$http.post('/dashboard/finance-view', { startDateDay: this.startDateDay, endDateDay: this.endDateDay , startDateMonth: this.startDateMonth , endDateMonth: this.endDateMonth })
+      const { dayStats, monthStats } = result.body
+      const { marginInfo: marginInfoDay, clientsInfo: clientsInfoDay } = dayStats
+      const { marginInfo: marginInfoMonth, clientsInfo: clientsInfoMonth } = monthStats
+      this.tableMarginToday = [ marginInfoDay ]
+      this.tableClientReceivablesToday = clientsInfoDay
+      this.tableMarginMonth = [ marginInfoMonth ]
+      this.tableClientReceivablesMonth = clientsInfoMonth
+    },
+    setDate(e, prop) {
+      this[prop] = new Date(e)
+    }
+
+  },
+  created() {
+    this.getFinanceData()
   },
   components: {
+    DatapickerWrapper,
     TableMargin,
     TableClientReceivables,
     PieChart,
-  },
-};
+    Datepicker
+  }
+}
 </script>
 <style lang="scss" scoped>
 .overallView {
@@ -122,27 +108,38 @@ export default {
     display: flex;
     margin-top: 75px;
     justify-content: center;
+
     &-line {
       width: 1px;
       height: auto;
       background: #dbd3c9;
     }
   }
+
   &__col {
     width: 450px;
   }
+
   .col {
     &__title {
       text-align: center;
       font-size: 22px;
       font-weight: bold;
     }
+
     &__table {
       margin-top: 50px;
+      padding: 10px 20px;
     }
+
     &__chart {
       margin-top: 50px;
     }
   }
+
+  .shadow {
+    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+  }
+
 }
 </style>

@@ -1,12 +1,11 @@
 <template lang="pug">
-.overallTable
   SettingsTable(:fields="fields", :tableData="tableData")
     template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
       .overallTable__head-title {{ field.label }}
     template(slot="client", slot-scope="{ row, index }")
-      .overallTable__data {{ row.client }}
+      .overallTable__data {{ row.clients }}
     template(slot="receivables", slot-scope="{ row, index }")
-      .overallTable__data {{ row.receivables }} &#8364;
+      .overallTable__data {{ row.receivables | roundTwoDigit }} &#8364;
 </template>
 <script>
 import SettingsTable from "../../Table/SettingsTable";
@@ -49,7 +48,6 @@ export default {
 
 .overallTable {
   padding: 20px;
-  box-shadow: 0 0 10px #67573e9d;
   &__data {
     @extend %table-data;
     overflow-x: hidden;
