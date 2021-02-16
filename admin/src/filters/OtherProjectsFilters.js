@@ -38,3 +38,7 @@ Vue.filter("otherProjectsIndustryFilter", (str) => {
 Vue.filter("roundWordCount", (str) => {
   return Math.round(+str)
 });
+
+Vue.filter("roundTwoDigit", (num) => {
+	return (+num).toFixed(2)
+});

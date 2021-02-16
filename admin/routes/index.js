@@ -19,6 +19,7 @@ const projectsRouter = require('./projectsapi')
 const memoqapiRouter = require('./memoqapi')
 const multipliers = require('./pricelists/multipliers')
 const settings = require('./settings')
+const dashboard = require('./dashboard')
 
 
 //ADMIN
@@ -33,6 +34,7 @@ router.use('/industry', industryRouter)
 router.use('/projectsapi', projectsRouter)
 
 router.use('/api-settings', requiresLogin, settings)
+router.use('/dashboard', dashboard)
 router.use('/reportsapi', requiresLogin, reportsapi)
 router.use('/pm-manage', requiresLogin, pmareaRouter)
 router.use('/prices', requiresLogin, pricelistsRouter)
