@@ -231,7 +231,7 @@
       font-size: 20px;
       color: $light-brown;
       cursor: pointer;
-      transition: ease 0.2s;
+      transition: ease 0.1s;
     }
 
     &__file-icon {

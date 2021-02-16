@@ -38,8 +38,7 @@
       color: $light-brown;
       font-size: 20px;
       cursor: pointer;
-      transition: ease 0.2s;
-      margin-right: 8px;
+      transition: ease 0.1s;
     }
 
     &_green {

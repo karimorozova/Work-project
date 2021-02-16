@@ -1,7 +1,7 @@
 <template lang="pug">
 .loading
     .loading__message
-        span.loading__text Loading 
+        span.loading__text Loading
         .loading__spinner
 </template>
 
@@ -33,7 +33,7 @@ export default {
         justify-content: center;
         align-items: center;
         background-color: #FFF;
-        box-shadow: 0 0 8px #68573E;
+        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
     &__text {
         color: #68573E;
@@ -41,7 +41,7 @@ export default {
         margin-right: 20px;
     }
     &__spinner {
-        border: 7px solid #d8d8d8;
+        border: 7px solid #e0dcd8;
         border-top: 7px solid #68573E;
         border-radius: 50%;
         width: 16px;

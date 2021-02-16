@@ -7,6 +7,20 @@ const DeliverySchema = new mongoose.Schema({
 		default: "",
 		trim: true
 	},
+	comments: {
+		dr1: {
+			comment: {
+				type: String,
+				default: ''
+			}
+		},
+		dr2: {
+			comment: {
+				type: String,
+				default: ''
+			}
+		}
+	},
 	tasks: [
 		{
 			timestamp: {
