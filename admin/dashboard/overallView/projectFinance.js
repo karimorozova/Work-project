@@ -21,6 +21,7 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			$match: {
 				status: { $in: [ 'In progress', 'Closed' ] },
 				finance: { $exists: true, $ne: [] },
+				isTest: {$ne: true},
 				creationTime: {
 					$gte: new Date(startDate),
 					$lte: new Date(endDate)
@@ -31,7 +32,7 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			$match: {
 				status: { $in: [ 'In progress', 'Closed' ] },
 				finance: { $exists: true, $ne: [] },
-				creationTime: {
+				startDate: {
 					$gte: new Date(startDate),
 					$lte: new Date(endDate)
 				}
@@ -49,16 +50,21 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			$project: {
 				customerId: '$customer',
 				clients: '$clients.name',
-				receivables: {$convert: {'input': '$finance.Price.receivables', 'to': 'double'}},
+				receivables: '$finance.Price.receivables',
+				payables: '$finance.Price.payables',
+				margin: { $subtract: [ '$finance.Price.receivables', '$finance.Price.payables' ] }
+
 				// receivables: { $toDouble: '$finance.Price.receivables' },
-				payables: {$convert: {'input': '$finance.Price.payables', 'to': 'double'}},
 				// payables: { $toDouble: '$finance.Price.payables' },
-				margin: { $subtract: [ {$convert: {'input': '$finance.Price.receivables', 'to': 'double'}}, {$convert: {'input': '$finance.Price.payables', 'to': 'double'}} ] }
+				// margin: { $subtract: [ { $toDouble: '$finance.Price.receivables' }, { $toDouble: '$finance.Price.payables' } ] }
+
+
 			}
 		}
 
 		const allProjects = await Projects.aggregate( [projectQueryMatch, querylookup, queryProject])
-		const allMemoqProjects = await MemoqProject.aggregate([ memoqprojectQueryMatch, querylookup, queryProject ])
+		// const allMemoqProjects = await MemoqProject.aggregate([ memoqprojectQueryMatch, querylookup, queryProject ])
+		const allMemoqProjects = []
 		return [ ...allProjects, ...allMemoqProjects ]
 	}
 
