@@ -315,11 +315,11 @@ const getProjectFinance = (tasks, minimumCharge) => {
       payables: +TotalWordCount,
     },
     Price: {
-      receivables: priceReceivables.toFixed(2),
-      payables: pricePayables.toFixed(2),
+      receivables: +priceReceivables.toFixed(2),
+      payables: +pricePayables.toFixed(2),
     },
-    profit,
-    roi
+    profit: +profit,
+    roi: +roi,
   };
 };
 

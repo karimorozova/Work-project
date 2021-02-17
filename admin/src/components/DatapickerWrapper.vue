@@ -58,6 +58,7 @@ export default {
 
   &__calendar {
     max-width: 25px;
+    cursor: pointer;
   }
 
   &__datepickers {
