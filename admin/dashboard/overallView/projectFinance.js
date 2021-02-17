@@ -49,9 +49,11 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			$project: {
 				customerId: '$customer',
 				clients: '$clients.name',
-				receivables: { $toDouble: '$finance.Price.receivables' },
-				payables: { $toDouble: '$finance.Price.payables' },
-				margin: { $subtract: [ { $toDouble: '$finance.Price.receivables' }, { $toDouble: '$finance.Price.payables' } ] }
+				receivables: {$convert: {'input': '$finance.Price.receivables', 'to': 'double'}},
+				// receivables: { $toDouble: '$finance.Price.receivables' },
+				payables: {$convert: {'input': '$finance.Price.payables', 'to': 'double'}},
+				// payables: { $toDouble: '$finance.Price.payables' },
+				margin: { $subtract: [ {$convert: {'input': '$finance.Price.receivables', 'to': 'double'}}, {$convert: {'input': '$finance.Price.payables', 'to': 'double'}} ] }
 			}
 		}
 
