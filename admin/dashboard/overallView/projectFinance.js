@@ -6,14 +6,16 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 	const endTime = {hour: 23, minute: 59, second: 59}
 
 	startDateDay =  startDateDay ? moment(startDateDay).set(startTime) : moment(startTime)
-	startDateMonth =  startDateMonth ? moment(startDateMonth).set(startTime).subtract(30, 'days') : moment(startTime).subtract(30, 'days')
+	startDateMonth =  startDateMonth ? moment(startDateMonth).set(startTime) : moment(startTime).subtract(30, 'days')
 	endDateDay =  endDateDay ? moment(endDateDay).set(endTime) : moment(endTime)
 	endDateMonth =  endDateMonth ? moment(endDateMonth).set(endTime) : moment(endTime)
 
 	const allDataDay = await getData(startDateDay , endDateDay )
 	const allDataMonth = await getData(startDateMonth , endDateMonth )
+
 	const dayStats = getFinalInfo(allDataDay)
 	const monthStats = getFinalInfo(allDataMonth)
+
 	return {dayStats, monthStats}
 
 	async function getData(startDate, endDate) {
@@ -32,6 +34,7 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			$match: {
 				status: { $in: [ 'In progress', 'Closed' ] },
 				finance: { $exists: true, $ne: [] },
+				isTest: {$ne: true},
 				startDate: {
 					$gte: new Date(startDate),
 					$lte: new Date(endDate)
@@ -63,8 +66,8 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 		}
 
 		const allProjects = await Projects.aggregate( [projectQueryMatch, querylookup, queryProject])
-		// const allMemoqProjects = await MemoqProject.aggregate([ memoqprojectQueryMatch, querylookup, queryProject ])
-		const allMemoqProjects = []
+		const allMemoqProjects = await MemoqProject.aggregate([ memoqprojectQueryMatch, querylookup, queryProject ])
+		// const allMemoqProjects = []
 		return [ ...allProjects, ...allMemoqProjects ]
 	}
 
@@ -85,7 +88,6 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			findClient.receivables += +project.receivables
 			findClient.payables += +project.payables
 			findClient.margin += +project.margin
-
 
 			return result
 		}, [])
