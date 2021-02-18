@@ -31,7 +31,7 @@ export default {
           label: "Receivables",
           headerKey: "headerReceivables",
           key: "receivables",
-          width: "30%",
+          width: "35%",
           padding: "0",
         },
       ],

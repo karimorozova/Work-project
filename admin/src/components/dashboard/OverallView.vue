@@ -2,98 +2,26 @@
   .overallView
     .overallView__col
       .col__title Today
-      .col__table.shadow
-        DatapickerWrapper(btnText="Accept" @updateFilter="updateData")
-          Datepicker(
-            :dateMinutes="0"
-            :dateHours="0"
-            @selected="(e) => setDate(e, 'startDateDay')"
-            calendarClass="vendor__calendar-custom"
-            :inline="true"
-            monday-first=true
-          )
-          Datepicker(
-            :dateMinutes="23"
-            :dateHours="59"
-            @selected="(e) => setDate(e, 'endDateDay')"
-            calendarClass="vendor__calendar-custom"
-            :inline="true"
-            monday-first=true
-          )
-        TableMargin(:tableData="tableMarginToday")
-        TableClientReceivables(:tableData="tableClientReceivablesToday")
+      ProjectFinanceStats
     .overallView__spaceLine
       .overallView__spaceLine-line
     .overallView__col
       .col__title Month
-      .col__table.shadow
-        DatapickerWrapper(btnText="Accept" @updateFilter="updateData")
-          Datepicker(
-            @selected="(e) => setDate(e, 'startDateMonth')"
-            calendarClass="vendor__calendar-custom"
-            :inline="true"
-            monday-first=true
-          )
-          Datepicker(
-            @selected="(e) => setDate(e, 'endDateMonth')"
-            calendarClass="vendor__calendar-custom"
-            :inline="true"
-            monday-first=true
-          )
-
-        TableMargin(:tableData="tableMarginMonth")
-        TableClientReceivables(:tableData="tableClientReceivablesMonth")
+      ProjectFinanceStats(:startDateSet="startDateMonth")
 
 </template>
 <script>
-import TableMargin from "./OverallViewChildrens/TableMargin"
-import TableClientReceivables from "./OverallViewChildrens/TableClientReceivables"
-import PieChart from "./OverallViewChildrens/PieChart"
-import Datepicker from "../Datepicker"
-import DatapickerWrapper from "../DatapickerWrapper"
+import ProjectFinanceStats from "./OverallViewChildrens/ProjectFinanceStats"
+import moment from "moment"
 
 export default {
   data() {
     return {
-      startDateDay: null,
-      startDateMonth: null,
-      endDateDay: null,
-      endDateMonth: null,
-      isDatepickers: false,
-      tableMarginToday: [],
-      tableMarginMonth: [],
-      tableClientReceivablesToday: [],
-      tableClientReceivablesMonth: []
+      startDateMonth:  moment({hour: 0, minute: 0, second: 0}).subtract(30, 'days').toDate(),
     }
-  },
-  methods: {
-    updateData() {
-      this.getFinanceData()
-    },
-    async getFinanceData() {
-      const result = await this.$http.post('/dashboard/finance-view', { startDateDay: this.startDateDay, endDateDay: this.endDateDay , startDateMonth: this.startDateMonth , endDateMonth: this.endDateMonth })
-      const { dayStats, monthStats } = result.body
-      const { marginInfo: marginInfoDay, clientsInfo: clientsInfoDay } = dayStats
-      const { marginInfo: marginInfoMonth, clientsInfo: clientsInfoMonth } = monthStats
-      this.tableMarginToday = [ marginInfoDay ]
-      this.tableClientReceivablesToday = clientsInfoDay
-      this.tableMarginMonth = [ marginInfoMonth ]
-      this.tableClientReceivablesMonth = clientsInfoMonth
-    },
-    setDate(e, prop) {
-      this[prop] = new Date(e)
-    }
-
-  },
-  created() {
-    this.getFinanceData()
   },
   components: {
-    DatapickerWrapper,
-    TableMargin,
-    TableClientReceivables,
-    PieChart,
-    Datepicker
+    ProjectFinanceStats,
   }
 }
 </script>

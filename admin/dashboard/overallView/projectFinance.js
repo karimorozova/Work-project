@@ -1,29 +1,22 @@
-const { Projects, MemoqProject } = require('../../models')
+const { Projects, MemoqProject, CurrencyRatio } = require('../../models')
 const moment = require('moment')
 
-async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth  , endDateMonth ) {
-	const startTime = {hour: 0, minute: 0, second: 0}
-	const endTime = {hour: 23, minute: 59, second: 59}
+async function getProjectsFinanceInfo(startDate, endDate) {
+	const currencyRatio = await CurrencyRatio.findOne()
 
-	startDateDay =  startDateDay ? moment(startDateDay).set(startTime) : moment(startTime)
-	startDateMonth =  startDateMonth ? moment(startDateMonth).set(startTime) : moment(startTime).subtract(30, 'days')
-	endDateDay =  endDateDay ? moment(endDateDay).set(endTime) : moment(endTime)
-	endDateMonth =  endDateMonth ? moment(endDateMonth).set(endTime) : moment(endTime)
+	const startTime = { hour: 0, minute: 0, second: 0 }
+	const endTime = { hour: 23, minute: 59, second: 59 }
 
-	const allDataDay = await getData(startDateDay , endDateDay )
-	const allDataMonth = await getData(startDateMonth , endDateMonth )
+	const allData = await getData(moment(startDate).set(startTime), moment(endDate).set(endTime))
 
-	const dayStats = getFinalInfo(allDataDay)
-	const monthStats = getFinalInfo(allDataMonth)
-
-	return {dayStats, monthStats}
+	return getFinalInfo(allData, currencyRatio)
 
 	async function getData(startDate, endDate) {
 		const memoqprojectQueryMatch = {
 			$match: {
 				status: { $in: [ 'In progress', 'Closed' ] },
 				finance: { $exists: true, $ne: [] },
-				isTest: {$ne: true},
+				isTest: { $ne: true },
 				creationTime: {
 					$gte: new Date(startDate),
 					$lte: new Date(endDate)
@@ -34,7 +27,7 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			$match: {
 				status: { $in: [ 'In progress', 'Closed' ] },
 				finance: { $exists: true, $ne: [] },
-				isTest: {$ne: true},
+				isTest: { $ne: true },
 				startDate: {
 					$gte: new Date(startDate),
 					$lte: new Date(endDate)
@@ -53,28 +46,29 @@ async function getProjectsFinanceInfo(startDateDay , endDateDay , startDateMonth
 			$project: {
 				customerId: '$customer',
 				clients: '$clients.name',
+				projectCurrency: '$projectCurrency',
 				receivables: '$finance.Price.receivables',
 				payables: '$finance.Price.payables',
 				margin: { $subtract: [ '$finance.Price.receivables', '$finance.Price.payables' ] }
-
-				// receivables: { $toDouble: '$finance.Price.receivables' },
-				// payables: { $toDouble: '$finance.Price.payables' },
-				// margin: { $subtract: [ { $toDouble: '$finance.Price.receivables' }, { $toDouble: '$finance.Price.payables' } ] }
-
-
 			}
 		}
 
-		const allProjects = await Projects.aggregate( [projectQueryMatch, querylookup, queryProject])
+		const allProjects = await Projects.aggregate([ projectQueryMatch, querylookup, queryProject ])
 		const allMemoqProjects = await MemoqProject.aggregate([ memoqprojectQueryMatch, querylookup, queryProject ])
-		// const allMemoqProjects = []
 		return [ ...allProjects, ...allMemoqProjects ]
 	}
 
-	function getFinalInfo(allData) {
+	function getFinalInfo(allData, currencyRatio) {
 		let marginInfo = { receivables: 0, payables: 0, margin: 0 }
 		const clientsInfo = allData.reduce((result, project) => {
+
 			if (!project || !project.clients) return result
+
+			if (project.projectCurrency && project.projectCurrency !== 'EUR') {
+				project.receivables = +(project.receivables / currencyRatio[project.projectCurrency]).toFixed(2)
+				project.payables = +(project.payables / currencyRatio[project.projectCurrency]).toFixed(2)
+				project.margin = +(project.margin / currencyRatio[project.projectCurrency]).toFixed(2)
+			}
 
 			marginInfo.receivables += +project.receivables
 			marginInfo.payables += +project.payables
