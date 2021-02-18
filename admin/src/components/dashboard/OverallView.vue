@@ -52,7 +52,7 @@ export default {
     &__title {
       text-align: center;
       font-size: 22px;
-      font-weight: bold;
+      font-family: Myriad600;
     }
 
     &__table {
