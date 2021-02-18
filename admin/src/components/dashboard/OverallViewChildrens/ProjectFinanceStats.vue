@@ -21,6 +21,7 @@
 <script>
 import TableMargin from "./TableMargin"
 import TableClientReceivables from "./TableClientReceivables"
+import PieChart from "./PieChart"
 import Datepicker from "../../Datepicker"
 import DatapickerWrapper from "../../DatapickerWrapper"
 import moment from "moment"
