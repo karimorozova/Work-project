@@ -1,5 +1,5 @@
 <template lang="pug">
-  SettingsTable(:fields="fields", :tableData="tableData")
+  SettingsTable(:fields="fields", :tableData="tableData" :rowCount="7" :tbodyStyle="{'max-height': '204px' }")
     template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
       .overallTable__head-title {{ field.label }}
     template(slot="client", slot-scope="{ row, index }")

@@ -4,7 +4,7 @@
       .table__thead-row(:class="{'tbody_visible-overflow': (tableData.length || 1) < rowCount }")
         .table__thead-cell(v-for="field of fields" :style="{width: field.width}")
           slot(:name="field.headerKey" :field="field")
-    .table__tbody(:class="[bodyClass, {'tbody_visible-overflow': (tableData.length || 1) < rowCount  }]")
+    .table__tbody(:class="[bodyClass, {'tbody_visible-overflow': (tableData.length || 1) < rowCount  }]" :style="tbodyStyle")
       .table__tbody-row(v-for="(row, index) of tableData" @click="onClick(index)")
         .table__tbody-cell(v-for="field of fields" :style="{width: field.width, padding: field.padding}")
           slot(:name="field.key" :row="row" :index="index")
@@ -60,7 +60,13 @@
 			rowCount: {
 				type: Number,
 				default: 18
-			}
+			},
+      tbodyStyle: {
+			  type: Object,
+        default: () =>{
+          return {'max-height': '600px' }
+        }
+      }
 		},
 		data() {
 			return {
@@ -109,7 +115,6 @@
     }
 
     &__tbody {
-      max-height: 600px;
       overflow-y: scroll;
       margin-bottom: 20px;
       border: 0.5px solid $cell-border;
