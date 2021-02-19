@@ -11,28 +11,25 @@ const { tableKeys } = require('../enums')
 const { getCompetenciesForCheck } = require('./helpers')
 const _ = require('lodash')
 
-/**
- *
- * @param {String} vendorId - updating subject's id
- * @param {String} newData - updated competence example from frontend
- * @param {String} oldData - old competence example from database
- * @return nothing - updates vendor's rates
- */
+
 const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
+
 	const vendor = await Vendors.findOne({ _id: vendorId })
 	const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true })
+
 	const sourceLangDifference = compareIds(newData.sourceLanguage, oldData.sourceLanguage)
 	const targetLangDifference = compareIds(newData.targetLanguage, oldData.targetLanguage)
 	const stepDifference = compareIds(newData.step, oldData.step)
 	const industryDifference = compareIds(newData.industry, oldData.industry)
+
 	let updatedRates = vendor.rates
-	if (sourceLangDifference || targetLangDifference) {
+	if (!!sourceLangDifference || !!targetLangDifference) {
 		updatedRates = await updateVendorLangPairs(newData, oldData, sourceLangDifference, targetLangDifference, vendor, updatedRates, defaultPricelist)
 	}
-	if (stepDifference) {
+	if (!!stepDifference) {
 		updatedRates = await updateVendorStepMultipliers(oldData, newData, stepDifference, vendor, updatedRates)
 	}
-	if (industryDifference) {
+	if (!!industryDifference) {
 		updatedRates = await updateIndustryMultipliers(oldData, newData, industryDifference, vendor, updatedRates)
 	}
 	return updatedRates
@@ -42,41 +39,27 @@ const updateVendorRatesFromCompetence = async (vendorId, newData, oldData) => {
 	}
 }
 
-/**
- *
- * @param {Object} newData - new competence example from frontend
- * @param {Object} oldData - old example from database
- * @param {Object} newSourceLang - new source language value of rate row
- * @param {Object} newTargetLang - new target language value of rate row
- * @param {Object} vendor - current vendor's data
- * @param {Object} defaultPricelist - default pricelist data
- * @param {Object} vendorRates - updated vendor's rates
- * @return nothing - updates vendor's rates
- */
+
 const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetLang, vendor, vendorRates, defaultPricelist) => {
 	let { competencies, qualifications } = vendor
 	const { sourceLanguage, targetLanguage } = oldData
 	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable: oldPricelistTable } = vendorRates
-	let pricelistTable = oldPricelistTable
+	let pricelistTable
+
 	if (newSourceLang && newTargetLang) {
-		const sameLangPairRow = findSameLangPairRow(basicPricesTable, newSourceLang._id, newTargetLang._id)
-		if (!sameLangPairRow) {
+		if (!findSameLangPairRow(basicPricesTable, newSourceLang._id, newTargetLang._id)) {
 			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, newSourceLang._id, newTargetLang._id)
-			pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
 		}
 	} else if (newSourceLang && !newTargetLang) {
-		const sameLangPairRow = findSameLangPairRow(basicPricesTable, newSourceLang._id, targetLanguage._id)
-		if (!sameLangPairRow) {
+		if (!findSameLangPairRow(basicPricesTable, newSourceLang._id, targetLanguage._id)) {
 			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, newSourceLang._id, targetLanguage._id)
-			pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
 		}
 	} else {
-		const sameLangPairRow = findSameLangPairRow(basicPricesTable, sourceLanguage._id, newTargetLang._id)
-		if (!sameLangPairRow) {
-			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage, newTargetLang._id)
-			pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
+		if (!findSameLangPairRow(basicPricesTable, sourceLanguage._id, newTargetLang._id)) {
+			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage._id, newTargetLang._id)
 		}
 	}
+	pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
 
 	const qualificationLangPairs = qualifications.map(({ source, target }) => `${ source } ${ target }`)
 	competencies = competencies.filter(row => {
@@ -87,20 +70,10 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 		}
 	})
 
-	const sameLangPairRow = findSameLangPairRow(competencies, sourceLanguage._id, targetLanguage._id)
-	if (!sameLangPairRow) {
+	if (!findSameLangPairRow(competencies, sourceLanguage._id, targetLanguage._id)) {
 		basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id)
-		pricelistTable = filterRedundantLangPair(pricelistTable, sourceLanguage._id, targetLanguage._id)
 	}
 
-	pricelistTable = _.uniqBy(pricelistTable, (item) => (
-			item.sourceLanguage.toString() +
-			item.targetLanguage.toString() +
-			item.step.toString() +
-			item.unit.toString() +
-			item.size +
-			item.industry.toString()
-	))
 	return {
 		basicPricesTable,
 		stepMultipliersTable,
@@ -108,23 +81,16 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 		pricelistTable
 	}
 
-
 	function findSameLangPairRow(arr, sourceLangId, targetLangId) {
-		return arr.find(item => (
-				`${ item.sourceLanguage } ${ item.targetLanguage }` === `${ sourceLangId } ${ targetLangId }`
-		))
+		return arr.find(item => (`${ item.sourceLanguage } ${ item.targetLanguage }` === `${ sourceLangId } ${ targetLangId }`))
 	}
 
 	function filterRedundantLangPair(arr, sourceLangId, targetLangId) {
-		return arr.filter(item => (
-				`${ item.sourceLanguage } ${ item.targetLanguage }` !== `${ sourceLangId } ${ targetLangId }`
-		))
+		return arr.filter(item => (`${ item.sourceLanguage } ${ item.targetLanguage }` !== `${ sourceLangId } ${ targetLangId }`))
 	}
 
 	function pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage, targetLanguage) {
-		const neededLangRow = defaultPricelist.basicPricesTable.find(item => (
-				`${ item.sourceLanguage } ${ item.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`
-		))
+		const neededLangRow = defaultPricelist.basicPricesTable.find(item => (`${ item.sourceLanguage } ${ item.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`))
 		const basicPrice = neededLangRow ? neededLangRow.basicPrice : 1
 		basicPricesTable.push({
 			type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
@@ -136,21 +102,13 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 	}
 }
 
-/**
- *
- * @param {Object} oldData - old example from database
- * @param {Object} newData - new example from frontend
- * @param {Object} newStep - new step value of rate row
- * @param {Object} vendor - current vendor's data
- * @param {Object} vendorRates - updated vendor's rates
- * @return nothing - updates vendor's rates
- */
 const updateVendorStepMultipliers = async (oldData, newData, newStep, vendor, vendorRates) => {
 	const { competencies, _id: vendorId } = vendor
 	const allTests = await LangTest.find({})
 	const neededCompetencies = getCompetenciesForCheck(competencies, oldData._id, allTests)
 	const sameStep = vendorRates.stepMultipliersTable.find(item => item.step.toString() === newStep._id.toString())
 	const isNotLastStepInCompetence = neededCompetencies.find(item => item.step.toString() === oldData.step._id.toString())
+
 	if (!sameStep) {
 		const dataForCreation = [ {
 			step: newStep._id,
@@ -158,30 +116,21 @@ const updateVendorStepMultipliers = async (oldData, newData, newStep, vendor, ve
 			targetLanguage: newData.targetLanguage._id,
 			industry: newData.industry._id
 		} ]
-		const {
-			stepMultipliersTable,
-			pricelistTable
-		} = await createRateCombinations(dataForCreation, vendorId)
+		const { stepMultipliersTable, pricelistTable } = await createRateCombinations(dataForCreation, vendorId)
 		vendorRates.stepMultipliersTable = [ ...stepMultipliersTable ]
 		vendorRates.pricelistTable = [ ...pricelistTable ]
+	} else {
+		const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable: oldPricelistTable } = vendorRates
+		vendorRates.pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
 	}
+
 	if (!isNotLastStepInCompetence) {
-		vendorRates.stepMultipliersTable = filterRedundantItem(
-				vendorRates.stepMultipliersTable, oldData.step._id, 'step')
-		vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.step._id, 'step')
+		vendorRates.stepMultipliersTable = filterRedundantItem(vendorRates.stepMultipliersTable, oldData.step._id, 'step')
 	}
+
 	return vendorRates
 }
 
-/**
- *
- * @param {Object} oldData - old example from database
- * @param {Object} newData - new example from frontend
- * @param {Object} newIndustry - new industry of rate row
- * @param {Object} vendor - current vendor's data
- * @param {Object} vendorRates - updated vendor's rates
- * @return nothing - updates vendor's rates
- */
 const updateIndustryMultipliers = async (oldData, newData, newIndustry, vendor, vendorRates) => {
 	const { competencies, _id: vendorId } = vendor
 	const sameIndustry = vendorRates.industryMultipliersTable.find(item => (
@@ -203,11 +152,13 @@ const updateIndustryMultipliers = async (oldData, newData, newIndustry, vendor, 
 		} = await createRateCombinations(dataForCreation, vendorId)
 		vendorRates.industryMultipliersTable = [ ...industryMultipliersTable ]
 		vendorRates.pricelistTable = [ ...pricelistTable ]
+	} else {
+		const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable: oldPricelistTable } = vendorRates
+		vendorRates.pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
 	}
+
 	if (!isNotLastIndustryInCompetence) {
-		vendorRates.industryMultipliersTable = filterRedundantItem(
-				vendorRates.industryMultipliersTable, oldData.industry._id, 'industry')
-		vendorRates.pricelistTable = filterRedundantItem(vendorRates.pricelistTable, oldData.industry._id, 'industry')
+		vendorRates.industryMultipliersTable = filterRedundantItem(vendorRates.industryMultipliersTable, oldData.industry._id, 'industry')
 	}
 	return vendorRates
 }

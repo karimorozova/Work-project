@@ -4,7 +4,7 @@
       .filters-other__col
         .filters-other__item
           LabelValue(label="Project ID")
-            input.filters-other__text-input(type="text" :v-model="clientName" id="clientName" @keyup="filterById")
+            input.filters-other__text-input(type="text" id="clientId" @keyup="filterById")
         .filters-other__item
           LabelValue(label="Client Name")
             input.filters-other__text-input(type="text" :v-model="clientName" id="clientName" @keyup="filterByName")
