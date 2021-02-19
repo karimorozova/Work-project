@@ -426,14 +426,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
 	return stepUnitSizeCombinations
 }
 
-/**
- *
- * @param {Array} newBasicPriceRows - new basic price rows
- * @param {Array} newStepMultiplierRows - new step multiplier rows
- * @param {Array} newIndustryMultiplierRows - new industry multiplier rows
- * @param {Array} oldPricelistTable - old pricelist table
- * @returns {Array} - returns fullfilled pricelist table
- */
+
 const generateNewPricelistCombinations = (
 		newBasicPriceRows,
 		newStepMultiplierRows,

@@ -53,13 +53,13 @@ const multiplyPrices = (basicPrice, firstPercentMultiplier, size, secondPercentM
     getPercentage(basicPrice, firstPercentMultiplier) *
     Number(size) *
     (secondPercentMultiplier / 100)
-  ).toFixed(4)
+  ).toFixed(3)
 );
 
 const groupPriceList = (arr, allIndustries) => {
   let result = [];
 
-  source = lodash.groupBy(arr, function (item) {
+  let source = lodash.groupBy(arr, function (item) {
     return item.sourceLanguage.lang;
   });
   lodash.forEach(source, function (value, target) {

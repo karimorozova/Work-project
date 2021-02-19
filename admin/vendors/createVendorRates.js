@@ -11,19 +11,14 @@ const {
 const createRateCombinations = async (listForRates, vendorId) => {
 	const vendor = await Vendors.findOne({ _id: vendorId });
 	const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true });
+
 	const { pricelistTable: oldPricelistTable } = vendor.rates;
 	const { langPairs, steps, industries } = splitRatesArr(listForRates);
+
 	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, rates } = await combineVendorRates(langPairs, steps, industries, defaultPricelist, vendor);
 	let pricelistTable = [...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
-	pricelistTable = _.uniqBy(pricelistTable, (item) => (
-			item.sourceLanguage.toString() +
-			item.targetLanguage.toString() +
-			item.step.toString() +
-			item.unit.toString() +
-			item.size +
-			item.industry.toString()
-	));
 	rates = { ...rates, pricelistTable };
+
 	return rates;
 };
 
