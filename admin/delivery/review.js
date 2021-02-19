@@ -30,15 +30,14 @@ async function checkPermission({projectId, taskId, userId}) {
         let review = await Delivery.findOne({projectId, "tasks.taskId": taskId})
             .populate("tasks.dr1Manager")
             .populate("tasks.dr2Manager")
+        // const { status, dr1Manager, dr2Manager, files, instructions } = getTaskData(review, taskId);
+        // const isCheckedFile = !!files.find(item => item.isFileApproved);
+        // const isCheckedInstruction = !!instructions.find(item => item.isChecked && item.isNotRelevant && item.step === status);
+        // if(!isCheckedFile && !isCheckedInstruction) {
+        //     review = await checkForReassign({status, dr1Manager, dr2Manager, projectId, taskId, userId}) || review;
+        // }
 
-        const { status, dr1Manager, dr2Manager, files, instructions } = getTaskData(review, taskId);
-        const isCheckedFile = !!files.find(item => item.isFileApproved);
-        const isCheckedInstruction = !!instructions.find(item => item.isChecked && item.isNotRelevant && item.step === status);
-        if(!isCheckedFile && !isCheckedInstruction) {
-            review = await checkForReassign({status, dr1Manager, dr2Manager, projectId, taskId, userId}) || review;
-        }
         return getCorrectStatus({review, userId, taskId});
-
     } catch(err) {
         console.log(err);
         console.log("Error in checkPermission");
