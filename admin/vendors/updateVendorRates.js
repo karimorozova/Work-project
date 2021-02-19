@@ -91,7 +91,7 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 
 	function pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage, targetLanguage) {
 		const neededLangRow = defaultPricelist.basicPricesTable.find(item => (`${ item.sourceLanguage } ${ item.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`))
-		const basicPrice = neededLangRow ? neededLangRow.basicPrice : 1
+		const basicPrice = !!neededLangRow ? (neededLangRow.euroBasicPrice/2).toFixed(3) : 0.05
 		basicPricesTable.push({
 			type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
 			sourceLanguage,
