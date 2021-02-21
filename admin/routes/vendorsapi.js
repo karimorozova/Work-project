@@ -22,10 +22,12 @@ const {
 	syncVendorRatesCost,
 	getVendorAssessmentsWordCount,
 	createRateRowFromQualification,
-	getVendorAfterCombinationsUpdated
+	getVendorAfterCombinationsUpdated,
+	updateVendorMatrix,
+	syncVendorMatrix
 } = require('../vendors')
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
-const { Vendors, Projects } = require('../models')
+const { Vendors, Projects, Pricelist } = require('../models')
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests')
 const { testSentMessage } = require("../emailMessages/candidateCommunication")
 
@@ -301,6 +303,8 @@ router.post('/new-vendor', upload.fields([ { name: 'photo' } ]), async (req, res
 	let vendor = JSON.parse(req.body.vendor)
 	const photoFile = req.files["photo"]
 	try {
+		const { discountChart } = await Pricelist.findOne({isVendorDefault: true})
+		vendor.matrix = {...discountChart}
 		const saveVendor = await Vendors.create(vendor)
 		const id = saveVendor.id
 		if (photoFile) {
@@ -426,9 +430,19 @@ router.delete('/deletevendor/:id', async (req, res) => {
 })
 
 router.post('/update-matrix', async (req, res) => {
-	const { _id, matrix } = req.body
+	const { _id, key, value } = req.body
 	try {
-		const updatedVendor = await getVendorAfterUpdate({ "_id": _id }, { matrix: matrix })
+		const updatedVendor = await updateVendorMatrix( _id, {key, value})
+		res.send(updatedVendor)
+	} catch (err) {
+		res.status(500).send("Error on updating Vendor's matrix")
+	}
+})
+
+router.post('/default-matrix', async (req, res) => {
+	const { _id, key } = req.body
+	try {
+		const updatedVendor = await syncVendorMatrix( _id, key)
 		res.send(updatedVendor)
 	} catch (err) {
 		res.status(500).send("Error on updating Vendor's matrix")

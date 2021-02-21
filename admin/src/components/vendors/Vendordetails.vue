@@ -225,7 +225,7 @@
 
       .title Discount Chart
         .vendor-info__drop-matrix(v-if="currentVendor._id")
-          FinanceMatrix(:entity="currentVendor", @setMatrixData="setMatrixData")
+          FinanceMatrixWithReset(:entity="currentVendor" @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
       .title Notes & Comments
         .vendor-info__notes-block
@@ -286,7 +286,7 @@
 
 <script>
 	import { mapGetters, mapActions } from "vuex"
-	import FinanceMatrix from "../FinanceMatrix"
+	import FinanceMatrixWithReset from "../FinanceMatrixWithReset"
 	import VendorCompetencies from "./VendorCompetencies"
 	import ResultTable from "./pricelists/ResultTable"
 	import IndustryTable from "./pricelists/IndustryTable"
@@ -377,7 +377,8 @@
 				updateIndustry: "updateIndustry",
 				getDuoCombinations: "getVendorDuoCombinations",
 				updateVendorStatus: "updateVendorStatus",
-				setVendorsMatrixData: "setVendorsMatrixData"
+				setVendorsMatrixData: "setVendorsMatrixData",
+        setDefaultValuesMatrixData: "setDefaultValuesMatrixData"
 			}),
 			setAlias({ option }) {
 				if (this.currentVendor.hasOwnProperty('aliases')) {
@@ -441,6 +442,14 @@
 					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
 				}
 			},
+      async getDefaultValuesDC( key ) {
+        try {
+          await this.setDefaultValuesMatrixData({ key })
+          this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
+        } catch (err) {
+          this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
+        }
+      },
 			refreshResultTable() {
 				this.isRefreshResultTable = true
 				setTimeout(() => {
@@ -780,7 +789,7 @@
 			StepTable,
 			IndustryTable,
 			ResultTable,
-			FinanceMatrix
+			FinanceMatrixWithReset
 		},
 		directives: {
 			ClickOutside

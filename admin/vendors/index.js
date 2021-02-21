@@ -11,6 +11,7 @@ const {
   deleteVendorCompetencies,
   generateCompetenciesCombinations
 } = require('./competencies');
+const {updateVendorMatrix, syncVendorMatrix} = require('./vendorMatrix')
 const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications');
 const { updateVendorsRatePrices, getVendorAfterCombinationsUpdated } = require('./updateVendorRates');
 const { syncVendorRatesCost } = require('./syncVendorRatesCost');
@@ -46,4 +47,6 @@ module.exports = {
   saveQualificationsAfterUpdateCompetencies,
   getVendorAfterCombinationsUpdated,
   getVendorAssessmentsWordCount,
+  updateVendorMatrix,
+  syncVendorMatrix
 };
