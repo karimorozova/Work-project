@@ -133,7 +133,7 @@ export const setVendorsMatrixData = async ({ commit, dispatch, state }, payload)
     try {
         const { _id, matrix } = state.currentVendor;
         matrix[payload.key].rate = payload.value;
-        const updatedVendor = await Vue.http.post('/vendorsapi/update-matrix', { _id, matrix });
+        const updatedVendor = await Vue.http.post('/vendorsapi/update-matrix', { _id, key: payload.key, value: payload.value });
         state.filteredVendors.forEach(item => {
             if (item._id === _id) item.matrix = matrix
         });
@@ -144,6 +144,23 @@ export const setVendorsMatrixData = async ({ commit, dispatch, state }, payload)
         commit("endRequest");
     }
 }
+
+export const setDefaultValuesMatrixData = async ({ commit, dispatch, state }, payload) => {
+    commit("startRequest");
+    try {
+        const { _id } = state.currentVendor;
+        const updatedVendor = await Vue.http.post('/vendorsapi/default-matrix', { _id, key: payload.key });
+        // state.filteredVendors.forEach(item => {
+        //     if (item._id === _id) item.matrix = matrix
+        // });
+        dispatch("storeCurrentVendor", updatedVendor.body)
+    } catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    } finally {
+        commit("endRequest");
+    }
+}
+
 
 export const updateVendorRate = async ({ commit, dispatch }, payload) => {
     commit("startRequest");
