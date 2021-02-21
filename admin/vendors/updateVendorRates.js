@@ -46,15 +46,17 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable: oldPricelistTable } = vendorRates
 	let pricelistTable
 
-	if (newSourceLang && newTargetLang) {
+	const [ newSourceLangCheck, newTargetLangCheck ] = [ !!newSourceLang, !!newTargetLang ]
+
+	if (newSourceLangCheck && newTargetLangCheck) {
 		if (!findSameLangPairRow(basicPricesTable, newSourceLang._id, newTargetLang._id)) {
 			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, newSourceLang._id, newTargetLang._id)
 		}
-	} else if (newSourceLang && !newTargetLang) {
+	} else if (newSourceLangCheck && !newTargetLangCheck) {
 		if (!findSameLangPairRow(basicPricesTable, newSourceLang._id, targetLanguage._id)) {
 			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, newSourceLang._id, targetLanguage._id)
 		}
-	} else {
+	} else if (!newSourceLangCheck && newTargetLangCheck) {
 		if (!findSameLangPairRow(basicPricesTable, sourceLanguage._id, newTargetLang._id)) {
 			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage._id, newTargetLang._id)
 		}
@@ -91,7 +93,7 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 
 	function pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage, targetLanguage) {
 		const neededLangRow = defaultPricelist.basicPricesTable.find(item => (`${ item.sourceLanguage } ${ item.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`))
-		const basicPrice = neededLangRow ? neededLangRow.basicPrice : 1
+		const basicPrice = !!neededLangRow ? (neededLangRow.euroBasicPrice / 2).toFixed(3) : 0.05
 		basicPricesTable.push({
 			type: sourceLanguage.toString() === targetLanguage.toString() ? 'Mono' : 'Duo',
 			sourceLanguage,
