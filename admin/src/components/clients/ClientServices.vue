@@ -7,8 +7,8 @@
       :errors="errors",
       :areErrors="areErrors",
       :isApproveModal="isDeleting",
-      bodyClass="bodyHeigth-300",
-      :rowCount="8",
+      :tbodyStyle="{'max-height': '300px'}",
+      :rowCount="9",
       @closeErrors="closeErrors",
       @approve="deleteService",
       @notApprove="setDefaults",
@@ -118,9 +118,10 @@ import SettingsTable from "../Table/SettingsTable";
 import crudIcons from "@/mixins/crudIcons";
 import scrollDrop from "@/mixins/scrollDrop";
 import scrollEnd from "../../mixins/scrollEnd";
+import checkCombinations from "../../mixins/combinationsChecker";
 
 export default {
-  mixins: [scrollDrop, crudIcons, scrollEnd],
+  mixins: [scrollDrop, crudIcons, scrollEnd, checkCombinations],
   props: {
     clientIndustries: {
       type: Array,
@@ -295,6 +296,7 @@ export default {
 
     async checkErrors(index) {
     	const currentIndex = index;
+      const countOfFields = {first: 3, second: 3, third: 3};
       if (this.currentActive === -1) return;
       this.errors = [];
 
@@ -309,6 +311,8 @@ export default {
 	    );
 	    if (arraysOfTheSame.length) this.errors.push("Such data already exists!");
     }
+      if (!this.checkCombinations(this.currentTargets.length, this.currentServices.length, this.currentIndustries.length, countOfFields))
+        this.errors.push(`Max selected fields: \n Target = ${countOfFields.first} | Services = ${countOfFields.second} | Steps = ${countOfFields.third} `)
 	    if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTargets.length) this.errors.push("Target should not be empty!");
       if (!this.currentIndustries.length) this.errors.push("Industry should not be empty!");
