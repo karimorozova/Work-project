@@ -1,149 +1,138 @@
 <template lang="pug">
-.step-files
+  .step-files
     StepInfoTitle(title="Files" :isIconReversed="isFilesShown" @titleClick="toggleFilesShow")
     .step-files__table(v-if="isFilesShown")
-        DataTable(
-            :fields="fields"
-            :tableData="stepFiles"
-            :bodyClass="stepFiles.length < 5 ? 'tbody_visible-overflow' : ''"
-            :tableheadRowClass="stepFiles.length < 5 ? 'tbody_visible-overflow' : ''"
-        )
-            template(slot="headerCheck" slot-scope="{ field }")
-                input.step-files__check(type="checkbox" v-model="isAllChecked")
-            template(slot="headerFileName" slot-scope="{ field }")
-                span.step-files__label {{ field.label }}
-            template(slot="headerCategory" slot-scope="{ field }")
-                span.step-files__label {{ field.label }}
-            template(slot="headerSource" slot-scope="{ field }")
-                span.step-files__label {{ field.label }}
-            template(slot="headerTarget" slot-scope="{ field }")
-                span.step-files__label {{ field.label }}
-            template(slot="check" slot-scope="{ row, index }")
-                .step-files__checkbox
-                    input.step-files__check(type="checkbox" v-model="row.check")
-            template(slot="fileName" slot-scope="{ row, index }")
-                span.step-files__name(:class="{'step-files_break-word': row.fileName.length > 40}") {{ row.fileName }}
-            template(slot="category" slot-scope="{ row, index }")
-                span.step-files__data {{ row.category }}
-            template(slot="source" slot-scope="{ row, index }") 
-                a.step-files__link(:href='row.source')
-                    img.step-files__image(src="../../../assets/images/download-big-b.png")
-            template(slot="target" slot-scope="{ row, index }")
-                .step-files__link(v-if="isDownloadIcon(row)")
-                    img.step-files__image(src="../../../assets/images/download-big-b.png" @click="downloadTargetFile(index)")                            
+      DataTable(
+        :fields="fields"
+        :tableData="stepFiles"
+        :bodyClass="stepFiles.length < 5 ? 'tbody_visible-overflow' : ''"
+        :tableheadRowClass="stepFiles.length < 5 ? 'tbody_visible-overflow' : ''"
+      )
+
+        template(slot="headerFileName" slot-scope="{ field }")
+          span.step-files__label {{ field.label }}
+        template(slot="headerCategory" slot-scope="{ field }")
+          span.step-files__label {{ field.label }}
+        template(slot="headerLink" slot-scope="{ field }")
+          span.step-files__label {{ field.label }}
+
+        template(slot="fileName" slot-scope="{ row, index }")
+          span.step-files__name(:class="{'step-files_break-word': row.fileName.length > 60}") {{ row.fileName }}
+        template(slot="category" slot-scope="{ row, index }")
+          span.step-files__data {{ row.category }}
+        template(slot="link" slot-scope="{ row, index }")
+          span(v-if="row.category !== 'Target'")
+            a.step-files__link(:target="'_blank'" :href='row.link')
+              img.step-files__image(src="../../../assets/images/download-big-b.png")
+          span(v-else)
+            a.step-files__link(v-if="isDownloadIcon(row)" :target="'_blank'" :href='row.link')
+              img.step-files__image(src="../../../assets/images/download-big-b.png")
 </template>
 
 <script>
-import StepInfoTitle from "./finance/StepInfoTitle";
-import DataTable from "../../DataTable";
-import { mapGetters, mapActions } from 'vuex';
+	import StepInfoTitle from "./finance/StepInfoTitle"
+	import DataTable from "../../DataTable"
+	import { mapGetters, mapActions } from 'vuex'
 
-export default {
-    props: {
-        stepFiles: {
-            type: Array
-        },
-        step: {
-            type: Object
-        },
-        projectId: {
-            type: [Number, String]
-        }
-    },
-    data() {
-        return {
-            isFilesShown: false,
-            isAllChecked: false,
-            fields: [
-                {label: "Check", headerKey: "headerCheck", key: "check", width: "5%", padding: 0},
-                {label: "File Name", headerKey: "headerFileName", key: "fileName", width: "33%", padding: 0},
-                {label: "Category", headerKey: "headerCategory", key: "category", width: "22%", padding: 0},
-                {label: "Source", headerKey: "headerSource", key: "source", width: "20%", padding: 0, cellClass: "step-files_centered"},
-                {label: "Target", headerKey: "headerTarget", key: "target", width: "20%", padding: 0, cellClass: "step-files_centered"},
-            ]
-        }
-    },
-    methods: {
-        ...mapActions({
-            storeProject: "setCurrentProject",
-            alertToggle: "alertToggle"
-        }),
-        toggleFilesShow() {
-            this.isFilesShown = !this.isFilesShown;
-        },
-        isDownloadIcon(file) {
-            if(this.step.serviceStep.calculationUnit === 'Words') {
-                return file.category !== 'Reference file' && this.isCompleted;
-            }
-            return this.isCompleted && file.target;
-        },
-        async downloadTargetFile(index) {
-            if(this.step.serviceStep.calculationUnit !== 'Words') {
-                return this.createLinkAndDownolad(this.stepFiles[index].target.split("./dist")[1]);
-            }
-            this.createLinkAndDownolad(this.stepFiles[index].target);
-            
-        },
-        createLinkAndDownolad(href) {
-            let link = document.createElement('a');
-            link.href = __WEBPACK__API_URL__ + href;
-            link.target = "_blank";
-            link.click();
-        },
-    },
-    computed: {
-        ...mapGetters({
-            currentProject: "getCurrentProject"
-        }),
-        isCompleted() {
-            const { progress } = this.step;
-            if(this.step.serviceStep.calculationUnit === 'Words') {
-            return (progress.wordsDone / progress.totalWordCount * 100 >= 100 && this.step.status === 'Completed') 
-                || this.step.status === 'Cancelled Halfway';
-            }
-            return progress === 100;
-        }
-    },
-    components: {
-        StepInfoTitle,
-        DataTable
-    }
-}
+	export default {
+		props: {
+			stepFiles: {
+				type: Array
+			},
+			step: {
+				type: Object
+			},
+			projectId: {
+				type: [ Number, String ]
+			},
+			originallyUnits: {
+				type: Array
+			}
+		},
+		data() {
+			return {
+				isFilesShown: false,
+				isAllChecked: false,
+				fields: [
+					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "60%", padding: 0 },
+					{ label: "Category", headerKey: "headerCategory", key: "category", width: "20%", padding: 0 },
+					{ label: "Link", headerKey: "headerLink", key: "link", width: "20%", padding: 0, cellClass: "step-files_centered" }
+				]
+			}
+		},
+		methods: {
+			...mapActions({
+				storeProject: "setCurrentProject",
+				alertToggle: "alertToggle"
+			}),
+			toggleFilesShow() {
+				this.isFilesShown = !this.isFilesShown
+			},
+			isDownloadIcon() {
+				return this.isCompleted
+			}
+		},
+		computed: {
+			...mapGetters({
+				currentProject: "getCurrentProject"
+			}),
+			getUnitTypeByUnitId() {
+				return this.originallyUnits
+						.find(unit => unit._id.toString() === this.step.serviceStep.unit).type
+			},
+			isCompleted() {
+				const { progress, status } = this.step
+				if (this.getUnitTypeByUnitId === 'CAT Wordcount') {
+					return (progress.wordsDone / progress.totalWordCount * 100 >= 100 && status === 'Completed') || status === 'Cancelled Halfway'
+				}
+				return progress === 100
+			}
+		},
+		components: {
+			StepInfoTitle,
+			DataTable
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors.scss";
 
-%flex {
+  %flex {
     display: flex;
     align-items: center;
     padding-left: 5px;
     height: 30px;
-}
+  }
 
-.step-files {
+  .step-files {
     box-shadow: 0 0 5px $brown-shadow;
     padding: 20px;
+
     &__table {
-        margin-top: 20px;
+      margin-top: 20px;
     }
+
     &__image {
-        height: 18px;
-        width: 18px;
-        cursor: pointer;
+      height: 18px;
+      width: 18px;
+      cursor: pointer;
     }
+
     &__data, &__checkbox, &__name {
-        @extend %flex;
+      @extend %flex;
     }
+
     &__link {
-        @extend %flex;
-        padding-left: 0;
+      @extend %flex;
+      padding-left: 0;
     }
+
     &_break-word {
-        word-break: break-word;
-        align-items: baseline;
-        overflow-y: auto;
+      word-break: break-word;
+      align-items: baseline;
+      overflow-y: auto;
     }
-}
+  }
 
 </style>

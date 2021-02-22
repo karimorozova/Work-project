@@ -21,7 +21,7 @@
       .other-info__item
         LabelValue(title="Status" :value="job.status | stepStatusFilter" customClass="pair_column-flex")
       .other-info__item
-        LabelValue(title="Payable" :value="job.nativeFinance.Price.payables" customClass="pair_column-flex")
+        LabelValue(title="Payable" :value="(job.nativeFinance.Price.payables).toFixed(2)" customClass="pair_column-flex")
           span(v-html="returnIconCurrencyByStringCode('EUR')")
 
 </template>
