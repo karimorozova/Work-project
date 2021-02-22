@@ -22,29 +22,30 @@
         :stepFiles="stepFiles"
         :step="step"
         :projectId="task.projectId"
+        :originallyUnits="originallyUnits"
       )
 </template>
 
 <script>
-	import Vendor from "../stepinfo/Vendor";
-	import Finance from "../stepinfo/finance/Finance";
-	import Matrix from "../stepinfo/Matrix";
-	import Files from "../stepinfo/Files";
-	import {mapGetters, mapActions} from "vuex";
+	import Vendor from "../stepinfo/Vendor"
+	import Finance from "../stepinfo/finance/Finance"
+	import Matrix from "../stepinfo/Matrix"
+	import Files from "../stepinfo/Files"
+	import { mapGetters, mapActions } from "vuex"
 
 	export default {
 		props: {
 			vendors: {
-				type: Array,
+				type: Array
 			},
 			step: {
-				type: Object,
+				type: Object
 			},
 			task: {
-				type: Object,
+				type: Object
 			},
 			index: {
-				type: [Number, String],
+				type: [ Number, String ]
 			},
 			originallyLanguages: {
 				type: Array
@@ -53,71 +54,77 @@
 				type: Array
 			},
 			projectCurrency: {
-				type: String,
-      }
+				type: String
+			}
 		},
 		data() {
 			return {
 				matrixData: [],
-			};
+				delivery: null
+			}
 		},
 		methods: {
 			stepFilesFiller(arr, category) {
-				let files = [];
+				let files = []
 				for (let file of arr) {
-					const nameArr = file.split("/");
-					const filePath = __WEBPACK__API_URL__ + file.split("./dist")[1];
-					const fileName = nameArr[nameArr.length - 1];
-					const targetFile = this.task.targetFiles
-						? this.task.targetFiles.find((item) => item.fileName === fileName)
-						: "";
-					files.push({
-						check: false,
-						fileName: fileName,
-						category: category,
-						source: filePath,
-						target: targetFile ? __WEBPACK__API_URL__ + targetFile.path : "",
-					});
+					const nameArr = file.split("/")
+					const filePath = file.includes('dist') ? __WEBPACK__API_URL__ + file.split("./dist")[1] : __WEBPACK__API_URL__ + file
+					const fileName = nameArr[nameArr.length - 1]
+					files.push({ fileName: fileName, category: category, link: filePath })
 				}
-				return files;
+				return files
 			},
-			refreshFinance({costs}) {
+			refreshFinance({ costs }) {
 				// console.log("refresh finance", costs);
 			},
+			async getDeliveryFiles() {
+				try {
+					const result = await this.$http.post("/pm-manage/delivery-data", {
+						projectId: this.currentProject._id,
+						taskId: this.task.taskId
+					})
+					this.delivery = result.data
+				} catch (err) {
+				}
+			},
 			closeInfo() {
-				this.$emit("closeStepInfo");
+				this.$emit("closeStepInfo")
 			},
 			...mapActions({
 				alertToggle: "alertToggle",
-				updateMatrix: "updateMatrix",
-			}),
+				updateMatrix: "updateMatrix"
+			})
+		},
+		mounted() {
+			this.getDeliveryFiles()
 		},
 		computed: {
 			...mapGetters({
-				currentProject: "getCurrentProject",
+				currentProject: "getCurrentProject"
 			}),
 			stepFiles() {
-				let result = [];
-				if (this.task.sourceFiles) {
-					result.push(
-						...this.stepFilesFiller(this.task.sourceFiles, "Source file")
-					);
+				let result = []
+				if (this.task.sourceFiles) result.push(...this.stepFilesFiller(this.task.sourceFiles, "Source"))
+				if (this.task.refFiles) result.push(...this.stepFilesFiller(this.task.refFiles, "Reference"))
+				if (this.currentProject.status !== 'Closed') {
+					if (this.task.targetFiles) result.push(...this.stepFilesFiller(this.task.targetFiles.map(i => i.path), "Target"))
+				} else {
+					if (this.delivery) {
+						console.log(this.delivery)
+						result.push(...this.stepFilesFiller(this.delivery.files.map(i => i.path), "Target"))
+					}
 				}
-				if (this.task.refFiles) {
-					result.push(
-						...this.stepFilesFiller(this.task.refFiles, "Reference file")
-					);
-				}
-				return result;
-			},
+				console.log(result)
+				return result
+			}
 		},
 		components: {
 			Vendor,
 			Finance,
 			Matrix,
-			Files,
-		},
-	};
+			Files
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
