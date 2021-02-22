@@ -7,8 +7,8 @@
         :errors="errors",
         :areErrors="areErrors",
         :isApproveModal="isDeleting",
-        bodyClass="bodyHeigth-300",
-        :rowCount="8",
+        :tbodyStyle="{'max-height': '300px'}",
+        :rowCount="9",
         @closeErrors="closeErrors",
         @approve="deleteCompetencies",
         @notApprove="setDefaults",
@@ -115,9 +115,10 @@
 	import SettingsTable from "../Table/SettingsTable";
 	import crudIcons from "@/mixins/crudIcons";
 	import scrollEnd from "../../mixins/scrollEnd";
+	import checkCombinations from "../../mixins/combinationsChecker";
 
 	export default {
-		mixins: [crudIcons, scrollEnd],
+		mixins: [crudIcons, scrollEnd, checkCombinations],
 		props: {
 			vendorIndustries: {
 				type: Array,
@@ -284,9 +285,12 @@
 
 			async checkErrors(index) {
 				if(this.currentActive === -1) return;
+				const countOfFields = {first: 10, second: 10, third: 10}
 				this.errors = [];
-				if(this.newRow) {
-					if(!this.currentSource) this.errors.push("Source should not be empty!");
+        if(this.newRow) {
+          if(!this.checkCombinations(this.currentTargets.length, this.currentIndustries.length, this.currentSteps.length, countOfFields))
+            this.errors.push(`Max selected fields: \n Target = ${countOfFields.first} | Industry = ${countOfFields.second} | Steps = ${countOfFields.third} `)
+          if(!this.currentSource) this.errors.push("Source should not be empty!");
 					if(!this.currentTargets.length) this.errors.push("Targets should not be empty!");
 					if(!this.currentIndustries.length) this.errors.push("Industries should not be empty!");
 					if(!this.currentSteps.length) this.errors.push("Steps should not be empty!");
