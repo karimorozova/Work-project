@@ -22,11 +22,17 @@ const newLQAStatusFromXTRFProjects = async () => {
 		const projectIndustry = _.find(allIndustries, { name: domain }) || otherIndustry;
 		const projectIndustryGroup = _.find(allIndustries, { name: findIndustry(domain) }) || otherIndustry;
 		await MemoqProject.findOneAndUpdate({ serverProjectGuid }, { isInLQAReports: true })
-		for ({
-			TotalWordCount,
-			TargetLangCode,
-			UserAssignments: { TranslationDocumentUserRoleAssignmentDetails: users }
-		} of documents) {
+		for (document of documents) {
+			const {
+				TotalWordCount,
+				TargetLangCode,
+				UserAssignments
+				} = document
+
+			if(!UserAssignments) continue
+
+			const users = UserAssignments.TranslationDocumentUserRoleAssignmentDetails
+
 			let targetLanguage = getLanguageByMemoqLangCode(languages, TargetLangCode) || TargetLangCode;
 
 			const user = _.filter(users, (user) => user.DocumentAssignmentRole === '0').shift();

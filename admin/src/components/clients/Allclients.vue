@@ -186,7 +186,6 @@ label {
     margin-bottom: 20px;
     &__row-button{
       display: flex;
-      justify-content: flex-end;
       margin-bottom: 20px;
     }
     &__row {
@@ -230,16 +229,26 @@ label {
 }
 
 .add-button {
-    width: 168px;
-    height: 34px;
-    line-height:34px;
-    color: #fff;
-    font-size: 14px;
-    border-radius: 10px;
-    box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    background-color: #D15F45;
-    border: 1px solid #D15F45;
+  min-width: 120px;
+  padding: 0 24px 0 24px;
+  height: 34px;
+  color: #fff;
+  font-size: 14px;
+  border-radius: 7px;
+  background-color: #d15f45;
+  border: none;
+  transition: .1s ease;
+  outline: none;
+  letter-spacing: 0.2px;
+
+  &:hover {
     cursor: pointer;
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  }
+
+  &:active {
+    transform: scale(.98);
+  }
 }
 
 .add-button:active, .add-button:focus{

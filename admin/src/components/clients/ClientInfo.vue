@@ -743,22 +743,7 @@
   }
 
   .button {
-    margin-left: 30px;
-    width: 138px;
-    height: 33px;
-    color: white;
-    font-size: 14px;
-    border-radius: 10px;
-    -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-    background-color: #d15f45;
-    border: 1px solid #d15f45;
-    cursor: pointer;
-    outline: none;
-
-    .delete-approve & {
-      margin-left: 0;
-    }
+    margin: 0 10px;
   }
 
   .delete-approve {

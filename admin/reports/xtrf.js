@@ -317,7 +317,7 @@ function getIndustryTier(industryTier, industryName, sourceGroupLang, targetGrou
   const industryTiers = industryTier[industryName]
   if (!industryTiers) return 1
   const industryInfo = industryTiers.find(({sourceLang, targetLang}) => sourceGroupLang === sourceLang && targetGroupLang == targetLang)
-  return  industryInfo.tier
+  return industryInfo ? industryInfo.tier : 1
 }
 // function getAssessmentInfo(result) {
 //   return  result.map((lqaReport)=> {
