@@ -312,7 +312,7 @@ export default {
 	    if (arraysOfTheSame.length) this.errors.push("Such data already exists!");
     }
       if (!this.checkCombinations(this.currentTargets.length, this.currentServices.length, this.currentIndustries.length, countOfFields))
-        this.errors.push(`Max selected fields: \n Target = ${countOfFields.first} | Services = ${countOfFields.second} | Steps = ${countOfFields.third} `)
+        this.errors.push(`Max selected fields: \n Targets = ${countOfFields.first} | Services = ${countOfFields.second} | Steps = ${countOfFields.third} `)
 	    if (!this.currentSource) this.errors.push("Source should not be empty!");
       if (!this.currentTargets.length) this.errors.push("Target should not be empty!");
       if (!this.currentIndustries.length) this.errors.push("Industry should not be empty!");

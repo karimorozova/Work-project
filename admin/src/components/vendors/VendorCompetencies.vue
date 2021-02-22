@@ -289,7 +289,7 @@
 				this.errors = [];
         if(this.newRow) {
           if(!this.checkCombinations(this.currentTargets.length, this.currentIndustries.length, this.currentSteps.length, countOfFields))
-            this.errors.push(`Max selected fields: \n Target = ${countOfFields.first} | Industry = ${countOfFields.second} | Steps = ${countOfFields.third} `)
+            this.errors.push(`Max selected fields: \n Targets = ${countOfFields.first} | Industries = ${countOfFields.second} | Steps = ${countOfFields.third} `)
           if(!this.currentSource) this.errors.push("Source should not be empty!");
 					if(!this.currentTargets.length) this.errors.push("Targets should not be empty!");
 					if(!this.currentIndustries.length) this.errors.push("Industries should not be empty!");
