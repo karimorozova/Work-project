@@ -87,6 +87,7 @@
         :isAssign="isAssign"
         :isDeliver="isDeliver"
         :isNotify="isNotify"
+        :isReadyForDelivery="isReadyForDelivery"
         :isDr1="isDr1"
         @toggleOption="toggleOption"
       )
@@ -104,8 +105,6 @@
           value="Approve Deliverable"
           @clicked="approve"
         )
-
-
 </template>
 
 <script>
@@ -137,8 +136,9 @@
 				areOptions: true,
 				isDeliver: false,
 				isNotify: false,
-				isDr1: true,
+				isReadyForDelivery: false,
 				isAssign: true,
+				isDr1: true,
 				files: [],
 				dr1Manager: null,
 				dr2Manager: null,
@@ -188,12 +188,19 @@
 				this[prop] = true
 				if (prop === 'isAssign') {
 					this.isDeliver = false
+					this.isReadyForDelivery = false
 					this.isNotify = false
 				} else if (prop === 'isDeliver') {
 					this.isAssign = false
+					this.isReadyForDelivery = false
+					this.isNotify = false
+				} else if (prop === 'isReadyForDelivery') {
+					this.isAssign = false
+					this.isDeliver = false
 					this.isNotify = false
 				} else {
 					this.isAssign = false
+					this.isReadyForDelivery = false
 					this.isDeliver = false
 				}
 			},
@@ -212,11 +219,11 @@
 				})
 				await this.getDeliveryData()
 			},
-			toggleOptions() {
-				this.isAssign = this.isDr1
-				this.isDeliver = !this.isDr1
-				this.isNotify = false
-			},
+			// toggleOptions() {
+			// 	this.isAssign = this.isDr1
+			// 	this.isDeliver = !this.isDr1
+			// 	this.isNotify = false
+			// },
 			checkAllFiles({ bool }) {
 				this.files = this.files.map(item => {
 					return { ...item, isChecked: bool }
@@ -278,6 +285,7 @@
 				}
 			},
 			async approve() {
+
 				try {
 					if (this.isDr1 && this.isAssign) {
 						await this.assignDr2({
@@ -286,16 +294,16 @@
 							dr2Manager: this.dr2Manager
 						})
 						return await this.getDeliveryData()
-					}
-					if (!this.isNotify && !this.isDeliver) {
+					} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
 						return await this.approveDeliverable(this.task.taskId)
+					} else {
+						return await this.approveWithOption({
+							taskId: this.task.taskId,
+							isDeliver: this.isDeliver,
+							contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
+							user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
+						})
 					}
-					await this.approveWithOption({
-						taskId: this.task.taskId,
-						isDeliver: this.isDeliver,
-						contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
-						user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
-					})
 				} catch (err) {
 				} finally {
 					this.$emit("close")
@@ -362,7 +370,7 @@
 				return _.groupBy(this.instructions, 'title')
 			},
 			isAllChecked() {
-				this.toggleOptions()
+				// this.toggleOptions()
 				const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
 				const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
 				return !uncheckedInstructions.length && !uncheckedFiles.length

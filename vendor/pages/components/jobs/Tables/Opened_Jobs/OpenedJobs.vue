@@ -41,7 +41,7 @@
       template(slot="deadLine" slot-scope="{ row, index }")
         .jobs__data(v-if="row.deadline") {{ formatDeadline(row.deadline) }}
       template(slot="amount" slot-scope="{ row, index }")
-        .jobs__data {{ row.nativeFinance.Price.payables }}
+        .jobs__data {{ (row.nativeFinance.Price.payables).toFixed(2) }}
           span.jobs__currency(v-if="row.nativeFinance.Price.payables")
           span(v-html='returnIconCurrencyByStringCode("EUR")')
       template(slot="icons" slot-scope="{ row, index }")

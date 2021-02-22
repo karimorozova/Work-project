@@ -1,7 +1,8 @@
 <template lang="pug">
   .options
-    .options__item(v-if="isDr1" :class="{'options_brown': isAssign}" @click="(e) => toggle(e, 'isAssign')") Assign DR2
-    .options__item(:class="{'options_brown': isDeliver, 'options_bordered': isDr1}" @click="(e) => toggle(e, 'isDeliver')") Deliver to Client
+    .options__item.border(v-if="isDr1" :class="{'options_brown': isAssign}" @click="(e) => toggle(e, 'isAssign')") Assign DR2
+    .options__item.border(:class="{'options_brown': isDeliver}" @click="(e) => toggle(e, 'isDeliver')") Deliver to Client
+    .options__item.border(:class="{'options_brown': isReadyForDelivery}" @click="(e) => toggle(e, 'isReadyForDelivery')") Ready for Delivery
     .options__item(:class="{'options_brown': isNotify}" @click="(e) => toggle(e, 'isNotify')") Notify Client
 </template>
 
@@ -11,7 +12,8 @@
 			isDeliver: { type: Boolean, default: false },
 			isNotify: { type: Boolean, default: false },
 			isDr1: { type: Boolean, default: true },
-			isAssign: { type: Boolean, default: true }
+			isAssign: { type: Boolean, default: true },
+			isReadyForDelivery: { type: Boolean, default: true }
 		},
 		methods: {
 			toggle(e, prop) {
@@ -23,6 +25,10 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .border {
+    border-right: 2px solid #938676;
+  }
 
   .options {
     display: flex;
