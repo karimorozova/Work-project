@@ -93,23 +93,25 @@
       margin-bottom: 20px;
     }
     &__update-btn {
-      width: 188px;
+      min-width: 120px;
+      padding: 0 24px 0 24px;
       height: 34px;
-      color: #fff;
+      color: $white;
       font-size: 14px;
-      border-radius: 10px;
-      box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
-      background-color: #D15F45;
-      border: 1px solid #D15F45;
-      cursor: pointer;
-      outline: 0;
-      line-height: 32px;
+      border-radius: 7px;
+      background-color: $orange;
+      border: none;
+      transition: .1s ease;
+      outline: none;
+      letter-spacing: 0.2px;
+
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      }
 
       &:active {
         transform: scale(.98);
-        outline: none !important;
-        outline-color: none;
-        border: none;
       }
     }
   }
