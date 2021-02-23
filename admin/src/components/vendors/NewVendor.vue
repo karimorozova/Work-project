@@ -515,6 +515,7 @@ export default {
 .buttons {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   margin-left: 10px;
   width: 1000px;
 }
