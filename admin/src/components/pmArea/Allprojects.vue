@@ -94,7 +94,7 @@
 			},
 			setStatuses(name) {
 				if(name === 'open-projects') {
-					this.statuses = ["All", "Approved", "Cancelled", "Cancelled Halfway", "In progress", "Rejected"]
+					this.statuses = ["All", "Approved", "Cancelled", "Cancelled Halfway", "In progress", "Rejected", "Ready for Delivery"]
 				} else if(name === 'quote-projects') {
 					this.statuses = ["All", "Draft", "Quote sent", "Cost Quote"]
 				} else {

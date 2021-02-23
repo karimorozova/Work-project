@@ -110,11 +110,9 @@
 					if (this.task.targetFiles) result.push(...this.stepFilesFiller(this.task.targetFiles.map(i => i.path), "Target"))
 				} else {
 					if (this.delivery) {
-						console.log(this.delivery)
 						result.push(...this.stepFilesFiller(this.delivery.files.map(i => i.path), "Target"))
 					}
 				}
-				console.log(result)
 				return result
 			}
 		},

@@ -32,7 +32,7 @@ async function getProjectDeliverables(project) {
         for(let task of tasks) {
             if(task.status !== 'Cancelled') {
                 const { taskId, targetFiles: taskFiles } = task;
-                taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
+                let taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
                 files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
             }
         }

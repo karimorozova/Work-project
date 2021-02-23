@@ -20,6 +20,9 @@
     .tasks-steps__tables
       Tasks(v-if="currentProject.tasks.length && isTasksShow"
         :allTasks="this.currentProject.tasks"
+        :originallyUnits="originallyUnits"
+        :originallySteps="originallySteps"
+        :originallyServices="originallyServices"
         @showTab="showTab"
         @updateTasks="updateTasks"
       )
@@ -52,6 +55,9 @@
 				type: Array
 			},
 			originallySteps: {
+				type: Array
+			},
+			originallyServices: {
 				type: Array
 			}
 		},

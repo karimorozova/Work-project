@@ -839,9 +839,9 @@ router.get('/deliverables', async (req, res) => {
 })
 
 router.post('/deliver', async (req, res) => {
-	const { tasks } = req.body
+	const { tasks, user } = req.body
 	try {
-		const updatedProject = await getAfterTasksDelivery(tasks)
+		const updatedProject = await getAfterTasksDelivery(tasks, user)
 		if (updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
 			await notifyProjectDelivery(updatedProject)
 		}
