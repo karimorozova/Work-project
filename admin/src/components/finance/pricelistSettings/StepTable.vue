@@ -293,7 +293,7 @@ export default {
               size: this.currentSize,
               multiplier: parseFloat(this.currentMultiplier).toFixed(0),
               usdMinPrice: this.currentMinPriceUSD,
-              euroMinPrice: parseFloat(this.currentMinPriceEUR).toFixed(3),
+              euroMinPrice: parseFloat(this.currentMinPriceEUR).toFixed(4),
               gbpMinPrice: this.currentMinPriceGBP
             }
           }
@@ -346,10 +346,10 @@ export default {
     currentRatio() {
       this.currentMinPriceUSD = (
         this.currentMinPriceEUR * this.currency.USD
-      ).toFixed(3);
+      ).toFixed(4);
       this.currentMinPriceGBP = (
         this.currentMinPriceEUR * this.currency.GBP
-      ).toFixed(3);
+      ).toFixed(4);
     },
     manageIcons() {
       const { delete: del, ...result } = this.icons;

@@ -53,7 +53,7 @@ const multiplyPrices = (basicPrice, firstPercentMultiplier, size, secondPercentM
     getPercentage(basicPrice, firstPercentMultiplier) *
     Number(size) *
     (secondPercentMultiplier / 100)
-  ).toFixed(3)
+  ).toFixed(4)
 );
 
 const groupPriceList = (arr, allIndustries) => {

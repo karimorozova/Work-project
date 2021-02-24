@@ -32,8 +32,8 @@ const getDefaultBasicPrices = async () => {
 			sourceLanguage: source._id,
 			targetLanguage: target._id,
 			euroBasicPrice: euroBasicPrice,
-			usdBasicPrice: (euroBasicPrice * USD).toFixed(3),
-			gbpBasicPrice: (euroBasicPrice * GBP).toFixed(3),
+			usdBasicPrice: (euroBasicPrice * USD).toFixed(4),
+			gbpBasicPrice: (euroBasicPrice * GBP).toFixed(4),
 			isActive: true
 		});
 	}

@@ -503,7 +503,7 @@ function getTasksInfo(obj, fromMinimumCharge, tasks, steps, allUnits, allSetting
 				task: curTask.service.title,
 				langPair: `${ langPair }`,
 				jobType: title,
-				unitPrice: curStep.clientRate.value.toFixed(3),
+				unitPrice: curStep.clientRate.value.toFixed(4),
 				unit: type,
 				quantity: totalQuantity,
 				cost,

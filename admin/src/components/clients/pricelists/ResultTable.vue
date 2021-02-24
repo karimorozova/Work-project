@@ -239,7 +239,7 @@
 				try {
 					await this.$http.post("/clientsapi/rates/change-pricelist/" + this.clientId, {
 								_id: id,
-								price: parseFloat(this.currentPrice).toFixed(3),
+								price: parseFloat(this.currentPrice).toFixed(4),
 								altered: true,
 								notification: "Price disconnected from function"
 							}
