@@ -2,7 +2,7 @@ const { xmlHeader, getHeaders } = require("../../configs");
 const parser = require('xml2json');
 const soapRequest = require('easy-soap-request');
 const fs = require('fs');
-const { getMemoqFileId } = require("./projects");
+const { getMemoqFileId, getMemoqFileIdNativeFormat } = require("./projects");
 
 const url = `https://memoq.pangea.global:8080/memoQServices/FileManager/FileManagerService`;
 const headerWithoutAction = getHeaders('IFileManagerService');
@@ -133,7 +133,9 @@ async function moveMemoqFileToProject(projectId, fileId) {
 
 async function downloadMemoqFile({memoqProjectId, docId, path}) {
     try {
-        const fileId = await getMemoqFileId(memoqProjectId, docId);
+        // old file download in different format
+        // const fileId = await getMemoqFileId(memoqProjectId, docId);
+        const fileId = await getMemoqFileIdNativeFormat(memoqProjectId, docId)
         const sessionId = await exportMemoqFile(fileId);
         await getMemoqFileChunks(sessionId, path);
     } catch(err) {

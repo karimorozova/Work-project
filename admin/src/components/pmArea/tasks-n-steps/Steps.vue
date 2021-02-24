@@ -580,6 +580,7 @@
     }
 
     &__info-icon {
+      height: 19px;
       i {
         color: $main-color;
         opacity: 0.7;

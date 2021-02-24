@@ -7,7 +7,7 @@ async function getProjectAfterApprove({taskId, project, isDeliver, contacts , us
             return await setTasksDeliveryStatus({taskId, project, status: "Delivered", user})
         }
         await notifyClientTaskReady({taskId, project, contacts});
-        return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery"});
+        return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery", user});
     } catch(err) {
         console.log(err);
         console.log("Error in getProjectAfterApprove");

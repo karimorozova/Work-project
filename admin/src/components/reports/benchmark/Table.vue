@@ -10,8 +10,8 @@
             .benchmark-table__header(slot="headerPrice" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__header(slot="headerMargin" slot-scope="{ field }") {{ field.label }}
             .benchmark-table__data(slot="vendor" slot-scope="{ row }") {{ row.vendorName }}
-            .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") € {{ row.baseRate.toFixed(3) }}
-            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.margin)" ) € {{ row.margin.toFixed(3) }}
+            .benchmark-table__data(slot="basicPrice" slot-scope="{ row }") € {{ row.baseRate.toFixed(4) }}
+            .benchmark-table__data(slot="margin" slot-scope="{ row }" :class="getMarginClass(row.margin)" ) € {{ row.margin.toFixed(4) }}
 </template>
 
 <script>

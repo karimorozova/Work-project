@@ -2,12 +2,14 @@ const schedule = require("node-schedule");
 const moment = require('moment');
 const { XtrfLqa } = require('./models');
 const { downloadFromMemoqProjectsData } = require("./services/memoqs/projects");
+const { downloadMemoqFile } = require("./services/memoqs/files");
 const { updateStatusesForOtherProjects, clearGarbageProjects } = require("./services/memoqs/otherProjects");
 const { saveOtherProjectStatuses } = require('./gmail');
 const { newLangReport } = require('./reports/newLangTierReport');
 const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles');
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmarkCost } = require('./reports');
 
+// downloadMemoqFile({memoqProjectId:'1443ab32-fa74-eb11-90ed-82bb18d08256', docId:'4c077bd7-e5e7-46a5-9e4e-2953ab86e913', path:'./dist/max.xlsx'} )
 // saveOtherProjectStatuses()
 // downloadFromMemoqProjectsData();
 // clearGarbageProjects(true);

@@ -3,6 +3,7 @@ const { moveProjectFile, moveFile } = require('../utils/movingFile');
 const { getProject } = require('./getProjects');
 const { getPdfOfQuote } = require("../emailMessages/clientCommunication");
 const fs = require('fs');
+const { Delivery } = require('../models')
 const htmlToPdf = require('html-pdf');
 const apiUrl = require('../helpers/apiurl');
 
@@ -27,12 +28,14 @@ async function storeFiles(filesArr, projectId) {
 
 async function getProjectDeliverables(project) {
     const { tasks, id: projectId } = project;
+    const { tasks: tasksInDelivery } = await Delivery.findOne({ 'projectId' : projectId })
     let files = [];
     try {
         for(let task of tasks) {
             if(task.status !== 'Cancelled') {
-                const { taskId, targetFiles: taskFiles } = task;
-                taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
+                const { taskId } = task;
+                let taskFiles = tasksInDelivery.find(item => item.taskId === taskId).files
+                let taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
                 files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
             }
         }

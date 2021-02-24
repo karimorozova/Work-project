@@ -124,6 +124,15 @@
 		props: {
 			allTasks: {
 				type: Array
+			},
+			originallyUnits: {
+				type: Array
+			},
+			originallySteps: {
+				type: Array
+			},
+			originallyServices: {
+				type: Array
 			}
 		},
 		data() {
@@ -244,8 +253,8 @@
 						case 'Cancel':
 							await this.cancelTasks(checkedTasks);
 							break;
-						case 'Deliver':
-							await this.deliverTasks(checkedTasks);
+            case 'Deliver':
+							await this.deliverTasks( {tasks: checkedTasks, user:this.user} );
 							break
 					}
 				} catch (err) {
@@ -345,8 +354,11 @@
 			},
 			progress(task) {
 				let progress = 0;
-				//MM
-				const CATServices = ['Translation', 'SEO Translation', 'Official Translation', 'Localization'];
+				const { _id: catId } = this.originallyUnits.find(({type}) => type === 'CAT Wordcount');
+				const CATServices = this.originallyServices
+            .filter(({ steps }) => steps.some(({ step : { calculationUnit } }) => calculationUnit.includes(catId)))
+            .map(({ title }) => title);
+
 				let taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId);
 				taskSteps = taskSteps.filter(item => !item.stepId.includes('Canceled'));
 				if(CATServices.includes(task.service.title)) {
