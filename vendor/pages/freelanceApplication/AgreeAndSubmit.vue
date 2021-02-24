@@ -120,10 +120,12 @@ export default {
     align-items: center;
     width: 80%;
     &__term {
-        display: flex;
+      display: flex;
+      margin-bottom: 10px;
+
     }
     &__text {
-        font-size: 12px;
+        font-size: 14px;
         margin-left: 3px;
     }
     &__link {
@@ -171,7 +173,7 @@ export default {
         align-items: center;
     }
     &__captcha-comment {
-        font-size: 12px;
+        font-size: 14px;
         margin-bottom: 3px;
         position: relative;
         &:after {
@@ -183,23 +185,27 @@ export default {
         }
     }
     &__submit {
-        margin-top: 10px;
-        color: #FFF;
-        font-size: 14px;
-        background-color: #D15F45;
-        border: none;
-        outline: none;
-        height: 40px;
-        width: 170px;
-        border-radius: 10px;
-        box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
+      margin-top: 10px;
+      min-width: 120px;
+      padding: 0 24px 0 24px;
+      height: 34px;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 7px;
+      background-color: #d15f45;
+      border: none;
+      transition: .1s ease;
+      outline: none;
+      letter-spacing: 0.2px;
+
+      &:hover {
         cursor: pointer;
-        &:hover {
-            box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);
-        }
-        &:active {
-            box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
-        }
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      }
+
+      &:active {
+        transform: scale(.98);
+      }
     }
     &_disabled {
         opacity: 0.6;

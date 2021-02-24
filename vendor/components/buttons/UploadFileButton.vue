@@ -39,22 +39,31 @@ export default {
 .upload-file {
     display: flex;
     flex-direction: column;
-    align-items: center;
     &__button {
-        overflow: hidden;
-        position: relative;
-        width: 150px;
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 10px;
-        box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        background-color: #D15F45;
-        &:hover {
-            box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);     
-        }
-        &:active {
-            box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
-        }
+      margin-top: 7px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 120px;
+      padding: 0 24px;
+      height: 34px;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 7px;
+      background-color: #d15f45;
+      border: none;
+      transition: .1s ease;
+      outline: none;
+      letter-spacing: 0.2px;
+
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      }
+
+      &:active {
+        transform: scale(.98);
+      }
         @media (max-width: 450px) {
             width: 100px;
         }
@@ -79,11 +88,13 @@ export default {
         font-family: Myriad400;
     }
     &__label {
-        font-size: 12px;
+        font-size: 14px;
     }
     &__comment {
-        font-size: 12px;
+        font-size: 14px;
         opacity: 0.6;
+      margin-top: 5px;
+
     }
     .personal__item & {
         @media (max-width: 450px) {

@@ -33,7 +33,7 @@ export default {
     display: flex;
     flex-direction: column;
     &__label {
-        font-size: 12px;
+        font-size: 14px;
         margin-bottom: 5px;
     }
     &__input {
@@ -42,11 +42,11 @@ export default {
         height: 30px;
         outline: none;
         border: 1px solid #67573E;
-        border-radius: 15px;
+        border-radius: 7px;
         color: #67573E;
-        box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
         &:focus {
-            box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
+          cursor: pointer;
+          box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
         }
         @media (max-width: 1600px) {
             width: 96%;
@@ -63,7 +63,7 @@ export default {
         position: absolute;
         left: 0;
         bottom: -24px;
-        font-size: 12px;
+        font-size: 14px;
         opacity: 0.5;
         .personal_contacts-height & {
             @media (max-width: 450px) {

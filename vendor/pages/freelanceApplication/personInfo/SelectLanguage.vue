@@ -99,7 +99,7 @@ export default {
 <style lang="scss" scoped>
 
 .native-language__title {
-    font-size: 12px;
+    font-size: 14px;
     margin-bottom: 5px;
 }
 
@@ -108,11 +108,10 @@ export default {
     left: 0;
     width: 268px;
     border: 1px solid #67573E;
-    border-radius: 15px;
+    border-radius: 7px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
     .language-pairs & {
         width: 255px;
         @media (max-width: 1600px) {

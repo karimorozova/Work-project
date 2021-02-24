@@ -64,7 +64,7 @@
     width: 100%;
 
     &__label {
-      font-size: 12px;
+      font-size: 14px;
     }
   }
 
@@ -73,11 +73,10 @@
     top: 20px;
     width: 100%;
     border: 1px solid #67573E;
-    border-radius: 15px;
+    border-radius: 7px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
 
     .drop {
       width: 100%;

@@ -175,7 +175,7 @@ export default {
 }
 
 .title {
-    font-size: 22px;
+    font-size: 28px;
 }
 
 label {
