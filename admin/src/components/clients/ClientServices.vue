@@ -296,7 +296,7 @@ export default {
 
     async checkErrors(index) {
     	const currentIndex = index;
-      const countOfFields = {first: 3, second: 3, third: 3};
+      const countOfFields = {first: 5, second: 5, third: 5};
       if (this.currentActive === -1) return;
       this.errors = [];
 
@@ -337,15 +337,14 @@ export default {
           services: this.currentServices,
           industries: this.currentIndustries,
         };
-        const result = this.$http.post("/clientsapi/services", {
+        const result = await this.$http.post("/clientsapi/services", {
           clientId: this.$route.params.id,
           currentData,
           oldData,
         });
-        result.then((data) => {
-          this.clientServices = data.body.services;
-          this.clientServices.length && this.$emit("updateRates", true);
-        });
+
+        this.clientServices = result.data.services;
+        this.clientServices.length && this.$emit("updateRates", true);
 
 	      await this.$http.post('/pm-manage/check-pricelist-langs',{
 		      pricelistId: this.defaultPriceList,
@@ -391,12 +390,10 @@ export default {
     async deleteService() {
       try {
         let currentData = this.clientServices[this.deleteIndex];
-        const result = this.$http.delete(`/clientsapi/services/${this.$route.params.id}/${currentData._id}`);
+        const result = await this.$http.delete(`/clientsapi/services/${this.$route.params.id}/${currentData._id}`);
         this.clientServices.splice(this.deleteIndex, 1);
+        this.$emit("updateRates", true)
         this.closeModal();
-        result.then((data) => {
-          data.services.length && this.$emit("updateRates", true);
-        });
         this.alertToggle({
           message: "Services are deleted",
           isShow: true,

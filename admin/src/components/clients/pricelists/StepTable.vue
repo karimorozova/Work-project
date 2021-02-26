@@ -294,6 +294,11 @@
       align-items: center;
       box-sizing: border-box;
     }
+    
+    &__empty {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
 
     &__editing-data {
       box-shadow: inset 0 0 7px $brown-shadow;

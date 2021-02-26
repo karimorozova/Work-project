@@ -61,7 +61,7 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 			basicPricesTable = pushNewBasicPriceItem(basicPricesTable, defaultPricelist, sourceLanguage._id, newTargetLang._id)
 		}
 	}
-	pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
+	pricelistTable = [...oldPricelistTable, ...generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable) ]
 
 	const qualificationLangPairs = qualifications.map(({ source, target }) => `${ source } ${ target }`)
 	competencies = competencies.filter(row => {
@@ -123,7 +123,7 @@ const updateVendorStepMultipliers = async (oldData, newData, newStep, vendor, ve
 		vendorRates.pricelistTable = [ ...pricelistTable ]
 	} else {
 		const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable: oldPricelistTable } = vendorRates
-		vendorRates.pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
+		vendorRates.pricelistTable = [...oldPricelistTable, ...generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable) ]
 	}
 
 	if (!isNotLastStepInCompetence) {
@@ -156,7 +156,7 @@ const updateIndustryMultipliers = async (oldData, newData, newIndustry, vendor, 
 		vendorRates.pricelistTable = [ ...pricelistTable ]
 	} else {
 		const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable: oldPricelistTable } = vendorRates
-		vendorRates.pricelistTable = [ ...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable) ]
+		vendorRates.pricelistTable = [...oldPricelistTable, ...generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable) ]
 	}
 
 	if (!isNotLastIndustryInCompetence) {

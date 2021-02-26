@@ -276,6 +276,11 @@
       margin-left: 3px;
     }
 
+    &__empty {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
     &__data,
     &__editing-data {
       height: 32px;

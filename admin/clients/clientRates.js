@@ -11,20 +11,45 @@ const { tableKeys } = require('../enums')
 const { getRateInfoFromStepFinance } = require('../pricelist/ratesmanage')
 const { getClient } = require('../clients')
 
-/**
- *
- * @param {ObjectId} clientId
- * @param {String} itemIdentifier
- * @param {Object} updatedItem
- * @returns nothing - just updates DB
- */
+
+const filteredCombinationsResultRatesTable = async (priceListTable, clientId) => {
+	const { services } = await Clients.findOne({ _id: clientId }).populate('services.services')
+	const steps = await Step.find()
+
+	let servicesStepCombinations = services.reduce((acc, curr) => {
+		let result = []
+		curr.services[0].steps.forEach(step => {
+			let { calculationUnit } = steps
+					.find(i => i._id.toString() === step.step.toString())
+			calculationUnit.forEach(unit => {
+				result.push({
+					sourceLanguage: curr.sourceLanguage,
+					targetLanguage: curr.targetLanguages[0],
+					industry: curr.industries[0],
+					step: step.step,
+					unit
+				})
+			})
+		})
+		acc.push(...result)
+		return acc
+	}, [])
+
+	servicesStepCombinations = servicesStepCombinations
+			.map(row => `${ row.sourceLanguage }-${ row.targetLanguage }-${ row.step }-${ row.unit }-${ row.industry }`)
+
+	return priceListTable.filter(finalTableItem => {
+		return !!servicesStepCombinations
+				.includes(`${ finalTableItem.sourceLanguage }-${ finalTableItem.targetLanguage }-${ finalTableItem.step }-${ finalTableItem.unit }-${ finalTableItem.industry }`)
+	})
+}
+
 const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
 	const client = await Clients.findOne({ _id: clientId })
 	const boundPricelist = await Pricelist.findOne({ _id: client.defaultPricelist })
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = client.rates
-	let updatedPricelistTable
+	let updatedPricelistTableTable
 	switch (itemIdentifier) {
-		default:
 		case tableKeys.basicPricesTable:
 			const { basicPrice } = basicPricesTable.find(item => item._id.toString() === updatedItem._id.toString())
 			if (basicPrice === Number(updatedItem.basicPrice)) return
@@ -35,14 +60,14 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
 					tableKeys.basicPricesTable,
 					'Client'
 			)
-			updatedPricelistTable = changePricelistTable(
+			updatedPricelistTableTable = changePricelistTable(
 					pricelistTable,
 					updatedItem,
 					itemIdentifier,
 					basicPrice
 			)
 			client.rates.basicPricesTable = updatedBasicPriceTable
-			client.rates.pricelistTable = updatedPricelistTable
+			client.rates.pricelistTable = updatedPricelistTableTable
 			break
 		case tableKeys.stepMultipliersTable:
 			const { multiplier: stepMultiplier } = stepMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString())
@@ -54,14 +79,14 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
 					tableKeys.stepMultipliersTable,
 					'Client'
 			)
-			updatedPricelistTable = changePricelistTable(
+			updatedPricelistTableTable = changePricelistTable(
 					pricelistTable,
 					updatedItem,
 					itemIdentifier,
 					stepMultiplier
 			)
 			client.rates.stepMultipliersTable = updatedStepMultipliersTable
-			client.rates.pricelistTable = updatedPricelistTable
+			client.rates.pricelistTable = updatedPricelistTableTable
 			break
 		case tableKeys.industryMultipliersTable:
 			const { multiplier: industryMultiplier } = industryMultipliersTable.find(item => item._id.toString() === updatedItem._id.toString())
@@ -73,34 +98,24 @@ const updateClientRates = async (clientId, itemIdentifier, updatedItem) => {
 					tableKeys.industryMultipliersTable,
 					'Client'
 			)
-			updatedPricelistTable = changePricelistTable(
+			updatedPricelistTableTable = changePricelistTable(
 					pricelistTable,
 					updatedItem,
 					itemIdentifier,
 					industryMultiplier
 			)
 			client.rates.industryMultipliersTable = updatedIndustryMultipliersTable
-			client.rates.pricelistTable = updatedPricelistTable
+			client.rates.pricelistTable = updatedPricelistTableTable
 			break
 	}
 	await Clients.updateOne({ _id: clientId }, { rates: client.rates })
 }
 
-/**
- *
- * @param {Array} arr - operation array
- * @param {Object} replacementItem - replacement item
- * @param {Object} boundPricelist - pricelist that has been bound to client
- * @param {String} key - key for selecting needed table
- * @param {String} personKey - client's name
- * @returns {Array} returns updated array of objects
- */
 const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) => {
 	const { _id } = replacementItem
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = boundPricelist
 	let altered
 	switch (key) {
-		default:
 		case tableKeys.basicPricesTable:
 			const { sourceLanguage, targetLanguage } = replacementItem
 			const neededLangPair = getNeededLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id)
@@ -124,18 +139,14 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) =>
 	return arr
 }
 
-
 const findIndexToReplace = (arr, searchItemId) => arr.findIndex(item => item._id.toString() === searchItemId)
 
-
 const changePricelistTable = (pricelistTable, updatedItem, key, oldMultiplier) => {
-	console.log(oldMultiplier)
-	let updatedPricelist
+	let updatedPricelistTable
 	switch (key) {
-		default:
 		case tableKeys.basicPricesTable:
 			const { sourceLanguage, targetLanguage, basicPrice } = updatedItem
-			updatedPricelist = pricelistTable.map(item => {
+			updatedPricelistTable = pricelistTable.map(item => {
 				if (!item.altered && `${ item.sourceLanguage } ${ item.targetLanguage }` === `${ sourceLanguage._id } ${ targetLanguage._id }`) {
 					item.price /= oldMultiplier
 					item.price *= Number(basicPrice)
@@ -146,7 +157,7 @@ const changePricelistTable = (pricelistTable, updatedItem, key, oldMultiplier) =
 			break
 		case tableKeys.stepMultipliersTable:
 			const { step, unit, size, multiplier: stepMultiplier } = updatedItem
-			updatedPricelist = pricelistTable.map(item => {
+			updatedPricelistTable = pricelistTable.map(item => {
 				if (!item.altered && `${ item.step } ${ item.unit } ${ item.size }` === `${ step._id } ${ unit._id } ${ size }`) {
 					item.price /= oldMultiplier
 					item.price *= Number(stepMultiplier)
@@ -157,7 +168,7 @@ const changePricelistTable = (pricelistTable, updatedItem, key, oldMultiplier) =
 			break
 		case tableKeys.industryMultipliersTable:
 			const { industry, multiplier: industryMultiplier } = updatedItem
-			updatedPricelist = pricelistTable.map(item => {
+			updatedPricelistTable = pricelistTable.map(item => {
 				if (!item.altered && item.industry.toString() === industry._id) {
 					item.price /= oldMultiplier
 					item.price *= Number(industryMultiplier)
@@ -167,49 +178,47 @@ const changePricelistTable = (pricelistTable, updatedItem, key, oldMultiplier) =
 			})
 			break
 	}
-	return updatedPricelist
+	return updatedPricelistTable
 }
-/**
- * @param {ObjectId} clientId - id of a current client
- * @param newServicesArr - fresh created services, consists: {
- *   sourceLanguage: {Object},
- *   targetLanguages: {Array},
- *   services: {Array},
- *   industries: {Array}
- * }
- * @returns: Nothing, but updates client's rates with new combinations
- */
+
 const addNewRateComponents = async (clientId, newServicesArr) => {
 	const { rates, currency, defaultPricelist } = await Clients.findOne({ _id: clientId })
 	const boundPricelist = await Pricelist.findOne({ _id: defaultPricelist })
+	const allLanguages = await Languages.find()
+	const allServices = await Services.find()
+	const allIndustries = await Industries.find()
+	const allSteps = await Step.find()
+
 	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates
+
 	const freshBasicPriceRows = []
 	const newStepMultiplierCombinations = []
 	const newIndustryMultiplierCombinations = []
+
 	for (let newService of newServicesArr) {
-		newService = await gatherFullServiceInfo(newService)
+
+		newService = gatherFullServiceInfo(newService, { allLanguages, allServices, allIndustries })
 		const { sourceLanguage, targetLanguages } = newService
-		const { uniqueServiceSteps, uniqueIndustries } = await getUniqueServiceItems(newService, rates)
+		const { uniqueServiceSteps, uniqueIndustries } = getUniqueServiceItems(newService, rates, allSteps)
+
 		const newSteps = []
 		for (let { steps } of newService.services) {
 			for (let { step } of steps) {
 				newSteps.push({ _id: step._id })
 			}
 		}
-		const newIndustries = newService.industries.map(item => item._id)
 		for (let step of newSteps) {
 			newStepMultiplierCombinations.push(...await getStepMultipliersCombinations(step, boundPricelist))
 		}
+
+		const newIndustries = newService.industries.map(item => item._id)
 		for (let industry of newIndustries) {
-			const neededIndustryRow = boundPricelist.industryMultipliersTable.find(item => (
-					item.industry.toString() === industry.toString()
-			))
+			const neededIndustryRow = boundPricelist.industryMultipliersTable
+					.find(item => item.industry.toString() === industry.toString())
 			const multiplier = neededIndustryRow ? neededIndustryRow.multiplier : 100
-			newIndustryMultiplierCombinations.push({
-				industry,
-				multiplier
-			})
+			newIndustryMultiplierCombinations.push({ industry, multiplier })
 		}
+
 		for (let { _id } of targetLanguages) {
 			const neededLangPair = getNeededLangPair(boundPricelist.basicPricesTable, sourceLanguage._id, _id)
 			const boundBasicPrice = neededLangPair ? getNeededCurrency(neededLangPair, currency) : 1
@@ -222,75 +231,42 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
 			basicPricesTable.push(newBasicPriceObj)
 			freshBasicPriceRows.push(newBasicPriceObj)
 		}
-		if (uniqueServiceSteps.length) {
-			for (let service of uniqueServiceSteps) {
-				stepMultipliersTable.push(...await getStepMultipliersCombinations(service, boundPricelist))
-			}
-		}
-		if (uniqueIndustries.length) {
+
+		if (uniqueServiceSteps.length) for (let service of uniqueServiceSteps) stepMultipliersTable.push(...await getStepMultipliersCombinations(service, boundPricelist))
+
+		if (uniqueIndustries.length)
 			for (let { _id } of uniqueIndustries) {
-				const neededIndustryRow = boundPricelist.industryMultipliersTable.find(({ industry }) => (
-						industry.toString() === _id.toString()
-				))
+				const neededIndustryRow = boundPricelist.industryMultipliersTable.find(({ industry }) => industry.toString() === _id.toString())
 				const multiplier = !!neededIndustryRow ? neededIndustryRow.multiplier : 100
-				industryMultipliersTable.push({
-					industry: _id,
-					multiplier
-				})
+				industryMultipliersTable.push({ industry: _id, multiplier })
 			}
-		}
+
 	}
-	pricelistTable.push(...generateNewPricelistCombinations(
-			freshBasicPriceRows,
-			newStepMultiplierCombinations,
-			newIndustryMultiplierCombinations,
-			pricelistTable))
-	basicPricesTable = _.uniqBy(basicPricesTable, item => (
-			item.sourceLanguage.toString() +
-			item.targetLanguage.toString()
-	))
-	pricelistTable = _.uniqBy(pricelistTable, item => (
-			item.sourceLanguage.toString() +
-			item.targetLanguage.toString() +
-			item.step.toString() +
-			item.unit.toString() +
-			item.size +
-			item.industry.toString()
-	))
-	await Clients.updateOne({ _id: clientId },
-			{ rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } }
-	)
+	pricelistTable = [...pricelistTable, ...generateNewPricelistCombinations(freshBasicPriceRows, newStepMultiplierCombinations, newIndustryMultiplierCombinations)]
+
+	basicPricesTable = _.uniqBy(basicPricesTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString()))
+	pricelistTable = _.uniqBy(pricelistTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString() + item.step.toString() + item.unit.toString() + item.size + item.industry.toString()))
+
+	const newRates = {
+		basicPricesTable,
+		stepMultipliersTable,
+		industryMultipliersTable,
+		pricelistTable: await filteredCombinationsResultRatesTable(pricelistTable, clientId)
+	}
+
+	await Clients.updateOne({ _id: clientId }, { rates: newRates })
 }
 
-/**
- *
- * @param {ObjectId} sourceLanguageId
- * @param {ObjectId} targetLanguageId
- * @param {ObjectId} serviceId
- * @param {ObjectId} industryId
- * @returns {Object} returns fullfilled object with all needed information
- */
-const gatherFullServiceInfo = async (
-		{
-			sourceLanguage: sourceLanguageId,
-			targetLanguages: targetLanguageId,
-			services: serviceId,
-			industries: industryId
-		}) => {
+const gatherFullServiceInfo = ({ sourceLanguage: sourceLanguageId, targetLanguages: targetLanguageId, services: serviceId, industries: industryId }, allData) => {
+	const { allLanguages, allServices, allIndustries } = allData
 	return {
-		sourceLanguage: await Languages.findOne({ _id: sourceLanguageId }),
-		targetLanguages: [ await Languages.findOne({ _id: targetLanguageId }) ],
-		services: [ await Services.findOne({ _id: serviceId }) ],
-		industries: [ await Industries.findOne({ _id: industryId }) ]
+		sourceLanguage: allLanguages.find(({ _id }) => _id.toString() === sourceLanguageId.toString()),
+		targetLanguages: [ allLanguages.find(({ _id }) => _id.toString() === targetLanguageId.toString()) ],
+		services: [ allServices.find(({ _id }) => _id.toString() === serviceId.toString()) ],
+		industries: [ allIndustries.find(({ _id }) => _id.toString() === industryId.toString()) ]
 	}
 }
 
-/**
- *
- * @param {Object} basicPriceObj
- * @param {String} clientCurrency
- * @returns {Object} returns needed price according to client's currency
- */
 const getNeededCurrency = (basicPriceObj, clientCurrency) => {
 	const { euroBasicPrice, usdBasicPrice, gbpBasicPrice } = basicPriceObj
 	if (clientCurrency === 'EUR') {
@@ -302,43 +278,14 @@ const getNeededCurrency = (basicPriceObj, clientCurrency) => {
 	}
 }
 
-/**
- *
- * @param {Array} arr - operation array
- * @param {ObjectId} sourceLangId
- * @param {ObjectId} targetLangId
- * @returns {Object} returns object with needed language pair
- */
-const getNeededLangPair = (arr, sourceLangId, targetLangId) => (
-		arr.find(item => (
-				item.sourceLanguage.toString() === sourceLangId.toString() &&
-				item.targetLanguage.toString() === targetLangId.toString()
-		)))
+const getNeededLangPair = (arr, sourceLangId, targetLangId) => (arr.find(item => (item.sourceLanguage.toString() === sourceLangId.toString() && item.targetLanguage.toString() === targetLangId.toString())))
 
-/**
- *
- * @param {Array} arr - operation array
- * @param {Object} step - step object
- * @param {Object} unit - unit object
- * @param {Number} size - size to find same
- * @returns {Object} - returns object of a needed step row
- */
-const getNeededStepRow = (arr, step, unit, size) => (
-		arr.find(item => (
-				`${ item.step } ${ item.unit } ${ item.size }` === `${ step._id } ${ unit._id } ${ size }`
-		))
-)
+const getNeededStepRow = (arr, step, unit, size) => (arr.find(item => (`${ item.step } ${ item.unit } ${ item.size }` === `${ step._id } ${ unit._id } ${ size }`)))
 
-/**
- *
- * @param {Object} newService - object of a new service
- * @param {Object} rates - rates object
- * @returns {Object} - returns unique service steps and industries
- */
-const getUniqueServiceItems = async (newService, rates) => {
+const getUniqueServiceItems = (newService, rates, allSteps) => {
 	const { services: newServices, industries: newIndustries } = newService
 	const { stepMultipliersTable, industryMultipliersTable } = rates
-	const newStepUnitCombination = await getStepUnitCombinations(newServices)
+	const newStepUnitCombination = getStepUnitCombinations(newServices, allSteps)
 	const currentIndustries = industryMultipliersTable.map(item => item.industry)
 	const currentStepUnitCombinations = stepMultipliersTable.map(({ step, unit }) => `${ step } - ${ unit }`)
 	let uniqueServiceStepsCombinations = newStepUnitCombination.length ?
@@ -349,7 +296,7 @@ const getUniqueServiceItems = async (newService, rates) => {
 		uniqueServiceStepsCombinations = uniqueServiceStepsCombinations.map(item => item.split(' ')[0])
 		uniqueServiceStepsCombinations = Array.from(new Set(uniqueServiceStepsCombinations))
 		for (let id of uniqueServiceStepsCombinations) {
-			const neededStep = await Step.findOne({ _id: id })
+			const neededStep = allSteps.find(({ _id }) => _id.toString() === id.toString())
 			uniqueServiceSteps.push(neededStep)
 		}
 	}
@@ -360,16 +307,11 @@ const getUniqueServiceItems = async (newService, rates) => {
 	}
 }
 
-/**
- *
- * @param {Array} newServices - array of a new services
- * @returns {Array} - returns unique step-unit rows
- */
-const getStepUnitCombinations = async (newServices) => {
+const getStepUnitCombinations = (newServices, allSteps) => {
 	const stepUnitCombinations = []
 	for (let { steps } of newServices) {
 		for (let { step } of steps) {
-			step = await Step.findOne({ _id: step })
+			step = allSteps.find(({ _id }) => _id.toString() === step.toString())
 			const { _id, calculationUnit } = step
 			for (let { _id: unitId } of calculationUnit) {
 				stepUnitCombinations.push(`${ _id } - ${ unitId }`)
@@ -379,13 +321,6 @@ const getStepUnitCombinations = async (newServices) => {
 	return Array.from(new Set(stepUnitCombinations))
 }
 
-//TODO: Add clients currencies for combinations
-/**
- *
- * @param {ObjectId} _id - step's id
- * @param {Array} stepMultipliersTable
- * @returns {Array} - returns array of step combinations
- */
 const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable }) => {
 	const stepUnitSizeCombinations = []
 	const { calculationUnit } = await Step.findOne({ _id })
@@ -426,17 +361,12 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
 	return stepUnitSizeCombinations
 }
 
-
-const generateNewPricelistCombinations = (
-		newBasicPriceRows,
-		newStepMultiplierRows,
-		newIndustryMultiplierRows,
-		oldPricelistTable
-) => {
+const generateNewPricelistCombinations = (newBasicPriceRows, newStepMultiplierRows, newIndustryMultiplierRows) => {
+	const newPricelistCombinations = []
 	for (let { step, unit, size, multiplier: stepMultiplierValue } of newStepMultiplierRows) {
 		for (let { sourceLanguage, targetLanguage, basicPrice } of newBasicPriceRows) {
 			for (let { industry, multiplier: industryMultiplierValue } of newIndustryMultiplierRows) {
-				oldPricelistTable.push({
+				newPricelistCombinations.push({
 					sourceLanguage,
 					targetLanguage,
 					step,
@@ -448,25 +378,10 @@ const generateNewPricelistCombinations = (
 			}
 		}
 	}
-	return oldPricelistTable
+	return newPricelistCombinations
 }
 
-/**
- *
- * @param {Array} basicPricesTable - basic prices rows
- * @param {Array} stepMultipliersTable - step multiplier rows
- * @param {Array} industryMultipliersTable - industry multiplier rows
- * @param {Array} oldPricelistTable - old pricelist table
- * @param {Boolean} fromDelete - key that variates from true to false
- * @returns {Array} returns unique pricelist combinations
- */
-const getPricelistCombinations = (
-		basicPricesTable,
-		stepMultipliersTable,
-		industryMultipliersTable,
-		oldPricelistTable,
-		fromDelete = false
-) => {
+const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable, fromDelete = false) => {
 	const newPricelistCombinations = []
 	for (let { step, unit, size, multiplier: stepMultiplierValue } of stepMultipliersTable) {
 		for (let { sourceLanguage, targetLanguage, basicPrice } of basicPricesTable) {
@@ -504,93 +419,48 @@ const getPricelistCombinations = (
 
 Object.fromEntries = l => l.reduce((a, [ k, v ]) => ({ ...a, [k]: v }), {})
 
-/**
- *
- * @param {Object} client
- * @param {Object} updatedService - new service entity
- * @param {Object} oldService - old service entity
- * @param {Object} dataToUpdate
- * @returns nothing - just updates a client
- */
-const updateClientRatesFromServices = async (client, updatedService, oldService, dataToUpdate) => {
-	const { _id, rates, services } = client
+const updateClientRatesFromServices = async (client, updatedService, oldService) => {
+	const { _id, rates } = client
+
+	let updatedBasicPricesTable = rates.basicPricesTable
+	let updatedStepMultipliersTable = rates.stepMultipliersTable
+	let updatedIndustryMultipliersTable = rates.industryMultipliersTable
+	let updatedPricelistTable = rates.pricelistTable
+
 	const sourceLangDifference = getSourceLangDifference(updatedService.sourceLanguage, oldService.sourceLanguage._id)
 	const targetLangDifference = getArrDifference(updatedService.targetLanguages, oldService.targetLanguages)
 	const serviceStepDifference = getArrDifference(updatedService.services, oldService.services)
 	const industryDifference = getArrDifference(updatedService.industries, oldService.industries)
-	let updatedBasicPricesTable = rates.basicPricesTable
-	let updatedStepMultipliersTable = rates.stepMultipliersTable
-	let updatedIndustryMultipliersTable = rates.industryMultipliersTable
-	let updatedPricelist = rates.pricelistTable
-	const compareOldSource = !sourceLangDifference
-	const compareOldTarget = !targetLangDifference
-	if (sourceLangDifference || targetLangDifference) {
-		const result = await updateClientLangPairs({
-			client,
-			sourceLangDifference,
-			targetLangDifference,
-			updatedService,
-			oldService,
-			updatedPricelist
-		})
-		updatedBasicPricesTable = result.updatedBasicPricesTable
-		updatedPricelist.pricelistTable = result.updatedPricelist
+
+	if (!!sourceLangDifference || !!targetLangDifference) {
+		updatedBasicPricesTable = await updateClientLangPairs({ client, sourceLangDifference, targetLangDifference, updatedService, oldService })
 	}
-	if (serviceStepDifference) {
-		const result = await updateClientStepMultipliers({
-			client,
-			serviceStepDifference,
-			updatedService,
-			oldService,
-			updatedPricelist,
-			compareOldSource,
-			compareOldTarget
-		})
-		updatedStepMultipliersTable = result.updatedStepMultipliersTable
-		updatedPricelist.pricelistTable = result.updatedPricelist
+	if (!!serviceStepDifference) {
+		updatedStepMultipliersTable = await updateClientStepMultipliers({ client, serviceStepDifference, updatedService })
 	}
-	if (industryDifference) {
-		const result = await updateClientIndustryMultipliers({
-			client,
-			industryDifference,
-			updatedService,
-			oldService,
-			updatedPricelist
-		})
-		updatedIndustryMultipliersTable = result.updatedIndustryMultipliersTable
-		updatedPricelist.pricelistTable = result.updatedPricelist
+	if (!!industryDifference) {
+		updatedIndustryMultipliersTable = await updateClientIndustryMultipliers({ client, industryDifference, updatedService })
 	}
+
+	updatedPricelistTable = getPricelistCombinations(updatedBasicPricesTable, updatedStepMultipliersTable, updatedIndustryMultipliersTable, updatedPricelistTable)
+	updatedPricelistTable = _.uniqBy(updatedPricelistTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString() + item.step.toString() + item.unit.toString() + item.size + item.industry.toString()))
 
 	await Clients.updateOne({ _id }, {
 		rates: {
 			basicPricesTable: updatedBasicPricesTable,
 			stepMultipliersTable: updatedStepMultipliersTable,
 			industryMultipliersTable: updatedIndustryMultipliersTable,
-			pricelistTable: updatedPricelist
+			pricelistTable: await filteredCombinationsResultRatesTable(updatedPricelistTable, _id)
 		}
 	})
 
-	/**
-	 *
-	 * @param {ObjectId} newSourceLang - object id of a new source lang
-	 * @param {ObjectId} oldSourceLang - object id of an old source lang
-	 * @returns {null|*}
-	 */
 	function getSourceLangDifference(newSourceLang, oldSourceLang) {
-		if (newSourceLang.toString() !== oldSourceLang.toString()) {
-			return newSourceLang
-		}
+		if (newSourceLang.toString() !== oldSourceLang.toString()) return { newItem: newSourceLang.toString(), oldItem: oldSourceLang.toString() }
 		return null
 	}
 
-	/**
-	 *
-	 * @param {Array} newItemsArr
-	 * @param {Array} oldItemsArr
-	 * @returns {null | {newItem: {Object}, oldItem: {Object}}}
-	 */
 	function getArrDifference(newItemsArr, oldItemsArr) {
-		oldItemsArr = oldItemsArr.map(({ _id }) => _id)
+		oldItemsArr = oldItemsArr.map(({ _id }) => _id.toString())
 		newItemsArr = newItemsArr.map(_id => _id.toString())
 		const differenceArr = _.difference(newItemsArr, oldItemsArr)
 		const oldItem = _.difference(oldItemsArr, newItemsArr)[0]
@@ -601,12 +471,6 @@ const updateClientRatesFromServices = async (client, updatedService, oldService,
 	}
 }
 
-/**
- *
- * @param {Object} dataToUpdate
- * @param {Array} oldServices
- * @returns {Array} - array of combinations
- */
 const generateServiceCombinations = async (dataToUpdate, oldServices) => {
 	const servicesCombinations = []
 	const { services: arrServices } = dataToUpdate
@@ -637,15 +501,6 @@ const generateServiceCombinations = async (dataToUpdate, oldServices) => {
 	return servicesCombinations
 }
 
-/**
- *
- * @param {Array} oldServices - services arr
- * @param {ObjectId} newSourceLang - id of a new source language
- * @param {ObjectId} newTargetLang - id of a new target language
- * @param {ObjectId} newService - id of a new service
- * @param {ObjectId} newIndustry - id of a new industry
- * @returns {Boolean}
- */
 const checkForDuplicateRow = (oldServices, newSourceLang, newTargetLang, newService, newIndustry) => {
 	let isIdentical = false
 	for (let { sourceLanguage, targetLanguages, services, industries } of oldServices) {
@@ -658,12 +513,6 @@ const checkForDuplicateRow = (oldServices, newSourceLang, newTargetLang, newServ
 	return isIdentical
 }
 
-/**
- *
- * @param {Array} newServices
- * @param {Array} oldServices
- * @returns {Array} returns filtered services that fit to conditions
- */
 const getUniqueServiceCombinations = (newServices, oldServices) => {
 	return newServices.filter(newItem => (
 			oldServices.every(oldItem => (
@@ -675,12 +524,6 @@ const getUniqueServiceCombinations = (newServices, oldServices) => {
 	))
 }
 
-/**
- *
- * @param {Object} obj1
- * @param {Object} obj2
- * @returns {Object} returns differences of a two objects
- */
 const getObjDifferences = (obj1, obj2) => {
 	let diffs = {}
 	let key
@@ -698,17 +541,12 @@ const getObjDifferences = (obj1, obj2) => {
 	return diffs
 }
 
-/**
- *
- * @param {Object} client
- * @param {Object} rowToDelete
- * @returns {Object} returns updated tables
- */
 const clearClientRates = (client, rowToDelete) => {
 	const { rates, services } = client
 	let { pricelistTable } = rates
 	let { sourceLanguage, targetLanguages, services: servicesToDelete, industries } = rowToDelete
 	const langPair = `${ sourceLanguage._id } ${ targetLanguages[0]._id }`
+
 	const filteredBasicPricesTable = filterRedundantLangPair(
 			rates,
 			services,
@@ -742,41 +580,36 @@ const clearClientRates = (client, rowToDelete) => {
 	}
 }
 
-/**
- *
- * @param {Object} rates
- * @param {Array} services
- * @param {ObjectId} rowToDeleteId
- * @param {String} langPair
- * @returns {Array} returns filtered table
- */
 const filterRedundantLangPair = (rates, services, rowToDeleteId, langPair) => {
 	const { basicPricesTable } = rates
-	const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString())
-	const otherLangPairs = otherServices.map(row => `${ row.sourceLanguage._id } ${ row.targetLanguages[0]._id }`)
+	const otherServices = services.filter(
+			row => row._id.toString() !== rowToDeleteId.toString()
+	)
+	const otherLangPairs = otherServices.map(
+			row => `${ row.sourceLanguage._id } ${ row.targetLanguages[0]._id }`
+	)
 	const redundantLangPairs = []
 	if (!otherLangPairs.includes(langPair)) redundantLangPairs.push(langPair)
 	if (redundantLangPairs.length) {
-		return basicPricesTable.filter(({ sourceLanguage, targetLanguage }) => (
-				!redundantLangPairs.includes(`${ sourceLanguage } ${ targetLanguage }`)
-		))
+		return basicPricesTable.filter(
+				({ sourceLanguage, targetLanguage }) =>
+						!redundantLangPairs.includes(`${ sourceLanguage } ${ targetLanguage }`)
+		)
 	}
 	return basicPricesTable
 }
 
-/**
- *
- * @param {Object} rates
- * @param {Array} services
- * @param {ObjectId} rowToDeleteId
- * @param {Object} serviceToDelete
- * @returns {Array} returns an updated table array
- */
 const filterRedundantSteps = (rates, services, rowToDeleteId, serviceToDelete) => {
 	const { stepMultipliersTable } = rates
-	const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString())
-	const stepIdsToDelete = serviceToDelete.steps.map(({ step }) => step.toString())
-	let otherSteps = otherServices.map(row => row.services.map(({ steps }) => steps.map(({ step }) => step.toString())))
+	const otherServices = services.filter(
+			row => row._id.toString() !== rowToDeleteId.toString()
+	)
+	const stepIdsToDelete = serviceToDelete.steps.map(
+			({ step }) => step.toString()
+	)
+	let otherSteps = otherServices.map(
+			row => row.services.map(({ steps }) => steps.map(({ step }) => step.toString()))
+	)
 	otherSteps = Array.from(new Set(flatArr(otherSteps)))
 	const redundantSteps = []
 	for (let step of stepIdsToDelete) {
@@ -794,18 +627,14 @@ const filterRedundantSteps = (rates, services, rowToDeleteId, serviceToDelete) =
 	}
 }
 
-/**
- *
- * @param {Object} rates
- * @param {Array} services
- * @param {ObjectId} rowToDeleteId
- * @param {Object} industryToDelete
- * @returns {Array} returns an updated table array
- */
 const filterRedundantIndustry = (rates, services, rowToDeleteId, industryToDelete) => {
 	const { industryMultipliersTable } = rates
-	const otherServices = services.filter(row => row._id.toString() !== rowToDeleteId.toString())
-	const otherIndustries = otherServices.map(row => row.industries[0]._id)
+	const otherServices = services.filter(
+			row => row._id.toString() !== rowToDeleteId.toString()
+	)
+	const otherIndustries = otherServices.map(
+			row => row.industries[0]._id
+	)
 	const redundantIndustries = []
 	if (!otherIndustries.includes(industryToDelete._id)) redundantIndustries.push(industryToDelete._id.toString())
 	if (redundantIndustries.length) {
@@ -814,13 +643,6 @@ const filterRedundantIndustry = (rates, services, rowToDeleteId, industryToDelet
 	return industryMultipliersTable
 }
 
-/**
- *
- * @param {Object} project
- * @param {Object} step
- * @param {Object} rate
- * @returns nothing, just updates client's rates
- */
 async function getClientAfterCombinationsUpdated({ project, step, rate }) {
 	try {
 		const rateInfo = await getRateInfoFromStepFinance({ project, step, rate })
@@ -848,5 +670,6 @@ module.exports = {
 	generateNewPricelistCombinations,
 	getClientAfterCombinationsUpdated,
 	generateServiceCombinations,
-	getUniqueServiceCombinations
+	getUniqueServiceCombinations,
+	filteredCombinationsResultRatesTable
 }

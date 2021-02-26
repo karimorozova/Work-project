@@ -285,7 +285,7 @@
 
 			async checkErrors(index) {
 				if(this.currentActive === -1) return;
-				const countOfFields = {first: 10, second: 10, third: 10}
+				const countOfFields = {first: 5, second: 5, third: 5}
 				this.errors = [];
         if(this.newRow) {
           if(!this.checkCombinations(this.currentTargets.length, this.currentIndustries.length, this.currentSteps.length, countOfFields))
@@ -385,8 +385,9 @@
 			async deleteCompetencies() {
 				try {
 					let currentData = this.competenciesData[this.deleteIndex];
-					const result = this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
+					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
 					this.competenciesData.splice(this.deleteIndex, 1);
+					this.$emit("updateRates", true);
 					this.closeModal();
 					this.alertToggle({
 						message: "Competencies are deleted",
@@ -399,8 +400,6 @@
 						isShow: true,
 						type: "error",
 					});
-				} finally {
-					this.$emit("updateRates", true);
 				}
 			},
 

@@ -16,7 +16,7 @@ const createRateCombinations = async (listForRates, vendorId) => {
 	const { langPairs, steps, industries } = splitRatesArr(listForRates);
 
 	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, rates } = await combineVendorRates(langPairs, steps, industries, defaultPricelist, vendor);
-	let pricelistTable = [...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
+	let pricelistTable = [...oldPricelistTable, ...generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable)];
 	rates = { ...rates, pricelistTable };
 
 	return rates;
@@ -139,7 +139,7 @@ const createRateRowFromQualification = async (vendorId, qualification) => {
 	steps = steps.map(item => item._id);
 	const industries = qualification.industries.map(i => i._id);
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, rates } = await combineVendorRates(langPairs, steps, industries, defaultPricelist, vendor);
-	let pricelistTable = [...await generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable)];
+	let pricelistTable = [...oldPricelistTable, ...generateNewPricelistCombinations(basicPricesTable, stepMultipliersTable, industryMultipliersTable)];
 	pricelistTable = _.uniqBy(pricelistTable, (item) => (
 			item.sourceLanguage.toString() +
 			item.targetLanguage.toString() +

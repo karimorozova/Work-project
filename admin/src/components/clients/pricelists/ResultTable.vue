@@ -461,6 +461,11 @@
       box-shadow: inset 0 0 7px $brown-shadow;
     }
 
+    &__empty {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
     &__data-input {
       width: 100%;
       border: none;
