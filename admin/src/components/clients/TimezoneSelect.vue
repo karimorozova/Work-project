@@ -116,7 +116,7 @@ export default {
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.4s;
+            transition: ease 0.2ss;
             &:last-child {
                 border: none;
             }

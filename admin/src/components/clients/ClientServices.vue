@@ -381,7 +381,6 @@ export default {
       }
       this.deleteIndex = index;
       this.isDeleting = true;
-      this.$emit("updateRates", true);
     },
 
     closeModal() {
@@ -392,8 +391,8 @@ export default {
       try {
         let currentData = this.clientServices[this.deleteIndex];
         const result = await this.$http.delete(`/clientsapi/services/${this.$route.params.id}/${currentData._id}`);
+	      this.$emit("updateRates", true);
         this.clientServices.splice(this.deleteIndex, 1);
-        this.$emit("updateRates", true)
         this.closeModal();
         this.alertToggle({
           message: "Services are deleted",

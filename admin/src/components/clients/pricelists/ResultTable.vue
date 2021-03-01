@@ -1,6 +1,6 @@
 <template lang="pug">
   .price
-    .prices-filter(v-if="currentServices.length")
+    .prices-filter
       ResultFilter(
         :source="sourceFilter"
         :target="targetFilter"
@@ -344,7 +344,7 @@
 				currentClient: "getCurrentClient"
 			}),
 			dataForSourceFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat(
 							this.getUniqueValues(
 									this.currentServices.map((source) => source.sourceLanguage),
@@ -354,7 +354,7 @@
 				}
 			},
 			dataForTargetFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat(
 							this.getUniqueValues(
 									this.currentServices.map((target) => target.targetLanguages).flat(),
@@ -364,7 +364,7 @@
 				}
 			},
 			dataForStepFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat([
 						...new Set(
 								this.steps
@@ -375,7 +375,7 @@
 				}
 			},
 			dataForUnitFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat([
 						...new Set(
 								this.units.filter((unit) =>
@@ -386,7 +386,7 @@
 				}
 			},
 			dataForIndustryFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat(
 							this.getUniqueValues(
 									this.currentServices.map((industry) => industry.industries).flat(),

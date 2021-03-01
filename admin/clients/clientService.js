@@ -1,4 +1,4 @@
-const { Clients } = require('../models')
+const { Clients, Services } = require('../models')
 const ObjectId = require('mongodb').ObjectID
 const { getClientAfterUpdate, getClient } = require('./getClients')
 const {
@@ -13,18 +13,20 @@ const {
 
 const updateClientService = async (clientId, dataToUpdate, oldData) => {
 	try {
+		const settingServices = await Services.find()
 		let client = await Clients.findOne({ _id: clientId }).populate('defaultPricelist')
 		const { services } = client
 		let { sourceLanguage, targetLanguages, services: servicesFromDataUpdate, industries } = dataToUpdate
-		const dataForSave = {
+		let dataForSave = {
 			sourceLanguage: ObjectId(sourceLanguage._id),
 			targetLanguages: getMappedArr(targetLanguages),
 			services: getMappedArr(servicesFromDataUpdate),
 			industries: getMappedArr(industries)
 		}
-
 		if (dataToUpdate._id) {
 			const neededServiceIndex = services.findIndex(service => service._id.toString() === dataToUpdate._id)
+			const { languageForm } = settingServices.find(({ _id }) => _id.toString() === dataForSave.services[0].toString())
+			dataForSave.sourceLanguage = languageForm === 'Mono' ? dataForSave.targetLanguages[0] : dataForSave.sourceLanguage
 			services.splice(neededServiceIndex, 1, dataForSave)
 			await Clients.updateOne({ _id: clientId }, { services })
 			let client = await Clients.findOne({ _id: clientId }).populate('defaultPricelist')

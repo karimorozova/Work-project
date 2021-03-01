@@ -96,7 +96,10 @@
 			})
 		},
 		mounted() {
-			this.getDeliveryFiles()
+			const { status } = this.task
+			if (status === 'Pending Approval [DR1]' || status === 'Pending Approval [DR2]' || status === 'Ready for Delivery') {
+				this.getDeliveryFiles()
+			}
 		},
 		computed: {
 			...mapGetters({
