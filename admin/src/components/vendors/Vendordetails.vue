@@ -168,25 +168,12 @@
           @updateRates="updateRates"
         )
 
-      .title Documents
-        TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
-
       .title Assessment
         TableAssessment(
           :assessmentData="assessmentData",
           :currentVendor="currentVendor",
           @refreshAssessment="setDetailsTablesData"
         )
-
-      .title Professional experience
-        TableProfessionalExperience(
-          :professionalExperienceData="professionalExperienceData",
-          :vendorId="vendorId",
-          @refreshProfExperiences="setDetailsTablesData"
-        )
-
-      .title Education
-        TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
 
       .title Rates
         .vendor-info__rates(v-if="currentVendor._id")
@@ -226,6 +213,19 @@
       .title Discount Chart
         .vendor-info__drop-matrix(v-if="currentVendor._id")
           FinanceMatrixWithReset(:entity="currentVendor" @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+
+      .title Documents
+        TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
+
+      .title Professional experience
+        TableProfessionalExperience(
+          :professionalExperienceData="professionalExperienceData",
+          :vendorId="vendorId",
+          @refreshProfExperiences="setDetailsTablesData"
+        )
+
+      .title Education
+        TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
 
       .title Notes & Comments
         .vendor-info__notes-block
