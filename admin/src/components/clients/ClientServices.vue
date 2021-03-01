@@ -381,6 +381,7 @@ export default {
       }
       this.deleteIndex = index;
       this.isDeleting = true;
+      this.$emit("updateRates", true);
     },
 
     closeModal() {
