@@ -328,15 +328,14 @@
 						step: this.currentSteps,
 						industry: this.currentIndustries,
 					};
-					const result = this.$http.post("/vendorsapi/competencies", {
+					const result = await this.$http.post("/vendorsapi/competencies", {
 						vendorId: this.$route.params.id,
 						currentData,
 					});
-					result.then((result) => {
-						this.competenciesData = result.data.competencies;
-						this.competenciesData.length && this.$emit("updateQualifications");
-						this.competenciesData.length && this.$emit("updateRates", true)
-					});
+
+          this.competenciesData = result.data.competencies;
+          this.competenciesData.length && this.$emit("updateQualifications");
+          this.competenciesData.length && this.$emit("updateRates", true)
 
 					await this.$http.post('/pm-manage/check-pricelist-langs', {
 						pricelistId: null,
@@ -432,6 +431,9 @@
 				const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
 				this.competenciesData = vendor.data.competencies;
 			},
+			getVendorInfoByState(){
+				this.competenciesData = this.currentVendor.competencies
+      }
 		},
 		computed: {
 			...mapGetters({
@@ -445,7 +447,7 @@
 			},
 		},
 		created() {
-			this.currentVendor._id && this.getVendorInfo();
+			this.currentVendor._id ? this.getVendorInfoByState() : this.getVendorInfo();
 		},
 		components: {
 			SelectSingle,
