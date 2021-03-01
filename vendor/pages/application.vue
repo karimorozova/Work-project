@@ -4,26 +4,28 @@
       headerText="Application Form"
     )
     form.application__form
-      hr
+      .application__line
       .application__header
-        span.title FREELANCE APPLICATION
+        p.title FREELANCE APPLICATION
         p.comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global.
+      p.application__step-title 1 person information
       .application__row-flex
-        .application__inputs
-          TextInput.application__mb-10(
+        .application__col50
+          TextInput.application__mb-15(
             label="Name"
             name="firstName"
             @setValue="setInfoValue"
           )
 
-          TextInput.application__mb-10(
+          TextInput.application__mb-15(
             label="Email"
             name="email"
             example="example@example.com"
             @setValue="setInfoValue"
           )
 
-          .application__availability Availability:
+          .application__availability
+            .available__title Availability:
             //span.availavility__asterisk *
             SelectSingle(
               :selectedOption="availability"
@@ -31,8 +33,8 @@
               @chooseOption="chooseOption"
             )
 
-        .application__inputs
-          TextInput.application__mb-10(
+        .application__col50
+          TextInput.application__mb-15(
             label="Surname"
             name="surname"
             @setValue="setInfoValue"
@@ -45,21 +47,23 @@
               @chooseLang="setMotherTongue"
             )
       .application__row-flex
-        .application__inputs
+        .application__col50
           p Do you work with CAT tools?
-        .application__inputs
-          input( type="radio" id="contactChoice1"
-            v-model="secondInfo.CAT" :value="true")
-          label( for="contactChoice1") Yes
-
-          input( type="radio" id="contactChoice2"
-            v-model="secondInfo.CAT" :value="false")
-          label( for="contactChoice2") No
+        .application__col50
+          .application__radio-group
+            .application__radio
+              input( type="radio" id="contactChoice1"
+                v-model="secondInfo.CAT" :value="true")
+              label( for="contactChoice1") Yes
+            .application__radio
+              input( type="radio" id="contactChoice2"
+                v-model="secondInfo.CAT" :value="false")
+              label( for="contactChoice2") No
 
       .application__row-flex(v-if="secondInfo.CAT === true")
-        .application__inputs
+        .application__col50
           p Please select the software you currently use or have previous experience.
-        .application__inputs
+        .application__col50
           .application__software
             SelectMulti(
               :isTableDropMenu="true"
@@ -72,18 +76,18 @@
             )
 
       .application__row-flex
-        .application__test2
-          UploadFileButton.application__mb-10(
+        .application__col30
+          UploadFileButton.application__mb-15(
             label="CV:"
             @uploadedFile="(e) => uploadCvFile('cv', e)"
           )
-        .application__test1
+        .application__col70
           .application__cover
             .application__text-area-label Cover Letter:
             textarea.application__text-area(rows=4 v-model="coverLetter" @change="setCoverLetter")
           .application__label
             .application__files
-              UploadFileButton.application__mb-10(
+              UploadFileButton.application__mb-15(
                 btn-text="and/or Upload file(s)"
                 @uploadedFile="(e) => uploadCvFile('cover', e)"
               )
@@ -99,7 +103,7 @@
                 )
       .application__row
         .text To be able to join our team, you are required you are preform a separate test for each language pair and industry you are applying for.
-          p The test is short 300 word text
+          p The test is short 300 word text.
       .application__row
         AgreeAndSubmit(
             :person="person"
@@ -232,14 +236,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  p{
+    margin: 0;
+  }
 
   .application {
     font-family: Myriad400;
     color: #67573E;
     position: relative;
-    p{
-      margin: 0;
-    }
 
     &__form {
       width: 33.5%;
@@ -265,6 +269,42 @@ export default {
       }
     }
 
+    &__radio-group {
+      display: flex;
+    }
+
+    &__radio {
+      margin-right: 30px;
+    }
+
+    &__header {
+      text-align: center;
+      margin-bottom: 15px;
+
+      .title {
+        font-size: 22px;
+        margin-bottom: 5px;
+        font-family: Myriad900;
+      }
+
+      .comment {
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+    }
+
+    &__line {
+      border-top: 1px solid #67573E;
+      margin: 20px 0 35px 0;
+    }
+
+    &__step-title {
+      margin: 0 0 10px 20px;
+      font-size: 20px;
+      text-transform: uppercase;
+      font-family: Myriad600;
+    }
+
     &__row{
       margin-bottom: 15px;
       &-flex{
@@ -273,33 +313,36 @@ export default {
       }
     }
 
-    &__test1 {
+    &__col70 {
       margin: 0 20px;
       width: 70%;
     }
-    &__test2 {
+    &__col30 {
       margin: 0 20px;
       display: flex;
-      align-items: center;
       width: 30%;
 
     }
+    .available__title {
+      margin-bottom: 5px;
+    }
 
     &__availability, &__software {
+      margin-bottom: 5px;
     }
     &__select-relative{
       position: relative;
       height: 63px;
     }
-    &__inputs, &__btn{
+    &__col50, &__btn{
       margin: 0 20px;
       width: 50%;
     }
     &__part{
       width: 50%;
     }
-    &__mb-10{
-      margin-bottom: 10px;
+    &__mb-15{
+      margin-bottom: 15px;
     }
 
     &__letter-text{
@@ -324,21 +367,6 @@ export default {
       outline: none;
       &-label {
         margin-bottom: 4px;
-      }
-    }
-
-
-    &__header {
-      text-align: center;
-      margin-bottom: 15px;
-
-      .title {
-        font-size: 22px;
-        font-family: Myriad900;
-      }
-
-      .comment {
-        font-size: 14px;
       }
     }
   }
