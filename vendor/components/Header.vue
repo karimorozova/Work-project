@@ -55,7 +55,9 @@ export default {
 
 .header__background {
     width: 100%;
-    height: 273px;
+    //height: 273px;
+    height: 215px;
+    background-position: center center;
     background-image: url('../assets/images/header2.jpg');
     background-size: cover;
     display: flex;

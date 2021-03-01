@@ -2,7 +2,7 @@
 .upload-file
     span.upload-file__label {{ label }}
     .upload-file__button
-        .upload-file__button-text Upload file(s)
+        .upload-file__button-text {{ btnText }}
         input.upload-file__input(name="detailFiles" type="file" @change='uploadFile' multiple)
     span.upload-file__comment Drag &amp; Drop
 </template>
@@ -13,6 +13,10 @@ export default {
         label: {
             type: String,
             default: ""
+        },
+        btnText: {
+            type: String,
+            default: "Upload file(s)"
         }
     },
     data() {
@@ -40,12 +44,12 @@ export default {
     display: flex;
     flex-direction: column;
     &__button {
-      margin-top: 7px;
+      margin-top: 3px;
       display: flex;
       justify-content: center;
       align-items: center;
       min-width: 120px;
-      padding: 0 24px;
+      padding: 5px 24px;
       height: 34px;
       color: #fff;
       font-size: 14px;
@@ -78,7 +82,7 @@ export default {
     }
     &__input {
         top: 0px;
-        right: -25px;
+        right: 0;
         z-index: 2;
         position: absolute;
         cursor: pointer;

@@ -1,13 +1,14 @@
 <template lang="pug">
-  .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped}, customClass]")
-    .select(@click="toggleOptions")
-      span.selected(v-if="selectedOption") {{ selectedOption }}
-      span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
-      .arrow-button
-        img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
-    .drop(v-if="isDropped")
-      .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
-        span {{ option }}
+  .drop-relative
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped}, customClass]")
+      .select(@click="toggleOptions")
+        span.selected(v-if="selectedOption") {{ selectedOption }}
+        span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
+        .arrow-button
+          img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
+      .drop(v-if="isDropped")
+        .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
+          span {{ option }}
 </template>
 
 <script>
@@ -67,10 +68,13 @@
       font-size: 14px;
     }
   }
-
+  .drop-relative{
+    position: relative;
+    height: 42px;
+  }
   .drop-select {
     position: absolute;
-    top: 20px;
+    top: 0;
     width: 100%;
     border: 1px solid #67573E;
     border-radius: 7px;

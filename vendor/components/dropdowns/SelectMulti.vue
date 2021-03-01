@@ -1,4 +1,5 @@
 <template lang="pug">
+  .drop__wrapper
     .drop-select(v-click-outside="outOptions" :class="customClass")
         .select(@click="toggleOptions")
             span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
@@ -68,10 +69,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.drop__wrapper{
+  position: relative;
+  height: 42px;
+}
 .drop-select {
     position: absolute;
-    top: 20px;
     width: 100%;
     border: 1px solid #67573E;
     border-radius: 7px;

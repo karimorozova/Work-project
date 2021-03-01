@@ -38,7 +38,6 @@ export default {
     }
     &__input {
         padding: 5px;
-        width: 258px;
         height: 30px;
         outline: none;
         border: 1px solid #67573E;
@@ -60,11 +59,9 @@ export default {
         
     }
     &__example {
-        position: absolute;
-        left: 0;
-        bottom: -24px;
         font-size: 14px;
         opacity: 0.5;
+        margin-top: 5px;
         .personal_contacts-height & {
             @media (max-width: 450px) {
                 display: none;

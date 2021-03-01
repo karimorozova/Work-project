@@ -84,7 +84,7 @@ export default {
     }
     &__input {
         top: 0px;
-        right: -25px;
+        right: 0;
         z-index: 2;
         position: absolute;
         cursor: pointer;

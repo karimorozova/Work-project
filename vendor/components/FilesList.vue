@@ -21,7 +21,7 @@ export default {
 
 <style lang="scss" scoped>
 .file-list {
-    margin-left: 70px;
+    margin-left: 20px;
     &__item {
         position: relative;
     }

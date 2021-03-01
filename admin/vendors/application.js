@@ -1,24 +1,25 @@
 const { Vendors, Languages } = require("../models");
 const { moveFile, sendEmail } = require("../utils");
-const { applicationMessage } = require("../emailMessages/vendorCommunication");
+const { applicationMessage,vendorRegistration } = require("../emailMessages/vendorCommunication");
 const fs = require("fs");
+const passwordGen = require("generate-password")
 
 async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
+    const softwares = JSON.parse(person['parsing-softwares'])
     try {
-        let vendor = await Vendors.create({...person, status: "Potential"});
+        let vendor = await Vendors.create({...person, softwares , status: "Potential"});
+
         vendor.cvFiles = await manageFiles(cvFiles, vendor.id, 'cvFile');
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');
         const parsedPersondata = getParsedData(person);
-        vendor.catExperience = parsedPersondata.technicalComp.cat || "";
-        vendor.softwares = parsedPersondata.technicalComp.softwares || [];
-        vendor.positions = parsedPersondata.positions;
-        vendor.educations = parsedPersondata.educations || [];
-        vendor.internetAccess = parsedPersondata.technicalComp.internet;
-        vendor.isTest = parsedPersondata.testAgree === "Yes";
-        vendor.languagePairs = parsedPersondata.languagePairs;
-        vendor.industries = parsedPersondata.industries;
+
+        const password = passwordGen.generate({length: 8, numbers: true});
+        vendor.password = password
+
         await vendor.save();
+
         await sendEmailToManager(parsedPersondata, vendor)
+        await sendEmailToVendor(vendor, password)
     } catch(err) {
         console.log(err);
         console.log("Error in manageNewApplication");
@@ -30,13 +31,24 @@ async function sendEmailToManager(personData, vendor) {
     try {
         emailData.to = "career@pangea.global";
         emailData.subject = `Application from ${emailData.firstName} ${emailData.surname}`;
-        const motherTongue = await Languages.find({"_id": emailData.native});
-        emailData.native = motherTongue[0].lang;
-        emailData.languagePairs = await getLanguagePairs(personData.languagePairs);
         emailData.cvFiles = [...vendor.cvFiles];
         emailData.coverLetterFiles = [...vendor.coverLetterFiles];
         emailData.attachments = getFilesAttachments([...emailData.cvFiles, ...emailData.coverLetterFiles]);
+
         const message = applicationMessage(emailData);
+        await sendEmail(emailData, message);
+    } catch(err) {
+        console.log(err);
+        console.log("Error in sendEmailToManager");
+    }
+}
+
+async function sendEmailToVendor(vendor, pass) {
+    const emailData = {firstName: vendor.firstName, surname: vendor.surname, email: vendor.email, textEmail: vendor.email , pass}
+    try {
+        emailData.to = emailData.email;
+        emailData.subject = `Application from ${emailData.firstName} ${emailData.surname}`;
+        const message = vendorRegistration(emailData);
         await sendEmail(emailData, message);
     } catch(err) {
         console.log(err);

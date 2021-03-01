@@ -1,25 +1,17 @@
 <template lang="pug">
 .terms-agree
-    .terms-agree__term
-        .terms-agree__checkbox(@click="(e) => toggleTermsAgree('isConfirm')")
-            .terms-agree__check(:class="{checked: isConfirm}")
-        span.terms-agree__text.terms-agree_justified I confirm that the information given in this form is true, complete and accurate and 
-            | I agree to provide evidence and/or references for the aforementioned expertise and qualifications
-            | if required.
     .terms-agree__term.terms-agree_align-start
         .terms-agree__checkbox(@click="(e) => toggleTermsAgree('isAgree')")
             .terms-agree__check(:class="{checked: isAgree}")
-        span.terms-agree__text I have read and accept the 
-            a.terms-agree__link(href="https://www.pangea.global/employment-candidate-privacy-notice" target="_blank") Employment Candidate Privacy Notice
+        span.terms-agree__text I agree to get a test
     .terms-agree__captcha
-        span.terms-agree__captcha-comment Please, confirm that you are not a robot   
         .terms-agree__google
             .g-recaptcha(data-sitekey="6LfMCXEUAAAAAPVdf_Ej5r0E744vsX3r-TxOc7Ed"
             style= {"transform": "scale(0.77)",
                 "-webkit-transform": "scale(0.77)",
                 "transform-origin": "150px 0",
                 "-webkit-transform-origin": "150px 0" })
-    input.terms-agree__submit(type="button" value="Submit" @click="checkForm" :disabled="!isAgree || !isConfirm" :class="{'terms-agree_disabled': !isAgree || !isConfirm}")
+    input.terms-agree__submit(type="button" value="Next >>>" @click="checkForm")
     script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
@@ -29,6 +21,9 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     props: {
         person: {
+            type: Object
+        },
+        secondInfo: {
             type: Object
         }
     },
@@ -81,21 +76,24 @@ export default {
                 if(!this.person.firstName) this.errors.push("Please enter your name.");
                 if(!this.person.surname) this.errors.push("Please enter your surname.");
                 await this.checkEmailErrors();
-                if(!this.person.phone) this.errors.push("Please enter your phone number.");
+                // if(!this.person.phone) this.errors.push("Please enter your phone number.");
                 if(!this.person.native) this.errors.push("Please select your mother tongue.");
-                if(!this.person.timezone) this.errors.push("Please select your timezone.");
-                if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
-                if(!this.person.cvFiles || (this.person.cvFiles && !this.person.cvFiles.length)) this.errors.push("Please upload CV file.");
-                if(this.person.cvFiles && this.person.cvFiles.length && this.areCvFilesTooBig(this.person.cvFiles)) this.errors.push("All CV files should have summarized size not more than 20Mb");
-                if(this.person.coverLetterFiles && this.person.coverLetterFiles.length && this.areCoverLetterFilesTooBig(this.person.coverLetterFiles)) {
-                    this.errors.push("All Cover Letter files should have summarized size not more than 2Mb");
-                }
-                if(!this.person.positions) this.errors.push("Please select position(s).");
-                if(!this.person.experienceYears) this.errors.push("Please select years of experience.");
-                if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");
-                if(!this.person.industries) this.errors.push("Please select industries.");
+                if(this.secondInfo.CAT !== true ) this.errors.push("Unfortunately, you must have experience in CAT Tools to be able to join Pangea.");
+                if(this.secondInfo.CAT === true && !this.person.softwares) this.errors.push("Please select the CAT Tools you use.");
+                // if(!this.person.timezone) this.errors.push("Please select your timezone.");
+                // if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
+                if(!this.person.cv || (this.person.cv && !this.person.cv.length)) this.errors.push("Please upload CV file.");
+                if(this.person.cv && this.person.cv.length && this.areCvFilesTooBig(this.person.cv)) this.errors.push("All CV files should have summarized size not more than 20Mb");
+                // if(this.person.coverLetterFiles && this.person.coverLetterFiles.length && this.areCoverLetterFilesTooBig(this.person.coverLetterFiles)) {
+                //     this.errors.push("All Cover Letter files should have summarized size not more than 2Mb");
+                // }
+                // if(!this.person.positions) this.errors.push("Please select position(s).");
+                // if(!this.person.experienceYears) this.errors.push("Please select years of experience.");
+                // if((this.person.technicalComp && !this.person.technicalComp.internet) || !this.person.technicalComp) this.errors.push("Please select internet access.");
+                // if(!this.person.industries) this.errors.push("Please select industries.");
                 if(!this.person.availability) this.errors.push("Please select availability.");
-                if(!this.person.testAgree) this.errors.push("Please answer the question about the test.");
+                if(!this.isAgree) this.errors.push("To be able to join our team, you must complete a short test of 300 words. Please confirm that you agree to take a test.");
+                // if(!this.person.testAgree) this.errors.push("Please answer the question about the test.");
                 let captchaValidation = await grecaptcha.getResponse();
                 if(captchaValidation.length === 0) this.errors.push("Please confirm that you are not a robot.");
                 if(this.errors.length) {
@@ -118,7 +116,6 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 80%;
     &__term {
       display: flex;
       margin-bottom: 10px;
@@ -133,7 +130,6 @@ export default {
         font-weight: 600;
     }
     &__checkbox {
-        margin: 3px 3px 0 5px;
         width: 18px;
         height: 18px;
         border: 1px solid #67573E;
@@ -166,7 +162,7 @@ export default {
         }
     }
     &__captcha {
-        margin-top: 30px;
+        margin-top: 10px;
         display: flex;
         flex-direction: column;
         justify-content: center;
