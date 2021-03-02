@@ -9,6 +9,10 @@
             input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search" ref="search")
             .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
                 span {{ showOption(option) }}
+            .drop__item(v-if="isRemoveOption" @click="removeOption")
+              span.remove__icon
+                i.fa.fa-ban(aria-hidden='true')
+                span.remove__text Remove Option
 </template>
 
 <script>
@@ -41,6 +45,10 @@ export default {
         },
         customClass: {
             type: String
+        },
+        isRemoveOption: {
+	        type: Boolean,
+	        default: false
         }
     },
     data() {
@@ -81,7 +89,7 @@ export default {
             this.searchValue = "";
             if(this.isDropped && this.hasSearch) {
                 this.$nextTick(() => this.$refs.search.focus());
-            } 
+            }
             this.showOptions(event);
         },
         chooseOption(index) {
@@ -96,6 +104,10 @@ export default {
         },
         search(e) {
             this.searchValue = e.target.value;
+        },
+	      removeOption(){
+        	this.$emit("removeOption")
+		      this.outOptions();
         }
     },
     computed: {
@@ -122,6 +134,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+  .remove{
+    &__icon {
+      margin-right: 5px;
+      color: #d15f45;
+    }
+  }
 
 .select-comp {
     width: 100%;

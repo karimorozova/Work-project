@@ -96,7 +96,7 @@ export default {
 
 .services-wrapper {
     @extend %setting-table;
-    width: fit-content;
+    width: 980px;
     box-sizing: border-box;
 }
 
