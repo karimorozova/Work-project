@@ -448,7 +448,14 @@ const VendorSchema = new mongoose.Schema({
 	coverLetterFiles: {
 		type: Array,
 		default: []
+	},
+	dateInfo: {
+		createdAt: {
+			type: Date,
+			default: new Date()
+		}
 	}
+
 }, { minimize: false });
 
 VendorSchema.statics.authenticate = function (email, password, callback) {

@@ -8,7 +8,7 @@ async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
     const softwares = JSON.parse(person['parsing-softwares'])
     try {
         let vendor = await Vendors.create({...person, softwares , status: "Potential"});
-
+        vendor.documents = await setDocuments(cvFiles.pop(), 'Resume', vendor.id);
         vendor.cvFiles = await manageFiles(cvFiles, vendor.id, 'cvFile');
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');
         const parsedPersondata = getParsedData(person);
@@ -85,6 +85,48 @@ async function getLanguagePairs(languagePairs) {
         pairs.push({source: source.symbol, target: target.symbol})
     }
     return pairs;
+}
+
+async function setDocuments(file, docCategory, subDir) {
+    const defaultDocuments = [
+        {
+            fileName: '',
+            category: 'NDA',
+            path: '',
+
+        },
+        {
+            fileName: '',
+            category: 'Contract',
+            path: '',
+
+        },
+        {
+            fileName: '',
+            category: 'Resume',
+            path: '',
+
+        },
+    ]
+
+    const docChanged = defaultDocuments.find(({category}) => docCategory === category )
+
+    docChanged.fileName = file.filename
+    docChanged.path = await manageFileToDir(file, 'cvFile', 'vendorDir', subDir)
+    return defaultDocuments
+
+}
+
+async function manageFileToDir(file, prop, mainDir, subDir) {
+    try {
+        let newFileName = `${prop}$_${file.filename.replace(/\s+/g, '_')}`;
+        const path = `/${mainDir}/${subDir}/${newFileName}`;
+        await moveFile(file, `./dist${path}`);
+        return path;
+    } catch(err) {
+        console.log(err);
+        console.log("Error in manageFileToDir");
+    }
 }
 
 async function manageFiles(files, vendorId, prop) {
