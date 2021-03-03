@@ -9,6 +9,10 @@
             input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search" ref="search")
             .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
                 span {{ showOption(option) }}
+            .drop__item(v-if="isRemoveOption" @click="removeOption")
+              span.remove__icon
+                i.fa.fa-ban(aria-hidden='true')
+                span.remove__text &nbsp; Remove Option
 </template>
 
 <script>
@@ -41,6 +45,10 @@ export default {
         },
         customClass: {
             type: String
+        },
+        isRemoveOption: {
+	        type: Boolean,
+	        default: false
         }
     },
     data() {
@@ -81,7 +89,7 @@ export default {
             this.searchValue = "";
             if(this.isDropped && this.hasSearch) {
                 this.$nextTick(() => this.$refs.search.focus());
-            } 
+            }
             this.showOptions(event);
         },
         chooseOption(index) {
@@ -96,6 +104,10 @@ export default {
         },
         search(e) {
             this.searchValue = e.target.value;
+        },
+	      removeOption(){
+        	this.$emit("removeOption")
+		      this.outOptions();
         }
     },
     computed: {
@@ -123,6 +135,13 @@ export default {
 
 <style lang="scss" scoped>
 
+  .remove{
+    &__icon {
+      margin-right: 5px;
+      color: #d15f45;
+    }
+  }
+
 .select-comp {
     width: 100%;
     &__label {
@@ -139,7 +158,7 @@ export default {
     flex-direction: column;
     box-sizing: border-box;
     .drop {
-        max-height: 186px;
+        max-height: 220px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: #FFF;
@@ -149,7 +168,7 @@ export default {
         &__search {
             width: 100%;
             box-sizing: border-box;
-            padding: 5px 0 5px 5px;
+            padding: 6px 0 6px 5px;
             color: #67573E;
             outline: none;
             box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
@@ -161,7 +180,7 @@ export default {
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.4s;
+            transition: ease 0.2s;
             &:last-child {
                 border: none;
             }

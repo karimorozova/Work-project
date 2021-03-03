@@ -285,7 +285,7 @@
 
 			async checkErrors(index) {
 				if(this.currentActive === -1) return;
-				const countOfFields = {first: 10, second: 10, third: 10}
+				const countOfFields = {first: 5, second: 5, third: 5}
 				this.errors = [];
         if(this.newRow) {
           if(!this.checkCombinations(this.currentTargets.length, this.currentIndustries.length, this.currentSteps.length, countOfFields))
@@ -328,15 +328,14 @@
 						step: this.currentSteps,
 						industry: this.currentIndustries,
 					};
-					const result = this.$http.post("/vendorsapi/competencies", {
+					const result = await this.$http.post("/vendorsapi/competencies", {
 						vendorId: this.$route.params.id,
 						currentData,
 					});
-					result.then((result) => {
-						this.competenciesData = result.data.competencies;
-						this.competenciesData.length && this.$emit("updateQualifications");
-						this.competenciesData.length && this.$emit("updateRates", true)
-					});
+
+          this.competenciesData = result.data.competencies;
+          this.competenciesData.length && this.$emit("updateQualifications");
+          this.competenciesData.length && this.$emit("updateRates", true)
 
 					await this.$http.post('/pm-manage/check-pricelist-langs', {
 						pricelistId: null,
@@ -385,8 +384,9 @@
 			async deleteCompetencies() {
 				try {
 					let currentData = this.competenciesData[this.deleteIndex];
-					const result = this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
+					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
 					this.competenciesData.splice(this.deleteIndex, 1);
+					this.$emit("updateRates", true);
 					this.closeModal();
 					this.alertToggle({
 						message: "Competencies are deleted",
@@ -399,8 +399,6 @@
 						isShow: true,
 						type: "error",
 					});
-				} finally {
-					this.$emit("updateRates", true);
 				}
 			},
 
@@ -433,6 +431,9 @@
 				const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
 				this.competenciesData = vendor.data.competencies;
 			},
+			getVendorInfoByState(){
+				this.competenciesData = this.currentVendor.competencies
+      }
 		},
 		computed: {
 			...mapGetters({
@@ -446,7 +447,7 @@
 			},
 		},
 		created() {
-			this.currentVendor._id && this.getVendorInfo();
+			this.currentVendor._id ? this.getVendorInfoByState() : this.getVendorInfo();
 		},
 		components: {
 			SelectSingle,

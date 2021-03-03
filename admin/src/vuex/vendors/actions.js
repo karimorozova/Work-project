@@ -132,6 +132,7 @@ export const setVendorsMatrixData = async ({ commit, dispatch, state }, payload)
     commit("startRequest");
     try {
         const { _id, matrix } = state.currentVendor;
+        payload.value = payload.value > 100 ? 100 : payload.value < 0 ? 0 : payload.value
         matrix[payload.key].rate = payload.value;
         const updatedVendor = await Vue.http.post('/vendorsapi/update-matrix', { _id, key: payload.key, value: payload.value });
         state.filteredVendors.forEach(item => {

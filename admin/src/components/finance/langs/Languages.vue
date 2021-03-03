@@ -91,12 +91,13 @@ export default {
 @import "../../../assets/scss/colors.scss";
 
 .languages {
-  height: 187px;
-  width: 180px;
+  height: 160px;
+  width: 191px;
   border: 1px solid #67573e;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
   box-sizing: border-box;
+
   &__empty {
     width: 100%;
     height: 100%;

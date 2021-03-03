@@ -6,9 +6,9 @@ const {
   getClientsForNewProject,
   getClientRates
 } = require('./getClients');
+
 const {
   updateClientRates,
-  deleteClientRates,
   getNeededLangPair,
   getNeededStepRow,
   getNeededCurrency,
@@ -18,11 +18,14 @@ const {
   changePricelistTable,
   generateNewPricelistCombinations,
   getClientAfterCombinationsUpdated,
+  filteredCombinationsResultRatesTable
 } = require('./clientRates');
+
 const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info');
 const { getAfterTaskStatusUpdate, updateClientProjectDate } = require('./projects');
 const { updateClientService, deleteClientService } = require('./clientService');
 const { updateRates } = require('./updateClientRates');
+
 const {
   syncClientRatesCost,
   synchronizeBasicPrice,
@@ -39,7 +42,6 @@ const clients = {
   getClientRates,
   gerFilteredClients,
   updateClientRates,
-  deleteClientRates,
   getClientAfterUpdate,
   updateClientInfo,
   getAfterTaskStatusUpdate,
@@ -66,7 +68,8 @@ const clients = {
   getClientsForNewProject,
   updateClientMatrix,
   syncClientMatrix,
-  getClientAfterCombinationsUpdated
+  getClientAfterCombinationsUpdated,
+  filteredCombinationsResultRatesTable
 };
 
 module.exports = clients;

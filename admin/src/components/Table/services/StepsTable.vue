@@ -2,7 +2,7 @@
     .steps
         .steps__table
             SettingsTable(
-                :fields="tableFields"
+                :fields="fields"
                 :tableData="steps"
                 :errors="errors"
                 :areErrors="areErrors"
@@ -52,25 +52,24 @@ import SelectMulti from "../../SelectMulti";
 import SettingsTable from "../SettingsTable";
 import SelectSingle from "@/components/SelectSingle";
 import Add from "@/components/Add";
-import tableFields from "@/mixins/tableFields";
 import crudIcons from "@/mixins/crudIcons";
 import scrollDrop from "@/mixins/scrollDrop";
 import { mapActions } from "vuex";
 
 export default {
-    mixins: [tableFields, crudIcons, scrollDrop],
+    mixins: [crudIcons, scrollDrop],
     props: {
         steps: { type: Array }
     },
     data() {
         return {
             fields: [
-                {label: "Title", headerKey: "headerTitle", key: "title", width: Math.floor(850*0.20), padding: "0"},
-                {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: Math.floor(850*0.28), padding: "0"},
-                {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: Math.floor(850*0.12), padding: "0"},
-                {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: Math.floor(850*0.12), padding: "0"},
-                {label: "Active", headerKey: "headerActive", key: "active", width: Math.floor(850*0.12), padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: 0, padding: "0"},
+                {label: "Title", headerKey: "headerTitle", key: "title", width: "21%", padding: "0"},
+                {label: "Calculation Unit", headerKey: "headerUnit", key: "calculationUnit", width: "35%", padding: "0"},
+                {label: "Stage 1", headerKey: "headerStage1", key: "stage1", width: "12%", padding: "0"},
+                {label: "Stage 2", headerKey: "headerStage2", key: "stage2", width: "12%", padding: "0"},
+                {label: "Active", headerKey: "headerActive", key: "active", width: "8%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0"},
             ],
             units: [],
             errors: [],
@@ -240,7 +239,6 @@ export default {
 @import "../../../assets/styles/settingsTable";
 
 .steps {
-    width: 850px;
     &__data {
         @extend %table-data;
     }

@@ -214,9 +214,9 @@ export const approveDeliverable = async ({ dispatch }, payload) => {
 export const deliverTasks = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
-		const tasks = payload.filter(item => item.status === "Ready for Delivery");
+		const tasks = payload.tasks.filter(item => item.status === "Ready for Delivery");
 		if(tasks.length) {
-			const updatedProject = await Vue.http.post("/pm-manage/deliver", { tasks });
+			const updatedProject = await Vue.http.post("/pm-manage/deliver", { tasks, user: payload.user });
 			await dispatch('setCurrentProject', updatedProject.data);
 		}
 		dispatch('alertToggle', { message: "Tasks delivered", isShow: true, type: "success" });

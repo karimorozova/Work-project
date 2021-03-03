@@ -6,12 +6,15 @@
       ProjectSubInformation(
         :project="currentProject"
       )
-    .project-info__all-info(v-if="originallyLanguages && originallyUnits && originallySteps")
+    .project-info__all-info(
+        v-if="originallyLanguages && originallyUnits &&originallySteps && originallyServices"
+      )
       .task-and-steps
         TasksAndSteps(
           :originallyLanguages="originallyLanguages"
           :originallyUnits="originallyUnits"
           :originallySteps="originallySteps"
+          :originallyServices="originallyServices"
           :isFinishedStatus="isFinishedStatus"
           @getMetrics="getMetrics"
           @setVendor="setVendor"
@@ -64,6 +67,7 @@
 				originallyLanguages: null,
 				originallyUnits: null,
 				originallySteps: null,
+				originallyServices: null,
 			}
 		},
 		methods: {
@@ -270,6 +274,18 @@
 					});
 				}
 			},
+			async getOriginallyServices() {
+				try {
+					const result = await this.$http.get('/api/services');
+					this.originallyServices = result.body;
+				} catch (err) {
+					this.alertToggle({
+						message: 'Error in Originally Steps',
+						isShow: true,
+						type: 'error',
+					});
+				}
+			},
 
 		},
 		computed: {
@@ -299,6 +315,7 @@
 			await this.getOriginallyLanguages();
 			await this.getOriginallyUnits();
 			await this.getOriginallySteps();
+			await this.getOriginallyServices();
 			// await this.getCustomer();
 		},
 		beforeRouteEnter(to, from, next) {

@@ -228,7 +228,6 @@
       &-name {
         width: 245px;
         font-size: 14px;
-
       }
 
       &-value {
@@ -251,7 +250,7 @@
     &__list {
       display: flex;
       height: 30px;
-      line-height: 30px;
+      /*line-height: 30px;*/
       border-bottom: 1px solid #938676;
 
       &-dropMenu {
@@ -262,12 +261,16 @@
       &-name {
         width: 250px;
         font-size: 14px;
+        display: flex;
+        align-items: center;
       }
 
       &-value {
         width: 55px;
         font-size: 14px;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       &-icons {

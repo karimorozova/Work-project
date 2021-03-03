@@ -1,5 +1,6 @@
 const { Vendors } = require("../models")
 const { getPricelistCombinations } = require("../clients")
+const _ = require('lodash')
 
 const deleteVendorRates = async (vendorId, rowToDelete) => {
 	const vendor = await Vendors.findOne({ _id: vendorId })
@@ -12,19 +13,22 @@ const deleteVendorRates = async (vendorId, rowToDelete) => {
 			rates,
 			competencies,
 			rowToDelete._id,
-			langPair
+			langPair,
+			qualifications
 	)
 	const filteredStepsTable = filterRedundantSteps(
 			rates,
 			competencies,
 			rowToDelete._id,
-			step
+			step,
+			qualifications
 	)
 	const filteredIndustriesTable = filterRedundantIndustry(
 			rates,
 			competencies,
 			rowToDelete._id,
-			industry
+			industry,
+			qualifications
 	)
 	pricelistTable = getPricelistCombinations(
 			filteredBasicPricesTable,
@@ -48,18 +52,22 @@ const filterRedundantLangPair = (
 		rates,
 		competencies,
 		rowToDeleteId,
-		langPair
+		langPair,
+		qualifications
 ) => {
 	const { basicPricesTable } = rates
 	const otherCompetencies = competencies.filter(
 			row => row._id.toString() !== rowToDeleteId.toString()
 	)
+	const otherQualifications = qualifications
+			.filter(({ status }) => status === 'Passed')
+			.map(row => `${ row.source } ${ row.target }`)
 
 	const otherLangPairs = otherCompetencies.map(
 			row => `${ row.sourceLanguage } ${ row.targetLanguage }`
 	)
 	const redundantLangPairs = []
-	if (!otherLangPairs.includes(langPair)) redundantLangPairs.push(langPair)
+	if (!otherLangPairs.includes(langPair) && !otherQualifications.includes(langPair)) redundantLangPairs.push(langPair)
 	if (redundantLangPairs.length) {
 		return basicPricesTable.filter(
 				({ sourceLanguage, targetLanguage }) =>
@@ -73,15 +81,22 @@ const filterRedundantSteps = (
 		rates,
 		competencies,
 		rowToDeleteId,
-		stepToDelete
+		stepToDelete,
+		qualifications
 ) => {
 	const { stepMultipliersTable } = rates
 	const otherCompetencies = competencies.filter(
 			row => row._id.toString() !== rowToDeleteId.toString()
 	)
+	const otherQualifications = _.flatten(
+			qualifications
+					.filter(({ status }) => status === 'Passed')
+					.map(row => row.steps)
+	).map(item => item.toString())
+
 	let otherSteps = otherCompetencies.map(row => row.step.toString())
 	const redundantSteps = []
-	if (!otherSteps.includes(stepToDelete))
+	if (!otherSteps.includes(stepToDelete) && !otherQualifications.includes(stepToDelete.toString()))
 		redundantSteps.push(stepToDelete.toString())
 	if (redundantSteps.length) {
 		return stepMultipliersTable.filter(
@@ -95,15 +110,23 @@ const filterRedundantIndustry = (
 		rates,
 		competencies,
 		rowToDeleteId,
-		industryToDelete
+		industryToDelete,
+		qualifications
 ) => {
 	const { industryMultipliersTable } = rates
 	const otherServices = competencies.filter(
 			row => row._id.toString() !== rowToDeleteId.toString()
 	)
+
+	const otherQualifications = _.flatten(
+			qualifications
+					.filter(({ status }) => status === 'Passed')
+					.map(row => row.industries)
+	).map(item => item.toString())
+
 	const otherIndustries = otherServices.map(row => row.industry.toString())
 	const redundantIndustries = []
-	if (!otherIndustries.includes(industryToDelete))
+	if (!otherIndustries.includes(industryToDelete) && !otherQualifications.includes(industryToDelete.toString()))
 		redundantIndustries.push(industryToDelete.toString())
 	if (redundantIndustries.length) {
 		return industryMultipliersTable.filter(
@@ -133,7 +156,7 @@ const filterExtraCombinationsForPriceListTable = (pricelistTable, competencies, 
 	otherQualifications = otherQualifications
 			.map(row => `${ row.sourceLanguage }-${ row.targetLanguage }-${ row.step }-${ row.industry }`)
 
-	 return  pricelistTable.filter(finalTableItem => {
+	return pricelistTable.filter(finalTableItem => {
 				return !![ ...otherCompetencies, ...otherQualifications ]
 						.includes(`${ finalTableItem.sourceLanguage }-${ finalTableItem.targetLanguage }-${ finalTableItem.step }-${ finalTableItem.industry }`)
 			}
