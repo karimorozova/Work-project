@@ -1,6 +1,6 @@
 <template lang="pug">
   .price
-    .prices-filter
+    .prices-filter()
       ResultFilter(
         :source="sourceFilter"
         :target="targetFilter"
@@ -280,7 +280,7 @@
 							}
 					)
 					this.dataArray.push(...result.data)
-					this.isDataRemain = result.body.length === 25
+					this.isDataRemain = result.data.length === 25
 				}
 			},
 			async getClientServices() {

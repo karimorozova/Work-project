@@ -21,7 +21,7 @@
 
 
 	export default {
-		mixins: [taskData, TasksLanguages],
+		mixins: [ taskData, TasksLanguages ],
 		props: {
 			originallyLanguages: {
 				type: Array
@@ -43,7 +43,7 @@
 			}),
 			setLanguage({ option }) {
 				const language = this.originallyLanguages.find(item => item.lang === option)
-				this.$emit("setTargets", { targets: [language] })
+				this.$emit("setTargets", { targets: [ language ] })
 				this.$emit("setSourceLanguage", { symbol: language.symbol })
 			}
 		},
@@ -71,23 +71,21 @@
   @import "../../../assets/scss/colors.scss";
 
   .tasks-langs {
-    margin-bottom: 40px;
 
     &__title {
       position: relative;
     }
 
     &__item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 30px;
+      display: block;
     }
 
     &__drop-menu {
       position: relative;
       width: 191px;
-      height: 28px;
-      margin-left: 20px;
+      margin-top: 3px;
+      height: 30px;
+
     }
 
     &__input {

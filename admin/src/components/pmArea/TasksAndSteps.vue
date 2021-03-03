@@ -6,10 +6,12 @@
     .tasks-steps__tasks-title Tasks and Steps
       img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
-      TasksData(v-if="isTaskData && !isFinishedStatus && originallyLanguages.length"
+      TasksData(
+        v-if="isTaskData && !isFinishedStatus && originallyLanguages.length"
         :originallyLanguages="originallyLanguages"
         :originallyUnits="originallyUnits"
         :originallySteps="originallySteps"
+        :originallyServices="originallyServices"
         @setValue="setValue"
         @showErrors="showErrors"
         @addTasks="addTasks"
@@ -147,7 +149,7 @@
 				await this.refreshMetricsIfStepsWereNotCreated()
 
 				let tasksData = this.getDataForTasks(dataForTasks)
-				const calculationUnit = [...new Set(dataForTasks.stepsAndUnits.map(item => item.unit))]
+				const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
 				const { sourceFiles, refFiles } = dataForTasks
 
 				if (sourceFiles && sourceFiles.length) {
@@ -222,7 +224,7 @@
 				return !wordsUnit || this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
 			},
 			isDisabled() {
-				const statuses = ["Closed", "Cancelled"]
+				const statuses = [ "Closed", "Cancelled" ]
 				return statuses.indexOf(this.currentProject.status) !== -1
 			}
 		},

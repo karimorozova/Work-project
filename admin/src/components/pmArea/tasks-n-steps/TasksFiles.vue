@@ -1,159 +1,261 @@
 <template lang="pug">
   .tasks-files
-    .tasks-files__main
-      .tasks-files__item(v-if="isWordcount")
-        span Source file:
-        span.tasks-files__label-red *
-        .tasks-files__upload-file
-          FilesUpload(
-            buttonValue="Source Files *"
-            inputClass="files-upload__source-file"
-            :files="sourceFiles"
-            @uploadFiles="uploadSourceFiles"
-            @deleteFile="(e) => deleteFile(e, 'sourceFiles')")
-      .tasks-files__item
-        span Reference file:
-        //span.tasks-files__label-red *
-        span.tasks-files__label-red
-        .tasks-files__upload-file
-          FilesUpload(
-            buttonValue="Reference Files"
-            inputClass="files-upload__ref-file"
-            :files="refFiles"
-            @uploadFiles="uploadRefFiles"
-            @deleteFile="(e) => deleteFile(e, 'refFiles')")
-    .tasks-files__tooltip Total size must be <= 10Mb, each file can be <= 2Mb
-    ValidationErrors(v-if="showFileSizeWarning"
+    .tasks-files__table
+      DataTable(
+        :fields="fields"
+        :tableData="filesData"
+        :bodyClass="filesData.length < 6 ? 'tbody_visible-overflow' : ''"
+        :tableheadRowClass="filesData.length < 6 ? 'tbody_visible-overflow' : ''"
+        bodyRowClass="steps-table-row"
+      )
+        template(slot="headerFileName" slot-scope="{ field }")
+          span.step-files__label {{ field.label }}
+        template(slot="headerCategory" slot-scope="{ field }")
+          span.step-files__label {{ field.label }}
+        template(slot="headerIcon" slot-scope="{ field }")
+          span.step-files__label {{ field.label }}
+
+        template(slot="fileName" slot-scope="{ row, index }")
+          span.step-files__data {{ row.name }}
+        template(slot="category" slot-scope="{ row, index }")
+          span.step-files__data {{ row.category }}
+        template(slot="icon" slot-scope="{ row, index }")
+          span.step-files__data.step-files__dataIcon(@click="removeFile(row.name, row.category)")
+            img(src="../../../assets/images/Other/delete-icon-qa-form.png")
+
+    .tasks-files__tableAdd(id="add")
+      Add(@add="openUploadModal")
+
+    .tasks-files__main(v-if="isUploadModal" id="modal")
+      .tasks-files__items
+        span.tasks-files__close(@click="closeUploadModal") &#215;
+        .tasks-files__item(v-if="isWordcount")
+          span Source file:
+          span.tasks-files__label-red *
+          .tasks-files__upload-file
+            FilesUpload(
+              buttonValue="Source Files *"
+              inputClass="files-upload__source-file"
+              :files="sourceFiles"
+              @uploadFiles="uploadSourceFiles"
+              @deleteFile="(e) => deleteFile(e, 'sourceFiles')"
+            )
+        .tasks-files__item
+          span Reference file:
+          span.tasks-files__label-red
+          .tasks-files__upload-file
+            FilesUpload(
+              buttonValue="Reference Files"
+              inputClass="files-upload__ref-file"
+              :files="refFiles"
+              @uploadFiles="uploadRefFiles"
+              @deleteFile="(e) => deleteFile(e, 'refFiles')"
+            )
+      .tasks-files__tooltip Total size must be <= 10Mb, each file can be <= 2Mb
+
+    ValidationErrors(
+      v-if="showFileSizeWarning"
       :errors="warnings"
       :isAbsolute="true"
-      @closeErrors="closeErrors")
+      @closeErrors="closeErrors"
+    )
+
 </template>
 
 <script>
-  import FilesUpload from './tasksFiles/FilesUpload';
-  import ValidationErrors from '../../ValidationErrors';
-  import { mapActions } from 'vuex';
+	import FilesUpload from './tasksFiles/FilesUpload'
+	import ValidationErrors from '../../ValidationErrors'
+	import { mapActions } from 'vuex'
+	import DataTable from "../../DataTable"
+	import Add from "../../Add"
 
-  export default {
-    props: {
-      tasksData: {
-        type: Object
-      }
-    },
-    data () {
-      return {
-        sourceFiles: [],
-        refFiles: [],
-        isSourceFilesShow: false,
-        isRefFilesShow: false,
-        forbiddenExtensions: [
-          'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
-          'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
-          'png', 'gif', 'bmp', 'tiff', 'ppm', 'pgm', 'jpg', 'svg', 'bat',
-          'mp3', 'aac', '3gp', 'aa', 'aax', 'aiff', 'alac', 'm4p', 'mpc'
-        ],
-        showFileSizeWarning: false,
-        warnings: ['File is too big. The max size of a file cannot exceed 2 MB'],
-      };
+	export default {
+		props: {
+			tasksData: {
+				type: Object
+			}
+		},
+		data() {
+			return {
+				fields: [
+					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "60%", padding: 0 },
+					{ label: "Category", headerKey: "headerCategory", key: "category", width: "30%", padding: 0 },
+					{ label: "", headerKey: "headerIcon", key: "icon", width: "10%", padding: 0, cellClass: "step-files_centered" }
+				],
+				sourceFiles: [],
+				refFiles: [],
+				isSourceFilesShow: false,
+				isRefFilesShow: false,
+				forbiddenExtensions: [
+					'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
+					'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
+					'png', 'gif', 'bmp', 'tiff', 'ppm', 'pgm', 'jpg', 'svg', 'bat',
+					'mp3', 'aac', '3gp', 'aa', 'aax', 'aiff', 'alac', 'm4p', 'mpc'
+				],
+				showFileSizeWarning: false,
+				warnings: [ 'File is too big. The max size of a file cannot exceed 2 MB' ],
+				isUploadModal: false
+			}
 		},
 		methods: {
 			...mapActions({
 				setDataValue: "setTasksDataValue"
 			}),
-			checkFiles(files) {
-				const sizesSum = files.reduce((acc, cur) => acc + cur.size, 0);
-				return sizesSum / 1000000 <= 10;
+			removeFile(name, category) {
+				let idx = -1
+				let props = ''
+				if (category === 'Source file') {
+					idx = this.sourceFiles.findIndex(item => item.name === name)
+					props = 'sourceFiles'
+				} else {
+					idx = this.refFiles.findIndex(item => item.name === name)
+					props = 'refFiles'
+				}
+				this.deleteFile({ index: idx }, props)
 			},
-			uploadSourceFiles({files}) {
-        const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2);
-        if (filesBiggerThan2MB.length) {
-          this.showFileSizeWarning = true;
-        }
-        const filteredFiles = Array.from(files).filter(item => {
-          const { size, name } = item;
-          const extension = name.split('.').pop();
-          return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1;
-        });
-        if (filteredFiles.length && this.checkFiles(filteredFiles)) {
-          for (let file of filteredFiles) {
-            const isExist = this.sourceFiles.find(item => item.name === file.name);
-            if (!isExist) {
-              this.sourceFiles.push(file);
+			outsideClickListener(e) {
+				const layout = document.getElementById("modal")
+				const add = document.getElementById("add")
+				let { target } = e
+				do {
+					if (target === layout) return
+					if (target === add) return
+					target = target.parentNode
+				} while (target)
+
+				this.closeUploadModal()
+			},
+			closeUploadModal() {
+				this.isUploadModal = false
+				document.removeEventListener('click', this.outsideClickListener)
+			},
+			openUploadModal() {
+				this.isUploadModal = true
+				document.addEventListener('click', this.outsideClickListener)
+			},
+			checkFiles(files) {
+				const sizesSum = files.reduce((acc, cur) => acc + cur.size, 0)
+				return sizesSum / 1000000 <= 10
+			},
+			uploadSourceFiles({ files }) {
+				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2)
+				if (filesBiggerThan2MB.length) {
+					this.showFileSizeWarning = true
+				}
+				const filteredFiles = Array.from(files).filter(item => {
+					const { size, name } = item
+					const extension = name.split('.').pop()
+					return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
+				})
+				if (filteredFiles.length && this.checkFiles(filteredFiles)) {
+					for (let file of filteredFiles) {
+						const isExist = this.sourceFiles.find(item => item.name === file.name)
+						if (!isExist) {
+							this.sourceFiles.push(file)
 						}
 					}
 				}
 				if (!filteredFiles.length) {
 					this.clearInputFiles(".files-upload__source-file")
 				}
-				this.setDataValue({prop: "sourceFiles", value: this.sourceFiles});
+				this.setDataValue({ prop: "sourceFiles", value: this.sourceFiles })
 			},
-			uploadRefFiles({files}) {
-        const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2);
-        if (filesBiggerThan2MB.length) {
-          this.showFileSizeWarning = true;
-        }
-        const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 2);
-        if (filteredFiles.length && this.checkFiles(filteredFiles)) {
-          for (let file of files) {
-            const isExist = this.refFiles.find(item => item.name === file.name);
-            if (!isExist) {
-              this.refFiles.push(file);
-            }
-          }
-        }
-        if (!filteredFiles.length) {
+			uploadRefFiles({ files }) {
+				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2)
+				if (filesBiggerThan2MB.length) {
+					this.showFileSizeWarning = true
+				}
+				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 2)
+				if (filteredFiles.length && this.checkFiles(filteredFiles)) {
+					for (let file of files) {
+						const isExist = this.refFiles.find(item => item.name === file.name)
+						if (!isExist) {
+							this.refFiles.push(file)
+						}
+					}
+				}
+				if (!filteredFiles.length) {
 					this.clearInputFiles(".files-upload__ref-file")
 				}
-				this.setDataValue({prop: "refFiles", value: this.refFiles});
+				this.setDataValue({ prop: "refFiles", value: this.refFiles })
 			},
-			deleteFile({index}, prop) {
-				this[prop].splice(index, 1);
-				this.setDataValue({prop, value: this[prop]});
+			deleteFile({ index }, prop) {
+				this[prop].splice(index, 1)
+				this.setDataValue({ prop, value: this[prop] })
 				if (!this[prop].length) {
 					if (prop === "sourceFiles") {
-						this.isSourceFilesShow = false;
-						return this.clearInputFiles(".files-upload__source-file");
+						this.isSourceFilesShow = false
+						return this.clearInputFiles(".files-upload__source-file")
 					}
-					this.isRefFilesShow = false;
-					return this.clearInputFiles(".files-upload__ref-file");
+					this.isRefFilesShow = false
+					return this.clearInputFiles(".files-upload__ref-file")
 				}
 			},
 			clearInputFiles(str) {
-        let inputFiles = document.querySelectorAll(str);
-        for (let elem of inputFiles) {
-          elem.value = '';
-        }
-      },
-      toggleSourceFiles () {
-        this.isSourceFilesShow = !this.isSourceFilesShow;
-      },
-      toggleRefFiles () {
-        this.isRefFilesShow = !this.isRefFilesShow;
-      },
-      closeErrors () {
-        this.showFileSizeWarning = false;
-      },
-    },
+				let inputFiles = document.querySelectorAll(str)
+				for (let elem of inputFiles) {
+					elem.value = ''
+				}
+			},
+			toggleSourceFiles() {
+				this.isSourceFilesShow = !this.isSourceFilesShow
+			},
+			toggleRefFiles() {
+				this.isRefFilesShow = !this.isRefFilesShow
+			},
+			closeErrors() {
+				this.showFileSizeWarning = false
+			}
+		},
 		components: {
+			Add,
+			DataTable,
 			FilesUpload,
-      ValidationErrors
+			ValidationErrors
 		},
 		computed: {
+			filesData() {
+				let tableData = []
+				this.sourceFiles.forEach(elem => tableData.push({ name: elem.name, category: 'Source file' }))
+				this.refFiles.forEach(elem => tableData.push({ name: elem.name, category: 'Reference file' }))
+				return tableData
+			},
 			isWordcount() {
 				return this.tasksData.stepsAndUnits
-					? this.tasksData.stepsAndUnits
-						.map(item => item.unit)
-						.includes("CAT Wordcount")
-					: false;
+						? this.tasksData.stepsAndUnits
+								.map(item => item.unit)
+								.includes("CAT Wordcount")
+						: false
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+  .step-files {
+    &__data {
+      display: flex;
+      align-items: center;
+      padding-left: 5px;
+      height: 30px;
+    }
+
+    &__dataIcon {
+      cursor: pointer;
+    }
+  }
 
   .tasks-files {
     position: relative;
+
+    &__tableAdd{
+      width: 100px;
+    }
+
+    &__items {
+      display: flex;
+      justify-content: space-around;
+    }
 
     &__item {
       display: flex;
@@ -171,10 +273,35 @@
     }
 
     &__main {
+      padding: 30px 20px 20px 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      position: absolute;
+      z-index: 9999;
+      background: white;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+    }
+
+    &__close {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
       display: flex;
       align-items: center;
-      margin-bottom: 60px;
-      justify-content: space-between;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
     }
 
     &__upload-file {
@@ -182,11 +309,9 @@
     }
 
     &__tooltip {
-      position: absolute;
-      bottom: -25px;
-      opacity: 0.5;
-      font-size: 14px;
-      width: 100%;
+      text-align: center;
+      opacity: 0.6;
+      margin-top: 20px;
     }
   }
 

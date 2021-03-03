@@ -1,17 +1,19 @@
 <template lang="pug">
   .tasks-data
     .tasks-data__main
-      .tasks-data__item(v-if="originallySteps && originallyUnits && templates.length")
+      .tasks-data__item(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
         ServiceAndWorkflow(
           :originallyLanguages="originallyLanguages"
           @setSourceLanguage="setSourceLang",
           @setTargets="setTargets",
           :originallyUnits="originallyUnits"
           :originallySteps="originallySteps"
+          :originallyServices="originallyServices"
           :templates="templates"
         )
-      .tasks-data__item
-        .tasks-data__item-title File Preparation
+
+      .tasks-data__item(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
+        .tasks-data__item-title Job Settings
         .tasks-data__langs(v-if="originallyLanguages.length")
           span(v-if="isMonoService")
             TasksLangs(
@@ -30,10 +32,6 @@
               :isRequest="isRequest"
               :setPossibleTargetsAction="setPossibleTargetsAction"
             )
-        .tasks-data__files(v-if="currentProject.status !== 'Requested'")
-          TasksFiles(:tasksData="tasksData")
-        .tasks-data__files.tasks-data_m-bottom-40(v-else)
-          TasksFilesRequested
 
         .tasks-data__services
           .tasks-data__service-steps(v-if="countCATWordcount === 2")
@@ -58,13 +56,23 @@
                 :originallyUnits="originallyUnits"
               )
 
-    .tasks-data__add-tasks(v-if="isProject && isButton")
-      Button(value="Add tasks", @clicked="checkForErrors")
+    .tasks-data__filesOptions(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
+      .tasks-data__filesOptions-title File Preparation
+      .tasks-data__files(v-if="currentProject.status !== 'Requested'")
+        TasksFiles(:tasksData="tasksData")
+
+    span(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
+      .tasks-data__add-tasks(v-if="isProject && isButton")
+        Button(value="Add tasks", @clicked="checkForErrors")
+
     .tasks-data__buttons(v-if="isRequest && isButton")
       .tasks-data__button
         Button(:value="currentProject.isAssigned ? 'Assign to AM' : 'Assign to PM'", @clicked="assignManager")
       .tasks-data__button
         Button(value="Add tasks", @clicked="checkForErrors", :isDisabled="isAddTasksDisabled")
+
+    //.tasks-data__files.tasks-data_m-bottom-40(v-else)
+      TasksFilesRequested
     slot(name="errors")
 </template>
 
@@ -79,6 +87,7 @@
 	import Button from "../../Button"
 	import BigToggler from "@/components/BigToggler"
 	import { mapGetters, mapActions } from "vuex"
+	import DataTable from "../../DataTable"
 
 	export default {
 		props: {
@@ -93,6 +102,9 @@
 			},
 			originallySteps: {
 				type: Array
+			},
+			originallyServices: {
+				type: Array
 			}
 		},
 		data() {
@@ -105,12 +117,12 @@
 			}
 		},
 		methods: {
-			...mapActions(["alertToggle", "setTasksDataValue", "setRequestValue"]),
+			...mapActions([ "alertToggle", "setTasksDataValue", "setRequestValue" ]),
 
 			setSourceLang({ symbol }) {
 				const language = this.originallyLanguages.find((item) => item.symbol === symbol)
 				this.setTasksDataValue({ prop: "source", value: language })
-				this.sourceLanguages = [language.symbol]
+				this.sourceLanguages = [ language.symbol ]
 				if (!this.isMonoService) this.setTargets({ "targets": [] })
 				this.setPossibleTargetsAction = true
 				setTimeout(() => {
@@ -119,7 +131,7 @@
 			},
 			setTargets({ targets }) {
 				this.setTasksDataValue({ prop: "targets", value: targets })
-				this.targetLanguages = [...targets]
+				this.targetLanguages = [ ...targets ]
 			},
 			isRefFilesHasSource() {
 				const { sourceFiles, refFiles } = this.tasksData
@@ -216,12 +228,10 @@
 			isDeadlineMissed() {
 				let today = new Date()
 				today.setHours(23, 59, 59)
-				const missedDeadline = this.tasksData.stepsDates.find(
-						(item) => item.deadline && new Date(item.deadline) <= today
+				const missedDeadline = this.tasksData.stepsDates.find((item) =>
+						item.deadline && new Date(item.deadline) <= today
 				)
-				return (
-						!!missedDeadline || new Date(this.currentProject.deadline) <= today
-				)
+				return (!!missedDeadline || new Date(this.currentProject.deadline) <= today)
 			},
 			checkRequestFies() {
 				const { sourceFiles, refFiles } = this.currentProject
@@ -331,7 +341,7 @@
 				)
 			},
 			isButton() {
-				const forbiddenStatuses = ["Cancelled", "Cancelled Halfway", "Closed"]
+				const forbiddenStatuses = [ "Cancelled", "Cancelled Halfway", "Closed" ]
 				return forbiddenStatuses.indexOf(this.currentProject.status) === -1
 			},
 			currentUnit() {
@@ -363,6 +373,7 @@
 			}
 		},
 		components: {
+			DataTable,
 			TasksLangs,
 			TasksLangsDuo,
 			TasksFiles,
@@ -385,6 +396,18 @@
   .tasks-data {
     position: relative;
 
+    &__filesOptions {
+      margin-top: 20px;
+      border: 2px solid #938676;
+      padding: 20px 15px;
+      border-radius: 10px;
+
+      &-title {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+    }
+
     &__workflow-wrapper {
       display: flex;
       align-items: center;
@@ -403,15 +426,15 @@
     }
 
     &__item {
-      padding: 20px 10px;
+      padding: 20px 15px;
       width: 49%;
-      border: 1px solid $brown-border;
+      border: 2px solid #938676;
       border-radius: 2px;
       box-sizing: border-box;
       border-radius: 10px;
 
       &-title {
-        font-size: 21px;
+        font-size: 18px;
         margin-bottom: 20px;
       }
     }

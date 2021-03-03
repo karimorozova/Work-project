@@ -12,7 +12,7 @@
             .drop__item(v-if="isRemoveOption" @click="removeOption")
               span.remove__icon
                 i.fa.fa-ban(aria-hidden='true')
-                span.remove__text Remove Option
+                span.remove__text &nbsp; Remove Option
 </template>
 
 <script>

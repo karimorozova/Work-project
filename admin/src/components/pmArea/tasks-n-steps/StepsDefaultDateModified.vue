@@ -1,12 +1,13 @@
 <template lang="pug">
   .steps-date
-    .steps-date-wrapper
+    .steps-date-wrapperTitle
       .steps-date__header
-        .steps-date__title(v-if="steps") Step {{ stepCounter }} - {{setSteps[0].steps[stepCounter-1].step.title}}
+        .steps-date__title Step {{ stepCounter }} - {{setSteps[0].steps[stepCounter-1].step.title}}
+
     .steps-date-wrapper
       .steps-date__picker
         .steps-date__input-wrapper
-          .steps-date__label Start date
+          .steps-date__label Start date:
             span.steps-date__label-red *
           .steps-date__datepicker-wrapper
             .steps-date__input
@@ -25,9 +26,10 @@
                 @invalidDate="invalidDateWarn"
               )
             img.steps-date__image(src="../../../assets/images/calendar.png" @click="showStartCalendar")
+
       .steps-date__picker
         .steps-date__input-wrapper
-          .steps-date__label Deadline
+          .steps-date__label Deadline:
             span.steps-date__label-red *
           .steps-date__datepicker-wrapper
             .steps-date__input
@@ -46,12 +48,13 @@
                 @invalidDate="invalidDateWarn"
               )
             img.steps-date__image(src="../../../assets/images/calendar.png" @click="showDeadlineCalendar")
+
     .steps-date-wrapper
       .steps-date__picker
         .steps-date__input-wrapper
-          .steps-date__label Unit
+          .steps-date__label Unit:
             span.steps-date__label-red *
-          .steps-date__datepicker-wrapper(v-if="steps")
+          .steps-date__datepicker-wrapper
             .steps-date__input(v-if="tasksData.stepsAndUnits[stepCounter-1]")
               .steps-date__drop-menu
                 SelectSingle(
@@ -63,66 +66,72 @@
 </template>
 
 <script>
-	import Datepicker from "../../Datepicker";
-	import SelectSingle from "@/components/SelectSingle";
-	import scrollDrop from "@/mixins/scrollDrop";
-	import moment from "moment";
-	import { mapGetters, mapActions } from "vuex";
+	import Datepicker from "../../Datepicker"
+	import SelectSingle from "@/components/SelectSingle"
+	import scrollDrop from "@/mixins/scrollDrop"
+	import moment from "moment"
+	import { mapActions } from "vuex"
 
 	export default {
-		mixins: [scrollDrop],
+		mixins: [ scrollDrop ],
 		props: {
 			stepCounter: {
 				type: Number
 			},
 			start: {
-				type: [Date, String]
+				type: [ Date, String ]
 			},
 			deadline: {
-				type: [Date, String]
+				type: [ Date, String ]
 			},
 			service: {
 				type: String,
 				default: ''
 			},
 			workflowId: {
-				type: Number,
+				type: Number
 			},
 			tasksData: {
 				type: Object
 			},
 			originallyUnits: {
-				type: Array,
+				type: Array
+			},
+			originallyServices: {
+				type: Array
+			},
+			originallySteps: {
+				type: Array
 			},
 		},
 		data() {
 			return {
 				highlighted: {
-					days: [6, 0]
+					days: [ 6, 0 ]
 				},
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
 				isReadonly: false,
-				services: null,
 				// originallyUnits: null,
+				services: null,
 				currentUnit: '',
-				steps: null,
+				steps: null
 			}
 		},
 		methods: {
 			...mapActions({
 				setDataValue: "setTasksDataValue",
 				getSteps: "getSteps",
-				getServices: "getServices",
+				getServices: "getServices"
 			}),
 			setUnit({ option }) {
-				this.currentUnit = this.originallyUnits.find(item => item.type === option);
-				this.sendUnit();
+				this.currentUnit = this.originallyUnits.find(item => item.type === option)
+				this.sendUnit()
 			},
 			setParams(option) {
 				this.currentUnit = this.originallyUnits.find(item => item.type === option)
-				this.sendUnit();
+				this.sendUnit()
 			},
 			// async getUnits(){
 			//   try {
@@ -136,28 +145,28 @@
 			//     });
 			//   }
 			// },
-			async getServiceSteps() {
-				try {
-					const services = await this.$http.get("/api/services");
-					const steps = await this.$http.get("/api/steps");
-					this.services = services.body;
-					this.steps = steps.body;
-				} catch (err) {
-					this.alertToggle({
-						message: "Erorr on getting Services or Steps",
-						isShow: true,
-						type: "error"
-					});
-				}
-			},
+			// async getServiceSteps() {
+			// 	try {
+			// 		const services = await this.$http.get("/api/services")
+			// 		const steps = await this.$http.get("/api/steps")
+			// 		this.services = services.body
+			// 		this.steps = steps.body
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: "Erorr on getting Services or Steps",
+			// 			isShow: true,
+			// 			type: "error"
+			// 		})
+			// 	}
+			// },
 			customFormatter(date) {
-				return moment(date).format('DD-MM-YYYY, HH:mm');
+				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			showStartCalendar() {
-				this.$refs.start.showCalendar();
+				this.$refs.start.showCalendar()
 			},
 			showDeadlineCalendar() {
-				this.$refs.deadline.showCalendar();
+				this.$refs.deadline.showCalendar()
 			},
 			setDate(e, prop) {
 				this.$emit("setDate", { date: new Date(e), prop })
@@ -166,15 +175,15 @@
 				this.$emit('sendUnit', {
 					stepCounter: this.stepCounter,
 					step: this.setSteps[0].steps[this.stepCounter - 1].step.title,
-					unit: this.currentUnit.type,
+					unit: this.currentUnit.type
 				})
 			},
 			invalidDateWarn({ message }) {
-				console.log(message);
-			},
+				console.log(message)
+			}
 		},
 		created() {
-			this.getServiceSteps();
+			// this.getServiceSteps()
 		},
 		mounted() {
 			// this.getServiceSteps();
@@ -182,42 +191,42 @@
 		},
 		computed: {
 			setSteps() {
-				if(this.services) {
-					return this.services.filter(item => item.title == this.service);
+				if (this.originallyServices) {
+					return this.originallyServices.filter(item => item.title == this.service)
 				}
 			},
 			optionUnits() {
-				const currentStep = this.setSteps[0].steps[this.stepCounter - 1].step.title;
-				return this.steps.filter(item => item.title == currentStep)[0]
-						.calculationUnit.map(item => item.type);
+				const currentStep = this.setSteps[0].steps[this.stepCounter - 1].step.title
+				return this.originallySteps.filter(item => item.title == currentStep)[0]
+						.calculationUnit.map(item => item.type)
 			},
 			disabledStart() {
 				let result = {
 					to: moment().add(-1, 'day').endOf('day').toDate()
-				};
-				if(this.deadline) {
+				}
+				if (this.deadline) {
 					result = {
 						to: moment().add(-1, 'day').endOf('day').toDate(),
 						from: moment(this.deadline).add(-1, 'hour').endOf('day').toDate()
 					}
 				}
-				return result;
+				return result
 			},
 			disabledDeadline() {
 				let result = {
 					to: moment().add(-1, 'day').endOf('day').toDate()
-				};
-				if(this.start) {
+				}
+				if (this.start) {
 					result = {
 						to: moment(this.start).add(-1, 'day').endOf('day').toDate()
 					}
 				}
-				return result;
+				return result
 			}
 		},
 		components: {
 			Datepicker,
-			SelectSingle,
+			SelectSingle
 		}
 	}
 </script>
@@ -226,20 +235,23 @@
   @import '../../../assets/scss/colors.scss';
 
   .steps-date {
-    padding: 12px 20px 0;
     background-color: $active-background;
-    border: 1px solid $brown-border;
-    margin-bottom: 50px;
+    border: 1px solid #938676;
+    margin-top: 40px;
     position: relative;
-    border-radius: 10px;
+    border-radius: 5px;
+    padding: 10px 15px 5px;
+
+    &__input {
+      margin-top: 3px;
+    }
 
     &__drop-menu {
       position: relative;
       width: 191px;
-      border-radius: 6px;
-      height: 29px;
+      border-radius: 5px;
+      height: 30px;
       background: #fff;
-      margin-bottom: 15px;
     }
 
     &__header {
@@ -251,7 +263,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
 
     &__datepicker-wrapper {
@@ -267,9 +279,9 @@
     &__title {
       position: relative;
       max-width: 100%;
-      margin: 10px 0 5px;
       text-align: center;
       font-size: 18px;
+      margin-bottom: 15px;
     }
 
     &__picker {
@@ -280,7 +292,6 @@
     }
 
     &__label {
-      padding: 5px 0;
 
       &-red {
         color: red;
@@ -291,7 +302,7 @@
 
     &__image {
       position: absolute;
-      top: 5px;
+      top: 8px;
       right: 5px;
       width: 18px;
       cursor: pointer;
