@@ -4,7 +4,6 @@ export const mutations = {
     },
     SET_TASKS_DATA_VALUE(state, payload) {
         const { prop, value } = payload;
-        console.log(payload)
         state.tasksData = {...state.tasksData, [prop]: value};
     },
     CLEAR_DATA(state) {

@@ -163,7 +163,7 @@ export default {
             border-bottom: .5px solid $light-brown;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.4s;
+            transition: ease 0.2s;
             &:last-child {
                 border: none;
             }

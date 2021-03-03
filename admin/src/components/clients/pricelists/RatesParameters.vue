@@ -123,7 +123,7 @@
     justify-content: space-between;
     position: relative;
     padding-bottom: 20px;
-    border-bottom: 2px solid #C5BFB5;
+    border-bottom: 1px solid #C5BFB5;
   }
 
   .actionsButton {

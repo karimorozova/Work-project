@@ -77,7 +77,6 @@
             :industries="industries"
             :isRefreshResultTable="isRefreshResultTable"
             :refresh="isRefreshAfterServiceUpdate"
-
           )
 
       .title(v-if="currentClient._id") Discount Chart
@@ -183,6 +182,7 @@
 		},
 		methods: {
 			async setMatrixData({ value, key }) {
+        value = value > 100 ? 100 : value < 0 ? 0 : value
 				try {
 					const result = await this.$http.post(
 							`/clientsapi/update-matrix/${ this.currentClient._id }`,
@@ -228,13 +228,13 @@
 				this.isRefreshResultTable = true
 				setTimeout(() => {
 					this.isRefreshResultTable = false
-				}, 1000)
+				}, 500)
 			},
 			updateRates(action) {
 				this.isRefreshAfterServiceUpdate = action
 				setTimeout(() => {
 					this.isRefreshAfterServiceUpdate = !action
-				}, 1000)
+				}, 500)
 			},
 			loadFile({ files, prop }) {
 				this.$emit("loadFile", { files, prop })

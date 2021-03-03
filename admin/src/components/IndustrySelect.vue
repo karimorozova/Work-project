@@ -182,7 +182,7 @@ export default {
             padding: 5px 0 5px 5px;
             border-bottom: .5px solid #BFB09D;
             cursor: pointer;
-            transition: all 0.4s;
+            transition: ease 0.2s;
             &:last-child {
                 border: none;
             }

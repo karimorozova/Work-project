@@ -1,6 +1,6 @@
 <template lang="pug">
   .price
-    .prices-filter(v-if="currentServices.length")
+    .prices-filter()
       ResultFilter(
         :source="sourceFilter"
         :target="targetFilter"
@@ -239,7 +239,7 @@
 				try {
 					await this.$http.post("/clientsapi/rates/change-pricelist/" + this.clientId, {
 								_id: id,
-								price: parseFloat(this.currentPrice).toFixed(3),
+								price: parseFloat(this.currentPrice).toFixed(4),
 								altered: true,
 								notification: "Price disconnected from function"
 							}
@@ -280,7 +280,7 @@
 							}
 					)
 					this.dataArray.push(...result.data)
-					this.isDataRemain = result.body.length === 25
+					this.isDataRemain = result.data.length === 25
 				}
 			},
 			async getClientServices() {
@@ -344,7 +344,7 @@
 				currentClient: "getCurrentClient"
 			}),
 			dataForSourceFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat(
 							this.getUniqueValues(
 									this.currentServices.map((source) => source.sourceLanguage),
@@ -354,7 +354,7 @@
 				}
 			},
 			dataForTargetFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat(
 							this.getUniqueValues(
 									this.currentServices.map((target) => target.targetLanguages).flat(),
@@ -364,7 +364,7 @@
 				}
 			},
 			dataForStepFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat([
 						...new Set(
 								this.steps
@@ -375,7 +375,7 @@
 				}
 			},
 			dataForUnitFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat([
 						...new Set(
 								this.units.filter((unit) =>
@@ -386,7 +386,7 @@
 				}
 			},
 			dataForIndustryFilter() {
-				if (this.currentServices.length) {
+				if (this.currentServices) {
 					return [ "All" ].concat(
 							this.getUniqueValues(
 									this.currentServices.map((industry) => industry.industries).flat(),
@@ -459,6 +459,11 @@
 
     &__editing-data {
       box-shadow: inset 0 0 7px $brown-shadow;
+    }
+
+    &__empty {
+      font-size: 14px;
+      margin-bottom: 15px;
     }
 
     &__data-input {

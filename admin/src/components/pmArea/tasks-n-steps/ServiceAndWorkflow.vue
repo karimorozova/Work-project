@@ -3,8 +3,8 @@
     .workflow__title Service & Workflow
     .workflow__wrapper
       .workflow__drop-menu
-        label.workflow__menu-title.workflow_relative Service
-          Asterisk(:customStyle="asteriskStyle")
+        label.workflow__menu-title.workflow_relative Service:
+          span.label-red *
         SelectSingle(
           :selectedOption="service"
           :options="allServices"
@@ -13,7 +13,7 @@
           :positionStyle="positionStyle"
         )
       .workflow__drop-menu
-        label.workflow__menu-title Workflow
+        label.workflow__menu-title Workflow:
         SelectSingle(
           :selectedOption="selectedWorkflow.name"
           :options="workflowStepsNames"
@@ -22,7 +22,7 @@
           :positionStyle="positionStyle"
         )
 
-    .workflow__default-dates(v-if="selectedWorkflow.id === 2917 && originallyUnits.length")
+    .workflow__default-dates(v-if="selectedWorkflow.id === 2917")
       StepsDefaultDateModified(
         :workflowId="2917"
         v-for="count in stepsCounter"
@@ -34,8 +34,10 @@
         :service="service"
         :tasksData="tasksData"
         :originallyUnits="originallyUnits"
+        :originallyServices="originallyServices"
+        :originallySteps="originallySteps"
       )
-    .workflow__default-dates(v-if="selectedWorkflow.id === 2890 && originallyUnits.length")
+    .workflow__default-dates(v-if="selectedWorkflow.id === 2890")
       StepsDefaultDateModified(
         :workflowId="2890"
         v-for="count in 1"
@@ -47,6 +49,8 @@
         :service="service"
         :tasksData="tasksData"
         :originallyUnits="originallyUnits"
+        :originallyServices="originallyServices"
+        :originallySteps="originallySteps"
       )
 
   transition(name="fade")
@@ -56,14 +60,13 @@
 
 <script>
 	import SelectSingle from "../../SelectSingle"
-	import Asterisk from "../../Asterisk"
 	import StepsDefaultDateModified from "./StepsDefaultDateModified"
 	import { mapGetters, mapActions } from "vuex"
 	import setDefaultTasksService from "@/mixins/setDefaultTasksService"
 	import TasksLanguages from "../../../mixins/TasksLanguages"
 
 	export default {
-		mixins: [setDefaultTasksService, TasksLanguages],
+		mixins: [ setDefaultTasksService, TasksLanguages ],
 		props: {
 			originallyLanguages: {
 				type: Array
@@ -72,6 +75,9 @@
 				type: Array
 			},
 			originallySteps: {
+				type: Array
+			},
+			originallyServices: {
 				type: Array
 			},
 			templates: {
@@ -91,7 +97,6 @@
 					{ start: new Date(), deadline: "" },
 					{ start: "", deadline: new Date() }
 				],
-				asteriskStyle: { top: "-2px" },
 				positionStyle: { "margin-top": "3px" },
 				isError: false,
 				stepsAndUnits: [],
@@ -119,7 +124,7 @@
 					}
 				}
 				if (this.selectedWorkflow.id === 2890) {
-					this.setDataValue({ prop: "stepsDates", value: this.stepsDates[0] })
+					this.setDataValue({ prop: "stepsDates", value: [this.stepsDates[0]] })
 				} else {
 					this.setDataValue({ prop: "stepsDates", value: this.stepsDates })
 				}
@@ -214,7 +219,7 @@
 					{ start: "", deadline: "" }
 				]
 				let stepDates = { ...this.stepsDates[0], deadline: this.currentProject.deadline }
-				this.setDataValue({ prop: "stepsDates", value: [stepDates] })
+				this.setDataValue({ prop: "stepsDates", value: [ stepDates ] })
 			},
 			setDefaultStepDates() {
 				this.stepsDates = [
@@ -279,7 +284,6 @@
 		},
 		components: {
 			SelectSingle,
-			Asterisk,
 			StepsDefaultDateModified
 		}
 	}
@@ -292,15 +296,14 @@
     position: relative;
 
     &__title {
-      font-size: 21px;
-      margin-bottom: 23px;
+      font-size: 18px;
+      margin-bottom: 20px;
     }
 
     &__wrapper {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 50px;
     }
 
     &__drop-menu {
@@ -310,7 +313,6 @@
     }
 
     &__default-dates {
-      margin: 30px 0;
     }
 
     &__error {
@@ -342,5 +344,9 @@
   .fade-enter,
   .fade-leave-to {
     opacity: 0;
+  }
+  .label-red{
+    color: red;
+    font-size: 14px;
   }
 </style>

@@ -824,14 +824,17 @@ router.get('/deliverables', async (req, res) => {
 	const { taskId } = req.query
 	try {
 		const project = await getProject({ 'tasks.taskId': taskId })
+		const task = project.tasks.find(({taskId: tId}) => tId === taskId);
 		const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-		const link = await getDeliverablesLink({
-			taskId, projectId: project.id, taskFiles: review.tasks[0].files
-		})
-		if (link) {
-			await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
+		if(task.deliverables){
+			res.send({ link:  task.deliverables})
+		}else{
+			const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
+			if (link) {
+				await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
+			}
+			res.send({ link })
 		}
-		res.send({ link })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on downloading deliverables')
@@ -839,9 +842,9 @@ router.get('/deliverables', async (req, res) => {
 })
 
 router.post('/deliver', async (req, res) => {
-	const { tasks } = req.body
+	const { tasks, user } = req.body
 	try {
-		const updatedProject = await getAfterTasksDelivery(tasks)
+		const updatedProject = await getAfterTasksDelivery(tasks, user)
 		if (updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
 			await notifyProjectDelivery(updatedProject)
 		}

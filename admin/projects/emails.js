@@ -26,7 +26,7 @@ const {
 } = require('../emailMessages/vendorCommunication');
 const { getProject } = require("./getProjects");
 const { getService } = require("../services/getServices");
-const { User, Units, Step } = require("../models");
+const { User, Units, Step, Delivery, Projects } = require("../models");
 const {
 	getDeliverablesLink,
 	getProjectDeliverables,
@@ -227,10 +227,14 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 	try {
 		const accManager = await User.findOne({ "_id": project.accountManager.id });
 		const task = project.tasks.find(item => item.taskId === taskId);
+		const taskIndex = project.tasks.findIndex(item => item.taskId === taskId);
 		const subject = `Delivery: ${ taskId } - ${ task.service.title } (ID C006.1)`;
-		const deliverables = task.deliverables || await getDeliverablesLink({ taskId, taskFiles: task.targetFiles, projectId: project.id });
+		const review = await Delivery.findOne({ projectId: project._id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
+		const deliverables = task.deliverables || await getDeliverablesLink({ taskId, taskFiles: review.tasks[0].files, projectId: project._id });
 		const content = fs.createReadStream(`./dist${ deliverables }`);
 		const attachments = [{ filename: "deliverables.zip", content }];
+		await Projects.updateOne({"_id": project._id}, { [`tasks.${taskIndex}.deliverables`]: deliverables})
+
 		for (let contact of contacts) {
 			const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id });
 			await sendEmail({ to: contact.email, attachments, subject }, message);

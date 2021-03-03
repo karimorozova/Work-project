@@ -34,11 +34,11 @@ function calculateCrossRate(USD, GBP) {
 }
 
 const rateExchangeVendorOntoProject = (projectCurrency, vendorCurrency, nativeRate, crossRateTable) => {
-	return +(nativeRate * crossRateTable[vendorCurrency][projectCurrency]).toFixed(3)
+	return +(nativeRate * crossRateTable[vendorCurrency][projectCurrency]).toFixed(4)
 }
 
 const rateExchangeProjectOntoVendor = (projectCurrency, vendorCurrency, nativeRate, crossRateTable) => {
-	return +(nativeRate * crossRateTable[projectCurrency][vendorCurrency]).toFixed(3)
+	return +(nativeRate * crossRateTable[projectCurrency][vendorCurrency]).toFixed(4)
 }
 
 const returnIconCurrencyByStringCode = (currencyStingCode) => {

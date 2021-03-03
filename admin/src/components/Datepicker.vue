@@ -1178,7 +1178,7 @@
   }
 
   .datepicker-custom-mod {
-    width: 192px;
+    width: 191px;
   }
 
   .steps__custom-input {

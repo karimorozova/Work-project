@@ -201,7 +201,7 @@
 									type: this.dataArray[index].type,
 									sourceLanguage: this.currentSourceLangObj,
 									targetLanguage: this.currentTargetLangObj,
-									basicPrice: parseFloat(this.currentBasicPrice).toFixed(3),
+									basicPrice: parseFloat(this.currentBasicPrice).toFixed(4),
 									altered: true
 								}
 							}
@@ -274,6 +274,11 @@
 
     label {
       margin-left: 3px;
+    }
+
+    &__empty {
+      font-size: 14px;
+      margin-bottom: 15px;
     }
 
     &__data,

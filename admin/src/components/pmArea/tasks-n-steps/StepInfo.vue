@@ -96,7 +96,10 @@
 			})
 		},
 		mounted() {
-			this.getDeliveryFiles()
+			const { status } = this.task
+			if (status === 'Pending Approval [DR1]' || status === 'Pending Approval [DR2]' || status === 'Ready for Delivery') {
+				this.getDeliveryFiles()
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -106,15 +109,11 @@
 				let result = []
 				if (this.task.sourceFiles) result.push(...this.stepFilesFiller(this.task.sourceFiles, "Source"))
 				if (this.task.refFiles) result.push(...this.stepFilesFiller(this.task.refFiles, "Reference"))
-				if (this.currentProject.status !== 'Closed') {
+				if (this.task.status !== 'Pending Approval [DR1]' && this.task.status !== 'Pending Approval [DR2]' && this.task.status !== 'Ready for Delivery') {
 					if (this.task.targetFiles) result.push(...this.stepFilesFiller(this.task.targetFiles.map(i => i.path), "Target"))
 				} else {
-					if (this.delivery) {
-						console.log(this.delivery)
-						result.push(...this.stepFilesFiller(this.delivery.files.map(i => i.path), "Target"))
-					}
+					if (this.delivery) result.push(...this.stepFilesFiller(this.delivery.files.map(i => i.path), "Target"))
 				}
-				console.log(result)
 				return result
 			}
 		},

@@ -44,7 +44,7 @@
 	import TasksLanguages from "../../../mixins/TasksLanguages"
 
 	export default {
-		mixins: [TasksLanguages],
+		mixins: [ TasksLanguages ],
 		props: {
 			originallyLanguages: {
 				type: Array
@@ -199,17 +199,15 @@
   }
 
   .tasks-langs {
-    margin-bottom: 35px;
-
     &__title {
       &-source {
-        margin-bottom: 5px;
+        margin-bottom: 3px;
         position: relative;
         width: 145px;
       }
 
       &-target {
-        margin-bottom: 5px;
+        margin-bottom: 3px;
         position: relative;
         width: 160px;
       }
@@ -217,19 +215,18 @@
   }
 
   .source {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     @extend %flex-column;
 
     &__drop-menu {
       position: relative;
-      width: 100%;
-      height: 28px;
+      width: 191px;
+      height: 30px;
     }
   }
 
   .target {
     &__arrows {
-      margin: 0 20px;
     }
 
     &__from {

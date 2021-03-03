@@ -330,7 +330,7 @@
 
         .account-menu-wrapper {
           .account-block {
-            width: 192px;
+            width: 191px;
             height: 124px;
             background-color: #fff;
             box-shadow: 1px 1px 11px black;
