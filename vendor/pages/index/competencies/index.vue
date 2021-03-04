@@ -2,6 +2,8 @@
 
 
   .competencies
+    |davay rodnaya za hip-hop && op
+    WYSIWYG
     h1.competencies__title Competencies and Rates
     .competencies__body
 
@@ -73,6 +75,7 @@
 <script>
 import SelectSingle from "../../../components/overall/SelectSingle"
 import { mapGetters } from "vuex"
+import WYSIWYG from "../../../components/overall/WYSIWYG"
 
 export default {
   data() {
@@ -121,6 +124,7 @@ export default {
   },
   components: {
     SelectSingle,
+	  WYSIWYG
   }
 }
 </script>
