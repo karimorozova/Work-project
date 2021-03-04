@@ -72,7 +72,7 @@
 			}
 		},
 		methods: {
-			...mapActions(["alertToggle", "setOriginallyUnits", "logout", "getVendorInfo"]),
+			...mapActions(["alertToggle", "setOriginallyUnits", "logout", "getVendorInfo","getAllLanguages","setAllIndustries"]),
 
 			mainPageRender() {
 				this.toggleSideBar(true)
@@ -139,6 +139,8 @@
 			this.domain = process.env.domain
 			this.setToken()
 			this.getVendorInfo()
+      this.getAllLanguages()
+      this.setAllIndustries()
 			this.mainPageRender()
 
 		},

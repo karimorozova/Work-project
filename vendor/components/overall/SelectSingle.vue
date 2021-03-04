@@ -1,18 +1,19 @@
 <template lang="pug">
-  .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]" :style="positionStyle")
-    .select
-      span.selected(v-if="selectedOption") {{ selectedOption }}
-      span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
-      .arrow-button(@click="toggleOptions" :class="{'no-border': projectsType === 'requests'}")
-        img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
-    .drop(v-if="isDropped")
-      input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search" ref="search")
-      .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
-        span {{ showOption(option) }}
-      .drop__item(v-if="isRemoveOption" @click="removeOption")
-        span.remove__icon
-          i.fa.fa-ban(aria-hidden='true')
-          span.remove__text &nbsp; Remove Option
+  .drop-wrapper
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]" :style="positionStyle")
+      .select
+        span.selected(v-if="selectedOption") {{ selectedOption }}
+        span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
+        .arrow-button(@click="toggleOptions" :class="{'no-border': projectsType === 'requests'}")
+          img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
+      .drop(v-if="isDropped")
+        input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search" ref="search")
+        .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
+          span {{ showOption(option) }}
+        .drop__item(v-if="isRemoveOption" @click="removeOption")
+          span.remove__icon
+            i.fa.fa-ban(aria-hidden='true')
+            span.remove__text &nbsp; Remove Option
 </template>
 
 <script>
@@ -148,7 +149,11 @@
       font-size: 12px;
     }
   }
-
+  .drop-wrapper {
+    position: relative;
+    min-height: 30px;
+    width: 100%;
+  }
   .drop-select {
     position: absolute;
     width: 100%;

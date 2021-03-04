@@ -1,23 +1,24 @@
 <template lang="pug">
-  .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]")
-    .select(@click="toggleOptions")
-      span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
-      span.selected.no-choice(v-if="!selectedOptions.length") {{ placeholder }}
-      .arrow-button
-        img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
-    .drop(v-if="isDropped")
-      .drop__buttonRow(v-if="allOptionsButtons")
-        .buttonRow__button(@click="setOrUnsetAllOptions('set')")
-          i.fa.fa-check-square-o(aria-hidden='true')
-          span Select All
-        .buttonRow__button(@click="setOrUnsetAllOptions('unset')")
-          i.fa.fa-square-o(aria-hidden='true')
-          span Clear All
-      input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" ref="search" placeholder="Search")
-      .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOptions(index)")
-        .checkbox
-          .checkbox__check(:class="{checked: activeClass(option)}")
-        span {{ showOption(option) }}
+  .drop-wrapper
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]")
+      .select(@click="toggleOptions")
+        span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
+        span.selected.no-choice(v-if="!selectedOptions.length") {{ placeholder }}
+        .arrow-button
+          img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
+      .drop(v-if="isDropped")
+        .drop__buttonRow(v-if="allOptionsButtons")
+          .buttonRow__button(@click="setOrUnsetAllOptions('set')")
+            i.fa.fa-check-square-o(aria-hidden='true')
+            span Select All
+          .buttonRow__button(@click="setOrUnsetAllOptions('unset')")
+            i.fa.fa-square-o(aria-hidden='true')
+            span Clear All
+        input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" ref="search" placeholder="Search")
+        .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOptions(index)")
+          .checkbox
+            .checkbox__check(:class="{checked: activeClass(option)}")
+          span {{ showOption(option) }}
 </template>
 
 <script>
@@ -120,6 +121,11 @@
   .fa-check-square-o,
   .fa-square-o {
     padding-right: 5px;
+  }
+  .drop-wrapper {
+    position: relative;
+    min-height: 30px;
+    width: 100%;
   }
   .drop-select {
     position: absolute;

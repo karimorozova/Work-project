@@ -1,4 +1,5 @@
 export * from './language'
+export * from './industry'
 export * from './timezones'
 export * from './vendors'
 export * from './rates'

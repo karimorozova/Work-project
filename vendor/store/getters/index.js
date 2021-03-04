@@ -1,4 +1,5 @@
 export const getLangs = state => state.languages;
+export const getIndustries = state => state.industries;
 export const getTimezones = state => state.timezones;
 export const getRequestsCount = state => state.currentRequests;
 export const getIsAlert = state => state.isAlert;

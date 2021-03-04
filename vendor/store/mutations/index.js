@@ -1,4 +1,5 @@
 import language from "./language";
+import industry from "./industry";
 import timezones from "./timezones";
 import vendors from "./vendors";
 import rates from "./rates";
@@ -9,6 +10,7 @@ import { SET_PREVIOUS_LINK } from "./helpers";
 
 export default {
   ...language,
+  ...industry,
   ...timezones,
   ...vendors,
   ...rates,

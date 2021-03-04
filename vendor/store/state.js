@@ -6,6 +6,7 @@ const state = {
   jobs: [],
   selectedJob: {},
   languages: [],
+  industries: [],
   timezones: [],
   steps: [],
   packages: [],
