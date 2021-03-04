@@ -7,11 +7,11 @@
     .terms-agree__captcha
         .terms-agree__google
             .g-recaptcha(data-sitekey="6LfMCXEUAAAAAPVdf_Ej5r0E744vsX3r-TxOc7Ed"
-            style= {"transform": "scale(0.77)",
-                "-webkit-transform": "scale(0.77)",
+            style={"transform": "scale(0.87)",
+                "-webkit-transform": "scale(0.87)",
                 "transform-origin": "150px 0",
                 "-webkit-transform-origin": "150px 0" })
-    input.terms-agree__submit(type="button" value="Next >>>" @click="checkForm")
+    input.terms-agree__submit(type="button" value="Submit Application" @click="checkForm")
     script(src='https://www.google.com/recaptcha/api.js', defer=true, async=true)
 </template>
 
@@ -63,11 +63,11 @@ export default {
             }, 0)
         },
         areCvFilesTooBig(files) {
-            const sum = this.getFilesSummarizedSize(files); 
+            const sum = this.getFilesSummarizedSize(files);
             return sum > 20;
         },
         areCoverLetterFilesTooBig(files) {
-            const sum = this.getFilesSummarizedSize(files); 
+            const sum = this.getFilesSummarizedSize(files);
             return sum > 2;
         },
         async checkForm() {
@@ -123,41 +123,41 @@ export default {
     }
     &__text {
         font-size: 14px;
-        margin-left: 3px;
+      margin-left: 10px;
     }
     &__link {
         color: #67573E;
         font-weight: 600;
     }
     &__checkbox {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         border: 1px solid #67573E;
         .checked {
             width: 100%;
             height: 100%;
             position: relative;
             &::before {
-                content: '';
-                position: absolute;
-                width: 7px;
-                height: 2px;
-                background-color: #67573E;
-                border: 1px solid #67573E;
-                top: 9px;
-                left: 2px;
-                transform: rotate(45deg);
+              content: '';
+              position: absolute;
+              width: 10px;
+              height: 3px;
+              background-color: #67573E;
+              top: 9px;
+              left: 1px;
+              -webkit-transform: rotate(45deg);
+              transform: rotate(45deg);
             }
             &::after {
-                content: '';
-                position: absolute;
-                width: 12px;
-                height: 2px;
-                background-color: #67573E;
-                border: 1px solid #67573E;
-                top: 7px;
-                left: 5px;
-                transform: rotate(-65deg);
+              content: '';
+              position: absolute;
+              width: 12px;
+              height: 3px;
+              background-color: #67573E;
+              top: 7px;
+              left: 5px;
+              -webkit-transform: rotate(-65deg);
+              transform: rotate(-65deg);
             }
         }
     }
@@ -182,17 +182,23 @@ export default {
     }
     &__submit {
       margin-top: 10px;
-      min-width: 120px;
-      padding: 0 24px 0 24px;
-      height: 34px;
+      width: calc(50% - 40px);
+      height: 38px;
       color: #fff;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 10px;
       background-color: #d15f45;
       border: none;
       transition: .1s ease;
       outline: none;
       letter-spacing: 0.2px;
+
+      @media all and (orientation: portrait) and (max-width: 767px) {
+        width: 100%;
+      }
+      @media all and (orientation: landscape) and (max-width: 1000px) {
+        /*padding: 20px;*/
+      }
 
       &:hover {
         cursor: pointer;
