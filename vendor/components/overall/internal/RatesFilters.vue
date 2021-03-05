@@ -24,7 +24,7 @@
 </template>
 
 <script>
-	import SelectSingle from "@/components/dropdowns/SelectSingle"
+	import SelectSingle from "../SelectSingle"
 
 	export default {
 		props: {

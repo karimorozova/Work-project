@@ -64,6 +64,30 @@
 						path: "/completed-jobs",
 						imgBrown: require("../assets/images/CATEGORIES/COMPLETE-JOBS.png"),
 						active: false
+					},
+					{
+						title: "COMPETENCIES & RATE",
+						path: "/competency-and-rate",
+						imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
+						active: false
+					},
+					{
+						title: "ASSESSMENT",
+						path: "/qualification-and-assessment",
+						imgBrown: require("../assets/images/CATEGORIES/report.png"),
+						active: false
+					},
+					{
+						title: "EXPERIENCE & EDUCATION",
+						path: "/experience-and-education",
+						imgBrown: require("../assets/images/CATEGORIES/languages.png"),
+						active: false
+					},
+					{
+						title: "DOCUMENTS",
+						path: "/documents",
+						imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
+						active: false
 					}
 				],
 				isAccountMenu: false,
@@ -72,7 +96,7 @@
 			}
 		},
 		methods: {
-			...mapActions(["alertToggle", "setOriginallyUnits", "logout", "getVendorInfo","getAllLanguages","setAllIndustries"]),
+			...mapActions([ "alertToggle", "setOriginallyUnits", "logout", "getVendorInfo", "getAllLanguages", "setAllIndustries" ]),
 
 			mainPageRender() {
 				this.toggleSideBar(true)
@@ -126,11 +150,11 @@
 				token: "getToken",
 				vendor: "getVendor"
 			}),
-			fullName() {
-				if (this.vendor) {
-					return this.vendor.firstName + " " + this.vendor.surname
-				}
-			}
+			// fullName() {
+			// 	if (this.vendor) {
+			// 		return this.vendor.firstName + " " + this.vendor.surname
+			// 	}
+			// }
 		},
 		async created() {
 			await this.getOriginallyUnits()
@@ -139,8 +163,8 @@
 			this.domain = process.env.domain
 			this.setToken()
 			this.getVendorInfo()
-      this.getAllLanguages()
-      this.setAllIndustries()
+			this.getAllLanguages()
+			this.setAllIndustries()
 			this.mainPageRender()
 
 		},
@@ -352,6 +376,9 @@
       margin-right: 0;
       cursor: pointer;
 
+      &:hover{
+
+      }
       &:last-child {
         margin-bottom: 0;
       }
@@ -360,6 +387,8 @@
     &__nav-title {
       /*font-family: Myriad900;*/
       color: #fff;
+      padding: 0 20px;
+      text-align: center;
     }
 
     &__image {

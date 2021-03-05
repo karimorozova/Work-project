@@ -6,8 +6,8 @@
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
-      :bodyClass="jobs.length < 7 ? 'tbody_height-200 tbody_visible-overflow' : 'tbody_height-200'"
-      :tableHeadRowClass="jobs.length < 7 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="[{ 'tbody_visible-overflow': jobs.length < 9 }]",
+      :tableheadRowClass="[{ 'tbody_visible-overflow': jobs.length < 9 }]",
       @closeErrors="closeErrors"
       @onRowClicked="chooseJob"
     )
@@ -45,13 +45,13 @@
 </template>
 
 <script>
-	import DataTable from "~/components/Tables/DataTable"
+	import DataTable from "../../../../../components/overall/DataTable"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
 	import currencyIconDetected from "../../../../../mixins/currencyIconDetected"
 
 	export default {
-		mixins: [currencyIconDetected],
+		mixins: [ currencyIconDetected ],
 		props: {
 			jobs: {
 				type: Array
@@ -130,7 +130,8 @@
       justify-content: center;
       align-items: center;
       padding-top: 5px;
-      img{
+
+      img {
         height: 20px;
       }
     }

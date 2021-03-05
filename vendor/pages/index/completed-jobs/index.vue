@@ -20,8 +20,8 @@
             :errors="errors"
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
-            :bodyClass="completedJobs.length < 7 ? 'tbody_height-200 tbody_visible-overflow' : 'tbody_height-200'"
-            :tableHeadRowClass="completedJobs.length < 7 ? 'tbody_visible-overflow' : ''"
+            :bodyClass="[{ 'tbody_visible-overflow': jobs.length < 10 }]",
+            :tableheadRowClass="[{ 'tbody_visible-overflow': jobs.length < 10 }]",
             @closeErrors="closeErrors"
             @onRowClicked="chooseJob"
           )
@@ -56,7 +56,7 @@
 
 <script>
 	import moment from 'moment'
-	import DataTable from "~/components/Tables/DataTable"
+	import DataTable from "../../../components/overall/DataTable"
 	import Filters from "../../components/jobs/Tables/Completed_Jobs/Filters"
 	import { mapGetters, mapActions } from "vuex"
 	import currencyIconDetected from "../../../mixins/currencyIconDetected"
