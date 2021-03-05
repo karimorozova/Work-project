@@ -111,7 +111,7 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
 		const occurrences = [];
 		const { calculationUnit } = step;
 		for (let unit of calculationUnit) {
-			const sizes = unit.hasOwnProperty('sizes') ? unit.sizes : [];
+			const sizes = unit.sizes !== null ? unit.sizes : [];
 			if(sizes.length) {
 				sizes.forEach(size => {
 					const occurrence = stepMultipliersTable.find(item => (
