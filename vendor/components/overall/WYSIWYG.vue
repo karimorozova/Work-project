@@ -1,11 +1,11 @@
 <template lang="pug">
   .container
-    ckeditor(v-model="editorData" :config="editorConfig")
+    ckeditor(v-model="editorData" :config="editorConfig" @blur="blurCkeditor")
 </template>
 
 <script>
 	let CKEditor
-	if (process.client) CKEditor = require('ckeditor4-vue')
+	if (process.client || !!CKEditor) CKEditor = require('ckeditor4-vue')
 	else CKEditor = { component: { template: '<div></div>' } }
 	export default {
 		data() {
@@ -30,10 +30,15 @@
 					],
 					removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
 					uiColor: "#F2EFEB",
-					height: 70,
+					height: 100,
 				}
 			}
 		},
+    methods: {
+      blurCkeditor(e) {
+        this.$emit('editorBlur', {data: this.editorData})
+      }
+    },
 		components: {
 			ckeditor: CKEditor.component
 		}
