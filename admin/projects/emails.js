@@ -101,7 +101,7 @@ const sendCostQuoteMessage = async (project, message, arrayOfEmails,) => {
 	for (let contactEmail of arrayOfEmails) {
 		const pdf = await getPdf(allUnits, allSettingsSteps, project);
 		const attachments = [{ content: fs.createReadStream(pdf), filename: 'quote.pdf' }];
-		await clientQuoteToEmails({
+		await clientQuoteToEmails(project.accountManager,{
 			email: contactEmail,
 			attachments,
 			subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`
@@ -124,7 +124,7 @@ const sendQuoteMessage = async (project, message, arrayOfEmails, tasksIds = []) 
 	for (let contactEmail of arrayOfEmails) {
 		const pdf = tasksIds.length ? await getPdf(allUnits, allSettingsSteps, project, tasksIds) : await getPdf(allUnits, allSettingsSteps, project);
 		const attachments = [{ content: fs.createReadStream(pdf), filename: 'quote.pdf' }];
-		await clientQuoteToEmails({
+		await clientQuoteToEmails(project.accountManager,{
 			email: contactEmail,
 			attachments,
 			subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`

@@ -208,7 +208,7 @@ async function getTaskSteps(task, industry, customer, discounts, projectId) {
 			defaultStepPrice,
 			vendorRate,
 			totalWords: quantity,
-			check: false,
+			// check: false,
 			vendorsClickedOffer: [],
 			isVendorRead: false,
 			service,

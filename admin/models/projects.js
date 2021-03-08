@@ -125,7 +125,7 @@ const ProjectsSchema = new mongoose.Schema({
 		defaultStepPrice: 0,
 		vendorRate: "",
 		nativeVendorRate: "",
-		check: false,
+		// check: false,
 		vendorsClickedOffer: Array,
 		isVendorRead: { type: Boolean, default: false },
 		previousStatus: ""

@@ -104,7 +104,7 @@ function getWordCountTasks(taskData) {
       cost: "",
       sourceFiles: translateFiles,
       refFiles: referenceFiles,
-      check: false,
+      // check: false,
       finance: {
         Wordcount: { receivables: 0, payables: 0 },
         Price: { receivables: 0, payables: 0 }
