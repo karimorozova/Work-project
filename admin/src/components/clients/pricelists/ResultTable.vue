@@ -194,7 +194,8 @@
 						tableKey: "Pricelist Table",
 						row: this.dataArray[index]
 					})
-					const result = await this.$http.post("/clientsapi/client-priceListTable-index", { id: this.clientId, index })
+          const rateId = this.dataArray[index]._id
+					const result = await this.$http.post("/clientsapi/client-priceListTable-index", { clientId: this.clientId, rateId })
 					this.dataArray.splice(index, 1, result.data)
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
@@ -250,7 +251,7 @@
 						type: "success"
 					})
 					const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
-					this.dataArray[index] = updatedData.body.pricelistTable[index]
+					this.dataArray[index] = updatedData.body.pricelistTable.find(rate => rate._id.toString() === id)
 					this.setDefaults()
 				} catch (err) {
 					this.alertToggle({
@@ -267,6 +268,7 @@
 				this.currentActive = -1
 			},
 			setFilter({ option, prop }) {
+			  this.isDataRemain = true
 				this[prop] = option
 				this.getPricelist(this.allFilters)
 			},
