@@ -43,10 +43,10 @@ router.get('/vendor', async (req, res) => {
 })
 
 router.post('/vendor-priceListTable-index', async (req, res) => {
-	const { id, index } = req.body
+	const { vendorId, rateId } = req.body
 	try {
-		const vendor = await getVendor({ "_id": id })
-		res.send(vendor.rates.pricelistTable[index])
+		const vendor = await getVendor({ "_id": vendorId })
+		res.send(vendor.rates.pricelistTable.find(rate => rate._id.toString() === rateId))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting priceListTable Vendor")
