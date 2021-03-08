@@ -17,10 +17,10 @@ async function notifyManagerProjectRejected(project) {
 
 async function notifyManagerProjectStarts(project) {
 	try {
-		const projectManager = await User.findOne({ "_id": project.projectManager.id });
+		const projectManager = await User.findOne({ "_id": project.projectManager._id });
 		const accountManager = await User.findOne({ "_id": project.accountManager._id });
 		const steps = await notifyVendorsProjectAccepted(project.steps, project);
-		await Projects.updateOne({ "_id": project.id }, { steps });
+		await Projects.updateOne({ "_id": project._id }, { steps });
 		const notAssignedStep = steps.find(item => !item.vendor);
 		if(notAssignedStep) {
 			await managerEmailsSend({ project, projectManager, accountManager });
@@ -49,9 +49,10 @@ async function notifyVendorsProjectAccepted(projectSteps, project) {
 	let steps = [];
 	try {
 		for (let step of projectSteps) {
-			if(step.vendor) {
-				const index = step.vendorsClickedOffer.indexOf(step.vendor._id);
+			if(!!step.vendor && step.status === 'Created') {
+				step.status = "Request Sent"
 				await sendRequestToVendor(project, step);
+				const index = step.vendorsClickedOffer.indexOf(step.vendor._id);
 				if(index !== -1) step.vendorsClickedOffer.splice(index, 1);
 			}
 			steps.push(step);
@@ -115,7 +116,7 @@ async function stepVendorsRequestSending(project, checkedSteps) {
 		let steps = [...project.steps];
 		const assignedStepsCheck = checkedSteps.map(item => item.stepId.toString());
 		for (let step of steps) {
-			if(assignedStepsCheck.indexOf(step.stepId.toString()) !== -1) {
+			if(assignedStepsCheck.indexOf(step.stepId.toString()) !== -1 && step.status === 'Created' ) {
 				await sendRequestToVendor(project, step);
 				step.status = "Request Sent"
 			}
