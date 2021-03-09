@@ -68,7 +68,7 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
 
 	for (let step of steps) {
 		const newStepsArr = [];
-		const fullStepInfo = await Step.findOne({ _id: step });
+		const fullStepInfo = await Step.findOne({ _id: step }).populate('calculationUnit');
 		if(fullStepInfo.calculationUnit.length) {
 			const sameStepMultipliers = checkForStepDuplicates(rates.stepMultipliersTable, fullStepInfo);
 			if(!sameStepMultipliers.length) {
@@ -111,7 +111,7 @@ const combineVendorRates = async (langPairs, steps, industries, defaultPricelist
 		const occurrences = [];
 		const { calculationUnit } = step;
 		for (let unit of calculationUnit) {
-			const sizes = unit.hasOwnProperty('sizes') ? unit.sizes : [];
+			const sizes = unit.sizes !== null ? unit.sizes : [];
 			if(sizes.length) {
 				sizes.forEach(size => {
 					const occurrence = stepMultipliersTable.find(item => (

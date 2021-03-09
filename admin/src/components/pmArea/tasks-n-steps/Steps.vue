@@ -449,12 +449,12 @@
 				const filteredSteps = steps.filter(item => item.status === "Created" || item.status === "Rejected")
 				if (!filteredSteps.length) return
 				const zeroPayablesStep = filteredSteps.find(item => !item.finance.Price.payables)
-				if (zeroPayablesStep) {
+				if (!!zeroPayablesStep) {
 					return this.showErrors(["There are steps with no payables!"])
 				}
 				try {
 					const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: filteredSteps, projectId: this.currentProject._id })
-					await this.setCurrentProject(result.body)
+					await this.setCurrentProject(result.data)
 					this.alertToggle({ message: "Requests has been sent.", isShow: true, type: 'success' })
 				} catch (err) {
 					this.alertToggle({ message: "Error: Request Confirmation cannot be sent.", isShow: true, type: 'error' })

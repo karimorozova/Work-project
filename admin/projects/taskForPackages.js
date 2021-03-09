@@ -86,7 +86,7 @@ async function getStepsForMonoStepPackages({ tasks, stepsDates, industry, custom
       vendorRate,
       finance,
       defaultStepPrice,
-      check: false,
+      // check: false,
       vendorsClickedOffer: [],
       isVendorRead: false,
       nativeFinance,

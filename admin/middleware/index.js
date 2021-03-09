@@ -87,10 +87,7 @@ const middleware = {
 			try {
 				const token = req.query['t']
 				jwt.verify(token, secretKey, async (err, decoded) => {
-					console.log(decoded)
-					if (err) {
-						return res.status(403).send(err)
-					}
+					if (err) return res.status(403).send(err)
 					return next()
 				})
 			} catch (err) {

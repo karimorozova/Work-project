@@ -323,13 +323,14 @@ const getStepUnitCombinations = (newServices, allSteps) => {
 
 const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable }) => {
 	const stepUnitSizeCombinations = []
-	const { calculationUnit } = await Step.findOne({ _id })
+	const { calculationUnit } = await Step.findOne({ _id }).populate('calculationUnit')
 	if (!calculationUnit.length) {
 		return []
 	} else {
 		for (let item of calculationUnit) {
 			const { _id: unitId } = item
-			const sizes = item.hasOwnProperty('sizes') ? item.sizes : []
+			const sizes = item.sizes !== null ? item.sizes : []
+
 			if (sizes.length) {
 				sizes.forEach(size => {
 					const neededStepRow = stepMultipliersTable.find(item => (
