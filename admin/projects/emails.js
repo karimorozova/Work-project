@@ -248,8 +248,8 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 async function notifyDeliverablesDownloaded(taskId, project, user) {
 	try {
 		const { projectManager, accManager } = await getAMPMbyProject(project);
-		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, project_id: project.projectId }, user);
-		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, project_id: project.projectId }, user);
+		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, projectName: project.projectName, project_id: project.projectId }, user);
+		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, projectName: project.projectName, project_id: project.projectId }, user);
 		await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
 		await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
 	} catch (err) {

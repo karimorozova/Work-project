@@ -30,6 +30,8 @@
         span.projects-table__label {{ field.label }}
       template(slot="headerProjectManager" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
+      template(slot="headerDelivery" slot-scope="{ field }")
+        span.projects-table__label {{ field.label }}
       template(slot="headerTest" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
 
@@ -59,6 +61,8 @@
         span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
       template(slot="projectManager" slot-scope="{ row }")
         span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
+      template(slot="projectDelivery" slot-scope="{ row, index }")
+        div.size-16(v-html="deliveryStatistic(index)")
       template(slot="projectTest" slot-scope="{ row, index }")
         .checkbox(@click.stop="")
           input(type="checkbox" class="test" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
@@ -67,12 +71,12 @@
 </template>
 
 <script>
-	import DataTable from "../DataTable";
-	import { mapActions } from "vuex";
+	import DataTable from "../DataTable"
+	import { mapActions } from "vuex"
 	import iconsCurrency from "../../mixins/currencyIconDetected"
 
 	export default {
-		mixins: [iconsCurrency],
+		mixins: [ iconsCurrency ],
 		props: {
 			allProjects: {
 				type: Array
@@ -81,19 +85,20 @@
 		data() {
 			return {
 				fields: [
-					{ label: "ID", headerKey: "headerProjectId", key: "projectId", width: "12%" },
-					{ label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "9%" },
-					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "11%" },
-					{ label: "Languages", headerKey: "headerLanguages", key: "languages", width: "11%" },
+					{ label: "ID", headerKey: "headerProjectId", key: "projectId", width: "11%" },
+					{ label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%" },
+					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "10%" },
+					{ label: "Languages", headerKey: "headerLanguages", key: "languages", width: "10%" },
 					{ label: "Status", headerKey: "headerStatus", key: "status", width: "8%" },
-					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "7%" },
+					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "6%" },
 					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "6%" },
 					{ label: "ROI", headerKey: "headerRoi", key: "roi", width: "6%" },
-					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "8%" },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "8%" },
+					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%" },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%" },
 					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "10%" },
-					{ label: "Test", headerKey: "headerTest", key: "projectTest", width: "4%" },
-				],
+					{ label: "Delivery", headerKey: "headerDelivery", key: "projectDelivery", width: "5%" },
+					{ label: "Test", headerKey: "headerTest", key: "projectTest", width: "4%" }
+				]
 			}
 		},
 		methods: {
@@ -107,38 +112,44 @@
 					projectId: projectId,
 					prop: 'isTest',
 					value: event.target.checked
-				});
+				})
+			},
+			deliveryStatistic(index) {
+				let { tasks } = this.allProjects[index]
+				tasks = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+				const { length: deliveryLength } = tasks.filter(({ status }) => status === 'Delivered')
+				return deliveryLength === tasks.length && tasks.length ? '<i class="fa fa-check" aria-hidden="true"></i>' : (deliveryLength && deliveryLength < tasks.length) ? `${ deliveryLength } / ${ tasks.length }` : ''
 			},
 			toFixedFinalCost(num) {
-				return num && num.toFixed(2);
+				return num && num.toFixed(2)
 			},
 			async setProjectProp({ projectId, prop, value }) {
 				try {
-					const result = await this.$http.put("/pm-manage/project-prop", { projectId, prop, value });
+					const result = await this.$http.put("/pm-manage/project-prop", { projectId, prop, value })
 					this.alertToggle({ message: "Project type changed", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server Error / Cannot update status Project", isShow: true, type: "error" })
 				}
 			},
 			async onRowClicked({ index }) {
-				const curProject = await this.$http.get(`/pm-manage/project?id=${ this.allProjects[index]._id }`);
-				this.storeCurrentClient(curProject.data.customer);
+				const curProject = await this.$http.get(`/pm-manage/project?id=${ this.allProjects[index]._id }`)
+				this.storeCurrentClient(curProject.data.customer)
 				this.$emit("selectProject", { project: curProject.body })
 			},
 			getId(row) {
-				return row.projectId || row.requestId;
+				return row.projectId || row.requestId
 			},
 			clientName(elem) {
-				return elem.name;
+				return elem.name
 			},
 			projectLangs(row) {
 				const pairs = row.tasks.map(item => {
-					return item.packageSize ? `${ item.targetLanguage } / ${ item.packageSize }` : `${ item.sourceLanguage } >> ${ item.targetLanguage }`;
-				}).filter((elem, index, self) => self.indexOf(elem) === index);
-				return pairs.reduce((prev, cur) => prev + cur + '<br>', "");
+					return item.packageSize ? `${ item.targetLanguage } / ${ item.packageSize }` : `${ item.sourceLanguage } >> ${ item.targetLanguage }`
+				}).filter((elem, index, self) => self.indexOf(elem) === index)
+				return pairs.reduce((prev, cur) => prev + cur + '<br>', "")
 			},
 			bottomScrolled() {
-				this.$emit("bottomScrolled");
+				this.$emit("bottomScrolled")
 			}
 		},
 		components: {
@@ -164,13 +175,6 @@
 
     &__edit {
       cursor: pointer;
-    }
-
-    .table-chekbox {
-      height: 22px;
-      width: 18px;
-      position: absolute;
-      z-index: 500;
     }
 
     .test {
@@ -235,5 +239,9 @@
         }
       }
     }
+  }
+
+  .size-16 {
+    font-size: 16px;
   }
 </style>

@@ -20,15 +20,6 @@ emitter.on('testEvent', () => {
     }, 60000)
 });
 
-emitter.on('projectApprovedNotification', async (project) => {
-    try {
-        await notifyManagerProjectStarts(project);
-    } catch(err) {
-        console.log("Error from emitter projectApprovedNotification");
-        console.log(err);
-    }
-})
-
 emitter.on('projectRejectedNotification', async (project) => {
     try {
         await notifyManagerProjectRejected(project);

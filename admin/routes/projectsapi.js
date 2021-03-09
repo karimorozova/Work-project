@@ -3,6 +3,7 @@ const { Projects } = require('../models')
 const { getProject, updateProjectStatus } = require('../projects')
 const { emitter } = require('../events')
 const { getProjectManageToken } = require("../middleware")
+const { notifyManagerProjectStarts } = require('../utils')
 const {
 	generateTemplateForAcceptQuote,
 	generateTemplateForRejectQuote,
@@ -93,10 +94,8 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
 			if (project.isClientOfferClicked || project.status !== "Quote sent") {
 				return res.send(generateTemplateForDefaultMessage('Sorry. Link is not valid anymore.'))
 			}
-			const status = project.isStartAccepted ? "Started" : "Approved"
-			await updateProjectStatus(projectId, status)
-			await Projects.updateOne({ "_id": projectId }, { $set: { isClientOfferClicked: true } })
-			emitter.emit('projectApprovedNotification', project)
+			await notifyManagerProjectStarts(project)
+			await Projects.updateOne({ "_id": projectId }, { $set: { status: "Approved", isClientOfferClicked: true } })
 			res.send(generateTemplateForAlertAcceptQuote(currentProject))
 		}
 	} catch (err) {

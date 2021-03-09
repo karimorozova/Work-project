@@ -60,8 +60,8 @@
         LabelValue(label="Deadline")
           Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
         img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
-      .filters__itemCenter
-        .filters__itemCenter-button(@click="refreshProjects")
+      .filters__itemLeft
+        .filters__itemLeft-button(@click="refreshProjects")
 </template>
 
 <script>
@@ -193,9 +193,9 @@
     justify-content: space-between;
     margin-bottom: 20px;
 
-    &__itemCenter {
+    &__itemLeft {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
 
       &-button {
         background-image: url('../../assets/images/refresh-icon.png');
@@ -203,6 +203,13 @@
         height: 20px;
         cursor: pointer;
       }
+    }
+
+    &__itemCenter {
+      display: flex;
+      justify-content: space-between;
+
+
     }
 
     &__col {
@@ -253,5 +260,9 @@
       width: 18px;
       cursor: pointer;
     }
+  }
+
+  .left {
+
   }
 </style>

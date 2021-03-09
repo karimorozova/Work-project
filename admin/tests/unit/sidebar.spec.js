@@ -7,6 +7,6 @@ describe('Sidebar.vue', () => {
     const wrapper = shallowMount(Sidebar, {
       propsData: { counterClass }
     })
-    expect(wrapper.vm.counterClass).toBe('new messag')
+    expect(wrapper.vm.counterClass).toBe('new message')
   })
 })

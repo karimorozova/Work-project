@@ -28,7 +28,7 @@ const sendEmailFromUser = async function (from, obj, msg) {
 				rej(error)
 			}
 			if (info) {
-				console.log('sendEmailFromUser', from, 'Message sent: %s', info.messageId)
+				console.log('sendEmailFromUser', sender, 'Message sent: %s', info.messageId)
 				res(info.messageId)
 			} else {
 				console.log('Error in sendEmail')
@@ -96,7 +96,7 @@ const clientQuoteToEmails = async function (from, obj, message) {
 				rej(error)
 			}
 			const messageId = info && info.messageId ? info.messageId : "Error"
-			console.log('clientQuoteToEmails', from, 'Message sent: %s', messageId)
+			console.log('clientQuoteToEmails', sender, 'Message sent: %s', messageId)
 			res()
 		})
 	})
