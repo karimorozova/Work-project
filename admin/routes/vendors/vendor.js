@@ -222,7 +222,7 @@ router.get("/vendor-rates", checkVendor, async (req, res) => {
 	}
 })
 
-router.post('/step-target', checkVendor, upload.fields([{ name: 'targetFile' }]), async (req, res) => {
+router.post('/step-target', checkVendor, upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
 	const { jobId } = req.body
 	try {
 		const project = await getProject({ 'steps._id': jobId })
@@ -242,14 +242,27 @@ router.post('/step-target', checkVendor, upload.fields([{ name: 'targetFile' }])
 })
 
 router.post('/target-files', async (req, res) => {
-	const { stepId } = req.body;
+	const { stepId } = req.body
 	try {
-		await downloadCompletedFiles(stepId);
-		res.send("Files downloaded");
+		await downloadCompletedFiles(stepId)
+		res.send("Files downloaded")
 	} catch (err) {
-		console.log(err);
-		res.status(500).send(err.message);
+		console.log(err)
+		res.status(500).send(err.message)
 	}
 })
+
+router.post("/pending-competencies", checkVendor, async (req, res) => {
+	const { pendingCompetencies, token } = req.body
+	try {
+		const { vendorId } = jwt.verify(token, secretKey)
+		await Vendors.updateOne({ "_id": vendorId }, { pendingCompetencies })
+		res.send('done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send(err.message)
+	}
+})
+
 
 module.exports = router

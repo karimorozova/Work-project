@@ -135,23 +135,44 @@ export default {
       return regex.test(rate)
     },
     checkError() {
-      if (this.currentSourceLang === this.currentTargetLang) this.errors.push('')
-      if (this.currentSourceLang.length > 0) this.errors.push('')
-      if (this.currentTargetLang.length > 0) this.errors.push('')
-      if (this.currentIndustry.length > 0) this.errors.push('')
-      if (!this.isNormalRate(this.rate)) this.errors.push('')
-      if (this.isReverseTranslate === true && !this.isNormalRate(this.reverseRate)) console.log('errro')
-      if (this.currentStep.length > 0) this.errors.push('')
+      // if (this.currentSourceLang === this.currentTargetLang) this.errors.push('')
+      // if (this.currentSourceLang.length > 0) this.errors.push('')
+      // if (this.currentTargetLang.length > 0) this.errors.push('')
+      // if (this.currentIndustry.length > 0) this.errors.push('')
+      // if (!this.isNormalRate(this.rate)) this.errors.push('')
+      // if (this.isReverseTranslate === true && !this.isNormalRate(this.reverseRate)) console.log('error')
+      // if (this.currentStep.length > 0) this.errors.push('')
       this.submitForm()
     },
     submitForm() {
+    	const pendingCompetencies = [
+    			{
+				    sourceLanguage: this.langs[0],
+				    targetLanguage: this.langs[0],
+				    step: {
+              "_id" : "6017ac07f313802d307b00f0",
+              "title" : "def2",
+            },
+				    industry: this.currentIndustry[0],
+				    rate: 1,
+				    descriptions: {
+					    targetLanguage: 'asd',
+					    industry: 'asdas',
+				    }
+          }
+      ]
+    	this.$axios.post('/vendor/pending-competencies', {
+		    token: this.token,
+		    pendingCompetencies
+      })
     }
   },
   computed: {
     ...mapGetters({
       langs: 'getLangs',
       industries: 'getIndustries',
-      vendor: "getVendor"
+      vendor: "getVendor",
+	    token: "getToken"
     }),
     motherTongue: function () {
       return this.vendor.native ? this.vendor.native.lang : ''
