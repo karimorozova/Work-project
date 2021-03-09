@@ -154,7 +154,7 @@
 
   .all-projects {
     margin: 40px 40px 40px 20px;
-    width: 1100px;
+    width: 1170px;
     box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
     padding: 20px;
   }
