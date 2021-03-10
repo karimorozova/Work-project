@@ -22,6 +22,7 @@ const getFilteredVendorsPendingCompetencies = async (filters) => {
 			await Vendors.aggregate([
 				{ $match: match }
 			]), [
+				{ path: 'native', select: [ 'lang' ] },
 				{ path: sourceQ, select: [ 'lang' ] },
 				{ path: targetQ, select: [ 'lang' ] },
 				{ path: industryQ, select: [ 'name' ] },
@@ -29,13 +30,13 @@ const getFilteredVendorsPendingCompetencies = async (filters) => {
 			])
 
 	result = result.reduce((acc, curr) => {
-		const { _id, pendingCompetencies, firstName, surname } = curr
+		const { _id, pendingCompetencies, firstName, surname, native } = curr
 		if (pendingCompetencies != null && pendingCompetencies.length) {
 
 			let filteredCompetencies = filterCompetencies(pendingCompetencies)
 
 			filteredCompetencies = filteredCompetencies.reduce((acc2, curr2) => {
-				curr2 = { ...curr2, vendorName: `${ firstName } ${ surname }`,  link: _id}
+				curr2 = { ...curr2, vendorName: `${ firstName } ${ surname }`, link: _id, native }
 				acc2.push(curr2)
 				return acc2
 			}, [])

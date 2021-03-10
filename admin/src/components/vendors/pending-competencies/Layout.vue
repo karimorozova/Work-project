@@ -2,6 +2,9 @@
   .container
     .pendingCompetencies
       .pendingCompetencies__body
+        CandidateForm(
+          :candidateFormData="candidateFormData"
+        )
         PendingCompetenciesFilter(
           :allSources="languagesList"
           :allTargets="languagesList"
@@ -49,7 +52,7 @@
             template(slot="priority" slot-scope="{ row }")
               .pendingCompetencies__data 1
             template(slot="modal" slot-scope="{ row }")
-              .pendingCompetencies__icon
+              .pendingCompetencies__icon(@click="openForm(), setCandidateData(row)")
                 i.fa.fa-id-card-o
             template(slot="link" slot-scope="{ row }")
               .pendingCompetencies__icon
@@ -62,11 +65,14 @@
 	import DataTable from "../../DataTable"
 	import { mapGetters, mapActions } from "vuex"
 	import PendingCompetenciesFilter from "./PendingCompetenciesFilter"
+	import CandidateForm from "./CandidateForm"
 
 
 	export default {
 		data() {
 			return {
+				candidateFormData: {},
+				isForm: false,
 				filters: {
 					sourceFilter: [ "All" ],
 					targetFilter: [ "All" ],
@@ -92,12 +98,18 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			setCandidateData(row) {
+				this.candidateFormData = row
+			},
 			async setFilter({ option }, prop) {
 				this.filters[prop] = option
 				await this.getVendorsPendingCompetencies(this.filters)
 			},
-			onRowClicked() {
-				alert('DA')
+			openForm() {
+				this.isForm = true
+			},
+			closeForm() {
+				this.isForm = false
 			},
 			async getVendorsPendingCompetencies(filters) {
 				try {
@@ -128,7 +140,7 @@
 		created() {
 			this.getVendorsPendingCompetencies(this.filters)
 		},
-		components: { PendingCompetenciesFilter, DataTable }
+		components: { PendingCompetenciesFilter, DataTable, CandidateForm }
 	}
 
 </script>
@@ -143,6 +155,7 @@
       width: 1100px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       padding: 20px;
+      position: relative;
     }
 
     &__data {

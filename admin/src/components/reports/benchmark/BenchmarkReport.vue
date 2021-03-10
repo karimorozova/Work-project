@@ -163,14 +163,14 @@ h3, h4 {
   }
 
   &__step-info {
-    font-size: 16px;
-    margin: 15px 0;
+    font-size: 14px;
+    margin: 10px 0;
   }
 
 
   &__language-pair {
     font-family: "Myriad600";
-    font-size: 22px;
+    font-size: 16px;
   }
 
   &__languages {

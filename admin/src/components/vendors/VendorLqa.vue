@@ -1,7 +1,7 @@
 <template lang="pug">
     .vendor-lqa
         span.vendor-lqa__close(@click="close") +
-        h3.vendor-lqa__title Vendor LQA
+        .vendor-lqa__title Vendor LQA
         .vendor-lqa__main
           .vendor-lqa__item
                 LabelVal(text="Vendor:" customClass="new-chart-label start-justified")
@@ -123,13 +123,13 @@ export default {
   width: 500px;
   min-height: 310px;
   position: fixed;
-  top: 30%;
-  left: 35%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: $white;
   padding: 20px;
   box-sizing: border-box;
-  border: 1px solid $main-color;
-  box-shadow: 0 0 10px $main-color;
+  box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   z-index: 99999;
 
   &__close {
@@ -142,6 +142,9 @@ export default {
     cursor: pointer;
   }
   &__title {
+    font-size: 22px;
+    font-family: 'Myriad600';
+    margin-bottom: 20px;
     text-align: center;
   }
   &__col-right {
@@ -162,7 +165,6 @@ export default {
   }
   &__value {
     margin-left: 10px;
-    font-weight: 600;
   }
   &__text {
     outline: none;

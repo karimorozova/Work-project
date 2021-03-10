@@ -239,8 +239,7 @@
       font-family: 'Myriad600';
     }
     &__text {
-      font-size: 22px;
-      margin-bottom: 10px;
+      font-size: 14px;
     }
 
     &__industry {
@@ -248,7 +247,8 @@
     }
 
     &__tier-industry{
-      margin: 15px 0;
+      font-size: 14px;
+      margin: 10px 0;
     }
   }
 
