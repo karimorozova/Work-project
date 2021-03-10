@@ -6,7 +6,11 @@ export const loadingToggle = ({ commit }, payload) => commit('loadingValue', pay
 export const servicesGetting = ({ commit }, payload) => commit('servicesFill', payload);
 export const setAllCustomers = ({ commit }, payload) => commit('allCustomers', payload);
 export const gettingClientLangs = ({ commit }, payload) => commit('customerlangs', payload);
+
 export const allLanguages = ({ commit }, payload) => commit('allLangs', payload);
+export const allIndustries = ({ commit }, payload) => commit('allIndustries', payload);
+export const allSteps = ({ commit }, payload) => commit('allSteps', payload);
+
 export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload);
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload);

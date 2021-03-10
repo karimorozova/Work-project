@@ -3,9 +3,12 @@ import * as getters from './getters';
 import { mutations } from './mutations';
 
 const state = {
+    languages: [],
+    steps: [],
+    industries: [],
+
     services: [],
     customers: [],
-    languages: [],
     clientLangs: [],
     vendors: [],
     duoRates: [],

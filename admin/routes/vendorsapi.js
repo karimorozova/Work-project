@@ -24,7 +24,8 @@ const {
 	createRateRowFromQualification,
 	getVendorAfterCombinationsUpdated,
 	updateVendorMatrix,
-	syncVendorMatrix
+	syncVendorMatrix,
+	getFilteredVendorsPendingCompetencies
 } = require('../vendors')
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
@@ -557,6 +558,17 @@ router.get("/delete-memoq-vendor/:id", async (req, res) => {
 		res.status(200).send('Deleted')
 	} else {
 		res.status(500).send('Error on deleting vendor in memoQ')
+	}
+})
+
+router.post('/filtered-pending-competencies', async (req, res) => {
+	const { filters } = req.body
+	try {
+		const result = await getFilteredVendorsPendingCompetencies(filters)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
 	}
 })
 
