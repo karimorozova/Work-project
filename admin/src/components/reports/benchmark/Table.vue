@@ -3,6 +3,7 @@
         DataTable(
             :fields="fields"
             :tableData="vendorsData"
+            bodyRowClass="cursor-default"
             :bodyClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
             :tableheadRowClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
         )

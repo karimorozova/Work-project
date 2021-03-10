@@ -139,6 +139,14 @@
 				let allLangs = result.body
 				this.$store.dispatch('allLanguages', allLangs)
 			},
+			async allIndustries() {
+				let result = await this.$http.get('/api/industries')
+				this.$store.dispatch('allIndustries', result.data)
+			},
+			async allSteps() {
+				let result = await this.$http.get('/api/steps')
+				this.$store.dispatch('allSteps', result.data)
+			},
 			gotoRequestPage(index) {
 				this.$router.push({ name: 'create-project' })
 				this.checkForSpecifiedSideBar('project', 'PROJECTS')
@@ -263,6 +271,8 @@
 		created() {
 			this.getCurrentUserGroup()
 			this.getLanguages()
+      this.allSteps()
+      this.allIndustries()
 		},
 		mounted() {
 			this.mainPageRender()
@@ -277,6 +287,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../src/assets/scss/colors";
+
   .admin-top {
     display: flex;
     align-items: center;
@@ -292,7 +304,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      margin-left: 150px;
+      margin-left: 140px;
 
       a {
         text-decoration: none;
@@ -344,7 +356,7 @@
             &__info {
               display: flex;
               justify-content: flex-start;
-              border-bottom: 1px solid #998e7e;
+              border-bottom: 1px solid $thead-background;
               padding: 5px 0;
 
               .icon {
@@ -378,7 +390,7 @@
               display: flex;
               justify-content: flex-start;
               align-items: center;
-              border-bottom: 1px solid #998e7e;
+              border-bottom: 1px solid $thead-background;
               cursor: pointer;
 
               .human_icon {
@@ -484,7 +496,7 @@
 
     &__inner {
       width: calc(100% - 150px);
-      margin-left: 150px;
+      margin-left: 140px;
     }
 
     .admin-navbar {
@@ -497,13 +509,13 @@
 
       &__sidebar {
         padding: 25px 0;
-        background-color: #998e7e;
-        width: 150px;
+        background-color: #948977;
+        width: 140px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 0 10px rgba(104, 87, 62, 0.6);
+        box-shadow: 0 0 7px rgba(104, 87, 62, 0.6);
         transition: all 0.5s;
         z-index: 2;
         overflow: hidden;
@@ -562,7 +574,7 @@
           background-color: white;
 
           .title {
-            color: #978d7e;
+            color: $thead-background;;
             font-family: Myriad900;
           }
 
@@ -599,7 +611,7 @@
 
   .additional {
     position: absolute;
-    border: 2px solid #978d7e;
+    border: 2px solid $thead-background;;
     color: #67573e;
     background-color: #fff;
     font-size: 16px;
@@ -611,7 +623,7 @@
     &__listItem {
       padding: 13px;
       font-family: Myriad400;
-      border-bottom: 0.2px solid #978d7e;
+      border-bottom: 0.2px solid $thead-background;
       cursor: pointer;
 
       &:hover {

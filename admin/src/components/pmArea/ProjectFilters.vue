@@ -186,7 +186,7 @@
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
   .filters {
     display: flex;
     width: 100%;

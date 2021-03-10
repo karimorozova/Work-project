@@ -106,6 +106,7 @@ export default {
         }
       }
     }
+    .cursor-default
     .steps-table-row,
     .rates-matrix-row {
       cursor: default;
