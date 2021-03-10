@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { Projects } = require('../models')
-const { getProject, updateProjectStatus } = require('../projects')
+const { getProject, updateProjectStatus, updateWithApprovedTasks } = require('../projects')
 const { emitter } = require('../events')
 const { getProjectManageToken } = require("../middleware")
 const { notifyManagerProjectStarts } = require('../utils')
@@ -95,7 +95,9 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
 				return res.send(generateTemplateForDefaultMessage('Sorry. Link is not valid anymore.'))
 			}
 			await notifyManagerProjectStarts(project)
-			await Projects.updateOne({ "_id": projectId }, { $set: { status: "Approved", isClientOfferClicked: true } })
+
+			const { tasks, steps } = updateWithApprovedTasks({ taskIds: project.tasks.map(i => i.taskId), project })
+			await Projects.updateOne({ "_id": projectId }, { $set: { tasks, steps, status: "Approved", isClientOfferClicked: true } })
 			res.send(generateTemplateForAlertAcceptQuote(currentProject))
 		}
 	} catch (err) {
@@ -126,7 +128,11 @@ router.get('/declinequote', async (req, res) => {
 				return res.send(generateTemplateForDefaultMessage('Sorry. Link is not valid anymore.'))
 			}
 			emitter.emit('projectRejectedNotification', project)
-			await Projects.updateOne({ "_id": projectId }, { $set: { status: "Rejected", isClientOfferClicked: true } })
+			const tasks = project.tasks.map(task => {
+				if (task.status === 'Quote sent') task.status = 'Rejected'
+				return task
+			})
+			await Projects.updateOne({ "_id": projectId }, { $set: { tasks, status: "Rejected", isClientOfferClicked: true } })
 			res.send(generateTemplateForAlertRejectQuote(currentProject))
 		}
 	} catch (err) {
