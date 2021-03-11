@@ -85,7 +85,7 @@ async function returnVendorRate(step, project) {
 	const allLanguages = await Languages.find()
 	let rate = {}
 	if (step.vendor.rates.pricelistTable.length) {
-		const { price } = returnPriceFromVendorRare(
+		const { price } = returnPriceFromVendorRate(
 				step.vendor.rates.pricelistTable,
 				returnIdFromLanguageSymbol(allLanguages, step.sourceLanguage).toString(),
 				returnIdFromLanguageSymbol(allLanguages, step.targetLanguage).toString(),
@@ -103,7 +103,7 @@ async function returnVendorRate(step, project) {
 		return allLanguages.find(item => item.symbol === symbol)._id
 	}
 
-	function returnPriceFromVendorRare(vendorRates, source, target, step, unit, industry) {
+	function returnPriceFromVendorRate(vendorRates, source, target, step, unit, industry) {
 		return vendorRates.find(i => {
 			return i.sourceLanguage._id === source && i.targetLanguage._id === target && i.step._id === step && i.unit._id === unit && i.industry._id === industry
 		})
@@ -118,20 +118,20 @@ function getStepPayables({ rate, metrics, step }, nativeVendorRate) {
 	let nativeFinanceValue = nativeVendorRate ? nativeVendorRate.value : 0
 	const percentageProgress = Math.trunc((step.progress.wordsDone / metrics.totalWords) * 100)
 
-	const fictitiousProgressCountReceivables = finance.Wordcount.receivables - (finance.Wordcount.receivables * (percentageProgress / 100)).toFixed(2)
-	const fictitiousProgressCountPayables = finance.Wordcount.payables - (finance.Wordcount.payables * (percentageProgress / 100)).toFixed(2)
+	const fictitiousProgressCountReceivables = +finance.Wordcount.receivables - +(finance.Wordcount.receivables * (percentageProgress / 100))
+	const fictitiousProgressCountPayables = +finance.Wordcount.payables - +(finance.Wordcount.payables * (percentageProgress / 100))
 
 	finance.Wordcount = nativeFinance.Wordcount = {
-		receivables: fictitiousProgressCountReceivables,
-		payables: fictitiousProgressCountPayables
+		receivables: +fictitiousProgressCountReceivables,
+		payables: +fictitiousProgressCountPayables
 	}
 
-	finance.Price.payables = (+fictitiousProgressCountReceivables * rateValue).toFixed(2)
-	nativeFinance.Price.payables = (+fictitiousProgressCountPayables * nativeFinanceValue).toFixed(2)
-
+	finance.Price.payables = fictitiousProgressCountReceivables * rateValue
+	nativeFinance.Price.payables = fictitiousProgressCountPayables * nativeFinanceValue
 
 	return { ...step, finance, vendorRate: rate, nativeVendorRate }
 }
+
 
 function calculatePayableWords(metrics) {
 	// const payables = Object.keys(metrics).filter(item => item !== "totalWords")
@@ -300,7 +300,7 @@ async function updateProjectCosts(project) {
 	const { receivables, payables } = finance.Price
 	const roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0
 	try {
-		const checkStatuses = ['Quote sent', 'Approved']
+		const checkStatuses = [ 'Quote sent', 'Approved' ]
 		const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1
 		return await updateProject({ '_id': project.id }, {
 			tasks: project.tasks,
