@@ -80,6 +80,7 @@
 				this.closeModal()
 				try {
 					await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
+					await this.$axios.post('/vendor/set-workFlowStatus', { token: this.getToken, stepId: this.job.stepId, stepAction: 'Finish'})
 					this.setCurrentJob()
 					this.targetFiles = []
 				} catch (err) {

@@ -155,8 +155,8 @@ async function getStepPayablesAssigment({ task, step, project, allUnits }) {
 		const rate = {
 			value: rateExchangeVendorOntoProject(projectCurrency, 'EUR', +nativeVendorRate.value, crossRate)
 		}
-		step.finance.Price.payables = +((type === 'Hours' ? step.hours : step.quantity) * +rate.value).toFixed(2)
-		step.nativeFinance.Price.payables = +((type === 'Hours' ? step.hours : step.quantity) * +nativeVendorRate.value).toFixed(2)
+		step.finance.Price.payables = +(type === 'Hours' ? step.hours : step.quantity) * +rate.value
+		step.nativeFinance.Price.payables = +(type === 'Hours' ? step.hours : step.quantity) * +nativeVendorRate.value
 		return {
 			...step,
 			vendorRate: rate,
@@ -176,14 +176,14 @@ function updateFinanceForNewStep(step, progress) {
 		nativeFinance: {
 			...nativeFinance,
 			Price: {
-				receivables: +receivables.toFixed(2),
+				receivables: +receivables,
 				payables: +nativePayables
 			}
 		},
 		finance: {
 			...finance,
 			Price: {
-				receivables: +receivables.toFixed(2),
+				receivables: +receivables,
 				payables: +payables
 			}
 		}

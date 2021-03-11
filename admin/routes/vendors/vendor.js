@@ -8,7 +8,7 @@ const { upload, sendEmail } = require('../../utils')
 const { setVendorNewPassword } = require('../../users')
 const { createMemoqUser } = require('../../services/memoqs/users')
 const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunication')
-const { assignMemoqTranslator, getProject, updateProjectProgress } = require('../../projects')
+const { assignMemoqTranslator, getProject, updateProjectProgress, regainWorkFlowStatusByStepId } = require('../../projects')
 const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
 const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
@@ -139,14 +139,33 @@ router.post("/create-memoq-vendor", checkVendor, async (req, res) => {
 })
 
 router.post("/assign-translator", checkVendor, async (req, res) => {
-	const { token, stepId, projectId } = req.body
+	const { token, stepId, projectId, stepAction } = req.body
 	try {
 		const { vendorId } = jwt.verify(token, secretKey)
 		await assignMemoqTranslator(vendorId, stepId, projectId)
+
+		const {memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
+		for (let documentGuid of memoqDocIds){
+			await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
+		}
 		res.send('Assigned')
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on assigning vendor as translator')
+	}
+})
+
+router.post("/set-workFlowStatus", checkVendor, async (req, res) => {
+	const { stepId, stepAction } = req.body
+	const {memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
+	for (let documentGuid of memoqDocIds){
+		await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
+	}
+	try {
+		res.status(200).send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on change work flow document status!')
 	}
 })
 

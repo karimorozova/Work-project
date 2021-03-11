@@ -3,7 +3,8 @@ const { storeFiles, getDeliverablesLink, manageDeliveryFile, getPdf } = require(
 const {
   getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, downloadCompletedFiles,
   updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles, updateOtherProject,
-  assignMemoqTranslator, checkProjectHasMemoqStep, assignProjectManagers, updateProjectStatusForClientPortalProject
+  assignMemoqTranslator, checkProjectHasMemoqStep, assignProjectManagers, updateProjectStatusForClientPortalProject,
+  regainWorkFlowStatusByStepId
 } = require('./updates');
 const {
   stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, notifyManagerStepStarted, notifyStepDecisionMade,
@@ -70,5 +71,6 @@ module.exports = {
   sendQuoteMessage,
   sendCostQuoteMessage,
   updateProjectFinanceOnDiscountsUpdate,
-  getPriceAfterApplyingDiscounts
+  getPriceAfterApplyingDiscounts,
+  regainWorkFlowStatusByStepId
 }
