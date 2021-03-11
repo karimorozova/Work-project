@@ -825,6 +825,19 @@ const checkProjectHasMemoqStep = async (projectId) => {
 	return [];
 };
 
+const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
+	let workFlowStatus;
+	const { steps, tasks }  = await Projects.findOne({ 'steps.stepId': stepId })
+	const {taskId, serviceStep: { title: jobType }, memoqDocIds} = steps.find(item => item.stepId === stepId)
+	const {memoqProjectId} = tasks.find(item => item.taskId === taskId)
+
+	jobType === 'Translation' ?
+			(workFlowStatus = stepAction === 'Start' ? 'TranslationNotStarted' : 'Review1NotStarted') :
+			(workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed')
+
+	return { workFlowStatus, memoqProjectId, memoqDocIds }
+}
+
 module.exports = {
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
@@ -838,5 +851,6 @@ module.exports = {
 	assignMemoqTranslator,
 	assignProjectManagers,
 	checkProjectHasMemoqStep,
-	updateProjectStatusForClientPortalProject
+	updateProjectStatusForClientPortalProject,
+	regainWorkFlowStatusByStepId
 };

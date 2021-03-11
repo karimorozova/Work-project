@@ -1,8 +1,7 @@
 <template lang="pug">
   .details
+    .title Project Details
     .details__data(v-if="job._id")
-      .details__header
-        .details__title Project Details
       .details__info
         .details__main
           MainInfo
@@ -39,7 +38,7 @@
 		data() {
 			return {
 				isApproveModal: false,
-				statuses: ["Quote sent", "Draft", "Requested"],
+				statuses: [ "Quote sent", "Draft", "Requested" ],
 				targetFiles: [],
 				message: "",
 				project: null,
@@ -60,8 +59,8 @@
 			async getProjectById(id) {
 				try {
 					const result = await this.$axios.post(`vendor/project`, {
-					id,
-					token: this.getToken,
+						id,
+						token: this.getToken
 					})
 					this.project = JSON.parse(window.atob(result.data))
 				} catch (e) {
@@ -81,6 +80,7 @@
 				this.closeModal()
 				try {
 					await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
+					await this.$axios.post('/vendor/set-workFlowStatus', { token: this.getToken, stepId: this.job.stepId, stepAction: 'Finish'})
 					this.setCurrentJob()
 					this.targetFiles = []
 				} catch (err) {
@@ -94,7 +94,7 @@
 					if (this.job.status !== "Started") return
 					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
 					const isCatTool = type === 'CAT Wordcount'
-					await this.$axios.post('/vendor/update-progress', { token:this.getToken, projectId: this.job.project_Id, isCatTool })
+					await this.$axios.post('/vendor/update-progress', { token: this.getToken, projectId: this.job.project_Id, isCatTool })
 					await this.getJobs()
 					this.setCurrentJob()
 					this.alertToggle({ message: "Progress updated", isShow: true, type: "success" })
@@ -183,6 +183,11 @@
 <style lang="scss" scoped>
   @import "../../../../../assets/scss/colors";
 
+  .title {
+    margin: 20px 0;
+    font-size: 20px;
+  }
+
   .details {
     color: $main-color;
     width: 100%;
@@ -191,7 +196,7 @@
     &__data {
       width: 1040px;
       margin-top: 10px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       box-sizing: border-box;
       position: relative;
     }

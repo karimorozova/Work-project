@@ -128,7 +128,8 @@
 					await this.$axios.post('/vendor/assign-translator', {
 						token: this.getToken,
 						stepId: this.job.stepId,
-						projectId: this.job.project_Id
+						projectId: this.job.project_Id,
+            stepAction: 'Start'
 					})
 				} catch (err) {
 				}
