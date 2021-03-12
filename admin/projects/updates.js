@@ -831,9 +831,13 @@ const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 	const {taskId, serviceStep: { title: jobType }, memoqDocIds} = steps.find(item => item.stepId === stepId)
 	const {memoqProjectId} = tasks.find(item => item.taskId === taskId)
 
-	jobType === 'Translation' ?
-			(workFlowStatus = stepAction === 'Start' ? 'TranslationNotStarted' : 'Review1NotStarted') :
-			(workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed')
+	if(jobType === 'Translation'){
+		workFlowStatus = stepAction === 'Start' ? 'TranslationNotStarted' : 'Review1NotStarted'
+	}else{
+		workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed'
+	}
+
+	console.log({jobType, workFlowStatus, stepAction})
 
 	return { workFlowStatus, memoqProjectId, memoqDocIds }
 }
