@@ -827,7 +827,7 @@ const checkProjectHasMemoqStep = async (projectId) => {
 
 const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 	let workFlowStatus;
-	const { steps, tasks }  = await Projects.findOne({ 'steps.stepId': stepId })
+	let { steps, tasks }  = await Projects.findOne({ 'steps.stepId': stepId })
 	const {taskId, serviceStep: { title: jobType }, memoqDocIds} = steps.find(item => item.stepId === stepId)
 	const {memoqProjectId} = tasks.find(item => item.taskId === taskId)
 
@@ -837,7 +837,20 @@ const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 		workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed'
 	}
 
-	console.log({jobType, workFlowStatus, stepAction})
+	tasks = tasks.map(item => {
+		if(item.taskId === taskId){
+			item.memoqDocs.map(item2 => {
+				return {
+					...item2,
+					WorkflowStatus: workFlowStatus
+				}
+			})
+			return item
+		}
+		return item
+	})
+
+	await Projects.updateOne({ 'steps.stepId': stepId }, { tasks })
 
 	return { workFlowStatus, memoqProjectId, memoqDocIds }
 }
