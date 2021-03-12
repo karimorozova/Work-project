@@ -498,7 +498,7 @@
 		computed: {
 			...mapGetters({
 				currentProject: 'getCurrentProject',
-				vendors: "getVendors",
+				vendors: "getAllVendorsForProject",
 				userGroup: "getUserGroup"
 			}),
 			stepActions() {

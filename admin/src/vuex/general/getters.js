@@ -11,6 +11,7 @@ export const getVuexServices = state => state.services;
 export const getAllLanguages = state => state.languages;
 export const getAllIndustries= state => state.industries;
 export const getAllSteps = state => state.steps;
+export const getAllVendorsForProject = state => state.vendorsForProject
 
 export const getClients = state => state.customers;
 export const getVendors = state => state.vendors;

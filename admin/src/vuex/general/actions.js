@@ -10,6 +10,7 @@ export const gettingClientLangs = ({ commit }, payload) => commit('customerlangs
 export const allLanguages = ({ commit }, payload) => commit('allLangs', payload);
 export const allIndustries = ({ commit }, payload) => commit('allIndustries', payload);
 export const allSteps = ({ commit }, payload) => commit('allSteps', payload);
+export const setVendorsForProject = ({ commit }, payload) => commit('allVendorsForProject', payload);
 
 export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload);
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
@@ -18,6 +19,7 @@ export const setProjectProp = ({ commit }, payload) => commit('storeProjectProp'
 export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
+
 
 export const getServices = async ({ commit, dispatch }) => {
   commit('startRequest')

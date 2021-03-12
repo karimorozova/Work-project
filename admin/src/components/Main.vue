@@ -42,9 +42,7 @@
                   span {{ note.title }}
           .balloons
       .admin-main-wrapper__inner
-        router-view(:isSidebar="isSidebar"
-          @refreshServices='refreshServices'
-        )
+        router-view(:isSidebar="isSidebar")
 </template>
 
 <script>
@@ -244,12 +242,12 @@
 				this.$router.push('/account-info')
 				this.accountMenuVisible = false
 			},
-			async refreshServices(data) {
-				await this.getServices()
-			},
+			// async refreshServices(data) {
+			// 	console.log('tyt')
+			// 	await this.getServices()
+			// },
 			...mapActions({
 				setUser: "setUser",
-				getServices: "getServices"
 			})
 		},
 		computed: {

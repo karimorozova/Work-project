@@ -6,7 +6,7 @@ const state = {
     languages: [],
     steps: [],
     industries: [],
-
+    vendorsForProject: [],
     services: [],
     customers: [],
     clientLangs: [],

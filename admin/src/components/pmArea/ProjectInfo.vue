@@ -64,9 +64,9 @@
 				mailSubject: '',
 				customer: null,
 
-				originallyLanguages: null,
+				// originallyLanguages: null,
 				originallyUnits: null,
-				originallySteps: null,
+				// originallySteps: null,
 				originallyServices: null,
 			}
 		},
@@ -75,7 +75,7 @@
 				"setProjectProp",
 				'setProjectStatus',
 				'setCurrentProject',
-				'vendorsSetting',
+				'setVendorsForProject',
 				'alertToggle',
 				'removeStepVendor',
 				'setStepVendor',
@@ -160,12 +160,10 @@
 				}
 				return { startDate, deadline };
 			},
-			async getVendors() {
+			async getVendorsForProject() {
 				try {
-					if(!this.allVendors.length) {
-						const result = await this.$http.get('/all-vendors?filter=Active');
-						this.vendorsSetting(result.body);
-					}
+						const result = await this.$http.get('/pm-manage/vendors-for-project');
+						this.setVendorsForProject(result.data);
 				} catch (err) {
 					this.alertToggle({ message: "Internal service error. Cannot get Vendors.", isShow: true, type: "error" })
 				}
@@ -223,18 +221,18 @@
 				const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
 				await this.setCurrentProject(curProject.body);
 			},
-			async getOriginallyLanguages() {
-				try {
-					const result = await this.$http.get("/api/languages");
-					this.originallyLanguages = result.body;
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Originally Languages",
-						isShow: true,
-						type: "error",
-					});
-				}
-			},
+			// async getOriginallyLanguages() {
+			// 	try {
+			// 		const result = await this.$http.get("/api/languages");
+			// 		this.originallyLanguages = result.body;
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: "Error in Originally Languages",
+			// 			isShow: true,
+			// 			type: "error",
+			// 		});
+			// 	}
+			// },
 			async getOriginallyUnits() {
 				try {
 					const result = await this.$http.get('/api/units');
@@ -262,18 +260,18 @@
 			// 		}
 			// 	}
 			// },
-			async getOriginallySteps() {
-				try {
-					const result = await this.$http.get('/api/steps');
-					this.originallySteps = result.body;
-				} catch (err) {
-					this.alertToggle({
-						message: 'Error in Originally Steps',
-						isShow: true,
-						type: 'error',
-					});
-				}
-			},
+			// async getOriginallySteps() {
+			// 	try {
+			// 		const result = await this.$http.get('/api/steps');
+			// 		this.originallySteps = result.body;
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: 'Error in Originally Steps',
+			// 			isShow: true,
+			// 			type: 'error',
+			// 		});
+			// 	}
+			// },
 			async getOriginallyServices() {
 				try {
 					const result = await this.$http.get('/api/services');
@@ -291,11 +289,12 @@
 		computed: {
 			...mapGetters({
 				currentProject: 'getCurrentProject',
-				allVendors: "getVendors",
-				currentClient: 'getCurrentClient'
+				currentClient: 'getCurrentClient',
+				originallyLanguages: 'getAllLanguages',
+				originallySteps: 'getAllSteps'
 			}),
 			isFinishedStatus() {
-				const finishedStatuses = ['Delivered', 'Closed', 'Cancelled', 'Canclled Halfway'];
+				const finishedStatuses = ['Delivered', 'Closed', 'Cancelled', 'Cancelled Halfway'];
 				return finishedStatuses.indexOf(this.currentProject.status) !== -1;
 			}
 		},
@@ -311,10 +310,10 @@
 		},
 		async created() {
 			await this.getProject();
-			await this.getVendors();
-			await this.getOriginallyLanguages();
+			await this.getVendorsForProject();
+			// await this.getOriginallyLanguages();
 			await this.getOriginallyUnits();
-			await this.getOriginallySteps();
+			// await this.getOriginallySteps();
 			await this.getOriginallyServices();
 			// await this.getCustomer();
 		},

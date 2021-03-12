@@ -102,7 +102,7 @@
 				isBilling: false,
 				isTest: false,
 				selectedIndustry: "",
-				industries: [],
+				// industries: [],
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
@@ -245,10 +245,10 @@
 					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
 				}
 			},
-			async getIndustries() {
+/*			async getIndustries() {
 				const industries = await this.$http.get('/api/industries')
 				this.industries = industries.body
-			},
+			},*/
 			startOpen() {
 				this.$refs.start.showCalendar()
 			},
@@ -291,6 +291,9 @@
 			}
 		},
 		computed: {
+			...mapGetters({
+				industries: "getAllIndustries",
+			}),
 			existProjectAccessChangeName() {
 				if (this.project) {
 					const { status } = this.project
@@ -326,7 +329,7 @@
 		async created() {
 			await this.getProjectData()
 			this.getCustomers()
-			this.getIndustries()
+			// this.getIndustries()
 			this.isBillingDate()
 			!this.project._id && this.setIsBillingTrue()
 		}
