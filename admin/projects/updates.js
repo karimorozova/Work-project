@@ -833,30 +833,26 @@ const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 
 	if(jobType === 'Translation'){
 		workFlowStatus = stepAction === 'Start' ? 'TranslationNotStarted' : 'Review1NotStarted'
-		await updateTasks()
 	}else{
 		workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed'
-		await updateTasks()
 	}
+
+	tasks = tasks.map(item => {
+		if(item.taskId === taskId){
+			item.memoqDocs.map(item2 => {
+				return {
+					...item2,
+					WorkflowStatus: workFlowStatus
+				}
+			})
+			return item
+		}
+		return item
+	})
 
 	await Projects.updateOne({ 'steps.stepId': stepId }, { tasks })
 
 	return { workFlowStatus, memoqProjectId, memoqDocIds }
-
-	async function updateTasks(){
-		tasks = tasks.map(item => {
-			if(item.taskId === taskId){
-				item.memoqDocs.map(item2 => {
-					return {
-						...item2,
-						WorkflowStatus: workFlowStatus
-					}
-				})
-				return item
-			}
-			return item
-		})
-	}
 }
 
 module.exports = {
