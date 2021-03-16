@@ -3,6 +3,7 @@
     .pendingCompetencies
       .pendingCompetencies__body
         CandidateForm(
+          v-if="Object.keys(candidateFormData).length"
           :candidateFormData="candidateFormData"
         )
         PendingCompetenciesFilter(

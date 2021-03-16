@@ -239,7 +239,7 @@
       font-family: 'Myriad600';
     }
     &__text {
-      font-size: 14px;
+      font-size: 16px;
     }
 
     &__industry {

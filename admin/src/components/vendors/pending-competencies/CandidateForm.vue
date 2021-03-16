@@ -8,7 +8,7 @@
           .candidateForm__col-value {{ candidateFormData.vendorName }}
         .candidateForm__col
           .candidateForm__col-title Native Language:
-          .candidateForm__col-value {{ candidateFormData.native.lang }}
+          .candidateForm__col-value {{  candidateFormData.native ? candidateFormData.native.lang  : '' }}
 
       .candidateForm__row
         .candidateForm__col
@@ -20,7 +20,8 @@
 
       .candidateForm__row(v-if="candidateFormData.descriptions.targetLanguage.length")
         .candidateForm__textarea
-          textarea.candidateForm__textareaText(disabled) {{ candidateFormData.descriptions.targetLanguage }}
+          span(v-html="candidateFormData.descriptions.targetLanguage").candidateForm__textareaText(disabled)
+          //textarea()
 
       .candidateForm__row
         .candidateForm__col
@@ -32,7 +33,7 @@
 
       .candidateForm__row(v-if="candidateFormData.descriptions.industry.length")
         .candidateForm__textarea
-          textarea.candidateForm__textareaText(disabled) {{ candidateFormData.descriptions.industry }}
+          textarea(v-model="candidateFormData.descriptions.industry").candidateForm__textareaText(disabled)
 
       .candidateForm__row
         DataTable(
@@ -46,6 +47,7 @@
 
 <script>
 	import DataTable from "../../DataTable"
+
 	export default {
 		components: { DataTable },
 		props: {
@@ -64,11 +66,11 @@
     background: white;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     width: 600px;
-/*    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);*/
+    /*    top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);*/
 
-    &__textareaText{
+    &__textareaText {
       padding-top: 5px;
       padding-left: 10px;
       overflow-y: auto;
@@ -81,7 +83,7 @@
       resize: none;
     }
 
-    &__textarea{
+    &__textarea {
       border: 2px solid #c5bfb5;
       border-radius: 8px;
       width: 100%;
@@ -104,7 +106,8 @@
     &__col {
       display: flex;
       width: 50%;
-      &-title{
+
+      &-title {
         margin-right: 10px;
         font-family: 'Myriad600';
       }
