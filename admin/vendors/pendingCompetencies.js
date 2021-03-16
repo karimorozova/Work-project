@@ -83,30 +83,37 @@ const getFilteredVendorsPendingCompetencies = async (filters) => {
 const extendVendorsPendingCompetencies = async (pendingCompetencies) => {
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
 	const allUnits = await Units.find()
-	const { _id: catId } = allUnits.find(({ type }) => type === 'CAT Wordcount')
-	const { _id: swId } = allUnits.find(({ type }) => type === 'Source Word')
-
+	const { _id: catUnitId } = allUnits.find(({ type }) => type === 'CAT Wordcount')
+	const { _id: sourceWordId } = allUnits.find(({ type }) => type === 'Source Word')
 
 	pendingCompetencies = pendingCompetencies.map(item => {
-		console.log(item.sourceLanguage)
-		// const euroBasicPrice = basicPricesTable.find(({ sourceLanguage, targetLanguage }) => )
-		// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({ step, unit, size }) => )
-		// const { multiplier: industryMultiplier } = stepMultipliersTable.find(({ industry }) => )
+		const {
+			sourceLanguage: { _id: sourceLanguagePC },
+			targetLanguage: { _id: targetLanguagePC },
+			step: { _id: stepPC },
+			industry: { _id: industryPC }
+		} = item
 
-		// console.log(euroBasicPrice)
+		const euroBasicPrice = basicPricesTable.find(({ sourceLanguage, targetLanguage }) =>
+				`${ sourceLanguage }-${ targetLanguage }` === `${ sourceLanguagePC }-${ targetLanguagePC }`)
 
-		return item
+		const stepMultiplier = stepMultipliersTable.find(({ step, unit, size }) =>
+				item.step.title === 'Translation' ? `${ step }-${ unit }-${ size }` === `${ stepPC }-${ catUnitId }-${ 1 }` : `${ step }-${ unit }-${ size }` === `${ stepPC }-${ sourceWordId }-${ 1 }`)
+
+		const industryMultiplier = industryMultipliersTable.find(({ industry }) =>
+				`${ industry }` === `${ industryPC }`)
+
+		const systemRate = euroBasicPrice && stepMultiplier && industryMultiplier ? calculateRate(euroBasicPrice, stepMultiplier, industryMultiplier) : 0
+
+		return {
+			...item,
+			systemRate
+		}
+
+		function calculateRate(euroBasicPrice, stepMultiplier, industryMultiplier) {
+			return (euroBasicPrice.euroBasicPrice * (stepMultiplier.multiplier / 100)) * (industryMultiplier.multiplier / 100) / 2
+		}
 	})
-	// console.log(pendingCompetencies.length)
-
-	// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({step, unit, size}))
-	// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({industry}))
-	// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({sourceLanguage,targetLanguage}))
-
-	// console.log(stepMultipliersTable)
-
-	// console.log({ basicPricesTable, stepMultipliersTable, industryMultipliersTable })
-	// console.log(pendingCompetencies)
 
 	return pendingCompetencies
 }

@@ -39,17 +39,27 @@
       .candidateForm__row
         DataTable(
           :fields="fields"
-          :tableData="[]"
+          :tableData="ratesTableData"
           bodyRowClass="cursor-default"
+          :bodyClass="'tbody_visible-overflow'"
+          :tableheadRowClass="'tbody_visible-overflow'"
         )
+          template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+            span.candidateForm__header-label {{ field.label }}
+
+          template(slot="rate" slot-scope="{ row }")
+            .candidateForm__data € {{ row.rate }}
+          template(slot="benchmark" slot-scope="{ row }")
+            .candidateForm__data € {{ row.systemRate }}
+          template(slot="margin" slot-scope="{ row }")
+            .candidateForm__data(:style="styleObject(row.margin)") € {{ row.margin }}
+
       .candidateForm__row
         .candidateForm__row-buttons
           Button(:value="'Approve & Test'" @clicked="approve")
           Button(:value="'Reject'" @clicked="reject")
           Button(:value="'Cancel'" @clicked="closeModal")
 
-      .candidateForm__row
-      | {{ candidateFormData }}
 </template>
 
 <script>
@@ -63,7 +73,19 @@
 				type: Object
 			}
 		},
+		data() {
+			return {
+				fields: [
+					{ label: "Requested Rate", headerKey: "headerRequestedRate", key: "rate", width: "33.3%", padding: "0" },
+					{ label: "Benchmark", headerKey: "headerBenchmark", key: "benchmark", width: "33.3%", padding: "0" },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "33.4%", padding: "0" }
+				]
+			}
+		},
 		methods: {
+			styleObject(margin) {
+				return margin < 0 ? { 'background': '#e8afa2' } : {}
+			},
 			approve() {
 				console.log('da1')
 			},
@@ -72,6 +94,18 @@
 			},
 			closeModal() {
 				this.$emit('closeModal')
+			}
+		},
+		computed: {
+			ratesTableData() {
+				if (this.candidateFormData) {
+					const { rate, systemRate } = this.candidateFormData
+					return [ {
+						rate: rate.toFixed(4),
+						systemRate: systemRate.toFixed(4),
+						margin: (systemRate - rate).toFixed(4)
+					} ]
+				}
 			}
 		}
 	}
@@ -118,7 +152,7 @@
 
     &__row {
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
 
       &-buttons {
         display: flex;
@@ -155,6 +189,14 @@
       &:hover {
         opacity: 1
       }
+    }
+
+    &__data {
+      height: 30px;
+      overflow-x: hidden;
+      padding: 0 5px;
+      align-items: center;
+      display: flex;
     }
   }
 </style>

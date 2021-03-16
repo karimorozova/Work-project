@@ -3,6 +3,7 @@
     .pendingCompetencies
       .pendingCompetencies__body
         CandidateForm(
+          v-if="isForm"
           :candidateFormData="candidateFormData"
           @closeModal="closeForm"
         )
@@ -42,21 +43,33 @@
 
             template(slot="vendorName" slot-scope="{ row }")
               .pendingCompetencies__data {{ row.vendorName }}
+
             template(slot="source" slot-scope="{ row }")
               .pendingCompetencies__data {{ row.sourceLanguage.lang }}
+
             template(slot="target" slot-scope="{ row }")
               .pendingCompetencies__data {{ row.targetLanguage.lang }}
+
             template(slot="step" slot-scope="{ row }")
               .pendingCompetencies__data {{ row.step.title }}
+
             template(slot="industry" slot-scope="{ row }")
               .pendingCompetencies__data {{ row.industry.name }}
+
             template(slot="priority" slot-scope="{ row }")
               .pendingCompetencies__data 1
+
             template(slot="alert" slot-scope="{ row }")
-              .pendingCompetencies__data 8
+              .pendingCompetencies__data
+                .pendingCompetencies__iconAlert-red(v-if="row.rate > row.systemRate")
+                  i.fa.fa-exclamation-circle
+                .pendingCompetencies__iconAlert-default(v-else)
+                  i.fa.fa-exclamation-circle
+
             template(slot="modal" slot-scope="{ row }")
               .pendingCompetencies__icon(@click="openForm(), setCandidateData(row)")
                 i.fa.fa-id-card-o
+
             template(slot="link" slot-scope="{ row }")
               .pendingCompetencies__icon
                 a(:href="'/vendors/details/' + row.link" target="_blank")
@@ -180,7 +193,24 @@
       cursor: pointer;
       font-size: 16px;
     }
+
+    &__iconAlert {
+      &-red {
+        color: #d15f45;
+        width: 100%;
+        font-size: 16px;
+        text-align: center;
+      }
+
+      &-default {
+        color: #c4beb6;
+        width: 100%;
+        font-size: 16px;
+        text-align: center;
+      }
+    }
   }
+
 
   a {
     color: #67573e;
