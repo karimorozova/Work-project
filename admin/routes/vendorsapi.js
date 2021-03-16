@@ -25,7 +25,8 @@ const {
 	getVendorAfterCombinationsUpdated,
 	updateVendorMatrix,
 	syncVendorMatrix,
-	getFilteredVendorsPendingCompetencies
+	getFilteredVendorsPendingCompetencies,
+	extendVendorsPendingCompetencies
 } = require('../vendors')
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
@@ -564,7 +565,8 @@ router.get("/delete-memoq-vendor/:id", async (req, res) => {
 router.post('/filtered-pending-competencies', async (req, res) => {
 	const { filters } = req.body
 	try {
-		const result = await getFilteredVendorsPendingCompetencies(filters)
+		let result = await getFilteredVendorsPendingCompetencies(filters)
+		result = await extendVendorsPendingCompetencies(result)
 		res.send(result)
 	} catch (err) {
 		console.log(err)

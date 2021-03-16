@@ -1,8 +1,7 @@
-const { Vendors, Languages, Industries, Step } = require('../models')
+const { Vendors, Languages, Industries, Step, Pricelist, Units } = require('../models')
 const ObjectId = require('mongodb').ObjectID
 
 const getFilteredVendorsPendingCompetencies = async (filters) => {
-	console.log(filters)
 	const languages = await Languages.find()
 	const industries = await Industries.find()
 	const steps = await Step.find()
@@ -81,6 +80,38 @@ const getFilteredVendorsPendingCompetencies = async (filters) => {
 	}
 }
 
+const extendVendorsPendingCompetencies = async (pendingCompetencies) => {
+	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
+	const allUnits = await Units.find()
+	const { _id: catId } = allUnits.find(({ type }) => type === 'CAT Wordcount')
+	const { _id: swId } = allUnits.find(({ type }) => type === 'Source Word')
+
+
+	pendingCompetencies = pendingCompetencies.map(item => {
+		console.log(item.sourceLanguage)
+		// const euroBasicPrice = basicPricesTable.find(({ sourceLanguage, targetLanguage }) => )
+		// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({ step, unit, size }) => )
+		// const { multiplier: industryMultiplier } = stepMultipliersTable.find(({ industry }) => )
+
+		// console.log(euroBasicPrice)
+
+		return item
+	})
+	// console.log(pendingCompetencies.length)
+
+	// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({step, unit, size}))
+	// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({industry}))
+	// const { multiplier: stepMultiplier } = stepMultipliersTable.find(({sourceLanguage,targetLanguage}))
+
+	// console.log(stepMultipliersTable)
+
+	// console.log({ basicPricesTable, stepMultipliersTable, industryMultipliersTable })
+	// console.log(pendingCompetencies)
+
+	return pendingCompetencies
+}
+
 module.exports = {
-	getFilteredVendorsPendingCompetencies
+	getFilteredVendorsPendingCompetencies,
+	extendVendorsPendingCompetencies
 }

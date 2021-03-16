@@ -18,7 +18,10 @@ const { syncVendorRatesCost } = require('./syncVendorRatesCost')
 const { createRateRowFromQualification } = require('./createVendorRates')
 const { getVendorAssessmentsWordCount } = require('./getVendorAssessments')
 
-const { getFilteredVendorsPendingCompetencies } = require('./pendingCompetencies')
+const {
+	getFilteredVendorsPendingCompetencies,
+	extendVendorsPendingCompetencies
+} = require('./pendingCompetencies')
 
 module.exports = {
 	getVendor,
@@ -51,5 +54,6 @@ module.exports = {
 	getVendorAssessmentsWordCount,
 	updateVendorMatrix,
 	syncVendorMatrix,
-  getFilteredVendorsPendingCompetencies
+  getFilteredVendorsPendingCompetencies,
+	extendVendorsPendingCompetencies
 }

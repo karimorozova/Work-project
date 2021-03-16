@@ -3,8 +3,8 @@
     .pendingCompetencies
       .pendingCompetencies__body
         CandidateForm(
-          v-if="Object.keys(candidateFormData).length"
           :candidateFormData="candidateFormData"
+          @closeModal="closeForm"
         )
         PendingCompetenciesFilter(
           :allSources="languagesList"
@@ -34,8 +34,8 @@
             :tableData="preCompetencies"
             bodyRowClass="cursor-default"
             :bodyCellClass="'vendor-table-cell'"
-            :bodyClass="['vendors-table__body',{'tbody_visible-overflow': preCompetencies.length < 6}]"
-            :tableheadRowClass="preCompetencies.length < 6 ? 'tbody_visible-overflow' : ''"
+            :bodyClass="['vendors-table__body',{'tbody_visible-overflow': preCompetencies.length < 18}]"
+            :tableheadRowClass="preCompetencies.length < 18 ? 'tbody_visible-overflow' : ''"
           )
             template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
               span.pendingCompetencies__header-label {{ field.label }}
@@ -52,6 +52,8 @@
               .pendingCompetencies__data {{ row.industry.name }}
             template(slot="priority" slot-scope="{ row }")
               .pendingCompetencies__data 1
+            template(slot="alert" slot-scope="{ row }")
+              .pendingCompetencies__data 8
             template(slot="modal" slot-scope="{ row }")
               .pendingCompetencies__icon(@click="openForm(), setCandidateData(row)")
                 i.fa.fa-id-card-o
@@ -84,12 +86,13 @@
 				},
 				preCompetencies: [],
 				fields: [
-					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "17%", padding: "0" },
-					{ label: "Source Language", headerKey: "headerSourceLanguage", key: "source", width: "17%", padding: "0" },
-					{ label: "Target Language", headerKey: "headerTargetLanguage", key: "target", width: "17%", padding: "0" },
-					{ label: "Step", headerKey: "headerStep", key: "step", width: "17%", padding: "0" },
-					{ label: "Industry", headerKey: "headerIndustry", key: "industry", width: "17%", padding: "0" },
+					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "16%", padding: "0" },
+					{ label: "Source Language", headerKey: "headerSourceLanguage", key: "source", width: "16%", padding: "0" },
+					{ label: "Target Language", headerKey: "headerTargetLanguage", key: "target", width: "16%", padding: "0" },
+					{ label: "Step", headerKey: "headerStep", key: "step", width: "16%", padding: "0" },
+					{ label: "Industry", headerKey: "headerIndustry", key: "industry", width: "16%", padding: "0" },
 					{ label: "Priority", headerKey: "headerPriority", key: "priority", width: "5%", padding: "0" },
+					{ label: "", headerKey: "headerAlert", key: "alert", width: "5%", padding: "0" },
 					{ label: "", headerKey: "headerModal", key: "modal", width: "5%", padding: "0" },
 					{ label: "", headerKey: "headerLink", key: "link", width: "5%", padding: "0" }
 				]
