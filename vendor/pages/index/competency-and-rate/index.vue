@@ -1,15 +1,10 @@
 <template lang="pug">
   .container(v-if="vendor")
-    .group(v-if="!isShowPendingCompetencies")
-      .title.with-button Pending Competencies
-        Button(value="Create" customClass="width-191" @clicked="showPendingCompetenciesModal")
-      PendingCompetencies(
-        :pendingCompetenciesData="vendor.pendingCompetencies"
-      )
-    .group(v-else)
-      .title.with-button Create Pending Competencies
-        Button(value="Close" customClass="width-191" @clicked="hidePendingCompetenciesModal")
-      PendingCompetenciesModal
+    .title.with-button Pending Competencies
+      Button(value="Create" customClass="width-191" @clicked="redirectToModal")
+    PendingCompetencies(
+      :pendingCompetenciesData="vendor.pendingCompetencies"
+    )
 
     .title Competencies
     Competencies(
@@ -26,7 +21,7 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex"
+	import { mapGetters } from "vuex"
 	import Rates from "../../../components/overall/internal/Rates"
 	import PendingCompetencies from "../../../components/overall/internal/PendingCompetencies"
 	import PendingCompetenciesModal from "../competencies/index"
@@ -35,19 +30,11 @@
   import Button from "../../../components/overall/Button";
 
 	export default {
-	  data(){
-	    return {
-	      isShowPendingCompetencies: false
-      }
-    },
 		components: {Button, DiscountChart, Competencies, Rates, PendingCompetencies,PendingCompetenciesModal },
     methods: {
-      showPendingCompetenciesModal() {
-        this.isShowPendingCompetencies = true
-      },
-      hidePendingCompetenciesModal() {
-        this.isShowPendingCompetencies = false
-      }
+		  redirectToModal() {
+		    this.$router.push('competencies')
+		  }
     },
 		computed: {
 			...mapGetters({
@@ -68,10 +55,7 @@
     margin: 20px 0px;
     font-size: 20px;
   }
-  .modal{
-    background: white;
-    z-index: 3;
-  }
+
   .with-button {
     display: flex;
     justify-content: space-between;

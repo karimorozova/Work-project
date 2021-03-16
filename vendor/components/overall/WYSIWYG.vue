@@ -1,6 +1,6 @@
 <template lang="pug">
   .container
-    ckeditor(v-model="editorData" :config="editorConfig" @blur="blurCkeditor")
+    ckeditor(v-model="editorDataUpdate" :config="editorConfig")
 </template>
 
 <script>
@@ -8,9 +8,11 @@
 	if (process.client || !!CKEditor) CKEditor = require('ckeditor4-vue')
 	else CKEditor = { component: { template: '<div></div>' } }
 	export default {
+	  props: {
+      editorData: "",
+    },
 		data() {
 			return {
-				editorData: "",
 				editorConfig: {
 					extraPlugins: ['colorbutton', 'smiley'],
 					toolbarGroups: [
@@ -34,10 +36,11 @@
 				}
 			}
 		},
-    methods: {
-      blurCkeditor(e) {
-        this.$emit('editorBlur', {data: this.editorData})
-      }
+    computed: {
+      editorDataUpdate: {
+        get () { return this.editorData },
+        set (value) { this.$emit('editorBlur', value) },
+      },
     },
 		components: {
 			ckeditor: CKEditor.component

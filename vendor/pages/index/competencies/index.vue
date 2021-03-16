@@ -1,5 +1,6 @@
 <template lang="pug">
   .competencies
+    .competencies__title Pending Competencies
     .competencies__body
       .competencies__modal-wrapper(v-if="errors.length > 0" @click="clearErrors")
         Modal.modal.modal-width-300(@close="clearErrors")
@@ -342,6 +343,7 @@ export default {
   width: 1040px;
   color: #67573e;
   font-family: Myriad400;
+  padding: 30px;
 
   p {
     margin: 0;

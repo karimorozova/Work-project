@@ -1,5 +1,6 @@
 <template lang="pug">
   .competencies
+    PendingCompetenciesModifyModal(v-if="editPendingCompetencies" :pendingCompetency="editPendingCompetencies" @close="closeModal" @updated="updateCurrentCompetencies")
     .competencies__table
       SettingsTable(
         :fields="fields"
@@ -34,6 +35,7 @@ import {mapActions, mapGetters} from "vuex"
   import crudIcons from "../../../mixins/crudIcons"
 
 	import SettingsTable from "../SettingsTable"
+import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
 	export default {
 	  mixins: [crudIcons],
 		props: {
@@ -44,6 +46,7 @@ import {mapActions, mapGetters} from "vuex"
 		},
 		data() {
 			return {
+        editPendingCompetencies: null,
 				fields: [
 					{
 						label: "Source Language",
@@ -95,9 +98,11 @@ import {mapActions, mapGetters} from "vuex"
 					case "delete":
 					  const pendingCompetencies = this.pendingCompetenciesData.filter((_, i) => i !== index)
             this.sendRequest(pendingCompetencies)
-            this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
 						break
 					default:
+            console.log(this.pendingCompetenciesData[index])
+            this.currentSelect = index
+					  this.editPendingCompetencies = this.pendingCompetenciesData[index]
 						// await this.checkErrors(index)
 				}
 			},
@@ -107,53 +112,18 @@ import {mapActions, mapGetters} from "vuex"
           token: this.token,
           pendingCompetencies,
         })
+        this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
+      },
+
+      updateCurrentCompetencies({data}) {
+        this.pendingCompetenciesData[this.currentSelect] = data
+        this.sendRequest(this.pendingCompetenciesData)
       },
 
 
-			setDefaults() {
-				this.isDeleting = false
-				this.currentSource = ""
-				this.currentTargets = []
-				this.currentIndustries = []
-				this.currentSteps = []
-			},
-
-			async manageDeleteClick(index) {
-				if (!this.competenciesData[index]._id) {
-					this.newRow = false
-					this.competenciesData.splice(index, 1)
-					this.setDefaults()
-					return
-				}
-				this.deleteIndex = index
-				this.isDeleting = true
-			},
-
 			closeModal() {
-				return (this.isDeleting = false)
+				return (this.editPendingCompetencies = null)
 			},
-
-			async deleteCompetencies() {
-				try {
-					let currentData = this.competenciesData[this.deleteIndex]
-					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`)
-					this.competenciesData.splice(this.deleteIndex, 1)
-					this.$emit("updateRates", true)
-					this.closeModal()
-					this.alertToggle({
-						message: "Competencies are deleted",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in save Competencies",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-
 
 			closeErrors() {
 				this.areErrors = false
@@ -171,6 +141,7 @@ import {mapActions, mapGetters} from "vuex"
       }
 		},
 		components: {
+      PendingCompetenciesModifyModal,
 			SettingsTable
 		}
 	}
