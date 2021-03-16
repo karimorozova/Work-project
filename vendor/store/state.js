@@ -9,6 +9,7 @@ const state = {
   industries: [],
   timezones: [],
   steps: [],
+  allSteps: [],
   packages: [],
   applicationFormData: {
     firstName: "",

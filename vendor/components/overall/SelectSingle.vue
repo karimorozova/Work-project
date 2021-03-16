@@ -76,7 +76,7 @@
 				this.$emit('scrollDrop', {drop: this.isDropped, offsetTop: top, offsetHeight: height});
 			},
 			showOption(opt) {
-				return (typeof opt === "string") ? opt: opt.name;
+				return (typeof opt === "string") ? opt: (opt.name || opt.lang || opt.title );
 			},
 			outOptions() {
 				this.isDropped = false;

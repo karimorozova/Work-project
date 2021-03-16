@@ -13,3 +13,7 @@ export const setAccountInfo = ({ commit }) => {
 export const setAccountProp = ({ commit }, payload) => {
     commit("SET_ACCOUNT_PROP", payload);
 }
+
+export const setVendorProp = ({ commit }, payload) => {
+  commit("SET_VENDOR_PROP", payload);
+}

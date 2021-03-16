@@ -96,7 +96,7 @@
 			}
 		},
 		methods: {
-			...mapActions([ "alertToggle", "setOriginallyUnits", "logout", "getVendorInfo", "getAllLanguages", "setAllIndustries" ]),
+			...mapActions([ "alertToggle", "setOriginallyUnits", "logout", "getVendorInfo", "getAllLanguages", "setAllIndustries", "setAllStepss" ]),
 
 			mainPageRender() {
 				this.toggleSideBar(true)
@@ -164,8 +164,9 @@
 			this.setToken()
 			this.getVendorInfo()
 			this.getAllLanguages()
-			this.setAllIndustries()
-			this.mainPageRender()
+      this.setAllIndustries()
+      this.setAllStepss()
+      this.mainPageRender()
 
 		},
 		updated() {

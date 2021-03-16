@@ -1,4 +1,4 @@
-export { setApplicationForm, setAccountInfo, setAccountProp } from "./set";
+export { setApplicationForm, setAccountInfo, setAccountProp, setVendorProp } from "./set";
 export { default as getVendorInfo } from "./get";
 export { setConfirmedPassword, setNewPassword } from "./password";
 export { saveVendorInfo, setOriginallyUnits } from "./info";

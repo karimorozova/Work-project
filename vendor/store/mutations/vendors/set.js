@@ -29,6 +29,11 @@ export const SET_ACCOUNT_PROP = (state, payload) => {
     state.accountInfo[prop] = value;
 }
 
+export const SET_VENDOR_PROP = (state, payload) => {
+  const { prop, value } = payload;
+  state.vendor[prop] = value;
+}
+
 export const SET_JOBS = (state, payload) => {
     state.jobs = payload;
 }
