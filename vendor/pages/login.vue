@@ -50,6 +50,7 @@
             this.$router.push(this.getPreviousLink) :
             this.$router.push('/dashboard')
 
+          this.setPreviousLink('')
 
 					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
 				} catch (err) {
@@ -67,6 +68,7 @@
 				alertToggle: "alertToggle",
 				login: "login",
 				setOriginallyUnits: "setOriginallyUnits",
+				setPreviousLink: "setPreviousLink"
 			})
 		},
 		computed: {
