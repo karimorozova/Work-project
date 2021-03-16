@@ -1,8 +1,7 @@
-const { Vendors, Languages, Industries, Step } = require('../models')
+const { Vendors, Languages, Industries, Step, Pricelist, Units } = require('../models')
 const ObjectId = require('mongodb').ObjectID
 
 const getFilteredVendorsPendingCompetencies = async (filters) => {
-	console.log(filters)
 	const languages = await Languages.find()
 	const industries = await Industries.find()
 	const steps = await Step.find()
@@ -81,6 +80,45 @@ const getFilteredVendorsPendingCompetencies = async (filters) => {
 	}
 }
 
+const extendVendorsPendingCompetencies = async (pendingCompetencies) => {
+	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
+	const allUnits = await Units.find()
+	const { _id: catUnitId } = allUnits.find(({ type }) => type === 'CAT Wordcount')
+	const { _id: sourceWordId } = allUnits.find(({ type }) => type === 'Source Word')
+
+	pendingCompetencies = pendingCompetencies.map(item => {
+		const {
+			sourceLanguage: { _id: sourceLanguagePC },
+			targetLanguage: { _id: targetLanguagePC },
+			step: { _id: stepPC },
+			industry: { _id: industryPC }
+		} = item
+
+		const euroBasicPrice = basicPricesTable.find(({ sourceLanguage, targetLanguage }) =>
+				`${ sourceLanguage }-${ targetLanguage }` === `${ sourceLanguagePC }-${ targetLanguagePC }`)
+
+		const stepMultiplier = stepMultipliersTable.find(({ step, unit, size }) =>
+				item.step.title === 'Translation' ? `${ step }-${ unit }-${ size }` === `${ stepPC }-${ catUnitId }-${ 1 }` : `${ step }-${ unit }-${ size }` === `${ stepPC }-${ sourceWordId }-${ 1 }`)
+
+		const industryMultiplier = industryMultipliersTable.find(({ industry }) =>
+				`${ industry }` === `${ industryPC }`)
+
+		const systemRate = euroBasicPrice && stepMultiplier && industryMultiplier ? calculateRate(euroBasicPrice, stepMultiplier, industryMultiplier) : 0
+
+		return {
+			...item,
+			systemRate
+		}
+
+		function calculateRate(euroBasicPrice, stepMultiplier, industryMultiplier) {
+			return (euroBasicPrice.euroBasicPrice * (stepMultiplier.multiplier / 100)) * (industryMultiplier.multiplier / 100) / 2
+		}
+	})
+
+	return pendingCompetencies
+}
+
 module.exports = {
-	getFilteredVendorsPendingCompetencies
+	getFilteredVendorsPendingCompetencies,
+	extendVendorsPendingCompetencies
 }
