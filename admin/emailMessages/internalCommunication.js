@@ -216,7 +216,7 @@ function managerProjectRejectedMessage(obj) {
                 <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
             </header>
             <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                <h4 class="contact-name">Dear ${ obj.accManager }</h4>
+                <h4 class="contact-name">Dear ${ obj.manager }</h4>
                 <p>
                     Client ${ obj.customer.name } has just rejected quote: ${ obj.projectId } - ${ obj.projectName }н.
                 </p>

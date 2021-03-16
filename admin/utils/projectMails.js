@@ -7,8 +7,11 @@ const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassign
 async function notifyManagerProjectRejected(project) {
 	try {
 		const accManager = await User.findOne({ "_id": project.accountManager.id });
-		const message = managerProjectRejectedMessage({ ...project._doc, accManager: accManager.firstName });
-		await managerNotifyMail(accManager, message, `Quote Rejected ${ project.projectId } - ${ project.projectName } (ID C003.0)`);
+		const projectManager = await User.findOne({ "_id": project.projectManager._id });
+		const messagePM = managerProjectRejectedMessage({ ...project._doc, manager: projectManager.firstName });
+		const messageAM = managerProjectRejectedMessage({ ...project._doc, manager: accManager.firstName });
+		await managerNotifyMail(accManager, messageAM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (ID C003.0)`);
+		await managerNotifyMail(projectManager, messagePM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (ID C003.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyManagerProjectRejected");
