@@ -95,7 +95,11 @@ async function getVendorAfterUpdate(query, update) {
     .populate('rates.pricelistTable.targetLanguage', ['lang'])
     .populate('rates.pricelistTable.step', ['title'])
     .populate('rates.pricelistTable.unit', ['type'])
-    .populate('rates.pricelistTable.industry', ['name']);
+    .populate('rates.pricelistTable.industry', ['name'])
+    .populate('pendingCompetencies.sourceLanguage', ['lang'])
+    .populate('pendingCompetencies.targetLanguage', ['lang'])
+    .populate('pendingCompetencies.industry', ['name'])
+    .populate('pendingCompetencies.step', ['title']);
 }
 
 async function getFilteredVendors(filters) {
