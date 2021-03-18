@@ -132,6 +132,14 @@
 					console.log("Cannot identify user group")
 				}
 			},
+			async allServices() {
+				let result = await this.$http.get('/api/services')
+				this.$store.dispatch('allServices', result.data)
+			},
+			async allUnits() {
+				let result = await this.$http.get('/api/units')
+				this.$store.dispatch('allUnits', result.data)
+			},
 			async getLanguages() {
 				let result = await this.$http.get('/api/languages')
 				let allLangs = result.body
@@ -242,10 +250,6 @@
 				this.$router.push('/account-info')
 				this.accountMenuVisible = false
 			},
-			// async refreshServices(data) {
-			// 	console.log('tyt')
-			// 	await this.getServices()
-			// },
 			...mapActions({
 				setUser: "setUser",
 			})
@@ -268,9 +272,12 @@
 		},
 		created() {
 			this.getCurrentUserGroup()
+      //SET GLOBAL VUEX
 			this.getLanguages()
       this.allSteps()
       this.allIndustries()
+			this.allServices()
+			this.allUnits()
 		},
 		mounted() {
 			this.mainPageRender()
@@ -302,7 +309,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      margin-left: 140px;
+      margin-left: 135px;
 
       a {
         text-decoration: none;
@@ -494,7 +501,7 @@
 
     &__inner {
       width: calc(100% - 150px);
-      margin-left: 140px;
+      margin-left: 135px;
     }
 
     .admin-navbar {
@@ -508,12 +515,12 @@
       &__sidebar {
         padding: 25px 0;
         background-color: #948977;
-        width: 140px;
+        width: 135px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 0 7px rgba(104, 87, 62, 0.6);
+        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
         transition: all 0.5s;
         z-index: 2;
         overflow: hidden;
@@ -524,7 +531,7 @@
         font-size: 14px;
         font-weight: bold;
         padding: 0;
-        width: 177px;
+        width: 150px;
         height: 77vh;
         overflow-y: scroll;
         margin-bottom: 0;

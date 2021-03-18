@@ -87,7 +87,7 @@
 				return margin < 0 ? { 'background': '#e8afa2' } : {}
 			},
 			approve() {
-				console.log('da1')
+				this.$emit('approve', this.candidateFormData)
 			},
 			reject() {
 				console.log('da2')

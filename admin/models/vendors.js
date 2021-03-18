@@ -482,7 +482,25 @@ const VendorSchema = new mongoose.Schema({
 				default: ''
 			},
 		}
-	} ]
+	} ],
+	approvedPendingCompetencies: [{
+		sourceLanguage: {
+			type: Schema.Types.ObjectId, ref: 'Language'
+		},
+		targetLanguage: {
+			type: Schema.Types.ObjectId, ref: 'Language'
+		},
+		step: {
+			type: Schema.Types.ObjectId, ref: 'Step'
+		},
+		industry: {
+			type: Schema.Types.ObjectId, ref: 'Industries'
+		},
+		rate: {
+			type: Number,
+			default: 0
+		},
+	}]
 
 }, { minimize: false })
 

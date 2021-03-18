@@ -6,6 +6,7 @@
           v-if="isForm"
           :candidateFormData="candidateFormData"
           @closeModal="closeForm"
+          @approve="approvePC"
         )
         PendingCompetenciesFilter(
           :allSources="languagesList"
@@ -115,6 +116,9 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			approvePC(PC){
+				console.log(PC)
+			},
 			setCandidateData(row) {
 				this.candidateFormData = row
 			},
@@ -168,7 +172,6 @@
     width: 100%;
 
     &__body {
-      margin: 40px 40px 40px 20px;
       width: 1100px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       padding: 20px;

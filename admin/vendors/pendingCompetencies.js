@@ -1,5 +1,18 @@
-const { Vendors, Languages, Industries, Step, Pricelist, Units } = require('../models')
+const {
+	Vendors,
+	Languages,
+	Industries,
+	Step,
+	Pricelist,
+	Units,
+	LangTest
+} = require('../models')
+
 const ObjectId = require('mongodb').ObjectID
+const { getVendor } = require('./getVendors')
+const { testSentMessage } = require("../emailMessages/candidateCommunication")
+const { sendEmail } = require('../utils/mailTemplate')
+const fs = require('fs')
 
 const getFilteredVendorsPendingCompetencies = async (filters) => {
 	const languages = await Languages.find()
@@ -118,7 +131,130 @@ const extendVendorsPendingCompetencies = async (pendingCompetencies) => {
 	return pendingCompetencies
 }
 
+const approvePendingCompetence = async ({ vendorId, pendingCompetence }) => {
+	let vendor = await getVendor({ _id: vendorId })
+	vendor.pendingCompetencies = vendor.pendingCompetencies.filter(({ _id }) =>
+			`${ _id }` !== pendingCompetence._id)
+
+	delete pendingCompetence._id
+	vendor.approvedPendingCompetencies.push(pendingCompetence)
+
+	await Vendors.updateOne({ _id: vendorId }, vendor)
+}
+
+const setRatePriceAfterPassedTest = async (vendorId, qualification) => {
+	let vendor = await getVendor({ _id: vendorId })
+	let approvedQualifications = generateQualificationsCombinations([ qualification ])
+	const matchesAPC = vendor.approvedPendingCompetencies
+			.filter(({ sourceLanguage, targetLanguage, industry, step }) =>
+					approvedQualifications
+							.map(({ sourceLanguage, targetLanguage, industry, step }) => `${ sourceLanguage }-${ targetLanguage }-${ industry }-${ step }`)
+							.includes(`${ sourceLanguage }-${ targetLanguage }-${ industry }-${ step }`))
+
+	const { rates, filteredAPC } = setUpRate(vendor.approvedPendingCompetencies, matchesAPC, vendor.rates.pricelistTable)
+	vendor.approvedPendingCompetencies = filteredAPC
+	vendor.rates.pricelistTable = rates
+
+	await Vendors.updateOne({ _id: vendorId }, vendor)
+}
+
+const setRatePriceAfterApprovalPC = async (vendorId) => {
+	let vendor = await getVendor({ _id: vendorId })
+	let allQualifications = generateQualificationsCombinations(vendor.qualifications)
+	const notMatchesAPC = vendor.approvedPendingCompetencies.filter(({ sourceLanguage, targetLanguage, industry, step }) =>
+			!allQualifications
+					.map(({ sourceLanguage, targetLanguage, industry, step }) => `${ sourceLanguage }-${ targetLanguage }-${ industry }-${ step }`)
+					.includes(`${ sourceLanguage }-${ targetLanguage }-${ industry }-${ step }`))
+
+	const { rates, filteredAPC } = setUpRate(vendor.approvedPendingCompetencies, notMatchesAPC, vendor.rates.pricelistTable)
+	vendor.approvedPendingCompetencies = filteredAPC
+	vendor.rates.pricelistTable = rates
+
+	await Vendors.updateOne({ _id: vendorId }, vendor)
+}
+
+const sendVendorTestAndUpdateQualification = async (vendorId) => {
+	let vendor = await getVendor({ _id: vendorId })
+	const allTests = await LangTest.find()
+
+	for (let ACP of vendor.approvedPendingCompetencies) {
+		const { sourceLanguage, targetLanguage, industry, step } = ACP
+		vendor.qualifications = vendor.qualifications.map(item => {
+			const match =
+					`${ sourceLanguage }-${ targetLanguage }` === `${ item.source._id }-${ item.target._id }` &&
+					item.industries.map(({ _id }) => _id.toString()).includes(`${ industry }`) &&
+					item.steps.map(({ _id }) => _id.toString()).includes(`${ step }`)
+
+			if (match && item.status === 'Created') {
+				item.status = 'Test Sent'
+				const message = testSentMessage({
+					...this.vendor,
+					industries: item.industries,
+					target: item.target,
+					source: item.source
+				})
+
+				const { path } = allTests.find(test => test._id.toString() === item.testId)
+				const attachments = [ { filename: path.split('/').pop(), content: fs.createReadStream(`./dist${ path }`) } ]
+				sendEmail({
+					to: vendor.email,
+					subject: `${ item.target.lang } - Translator@Pangea position - Sample text for translation (ID CAN001.0)`,
+					attachments
+				}, message)
+			}
+
+			return item
+		})
+	}
+	await Vendors.updateOne({ _id: vendorId }, vendor)
+	return vendor
+}
+
+//internal helpers =>
+function setUpRate(AllAPC, APCarr, rates) {
+	for (let APC of APCarr) {
+		rates = rates.map(item => {
+			const match =
+					`${ item.sourceLanguage._id }-${ item.targetLanguage._id }-${ item.industry._id }-${ item.step._id }` ===
+					`${ APC.sourceLanguage }-${ APC.targetLanguage }-${ APC.industry }-${ APC.step }`
+
+			if (match) {
+				item.price = APC.rate
+				item.altered = true
+				item.notification = 'Changed! Price taken from pending competence.'
+			}
+			return item
+		})
+		AllAPC = AllAPC.filter(({ _id }) => `${ _id }` !== `${ APC._id }`)
+	}
+	return { rates, filteredAPC: AllAPC }
+}
+
+function generateQualificationsCombinations(qualifications) {
+	let listOfQualifications = []
+
+	for (let qualification of qualifications) {
+		const { source, target, steps, industries } = qualification
+		steps.forEach(step => {
+			industries.forEach(industry => {
+				listOfQualifications.push({
+					sourceLanguage: source._id,
+					targetLanguage: target._id,
+					industry: industry._id,
+					step: step._id
+				})
+			})
+		})
+	}
+	return listOfQualifications
+}
+
+
 module.exports = {
 	getFilteredVendorsPendingCompetencies,
-	extendVendorsPendingCompetencies
+	extendVendorsPendingCompetencies,
+	approvePendingCompetence,
+	setRatePriceAfterPassedTest,
+	setRatePriceAfterApprovalPC,
+	sendVendorTestAndUpdateQualification
 }

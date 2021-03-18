@@ -46,6 +46,12 @@ export const mutations = {
     allSteps(state, payload) {
         state.steps = payload
     },
+    allUnits(state, payload) {
+        state.units = payload
+    },
+    allServices(state, payload) {
+        state.services = payload
+    },
 
     customerlangs(state, payload) {
         state.clientLangs = payload

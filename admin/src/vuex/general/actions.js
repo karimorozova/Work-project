@@ -11,6 +11,9 @@ export const allLanguages = ({ commit }, payload) => commit('allLangs', payload)
 export const allIndustries = ({ commit }, payload) => commit('allIndustries', payload);
 export const allSteps = ({ commit }, payload) => commit('allSteps', payload);
 export const setVendorsForProject = ({ commit }, payload) => commit('allVendorsForProject', payload);
+export const allUnits = ({ commit }, payload) => commit('allUnits', payload);
+export const allServices = ({ commit }, payload) => commit('allServices', payload);
+
 
 export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload);
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
