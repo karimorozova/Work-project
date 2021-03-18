@@ -574,9 +574,8 @@
 
   .vendorTests {
     @extend %setting-table;
-    width: 1100px;
-    margin: 40px 20px 40px 20px;
-    box-shadow: 0 0 10px $brown-shadow;
+    width: 1160px;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     position: relative !important;
 
     &__approve {
@@ -593,7 +592,7 @@
 
     &__icons {
       @extend %table-icons;
-      height: 32px;
+      height: 30px;
       justify-content: center;
     }
 

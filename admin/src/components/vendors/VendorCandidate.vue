@@ -29,16 +29,15 @@
 </script>
 <style lang="scss" scoped>
   .candidate {
-    margin: 20px 10px 40px;
     width: 300px;
     background: #fff;
-    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
-    padding: 40px;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    padding: 20px;
+    margin-right: 40px;
 
     &__title {
-      font-size: 18px;
-      font-family: 'Myriad600';
-      border-bottom: 1px solid #67573e;
+      font-size: 22px;
+      border-bottom: 1px solid #c5bfb5;
       padding-bottom: 5px;
     }
 
@@ -48,12 +47,12 @@
 
       &-key {
         width: 150px;
-        font-size: 16px;
+        font-size: 14px;
       }
 
       &-value {
         width: 150px;
-        font-size: 16px;
+        font-size: 14px;
 
         p {
           display: block;

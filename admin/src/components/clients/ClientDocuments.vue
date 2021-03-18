@@ -319,7 +319,7 @@
 
     &__icons {
       @extend %table-icons;
-      height: 32px;
+      height: 30px;
       justify-content: flex-end;
     }
 

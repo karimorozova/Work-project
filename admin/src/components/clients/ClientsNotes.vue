@@ -170,7 +170,7 @@
     &__icon {
       position: absolute;
       height: 14px;
-      right: 40px;
+      right: 20px;
       bottom: 20px;
       transition: .1s ease;
     }
@@ -178,7 +178,7 @@
 
   .clientsNotes {
     position: relative;
-    padding: 0 40px 40px;
+    padding: 0 20px 20px;
 
     &__modal {
       position: absolute;

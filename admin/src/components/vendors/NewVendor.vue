@@ -41,7 +41,7 @@
                     label.block-item__label Native Language:
                     .block-item__drop-menu.block-item_medium-index
                         NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="setNative")
-                .block-item
+                .block-item.no-margin
                     label Gender:
                     .block-item__drop-menu
                         SelectSingle(
@@ -328,9 +328,10 @@ export default {
 .vendor-subinfo {
   &__general {
     padding: 20px;
-    margin-top: 120px;
+    margin-top: 100px;
     width: 350px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    margin-left: 40px;
   }
 }
 .block-item-subinfo {
@@ -371,19 +372,20 @@ export default {
 }
 
 .vendor-info {
-  padding: 40px;
   box-sizing: border-box;
+  width: 1000px;
 }
 
 .title {
   font-size: 22px;
+  padding: 30px 0 10px;
+  width: 1000px;
 }
 .gen-info,
 .rates {
   box-sizing: border-box;
-  margin: 20px 10px 40px 10px;
-  padding: 40px;
-  box-shadow: 0 0 10px #67573e9d;
+  padding: 20px;
+  box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   width: 1000px;
 }
 
@@ -616,7 +618,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 10px #67573e;
+  box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   background-color: #fff;
   z-index: 20;
   p {
@@ -627,5 +629,8 @@ export default {
   .approve-block {
     margin-bottom: 15px;
   }
+}
+.no-margin{
+  margin-bottom: 0;
 }
 </style>

@@ -452,7 +452,7 @@
 
     &__data,
     &__editing-data {
-      min-height: 32px;
+      height: 30px;
       padding: 0 5px;
       display: flex;
       align-items: center;

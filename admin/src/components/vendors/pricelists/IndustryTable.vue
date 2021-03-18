@@ -66,11 +66,14 @@
 	export default {
 		mixins: [ crudIcons ],
 		props: {
-			tableData: {
+			dataArray: {
 				type: Array
 			},
 			vendorId: {
 				type: String
+			},
+			vendor: {
+				type: Object
 			},
 			refresh: {
 				type: Boolean
@@ -101,8 +104,6 @@
 						padding: "0"
 					}
 				],
-				dataArray: [],
-
 				currentIndustry: "",
 				currentMultiplier: "",
 				currentIndustryObj: null,
@@ -114,12 +115,10 @@
 				currentActive: -1
 			}
 		},
-		created() {
-			this.getIndustries()
-		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+				storeCurrentVendor: "storeCurrentVendor",
 			}),
 			async getRowPrice(index) {
 				try {
@@ -128,15 +127,13 @@
 						row: this.dataArray[index]
 					})
 					const result = await this.$http.post(`/vendorsapi/vendor-rate-by-key`, { id: this.vendorId, key: 'industryMultipliersTable' })
-					this.dataArray = result.data
+					this.vendor.rates.industryMultipliersTable = result.data
+					await this.storeCurrentVendor(this.vendor)
 					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
-			},
-			async getIndustries() {
-				this.dataArray = this.tableData
 			},
 			async makeAction(index, key) {
 				if (this.currentActive !== -1 && this.currentActive !== index) {
@@ -224,14 +221,6 @@
 				return result
 			}
 		},
-		watch: {
-			async refresh() {
-				if (this.refresh) {
-					const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`)
-					this.dataArray = vendor.data.rates.industryMultipliersTable
-				}
-			}
-		},
 		components: {
 			DataTable
 		}
@@ -271,7 +260,7 @@
 
     &__data,
     &__editing-data {
-      height: 32px;
+      height: 30px;
       padding: 0 5px;
       display: flex;
       align-items: center;

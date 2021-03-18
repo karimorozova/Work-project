@@ -188,7 +188,7 @@
       box-sizing: border-box;
       color: $main-color;
       width: 191px;
-      height: 32px;
+      height: 30px;
       padding: 0 5px;
       outline: none;
       border: 1px solid $main-color;
@@ -198,7 +198,7 @@
 
     &__drop {
       position: relative;
-      height: 32px;
+      height: 30px;
       width: 191px;
       margin-left: 8px;
     }

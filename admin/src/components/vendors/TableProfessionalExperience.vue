@@ -10,6 +10,7 @@
       @approve="deleteExperience"
       @notApprove="setDefaults"
       @closeModal="setDefaults"
+      :tbodyStyle="{'max-height': '256px'}",
     )
 
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -180,7 +181,7 @@
 				const dates = this.professionalExperienceData[index].duration.match(RE)
 			},
 			manageCancelEdition() {
-				this.$emit("refreshProfExperiences")
+				// this.$emit("refreshProfExperiences")
 				this.setDefaults()
 			},
 			setDefaults() {
@@ -316,10 +317,8 @@
 
   .experience {
     @extend %setting-table;
-    width: 920px;
-    margin: 20px 10px 40px;
-    padding: 40px;
-    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+    padding: 20px;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
 
     &__data {
       @extend %table-data;

@@ -316,8 +316,6 @@
 					return
 				}
 				const vendor = this.vendors[index];
-				//MM
-				// this.storeCurrentVendor(vendor);
 				this.$router.push(`/vendors/details/${ vendor._id }`);
 			}
 		},

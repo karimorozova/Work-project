@@ -10,6 +10,7 @@
       @approve="deleteData"
       @notApprove="setDefaults"
       @closeModal="setDefaults"
+      :tbodyStyle="{'max-height': '256px'}",
     )
 
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -245,7 +246,7 @@
 				}
 			},
 			manageCancelEdition() {
-				this.$emit('refreshEducations')
+				// this.$emit('refreshEducations')
 				this.setDefaults()
 			},
 			async manageDeleteClick(index) {
@@ -362,10 +363,8 @@
 
   .education {
     @extend %setting-table;
-    margin: 20px 10px 40px;
-    width: 920px;
-    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
-    padding: 40px;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    padding: 20px;
 
     &__data {
       @extend %table-data;

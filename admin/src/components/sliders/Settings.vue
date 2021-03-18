@@ -113,13 +113,13 @@ export default {
   position: relative;
   width: 100%;
   &__sidebar {
-    box-shadow: -10px 0 10px 10px $brown-shadow;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   }
   &__table {
-    margin: 40px 40px 40px 20px;
   }
   &__inner {
     width: 100%;
+    padding: 40px;
   }
 }
 

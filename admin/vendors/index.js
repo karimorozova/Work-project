@@ -20,7 +20,10 @@ const { getVendorAssessmentsWordCount } = require('./getVendorAssessments')
 
 const {
 	getFilteredVendorsPendingCompetencies,
-	extendVendorsPendingCompetencies
+	extendVendorsPendingCompetencies,
+	approvePendingCompetence,
+	setRatePriceAfterPassedTest,
+	sendVendorTestAndUpdateQualification
 } = require('./pendingCompetencies')
 
 module.exports = {
@@ -55,5 +58,8 @@ module.exports = {
 	updateVendorMatrix,
 	syncVendorMatrix,
   getFilteredVendorsPendingCompetencies,
-	extendVendorsPendingCompetencies
+	extendVendorsPendingCompetencies,
+	approvePendingCompetence,
+	setRatePriceAfterPassedTest,
+	sendVendorTestAndUpdateQualification
 }

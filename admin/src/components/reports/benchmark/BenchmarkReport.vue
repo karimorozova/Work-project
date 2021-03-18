@@ -150,9 +150,8 @@ h3, h4 {
 }
 
 .benchmark {
-  margin: 40px 40px 40px 20px;
-  width: 1100px;
-  box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+  width: 1160px;
+  box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   padding: 20px;
   max-height: 750px;
   overflow-y: auto;

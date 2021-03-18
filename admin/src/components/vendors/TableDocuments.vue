@@ -11,6 +11,7 @@
         @approve="deleteData"
         @notApprove="setDefaults"
         @closeModal="setDefaults"
+        :tbodyStyle="{'max-height': '256px'}",
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -182,11 +183,11 @@
 				}
 			},
 			scrollDrop(index) {
-				let fillingСategory = this.documentsData.filter(function (item) {
+				let fillingCategory = this.documentsData.filter(function (item) {
 					return item.fileName !== ""
 				})
 
-				this.categories = [ ...new Set(fillingСategory.map(item => item.category)) ]
+				this.categories = [ ...new Set(fillingCategory.map(item => item.category)) ]
 
 				const { category } = this.documentsData[index]
 				let countCategories = this.documentsData.filter(
@@ -234,7 +235,7 @@
 					})
 				} catch (err) {
 				} finally {
-					this.$emit("refreshDocuments")
+					// this.$emit("refreshDocuments")
 					this.setDefaults()
 				}
 			},
@@ -271,7 +272,7 @@
 					})
 				} catch (err) {
 				} finally {
-					this.$emit("refreshDocuments")
+					// this.$emit("refreshDocuments")
 					this.setDefaults()
 				}
 			},
@@ -287,7 +288,7 @@
 					const result = await this.storeDocumentsDefault(defaultDocument)
 				} catch (err) {
 				} finally {
-					this.$emit("refreshDocuments")
+					// this.$emit("refreshDocuments")
 					this.setDefaults()
 				}
 			}
@@ -318,10 +319,8 @@
 
   .documents {
     @extend %setting-table;
-    margin: 20px 10px 40px;
-    width: 920px;
-    padding: 40px;
-    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+    padding: 20px;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
 
     &__upload {
       position: relative;
@@ -366,7 +365,7 @@
 
     &__icons {
       @extend %table-icons;
-      height: 32px;
+      height: 30px;
       justify-content: flex-end;
     }
 

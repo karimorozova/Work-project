@@ -126,7 +126,7 @@ export default {
   }
   &__icons {
     @extend %table-icons;
-    height: 32px;
+    height: 30px;
   }
   &__icon {
     @extend %table-icon;

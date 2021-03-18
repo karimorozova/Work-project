@@ -209,6 +209,8 @@
   @import "../../../assets/styles/settingsTable";
 
   .discounts {
+    display: block;
+
     &__block {
       border-top: 2px solid #938676;
       border-left: 2px solid #938676;

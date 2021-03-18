@@ -182,7 +182,7 @@ export default {
 .files-table {
 
     &__data, &__icons {
-        height: 32px;
+        height: 30px;
         box-sizing: border-box;
         padding: 0 5px;
         display: flex;
@@ -191,7 +191,7 @@ export default {
 
     &__drop {
         position: relative;
-        height: 32px;
+        height: 30px;
     }
     &__icons {
         justify-content: space-around;

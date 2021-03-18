@@ -3,6 +3,7 @@ const { getVendor, getVendorAfterUpdate } = require('./getVendors')
 const ObjectId = require('mongodb').ObjectID
 const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications')
 const { deleteVendorRates, filterExtraCombinationsForPriceListTable } = require('./deleteVendorRates')
+const { setRatePriceAfterApprovalPC } = require('./pendingCompetencies')
 const { uniqBy } = require('lodash')
 
 
@@ -35,6 +36,8 @@ const updateVendorCompetencies = async (vendorId, dataToUpdate) => {
 			rates = await filterRatesAfterUpdate(rates, vendorId)
 			rates.pricelistTable = getPriceListTableUnique(rates.pricelistTable)
 			await Vendors.updateOne({ _id: vendorId }, { rates })
+
+			await setRatePriceAfterApprovalPC(vendorId)
 
 			return await getVendor({ _id: vendorId })
 		}

@@ -153,7 +153,6 @@ export default {
   position: relative;
   width: 100%;
     &__table {
-        margin: 40px 40px 40px 20px;
         padding: 20px;
         box-sizing: border-box;
         min-height: 150px;

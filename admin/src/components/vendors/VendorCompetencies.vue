@@ -7,7 +7,7 @@
         :errors="errors",
         :areErrors="areErrors",
         :isApproveModal="isDeleting",
-        :tbodyStyle="{'max-height': '300px'}",
+        :tbodyStyle="{'max-height': '256px'}",
         :rowCount="9",
         @closeErrors="closeErrors",
         @approve="deleteCompetencies",
@@ -132,6 +132,9 @@
 			industries: {
 				type: Array,
 			},
+			competenciesData:{
+				type: Array,
+      }
 		},
 		data() {
 			return {
@@ -140,40 +143,40 @@
 						label: "Source Language",
 						headerKey: "headerSource",
 						key: "source",
-						width: "20%",
+						width: "21%",
 						padding: "0",
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
 						key: "targets",
-						width: "20%",
+						width: "21%",
 						padding: "0",
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "20%",
+						width: "21%",
 						padding: "0",
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "20%",
+						width: "21%",
 						padding: "0",
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "20%",
+						width: "16%",
 						padding: "0",
 					},
 				],
 
-				competenciesData: [],
+				// competenciesData: [],
 				currentSource: "",
 				currentTargets: [],
 				currentIndustries: [],
@@ -193,6 +196,7 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				storeCurrentVendor: "storeCurrentVendor",
+				updateVendorProp: "updateVendorProp",
 			}),
 
 			presentArrays(Arr, key) {
@@ -332,10 +336,20 @@
 						vendorId: this.$route.params.id,
 						currentData,
 					});
+					await this.storeCurrentVendor(result.data)
 
-          this.competenciesData = result.data.competencies;
-          this.competenciesData.length && this.$emit("updateQualifications");
-          this.competenciesData.length && this.$emit("updateRates", true)
+					this.competenciesData.length && this.$emit("updateRates", true)
+
+					// this.updateVendorProp({ prop: "competencies", value: result.data.competencies })
+
+          // this.competenciesData = result.data.competencies;
+          // this.competenciesData.length && this.$emit("updateQualifications");
+          //
+
+					// if (result.data.pendingCompetencies.length) {
+					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
+					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data })
+					// }
 
 					await this.$http.post('/pm-manage/check-pricelist-langs', {
 						pricelistId: null,
@@ -385,7 +399,13 @@
 				try {
 					let currentData = this.competenciesData[this.deleteIndex];
 					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
-					this.competenciesData.splice(this.deleteIndex, 1);
+					await this.storeCurrentVendor(result.data)
+
+					// if (result.data.pendingCompetencies.length) {
+					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
+					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data.pendingCompetencies })
+					// }
+					// this.competenciesData.splice(this.deleteIndex, 1);
 					this.$emit("updateRates", true);
 					this.closeModal();
 					this.alertToggle({
@@ -426,19 +446,19 @@
 			setSource({ option }) {
 				this.currentSource = this.languages.find((item) => item.lang === option);
 			},
-
-			async getVendorInfo() {
-				const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
-				this.competenciesData = vendor.data.competencies;
-			},
-			getVendorInfoByState(){
-				this.competenciesData = this.currentVendor.competencies
-      }
+			// async getVendorInfo() {
+			// 	console.log('1')
+			// 	const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
+			// 	this.competenciesData = vendor.data.competencies;
+			// },
+			// getVendorInfoByState(){
+			// 	this.competenciesData = this.currentVendor.competencies
+      // }
 		},
 		computed: {
-			...mapGetters({
-				currentVendor: "getCurrentVendor",
-			}),
+			// ...mapGetters({
+			// 	currentVendor: "getCurrentVendor",
+			// }),
 			sourceData() {
 				return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b));
 			},
@@ -447,7 +467,10 @@
 			},
 		},
 		created() {
-			this.currentVendor._id ? this.getVendorInfoByState() : this.getVendorInfo();
+			// if(this.currentVendor._id){
+			// 	this.competenciesData = this.currentVendor.competencies
+      // }
+			 // ?  : this.getVendorInfo();
 		},
 		components: {
 			SelectSingle,
@@ -479,7 +502,7 @@
 
     &__icons {
       @extend %table-icons;
-      height: 32px;
+      height: 30px;
       justify-content: center;
     }
 

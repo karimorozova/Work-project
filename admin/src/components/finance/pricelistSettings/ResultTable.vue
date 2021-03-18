@@ -281,7 +281,7 @@ export default {
   }
   &__data,
   &__editing-data {
-    height: 32px;
+    height: 30px;
     padding: 0 5px;
     display: flex;
     align-items: center;

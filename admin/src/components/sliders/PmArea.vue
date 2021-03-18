@@ -7,7 +7,8 @@
         :multiLinks="sidebarLinksMulti",
         :multiActiveIndex="currentIndex"
       )
-    router-view
+    .projects-area__table
+      router-view
 
 </template>
 
@@ -104,12 +105,17 @@
   @import "../../assets/scss/colors.scss";
 
   .projects-area {
-    min-height: 94vh;
     display: flex;
     width: 100%;
+    box-sizing: border-box;
+    min-height: 94vh;
 
     &__sidebar {
-      box-shadow: -10px 0 10px 10px $brown-shadow;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    }
+    &__table {
+      padding: 40px;
+      width: 100%;
     }
 
   }
