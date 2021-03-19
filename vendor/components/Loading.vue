@@ -35,7 +35,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    z-index: 10000;
+    z-index: 100000;
 
     &__message {
       position: fixed;

@@ -1,25 +1,30 @@
 <template lang="pug">
   Modal.modal(@close="closeModal")
     .modal__row
+      .modal__title
+        span.language {{pendingCompetency.sourceLanguage.lang}}
+        span
+          i(class="fas fa-angle-double-right")
+        span.language {{pendingCompetency.targetLanguage.lang}}
+    .modal__row
       .modal__info
         .info__text
-          span.bold {{pendingCompetency.sourceLanguage.lang}} &nbsp;
-          | >> &nbsp;
-          span.bold {{pendingCompetency.targetLanguage.lang}} &nbsp;
-          | for &nbsp;
-          span.bold {{pendingCompetency.industry.name}} &nbsp;
-          | for step: &nbsp;
-          span.bold {{pendingCompetency.step.title}}
+          span.bold Industry: &nbsp;
+          span {{pendingCompetency.industry.name}}
+        .info__text
+          span.bold Step: &nbsp;
+          span {{pendingCompetency.step.title}}
     .modal__row
       .modal__rates
-        span Rate:
+        span.bold Rate:
         input.width-191(v-model.lazy="currentRate" type="text" @click="selectInputValue")
     .modal__row
       p.wysiwyg__text Please provide more details about your experience in &nbsp;
-        span.bold {{pendingCompetency.industry.name}}
+        span {{pendingCompetency.industry.name}}
       WYSIWYG(:editorData="pendingCompetency.descriptions.industry" @editorBlur="changeCkeditor")
     .modal__row
-      Button(value="Edit" @clicked="updatePendingCompetency")
+      .button
+        Button(value="Edit & Save" @clicked="updatePendingCompetency")
 
 
 </template>
@@ -80,11 +85,12 @@ import SelectSingle from "../SelectSingle";
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     box-sizing: border-box;
     padding: 20px 20px 0 20px;
-    width: 750px;
+    width: 700px;
     position: absolute;
-    transform: translate(-50%,0);
+    transform: translate(-50%,-13.5%);
     left: 50%;
     top: 50px;
+    z-index: 654;
 
     &__row {
       margin-bottom: 15px;
@@ -92,23 +98,25 @@ import SelectSingle from "../SelectSingle";
 
     &__info{
       display: flex;
-      justify-content: space-between;
       align-items: center;
+
     }
 
     &__rates {
       display: flex;
       align-items: center;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #c5bfb5;
 
       span {
-        margin-right: 15px;
+        margin-right: 10px;
       }
 
       input {
-        padding: 7px 10px;
+        padding: 6px 5px;
         border: 1px solid #66563D;
         color: #66563D;
-        border-radius: 7px;
+        border-radius: 5px;
         outline: none;
         box-sizing: border-box;
       }
@@ -125,9 +133,13 @@ import SelectSingle from "../SelectSingle";
       }
     }
   }
+  .info{
+    &__text{
+      padding-right: 20px;
+    }
+  }
 
   .wysiwyg__text {
-    opacity: .6;
     margin-top: 0;
     margin-bottom: 5px;
     font-size: 14px;
@@ -138,5 +150,11 @@ import SelectSingle from "../SelectSingle";
 
   .bold {
     font-family: Myriad600;
+  }
+  .language{
+    font-size: 18px;
+  }
+  .button{
+    text-align: center;
   }
 </style>

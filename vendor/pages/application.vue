@@ -4,7 +4,6 @@
     .application__body
       .application__content
         form.application__form
-          //.application__line
           .application__header
             p.title FREELANCE APPLICATION
             p.comment If you have any queries regarding the completion of this form, please contact vendor@pangea.global
@@ -39,7 +38,7 @@
                   @chooseLang="setMotherTongue"
                 )
 
-          p.application__step-title pe2222222222
+          p.application__step-title Professional Information
 
           .application__row-flex
             .application__col50
@@ -113,7 +112,7 @@
 
           .application__row
             .text To be able to join our team, you are required you are preform a separate test for each language pair and industry you are applying for.
-            .text.description The test is short 300 word text
+            .description The test is short 300 word text
           .application__row
             AgreeAndSubmit(
               :person="person"
@@ -331,10 +330,18 @@
     &__step-title {
       font-size: 18px;
       text-transform: uppercase;
-      margin-top: 20px;
+      margin-top: 40px;
       letter-spacing: -0.2px;
+      border-bottom: 1px solid #dad6d0;
+      margin-right: 40px;
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+
       @media all and (orientation: portrait) and (max-width: 767px) {
-        margin-top: 25px;
+        padding-bottom: 0px;
+        margin-bottom: 5px;
+        border-bottom: 0;
+        margin-right: 0px;
       }
 
     }
@@ -432,8 +439,9 @@
   }
 
   .description {
-    opacity: 0.6;
+    margin-top: 20px;
     margin-bottom: 4px;
+    font-family: Myriad600;
   }
 
   p {
@@ -492,6 +500,11 @@
     left: 0;
     width: 100%;
     text-align: center;
+  }
+  .text{
+    margin-top: 40px;
+    padding-right: 40px;
+    font-family: 'Myriad600';
   }
 
   .hidden {
