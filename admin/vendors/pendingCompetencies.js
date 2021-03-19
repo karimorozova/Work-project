@@ -207,6 +207,32 @@ const sendVendorTestAndUpdateQualification = async (vendorId) => {
 		})
 	}
 	await Vendors.updateOne({ _id: vendorId }, vendor)
+
+	return vendor
+}
+
+const rejectedPendingCompetence = async (vendorId, pendingCompetence, template) => {
+	let vendor = await getVendor({ _id: vendorId })
+
+	vendor.pendingCompetencies = vendor.pendingCompetencies
+			.filter(({_id}) => _id.toString() !== pendingCompetence._id)
+
+	sendEmail({
+		to: vendor.email,
+		subject: `COMPETENCE REJECTED (ID CAN010.0)`,
+	}, template)
+
+	await Vendors.updateOne({ _id: vendorId }, vendor)
+	return vendor
+}
+
+const deletePendingCompetence = async (vendorId, pendingCompetence,) => {
+	let vendor = await getVendor({ _id: vendorId })
+
+	vendor.pendingCompetencies = vendor.pendingCompetencies
+			.filter(({_id}) => _id.toString() !== pendingCompetence._id)
+
+	await Vendors.updateOne({ _id: vendorId }, vendor)
 	return vendor
 }
 
@@ -256,5 +282,7 @@ module.exports = {
 	approvePendingCompetence,
 	setRatePriceAfterPassedTest,
 	setRatePriceAfterApprovalPC,
-	sendVendorTestAndUpdateQualification
+	sendVendorTestAndUpdateQualification,
+	rejectedPendingCompetence,
+	deletePendingCompetence
 }

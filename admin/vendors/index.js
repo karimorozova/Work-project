@@ -23,7 +23,9 @@ const {
 	extendVendorsPendingCompetencies,
 	approvePendingCompetence,
 	setRatePriceAfterPassedTest,
-	sendVendorTestAndUpdateQualification
+	sendVendorTestAndUpdateQualification,
+	rejectedPendingCompetence,
+	deletePendingCompetence
 } = require('./pendingCompetencies')
 
 module.exports = {
@@ -62,5 +64,7 @@ module.exports = {
 	approvePendingCompetence,
 	setRatePriceAfterPassedTest,
 	sendVendorTestAndUpdateQualification,
-  hasVendorCompetenciesAndPending
+  hasVendorCompetenciesAndPending,
+	rejectedPendingCompetence,
+	deletePendingCompetence
 }

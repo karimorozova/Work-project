@@ -29,12 +29,14 @@ const {
 	extendVendorsPendingCompetencies,
 	approvePendingCompetence,
 	setRatePriceAfterPassedTest,
-	sendVendorTestAndUpdateQualification
+	sendVendorTestAndUpdateQualification,
+	rejectedPendingCompetence,
+	deletePendingCompetence
 } = require('../vendors')
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests')
-const { testSentMessage } = require("../emailMessages/candidateCommunication")
+const { testSentMessage, rejectedPendingCompetenceTemplate } = require("../emailMessages/candidateCommunication")
 
 router.get('/vendor', async (req, res) => {
 	const id = req.query.id
@@ -603,6 +605,41 @@ router.post('/approve-pending-competence', async (req, res) => {
 		res.status(500).send("Error on getting filtered Vendors")
 	}
 })
+
+router.post('/get-reject-pc-message', async (req, res) => {
+	let { pendingCompetence } = req.body
+	try {
+		const template = await rejectedPendingCompetenceTemplate(pendingCompetence)
+		res.send(template)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/reject-pending-competence', async (req, res) => {
+	let { vendorId, pendingCompetence, template } = req.body
+	try {
+		const result = await rejectedPendingCompetence(vendorId, pendingCompetence, template)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/delete-pending-competence', async (req, res) => {
+	let { vendorId, pendingCompetence } = req.body
+	try {
+		const result = await deletePendingCompetence(vendorId, pendingCompetence)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+
 
 
 module.exports = router

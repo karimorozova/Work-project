@@ -3,7 +3,7 @@
     .candidateForm
       span.candidateForm__close(@click="closeModal") &#215;
       .candidateForm__title Candidate Form
-      .candidateForm__row
+      .candidateForm__row(v-if="!!candidateFormData.vendorName")
         .candidateForm__col
           .candidateForm__col-title Vendor:
           .candidateForm__col-value {{ candidateFormData.vendorName }}
@@ -22,7 +22,6 @@
       .candidateForm__row(v-if="candidateFormData.descriptions.targetLanguage.length")
         .candidateForm__textarea
           .candidateForm__textareaText(v-html="candidateFormData.descriptions.targetLanguage")
-          //textarea()
 
       .candidateForm__row
         .candidateForm__col
@@ -58,6 +57,7 @@
         .candidateForm__row-buttons
           Button(:value="'Approve & Test'" @clicked="approve")
           Button(:value="'Reject'" @clicked="reject")
+          Button(:value="'Delete'" @clicked="deletePC")
           Button(:value="'Cancel'" @clicked="closeModal")
 
 </template>
@@ -86,11 +86,14 @@
 			styleObject(margin) {
 				return margin < 0 ? { 'background': '#e8afa2' } : {}
 			},
+			deletePC(){
+				this.$emit('deletePC', this.candidateFormData)
+      },
 			approve() {
 				this.$emit('approve', this.candidateFormData)
 			},
 			reject() {
-				console.log('da2')
+				this.$emit('reject', this.candidateFormData)
 			},
 			closeModal() {
 				this.$emit('closeModal')
@@ -157,7 +160,7 @@
       &-buttons {
         display: flex;
         width: 100%;
-        justify-content: space-around;
+        justify-content: space-between;
       }
     }
 

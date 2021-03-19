@@ -1,11 +1,15 @@
 <template lang="pug">
   .competencies
-    //| {{ pendingCompetenciesData }}
+    .competencies__preview(v-if="isWYSIWYG")
+      WYSIWYG(@closePreview="closeWYSIWYG", :message="message", @send="sendMessage")
+
     CandidateForm(
       v-if="isForm"
       :candidateFormData="candidateFormData"
       @closeModal="closeForm"
       @approve="approvePC"
+      @reject="startReject"
+      @deletePC="deletePC"
     )
     .competencies__table
       SettingsTable(
@@ -44,13 +48,12 @@
 </template>
 
 <script>
-	import { mapActions, mapGetters } from "vuex"
-	// import crudIcons from "../../../mixins/crudIcons"
+	import { mapActions } from "vuex"
 	import SettingsTable from "../../Table/SettingsTable"
 	import CandidateForm from "./CandidateForm"
+	import WYSIWYG from "../WYSIWYG"
 
 	export default {
-		// mixins: [crudIcons],
 		props: {
 			pendingCompetenciesData: {
 				type: Array,
@@ -104,8 +107,10 @@
 					}
 				],
 				isForm: false,
-				candidateFormData: {}
-
+				candidateFormData: {},
+				message: '',
+				isWYSIWYG: false,
+				pendingCompetenceForReject: {}
 			}
 		},
 		methods: {
@@ -113,19 +118,75 @@
 				alertToggle: "alertToggle",
 				storeCurrentVendor: "storeCurrentVendor"
 			}),
-			async approvePC(pendingCompetence) {
-				try {
-					const result = await this.$http.post('/vendorsapi/approve-pending-competence', {
+			async deletePC(pendingCompetence){
+				try{
+					const result = await this.$http.post('/vendorsapi/delete-pending-competence', {
 						vendorId: this.$route.params.id,
 						pendingCompetence,
 					})
 					await this.storeCurrentVendor(result.data)
-					this.$emit("updateRates", true);
+				}catch (e) {
+					this.alertToggle({ message: "Error on deleting pending competence", isShow: true, type: "error" })
+				}finally {
+					this.closeForm()
+				}
+			},
+			async getRejectMessage() {
+				try {
+					const result = await this.$http.post('/vendorsapi/get-reject-pc-message', {
+						pendingCompetence: this.pendingCompetenceForReject
+					})
+					this.message = result.data
+				} catch (err) {
+					this.alertToggle({ message: "Error on reject message", isShow: true, type: "error" })
+				}
+			},
+			async startReject(pendingCompetence) {
+				this.pendingCompetenceForReject = pendingCompetence
+				await this.getRejectMessage()
+				this.openWYSIWYG()
+			},
+			openWYSIWYG() {
+				this.isWYSIWYG = true
+			},
+			closeWYSIWYG() {
+				this.isWYSIWYG = false
+				this.pendingCompetenceForReject = {}
+				this.message = ''
+			},
+			sendMessage() {
+				this.rejectPC()
+			},
+			async rejectPC() {
+				try {
+					const result = await this.$http.post('/vendorsapi/reject-pending-competence', {
+						vendorId: this.$route.params.id,
+						pendingCompetence: this.pendingCompetenceForReject,
+						template: this.message
+					})
+					await this.storeCurrentVendor(result.data)
+					this.alertToggle({ message: "Pending Competence Rejected", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Pending Competence Not Rejected", isShow: true, type: "error" })
+				} finally {
+					this.closeForm()
+					this.closeWYSIWYG()
+				}
+			},
+			async approvePC(pendingCompetence) {
+				try {
+					const result = await this.$http.post('/vendorsapi/approve-pending-competence', {
+						vendorId: this.$route.params.id,
+						pendingCompetence
+					})
+					await this.storeCurrentVendor(result.data)
+					this.$emit("updateRates", true)
 					this.alertToggle({ message: "Pending Competence Approved", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Pending Competence Not Approved", isShow: true, type: "error" })
 				} finally {
 					this.closeForm()
+					this.closeWYSIWYG()
 				}
 			},
 			setCandidateData(row) {
@@ -137,93 +198,9 @@
 			closeForm() {
 				this.isForm = false
 			}
-
-
-			// ...mapActions([
-			// 	"setVendorProp"
-			// ]),
-
-			// makeActions(index, key) {
-			// 	console.log(index)
-			// 	switch (key) {
-			// 		case "delete":
-			// 			const pendingCompetencies = this.pendingCompetenciesData.filter((_, i) => i !== index)
-			// 			this.sendRequest(pendingCompetencies)
-			// 			this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
-			// 			break
-			// 		default:
-			// 			// await this.checkErrors(index)
-			// 	}
-			// },
-			//
-			// sendRequest(pendingCompetencies) {
-			// 	this.$axios.post('/vendor/pending-competencies', {
-			// 		token: this.token,
-			// 		pendingCompetencies,
-			// 	})
-			// },
-			//
-			//
-			// setDefaults() {
-			// 	this.isDeleting = false
-			// 	this.currentSource = ""
-			// 	this.currentTargets = []
-			// 	this.currentIndustries = []
-			// 	this.currentSteps = []
-			// },
-			//
-			// async manageDeleteClick(index) {
-			// 	if (!this.competenciesData[index]._id) {
-			// 		this.newRow = false
-			// 		this.competenciesData.splice(index, 1)
-			// 		this.setDefaults()
-			// 		return
-			// 	}
-			// 	this.deleteIndex = index
-			// 	this.isDeleting = true
-			// },
-			//
-			// closeModal() {
-			// 	return (this.isDeleting = false)
-			// },
-			//
-			// async deleteCompetencies() {
-			// 	try {
-			// 		let currentData = this.competenciesData[this.deleteIndex]
-			// 		const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`)
-			// 		this.competenciesData.splice(this.deleteIndex, 1)
-			// 		this.$emit("updateRates", true)
-			// 		this.closeModal()
-			// 		this.alertToggle({
-			// 			message: "Competencies are deleted",
-			// 			isShow: true,
-			// 			type: "success"
-			// 		})
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: "Error in save Competencies",
-			// 			isShow: true,
-			// 			type: "error"
-			// 		})
-			// 	}
-			// },
-			//
-			// closeErrors() {
-			// 	this.areErrors = false
-			// },
-
-		},
-
-		computed: {
-			// ...mapGetters({
-			// 	token: "getToken"
-			// }),
-			// manageIcons() {
-			// 	const {cancel, save ,...reuslt} = this.icons
-			// 	return reuslt
-			// }
 		},
 		components: {
+			WYSIWYG,
 			CandidateForm,
 			SettingsTable
 		}

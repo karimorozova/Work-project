@@ -81,8 +81,35 @@ function testPassedMessage(obj) {
             </div>`;
 }
 
+function rejectedPendingCompetenceTemplate(obj) {
+	const a = 'asdasdasd'
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ a }</span></p>
+                    <p style="font-weight: 400;" > 
+                        Thank you again for applying for the ${ a }-Translator@Pangea position. <br>
+                        Your test and qualifications have been reviewed carefully and although your talent is valued, we have decided to pursue other candidates at this stage.
+                    </p>
+                    <p style="font-weight: 400;" >
+                        Should something change on our side, we will not hesitate to contact you. <br>
+                        Thank you again for your time and effort, and we wish you the best in your current endeavors. <br>
+                        All the best, <br>
+                        Pangea HR Team
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
 module.exports = {
 	testSentMessage,
 	testNotPassedMessage,
-	testPassedMessage
+	testPassedMessage,
+	rejectedPendingCompetenceTemplate
 }

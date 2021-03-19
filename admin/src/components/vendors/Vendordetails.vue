@@ -623,11 +623,9 @@
 				this.vendorId = this.$route.params.id
 				const id = this.$route.params.id
 				try {
-					if (!this.currentVendor._id) {
-						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
-						await this.storeCurrentVendor(vendor.data)
-						this.oldEmail = this.currentVendor.email
-					}
+          const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+          await this.storeCurrentVendor(vendor.data)
+          this.oldEmail = this.currentVendor.email
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on getting Vendor's info",

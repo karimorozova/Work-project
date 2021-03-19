@@ -2,11 +2,16 @@
   .container
     .pendingCompetencies
       .pendingCompetencies__body
+        .competencies__preview(v-if="isWYSIWYG")
+          WYSIWYG(@closePreview="closeWYSIWYG", :message="message", @send="sendMessage")
+
         CandidateForm(
           v-if="isForm"
           :candidateFormData="candidateFormData"
           @closeModal="closeForm"
           @approve="approvePC"
+          @reject="startReject"
+          @deletePC="deletePC"
         )
         PendingCompetenciesFilter(
           :allSources="languagesList"
@@ -83,6 +88,7 @@
 	import { mapGetters, mapActions } from "vuex"
 	import PendingCompetenciesFilter from "./PendingCompetenciesFilter"
 	import CandidateForm from "./CandidateForm"
+	import WYSIWYG from "../WYSIWYG"
 
 
 	export default {
@@ -90,6 +96,9 @@
 			return {
 				candidateFormData: {},
 				isForm: false,
+				isWYSIWYG: false,
+				pendingCompetenceForReject: {},
+        message: '',
 				filters: {
 					sourceFilter: [ "All" ],
 					targetFilter: [ "All" ],
@@ -114,10 +123,80 @@
 		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+				storeCurrentVendor: "storeCurrentVendor"
 			}),
-			approvePC(PC){
-				console.log(PC)
+			async deletePC(pendingCompetence){
+				try{
+					const result = await this.$http.post('/vendorsapi/delete-pending-competence', {
+						vendorId: pendingCompetence.link,
+						pendingCompetence,
+					})
+					await this.storeCurrentVendor(result.data)
+					this.getVendorsPendingCompetencies(this.filters)
+        }catch (e) {
+					this.alertToggle({ message: "Error on deleting pending competence", isShow: true, type: "error" })
+				}finally {
+					this.closeForm()
+				}
+      },
+			async getRejectMessage() {
+				try {
+					const result = await this.$http.post('/vendorsapi/get-reject-pc-message', {
+						pendingCompetence: this.pendingCompetenceForReject
+					})
+					this.message = result.data
+				} catch (err) {
+					this.alertToggle({ message: "Error on reject message", isShow: true, type: "error" })
+				}
+			},
+			async startReject(pendingCompetence) {
+				this.pendingCompetenceForReject = pendingCompetence
+				await this.getRejectMessage()
+				this.openWYSIWYG()
+			},
+			closeWYSIWYG() {
+				this.isWYSIWYG = false
+				this.pendingCompetenceForReject = {}
+				this.message = ''
+			},
+			openWYSIWYG() {
+				this.isWYSIWYG = true
+			},
+			sendMessage() {
+				this.rejectPC()
+			},
+			async rejectPC() {
+				try {
+					const result = await this.$http.post('/vendorsapi/reject-pending-competence', {
+						vendorId: this.pendingCompetenceForReject.link,
+						pendingCompetence: this.pendingCompetenceForReject,
+						template: this.message
+					})
+					await this.storeCurrentVendor(result.data)
+					this.getVendorsPendingCompetencies(this.filters)
+					this.alertToggle({ message: "Pending Competence Rejected", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Pending Competence Not Rejected", isShow: true, type: "error" })
+				} finally {
+					this.closeForm()
+					this.closeWYSIWYG()
+				}
+			},
+			async approvePC(pendingCompetence) {
+				try {
+					const result = await this.$http.post('/vendorsapi/approve-pending-competence', {
+						vendorId: pendingCompetence.link,
+						pendingCompetence,
+					})
+					await this.storeCurrentVendor(result.data)
+					this.getVendorsPendingCompetencies(this.filters)
+					this.alertToggle({ message: "Pending Competence Approved", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Pending Competence Not Approved", isShow: true, type: "error" })
+				} finally {
+					this.closeForm()
+				}
 			},
 			setCandidateData(row) {
 				this.candidateFormData = row
@@ -161,7 +240,7 @@
 		created() {
 			this.getVendorsPendingCompetencies(this.filters)
 		},
-		components: { PendingCompetenciesFilter, DataTable, CandidateForm }
+		components: { WYSIWYG, PendingCompetenciesFilter, DataTable, CandidateForm }
 	}
 
 </script>
