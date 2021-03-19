@@ -5,9 +5,9 @@
     slot
     .approve-modal__buttons
         .approve-modal__button(@click="approve")
-            Button(:value="approveValue" class="width-191")
+            Button(:value="approveValue")
         .approve-modal__button(@click="notApprove")
-            Button(:value="notApproveValue" class="width-191")
+            Button(:value="notApproveValue")
     span.approve-modal__close(@click="close") +
 </template>
 
@@ -63,7 +63,6 @@ export default {
     box-shadow: 0 0 10px #67573e9d;
     background-color: $white;
     &__buttons {
-        margin-top: 10px;
         display: flex;
     }
     &__button {

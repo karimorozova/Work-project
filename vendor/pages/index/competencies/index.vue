@@ -7,22 +7,24 @@
           .modal-error Error:
           p.modal-error__errors(v-for="modalError in errors") {{modalError}}
       .competencies__modal-wrapper(v-if="showAlert.isShow")
-        ApproveModal.modal.modal-width-500(
+        ApproveModal.modal.modal-width-450(
           approveValue="Yes"
           notApproveValue="No"
           @approve="modifyApprove"
           @notApprove="modifyNotApprove"
           @close="closeApproveModal"
         )
-          p(v-for="matchPending in matchPendingCompetencies")
-            span.bold {{matchPending.sourceLanguage.lang}} &nbsp;
-            span >> &nbsp;
-            span.bold {{matchPending.targetLanguage.lang}} &nbsp;
-            span for &nbsp;
-            span.bold {{matchPending.industry.name}} &nbsp;
-          p for step: &nbsp;
-            span.bold {{currentStep.title}} &nbsp;
-            span has been entered in our system. Do you wish to overwrite the information with the new information you have entered.
+          .text-center
+            p(v-for="matchPending in matchPendingCompetencies")
+              span.bold {{matchPending.sourceLanguage.lang}} &nbsp;
+              span >> &nbsp;
+              span.bold {{matchPending.targetLanguage.lang}} &nbsp;
+              span for &nbsp;
+              span.bold {{matchPending.industry.name}} &nbsp;
+            p for step: &nbsp;
+              span.bold {{currentStep.title}} &nbsp;
+              span has been entered in our system.
+            p.modal__questions Do you wish to overwrite the information with the new information you have entered?
 
       .competencies__row
         .competencies__col
@@ -31,7 +33,9 @@
             SelectSingle.width-191(
               :selectedOption="currentSourceLang.lang"
               :options="langs"
+              :hasSearch="true"
               placeholder="Source language"
+              fieldName="lang"
               @chooseOption="(e) => setSelectedOption(e, 'currentSourceLang')"
             )
         .competencies__col
@@ -40,6 +44,8 @@
             SelectSingle.width-191(
               :selectedOption="targetLangOrMotherTongue.lang"
               :options="langs"
+              :hasSearch="true"
+              fieldName="lang"
               placeholder="Target language"
               @chooseOption="(e) => setSelectedOption(e, 'currentTargetLang')"
               )
@@ -60,6 +66,8 @@
             SelectMulti.width-191(
               :selectedOptions="currentIndustry.map(({name})=> name)"
               :options="industries"
+              :hasSearch="true"
+              fieldName="name"
               placeholder="Industry"
               @chooseOptions="setSelectedMultiOption"
               )
@@ -69,6 +77,8 @@
             SelectSingle.width-191(
               :selectedOption="currentStep.title"
               :options="filteredSteps()"
+              :hasSearch="true"
+              fieldName="title"
               placeholder="Step"
               @chooseOption="(e) => setSelectedOption(e, 'currentStep')"
               )
@@ -84,7 +94,7 @@
         .competencies__select
           .competencies__input-title Rate per word:
           .competencies__rates
-            input.width-191(v-model.lazy="currentRate" type="text")
+            input.width-191(v-model.lazy="currentRate" type="text" @click="selectInputValue")
 
       .competencies__row
         .competencies__text
@@ -113,11 +123,11 @@
         .competencies__select(v-if="isReverseTranslate === true")
           .competencies__input-title Rate per word:
           .competencies__rates
-            input.width-191(v-model.lazy="currentReverseRate" type="text")
+            input.width-191(v-model.lazy="currentReverseRate" type="text" @click="selectInputValue")
 
       .competencies__row
         .competencies__submit
-          Button(value="Submit" @clicked="checkError" customClass="width-191" :isDisabled="showAlert.isShow")
+          Button(value="Submit" @clicked="checkError" :isDisabled="showAlert.isShow")
 
 
 </template>
@@ -169,15 +179,16 @@ export default {
   },
   methods: {
     ...mapActions([
-      "setVendorProp"
+      "setVendorProp",
+      "alertToggle"
     ]),
     filteredSteps () {
       return this.steps.filter((step) => this.showStep.includes(step.title) )
     },
-    setSelectedOption({ option }, value) {
+    setSelectedOption ({ option }, value) {
       this[value] = option
     },
-    setSelectedMultiOption({option}){
+    setSelectedMultiOption ({option}){
       const index = this.currentIndustry.findIndex(({name}) => option.name === name)
       if (index !== -1) {
         this.currentIndustry.splice(index, 1)
@@ -189,13 +200,13 @@ export default {
         this.currentIndustry.push(option)
       }
     },
-    setTargetLangDetails ({ data }) {
+    setTargetLangDetails ( data ) {
       this.targetLangDetails = data
     },
-    setIndustriesDetails({ data }, name) {
+    setIndustriesDetails ( data , name) {
       this.industriesDetails[name] = data
     },
-    isEqualsMotherTongue() {
+    isEqualsMotherTongue () {
       return this.currentTargetLang.lang && this.currentTargetLang.lang !== this.motherTongue.lang
     },
     isNormalRate(rate) {
@@ -241,12 +252,17 @@ export default {
       if (!this.targetLangOrMotherTongue.lang) this.errors.push('Target Language is empty')
       if (this.currentIndustry.length < 1) this.errors.push('Industry is empty')
       if (!this.currentStep.title) this.errors.push('Step is empty')
-      // if (!this.isNormalRate(this.rate)) this.errors.push('Rate is empty')
-      // if (this.isReverseTranslate === true && !this.isNormalRate(this.reverseRate)) console.log('Reverse rate is empty')
-      if (this.errors.length < 0) return
-      // if (this.currentSourceLang === this.currentTargetLang) this.errors.push('')
-      // if (this..length > 0) this.errors.push('')
-      this.submitForm()
+      if (this.currentRate <= 0) this.errors.push('Minimal rate value is 0.0001')
+      if (this.isReverseTranslate === true && this.currentRate <= 0) console.log('Minimal reverse rate value is 0.0001')
+      if (!this.isEqualsMotherTongue() && this.targetLangDetails === '') this.errors.push('Please enter the target language details')
+      for(const {name} of this.currentIndustry) {
+        if (!this.industriesDetails[name] || this.industriesDetails[name].trim() === '') {
+          this.errors.push(`Please enter the ${name} details`)
+        }
+      }
+
+      if (this.errors.length <= 0)  this.submitForm()
+
     },
     submitForm() {
       let pendingCompetenciesCombinations = this.generateFinalData(this.currentSourceLang, this.targetLangOrMotherTongue)
@@ -264,25 +280,33 @@ export default {
         this.sendRequest(pendingCompetencies)
         this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
         this.pendingCompetenciesToDefault()
+        this.$router.push('competency-and-rate');
       }
     },
     modifyApprove() {
       const pendingCompetencies = [...this.oldPendingCompetencies, ...this.matchPendingCompetencies, ...this.newPendingCompetencies]
-      this.sendRequest(pendingCompetencies)
-      this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
-      this.pendingCompetenciesToDefault()
-      this.showAlert.isShow = false
+      this.sendAndUpdateState(pendingCompetencies)
     },
     modifyNotApprove() {
       const pendingCompetencies = [...this.vendor.pendingCompetencies,...this.newPendingCompetencies]
-      this.sendRequest(pendingCompetencies)
-      this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
-      this.pendingCompetenciesToDefault()
-      this.showAlert.isShow = false
+      this.sendAndUpdateState(pendingCompetencies)
     },
     closeApproveModal() {
       this.showAlert.isShow = false
       this.pendingCompetenciesToDefault()
+    },
+    sendAndUpdateState(pendingCompetencies) {
+      try {
+
+        this.sendRequest(pendingCompetencies)
+        this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
+        this.pendingCompetenciesToDefault()
+        this.showAlert.isShow = false
+        this.alertToggle({ message: "You’ve successfully created pending competencies", isShow: true, type: "success" })
+        this.$router.push('competency-and-rate');
+      } catch (e) {
+        this.alertToggle({ message: "Cannot create pending competencies", isShow: true, type: "error" })
+      }
     },
     pendingCompetenciesToDefault () {
       this.matchPendingCompetencies = []
@@ -297,6 +321,9 @@ export default {
     },
     clearErrors() {
       this.errors = []
+    },
+    selectInputValue(e) {
+      e.target.select()
     }
   },
   computed: {
@@ -479,12 +506,20 @@ export default {
   .width-191 {
     width: 191px;
   }
-  .modal-width-300 {
-    width: 300px;
+  .modal{
+    &-width-300 {
+      width: 300px;
+    }
+    &-width-450 {
+      width: 450px;
+    }
+    &__questions{
+      margin: 7px 0;
+    }
   }
-  .modal-width-500 {
-    width: 500px;
-  }
+
+
+
   .radio {
     position: relative;
     cursor: pointer;
@@ -530,6 +565,9 @@ export default {
     top: calc(50% - 10px);
     left: 0;
     width: 100%;
+    text-align: center;
+  }
+  .text-center {
     text-align: center;
   }
 

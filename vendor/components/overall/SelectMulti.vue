@@ -51,6 +51,10 @@
 				type: Boolean,
 				default: false,
 			},
+      fieldName: {
+			  type: String,
+        default: 'name',
+      }
 		},
 		data() {
 			return {
@@ -60,7 +64,7 @@
 		},
 		methods: {
 			showOption(opt) {
-				return (typeof opt === "string") ? opt: opt.name;
+        return (typeof opt === "string") ? opt: (opt[this.fieldName] );
 			},
 			outOptions() {
 				this.isDropped = false;
@@ -106,7 +110,13 @@
 			filteredOptions() {
 				let result = this.options;
 				if(this.searchValue) {
-					return result.filter(item => item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1);
+					return result.filter(item =>{
+
+            if(item[this.fieldName]) {
+              return item[this.fieldName].toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1;
+            }
+            return item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1;
+          });
 				}
 				return result;
 			}

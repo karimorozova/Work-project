@@ -13,24 +13,22 @@
     .modal__row
       .modal__rates
         span Rate:
-        input.width-191(v-model.lazy="currentRate" type="text")
+        input.width-191(v-model.lazy="currentRate" type="text" @click="selectInputValue")
     .modal__row
       p.wysiwyg__text Please provide more details about your experience in &nbsp;
         span.bold {{pendingCompetency.industry.name}}
       WYSIWYG(:editorData="pendingCompetency.descriptions.industry" @editorBlur="changeCkeditor")
     .modal__row
-      Button(value="Edit" custom-class="width-191" @clicked="updatePendingCompetency")
+      Button(value="Edit" @clicked="updatePendingCompetency")
 
 
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex"
-
-	import Modal from "../Modal"
-	import WYSIWYG from "../WYSIWYG"
-	import Button from "../Button"
-  import SelectSingle from "../SelectSingle";
+import Modal from "../Modal"
+import WYSIWYG from "../WYSIWYG"
+import Button from "../Button"
+import SelectSingle from "../SelectSingle";
 	export default {
     components: {SelectSingle, Modal,WYSIWYG, Button},
     props: {
@@ -44,7 +42,7 @@ import {mapActions, mapGetters} from "vuex"
         description: {
           industry: ''
         },
-        currentRate: 0
+        currentRate: (0).toFixed(4)
       }
     },
     watch: {
@@ -63,6 +61,9 @@ import {mapActions, mapGetters} from "vuex"
       },
       closeModal() {
         this.$emit('close')
+      },
+      selectInputValue(e) {
+        e.target.select()
       }
     },
     created() {
@@ -78,7 +79,7 @@ import {mapActions, mapGetters} from "vuex"
   .modal {
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     box-sizing: border-box;
-    padding: 30px 30px 0 30px;
+    padding: 20px 20px 0 20px;
     width: 750px;
     position: absolute;
     transform: translate(-50%,0);
@@ -86,7 +87,7 @@ import {mapActions, mapGetters} from "vuex"
     top: 50px;
 
     &__row {
-      margin-bottom: 30px;
+      margin-bottom: 15px;
     }
 
     &__info{

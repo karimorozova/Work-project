@@ -29,7 +29,6 @@ function applicationMessage (obj) {
                     <p style="font-weight: 400;"><b style="margin-right: 6px;"> Mother tongue: </b> <span>${ obj.lang }</span> </p>
                     <p style="font-weight: 400;"><b style="margin-right: 6px;"> Availability: </b> <span>${ obj.availability }</span> </p>
                     <p style="font-weight: 400;"><b style="margin-right: 6px;"> Software expirience: </b> <span>${ obj.softwares }</span> </p>
-	                  <p style="font-weight: 400;"><b style="margin-right: 6px;"> Cover Letter: </b> ${obj.coverLetter} </p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -115,13 +114,13 @@ function requestMessageForVendor(obj) {
                         By clicking on one of the links below, you can accept or reject the job.
                     </p>
                     <p style="font-weight: 400;">
-                        You can accept the quote by clicking the link below:  
+                        You can accept the quote by clicking the link below:
                     </p>
-                    
+
                     <span style="font-weight: 400;">I accept - ${ acceptQuote }</span>
                     <p style="font-weight: 400;">or</p>
                     <span style="font-weight: 400;">I reject - ${ declineQuote }</span>
-                    
+
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -178,7 +177,7 @@ function vendorReassignmentMessage(obj, reason) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
-                        We would like to update you that ${ obj.stepId } ${ obj.serviceStep.title } has been reassigned to a different vendor. 
+                        We would like to update you that ${ obj.stepId } ${ obj.serviceStep.title } has been reassigned to a different vendor.
                     </p>
                 </div>
                 <footer>
@@ -230,7 +229,7 @@ function vendorMiddleAssignmentMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.step.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
-                        Step: ${ obj.step.stepId } has been reassigned to you. 
+                        Step: ${ obj.step.stepId } has been reassigned to you.
                     </p>
                     <p style="font-weight: 400;">
                         ${ mainMessage }

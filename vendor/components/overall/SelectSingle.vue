@@ -50,7 +50,11 @@
 			isRemoveOption: {
 				type: Boolean,
 				default: false
-			}
+			},
+      fieldName: {
+			  type: String,
+        default: 'name'
+      }
 		},
 		data() {
 			return {
@@ -76,7 +80,7 @@
 				this.$emit('scrollDrop', {drop: this.isDropped, offsetTop: top, offsetHeight: height});
 			},
 			showOption(opt) {
-				return (typeof opt === "string") ? opt: (opt.name || opt.lang || opt.title );
+				return (typeof opt === "string") ? opt: (opt[this.fieldName] );
 			},
 			outOptions() {
 				this.isDropped = false;
@@ -119,8 +123,8 @@
 				let result = this.options;
 				if(this.searchValue) {
 					return result.filter(item => {
-						if(item.name) {
-							return item.name.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1;
+						if(item[this.fieldName]) {
+							return item[this.fieldName].toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1;
 						}
 						return item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1;
 					});

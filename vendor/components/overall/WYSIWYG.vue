@@ -9,7 +9,10 @@
 	else CKEditor = { component: { template: '<div></div>' } }
 	export default {
 	  props: {
-      editorData: "",
+      editorData: {
+        type: String,
+        default: ''
+      },
     },
 		data() {
 			return {

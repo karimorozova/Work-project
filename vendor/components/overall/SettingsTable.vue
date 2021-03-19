@@ -159,17 +159,17 @@
 
     &__thead-row,
     &__tbody-row {
-/*      &:nth-of-type(2n) {
-        .table__tbody-cell {
-          background-color: $table-row-zebra-background;
+      &:nth-of-type(odd) {
+          .table__tbody-cell {
+            background-color: $table-row-zebra-background;
+          }
         }
-      }
 
       &:hover {
         .table__tbody-cell {
           background-color: $cell-background;
         }
-      }*/
+      }
 
       display: flex;
     }

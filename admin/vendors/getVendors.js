@@ -36,6 +36,11 @@ async function getVendor(query) {
     .populate('pendingCompetencies.step', ['title']);
 }
 
+async function hasVendorCompetenciesAndPending (vendorId){
+  const vendor = await Vendors.findOne({_id: vendorId})
+  return !vendor.competencies.length && !vendor.pendingCompetencies.length
+}
+
 async function getVendors(query) {
   return await Vendors.find(query)
     .populate('native')
@@ -156,4 +161,4 @@ async function getFilteredVendors(filters) {
   }
 }
 
-module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors };
+module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, hasVendorCompetenciesAndPending};

@@ -99,7 +99,7 @@ export default {
 
     .calendarContainer {
       display: flex;
-      border: 2px solid #67573e;
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       padding: 10px;
       font-size: 16px;
       background-color: #fff;

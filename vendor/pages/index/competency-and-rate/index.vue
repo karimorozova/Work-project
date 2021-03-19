@@ -1,7 +1,7 @@
 <template lang="pug">
   .container(v-if="vendor")
     .title.with-button Pending Competencies
-      Button(value="Create" customClass="width-191" @clicked="redirectToModal")
+      Button(value="Create" @clicked="redirectToModal")
     PendingCompetencies(
       :pendingCompetenciesData="vendor.pendingCompetencies"
     )

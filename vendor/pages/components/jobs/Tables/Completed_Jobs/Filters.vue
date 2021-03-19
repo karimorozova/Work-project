@@ -37,7 +37,7 @@
 
 <script>
 	import Calendar from "~/components/Calendar"
-	import SelectSingle from "~/components/dropdowns/SelectSingle.vue"
+	import SelectSingle from "../../../../../components/overall/SelectSingle.vue"
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
@@ -86,7 +86,7 @@
 					const step = this.steps.find(item => item.title === option)
 					return this.$emit('setJobTypeFilter', { step })
 				}
-				this.$emit('setJobTypeFilter', { step: 'All' })
+				this.$emit('setJobTypeFilter', { step: {title : 'All'}})
 			},
 			async getSteps() {
 				try {

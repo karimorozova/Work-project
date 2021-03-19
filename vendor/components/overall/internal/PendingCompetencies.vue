@@ -5,8 +5,12 @@
       SettingsTable(
         :fields="fields"
         :tableData="pendingCompetenciesData"
+        :isApproveModal="isDeleting"
         :tbodyStyle="{'max-height': '288px'}",
         :rowCount="10"
+        @approve="deleteData"
+        @notApprove="setDefaults"
+        @closeModal="setDefaults"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
@@ -46,6 +50,7 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
 		},
 		data() {
 			return {
+        isDeleting: false,
         editPendingCompetencies: null,
 				fields: [
 					{
@@ -89,18 +94,18 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
 		},
 		methods: {
       ...mapActions([
-        "setVendorProp"
+        "setVendorProp",
+        "alertToggle"
       ]),
 
 			makeActions(index, key) {
         console.log(index)
 				switch (key) {
 					case "delete":
-					  const pendingCompetencies = this.pendingCompetenciesData.filter((_, i) => i !== index)
-            this.sendRequest(pendingCompetencies)
+            this.isDeleting = true
+            this.currentSelect = index
 						break
 					default:
-            console.log(this.pendingCompetenciesData[index])
             this.currentSelect = index
 					  this.editPendingCompetencies = this.pendingCompetenciesData[index]
 						// await this.checkErrors(index)
@@ -108,18 +113,32 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
 			},
 
       sendRequest(pendingCompetencies) {
-        this.$axios.post('/vendor/pending-competencies', {
-          token: this.token,
-          pendingCompetencies,
-        })
-        this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
+        try {
+          this.$axios.post('/vendor/pending-competencies', {
+            token: this.token,
+            pendingCompetencies,
+          })
+          this.setVendorProp({prop: "pendingCompetencies", value: pendingCompetencies})
+          this.alertToggle({ message: "You’ve successfully made changes", isShow: true, type: "success" })
+          this.editPendingCompetencies = null
+        }catch (e) {
+          this.alertToggle({ message: "Cannot edit info", isShow: true, type: "error" })
+        }
+
       },
 
       updateCurrentCompetencies({data}) {
         this.pendingCompetenciesData[this.currentSelect] = data
         this.sendRequest(this.pendingCompetenciesData)
       },
-
+      deleteData(){
+        this.isDeleting = false
+        const pendingCompetencies = this.pendingCompetenciesData.filter((_, i) => i !== this.currentSelect)
+        this.sendRequest(pendingCompetencies)
+      },
+      setDefaults(){
+        this.isDeleting = false
+      },
 
 			closeModal() {
 				return (this.editPendingCompetencies = null)
