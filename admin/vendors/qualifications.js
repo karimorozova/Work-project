@@ -4,6 +4,7 @@ const { updateVendorRatesFromCompetence } = require('./updateVendorRates')
 const { getCompetenciesForCheck } = require('./helpers')
 const { flatten } = require('lodash')
 const { generateNewPricelistCombinations } = require('../clients')
+
 const saveQualifications = async (listOfNewCompetencies, vendorId) => {
 	const allTests = await LangTest.find({})
 	let { qualifications } = await Vendors.findOne({ _id: vendorId })

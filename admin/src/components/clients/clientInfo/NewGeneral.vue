@@ -205,7 +205,8 @@ export default {
   display: flex;
   justify-content: space-between;
   &__block {
-    width: 38%;
+    width: 39%;
+    padding-bottom: 1px;
   }
   &_error-shadow {
     box-shadow: 0 0 5px $red;
@@ -219,7 +220,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 26px;
+  margin-bottom: 20px;
+  height: 30px;
+
   &__check-item {
     width: 190px;
   }

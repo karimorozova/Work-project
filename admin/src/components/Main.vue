@@ -42,9 +42,7 @@
                   span {{ note.title }}
           .balloons
       .admin-main-wrapper__inner
-        router-view(:isSidebar="isSidebar"
-          @refreshServices='refreshServices'
-        )
+        router-view(:isSidebar="isSidebar")
 </template>
 
 <script>
@@ -134,10 +132,26 @@
 					console.log("Cannot identify user group")
 				}
 			},
+			async allServices() {
+				let result = await this.$http.get('/api/services')
+				this.$store.dispatch('allServices', result.data)
+			},
+			async allUnits() {
+				let result = await this.$http.get('/api/units')
+				this.$store.dispatch('allUnits', result.data)
+			},
 			async getLanguages() {
 				let result = await this.$http.get('/api/languages')
 				let allLangs = result.body
 				this.$store.dispatch('allLanguages', allLangs)
+			},
+			async allIndustries() {
+				let result = await this.$http.get('/api/industries')
+				this.$store.dispatch('allIndustries', result.data)
+			},
+			async allSteps() {
+				let result = await this.$http.get('/api/steps')
+				this.$store.dispatch('allSteps', result.data)
 			},
 			gotoRequestPage(index) {
 				this.$router.push({ name: 'create-project' })
@@ -236,12 +250,8 @@
 				this.$router.push('/account-info')
 				this.accountMenuVisible = false
 			},
-			async refreshServices(data) {
-				await this.getServices()
-			},
 			...mapActions({
 				setUser: "setUser",
-				getServices: "getServices"
 			})
 		},
 		computed: {
@@ -262,7 +272,12 @@
 		},
 		created() {
 			this.getCurrentUserGroup()
+      //SET GLOBAL VUEX
 			this.getLanguages()
+      this.allSteps()
+      this.allIndustries()
+			this.allServices()
+			this.allUnits()
 		},
 		mounted() {
 			this.mainPageRender()
@@ -277,6 +292,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../src/assets/scss/colors";
+
   .admin-top {
     display: flex;
     align-items: center;
@@ -292,7 +309,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      margin-left: 150px;
+      margin-left: 135px;
 
       a {
         text-decoration: none;
@@ -344,7 +361,7 @@
             &__info {
               display: flex;
               justify-content: flex-start;
-              border-bottom: 1px solid #998e7e;
+              border-bottom: 1px solid $thead-background;
               padding: 5px 0;
 
               .icon {
@@ -378,7 +395,7 @@
               display: flex;
               justify-content: flex-start;
               align-items: center;
-              border-bottom: 1px solid #998e7e;
+              border-bottom: 1px solid $thead-background;
               cursor: pointer;
 
               .human_icon {
@@ -484,7 +501,7 @@
 
     &__inner {
       width: calc(100% - 150px);
-      margin-left: 150px;
+      margin-left: 135px;
     }
 
     .admin-navbar {
@@ -497,13 +514,13 @@
 
       &__sidebar {
         padding: 25px 0;
-        background-color: #998e7e;
-        width: 150px;
+        background-color: #948977;
+        width: 135px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 0 10px rgba(104, 87, 62, 0.6);
+        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
         transition: all 0.5s;
         z-index: 2;
         overflow: hidden;
@@ -514,7 +531,7 @@
         font-size: 14px;
         font-weight: bold;
         padding: 0;
-        width: 177px;
+        width: 150px;
         height: 77vh;
         overflow-y: scroll;
         margin-bottom: 0;
@@ -562,7 +579,7 @@
           background-color: white;
 
           .title {
-            color: #978d7e;
+            color: $thead-background;;
             font-family: Myriad900;
           }
 
@@ -599,7 +616,7 @@
 
   .additional {
     position: absolute;
-    border: 2px solid #978d7e;
+    border: 2px solid $thead-background;;
     color: #67573e;
     background-color: #fff;
     font-size: 16px;
@@ -611,7 +628,7 @@
     &__listItem {
       padding: 13px;
       font-family: Myriad400;
-      border-bottom: 0.2px solid #978d7e;
+      border-bottom: 0.2px solid $thead-background;
       cursor: pointer;
 
       &:hover {

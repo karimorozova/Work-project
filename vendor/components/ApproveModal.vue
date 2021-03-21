@@ -1,6 +1,8 @@
 <template lang="pug">
 .approve-modal(:class="{'approve-modal_centered': isCentered}")
-    .approve-modal__text {{ text }}
+    .approve-modal__text
+      span  {{text}}
+    slot
     .approve-modal__buttons
         .approve-modal__button(@click="approve")
             Button(:value="approveValue")
@@ -10,7 +12,7 @@
 </template>
 
 <script>
-import Button from "./buttons/Button";
+import Button from "../components/overall/Button";
 
 export default {
     props: {
@@ -57,12 +59,10 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 15px;
+    padding: 20px;
     box-shadow: 0 0 10px #67573e9d;
     background-color: $white;
-    max-width: 300px;
     &__buttons {
-        margin-top: 10px;
         display: flex;
     }
     &__button {
@@ -84,7 +84,7 @@ export default {
     .approve-modal {
         &__text {
             font-size: 18px;
-            text-align: center;       
+            text-align: center;
         }
     }
 }

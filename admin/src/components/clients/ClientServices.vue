@@ -480,7 +480,7 @@ export default {
   }
   &__icons {
     @extend %table-icons;
-    height: 32px;
+    height: 30px;
     justify-content: center;
   }
   &__icon {

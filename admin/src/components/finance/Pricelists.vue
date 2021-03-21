@@ -290,8 +290,6 @@
   @import "../../assets/styles/settingsTable.scss";
 
   .pricelists {
-    margin: 20px;
-    margin-left: 0;
     position: relative;
 
     &__approve {

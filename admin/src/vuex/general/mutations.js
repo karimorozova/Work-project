@@ -30,11 +30,29 @@ export const mutations = {
             return a.firstName > b.firstName;
         })
     },
+    allVendorsForProject(state, payload) {
+        state.vendorsForProject = payload.sort((a, b) => {
+            return a.firstName > b.firstName;
+        })
+    },
     allLangs(state, payload) {
         state.languages = payload.sort((a, b) => {
             return a.lang > b.lang;
         })
     },
+    allIndustries(state, payload) {
+        state.industries = payload
+    },
+    allSteps(state, payload) {
+        state.steps = payload
+    },
+    allUnits(state, payload) {
+        state.units = payload
+    },
+    allServices(state, payload) {
+        state.services = payload
+    },
+
     customerlangs(state, payload) {
         state.clientLangs = payload
     },

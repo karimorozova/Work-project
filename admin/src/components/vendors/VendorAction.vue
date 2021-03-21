@@ -29,15 +29,14 @@ export default {
   padding: 20px;
 
   &__title {
-    font-size: 18px;
-    font-family: 'Myriad600';
-    border-bottom: 1px solid #938676;
+    font-size: 22px;
+    border-bottom: 1px solid #c5bfb5;
     padding-bottom: 5px;
   }
 
   &__row {
     display: flex;
-    padding-top: 15px;
+    padding-top: 20px;
   }
 
   &__icon {
@@ -48,7 +47,7 @@ export default {
     height: 28px;
 
     i {
-      font-size: 24px;
+      font-size: 22px;
       cursor: pointer;
     }
     

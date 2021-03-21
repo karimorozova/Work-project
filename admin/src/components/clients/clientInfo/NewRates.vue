@@ -93,6 +93,7 @@ export default {
 @import "../../../assets/scss/colors.scss";
 .rates-info {
   display: flex;
+  padding: 8px;
   &_error-shadow {
     box-shadow: 0 0 5px $red;
     height: 31px;

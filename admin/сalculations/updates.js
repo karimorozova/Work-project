@@ -1,4 +1,5 @@
-const { Units } = require('../models');
+const { Units, Vendors } = require('../models');
+const { getVendor } = require('../vendors/getVendors')
 const { getAfterWordcountPayablesUpdated } = require("./wordcount");
 const { getAfterHoursPayablesUpdated } = require("./commonUnits");
 const { updateProject } = require("../projects");
@@ -6,6 +7,7 @@ const { updateProject } = require("../projects");
 async function getAfterPayablesUpdated ({ projectId, step, index }) {
 	try {
 		delete step.check
+		step.vendor = await getVendor({ "_id": step.vendor._id })
 		const queryStr = `steps.${index}`;
 		let project = await updateProject({ "_id": projectId }, { $set: { [queryStr]: step } });
 		let { type } = await Units.findOne({ _id: step.serviceStep.unit });

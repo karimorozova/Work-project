@@ -186,7 +186,7 @@
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
   .filters {
     display: flex;
     width: 100%;
@@ -223,7 +223,7 @@
     &__drop-menu {
       position: relative;
       width: 166px;
-      height: 32px;
+      height: 30px;
     }
 
     &_medium-menu {

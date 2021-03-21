@@ -1,4 +1,5 @@
 export const getLangs = state => state.languages;
+export const getIndustries = state => state.industries;
 export const getTimezones = state => state.timezones;
 export const getRequestsCount = state => state.currentRequests;
 export const getIsAlert = state => state.isAlert;
@@ -9,6 +10,7 @@ export const getVendor = state => state.vendor;
 export const getAccountInfo = state => state.accountInfo;
 export const getNewPassword = state => state.newPassword;
 export const getSteps = state => state.steps;
+export const getAllStepss = state => state.allSteps;
 export const getPackages = state => state.packages;
 export const getAllJobs = state => state.jobs;
 export const getSelectedJob = state => state.selectedJob;

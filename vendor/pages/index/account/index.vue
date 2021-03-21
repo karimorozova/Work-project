@@ -12,10 +12,6 @@
       .account-info__title Change Password
       Password
 
-    .account-info__rates
-      .account-info__title Rates
-      Rates
-
     ValidationErrors(v-if="areErorrs"
       :errors="errors"
       :isAbsolute="isAbsolute"
@@ -26,7 +22,6 @@
 	import Buttons from "../../components/account/Buttons"
 	import GeneralInfo from "../../components/account/GeneralInfo"
 	import Password from "../../components/account/Password"
-	import Rates from "../../components/account/Rates"
 	import ValidationErrors from "@/components/ValidationErrors"
 	import { mapActions, mapGetters } from "vuex"
 
@@ -78,7 +73,6 @@
 			Buttons,
 			GeneralInfo,
 			Password,
-			Rates,
 			ValidationErrors
 		},
 		mounted() {
@@ -93,7 +87,7 @@
   .account-info {
     width: 100%;
     box-sizing: border-box;
-    padding: 30px;
+    padding: 20px 40px;
     color: $main-color;
     position: relative;
 
@@ -105,11 +99,12 @@
       display: flex;
       justify-content: flex-end;
       width: 1040px;
+      position: absolute;
     }
 
     &__title {
       font-size: 20px;
-      margin: 20px 0;
+      margin: 30px 0 10px;
     }
   }
 </style>

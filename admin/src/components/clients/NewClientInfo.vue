@@ -317,29 +317,28 @@
 
   .new-client-subinfo {
     &__general {
-      margin-top: 120px;
+      margin-top: 100px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      margin-left: 40px;
     }
 
     &__date {
       margin-top: 40px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
   }
 
   .new-client-info {
     position: relative;
-    padding: 40px;
-    width: 1020px;
+    width: 1000px;
 
     &__gen-info, &__rates, &__documents, &__contacts-info, &__sales, &__billing {
-      margin: 20px 10px 40px 10px;
-      padding: 40px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      padding: 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       box-sizing: border-box;
     }
 
@@ -350,6 +349,7 @@
 
   .title {
     font-size: 22px;
+    padding: 30px 0 10px;
   }
 
   .buttons {

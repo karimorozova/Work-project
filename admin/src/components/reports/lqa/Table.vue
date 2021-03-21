@@ -4,6 +4,7 @@
       VendorLqa(:vendorData="lqaData", @closeForm="closeForm()", @saveVendorLqa="saveVendorLqa")
     DataTable(
       :fields="fields"
+      bodyRowClass="cursor-default"
       :tableData="vendorsData"
       :bodyClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
       :tableheadRowClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
@@ -222,7 +223,7 @@
       text-decoration: none;
 
       .icon-link {
-        font-size: 18px;
+        font-size: 16px;
       }
     }
     &__data.center {

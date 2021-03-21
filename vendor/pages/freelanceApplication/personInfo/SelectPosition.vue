@@ -59,21 +59,20 @@ export default {
 <style lang="scss" scoped>
 
 .position__label {
-    font-size: 12px;
+    font-size: 14px;
     position: absolute;
     top: -45px;
 }
 
 .drop-select {
     position: absolute;
-    top: -25px;;
+    top: -25px;
     width: 268px;
     border: 1px solid #67573E;
-    border-radius: 15px;
+    border-radius: 7px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
     @media (max-width: 1600px) {
         width: 100%;
     }

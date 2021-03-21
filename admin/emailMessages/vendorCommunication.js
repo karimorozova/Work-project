@@ -3,14 +3,9 @@ const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 
-function applicationMessage(obj) {
+function applicationMessage (obj) {
 	let cvFiles = ""
-	let languagePairs = ""
-	let software = ""
-	let industries = ""
 	let coverLetterFiles = ""
-	let educations = ""
-	let positions = ""
 	if (obj.cvFiles.length) {
 		cvFiles = obj.cvFiles.reduce((acc, cur, index) => {
 			return acc + `<a href="${ apiUrl }${ cur }" download target='_self'>cvFile${ index + 1 }</a>; `
@@ -21,82 +16,65 @@ function applicationMessage(obj) {
 			return acc + `<a href="${ apiUrl }${ cur }" download target='_self'>coverLetterFile${ index + 1 }</a>; `
 		}, "")
 	}
-	if (obj.languagePairs) {
-		languagePairs = obj.languagePairs.reduce((acc, cur) => {
-			return acc + cur.source + ' >> ' + cur.target + "; "
-		}, "")
-	}
-	if (obj.industries) {
-		industries = obj.industries.reduce((acc, cur) => {
-			return acc + cur.name + "; "
-		}, "")
-	}
-	if (obj.positions) {
-		positions = obj.positions.reduce((acc, cur) => {
-			return acc + cur + "; "
-		}, "")
-	}
-	if (obj.technicalComp.softwares) {
-		software = obj.technicalComp.softwares.reduce((acc, cur) => {
-			return acc + cur + "; "
-		}, "")
-	}
-	if (obj.educations) {
-		educations = obj.educations.reduce((acc, cur) => {
-			return acc + `${ cur.study }/${ cur.field }/${ cur.institute }/${ cur.grade } <br>`
-		}, "")
-	}
-	return `<div class="main" style="font-weight:400;font-size:12px;border-width:1px;border-style:solid;border-color:#66563E;max-width:700px;display:flex;flex-direction:column;padding-top:10px;padding-bottom:10px;padding-right:10px;padding-left:10px;" >
-    <h2 class="head-title" style="font-size:18px;align-self:center;" >New Application Request</h1>
-        <div class="personal">
-            <ul>
-                <li style="margin-bottom:5px;" >Name: ${ obj.firstName }</li>
-                <li style="margin-bottom:5px;" >Surname: ${ obj.surname }</li>
-                <li style="margin-bottom:5px;" >Email: ${ obj.email }</li>
-                <li style="margin-bottom:5px;" >Phone Number: ${ obj.phone }</li>
-                <li style="margin-bottom:5px;" >Mother tongue: ${ obj.native }</li>
-                <li style="margin-bottom:5px;" >Time-zone: ${ obj.timezone }</li>
-                <li style="margin-bottom:5px;" >Language Pairs: ${ languagePairs }</li>
-                <li style="margin-bottom:5px;" >CV: ${ cvFiles }</li>
-                <li style="margin-bottom:5px;" >Position: ${ positions }</li>
-            </ul>
-        </div>
-        <div class="education">
-            <ul>
-                <li style="margin-bottom:5px;" >Education:
-                    <div>
-                        ${ educations }
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <div class="transExp">
-            <ul>
-                <li style="margin-bottom:5px;" >Transaltion Experience: <span>${ obj.experienceYears }</span></li>
-            </ul>
-        </div>
-        <div class="tech">
-            <ul>
-                <li style="margin-bottom:5px;" >Internet Access: ${ obj.technicalComp.internet }</li>
-                <li style="margin-bottom:5px;" >CAT experience: ${ obj.technicalComp.cat }</li>
-                <li style="margin-bottom:5px;" >Software experience: ${ software }</li>
-            </ul>
-        </div>
-        <div class="industries">
-            <ul>
-                <li style="margin-bottom:5px;" >Industries: ${ industries }</li>
-            </ul>
-        </div>
-        <div class="other">
-            <ul>
-                <li style="margin-bottom:5px;" >Availability: ${ obj.availability }</li>
-                <li style="margin-bottom:5px;" >Willing to take a test: ${ obj.testAgree }</li>
-                <li style="margin-bottom:5px;" >Rate: ${ obj.basicRate }</li>
-                <li style="margin-bottom:5px;" >Cover Letter: ${ obj.coverLetter }</li>
-                <li style="margin-bottom:5px;" >Cover Letter (files): ${ coverLetterFiles }</li>
-            </ul>
-        </div>
-    </div>`
+
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row" style="color:#66563E;">New application request</span></p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;color:#66563E;"> Name: </b> ${obj.firstName} </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;color:#66563E;"> Surname: </b> ${obj.surname} </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Email: </b> <span>${ obj.email }</span> </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Mother tongue: </b> <span>${ obj.lang }</span> </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Availability: </b> <span>${ obj.availability }</span> </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Software expirience: </b> <span>${ obj.softwares }</span> </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`
+}
+function vendorRegistration(obj) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                		<p style="color: #66563E; background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.firstName },</span></p>
+										<p style="font-weight: 400;color:#66563E;">
+                      Thank you for your interest in working with Pangea.
+                      We are always on the lookout for talent, yet only the best of the best get to join us.
+                      Submitting your information tells us you may be our next superstar.
+                      It all starts with completing your profile. Here is what you need to do:
+										</p>
+										<p style="font-weight: 400;color:#66563E;">Enter our system and complete your competencies:</p>
+										<p style="font-weight: 400;color:#66563E;">language pair and industry</p>
+										<p style="font-weight: 400;color:#66563E;">1. Go to: https://vendor.pangea.global/login</p>
+										<p style="font-weight: 400;color:#66563E;">2. Log in to the system with the following details:</p>
+                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">- username: ${ obj.email.replace(/@/g, '<span>@</span>') }</p>
+                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">- password:   ${ obj.pass }</p>
+										<p style="font-weight: 400;color:#66563E;">
+                      3. Once in, you will be required to provide additional information that will allow us
+                      to get a clearer idea of your industry expertise and language proficiency.
+                      Please fill in the form, as required.
+                    </p>
+                    <p style="font-weight: 400;color:#66563E;">
+                      We normally allow all candidates a period of 21 days to complete their profile.
+                      Should you not manage to complete this step within the given time frame,
+                      contact us and we will extend the deadline. In the lapse of time,
+                      should you fail to notify us to request an extension, your profile will be automatically deleted.
+                      If you wish to join Pangea at a later stage, you will have to repeat the process.
+                    </p>
+                    <p style="font-weight: 400;color:#66563E;">Many thanks,</p>
+                    <p style="font-weight: 400;color:#66563E;">Pangea HR team</p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`
 }
 
 function requestMessageForVendor(obj) {
@@ -156,13 +134,13 @@ function requestMessageForVendor(obj) {
                         By clicking on one of the links below, you can accept or reject the job.
                     </p>
                     <p style="font-weight: 400;">
-                        You can accept the quote by clicking the link below:  
+                        You can accept the quote by clicking the link below:
                     </p>
-                    
+
                     <span style="font-weight: 400;">I accept - ${ acceptQuote }</span>
                     <p style="font-weight: 400;">or</p>
                     <span style="font-weight: 400;">I reject - ${ declineQuote }</span>
-                    
+
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -219,7 +197,7 @@ function vendorReassignmentMessage(obj, reason) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
-                        We would like to update you that ${ obj.stepId } ${ obj.serviceStep.title } has been reassigned to a different vendor. 
+                        We would like to update you that ${ obj.stepId } ${ obj.serviceStep.title } has been reassigned to a different vendor.
                     </p>
                 </div>
                 <footer>
@@ -271,7 +249,7 @@ function vendorMiddleAssignmentMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.step.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
-                        Step: ${ obj.step.stepId } has been reassigned to you. 
+                        Step: ${ obj.step.stepId } has been reassigned to you.
                     </p>
                     <p style="font-weight: 400;">
                         ${ mainMessage }
@@ -360,5 +338,6 @@ module.exports = {
 	vendorMiddleAssignmentMessage,
 	stepReopenedMessage,
 	stepReadyToStartMessage,
-	sendMemoqCredentials
+	sendMemoqCredentials,
+	vendorRegistration
 }

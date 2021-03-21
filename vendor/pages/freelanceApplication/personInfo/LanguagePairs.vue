@@ -103,9 +103,10 @@ export default {
     flex-direction: column;
     width: 100%;
     border: 1px solid #66563D;
-    border-radius: 15px;
+    border-radius: 7px;
     justify-content: center;
     padding: 10px 0;
+
     &__row {
         box-sizing: border-box;
         display: flex;
@@ -123,7 +124,7 @@ export default {
         align-items: center;
         margin-left: 20px;
         opacity: 0.7;
-        font-size: 12px;
+        font-size: 14px;
         &_rotated {
             transform: rotate(45deg);
         }
@@ -166,7 +167,7 @@ export default {
         flex-direction: column;
         align-items: center;
         width: 3%;
-        font-size: 12px;
+        font-size: 14px;
         opacity: 0.7;
         &:hover {
             .language-pairs__button-label_opacity {

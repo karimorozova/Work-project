@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     .preview
-      span.preview__close(@click="closePreview") &#10006;
+      span.preview__close(@click="closePreview") &#215;
       .preview__mails
         MailChips(:emails="allMails" @emailAction="getSelectedMails")
       .preview__details
@@ -9,7 +9,7 @@
       .preview__button
         Button(value="Send" v-if="selectedMails.length" @clicked="send")
         Button(value="Send" :isDisabled="true" v-else)
-  .background
+    .background
 </template>
 
 <script>
@@ -33,8 +33,9 @@
 						this.message.replace('cid:logo@pan', '../../../static/email-logo.png') :
 						this.message,
 				editorConfig: {
-					uiColor: "#F4F0EE",
-					allowedContent: true
+					allowedContent: true,
+					uiColor: "#F2EFEB",
+					height: 350,
 				}
 			};
 		},
@@ -94,24 +95,34 @@
     right: 20%;
     margin: 0 auto;
     padding: 20px;
-    box-shadow: 0 0 10px $brown-shadow;
     display: flex;
     flex-direction: column;
     align-items: center;
     box-sizing: border-box;
+    max-height: 720px;
 
     &__mails {
       width: 100%;
-      margin-top: 10px;
-      margin-bottom: -12px;
+      margin-top: 20px;
+      margin-bottom: 10px;
     }
 
     &__close {
       position: absolute;
       top: 8px;
-      right: 20px;
-      font-size: 16px;
+      right: 10px;
+      font-size: 22px;
       cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      font-family: Myriad900;
+      opacity: .8;
+      transition: .2s ease;
+
+      &:hover {
+        opacity: 1
+      }
     }
 
     &__details {

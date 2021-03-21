@@ -3,6 +3,7 @@
         DataTable(
             :fields="fields"
             :tableData="vendorsData"
+            bodyRowClass="cursor-default"
             :bodyClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
             :tableheadRowClass="vendorsData.length < 6 ? 'tbody_visible-overflow' : ''"
         )
@@ -26,9 +27,9 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Vendor Name", headerKey: "headerVendor", key: "vendor", width: "40%"},
-                {label: "Basic Price", headerKey: "headerPrice", key: "basicPrice", width: "30%"},
-                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "30%"}
+                {label: "Vendor Name", headerKey: "headerVendor", key: "vendor", width: "40%",padding: "0" },
+                {label: "Basic Price", headerKey: "headerPrice", key: "basicPrice", width: "30%",padding: "0" },
+                {label: "Margin", headerKey: "headerMargin", key: "margin", width: "30%",padding: "0" }
             ]
         }
     },
@@ -50,10 +51,17 @@ export default {
 <style lang="scss" scoped>
 
 .benchmark-table {
+    &__data {
+      height: 30px;
+      overflow-x: hidden;
+      padding: 0 5px;
+      align-items: center;
+      display: flex;
+    }
     max-width: 55%;
     margin: 10px 0 20px;
     &_red {
-        color: #d15f45;
+        background: #e8afa2;
     }
     &_green {
         color: #4ca553;

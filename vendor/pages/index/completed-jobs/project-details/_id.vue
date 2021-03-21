@@ -1,8 +1,10 @@
 <template lang="pug">
   .details
+    .title Project Details
     .details__data(v-if="job._id")
-      .details__header
+      //.details__header
         .details__title Project Details
+
       .details__info
         .details__main
           MainInfo
@@ -60,6 +62,10 @@
 
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors.scss";
+  .title{
+    margin: 30px 0 10px;
+    font-size: 20px;
+  }
 
   .details {
     color: $main-color;
@@ -69,7 +75,7 @@
     &__data {
       width: 1040px;
       margin-top: 10px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       box-sizing: border-box;
     }
 

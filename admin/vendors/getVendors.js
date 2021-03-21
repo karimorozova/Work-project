@@ -29,7 +29,16 @@ async function getVendor(query) {
     .populate('rates.pricelistTable.targetLanguage', ['lang'])
     .populate('rates.pricelistTable.step', ['title'])
     .populate('rates.pricelistTable.unit', ['type'])
-    .populate('rates.pricelistTable.industry', ['name']);
+    .populate('rates.pricelistTable.industry', ['name'])
+    .populate('pendingCompetencies.sourceLanguage', ['lang'])
+    .populate('pendingCompetencies.targetLanguage', ['lang'])
+    .populate('pendingCompetencies.industry', ['name'])
+    .populate('pendingCompetencies.step', ['title']);
+}
+
+async function hasVendorCompetenciesAndPending (vendorId){
+  const vendor = await Vendors.findOne({_id: vendorId})
+  return !vendor.competencies.length && !vendor.pendingCompetencies.length
 }
 
 async function getVendors(query) {
@@ -91,7 +100,11 @@ async function getVendorAfterUpdate(query, update) {
     .populate('rates.pricelistTable.targetLanguage', ['lang'])
     .populate('rates.pricelistTable.step', ['title'])
     .populate('rates.pricelistTable.unit', ['type'])
-    .populate('rates.pricelistTable.industry', ['name']);
+    .populate('rates.pricelistTable.industry', ['name'])
+    .populate('pendingCompetencies.sourceLanguage', ['lang'])
+    .populate('pendingCompetencies.targetLanguage', ['lang'])
+    .populate('pendingCompetencies.industry', ['name'])
+    .populate('pendingCompetencies.step', ['title']);
 }
 
 async function getFilteredVendors(filters) {
@@ -100,6 +113,42 @@ async function getFilteredVendors(filters) {
     const vendors = await Vendors.aggregate([
       { $addFields: { "name": { $concat: ["$firstName", " ", "$surname"] } } },
       { $match: query },
+      { $unset: [
+          'assessments',
+          'availability',
+          'basicRate',
+          'catExperience',
+          'companyName',
+          'coverLetterFiles',
+          'currency',
+          'cvFiles',
+          'documents',
+          'educations',
+          'email',
+          'experienceYears',
+          'gender',
+          'guid',
+          'internetAccess',
+          'languagePairs',
+          'linkedin',
+          'matrix',
+          'notes',
+          'password',
+          'phone',
+          'photo',
+          'positions',
+          'profExperiences',
+          'professionalLevel',
+          'qualifications',
+          'skype',
+          'softwares',
+          'temporaryEyes',
+          'timezone',
+          'tqi',
+          'website',
+          'whatsapp',
+          'wordCountInfo',
+        ]}
     ]).sort({ _id: 1 }).limit(25);
 
     return Vendors.populate(vendors, [
@@ -112,4 +161,4 @@ async function getFilteredVendors(filters) {
   }
 }
 
-module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors };
+module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, hasVendorCompetenciesAndPending};

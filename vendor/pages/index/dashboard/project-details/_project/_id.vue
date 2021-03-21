@@ -187,7 +187,7 @@
   @import "../../../../../assets/scss/colors";
 
   .title {
-    margin: 20px 0;
+    margin: 30px 0 10px;
     font-size: 20px;
   }
 

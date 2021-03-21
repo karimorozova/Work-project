@@ -1,94 +1,107 @@
 <template lang="pug">
-.upload-file
+  .upload-file
     span.upload-file__label {{ label }}
     .upload-file__button
-        .upload-file__button-text Upload file(s)
-        input.upload-file__input(name="detailFiles" type="file" @change='uploadFile' multiple)
+      .upload-file__button-text {{ btnText }}
+      input.upload-file__input(name="detailFiles" type="file" @change='uploadFile' multiple)
     span.upload-file__comment Drag &amp; Drop
 </template>
 
 <script>
-export default {
-    props: {
-        label: {
-            type: String,
-            default: ""
-        }
-    },
-    data() {
-        return {
-            files: []
-        }
-    },
-    methods: {
-        uploadFile(event) {
-            for(let file of event.target.files) {
-                const isExist = this.files.find(item => item.name === file.name) 
-                if (!isExist) {
-                    this.files.push(file);
-                    this.$emit("uploadedFile", {files: this.files})
-                }
-            }
-        }
-    }
-}
+	export default {
+		props: {
+			label: {
+				type: String,
+				default: ""
+			},
+			btnText: {
+				type: String,
+				default: "Upload file(s)"
+			}
+		},
+		data() {
+			return {
+				files: []
+			}
+		},
+		methods: {
+			uploadFile(event) {
+				for (let file of event.target.files) {
+					const isExist = this.files.find(item => item.name === file.name)
+					if (!isExist) {
+						this.files.push(file)
+						this.$emit("uploadedFile", { files: this.files })
+					}
+				}
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
 
-.upload-file {
+  .upload-file {
     display: flex;
     flex-direction: column;
-    align-items: center;
+
     &__button {
-        overflow: hidden;
-        position: relative;
-        width: 150px;
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 10px;
-        box-shadow: 0 3px 5px rgba(103, 87, 62, 0.5);
-        background-color: #D15F45;
-        &:hover {
-            box-shadow: 0 0 7px rgba(103, 87, 62, 0.8);     
-        }
-        &:active {
-            box-shadow: 0 0px 15px rgba(103, 87, 62, 1);
-        }
-        @media (max-width: 450px) {
-            width: 100px;
-        }
-    }
-    &__button-text {
-        z-index: 1;
-        position: relative;
-        color: #fff;
-        font-size: 15px;
-        font-family: Myriad400;
-        text-align: center;
-    }
-    &__input {
-        top: 0px;
-        right: -25px;
-        z-index: 2;
-        position: absolute;
+      margin-top: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 120px;
+      height: 38px;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 10px;
+      background-color: #d15f45;
+      border: none;
+      transition: .1s ease;
+      outline: none;
+      letter-spacing: 0.2px;
+      position: relative;
+
+      &:hover {
         cursor: pointer;
-        opacity: 0;
-        filter: alpha(opacity=0);
-        font-size: 30px;
-        font-family: Myriad400;
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      }
+
+      &:active {
+        transform: scale(.98);
+      }
     }
+
+    &__button-text {
+      z-index: 0;
+      position: relative;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    &__input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
     &__label {
-        font-size: 12px;
+      font-size: 14px;
     }
+
     &__comment {
-        font-size: 12px;
-        opacity: 0.6;
+      font-size: 14px;
+      opacity: 0.6;
+      margin-top: 4px;
+
     }
+
     .personal__item & {
-        @media (max-width: 450px) {
-            margin-top: 40px;
-        }
+      @media (max-width: 450px) {
+        margin-top: 40px;
+      }
     }
-}
+  }
 </style>

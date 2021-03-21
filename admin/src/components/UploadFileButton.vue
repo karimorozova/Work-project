@@ -37,14 +37,18 @@
     align-items: center;
 
     &__button {
-      overflow: hidden;
+      /*overflow: hidden;*/
       position: relative;
+      width: 55px;
       height: 34px;
       color: #fff;
       font-size: 14px;
       border-radius: 7px;
       text-align: center;
       background-color: #d15f45;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
       &:hover {
         cursor: pointer;
@@ -56,14 +60,8 @@
       }
 
       .tasks-data & {
-        width: 55px;
-        padding: 0;
-        margin-bottom: 0;
-        font-size: 18px;
-        align-items: center;
-        display: flex;
-        border-radius: 7px;
-        justify-content: center;
+        z-index: 999999;
+        cursor: pointer!important;
       }
     }
 
@@ -90,15 +88,17 @@
     }
 
     input {
-      top: 0px;
-      right: -25px;
-      z-index: 2;
+      top: 0;
+      right: 0;
+      z-index: 200;
       position: absolute;
       cursor: pointer;
       opacity: 0;
       filter: alpha(opacity=0);
       font-size: 30px;
       font-family: Myriad400;
+      width: 55px;
+      height: 34px;
     }
   }
 </style>

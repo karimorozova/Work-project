@@ -4,7 +4,7 @@
             .title
                 span Contact Details
             .buttons
-                input.button(type="button" value="Save" @click="checkForErrors")
+                input.button(type="button" value="Continue" @click="checkForErrors")
                 input.button(type="button" value="Cancel" @click="cancel")
                 input.button(type="button" value="Delete" @click="deleteContact")
         .details
@@ -254,8 +254,7 @@ export default {
 
 .contact-wrap {
     position: relative;
-    padding: 40px;
-    width: 750px;
+    width: 700px;
 
     label {
         margin-bottom: 0;
@@ -264,9 +263,7 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-left: 10px;
-        margin-right: 10px;
-        padding-bottom: 15px;
+        padding-bottom: 20px;
 
     }
     &_error-shadow {
@@ -275,30 +272,38 @@ export default {
 }
 
 .title {
-    font-size: 26px;
+    font-size: 22px;
 }
 
 .button {
-    width: 138px;
-    margin-left: 30px;
-    height: 33px;
-    color: white;
+    min-width: 120px;
+    padding: 0 24px 0 24px;
+    height: 34px;
+    color: $white;
     font-size: 14px;
-    border-radius: 10px;
-    -webkit-box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    box-shadow: 0 3px 5px rgba(0,0,0,.4);
-    background-color: #D15F45;
-    border: 1px solid #D15F45;
-    cursor: pointer;
+    border-radius: 7px;
+    background-color: $orange;
+    border: none;
+    transition: .1s ease;
     outline: none;
+    letter-spacing: 0.2px;
+    margin-left: 10px;
+
+    &:hover {
+      cursor: pointer;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    }
+
+    &:active {
+      transform: scale(.98);
+    }
 }
 
 .details {
-    margin: 20px 10px 40px;
-    box-shadow: 0 0 10px rgba(103, 87, 62, 0.5);
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     display: flex;
     flex-direction: column;
-    padding: 40px;
+    padding: 20px;
     &__item {
         display: flex;
         align-items: center;

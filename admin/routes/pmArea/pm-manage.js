@@ -8,6 +8,7 @@ const {
 	Projects,
 	Pricelist,
 	Units,
+	Vendors,
 	Discounts
 } = require('../../models')
 
@@ -824,11 +825,11 @@ router.get('/deliverables', async (req, res) => {
 	const { taskId } = req.query
 	try {
 		const project = await getProject({ 'tasks.taskId': taskId })
-		const task = project.tasks.find(({taskId: tId}) => tId === taskId);
+		const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
 		const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-		if(task.deliverables){
-			res.send({ link:  task.deliverables})
-		}else{
+		if (task.deliverables) {
+			res.send({ link: task.deliverables })
+		} else {
 			const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
 			if (link) {
 				await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
@@ -1282,6 +1283,21 @@ router.post('/remove-vendor-from-step', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on remove-vendor-from-step!')
+	}
+})
+
+router.get('/vendors-for-project', async (req, res) => {
+	try {
+		const result = await Vendors.find({ status: "Active" }, { "firstName": 1, "surname": 1, "rates.pricelistTable": 1 })
+				.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
+				.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
+				.populate('rates.pricelistTable.step', [ 'title' ])
+				.populate('rates.pricelistTable.unit', [ 'type' ])
+				.populate('rates.pricelistTable.industry', [ 'name' ])
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendors-for-project!')
 	}
 })
 module.exports = router

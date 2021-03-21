@@ -88,7 +88,14 @@ async function getClientAfterUpdate(query, update) {
 async function gerFilteredClients(filters) {
 	try {
 		const query = getClientsFilteringQuery(filters)
-		return await Clients.find(query).sort({ _id: 1 }).limit(25)
+		return await Clients.find(query,
+				{ name: 1,
+					status: 1,
+					website: 1,
+					industries: 1,
+					leadSource: 1,
+				})
+				.sort({ _id: 1 }).limit(25)
 				.populate('industries', [ 'icon' ])
 	} catch (err) {
 		console.log(err)

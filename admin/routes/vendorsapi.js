@@ -24,12 +24,19 @@ const {
 	createRateRowFromQualification,
 	getVendorAfterCombinationsUpdated,
 	updateVendorMatrix,
-	syncVendorMatrix
+	syncVendorMatrix,
+	getFilteredVendorsPendingCompetencies,
+	extendVendorsPendingCompetencies,
+	approvePendingCompetence,
+	setRatePriceAfterPassedTest,
+	sendVendorTestAndUpdateQualification,
+	rejectedPendingCompetence,
+	deletePendingCompetence
 } = require('../vendors')
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests')
-const { testSentMessage } = require("../emailMessages/candidateCommunication")
+const { testSentMessage, rejectedPendingCompetenceTemplate } = require("../emailMessages/candidateCommunication")
 
 router.get('/vendor', async (req, res) => {
 	const id = req.query.id
@@ -303,8 +310,8 @@ router.post('/new-vendor', upload.fields([ { name: 'photo' } ]), async (req, res
 	let vendor = JSON.parse(req.body.vendor)
 	const photoFile = req.files["photo"]
 	try {
-		const { discountChart } = await Pricelist.findOne({isVendorDefault: true})
-		vendor.matrix = {...discountChart}
+		const { discountChart } = await Pricelist.findOne({ isVendorDefault: true })
+		vendor.matrix = { ...discountChart }
 		const saveVendor = await Vendors.create(vendor)
 		const id = saveVendor.id
 		if (photoFile) {
@@ -398,6 +405,7 @@ router.post('/qualification-rates/:id', async (req, res) => {
 	try {
 		const { qualification } = req.body
 		await createRateRowFromQualification(vendorId, qualification)
+		await setRatePriceAfterPassedTest(vendorId, qualification)
 		res.send('Saved')
 	} catch (err) {
 		console.log(err)
@@ -432,7 +440,7 @@ router.delete('/deletevendor/:id', async (req, res) => {
 router.post('/update-matrix', async (req, res) => {
 	const { _id, key, value } = req.body
 	try {
-		const updatedVendor = await updateVendorMatrix( _id, {key, value})
+		const updatedVendor = await updateVendorMatrix(_id, { key, value })
 		res.send(updatedVendor)
 	} catch (err) {
 		res.status(500).send("Error on updating Vendor's matrix")
@@ -442,7 +450,7 @@ router.post('/update-matrix', async (req, res) => {
 router.post('/default-matrix', async (req, res) => {
 	const { _id, key } = req.body
 	try {
-		const updatedVendor = await syncVendorMatrix( _id, key)
+		const updatedVendor = await syncVendorMatrix(_id, key)
 		res.send(updatedVendor)
 	} catch (err) {
 		res.status(500).send("Error on updating Vendor's matrix")
@@ -559,5 +567,80 @@ router.get("/delete-memoq-vendor/:id", async (req, res) => {
 		res.status(500).send('Error on deleting vendor in memoQ')
 	}
 })
+
+router.post('/filtered-pending-competencies', async (req, res) => {
+	const { filters } = req.body
+	try {
+		let result = await getFilteredVendorsPendingCompetencies(filters)
+		result = await extendVendorsPendingCompetencies(result)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/vendor-pendingCompetencies-add-benchmark', async (req, res) => {
+	let { pendingCompetencies } = req.body
+	try {
+		const result = await extendVendorsPendingCompetencies(pendingCompetencies)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/approve-pending-competence', async (req, res) => {
+	let { vendorId, pendingCompetence } = req.body
+	try {
+		await approvePendingCompetence({ vendorId, pendingCompetence })
+		const { sourceLanguage, targetLanguage, industry, step } = pendingCompetence
+		const competence = { sourceLanguage, targetLanguage: [ targetLanguage ], industry: [ industry ], step: [ step ] }
+		await updateVendorCompetencies(vendorId, competence)
+		const vendor = await sendVendorTestAndUpdateQualification(vendorId)
+		res.send(vendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/get-reject-pc-message', async (req, res) => {
+	let { pendingCompetence , vendorId } = req.body
+	try {
+    pendingCompetence.vendorName = !pendingCompetence.vendorName ?  (await Vendors.findOne({_id: vendorId})).firstName: pendingCompetence.vendorName
+		const template = await rejectedPendingCompetenceTemplate(pendingCompetence)
+		res.send(template)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/reject-pending-competence', async (req, res) => {
+	let { vendorId, pendingCompetence, template } = req.body
+	try {
+		const result = await rejectedPendingCompetence(vendorId, pendingCompetence, template)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/delete-pending-competence', async (req, res) => {
+	let { vendorId, pendingCompetence } = req.body
+	try {
+		const result = await deletePendingCompetence(vendorId, pendingCompetence)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+
+
 
 module.exports = router

@@ -12,6 +12,7 @@
         :areErrors="areErrors",
         :isApproveModal="isDeleting",
         @closeErrors="closeErrors",
+        :tbodyStyle="{'max-height': '256px'}",
         @approve="deleteData",
         @notApprove="setDefaults",
         @closeModal="setDefaults"
@@ -239,7 +240,7 @@
 				this.currentTestType = this.qualificationData[index].testType
 			},
 			manageCancelEdition(index) {
-				this.$emit("refreshQualifications")
+				// this.$emit("refreshQualifications")
 				this.setDefaults()
 			},
 			setDefaults() {
@@ -383,6 +384,7 @@
 						isShow: true,
 						type: "success"
 					})
+
 				} catch (err) {
 				} finally {
 					this.manageCancelEdition()
@@ -462,18 +464,18 @@
 			}
 		},
 		watch: {
-			async refresh() {
-				if (this.refresh) {
-					try {
-						const id = this.$route.params.id
-						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
-						await this.storeCurrentVendor(vendor.body)
-					} catch (err) {
-					} finally {
-						this.$emit("refreshQualifications")
-					}
-				}
-			}
+			// async refresh() {
+			// 	if (this.refresh) {
+			// 		try {
+			// 			const id = this.$route.params.id
+			// 			const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+			// 			await this.storeCurrentVendor(vendor.body)
+			// 		} catch (err) {
+			// 		} finally {
+			// 			this.$emit("refreshQualifications")
+			// 		}
+			// 	}
+			// }
 		},
 		computed: {
 			...mapGetters({
@@ -550,10 +552,8 @@
 
   .qualifications {
     @extend %setting-table;
-    margin: 20px 10px 40px;
-    width: 920px;
-    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
-    padding: 40px;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    padding: 20px;
 
     &__data {
       @extend %table-data;
@@ -571,7 +571,7 @@
 
     &__icons {
       @extend %table-icons;
-      height: 32px;
+      height: 30px;
       justify-content: flex-end;
     }
 
@@ -600,7 +600,7 @@
 
   .progress-line {
     display: flex;
-    height: 32px;
+    height: 30px;
     align-items: center;
     padding: 0 5px;
 

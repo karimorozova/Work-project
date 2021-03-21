@@ -1,13 +1,5 @@
 <template lang="pug">
   .ratesParams
-    .actionsButton
-      .actionsButton__icon
-          img.defaultIcon(v-if="!ratesParamsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
-          img.opacity(v-else :src="icons.edit.icon")
-      .actionsButton__icon
-          img.defaultIcon(v-if="ratesParamsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-          img.opacity(v-else :src="icons.cancel.icon")
-
     .pricelist-infoBlock
       .rates
         .rates-item
@@ -29,17 +21,24 @@
             .checkbox
               input(type="checkbox" id="ignoreMinPrice" v-model="ignoreMinPrice" @change="setTest")
               label(for="ignoreMinPrice")
-    .dicounts
+    .discounts
       Discounts(
         :paramsIsEdit="ratesParamsIsEdit",
         :enum="'client'"
       )
+      .actionsButton
+        .actionsButton__icon
+          img.defaultIcon(v-if="!ratesParamsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+          img.opacity(v-else :src="icons.edit.icon")
+        .actionsButton__icon
+          img.defaultIcon(v-if="ratesParamsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+          img.opacity(v-else :src="icons.cancel.icon")
 
 
 </template>
 <script>
-	import { mapGetters, mapActions } from 'vuex';
-	import Discounts from "./Discounts";
+	import { mapGetters, mapActions } from 'vuex'
+	import Discounts from "./Discounts"
 
 	export default {
 		components: { Discounts },
@@ -47,45 +46,45 @@
 			return {
 				icons: {
 					edit: { icon: require("../../../assets/images/Other/edit-icon-qa.png") },
-					cancel: { icon: require("../../../assets/images/cancel-icon.png") },
+					cancel: { icon: require("../../../assets/images/cancel-icon.png") }
 				},
 				ignoreMinPrice: false,
-				ratesParamsIsEdit: false,
-			};
+				ratesParamsIsEdit: false
+			}
 		},
 		methods: {
-			...mapActions(['storeClientProperty', 'alertToggle']),
+			...mapActions([ 'storeClientProperty', 'alertToggle' ]),
 			crudActions(actionType) {
 				switch (actionType) {
 					case 'cancel':
-						this.ratesParamsIsEdit = false;
-						break;
+						this.ratesParamsIsEdit = false
+						break
 					case 'edit':
-						this.ratesParamsIsEdit = true;
-						break;
+						this.ratesParamsIsEdit = true
+						break
 				}
 			},
 			async updateMinPrice() {
 				try {
 					await this.$http.put('/clientsapi/set-min-price', {
 						_id: this.currentClient._id,
-						value: this.$refs.minPrice.value,
-					});
-					this.storeClientProperty({ prop: 'minPrice', value: this.$refs.minPrice.value });
-					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" });
+						value: this.$refs.minPrice.value
+					})
+					this.storeClientProperty({ prop: 'minPrice', value: this.$refs.minPrice.value })
+					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({
 						message: 'Client\'s minimum price is not updated!',
 						isShow: true,
-						type: 'error',
-					});
+						type: 'error'
+					})
 				}
 				// this.storeClientProperty({ prop, value: e.target.value });
 			},
 			getSymbol(currency) {
 				return currency === 'USD' ?
 						'&ensp;&#36;' :
-						currency === 'EUR' ? '&ensp;&euro;' : '&ensp;&pound';
+						currency === 'EUR' ? '&ensp;&euro;' : '&ensp;&pound'
 			},
 			async setTest() {
 				// this.storeClientProperty({
@@ -95,14 +94,14 @@
 				try {
 					await this.$http.put('/clientsapi/toggle-ignore-min-price', {
 						_id: this.currentClient._id,
-						value: this.ignoreMinPrice,
-					});
+						value: this.ignoreMinPrice
+					})
 				} catch (err) {
 					this.alertToggle({
 						message: 'Client\'s ignoreMinPrice is not updated!',
 						isShow: true,
-						type: 'error',
-					});
+						type: 'error'
+					})
 				}
 			}
 		},
@@ -115,7 +114,7 @@
 				currentClient: "getCurrentClient"
 			})
 		}
-	};
+	}
 </script>
 <style lang="scss" scoped>
   .ratesParams {
@@ -126,19 +125,23 @@
     border-bottom: 1px solid #C5BFB5;
   }
 
+  .discounts {
+    display: flex;
+  }
+
   .actionsButton {
     display: flex;
-    position: absolute;
-    right: 0;
-    top: -30px;
+    padding-left: 20px;
 
     &__icon {
       margin-left: 5px;
     }
   }
-  .defaultIcon{
+
+  .defaultIcon {
     cursor: pointer;
   }
+
   .opacity {
     opacity: .5;
     cursor: default;
@@ -146,7 +149,7 @@
 
   .rates {
     display: flex;
-    padding: 16px 30px;
+    padding: 20px;
     background: #F2EFEB;
     border: 2px solid #938676;
     flex-direction: column;

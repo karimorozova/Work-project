@@ -83,7 +83,7 @@ export default {
     }
   }
   &__tbody {
-    max-height: 180px;
+    max-height: 192px;
     overflow-y: scroll;
     margin-bottom: 20px;
     border: 0.5px solid $cell-border;
@@ -106,6 +106,7 @@ export default {
         }
       }
     }
+    .cursor-default,
     .steps-table-row,
     .rates-matrix-row {
       cursor: default;
@@ -166,7 +167,7 @@ export default {
     padding: 7px 5px 5px 6px;
     border: 1px solid $cell-border;
     border-right: none;
-    min-height: 32px;
+    min-height: 30px;
     
     &:last-child {
       border-right: 0.5px solid $cell-border;
@@ -300,7 +301,7 @@ export default {
   box-sizing: border-box;
   font-size: 14px;
   padding: 0 0 0 5px;
-  height: 34px;
+  height: 32px;
   line-height: 34px;
   border: 1px solid #938676;
   border-right: none;

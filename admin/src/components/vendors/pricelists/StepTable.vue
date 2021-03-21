@@ -71,11 +71,14 @@
 	export default {
 		mixins: [ crudIcons ],
 		props: {
-			tableData: {
+			dataArray: {
 				type: Array
 			},
 			vendorId: {
 				type: String
+			},
+			vendor: {
+				type: Object
 			},
 			refresh: {
 				type: Boolean
@@ -120,7 +123,6 @@
 						padding: "0"
 					}
 				],
-				dataArray: [],
 				currentStep: "",
 				currentUnit: "",
 				currentStepObj: "",
@@ -136,12 +138,10 @@
 				isDataRemain: true
 			}
 		},
-		created() {
-			this.getSteps()
-		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+				storeCurrentVendor: "storeCurrentVendor",
 			}),
 			async getRowPrice(index) {
 				try {
@@ -150,7 +150,8 @@
 						row: this.dataArray[index]
 					})
 					const result = await this.$http.post(`/vendorsapi/vendor-rate-by-key`, {id: this.vendorId, key: 'stepMultipliersTable'})
-					this.dataArray = result.data
+					this.vendor.rates.stepMultipliersTable = result.data
+					await this.storeCurrentVendor(this.vendor)
 					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
@@ -198,9 +199,6 @@
 				if (Math.sign(this.currentMultiplier) == -1) return
 				await this.manageSaveClick(index)
 			},
-			async getSteps() {
-				this.dataArray = this.tableData
-			},
 			refreshResultTable() {
 				this.$emit("refreshResultTable")
 			},
@@ -238,14 +236,6 @@
 			},
 			closeErrors() {
 				this.areErrors = false
-			}
-		},
-		watch: {
-			async refresh() {
-				if (this.refresh) {
-					const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`)
-					this.dataArray = vendor.data.rates.stepMultipliersTable
-				}
 			}
 		},
 		computed: {
@@ -288,7 +278,7 @@
 
     &__data,
     &__editing-data {
-      height: 32px;
+      height: 30px;
       padding: 0 5px;
       display: flex;
       align-items: center;

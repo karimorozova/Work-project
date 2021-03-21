@@ -6,8 +6,10 @@ const state = {
   jobs: [],
   selectedJob: {},
   languages: [],
+  industries: [],
   timezones: [],
   steps: [],
+  allSteps: [],
   packages: [],
   applicationFormData: {
     firstName: "",

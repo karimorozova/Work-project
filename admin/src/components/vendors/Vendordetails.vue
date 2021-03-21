@@ -1,6 +1,6 @@
 <template lang="pug">
   .vendor-wrap
-    .vendor-info
+    .vendor-info(v-if="currentVendor._id")
       .buttons
         input.button(type="button", value="Save", @click="checkForErrors")
         input.button(type="button", value="Cancel", @click="cancel")
@@ -66,7 +66,7 @@
               label.block-item__label.block-item_relative Native Language:
               .block-item__drop-menu.block-item_medium-index
                 NativeLanguageSelect(:selectedLang="currentVendor.native", @chosenLang="setNative")
-            .block-item
+            .block-item.no-margin
               label Gender:
               .block-item__drop-menu
                 SelectSingle(
@@ -127,7 +127,7 @@
                   :filteredIndustries="selectedIndNames",
                   @chosenInd="chosenInd"
                 )
-            .block-item
+            .block-item.no-margin
               label Aliases:
               .block-item__drop-menu
                 SelectMulti(
@@ -147,92 +147,86 @@
           @send="sendQuote"
         )
 
+      .title Pending Competencies
+      .vendor-info__competencies
+        PendingCompetencies(:pendingCompetenciesData="currentVendor.pendingCompetencies" @updateRates="updateRates")
+
       .title Competencies
-      .vendor-info__competencies(v-if="currentVendor.industries")
+      .vendor-info__competencies
         VendorCompetencies(
+          :competenciesData="currentVendor.competencies"
           :languages="languages",
           :steps="steps",
           :industries="industries",
           :vendorIndustries="currentVendor.industries.map((i) => i.name)",
-          @updateQualifications="updateQualifications"
           @updateRates="updateRates"
         )
 
-      .title(v-if="currentVendor._id") Qualifications
-        TableQualifications(
-          :qualificationData="qualificationData",
-          :assessmentData="assessmentData",
-          :currentVendor="currentVendor",
-          @refreshQualifications="setDetailsTablesData"
-          :refresh="isRefreshQualificationTable"
-          @updateRates="updateRates"
-        )
+      .title Qualifications
+      TableQualifications(
+        :qualificationData="currentVendor.qualifications",
+        :assessmentData="assessmentData",
+        :currentVendor="currentVendor",
+        @updateRates="updateRates"
+      )
 
       .title Assessment
-        TableAssessment(
-          :assessmentData="assessmentData",
-          :currentVendor="currentVendor",
-          @refreshAssessment="setDetailsTablesData"
-        )
+      TableAssessment(:assessmentData="currentVendor.assessments", :currentVendor="currentVendor",)
 
       .title Rates
-        .vendor-info__rates(v-if="currentVendor._id")
-          .vendor-info__tables-row
-            .lang-table(v-if="currentVendor._id && languages.length")
-              LangTable(
-                :tableData="currentVendor.rates.basicPricesTable",
-                :vendorId="currentVendor._id",
-                @refreshResultTable="refreshResultTable",
-                :refresh="isRefreshAfterServiceUpdate"
-              )
-            .step-table(v-if="currentVendor._id && steps.length && units.length")
-              StepTable(
-                :tableData="currentVendor.rates.stepMultipliersTable",
-                :vendorId="currentVendor._id",
-                @refreshResultTable="refreshResultTable",
-                :refresh="isRefreshAfterServiceUpdate"
-              )
-            .industry-table(v-if="currentVendor._id && industries.length")
-              IndustryTable(
-                :tableData="currentVendor.rates.industryMultipliersTable",
-                :vendorId="currentVendor._id",
-                @refreshResultTable="refreshResultTable",
-                :refresh="isRefreshAfterServiceUpdate"
-              )
-          .result-table(v-if="currentVendor._id")
-            ResultTable(
+      .vendor-info__rates
+        .vendor-info__tables-row
+          .lang-table(v-if="languages.length")
+            LangTable(
+              :dataArray="currentVendor.rates.basicPricesTable",
               :vendorId="currentVendor._id",
-              :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
-              :steps="steps.map((i) => i.title)",
-              :units="units.map((i) => i.type)",
-              :industries="industries.map((i) => i.name)",
-              :isRefreshResultTable="isRefreshResultTable",
-              :refresh="isRefreshAfterServiceUpdate"
+              :vendor="currentVendor"
+              @refreshResultTable="refreshResultTable",
             )
+          .step-table(v-if="steps.length && units.length")
+            StepTable(
+              :dataArray="currentVendor.rates.stepMultipliersTable",
+              :vendorId="currentVendor._id",
+              :vendor="currentVendor"
+              @refreshResultTable="refreshResultTable",
+            )
+          .industry-table(v-if="industries.length")
+            IndustryTable(
+              :dataArray="currentVendor.rates.industryMultipliersTable",
+              :vendorId="currentVendor._id",
+              :vendor="currentVendor"
+              @refreshResultTable="refreshResultTable",
+            )
+        .result-table
+          ResultTable(
+            :vendorId="currentVendor._id",
+            :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
+            :steps="steps.map((i) => i.title)",
+            :units="units.map((i) => i.type)",
+            :industries="industries.map((i) => i.name)",
+            :isRefreshResultTable="isRefreshResultTable",
+            :refresh="isRefreshAfterServiceUpdate"
+          )
 
       .title Discount Chart
-        .vendor-info__drop-matrix(v-if="currentVendor._id")
-          FinanceMatrixWithReset(:entity="currentVendor" @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+      .vendor-info__drop-matrix
+        FinanceMatrixWithReset(:entity="currentVendor" @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
       .title Documents
-        TableDocuments(:documentsData="documentsData", :vendorId="vendorId", @refreshDocuments="setDetailsTablesData")
+      TableDocuments(:documentsData="currentVendor.documents", :vendorId="vendorId")
 
       .title Professional experience
-        TableProfessionalExperience(
-          :professionalExperienceData="professionalExperienceData",
-          :vendorId="vendorId",
-          @refreshProfExperiences="setDetailsTablesData"
-        )
+      TableProfessionalExperience(:professionalExperienceData="currentVendor.profExperiences", :vendorId="vendorId",)
 
       .title Education
-        TableEducation(:educationData="educationData", :vendorId="vendorId", @refreshEducations="setDetailsTablesData")
+      TableEducation(:educationData="currentVendor.educations", :vendorId="vendorId")
 
       .title Notes & Comments
-        .vendor-info__notes-block
-          .vendor-info__notes
-            VendorCandidate(:candidateData="currentVendor")
-          .vendor-info__editor(v-if="currentVendor._id")
-            ckeditor(v-model="currentVendor.notes", :config="editorConfig")
+      .vendor-info__notes-block
+        .vendor-info__notes
+          VendorCandidate(:candidateData="currentVendor")
+        .vendor-info__editor
+          ckeditor(v-model="currentVendor.notes", :config="editorConfig")
 
       //.title Vendor to memoq
         //div
@@ -254,7 +248,7 @@
         input.button.approve-block(type="button", value="Cancel", @click="cancelApprove")
         input.button(type="button", value="Delete", @click="approveVendorDelete")
 
-    .vendor-subinfo
+    .vendor-subinfo(v-if="currentVendor._id")
       .vendor-subinfo__general
         .block-item-subinfo
           label.block-item-subinfo__label Vendor Status:
@@ -315,30 +309,19 @@
 	import photoPreview from "@/mixins/photoPreview"
 	import ApproveModal from "../ApproveModal"
 	import SelectMulti from "../SelectMulti"
+	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
 
 	export default {
 		mixins: [ photoPreview ],
 		data() {
 			return {
-				languages: [],
-				industries: [],
-				services: [],
-				units: [],
-				steps: [],
 				aliases: [],
-
 				currentVendorAliases: [],
 				memoqAction: "",
 				approveMemoqVendorAction: false,
-				isRefreshQualificationTable: false,
 				isRefreshAfterServiceUpdate: false,
 				isRefreshResultTable: false,
 				vendorId: "",
-				educationData: [],
-				professionalExperienceData: [],
-				qualificationData: [],
-				documentsData: [],
-				assessmentData: [],
 				areErrorsExist: false,
 				isSaveClicked: false,
 				vendorShow: true,
@@ -378,7 +361,7 @@
 				getDuoCombinations: "getVendorDuoCombinations",
 				updateVendorStatus: "updateVendorStatus",
 				setVendorsMatrixData: "setVendorsMatrixData",
-        setDefaultValuesMatrixData: "setDefaultValuesMatrixData"
+				setDefaultValuesMatrixData: "setDefaultValuesMatrixData"
 			}),
 			setAlias({ option }) {
 				if (this.currentVendor.hasOwnProperty('aliases')) {
@@ -428,12 +411,6 @@
 					})
 				}
 			},
-			async updateQualifications() {
-				this.isRefreshQualificationTable = true
-				setTimeout(() => {
-					this.isRefreshQualificationTable = false
-				}, 2000)
-			},
 			async setMatrixData({ value, key }) {
 				try {
 					await this.setVendorsMatrixData({ value, key })
@@ -442,14 +419,14 @@
 					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
 				}
 			},
-      async getDefaultValuesDC( key ) {
-        try {
-          await this.setDefaultValuesMatrixData({ key })
-          this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
-        } catch (err) {
-          this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
-        }
-      },
+			async getDefaultValuesDC(key) {
+				try {
+					await this.setDefaultValuesMatrixData({ key })
+					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
+				}
+			},
 			refreshResultTable() {
 				this.isRefreshResultTable = true
 				setTimeout(() => {
@@ -642,86 +619,16 @@
 			chosenInd({ industry }) {
 				this.updateIndustry(industry)
 			},
-			setDetailsTablesData() {
-				this.educationData = Array.from(this.currentVendor.educations)
-				this.professionalExperienceData = Array.from(this.currentVendor.profExperiences)
-				this.qualificationData = Array.from(this.currentVendor.qualifications)
-				this.documentsData = Array.from(this.currentVendor.documents)
-				this.assessmentData = Array.from(this.currentVendor.assessments)
-			},
 			async getVendor() {
 				this.vendorId = this.$route.params.id
 				const id = this.$route.params.id
 				try {
-					if (!this.currentVendor._id) {
-						const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
-						await this.storeCurrentVendor(vendor.body)
-						this.oldEmail = this.currentVendor.email
-					}
-					this.setDetailsTablesData()
+          const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+          await this.storeCurrentVendor(vendor.data)
+          this.oldEmail = this.currentVendor.email
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on getting Vendor's info",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getLangs() {
-				try {
-					const result = await this.$http.get("/api/languages")
-					this.languages = Array.from(result.body)
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Languages",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getIndustries() {
-				try {
-					const result = await this.$http.get("/api/industries")
-					this.industries = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Industries",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getServices() {
-				try {
-					const result = await this.$http.get("/api/services")
-					this.services = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Services",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getUnits() {
-				try {
-					const result = await this.$http.get("/api/units")
-					this.units = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Units",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getSteps() {
-				try {
-					const result = await this.$http.get("/api/steps")
-					this.steps = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Steps",
 						isShow: true,
 						type: "error"
 					})
@@ -742,7 +649,12 @@
 		},
 		computed: {
 			...mapGetters({
-				currentVendor: "getCurrentVendor"
+				currentVendor: "getCurrentVendor",
+				languages: "getAllLanguages",
+				steps: "getAllSteps",
+				services: "getAllServices",
+				units: "getAllUnits",
+				industries: "getAllIndustries"
 			}),
 			vendorAliases() {
 				if (this.aliases) {
@@ -763,6 +675,7 @@
 			}
 		},
 		components: {
+			PendingCompetencies,
 			SelectMulti,
 			ApproveModal,
 			VendorCompetencies,
@@ -796,11 +709,6 @@
 		},
 		created() {
 			this.getVendor()
-			this.getLangs()
-			this.getUnits()
-			this.getSteps()
-			this.getIndustries()
-			this.getServices()
 			this.getAliases()
 		},
 		mounted() {
@@ -864,36 +772,35 @@
   .vendor-subinfo {
     &__general {
       padding: 20px;
-      margin-top: 120px;
+      margin-top: 100px;
       width: 350px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      margin-left: 40px;
     }
 
     &__action {
       margin-top: 40px;
       width: 390px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      margin-left: 40px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
   }
 
   .vendor-info {
-    padding: 40px;
     position: relative;
-    width: 1020px;
+    width: 1000px;
 
     &__competencies {
       box-sizing: border-box;
-      margin: 20px 10px 40px 10px;
-      padding: 40px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      padding: 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       position: relative;
     }
 
     &__drop-matrix {
       box-sizing: border-box;
-      margin: 20px 10px 40px 10px;
-      padding: 40px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      padding: 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       position: relative;
     }
 
@@ -902,7 +809,6 @@
     }
 
     &__editor {
-      margin: 20px 10px 50px 10px;
       width: 100%;
     }
 
@@ -917,10 +823,8 @@
 
     &__rates {
       box-sizing: border-box;
-      margin: 20px 10px 40px 10px;
-      padding: 40px 40px 20px 40px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
-      font-size: 16px;
+      padding: 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
 
     &__tables-row {
@@ -942,13 +846,13 @@
 
   .title {
     font-size: 22px;
+    padding: 30px 0 10px;
   }
 
   .gen-info {
     box-sizing: border-box;
-    margin: 20px 10px 40px 10px;
-    padding: 40px;
-    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+    padding: 20px;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   }
 
   .gen-info {
@@ -1210,5 +1114,9 @@
     .approve-block {
       margin-bottom: 15px;
     }
+  }
+
+  .no-margin {
+    margin-bottom: 0;
   }
 </style>

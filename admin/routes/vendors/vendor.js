@@ -3,7 +3,7 @@ const { checkVendor } = require('../../middleware')
 const jwt = require("jsonwebtoken")
 const { secretKey } = require('../../configs')
 const { Vendors } = require('../../models')
-const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp } = require('../../vendors')
+const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp, hasVendorCompetenciesAndPending } = require('../../vendors')
 const { upload, sendEmail } = require('../../utils')
 const { setVendorNewPassword } = require('../../users')
 const { createMemoqUser } = require('../../services/memoqs/users')
@@ -65,6 +65,18 @@ router.get("/info", checkVendor, async (req, res) => {
 		console.log(err)
 		res.status(500).send("Error on getting Vendor info. Try later.")
 	}
+})
+
+router.get("/has-competencies", checkVendor, async (req, res) => {
+  const { token } = req.query
+  try {
+    const verificationResult = jwt.verify(token, secretKey)
+    const vendor = await hasVendorCompetenciesAndPending(verificationResult.vendorId )
+    res.send({check: vendor})
+  } catch (err) {
+    console.log(err)
+    res.status(500).send("Error on getting Vendor info. Try later.")
+  }
 })
 
 router.post("/info", checkVendor, upload.fields([ { name: 'photo' } ]), async (req, res) => {

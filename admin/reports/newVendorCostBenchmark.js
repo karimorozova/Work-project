@@ -30,7 +30,7 @@ const updateVendorBenchmarkCost = async () => {
 				stepMultipliersTable.forEach(({ step, unit, size, multiplier: stepMultiplierValue }) => {
 					const rate = multiplyPrices(euroBasicPrice, stepMultiplierValue, size, industryMultiplierValue)
 					const stepAndUnitKey = step + '/' + unit
-					result[langPair][industry][stepAndUnitKey] = rate
+					result[langPair][industry][stepAndUnitKey] = {[size]: rate}
 				})
 			})
 		})
@@ -40,12 +40,18 @@ const updateVendorBenchmarkCost = async () => {
 	function getVendorBenchmarkCost(allVendors, allBenchmarks) {
 		const vendorBenchmarks = []
 		allVendors.forEach(vendor => {
-			vendor.rates.pricelistTable.forEach(({ sourceLanguage, targetLanguage, industry, step, unit, price }) => {
+			vendor.rates.pricelistTable.forEach(({ sourceLanguage, targetLanguage, industry, step, unit, price, size }) => {
 
 				const languagePair = sourceLanguage._id + '/' + targetLanguage._id
 				const stepAndUnitInfo = step._id + '/' + unit._id
-				if (!allBenchmarks[languagePair]) return
-				const benchmark = (allBenchmarks[languagePair][industry][stepAndUnitInfo] * 0.5).toFixed(3)
+
+        if (
+          !allBenchmarks[languagePair]
+          || !allBenchmarks[languagePair][industry][stepAndUnitInfo]
+          || !allBenchmarks[languagePair][industry][stepAndUnitInfo][size]
+        ) return
+
+        const benchmark = (allBenchmarks[languagePair][industry][stepAndUnitInfo][size] * 0.5).toFixed(3)
 				const vendorInfo = {
 					baseRate: price,
 					margin: (benchmark - price).toFixed(3),

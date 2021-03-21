@@ -1,13 +1,14 @@
 <template lang="pug">
-  .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped}, customClass]")
-    .select(@click="toggleOptions")
-      span.selected(v-if="selectedOption") {{ selectedOption }}
-      span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
-      .arrow-button
-        img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
-    .drop(v-if="isDropped")
-      .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
-        span {{ option }}
+  .drop-relative
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped}, customClass]")
+      .select(@click="toggleOptions")
+        span.selected(v-if="selectedOption") {{ selectedOption }}
+        span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
+        .arrow-button
+          img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
+      .drop(v-if="isDropped")
+        .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
+          span {{ option }}
 </template>
 
 <script>
@@ -64,24 +65,28 @@
     width: 100%;
 
     &__label {
-      font-size: 12px;
+      font-size: 14px;
     }
+  }
+
+  .drop-relative {
+    position: relative;
+    height: 42px;
   }
 
   .drop-select {
     position: absolute;
-    top: 20px;
     width: 100%;
-    border: 1px solid #67573E;
-    border-radius: 15px;
+    top: 0;
+    border: 1px solid #c3c5c5;
+    border-radius: 10px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 3px 8px rgba(103, 87, 62, 0.7);
 
     .drop {
       width: 100%;
-      max-height: 100px;
+      max-height: 188px;
       overflow-y: auto;
       overflow-x: hidden;
       display: flex;
@@ -91,14 +96,14 @@
 
       &__item {
         align-items: center;
-        padding: 5px;
-        border-bottom: .5px solid #BFB09D;
+        padding: 6px;
+        border-bottom: .5px solid #C4BEB6;
         cursor: pointer;
         font-size: 14px;
-        transition: all 0.4s;
+        transition: ease 0.2s;
 
         &:first-child {
-          border-top: .5px solid #BFB09D;
+          border-top: .5px solid #C4BEB6;
         }
 
         &:last-child {
@@ -128,16 +133,14 @@
   .select {
     border-radius: 15px;
     width: 100%;
-    height: 40px;
     display: flex;
     justify-content: space-between;
     cursor: pointer;
 
     .selected {
-      width: 90%;
-      padding: 3px 10px;
+      width: 80%;
+      padding: 10px;
       font-size: 14px;
-      max-height: 40px;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
@@ -150,7 +153,7 @@
     }
 
     .arrow-button {
-      width: 10%;
+      width: 20%;
       display: flex;
       justify-content: center;
       align-items: center;

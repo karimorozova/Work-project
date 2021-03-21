@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
+const Schema = mongoose.Schema
 
 const VendorSchema = new mongoose.Schema({
 	guid: {
@@ -15,7 +15,7 @@ const VendorSchema = new mongoose.Schema({
 	currency: {
 		type: String,
 		default: 'EUR',
-		trim: true,
+		trim: true
 	},
 	firstName: {
 		type: String,
@@ -39,7 +39,7 @@ const VendorSchema = new mongoose.Schema({
 	},
 	aliases: {
 		type: Array,
-		default: [],
+		default: []
 	},
 	email: {
 		type: String,
@@ -134,33 +134,33 @@ const VendorSchema = new mongoose.Schema({
 	notes: {
 		type: String
 	},
-	competencies: [{
+	competencies: [ {
 		sourceLanguage: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		targetLanguage: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		step: {
-			type: Schema.Types.ObjectId, ref: 'Step',
+			type: Schema.Types.ObjectId, ref: 'Step'
 		},
 		industry: {
-			type: Schema.Types.ObjectId, ref: 'Industries',
+			type: Schema.Types.ObjectId, ref: 'Industries'
 		}
-	}],
-	qualifications: [{
+	} ],
+	qualifications: [ {
 		source: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		target: {
 			type: Schema.Types.ObjectId, ref: 'Language'
 		},
-		industries: [{
+		industries: [ {
 			type: Schema.Types.ObjectId, ref: 'Industries'
-		}],
-		steps: [{
+		} ],
+		steps: [ {
 			type: Schema.Types.ObjectId, ref: 'Step'
-		}],
+		} ],
 		status: {
 			type: String,
 			default: 'Created',
@@ -168,17 +168,17 @@ const VendorSchema = new mongoose.Schema({
 		},
 		tqi: {
 			type: Number,
-			default: 0,
+			default: 0
 		},
 		testType: {
 			type: String,
-			default: '',
+			default: ''
 		},
 		testId: {
 			type: String,
-			default: '',
+			default: ''
 		}
-	}],
+	} ],
 	documents: {
 		type: Array,
 		default: []
@@ -191,7 +191,7 @@ const VendorSchema = new mongoose.Schema({
 		type: Array,
 		default: []
 	},
-	assessments: [{
+	assessments: [ {
 		sourceLanguage: {
 			type: Schema.Types.ObjectId,
 			ref: 'Language'
@@ -200,15 +200,15 @@ const VendorSchema = new mongoose.Schema({
 			type: Schema.Types.ObjectId,
 			ref: 'Language'
 		},
-		industries: [{
+		industries: [ {
 			industry: {
 				type: Schema.Types.ObjectId,
 				ref: 'Industries'
 			},
-			steps: [{
+			steps: [ {
 				step: {
 					type: Schema.Types.ObjectId,
-					ref: 'Step',
+					ref: 'Step'
 				},
 				tqi: {
 					fileName: {
@@ -253,11 +253,11 @@ const VendorSchema = new mongoose.Schema({
 					grade: {
 						type: Number
 					}
-				},
-			}]
-		}]
-	}],
-	wordCountInfo: [{
+				}
+			} ]
+		} ]
+	} ],
+	wordCountInfo: [ {
 		industry: {
 			id: {
 				type: Schema.Types.ObjectId, ref: 'Industries'
@@ -265,54 +265,54 @@ const VendorSchema = new mongoose.Schema({
 			name: {
 				type: String,
 				default: '',
-				trim: true,
+				trim: true
 			}
 		},
 		targetLanguage: {
 			id: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			group: {
 				type: String,
 				default: '',
-				trim: true,
+				trim: true
 			}
 		},
 		wordCount: {
 			type: Number,
-			default: 0,
+			default: 0
 		}
-	}],
+	} ],
 	industries: [
 		{ type: Schema.Types.ObjectId, ref: 'Industries' }
 	],
-	languagePairs: [{
+	languagePairs: [ {
 		source: {
 			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		target: {
 			type: Schema.Types.ObjectId, ref: 'Language'
 		}
-	}],
+	} ],
 	rates: {
-		basicPricesTable: [{
+		basicPricesTable: [ {
 			type: {
 				type: String,
 				trim: true
 			},
 			sourceLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			targetLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			basicPrice: {
 				type: Number,
-				default: 1,
+				default: 1
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -322,20 +322,20 @@ const VendorSchema = new mongoose.Schema({
 			isActive: {
 				type: Boolean
 			}
-		}],
-		stepMultipliersTable: [{
+		} ],
+		stepMultipliersTable: [ {
 			step: {
-				type: Schema.Types.ObjectId, ref: 'Step',
+				type: Schema.Types.ObjectId, ref: 'Step'
 			},
 			unit: {
-				type: Schema.Types.ObjectId, ref: 'Units',
+				type: Schema.Types.ObjectId, ref: 'Units'
 			},
 			size: {
-				type: Number,
+				type: Number
 			},
 			multiplier: {
 				type: Number,
-				default: 100,
+				default: 100
 			},
 			defaultSize: {
 				type: Boolean,
@@ -343,7 +343,7 @@ const VendorSchema = new mongoose.Schema({
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -353,18 +353,18 @@ const VendorSchema = new mongoose.Schema({
 			isActive: {
 				type: Boolean
 			}
-		}],
-		industryMultipliersTable: [{
+		} ],
+		industryMultipliersTable: [ {
 			industry: {
-				type: Schema.Types.ObjectId, ref: 'Industries',
+				type: Schema.Types.ObjectId, ref: 'Industries'
 			},
 			multiplier: {
 				type: Number,
-				default: 100,
+				default: 100
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -374,25 +374,25 @@ const VendorSchema = new mongoose.Schema({
 			isActive: {
 				type: Boolean
 			}
-		}],
-		pricelistTable: [{
+		} ],
+		pricelistTable: [ {
 			sourceLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			targetLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			step: {
-				type: Schema.Types.ObjectId, ref: 'Step',
+				type: Schema.Types.ObjectId, ref: 'Step'
 			},
 			unit: {
-				type: Schema.Types.ObjectId, ref: 'Units',
+				type: Schema.Types.ObjectId, ref: 'Units'
 			},
 			size: {
-				type: Number,
+				type: Number
 			},
 			industry: {
-				type: Schema.Types.ObjectId, ref: 'Industries',
+				type: Schema.Types.ObjectId, ref: 'Industries'
 			},
 			price: {
 				type: Number,
@@ -400,7 +400,7 @@ const VendorSchema = new mongoose.Schema({
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -410,7 +410,7 @@ const VendorSchema = new mongoose.Schema({
 			isActive: {
 				type: Boolean
 			}
-		}]
+		} ]
 	},
 	positions: {
 		type: Array,
@@ -422,7 +422,7 @@ const VendorSchema = new mongoose.Schema({
 	},
 	password: {
 		type: String,
-		default: '',
+		default: ''
 	},
 	//REFACTOR
 	temporaryEyes: '',
@@ -448,41 +448,94 @@ const VendorSchema = new mongoose.Schema({
 	coverLetterFiles: {
 		type: Array,
 		default: []
-	}
-}, { minimize: false });
+	},
+	dateInfo: {
+		createdAt: {
+			type: Date,
+			default: new Date()
+		}
+	},
+	pendingCompetencies: [ {
+		sourceLanguage: {
+			type: Schema.Types.ObjectId, ref: 'Language'
+		},
+		targetLanguage: {
+			type: Schema.Types.ObjectId, ref: 'Language'
+		},
+		step: {
+			type: Schema.Types.ObjectId, ref: 'Step'
+		},
+		industry: {
+			type: Schema.Types.ObjectId, ref: 'Industries'
+		},
+		rate: {
+			type: Number,
+			default: 0
+		},
+		descriptions: {
+			targetLanguage: {
+				type: String,
+				default: ''
+			},
+			industry: {
+				type: String,
+				default: ''
+			},
+		}
+	} ],
+	approvedPendingCompetencies: [{
+		sourceLanguage: {
+			type: Schema.Types.ObjectId, ref: 'Language'
+		},
+		targetLanguage: {
+			type: Schema.Types.ObjectId, ref: 'Language'
+		},
+		step: {
+			type: Schema.Types.ObjectId, ref: 'Step'
+		},
+		industry: {
+			type: Schema.Types.ObjectId, ref: 'Industries'
+		},
+		rate: {
+			type: Number,
+			default: 0
+		},
+	}]
+
+}, { minimize: false })
 
 VendorSchema.statics.authenticate = function (email, password, callback) {
 	Vendors.findOne({ email: email })
 			.exec((err, vendor) => {
-				if(err) {
-					return callback(err);
-				} else if(!vendor) {
-					const err = new Error('Vendor not found.');
-					err.status = 401;
-					return callback(err);
+				if (err) {
+					return callback(err)
+				} else if (!vendor) {
+					const err = new Error('Vendor not found.')
+					err.status = 401
+					return callback(err)
 				}
 				bcrypt.compare(password, vendor.password, function (err, result) {
-					if(result === true || !vendor.password) {
-						return callback(null, vendor);
+					if (result === true || !vendor.password) {
+						return callback(null, vendor)
 					} else {
-						return callback();
+						return callback()
 					}
-				});
-			});
-};
+				})
+			})
+}
 
 VendorSchema.pre('save', function (next) {
-	const vendor = this;
+	const vendor = this
 	bcrypt.hash(vendor.password, 10, (err, hash) => {
-		if(err) {
-			return next(err);
+		if (err) {
+			return next(err)
 		}
-		vendor.password = hash;
-		next();
-	});
-});
+		vendor.password = hash
+		next()
+	})
+})
 
 
-const Vendors = mongoose.model('Vendors', VendorSchema);
+const Vendors = mongoose.model('Vendors', VendorSchema)
 
-module.exports = Vendors;
+module.exports = Vendors

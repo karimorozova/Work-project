@@ -161,12 +161,9 @@ export default {
 <style lang="scss" scoped>
 
 .all-clients {
-    margin-top: 20px;
-    margin-left: 20px;
     position: relative;
-    width: 1180px;
+    width: 1200px;
     &__table {
-        margin: 40px 40px 40px 0;
         padding: 20px;
         font-size: 14px;
         font-weight: normal;
@@ -175,7 +172,7 @@ export default {
 }
 
 .title {
-    font-size: 22px;
+    font-size: 28px;
 }
 
 label {

@@ -63,8 +63,8 @@ export default {
 
 .sidebar {
     background-color: #fff;
-    width: 175px;
-    min-width: 175px;
+    width: 170px;
+    min-width: 170px;
     display: flex;
     flex-direction: column;
     color: $main-color;
@@ -72,12 +72,12 @@ export default {
     transition: all 1s;
     position: relative;
     &__links {
-        width: 175px;
+        width: 170px;
     }
     &__title {
         display: flex;
         justify-content: center;
-        padding: 44px 0;
+        padding: 40px 5px;
         font-family: Myriad900;
     }
     &__inner {
@@ -89,11 +89,12 @@ export default {
         justify-content: center;
         align-items: center;        
         border-top: 1px solid $beige;
-        padding: 5px 0;
+        padding: 5.2px 5px;
         box-sizing: border-box;
-        max-height: 27px;
         position: relative;
         cursor: pointer;
+        letter-spacing: -0.2px;
+
         &:last-child {
             border-bottom: 1px solid $beige;
         }

@@ -95,7 +95,7 @@ export default {
     display: flex;
     flex-direction: column;
     &__main-title {
-        font-size: 24px;
+        font-size: 20px;
         position: relative;
         margin-bottom: 20px;
         &:before {
@@ -103,7 +103,7 @@ export default {
             position: absolute;
             left: -20px;
             bottom: -2px;
-            font-size: 28px;
+            font-size: 22px;
             @media (max-width: 320px) {
                 font-size: 24px;
             }
@@ -116,7 +116,7 @@ export default {
         position: absolute;
         padding-left: 4px;
         top: -2px;
-        font-size: 12px;
+        font-size: 14px;
         color: red;
     }
     &__options{
@@ -127,7 +127,7 @@ export default {
         position: relative;
     }
     &__comment, &__label {
-        font-size: 12px;
+        font-size: 14px;
     }
     &__comment {
         position: relative;
@@ -138,11 +138,11 @@ export default {
         padding: 12px 10px;
         border: 1px solid #66563D;
         color: #66563D;
-        border-radius: 15px;
+        border-radius: 7px;
         outline: none;
-        box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
         &:focus {
-            box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
+          cursor: pointer;
+          box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
         }
         @media (max-width: 450px) {
             width: 30%;
@@ -152,13 +152,13 @@ export default {
         padding: 10px;
         resize: none;
         border: 1px solid #66563D;
-        border-radius: 15px;
-        box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
+        border-radius: 7px;
         margin-top: 10px;
         color: #66563D;
         outline: none;
         &:focus {
-            box-shadow: 0 0 15px rgba(103, 87, 62, 0.8);
+          cursor: pointer;
+          box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
         }
     }
     &__error {
@@ -215,7 +215,7 @@ export default {
         top: -2px;
         left: 60px;
         color: red;
-        font-size: 12px;
+        font-size: 14px;
     }
 }
 </style>

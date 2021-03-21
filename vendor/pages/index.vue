@@ -3,6 +3,7 @@
     .vendor-portal__top
       .vendor-portal__admin-name
         h2.vendor-portal__adminPortal VENDOR PORTAL
+        //h2.vendor-portal__adminPortal(v-if="vendorvendor.competencies || vendor.competencies.length") VENDOR PORTAL
       .vendor-portal__account(v-click-outside="hideAccountMenu")
         .vendor-portal__photo-wrapper
           img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
@@ -15,7 +16,7 @@
                 .vendor-portal__personal
                   .vendor-portal__personal-data {{ vendor.firstName }}
                   .vendor-portal__personal-data {{ vendor.email }}
-              .vendor-portal__item(@click="showAccountInfo")
+              //.vendor-portal__item(@click="showAccountInfo")
                 .vendor-portal__icon
                   img(src="../assets/images/man.png")
                 .vendor-portal__list-label My Account
@@ -35,7 +36,9 @@
           ul.vendor-portal__nav-menu
             router-link(:to="note.path" v-for="(note, index) in navbarList" :key="index")
               li.vendor-portal__nav-item(@click="switchSection(index)" :class="{'vendor-portal_active': note.active}")
-                .vendor-portal__image
+                .vendor-portal__image(v-if="!note.active && note.imgWhite")
+                  img.image.navbar_no-filter(:src="note.imgWhite")
+                .vendor-portal__image(v-else)
                   img(:src="note.imgBrown")
                 .vendor-portal__nav-title
                   span {{ note.title }}
@@ -49,7 +52,7 @@
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		middleware: 'authenticated',
+		middleware: ['authenticated', 'new-user-redirect'],
 		data() {
 			return {
 				navbarList: [
@@ -64,7 +67,47 @@
 						path: "/completed-jobs",
 						imgBrown: require("../assets/images/CATEGORIES/COMPLETE-JOBS.png"),
 						active: false
-					}
+					},
+					{
+						title: "COMPETENCIES & RATE",
+						path: "/competency-and-rate",
+						imgBrown: require("../assets/images/CATEGORIES/competencies.png"),
+						imgWhite: require("../assets/images/CATEGORIES/competencies(selected).png"),
+            // imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
+            active: false
+					},
+					{
+						title: "ASSESSMENT",
+						path: "/qualification-and-assessment",
+						imgBrown: require("../assets/images/CATEGORIES/assessment.png"),
+            imgWhite: require("../assets/images/CATEGORIES/assessment(selected).png"),
+            // imgBrown: require("../assets/images/CATEGORIES/rate.png"),
+						active: false
+					},
+					{
+						title: "EXPERIENCE & EDUCATION",
+						path: "/experience-and-education",
+						imgBrown: require("../assets/images/CATEGORIES/experience-education.png"),
+            imgWhite: require("../assets/images/CATEGORIES/experience-education(selected).png"),
+            // imgBrown: require("../assets/images/CATEGORIES/languages.png"),
+						active: false
+					},
+					{
+						title: "DOCUMENTS",
+						path: "/documents",
+						imgBrown: require("../assets/images/CATEGORIES/documents.png"),
+            imgWhite: require("../assets/images/CATEGORIES/documents(selected).png"),
+						// imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
+						active: false
+					},
+          {
+            title: "PROFILE",
+            path: "/account",
+            imgBrown: require("../assets/images/CATEGORIES/my-account.png"),
+            imgWhite: require("../assets/images/CATEGORIES/my-account(selected).png"),
+
+            active: false
+          }
 				],
 				isAccountMenu: false,
 				accountInfo: false,
@@ -72,7 +115,7 @@
 			}
 		},
 		methods: {
-			...mapActions(["alertToggle", "setOriginallyUnits", "logout", "getVendorInfo"]),
+			...mapActions([ "alertToggle", "setOriginallyUnits", "logout", "getVendorInfo", "getAllLanguages", "setAllIndustries", "setAllStepss" ]),
 
 			mainPageRender() {
 				this.toggleSideBar(true)
@@ -109,10 +152,10 @@
 			showAccountMenu() {
 				this.isAccountMenu = !this.isAccountMenu
 			},
-			showAccountInfo() {
-				this.hideAccountMenu()
-				this.$router.push('/account')
-			},
+			// showAccountInfo() {
+			// 	this.hideAccountMenu()
+			// 	this.$router.push('/account')
+			// },
 			hideAccountMenu() {
 				this.isAccountMenu = false
 			},
@@ -126,20 +169,22 @@
 				token: "getToken",
 				vendor: "getVendor"
 			}),
-			fullName() {
-				if (this.vendor) {
-					return this.vendor.firstName + " " + this.vendor.surname
-				}
-			}
+			// fullName() {
+			// 	if (this.vendor) {
+			// 		return this.vendor.firstName + " " + this.vendor.surname
+			// 	}
+			// }
 		},
-		async created() {
+    async created() {
 			await this.getOriginallyUnits()
-		},
-		mounted() {
-			this.domain = process.env.domain
-			this.setToken()
-			this.getVendorInfo()
-			this.mainPageRender()
+
+      this.domain = process.env.domain
+      this.setToken()
+      this.getVendorInfo()
+      this.getAllLanguages()
+      this.setAllIndustries()
+      this.setAllStepss()
+      this.mainPageRender()
 
 		},
 		updated() {
@@ -163,7 +208,7 @@
       position: fixed;
       height: 6vh;
       width: 100%;
-      z-index: 1000;
+      z-index: 10000;
     }
 
     &__admin-name {
@@ -291,7 +336,7 @@
     &__main {
       box-sizing: border-box;
       padding-top: 6vh;
-      padding-left: 150px;
+      padding-left: 135px;
       display: flex;
       height: 100%;
       position: relative;
@@ -311,8 +356,8 @@
 
     &__sidebar {
       padding: 25px 0;
-      background-color: #998e7e;
-      width: 150px;
+      background-color: #948977;
+      width: 135px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -325,7 +370,7 @@
       list-style: none;
       font-size: 14px;
       padding: 0;
-      width: 167px;
+      width: 155px;
       height: 77vh;
       margin-bottom: 0;
       overflow-y: scroll;
@@ -350,6 +395,9 @@
       margin-right: 0;
       cursor: pointer;
 
+      &:hover{
+
+      }
       &:last-child {
         margin-bottom: 0;
       }
@@ -358,11 +406,16 @@
     &__nav-title {
       /*font-family: Myriad900;*/
       color: #fff;
+      padding: 0 20px;
+      text-align: center;
     }
 
     &__image {
       img {
         filter: brightness(300%);
+      }
+      .navbar_no-filter {
+        filter: none;
       }
     }
 

@@ -7,8 +7,8 @@
           :startFilter="startFilter"
           :deadFilter="deadFilter"
           :invoiceDateFilter="invoiceDateFilter"
-          :jobTypeFilter="jobTypeFilter"
-          @setJobTypeFilter="setJobTypeFIlter"
+          :jobTypeFilter="jobTypeFilter.title"
+          @setJobTypeFilter="setJobTypeFilter"
           @setInvoiceDateFilter="(option) => setFilter(option, 'invoiceDateFilter')"
           @requestOnFilterStartDate="requestOnFilterStartDate"
           @requestOnFilterDeadline="requestOnFilterDeadline"
@@ -16,12 +16,12 @@
         .jobs__table
           DataTable(
             :fields="fields"
-            :tableData="completedJobs"
+            :tableData="filteredJob"
             :errors="errors"
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
-            :bodyClass="completedJobs.length < 7 ? 'tbody_height-200 tbody_visible-overflow' : 'tbody_height-200'"
-            :tableHeadRowClass="completedJobs.length < 7 ? 'tbody_visible-overflow' : ''"
+            :bodyClass="[{ 'tbody_visible-overflow': jobs.length < 10 }]",
+            :tableheadRowClass="[{ 'tbody_visible-overflow': jobs.length < 10 }]",
             @closeErrors="closeErrors"
             @onRowClicked="chooseJob"
           )
@@ -56,7 +56,7 @@
 
 <script>
 	import moment from 'moment'
-	import DataTable from "~/components/Tables/DataTable"
+	import DataTable from "../../../components/overall/DataTable"
 	import Filters from "../../components/jobs/Tables/Completed_Jobs/Filters"
 	import { mapGetters, mapActions } from "vuex"
 	import currencyIconDetected from "../../../mixins/currencyIconDetected"
@@ -81,7 +81,7 @@
 				deleteIndex: -1,
 				startDateFilter: { from: "", to: "" },
 				deadlineFilter: { from: "", to: "" },
-				jobTypeFilter: "All",
+				jobTypeFilter: {title: "All"},
 				invoiceDateFilter: "All"
 			}
 		},
@@ -121,13 +121,8 @@
 				this[prop] = option
 				this.filterJobs()
 			},
-			setJobTypeFIlter({ step }) {
-				this.jobTypeFilter = step.title || step
-				if (step !== 'All') {
-					this.filterJobs = this.completedJobs.filter(item => item.serviceStep.symbol === step.symbol)
-				} else {
-					this.filteredJobs = this.completedJobs
-				}
+			setJobTypeFilter({ step }) {
+				this.jobTypeFilter = step
 			},
 
 			filterJobs() {
@@ -137,13 +132,6 @@
 					this.filteredJobs = this.filteredJobs.filter(item => item.invoiceDate === this.invoiceDateFilter)
 				}
 
-				if (this.deadlineFilter.from) {
-					this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.deadline).format() >= moment(this.deadlineFilter.from).format()) && (moment(item.deadline).format() <= moment(this.deadlineFilter.to).format())))
-				}
-
-				if (this.startDateFilter.from) {
-					this.filteredJobs = this.filteredJobs.filter(item => ((moment(item.start).format() >= moment(this.startDateFilter.from).format()) && (moment(item.start).format() <= moment(this.startDateFilter.to).format())))
-				}
 			},
 			formatDeadline(date) {
 				if (date) {
@@ -156,6 +144,30 @@
 			...mapGetters({
 				jobs: "getAllJobs"
 			}),
+      filteredJob () {
+			  let result = this.completedJobs
+        if (this.jobTypeFilter.title !== "All") {
+          result = result.filter(item => {
+           return  item.serviceStep.step === this.jobTypeFilter._id
+        })
+        }
+
+        if (this.startDateFilter.from) {
+          result = result.filter(item => (
+            moment(item.start).isSameOrAfter(moment(this.startDateFilter.from).set({"hour": 0, "minute": 0}))
+            && moment(item.start).isSameOrBefore(moment(this.startDateFilter.to).set({"hour": 23, "minute": 59}))
+          ))
+        }
+
+        if (this.deadlineFilter.from) {
+          result = result.filter(item => (
+            moment(item.deadline).isSameOrAfter(moment(this.deadlineFilter.from).set({"hour": 0, "minute": 0}))
+            && moment(item.deadline).isSameOrBefore(moment(this.deadlineFilter.to).set({"hour": 23, "minute": 59}))
+          ))
+        }
+
+			  return result
+      },
 			startFilter() {
 				let result = ""
 				if (this.startDateFilter.from) {
@@ -193,13 +205,13 @@
 
   .closed-jobs {
     width: 100%;
-    padding: 30px;
+    padding: 20px 40px;
 
     .jobs_block {
       color: $main-color;
 
       &__title {
-        margin: 20px 0;
+        margin: 30px 0 10px;
         font-family: Myriad400;
         font-size: 20px;
       }

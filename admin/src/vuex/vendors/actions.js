@@ -1,6 +1,6 @@
 import Vue from "vue";
 
-export const storeCurrentVendor = ({ commit }, payload) => commit('setCurrentVendor', payload);
+
 export const setFilteredVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
 export const updateVendorProp = ({ commit }, payload) => commit('setVendorProp', payload);
 export const updateIndustry = ({ commit }, payload) => commit('updateVendorIndustry', payload);
@@ -14,6 +14,22 @@ export const SET_CURRENT_VENDOR_QUALIFICATIONS = ({ commit }, payload) => commit
 export const SET_CURRENT_VENDOR_DOCUMENTS = ({ commit }, payload) => commit('SET_CURRENT_VENDOR_DOCUMENTS', payload);
 export const SET_CURRENT_VENDOR_ASSESSMENT = ({ commit }, payload) => commit('SET_CURRENT_VENDOR_ASSESSMENT', payload);
 
+
+export const storeCurrentVendor = async ({ commit, dispatch, state }, payload) => {
+    commit("startRequest");
+    try {
+        let vendor = payload
+        if (vendor.pendingCompetencies.length) {
+            const result = await Vue.http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: vendor.pendingCompetencies })
+            vendor.pendingCompetencies = result.data
+        }
+        commit('setCurrentVendor', vendor);
+    }catch (err) {
+        dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
+    }finally {
+        commit("endRequest");
+    }
+}
 
 export const saveVendorRates = async ({ commit, dispatch, state }, payload) => {
     commit("startRequest");
@@ -70,7 +86,7 @@ export const deleteVendorRates = async ({ commit, dispatch, state }, payload) =>
     }
 }
 
-export const deleteCurrentVendor = async ({ commit, state }, payload) => {
+export const deleteCurrentVendor = async ({ commit, state, dispatch }, payload) => {
     commit("startRequest");
     try {
         const { id } = payload;
@@ -84,7 +100,7 @@ export const deleteCurrentVendor = async ({ commit, state }, payload) => {
     }
 }
 
-export const saveNewVendor = async ({ commit, state }, payload) => {
+export const saveNewVendor = async ({ commit, state, dispatch }, payload) => {
     commit("startRequest");
     try {
         const result = await Vue.http.post("/vendorsapi/new-vendor", payload);
@@ -98,13 +114,19 @@ export const saveNewVendor = async ({ commit, state }, payload) => {
     }
 }
 
-export const updateCurrentVendor = async ({ commit, state }, payload) => {
+export const updateCurrentVendor = async ({ commit, state, dispatch }, payload) => {
     commit("startRequest");
     try {
         const result = await Vue.http.post("/vendorsapi/update-vendor", payload);
-        const updatedVendor = result.body;
+        let updatedVendor = result.body;
         const index = state.filteredVendors.findIndex(item => item._id === updatedVendor._id);
         state.filteredVendors.splice(index, 1, updatedVendor);
+
+        if (updatedVendor.pendingCompetencies.length) {
+            const result = await Vue.http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: updatedVendor.pendingCompetencies })
+            updatedVendor.pendingCompetencies = result.data
+        }
+
         commit('setCurrentVendor', updatedVendor);
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
@@ -117,7 +139,7 @@ export const updateVendorStatus = async ({ commit, dispatch, state }, payload) =
     commit("startRequest");
     try {
         const result = await Vue.http.post("/vendorsapi/update-vendor-status", payload);
-        const updatedVendor = result.body;        
+        const updatedVendor = result.body;
         const index = state.filteredVendors.findIndex(item => item._id === updatedVendor._id);
         state.filteredVendors.splice(index, 1, updatedVendor);
         commit('setCurrentVendor', updatedVendor);
@@ -223,7 +245,7 @@ export const deleteCurrentVendorProfessionalExperience = async ({ commit, dispat
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });
     } finally {
-        commit("endRequest"); 
+        commit("endRequest");
     }
 }
 

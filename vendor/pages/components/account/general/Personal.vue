@@ -11,22 +11,22 @@
         .personal__item
             LabelDrop(name="Time Zone:")
                 SelectSingle(
-                    :selectedOption="accountInfo.timezone" 
-                    :options="zones" 
+                    :selectedOption="accountInfo.timezone"
+                    :options="zones"
                     customClass="account"
                     @chooseOption="(e) => setProperty(e, 'timezone')")
         .personal__item
             LabelDrop(name="Native Language:")
                 SelectSingle(
-                    :selectedOption="nativeLang" 
-                    :options="langs" 
+                    :selectedOption="nativeLang"
+                    :options="langs"
                     customClass="account"
                     @chooseOption="(e) => setProperty(e, 'native')")
         .personal__item
             LabelDrop(name="Gender:")
                 SelectSingle(
-                    :selectedOption="accountInfo.gender" 
-                    :options="genders" 
+                    :selectedOption="accountInfo.gender"
+                    :options="genders"
                     customClass="account"
                     @chooseOption="(e) => setProperty(e, 'gender')")
 </template>
@@ -34,7 +34,7 @@
 <script>
 import LabelInput from "./LabelInput";
 import LabelDrop from "./LabelDrop";
-import SelectSingle from "~/components/dropdowns/SelectSingle";
+import SelectSingle from "../../../../components/overall/SelectSingle";
 import { mapGetters, mapActions } from "vuex";
 
 export default {

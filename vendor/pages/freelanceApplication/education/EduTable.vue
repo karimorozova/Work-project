@@ -50,7 +50,7 @@ export default {
     height: 97px;
     }
     &__thead-cell {
-        font-size: 12px;
+        font-size: 14px;
         padding: 5px 0 5px 6px;
         border-right: 0.5px solid #FFF;
         &:last-child {

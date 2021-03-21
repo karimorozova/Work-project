@@ -31,16 +31,16 @@
           @approveDelete="approveContactDelete")
 
       .title(v-if="currentClient._id") Services
-        .client-info__services(v-if="currentClient._id && currentClient.industries")
-          ClientServices(
-            :languages="languages"
-            :sourceLanguagesClient="sourceLanguagesClientData"
-            :targetLanguagesClient="targetLanguagesClientData"
-            :industries="industries"
-            :services="services"
-            :clientIndustries="currentClient.industries.map(i => i.name)"
-            @updateRates="updateRates"
-          )
+      .client-info__services(v-if="currentClient._id && currentClient.industries")
+        ClientServices(
+          :languages="languages"
+          :sourceLanguagesClient="sourceLanguagesClientData"
+          :targetLanguagesClient="targetLanguagesClientData"
+          :industries="industries"
+          :services="services"
+          :clientIndustries="currentClient.industries.map(i => i.name)"
+          @updateRates="updateRates"
+        )
 
       .title(v-if="currentClient._id") Rates
       .client-info__rates(v-if="currentClient._id")
@@ -648,31 +648,31 @@
 
   .client-subinfo {
     &__general {
-      margin-top: 120px;
+      margin-top: 100px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      margin-left: 40px;
 
     }
 
     &__date {
-      margin-top: 146px;
+      margin-top: 65px;
+      margin-left: 40px;
       width: 390px;
       height: 270px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
 
     }
   }
 
   .client-info {
-    padding: 40px;
-    width: 1020px;
+    width: 1000px;
     position: relative;
 
     &__notes {
-      margin: 20px 10px 40px 10px;
       box-sizing: border-box;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
 
     &__gen-info,
@@ -682,17 +682,15 @@
     &__documents,
     &__chart,
     &__billing {
-      margin: 20px 10px 40px 10px;
-      padding: 40px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      padding: 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       box-sizing: border-box;
     }
 
     &__rates {
       padding: 0;
-      margin: 20px 10px 40px 10px;
-      padding: 40px 40px 20px 40px !important;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      padding: 20px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
 
       box-sizing: border-box;
     }
@@ -703,10 +701,6 @@
 
     &__services {
       position: relative;
-    }
-
-    &__rates {
-      padding: 40px;
     }
 
     &_error-shadow {
@@ -733,6 +727,7 @@
 
   .title {
     font-size: 22px;
+    padding: 30px 0 10px;
   }
 
   .buttons {

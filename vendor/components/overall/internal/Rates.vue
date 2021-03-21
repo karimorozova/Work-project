@@ -25,6 +25,7 @@
         :fields="fields"
         :tableData="filteredData"
         :rowClass="'cursor-default'"
+        bodyRowClass="rates-matrix-row"
         :bodyClass="[rates.length < 10 ? 'table_no-body-bottom-margin tbody_visible-overflow' : 'table_no-body-bottom-margin', 'tbody_height-300']"
         :tableHeadRowClass="rates.length < 10 ? 'tbody_visible-overflow' : ''"
       )
@@ -50,10 +51,10 @@
 
 <script>
 	import { mapGetters } from 'vuex'
-	import DataTable from "../../../components/Tables/DataTable"
-	import { getToken } from "../../../store/getters"
+	import DataTable from "../DataTable"
+	// import { getToken } from "../../../store/getters"
 	import currencyIconDetected from "../../../mixins/currencyIconDetected"
-	import Filters from "./rates/Filters"
+	import Filters from "./RatesFilters"
 
 	export default {
 		mixins: [currencyIconDetected],
@@ -159,11 +160,15 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors";
 
   .rates {
-    padding: 20px;
-    box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+    width: 1040px;
+    height: auto;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-sizing: border-box;
+    padding: 20px 20px 20px 20px;
+    position: relative;
 
     &__table_msg {
       margin-top: 5px;

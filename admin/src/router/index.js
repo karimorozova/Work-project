@@ -61,6 +61,7 @@ import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
+import {default as PendingCompetenciesLayout} from "../components/vendors/pending-competencies/Layout"
 import { store } from '../vuex/store'
 
 Vue.use(Router)
@@ -440,6 +441,11 @@ const router = new Router({
                             path: 'benchmark',
                             name: 'benchmark',
                             component: BenchmarkReport
+                        },
+                        {
+                            path: 'pending-competencies',
+                            name: 'pending-competencies',
+                            component: PendingCompetenciesLayout
                         }
                     ]
                 }

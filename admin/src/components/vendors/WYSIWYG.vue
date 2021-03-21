@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     .preview
-      span.preview__close(@click="closePreview") +
+      span.preview__close(@click="closePreview") &#215;
       .preview__header
         .preview__drop-menu(v-if="previewDropMenu")
           SelectSingle(
@@ -11,7 +11,7 @@
             @chooseOption="setTemplate"
             @scrollDrop="scrollDrop"
           )
-        .preview__title Preview
+        //.preview__title Preview
       .preview__details
         ckeditor(v-model="editorData" :config="editorConfig")
       .preview__button
@@ -47,8 +47,9 @@
 						this.message.replace('cid:logo@pan', '../../../static/email-logo.png') :
 						this.message,
 				editorConfig: {
-					uiColor: "#F4F0EE",
-					allowedContent: true
+					allowedContent: true,
+					uiColor: "#F2EFEB",
+					height: 350,
 				}
 			};
 		},
@@ -120,20 +121,28 @@
     right: 20%;
     margin: 0 auto;
     padding: 20px;
-    box-shadow: 0 0 10px $brown-shadow;
     display: flex;
     flex-direction: column;
     align-items: center;
     box-sizing: border-box;
+    max-height: 720px;
 
     &__close {
       position: absolute;
-      top: 5px;
-      right: 10px;
-      transform: rotate(45deg);
-      font-weight: 600;
-      font-size: 24px;
+      top: 10px;
+      right: 15px;
+      font-size: 22px;
       cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      font-family: Myriad900;
+      opacity: .8;
+      transition: .2s ease;
+
+      &:hover {
+        opacity: 1
+      }
     }
 
     &__details {
@@ -142,17 +151,14 @@
       overflow-y: auto;
     }
 
-    &__title {
-      font-size: 22px;
-      text-align: center;
-      padding-top: 5px;
-    }
+    /*&__title {*/
+    /*  font-size: 22px;*/
+    /*  text-align: center;*/
+    /*  padding-top: 5px;*/
+    /*}*/
 
     &__header {
-      height: 50px;
-      width: 100%;
       margin-top: 20px;
-      display: block;
     }
 
     &__drop-menu {

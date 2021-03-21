@@ -43,7 +43,7 @@ export default {
   box-sizing: border-box;
   min-height: 94vh;
   &__sidebar {
-    box-shadow: -10px 0 10px 10px $brown-shadow;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   }
 }
 </style>

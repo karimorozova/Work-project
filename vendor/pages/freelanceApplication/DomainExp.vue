@@ -92,7 +92,7 @@ export default {
     display: flex;
     flex-direction: column;
     &__main-title {
-        font-size: 24px;
+        font-size: 20px;
         position: relative;
         margin-bottom: 20px;
         &:before {
@@ -100,7 +100,7 @@ export default {
             position: absolute;
             left: -20px;
             bottom: -2px;
-            font-size: 28px;
+            font-size: 22px;
             @media (max-width: 320px) {
                 font-size: 24px;
             }
@@ -124,7 +124,7 @@ export default {
         position: relative;
     }
     &__comment, &__label {
-        font-size: 12px;
+        font-size: 14px;
     }
 }
 

@@ -102,7 +102,7 @@
 				isBilling: false,
 				isTest: false,
 				selectedIndustry: "",
-				industries: [],
+				// industries: [],
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
@@ -245,10 +245,10 @@
 					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
 				}
 			},
-			async getIndustries() {
+/*			async getIndustries() {
 				const industries = await this.$http.get('/api/industries')
 				this.industries = industries.body
-			},
+			},*/
 			startOpen() {
 				this.$refs.start.showCalendar()
 			},
@@ -291,6 +291,9 @@
 			}
 		},
 		computed: {
+			...mapGetters({
+				industries: "getAllIndustries",
+			}),
 			existProjectAccessChangeName() {
 				if (this.project) {
 					const { status } = this.project
@@ -326,7 +329,7 @@
 		async created() {
 			await this.getProjectData()
 			this.getCustomers()
-			this.getIndustries()
+			// this.getIndustries()
 			this.isBillingDate()
 			!this.project._id && this.setIsBillingTrue()
 		}
@@ -347,7 +350,7 @@
         position: absolute;
         right: 6px;
         top: 8px;
-        font-size: 18px;
+        font-size: 16px;
         cursor: pointer;
       }
     }
@@ -365,7 +368,7 @@
     &__all-info {
       width: 960px;
       padding: 20px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
 
     &__info-row {

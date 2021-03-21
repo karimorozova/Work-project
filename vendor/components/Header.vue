@@ -1,101 +1,68 @@
 <template lang="pug">
-.header
+  .header
     .header__logo
-        a.header__link(href="https://www.pangea.global/")
-            img.header__image(src="../assets/images/new-logo.png")
+      a.header__link(href="https://www.pangea.global/")
+        img.header__image(src="../assets/images/new-logo.png")
     .header__background
-        span.header__text {{ headerText }}
+      span.header__text {{ headerText }}
 </template>
 
 <script>
 
-export default {
-    props: {
-        headerText: {
-            type: String
-        }
-    }    
-}
+	export default {
+		props: {
+			headerText: {
+				type: String
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
 
-.header {
+  .header {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    &__logo {
-        width: 34%;
-        padding-right: 100px;
-        margin: 5px 0;
-        display: flex;
-        justify-content: flex-start;
-        @media (max-width: 1440px) {
-        width: 40%;
-        }
-        @media (max-width: 1440px) {
-            width: 50%;
-        }
-        @media (max-width: 1024px) {
-            width: 60%;
-        }
-        @media (max-width: 768px) {
-            width: 80%;
-        }
-        @media (max-width: 450px) {
-            padding-right: 0;
-            width: 67%;
-        }
-        @media (max-width: 370px) {
-            width: 80%;
-        }
-    }
-}
 
-.header__background {
+    &__logo {
+      width: 650px;
+      margin: 5px 0;
+      display: flex;
+      justify-content: flex-start;
+      @media all and (orientation: portrait) and (max-width: 767px) {
+        width: auto;
+      }
+
+    }
+  }
+
+  .header__background {
     width: 100%;
-    height: 273px;
-    background-image: url('../assets/images/header2.jpg');
+    height: 251px;
+    background-image: url('../assets/images/pangea-header.jpg');
     background-size: cover;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 0;
+    background-repeat: no-repeat;
     display: flex;
     justify-content: center;
-    @media (max-width: 768px) {
-        height: 111px;
-    }
-}
+    align-items: center;
+    background-position: 100% 100%;
+  }
 
-.header__text {
-    width: 34%;
-    padding-right: 100px;
-    color: #665741;
+  .header__text {
+    width: 650px;
     font-size: 56px;
-    font-weight: bold;
-    font-family: 'Open Sans', sans-serif;
-    text-shadow:
-        -1px -1px 0 #fff,
-        1px -1px 0 #fff,
-        -1px 1px 0 #fff,
-        1px 1px 0 #fff;
-    @media (max-width: 1440px) {
-        width: 40%;
+    color: white;
+    font-family: Myriad600;
+    text-shadow: 1px 1px 2px #3c6350;
+    @media all and (orientation: portrait) and (max-width: 767px) {
+      /*flex-direction: column;*/
+      font-size: 45px;
+      width: auto;
     }
-    @media (max-width: 1440px) {
-        width: 50%;
+    @media all and (orientation: landscape) and (max-width: 1000px) {
+      /*flex-direction: row;*/
     }
-    @media (max-width: 1024px) {
-        width: 60%;
-    }
-    @media (max-width: 768px) {
-        width: 80%;
-    }
-    @media (max-width: 450px) {
-        padding-right: 0;
-        font-size: 44px;
-    }
-}
+  }
 </style>

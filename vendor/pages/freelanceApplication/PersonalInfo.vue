@@ -196,7 +196,7 @@ export default {
     flex-direction: column;
     width: 100%;
     &__label {
-        font-size: 12px;
+        font-size: 14px;
         margin-top: 40px;
     }
     &__asterisk {
@@ -228,7 +228,7 @@ export default {
 }
 
 .personal__main-title {
-    font-size: 24px;
+    font-size: 20px;
     position: relative;
     margin-bottom: 20px;
     &:before {
@@ -236,7 +236,7 @@ export default {
         position: absolute;
         left: -20px;
         bottom: -2px;
-        font-size: 28px;
+        font-size: 22px;
         @media (max-width: 320px) {
             font-size: 24px;
         }

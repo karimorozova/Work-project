@@ -1,38 +1,65 @@
 <template lang="pug">
-.file-list
-    .file-list__item(v-for="(file, index) in files") {{ file.name }}
-        span.file-list__delete(@click="deleteFile(index)") +
+  .file-list
+    .file-list__items(v-for="(file, index) in files")
+      .file-list__item
+        .file-list__name {{file.name}}
+        span.file-list__delete(@click="deleteFile(index)") &#x2715
+
 </template>
 
 <script>
-export default {
-    props: {
-        files: {
-            type: Array
-        }
-    },
-    methods: {
-        deleteFile(index) {
-            this.files.splice(index, 1);
-        }
-    }
-}
+	export default {
+		props: {
+			files: {
+				type: Array
+			}
+		},
+		methods: {
+			deleteFile(index) {
+				this.files.splice(index, 1)
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-.file-list {
-    margin-left: 70px;
+  .file-list {
+
+    &__items {
+      position: relative;
+    }
+
+    &__name {
+      color: #aba294;
+    }
+
     &__item {
-        position: relative;
+      border-radius: 10px;
+      border: 1px solid #c3c5c5;
+      box-sizing: border-box;
+      background-color: transparent;
+      font-size: 12px;
+      padding: 10px;
+      margin: 0;
+      width: 100%;
+      display: flex;
+      -webkit-box-pack: justify;
+      justify-content: space-between;
+      -webkit-box-align: center;
+      align-items: center;
+      position: relative;
+      margin-top: 5px;
+      font-family: -webkit-pictograph;
     }
+
     &__delete {
-        position: absolute;
-        left: -20px;
-        top: -3px;
-        font-size: 20px;
-        font-weight: 700;
-        transform: rotate(45deg);
+      cursor: pointer;
+      transform: 0.2s ease;
+
+      &:hover {
+        font-weight: bold;
         cursor: pointer;
+      }
     }
-}
+  }
 </style>
