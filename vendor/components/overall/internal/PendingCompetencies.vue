@@ -57,35 +57,35 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
 						label: "Source Language",
 						headerKey: "headerSource",
 						key: "source",
-						width: "20%",
+						width: "22.5%",
 						padding: "0"
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
 						key: "targets",
-						width: "20%",
+						width: "22.5%",
 						padding: "0"
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "20%",
+						width: "22.5%",
 						padding: "0"
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "20%",
+						width: "22.5%",
 						padding: "0"
 					},
           {
             label: "",
             headerKey: "headerIcons",
             key: "icons",
-            width: "20%",
+            width: "10%",
             padding: "0"
           },
 				],
@@ -200,7 +200,7 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
 
     &__icon {
       cursor: pointer;
-      margin-right: 8px;
+      margin-right: 10px;
     }
 
     &__drop-menu {

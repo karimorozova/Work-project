@@ -34,7 +34,7 @@
     justify-content: space-between;
 
     &__photo-block {
-      width: 25%;
+      width: 20%;
     }
 
     &__block {

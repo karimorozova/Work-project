@@ -63,7 +63,7 @@
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors.scss";
   .title{
-    margin: 20px 0;
+    margin: 30px 0 10px;
     font-size: 20px;
   }
 

@@ -1,13 +1,13 @@
 <template lang="pug">
   .buttons
     .buttons__button
-      Button(value="Save" @makeAction="save")
+      Button(value="Save" @clicked="save")
     .buttons__button
-      Button(value="Cancel" @makeAction="cancel")
+      Button(value="Cancel" @clicked="cancel")
 </template>
 
 <script>
-	import Button from "~/components/buttons/Button"
+	import Button from "../../../components/overall/Button"
 
 	export default {
 		data() {
@@ -18,7 +18,7 @@
 				this.$emit("save")
 			},
 			cancel() {
-				this.$router.go(-1)
+				this.$router.push('/dashboard')
 			}
 		},
 		components: {

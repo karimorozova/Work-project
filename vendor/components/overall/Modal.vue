@@ -33,7 +33,6 @@ export default {
   position: absolute;
   padding: 20px;
   background-color: $white;
-  font-size: 16px;
   z-index: 1000;
 
   &__buttons {

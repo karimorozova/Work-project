@@ -29,11 +29,11 @@
 <style lang="scss" scoped>
   .container {
     color: #67573E;
-    padding: 30px;
+    padding: 20px 40px;
   }
 
   .title {
-    margin: 20px 0px;
+    margin: 30px 0px 10px;
     font-size: 20px;
   }
 </style>

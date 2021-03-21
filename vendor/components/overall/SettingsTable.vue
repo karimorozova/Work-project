@@ -27,7 +27,7 @@
 
 <script>
 	import ValidationErrors from "../ValidationErrors"
-	import ApproveModal from "../ApproveModal"
+	import ApproveModal from "../overall/ApproveModal"
 
 	export default {
 		props: {

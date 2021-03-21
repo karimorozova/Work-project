@@ -33,6 +33,11 @@ body {
   font-size: 14px;
 }
 
+.fa-angle-double-right{
+  font-size: 14px;
+  margin: 0 5px;
+}
+
 .slide-fade-enter-active {
   transition: all .5s ease;
 }

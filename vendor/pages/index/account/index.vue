@@ -87,7 +87,7 @@
   .account-info {
     width: 100%;
     box-sizing: border-box;
-    padding: 30px;
+    padding: 20px 40px;
     color: $main-color;
     position: relative;
 
@@ -99,11 +99,12 @@
       display: flex;
       justify-content: flex-end;
       width: 1040px;
+      position: absolute;
     }
 
     &__title {
       font-size: 20px;
-      margin: 20px 0;
+      margin: 30px 0 10px;
     }
   }
 </style>

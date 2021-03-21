@@ -1,7 +1,8 @@
 <template lang="pug">
   .container(v-if="vendor")
-    .title.with-button Pending Competencies
-      Button(value="Create" @clicked="redirectToModal")
+    .title Pending Competencies
+    .button
+      Button(value="Create Competency" @clicked="redirectToModal")
     PendingCompetencies(
       :pendingCompetenciesData="vendor.pendingCompetencies"
     )
@@ -47,18 +48,17 @@
 <style lang="scss" scoped>
   .container {
     color: #67573E;
-    padding: 30px;
+    padding: 20px 40px;
     position: relative;
   }
 
   .title {
-    margin: 20px 0px;
+    margin: 30px 0px 10px;
     font-size: 20px;
   }
-
-  .with-button {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .button {
+    position: absolute;
+    top: 30px;
+    right: 40px;
   }
 </style>

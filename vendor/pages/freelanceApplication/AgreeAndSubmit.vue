@@ -123,7 +123,8 @@ export default {
     }
     &__text {
         font-size: 14px;
-      margin-left: 10px;
+      margin-left: 7px;
+      font-family: Myriad600;
     }
     &__link {
         color: #67573E;

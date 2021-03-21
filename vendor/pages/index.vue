@@ -2,8 +2,8 @@
   .vendor-portal
     .vendor-portal__top
       .vendor-portal__admin-name
-        h2.vendor-portal__adminPortal(v-if="!vendor.competencies || !vendor.competencies.length") CANDIDATE PORTAL
-        h2.vendor-portal__adminPortal(v-else) VENDOR PORTAL
+        h2.vendor-portal__adminPortal VENDOR PORTAL
+        //h2.vendor-portal__adminPortal(v-if="vendorvendor.competencies || vendor.competencies.length") VENDOR PORTAL
       .vendor-portal__account(v-click-outside="hideAccountMenu")
         .vendor-portal__photo-wrapper
           img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
@@ -208,7 +208,7 @@
       position: fixed;
       height: 6vh;
       width: 100%;
-      z-index: 1000;
+      z-index: 10000;
     }
 
     &__admin-name {
@@ -336,7 +336,7 @@
     &__main {
       box-sizing: border-box;
       padding-top: 6vh;
-      padding-left: 150px;
+      padding-left: 135px;
       display: flex;
       height: 100%;
       position: relative;

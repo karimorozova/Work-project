@@ -65,6 +65,7 @@ export default {
   box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   background-color: $white;
   font-size: 16px;
+  text-align: center;
 
   &__buttons {
     margin-top: 10px;
