@@ -32,7 +32,6 @@ export default {
 .modal {
   position: absolute;
   padding: 20px;
-  box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   background-color: $white;
   font-size: 16px;
   z-index: 1000;

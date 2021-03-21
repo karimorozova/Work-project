@@ -42,13 +42,33 @@ function vendorRegistration(obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                		<p style="color: #66563E; background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
-										<p style="font-weight: 400;color:#66563E;">Your account has been created.</p>
+                		<p style="color: #66563E; background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.firstName },</span></p>
 										<p style="font-weight: 400;color:#66563E;">
-											<div>Your credentials:</div>
-											<div>Login: <span> ${ obj.email.replace(/@/g, '<span>@</span>') }</span></div>
-											<div>Password: ${ obj.pass }</div>
+                      Thank you for your interest in working with Pangea.
+                      We are always on the lookout for talent, yet only the best of the best get to join us.
+                      Submitting your information tells us you may be our next superstar.
+                      It all starts with completing your profile. Here is what you need to do:
+										</p>
+										<p style="font-weight: 400;color:#66563E;">Enter our system and complete your competencies:</p>
+										<p style="font-weight: 400;color:#66563E;">language pair and industry</p>
+										<p style="font-weight: 400;color:#66563E;">1. Go to: https://vendor.pangea.global/login</p>
+										<p style="font-weight: 400;color:#66563E;">2. Log in to the system with the following details:</p>
+                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">- username: ${ obj.email.replace(/@/g, '<span>@</span>') }</p>
+                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">- password:   ${ obj.pass }</p>
+										<p style="font-weight: 400;color:#66563E;">
+                      3. Once in, you will be required to provide additional information that will allow us
+                      to get a clearer idea of your industry expertise and language proficiency.
+                      Please fill in the form, as required.
                     </p>
+                    <p style="font-weight: 400;color:#66563E;">
+                      We normally allow all candidates a period of 21 days to complete their profile.
+                      Should you not manage to complete this step within the given time frame,
+                      contact us and we will extend the deadline. In the lapse of time,
+                      should you fail to notify us to request an extension, your profile will be automatically deleted.
+                      If you wish to join Pangea at a later stage, you will have to repeat the process.
+                    </p>
+                    <p style="font-weight: 400;color:#66563E;">Many thanks,</p>
+                    <p style="font-weight: 400;color:#66563E;">Pangea HR team</p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">

@@ -5,7 +5,8 @@
       .competencies__modal-wrapper(v-if="errors.length > 0" @click="clearErrors")
         Modal.modal.modal-width-300(@close="clearErrors")
           .modal-error Error:
-          p.modal-error__errors(v-for="modalError in errors") {{modalError}}
+          ul
+            li.modal-error__errors(v-for="modalError in errors") {{modalError}}
       .competencies__modal-wrapper(v-if="showAlert.isShow")
         ApproveModal.modal.modal-width-450(
           approveValue="Yes"
@@ -120,7 +121,7 @@
               | No
 
       .competencies__row
-        .competencies__select(v-if="isReverseTranslate === true")
+        .competencies__select(v-if="isReverseTranslate")
           .competencies__input-title Rate per word:
           .competencies__rates
             input.width-191(v-model.lazy="currentReverseRate" type="text" @click="selectInputValue")
@@ -253,8 +254,8 @@ export default {
       if (this.currentIndustry.length < 1) this.errors.push('Industry is empty')
       if (!this.currentStep.title) this.errors.push('Step is empty')
       if (this.currentRate <= 0) this.errors.push('Minimal rate value is 0.0001')
-      if (this.isReverseTranslate === true && this.currentRate <= 0) console.log('Minimal reverse rate value is 0.0001')
-      if (!this.isEqualsMotherTongue() && this.targetLangDetails === '') this.errors.push('Please enter the target language details')
+      if (this.isReverseTranslate && this.currentReverseRate <= 0) this.errors.push('Minimal reverse rate value is 0.0001')
+      if (this.isEqualsMotherTongue() && this.targetLangDetails === '') this.errors.push('Please enter the target language details')
       for(const {name} of this.currentIndustry) {
         if (!this.industriesDetails[name] || this.industriesDetails[name].trim() === '') {
           this.errors.push(`Please enter the ${name} details`)
@@ -507,6 +508,7 @@ export default {
     width: 191px;
   }
   .modal{
+    box-shadow: rgba(255, 0, 0, 0.3) 0px 2px 5px, rgba(255, 0, 0, 0.15) 0px 2px 6px 2px;
     &-width-300 {
       width: 300px;
     }
@@ -515,6 +517,10 @@ export default {
     }
     &__questions{
       margin: 7px 0;
+    }
+    ul {
+      padding-left: 20px;
+      margin: 5px 0;
     }
   }
 

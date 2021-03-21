@@ -607,8 +607,9 @@ router.post('/approve-pending-competence', async (req, res) => {
 })
 
 router.post('/get-reject-pc-message', async (req, res) => {
-	let { pendingCompetence } = req.body
+	let { pendingCompetence , vendorId } = req.body
 	try {
+    pendingCompetence.vendorName = !pendingCompetence.vendorName ?  (await Vendors.findOne({_id: vendorId})).firstName: pendingCompetence.vendorName
 		const template = await rejectedPendingCompetenceTemplate(pendingCompetence)
 		res.send(template)
 	} catch (err) {

@@ -143,7 +143,8 @@
 			async getRejectMessage() {
 				try {
 					const result = await this.$http.post('/vendorsapi/get-reject-pc-message', {
-						pendingCompetence: this.pendingCompetenceForReject
+						pendingCompetence: this.pendingCompetenceForReject,
+            vendorId: this.pendingCompetenceForReject.link
 					})
 					this.message = result.data
 				} catch (err) {
