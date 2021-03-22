@@ -28,6 +28,9 @@
       )
         template(slot="headerCheck" slot-scope="{ field }")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
+
+        template(slot="headerInfo" slot-scope="{ field }")
+          span.steps__label {{ field.label }}
         template(slot="headerName" slot-scope="{ field }")
           span.steps__label {{ field.label }}
         template(slot="headerLanguage" slot-scope="{ field }")
@@ -200,17 +203,18 @@
 				},
 				tabs: ['Tasks', 'Steps'],
 				fields: [
-					{ label: "Check", headerKey: "headerCheck", key: "check", width: "5%" },
+					{ label: "Check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0  },
+					{ label: "Info", headerKey: "headerInfo", key: "info", width: "4%", padding: 0  },
 					{ label: "Step", headerKey: "headerName", key: "name", width: "9%", padding: 0 },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%" },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0  },
 					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "13%", padding: 0 },
-					{ label: "Start", headerKey: "headerStart", key: "start", width: "9%" },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%" },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%" },
+					{ label: "Start", headerKey: "headerStart", key: "start", width: "8%", padding: 0  },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "8%", padding: 0  },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%", padding: 0  },
 					{ label: "Status", headerKey: "headerStatus", key: "status", width: "9%", padding: 0 },
-					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%" },
-					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%" },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%" }
+					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%", padding: 0  },
+					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%", padding: 0  },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%", padding: 0  }
 				],
 				selectedVendors: [],
 				actions: ["Mark as accept/reject", "Request confirmation"],
@@ -580,7 +584,7 @@
     }
 
     &__info-icon {
-      height: 19px;
+      height: 18px;
       i {
         color: $main-color;
         opacity: 0.7;

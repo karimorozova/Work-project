@@ -21,7 +21,7 @@ function testSentMessage(obj) {
                         </span>
                     </p>
                     <p style="font-weight: 400;">
-                        If you have any question, please do not hesitate to contact us. <br>
+                        If you have any question, please do not hesitate to contact us in <span style="color: #D15F45">career@pangea.global</span> <br>
                         Many thanks,<br>
                         Pangea HR team
                     </p>
@@ -92,17 +92,20 @@ function rejectedPendingCompetenceTemplate({vendorName, sourceLanguage, targetLa
                       We appreciate the time and effort you invested in completing this form.
                       Unfortunately, your profile does not match our requirements. Here are the details:
                     </p>
-                    <p>Competency:</p>
                     <p style="font-weight: 400;">
+                    	Competency: <br>
                       - Language pair: ${sourceLanguage.lang + ' >> ' + targetLanguage.lang}<br>
                       - Industry: ${industry.name}<br>
                       - Step: ${step.title}
                     </p>
-                    <p>Reason:</p>
-                    <p style="font-weight: 400;font-style: italic">VM to enter more details here</p>
-                    <p style="font-weight: 400;">We wish you good luck in pursuing other opportunities.</p>
-                    <p style="font-weight: 400;">Kind regards,</p>
-                    <p style="font-weight: 400;">Pangea HR team</p>
+                    <p style="font-weight: 400;">Reason: <br>
+                    	VM to enter more details here
+                    </p>
+                    <p style="font-weight: 400;">
+                    We wish you good luck in pursuing other opportunities. <br>
+                    Kind regards, <br>
+                    Pangea HR team
+                    </p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">

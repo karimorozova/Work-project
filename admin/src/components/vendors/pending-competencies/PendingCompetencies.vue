@@ -155,15 +155,15 @@
 				this.pendingCompetenceForReject = {}
 				this.message = ''
 			},
-			sendMessage() {
-				this.rejectPC()
+			sendMessage(template) {
+				this.rejectPC(template)
 			},
-			async rejectPC() {
+			async rejectPC(template) {
 				try {
 					const result = await this.$http.post('/vendorsapi/reject-pending-competence', {
 						vendorId: this.$route.params.id,
 						pendingCompetence: this.pendingCompetenceForReject,
-						template: this.message
+						template,
 					})
 					await this.storeCurrentVendor(result.data)
 					this.alertToggle({ message: "Pending Competence Rejected", isShow: true, type: "success" })

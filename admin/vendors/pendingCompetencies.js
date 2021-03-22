@@ -188,7 +188,7 @@ const sendVendorTestAndUpdateQualification = async (vendorId) => {
 			if (match && item.status === 'Created') {
 				item.status = 'Test Sent'
 				const message = testSentMessage({
-					...this.vendor,
+					firstName: vendor.firstName,
 					industries: item.industries,
 					target: item.target,
 					source: item.source
