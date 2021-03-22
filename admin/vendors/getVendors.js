@@ -107,57 +107,25 @@ async function getVendorAfterUpdate(query, update) {
     .populate('pendingCompetencies.step', ['title']);
 }
 
+
 async function getFilteredVendors(filters) {
   try {
     const query = getFilteringQuery(filters);
-    const vendors = await Vendors.aggregate([
-      { $addFields: { "name": { $concat: ["$firstName", " ", "$surname"] } } },
-      { $match: query },
-      { $unset: [
-          'assessments',
-          'availability',
-          'basicRate',
-          'catExperience',
-          'companyName',
-          'coverLetterFiles',
-          'currency',
-          'cvFiles',
-          'documents',
-          'educations',
-          'email',
-          'experienceYears',
-          'gender',
-          'guid',
-          'internetAccess',
-          'languagePairs',
-          'linkedin',
-          'matrix',
-          'notes',
-          'password',
-          'phone',
-          'photo',
-          'positions',
-          'profExperiences',
-          'professionalLevel',
-          'qualifications',
-          'skype',
-          'softwares',
-          'temporaryEyes',
-          'timezone',
-          'tqi',
-          'website',
-          'whatsapp',
-          'wordCountInfo',
-        ]}
-    ]).sort({ _id: 1 }).limit(25);
-
-    return Vendors.populate(vendors, [
-      "industries",
-      "native",
-    ])
+    return await Vendors.find(query, {
+          firstName: 1,
+          status: 1,
+          surname:1,
+          competencies: 1,
+          native: 1,
+          industries: 1,
+          isTest: 1,
+        })
+        .sort({ _id: 1 }).limit(25)
+        .populate("industries")
+        .populate("native")
   } catch (err) {
-    console.log(err);
-    console.log("Error on filtering vendors");
+    console.log(err)
+    console.log("Error on filtering vendors")
   }
 }
 

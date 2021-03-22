@@ -439,10 +439,10 @@
 					this.isRefreshAfterServiceUpdate = !action
 				}, 1000)
 			},
-			async setTest() {
+			async setTest(event) {
 				const vendor = {
 					id: this.currentVendor._id,
-					isTest: e.target.checked
+					isTest: event.target.checked
 				}
 				try {
 					await this.updateVendorStatus(vendor)

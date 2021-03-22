@@ -11,22 +11,22 @@ function getFilteringQuery(filters) {
     if(industries) {
         query.industries = ObjectId(industries);
     }
-    if(sourceFilter) {
-        query["wordsRates.source"] = sourceFilter;
-    }
-    if(targetFilter) {
-        query["wordsRates.target"] = targetFilter;
-    }
+    // if(sourceFilter) {
+    //     query["wordsRates.source"] = sourceFilter;
+    // }
+    // if(targetFilter) {
+    //     query["wordsRates.target"] = targetFilter;
+    // }
     if(nameFilter) {
-        query["name"] = {"$regex": new RegExp(`${nameFilter}`, 'i')};
+        query["firstName"] = {"$regex": new RegExp(`${nameFilter}`, 'i')};
     }
-    if(stepFilter) {
-        query["$or"] = [
-            {[`wordsRates.rates.${stepFilter}.active`]: true},
-            {[`hoursRates.rates.${stepFilter}.active`]: true},
-            {[`monoRates.rates.${stepFilter}.active`]: true},
-        ]
-    }
+    // if(stepFilter) {
+    //     query["$or"] = [
+    //         {[`wordsRates.rates.${stepFilter}.active`]: true},
+    //         {[`hoursRates.rates.${stepFilter}.active`]: true},
+    //         {[`monoRates.rates.${stepFilter}.active`]: true},
+    //     ]
+    // }
     return query;
 }
 

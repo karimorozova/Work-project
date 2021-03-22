@@ -4,11 +4,17 @@
         .v-filters__item.v-filters_margin-bottom-20
             label.v-filters__filter-title Name:
             input.v-filters__input-field(type="text" placeholder="Vendor Name" v-model="nameFilter" @keyup="filterByName")
-        .v-filters__item
+    .v-filters__col.v-filters_width-22
+      .v-filters__item
+        label.v-filters__filter-title Industry:
+        .v-filters__drop-menu
+          VendorIndustrySelect(:isAllExist="isAllForIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenIndustry")
+        //.v-filters__item
             label.v-filters__filter-title Step:
             .v-filters__drop-menu
                 SelectSingle(:selectedOption="step" :options="stepNames" @chooseOption="setStepFilter")
     .v-filters__col.v-filters_width-25
+    //.v-filters__col.v-filters_width-25
         .v-filters__item.v-filters_margin-bottom-20
             label.v-filters__filter-title Source Language:
             .v-filters__drop-menu.v-filters_index-20
@@ -17,11 +23,7 @@
             label.v-filters__filter-title Target Language:
             .v-filters__drop-menu
                 LanguagesSelect(:selectedLangs="targetLangs" @chosenLang="({lang}) => addLang({lang}, 'targetFilter')" customClass="vendors-filter" :addAll="true")
-    .v-filters__col.v-filters_width-22
-        .v-filters__item
-            label.v-filters__filter-title Industry:
-            .v-filters__drop-menu
-                VendorIndustrySelect(:isAllExist="isAllForIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenIndustry")
+
         
 </template>
 
@@ -132,13 +134,12 @@ export default {
 .v-filters {
     width: 100%;
     display: flex;
-    justify-content: space-between;
     &__col {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        margin-bottom: 20px;
+        margin-right: 50px;
     }
     &__filter-title {
         margin-bottom: 0;
@@ -173,21 +174,6 @@ export default {
         box-sizing: border-box;
         z-index: 10;
     }
-    /*&_index-20 {*/
-    /*    z-index: 20;*/
-    /*}*/
-    /*&_width-21 {*/
-    /*    width: 21%;*/
-    /*    min-width: 240px;*/
-    /*}*/
-    /*&_width-25 {*/
-    /*    width: 25%;*/
-    /*    min-width: 308px;*/
-    /*}*/
-    /*&_width-22 {*/
-    /*    width: 22%;*/
-    /*    min-width: 255px;*/
-    /*}*/
     &_margin-bottom-20 {
         margin-bottom: 20px;
     }

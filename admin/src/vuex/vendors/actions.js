@@ -139,7 +139,13 @@ export const updateVendorStatus = async ({ commit, dispatch, state }, payload) =
     commit("startRequest");
     try {
         const result = await Vue.http.post("/vendorsapi/update-vendor-status", payload);
-        const updatedVendor = result.body;
+        let updatedVendor = result.body;
+
+        if (updatedVendor.pendingCompetencies.length) {
+            const result = await Vue.http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: updatedVendor.pendingCompetencies })
+            updatedVendor.pendingCompetencies = result.data
+        }
+
         const index = state.filteredVendors.findIndex(item => item._id === updatedVendor._id);
         state.filteredVendors.splice(index, 1, updatedVendor);
         commit('setCurrentVendor', updatedVendor);

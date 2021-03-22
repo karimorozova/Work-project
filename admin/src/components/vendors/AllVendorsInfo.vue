@@ -61,7 +61,13 @@ export default {
         async bottomScrolled() {
             if(this.isDataRemain) {
                 const result = await this.$http.post('/vendorsapi/filtered-vendors', {filters: this.filters});
-                this.setFilteredVendors([...this.vendors, ...result.body]);
+                const mappedResult = result.data.map(item => {
+                  return {
+                    ...item,
+                    name: `${item.firstName} ${item.surname}`
+                  }
+                })
+                this.setFilteredVendors([...this.vendors, ...mappedResult]);
                 this.isDataRemain = result.body.length === 25;
                 this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
             }
@@ -106,7 +112,13 @@ export default {
             this.isDataRemain = true;
             try {
                 const result = await this.$http.post('/vendorsapi/filtered-vendors', {filters: this.filters});
-                this.setFilteredVendors(result.body);
+                const mappedResult = result.data.map(item => {
+                  return {
+                  	...item,
+                    name: `${item.firstName} ${item.surname}`
+                  }
+                })
+                this.setFilteredVendors(mappedResult);
                 this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : "";
                 this.scrollBodyToTop();
             } catch(err) {
