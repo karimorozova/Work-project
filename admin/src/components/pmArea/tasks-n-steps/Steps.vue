@@ -52,7 +52,9 @@
         template(slot="headerMargin" slot-scope="{ field }")
           span.steps__label {{ field.label }}
         template(slot="check" slot-scope="{ row, index }")
-          CheckBox(:isChecked="row.check" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
+          .steps__step-check
+            CheckBox(:isChecked="row.check" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
+        template(slot="info" slot-scope="{row, index}")
           .steps__info-icon(@click="showStepDetails(index)")
             i.fa.fa-info-circle
         template(slot="name" slot-scope="{ row }")
@@ -80,47 +82,59 @@
             span.steps__step-no-select(v-if="!row.vendor") No Vendor
 
         template(slot="start" slot-scope="{ row, index }")
-          Datepicker(
-            @selected="(e) => changeDate(e, 'start', index)"
-            v-model="row.start"
-            inputClass="steps__custom-input"
-            calendarClass="steps__calendar-custom"
-            :format="customFormatter"
-            monday-first=true
-            :disabledPicker="isDatePickDisabled"
-            :highlighted="highlighted"
-            @scrollDrop="scrollDrop")
+          .steps__step-date
+            Datepicker(
+              @selected="(e) => changeDate(e, 'start', index)"
+              v-model="row.start"
+              inputClass="steps__custom-input"
+              calendarClass="steps__calendar-custom"
+              :format="customFormatter"
+              monday-first=true
+              :disabledPicker="isDatePickDisabled"
+              :highlighted="highlighted"
+              @scrollDrop="scrollDrop")
+
         template(slot="deadline" slot-scope="{ row, index }")
-          Datepicker(
-            @selected="(e) => changeDate(e, 'deadline', index)"
-            v-model="row.deadline"
-            inputClass="steps__custom-input"
-            calendarClass="steps__calendar-custom"
-            :format="customFormatter"
-            monday-first=true
-            :disabled="disabled"
-            :disabledPicker="isDatePickDisabled"
-            :highlighted="highlighted"
-            @scrollDrop="scrollDrop")
+          .steps__step-date
+            Datepicker(
+              @selected="(e) => changeDate(e, 'deadline', index)"
+              v-model="row.deadline"
+              inputClass="steps__custom-input"
+              calendarClass="steps__calendar-custom"
+              :format="customFormatter"
+              monday-first=true
+              :disabled="disabled"
+              :disabledPicker="isDatePickDisabled"
+              :highlighted="highlighted"
+              @scrollDrop="scrollDrop")
+
         template(slot="progress" slot-scope="{ row, index }")
-          ProgressLineStep(:progress="progress(row.progress)" :lastProgress="lastProgress(row, index)")
+          .steps__step-progress
+            ProgressLineStep(:progress="progress(row.progress)" :lastProgress="lastProgress(row, index)")
         template(slot="status" slot-scope="{ row }")
-          span.steps__step-status {{ row.status | stepsAndTasksStatusFilter }}
+          .steps__step-data
+            span {{ row.status | stepsAndTasksStatusFilter }}
+
         template(slot="receivables" slot-scope="{ row }")
-          span.steps__money(v-if="isShowValue(row, 'receivables')")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-            span.steps__step-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
-            span.steps__step-data(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
+          .steps__step-data
+            span(v-if="isShowValue(row, 'receivables')")
+              span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+              span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+              span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          span.steps__money(v-if="isShowValue(row, 'payables')")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-            span.steps__step-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
-            span.steps__step-data(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
+          .steps__step-data
+            span(v-if="isShowValue(row, 'payables')")
+              span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+              span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
+              span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
+
         template(slot="margin" slot-scope="{ row }")
-          span.steps__money(v-if="marginCalc(row)")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span.steps__step-data(v-if="marginCalc(row)") {{ marginCalc(row) }}
+          .steps__step-data
+            span(v-if="marginCalc(row)")
+              span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span(v-if="marginCalc(row)") {{ marginCalc(row) }}
+
       transition(name="fade")
         .steps__info(v-if="isStepInfo")
           StepInfo(
@@ -204,8 +218,8 @@
 				tabs: ['Tasks', 'Steps'],
 				fields: [
 					{ label: "Check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0  },
-					{ label: "Info", headerKey: "headerInfo", key: "info", width: "4%", padding: 0  },
-					{ label: "Step", headerKey: "headerName", key: "name", width: "9%", padding: 0 },
+					{ label: "", headerKey: "headerInfo", key: "info", width: "3%", padding: 0  },
+					{ label: "Step", headerKey: "headerName", key: "name", width: "10%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0  },
 					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "13%", padding: 0 },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "8%", padding: 0  },
@@ -553,6 +567,33 @@
     display: flex;
     flex-direction: column;
 
+    &__step-check{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+    }
+
+    &__step-data{
+      height: 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 5px;
+    }
+
+    &__step-date{
+      height: 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 2px;
+    }
+    &__step-progress{
+      padding: 0 4px;
+      display: flex;
+      height: 30px;
+      align-items: center;
+    }
+
     &__table {
       position: relative;
     }
@@ -584,15 +625,17 @@
     }
 
     &__info-icon {
-      height: 18px;
+      font-size: 18px;
+      display: flex;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+
       i {
         color: $main-color;
-        opacity: 0.7;
-        transition: all 0.3s;
+        opacity: 0.8;
+        transition: all 0.2s;
         cursor: pointer;
-        margin-top: 2px;
-        margin-left: 5px;
-
         &:hover {
           opacity: 1;
         }

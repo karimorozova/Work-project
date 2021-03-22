@@ -14,15 +14,17 @@ const dr1Instructions = [
     {step: "dr1", text: "Prepare & deliver file to AM", title: "Download deliverables", isChecked: false, isNotRelevant: false},
 ]
 const dr2Instructions = [
-    {step: "dr2", text: "Check files/work on Memoq to ensure all segments were translated and mark in green", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "Run a QA to see if there are any warnings or comments left by the vendors", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "If there are any failures in the QA- please contact the vendors to modify the output, and re start the PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "Check that the terms are translated according to the client's instructions, and that any character limitations have been followed", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "If QA pass - Complete PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "Open file to see if all is OK", title: "Download deliverables", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "If file is word/excel/powerpoint/HTML (visual files) - send for sanity checkup to either translator or revisor", title: "Download deliverables", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "Check Client's brief/instructions ", title: "Download deliverables", isChecked: false, isNotRelevant: false},
-    {step: "dr2", text: "Prepare & deliver file to AM", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Check Language combinations (If the languages that were requested are the languages we are delivering", title:"", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Check File Type (Are we delivering the file format that was requested/required)", title:"", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "ICheck Number of files (Are the number of files that were request and the same as the number of files we are delivering)", title:"", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Client's Brief", title:"Check if instructions followed", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Terms", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Other instructions (TOV, Style etc)", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Compare source & target files [Beyond Compare stage] (to check for any issues, omits or other mismatches) ", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "If any issues send back to PMs", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Check Payment Profile of Client (PPP, Prepayment, Monthly)", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Deliver to client", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
+    {step: "dr2", text: "Comments (If any)", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
 ]
 
 async function checkPermission({projectId, taskId, userId}) {

@@ -129,7 +129,7 @@
       width: 80%;
       padding: 0 5px;
       font-size: 14px;
-      max-height: 31px;
+      max-height: 30px;
       display: flex;
       align-items: center;
       flex-wrap: wrap;

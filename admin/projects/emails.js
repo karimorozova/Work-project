@@ -235,9 +235,13 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 		const attachments = [{ filename: "deliverables.zip", content }];
 		await Projects.updateOne({"_id": project._id}, { [`tasks.${taskIndex}.deliverables`]: deliverables})
 
-		for (let contact of contacts) {
+		for await (let contact of contacts) {
+			const finalAttachments = attachments
+					.filter(item => item.filename === 'deliverables.zip')
+					.map(item => ({ filename: item.filename, path: `./dist${ deliverables }` }))
+
 			const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id });
-			await sendEmail({ to: contact.email, attachments, subject }, message);
+			await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message);
 		}
 	} catch (err) {
 		console.log(err);

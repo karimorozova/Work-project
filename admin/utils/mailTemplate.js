@@ -49,11 +49,9 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 		}
 		mailOptions.attachments = obj.attachments || []
 		if (!withoutImage) {
-			mailOptions.attachments.push({
-				filename: 'logo.png',
-				path: './static/email-logo.png',
-				cid: 'logo@pan' //same cid value as in the html img src
-			})
+			if(!mailOptions.attachments.map(item => item.filename).includes('logo.png')){
+				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
+			}
 		}
 		mailTransporter.sendMail(mailOptions, (error, info) => {
 			mailTransporter.close()
@@ -61,10 +59,10 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 				console.log(error)
 				rej(error)
 			}
-
 			if (info) {
 				console.log('sendEmail', 'Message sent: %s', info.messageId)
 				res(info.messageId)
+				mailOptions = {}
 			} else {
 				console.log('Error in sendEmail')
 				rej("no message sent")

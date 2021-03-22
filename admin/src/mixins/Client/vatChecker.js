@@ -9,8 +9,9 @@ export default {
 				} else {
 					try {
 						let result = await this.$http.get("/clientsapi/clients-every")
-						const clientVatIds = result.data.map(
-								({ billingInfo }) => billingInfo.vatId
+						const clientVatIds = result.data
+								.filter(({_id}) => _id.toString() !== (this.$route.params.id).toString())
+								.map(({ billingInfo }) => billingInfo.vatId
 						)
 						if (clientVatIds.includes(entity.billingInfo.vatId)) {
 							this.errors.push("Please, add unique VAT ID.")
