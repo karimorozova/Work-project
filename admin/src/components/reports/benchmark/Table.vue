@@ -52,7 +52,7 @@ export default {
 
 .benchmark-table {
     &__data {
-      height: 30px;
+      height: 31px;
       overflow-x: hidden;
       padding: 0 5px;
       align-items: center;

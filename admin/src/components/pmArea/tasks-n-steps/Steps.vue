@@ -571,18 +571,18 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 30px;
+      height: 31px;
     }
 
     &__step-data{
-      height: 30px;
+      height: 31px;
       display: flex;
       align-items: center;
       padding: 0 5px;
     }
 
     &__step-date{
-      height: 30px;
+      height: 31px;
       display: flex;
       align-items: center;
       padding: 0 2px;

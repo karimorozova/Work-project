@@ -75,7 +75,7 @@ export default {
 .table {
   width: 100%;
   &__thead {
-    border: 0.5px solid #938676;
+    border: 1px solid #938676;
     border-bottom: none;
     .table__head-row {
       background-color: $thead-background;
@@ -86,13 +86,12 @@ export default {
     max-height: 192px;
     overflow-y: scroll;
     margin-bottom: 20px;
-    border: 0.5px solid $cell-border;
-    border-bottom: 1px solid $cell-border;
+    border: 1px solid $cell-border;
     border-top: none;
 
     .table__body-row {
       .steps-cell{
-        padding: 7px 5px 6px 5px;
+        padding: 7px 5px 7px 5px;
       }
       cursor: pointer;
       &:nth-of-type(odd) {
@@ -139,21 +138,21 @@ export default {
   &__thead-cell {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 7px 5px 5px 6px;
-    border: 0.5px solid $cell-border;
+    padding: 7px 5px 7px 5px;
+    border: 1px solid $cell-border;
     border-right: none;
-    border-left: 0.5px solid $white;
+    border-left: 1px solid $white;
     &:first-child {
-      border-left: 0.5px solid $cell-border;
+      border-left: 1px solid $cell-border;
     }
     &:last-child {
-      border-right: 0.5px solid $cell-border;
+      border-right: 1px solid $cell-border;
     }
   }
   &__thead-cell-icon {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 7px 5px 5px 6px;
+    padding: 7px 5px 7px 5px;
     border: 0.5px solid $cell-border;
     border-right: none;
     border-left: 0.5px solid $white;
@@ -165,12 +164,14 @@ export default {
     box-sizing: border-box;
     font-size: 14px;
     padding: 7px 5px 7px 5px;
-    border: 1px solid $cell-border;
+    border-bottom: 1px solid $cell-border;
+    border-left: 1px solid $cell-border;
     border-right: none;
-    min-height: 30px;
-    
+    border-top: none;
+    min-height: 32px;
+
     &:last-child {
-      border-right: 0.5px solid $cell-border;
+      border-right: 1px solid $cell-border;
     }
     &:focus-within {
       box-shadow: inset 0 0 5px $cell-border;
@@ -302,9 +303,11 @@ export default {
   font-size: 14px;
   padding: 0 0 0 5px;
   height: 32px;
-  line-height: 34px;
-  border: 1px solid #938676;
+  line-height: 32px;
+  border-bottom: 1px solid $cell-border;
+  border-left: 1px solid $cell-border;
   border-right: none;
+  border-top: none;
 }
   .padding-with-check-box{
     padding: 5px 5px 5px 6px;

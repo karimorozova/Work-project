@@ -266,7 +266,7 @@ export default {
     }
     &__data-cell, &__info__input {
         overflow-x: hidden;
-        height: 30px;
+        height: 31px;
         padding: 0 5px;
         align-items: center;
         display: flex;

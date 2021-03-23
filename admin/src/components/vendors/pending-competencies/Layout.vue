@@ -259,7 +259,7 @@
     }
 
     &__data {
-      height: 30px;
+      height: 31px;
       overflow-x: hidden;
       padding: 0 5px;
       align-items: center;
@@ -269,9 +269,9 @@
     &__icon {
       color: #67573e;
       display: flex;
-      height: 30px;
+      height: 31px;
       align-items: center;
-      height: 30px;
+      height: 31px;
       justify-content: center;
       cursor: pointer;
       font-size: 16px;

@@ -306,7 +306,7 @@ export default {
         border: 1px solid #BFB09D;
     }
     .select {
-        height: 30px;
+        height: 31px;
         box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
     }
 }

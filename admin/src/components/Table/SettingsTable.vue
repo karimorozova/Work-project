@@ -105,7 +105,7 @@
     cursor: default;
 
     &__thead {
-      border: 0.5px solid $thead-background;
+      border: 1px solid $thead-background;
       border-bottom: none;
 
       .table__thead-row {
@@ -117,38 +117,39 @@
     &__tbody {
       overflow-y: scroll;
       margin-bottom: 20px;
-      border: 0.5px solid $cell-border;
-      border-bottom: 1px solid $cell-border;
+      border: 1px solid $cell-border;
       border-top: none;
     }
 
     &__thead-cell {
       box-sizing: border-box;
       font-size: 14px;
-      padding: 7px 5px 5px 6px;
-      border: 0.5px solid $cell-border;
+      padding: 7px 5px 7px 5px;
+      border: 1px solid $cell-border;
       border-right: none;
-      border-left: 0.5px solid $white;
+      border-left: 1px solid $white;
 
       &:first-child {
-        border-left: 0.5px solid $cell-border;
+        border-left: 1px solid $cell-border;
       }
 
       &:last-child {
-        border-right: 0.5px solid $cell-border;
+        border-right: 1px solid $cell-border;
       }
     }
 
     &__tbody-cell {
       box-sizing: border-box;
       font-size: 14px;
-      padding: 7px 5px 5px 6px;
-      border: 1px solid $cell-border;
+      padding: 7px 5px 7px 5px;
+      border-bottom: 1px solid $cell-border;
+      border-left: 1px solid $cell-border;
       border-right: none;
-      min-height: 30px;
+      border-top: none;
+      min-height: 32px;
 
       &:last-child {
-        border-right: 0.5px solid $cell-border;
+        border-right: 1px solid $cell-border;
       }
 
       &:focus-within {
@@ -159,6 +160,19 @@
     &__thead-row,
     &__tbody-row {
       display: flex;
+    }
+
+    &__tbody-row{
+      &:nth-of-type(odd) {
+        .table__tbody-cell {
+          background-color: $table-row-zebra-background;
+        }
+      }
+      &:hover {
+        .table__tbody-cell {
+          background-color: $cell-background;
+        }
+      }
     }
 
     &__thead-row {

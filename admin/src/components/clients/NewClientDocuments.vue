@@ -94,7 +94,7 @@ export default {
     background: url("../../assets/images/Other/upload-icon.png");
     background-position: center;
     background-repeat: no-repeat;
-    height: 30px;
+    height: 31px;
     width: 18px;
     overflow: hidden;
     margin-right: 8px;
@@ -126,7 +126,7 @@ export default {
   }
   &__icons {
     @extend %table-icons;
-    height: 30px;
+    height: 31px;
   }
   &__icon {
     @extend %table-icon;

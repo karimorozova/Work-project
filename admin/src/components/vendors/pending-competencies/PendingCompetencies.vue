@@ -230,16 +230,16 @@
 
     &__icons {
       @extend %table-icons;
-      height: 30px;
+      height: 31px;
       justify-content: center;
     }
 
     &__icon {
       color: #67573e;
       display: flex;
-      height: 30px;
+      height: 31px;
       align-items: center;
-      height: 30px;
+      height: 31px;
       justify-content: center;
       cursor: pointer;
       font-size: 16px;

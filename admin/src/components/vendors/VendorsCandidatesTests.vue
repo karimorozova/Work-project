@@ -180,7 +180,7 @@
 						label: "Evaluation Name",
 						headerKey: "headerEvaluatioName",
 						key: "evaluationName",
-						width: "15%",
+						width: "14%",
 						padding: "0",
 					},
 					{
@@ -222,14 +222,14 @@
 						label: "File Name",
 						headerKey: "headerFile",
 						key: "file",
-						width: "13%",
+						width: "15%",
 						padding: "0",
 					},
 					{
 						label: "Uploaded",
 						headerKey: "headerUploaded",
 						key: "uploaded",
-						width: "9%",
+						width: "8%",
 						padding: "0",
 					},
 					{
@@ -316,7 +316,7 @@
 			},
 			isSameTestName() {
 				const allVendorsTests = this.vendorTests.filter((test) =>
-						this.currentIndex >= 0 ? test._id !== this.vendorTests[this.currentIndex]._id : false
+						this.currentIndex >= 0 ? test._id !== this.vendorTests[this.currentIndex]._id : true
 				);
 				return allVendorsTests.map((test) => test.evaluationName).includes(this.currentEvaluationName);
 			},
@@ -572,6 +572,9 @@
   @import "../../assets/scss/style.scss";
   @import "../../assets/styles/settingsTable.scss";
 
+  a{
+    color: #d15f45;
+  }
   .vendorTests {
     @extend %setting-table;
     width: 1160px;

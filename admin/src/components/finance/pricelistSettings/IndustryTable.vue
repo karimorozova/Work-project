@@ -216,7 +216,7 @@ export default {
   }
   &__data,
   &__editing-data {
-    height: 30px;
+    height: 31px;
     padding: 0 5px;
     display: flex;
     align-items: center;

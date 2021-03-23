@@ -283,7 +283,7 @@ export default {
   &__header,
   &__data,
   &__icons {
-    height: 30px;
+    height: 31px;
     display: flex;
     align-items: center;
     justify-content: center;

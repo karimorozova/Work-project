@@ -76,9 +76,12 @@
           value="Create Project"
           @clicked="checkForErrors"
         )
-    ValidationErrors(v-if="areErrorsExist"
-      :errors="errors"
-      @closeErrors="closeErrors")
+      ValidationErrors(
+        v-if="areErrorsExist"
+        :errors="errors"
+        :isAbsolute="true"
+        @closeErrors="closeErrors"
+      )
 </template>
 
 <script>
@@ -238,8 +241,8 @@
 				this.project.customer = customer._id
 				this.project.isTest = this.isTest
 				try {
-					const newProject = await this.$http.post("/pm-manage/new-project", this.project)
-					this.$emit('projectCreated', { project: newProject.body, customer: customer })
+					const newProject = await this.$http.post("/pm-manage/new-project", {project: this.project, user: this.user})
+					this.$emit('projectCreated', { project: newProject.data, customer: customer })
 					this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
@@ -293,6 +296,7 @@
 		computed: {
 			...mapGetters({
 				industries: "getAllIndustries",
+        user: "getUser"
 			}),
 			existProjectAccessChangeName() {
 				if (this.project) {
@@ -369,6 +373,7 @@
       width: 960px;
       padding: 20px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      position: relative;
     }
 
     &__info-row {
