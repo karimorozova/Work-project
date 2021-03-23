@@ -10,15 +10,17 @@
             img(src="../../../assets/images/arrow_open.png" :class="{'reverse-icon': droppedLang}")
         input.search(v-if="droppedLang" v-model="searchLang" placeholder="Search")
         .drop(v-if="droppedLang")
-          .drop__item(v-for="(language, index) in filteredLangs" @click="chooseLang(index)" :class="{'active-lang': selectedLang.lang == language.lang}")
+          .drop__item(v-for="(language, index) in removeEnglishLang(filteredLangs)" @click="chooseLang(index)" :class="{'active-lang': selectedLang.lang == language.lang}")
             span {{ language.lang }}
 </template>
 
 <script>
 	import ClickOutside from "vue-click-outside"
 	import { mapGetters, mapActions } from "vuex"
+  import removeLang from "../../../mixins/removeLang";
 
 	export default {
+	  mixins: [removeLang],
 		props: {
 			selectedLang: {
 				type: Object,
@@ -73,18 +75,19 @@
 			chooseLang(index) {
 				this.$emit("chooseLang", { lang: this.filteredLangs[index], index: this.parentIndex })
 				this.outClick()
-			}
+			},
+
 		},
 		computed: {
 			...mapGetters({
 				allLanguages: 'getLangs'
 			}),
 			filteredLangs() {
-				let result = this.allLanguages.filter(item => {
+				let result = this.removeEnglishLang(this.allLanguages.filter(item => {
 					if (item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
 						return item
 					}
-				})
+				}))
 				return result
 			}
 		},
