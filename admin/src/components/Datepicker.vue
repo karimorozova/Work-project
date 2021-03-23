@@ -1,16 +1,13 @@
-<template>
-  <div class="vdp-datepicker" :class="[wrapperClass, isRtl ? 'rtl' : '']">
-    <div :class="{'input-group' : bootstrapStyling}">
+<template lang="pug">
+  .vdp-datepicker(:class="[wrapperClass, isRtl ? 'rtl' : '']")
+    div(:class="{'input-group' : bootstrapStyling}")
       <!-- Calendar Button -->
-      <span v-if="calendarButton" class="vdp-datepicker__calendar-button" :class="{'input-group-addon' : bootstrapStyling}" @click="showCalendar"
-            v-bind:style="{'cursor:not-allowed;' : disabledPicker}">
-        <i :class="calendarButtonIcon">
-          {{ calendarButtonIconContent }}
-          <span v-if="!calendarButtonIcon">&hellip;</span>
-        </i>
-      </span>
+      span(v-if="calendarButton" class="vdp-datepicker__calendar-button" :class="{'input-group-addon' : bootstrapStyling}" @click="showCalendar"
+            v-bind:style="{'cursor:not-allowed;' : disabledPicker}")
+        i.calendarButtonIcon {{ calendarButtonIconContent }}
+          span(v-if="!calendarButtonIcon") &hellip;
       <!-- Input -->
-      <input
+      input(
           :type="inline ? 'hidden' : 'text'"
           :class="[inputClass,inputClass2]"
           :name="name"
@@ -24,84 +21,112 @@
           :clear-button="clearButton"
           :disabled="disabledPicker"
           :required="required"
-          :readonly="isReadonly">
+          :readonly="isReadonly"
+          )
       <!-- Clear Button -->
-      <span v-if="clearButton && selectedDate" class="vdp-datepicker__clear-button" :class="{'input-group-addon' : bootstrapStyling}" @click="clearDate()">
-        <i :class="clearButtonIcon">
-          <span v-if="!clearButtonIcon">&times;</span>
-        </i>
-      </span>
-    </div>
+      span(v-if="clearButton && selectedDate" class="vdp-datepicker__clear-button" :class="{'input-group-addon' : bootstrapStyling}" @click="clearDate()")
+        i.clearButtonIcon
+          span(v-if="!clearButtonIcon") &times;
+
 
     <!-- Day View -->
-    <template v-if="allowedToShowView('day')">
-      <div :class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showDayView" v-bind:style="calendarStyle">
-        <header>
-              <span
-                  @click="isRtl ? nextMonth() : previousMonth()"
-                  class="prev"
-                  v-bind:class="{ 'disabled' : isRtl ? nextMonthDisabled(pageTimestamp) : previousMonthDisabled(pageTimestamp) }">&lt;</span>
-          <span @click="showMonthCalendar" :class="allowedToShowView('month') ? 'up' : ''">{{ isYmd ? currYear : currMonthName }} {{ isYmd ? currMonthName : currYear }}</span>
-          <span
+    template(v-if="allowedToShowView('day')")
+      div(:class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showDayView" v-bind:style="calendarStyle")
+        header
+          span(
+              @click="isRtl ? nextMonth() : previousMonth()"
+              class="prev"
+              v-bind:class="{ 'disabled' : isRtl ? nextMonthDisabled(pageTimestamp) : previousMonthDisabled(pageTimestamp) }"
+              ) &lt;
+          span(
+              @click="showMonthCalendar"
+              :class="allowedToShowView('month') ? 'up' : ''"
+              ) {{ isYmd ? currYear : currMonthName }} {{ isYmd ? currMonthName : currYear }}
+          span(
               @click="isRtl ? previousMonth() : nextMonth()"
               class="next"
-              v-bind:class="{ 'disabled' : isRtl ? previousMonthDisabled(pageTimestamp) : nextMonthDisabled(pageTimestamp) }">&gt;</span>
-        </header>
-        <div class="custom-fonts" :class="isRtl ? 'flex-rtl' : ''">
-          <span class="cell day-header" v-for="d in daysOfWeek" :key="d.timestamp">{{ d }}</span>
-          <span class="cell day"
+              v-bind:class="{ 'disabled' : isRtl ? previousMonthDisabled(pageTimestamp) : nextMonthDisabled(pageTimestamp) }"
+              ) &gt;
+        .custom-fonts( :class="isRtl ? 'flex-rtl' : ''")
+          span.cell.day-header( v-for="d in daysOfWeek" :key="d.timestamp") {{ d }}
+          span.cell.day(
                 v-for="day in days"
                 :key="day.timestamp"
                 track-by="timestamp"
                 v-bind:class="dayClasses(day)"
-                @click="selectDate(day)">{{ day.date }}</span>
-        </div>
-      </div>
-    </template>
+                @click="selectDate(day)"
+                ) {{ day.date }}
+
+        .time-select
+          p.time__name Time:
+          .change-time.hour
+            span(
+              @click="() => checkHours(+hours+1)"
+              class="prev"
+            )
+              i.fa.fa-chevron-up
+            input.date-input(type="text" v-model="hours" maxlength="2" @click="selectAllText")
+            span(
+              @click="() => checkHours(hours-1)"
+              class="next"
+            )
+              i.fa.fa-chevron-down
+          .separator :
+          .change-time.minute
+            span(
+              @click="() => checkMinutes(+minutes+1)"
+              class="prev"
+            )
+              i.fa.fa-chevron-up
+            input.date-input(type="text" v-model="minutes" maxlength="2" @click="selectAllText")
+            span(
+              @click="() => checkMinutes(minutes-1)"
+              class="next"
+            )
+              i.fa.fa-chevron-down
 
     <!-- Month View -->
-    <template v-if="allowedToShowView('month')">
-      <div :class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showMonthView" v-bind:style="calendarStyle">
-        <header>
-              <span
-                  @click="previousYear"
-                  class="prev"
-                  v-bind:class="{ 'disabled' : previousYearDisabled(pageTimestamp) }">&lt;</span>
-          <span @click="showYearCalendar" :class="allowedToShowView('year') ? 'up' : ''">{{ getPageYear() }}</span>
-          <span
+    template( v-if="allowedToShowView('month')")
+      div( :class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showMonthView" v-bind:style="calendarStyle")
+        header
+          span.prev(
+              @click="previousYear"
+              v-bind:class="{ 'disabled' : previousYearDisabled(pageTimestamp) }"
+              ) &lt;
+          span( @click="showYearCalendar" :class="allowedToShowView('year') ? 'up' : ''") {{ getPageYear() }}
+          span.next(
               @click="nextYear"
-              class="next"
-              v-bind:class="{ 'disabled' : nextYearDisabled(pageTimestamp) }">&gt;</span>
-        </header>
-        <span class="cell month"
+              v-bind:class="{ 'disabled' : nextYearDisabled(pageTimestamp) }"
+              ) &gt;
+        span.cell.month(
               v-for="month in months"
               :key="month.timestamp"
               track-by="timestamp"
               v-bind:class="{ 'selected': month.isSelected, 'disabled': month.isDisabled }"
-              @click.stop="selectMonth(month)">{{ month.month }}</span>
-      </div>
-    </template>
+              @click.stop="selectMonth(month)"
+              ) {{ month.month }}
+
 
     <!-- Year View -->
-    <template v-if="allowedToShowView('year')">
-      <div :class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showYearView" v-bind:style="calendarStyle">
-        <header>
-              <span @click="previousDecade" class="prev"
-                    v-bind:class="{ 'disabled' : previousDecadeDisabled(pageTimestamp) }">&lt;</span>
-          <span>{{ getPageDecade() }}</span>
-          <span @click="nextDecade" class="next"
-                v-bind:class="{ 'disabled' : nextMonthDisabled(pageTimestamp) }">&gt;</span>
-        </header>
-        <span
-            class="cell year"
+    template( v-if="allowedToShowView('year')")
+      div( :class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showYearView" v-bind:style="calendarStyle")
+        header
+          span.prev(
+              @click="previousDecade"
+              v-bind:class="{ 'disabled' : previousDecadeDisabled(pageTimestamp) }"
+              ) &lt;
+          span {{ getPageDecade() }}
+          span.next(
+              @click="nextDecade"
+              v-bind:class="{ 'disabled' : nextMonthDisabled(pageTimestamp) }"
+              ) &gt;
+        span.cell.year(
             v-for="year in years"
             :key="year.timestamp"
             track-by="timestamp"
             v-bind:class="{ 'selected': year.isSelected, 'disabled': year.isDisabled }"
-            @click.stop="selectYear(year)">{{ year.year }}</span>
-      </div>
-    </template>
-  </div>
+            @click.stop="selectYear(year)"
+            ) {{ year.year }}
 </template>
 
 <script>
@@ -161,7 +186,7 @@
 			maximumView: {
 				type: String,
 				default: 'year'
-			}
+			},
 		},
 		data() {
 			const startDate = this.openDate ? new Date(this.openDate) : new Date()
@@ -187,7 +212,9 @@
 				/*
          * Positioning
          */
-				calendarHeight: 0
+				calendarHeight: 0,
+        hours: moment().hour(),
+        minutes: moment().minute()
 			}
 		},
 		watch: {
@@ -199,7 +226,21 @@
 			},
 			initialView() {
 				this.setInitialView()
-			}
+			},
+      hours(value) {
+			  if (value > 23) {
+			    this.hours = 23
+          return
+        }
+			  this.hours = value < 0 ? '0': value
+      },
+      minutes(value) {
+        if (value > 59) {
+          this.minutes = 59
+          return
+        }
+        this.minutes = value < 0 ? '0': value
+      }
 		},
 		computed: {
 			computedInitialView() {
@@ -409,7 +450,7 @@
 				const value = e.target.value
 				const dateParts = value.split(", ")
 				const dateString = dateParts[0].split("-").reverse().join("-") + "T" + dateParts[1]
-				const newDate = new Date(moment(dateString))
+				const newDate = new Date(moment(dateString).set({hour: this.hours, minute: this.minutes}))
 				if (isNaN(newDate.getTime())) {
 					return this.$emit("invalidDate", { message: "Please set valid date" })
 				}
@@ -493,7 +534,7 @@
 					this.$emit('selectedDisabled', day)
 					return false
 				}
-				this.setDate(day.timestamp)
+				this.setDate(moment(day).set({hour: this.hours, minute: this.minutes}).format())
 				if (!this.isInline) {
 					this.close(true)
 				}
@@ -915,7 +956,40 @@
 				if (this.isInline) {
 					this.setInitialView()
 				}
-			}
+			},
+      checkHours(hours) {
+			  hours = parseInt((hours+'').replace(/\D*/g, ''))
+			  if(hours >= 24 ) {
+			    this.hours = 0
+          return
+        }
+			  if(hours < 0 ) {
+			    this.hours = 23
+          return
+        }
+			  this.hours = hours
+      },
+      checkMinutes(minutes) {
+        minutes = parseInt((minutes+'').replace(/\D*/g, ''))
+			  if (minutes > 59) {
+			    this.checkHours((+this.hours+1))
+          this.minutes = 0
+          return
+        }
+			  if (minutes < 0) {
+          this.checkHours((+this.hours-1))
+          this.minutes = 59
+          return
+        }
+			  this.minutes = minutes
+
+      },
+      selectAllText(e) {
+			  e.target.select()
+      },
+      twoDigit(digit) {
+			  return digit < 10 ? '0'+digit : digit
+      }
 		},
 		mounted() {
 			this.init()
@@ -1233,6 +1307,36 @@
 
   .request_background {
     background-color: rgba(229, 105, 97, 0.24);
+  }
+  .time-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #ccc;
+  }
+  .time-select i {
+    color: #d15f45;
+  }
+  .time-select span {
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+  }
+  .time__name {
+    margin-right: 15px;
+  }
+  .change-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+  }
+  .date-input{
+    width: 55px;
+    text-align: center;
+  }
+  .separator {
+    font-size: 32px;
   }
 
 
