@@ -164,7 +164,7 @@ export default {
   &__tbody-cell {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 7px 5px 5px 6px;
+    padding: 7px 5px 7px 5px;
     border: 1px solid $cell-border;
     border-right: none;
     min-height: 30px;
