@@ -35,7 +35,7 @@
               .competencies__input-title Source Language:
               SelectSingle.width-191(
                 :selectedOption="currentSourceLang.lang"
-                :options="langs"
+                :options="removeEnglishLang(langs)"
                 :hasSearch="true"
                 placeholder="Source language"
                 fieldName="lang"
@@ -46,7 +46,7 @@
               .competencies__input-title Target Language:
               SelectSingle.width-191(
                 :selectedOption="targetLangOrMotherTongue.lang"
-                :options="langs"
+                :options="removeEnglishLang(langs)"
                 :hasSearch="true"
                 fieldName="lang"
                 placeholder="Target language"
@@ -147,8 +147,10 @@
 	import ApproveModal from "../../../components/ApproveModal"
 	import Button from "../../../components/overall/Button"
 	import Modal from "../../../components/overall/Modal"
+  import removeLang from "../../../mixins/removeLang";
 
 	export default {
+    mixins: [removeLang],
 		data() {
 			return {
 				showStep: [ 'Translation', 'Copywriting' ],
