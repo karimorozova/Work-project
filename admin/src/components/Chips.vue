@@ -66,6 +66,7 @@ input::placeholder {
   border-radius: 8px;
   width: 65px;
   border: 1px solid #67573e;
+  background: transparent;
 }
 #myInput:focus {
   outline: none;

@@ -340,7 +340,7 @@
 				langs: 'getLangs',
 				industries: 'getIndustries',
 				vendor: "getVendor",
-				steps: "getAllStepss",
+				steps: "getAllSteps",
 				token: "getToken"
 			}),
 			pendingCompetenciesToStrings() {

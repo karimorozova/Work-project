@@ -1,6 +1,5 @@
-import setAllLangs from './setLang'
-import { SET_ALL_LANGS } from '../../mutation-types'
+import { SET_LANGUAGES } from './setLang'
 
 export default {
-  [SET_ALL_LANGS]: setAllLangs
+  SET_LANGUAGES
 }

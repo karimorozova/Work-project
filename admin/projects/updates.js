@@ -837,20 +837,18 @@ const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 		workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed'
 	}
 
-	tasks = tasks.map(item => {
+	const updatedTasks = tasks.map(item => {
 		if(item.taskId === taskId){
-			item.memoqDocs.map(item2 => {
-				return {
-					...item2,
-					WorkflowStatus: workFlowStatus
-				}
-			})
+			 item.memoqDocs.map(doc => {
+			 	doc.WorkflowStatus = workFlowStatus
+			 })
+			return item
+		}else{
 			return item
 		}
-		return item
 	})
 
-	await Projects.updateOne({ 'steps.stepId': stepId }, { tasks })
+	await Projects.updateOne({ 'steps.stepId': stepId }, { tasks: updatedTasks })
 
 	return { workFlowStatus, memoqProjectId, memoqDocIds }
 }

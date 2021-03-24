@@ -20,8 +20,8 @@
             :errors="errors"
             :areErrors="areErrors"
             :isApproveModal="isDeleting"
-            :bodyClass="[{ 'tbody_visible-overflow': jobs.length < 10 }]",
-            :tableheadRowClass="[{ 'tbody_visible-overflow': jobs.length < 10 }]",
+            :bodyClass="['vendors-table__body',{'tbody_visible-overflow': filteredJob.length < 14}]"
+            :tableheadRowClass="[{ 'tbody_visible-overflow': filteredJob.length < 14 }]",
             @closeErrors="closeErrors"
             @onRowClicked="chooseJob"
           )
@@ -66,12 +66,12 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "20%", padding: "0" },
+					{ label: "Job ID", headerKey: "headerJobId", key: "jobId", width: "28%", padding: "0" },
 					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "20%", padding: "0" },
-					{ label: "Type", headerKey: "headerType", key: "type", width: "15%", padding: "0" },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "15%", padding: "0" },
-					{ label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "15%", padding: "0" },
-					{ label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "15%", padding: "0" }
+					{ label: "Type", headerKey: "headerType", key: "type", width: "13%", padding: "0" },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: "0" },
+					{ label: "Total Amount", headerKey: "headerAmount", key: "amount", width: "13%", padding: "0" },
+					{ label: "Invoice date", headerKey: "headerInvoiceDate", key: "invoiceDate", width: "13%", padding: "0" }
 				],
 				isTableDropMenu: true,
 				currentActive: -1,

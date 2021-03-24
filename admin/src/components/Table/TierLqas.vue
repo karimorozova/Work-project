@@ -176,6 +176,7 @@ export default {
     border: none;
     outline: none;
     color: $main-color;
+    background: transparent;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {

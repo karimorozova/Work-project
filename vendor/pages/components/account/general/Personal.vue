@@ -51,7 +51,7 @@ export default {
     methods: {
         ...mapActions({
             getAllTimezones: "getAllTimezones",
-            getAllLanguages: "getAllLanguages",
+            // getAllLanguages: "getAllLanguages",
             setAccountProp: "setAccountProp"
         }),
         setInputValue({value}, prop) {
@@ -85,7 +85,7 @@ export default {
     },
     mounted() {
         this.getAllTimezones();
-        this.getAllLanguages();
+        // this.getAllLanguages();
     }
 }
 </script>

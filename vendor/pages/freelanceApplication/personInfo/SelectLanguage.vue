@@ -50,7 +50,7 @@
 		},
 		methods: {
 			...mapActions({
-				getAllLanguages: 'getAllLanguages'
+				// getAllLanguages: 'getAllLanguages'
 			}),
 			toggleLangs(event) {
 				let elementsObj = event.composedPath()
@@ -95,7 +95,7 @@
 			ClickOutside
 		},
 		created() {
-			this.getAllLanguages()
+			// this.getAllLanguages()
 		},
 		mounted() {
 		}

@@ -1,3 +1,3 @@
-export default (state, payload) => {
-  state.allSteps = payload;
-};
+export const SET_STEPS = (state, payload) => {
+  state.allSteps = payload
+}

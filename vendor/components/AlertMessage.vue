@@ -29,7 +29,7 @@ export default {
     top: 70px;
     width: 230px;
     padding: 30px 20px 30px 40px;
-    box-shadow: 0 0 15px $brown-shadow;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     background-color: $white;
     color: $green-success;
     &_error {

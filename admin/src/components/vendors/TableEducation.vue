@@ -450,4 +450,7 @@
       font-size: 0;
     }
   }
+  a{
+    color: #D15F45;
+  }
 </style>

@@ -792,6 +792,7 @@
     border: none;
     outline: none;
     color: inherit;
+    background: transparent;
   }
 
   .title-language {

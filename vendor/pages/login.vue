@@ -46,11 +46,10 @@
 					});
 					this.login(result);
 
-
           const previousLink = this.$cookie.get('previousPath')
           !!result && !!previousLink && previousLink !== '/login' && previousLink !== '/' ?
-            this.$router.push(previousLink) :
-            this.$router.push('/dashboard')
+              await this.$router.push(previousLink) :
+              await this.$router.push('/dashboard')
 
           this.$cookie.delete('previousPath')
 					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
@@ -68,7 +67,6 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				login: "login",
-				setOriginallyUnits: "setOriginallyUnits"
 			})
 		}
 	}

@@ -6,8 +6,8 @@
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
-      :bodyClass="[{ 'tbody_visible-overflow': jobs.length < 9 }]",
-      :tableheadRowClass="[{ 'tbody_visible-overflow': jobs.length < 9 }]",
+      :bodyClass="[{ 'tbody_visible-overflow': jobs.length < 6 }]",
+      :tableheadRowClass="[{ 'tbody_visible-overflow': jobs.length < 6 }]",
       @closeErrors="closeErrors"
       @onRowClicked="chooseJob"
     )
