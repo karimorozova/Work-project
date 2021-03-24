@@ -131,6 +131,10 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+  isCreatedByManager: {
+	  type: Boolean,
+    default: false
+  },
 	notes: {
 		type: String
 	},

@@ -54,7 +54,7 @@
                 :key="day.timestamp"
                 track-by="timestamp"
                 v-bind:class="dayClasses(day)"
-                @click="selectDate(day)"
+                @click="setDay(day)"
                 ) {{ day.date }}
 
         .time-select
@@ -84,6 +84,8 @@
               class="next"
             )
               i.fa.fa-chevron-down
+        Button.select-date(value="select" @clicked="selectDate()")
+
 
     <!-- Month View -->
     template( v-if="allowedToShowView('month')")
@@ -133,9 +135,11 @@
 	import DateUtils from '../../utils/DateUtils.js'
 	import DateLanguages from '../../utils/DateLanguages.js'
 	import moment from 'moment'
+  import Button from "./Button";
 
 	export default {
-		props: {
+    components: {Button},
+    props: {
 			value: {
 				validator: function (val) {
 					return val === null || val instanceof Date || typeof val === 'string' || typeof val === 'number'
@@ -213,6 +217,7 @@
          * Positioning
          */
 				calendarHeight: 0,
+        day: '',
         hours: moment().hour(),
         minutes: moment().minute()
 			}
@@ -529,16 +534,21 @@
 			/**
 			 * @param {Object} day
 			 */
-			selectDate(day) {
-				if (day.isDisabled) {
-					this.$emit('selectedDisabled', day)
+			selectDate() {
+				if (this.day.isDisabled) {
+					this.$emit('selectedDisabled', this.day)
 					return false
 				}
-				this.setDate(moment(day).set({hour: this.hours, minute: this.minutes}).format())
+				this.setDate(moment(this.day).set({hour: this.hours, minute: this.minutes}).format())
 				if (!this.isInline) {
 					this.close(true)
 				}
 			},
+      setDay(day) {
+			  if (!day.isDisabled) {
+          this.day = day
+        }
+      },
 			/**
 			 * @param {Object} month
 			 */
@@ -936,10 +946,10 @@
 			},
 			dayClasses(day) {
 				return {
-					'selected': day.isSelected,
+					'selected': day.isToday,
 					'disabled': day.isDisabled,
 					'highlighted': day.isHighlighted,
-					'today': day.isToday,
+					'today': (day.isSelected && !this.day )|| day === this.day,
 					'beforeToday': day.isBeforeToday,
 					'weekend': day.isWeekend,
 					'sat': day.isSaturday,
@@ -958,8 +968,8 @@
 				}
 			},
       checkHours(hours) {
-			  hours = parseInt((hours+'').replace(/\D*/g, ''))
-			  if(hours >= 24 ) {
+        hours = parseInt((hours+'').replace(/[^-\d]/g, ''))
+        if(hours >= 24 ) {
 			    this.hours = 0
           return
         }
@@ -970,7 +980,7 @@
 			  this.hours = hours
       },
       checkMinutes(minutes) {
-        minutes = parseInt((minutes+'').replace(/\D*/g, ''))
+        minutes = parseInt((minutes+'').replace(/[^-\d]/g, ''))
 			  if (minutes > 59) {
 			    this.checkHours((+this.hours+1))
           this.minutes = 0
@@ -1133,7 +1143,7 @@
   }
 
   .vdp-datepicker__calendar .cell.selected {
-    background: white;
+    background: #ccc;
     font-weight: bold;
   }
 
@@ -1337,6 +1347,10 @@
   }
   .separator {
     font-size: 32px;
+  }
+  .select-date{
+    padding: 5px;
+    text-align: center;
   }
 
 

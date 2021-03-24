@@ -38,7 +38,7 @@
       .title Sales Information
       .new-client-info__sales
         ClientSalesInfo(:client="client" @setLeadSource="setLeadSource" :isEmpty="isLeadEmpty")
-      .title Billing Informations
+      .title Billing Information
       .new-client-info__billing
         ClientBillInfo(:client="client" :errorFields="billErrors" @changeProperty="setBillInfo")
       ValidationErrors(
@@ -208,10 +208,10 @@
 					this.errors.push('Please, add Payment type.')
 					this.billErrors.push('payment')
 				}
-				if (!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
-					this.errors.push('Please provide a valid email in Billing Informations.')
-					this.billErrors.push('email')
-				}
+				// if (!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
+				// 	this.errors.push('Please provide a valid email in Billing Informations.')
+				// 	this.billErrors.push('email')
+				// }
 				if (!this.client.accountManager || !this.client.salesManager || !this.client.projectManager) this.errors.push('All managers should be assigned.')
 
 				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email)

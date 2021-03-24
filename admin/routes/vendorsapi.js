@@ -8,6 +8,7 @@ const {
 	getVendor,
 	getVendorAfterUpdate,
 	getFilteredVendors,
+  getFilteredVendorsWithCustomFilters,
 	updateVendorEducation,
 	saveVendorDocument,
 	saveVendorDocumentDefault,
@@ -225,7 +226,14 @@ router.post('/vendor-assessment', upload.fields([ { name: 'assessmentFile' } ]),
 router.post('/filtered-vendors', async (req, res) => {
 	const { filters } = req.body
 	try {
-		const filteredVendors = await getFilteredVendors(filters)
+	  const notEmptyOrCreatedByManagerFilter = {$or: [
+	      {isCreatedByManager: true},
+        { status:{$ne: 'Potential'}},
+        { pendingCompetencies: { $exists: true, $not: {$size: 0} } },
+        { competencies: { $exists: true, $not: {$size: 0} } },
+        { approvedPendingCompetencies: { $exists: true, $not: {$size: 0} } },
+      ]}
+		const filteredVendors = await getFilteredVendorsWithCustomFilters(filters,notEmptyOrCreatedByManagerFilter)
 		res.send(filteredVendors)
 	} catch (err) {
 		console.log(err)
