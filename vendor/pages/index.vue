@@ -221,7 +221,6 @@
 		},
 		async created() {
 			await this.getOriginallyUnits()
-<<<<<<< Updated upstream
 			await this.getVendorInfo()
 			await this.getAllIndustries()
 			await this.getAllLanguages()
@@ -229,19 +228,6 @@
 			// // this.setToken()
 		},
 		updated() {
-=======
-		},
-    mounted() {
-      this.domain = process.env.domain
-      this.setToken()
-      this.getVendorInfo()
-      this.getAllLanguages()
-      this.setAllIndustries()
-      this.setAllStepss()
-      this.mainPageRender()
-    },
-    updated() {
->>>>>>> Stashed changes
 			this.toggleSideBar(false)
 		},
 		mounted() {
