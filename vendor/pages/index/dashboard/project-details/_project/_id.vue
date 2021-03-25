@@ -1,7 +1,9 @@
 <template lang="pug">
-  .details
+  .details(v-if="job._id")
     .title Project Details
-    .details__data(v-if="job._id")
+    //.btn(v-if="!isForbidden.status")
+      //Button(:value="'Update'" @clicked="updateData")
+    .details__data
       .details__info
         .details__main
           MainInfo
@@ -33,6 +35,7 @@
 	const Forbidden = () => import("../../../../components/details/Forbidden")
 	const ApproveModal = () => import("~/components/ApproveModal")
 	import { mapGetters, mapActions } from "vuex"
+	import Button from "../../../../../components/overall/Button"
 
 	export default {
 		data() {
@@ -56,6 +59,18 @@
 			closeModal() {
 				this.isApproveModal = false
 			},
+			// async updateData() {
+				// try {
+				// 	await this.getProjectById(this.$route.params.project)
+				// 	if (this.project) {
+				// 		await this.getStepFromProject(this.$route.params.id)
+				// 		await this.getTaskFromProject(this.currentStep.taskId)
+				// 	}
+				// } catch (err) {
+				// } finally {
+				// 	this.refreshProgress()
+				// }
+			// },
 			async getProjectById(id) {
 				try {
 					const result = await this.$axios.post(`vendor/project`, {
@@ -125,12 +140,13 @@
 			}
 		},
 		computed: {
-			...mapGetters({
-				job: "getSelectedJob",
-				allJobs: "getAllJobs",
-				originallyUnits: "getOriginallyUnits",
-				getToken: "getToken"
-			}),
+			...
+					mapGetters({
+						job: "getSelectedJob",
+						allJobs: "getAllJobs",
+						originallyUnits: "getOriginallyUnits",
+						getToken: "getToken"
+					}),
 			buttonValue() {
 				return "Start"
 			},
@@ -164,6 +180,7 @@
 			}
 		},
 		components: {
+			Button,
 			MainInfo,
 			OtherInfo,
 			FilesAndButtons,

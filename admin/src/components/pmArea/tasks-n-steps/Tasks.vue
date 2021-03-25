@@ -53,7 +53,8 @@
         template(slot="headerDelivery" slot-scope="{ field }")
           span.tasks__label {{ field.label }}
         template(slot="check" slot-scope="{ row, index }")
-          CheckBox(:isChecked="row.isChecked" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
+          .tasks__task-check
+            CheckBox(:isChecked="row.isChecked" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
         template(slot="taskId" slot-scope="{ row }")
           span.tasks__task-data {{ row.taskId }}
         template(slot="language" slot-scope="{ row }")
@@ -63,29 +64,38 @@
         template(slot="deadline" slot-scope="{ row }")
           span.tasks__task-data {{ formatDate(row.deadline) }}
         template(slot="progress" slot-scope="{ row, index }")
-          ProgressLine(:progress="progress(row, index)")
+          .tasks__task-progress
+            ProgressLine(:progress="progress(row, index)")
         template(slot="status" slot-scope="{ row }")
-          .tasks__task-status {{ row.status | stepsAndTasksStatusFilter }}
+          .tasks__task-data {{ row.status | stepsAndTasksStatusFilter }}
             .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
               img.tasks__time-icon(src="../../../assets/images/time_icon.png")
               .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
+
         template(slot="receivables" slot-scope="{ row }")
-          span.tasks__money(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span.tasks__task-data(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
-          span.tasks__task-data(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
+          .tasks__task-data
+            span(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0")
+              span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+            span(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
+
         template(slot="payables" slot-scope="{ row }")
-          span.tasks__money(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span.tasks__task-data(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
-          span.tasks__task-data(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
+          .tasks__task-data
+            span(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
+              span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
+            span(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
+
         template(slot="margin" slot-scope="{ row }")
-          span.tasks__money(v-if="marginCalc(row.finance.Price)")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span.tasks__task-data(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
+          .tasks__task-data
+            span(v-if="marginCalc(row.finance.Price)")
+              span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
+
         template(slot="delivery" slot-scope="{ row }")
-          img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
-          img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
+          .tasks__task-data
+            img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
+            img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
 
     .tasks__approve-action(v-if="isApproveActionShow")
       ApproveModalPayment(
@@ -138,17 +148,17 @@
 		data() {
 			return {
 				fields: [
-					{ label: "check", headerKey: "headerCheck", key: "check", width: "3%" },
-					{ label: "Task ID", headerKey: "headerTaskId", key: "taskId", width: "17%" },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "10%" },
-					{ label: "Start", headerKey: "headerStart", key: "start", width: "9%" },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%" },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "13%" },
-					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%" },
-					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "8%" },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%" },
-					{ label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "6%", cellClass: "tasks_centered" },
+					{ label: "check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0  },
+					{ label: "Task ID", headerKey: "headerTaskId", key: "taskId", width: "16%", padding: 0  },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0  },
+					{ label: "Start", headerKey: "headerStart", key: "start", width: "9%", padding: 0  },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%", padding: 0  },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%", padding: 0  },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "13%", padding: 0  },
+					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%", padding: 0  },
+					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "8%", padding: 0  },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%", padding: 0  },
+					{ label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "5%", cellClass: "tasks_centered", padding: 0 },
 				],
 				selectedAction: "",
 				tabs: ['Tasks', 'Steps'],
@@ -483,6 +493,26 @@
     display: flex;
     flex-direction: column;
 
+    &__task-check{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+    }
+
+    &__task-data{
+      height: 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 5px;
+      position: relative;
+    }
+    &__task-progress{
+      padding: 0 4px;
+      display: flex;
+      height: 30px;
+      align-items: center;
+    }
     &__action {
       align-self: flex-end;
     }
@@ -533,8 +563,8 @@
     &__timestamp {
       cursor: pointer;
       position: absolute;
-      right: 0;
-      top: 0;
+      right: 5px;
+      top: 7px;
 
       &:hover {
         .tasks__time-data {

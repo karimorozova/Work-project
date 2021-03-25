@@ -353,7 +353,7 @@
     &_no-padding {
       height: 100%;
       width: 100%;
-      max-height: 30px;
+      max-height: 31px;
       box-sizing: border-box;
       display: flex;
       align-items: center;

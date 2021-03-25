@@ -8,12 +8,9 @@ const { calculateCrossRate } = require('../helpers/commonFunctions')
 
 const moment = require('moment');
 
-/**
- *
- * @param {Object} project
- * @returns {Object}
- */
-async function createProject(project) {
+
+async function createProject(project, user) {
+  const { group: { name: role }, _id: roleId }  = user
   let todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
   let todayEnd = new Date(todayStart);
@@ -27,7 +24,7 @@ async function createProject(project) {
 
     project.status = project.status || "Draft";
     project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
-    project.projectManager = projectManager._id;
+    project.projectManager  = (role === 'Project Managers') ? roleId : projectManager._id
     project.accountManager = accountManager._id;
     project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';
     project.clientContacts = [contacts.find(({ leadContact }) => leadContact)];

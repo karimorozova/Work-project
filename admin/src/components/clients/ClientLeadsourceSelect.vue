@@ -92,7 +92,7 @@ export default {
     overflow: hidden;
     .clients-table__drop-menu & {
         width: 100%;
-        height: 30px;
+        height: 31px;
         border: none;
     }
     .selected {
@@ -108,7 +108,7 @@ export default {
         position: relative;
         .clients-table__drop-menu & {
             width: 77%;
-            max-height: 30px;
+            max-height: 31px;
         }
         .industry-tooltip {
             width: 40px;

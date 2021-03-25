@@ -1,4 +1,4 @@
-const { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, hasVendorCompetenciesAndPending } = require('./getVendors')
+const { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, getFilteredVendorsWithCustomFilters, hasVendorCompetenciesAndPending } = require('./getVendors')
 const {
 	saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, saveHashedPassword, getPhotoLink,
 	removeOldVendorFile, updateVendorEducation, removeVendorEdu, updateVendorAssessment
@@ -33,6 +33,7 @@ module.exports = {
 	getVendors,
 	getVendorAfterUpdate,
 	getFilteredVendors,
+  getFilteredVendorsWithCustomFilters,
 	saveVendorDocument,
 	saveVendorDocumentDefault,
 	removeVendorDoc,

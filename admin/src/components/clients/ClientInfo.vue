@@ -89,7 +89,7 @@
       .title(v-if="currentClient._id") Sales Information
       .client-info__sales(v-if="currentClient._id")
         ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
-      .title(v-if="currentClient._id") Billing Informations
+      .title(v-if="currentClient._id") Billing Information
       .client-info__billing(v-if="currentClient._id")
         ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
       .delete-approve(v-if="isApproveModal")
@@ -356,17 +356,17 @@
 							"Please provide a valid email in General Informations."
 					)
 				}
-				if (
-						!this.currentClient.billingInfo.email ||
-						!emailValidRegex.test(
-								this.currentClient.billingInfo.email.toLowerCase()
-						)
-				) {
-					this.errors.push(
-							"Please provide a valid email in Billing Informations."
-					)
-					this.billErrors.push("email")
-				}
+				// if (
+				// 		!this.currentClient.billingInfo.email ||
+				// 		!emailValidRegex.test(
+				// 				this.currentClient.billingInfo.email.toLowerCase()
+				// 		)
+				// ) {
+				// 	this.errors.push(
+				// 			"Please provide a valid email in Billing Informations."
+				// 	)
+				// 	this.billErrors.push("email")
+				// }
 				if (
 						!this.currentClient.accountManager ||
 						!this.currentClient.salesManager ||

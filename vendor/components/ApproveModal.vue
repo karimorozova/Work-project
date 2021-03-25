@@ -60,7 +60,7 @@ export default {
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     background-color: $white;
     &__buttons {
         display: flex;
@@ -80,10 +80,12 @@ export default {
 }
 
 .approve-modal_centered {
-    padding: 25px;
+    padding: 20px;
+    width: 350px;
     .approve-modal {
         &__text {
-            font-size: 18px;
+            font-size: 16px;
+            margin-bottom: 10px;
             text-align: center;
         }
     }

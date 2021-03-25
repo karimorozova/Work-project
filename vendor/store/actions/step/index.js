@@ -1,1 +1,1 @@
-export { default as setAllStepss } from "./get";
+export { default as setAllSteps } from "./get";

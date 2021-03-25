@@ -98,14 +98,14 @@ const ClientSchema = new mongoose.Schema({
 			type: String,
 			trim: true
 		},
-		contactName: {
-			type: String,
-			trim: true
-		},
-		email: {
-			type: String,
-			trim: true
-		},
+		// contactName: {
+		// 	type: String,
+		// 	trim: true
+		// },
+		// email: {
+		// 	type: String,
+		// 	trim: true
+		// },
 		vat: {
 			type: Boolean,
 			default: false
@@ -131,18 +131,18 @@ const ClientSchema = new mongoose.Schema({
 			type: String,
 			trim: true,
 		},
-		startingBalance: {
-			type: Number,
-			default: 0
-		},
-		balance: {
-			type: Number,
-			default: 0
-		},
-		minimumBalance: {
-			type: Number,
-			default: 0
-		}
+		// startingBalance: {
+		// 	type: Number,
+		// 	default: 0
+		// },
+		// balance: {
+		// 	type: Number,
+		// 	default: 0
+		// },
+		// minimumBalance: {
+		// 	type: Number,
+		// 	default: 0
+		// }
 	},
 	sourceLanguages: [{
 		type: Schema.Types.ObjectId, ref: 'Language'

@@ -119,7 +119,8 @@
 		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+				setCurrentProject: "setCurrentProject"
 			}),
 			copyId() {
 				let id = document.getElementById('id')
@@ -221,6 +222,7 @@
 					const result = await this.$http.delete(
 							`/pm-manage/client-contact/${ this.project._id }/${ this.projectClientContacts[this.deleteIndex]._id }`
 					)
+					this.setCurrentProject(result.data)
 					this.projectClientContacts = result.data.clientContacts
 					this.alertToggle({
 						message: "Project client contact removed",
@@ -259,6 +261,7 @@
 						contact: this.currentClientContact,
 						oldContact: this.oldClientContact
 					})
+          this.setCurrentProject(result.data)
 					this.projectClientContacts = result.data.clientContacts
 					this.alertToggle({
 						message: "Saved project client contact",
@@ -320,7 +323,7 @@
 					})
 				}
 			},
-			async setUrgentStatus() {
+			async setUrgentStatus(event) {
 				try {
 					const result = await this.$http.post("/pm-manage/urgent", {
 						projectId: this.project._id,
@@ -421,7 +424,7 @@
       }
 
       &__height {
-        height: 32px;
+        height: 30px;
       }
 
       &__icons {

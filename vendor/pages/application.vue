@@ -229,7 +229,7 @@
 				this.person.native = lang._id
 				this.person.lang = lang.lang
 			}
-		},
+    },
 		components: {
 			Header,
 			Footer,

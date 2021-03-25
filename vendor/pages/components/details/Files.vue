@@ -16,8 +16,9 @@
       DataTable(
         :fields="fields"
         :tableData="jobFiles"
-        :bodyClass="jobFiles.length < 7 ? 'table_no-body-bottom-margin tbody_visible-overflow' : 'table_no-body-bottom-margin'"
-        :tableHeadRowClass="jobFiles.length < 7 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="[{ 'tbody_visible-overflow': jobFiles.length < 6 }]",
+        :tableheadRowClass="[{ 'tbody_visible-overflow': jobFiles.length < 6 }]",
+        bodyRowClass="cursor-default"
       )
         template(slot="headerFileName" slot-scope="{ field }")
           span.job-files__label {{ field.label }}
@@ -42,18 +43,22 @@
           .job-files_flex-centered
             a.job-files__link(:href='row.source')
               img.job-files__image(src="../../../assets/images/download.png")
+
         template(slot="target" slot-scope="{ row, index }")
-          .job-files_flex-centered
+          .job-files_flex-centered(v-if="row.category === 'Source file'")
             .job-files__link(v-if="isTargetLink(row)")
               img.job-files__image(src="../../../assets/images/download.png" @click="downloadTarget(row)")
+
         template(slot="editor" slot-scope="{ row, index }")
           .job-files__editor(v-if="isEditor && row.category === 'Source file'")
-            img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToMemoqEditor(row)")
+            span.icon-editor(@click="goToMemoqEditor(row)")
+              i.fas.fa-external-link-alt
+            //img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToMemoqEditor(row)")
 
 </template>
 
 <script>
-	import DataTable from "~/components/Tables/DataTable"
+	import DataTable from "../../../components/overall/DataTable"
 	import ProgressLine from "~/components/ProgressLine"
 	import { mapGetters, mapActions } from 'vuex'
 	import ApproveModal from "../../../components/ApproveModal"
@@ -266,6 +271,11 @@
       display: flex;
       justify-content: center;
     }
+  }
+  .icon-editor{
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 3px;
   }
 
 </style>

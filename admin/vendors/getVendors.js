@@ -128,5 +128,25 @@ async function getFilteredVendors(filters) {
     console.log("Error on filtering vendors")
   }
 }
+async function getFilteredVendorsWithCustomFilters(filters, customFilters = {}){
+  try {
+    const query = {...getFilteringQuery(filters), ...customFilters};
+    return await Vendors.find(query, {
+      firstName: 1,
+      status: 1,
+      surname:1,
+      competencies: 1,
+      native: 1,
+      industries: 1,
+      isTest: 1,
+    })
+      .sort({ _id: 1 }).limit(25)
+      .populate("industries")
+      .populate("native")
+  } catch (err) {
+    console.log(err)
+    console.log("Error on filtering vendors")
+  }
+}
 
-module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, hasVendorCompetenciesAndPending};
+module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, getFilteredVendorsWithCustomFilters, hasVendorCompetenciesAndPending};

@@ -159,7 +159,7 @@ export default {
   width: 550px;
 
   &__data, &__editing-data {
-    height: 30px;
+    height: 31px;
     padding: 0 5px;
     display: flex;
     align-items: center;
@@ -176,6 +176,7 @@ export default {
     border: none;
     outline: none;
     color: $main-color;
+    background: transparent;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {

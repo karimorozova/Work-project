@@ -29,7 +29,7 @@
 </template>
 
 <script>
-	import DataTable from "~/components/Tables/DataTable"
+	import DataTable from "../../../components/overall/DataTable"
 	import ApproveModal from "~/components/ApproveModal"
 	import UpcomingJobs from "../../components/jobs/Tables/Upcoming_Jobs/UpcomingJobs"
 	import OpenedJobs from "../../components/jobs/Tables/Opened_Jobs/OpenedJobs"

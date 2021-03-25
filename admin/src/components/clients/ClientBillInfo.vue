@@ -10,17 +10,17 @@
               label(for="same")
     .billing-info
       .names-info
-        .names-info__item
-          label.names-info__label Contact Name:
-          input(type="text" :value="client.billingInfo.contactName" @change="(e) => changeProperty(e, 'contactName')")
+        //.names-info__item
+        //  label.names-info__label Contact Name:-
+        //  input(type="text" :value="client.billingInfo.contactName" @change="(e) => changeProperty(e, 'contactName')")
 
         .names-info__item
           label.names-info__label Official Company Name:
           input(type="text" :value="client.billingInfo.officialCompanyName" @change="(e) => changeProperty(e, 'officialCompanyName')")
 
-        .names-info__item
-          label.names-info__label.names-info_asterisk Email:
-          input(type="text" :value="client.billingInfo.email" @change="(e) => changeProperty(e, 'email')" :class="{'names-info_error-shadow': errorFields.indexOf('email') !== -1}")
+        //.names-info__item
+        //  label.names-info__label.names-info_asterisk Email:-
+        //  input(type="text" :value="client.billingInfo.email" @change="(e) => changeProperty(e, 'email')" :class="{'names-info_error-shadow': errorFields.indexOf('email') !== -1}")
 
         .names-info__item
           label.names-info__label VAT:
@@ -39,16 +39,16 @@
             )
 
         .names-info__item
-          label.names-info__label Due Date:
+          label.names-info__label Payment Terms:
           .names-info__dueDate
             input(type="text" id="dueDate" :value="client.billingInfo.dueDate" @change="(e) => changeProperty(e, 'dueDate')")
-            .dueDate-date days since issue date
+            //.dueDate-date days since issue date
 
-        .names-info__item
-          label.names-info__label
-            p Starting balance
-            p (for prepaid):
-          input(type="number" :value="client.billingInfo.startingBalance" @change="(e) => changeProperty(e, 'startingBalance')")
+        //.names-info__item
+        //  label.names-info__label
+        //    p Starting balance
+        //    p (for prepaid):
+        //  input(type="number" :value="client.billingInfo.startingBalance" @change="(e) => changeProperty(e, 'startingBalance')")
 
       .names-info
         .names-info__item-address
@@ -72,17 +72,17 @@
               @chooseOption="setPayment"
             )
 
-        .names-info__item
-          label.names-info__label
-            p Balance
-            p (for prepaid):
-          input(type="number" :value="client.billingInfo.balance" @change="(e) => changeProperty(e, 'balance')")
-
-        .names-info__item
-          label.names-info__label
-            p Minimum balance
-            p (for prepaid):
-          input(type="number" :value="client.billingInfo.minimumBalance" @change="(e) => changeProperty(e, 'minimumBalance')")
+        //.names-info__item
+        //  label.names-info__label
+        //    p Balance
+        //    p (for prepaid):
+        //  input(type="number" :value="client.billingInfo.balance" @change="(e) => changeProperty(e, 'balance')")
+        //
+        //.names-info__item
+        //  label.names-info__label
+        //    p Minimum balance
+        //    p (for prepaid):
+        //  input(type="number" :value="client.billingInfo.minimumBalance" @change="(e) => changeProperty(e, 'minimumBalance')")
 </template>
 
 <script>
@@ -115,9 +115,7 @@
 				})
 			},
 			isSetSame(currentEnum) {
-				this.client.billingInfo.contactName = currentEnum.name
 				this.client.billingInfo.officialCompanyName = currentEnum.officialCompanyName
-				this.client.billingInfo.email = currentEnum.email
 			},
 			setSame(e) {
 				this.isSame = e.target.checked
@@ -128,7 +126,7 @@
 						this.isSetSame(this.currentClient)
 					}
 				} else {
-					this.client.billingInfo.contactName = this.client.billingInfo.officialCompanyName = this.client.billingInfo.email = ""
+					this.client.billingInfo.officialCompanyName = ""
 				}
 			},
 			setVAT(e) {
@@ -144,10 +142,8 @@
 				})
 			},
 			isSameInformation() {
-				if (this.client.name || this.client.officialCompanyName || this.client.email) {
-					this.isSame = this.client.billingInfo.contactName === this.client.name &&
-							this.client.billingInfo.officialCompanyName === this.client.officialCompanyName &&
-							this.client.billingInfo.email === this.client.email
+				if (this.client.officialCompanyName ) {
+					this.isSame = this.client.billingInfo.officialCompanyName === this.client.officialCompanyName
 				}
 			}
 		},

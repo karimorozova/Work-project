@@ -7,7 +7,7 @@
         :project="currentProject"
       )
     .project-info__all-info(
-        v-if="originallyLanguages && originallyUnits &&originallySteps && originallyServices"
+        v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices"
       )
       .task-and-steps
         TasksAndSteps(
@@ -65,9 +65,9 @@
 				customer: null,
 
 				// originallyLanguages: null,
-				originallyUnits: null,
+				// originallyUnits: null,
 				// originallySteps: null,
-				originallyServices: null,
+				// originallyServices: null,
 			}
 		},
 		methods: {
@@ -233,18 +233,18 @@
 			// 		});
 			// 	}
 			// },
-			async getOriginallyUnits() {
-				try {
-					const result = await this.$http.get('/api/units');
-					this.originallyUnits = result.body;
-				} catch (err) {
-					this.alertToggle({
-						message: 'Error in Originally Units',
-						isShow: true,
-						type: 'error',
-					});
-				}
-			},
+			// async getOriginallyUnits() {
+			// 	try {
+			// 		const result = await this.$http.get('/api/units');
+			// 		this.originallyUnits = result.body;
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: 'Error in Originally Units',
+			// 			isShow: true,
+			// 			type: 'error',
+			// 		});
+			// 	}
+			// },
       //MM For refactor
 			// async getCustomer() {
 			// 	if(!this.currentClient._id) {
@@ -272,18 +272,18 @@
 			// 		});
 			// 	}
 			// },
-			async getOriginallyServices() {
-				try {
-					const result = await this.$http.get('/api/services');
-					this.originallyServices = result.body;
-				} catch (err) {
-					this.alertToggle({
-						message: 'Error in Originally Steps',
-						isShow: true,
-						type: 'error',
-					});
-				}
-			},
+			// async getOriginallyServices() {
+			// 	try {
+			// 		const result = await this.$http.get('/api/services');
+			// 		this.originallyServices = result.body;
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: 'Error in Originally Steps',
+			// 			isShow: true,
+			// 			type: 'error',
+			// 		});
+			// 	}
+			// },
 
 		},
 		computed: {
@@ -291,7 +291,9 @@
 				currentProject: 'getCurrentProject',
 				currentClient: 'getCurrentClient',
 				originallyLanguages: 'getAllLanguages',
-				originallySteps: 'getAllSteps'
+				originallySteps: 'getAllSteps',
+				originallyServices: "getAllServices",
+				originallyUnits: "getAllUnits",
 			}),
 			isFinishedStatus() {
 				const finishedStatuses = ['Delivered', 'Closed', 'Cancelled', 'Cancelled Halfway'];
@@ -312,9 +314,9 @@
 			await this.getProject();
 			await this.getVendorsForProject();
 			// await this.getOriginallyLanguages();
-			await this.getOriginallyUnits();
+			// await this.getOriginallyUnits();
 			// await this.getOriginallySteps();
-			await this.getOriginallyServices();
+			// await this.getOriginallyServices();
 			// await this.getCustomer();
 		},
 		beforeRouteEnter(to, from, next) {

@@ -52,7 +52,7 @@
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		middleware: ['authenticated', 'new-user-redirect'],
+		middleware: [ 'authenticated', 'new-user-redirect' ],
 		data() {
 			return {
 				navbarList: [
@@ -73,49 +73,53 @@
 						path: "/competency-and-rate",
 						imgBrown: require("../assets/images/CATEGORIES/competencies.png"),
 						imgWhite: require("../assets/images/CATEGORIES/competencies(selected).png"),
-            // imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
-            active: false
+						// imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
+						active: false
 					},
 					{
 						title: "ASSESSMENT",
 						path: "/qualification-and-assessment",
 						imgBrown: require("../assets/images/CATEGORIES/assessment.png"),
-            imgWhite: require("../assets/images/CATEGORIES/assessment(selected).png"),
-            // imgBrown: require("../assets/images/CATEGORIES/rate.png"),
+						imgWhite: require("../assets/images/CATEGORIES/assessment(selected).png"),
+						// imgBrown: require("../assets/images/CATEGORIES/rate.png"),
 						active: false
 					},
 					{
 						title: "EXPERIENCE & EDUCATION",
 						path: "/experience-and-education",
 						imgBrown: require("../assets/images/CATEGORIES/experience-education.png"),
-            imgWhite: require("../assets/images/CATEGORIES/experience-education(selected).png"),
-            // imgBrown: require("../assets/images/CATEGORIES/languages.png"),
+						imgWhite: require("../assets/images/CATEGORIES/experience-education(selected).png"),
+						// imgBrown: require("../assets/images/CATEGORIES/languages.png"),
 						active: false
 					},
 					{
 						title: "DOCUMENTS",
 						path: "/documents",
 						imgBrown: require("../assets/images/CATEGORIES/documents.png"),
-            imgWhite: require("../assets/images/CATEGORIES/documents(selected).png"),
+						imgWhite: require("../assets/images/CATEGORIES/documents(selected).png"),
 						// imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
 						active: false
 					},
-          {
-            title: "PROFILE",
-            path: "/account",
-            imgBrown: require("../assets/images/CATEGORIES/my-account.png"),
-            imgWhite: require("../assets/images/CATEGORIES/my-account(selected).png"),
+					{
+						title: "PROFILE",
+						path: "/account",
+						imgBrown: require("../assets/images/CATEGORIES/my-account.png"),
+						imgWhite: require("../assets/images/CATEGORIES/my-account(selected).png"),
 
-            active: false
-          }
+						active: false
+					}
 				],
 				isAccountMenu: false,
 				accountInfo: false,
-				domain: ""
+				domain: ''
 			}
 		},
 		methods: {
-			...mapActions([ "alertToggle", "setOriginallyUnits", "logout", "getVendorInfo", "getAllLanguages", "setAllIndustries", "setAllStepss" ]),
+			...mapActions([
+				"alertToggle",
+				"logout",
+				"setOriginallyUnits"
+			]),
 
 			mainPageRender() {
 				this.toggleSideBar(true)
@@ -125,6 +129,50 @@
 					const result = await this.$axios.get("/api/units")
 					this.setOriginallyUnits(result.data)
 				} catch (err) {
+				}
+			},
+			async getVendorInfo() {
+				try {
+					const result = await this.$axios.get(`/vendor/info?token=${ this.$store.state.token }`)
+					const decode = window.atob(result.data)
+					const data = JSON.parse(decode)
+					this.$store.commit("SET_VENDOR", data)
+					this.$store.commit("SET_ACCOUNT_INFO")
+				} catch (err) {
+				}
+			},
+			async getAllIndustries() {
+				try {
+					let result = await this.$axios.$get("/api/industries")
+					result.sort((a, b) => {
+						if (a.lang < b.lang) return -1
+						if (a.lang > b.lang) return 1
+					})
+					this.$store.commit("SET_INDUSTRIES", result)
+				} catch (err) {
+				}
+			},
+			async getAllLanguages() {
+				try {
+					let result = await this.$axios.$get("/api/languages")
+					result.sort((a, b) => {
+						if (a.lang < b.lang) return -1
+						if (a.lang > b.lang) return 1
+					})
+					this.$store.commit('SET_LANGUAGES', result)
+				} catch (err) {
+				}
+			},
+			async getAllSteps() {
+				try {
+					let result = await this.$axios.$get("/api/steps")
+					result.sort((a, b) => {
+						if (a.title < b.title) return -1
+						if (a.title > b.title) return 1
+					})
+					this.$store.commit('SET_STEPS', result)
+				} catch (err) {
+
 				}
 			},
 			toggleSideBar(isFirstRender) {
@@ -147,7 +195,7 @@
 				this.navbarList.forEach((item, i) => {
 					item.active = i === index
 				})
-				this.$router.push(this.navbarList[index].path)
+				// this.$router.push(this.navbarList[index].path)
 			},
 			showAccountMenu() {
 				this.isAccountMenu = !this.isAccountMenu
@@ -167,28 +215,24 @@
 		computed: {
 			...mapGetters({
 				token: "getToken",
-				vendor: "getVendor"
-			}),
-			// fullName() {
-			// 	if (this.vendor) {
-			// 		return this.vendor.firstName + " " + this.vendor.surname
-			// 	}
-			// }
+				vendor: "getVendor",
+				steps: "getAllSteps"
+			})
 		},
-    async created() {
+		async created() {
 			await this.getOriginallyUnits()
-
-      this.domain = process.env.domain
-      this.setToken()
-      this.getVendorInfo()
-      this.getAllLanguages()
-      this.setAllIndustries()
-      this.setAllStepss()
-      this.mainPageRender()
-
+			await this.getVendorInfo()
+			await this.getAllIndustries()
+			await this.getAllLanguages()
+			await this.getAllSteps()
+			// // this.setToken()
 		},
 		updated() {
 			this.toggleSideBar(false)
+		},
+		mounted() {
+			this.domain = process.env.domain
+			this.mainPageRender()
 		},
 		directives: {
 			ClickOutside
@@ -395,9 +439,10 @@
       margin-right: 0;
       cursor: pointer;
 
-      &:hover{
+      &:hover {
 
       }
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -414,6 +459,7 @@
       img {
         filter: brightness(300%);
       }
+
       .navbar_no-filter {
         filter: none;
       }

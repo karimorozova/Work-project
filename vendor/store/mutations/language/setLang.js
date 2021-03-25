@@ -1,3 +1,3 @@
-export default (state, payload) => {
-  state.languages = payload;
-};
+export const SET_LANGUAGES = (state, payload) => {
+	state.languages = payload
+}

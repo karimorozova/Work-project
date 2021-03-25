@@ -49,17 +49,12 @@
 					email: '',
 					billingInfo: {
 						officialCompanyName: '',
-						contactName: '',
-						email: '',
 						vat: false,
             vatId: '',
 						dueDate: '',
 						address: '',
 						invoiceSending: false,
 						paymentType: '',
-						startingBalance: '',
-						balance: '',
-						minimumBalance: ''
 					}
 
 				},

@@ -155,15 +155,15 @@
 				this.pendingCompetenceForReject = {}
 				this.message = ''
 			},
-			sendMessage() {
-				this.rejectPC()
+			sendMessage(template) {
+				this.rejectPC(template)
 			},
-			async rejectPC() {
+			async rejectPC(template) {
 				try {
 					const result = await this.$http.post('/vendorsapi/reject-pending-competence', {
 						vendorId: this.$route.params.id,
 						pendingCompetence: this.pendingCompetenceForReject,
-						template: this.message
+						template,
 					})
 					await this.storeCurrentVendor(result.data)
 					this.alertToggle({ message: "Pending Competence Rejected", isShow: true, type: "success" })
@@ -230,16 +230,16 @@
 
     &__icons {
       @extend %table-icons;
-      height: 30px;
+      height: 31px;
       justify-content: center;
     }
 
     &__icon {
       color: #67573e;
       display: flex;
-      height: 30px;
+      height: 31px;
       align-items: center;
-      height: 30px;
+      height: 31px;
       justify-content: center;
       cursor: pointer;
       font-size: 16px;

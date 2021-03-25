@@ -211,6 +211,7 @@ async function getPMnotificationMessage(project, task, user) {
 }
 
 async function notifyClientTaskReady({ taskId, project, contacts }) {
+	contacts.push({email: 'am@pangea.global', firstName: 'Account Managers'})
 	const task = project.tasks.find(item => item.taskId === taskId);
 	try {
 		for (let contact of contacts) {
@@ -224,6 +225,7 @@ async function notifyClientTaskReady({ taskId, project, contacts }) {
 }
 
 async function sendClientDeliveries({ taskId, project, contacts }) {
+	contacts.push({email: 'am@pangea.global', firstName: 'Account Managers'})
 	try {
 		const accManager = await User.findOne({ "_id": project.accountManager.id });
 		const task = project.tasks.find(item => item.taskId === taskId);
@@ -235,9 +237,13 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 		const attachments = [{ filename: "deliverables.zip", content }];
 		await Projects.updateOne({"_id": project._id}, { [`tasks.${taskIndex}.deliverables`]: deliverables})
 
-		for (let contact of contacts) {
+		for await (let contact of contacts) {
+			const finalAttachments = attachments
+					.filter(item => item.filename === 'deliverables.zip')
+					.map(item => ({ filename: item.filename, path: `./dist${ deliverables }` }))
+
 			const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id });
-			await sendEmail({ to: contact.email, attachments, subject }, message);
+			await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message);
 		}
 	} catch (err) {
 		console.log(err);
@@ -248,8 +254,8 @@ async function sendClientDeliveries({ taskId, project, contacts }) {
 async function notifyDeliverablesDownloaded(taskId, project, user) {
 	try {
 		const { projectManager, accManager } = await getAMPMbyProject(project);
-		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, projectName: project.projectName, project_id: project.projectId }, user);
-		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, projectName: project.projectName, project_id: project.projectId }, user);
+		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user);
+		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user);
 		await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
 		await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`);
 	} catch (err) {
@@ -265,12 +271,20 @@ async function notifyProjectDelivery(project, template) {
 	try {
 		const deliverables = project.deliverables || await getProjectDeliverables(project);
 		const attachments = [{ filename: "deliverables.zip", path: `./dist${ deliverables }` }];
+
 		for (let contact of notifyContacts) {
 			await sendEmail({ to: contact, attachments, subject }, dynamicClientName(message, contact, project));
 		}
+		await sendEmail({ to: 'am@pangea.global', attachments, subject }, amFirstName(message));
+
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyProjectDelivery");
+	}
+
+	function amFirstName(message){
+		const name = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear Account Managers</span></p>`;
+		return message.replace(`<div id="client-name-row">&nbsp;</div>`, name)
 	}
 }
 

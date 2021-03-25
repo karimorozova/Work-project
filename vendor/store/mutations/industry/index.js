@@ -1,6 +1,5 @@
-import setAllIndustries from './setIndusry'
-import { SET_ALL_INDUSTRY } from '../../mutation-types'
+import { SET_INDUSTRIES } from './setIndusry'
 
 export default {
-  [SET_ALL_INDUSTRY]: setAllIndustries
+  SET_INDUSTRIES
 }

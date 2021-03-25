@@ -319,13 +319,13 @@
 				this.currentSource = this.languages.find((item) => item.lang === option)
 			},
 
-			async getVendorInfo() {
-				const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`)
-				this.competenciesData = vendor.data.competencies
-			},
-			getVendorInfoByState() {
-				this.competenciesData = this.currentVendor.competencies
-			}
+			// async getVendorInfo() {
+			// 	const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`)
+			// 	this.competenciesData = vendor.data.competencies
+			// },
+			// getVendorInfoByState() {
+			// 	this.competenciesData = this.currentVendor.competencies
+			// }
 		},
 		computed: {
 			// sourceData() {

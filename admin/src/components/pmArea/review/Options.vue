@@ -1,9 +1,9 @@
 <template lang="pug">
   .options
     .options__item.border(v-if="isDr1" :class="{'options_brown': isAssign}" @click="(e) => toggle(e, 'isAssign')") Assign DR2
-    .options__item.border(:class="{'options_brown': isDeliver}" @click="(e) => toggle(e, 'isDeliver')") Deliver to Client
     .options__item.border(:class="{'options_brown': isReadyForDelivery}" @click="(e) => toggle(e, 'isReadyForDelivery')") Ready for Delivery
-    .options__item(:class="{'options_brown': isNotify}" @click="(e) => toggle(e, 'isNotify')") Notify Client
+    .options__item.border(:class="{'options_brown': isNotify}" @click="(e) => toggle(e, 'isNotify')") Notify Client
+    .options__item(:class="{'options_brown': isDeliver}" @click="(e) => toggle(e, 'isDeliver')") Deliver to Client
 </template>
 
 <script>

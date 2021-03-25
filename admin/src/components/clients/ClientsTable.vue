@@ -306,7 +306,7 @@ export default {
 .clients-table {
     position: relative;
     &__data-cell {
-        padding: 6px 0 0 5px;
+        padding: 6px 6px 0 5px;
         max-height: 28px;
         overflow-y: auto;
     }

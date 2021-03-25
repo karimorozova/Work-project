@@ -18,11 +18,11 @@
         span.projects-table__label {{ field.label }}
       template(slot="headerStatus" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
-      template(slot="headerReceivables" slot-scope="{ field }")
-        span.projects-table__label {{ field.label }}
       template(slot="headerPayables" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
-      template(slot="headerRoi" slot-scope="{ field }")
+      template(slot="headerReceivables" slot-scope="{ field }")
+        span.projects-table__label {{ field.label }}
+      template(slot="headerMargin" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
       template(slot="headerStartDate" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
@@ -45,16 +45,22 @@
         span(v-html="projectLangs(row)")
       template(slot="status" slot-scope="{ row }")
         span {{ row.status }}
-      template(slot="receivables" slot-scope="{ row }")
-        span(v-if="row.finance && row.finance.Price.receivables")
-          span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-          span {{ toFixedFinalCost(row.finance.Price.receivables )}}
+
       template(slot="payables" slot-scope="{ row }")
-        span(v-if="row.finance && row.finance.Price.payables")
+        span.finance-margin(v-if="row.finance && row.finance.Price.payables")
           span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
           span {{ toFixedFinalCost(row.finance.Price.payables ) }}
-      template(slot="roi" slot-scope="{ row }")
-        span {{ row.roi }}
+
+      template(slot="receivables" slot-scope="{ row }")
+        span.finance-margin(v-if="row.finance && row.finance.Price.receivables")
+          span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+          span {{ toFixedFinalCost(row.finance.Price.receivables )}}
+
+      template(slot="margin" slot-scope="{ row }")
+        span.finance-margin(v-if="row.finance && row.finance.Price.receivables && row.finance.Price.payables")
+          span(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+          span {{ toFixedFinalCost(row.finance.Price.receivables - row.finance.Price.payables) }}
+
       template(slot="startDate" slot-scope="{ row }")
         span {{ row.startDate.split('T')[0].split('-').reverse().join('-') }}
       template(slot="deadline" slot-scope="{ row }")
@@ -90,13 +96,13 @@
 					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "10%" },
 					{ label: "Languages", headerKey: "headerLanguages", key: "languages", width: "10%" },
 					{ label: "Status", headerKey: "headerStatus", key: "status", width: "8%" },
-					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "6%" },
 					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "6%" },
-					{ label: "ROI", headerKey: "headerRoi", key: "roi", width: "6%" },
+					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "7%" },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "6%" },
 					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%" },
 					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "10%" },
-					{ label: "Delivery", headerKey: "headerDelivery", key: "projectDelivery", width: "5%" },
+					{ label: "Del", headerKey: "headerDelivery", key: "projectDelivery", width: "4%" },
 					{ label: "Test", headerKey: "headerTest", key: "projectTest", width: "4%" }
 				]
 			}
@@ -243,5 +249,8 @@
 
   .size-16 {
     font-size: 16px;
+  }
+  .finance-margin{
+    margin-left: -4px;
   }
 </style>

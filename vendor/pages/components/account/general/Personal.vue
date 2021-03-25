@@ -19,7 +19,8 @@
             LabelDrop(name="Native Language:")
                 SelectSingle(
                     :selectedOption="nativeLang"
-                    :options="langs"
+                    :options="removeEnglishLang(langs)"
+                    fieldName="lang"
                     customClass="account"
                     @chooseOption="(e) => setProperty(e, 'native')")
         .personal__item
@@ -36,8 +37,10 @@ import LabelInput from "./LabelInput";
 import LabelDrop from "./LabelDrop";
 import SelectSingle from "../../../../components/overall/SelectSingle";
 import { mapGetters, mapActions } from "vuex";
+import removeLang from "../../../../mixins/removeLang";
 
 export default {
+  mixins: [removeLang],
     data() {
         return {
             isReadonly: true,
@@ -48,17 +51,13 @@ export default {
     methods: {
         ...mapActions({
             getAllTimezones: "getAllTimezones",
-            getAllLanguages: "getAllLanguages",
+            // getAllLanguages: "getAllLanguages",
             setAccountProp: "setAccountProp"
         }),
         setInputValue({value}, prop) {
             this.setAccountProp({prop, value});
         },
         setProperty({option}, prop) {
-            if(prop === "native") {
-                const language = this.allLanguages.find(item => item.lang === option);
-                return this.setAccountProp({prop: "native", value: language});
-            }
             this.setAccountProp({ prop, value: option});
         }
     },
@@ -76,7 +75,7 @@ export default {
             return this.timezones.map(item => item.zone);
         },
         langs() {
-            return this.allLanguages.map(item => item.lang);
+            return this.allLanguages;
         }
     },
     components: {
@@ -86,7 +85,7 @@ export default {
     },
     mounted() {
         this.getAllTimezones();
-        this.getAllLanguages();
+        // this.getAllLanguages();
     }
 }
 </script>

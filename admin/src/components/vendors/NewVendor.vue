@@ -16,7 +16,7 @@
                     img.photo-image(v-if="imageExist")
                     p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
                 .photo-wrap(v-if="vendor.photo")
-                    input.photo-file(type="file" @change="previewPhoto")                       
+                    input.photo-file(type="file" @change="previewPhoto")
                     img.photo-image(:src="vendor.photo")
             .gen-info__block
                 .block-item
@@ -83,8 +83,8 @@
             span.require *
           .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(:class="{'block-item_error-shadow': isSaveClicked && !vendor.status}")
             VendorStatusSelect(
-              isAllExist="no" 
-              :selectedStatus="vendorStatus" 
+              isAllExist="no"
+              :selectedStatus="vendorStatus"
               @chosenStatus="chosenStatus"
             )
         .block-item-subinfo
@@ -158,7 +158,8 @@ export default {
         test: false,
         position: [],
         isTest: false,
-        professionalLevel: ""
+        professionalLevel: "",
+        isCreatedByManager: true
       },
       isFileError: false,
       onlySpaces: /^\s+$/,

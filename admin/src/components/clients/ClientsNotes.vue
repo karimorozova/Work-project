@@ -23,7 +23,7 @@
                 .name {{ user.firstName || ""}} {{ user.lastName || "" }}
                 .time {{ formateDate(updatedAT) }}
 
-              .comment__icons(v-if="getUser._id.toString() === user._id.toString() || getUser.position === 'Administrator'")
+              .comment__icons(v-if="getUser._id.toString() === user._id.toString() || getUser.group.name === 'Administrators'")
                 span
                   .icon(v-if="editableNoteIndex !== index" @click="setEditorData(index)")
                     img(:src="icons.edit.icon")

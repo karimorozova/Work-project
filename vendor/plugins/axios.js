@@ -3,9 +3,13 @@ import Vue from 'vue';
 
 export default function ({ store, $axios, route }) {
 	$axios.onRequest(config => {
+
+		// config.headers.common['token-header'] = store.state.token;
+		// store.dispatch('noRequest')
 		store.dispatch('addRequest');
+
 		if(config && config.progress === false) {
-			return
+			return config
 		}
 	});
 
@@ -21,11 +25,6 @@ export default function ({ store, $axios, route }) {
 
 	$axios.onError(error => {
 		if(error && error.config) {
-			// for (let i = 0; i < store.state.currentRequests; i++) {
-			// 	if(store.state.currentRequests !== 0) {
-			// 		store.dispatch('delRequest');
-			// 	}
-			// }
 			store.dispatch('delRequest');
 			store.dispatch('noRequest')
 		}
@@ -33,7 +32,14 @@ export default function ({ store, $axios, route }) {
 
 	$axios.interceptors.request.use(config => {
 		if(route.name !== "application") {
-			if(document) {
+			// if(!!store.state.token){
+			// 	config.headers.common['token-header'] = store.state.token;
+			// }else{
+			// 	if(document) {
+			// 		config.headers.common['token-header'] = Vue.cookie.get("vendor");
+				// }
+			// }
+			if(!!document){
 				config.headers.common['token-header'] = Vue.cookie.get("vendor");
 			}
 		}

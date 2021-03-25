@@ -131,6 +131,10 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+  isCreatedByManager: {
+	  type: Boolean,
+    default: false
+  },
 	notes: {
 		type: String
 	},
@@ -424,9 +428,6 @@ const VendorSchema = new mongoose.Schema({
 		type: String,
 		default: ''
 	},
-	//REFACTOR
-	temporaryEyes: '',
-	//END REFACTOR
 	matrix: {
 		type: Object,
 		default: {

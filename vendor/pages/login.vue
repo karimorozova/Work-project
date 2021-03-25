@@ -20,7 +20,7 @@
 </template>
 
 <script>
-	import { mapActions, mapGetters } from "vuex";
+	import { mapActions } from "vuex";
 
 	export default {
 		data() {
@@ -46,12 +46,12 @@
 					});
 					this.login(result);
 
-          !!result && !!this.getPreviousLink && this.getPreviousLink !== '/login' ?
-            this.$router.push(this.getPreviousLink) :
-            this.$router.push('/dashboard')
+          const previousLink = this.$cookie.get('previousPath')
+          !!result && !!previousLink && previousLink !== '/login' && previousLink !== '/' ?
+              await this.$router.push(previousLink) :
+              await this.$router.push('/dashboard')
 
-          this.setPreviousLink('')
-
+          this.$cookie.delete('previousPath')
 					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
 				} catch (err) {
 					let message = err.message;
@@ -67,15 +67,8 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				login: "login",
-				setOriginallyUnits: "setOriginallyUnits",
-				setPreviousLink: "setPreviousLink"
 			})
-		},
-		computed: {
-			...mapGetters({
-				getPreviousLink: "getPreviousLink"
-			})
-		},
+		}
 	}
 </script>
 

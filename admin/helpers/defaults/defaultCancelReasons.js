@@ -1,7 +1,7 @@
 const defaultCancelReasons = [
-  { reason: "Reason 1" },
-  { reason: "Reason 2" },
-  { reason: "Reason 3" }
+  { reason: "Unresponsive" },
+  { reason: "Technical issues" },
+  { reason: "Personal issues" }
 ];
 
 module.exports = { defaultCancelReasons };

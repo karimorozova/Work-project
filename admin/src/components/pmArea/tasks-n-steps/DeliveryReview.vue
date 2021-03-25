@@ -56,6 +56,11 @@
           .notes__button(@click="sendMessage") Save &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
 
+    .review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
+      .dr1Comment__title DR1 Comment
+      .dr1Comment__textarea
+        .dr1Comment__textareaText(v-html="previousComment")
+
     span.relative
       .split-line
       .review__forbidden(v-if="isReviewing")
@@ -147,7 +152,8 @@
 				instructions: [],
 				isReviewing: false,
 				isModal: false,
-				rollbackManager: null
+				rollbackManager: null,
+				previousComment: ''
 			}
 		},
 		methods: {
@@ -356,6 +362,7 @@
 					const commentsData = await this.$http.get('/pm-manage/delivery-comments/' + this.project._id)
 					const { comments } = commentsData.data
 					this.editorData = this.task.status === 'Pending Approval [DR2]' ? comments.dr2.comment : comments.dr1.comment
+					this.previousComment = this.task.status === 'Pending Approval [DR2]' ? comments.dr1.comment : ''
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
 				}
@@ -403,6 +410,35 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .dr1Comment {
+    &__title {
+      border-bottom: 1px solid #c5bfb5;
+      font-family: Myriad600;
+      width: 78%;
+      margin-bottom: 10px;
+      padding-bottom: 2px;
+    }
+
+    &__textareaText {
+      padding-left: 10px;
+      overflow-y: auto;
+      min-height: 50px;
+      max-height: 100px;
+      border: none;
+      outline: none;
+      width: auto;
+      background: transparent;
+      resize: none;
+    }
+
+    &__textarea {
+      border: 2px solid #c5bfb5;
+      border-radius: 8px;
+      width: 100%;
+      heigth: 60px;
+    }
+  }
 
   .review {
     display: flex;

@@ -1,3 +1,0 @@
-export {
-	setPreviousLink
-} from './helper'
