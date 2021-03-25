@@ -645,8 +645,16 @@
 						type: "error"
 					})
 				}
-			}
+			},
 		},
+    sockets: {
+      connect: function () {
+        console.log('socket connected')
+      },
+      hello: function (data) {
+        console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
+      }
+    },
 		computed: {
 			...mapGetters({
 				currentVendor: "getCurrentVendor",

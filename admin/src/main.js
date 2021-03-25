@@ -12,6 +12,15 @@ import VueLodash from 'vue-lodash';
 import "./filters/GeneralFilters";
 export const bus = new Vue();
 
+import * as io from 'socket.io-client'
+import VueSocketIO from 'vue-socket.io';
+
+Vue.use(new VueSocketIO({
+  debug: true,
+  connection: 'http://localhost:8080'
+}))
+
+
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem("token");
   const value = token || "";
@@ -37,6 +46,7 @@ Vue.http.interceptors.push((request, next) => {
   const token = localStorage.getItem("token");
   const value = token || ""
   request.headers.set('token-header', value);
+  request.setHeader('Access-Control-Allow-Origin', '*');
   next();
 })
 

@@ -12,8 +12,36 @@ const db = mongoose.connection;
 const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
+const cors = require('cors')
+app.use(cors({origin: "http://localhost:8080",}))
 require('./helpers/dbSetDefault');
 require('./schedule');
+
+// SOCKET.IO SERVER
+const httpServer = require("http").Server(app);
+
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "http://localhost:8080",
+    methods: ["GET", "POST"]
+  }
+});
+httpServer.listen(8080);
+io.on('connection', socket => {
+  console.log(`A user connected with socket id ${socket.id}`)
+
+  socket.broadcast.emit('hello', socket.id)
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('user-disconnected', socket.id)
+  })
+
+  socket.on('nudge-client', data => {
+    socket.broadcast.to(data.to).emit('client-nudged', data)
+  })
+})
+
+// end SOCKET.IO se
 
 // const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 
