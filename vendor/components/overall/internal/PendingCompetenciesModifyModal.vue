@@ -45,7 +45,7 @@ import SelectSingle from "../SelectSingle";
     data() {
       return {
         description: {
-          industry: ''
+          industry: null
         },
         currentRate: (0).toFixed(4)
       }
@@ -59,7 +59,7 @@ import SelectSingle from "../SelectSingle";
     },
     methods: {
       updatePendingCompetency() {
-        this.$emit('updated', {data: {...this.pendingCompetency, rate: this.currentRate, descriptions: {industry: this.description.industry} }})
+        this.$emit('updated', {data: {...this.pendingCompetency, rate: this.currentRate, descriptions: {industry: this.descriptionNewOrOld} }})
       },
       changeCkeditor(data) {
         this.description.industry = data
@@ -73,6 +73,13 @@ import SelectSingle from "../SelectSingle";
     },
     created() {
       this.currentRate = this.pendingCompetency.rate
+    },
+    computed: {
+      descriptionNewOrOld (){
+       return  this.description.industry === '' ||  this.description.industry
+          ? this.description.industry
+          : this.pendingCompetency.descriptions.industry
+      }
     }
   }
 </script>
