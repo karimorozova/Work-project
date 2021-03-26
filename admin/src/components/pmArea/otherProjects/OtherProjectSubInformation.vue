@@ -72,7 +72,7 @@
                 :class="{ 'client-table_opacity': true }",
                 aria-hidden="true"
               )
-              i.client-table__icon.fa.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
+              i.client-table__icon.fas.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
               img.client-table__icon(
                 v-for="(icon, key) in icons",
                 :src="icon.icon",

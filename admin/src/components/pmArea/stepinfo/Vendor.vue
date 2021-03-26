@@ -18,11 +18,11 @@
         span.step-vendor__no-vendor(v-if="!vendor") No Vendor
       .step-vendor__contacts
         .step-vendor__icon(@click="gotToVendorInfo")
-          i.fa.fa-info-circle
+          i.fas.fa-info-circle
         .step-vendor__icon(@click="sendEmail")
           i.fa.fa-envelope
         .step-vendor__icon
-          i.fa.fa-slack
+          i.fab.fa-slack-hash
     .step-vendor__options(v-if="isVendorSelect")
       .step-vendor__check
         CustomRadio(:isChecked="isAfterRejectCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterRejectCheck')")

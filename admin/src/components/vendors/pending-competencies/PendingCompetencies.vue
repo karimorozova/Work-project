@@ -43,7 +43,7 @@
         template(slot="modal", slot-scope="{ row, index }")
           .competencies__data
             .competencies__icon(@click="openForm(), setCandidateData(row)")
-              i.fa.fa-id-card-o
+              i.far.fa-address-card
 
 </template>
 

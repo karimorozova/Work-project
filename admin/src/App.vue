@@ -36,6 +36,8 @@
     color: #67573E;
   }
 
+  ::-webkit-file-upload-button { cursor:pointer; }
+
   .b-log-in,
   .b-log-out {
     padding: 6px;

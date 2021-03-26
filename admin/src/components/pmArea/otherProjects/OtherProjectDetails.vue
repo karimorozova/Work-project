@@ -29,7 +29,7 @@
               span#myTooltip.tooltiptext XTRF: {{ project.client }}
               img(:style="{ cursor: 'help', 'margin-right': '5px' }", src="../../../assets/images/red-info-icon.png")
             .project__input-icons
-              i.fa.fa-external-link.icon-link(aria-hidden='true' @click="goToClientInfo(project.customer._id)")
+              i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo(project.customer._id)")
               input.project__input-text2.project__input-client(type="text" :value="project.customer.name" readonly)
         .project__client(v-else)
           LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")

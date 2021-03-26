@@ -3,11 +3,11 @@
   .action__title Action
   .action__row
     .action__icon
-      i.fa.fa-info-circle
+      i.fas.fa-info-circle
     .action__icon
       i.fa.fa-envelope(@click="openPreview")
     .action__icon
-      i.fa.fa-slack
+      i.fab.fa-slack-hash
 
 </template> 
 <script>

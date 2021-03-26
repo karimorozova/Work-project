@@ -56,7 +56,7 @@
             CheckBox(:isChecked="row.check" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
         template(slot="info" slot-scope="{row, index}")
           .steps__info-icon(@click="showStepDetails(index)")
-            i.fa.fa-info-circle
+            i.fas.fa-info-circle
         template(slot="name" slot-scope="{ row }")
           span.steps__step-data.steps_no-padding {{ row.name }}
         template(slot="language" slot-scope="{ row }")
