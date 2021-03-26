@@ -192,12 +192,12 @@
 			}),
 			async getRowPrice(index) {
 				try {
-					await this.$http.post("/vendorsapi/rates/sync-cost/" + this.vendorId, {
+					await this.$http.post("/vendorsapi/rates/sync-cost/" + this.$route.params.id, {
 						tableKey: "Pricelist Table",
 						row: this.dataArray[index]
 					})
           const rateId = this.dataArray[index]._id
-					const result = await this.$http.post("/vendorsapi/vendor-priceListTable-index", { vendorId: this.vendorId, rateId })
+					const result = await this.$http.post("/vendorsapi/vendor-priceListTable-index", { vendorId: this.$route.params.id, rateId })
 					this.dataArray.splice(index, 1, result.data)
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
@@ -241,7 +241,7 @@
 				const id = this.dataArray[index]._id
 
 				try {
-					await this.$http.post("/vendorsapi/rates/change-pricelist/" + this.vendorId, {
+					await this.$http.post("/vendorsapi/rates/change-pricelist/" + this.$route.params.id, {
 						_id: id,
 						price: parseFloat(this.currentPrice).toFixed(4),
 						altered: true,
@@ -252,7 +252,7 @@
 						isShow: true,
 						type: "success"
 					})
-					const updatedData = await this.$http.get("/vendorsapi/rates/" + this.vendorId)
+					const updatedData = await this.$http.get("/vendorsapi/rates/" + this.$route.params.id)
 					this.dataArray[index] = updatedData.body.pricelistTable.find(rate => rate._id.toString() === id)
 					this.setDefaults()
 				} catch (err) {
@@ -276,7 +276,7 @@
 			},
 			async bottomScrolled() {
 				if (this.isDataRemain) {
-					const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.vendorId, {
+					const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.$route.params.id, {
 						...this.allFilters,
 						countFilter: this.dataArray.length
 					})
@@ -286,11 +286,12 @@
 			},
 			async getPricelist(filters, count = 0) {
 				try {
-					const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.vendorId, {
+					const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.$route.params.id, {
 								...filters,
 								countFilter: count
 							}
 					)
+					console.log(result.data)
 					this.dataArray = result.data
 				} catch (err) {
 					this.alertToggle({
@@ -325,6 +326,7 @@
 			}
 		},
 		created() {
+			console.log('tyt')
 			this.getPricelist(this.allFilters)
 		},
 		computed: {
