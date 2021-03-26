@@ -597,7 +597,7 @@
 				if (checkedTasks.length) {
 					if (this.isEvery('Created')) {
 						if (status !== "Draft" && status !== "Cost Quote" && status !== "Rejected") {
-							return [ 'Send a Quote', 'Cancel' ]
+							return [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
 						} else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length === 1) {
 							return [ 'Manage reference files', 'Upload reference files', 'Cancel' ]
 						} else {

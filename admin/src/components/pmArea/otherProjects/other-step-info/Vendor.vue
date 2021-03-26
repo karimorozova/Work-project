@@ -9,11 +9,11 @@
         input.step-vendor__input-text(type="text" :value="vendorName" disabled)
       .step-vendor__contacts
         .step-vendor__icon(@click="gotToVendorInfo(vendor._id)")
-          i.fa.fa-info-circle
+          i.fas.fa-info-circle
         .step-vendor__icon(@click="sendEmail")
           i.fa.fa-envelope
         .step-vendor__icon
-          i.fa.fa-slack
+          i.fab.fa-slack-hash
 </template>
 
 <script>
