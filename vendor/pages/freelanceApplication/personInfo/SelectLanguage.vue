@@ -45,13 +45,22 @@
 				languages: [],
 				droppedLang: false,
 				errors: [],
-				searchLang: ''
+				searchLang: '',
+				allLanguages: []
 			}
 		},
 		methods: {
-			...mapActions({
-				// getAllLanguages: 'getAllLanguages'
-			}),
+			async getAllLanguages() {
+				try {
+					let result = await this.$axios.$get("/api/languages")
+					result.sort((a, b) => {
+						if (a.lang < b.lang) return -1
+						if (a.lang > b.lang) return 1
+					})
+					this.allLanguages = result
+				} catch (err) {
+				}
+			},
 			toggleLangs(event) {
 				let elementsObj = event.composedPath()
 				let tr = elementsObj.find(item => {
@@ -79,9 +88,6 @@
 
 		},
 		computed: {
-			...mapGetters({
-				allLanguages: 'getLangs'
-			}),
 			filteredLangs() {
 				let result = this.removeEnglishLang(this.allLanguages.filter(item => {
 					if (item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
@@ -95,7 +101,7 @@
 			ClickOutside
 		},
 		created() {
-			// this.getAllLanguages()
+	  	this.getAllLanguages()
 		},
 		mounted() {
 		}

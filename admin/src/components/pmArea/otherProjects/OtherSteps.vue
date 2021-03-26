@@ -25,7 +25,7 @@
 
           template(slot="info" slot-scope="{row, index}")
             div(@click="showStepDetails(index)" :class="{isDisabled: isNoFinanceData(index), 'steps__info-icon': !isNoFinanceData(index) }")
-              i.fa.fa-info-circle
+              i.fas.fa-info-circle
           template(slot="name" slot-scope="{ row }")
             span.steps__step-data.steps_no-padding {{ getStepName(row.DocumentAssignmentRole) }}
           template(slot="language" slot-scope="{ row, index }")

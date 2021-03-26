@@ -9,15 +9,15 @@
       .project__info-row
         .project__date
           LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
-            Datepicker(v-model="project.startDate" @selected="(e) => updateProjectDate(e, 'startDate')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start" :disabledPicker="disabledPicker")
+            DatepickerWithTime(v-model="project.startDate" @selected="(e) => updateProjectDate(e, 'startDate')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start" :disabledPicker="disabledPicker")
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
         .project__date
           LabelValue(label="Deadline" :isRequired="isRequiredField" customClass="project_margin")
-            Datepicker(v-model="project.deadline" @selected="(e) => updateProjectDate(e, 'deadline')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+            DatepickerWithTime(v-model="project.deadline" @selected="(e) => updateProjectDate(e, 'deadline')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
         .project__date
           LabelValue(label="Billing Date" customClass="project_margin")
-            Datepicker(
+            DatepickerWithTime(
               v-model="project.billingDate"
               ref="billingDate"
               @selected="(e) => updateProjectDate(e, 'billingDate')"
@@ -37,7 +37,7 @@
         .project__client
           LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
             .project__input-icons(v-if="project._id")
-              i.fa.fa-external-link.icon-link(aria-hidden='true' @click="goToClientInfo")
+              i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
               input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
 
             .project__drop-menu(v-else)
@@ -93,6 +93,7 @@
 	import Button from "../Button"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
+  import DatepickerWithTime from "../DatepickerWithTime";
 
 	export default {
 		props: {
@@ -323,6 +324,7 @@
 			}
 		},
 		components: {
+      DatepickerWithTime,
 			SelectSingle,
 			SelectMulti,
 			Datepicker,

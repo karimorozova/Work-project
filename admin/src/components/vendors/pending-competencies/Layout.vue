@@ -74,12 +74,12 @@
 
             template(slot="modal" slot-scope="{ row }")
               .pendingCompetencies__icon(@click="openForm(), setCandidateData(row)")
-                i.fa.fa-id-card-o
+                i.far.fa-address-card
 
             template(slot="link" slot-scope="{ row }")
               .pendingCompetencies__icon
                 a(:href="'/vendors/details/' + row.link" target="_blank")
-                  i.fa.fa-external-link
+                  i.fas.fa-external-link-alt
 
 </template>
 

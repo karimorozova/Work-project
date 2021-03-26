@@ -46,7 +46,7 @@
 
       .lqa-table__data.center(slot="link" slot-scope="{ row }")
         a(:href="getVendorProfileLink(row.vendor._id)" target="_blank" style="position: relative")
-          i.fa.fa-external-link.icon-link
+          i.fas.fa-external-link-alt.icon-link
 
 
 </template>
