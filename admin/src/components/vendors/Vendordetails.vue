@@ -354,6 +354,7 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				updateVendorProp: "updateVendorProp",
+        updateWithOutSocketVendorProp: "updateWithOutSocketVendorProp",
 				updateCurrentVendor: "updateCurrentVendor",
 				deleteCurrentVendor: "deleteCurrentVendor",
 				storeCurrentVendor: "storeCurrentVendor",
@@ -521,6 +522,7 @@
 				}
 			},
 			async checkForErrors() {
+        this.$socket.emit('test', 'test')
 				const textReg = /^[-\sa-zA-Z]+$/
 				try {
 					this.errors = []
@@ -647,14 +649,6 @@
 				}
 			},
 		},
-    sockets: {
-      connect: function () {
-        console.log('socket connected')
-      },
-      hello: function (data) {
-        console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
-      }
-    },
 		computed: {
 			...mapGetters({
 				currentVendor: "getCurrentVendor",
@@ -718,6 +712,11 @@
 		created() {
 			this.getVendor()
 			this.getAliases()
+
+      this.$socket.on('socketUpdateVendorProp', (data) => {
+        this.updateWithOutSocketVendorProp(data)
+      })
+
 		},
 		mounted() {
 			this.oldEmail = this.currentVendor.email

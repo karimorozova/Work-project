@@ -12,34 +12,10 @@ const db = mongoose.connection;
 const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
-const cors = require('cors')
-app.use(cors({origin: "http://localhost:8080",}))
 require('./helpers/dbSetDefault');
 require('./schedule');
 
 // SOCKET.IO SERVER
-const httpServer = require("http").Server(app);
-
-const io = require("socket.io")(httpServer, {
-  cors: {
-    origin: "http://localhost:8080",
-    methods: ["GET", "POST"]
-  }
-});
-httpServer.listen(8080);
-io.on('connection', socket => {
-  console.log(`A user connected with socket id ${socket.id}`)
-
-  socket.broadcast.emit('hello', socket.id)
-
-  socket.on('disconnect', () => {
-    socket.broadcast.emit('user-disconnected', socket.id)
-  })
-
-  socket.on('nudge-client', data => {
-    socket.broadcast.to(data.to).emit('client-nudged', data)
-  })
-})
 
 // end SOCKET.IO se
 
@@ -105,6 +81,26 @@ app.use((err, req, res, next) => {
 app.use(history({ verbose: true, index: '/' }));
 app.use(checkRoutes);
 
-app.listen(port, () => {
+const httpServer = require("http").createServer(app);
+
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"]
+  },
+  allowEIO3: true
+})
+
+io.on('connection', socket => {
+  socket.on('changeVendorProp', (data)=>{
+    socket.broadcast.emit('socketUpdateVendorProp', data)
+  })
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('user-disconnected', socket.id)
+  })
+})
+
+httpServer.listen(port, () => {
 	console.log('\x1b[32m', `✈  Server is working on: ${ port }`, '\x1b[0m');
 });

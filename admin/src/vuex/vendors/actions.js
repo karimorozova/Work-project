@@ -1,8 +1,16 @@
 import Vue from "vue";
 
+import io from 'socket.io-client'
+const socket = io('http://localhost:3001')
 
 export const setFilteredVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
-export const updateVendorProp = ({ commit }, payload) => commit('setVendorProp', payload);
+export const updateVendorProp = ({ commit }, payload) => {
+  socket.emit('changeVendorProp', {prop: payload.prop, value: payload.value})
+  commit('setVendorProp', payload);
+}
+export const updateWithOutSocketVendorProp = ({ commit }, payload) => {
+  commit('setVendorProp', payload);
+}
 export const updateIndustry = ({ commit }, payload) => commit('updateVendorIndustry', payload);
 export const storeVendor = ({ commit, state }, payload) => {
     const index = state.filteredVendors.findIndex(item => item._id === payload._id);
