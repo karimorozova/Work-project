@@ -172,13 +172,61 @@ router.get('/language-pairs', async (req, res) => {
 })
 
 router.post('/new-project', async (req, res) => {
-	let {project, user} = req.body
+	let { project, user } = req.body
 	try {
 		const result = await createProject(project, user)
 		res.send(result)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/remove-reference-files', async (req, res) => {
+	try {
+		const { projectId, checkedTasksId, filePath } = req.body
+		let { _id, tasks } = await getProject({ '_id': projectId })
+
+		fs.unlink(filePath, (err) => {
+			if (err) throw(err)
+		})
+
+		const taskIndex = tasks.findIndex(({ taskId }) => taskId === checkedTasksId)
+		tasks[taskIndex].refFiles = tasks[taskIndex].refFiles.filter(item => item !== filePath)
+
+		const updatedProject = await updateProject({ '_id': _id }, { tasks })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
+	}
+})
+
+router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
+	try {
+		const { refFiles } = req.files
+		const { projectId, checkedTasks } = req.body
+		let { _id, tasks } = await getProject({ '_id': projectId })
+		const taskRefFiles = await storeFiles(refFiles, _id)
+
+		for (let itemTasksId of JSON.parse(checkedTasks).map(({ taskId }) => taskId)) {
+			const taskIndex = tasks.findIndex(({ taskId }) => taskId === itemTasksId)
+			if (taskIndex !== -1) {
+				if (tasks[taskIndex].hasOwnProperty('refFiles')) {
+					tasks[taskIndex].refFiles.push(...taskRefFiles)
+				} else {
+					tasks[taskIndex].refFiles = []
+					tasks[taskIndex].refFiles.push(...taskRefFiles)
+				}
+			}
+		}
+
+		const updatedProject = await updateProject({ '_id': _id }, { tasks })
+		res.send(updatedProject)
+
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
 	}
 })
 

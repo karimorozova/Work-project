@@ -24,7 +24,7 @@
           .lqa-vendors-table__data(slot="lqa" slot-scope="{ row }") {{  row.lqaNumber }}
           .lqa-vendors-table__data.center(slot="link" slot-scope="{ row }")
             span.icon-link(@click.stop="routeToVendor(row.vendorId)")
-              i.fa.fa-external-link
+              i.fas.fa-external-link-alt
 
 </template>
 

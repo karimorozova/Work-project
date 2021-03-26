@@ -2,7 +2,7 @@
   .upload-file
     span.upload-file__label(v-if="label") {{ label }}
     .upload-file__button
-      i.fa.fa-upload(aria-hidden='true')
+      i.fas.fa-upload(aria-hidden='true')
       slot
     span.upload-file__comment(v-if="comment") {{ comment }}
 </template>
