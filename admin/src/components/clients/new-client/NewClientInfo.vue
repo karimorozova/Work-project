@@ -16,13 +16,14 @@
         )
       .title Contact Details
       .new-client-info__contacts-info(:class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
-        ContactsInfo(
+        NewContactsInfo(
           :client="client"
           @contactDetails="contactDetails"
           @setLeadContact="setLeadContact"
           @saveContactUpdates="saveContactUpdates"
           @newContact="addNewContact"
-          @approveDelete="approveContactDelete")
+          @approveDelete="approveContactDelete"
+        )
       .title Rates Parameters
       .new-client-info__rates
         NewRates(
@@ -35,12 +36,23 @@
         NewClientDocuments(
           @uploadFiles="uploadFiles"
         )
+
       .title Sales Information
       .new-client-info__sales
-        ClientSalesInfo(:client="client" @setLeadSource="setLeadSource" :isEmpty="isLeadEmpty")
+        NewClientSalesInfo(
+          :client="client"
+          @setLeadSource="setLeadSource"
+          :isEmpty="isLeadEmpty"
+        )
+
       .title Billing Information
       .new-client-info__billing
-        ClientBillInfo(:client="client" :errorFields="billErrors" @changeProperty="setBillInfo")
+        NewClientBillInfo(
+          :client="client"
+          :errorFields="billErrors"
+          @changeProperty="setBillInfo"
+        )
+
       ValidationErrors(
         v-if="areErrorsExist"
         :errors="errors"
@@ -55,20 +67,21 @@
 </template>
 
 <script>
-	import NewRates from './clientInfo/NewRates'
+	import NewRates from './NewRates'
 	import NewClientDocuments from './NewClientDocuments'
-	import NewGeneral from './clientInfo/NewGeneral'
-	import Button from "../Button"
-	import ValidationErrors from "../ValidationErrors"
-	import ContactsInfo from './ContactsInfo'
-	import ClientSalesInfo from './ClientSalesInfo'
-	import ClientBillInfo from './ClientBillInfo'
-	import NewSideGeneral from './clientInfo/NewSideGeneral'
+	import NewGeneral from './NewGeneral'
+	import Button from "../../Button"
+	import ValidationErrors from "../../ValidationErrors"
+	import ContactsInfo from '../ContactsInfo'
+	import NewClientSalesInfo from './NewClientSalesInfo'
+	import NewClientBillInfo from './NewClientBillInfo'
+	import NewSideGeneral from './NewSideGeneral'
 	import { mapGetters, mapActions } from "vuex"
-	import vatChecker from "../../mixins/Client/vatChecker"
+	import vatChecker from "../../../mixins/Client/vatChecker"
+	import NewContactsInfo from "./NewContactsInfo"
 
 	export default {
-		mixins: [vatChecker],
+		mixins: [ vatChecker ],
 		props: {
 			client: {
 				type: Object
@@ -270,7 +283,7 @@
 					const newClient = { ...result.body.client }
 					await this.addNewClient(newClient)
 					this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
-					this.$router.push(`/clients/details/${ newClient._id }`)
+					await this.$router.push(`/clients/details/${ newClient._id }`)
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
 				}
@@ -295,12 +308,13 @@
 			}
 		},
 		components: {
+			NewContactsInfo,
 			NewGeneral,
 			Button,
 			ValidationErrors,
 			ContactsInfo,
-			ClientSalesInfo,
-			ClientBillInfo,
+			NewClientSalesInfo,
+			NewClientBillInfo,
 			NewClientDocuments,
 			NewSideGeneral,
 			NewRates
@@ -309,7 +323,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors";
 
   .client-layout {
     display: flex;

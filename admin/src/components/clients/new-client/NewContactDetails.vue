@@ -82,17 +82,17 @@
 </template>
 
 <script>
-	import ValidationErrors from "../ValidationErrors";
-	import Asterisk from "../Asterisk";
-	import SelectSingle from "../SelectSingle";
-	import ClickOutside from "vue-click-outside";
-	import CountriesSelect from './CountriesSelect';
-	import TimezoneSelect from './TimezoneSelect';
-	import { mapGetters } from 'vuex';
-	import photoPreview from '@/mixins/photoPreview';
+	import ValidationErrors from "../../ValidationErrors"
+	import Asterisk from "../../Asterisk"
+	import SelectSingle from "../../SelectSingle"
+	import ClickOutside from "vue-click-outside"
+	import CountriesSelect from '../CountriesSelect'
+	import TimezoneSelect from '../TimezoneSelect'
+	import { mapGetters } from 'vuex'
+	import photoPreview from '@/mixins/photoPreview'
 
 	export default {
-		mixins: [photoPreview],
+		mixins: [ photoPreview ],
 		data() {
 			return {
 				contact: {
@@ -110,7 +110,7 @@
 					country: "",
 					timeZone: "",
 					notes: "",
-					leadContact: false,
+					leadContact: false
 				},
 				imageExist: false,
 				areErrorsExist: false,
@@ -119,50 +119,50 @@
 				photoFile: [],
 				errors: [],
 				isSaveClicked: false,
-				genders: ["Male", "Female"],
+				genders: [ "Male", "Female" ],
 				fromRoute: "",
 				isFileError: false
 			}
 		},
 		methods: {
 			openGenders() {
-				this.genderDropped = !this.genderDropped;
+				this.genderDropped = !this.genderDropped
 			},
 			outGenders() {
-				this.genderDropped = false;
+				this.genderDropped = false
 			},
 			setGender({ option }) {
-				this.contact.gender = option;
+				this.contact.gender = option
 			},
 			cancel() {
-				this.$router.push({ path: this.fromRoute });
+				this.$router.push({ path: this.fromRoute })
 			},
 			cancelApprove() {
-				this.approveShow = false;
+				this.approveShow = false
 			},
 			deleteContact() {
-				this.approveShow = true;
+				this.approveShow = true
 			},
 			chosenCountry(data) {
-				this.countrySelected = data;
-				this.contact.country = data;
+				this.countrySelected = data
+				this.contact.country = data
 			},
 			chosenZone(data) {
-				this.timezoneSelected = data;
-				this.contact.timezone = data;
+				this.timezoneSelected = data
+				this.contact.timezone = data
 			},
 			setPhone(e) {
-				const { value } = e.target;
-				const regex = /^[0-9]+$/;
-				const characters = value.split("").filter(item => regex.test(item));
-				const clearedValue = characters.join("");
-				this.contact.phone = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue;
-				this.$refs.phone.value = this.contact.phone;
+				const { value } = e.target
+				const regex = /^[0-9]+$/
+				const characters = value.split("").filter(item => regex.test(item))
+				const clearedValue = characters.join("")
+				this.contact.phone = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue
+				this.$refs.phone.value = this.contact.phone
 			},
 			async checkEmailUniquenes() {
 				try {
-					const result = await this.$http.get(`/clientsapi/unique-email?email=${ this.contact.email }`);
-					if(result.body === "exist") {
+					const result = await this.$http.get(`/clientsapi/unique-email?email=${ this.contact.email }`)
+					if (result.body === "exist") {
 						this.errors.push("The email you entered is already used in our system.")
 					}
 				} catch (err) {
@@ -170,41 +170,41 @@
 				}
 			},
 			async checkForErrors() {
-				this.errors = [];
-				const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-				const textReg = /^[-\sa-zA-Z]+$/;
-				if(!this.contact.firstName || !textReg.test(this.contact.firstName)) this.errors.push("Please, enter valid contact's first name.");
-				if(!this.contact.position || !textReg.test(this.contact.position)) this.errors.push("Please, enter valid contact's position.");
-				if(this.contact.surname && !textReg.test(this.contact.surname)) this.errors.push("Please, enter valid contact's surname.");
-				if(!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.");
-				if(this.contact.email && emailValidReg.test(this.contact.email)) {
-					await this.checkEmailUniquenes();
+				this.errors = []
+				const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+				const textReg = /^[-\sa-zA-Z]+$/
+				if (!this.contact.firstName || !textReg.test(this.contact.firstName)) this.errors.push("Please, enter valid contact's first name.")
+				if (!this.contact.position || !textReg.test(this.contact.position)) this.errors.push("Please, enter valid contact's position.")
+				if (this.contact.surname && !textReg.test(this.contact.surname)) this.errors.push("Please, enter valid contact's surname.")
+				if (!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.")
+				if (this.contact.email && emailValidReg.test(this.contact.email)) {
+					await this.checkEmailUniquenes()
 				}
-				if(/^\s+$/.exec(this.contact.firstName) || /^\s+$/.exec(this.contact.firstName)) {
+				if (/^\s+$/.exec(this.contact.firstName) || /^\s+$/.exec(this.contact.firstName)) {
 					this.errors.push("Please, enter valid contact's first name or e-mail address.")
 				}
-				if(this.errors.length) {
-					this.areErrorsExist = true;
-					this.isSaveClicked = true;
+				if (this.errors.length) {
+					this.areErrorsExist = true
+					this.isSaveClicked = true
 					return
 				}
-				this.contactSave();
+				this.contactSave()
 			},
 			contactSave() {
 				this.$emit('contactSave', { contact: this.contact, file: this.photoFile[0] })
 			},
 			closeErrorsBlock() {
-				this.areErrorsExist = false;
-			},
+				this.areErrorsExist = false
+			}
 		},
 		computed: {
 			...mapGetters({
 				currentClient: "getCurrentClient"
 			}),
 			isEmailValid() {
-				if(this.isSaveClicked) {
-					let regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-					return regex.test(this.contact.email);
+				if (this.isSaveClicked) {
+					let regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+					return regex.test(this.contact.email)
 				}
 				return true
 			}
@@ -221,19 +221,19 @@
 		},
 		beforeRouteEnter(to, from, next) {
 			next(vm => {
-				vm.fromRoute = from.path;
+				vm.fromRoute = from.path
 			})
 		},
 		created() {
-			if(!this.currentClient._id && this.$route.params.id) {
-				this.$router.push(`/clients/details/${ this.$route.params.id }`);
+			if (!this.currentClient._id && this.$route.params.id) {
+				this.$router.push(`/clients/details/${ this.$route.params.id }`)
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors";
 
   .contact-wrap {
     position: relative;

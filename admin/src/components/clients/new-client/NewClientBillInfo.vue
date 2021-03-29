@@ -86,7 +86,7 @@
 </template>
 
 <script>
-	import SelectSingle from "../SelectSingle"
+	import SelectSingle from "../../SelectSingle"
 	import { mapGetters } from "vuex"
 
 	export default {
