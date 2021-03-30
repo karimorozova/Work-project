@@ -63,14 +63,11 @@
 	export default {
 		mixins: [ crudIcons ],
 		props: {
-			tableData: {
+			dataArray: {
 				type: Array
 			},
 			clientId: {
 				type: String
-			},
-			refresh: {
-				type: Boolean
 			}
 		},
 		data() {
@@ -98,7 +95,6 @@
 						padding: "0"
 					}
 				],
-				dataArray: [],
 
 				currentIndustry: "",
 				currentMultiplier: "",
@@ -111,12 +107,10 @@
 				currentActive: -1
 			}
 		},
-		created() {
-			this.getIndustries()
-		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+				setUpClientRatesProp: "setUpClientRatesProp"
 			}),
 			async getRowPrice(index) {
 				try {
@@ -125,15 +119,12 @@
 						row: this.dataArray[index]
 					})
 					const result = await this.$http.post(`/clientsapi/client-rate-by-key`, { id: this.clientId, key: 'industryMultipliersTable' })
-					this.dataArray = result.data
+					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'industryMultipliersTable', value: result.data })
 					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
-			},
-			async getIndustries() {
-				this.dataArray = this.tableData
 			},
 			async makeAction(index, key) {
 				if (this.currentActive !== -1 && this.currentActive !== index) {
@@ -199,15 +190,11 @@
 								}
 							}
 					)
-					this.alertToggle({
-						message: "Saved successfully",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Saved successfully", isShow: true, type: "success" })
 					const updatedData = await this.$http.get(
 							"/clientsapi/rates/" + this.clientId
 					)
-					this.dataArray[index] = updatedData.body.industryMultipliersTable[index]
+					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'industryMultipliersTable', value: updatedData.data.industryMultipliersTable })
 					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
@@ -230,14 +217,6 @@
 			...mapGetters({
 				currentClient: "getCurrentClient"
 			})
-		},
-		watch: {
-			async refresh() {
-				if (this.refresh) {
-					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
-					this.dataArray = client.data.rates.industryMultipliersTable
-				}
-			}
 		},
 		components: {
 			DataTable
@@ -316,14 +295,14 @@
 
       &-link {
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 5px;
         margin-right: 4px;
       }
 
       &-link-opacity {
         cursor: default;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 4px;
         opacity: 0.5;
         margin-right: 4px;

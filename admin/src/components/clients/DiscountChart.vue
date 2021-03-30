@@ -101,14 +101,14 @@
 
       .icons-link {
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         margin-left: 3px;
         margin-right: 3px;
       }
 
       .icons-link-opacity {
         cursor: default;
-        font-size: 18px;
+        font-size: 16px;
         opacity: 0.5;
         margin-left: 3px;
         margin-right: 3px;

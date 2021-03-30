@@ -37,15 +37,19 @@
 
 </template>
 <script>
-	import SettingsTable from "../Table/SettingsTable";
-	import SelectSingle from "../SelectSingle";
-	import Add from "../Add";
-	import crudIcons from "@/mixins/crudIcons";
-	import { mapGetters, mapActions } from "vuex";
+	import SettingsTable from "../Table/SettingsTable"
+	import SelectSingle from "../SelectSingle"
+	import Add from "../Add"
+	import crudIcons from "@/mixins/crudIcons"
+	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		mixins: [crudIcons],
-		props: {},
+		mixins: [ crudIcons ],
+		props: {
+			documentsData: {
+				type: Array
+			}
+		},
 		data() {
 			return {
 				fields: [
@@ -74,7 +78,6 @@
 				currentCategory: "",
 				currentFile: "",
 
-				documentsData: [],
 				areErrors: false,
 				errors: [],
 				isDeleting: false,
@@ -87,150 +90,115 @@
 					{ fileName: "", path: "", category: "NDA" },
 					{ fileName: "", path: "", category: "Contract" }
 				]
-			};
+			}
 		},
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
-				storeClientProperty: "storeClientProperty"
+				setUpClientProp: "setUpClientProp"
 			}),
 
 			async makeAction(index, key) {
-				if(this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing();
+				if (this.currentActive !== -1 && this.currentActive !== index) {
+					return this.isEditing()
 				}
 				switch (key) {
 					case "edit":
-						this.setEditingData(index);
-						break;
+						this.setEditingData(index)
+						break
 					case "cancel":
-						this.manageCancelEdition(index);
-						break;
+						this.manageCancelEdition(index)
+						break
 					case "delete":
-						this.manageDeleteClick(index);
-						break;
+						this.manageDeleteClick(index)
+						break
 					default:
-						await this.checkErrors(index);
+						await this.checkErrors(index)
 				}
 			},
 			setEditingData(index) {
-				this.currentActive = index;
-				this.currentCategory = this.documentsData[index].category;
+				this.currentActive = index
+				this.currentCategory = this.documentsData[index].category
 			},
 			manageCancelEdition(index) {
-				this.setDefaults();
+				this.setDefaults()
 			},
 			setDefaults() {
-				this.currentActive = -1;
-				this.isDeleting = false;
-				this.currentCategory = "";
-				this.currentFile = "";
+				this.currentActive = -1
+				this.isDeleting = false
+				this.currentCategory = ""
+				this.currentFile = ""
 			},
 			uploadDocument() {
-				this.currentFile = this.$refs.file.files[0];
+				this.currentFile = this.$refs.file.files[0]
 			},
 			async checkErrors(index) {
-				if(this.currentActive === -1) return;
-				const doc = this.documentsData[index];
-				this.errors = [];
-				if(!this.currentCategory)
-					this.errors.push("Category should not be empty!");
-				if((!doc.path && !this.currentFile) || (doc.fileName === "" && !this.currentFile))
-					this.errors.push("Upload a file to save!");
-				if(this.currentFile.size > 40000000) {
-					this.errors.push("The file should not exceed 40 MB!");
+				if (this.currentActive === -1) return
+				const doc = this.documentsData[index]
+				this.errors = []
+				if (!this.currentCategory)
+					this.errors.push("Category should not be empty!")
+				if ((!doc.path && !this.currentFile) || (doc.fileName === "" && !this.currentFile))
+					this.errors.push("Upload a file to save!")
+				if (this.currentFile.size > 40000000) {
+					this.errors.push("The file should not exceed 40 MB!")
 				}
-				if(this.errors.length) {
-					this.areErrors = true;
+				if (this.errors.length) {
+					this.areErrors = true
 				} else {
-					await this.manageSaveClick(index);
+					await this.manageSaveClick(index)
 				}
 			},
 
 			async manageSaveClick(index) {
-				let formData = new FormData();
-				formData.append("clientId", this.currentClient._id);
-				formData.append("category", this.currentCategory);
-				formData.append("documentFile", this.currentFile);
+				let formData = new FormData()
+				formData.append("clientId", this.currentClient._id)
+				formData.append("category", this.currentCategory)
+				formData.append("documentFile", this.currentFile)
 
-				if(this.documentsData[index].path) {
-					const { fileName, path, category } = this.documentsData[index];
-					formData.append("oldCategory", category);
-					formData.append("oldName", fileName);
-					if(category === this.currentCategory) {
-						formData.append("oldFilePath", path);
+				if (this.documentsData[index].path) {
+					const { fileName, path, category } = this.documentsData[index]
+					formData.append("oldCategory", category)
+					formData.append("oldName", fileName)
+					if (category === this.currentCategory) {
+						formData.append("oldFilePath", path)
 					}
 				}
 				try {
-					const result = await this.$http.post(
-							"/clientsapi/client-document",
-							formData
-					);
-					this.alertToggle({
-						message: "Document saved",
-						isShow: true,
-						type: "success"
-					});
+					await this.$http.post("/clientsapi/client-document", formData)
+					this.alertToggle({ message: "Document saved", isShow: true, type: "success" })
 				} catch (err) {
 				} finally {
-					this.refreshDocuments();
+					this.refreshDocuments()
 				}
 			},
 			async manageDeleteClick(index) {
-				if(!this.documentsData[index].path) {
-					return this.setDefaults();
+				if (!this.documentsData[index].path) {
+					return this.setDefaults()
 				}
 
-				this.deleteIndex = index;
-				this.isDeleting = true;
+				this.deleteIndex = index
+				this.isDeleting = true
 			},
 			async deleteData() {
-				const docFile = this.documentsData[this.deleteIndex];
+				const docFile = this.documentsData[this.deleteIndex]
 				try {
-					const result = await this.$http.post("/clientsapi/remove-client-doc", {
-						docFile,
-						clientId: this.$route.params.id
-					});
-					this.alertToggle({
-						message: "Document removed",
-						isShow: true,
-						type: "success"
-					});
+					await this.$http.post("/clientsapi/remove-client-doc", { docFile, clientId: this.$route.params.id })
+					this.alertToggle({ message: "Document removed", isShow: true, type: "success" })
 				} catch (err) {
 				} finally {
-					this.refreshDocuments();
+					this.refreshDocuments()
 				}
 			},
 			closeErrors() {
-				this.areErrors = false;
+				this.areErrors = false
 			},
 			async refreshDocuments() {
-				const client = await this.$http.get(
-						`/clientsapi/client?id=${ this.$route.params.id }`
-				);
-				this.documentsData = client.data.documents;
-				this.setDefaults();
-			},
-			async setDocumentsDefaults(category) {
-				let defaultDocument = {
-					clientId: this.$route.params.id,
-					category: category
-				};
-				try {
-					const result = this.$http.post(
-							"/clientsapi/client-document-default",
-							defaultDocument
-					);
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in creating default documents",
-						isShow: true,
-						type: "error"
-					});
-				} finally {
-					this.refreshDocuments();
-				}
-			},
+				const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
+				this.setUpClientProp({ _id: this.$route.params.id, key: 'documents', value: client.data.documents })
+				this.setDefaults()
+			}
+
 		},
 		computed: {
 			...mapGetters({
@@ -242,38 +210,18 @@
 			SelectSingle,
 			Add
 		},
-		async created() {
-			const client = await this.$http.get(
-					`/clientsapi/client?id=${ this.$route.params.id }`
-			);
-			let documents = client.data.documents;
-
-			switch (documents.length) {
-				case 1:
-					let category = documents[0].category;
-					category == "NDA"
-							? await this.setDocumentsDefaults("Contract")
-							: await this.setDocumentsDefaults("NDA");
-					break;
-
-				case 0:
-					await this.setDocumentsDefaults("NDA");
-					await this.setDocumentsDefaults("Contract");
-					break;
-
-				default:
-					this.documentsData = client.data.documents;
-					break;
-			}
-		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__;
+			this.domain = __WEBPACK__API_URL__
 		}
-	};
+	}
 </script>
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
   @import "../../assets/styles/settingsTable";
+
+  a {
+    color: #d15f45;
+  }
 
   .documents {
     &__upload {

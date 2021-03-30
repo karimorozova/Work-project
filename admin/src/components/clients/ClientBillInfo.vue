@@ -152,7 +152,7 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "getCurrentClient"
+				currentClient: "currentClientOverallData"
 			})
 		},
 		components: {

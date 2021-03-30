@@ -115,7 +115,6 @@
 				ndaFile: [],
 				documentsFiles: [],
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
-
 			}
 		},
 		created() {
@@ -163,6 +162,7 @@
 				}
 			},
 			setLeadSource({ leadSource }) {
+
 				this.client.leadSource = leadSource
 			},
 			setBillInfo({ prop, value }) {
@@ -280,7 +280,7 @@
 				}
 				try {
 					const result = await this.$http.post('/clientsapi/update-client', sendData)
-					const newClient = { ...result.body.client }
+					const newClient = { ...result.data.client }
 					await this.addNewClient(newClient)
 					this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
 					await this.$router.push(`/clients/details/${ newClient._id }`)

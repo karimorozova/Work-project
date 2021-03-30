@@ -6,15 +6,15 @@
         :tableData="client.contacts"
         :bodyClass="contactsLength < 5 ? 'tbody_visible-overflow' : ''"
         :tableheadRowClass="contactsLength < 5 ? 'tbody_visible-overflow' : ''"
-        @onRowClicked="showContactDetails"
+        bodyRowClass="cursor-default"
       )
         template(slot="headerName" slot-scope="{ field }")
           span.contacts-info__header-title {{ field.label }}
         template(slot="headerEmail" slot-scope="{ field }")
           span.contacts-info__header-title {{ field.label }}
-        template(slot="headerPhone" slot-scope="{ field }")
-          span.contacts-info__header-title {{ field.label }}
         template(slot="headerPosition" slot-scope="{ field }")
+          span.contacts-info__header-title {{ field.label }}
+        template(slot="headerPhone" slot-scope="{ field }")
           span.contacts-info__header-title {{ field.label }}
         template(slot="headerNotes" slot-scope="{ field }")
           span.contacts-info__header-title {{ field.label }}
@@ -22,6 +22,7 @@
           span.contacts-info__header-title {{ field.label }}
         template(slot="headerIcons" slot-scope="{ field }")
           span.contacts-info__header-title {{ field.label }}
+
         template(slot="name" slot-scope="{ row }")
           .contacts-info__data-cell {{ getFullName(row) }}
 
@@ -51,6 +52,8 @@
 
         template(slot="icons" slot-scope="{ row, index }")
           .contacts-info__icons
+            .contacts-info__fontIcon(@click="showContactDetails({index})")
+              i.far.fa-address-card
             img.contacts-info__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :class="{'contacts-info_opacity': isIconClass(index, key)}")
     .contacts-info__approve(v-if="isDeleteMessageShow")
       ApproveModal(
@@ -86,18 +89,15 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Full Name", headerKey: "headerName", key: "name", width: "15%", padding: "0" },
-					{ label: "Email", headerKey: "headerEmail", key: "email", width: "17.5%", padding: "0" },
-					{ label: "Phone number", headerKey: "headerPhone", key: "phone", width: "17.5%", padding: "0" },
-					{ label: "Position", headerKey: "headerPosition", key: "position", width: "13.5%", padding: "0" },
-					{ label: "Notes", headerKey: "headerNotes", key: "notes", width: "13.5%", padding: "0" },
-					{ label: "Lead Contact", headerKey: "headerLead", key: "lead", width: "10%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "13%", padding: "0" }
+					{ label: "Full Name", headerKey: "headerName", key: "name", width: "18%", padding: "0" },
+					{ label: "Email", headerKey: "headerEmail", key: "email", width: "18%", padding: "0" },
+					{ label: "Position", headerKey: "headerPosition", key: "position", width: "18%", padding: "0" },
+					{ label: "Phone number", headerKey: "headerPhone", key: "phone", width: "16%", padding: "0" },
+					{ label: "Notes", headerKey: "headerNotes", key: "notes", width: "16%", padding: "0" },
+					{ label: "Lead", headerKey: "headerLead", key: "lead", width: "7%", padding: "0" },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "7%", padding: "0" }
 				],
 				icons: {
-					save: { name: 'save', active: false, icon: require('../../../assets/images/Other/save-icon-qa-form.png') },
-					edit: { name: 'edit', active: true, icon: require('../../../assets/images/Other/edit-icon-qa.png') },
-					cancel: { icon: require('../../../assets/images/cancel-icon.png') },
 					delete: { name: 'delete', active: true, icon: require('../../../assets/images/Other/delete-icon-qa-form.png') }
 				},
 				currentEditingIndex: -1,
@@ -261,6 +261,12 @@
     outline: none;
     position: relative;
 
+    &__fontIcon{
+      font-size: 16px;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+
     &_opacity {
       opacity: 0.5;
     }
@@ -281,7 +287,6 @@
 
     &__icons {
       padding-top: 3px;
-      margin-right: 18px;
       display: flex;
       justify-content: space-around;
       align-items: center;

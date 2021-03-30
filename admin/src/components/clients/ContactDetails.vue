@@ -6,7 +6,7 @@
             .buttons
                 input.button(type="button" value="Continue" @click="checkForErrors")
                 input.button(type="button" value="Cancel" @click="cancel")
-                input.button(type="button" value="Delete" @click="deleteContact")
+                //input.button(type="button" value="Delete" @click="deleteContact")
         .details
             .details__item
                 .photo-wrap(v-if="!contact.photo")
@@ -201,14 +201,14 @@ export default {
             this.contactUpdate();
         },
         contactUpdate() {
-            this.$emit('contactUpdate', {file: this.photoFile[0], index: this.index, contact: this.contact})
+            this.$emit('contactUpdate', {file: this.photoFile[0], index: this.index || this.$route.params.index, contact: this.contact})
         },
         getContact() {
             const index = this.index || this.$route.params.index;
             if(!this.isNewClient) {
                 this.contact = {...this.currentClient.contacts[index]};
             } else {
-                this.contact = {...this.newClient.contacts[index]};
+	            this.contact = {...this.newClient.contacts[index]};
             }
             this.oldEmail = this.contact.email;
         },
@@ -218,7 +218,7 @@ export default {
     },
     computed: {
         ...mapGetters({
-            currentClient: "getCurrentClient"
+            currentClient: "currentClientOverallData"
         }),
          isEmailValid() {
             if(this.isSaveClicked) {
