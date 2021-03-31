@@ -8,3 +8,4 @@ export const getCurrentVendorProfessionalExperience = state => state.currentVend
 export const getCurrentVendorQualifications = state => state.currentVendorQualifications;
 export const getCurrentVendorDocuments = state => state.currentVendorDocuments;
 export const getCurrentVendorAssessment = state => state.currentVendorAssessment;
+export const getCurrentVendorGeneralData = state => state.currentVendorGeneralData;

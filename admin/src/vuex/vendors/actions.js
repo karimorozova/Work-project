@@ -372,5 +372,21 @@ export const removeLangTest = async ({ commit, dispatch }, payload) => {
     }
 }
 
+export const initCurrentVendorGeneralData = async ({commit, state}, payload) => {
+  commit('setCurrentVendorGeneralData', payload)
+}
 
+export const updateCurrentVendorGeneralData = async ({commit, state},payload) => {
+  commit("updateCurrentVendorGeneralData", payload)
+}
+
+export const senNewCurrentVendor = async ({commit, state},payload) => {
+
+  await Vue.http.post("/vendorsapi/remove-lang-test", { _id, path });
+  commit("senNewCurrentVendor", payload)
+}
+
+export const clearVendorGeneralData = async ({commit, dispatch}, payload) => {
+  commit("setCurrentVendorGeneralData", payload)
+}
 

@@ -17,6 +17,20 @@ export const mutations = {
         }
     },
 
+    setCurrentVendorGeneralData(state, payload) {
+      let keys = ['firstName','surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website' ,'skype' ,'linkedin','whatsapp', 'industries', 'aliases', 'gender','status','matrix','professionalLevel','notes']
+
+      for(const key of keys) {
+        state.currentVendorGeneralData[key] = payload[key]
+      }
+    },
+    updateCurrentVendorGeneralData(state, payload) {
+      state.currentVendorGeneralData[payload.key] = payload.value
+    },
+    senNewCurrentVendor(state){
+        state.currentVendor = {...state.currentVendor, ...state.currentVendorGeneralData}
+    },
+
 
     SET_CURRENT_VENDOR_EDUCATION(state,payload){
         state.currentVendorEducations[payload._id] = payload
