@@ -134,7 +134,7 @@ export default {
 .select {
     border-radius: 15px;
     width: 100%;
-    height: 40px;
+    height: 36px;
     display: flex;
     justify-content: space-between;
     cursor: pointer;

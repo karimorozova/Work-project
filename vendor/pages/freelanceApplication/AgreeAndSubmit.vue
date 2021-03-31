@@ -71,26 +71,30 @@ export default {
             return sum > 2;
         },
         async checkForm() {
+
             this.errors = [];
             try {
                 if(!this.person.firstName) this.errors.push("Please enter your name.");
+	              if(!this.person.phone) this.errors.push("Please enter your phone.");
                 if(!this.person.surname) this.errors.push("Please enter your surname.");
                 await this.checkEmailErrors();
                 // if(!this.person.phone) this.errors.push("Please enter your phone number.");
                 if(!this.person.native) this.errors.push("Please select your mother tongue.");
-                if(this.secondInfo.CAT !== true ) this.errors.push("Unfortunately, you must have experience in CAT Tools to be able to join Pangea.");
+	              if(!this.person.industries) this.errors.push("Please select the industries.")
+	              if(this.secondInfo.CAT !== true ) this.errors.push("Unfortunately, you must have experience in CAT Tools to be able to join Pangea.");
                 if(this.secondInfo.CAT === true && !this.person.softwares) this.errors.push("Please select the CAT Tools you use.");
                 // if(!this.person.timezone) this.errors.push("Please select your timezone.");
                 // if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
                 if(!this.person.cv || (this.person.cv && !this.person.cv.length)) this.errors.push("Please upload CV file.");
                 if(this.person.cv && this.person.cv.length && this.areCvFilesTooBig(this.person.cv)) this.errors.push("All CV files should have summarized size not more than 20Mb");
 
-                for (let fileName of this.person.cv.map(item => item.name)){
-                	if(this.person.cover.map(item => item.name).includes(fileName)){
-		                this.errors.push("File names must be different.");
-                  }
+                if(this.person.hasOwnProperty('cv') && this.person.hasOwnProperty('cover')){
+	                for (let fileName of this.person.cv.map(item => item.name)){
+		                if(this.person.cover.map(item => item.name).includes(fileName)){
+			                this.errors.push("File names must be different.");
+		                }
+	                }
                 }
-
 
                 // if(this.person.coverLetterFiles && this.person.coverLetterFiles.length && this.areCoverLetterFilesTooBig(this.person.coverLetterFiles)) {
                 //     this.errors.push("All Cover Letter files should have summarized size not more than 2Mb");

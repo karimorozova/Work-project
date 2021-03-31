@@ -19,6 +19,14 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       `${target.lang} - Translator@Pangea position - Test Passed (ID ${messageId})`
       : `${target.lang} - Translator@Pangea position - Test Not Passed (ID ${messageId})`;
     message = status === 'Passed' ? testPassedMessage(vendor) : testNotPassedMessage({ ...vendor, target });
+
+    //#dima
+    // if (status === 'Passed') {
+    //   console.log(vendor.assessments)
+    //   const attachments = [{ filename: testPath.split('/').pop(), content: fs.createReadStream(`./dist${testPath}`) }];
+    //   return await sendEmail({ to: vendor.email, subject, attachments }, message);
+    // }
+
     await sendEmail({ to: vendor.email, subject }, message);
   } catch (err) {
     console.log(err);

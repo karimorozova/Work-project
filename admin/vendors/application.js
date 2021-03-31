@@ -35,6 +35,7 @@ async function sendEmailToManager(personData, vendor) {
 
         emailData.coverLetterFiles = vendor.coverLetterFiles;
         emailData.attachments = getFilesAttachments([...emailData.cvFiles, ...emailData.coverLetterFiles]);
+        emailData.phone = vendor.phone
 
         const message = applicationMessage(emailData);
         await sendEmail(emailData, message);

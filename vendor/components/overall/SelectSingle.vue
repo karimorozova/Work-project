@@ -243,7 +243,7 @@
       width: 80%;
       padding: 0 5px;
       font-size: 14px;
-      max-height: 40px;
+      max-height: 36px;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
