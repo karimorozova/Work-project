@@ -85,7 +85,7 @@
           .application__row-flex
             .application__col50
               UploadFileButton.application__mb-10(
-                label="CV:"
+                label="CV (English version):"
                 @uploadedFile="(e) => uploadCvFile('cv', e)"
               )
               .application__part.application__mb-10(v-if="files.cv.length") CV files:

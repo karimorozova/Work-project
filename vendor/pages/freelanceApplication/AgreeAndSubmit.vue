@@ -84,6 +84,14 @@ export default {
                 // if(!this.person.languagePairs || (this.person.languagePairs && !this.person.languagePairs.length)) this.errors.push("Please set at least one language pair.");
                 if(!this.person.cv || (this.person.cv && !this.person.cv.length)) this.errors.push("Please upload CV file.");
                 if(this.person.cv && this.person.cv.length && this.areCvFilesTooBig(this.person.cv)) this.errors.push("All CV files should have summarized size not more than 20Mb");
+
+                for (let fileName of this.person.cv.map(item => item.name)){
+                	if(this.person.cover.map(item => item.name).includes(fileName)){
+		                this.errors.push("File names must be different.");
+                  }
+                }
+
+
                 // if(this.person.coverLetterFiles && this.person.coverLetterFiles.length && this.areCoverLetterFilesTooBig(this.person.coverLetterFiles)) {
                 //     this.errors.push("All Cover Letter files should have summarized size not more than 2Mb");
                 // }
