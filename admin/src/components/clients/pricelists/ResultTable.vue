@@ -490,14 +490,14 @@
 
       &-link {
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 5px;
         margin-right: 4px;
       }
 
       &-link-opacity {
         cursor: default;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 4px;
         opacity: 0.5;
         margin-right: 4px;

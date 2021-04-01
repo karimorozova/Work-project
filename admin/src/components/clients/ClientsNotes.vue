@@ -122,7 +122,6 @@
 						message: this.editorData,
 						clientId: this.currentClient._id,
 					});
-					console.log(this.editorData)
 				} catch (err) {
 					this.alertToggle({ message: "Error in send message", isShow: true, type: "error" });
 				} finally {

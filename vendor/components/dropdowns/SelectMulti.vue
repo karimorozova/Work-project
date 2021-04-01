@@ -123,7 +123,7 @@
   .select {
     border-radius: 15px;
     width: 100%;
-    height: 40px;
+    height: 36px;
     display: flex;
     justify-content: space-between;
     cursor: pointer;
@@ -132,7 +132,7 @@
       width: 80%;
       padding: 3px 10px;
       font-size: 14px;
-      max-height: 40px;
+      max-height: 36px;
       display: flex;
       align-items: center;
       flex-wrap: wrap;

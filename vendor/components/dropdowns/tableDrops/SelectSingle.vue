@@ -116,7 +116,7 @@ export default {
         padding: 3px 5px;
         border-right: 0.5px solid #67573E;
         font-size: 14px;
-        max-height: 40px;
+        max-height: 36px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;

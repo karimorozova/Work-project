@@ -30,7 +30,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
+    /*cursor: pointer;*/
     &__inside-circle {
         width: 8px;
         height: 8px;

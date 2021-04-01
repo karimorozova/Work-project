@@ -12,6 +12,13 @@ import VueLodash from 'vue-lodash';
 import "./filters/GeneralFilters";
 export const bus = new Vue();
 
+
+const io = require("socket.io-client");
+const socket = io('http://localhost:3001')
+Vue.prototype.$socket = socket
+
+
+
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem("token");
   const value = token || "";

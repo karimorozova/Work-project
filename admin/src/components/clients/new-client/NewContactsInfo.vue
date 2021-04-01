@@ -74,12 +74,11 @@
 </template>
 
 <script>
-	import DataTable from "../DataTable"
-	import CustomRadio from "../CustomRadio"
-	import Add from "../Add"
-	import ValidationErrors from "../ValidationErrors"
-	import ApproveModal from '../ApproveModal'
-	import { mapGetters, mapActions } from 'vuex'
+	import CustomRadio from "../../CustomRadio"
+	import Add from "../../Add"
+	import ValidationErrors from "../../ValidationErrors"
+	import ApproveModal from '../../ApproveModal'
+	import DataTable from "../../DataTable"
 
 	export default {
 		props: {
@@ -99,7 +98,7 @@
 					{ label: "", headerKey: "headerIcons", key: "icons", width: "7%", padding: "0" }
 				],
 				icons: {
-					delete: { name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png') }
+					delete: { name: 'delete', active: true, icon: require('../../../assets/images/Other/delete-icon-qa-form.png') }
 				},
 				currentEditingIndex: -1,
 				isErrorShow: false,
@@ -253,7 +252,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors.scss";
 
   .contacts-info {
     font-size: 14px;

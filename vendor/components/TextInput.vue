@@ -1,7 +1,7 @@
 <template lang="pug">
   .text-input
     .text-input__label {{ label }}:
-    input.text-input__input(type="text" :name="name" @change="setValue")
+    input.text-input__input(:type="type" :name="name"  @change="setValue")
     span.text-input__example(v-if="example") {{ example }}
 
 </template>
@@ -17,7 +17,11 @@
 			},
 			example: {
 				type: String
-			}
+			},
+			type:{
+				type: String,
+        default: 'text'
+      }
 		},
 		methods: {
 			setValue({ target: { value, name } }) {
@@ -28,6 +32,16 @@
 </script>
 
 <style lang="scss" scoped>
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
 
   .text-input {
     display: flex;

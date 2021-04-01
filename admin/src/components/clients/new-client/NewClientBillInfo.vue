@@ -86,7 +86,7 @@
 </template>
 
 <script>
-	import SelectSingle from "../SelectSingle"
+	import SelectSingle from "../../SelectSingle"
 	import { mapGetters } from "vuex"
 
 	export default {
@@ -120,11 +120,7 @@
 			setSame(e) {
 				this.isSame = e.target.checked
 				if (this.isSame) {
-					if (Object.keys(this.currentClient).length === 0) {
-						this.isSetSame(this.client)
-					} else {
-						this.isSetSame(this.currentClient)
-					}
+					this.isSetSame(this.client)
 				} else {
 					this.client.billingInfo.officialCompanyName = ""
 				}
@@ -152,7 +148,7 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "currentClientOverallData"
+				currentClient: "getCurrentClient"
 			})
 		},
 		components: {

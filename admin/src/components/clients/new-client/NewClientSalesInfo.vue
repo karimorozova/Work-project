@@ -15,16 +15,12 @@
           :options="['test','test2']"
           @chooseOption="setGenerator"
         )
-    //- .status-info
-    //-     label.lead-info__label Sales comission status:
-    //-     .status-info__data
-    //-         span {{ client.salesComission }}
 </template>
 
 <script>
-	import ClientLeadsourceSelect from './ClientLeadsourceSelect'
-	import SelectSingle from '../SelectSingle'
-	import Asterisk from "../Asterisk"
+	import ClientLeadsourceSelect from '../ClientLeadsourceSelect'
+	import SelectSingle from '../../SelectSingle'
+	import Asterisk from "../../Asterisk"
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
@@ -43,19 +39,19 @@
 		},
 		methods: {
 			...mapActions({
-				storeClientPropertyOverallData: "storeClientPropertyOverallData"
+				storeClientProperty: "storeClientProperty"
 			}),
 			chosenLeadsource({ leadSource }) {
 				this.$emit("setLeadSource", { leadSource })
 			},
 			setGenerator({ option }) {
 				this.leadGeneration = option
-				this.storeClientPropertyOverallData({ prop: "leadGeneration", value: this.leadGeneration })
+				this.storeClientProperty({ prop: "leadGeneration", value: this.leadGeneration })
 			}
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "currentClientOverallData"
+				currentClient: "getCurrentClient"
 			})
 		},
 		components: {
@@ -109,7 +105,6 @@
       width: 190px;
       height: 28px;
     }
-
   }
 
 </style>

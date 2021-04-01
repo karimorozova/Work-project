@@ -53,7 +53,7 @@
 			}
 		},
 		methods: {
-			...mapActions([ 'storeClientProperty', 'alertToggle' ]),
+			...mapActions([ 'setUpClientProp', 'alertToggle' ]),
 			crudActions(actionType) {
 				switch (actionType) {
 					case 'cancel':
@@ -70,7 +70,7 @@
 						_id: this.currentClient._id,
 						value: this.$refs.minPrice.value
 					})
-					this.storeClientProperty({ prop: 'minPrice', value: this.$refs.minPrice.value })
+					this.setUpClientProp({ _id: this.$route.params.id, key: 'minPrice', value: this.$refs.minPrice.value })
 					this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({
@@ -91,18 +91,18 @@
 				//   prop: "ignoreMinPrice",
 				//   value: event.target.checked
 				// });
-				try {
-					await this.$http.put('/clientsapi/toggle-ignore-min-price', {
-						_id: this.currentClient._id,
-						value: this.ignoreMinPrice
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: 'Client\'s ignoreMinPrice is not updated!',
-						isShow: true,
-						type: 'error'
-					})
-				}
+				// try {
+				// 	await this.$http.put('/clientsapi/toggle-ignore-min-price', {
+				// 		_id: this.currentClient._id,
+				// 		value: this.ignoreMinPrice
+				// 	})
+				// } catch (err) {
+				// 	this.alertToggle({
+				// 		message: 'Client\'s ignoreMinPrice is not updated!',
+				// 		isShow: true,
+				// 		type: 'error'
+				// 	})
+				// }
 			}
 		},
 		mounted() {

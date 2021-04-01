@@ -18,6 +18,12 @@
                 @setValue="setInfoValue"
               )
               TextInput.application__mb-10(
+                label="Phone"
+                name="phone"
+                :type="'number'"
+                @setValue="setInfoValue"
+              )
+              TextInput.application__mb-10(
                 label="Email"
                 name="email"
                 example="example@example.com"
@@ -39,19 +45,21 @@
                 )
 
           p.application__step-title Professional Information
-
           .application__row-flex
             .application__col50
-              .application__availability.application__mb-10
-                .available__title Availability:
-                SelectSingle(
-                  :selectedOption="availability"
-                  :options="availabilityOptions"
-                  @chooseOption="chooseOption"
+              .available__title.application__mb-10 Industries:
+              .application__software
+                SelectMulti(
+                  :isTableDropMenu="true"
+                  placeholder="Select"
+                  :hasSearch="false"
+                  :options="industries.map(item => item.name)"
+                  :selectedOptions="selectedIndustries.map(item => item.name)"
+                  :allOptionsButtons="true"
+                  @chooseOptions="chooseIndustries"
                 )
             .application__col50
               .application__mb-10
-
                 p Do you work with CAT tools?
                 .application__radio-group
                   .application__radio
@@ -65,27 +73,35 @@
                       span.label
                       | No
 
-          .application__row-flex(v-if="secondInfo.CAT === true")
+          .application__row-flex
             .application__col50
-              .available__title.application__mb-10 Please select the software you currently use or have previous experience:
-              .application__software
-                SelectMulti(
-                  :isTableDropMenu="true"
-                  placeholder="Select"
-                  :hasSearch="false"
-                  :options="softwaresOptions"
-                  :selectedOptions="softwares"
-                  :allOptionsButtons="true"
-                  @chooseOptions="chooseOptions"
+              .application__availability.application__mb-10
+                .available__title Availability:
+                SelectSingle(
+                  :selectedOption="availability"
+                  :options="availabilityOptions"
+                  @chooseOption="chooseOption"
                 )
             .application__col50
+              div(v-if="secondInfo.CAT === true")
+                .available__title.application__mb-10 Previous software experience:
+                .application__software
+                  SelectMulti(
+                    :isTableDropMenu="true"
+                    placeholder="Select"
+                    :hasSearch="false"
+                    :options="softwaresOptions"
+                    :selectedOptions="softwares"
+                    :allOptionsButtons="true"
+                    @chooseOptions="chooseOptions"
+                  )
 
           p.application__step-title FILES
 
           .application__row-flex
             .application__col50
               UploadFileButton.application__mb-10(
-                label="CV:"
+                label="CV (English version):"
                 @uploadedFile="(e) => uploadCvFile('cv', e)"
               )
               .application__part.application__mb-10(v-if="files.cv.length") CV files:
@@ -158,7 +174,9 @@
 				availabilityOptions: [ "Full-time", "Part-time", "Limited" ],
 				availability: "",
 				softwaresOptions: [ "XTM", "MemoQ", "Trados" ],
-				secondInfo: { CAT: false }
+				secondInfo: { CAT: false },
+				industries: [],
+        selectedIndustries: []
 			}
 		},
 		methods: {
@@ -224,11 +242,35 @@
 				}
 				this.person.softwares = this.softwares
 			},
+			chooseIndustries({ option }) {
+				const position = this.selectedIndustries.findIndex(item => item.name === option)
+				if (position !== -1) {
+					this.selectedIndustries.splice(position, 1)
+				} else {
+					const industry = this.industries.find(item => item.name === option)
+					this.selectedIndustries.push(industry)
+				}
+				this.person.industries = this.selectedIndustries
+			},
 			setMotherTongue({ lang }) {
 				this.selectedTongue = lang
 				this.person.native = lang._id
 				this.person.lang = lang.lang
-			}
+			},
+			async getAllIndustries() {
+				try {
+					let result = await this.$axios.$get("/api/industries")
+					result.sort((a, b) => {
+						if (a.lang < b.lang) return -1
+						if (a.lang > b.lang) return 1
+					})
+					this.industries = result
+				} catch (err) {
+				}
+			},
+    },
+    created(){
+      this.getAllIndustries()
     },
 		components: {
 			Header,

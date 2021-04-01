@@ -1,8 +1,16 @@
 import Vue from "vue";
 
+import io from 'socket.io-client'
+const socket = io('http://localhost:3001')
 
 export const setFilteredVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
-export const updateVendorProp = ({ commit }, payload) => commit('setVendorProp', payload);
+export const updateVendorProp = ({ commit }, payload) => {
+  socket.emit('changeVendorProp', {id: payload.id, key: payload.key, value: payload.value})
+  commit('setVendorProp', {prop: payload.key, value: payload.value});
+}
+export const updateWithOutSocketVendorProp = ({ commit }, payload) => {
+  commit('setVendorProp', payload);
+}
 export const updateIndustry = ({ commit }, payload) => commit('updateVendorIndustry', payload);
 export const storeVendor = ({ commit, state }, payload) => {
     const index = state.filteredVendors.findIndex(item => item._id === payload._id);
@@ -364,5 +372,19 @@ export const removeLangTest = async ({ commit, dispatch }, payload) => {
     }
 }
 
+export const initCurrentVendorGeneralData = async ({commit, state}, payload) => {
+  commit('setCurrentVendorGeneralData', payload)
+}
 
+export const updateCurrentVendorGeneralData = async ({commit, state},payload) => {
+  commit("updateCurrentVendorGeneralData", payload)
+}
+
+// export const setNewCurrentVendor = async ({commit, state},payload) => {
+//   commit("setNewCurrentVendor", payload)
+// }
+
+export const clearVendorGeneralData = async ({commit, dispatch}, payload) => {
+  commit("setCurrentVendorGeneralData", payload)
+}
 

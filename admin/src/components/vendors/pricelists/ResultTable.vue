@@ -326,7 +326,6 @@
 			}
 		},
 		created() {
-			console.log('tyt')
 			this.getPricelist(this.allFilters)
 		},
 		computed: {

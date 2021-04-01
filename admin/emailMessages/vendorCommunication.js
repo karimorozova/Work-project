@@ -5,6 +5,10 @@ const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 
 function applicationMessage (obj) {
 	let cvFiles = ""
+	let industries = obj.industries.reduce((acc, curr) => {
+		acc = `${acc} ${curr.name};`
+		return acc;
+	},'')
 	let coverLetterFiles = ""
 	if (obj.cvFiles.length) {
 		cvFiles = obj.cvFiles.reduce((acc, cur, index) => {
@@ -26,9 +30,11 @@ function applicationMessage (obj) {
                     <p style="font-weight: 400;"><b style="margin-right: 6px;color:#66563E;"> Name: </b> ${obj.firstName} </p>
                     <p style="font-weight: 400;"><b style="margin-right: 6px;color:#66563E;"> Surname: </b> ${obj.surname} </p>
                     <p style="font-weight: 400;"><b style="margin-right: 6px;"> Email: </b> <span>${ obj.email }</span> </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Phone: </b> <span>${ obj.phone }</span> </p>
                     <p style="font-weight: 400;"><b style="margin-right: 6px;"> Mother tongue: </b> <span>${ obj.lang }</span> </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Industries: </b> <span>${ industries }</span> </p>
                     <p style="font-weight: 400;"><b style="margin-right: 6px;"> Availability: </b> <span>${ obj.availability }</span> </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Software expirience: </b> <span>${ obj.softwares }</span> </p>
+                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Software experience: </b> <span>${ obj.softwares }</span> </p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">

@@ -50,11 +50,11 @@
 					billingInfo: {
 						officialCompanyName: '',
 						vat: false,
-            vatId: '',
+						vatId: '',
 						dueDate: '',
 						address: '',
 						invoiceSending: false,
-						paymentType: '',
+						paymentType: ''
 					}
 
 				},
@@ -98,7 +98,7 @@
 				this.$router.go(-1)
 			},
 			loadFile({ files, prop }) {
-				this[prop] = [files[0]]
+				this[prop] = [ files[0] ]
 			},
 			...mapActions({
 				alertToggle: "alertToggle"
@@ -113,7 +113,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors";
 
   .new-client-wrap {
     position: relative;

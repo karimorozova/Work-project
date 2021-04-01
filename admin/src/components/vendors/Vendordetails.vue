@@ -1,142 +1,10 @@
 <template lang="pug">
   .vendor-wrap
+    PopUpWindow(v-if="isChangedVendorGeneralInfo" text="test a  or b ?"  @accept="checkForErrors" @cancel="cancel")
     .vendor-info(v-if="currentVendor._id")
-      .buttons
-        input.button(type="button", value="Save", @click="checkForErrors")
-        input.button(type="button", value="Cancel", @click="cancel")
-        input.button(type="button", value="Delete", @click="deleteVendor")
       .title General Information
-      .vendor-details
-        .gen-info
-          .gen-info__block
-            .photo-wrap(v-if="!currentVendor.photo")
-              input.photo-file(type="file", @change="previewPhoto")
-              .photo-text(v-if="!imageExist")
-                p.photo-text__message(v-if="!isFileError") upload your photo
-                  span.photo-extensions *.jpg/jpeg/png
-                  span.photo-size <= 2MB
-              img.photo-image(v-if="imageExist")
-              p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
-            .photo-wrap(v-if="currentVendor.photo")
-              input.photo-file(type="file", @change="previewPhoto")
-              img.photo-image(:src="currentVendor.photo")
-          .gen-info__block
-            .block-item
-              label.block-item__label.block-item_relative First Name:
-                Asterisk(:customStyle="asteriskStyle")
-              input.block-item__input-filed(
-                :class="{ 'block-item_error-shadow': errors.includes('Please, enter valid first name.') && isSaveClicked }",
-                type="text",
-                placeholder="First Name",
-                :value="currentVendor.firstName",
-                @change="(e) => updateProp(e, 'firstName')"
-              )
-            .block-item
-              label Surname:
-              input.block-item__input-filed(
-                type="text",
-                placeholder="Surname",
-                :value="currentVendor.surname",
-                @change="(e) => updateProp(e, 'surname')"
-              )
-            .block-item
-              label.block-item__label.block-item_relative Email:
-                Asterisk(:customStyle="asteriskStyle")
-              input.block-item__input-filed(
-                :class="{ 'block-item_error-shadow': validateEmail() && isSaveClicked }",
-                type="text",
-                placeholder="Email",
-                :value="currentVendor.email",
-                @change="(e) => updateProp(e, 'email')"
-              )
-            .block-item
-              label Phone:
-              input.block-item__input-filed(
-                type="text",
-                placeholder="Phone",
-                :value="currentVendor.phone",
-                @input="setPhone",
-                ref="phone"
-              )
-            .block-item
-              label Time Zone:
-              .block-item__drop-menu.block-item_high-index
-                TimezoneSelect(:timezoneSelected="currentVendor.timezone", @chosenZone="setTimezone")
-            .block-item
-              label.block-item__label.block-item_relative Native Language:
-              .block-item__drop-menu.block-item_medium-index
-                NativeLanguageSelect(:selectedLang="currentVendor.native", @chosenLang="setNative")
-            .block-item.no-margin
-              label Gender:
-              .block-item__drop-menu
-                SelectSingle(
-                  :options="genders",
-                  :selectedOption="currentVendor.gender",
-                  placeholder="Gender",
-                  @chooseOption="updateGender"
-                )
-          .gen-info__block
-            .block-item
-              label Company Name:
-              input.block-item__input-filed(
-                type="text",
-                placeholder="Company Name",
-                :value="currentVendor.companyName",
-                @change="(e) => updateProp(e, 'companyName')"
-              )
-            .block-item
-              label Website:
-              input.block-item__input-filed(
-                type="text",
-                placeholder="Website",
-                :value="currentVendor.website",
-                @change="(e) => updateProp(e, 'website')"
-              )
-            .block-item
-              label Skype:
-              input.block-item__input-filed(
-                type="text",
-                placeholder="Skype",
-                :value="currentVendor.skype",
-                @change="(e) => updateProp(e, 'skype')"
-              )
-            .block-item
-              label Linkedin:
-              input.block-item__input-filed(
-                type="text",
-                placeholder="Linkedin",
-                :value="currentVendor.linkedin",
-                @change="(e) => updateProp(e, 'linkedin')"
-              )
-            .block-item
-              label WhatsApp:
-              input.block-item__input-filed(
-                type="text",
-                placeholder="WhatsApp",
-                :value="currentVendor.whatsapp",
-                @change="(e) => updateProp(e, 'whatsapp')"
-              )
-            .block-item
-              label Industries:
-                span.require *
-              .block-item__drop-menu(
-                :class="{ 'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length }"
-              )
-                MultiVendorIndustrySelect(
-                  :selectedInd="currentVendor.industries || []",
-                  :filteredIndustries="selectedIndNames",
-                  @chosenInd="chosenInd"
-                )
-            .block-item.no-margin
-              label Aliases:
-              .block-item__drop-menu
-                SelectMulti(
-                  placeholder="Select"
-                  :hasSearch="true"
-                  :selectedOptions="currentVendor.hasOwnProperty('aliases') ? currentVendor.aliases : currentVendorAliases"
-                  :options="vendorAliases"
-                  @chooseOptions="setAlias"
-                )
+      .vendor-details(v-if="getVendorUpdatedData.industries")
+        VendorMainInfo
 
       .vendor-info__preview(v-if="isEditAndSend")
         WYSIWYG(
@@ -226,7 +94,7 @@
         .vendor-info__notes
           VendorCandidate(:candidateData="currentVendor")
         .vendor-info__editor
-          ckeditor(v-model="currentVendor.notes", :config="editorConfig")
+          ckeditor(v-model="getVendorUpdatedData.notes", :config="editorConfig")
 
       //.title Vendor to memoq
         //div
@@ -254,9 +122,9 @@
           label.block-item-subinfo__label Vendor Status:
             span.require *
           .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(
-            :class="{ 'block-item-subinfo_error-shadow': isSaveClicked && !currentVendor.status }"
+            :class="{ 'block-item-subinfo_error-shadow': isSaveClicked && !getVendorUpdatedData.status }"
           )
-            VendorStatusSelect(isAllExist="no", :selectedStatus="currentVendor.status", @chosenStatus="chosenStatus")
+            VendorStatusSelect(isAllExist="no", :selectedStatus="getVendorUpdatedData.status", @chosenStatus="chosenStatus")
         .block-item-subinfo
           label.block-item-subinfo__label Professional level:
           .block-item-subinfo__drop.block-item-subinfo_high-index
@@ -310,6 +178,8 @@
 	import ApproveModal from "../ApproveModal"
 	import SelectMulti from "../SelectMulti"
 	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
+  import VendorMainInfo from "./VendorGeneralInfo";
+  import PopUpWindow from "../PopUpWindow";
 
 	export default {
 		mixins: [ photoPreview ],
@@ -336,7 +206,7 @@
 				oldEmail: "",
 				isFileError: false,
 				isEditAndSend: false,
-				editorConfig: {
+        editorConfig: {
 					allowedContent: true,
 					uiColor: "#F4F0EE",
 					resize_minHeight: "130",
@@ -354,6 +224,7 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				updateVendorProp: "updateVendorProp",
+        updateWithOutSocketVendorProp: "updateWithOutSocketVendorProp",
 				updateCurrentVendor: "updateCurrentVendor",
 				deleteCurrentVendor: "deleteCurrentVendor",
 				storeCurrentVendor: "storeCurrentVendor",
@@ -361,7 +232,10 @@
 				getDuoCombinations: "getVendorDuoCombinations",
 				updateVendorStatus: "updateVendorStatus",
 				setVendorsMatrixData: "setVendorsMatrixData",
-				setDefaultValuesMatrixData: "setDefaultValuesMatrixData"
+				setDefaultValuesMatrixData: "setDefaultValuesMatrixData",
+        initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
+        updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
+        updateVendorGeneralData: "updateVendorGeneralData"
 			}),
 			setAlias({ option }) {
 				if (this.currentVendor.hasOwnProperty('aliases')) {
@@ -491,16 +365,7 @@
 			},
 			validateEmail() {
 				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-				return !this.currentVendor.email || !emailValidRegex.test(this.currentVendor.email.toLowerCase())
-			},
-			setPhone(e) {
-				const { value } = e.target
-				const regex = /^[0-9]+$/
-				const characters = value.split("").filter((item) => regex.test(item))
-				const clearedValue = characters.join("")
-				const phoneValue = clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue
-				this.$refs.phone.value = phoneValue
-				this.updateVendorProp({ prop: "phone", value: phoneValue })
+				return !this.getVendorUpdatedData.email || !emailValidRegex.test(this.getVendorUpdatedData.email.toLowerCase())
 			},
 			async checkEmail() {
 				if (this.validateEmail()) {
@@ -524,15 +389,15 @@
 				const textReg = /^[-\sa-zA-Z]+$/
 				try {
 					this.errors = []
-					if (!this.currentVendor.firstName || !textReg.test(this.currentVendor.firstName))
+					if (!this.getVendorUpdatedData.firstName || !textReg.test(this.getVendorUpdatedData.firstName))
 						this.errors.push("Please, enter valid first name.")
-					if (/^\s+$/.exec(this.currentVendor.firstName)) {
+					if (/^\s+$/.exec(this.getVendorUpdatedData.firstName)) {
 						this.errors.push("Please, enter valid first name.")
 					}
-					if (this.currentVendor.surname && !textReg.test(this.currentVendor.surname))
+					if (this.getVendorUpdatedData.surname && !textReg.test(this.getVendorUpdatedData.surname))
 						this.errors.push("Please, enter valid surname.")
-					if (!this.currentVendor.industries.length) this.errors.push("Please, choose at least one industry.")
-					if (!this.currentVendor.status) this.errors.push("Please, choose status.")
+					if (!this.getVendorUpdatedData.industries.length) this.errors.push("Please, choose at least one industry.")
+					if (!this.getVendorUpdatedData.status) this.errors.push("Please, choose status.")
 					await this.checkEmail()
 					if (this.errors.length) {
 						this.areErrorsExist = true
@@ -545,11 +410,13 @@
 			},
 			async updateVendor() {
 				let sendData = new FormData()
-				sendData.append("vendor", JSON.stringify(this.currentVendor))
+				sendData.append("vendor", JSON.stringify({...this.getVendorUpdatedData, _id: this.$route.params.id}))
 				sendData.append("photo", this.photoFile[0])
 				try {
 					await this.updateCurrentVendor(sendData)
-					this.oldEmail = this.currentVendor.email
+					this.oldEmail = this.getVendorUpdatedData.email
+          this.$socket.emit('updatedVendorData', {id:  this.$route.params.id})
+          // this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, newData: this.getVendorUpdatedData})
 					this.alertToggle({
 						message: "Vendor info updated",
 						isShow: true,
@@ -565,27 +432,14 @@
 					this.closeErrors()
 				}
 			},
-			updateProp(e, prop) {
-				const value = e.target.value
-				this.updateVendorProp({ prop, value })
-			},
-			updateGender({ option }) {
-				this.updateVendorProp({ prop: "gender", value: option })
-			},
 			updateProfessionalLevel({ option }) {
-				this.updateVendorProp({ prop: "professionalLevel", value: option })
-			},
-			setTimezone(data) {
-				this.updateVendorProp({ prop: "timezone", value: data })
-			},
-			setNative({ lang }) {
-				this.updateVendorProp({ prop: "native", value: lang })
+				this.updateCurrentVendorGeneralData({ key: "professionalLevel", value: option })
 			},
 			chosenStatus({ option }) {
-				this.updateVendorProp({ prop: "status", value: option })
+				this.updateCurrentVendorGeneralData({ key: "status", value: option })
 			},
 			cancel() {
-				this.$router.go(-1)
+			  this.initCurrentVendorGeneralData(this.currentVendor)
 			},
 			async approveVendorDelete() {
 				this.isApproveModal = false
@@ -616,31 +470,17 @@
 					})
 				}
 			},
-			chosenInd({ industry }) {
-				this.updateIndustry(industry)
-			},
 			async getVendor() {
 				this.vendorId = this.$route.params.id
 				const id = this.$route.params.id
 				try {
           const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
           await this.storeCurrentVendor(vendor.data)
+          this.initCurrentVendorGeneralData(vendor.data)
           this.oldEmail = this.currentVendor.email
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on getting Vendor's info",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getAliases() {
-				try {
-					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
-					this.aliases = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Aliases",
 						isShow: true,
 						type: "error"
 					})
@@ -654,13 +494,24 @@
 				steps: "getAllSteps",
 				services: "getAllServices",
 				units: "getAllUnits",
-				industries: "getAllIndustries"
+				industries: "getAllIndustries",
+        getVendorUpdatedData: "getCurrentVendorGeneralData"
 			}),
 			vendorAliases() {
 				if (this.aliases) {
 					return this.aliases
 				}
 			},
+      isChangedVendorGeneralInfo() {
+        if (this.currentVendor.hasOwnProperty('firstName')) {
+          let keys = [ 'firstName', 'surname', 'email','phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender','status','matrix','professionalLevel','notes']
+          for (let key of keys) {
+            if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
+              return true
+            }
+          }
+        }
+      },
 			selectedIndNames() {
 				let result = []
 				if (this.currentVendor.industries && this.currentVendor.industries.length) {
@@ -671,10 +522,12 @@
 				return result
 			},
 			optionProfessionalLevel() {
-				return this.currentVendor.hasOwnProperty("professionalLevel") ? this.currentVendor.professionalLevel : ""
+				return this.getVendorUpdatedData.hasOwnProperty("professionalLevel") ? this.getVendorUpdatedData.professionalLevel : ""
 			}
 		},
 		components: {
+      PopUpWindow,
+      VendorMainInfo,
 			PendingCompetencies,
 			SelectMulti,
 			ApproveModal,
@@ -709,7 +562,20 @@
 		},
 		created() {
 			this.getVendor()
-			this.getAliases()
+
+      this.$socket.on('setFreshVendorData', ({ id}) => {
+        if (id == this.$route.params.id){
+          this.getVendor()
+        }
+      })
+
+      this.$socket.on('socketUpdateVendorProp', ({id, key, value}) => {
+        if (this.$route.params.id === id) {
+          this.updateWithOutSocketVendorProp({key,value})
+        }
+      })
+
+
 		},
 		mounted() {
 			this.oldEmail = this.currentVendor.email

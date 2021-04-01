@@ -19,6 +19,18 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       `${target.lang} - Translator@Pangea position - Test Passed (ID ${messageId})`
       : `${target.lang} - Translator@Pangea position - Test Not Passed (ID ${messageId})`;
     message = status === 'Passed' ? testPassedMessage(vendor) : testNotPassedMessage({ ...vendor, target });
+
+    if (status === 'Passed') {
+      const vendorAssessment = vendor.assessments.find((assessments) => assessments.sourceLanguage._id === source._id && assessments.targetLanguage._id === target._id)
+      const assessmentIndustries = vendorAssessment.industries.find(({industry}) => qualification.industries.map(({_id})=> _id).includes(industry._id))
+      const assessmentStep = assessmentIndustries.steps.reverse().find(({step})=> {
+        return  qualification.steps.map(({_id})=> _id).includes(step._id)
+      })
+
+      const attachments = [{ filename: assessmentStep.tqi.fileName, content: assessmentStep.tqi.path}];
+      return await sendEmail({ to: vendor.email, subject, attachments }, message);
+    }
+
     await sendEmail({ to: vendor.email, subject }, message);
   } catch (err) {
     console.log(err);

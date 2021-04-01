@@ -71,15 +71,12 @@
 	export default {
 		mixins: [ crudIcons ],
 		props: {
-			tableData: {
+			dataArray: {
 				type: Array
 			},
 			clientId: {
 				type: String
 			},
-			refresh: {
-				type: Boolean
-			}
 		},
 		data() {
 			return {
@@ -120,7 +117,6 @@
 						padding: "0"
 					}
 				],
-				dataArray: [],
 				currentStep: "",
 				currentUnit: "",
 				currentStepObj: "",
@@ -136,12 +132,10 @@
 				isDataRemain: true
 			}
 		},
-		created() {
-			this.getSteps()
-		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+				setUpClientRatesProp: "setUpClientRatesProp"
 			}),
 			async getRowPrice(index) {
 				try {
@@ -150,7 +144,7 @@
 						row: this.dataArray[index]
 					})
 					const result = await this.$http.post(`/clientsapi/client-rate-by-key`, { id: this.clientId, key: 'stepMultipliersTable' })
-					this.dataArray = result.data
+					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'stepMultipliersTable', value: result.data })
 					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
@@ -198,9 +192,6 @@
 				if (Math.sign(this.currentMultiplier) == -1) return
 				await this.manageSaveClick(index)
 			},
-			async getSteps() {
-				this.dataArray = this.tableData
-			},
 			refreshResultTable() {
 				this.$emit("refreshResultTable")
 			},
@@ -227,7 +218,7 @@
 						type: "success"
 					})
 					const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
-					this.dataArray[index] = updatedData.body.stepMultipliersTable[index]
+					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'stepMultipliersTable', value: updatedData.data.stepMultipliersTable })
 					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
@@ -254,14 +245,6 @@
 		components: {
 			DataTable
 		},
-		watch: {
-			async refresh() {
-				if (this.refresh) {
-					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
-					this.dataArray = client.data.rates.stepMultipliersTable
-				}
-			}
-		}
 	}
 </script>
 <style lang="scss" scoped>
@@ -326,14 +309,14 @@
 
       &-link {
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 5px;
         margin-right: 4px;
       }
 
       &-link-opacity {
         cursor: default;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 4px;
         opacity: 0.5;
         margin-right: 4px;

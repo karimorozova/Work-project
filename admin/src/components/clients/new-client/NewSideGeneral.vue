@@ -3,76 +3,67 @@
     .block-item
       label.block-item__label Status:
         span.require *
-      .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.status}")
-        ClientStatusSelect(:selectedStatus="currentClientOverallData.status" @chosenStatus="setStatus")
+      .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !client.status}")
+        ClientStatusSelect(
+          :selectedStatus="clientStatus"
+          @chosenStatus="setStatus"
+        )
     .block-item
       label.block-item__label Test:
       .block-item__check-item.checkbox
-        input(type="checkbox" id="test" :checked="currentClient.isTest" @change="setTest")
+        input(type="checkbox" id="test" :checked="client.isTest" @change="setTest")
         label(for="test")
     .block-item
       label.block-item__label Account Manager:
         span.require *
-      .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
-        AMSelect(:selectedManager="currentClientOverallData.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
+      .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.accountManager}")
+        AMSelect(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
     .block-item
       label.block-item__label Sales Manager:
         span.require *
-      .block-item__drop.block-item_medium-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.salesManager}")
-        AMSelect(:selectedManager="currentClientOverallData.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')" group="Sales")
+      .block-item__drop.block-item_medium-index(:class="{'general-info_error-shadow': isSaveClicked && !client.salesManager}")
+        AMSelect(:selectedManager="client.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')" group="Sales")
     .block-item
       label.block-item__label Project Manager:
         span.require *
-      .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
-        AMSelect(:selectedManager="currentClientOverallData.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
+      .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.projectManager}")
+        AMSelect(:selectedManager="client.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
 </template>
 
 <script>
 	import ClientStatusSelect from "../ClientStatusSelect"
-	import { mapGetters, mapActions } from "vuex"
 	import AMSelect from "../AMSelect"
 
 	export default {
 		props: {
-			isSaveClicked: { type: Boolean }
+			client: {
+				type: Object
+			},
+			isSaveClicked: {
+				type: Boolean
+			}
 		},
 		data() {
 			return {}
 		},
 		methods: {
-			...mapActions([ "storeClientPropertyOverallData", "updateClientStatus", "alertToggle" ]),
-			async setTest(event) {
-				const client = {
-					id: this.currentClient._id,
-					isTest: event.target.checked
-				}
-				try {
-					await this.updateClientStatus(client)
-					this.alertToggle({
-						message: "Client status updated",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Server error / Cannot update Client status",
-						isShow: true,
-						type: "error"
-					})
-				}
+			setManager({ manager }, prop) {
+				this.client[prop] = manager
+			},
+			setTest() {
+				this.client.isTest = event.target.checked
 			},
 			setStatus({ status }) {
-				this.storeClientPropertyOverallData({ prop: "status", value: status })
-			},
-			setManager({ manager }, prop) {
-				this.storeClientPropertyOverallData({ prop, value: manager })
+				this.client.status = status
 			}
 		},
 		computed: {
-			...mapGetters({
-				currentClient: "getCurrentClient",
-				currentClientOverallData: "currentClientOverallData"
-			})
+			clientStatus() {
+				if (!this.client.status) {
+					this.client.status = 'Potential'
+				}
+				return this.client.status
+			}
 		},
 		components: {
 			ClientStatusSelect,
@@ -82,10 +73,15 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors";
 
   .general-info {
     padding: 20px;
+
+    &_error-shadow {
+      box-shadow: 0 0 5px $red;
+      height: 31px;
+    }
 
     .block-item:last-child {
       height: 30px;

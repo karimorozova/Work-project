@@ -15,6 +15,10 @@ let logger = require('morgan');
 require('./helpers/dbSetDefault');
 require('./schedule');
 
+// SOCKET.IO SERVER
+
+// end SOCKET.IO se
+
 // const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
 
 
@@ -77,6 +81,29 @@ app.use((err, req, res, next) => {
 app.use(history({ verbose: true, index: '/' }));
 app.use(checkRoutes);
 
-app.listen(port, () => {
+const httpServer = require("http").createServer(app);
+
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"]
+  },
+  allowEIO3: true
+})
+
+io.on('connection', socket => {
+  socket.on('updatedVendorData', (data)=>{
+    socket.broadcast.emit('setFreshVendorData', data)
+  })
+  socket.on('updateVendorProp', (data)=>{
+    socket.broadcast.emit('socketUpdateVendorProp', data)
+  })
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('user-disconnected', socket.id)
+  })
+})
+
+httpServer.listen(port, () => {
 	console.log('\x1b[32m', `✈  Server is working on: ${ port }`, '\x1b[0m');
 });

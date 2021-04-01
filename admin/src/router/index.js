@@ -27,22 +27,33 @@ import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
 import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
+
+
+//------------------------------------------------------------CLIENT------------------------------------------------------------
+//NEW CLIENT
+import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
+import NewContactDetails from '@/components/clients/new-client/NewContactDetails'
+import NewClient from '@/components/clients/new-client/NewClient'
+
+//CLIENT
+import ContactDetails from '@/components/clients/ContactDetails'
+import ClientInfo from '@/components/clients/ClientInfo'
 import ClientDetails from '@/components/clients/ClientDetails'
+
+//CLIENT TABLE
 import Allclients from '@/components/clients/Allclients'
 import ActiveClients from '@/components/clients/ActiveClients'
 import InactiveClients from '@/components/clients/InactiveClients'
 import PotentialClients from '@/components/clients/PotentialClients'
-import ClientInfo from '@/components/clients/ClientInfo'
-import NewClientInfo from '@/components/clients/NewClientInfo'
-import ContactDetails from '@/components/clients/ContactDetails'
-import NewContactDetails from '@/components/clients/NewContactDetails'
+//------------------------------------------------------------CLIENT------------------------------------------------------------
+
+
 import Vendordetails from '@/components/vendors/Vendordetails'
 import AllVendorsTable from '@/components/vendors/AllVendorsTable'
 import ActiveVendors from '@/components/vendors/ActiveVendors'
 import PotentialVendors from '@/components/vendors/PotentialVendors'
 import InactiveVendors from '@/components/vendors/InactiveVendors'
 import NewVendor from '@/components/vendors/NewVendor'
-import NewClient from '@/components/clients/NewClient'
 import Accountinfo from '@/components/account/Accountinfo'
 import Projects from '@/components/pmArea/Projects'
 import Requests from '@/components/pmArea/Requests'

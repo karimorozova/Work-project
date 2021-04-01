@@ -183,7 +183,7 @@ router.post('/deleteContact', async (req, res) => {
 	const { id, contacts } = req.body
 	try {
 		const result = await getClientAfterUpdate({ "_id": id }, { contacts: contacts })
-		res.send({ updatedClient: result })
+		res.send(result)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on deleting contact of Client")

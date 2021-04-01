@@ -3,23 +3,20 @@ const { moveFile, sendEmail } = require("../utils");
 const { applicationMessage,vendorRegistration } = require("../emailMessages/vendorCommunication");
 const fs = require("fs");
 const passwordGen = require("generate-password")
+const { getVendorAfterUpdate } = require('../vendors/getVendors')
 
 async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
-    const softwares = JSON.parse(person['parsing-softwares'])
+    const softData = JSON.parse(person['parsing-softwares'])
     try {
-        let vendor = await Vendors.create({...person, softwares , status: "Potential"});
-        vendor.documents = await setDocuments(cvFiles.pop(), 'Resume', vendor.id);
-        vendor.cvFiles = await manageFiles(cvFiles, vendor.id, 'cvFile');
+        let vendor = await Vendors.create({...person, softData , status: "Potential"});
+        vendor.documents = await setDocuments(cvFiles, 'Resume', vendor.id);
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');
-        const parsedPersondata = getParsedData(person);
+        vendor.password = passwordGen.generate({ length: 8, numbers: true })
+        const updatedVendor = await getVendorAfterUpdate({_id: vendor._id}, vendor)
 
-        const password = passwordGen.generate({length: 8, numbers: true});
-        vendor.password = password
-
-        await vendor.save();
-
-        await sendEmailToManager(parsedPersondata, vendor)
-        await sendEmailToVendor(vendor, password)
+        const parsedPersonData = getParsedData(person);
+        await sendEmailToManager(parsedPersonData, updatedVendor)
+        await sendEmailToVendor(updatedVendor, updatedVendor.password)
     } catch(err) {
         console.log(err);
         console.log("Error in manageNewApplication");
@@ -29,11 +26,16 @@ async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
 async function sendEmailToManager(personData, vendor) {
     let emailData = {...personData};
     try {
-        emailData.to = "career@pangea.global";
+        emailData.to = "maksym@pangea.global";
         emailData.subject = `Application from ${emailData.firstName} ${emailData.surname}`;
-        emailData.cvFiles = [...vendor.cvFiles];
-        emailData.coverLetterFiles = [...vendor.coverLetterFiles];
+
+        emailData.cvFiles = vendor.documents
+            .filter(({category}) => category === 'Resume' )
+            .map(({category, path}) => { if(category === 'Resume') return path})
+
+        emailData.coverLetterFiles = vendor.coverLetterFiles;
         emailData.attachments = getFilesAttachments([...emailData.cvFiles, ...emailData.coverLetterFiles]);
+        emailData.phone = vendor.phone
 
         const message = applicationMessage(emailData);
         await sendEmail(emailData, message);
@@ -77,66 +79,43 @@ function getParsedData(person) {
     }, {});
 }
 
-async function getLanguagePairs(languagePairs) {
-    let pairs = [];
-    for(let lang of languagePairs) {
-        let source = await Languages.findOne({"_id": lang.source});
-        let target = await Languages.findOne({"_id": lang.target});
-        pairs.push({source: source.symbol, target: target.symbol})
-    }
-    return pairs;
-}
-
-async function setDocuments(file, docCategory, subDir) {
-    const defaultDocuments = [
+async function setDocuments(cvFiles, docCategory, subDir) {
+    let defaultDocuments = [
         {
             fileName: '',
             category: 'NDA',
-            path: '',
-
+            path: '1',
         },
         {
             fileName: '',
             category: 'Contract',
-            path: '',
-
-        },
-        {
-            fileName: '',
-            category: 'Resume',
-            path: '',
-
-        },
+            path: '2',
+        }
     ]
+    if(cvFiles.length) {
+        let counter = 1
+        for await (let file of cvFiles) {
+            let newFileName = `cvFile${counter}_${file.filename.replace(/\s+/g, '_')}`;
+            const path = `/vendorsDocs/${subDir}/${newFileName}`;
+            await moveFile(file, `./dist${path}`);
 
-    const docChanged = defaultDocuments.find(({category}) => docCategory === category )
-
-    docChanged.fileName = file.filename
-    docChanged.path = await manageFileToDir(file, 'cvFile', 'vendorDir', subDir)
-    return defaultDocuments
-
-}
-
-async function manageFileToDir(file, prop, mainDir, subDir) {
-    try {
-        let newFileName = `${prop}$_${file.filename.replace(/\s+/g, '_')}`;
-        const path = `/${mainDir}/${subDir}/${newFileName}`;
-        await moveFile(file, `./dist${path}`);
-        return path;
-    } catch(err) {
-        console.log(err);
-        console.log("Error in manageFileToDir");
+            const fileName = file.filename
+            defaultDocuments.push({ fileName, category: docCategory, path })
+            counter++;
+        }
     }
+    return defaultDocuments
 }
+
 
 async function manageFiles(files, vendorId, prop) {
     let paths = [];
     try {
         if(files.length) {
             let counter = 1
-            for(let file of files) {
+            for await (let file of files) {
                     let newFileName = `${prop}${counter}_${file.filename.replace(/\s+/g, '_')}`;
-                    const path = `/application/${vendorId}/${newFileName}`;
+                    const path = `/vendorsDocs/${vendorId}/${newFileName}`;
                     await moveFile(file, `./dist${path}`);
                     paths.push(path);
                     counter++;

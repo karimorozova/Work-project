@@ -1,38 +1,38 @@
 <template lang="pug">
   .client-layout
-    .client-info
-      .buttons
-        .button
-          Button(value="Save" @clicked="checkForErrors")
-        .button
-          Button(value="Cancel" @clicked="cancel")
-        .button
-          Button(value="Delete" @clicked="deleteClient")
-      .title(v-if="currentClient._id") General Information
-      .client-info__gen-info(v-if="currentClient._id")
+    .client-info(v-if="currentClient._id")
+
+      PopUpWindow(v-if="detectedForSave" text="test a  or b ?"  @accept="checkForErrors" @cancel="cancel")
+
+      .title General Information
+      .client-info__gen-info
         General(
           :isSaveClicked="isSaveClicked"
           :languages="languages"
           :timezones="timezones"
           :allClientAliases="aliases"
         )
-      .title(v-if="currentClient._id") Notes & Comments
-      .client-info__notes(v-if="currentClient._id")
-        ClientsNotes()
 
-      .title(v-if="currentClient._id") Contact Details
-      .client-info__contacts-info(v-if="currentClient._id")
+      .title Notes & Comments
+      .client-info__notes
+        ClientsNotes
+
+      .title Contact Details
+      .client-info__contacts-info
         ContactsInfo(
-          :client="currentClient"
+          :client="currentClientOverallData"
           @contactDetails="contactDetails"
           @saveContactUpdates="saveContactUpdates"
           @setLeadContact="setLeadContact"
           @newContact="addNewContact"
-          @approveDelete="approveContactDelete")
+          @approveDelete="approveContactDelete"
+        )
 
-      .title(v-if="currentClient._id") Services
-      .client-info__services(v-if="currentClient._id && currentClient.industries")
+      .title Services
+      .client-info__services
         ClientServices(
+          :clientServices="currentClient.services"
+          :defaultPricelist="currentClient.defaultPricelist"
           :languages="languages"
           :sourceLanguagesClient="sourceLanguagesClientData"
           :targetLanguagesClient="targetLanguagesClientData"
@@ -42,33 +42,32 @@
           @updateRates="updateRates"
         )
 
-      .title(v-if="currentClient._id") Rates
-      .client-info__rates(v-if="currentClient._id")
+      .title Rates
+      .client-info__rates
         RatesParameters
         .client-info__tables-row
-          .lang-table(v-if="currentClient._id")
+          .lang-table
             LangTable(
-              :tableData="currentClient.rates.basicPricesTable"
+              :dataArray="currentClient.rates.basicPricesTable"
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
-              :refresh="isRefreshAfterServiceUpdate"
             )
-          .step-table(v-if="currentClient._id")
+          .step-table
             StepTable(
-              :tableData="currentClient.rates.stepMultipliersTable"
+              :dataArray="currentClient.rates.stepMultipliersTable"
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
               :refresh="isRefreshAfterServiceUpdate"
             )
-          .industry-table(v-if="currentClient._id")
+          .industry-table
             IndustryTable(
-              :tableData="currentClient.rates.industryMultipliersTable"
+              :dataArray="currentClient.rates.industryMultipliersTable"
               :clientId="currentClient._id"
               @refreshResultTable="refreshResultTable"
               :refresh="isRefreshAfterServiceUpdate"
             )
 
-        .result-table(v-if="currentClient._id")
+        .result-table
           ResultTable(
             :clientId="currentClient._id"
             :languages="languages"
@@ -79,34 +78,41 @@
             :refresh="isRefreshAfterServiceUpdate"
           )
 
-      .title(v-if="currentClient._id") Discount Chart
-      .client-info__chart(v-if="currentClient._id")
+      .title Discount Chart
+      .client-info__chart
         DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
-      .title(v-if="currentClient._id") Documents
-      .client-info__documents(v-if="currentClient._id")
-        ClientDocuments
-      .title(v-if="currentClient._id") Sales Information
-      .client-info__sales(v-if="currentClient._id")
-        ClientSalesInfo(:client="currentClient" @setLeadSource="setLeadSource")
-      .title(v-if="currentClient._id") Billing Information
-      .client-info__billing(v-if="currentClient._id")
-        ClientBillInfo(:client="currentClient" @changeProperty="changeBillingProp")
+      .title Documents
+      .client-info__documents
+        ClientDocuments(
+          :documentsData="currentClient.documents"
+        )
+
+      .title Sales Information
+      .client-info__sales
+        ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
+
+      .title Billing Information
+      .client-info__billing
+        ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+
       .delete-approve(v-if="isApproveModal")
         p Are you sure you want to delete?
         input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
         input.button(type="button" value="Delete" @click="approveClientDelete")
-      ValidationErrors(v-if="areErrorsExist"
+
+      ValidationErrors(
+        v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrorsBlock"
       )
-    .client-subinfo
-      .client-subinfo__general(v-if="currentClient._id")
-        SideGeneral(
-          :isSaveClicked="isSaveClicked"
-        )
-      .client-subinfo__date(v-if="currentClient._id")
-        OtherClientInformation()
+
+    .client-subinfo(v-if="currentClient._id")
+      .client-subinfo__general
+        SideGeneral(:isSaveClicked="isSaveClicked")
+
+      .client-subinfo__date
+        OtherClientInformation
 
 </template>
 
@@ -115,7 +121,6 @@
 	import OtherClientInformation from "./OtherClientInformation"
 	import ClientDocuments from "./ClientDocuments"
 	import ClientServices from "./ClientServices"
-	import OldGeneral from "./clientInfo/OldGeneral"
 	import General from "./clientInfo/General"
 	import SideGeneral from "./clientInfo/SideGeneral"
 	import Button from "../Button"
@@ -131,6 +136,7 @@
 	import DiscountChart from "./DiscountChart"
 	import ClientsNotes from "./ClientsNotes"
 	import vatChecker from "../../mixins/Client/vatChecker"
+  import PopUpWindow from "../PopUpWindow";
 
 	export default {
 		mixins: [ vatChecker ],
@@ -150,11 +156,6 @@
 		},
 		data() {
 			return {
-				languages: [],
-				industries: [],
-				services: [],
-				units: [],
-				steps: [],
 				aliases: [],
 				timezones: [],
 				currentDocuments: [],
@@ -163,7 +164,6 @@
 					targetLanguages: []
 				},
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/,
-
 
 				isApproveModal: false,
 				clientShow: true,
@@ -177,51 +177,57 @@
 				isLeadEmpty: "",
 				isSaveClicked: false,
 				isRefreshResultTable: false,
-				isRefreshAfterServiceUpdate: false
+				isRefreshAfterServiceUpdate: false,
+
+        generalKeys: [
+	        'name',
+	        'officialCompanyName',
+	        'email',
+	        'website',
+	        'industries',
+	        'nativeLanguage',
+	        'timeZone',
+	        'aliases',
+	        'targetLanguages',
+	        'sourceLanguages',
+	        'status',
+	        'accountManager',
+	        'salesManager',
+	        'projectManager',
+	        'otherInfo',
+	        'leadGeneration',
+	        'leadSource',
+	        'contacts'
+        ],
+        billingKeys: [
+					'vat',
+					'vatId',
+					'address',
+					'invoiceSending',
+					'officialCompanyName',
+					'dueDate',
+					'paymentType'
+				]
 			}
 		},
 		methods: {
 			async setMatrixData({ value, key }) {
-        value = value > 100 ? 100 : value < 0 ? 0 : value
+				value = value > 100 ? 100 : value < 0 ? 0 : value
 				try {
-					const result = await this.$http.post(
-							`/clientsapi/update-matrix/${ this.currentClient._id }`,
-							{
-								updatedRowObj: {
-									value,
-									key
-								}
-							}
-					)
-					this.currentClient.matrix = result.data
-					this.alertToggle({
-						message: "Matrix data updated",
-						isShow: true,
-						type: "success"
-					})
+					const result = await this.$http.post(`/clientsapi/update-matrix/${ this.currentClient._id }`, { updatedRowObj: { value, key } })
+					this.setUpClientProp({ _id: this.$route.params.id, key: 'matrix', value: result.data })
+					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on setting matrix data",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
 				}
 			},
 			async getDefaultValuesDC(discountKey) {
 				try {
 					const result = await this.$http.post(`/clientsapi/sync-matrix/${ this.currentClient._id }`, { key: discountKey })
-					this.currentClient.matrix = result.data
-					this.alertToggle({
-						message: "Matrix data updated",
-						isShow: true,
-						type: "success"
-					})
+					this.setUpClientProp({ _id: this.$route.params.id, key: 'matrix', value: result.data })
+					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on setting matrix data",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
 				}
 			},
 			refreshResultTable() {
@@ -240,18 +246,10 @@
 				this.$emit("loadFile", { files, prop })
 			},
 			cancel() {
-				if (
-						this.fromRoute === "/new-client" ||
-						this.fromRoute.indexOf("contact") !== -1
-				) {
-					this.$router.push("/clients")
-				} else {
-					this.$router.push(this.fromRoute)
-				}
-				this.storeCurrentClient({})
+        this.storeCurrentClientOverallData(this.currentClient)
 			},
 			saveContactUpdates({ index, contact }) {
-				this.updateClientContact({ index, contact })
+				// this.updateClientContact({ index, contact })
 			},
 			deleteClient() {
 				this.isApproveModal = true
@@ -264,31 +262,15 @@
 				this.contactShow = false
 				try {
 					if (this.currentClient.contacts.length === 1) {
-						return this.alertToggle({
-							message: "Error! At least one contact should remain!",
-							isShow: true,
-							type: "error"
-						})
+						return this.alertToggle({ message: "Error! At least one contact should remain!", isShow: true, type: "error" })
 					}
 					const contacts = this.updateLeadWhenDeleted(index)
-					const result = await this.$http.post("/clientsapi/deleteContact", {
-						id: this.currentClient._id,
-						contacts
-					})
-					const { updatedClient } = result.body
-					await this.storeClient(updatedClient)
-					await this.storeCurrentClient(updatedClient)
-					this.alertToggle({
-						message: "Contact has been deleted",
-						isShow: true,
-						type: "success"
-					})
+					const result = await this.$http.post("/clientsapi/deleteContact", { id: this.currentClient._id, contacts })
+					this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
+					this.storeCurrentClientOverallData(result.data)
+					this.alertToggle({ message: "Contact has been deleted", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Internal server error on deleting contact",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Internal server error on deleting contact", isShow: true, type: "error" })
 				}
 			},
 			updateLeadWhenDeleted(index) {
@@ -305,10 +287,10 @@
 				this.isApproveModal = false
 			},
 			setLeadSource({ leadSource }) {
-				this.storeClientProperty({ prop: "leadSource", value: leadSource })
+				this.storeClientPropertyOverallData({ prop: "leadSource", value: leadSource })
 			},
 			changeBillingProp({ prop, value }) {
-				this.storeClientBillingInfoProperty({ prop: prop, value })
+				this.storeClientPropertyOverallDataBilling({ prop, value })
 			},
 			contactDetails({ contactIndex }) {
 				this.$router.push({ name: "contact", params: { index: contactIndex } })
@@ -327,59 +309,36 @@
 			async checkForErrors() {
 				this.clearErrors()
 				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-				if (!this.currentClient.name)
+				if (!this.currentClientOverallData.name)
 					this.errors.push("Company name cannot be empty.")
-				if (!this.currentClient.industries.length)
+				if (!this.currentClientOverallData.industries.length)
 					this.errors.push("Please, choose at least one industry.")
-				if (!this.currentClient.sourceLanguages.length)
+				if (!this.currentClientOverallData.sourceLanguages.length)
 					this.errors.push("Please, choose source language.")
-				if (!this.currentClient.targetLanguages.length)
+				if (!this.currentClientOverallData.targetLanguages.length)
 					this.errors.push("Please, choose target language.")
-				if (!this.currentClient.contacts.length)
+				if (!this.currentClientOverallData.contacts.length)
 					this.errors.push("Please, add at least one contact.")
 				if (!this.contactLeadError())
 					this.errors.push("Please set Lead Contact of the Client.")
-				if (!this.currentClient.status)
+				if (!this.currentClientOverallData.status)
 					this.errors.push("Please, choose status.")
-				if (!this.currentClient.leadSource) {
+				if (!this.currentClientOverallData.leadSource) {
 					this.errors.push("Please, choose lead source.")
 					this.isLeadEmpty = true
 				}
-
 				this.vatChecker({ newClient: false })
-
-				if (
-						!this.currentClient.email ||
-						!emailValidRegex.test(this.currentClient.email.toLowerCase())
-				) {
-					this.errors.push(
-							"Please provide a valid email in General Informations."
-					)
+				if (!this.currentClientOverallData.email || !emailValidRegex.test(this.currentClientOverallData.email.toLowerCase())) {
+					this.errors.push("Please provide a valid email in General Informations.")
 				}
-				// if (
-				// 		!this.currentClient.billingInfo.email ||
-				// 		!emailValidRegex.test(
-				// 				this.currentClient.billingInfo.email.toLowerCase()
-				// 		)
-				// ) {
-				// 	this.errors.push(
-				// 			"Please provide a valid email in Billing Informations."
-				// 	)
-				// 	this.billErrors.push("email")
+				if (!this.currentClientOverallData.accountManager || !this.currentClientOverallData.salesManager || !this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
+
+				// const isSameEmailsExists = await this.checkSameClientEmails(this.currentClientOverallData.email, this.currentClientOverallData._id)
+				// if (isSameEmailsExists) {
+				// 	this.errors.push("A client with such Email already exists, the client's Email should be unique!")
 				// }
-				if (
-						!this.currentClient.accountManager ||
-						!this.currentClient.salesManager ||
-						!this.currentClient.projectManager
-				)
-					this.errors.push("All managers should be assigned.")
-
-				const isSameEmailsExists = await this.checkSameClientEmails(this.currentClient.email, this.currentClient._id)
-				if (isSameEmailsExists) {
-					this.errors.push("A client with such Email already exists, the client's Email should be unique!")
-				}
-				if (this.currentClient.website) {
-					if (this.websiteRegEx.exec(this.currentClient.website) === null) {
+				if (this.currentClientOverallData.website) {
+					if (this.websiteRegEx.exec(this.currentClientOverallData.website) === null) {
 						this.errors.push("The website field must contain a link")
 					}
 				}
@@ -400,44 +359,39 @@
 			},
 
 			async updateClient() {
+        let clientForSave = {...this.currentClient}
+				let keys = [ ...this.generalKeys ]
+				let billingKeys = [ ...this.billingKeys ]
+
+				for(let key of keys) clientForSave[key] = this.currentClientOverallData[key]
+				for(let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
+
 				let sendData = new FormData()
-				let dataForClient = this.currentClient
+				let dataForClient = clientForSave
 				this.getClientDocumentInfo().then(
 						(result) => (dataForClient.documents = result.data.documents)
 				)
-
 				sendData.append("client", JSON.stringify(dataForClient))
 				for (let i = 0; i < this.contactsPhotos.length; i++) {
 					sendData.append("photos", this.contactsPhotos[i])
 				}
 				try {
-					const result = await this.$http.post(
-							"/clientsapi/update-client",
-							sendData
-					)
-					const { client } = result.body
+					const result = await this.$http.post("/clientsapi/update-client", sendData)
+					const { client } = result.data
 					await this.storeClient(client)
 					await this.storeCurrentClient(client)
 					this.alertToggle({
-						message: "Client info has been updated",
-						isShow: true,
-						type: "success"
+						message: "Client info has been updated", isShow: true, type: "success"
 					})
 				} catch (err) {
-					this.alertToggle({
-						message: "Internal server error on updating Client info",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
 				}
 			},
 			async approveClientDelete() {
 				const id = this.currentClient._id
 				this.isApproveModal = false
 				try {
-					const hasRelatedDocs = await this.$http.get(
-							`/clientsapi/any-doc?id=${ id }`
-					)
+					const hasRelatedDocs = await this.$http.get(`/clientsapi/any-doc?id=${ id }`)
 					if (hasRelatedDocs.body) {
 						return this.alertToggle({
 							message: "The client has related documents and cannot be deleted",
@@ -445,119 +399,76 @@
 							type: "error"
 						})
 					}
-					const result = await this.$http.delete(
-							`/clientsapi/deleteclient/${ id }`
-					)
+					const result = await this.$http.delete(`/clientsapi/deleteclient/${ id }`)
 					await this.removeClient(id)
-					this.alertToggle({
-						message: "Client has been removed",
-						isShow: true,
-						type: "success"
-					})
-					this.$router.push("/clients")
+					this.alertToggle({ message: "Client has been removed", isShow: true, type: "success" })
+					await this.$router.push("/clients")
 				} catch (err) {
-					this.alertToggle({
-						message: "Internal server error on deleting the Client",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Internal server error on deleting the Client", isShow: true, type: "error" })
 				}
 			},
 			setLeadContact({ index }) {
-				this.updateLeadContact(index)
+				// this.updateLeadContact(index)
 			},
 			async getClientDocumentInfo() {
-				return await this.$http.get(
-						`/clientsapi/client?id=${ this.$route.params.id }`
-				)
+				return await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
 			},
 			async getClientInfoLangs() {
-				const client = await this.$http.get(
-						`/clientsapi/client-languages?id=${ this.$route.params.id }`
-				)
+				const client = await this.$http.get(`/clientsapi/client-languages?id=${ this.$route.params.id }`)
 				this.clientDataInCreated.sourceLanguages = client.body.sourceLanguages
 				this.clientDataInCreated.targetLanguages = client.body.targetLanguages
 			},
+			async setDocumentsDefaults(category) {
+				let defaultDocument = { clientId: this.$route.params.id, category: category }
+				try {
+					const result = await this.$http.post("/clientsapi/client-document-default", defaultDocument)
+				} catch (err) {
+					this.alertToggle({ message: "Error in creating default documents", isShow: true, type: "error" })
+				}
+			},
+			async setNewClientDocuments(client) {
+				switch (client.documents.length) {
+					case 1:
+						let category = client.documents[0].category
+						category === "NDA" ? await this.setDocumentsDefaults("Contract") : await this.setDocumentsDefaults("NDA")
+						break
+					case 0:
+						await this.setDocumentsDefaults("NDA")
+						await this.setDocumentsDefaults("Contract")
+						break
+				}
+			},
 			async getClientInfo() {
 				if (!this.currentClient._id) {
-					const client = await this.$http.get(
-							`/clientsapi/client?id=${ this.$route.params.id }`
-					)
-					this.storeCurrentClient(client.body)
+					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
+					this.storeCurrentClient(client.data)
+					this.storeCurrentClientOverallData(client.data)
+					this.setNewClientDocuments(client.data)
+				}
+			},
+			async getClientInfoWithoutOverallData() {
+				if (!this.currentClient._id) {
+					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
+					this.storeCurrentClient(client.data)
 				}
 			},
 			...mapActions({
 				alertToggle: "alertToggle",
 				storeClient: "storeClient",
 				storeCurrentClient: "storeCurrentClient",
+				storeCurrentClientOverallData: "storeCurrentClientOverallData",
 				storeClientProperty: "storeClientProperty",
 				removeClient: "removeClient",
 				storeClientContact: "storeClientContact",
 				updateClientContact: "updateClientContact",
 				updateLeadContact: "updateLeadContact",
 				deleteClientContact: "deleteClientContact",
-				storeClientBillingInfoProperty: "storeClientBillingInfoProperty"
+				storeClientBillingInfoProperty: "storeClientBillingInfoProperty",
+				setUpClientProp: "setUpClientProp",
+				storeClientPropertyOverallData: "storeClientPropertyOverallData",
+				storeClientPropertyOverallDataBilling: "storeClientPropertyOverallDataBilling"
 			}),
-			async getLangs() {
-				try {
-					const result = await this.$http.get("/api/languages")
-					this.languages = Array.from(result.body)
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Languages",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getIndustries() {
-				try {
-					const result = await this.$http.get("/api/industries")
-					this.industries = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Industries",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getServices() {
-				try {
-					const result = await this.$http.get("/api/services")
-					this.services = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Services",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getUnits() {
-				try {
-					const result = await this.$http.get("/api/units")
-					this.units = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Units",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async getSteps() {
-				try {
-					const result = await this.$http.get("/api/steps")
-					this.steps = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Steps",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
+
 			async getAliases() {
 				try {
 					const result = await this.$http.get("/memoqapi/memoq-client-aliases")
@@ -586,8 +497,31 @@
 		computed: {
 			...mapGetters({
 				allClients: "getClients",
-				currentClient: "getCurrentClient"
+				currentClient: "getCurrentClient",
+				steps: "getAllSteps",
+				units: "getAllUnits",
+				services: "getAllServices",
+				industries: "getAllIndustries",
+				languages: "getAllLanguages",
+				currentClientOverallData: "currentClientOverallData"
 			}),
+			detectedForSave() {
+				if (this.currentClient.hasOwnProperty('name')) {
+					let keys = [ ...this.generalKeys ]
+					let billingKeys = [ ...this.billingKeys ]
+
+					for (let key of keys) {
+						if (JSON.stringify(this.currentClientOverallData[key]) !== JSON.stringify(this.currentClient[key])) {
+							return true
+						}
+					}
+					for (let key of billingKeys) {
+						if (JSON.stringify(this.currentClientOverallData.billingInfo[key]) !== JSON.stringify(this.currentClient.billingInfo[key])) {
+							return true
+						}
+					}
+				}
+			},
 			sourceLanguagesClientData() {
 				if (this.clientDataInCreated.sourceLanguages.length) {
 					return this.clientDataInCreated.sourceLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
@@ -604,7 +538,6 @@
 			DiscountChart,
 			ClientServices,
 			General,
-			OldGeneral,
 			Button,
 			ValidationErrors,
 			ContactsInfo,
@@ -618,21 +551,24 @@
 			ClientDocuments,
 			OtherClientInformation,
 			RatesParameters,
-			ClientsNotes
+			ClientsNotes,
+      PopUpWindow,
 		},
 		created() {
-			this.getClientInfo()
 			this.getClientInfoLangs()
-			this.getLangs()
-			this.getUnits()
-			this.getSteps()
-			this.getIndustries()
-			this.getServices()
 			this.getTimezones()
 			this.getAliases()
 		},
+		beforeDestroy() {
+			this.storeCurrentClient({})
+		},
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
+				if (from.name !== 'contact') {
+					vm.getClientInfo()
+				} else {
+					vm.getClientInfoWithoutOverallData()
+				}
 				vm.fromRoute = from.path
 			})
 		}

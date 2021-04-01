@@ -12,6 +12,26 @@ const state = {
     currentVendorQualifications: [],
     currentVendorDocuments: [],
     currentVendorAssessment: [],
+    currentVendorGeneralData: {
+      firstName: null,
+      surname: null,
+      email: null,
+      phone: null,
+      timezone: null,
+      native: null,
+      companyName: null,
+      website: null,
+      skype: null,
+      linkedin: null,
+      whatsapp: null,
+      industries: null,
+      aliases: null,
+      gender: null,
+      status: null,
+      matrix: null,
+      professionalLevel: null,
+      notes: null
+    },
 }
 
 export const vendors = {

@@ -1,16 +1,19 @@
 const mv = require('mv');
 const fs = require('fs');
 
-const moveFile = (oldFile, newPath) => {
-    mv(oldFile.path, newPath, {
+const moveFile = async (oldFile, newPath) => {
+  return await new Promise((resolve, reject) => {
+     mv(oldFile.path, newPath, {
       mkdirp: true
     }, (err) => {
-      if(err) {
+      if (err) {
         console.log("Error from Move File: " + err);
+        reject(err);
       }
     });
-    return newPath;
-} 
+    resolve(newPath);
+  })
+}
 
 const moveProjectFile = (oldFile, newPath) => {
     return new Promise((resolve, reject) => {
@@ -22,6 +25,6 @@ const moveProjectFile = (oldFile, newPath) => {
             resolve(newPath);
         });
     })
-} 
+}
 
 module.exports = { moveFile, moveProjectFile };

@@ -48,7 +48,7 @@
           SelectMulti(
             placeholder="Select"
             :hasSearch="true"
-            :selectedOptions="currentClient.hasOwnProperty('sourceLanguages') ? makeStringLanguage(currentClient.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
+            :selectedOptions="currentClient.sourceLanguages.length ? makeStringLanguage(currentClient.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
             :options="sourceLanguages | firstEnglishLanguage"
             @chooseOptions="setSource"
             :allOptionsButtons="true"
@@ -60,7 +60,7 @@
           SelectMulti(
             placeholder="Select"
             :hasSearch="true"
-            :selectedOptions="currentClient.hasOwnProperty('targetLanguages') ? makeStringLanguage(currentClient.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
+            :selectedOptions="currentClient.targetLanguages.length ? makeStringLanguage(currentClient.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
             :options="targetLanguages"
             @chooseOptions="setTarget"
             :allOptionsButtons="true"
@@ -84,19 +84,19 @@
 </template>
 
 <script>
-	import Asterisk from "@/components/Asterisk";
-	import ClientStatusSelect from "../ClientStatusSelect";
-	import MultiClientIndustrySelect from "../MultiClientIndustrySelect";
-	import AMSelect from "../AMSelect";
-	import scrollDrop from "@/mixins/scrollDrop";
-	import SelectSingle from "../../SelectSingle";
-	import SelectMulti from "../../SelectMulti";
+	import Asterisk from "@/components/Asterisk"
+	import ClientStatusSelect from "../ClientStatusSelect"
+	import MultiClientIndustrySelect from "../MultiClientIndustrySelect"
+	import AMSelect from "../AMSelect"
+	import scrollDrop from "@/mixins/scrollDrop"
+	import SelectSingle from "../../SelectSingle"
+	import SelectMulti from "../../SelectMulti"
 
-	import { mapGetters, mapActions } from "vuex";
-	import SelectMultiBlocks from "../../SelectMultiBlocks";
+	import { mapGetters, mapActions } from "vuex"
+	import SelectMultiBlocks from "../../SelectMultiBlocks"
 
 	export default {
-		mixins: [scrollDrop],
+		mixins: [ scrollDrop ],
 		props: {
 			isSaveClicked: {
 				type: Boolean
@@ -109,7 +109,7 @@
 			},
 			allClientAliases: {
 				type: Array
-			},
+			}
 		},
 		data() {
 			return {
@@ -118,107 +118,107 @@
 				currentLanguage: "",
 				currentSourceLanguages: [],
 				currentTargetLanguages: [],
-				currentClientAliases: [],
-			};
+				currentClientAliases: []
+			}
 		},
 		methods: {
-			...mapActions(["storeClientProperty", "updateClientStatus", "alertToggle"]),
+			...mapActions([ "storeClientPropertyOverallData", "updateClientStatus", "alertToggle" ]),
 			changeProperty(e, prop) {
-				this.storeClientProperty({ prop, value: e.target.value });
+				this.storeClientPropertyOverallData({ prop, value: e.target.value })
 			},
 			makeStringLanguage(langArray) {
-				return langArray.map(item => item.lang);
+				return langArray.map(item => item.lang)
 			},
 			setIndustries({ industry }) {
-				let industries = [...this.currentClient.industries];
-				const position = industries.findIndex(item => item._id === industry._id);
-				if(position !== -1) {
-					industries.splice(position, 1);
+				let industries = [ ...this.currentClient.industries ]
+				const position = industries.findIndex(item => item._id === industry._id)
+				if (position !== -1) {
+					industries.splice(position, 1)
 				} else {
-					industries.push(industry);
+					industries.push(industry)
 				}
-				this.storeClientProperty({ prop: "industries", value: industries });
+				this.storeClientPropertyOverallData({ prop: "industries", value: industries })
 			},
 			setLanguage({ option }) {
-				this.currentLanguage = option;
-				const lang = this.languages.find(item => item.lang == option);
-				this.storeClientProperty({ prop: "nativeLanguage", value: lang });
+				this.currentLanguage = option
+				const lang = this.languages.find(item => item.lang == option)
+				this.storeClientPropertyOverallData({ prop: "nativeLanguage", value: lang })
 			},
 			setTimezone({ option }) {
-				this.currentZone = option;
-				const timezone = this.timezones.find(item => item.zone == option);
-				this.storeClientProperty({ prop: "timeZone", value: timezone });
+				this.currentZone = option
+				const timezone = this.timezones.find(item => item.zone == option)
+				this.storeClientPropertyOverallData({ prop: "timeZone", value: timezone })
 			},
 			setAlias({ option }) {
-				if(this.currentClient.hasOwnProperty('aliases')) {
-					if(this.currentClient.aliases.length) {
-						this.currentClientAliases = this.currentClient.aliases
+				if (this.currentClient.hasOwnProperty('aliases')) {
+					if (this.currentClient.aliases.length) {
+						this.currentClientAliases = [ ...this.currentClient.aliases ]
 					}
 				}
-				const position = this.currentClientAliases.indexOf(option);
+				const position = this.currentClientAliases.indexOf(option)
 
-				if(position !== -1) {
-					this.currentClientAliases.splice(position, 1);
-					this.storeClientProperty({
+				if (position !== -1) {
+					this.currentClientAliases.splice(position, 1)
+					this.storeClientPropertyOverallData({
 						prop: "aliases",
 						value: this.currentClientAliases
-					});
+					})
 				} else {
-					this.currentClientAliases.push(option);
-					this.storeClientProperty({
+					this.currentClientAliases.push(option)
+					this.storeClientPropertyOverallData({
 						prop: "aliases",
 						value: this.currentClientAliases
-					});
+					})
 				}
 			},
 			setTarget({ option }) {
-				if(this.currentClient.hasOwnProperty('targetLanguages')) {
-					if(this.currentClient.targetLanguages.length) {
-						this.currentTargetLanguages = this.currentClient.targetLanguages
+				if (this.currentClient.hasOwnProperty('targetLanguages')) {
+					if (this.currentClient.targetLanguages.length) {
+						this.currentTargetLanguages = [ ...this.currentClient.targetLanguages ]
 					}
 				}
 				const position = this.currentTargetLanguages
 						.map(item => item.lang)
-						.indexOf(option);
+						.indexOf(option)
 
-				if(position !== -1) {
-					this.currentTargetLanguages.splice(position, 1);
-					this.storeClientProperty({
+				if (position !== -1) {
+					this.currentTargetLanguages.splice(position, 1)
+					this.storeClientPropertyOverallData({
 						prop: "targetLanguages",
 						value: this.currentTargetLanguages
-					});
+					})
 				} else {
-					const lang = this.languages.find(item => item.lang === option);
-					this.currentTargetLanguages.push(lang);
-					this.storeClientProperty({
+					const lang = this.languages.find(item => item.lang === option)
+					this.currentTargetLanguages.push(lang)
+					this.storeClientPropertyOverallData({
 						prop: "targetLanguages",
 						value: this.currentTargetLanguages
-					});
+					})
 				}
 			},
 			setSource({ option }) {
-				if(this.currentClient.hasOwnProperty('sourceLanguages')) {
-					if(this.currentClient.sourceLanguages.length) {
-						this.currentSourceLanguages = this.currentClient.sourceLanguages
+				if (this.currentClient.hasOwnProperty('sourceLanguages')) {
+					if (this.currentClient.sourceLanguages.length) {
+						this.currentSourceLanguages = [ ...this.currentClient.sourceLanguages ]
 					}
 				}
 				const position = this.currentSourceLanguages
 						.map(item => item.lang)
-						.indexOf(option);
+						.indexOf(option)
 
-				if(position !== -1) {
-					this.currentSourceLanguages.splice(position, 1);
-					this.storeClientProperty({
+				if (position !== -1) {
+					this.currentSourceLanguages.splice(position, 1)
+					this.storeClientPropertyOverallData({
 						prop: "sourceLanguages",
 						value: this.currentSourceLanguages
-					});
+					})
 				} else {
-					const lang = this.languages.find(item => item.lang === option);
-					this.currentSourceLanguages.push(lang);
-					this.storeClientProperty({
+					const lang = this.languages.find(item => item.lang === option)
+					this.currentSourceLanguages.push(lang)
+					this.storeClientPropertyOverallData({
 						prop: "sourceLanguages",
 						value: this.currentSourceLanguages
-					});
+					})
 				}
 			},
 			selectedSource() {
@@ -226,39 +226,39 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "getCurrentClient"
+				currentClient: "currentClientOverallData"
 			}),
 			clientAliases() {
-				if(this.allClientAliases) {
-					return this.allClientAliases;
+				if (this.allClientAliases) {
+					return this.allClientAliases
 				}
 			},
 			sourceLanguages() {
-				if(this.languages) {
-          return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b));
-        }
+				if (this.languages) {
+					return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b))
+				}
 			},
 			targetLanguages() {
-				if(this.languages) {
-          return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b));
-        }
+				if (this.languages) {
+					return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b))
+				}
 			},
 			timezoneData() {
-				if(this.timezones) {
-					return this.timezones.map(item => item.zone);
+				if (this.timezones) {
+					return this.timezones.map(item => item.zone)
 				}
 			},
 			selectedIndNames() {
-				let result = [];
-				if(
+				let result = []
+				if (
 						this.currentClient.industries &&
 						this.currentClient.industries.length
 				) {
 					for (let industry of this.currentClient.industries) {
-						result.push(industry.name);
+						result.push(industry.name)
 					}
 				}
-				return result;
+				return result
 			}
 		},
 		components: {
@@ -270,7 +270,7 @@
 			SelectSingle,
 			SelectMulti
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
