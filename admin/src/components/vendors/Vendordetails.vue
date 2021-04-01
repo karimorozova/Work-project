@@ -1,6 +1,6 @@
 <template lang="pug">
   .vendor-wrap
-    PopUpWindow(v-if="isChangedVendorGeneralInfo" text="test a  or b ?"  @accept="checkForErrors" @cancel="cancel")
+    PopUpWindow(v-if="isChangedVendorGeneralInfo" text="Do you wanna change Vendor info?"  @accept="checkForErrors" @cancel="cancel")
     .vendor-info(v-if="currentVendor._id")
       .title General Information
       .vendor-details(v-if="getVendorUpdatedData.industries")

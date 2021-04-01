@@ -2,7 +2,7 @@
   .client-layout
     .client-info(v-if="currentClient._id")
 
-      PopUpWindow(v-if="detectedForSave" text="test a  or b ?"  @accept="checkForErrors" @cancel="cancel")
+      PopUpWindow(v-if="detectedForSave" text="Do you wanna change Client info?"  @accept="checkForErrors" @cancel="cancel")
 
       .title General Information
       .client-info__gen-info
