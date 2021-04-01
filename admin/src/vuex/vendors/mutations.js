@@ -27,9 +27,9 @@ export const mutations = {
     updateCurrentVendorGeneralData(state, payload) {
       state.currentVendorGeneralData[payload.key] = payload.value
     },
-    senNewCurrentVendor(state){
-        state.currentVendor = {...state.currentVendor, ...state.currentVendorGeneralData}
-    },
+    // setNewCurrentVendor(state,payload){
+    //     state.currentVendor[payload.key] = payload.value
+    // },
 
 
     SET_CURRENT_VENDOR_EDUCATION(state,payload){

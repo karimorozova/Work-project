@@ -1,10 +1,7 @@
 <template lang="pug">
   .vendor-wrap
+    PopUpWindow(v-if="isChangedVendorGeneralInfo" text="test a  or b ?"  @accept="checkForErrors" @cancel="cancel")
     .vendor-info(v-if="currentVendor._id")
-      .buttons(v-if="isChangedVendorGeneralInfo")
-        input.button(type="button", value="Save", @click="checkForErrors")
-        input.button(type="button", value="Cancel", @click="cancel")
-        input.button(type="button", value="Delete", @click="deleteVendor")
       .title General Information
       .vendor-details(v-if="getVendorUpdatedData.industries")
         VendorMainInfo
@@ -182,6 +179,7 @@
 	import SelectMulti from "../SelectMulti"
 	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
   import VendorMainInfo from "./VendorGeneralInfo";
+  import PopUpWindow from "../PopUpWindow";
 
 	export default {
 		mixins: [ photoPreview ],
@@ -208,7 +206,7 @@
 				oldEmail: "",
 				isFileError: false,
 				isEditAndSend: false,
-editorConfig: {
+        editorConfig: {
 					allowedContent: true,
 					uiColor: "#F4F0EE",
 					resize_minHeight: "130",
@@ -417,6 +415,8 @@ editorConfig: {
 				try {
 					await this.updateCurrentVendor(sendData)
 					this.oldEmail = this.getVendorUpdatedData.email
+          this.$socket.emit('updatedVendorData', {id:  this.$route.params.id})
+          // this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, newData: this.getVendorUpdatedData})
 					this.alertToggle({
 						message: "Vendor info updated",
 						isShow: true,
@@ -526,6 +526,7 @@ editorConfig: {
 			}
 		},
 		components: {
+      PopUpWindow,
       VendorMainInfo,
 			PendingCompetencies,
 			SelectMulti,
@@ -562,9 +563,18 @@ editorConfig: {
 		created() {
 			this.getVendor()
 
-      this.$socket.on('socketUpdateVendorProp', (data) => {
-        this.updateWithOutSocketVendorProp(data)
+      this.$socket.on('setFreshVendorData', ({ id}) => {
+        if (id == this.$route.params.id){
+          this.getVendor()
+        }
       })
+
+      this.$socket.on('socketUpdateVendorProp', ({id, key, value}) => {
+        if (this.$route.params.id === id) {
+          this.updateWithOutSocketVendorProp({key,value})
+        }
+      })
+
 
 		},
 		mounted() {

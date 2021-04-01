@@ -1,13 +1,8 @@
 <template lang="pug">
   .client-layout
     .client-info(v-if="currentClient._id")
-      .buttons(v-if="detectedForSave")
-        .button
-          Button(value="Save" @clicked="checkForErrors")
-        .button
-          Button(value="Cancel" @clicked="cancel")
-        .button
-          Button(value="Delete" @clicked="deleteClient")
+
+      PopUpWindow(v-if="detectedForSave" text="test a  or b ?"  @accept="checkForErrors" @cancel="cancel")
 
       .title General Information
       .client-info__gen-info
@@ -141,6 +136,7 @@
 	import DiscountChart from "./DiscountChart"
 	import ClientsNotes from "./ClientsNotes"
 	import vatChecker from "../../mixins/Client/vatChecker"
+  import PopUpWindow from "../PopUpWindow";
 
 	export default {
 		mixins: [ vatChecker ],
@@ -250,12 +246,7 @@
 				this.$emit("loadFile", { files, prop })
 			},
 			cancel() {
-				if (this.fromRoute === "/new-client" || this.fromRoute.indexOf("contact") !== -1) {
-					this.$router.push("/clients")
-				} else {
-					this.$router.push(this.fromRoute)
-				}
-				this.storeCurrentClient({})
+        this.storeCurrentClientOverallData(this.currentClient)
 			},
 			saveContactUpdates({ index, contact }) {
 				// this.updateClientContact({ index, contact })
@@ -342,10 +333,10 @@
 				}
 				if (!this.currentClientOverallData.accountManager || !this.currentClientOverallData.salesManager || !this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
 
-				const isSameEmailsExists = await this.checkSameClientEmails(this.currentClientOverallData.email, this.currentClientOverallData._id)
-				if (isSameEmailsExists) {
-					this.errors.push("A client with such Email already exists, the client's Email should be unique!")
-				}
+				// const isSameEmailsExists = await this.checkSameClientEmails(this.currentClientOverallData.email, this.currentClientOverallData._id)
+				// if (isSameEmailsExists) {
+				// 	this.errors.push("A client with such Email already exists, the client's Email should be unique!")
+				// }
 				if (this.currentClientOverallData.website) {
 					if (this.websiteRegEx.exec(this.currentClientOverallData.website) === null) {
 						this.errors.push("The website field must contain a link")
@@ -560,7 +551,8 @@
 			ClientDocuments,
 			OtherClientInformation,
 			RatesParameters,
-			ClientsNotes
+			ClientsNotes,
+      PopUpWindow,
 		},
 		created() {
 			this.getClientInfoLangs()

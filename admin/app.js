@@ -92,7 +92,10 @@ const io = require("socket.io")(httpServer, {
 })
 
 io.on('connection', socket => {
-  socket.on('changeVendorProp', (data)=>{
+  socket.on('updatedVendorData', (data)=>{
+    socket.broadcast.emit('setFreshVendorData', data)
+  })
+  socket.on('updateVendorProp', (data)=>{
     socket.broadcast.emit('socketUpdateVendorProp', data)
   })
 

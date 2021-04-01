@@ -5,8 +5,8 @@ const socket = io('http://localhost:3001')
 
 export const setFilteredVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
 export const updateVendorProp = ({ commit }, payload) => {
-  socket.emit('changeVendorProp', {prop: payload.prop, value: payload.value})
-  commit('setVendorProp', payload);
+  socket.emit('changeVendorProp', {id: payload.id, key: payload.key, value: payload.value})
+  commit('setVendorProp', {prop: payload.key, value: payload.value});
 }
 export const updateWithOutSocketVendorProp = ({ commit }, payload) => {
   commit('setVendorProp', payload);
@@ -380,11 +380,9 @@ export const updateCurrentVendorGeneralData = async ({commit, state},payload) =>
   commit("updateCurrentVendorGeneralData", payload)
 }
 
-export const senNewCurrentVendor = async ({commit, state},payload) => {
-
-  await Vue.http.post("/vendorsapi/remove-lang-test", { _id, path });
-  commit("senNewCurrentVendor", payload)
-}
+// export const setNewCurrentVendor = async ({commit, state},payload) => {
+//   commit("setNewCurrentVendor", payload)
+// }
 
 export const clearVendorGeneralData = async ({commit, dispatch}, payload) => {
   commit("setCurrentVendorGeneralData", payload)
