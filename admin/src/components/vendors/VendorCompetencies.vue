@@ -336,8 +336,8 @@
 						vendorId: this.$route.params.id,
 						currentData,
 					});
-
-					await this.updateVendorProp({ id: this.$route.params.id , key: 'competencies', value: result.data.competencies })
+          await this.storeCurrentVendor(result.data)
+					// await this.updateVendorProp({ id: this.$route.params.id , key: 'competencies', value: result.data.competencies })
 
 					this.competenciesData.length && this.$emit("updateRates", true)
 
