@@ -2,7 +2,7 @@
   .pop-up-window
     .pop-up-window__body
       .pop-up-window__bottons
-        Button.btn(:value="btnAcceptText || 'Accept'" @clicked="accept")
+        Button.btn(:value="btnAcceptText || 'Save'" @clicked="accept")
         Button.btn(:value="btnCancelText || 'Cancel'" @clicked="cancel")
       .pop-up-window__text {{text}}
 </template>
@@ -33,12 +33,13 @@ export default {
 
 <style scoped lang="scss">
   .pop-up-window {
-    background-color: #f4f2f1;
+    box-shadow: 0 2px 5px rgba(103,87,62,.3),0 2px 6px 2px rgba(103,87,62,.15);
+    background-color: #fff;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 6;
+    z-index: 20;
     animation-duration: 0.3s;
     animation-name: slidein;
   }

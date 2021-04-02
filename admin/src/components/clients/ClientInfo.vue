@@ -2,7 +2,7 @@
   .client-layout
     .client-info(v-if="currentClient._id")
 
-      PopUpWindow(v-if="detectedForSave" text="Do you want to change Client info?"  @accept="checkForErrors" @cancel="cancel")
+      SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
 
       .title General Information
       .client-info__gen-info
@@ -136,7 +136,7 @@
 	import DiscountChart from "./DiscountChart"
 	import ClientsNotes from "./ClientsNotes"
 	import vatChecker from "../../mixins/Client/vatChecker"
-  import PopUpWindow from "../PopUpWindow";
+  import SaveCancelPopUp from "../SaveCancelPopUp";
 
 	export default {
 		mixins: [ vatChecker ],
@@ -378,9 +378,14 @@
 				try {
 					const result = await this.$http.post("/clientsapi/update-client", sendData)
 					const { client } = result.data
+
 					await this.storeClient(client)
 					await this.storeCurrentClient(client)
-					this.alertToggle({
+          this.storeCurrentClientOverallData(client)
+
+          this.$socket.emit('updatedClientData', {_id: this.$route.params.id, data: this.currentClientOverallData})
+
+          this.alertToggle({
 						message: "Client info has been updated", isShow: true, type: "success"
 					})
 				} catch (err) {
@@ -535,6 +540,7 @@
 
 		},
 		components: {
+      SaveCancelPopUp,
 			DiscountChart,
 			ClientServices,
 			General,
@@ -552,12 +558,17 @@
 			OtherClientInformation,
 			RatesParameters,
 			ClientsNotes,
-      PopUpWindow,
 		},
 		created() {
 			this.getClientInfoLangs()
 			this.getTimezones()
 			this.getAliases()
+      this.$socket.on('refreshClientData', ({ _id, data }) => {
+        if (_id == this.$route.params.id) {
+          this.storeCurrentClient({...this.currentClient, ...data})
+          this.storeCurrentClientOverallData(data)
+        }
+      })
 		},
 		beforeDestroy() {
 			this.storeCurrentClient({})
@@ -580,6 +591,7 @@
 
   .client-layout {
     display: flex;
+    margin-bottom: 50px;
   }
 
   .client-subinfo {
