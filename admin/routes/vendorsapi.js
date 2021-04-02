@@ -8,6 +8,7 @@ const {
 	getVendor,
 	getVendorAfterUpdate,
 	getFilteredVendors,
+	getFilteredVendorsPotential,
   getFilteredVendorsWithCustomFilters,
 	updateVendorEducation,
 	saveVendorDocument,
@@ -220,6 +221,16 @@ router.post('/vendor-assessment', upload.fields([ { name: 'assessmentFile' } ]),
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on saving Vendor's assessment")
+	}
+})
+router.post('/filtered-potential-vendors', async (req, res) => {
+	const { filters } = req.body
+	try {
+		const filteredVendors = await getFilteredVendorsPotential(filters)
+		res.send(filteredVendors)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
 	}
 })
 
