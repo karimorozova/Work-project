@@ -26,7 +26,7 @@ async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
 async function sendEmailToManager(personData, vendor) {
     let emailData = {...personData};
     try {
-        emailData.to = "maksym@pangea.global";
+        emailData.to = "career@pangea.global";
         emailData.subject = `Application from ${emailData.firstName} ${emailData.surname}`;
 
         emailData.cvFiles = vendor.documents

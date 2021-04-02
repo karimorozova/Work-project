@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 import io from 'socket.io-client'
-const socket = io('http://localhost:3001')
+const socket = io('https://admin.pangea.global:3001')
 
 export const setFilteredVendors = ({ commit }, payload) => commit('SET_FILTERED_VENDORS', payload);
 export const updateVendorProp = ({ commit }, payload) => {
