@@ -14,7 +14,7 @@ export const bus = new Vue();
 
 
 const io = require("socket.io-client");
-const socket = io('https://admin.pangea.global:3001')
+const socket = io('https://admin.pangea.global')
 Vue.prototype.$socket = socket
 
 

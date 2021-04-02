@@ -85,9 +85,10 @@ const httpServer = require("http").createServer(app);
 
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "https://admin.pangea.global:3001",
+    origin: "https://admin.pangea.global:*",
     methods: ["GET", "POST"]
   },
+  secure: true,
   allowEIO3: true
 })
 
