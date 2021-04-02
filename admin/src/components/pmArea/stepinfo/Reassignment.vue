@@ -76,7 +76,7 @@
 		},
 		data() {
 			return {
-				reasons: [],
+				reasons: ['Unresponsive', 'Technical issues', 'Personal issues'],
 				isAllShow: false,
 				newVendor: null,
 				reason: "",
@@ -163,14 +163,14 @@
 				} catch (err) {
 				}
 			},
-			async getReasons() {
-				try {
-					const result = await this.$http.get("/api/reasons");
-					this.reasons = result.body;
-				} catch (err) {
-					this.alertToggle({ message: "Error on getting Reasons.", isShow: true, type: "error" });
-				}
-			}
+			// async getReasons() {
+			// 	try {
+			// 		const result = await this.$http.get("/api/reasons");
+			// 		this.reasons = result.body;
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: "Error on getting Reasons.", isShow: true, type: "error" });
+			// 	}
+			// }
 		},
 		computed: {
 			...mapGetters({
@@ -179,7 +179,7 @@
 				userGroup: "getUserGroup"
 			}),
 			cancelReasons() {
-				return this.reasons ? this.reasons.map(item => item.reason) : [];
+				return this.reasons;
 			},
 			vendors() {
 				return this.allVendors.filter(item => item._id !== this.step.vendor._id);
@@ -197,7 +197,7 @@
 			Button
 		},
 		created() {
-			this.getReasons();
+			// this.getReasons();
 		}
 	}
 </script>
