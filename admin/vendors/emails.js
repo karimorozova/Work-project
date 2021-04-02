@@ -27,7 +27,7 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
         return  qualification.steps.map(({_id})=> _id).includes(step._id)
       })
 
-      const attachments = [{ filename: assessmentStep.tqi.fileName, content: assessmentStep.tqi.path}];
+      const attachments = [{ filename: assessmentStep.tqi.fileName, content: fs.createReadStream(`./dist${assessmentStep.tqi.path}`)}];
       return await sendEmail({ to: vendor.email, subject, attachments }, message);
     }
 

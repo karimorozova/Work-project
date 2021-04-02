@@ -20,6 +20,9 @@ function testSentMessage(obj) {
 	                        Kindly confirm you have received this email and please advise ahead if you have any issues with the deadline that was provided.
                         </span>
                     </p>
+                    <p>
+                    	Please sent the completed test to <span style="color: #D15F45">career@pangea.global</span>
+                    </p>
                     <p style="font-weight: 400;">
                         If you have any question, please do not hesitate to contact us in <span style="color: #D15F45">career@pangea.global</span> <br>
                         Many thanks,<br>
