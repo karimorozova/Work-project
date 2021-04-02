@@ -4,6 +4,7 @@ const { applicationMessage,vendorRegistration } = require("../emailMessages/vend
 const fs = require("fs");
 const passwordGen = require("generate-password")
 const { getVendorAfterUpdate } = require('../vendors/getVendors')
+const bcrypt = require('bcryptjs');
 
 async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
     const softData = JSON.parse(person['parsing-softwares'])
@@ -11,12 +12,13 @@ async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
         let vendor = await Vendors.create({...person, softData , status: "Potential"});
         vendor.documents = await setDocuments(cvFiles, 'Resume', vendor.id);
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');
-        vendor.password = passwordGen.generate({ length: 8, numbers: true })
+        const mailPassword = passwordGen.generate({ length: 8, numbers: true })
+        vendor.password = await bcrypt.hash(mailPassword, 10)
         const updatedVendor = await getVendorAfterUpdate({_id: vendor._id}, vendor)
 
         const parsedPersonData = getParsedData(person);
         await sendEmailToManager(parsedPersonData, updatedVendor)
-        await sendEmailToVendor(updatedVendor, updatedVendor.password)
+        await sendEmailToVendor(updatedVendor, mailPassword)
     } catch(err) {
         console.log(err);
         console.log("Error in manageNewApplication");

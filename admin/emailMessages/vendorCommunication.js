@@ -57,10 +57,10 @@ function vendorRegistration(obj) {
 										</p>
 										<p style="font-weight: 400;color:#66563E;">Enter our system and complete your competencies:</p>
 										<p style="font-weight: 400;color:#66563E;">language pair and industry</p>
-										<p style="font-weight: 400;color:#66563E;">1. Go to: https://vendor.pangea.global/login</p>
+										<p style="font-weight: 400;color:#66563E;">1. Go to: <a href="https://vendor.pangea.global/login" style="color: #D15F46;">Vendor Portal</a></p>
 										<p style="font-weight: 400;color:#66563E;">2. Log in to the system with the following details:</p>
-                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">- username: ${ obj.email.replace(/@/g, '<span>@</span>') }</p>
-                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">- password:   ${ obj.pass }</p>
+                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">• username: <b>${ obj.email.replace(/@/g, '<span>@</span>').replace(/\./g, '<span>.</span>') }</b> </p>
+                    <p style="font-weight: 400;color:#66563E;margin-left: 10px;">• password: <b>${ obj.pass }</b> </p>
 										<p style="font-weight: 400;color:#66563E;">
                       3. Once in, you will be required to provide additional information that will allow us
                       to get a clearer idea of your industry expertise and language proficiency.
