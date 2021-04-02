@@ -285,10 +285,10 @@
 								: today
 			},
 			setDateRange() {
-				this.$emit("getFilteredReports", {
-					fromDate: this.fromDate,
-					toDate: this.toDate
-				})
+				// this.$emit("getFilteredReports", {
+				// 	fromDate: this.fromDate,
+				// 	toDate: this.toDate
+				// })
 				this.dateRange =
 						moment(this.fromDate).format("DD-MM-YYYY") +
 						" / " +

@@ -1,6 +1,6 @@
 <template lang="pug">
   .vendor-wrap
-    PopUpWindow(v-if="isChangedVendorGeneralInfo" text="Do you want to change Vendor info?"  @accept="checkForErrors" @cancel="cancel")
+    SaveCancelPopUp(v-if="isChangedVendorGeneralInfo" text=""  @accept="checkForErrors" @cancel="cancel")
     .vendor-info(v-if="currentVendor._id")
       .title General Information
       .vendor-details(v-if="getVendorUpdatedData.industries")
@@ -179,7 +179,7 @@
 	import SelectMulti from "../SelectMulti"
 	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
   import VendorMainInfo from "./VendorGeneralInfo";
-  import PopUpWindow from "../PopUpWindow";
+  import SaveCancelPopUp from "../SaveCancelPopUp";
 
 	export default {
 		mixins: [ photoPreview ],
@@ -414,9 +414,10 @@
 				sendData.append("photo", this.photoFile[0])
 				try {
 					await this.updateCurrentVendor(sendData)
+          this.initCurrentVendorGeneralData(this.currentVendor)
 					this.oldEmail = this.getVendorUpdatedData.email
           this.$socket.emit('updatedVendorData', {id:  this.$route.params.id})
-          // this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, newData: this.getVendorUpdatedData})
+          // this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, data: this.getVendorUpdatedData})
 					this.alertToggle({
 						message: "Vendor info updated",
 						isShow: true,
@@ -526,7 +527,7 @@
 			}
 		},
 		components: {
-      PopUpWindow,
+      SaveCancelPopUp,
       VendorMainInfo,
 			PendingCompetencies,
 			SelectMulti,
@@ -633,6 +634,7 @@
     position: relative;
     width: 100%;
     display: flex;
+    margin-bottom: 50px;
   }
 
   .vendor-subinfo {

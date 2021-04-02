@@ -96,6 +96,9 @@ io.on('connection', socket => {
   socket.on('updatedVendorData', (data)=>{
     socket.broadcast.emit('setFreshVendorData', data)
   })
+  socket.on('updatedClientData', (data)=>{
+    socket.broadcast.emit('refreshClientData', data)
+  })
   socket.on('updateVendorProp', (data)=>{
     socket.broadcast.emit('socketUpdateVendorProp', data)
   })

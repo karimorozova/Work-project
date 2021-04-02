@@ -1,5 +1,6 @@
 const { Vendors } = require("../models");
-const { getFilteringQuery } = require("./filter");
+const { getFilteringQuery, getFilteringQueryPotential  } = require("./filter");
+const moment = require('moment')
 
 async function getVendor(query) {
   return await Vendors.findOne(query)
@@ -149,4 +150,36 @@ async function getFilteredVendorsWithCustomFilters(filters, customFilters = {}){
   }
 }
 
-module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, getFilteredVendorsWithCustomFilters, hasVendorCompetenciesAndPending};
+async function getFilteredVendorsPotential(filters){
+  try {
+    const query = getFilteringQueryPotential(filters);
+
+    let vendors = await Vendors.find(query, {
+      firstName: 1,
+      status: 1,
+      surname: 1,
+      competencies: 1,
+      native: 1,
+      industries: 1,
+      isTest: 1,
+      dateInfo: 1,
+    }).sort({ _id: 1 }).limit(25).populate("industries").populate("native")
+
+    const rebuildVendors = vendors.map(item => {
+      return {
+        ...item._doc,
+        date: moment(item._doc.dateInfo.createdAt).format("DD-MM-YYYY, HH:ss")
+      }
+    })
+
+    console.log(rebuildVendors)
+
+    return rebuildVendors
+
+  } catch (err) {
+    console.log(err)
+    console.log("Error on filtering vendors")
+  }
+}
+
+module.exports = { getVendor, getVendors, getVendorAfterUpdate, getFilteredVendors, getFilteredVendorsWithCustomFilters, hasVendorCompetenciesAndPending, getFilteredVendorsPotential};
