@@ -251,6 +251,11 @@ const router = new Router({
                             component: PotentialVendors
                         },
                         {
+                            path: 'pending-competencies-vendors',
+                            name: 'pending-competencies-vendors',
+                            component: PendingCompetenciesLayout
+                        },
+                        {
                             path: 'tests',
                             name: 'tests-vendors',
                             props: true,

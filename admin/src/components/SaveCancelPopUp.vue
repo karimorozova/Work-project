@@ -3,7 +3,7 @@
     .pop-up-window__body
       .pop-up-window__bottons
         Button.btn(:value="btnAcceptText || 'Save'" @clicked="accept")
-        Button.btn(:value="btnCancelText || 'Cancel'" @clicked="cancel")
+        Button.btn(:outline="true" :value="btnCancelText || 'Cancel'" @clicked="cancel")
       .pop-up-window__text {{text}}
 </template>
 
@@ -53,7 +53,7 @@ export default {
   }
   .pop-up-window__bottons {
     padding-right: 15px;
-    border-right: 1px solid #ccc;
+    /*border-right: 1px solid #ccc;*/
     display: flex;
     .btn {
       margin: 0 10px;
