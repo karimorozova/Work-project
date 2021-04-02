@@ -1,6 +1,11 @@
 <template lang="pug">
-  .action-button(:class="[customClass, {disabled: isDisabled}]")
-    input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
+  .buttons
+    .button(v-if="outline")
+      .action-buttonOutline(:class="[customClass, {disabled: isDisabled}]")
+        input.action-buttonOutline__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
+    .button(v-else)
+      .action-button(:class="[customClass, {disabled: isDisabled}]")
+        input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
 </template>
 
 <script>
@@ -14,7 +19,11 @@
 			},
 			customClass: {
 				type: String
-			}
+			},
+      outline:{
+				type: Boolean,
+        default: false,
+      }
 		},
 		methods: {
 			clicked() {
@@ -26,6 +35,39 @@
 
 <style lang="scss" scoped>
   @import "../assets/scss/colors.scss";
+
+  .action-buttonOutline {
+    &__button {
+      transition: .2s ease-out;
+      text-align: center;
+      border: 2px solid #d15f45;
+      min-width: 120px;
+      padding: 0 24px 0 24px;
+      height: 34px;
+      color: #d15f45;
+      font-size: 14px;
+      border-radius: 7px;
+      background-color: white;
+      outline: none;
+      letter-spacing: 0.2px;
+
+      &:hover {
+        cursor: pointer;
+        background: #f4f2f1;
+      }
+
+      &:active {
+        transform: scale(.98);
+      }
+    }
+
+    .other-choice & {
+      margin: 7px;
+      @media (max-width: 450px) {
+        margin: 5px;
+      }
+    }
+  }
 
   .action-button {
     &__button {
@@ -67,7 +109,6 @@
       color: $white;
       font-size: 14px;
       border-radius: 7px;
-      /* box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .12), 0 1px 5px 0 rgba(0, 0, 0, .2);*/
       background-color: $orange;
       border: none;
       transition: .1s ease;
@@ -76,7 +117,6 @@
 
       &:hover {
         cursor: pointer;
-        /*box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);*/
         box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
       }
 
@@ -95,7 +135,6 @@
       color: $white;
       font-size: 14px;
       border-radius: 7px;
-      /* box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .12), 0 1px 5px 0 rgba(0, 0, 0, .2);*/
       background-color: $orange;
       border: none;
       transition: .1s ease;

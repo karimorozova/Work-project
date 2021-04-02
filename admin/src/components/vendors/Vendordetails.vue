@@ -640,7 +640,7 @@
   .vendor-subinfo {
     &__general {
       padding: 20px;
-      margin-top: 100px;
+      margin-top: 66px;
       width: 350px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       margin-left: 40px;

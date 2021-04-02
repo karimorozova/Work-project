@@ -29,12 +29,22 @@
 					{
 						title: "CANDIDATES",
 						links: [
-							{
+								{
 								arrayIndex: 1,
 								title: "Potential",
 								routeName: "potential-vendors",
 							},
 							{ arrayIndex: 1, title: "Tests", routeName: "tests-vendors" },
+						],
+					},
+					{
+						title: "REPORTS",
+						links: [
+							{
+								arrayIndex: 2,
+								title: "Competencies Queue",
+								routeName: "pending-competencies-vendors",
+							},
 						],
 					},
 				],
