@@ -1,7 +1,7 @@
 <template lang="pug">
   .client-layout
     .client-info(v-if="currentClient._id")
-
+      //Sidebar
       SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
 
       .title General Information
@@ -137,6 +137,7 @@
 	import ClientsNotes from "./ClientsNotes"
 	import vatChecker from "../../mixins/Client/vatChecker"
   import SaveCancelPopUp from "../SaveCancelPopUp";
+	import Sidebar from "./sidebar/SidebarMenu"
 
 	export default {
 		mixins: [ vatChecker ],
@@ -539,6 +540,7 @@
 
 		},
 		components: {
+			Sidebar,
       SaveCancelPopUp,
 			DiscountChart,
 			ClientServices,

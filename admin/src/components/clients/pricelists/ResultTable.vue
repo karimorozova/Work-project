@@ -1,6 +1,6 @@
 <template lang="pug">
   .price
-    .prices-filter()
+    .prices-filter
       ResultFilter(
         :source="sourceFilter"
         :target="targetFilter"
@@ -17,9 +17,9 @@
 
     DataTable(
       :fields="fields"
-      :tableData="currentClientPriceList"
-      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': currentClientPriceList.length < 6}]"
-      :tableheadRowClass="currentClientPriceList.length < 6 ? 'tbody_visible-overflow' : ''"
+      :tableData="currentClientPriceListFiltered"
+      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': currentClientPriceListFiltered.length < 6}]"
+      :tableheadRowClass="currentClientPriceListFiltered.length < 6 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="client-pricelist-table-row"
       bodyCellClass="client-pricelist-table-cell"
     )
@@ -70,9 +70,9 @@
               span(v-else)
                 span#myTooltip.tooltiptext {{ row.notification }}
               img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png")
-          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key, row)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
-            .price__icons-link(@click="getRowPrice(index)")
+            .price__icons-link(@click="getRowPrice(index, row)")
               i.fa.fa-link(aria-hidden='true')
           span(v-else)
             .price__icons-link-opacity
@@ -185,27 +185,27 @@
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
-        updateClientRatesProp: "updateClientRatesProp"
+				updateClientRatesProp: "updateClientRatesProp"
 			}),
-			async getRowPrice(index) {
+			async getRowPrice(index, row) {
 				try {
 					await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
 						tableKey: "Pricelist Table",
-						row: this.currentClientPriceList[index]
+						row
 					})
 
-          this.updateClientRatesProp({key: "pricelistTable"})
+					this.updateClientRatesProp({ key: "pricelistTable" })
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
-			async makeAction(index, key) {
+			async makeAction(index, key, row) {
 				if (this.currentActive !== -1 && this.currentActive !== index) {
 					return this.isEditing()
 				}
 				switch (key) {
 					case "edit":
-						this.setEditingData(index)
+						this.setEditingData(index, row)
 						break
 					case "cancel":
 						this.manageCancelEdition()
@@ -214,27 +214,27 @@
 						alert("delete")
 						break
 					default:
-						await this.checkErrors(index)
+						await this.checkErrors(index, row)
 				}
 			},
-			setEditingData(index) {
+			setEditingData(index, row) {
 				this.currentActive = index
-				this.currentSourceLanguage = this.currentClientPriceList[index].sourceLanguage.lang
-				this.currentTargetLanguage = this.currentClientPriceList[index].targetLanguage.lang
-				this.currentStep = this.currentClientPriceList[index].step.title
-				this.currentUnit = this.currentClientPriceList[index].unit.type
-				this.currentIndustry = this.currentClientPriceList[index].industry.name
-				this.currentPrice = this.currentClientPriceList[index].price
+				this.currentSourceLanguage = row.sourceLanguage.lang
+				this.currentTargetLanguage = row.targetLanguage.lang
+				this.currentStep = row.step.title
+				this.currentUnit = row.unit.type
+				this.currentIndustry = row.industry.name
+				this.currentPrice = row.price
 			},
-			async checkErrors(index) {
+			async checkErrors(index, row) {
 				if (this.currentActive === -1) return
-				if (this.currentPrice == "") return
-				await this.manageSaveClick(index)
+				if (this.currentPrice === "") return
+				await this.manageSaveClick(index, row)
 			},
 
-			async manageSaveClick(index) {
+			async manageSaveClick(index, row) {
 				if (this.currentActive === -1) return
-				const id = this.currentClientPriceList[index]._id
+				const id = row._id
 				try {
 					await this.$http.post("/clientsapi/rates/change-pricelist/" + this.clientId, {
 								_id: id,
@@ -248,7 +248,7 @@
 						isShow: true,
 						type: "success"
 					})
-          this.updateClientRatesProp({key: "pricelistTable"})
+					this.updateClientRatesProp({ key: "pricelistTable" })
 					this.setDefaults()
 				} catch (err) {
 					this.alertToggle({
@@ -265,40 +265,12 @@
 				this.currentActive = -1
 			},
 			setFilter({ option, prop }) {
-			  this.isDataRemain = true
+				this.isDataRemain = true
 				this[prop] = option
-				this.getPricelist(this.allFilters)
 			},
-			// async bottomScrolled() {
-			// 	if (this.isDataRemain) {
-			// 		const result = await this.$http.post(
-			// 				"/clientsapi/rates/rate-combinations/" + this.clientId,
-			// 				{
-			// 					...this.allFilters,
-			// 					countFilter: this.currentClientPriceList.length
-			// 				}
-			// 		)
-			// 		this.currentClientPriceList.push(...result.data)
-			// 		this.isDataRemain = result.data.length === 25
-			// 	}
-			// },
 			async getClientServices() {
-				// const client = await this.$http.get(
-				// 		`/clientsapi/client?id=${ this.$route.params.id }`
-				// )
-				this.currentServices = this.currentClient.service
+				this.currentServices = this.currentClient.services
 			},
-			// async getPricelist(filters, count = 0) {
-			// 	try {
-			// 		this.currentClientPriceList = this.currentClientPriceList
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: "Error on getting Pricelist",
-			// 			isShow: true,
-			// 			type: "error"
-			// 		})
-			// 	}
-			// },
 			getUniqueValues(arr, key) {
 				return [ ...new Set(arr.map((item) => item[key])) ]
 			},
@@ -314,27 +286,13 @@
 			}
 
 		},
-		watch: {
-			// async isRefreshResultTable() {
-			// 	if (this.isRefreshResultTable) {
-			// 		this.getPricelist(this.allFilters)
-			// 	}
-			// },
-			// async refresh() {
-			// 	if (this.refresh) {
-			// 		this.getPricelist(this.allFilters)
-			// 		this.getClientServices()
-			// 	}
-			// }
-		},
 		created() {
-			// this.getPricelist(this.allFilters)
 			this.getClientServices()
 		},
 		computed: {
 			...mapGetters({
 				currentClient: "getCurrentClient",
-        currentClientPriceList: "getCurrentClientPriceList",
+				currentClientPriceList: "getCurrentClientPriceList"
 			}),
 			dataForSourceFilter() {
 				if (this.currentServices) {
@@ -388,19 +346,27 @@
 					)
 				}
 			},
-			allFilters() {
-				let result = {
-					sourceFilter: this.sourceFilter,
-					targetFilter: this.targetFilter,
-					stepFilter: this.stepFilter,
-					unitFilter: this.unitFilter,
-					industryFilter: this.industryFilter
+			currentClientPriceListFiltered() {
+				let result = this.currentClientPriceList
+
+				let fields = [
+					{ filter: this.sourceFilter, query: 'item.sourceLanguage.lang === this.sourceFilter' },
+					{ filter: this.targetFilter, query: 'item.targetLanguage.lang === this.targetFilter' },
+					{ filter: this.stepFilter, query: 'item.step.title === this.stepFilter' },
+					{ filter: this.unitFilter, query: 'item.unit.type === this.unitFilter' },
+					{ filter: this.industryFilter, query: 'item.industry.name === this.industryFilter' },
+				]
+
+				let neededFields = fields.filter(({ filter }) => !!filter && filter !== 'All')
+				if (neededFields.length) {
+					let lastField = neededFields[neededFields.length - 1]
+					let query = neededFields.reduce((acc, curr) => {
+						curr.query !== lastField.query ? (acc = acc + curr.query + ' && ') : (acc = acc + curr.query)
+						return acc
+					}, 'item => ')
+
+					return result.filter(eval(query))
 				}
-				if (this.sourceFilter === "All") result.sourceFilter = ""
-				if (this.targetFilter === "All") result.targetFilter = ""
-				if (this.stepFilter === "All") result.stepFilter = ""
-				if (this.unitFilter === "All") result.unitFilter = ""
-				if (this.industryFilter === "All") result.industryFilter = ""
 
 				return result
 			},

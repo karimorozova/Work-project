@@ -15,10 +15,9 @@
     )
     DataTable(
       :fields="fields",
-      :tableData="currentVendorPriceList",
-      @bottomScrolled="bottomScrolled",
-      :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': currentVendorPriceList.length < 6 }]",
-      :tableheadRowClass="currentVendorPriceList.length < 6 ? 'tbody_visible-overflow' : ''",
+      :tableData="currentVendorPriceListFiltered",
+      :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': currentVendorPriceListFiltered.length < 6 }]",
+      :tableheadRowClass="currentVendorPriceListFiltered.length < 6 ? 'tbody_visible-overflow' : ''",
       bodyRowClass="client-pricelist-table-row",
       bodyCellClass="client-pricelist-table-cell"
     )
@@ -72,11 +71,11 @@
           img.price__icon(
             v-for="(icon, key) in manageIcons",
             :src="icon.icon",
-            @click="makeAction(index, key)",
+            @click="makeAction(index, key, row)",
             :class="{ price_opacity: isActive(key, index) }"
           )
           span(v-if="row.altered")
-            .price__icons-link(@click="getRowPrice(index)")
+            .price__icons-link(@click="getRowPrice(index, row)")
               i.fa.fa-link(aria-hidden="true")
           span(v-else)
             .price__icons-link-opacity
@@ -190,11 +189,11 @@
 				alertToggle: "alertToggle",
         updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
-			async getRowPrice(index) {
+			async getRowPrice(index, row) {
 				try {
 					await this.$http.post("/vendorsapi/rates/sync-cost/" + this.$route.params.id, {
 						tableKey: "Pricelist Table",
-						row: this.currentVendorPriceList[index]
+						row
 					})
 
           this.updateVendorRatesByKey({key: 'pricelistTable'})
@@ -203,13 +202,13 @@
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
-			async makeAction(index, key) {
+			async makeAction(index, key, row) {
 				if (this.currentActive !== -1 && this.currentActive !== index) {
 					return this.isEditing()
 				}
 				switch (key) {
 					case "edit":
-						this.setEditingData(index)
+						this.setEditingData(index, row)
 						break
 					case "cancel":
 						this.manageCancelEdition()
@@ -218,27 +217,27 @@
 						alert("delete")
 						break
 					default:
-						await this.checkErrors(index)
+						await this.checkErrors(index, row)
 				}
 			},
-			setEditingData(index) {
+			setEditingData(index, row) {
 				this.currentActive = index
-				this.currentSourceLanguage = this.currentVendorPriceList[index].sourceLanguage.lang
-				this.currentTargetLanguage = this.currentVendorPriceList[index].targetLanguage.lang
-				this.currentStep = this.currentVendorPriceList[index].step.title
-				this.currentUnit = this.currentVendorPriceList[index].unit.type
-				this.currentIndustry = this.currentVendorPriceList[index].industry.name
-				this.currentPrice = this.currentVendorPriceList[index].price
+				this.currentSourceLanguage = row.sourceLanguage.lang
+				this.currentTargetLanguage = row.targetLanguage.lang
+				this.currentStep = row.step.title
+				this.currentUnit = row.unit.type
+				this.currentIndustry = row.industry.name
+				this.currentPrice = row.price
 			},
-			async checkErrors(index) {
+			async checkErrors(index, row) {
 				if (this.currentActive === -1) return
 				if (this.currentPrice === "") return
-				await this.manageSaveClick(index)
+				await this.manageSaveClick(index, row)
 			},
 
-			async manageSaveClick(index) {
+			async manageSaveClick(index, row) {
 				if (this.currentActive === -1) return
-				const id = this.currentVendorPriceList[index]._id
+				const id = row._id
 
 				try {
 					await this.$http.post("/vendorsapi/rates/change-pricelist/" + this.$route.params.id, {
@@ -272,35 +271,8 @@
 			setFilter({ option, prop }) {
 			  this.isDataRemain = true
 				this[prop] = option
-				this.getPricelist(this.allFilters)
+				// this.getPricelist(this.allFilters)
 			},
-			async bottomScrolled() {
-				if (this.isDataRemain) {
-					const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.$route.params.id, {
-						...this.allFilters,
-						countFilter: this.currentVendorPriceList.length
-					})
-					this.currentVendorPriceList.push(...result.data)
-					this.isDataRemain = result.body.length === 25
-				}
-			},
-			// async getPricelist(filters, count = 0) {
-			// 	try {
-			// 		const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.$route.params.id, {
-			// 					...filters,
-			// 					countFilter: count
-			// 				}
-			// 		)
-			// 		console.log(result.data)
-			// 		this.currentVendorPriceList = result.data
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: "Error on getting Pricelist",
-			// 			isShow: true,
-			// 			type: "error"
-			// 		})
-			// 	}
-			// },
 			getAllConcatUniqueValues(key, mapKey) {
 				return [ "All" ].concat(
 						this.getUniqueValues(
@@ -312,21 +284,6 @@
 			getUniqueValues(arr, key) {
 				return [ ...new Set(arr.map((item) => item[key])) ]
 			}
-		},
-		// watch: {
-		// 	async isRefreshResultTable() {
-		// 		if (this.isRefreshResultTable) {
-		// 			await this.getPricelist(this.allFilters)
-		// 		}
-		// 	},
-		// 	async refresh() {
-		// 		if (this.refresh) {
-		// 			await this.getPricelist(this.allFilters)
-		// 		}
-		// 	}
-		// },
-		created() {
-			// this.getPricelist(this.allFilters)
 		},
 		computed: {
 			...mapGetters({
@@ -358,19 +315,27 @@
 					return this.getAllConcatUniqueValues('industry', "name")
 				}
 			},
-			allFilters() {
-				let result = {
-					sourceFilter: this.sourceFilter,
-					targetFilter: this.targetFilter,
-					stepFilter: this.stepFilter,
-					unitFilter: this.unitFilter,
-					industryFilter: this.industryFilter
+			currentVendorPriceListFiltered() {
+				let result = this.currentVendorPriceList
+
+				let fields = [
+					{ filter: this.sourceFilter, query: 'item.sourceLanguage.lang === this.sourceFilter' },
+					{ filter: this.targetFilter, query: 'item.targetLanguage.lang === this.targetFilter' },
+					{ filter: this.stepFilter, query: 'item.step.title === this.stepFilter' },
+					{ filter: this.unitFilter, query: 'item.unit.type === this.unitFilter' },
+					{ filter: this.industryFilter, query: 'item.industry.name === this.industryFilter' },
+				]
+
+				let neededFields = fields.filter(({ filter }) => !!filter && filter !== 'All')
+				if (neededFields.length) {
+					let lastField = neededFields[neededFields.length - 1]
+					let query = neededFields.reduce((acc, curr) => {
+						curr.query !== lastField.query ? (acc = acc + curr.query + ' && ') : (acc = acc + curr.query)
+						return acc
+					}, 'item => ')
+
+					return result.filter(eval(query))
 				}
-				if (this.sourceFilter === "All") result.sourceFilter = ""
-				if (this.targetFilter === "All") result.targetFilter = ""
-				if (this.stepFilter === "All") result.stepFilter = ""
-				if (this.unitFilter === "All") result.unitFilter = ""
-				if (this.industryFilter === "All") result.industryFilter = ""
 
 				return result
 			},
