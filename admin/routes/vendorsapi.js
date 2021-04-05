@@ -33,7 +33,8 @@ const {
 	setRatePriceAfterPassedTest,
 	sendVendorTestAndUpdateQualification,
 	rejectedPendingCompetence,
-	deletePendingCompetence
+	deletePendingCompetence,
+	saveNotPassedTest
 } = require('../vendors')
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
@@ -187,6 +188,22 @@ router.post('/vendor-qualification', upload.fields([ { name: 'assessmentFile' } 
 				{ _id: vendorId },
 				{ [query]: qualification }
 		)
+		res.send(updatedVendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating")
+	}
+})
+
+router.post('/qualification-not-passed-path', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	const { vendorId, qId } = req.body
+	const files = req.files["file"]
+	try {
+		const updatedVendor = await saveNotPassedTest({
+			vendorId,
+			qId,
+			file: files[0]
+		})
 		res.send(updatedVendor)
 	} catch (err) {
 		console.log(err)

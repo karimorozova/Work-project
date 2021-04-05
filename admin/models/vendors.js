@@ -131,10 +131,10 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-  isCreatedByManager: {
-	  type: Boolean,
-    default: false
-  },
+	isCreatedByManager: {
+		type: Boolean,
+		default: false
+	},
 	notes: {
 		type: String
 	},
@@ -150,6 +150,17 @@ const VendorSchema = new mongoose.Schema({
 		},
 		industry: {
 			type: Schema.Types.ObjectId, ref: 'Industries'
+		}
+	} ],
+	notPassedQualifications: [ {
+		fileName: {
+			type: String
+		},
+		qId: {
+			type: String
+		},
+		path: {
+			type: String
 		}
 	} ],
 	qualifications: [ {
@@ -420,10 +431,6 @@ const VendorSchema = new mongoose.Schema({
 		type: Array,
 		default: []
 	},
-	isTest: {
-		type: Boolean,
-		default: false
-	},
 	password: {
 		type: String,
 		default: ''
@@ -481,10 +488,10 @@ const VendorSchema = new mongoose.Schema({
 			industry: {
 				type: String,
 				default: ''
-			},
+			}
 		}
 	} ],
-	approvedPendingCompetencies: [{
+	approvedPendingCompetencies: [ {
 		sourceLanguage: {
 			type: Schema.Types.ObjectId, ref: 'Language'
 		},
@@ -500,8 +507,8 @@ const VendorSchema = new mongoose.Schema({
 		rate: {
 			type: Number,
 			default: 0
-		},
-	}]
+		}
+	} ]
 
 }, { minimize: false })
 

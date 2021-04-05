@@ -4,6 +4,8 @@
       WYSIWYG(@closePreview="closePreview", :message="previewMessage", @send="sendMessage")
     .qualifications__form(v-if="isForm")
       VendorLqa(:vendorData="lqaData", @closeForm="closeForm", @saveVendorLqa="saveVendorLqa")
+    .qualifications__form(v-if="isFormNotPassed")
+      VendorLqa(:vendorData="lqaDataNotPassed", @closeForm="closeFormNotPassed", @saveVendorLqa="saveNotPassedTest")
     .qualifications__table
       SettingsTable(
         :fields="fields",
@@ -159,6 +161,9 @@
 				lqaData: {
 					isTqi: true
 				},
+				lqaDataNotPassed: {
+					isTqi: true
+				},
 				targets: [],
 				vendorTests: [],
 
@@ -181,7 +186,8 @@
 				currentActive: -1,
 				isForm: false,
 				isEditAndSend: false,
-				statusStage: -1
+				statusStage: -1,
+				isFormNotPassed: false,
 			}
 		},
 		methods: {
@@ -253,7 +259,22 @@
 				this.currentTqi = null
 				this.currentSteps = []
 			},
-
+			handleNotPassedTest(index){
+				if (this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)) {
+					this.setDefaults()
+					return
+				}
+				this.lqaDataNotPassed = {
+					vendor: {
+						name: `${ this.currentVendor.firstName } ${ this.currentVendor.surname }`,
+						industries: this.presentArrays(this.currentIndustries, 'name'),
+						sourceLang: this.currentSource.lang,
+						targetLang: this.currentTarget.lang,
+						step: this.presentArrays(this.currentSteps, "title")
+					}
+				}
+				this.openFormNotPassed(index)
+      },
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
 				this.errors = []
@@ -262,10 +283,11 @@
 					this.areErrors = true
 					return
 				}
-
 				if (this.currentStatus === "Passed") {
 					this.handleLqa(index)
-				} else if (this.currentStatus === "Test Sent") {
+				}else if(this.currentStatus === "Not Passed"){
+					this.handleNotPassedTest(index)
+        }else if (this.currentStatus === "Test Sent") {
 					const template = await this.$http.post(`/vendorsapi/get-message`, {
 						...this.currentVendor,
 						industries: this.currentIndustries,
@@ -306,6 +328,25 @@
 				}
 				this.openForm(index)
 			},
+      async saveNotPassedTest({ vendorData }){
+	      const { file, grade } = vendorData
+	      let formData = new FormData()
+	      formData.append("vendorId", this.currentVendor._id)
+	      formData.append("qId", this.qualificationData[this.currentActive]._id)
+	      formData.append("file", file)
+
+	      this.currentTqi = grade
+
+        try {
+	      	await this.$http.post('/vendorsapi/qualification-not-passed-path', formData)
+	        await this.manageSaveClick(this.currentActive)
+	        this.alertToggle({ message: "Qualification saved", isShow: true, type: "success" })
+        }catch (err) {
+        }finally {
+          this.closeFormNotPassed()
+        }
+
+      },
 			async saveVendorLqa({ vendorData }) {
 				const { file, grade } = vendorData
 				let assessment = {
@@ -354,12 +395,15 @@
 					this.setDefaults()
 					return
 				}
-				const tqi =
-						this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
-								? 0
-								: this.currentTqi
+				// const tqi =
+				// 		this.qualificationData[index].status === "Not Passed" || this.currentStatus === "Not Passed"
+				// 				? 0
+				// 				: this.currentTqi
+
+				const tqi = this.currentTqi
 
 				let qualification = {
+					_id: this.qualificationData[index]._id,
 					testId: this.qualificationData[index].testId,
 					target: this.currentTarget,
 					industries: this.currentIndustries,
@@ -433,8 +477,14 @@
 			closeForm() {
 				this.isForm = false
 			},
+			closeFormNotPassed(){
+				this.isFormNotPassed = false
+      },
 			openForm() {
 				this.isForm = true
+			},
+			openFormNotPassed() {
+				this.isFormNotPassed = true
 			},
 			async getTests() {
 				try {

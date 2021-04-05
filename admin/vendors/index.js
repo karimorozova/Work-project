@@ -7,10 +7,20 @@ const {
 	hasVendorCompetenciesAndPending,
 	getFilteredVendorsPotential
 } = require('./getVendors')
+
 const {
-	saveVendorDocument, saveVendorDocumentDefault, removeVendorDoc, saveHashedPassword, getPhotoLink,
-	removeOldVendorFile, updateVendorEducation, removeVendorEdu, updateVendorAssessment
+	saveVendorDocument,
+	saveVendorDocumentDefault,
+	removeVendorDoc,
+	saveHashedPassword,
+	getPhotoLink,
+	removeOldVendorFile,
+	updateVendorEducation,
+	removeVendorEdu,
+	updateVendorAssessment,
+	saveNotPassedTest
 } = require('./info')
+
 const { getJobs, updateStepProp } = require('./jobs')
 const { manageNewApplication } = require('./application')
 const { notifyTestStatus, sendMessageToVendor } = require('./emails')
@@ -76,5 +86,6 @@ module.exports = {
   hasVendorCompetenciesAndPending,
 	rejectedPendingCompetence,
 	deletePendingCompetence,
-	getFilteredVendorsPotential
+	getFilteredVendorsPotential,
+	saveNotPassedTest
 }

@@ -271,7 +271,7 @@ export const storeCurrentVendorQualification = async ({ commit, dispatch }, payl
         dispatch("storeCurrentVendor", updatedVendor.body);
         const statuses = ["Test Sent", "Not Passed", "Passed"];
         if(statuses.indexOf(qualification.status) !== -1) {
-            await Vue.http.post("/vendorsapi/test-emails", { vendor, qualification, testPath, message });
+            await Vue.http.post("/vendorsapi/test-emails", { vendor: updatedVendor.data, qualification, testPath, message });
         }
     } catch (err) {
         dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" });

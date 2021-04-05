@@ -92,6 +92,35 @@ async function updateVendorEducation({ vendorId, education, file, index }) {
   }
 }
 
+async function saveNotPassedTest({ vendorId, qId, file }){
+  const vendor = await Vendors.findOne({"_id": vendorId})
+  let { notPassedQualifications } = vendor
+  const idx = notPassedQualifications.findIndex(item => item.qId === qId)
+  let dt = new Date()
+  let num =  Number.parseInt((dt.getMilliseconds() * 24 / 7).toString())
+
+  if (file) {
+    const newPath = `/vendorsDocs/${ vendorId }/test-${ num }-${ file.filename }`
+    await moveFile(file, `./dist${ newPath }`)
+
+    if (idx === -1) {
+      notPassedQualifications.push({
+        fileName: file.filename,
+        path: `/vendorsDocs/${ vendorId }/test-${ num }-${ file.filename }`,
+        qId
+      })
+    } else {
+      notPassedQualifications.splice(idx, 1, {
+        fileName: file.filename,
+        path: `/vendorsDocs/${ vendorId }/test-${ num }-${ file.filename }`,
+        qId
+      })
+    }
+  }
+
+  return await getVendorAfterUpdate({ _id: vendorId }, { notPassedQualifications });
+}
+
 async function updateVendorAssessment({ vendorId, assessment, file }) {
   try {
     const vendor = await getVendor({ _id: vendorId });
@@ -217,5 +246,6 @@ module.exports = {
   removeOldVendorFile,
   updateVendorEducation,
   removeVendorEdu,
-  updateVendorAssessment
+  updateVendorAssessment,
+  saveNotPassedTest
 };

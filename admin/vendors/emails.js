@@ -30,8 +30,19 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       const attachments = [{ filename: assessmentStep.tqi.fileName, content: fs.createReadStream(`./dist${assessmentStep.tqi.path}`)}];
       return await sendEmail({ to: vendor.email, subject, attachments }, message);
     }
+    if(status === 'Not Passed') {
+      const { _id: qId } = vendor.qualifications.find(item =>
+          `${item.source._id}` === `${qualification.source._id}` &&
+          `${item.target._id}` === `${qualification.target._id}` &&
+          item.industries.some(item => qualification.industries.find(elem => item._id.toString() === elem._id.toString())) &&
+          item.steps.some(item => qualification.steps.find(elem => item._id.toString() === elem._id.toString()))
+      )
+      const {fileName, path} = vendor.notPassedQualifications.find(item => item.qId.toString() === qId.toString())
 
-    await sendEmail({ to: vendor.email, subject }, message);
+      const attachments = [{ filename: fileName, content: fs.createReadStream(`./dist${path}`)}];
+      return await sendEmail({ to: vendor.email, subject, attachments }, message);
+    }
+
   } catch (err) {
     console.log(err);
     console.log('Error in notifyTestStatus');
