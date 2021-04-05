@@ -401,7 +401,6 @@
 					let currentData = this.competenciesData[this.deleteIndex];
 					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
 					await this.storeCurrentVendor(result.data)
-          await this.setNewCurrentVendor(result.data.competencies)
 					// if (result.data.pendingCompetencies.length) {
 					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
 					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data.pendingCompetencies })

@@ -235,7 +235,8 @@
 				setDefaultValuesMatrixData: "setDefaultValuesMatrixData",
         initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
         updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
-        updateVendorGeneralData: "updateVendorGeneralData"
+        updateVendorGeneralData: "updateVendorGeneralData",
+        updateVendorRatesByKey: 'updateVendorRatesFromServer',
 			}),
 			setAlias({ option }) {
 				if (this.currentVendor.hasOwnProperty('aliases')) {
@@ -302,10 +303,7 @@
 				}
 			},
 			refreshResultTable() {
-				this.isRefreshResultTable = true
-				setTimeout(() => {
-					this.isRefreshResultTable = false
-				}, 1000)
+        this.updateVendorRatesByKey({key: 'pricelistTable'})
 			},
 			updateRates(action) {
 				this.isRefreshAfterServiceUpdate = action

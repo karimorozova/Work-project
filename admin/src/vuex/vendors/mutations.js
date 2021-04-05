@@ -44,11 +44,16 @@ export const mutations = {
     SET_CURRENT_VENDOR_DOCUMENTS(state,payload){
         state.currentVendorDocuments[payload._id] = payload
    },
+
    SET_CURRENT_VENDOR_ASSESSMENT(state,payload){
-    state.currentVendorAssessment.push({
+      state.currentVendorAssessment.push({
         _id: payload._id,
         industry: payload.industry,
-    })
-},
-
+      })
+   },
+  updateVendorRates(state,payload) {
+      const {key, data} = payload
+      console.log({key,data})
+      state.currentVendor.rates[key] = data
+  }
 }

@@ -388,3 +388,9 @@ export const clearVendorGeneralData = async ({commit, dispatch}, payload) => {
   commit("setCurrentVendorGeneralData", payload)
 }
 
+export const updateVendorRatesFromServer = async ({commit, state}, payload) => {
+  const {key} = payload
+  const rate = await Vue.http.post('/vendorsapi/vendor-rate-by-key', {key, id: state.currentVendor._id});
+  commit('updateVendorRates', {key, data: rate.body})
+}
+

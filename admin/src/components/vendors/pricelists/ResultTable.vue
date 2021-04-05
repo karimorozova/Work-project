@@ -15,10 +15,10 @@
     )
     DataTable(
       :fields="fields",
-      :tableData="dataArray",
+      :tableData="currentVendorPriceList",
       @bottomScrolled="bottomScrolled",
-      :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 6 }]",
-      :tableheadRowClass="dataArray.length < 6 ? 'tbody_visible-overflow' : ''",
+      :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': currentVendorPriceList.length < 6 }]",
+      :tableheadRowClass="currentVendorPriceList.length < 6 ? 'tbody_visible-overflow' : ''",
       bodyRowClass="client-pricelist-table-row",
       bodyCellClass="client-pricelist-table-cell"
     )
@@ -82,7 +82,7 @@
             .price__icons-link-opacity
               i.fa.fa-link(aria-hidden="true")
 
-    .price__empty(v-if="!dataArray.length") Nothing found...
+    .price__empty(v-if="!currentVendorPriceList.length") Nothing found...
 </template>
 <script>
 	import DataTable from "../../DataTable"
@@ -169,7 +169,6 @@
 					}
 				],
 
-				dataArray: [],
 				currentSourceLanguage: "",
 				currentTargetLanguage: "",
 				currentStep: "",
@@ -188,18 +187,19 @@
 		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+        updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
 			async getRowPrice(index) {
 				try {
 					await this.$http.post("/vendorsapi/rates/sync-cost/" + this.$route.params.id, {
 						tableKey: "Pricelist Table",
-						row: this.dataArray[index]
+						row: this.currentVendorPriceList[index]
 					})
-          const rateId = this.dataArray[index]._id
-					const result = await this.$http.post("/vendorsapi/vendor-priceListTable-index", { vendorId: this.$route.params.id, rateId })
-					this.dataArray.splice(index, 1, result.data)
-				} catch (err) {
+
+          this.updateVendorRatesByKey({key: 'pricelistTable'})
+
+        } catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
@@ -223,12 +223,12 @@
 			},
 			setEditingData(index) {
 				this.currentActive = index
-				this.currentSourceLanguage = this.dataArray[index].sourceLanguage.lang
-				this.currentTargetLanguage = this.dataArray[index].targetLanguage.lang
-				this.currentStep = this.dataArray[index].step.title
-				this.currentUnit = this.dataArray[index].unit.type
-				this.currentIndustry = this.dataArray[index].industry.name
-				this.currentPrice = this.dataArray[index].price
+				this.currentSourceLanguage = this.currentVendorPriceList[index].sourceLanguage.lang
+				this.currentTargetLanguage = this.currentVendorPriceList[index].targetLanguage.lang
+				this.currentStep = this.currentVendorPriceList[index].step.title
+				this.currentUnit = this.currentVendorPriceList[index].unit.type
+				this.currentIndustry = this.currentVendorPriceList[index].industry.name
+				this.currentPrice = this.currentVendorPriceList[index].price
 			},
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
@@ -238,7 +238,7 @@
 
 			async manageSaveClick(index) {
 				if (this.currentActive === -1) return
-				const id = this.dataArray[index]._id
+				const id = this.currentVendorPriceList[index]._id
 
 				try {
 					await this.$http.post("/vendorsapi/rates/change-pricelist/" + this.$route.params.id, {
@@ -252,8 +252,8 @@
 						isShow: true,
 						type: "success"
 					})
-					const updatedData = await this.$http.get("/vendorsapi/rates/" + this.$route.params.id)
-					this.dataArray[index] = updatedData.body.pricelistTable.find(rate => rate._id.toString() === id)
+					this.updateVendorRatesByKey({key: 'pricelistTable'})
+
 					this.setDefaults()
 				} catch (err) {
 					this.alertToggle({
@@ -278,29 +278,29 @@
 				if (this.isDataRemain) {
 					const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.$route.params.id, {
 						...this.allFilters,
-						countFilter: this.dataArray.length
+						countFilter: this.currentVendorPriceList.length
 					})
-					this.dataArray.push(...result.data)
+					this.currentVendorPriceList.push(...result.data)
 					this.isDataRemain = result.body.length === 25
 				}
 			},
-			async getPricelist(filters, count = 0) {
-				try {
-					const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.$route.params.id, {
-								...filters,
-								countFilter: count
-							}
-					)
-					console.log(result.data)
-					this.dataArray = result.data
-				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Pricelist",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
+			// async getPricelist(filters, count = 0) {
+			// 	try {
+			// 		const result = await this.$http.post("/vendorsapi/rates/rate-combinations/" + this.$route.params.id, {
+			// 					...filters,
+			// 					countFilter: count
+			// 				}
+			// 		)
+			// 		console.log(result.data)
+			// 		this.currentVendorPriceList = result.data
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: "Error on getting Pricelist",
+			// 			isShow: true,
+			// 			type: "error"
+			// 		})
+			// 	}
+			// },
 			getAllConcatUniqueValues(key, mapKey) {
 				return [ "All" ].concat(
 						this.getUniqueValues(
@@ -313,24 +313,25 @@
 				return [ ...new Set(arr.map((item) => item[key])) ]
 			}
 		},
-		watch: {
-			async isRefreshResultTable() {
-				if (this.isRefreshResultTable) {
-					await this.getPricelist(this.allFilters)
-				}
-			},
-			async refresh() {
-				if (this.refresh) {
-					await this.getPricelist(this.allFilters)
-				}
-			}
-		},
+		// watch: {
+		// 	async isRefreshResultTable() {
+		// 		if (this.isRefreshResultTable) {
+		// 			await this.getPricelist(this.allFilters)
+		// 		}
+		// 	},
+		// 	async refresh() {
+		// 		if (this.refresh) {
+		// 			await this.getPricelist(this.allFilters)
+		// 		}
+		// 	}
+		// },
 		created() {
-			this.getPricelist(this.allFilters)
+			// this.getPricelist(this.allFilters)
 		},
 		computed: {
 			...mapGetters({
-				currentVendor: "getCurrentVendor"
+				currentVendor: "getCurrentVendor",
+        currentVendorPriceList: "getVendorPriceList",
 			}),
 			dataForSourceFilter() {
 				if (this.currentVendor.rates.pricelistTable.length) {
