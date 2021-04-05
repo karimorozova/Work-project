@@ -17,10 +17,9 @@
 
     DataTable(
       :fields="fields"
-      :tableData="dataArray"
-      @bottomScrolled="bottomScrolled"
-      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 6}]"
-      :tableheadRowClass="dataArray.length < 6 ? 'tbody_visible-overflow' : ''"
+      :tableData="currentClientPriceList"
+      :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': currentClientPriceList.length < 6}]"
+      :tableheadRowClass="currentClientPriceList.length < 6 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="client-pricelist-table-row"
       bodyCellClass="client-pricelist-table-cell"
     )
@@ -79,7 +78,7 @@
             .price__icons-link-opacity
               i.fa.fa-link(aria-hidden='true')
 
-    .price__empty(v-if="!dataArray.length") Nothing found...
+    .price__empty(v-if="!currentClientPriceList.length") Nothing found...
 </template>
 <script>
 	import DataTable from "../../DataTable"
@@ -166,7 +165,6 @@
 					}
 				],
 
-				dataArray: [],
 				currentSourceLanguage: "",
 				currentTargetLanguage: "",
 				currentStep: "",
@@ -186,17 +184,17 @@
 		},
 		methods: {
 			...mapActions({
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
+        updateClientRatesProp: "updateClientRatesProp"
 			}),
 			async getRowPrice(index) {
 				try {
 					await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
 						tableKey: "Pricelist Table",
-						row: this.dataArray[index]
+						row: this.currentClientPriceList[index]
 					})
-          const rateId = this.dataArray[index]._id
-					const result = await this.$http.post("/clientsapi/client-priceListTable-index", { clientId: this.clientId, rateId })
-					this.dataArray.splice(index, 1, result.data)
+
+          this.updateClientRatesProp({key: "pricelistTable"})
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
@@ -221,12 +219,12 @@
 			},
 			setEditingData(index) {
 				this.currentActive = index
-				this.currentSourceLanguage = this.dataArray[index].sourceLanguage.lang
-				this.currentTargetLanguage = this.dataArray[index].targetLanguage.lang
-				this.currentStep = this.dataArray[index].step.title
-				this.currentUnit = this.dataArray[index].unit.type
-				this.currentIndustry = this.dataArray[index].industry.name
-				this.currentPrice = this.dataArray[index].price
+				this.currentSourceLanguage = this.currentClientPriceList[index].sourceLanguage.lang
+				this.currentTargetLanguage = this.currentClientPriceList[index].targetLanguage.lang
+				this.currentStep = this.currentClientPriceList[index].step.title
+				this.currentUnit = this.currentClientPriceList[index].unit.type
+				this.currentIndustry = this.currentClientPriceList[index].industry.name
+				this.currentPrice = this.currentClientPriceList[index].price
 			},
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
@@ -236,7 +234,7 @@
 
 			async manageSaveClick(index) {
 				if (this.currentActive === -1) return
-				const id = this.dataArray[index]._id
+				const id = this.currentClientPriceList[index]._id
 				try {
 					await this.$http.post("/clientsapi/rates/change-pricelist/" + this.clientId, {
 								_id: id,
@@ -250,8 +248,7 @@
 						isShow: true,
 						type: "success"
 					})
-					const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
-					this.dataArray[index] = updatedData.body.pricelistTable.find(rate => rate._id.toString() === id)
+          this.updateClientRatesProp({key: "pricelistTable"})
 					this.setDefaults()
 				} catch (err) {
 					this.alertToggle({
@@ -272,43 +269,36 @@
 				this[prop] = option
 				this.getPricelist(this.allFilters)
 			},
-			async bottomScrolled() {
-				if (this.isDataRemain) {
-					const result = await this.$http.post(
-							"/clientsapi/rates/rate-combinations/" + this.clientId,
-							{
-								...this.allFilters,
-								countFilter: this.dataArray.length
-							}
-					)
-					this.dataArray.push(...result.data)
-					this.isDataRemain = result.data.length === 25
-				}
-			},
+			// async bottomScrolled() {
+			// 	if (this.isDataRemain) {
+			// 		const result = await this.$http.post(
+			// 				"/clientsapi/rates/rate-combinations/" + this.clientId,
+			// 				{
+			// 					...this.allFilters,
+			// 					countFilter: this.currentClientPriceList.length
+			// 				}
+			// 		)
+			// 		this.currentClientPriceList.push(...result.data)
+			// 		this.isDataRemain = result.data.length === 25
+			// 	}
+			// },
 			async getClientServices() {
-				const client = await this.$http.get(
-						`/clientsapi/client?id=${ this.$route.params.id }`
-				)
-				this.currentServices = client.body.services
+				// const client = await this.$http.get(
+				// 		`/clientsapi/client?id=${ this.$route.params.id }`
+				// )
+				this.currentServices = this.currentClient.service
 			},
-			async getPricelist(filters, count = 0) {
-				try {
-					const result = await this.$http.post(
-							"/clientsapi/rates/rate-combinations/" + this.clientId,
-							{
-								...filters,
-								countFilter: count
-							}
-					)
-					this.dataArray = result.data
-				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Pricelist",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
+			// async getPricelist(filters, count = 0) {
+			// 	try {
+			// 		this.currentClientPriceList = this.currentClientPriceList
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: "Error on getting Pricelist",
+			// 			isShow: true,
+			// 			type: "error"
+			// 		})
+			// 	}
+			// },
 			getUniqueValues(arr, key) {
 				return [ ...new Set(arr.map((item) => item[key])) ]
 			},
@@ -325,25 +315,26 @@
 
 		},
 		watch: {
-			async isRefreshResultTable() {
-				if (this.isRefreshResultTable) {
-					this.getPricelist(this.allFilters)
-				}
-			},
-			async refresh() {
-				if (this.refresh) {
-					this.getPricelist(this.allFilters)
-					this.getClientServices()
-				}
-			}
+			// async isRefreshResultTable() {
+			// 	if (this.isRefreshResultTable) {
+			// 		this.getPricelist(this.allFilters)
+			// 	}
+			// },
+			// async refresh() {
+			// 	if (this.refresh) {
+			// 		this.getPricelist(this.allFilters)
+			// 		this.getClientServices()
+			// 	}
+			// }
 		},
 		created() {
-			this.getPricelist(this.allFilters)
+			// this.getPricelist(this.allFilters)
 			this.getClientServices()
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "getCurrentClient"
+				currentClient: "getCurrentClient",
+        currentClientPriceList: "getCurrentClientPriceList",
 			}),
 			dataForSourceFilter() {
 				if (this.currentServices) {

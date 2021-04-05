@@ -3,7 +3,11 @@ import * as getters from './getters';
 import { mutations } from './mutations';
 
 const state = {
-    currentClient: {},
+    currentClient: {
+      rates: {
+        pricelistTable: null,
+      }
+    },
 
     currentClientOverallData: {
         name: null,

@@ -83,5 +83,8 @@ export const mutations = {
             state.currentClientOverallData.contacts[index].leadContact = false;
         }
         state.currentClientOverallData.contacts[payload].leadContact = true;
+    },
+    updateClientRatesProp(state, payload) {
+      state.currentClient.rates[payload.key] = payload.data
     }
 }

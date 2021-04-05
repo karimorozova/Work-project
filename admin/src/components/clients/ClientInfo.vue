@@ -231,12 +231,10 @@
 				}
 			},
 			refreshResultTable() {
-				this.isRefreshResultTable = true
-				setTimeout(() => {
-					this.isRefreshResultTable = false
-				}, 500)
+        this.updateClientRatesProp({key: "pricelistTable"})
 			},
 			updateRates(action) {
+        this.updateClientRatesProp({key: "pricelistTable"})
 				this.isRefreshAfterServiceUpdate = action
 				setTimeout(() => {
 					this.isRefreshAfterServiceUpdate = !action
@@ -471,7 +469,8 @@
 				storeClientBillingInfoProperty: "storeClientBillingInfoProperty",
 				setUpClientProp: "setUpClientProp",
 				storeClientPropertyOverallData: "storeClientPropertyOverallData",
-				storeClientPropertyOverallDataBilling: "storeClientPropertyOverallDataBilling"
+				storeClientPropertyOverallDataBilling: "storeClientPropertyOverallDataBilling",
+        updateClientRatesProp: 'updateClientRatesProp',
 			}),
 
 			async getAliases() {

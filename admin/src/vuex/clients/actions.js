@@ -133,3 +133,8 @@ export const updateClientStatus = async ({ commit, dispatch }, payload) => {
 		commit("endRequest")
 	}
 }
+
+export const updateClientRatesProp = async ({commit, dispatch, state}, payload) => {
+   const rates = await Vue.http.get("/clientsapi/rates/" + state.currentClient._id)
+  commit('updateClientRatesProp', {data: rates.body[payload.key], key: payload.key})
+}
