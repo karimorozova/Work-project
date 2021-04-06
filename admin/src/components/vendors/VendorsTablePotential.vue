@@ -308,7 +308,8 @@
 					return
 				}
 				const vendor = this.vendors[index];
-				this.$router.push(`/vendors/details/${ vendor._id }`);
+        window.open(`/vendors/details/${ vendor._id }`, "_blank");
+        // this.$router.push(`/vendors/details/${ vendor._id }`);
 			}
 		},
 		computed: {

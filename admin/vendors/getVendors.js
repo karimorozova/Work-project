@@ -152,7 +152,16 @@ async function getFilteredVendorsWithCustomFilters(filters, customFilters = {}){
 
 async function getFilteredVendorsPotential(filters){
   try {
-    const query = getFilteringQueryPotential(filters);
+
+    const notEmptyOrCreatedByManagerFilter = {$or: [
+        {isCreatedByManager: true},
+        { status:{$ne: 'Potential'}},
+        { pendingCompetencies: { $exists: true, $not: {$size: 0} } },
+        { competencies: { $exists: true, $not: {$size: 0} } },
+        { approvedPendingCompetencies: { $exists: true, $not: {$size: 0} } },
+      ]}
+
+    const query = {...getFilteringQueryPotential(filters),...notEmptyOrCreatedByManagerFilter};
 
     let vendors = await Vendors.find(query, {
       firstName: 1,
