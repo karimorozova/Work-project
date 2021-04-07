@@ -25,6 +25,9 @@
           )
         .vendors-table__no-drop.vendors-table__status(v-else) {{ row.status }}
 
+      template(slot="potentialLang" slot-scope="{ row }")
+        .vendors-table__combinations(v-html="formateLanguagesPairs(getPendingLanguagePair(row)) ")
+
       template(slot="languagePair" slot-scope="{ row }")
         .vendors-table__combinations(v-html="formateLanguagesPairs(getLanguagePairs(row).duoLanguagesPairs) ")
 
@@ -57,11 +60,11 @@
 
       template(slot="test" slot-scope="{ row, index }")
         .checkbox(@click.stop="")
-          input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
+          input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="" disabled)
           label(:for="'test' + (index + 1)")
       template(slot="icons" slot-scope="{ row, index }")
         span.vendors-table__icons
-          img.vendors-table__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'vendors-table_opacity': isIconClass(index, key)}")
+          img.vendors-table__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in manageIcons" :src="icon.icon" :class="{'vendors-table_opacity': isIconClass(index, key)}")
     .vendors-table__error(v-if="isErrorShow")
       .vendors-table__error-message
         p Please finish the current edition first!
@@ -111,14 +114,15 @@
 			return {
 				fields: [
 					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "15%", padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "8%", padding: "0" },
+					{ label: "Pending Pair", headerKey: "headerPotentialLang", key: "potentialLang", width: "12%", cellClass: "vendors-table_scroll-y" },
 					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "12%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "12%", cellClass: "vendors-table_scroll-y" },
+					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "10%", cellClass: "vendors-table_scroll-y" },
 					{ label: "Native Language", headerKey: "headerNative", key: "native", width: "12%", padding: "0" },
 					{ label: "Industry", headerKey: "headerIndustry", key: "industry", width: "12%", padding: "0" },
 					{ label: "Created At", headerKey: "headerCreated", key: "createdAt", width: "12%", padding: "0",},
-					{ label: "Test", headerKey: "headerTest", key: "test", width: "5%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "8%", padding: "3px" },
+					{ label: "Test", headerKey: "headerTest", key: "test", width: "3%", padding: "0" },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "4%", padding: "3px" },
 				],
 				icons: {
 					save: { icon: require('../../assets/images/Other/save-icon-qa-form.png') },
@@ -202,6 +206,10 @@
 					}
 				}
 			},
+      getPendingLanguagePair(vendor) {
+			  if(!vendor && !vendor.pendingCompetencies && !vendor.competencies[0].sourceLanguage ) return []
+        return [...new Set(vendor.pendingCompetencies.map(({sourceLanguage, targetLanguage})=> (`${sourceLanguage.symbol} >> ${targetLanguage.symbol}`)))]
+      },
 			isIconClass(index, key) {
 				if(this.currentEditingIndex !== index) {
 					return key === 'save' || key === 'cancel';
@@ -323,7 +331,10 @@
 					result.push(ind.name);
 				}
 				return result;
-			}
+			},
+      manageIcons() {
+        return { delete: this.icons.delete }
+      },
 		},
 		components: {
 			DataTable,
@@ -471,11 +482,13 @@
     }
 
     .checkbox {
-      display: inline-flex;
+      display: flex;
       align-items: center;
+      justify-content: center;
+      padding-top: 3px;
 
       input[type="checkbox"] {
-        opacity: 0;
+        display: none;
 
         + {
           label {
@@ -499,7 +512,7 @@
       label {
         position: relative;
         display: inline-block;
-        padding-left: 22px;
+        padding-left: 19px;
         padding-top: 7px;
 
         &::before {

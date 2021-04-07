@@ -37,6 +37,12 @@
                 Button(value="Set Range" @clicked="setDateRange")
               .v-filters__buttonItem
                 Button(value="Clear Range" @clicked="clearDateRange")
+    .v-filters__col.v-filters_width-22
+      .v-filters__item.margin-top-4
+        span Active Vendors:
+        .checkbox
+          input(type="checkbox" id="hasPending"  :checked="hasPending"  @click.stop="hasPendingClicked")
+          label(for="hasPending")
 
 
 </template>
@@ -85,6 +91,7 @@
 				fromDate: new Date(),
 				toDate: new Date(),
 				dateRange: "",
+        hasPending: true,
 			}
 		},
 		methods: {
@@ -149,7 +156,11 @@
 				function doneTyping() {
 					vm.$emit("setNameFilter", { option: value })
 				}
-			}
+			},
+      hasPendingClicked() {
+			  this.hasPending = !this.hasPending
+			  this.$emit('setIsPendingFilter', {hasPending: this.hasPending})
+      }
 		},
 		computed: {
 			stepNames() {
@@ -292,6 +303,66 @@
 
     &_margin-bottom-20 {
       margin-bottom: 20px;
+    }
+    .checkbox {
+      display: inline-flex;
+      align-items: center;
+
+      input[type="checkbox"] {
+        opacity: 0;
+
+        + {
+          label {
+            &::after {
+              content: none;
+            }
+          }
+        }
+
+        &:checked {
+          + {
+            label {
+              &::after {
+                content: "";
+              }
+            }
+          }
+        }
+      }
+
+      label {
+        position: relative;
+        display: inline-block;
+        padding-left: 22px;
+        padding-top: 24px;
+
+        &::before {
+          position: absolute;
+          content: "";
+          display: inline-block;
+          height: 16px;
+          width: 16px;
+          border: 1px solid;
+          left: 0px;
+          top: 3px;
+        }
+
+        &::after {
+          position: absolute;
+          content: "";
+          display: inline-block;
+          height: 5px;
+          width: 9px;
+          border-left: 2px solid;
+          border-bottom: 2px solid;
+          transform: rotate(-45deg);
+          left: 4px;
+          top: 7px;
+        }
+      }
+    }
+    .margin-top-4 {
+      margin-top: 4px;
     }
   }
 

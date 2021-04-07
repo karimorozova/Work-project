@@ -561,7 +561,7 @@
 				switch (this.qualificationData[this.currentActive].status) {
 					case "Created":
 					case "Re-Test":
-						result.push("Test Sent")
+						result.push("Test Sent","Passed", "Not Passed")
 						break
 					case "Test Sent":
 						result.push("Test Received")

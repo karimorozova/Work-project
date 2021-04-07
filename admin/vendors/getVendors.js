@@ -124,6 +124,8 @@ async function getFilteredVendors(filters) {
         .sort({ _id: 1 }).limit(25)
         .populate("industries")
         .populate("native")
+        .populate('pendingCompetencies.sourceLanguage')
+        .populate('pendingCompetencies.targetLanguage')
   } catch (err) {
     console.log(err)
     console.log("Error on filtering vendors")
@@ -163,6 +165,8 @@ async function getFilteredVendorsPotential(filters){
 
     const query = {...getFilteringQueryPotential(filters),...notEmptyOrCreatedByManagerFilter};
 
+    const query = getFilteringQueryPotential(filters);
+
     let vendors = await Vendors.find(query, {
       firstName: 1,
       status: 1,
@@ -172,7 +176,11 @@ async function getFilteredVendorsPotential(filters){
       industries: 1,
       isTest: 1,
       dateInfo: 1,
-    }).sort({ _id: 1 }).limit(25).populate("industries").populate("native")
+    }).sort({ _id: 1 }).limit(25)
+      .populate("industries")
+      .populate("native")
+      .populate('pendingCompetencies.sourceLanguage')
+      .populate('pendingCompetencies.targetLanguage')
 
     const rebuildVendors = vendors.map(item => {
       return {
@@ -181,7 +189,6 @@ async function getFilteredVendorsPotential(filters){
       }
     })
 
-    console.log(rebuildVendors)
 
     return rebuildVendors
 
