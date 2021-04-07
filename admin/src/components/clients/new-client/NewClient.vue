@@ -120,7 +120,7 @@
     display: flex;
     width: 100%;
     box-sizing: border-box;
-    min-height: 94vh;
+    min-height: 95vh;
   }
 
 </style>

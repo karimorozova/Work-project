@@ -58,7 +58,7 @@ export default {
 .adminNavbar {
   position: relative;
   display: flex;
-  min-height: 94vh;
+  min-height: 95vh;
   &__slider {
     // transform: translate(-50%);
     background-color: #fff;

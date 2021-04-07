@@ -5,7 +5,7 @@
         input.action-buttonOutline__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
     .button(v-else)
       .action-button(:class="[customClass, {disabled: isDisabled}]")
-        input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
+        input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
 </template>
 
 <script>
@@ -20,10 +20,14 @@
 			customClass: {
 				type: String
 			},
-      outline:{
+			outline: {
 				type: Boolean,
-        default: false,
-      }
+				default: false
+			},
+			color: {
+				type: String,
+				default: "#d15f45"
+			}
 		},
 		methods: {
 			clicked() {

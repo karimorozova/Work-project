@@ -10,6 +10,7 @@ const state = {
     services: [],
     units: [],
     customers: [],
+    users: [],
 
     clientLangs: [],
     vendors: [],

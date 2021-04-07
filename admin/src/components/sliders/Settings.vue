@@ -109,7 +109,7 @@ export default {
 
 .settings {
   display: flex;
-  min-height: 94vh;
+  min-height: 95vh;
   position: relative;
   width: 100%;
   &__sidebar {

@@ -108,7 +108,7 @@
     display: flex;
     width: 100%;
     box-sizing: border-box;
-    min-height: 94vh;
+    min-height: 95vh;
 
     &__sidebar {
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;

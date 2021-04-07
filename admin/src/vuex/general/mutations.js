@@ -52,7 +52,9 @@ export const mutations = {
     allServices(state, payload) {
         state.services = payload
     },
-
+    allUsers(state, payload) {
+        state.users = payload
+    },
     customerlangs(state, payload) {
         state.clientLangs = payload
     },

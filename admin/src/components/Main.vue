@@ -2,7 +2,7 @@
   .adminportal-wrapper
     .admin-top
       .admin-top__admin-name
-        h2.adminPortal ADMIN PORTAL
+        .adminPortal ADMIN PORTAL
       .admin-top__search-block
         .new-request
           Button(value="Add New Project" @clicked="gotoRequestPage" customClass="main-nav_button")
@@ -145,6 +145,11 @@
 				let allLangs = result.body
 				this.$store.dispatch('allLanguages', allLangs)
 			},
+			async getAllUsers() {
+					const result = await this.$http.get("/users-full");
+					let users = result.body;
+				  this.$store.dispatch('allUsers', users)
+			},
 			async allIndustries() {
 				let result = await this.$http.get('/api/industries')
 				this.$store.dispatch('allIndustries', result.data)
@@ -278,6 +283,7 @@
       this.allIndustries()
 			this.allServices()
 			this.allUnits()
+      this.getAllUsers()
 		},
 		mounted() {
 			this.mainPageRender()
@@ -300,7 +306,7 @@
     justify-content: space-between;
     background-color: #67573e;
     position: fixed;
-    height: 6vh;
+    height: 5vh;
     width: 100%;
     z-index: 1000;
 
@@ -493,7 +499,7 @@
 
   .admin-main-wrapper {
     box-sizing: border-box;
-    padding-top: 6vh;
+    padding-top: 5vh;
     display: flex;
     height: 100%;
     position: relative;
@@ -510,7 +516,7 @@
       left: 0;
       z-index: 999;
       display: flex;
-      min-height: 94vh;
+      min-height: 95vh;
 
       &__sidebar {
         padding: 25px 0;

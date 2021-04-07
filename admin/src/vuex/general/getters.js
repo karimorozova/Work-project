@@ -8,6 +8,7 @@ export const alertMessage = state => state.alertMessage;
 
 export const getVuexServices = state => state.services;
 
+export const getUsers = state => state.users;
 export const getUser = state => state.user;
 export const getAllLanguages = state => state.languages;
 export const getAllIndustries= state => state.industries;

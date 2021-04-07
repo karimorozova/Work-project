@@ -45,7 +45,7 @@ export default {
 .finance-settings {
   position: relative;
   display: flex;
-  min-height: 94vh;
+  min-height: 95vh;
 }
 
 .button {

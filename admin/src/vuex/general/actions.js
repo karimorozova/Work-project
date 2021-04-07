@@ -13,6 +13,7 @@ export const allSteps = ({ commit }, payload) => commit('allSteps', payload);
 export const setVendorsForProject = ({ commit }, payload) => commit('allVendorsForProject', payload);
 export const allUnits = ({ commit }, payload) => commit('allUnits', payload);
 export const allServices = ({ commit }, payload) => commit('allServices', payload);
+export const allUsers = ({ commit }, payload) => commit('allUsers', payload);
 
 
 export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload);

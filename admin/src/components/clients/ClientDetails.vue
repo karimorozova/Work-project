@@ -95,7 +95,7 @@ export default {
     position: relative;
     display: flex;
     width: 100%;
-    min-height: 94vh;
+    min-height: 95vh;
 }
 
 </style>

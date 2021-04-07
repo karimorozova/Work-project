@@ -1,7 +1,16 @@
 <template lang="pug">
   .client-layout
     .client-info(v-if="currentClient._id")
-      //Sidebar
+      Sidebar(
+        @createTask="createTask"
+      )
+      transition(name="modal")
+        .client-activity__addTask(v-if="createTaskModal")
+          AddTask(
+            :clientTask="clientTask"
+            @close="closeTaskModal"
+          )
+
       SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
 
       .title General Information
@@ -136,8 +145,9 @@
 	import DiscountChart from "./DiscountChart"
 	import ClientsNotes from "./ClientsNotes"
 	import vatChecker from "../../mixins/Client/vatChecker"
-  import SaveCancelPopUp from "../SaveCancelPopUp";
+	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Sidebar from "./sidebar/SidebarMenu"
+	import AddTask from "./activity/AddTask"
 
 	export default {
 		mixins: [ vatChecker ],
@@ -157,6 +167,7 @@
 		},
 		data() {
 			return {
+				clientTask: {},
 				aliases: [],
 				timezones: [],
 				currentDocuments: [],
@@ -180,27 +191,27 @@
 				isRefreshResultTable: false,
 				isRefreshAfterServiceUpdate: false,
 
-        generalKeys: [
-	        'name',
-	        'officialCompanyName',
-	        'email',
-	        'website',
-	        'industries',
-	        'nativeLanguage',
-	        'timeZone',
-	        'aliases',
-	        'targetLanguages',
-	        'sourceLanguages',
-	        'status',
-	        'accountManager',
-	        'salesManager',
-	        'projectManager',
-	        'otherInfo',
-	        'leadGeneration',
-	        'leadSource',
-	        'contacts'
-        ],
-        billingKeys: [
+				generalKeys: [
+					'name',
+					'officialCompanyName',
+					'email',
+					'website',
+					'industries',
+					'nativeLanguage',
+					'timeZone',
+					'aliases',
+					'targetLanguages',
+					'sourceLanguages',
+					'status',
+					'accountManager',
+					'salesManager',
+					'projectManager',
+					'otherInfo',
+					'leadGeneration',
+					'leadSource',
+					'contacts'
+				],
+				billingKeys: [
 					'vat',
 					'vatId',
 					'address',
@@ -208,10 +219,26 @@
 					'officialCompanyName',
 					'dueDate',
 					'paymentType'
-				]
+				],
+
+				createTaskModal: false
 			}
 		},
 		methods: {
+			closeTaskModal() {
+				this.createTaskModal = false
+			},
+			createTask() {
+				this.clientTask = {
+					priority: "",
+					title: "",
+					deadline: "",
+					details: "",
+					assignedTo: {},
+					associatedTo: []
+				}
+				this.createTaskModal = true
+			},
 			async setMatrixData({ value, key }) {
 				value = value > 100 ? 100 : value < 0 ? 0 : value
 				try {
@@ -232,10 +259,10 @@
 				}
 			},
 			refreshResultTable() {
-        this.updateClientRatesProp({key: "pricelistTable"})
+				this.updateClientRatesProp({ key: "pricelistTable" })
 			},
 			updateRates(action) {
-        this.updateClientRatesProp({key: "pricelistTable"})
+				this.updateClientRatesProp({ key: "pricelistTable" })
 				this.isRefreshAfterServiceUpdate = action
 				setTimeout(() => {
 					this.isRefreshAfterServiceUpdate = !action
@@ -245,7 +272,7 @@
 				this.$emit("loadFile", { files, prop })
 			},
 			cancel() {
-        this.storeCurrentClientOverallData(this.currentClient)
+				this.storeCurrentClientOverallData(this.currentClient)
 			},
 			saveContactUpdates({ index, contact }) {
 				// this.updateClientContact({ index, contact })
@@ -358,12 +385,12 @@
 			},
 
 			async updateClient() {
-        let clientForSave = {...this.currentClient}
+				let clientForSave = { ...this.currentClient }
 				let keys = [ ...this.generalKeys ]
 				let billingKeys = [ ...this.billingKeys ]
 
-				for(let key of keys) clientForSave[key] = this.currentClientOverallData[key]
-				for(let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
+				for (let key of keys) clientForSave[key] = this.currentClientOverallData[key]
+				for (let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
@@ -380,11 +407,11 @@
 
 					await this.storeClient(client)
 					await this.storeCurrentClient(client)
-          this.storeCurrentClientOverallData(client)
+					this.storeCurrentClientOverallData(client)
 
-          this.$socket.emit('updatedClientData', {_id: this.$route.params.id, data: this.currentClientOverallData})
+					this.$socket.emit('updatedClientData', { _id: this.$route.params.id, data: this.currentClientOverallData })
 
-          this.alertToggle({
+					this.alertToggle({
 						message: "Client info has been updated", isShow: true, type: "success"
 					})
 				} catch (err) {
@@ -471,7 +498,7 @@
 				setUpClientProp: "setUpClientProp",
 				storeClientPropertyOverallData: "storeClientPropertyOverallData",
 				storeClientPropertyOverallDataBilling: "storeClientPropertyOverallDataBilling",
-        updateClientRatesProp: 'updateClientRatesProp',
+				updateClientRatesProp: 'updateClientRatesProp'
 			}),
 
 			async getAliases() {
@@ -541,7 +568,7 @@
 		},
 		components: {
 			Sidebar,
-      SaveCancelPopUp,
+			SaveCancelPopUp,
 			DiscountChart,
 			ClientServices,
 			General,
@@ -559,17 +586,18 @@
 			OtherClientInformation,
 			RatesParameters,
 			ClientsNotes,
+			AddTask
 		},
 		created() {
 			this.getClientInfoLangs()
 			this.getTimezones()
 			this.getAliases()
-      this.$socket.on('refreshClientData', ({ _id, data }) => {
-        if (_id == this.$route.params.id) {
-          this.storeCurrentClient({...this.currentClient, ...data})
-          this.storeCurrentClientOverallData(data)
-        }
-      })
+			this.$socket.on('refreshClientData', ({ _id, data }) => {
+				if (_id == this.$route.params.id) {
+					this.storeCurrentClient({ ...this.currentClient, ...data })
+					this.storeCurrentClientOverallData(data)
+				}
+			})
 		},
 		beforeDestroy() {
 			this.storeCurrentClient({})
@@ -589,6 +617,28 @@
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
+
+  .client-activity {
+    &__addTask {
+      position: fixed;
+      top: 0%;
+      left: 50%;
+      transform: translate(-50%, 25%);
+      z-index: 999999;
+    }
+  }
+
+
+
+  .modal-enter-active,
+  .modal-leave-active {
+    transition: .2s cubic-bezier(.25, .8, .25, 1);
+  }
+
+  .modal-enter,
+  .modal-leave-to {
+    transition: .2s cubic-bezier(.25, .8, .25, 1);
+  }
 
   .client-layout {
     display: flex;
