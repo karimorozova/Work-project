@@ -154,7 +154,6 @@ async function getFilteredVendorsWithCustomFilters(filters, customFilters = {}){
 
 async function getFilteredVendorsPotential(filters){
   try {
-    const query = getFilteringQueryPotential(filters);
 
     const query = getFilteringQueryPotential(filters);
 

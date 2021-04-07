@@ -254,14 +254,8 @@ router.post('/filtered-potential-vendors', async (req, res) => {
 router.post('/filtered-vendors', async (req, res) => {
 	const { filters } = req.body
 	try {
-	  const notEmptyOrCreatedByManagerFilter = {$or: [
-	      {isCreatedByManager: true},
-        { status:{$ne: 'Potential'}},
-        { pendingCompetencies: { $exists: true, $not: {$size: 0} } },
-        { competencies: { $exists: true, $not: {$size: 0} } },
-        { approvedPendingCompetencies: { $exists: true, $not: {$size: 0} } },
-      ]}
-		const filteredVendors = await getFilteredVendorsWithCustomFilters(filters,notEmptyOrCreatedByManagerFilter)
+
+		const filteredVendors = await getFilteredVendors(filters)
 		res.send(filteredVendors)
 	} catch (err) {
 		console.log(err)
