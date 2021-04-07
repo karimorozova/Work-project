@@ -33,12 +33,20 @@ function getFilteringQuery(filters) {
 
 function getFilteringQueryPotential(filters) {
 
-    const { status, industries, nameFilter, dateRange } = getFiltersPotential(filters);
-    let query = {
+  const { status, industries, nameFilter, dateRange } = getFiltersPotential(filters);
+
+  let query = {
         status
     }
     if(filters.lastId) {
         query["_id"] = {$gt: ObjectId(filters.lastId)}
+    }
+    if(!!filters.pendingFilter) {
+      query['status'] = "Potential"
+      query["$or"] =  [
+        { pendingCompetencies: { $exists: true, $not: {$size: 0} } },
+        { competencies: { $exists: true, $not: {$size: 0} } },
+      ]
     }
     if(industries) {
         query.industries = ObjectId(industries);

@@ -19,6 +19,7 @@
           @addLangFilter="addLangFilter"
           @setAllLangs="setAllLangs"
           @setStepFilter="setStepFilter"
+          @setIsPendingFilter="setIsPendingFilter"
         )
         .all-vendors__new-vendor
           input.all-vendors__add-vendor(type="submit" value="Add vendor" @click="addVendor")
@@ -53,7 +54,8 @@
 				nameFilter: "",
 				isDataRemain: true,
 				lastId: "",
-				statusFilter: 'Potential'
+				statusFilter: 'Potential',
+        pendingFilter: true,
 			}
 		},
 		methods: {
@@ -116,6 +118,11 @@
 				this[prop].push(lang);
 				await this.getVendors();
 			},
+      async setIsPendingFilter(e) {
+        this.pendingFilter = e.hasPending
+
+        await this.getVendors();
+      },
 			async getVendors() {
 				this.lastId = "";
 				this.isDataRemain = true;
@@ -148,7 +155,9 @@
 					sourceFilter: this.sourceLangs.map(item => item._id),
 					targetFilter: this.targetLangs.map(item => item._id),
 					industryFilter: this.industryFilter,
-					lastId: this.lastId
+					lastId: this.lastId,
+          pendingFilter: this.pendingFilter
+
 				}
 			},
 			sourceFilter() {

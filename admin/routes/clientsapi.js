@@ -22,7 +22,7 @@ const {
 	syncClientMatrix
 } = require('../clients')
 const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist')
-const { Clients, Pricelist, ClientRequest, Projects } = require('../models')
+const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks } = require('../models')
 const { getProject } = require('../projects')
 
 router.get('/client', async (req, res) => {
@@ -474,10 +474,62 @@ router.post('/delete-notes', async (req, res) => {
 		client.notes.splice(index, 1)
 		const updatedClient = await getClientAfterUpdate({ "_id": clientId }, { notes: client.notes })
 		res.send(updatedClient)
-	} catch (err) {
-		console.log(err)
+	} catch (e) {
+		console.log(e)
 		res.status(500).send('Error on client notes')
 	}
 })
+
+// Activities
+
+// Task
+router.post('/activity/task/', async (req,res)=> {
+  try {
+    const { data } = req.body
+    const task = await ClientsTasks.create(data)
+    res.send(task)
+  }catch (e) {
+    res.send({error: e.message})
+  }
+
+})
+
+router.post('/activity/task/:id', async (req,res)=> {
+  try {
+    const { id } = req.params
+    const { data } = req.body
+    const task = await ClientsTasks.updateOne({_id: id}, data)
+    res.send(task)
+  } catch (e) {
+    console.log(e)
+    res.status(500).send('Error on client notes')
+  }
+
+})
+
+router.get('/activity/task/:id', async (req,res)=> {
+  try {
+    const { id } = req.params
+    const task = await ClientsTasks.find({_id: id})
+    res.send(task)
+  } catch (e) {
+
+  }
+
+})
+
+router.delete('/activity/task/:id', async (req,res)=> {
+  try {
+    const { id } = req.params
+    const task = await ClientsTasks.deleteOne({_id: id})
+    res.send({status: 'Success', isDeleted: true})
+  } catch (e) {
+    res.status(500).send({status: 'Error', isDeleted: false})
+  }
+
+})
+
+// End Task
+// End Activities
 
 module.exports = router
