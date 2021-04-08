@@ -4,7 +4,8 @@ const {
   getClientAfterUpdate,
   gerFilteredClients,
   getClientsForNewProject,
-  getClientRates
+  getClientRates,
+  getClientWithActions,
 } = require('./getClients');
 
 const {
@@ -31,13 +32,14 @@ const {
   synchronizeBasicPrice,
   synchronizeStepMultiplier,
   synchronizeIndustryMultiplier,
-  synchronizePricelistTable
+  synchronizePricelistTable,
 } = require('./syncClientRatesCost');
 
 const { updateClientMatrix, syncClientMatrix } = require('./clientMatrix');
 
 const clients = {
   getClient,
+  getClientWithActions,
   getClients,
   getClientRates,
   gerFilteredClients,

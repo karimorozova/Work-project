@@ -3,6 +3,10 @@ const Schema = mongoose.Schema
 
 
 const ClientsTasksSchema = new Schema({
+  client: {
+    type: Schema.Types.ObjectId,
+    ref: 'Clients'
+  },
   title:{
     type: String,
     default: '',

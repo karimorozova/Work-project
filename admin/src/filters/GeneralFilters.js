@@ -1,4 +1,5 @@
 import Vue from "vue";
+import moment from "moment";
 
 Vue.filter("firstEnglishLanguage", (arr) => {
 	if (arr.length) {
@@ -35,4 +36,9 @@ Vue.filter("stepsAndTasksStatusFilter", (status) => {
     newStatus = 'In progress';
   }
 	return newStatus;
+});
+
+Vue.filter("formatDate", (date) => {
+  console.log(date)
+  return moment(date).format('DD-MM-YYYY, HH:mm');
 });

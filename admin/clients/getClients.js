@@ -1,4 +1,4 @@
-const { Clients } = require('../models/')
+const { Clients, ClientsTasks } = require('../models/')
 const { getClientsFilteringQuery } = require('./filter')
 
 /**
@@ -28,6 +28,42 @@ async function getClient(obj) {
 			.populate('timeZone')
 			.populate('defaultPricelist', [ 'name' ])
 			.populate('services.services', [ 'title', 'steps' ])
+}
+
+async function getClientWithActions(obj) {
+
+  const client =  await Clients.findOne(obj)
+    .populate([
+      {path:'industries', select: [ 'name', 'icon' ]},
+      {path:'nativeLanguage', select: [ 'lang' ]},
+      {path:'services.sourceLanguage', select: [ 'lang' ]},
+      {path:'services.targetLanguages', select: [ 'lang' ]},
+      {path:'services.industries', select: [ 'name' ]},
+      {path:'sourceLanguages', select: [ 'lang' ]},
+      {path:'targetLanguages', select: [ 'lang' ]},
+      {path:'rates.industryMultipliersTable.industry', select: [ 'name', 'icon' ]},
+      {path:'rates.stepMultipliersTable.step', select: [ 'title' ]},
+      {path:'rates.stepMultipliersTable.unit', select: [ 'type' ]},
+      {path:'rates.basicPricesTable.sourceLanguage', select: [ 'lang', 'iso1' ]},
+      {path:'rates.basicPricesTable.targetLanguage', select: [ 'lang', 'iso1' ]},
+      {path:'rates.pricelistTable.sourceLanguage', select: [ 'lang' ]},
+      {path:'rates.pricelistTable.targetLanguage', select: [ 'lang' ]},
+      {path:'rates.pricelistTable.step', select: [ 'title' ]},
+      {path:'rates.pricelistTable.unit', select: [ 'type' ]},
+      {path:'rates.pricelistTable.industry', select: [ 'name' ]},
+      {path:'timeZone'},
+      {path:'defaultPricelist', select: [ 'name' ]},
+      {path:'services.services', select: [ 'title', 'steps' ]},
+    ]).lean()
+
+  client.tasks = await ClientsTasks.find({client: obj._id})
+    .populate([
+      {path: 'assignedTo', select: ['firstName','lastName']}
+    ])
+
+  console.log(client)
+
+  return client
 }
 
 /**
@@ -137,5 +173,6 @@ module.exports = {
 	getClientAfterUpdate,
 	gerFilteredClients,
 	getClientsForNewProject,
-	getClientRates
+	getClientRates,
+  getClientWithActions
 }

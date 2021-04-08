@@ -4,6 +4,7 @@ const apiUrl = require('../helpers/apiurl')
 const fse = require('fs-extra')
 const {
 	getClient,
+  getClientWithActions,
 	getClients,
 	getClientRates,
 	updateClientRates,
@@ -34,6 +35,17 @@ router.get('/client', async (req, res) => {
 		console.log(err)
 		res.status(500).send("Error on getting Client")
 	}
+})
+
+router.get('/client-with-activities', async (req, res) => {
+  let { id } = req.query
+  try {
+    const client = await getClientWithActions({ "_id": id })
+    res.send(client)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send("Error on getting Client")
+  }
 })
 
 router.post('/client-priceListTable-index', async (req, res) => {
@@ -486,10 +498,15 @@ router.post('/delete-notes', async (req, res) => {
 router.post('/activity/task/', async (req,res)=> {
   try {
     const { data } = req.body
-    const task = await ClientsTasks.create(data)
-    res.send(task)
+    await ClientsTasks.create(data)
+
+    const tasks = await ClientsTasks.find({"client": data.client})
+      .populate( 'assignedTo', ['firstName','lastName'])
+
+    res.send(tasks)
+
   }catch (e) {
-    res.send({error: e.message})
+    res.status(500).send('Error on client created')
   }
 
 })
@@ -501,8 +518,7 @@ router.post('/activity/task/:id', async (req,res)=> {
     const task = await ClientsTasks.updateOne({_id: id}, data)
     res.send(task)
   } catch (e) {
-    console.log(e)
-    res.status(500).send('Error on client notes')
+    res.status(500).send('Error on client update')
   }
 
 })
@@ -513,7 +529,7 @@ router.get('/activity/task/:id', async (req,res)=> {
     const task = await ClientsTasks.find({_id: id})
     res.send(task)
   } catch (e) {
-
+    res.status(500).send('Error on client get')
   }
 
 })
@@ -524,7 +540,7 @@ router.delete('/activity/task/:id', async (req,res)=> {
     const task = await ClientsTasks.deleteOne({_id: id})
     res.send({status: 'Success', isDeleted: true})
   } catch (e) {
-    res.status(500).send({status: 'Error', isDeleted: false})
+    res.status(500).send('Error on client delete')
   }
 
 })

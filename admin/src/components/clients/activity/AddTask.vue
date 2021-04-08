@@ -65,7 +65,7 @@
 	import Datepicker from "../../DatepickerWithTime"
 	import moment from "moment"
 	import SelectSingle from "../../SelectSingle"
-	import { mapGetters } from "vuex"
+  import {mapActions, mapGetters} from "vuex"
 	import SelectMulti from "../../SelectMulti"
 	import Button from "../../Button"
 
@@ -86,7 +86,10 @@
 			}
 		},
 		methods: {
-			createTask() {
+		  ...mapActions({
+        setUpClientProp: 'setUpClientProp'
+      }),
+			async createTask() {
 				const { priority, title, deadline, details, assignedTo, associatedTo } = this.clientTask
 				const data = {
 					priority,
@@ -94,9 +97,17 @@
 					deadline,
 					details,
 					assignedTo,
-					associatedTo
+					associatedTo,
+          client: this.$route.params.id
 				}
-				console.log('asdasd', data)
+				try {
+          const tasks = await this.$http.post(`/clientsapi/activity/task`,  { data })
+          this.setUpClientProp({key: "tasks", value: tasks.body})
+          this.closeModal()
+        } catch (e) {
+          console.log(e)
+        }
+
 			},
 			setAssociatedTo({ option }) {
 				const position = this.clientTask.associatedTo
@@ -114,7 +125,8 @@
 				this.clientTask.priority = option
 			},
 			setDate(e) {
-				this.clientTask.deadline = moment(new Date(e)).format('DD-MM-YYYY, HH:mm')
+				// this.clientTask.deadline = moment(new Date(e)).format('DD-MM-YYYY, HH:mm')
+				this.clientTask.deadline = new Date(e)
 				this.isDatePicker = false
 			},
 			closeModal() {
