@@ -18,7 +18,7 @@
         span.require *
       .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.accountManager}")
         AMSelect(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
-    .block-item
+    //.block-item
       label.block-item__label Sales Manager:
         span.require *
       .block-item__drop.block-item_medium-index(:class="{'general-info_error-shadow': isSaveClicked && !client.salesManager}")

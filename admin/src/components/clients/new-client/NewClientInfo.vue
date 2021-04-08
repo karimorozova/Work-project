@@ -225,7 +225,10 @@
 				// 	this.errors.push('Please provide a valid email in Billing Informations.')
 				// 	this.billErrors.push('email')
 				// }
-				if (!this.client.accountManager || !this.client.salesManager || !this.client.projectManager) this.errors.push('All managers should be assigned.')
+				if (
+						!this.client.accountManager ||
+            // !this.client.salesManager ||
+            !this.client.projectManager) this.errors.push('All managers should be assigned.')
 
 				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email)
 				if (isSameEmailsExists) {
@@ -333,7 +336,6 @@
     &__general {
       margin-top: 100px;
       width: 390px;
-      height: 270px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       margin-left: 40px;
     }

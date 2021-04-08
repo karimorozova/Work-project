@@ -5,23 +5,42 @@
     transition(name='slide')
       .sidebarMenu__body(v-if="isShowMenu")
         .sidebarMenu__content
+
           .sidebarMenu__mainIcons
-            span(@click="createTask") Create Task
+            .icon(@click="createTask")
+              i.fas.fa-tasks
+
+          .sidebarMenu__allActivities
+            .allActivities
+              i.fas.fa-chart-line
+              span.allActivities__title View All Activities
+
+          .sidebarMenu__generalInfo
+            SideGeneral(
+              :isSaveClicked="isSaveClicked"
+            )
+
           .sidebarMenu__listActivities
             OpenActivities(
-              @openActivityDetails="openActivityDetails"
+              @openActivityDetails="openActivityDetailsTask"
             )
         transition(name='slide-bottom')
           .sidebarMenu__activityDetails(v-if="isShowDetailsTask")
-            ActivityDetailTask
+            ActivityDetailTask(
+              @closeActivityDetailsTask="closeActivityDetailsTask"
+            )
 
 </template>
 
 <script>
 	import OpenActivities from "./OpenActivities"
 	import ActivityDetailTask from './ActivityDetailTask'
+	import SideGeneral from "../clientInfo/SideGeneral"
 
 	export default {
+		props: {
+			isSaveClicked: { type: Boolean }
+		},
 		data() {
 			return {
 				isShowMenu: false,
@@ -30,8 +49,11 @@
 			}
 		},
 		methods: {
-			openActivityDetails() {
+			openActivityDetailsTask() {
 				this.isShowDetailsTask = true
+			},
+			closeActivityDetailsTask() {
+				this.isShowDetailsTask = false
 			},
 			createTask() {
 				this.$emit('createTask')
@@ -41,6 +63,7 @@
 			}
 		},
 		components: {
+			SideGeneral,
 			OpenActivities,
 			ActivityDetailTask
 		}
@@ -48,20 +71,47 @@
 </script>
 
 <style lang="scss" scoped>
-  i {
-    font-size: 20px;
-  }
-
   .sidebarMenu {
+    &__generalInfo {
+      padding: 20px;
+    }
+
+    &__allActivities {
+      padding: 20px;
+
+      .allActivities {
+        padding: 10px;
+        display: flex;
+        border: 1px solid #e8e8e8;
+        font-size: 18px;
+        justify-content: center;
+        font-family: 'Myriad600';
+        transition: ease 0.2s;
+
+        &__title {
+          margin-left: 10px;
+        }
+
+        &:hover {
+          cursor: pointer;
+          background: rgba(153, 153, 153, .1);
+        }
+      }
+    }
+
     &__mainIcons {
       padding: 20px;
+      display: flex;
+      justify-content: space-between;
     }
 
     &__activityDetails {
       position: absolute;
       bottom: 0;
-      margin-bottom: 30px;
+      padding-bottom: 35px;
       width: 100%;
+      z-index: 10;
+      background: white;
     }
 
     &__content {
@@ -81,11 +131,11 @@
     &__body {
       background: #fff;
       position: fixed;
-      width: 390px;
+      width: 400px;
       right: 0;
       top: 5vh;
       height: 95vh;
-      z-index: 9999;
+      z-index: 9;
       border-left: 2px solid #E8E8E8;
     }
   }
@@ -114,5 +164,28 @@
     transform: translateY(100%);
     transition: 0.15s;
     transition-timing-function: ease-in;
+  }
+
+  i {
+    font-size: 20px;
+  }
+
+  .icon {
+    height: 40px;
+    min-width: 40px;
+    width: 40px;
+    background: #daeded;
+    font-size: 20px;
+    border-radius: 40px;
+    color: #4ba5a5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: ease 0.2s;
+
+    &:hover {
+      cursor: pointer;
+      background: #c8e4e4;
+    }
   }
 </style>

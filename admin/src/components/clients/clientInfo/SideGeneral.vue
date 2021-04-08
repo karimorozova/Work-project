@@ -1,30 +1,32 @@
 <template lang="pug">
   .general-info
-    .block-item
-      label.block-item__label Status:
-        span.require *
-      .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.status}")
-        ClientStatusSelect(:selectedStatus="currentClientOverallData.status" @chosenStatus="setStatus")
-    .block-item
-      label.block-item__label Test:
-      .block-item__check-item.checkbox
-        input(type="checkbox" id="test" :checked="currentClient.isTest" @change="setTest")
-        label(for="test")
-    .block-item
-      label.block-item__label Account Manager:
-        span.require *
-      .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
-        AMSelect(:selectedManager="currentClientOverallData.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
-    .block-item
-      label.block-item__label Sales Manager:
-        span.require *
-      .block-item__drop.block-item_medium-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.salesManager}")
-        AMSelect(:selectedManager="currentClientOverallData.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')" group="Sales")
-    .block-item
-      label.block-item__label Project Manager:
-        span.require *
-      .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
-        AMSelect(:selectedManager="currentClientOverallData.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
+    .title General Information
+    .block-items
+      .block-item
+        label.block-item__label Status:
+          span.require *
+        .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.status}")
+          ClientStatusSelect(:selectedStatus="currentClientOverallData.status" @chosenStatus="setStatus")
+      .block-item
+        label.block-item__label Test:
+        .block-item__check-item.checkbox
+          input(type="checkbox" id="test" :checked="currentClient.isTest" @change="setTest")
+          label(for="test")
+      .block-item
+        label.block-item__label Account Manager:
+          span.require *
+        .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
+          AMSelect(:selectedManager="currentClientOverallData.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
+      //.block-item
+        label.block-item__label Sales Manager:
+          span.require *
+        .block-item__drop.block-item_medium-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.salesManager}")
+          AMSelect(:selectedManager="currentClientOverallData.salesManager" @chosenManager="(manager) => setManager(manager, 'salesManager')" group="Sales")
+      .block-item
+        label.block-item__label Project Manager:
+          span.require *
+        .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
+          AMSelect(:selectedManager="currentClientOverallData.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
 </template>
 
 <script>
@@ -84,16 +86,23 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
-  .general-info {
-    padding: 20px;
+  .block-items {
+    padding: 10px;
+    border: 1px solid #e8e8e8;
+  }
 
-    .block-item:last-child {
-      height: 30px;
-    }
+  .title {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+
+  .general-info {
 
     .block-item {
       display: flex;
-      height: 50px;
+      height: 45px;
+      align-items: center;
+      position: relative;
 
       &__last {
         height: 30px;
@@ -119,6 +128,7 @@
       &__drop {
         position: relative;
         width: 190px;
+        height: 30px;
       }
     }
 

@@ -3,6 +3,7 @@
     .client-info(v-if="currentClient._id")
       Sidebar(
         @createTask="createTask"
+        :isSaveClicked="isSaveClicked"
       )
       transition(name="modal")
         .client-activity__addTask(v-if="createTaskModal")
@@ -117,7 +118,7 @@
       )
 
     .client-subinfo(v-if="currentClient._id")
-      .client-subinfo__general
+      //.client-subinfo__general
         SideGeneral(:isSaveClicked="isSaveClicked")
 
       .client-subinfo__date
@@ -357,7 +358,10 @@
 				if (!this.currentClientOverallData.email || !emailValidRegex.test(this.currentClientOverallData.email.toLowerCase())) {
 					this.errors.push("Please provide a valid email in General Informations.")
 				}
-				if (!this.currentClientOverallData.accountManager || !this.currentClientOverallData.salesManager || !this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
+				if (
+						!this.currentClientOverallData.accountManager ||
+            // !this.currentClientOverallData.salesManager ||
+            !this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
 
 				// const isSameEmailsExists = await this.checkSameClientEmails(this.currentClientOverallData.email, this.currentClientOverallData._id)
 				// if (isSameEmailsExists) {
@@ -471,7 +475,8 @@
 			},
 			async getClientInfo() {
 				if (!this.currentClient._id) {
-					const client = await this.$http.get(`/clientsapi/client-with-activities?id=${ this.$route.params.id }`)
+					// GO BACK
+					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
 					this.storeCurrentClient(client.data)
 					this.storeCurrentClientOverallData(client.data)
 					this.setNewClientDocuments(client.data)
@@ -479,7 +484,8 @@
 			},
 			async getClientInfoWithoutOverallData() {
 				if (!this.currentClient._id) {
-					const client = await this.$http.get(`/clientsapi/client-with-activities?id=${ this.$route.params.id }`)
+				// GO BACK
+					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
 					this.storeCurrentClient(client.data)
 				}
 			},

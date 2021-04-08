@@ -31,7 +31,7 @@
 					isTest: false,
 					nda: "",
 					accountManager: "",
-					salesManager: "",
+					salesManager: null,
 					projectManager: "",
 					leadSource: "",
 					salesComission: "",

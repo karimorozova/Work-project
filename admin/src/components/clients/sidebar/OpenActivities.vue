@@ -4,7 +4,7 @@
     .openActivities__list
       .openActivities__item(v-on:click="openActivityDetails")
         .card
-          .card__check
+          .card__check(v-on:click.stop="completeActivity")
             i.far.fa-check-circle
           .card__data
             .card__title Hello Js
@@ -35,6 +35,9 @@
 			return {}
 		},
 		methods: {
+			completeActivity() {
+				alert('done')
+			},
 			openActivityDetails() {
 				this.$emit('openActivityDetails')
 			}
@@ -83,9 +86,9 @@
     }
 
     &__check {
-      height: 24px;
-      font-size: 24px;
-      width: 24px;
+      height: 22px;
+      font-size: 22px;
+      width: 22px;
       margin-right: 10px;
       color: rgba(0, 0, 0, .6);
       cursor: pointer;
