@@ -108,9 +108,9 @@
         height: 30px;
       }
 
-      &_maxhigh-index {
-        z-index: 12;
-      }
+      /*&_maxhigh-index {*/
+      /*  z-index: 12;*/
+      /*}*/
 
       &_high-index {
         z-index: 10;

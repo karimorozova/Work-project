@@ -146,7 +146,7 @@ export default {
     width: 100%;
     border: 1px solid #67573E;
     border-radius: 5px;
-    z-index: 6;
+    z-index: 11;
     overflow: hidden;
     .drop {
         box-sizing: border-box;

@@ -515,8 +515,9 @@ router.post('/activity/task/:id', async (req,res)=> {
   try {
     const { id } = req.params
     const { data } = req.body
-    const task = await ClientsTasks.updateOne({_id: id}, data)
-    res.send(task)
+	  await ClientsTasks.updateOne({_id: id}, data)
+	  const tasks = await ClientsTasks.find({"client": data.client}).populate( 'assignedTo', ['firstName','lastName'])
+    res.send(tasks)
   } catch (e) {
     res.status(500).send('Error on client update')
   }

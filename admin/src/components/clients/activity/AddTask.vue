@@ -1,5 +1,6 @@
 <template lang="pug">
   .clientTask
+    ValidationErrors(v-if="areErrors", :errors="errors", @closeErrors="closeErrors")
     .clientTask__body
       .clientTask__close(@click="closeModal") &#215;
       .clientTask__input
@@ -18,24 +19,17 @@
       .clientTask__setting
         .setting__item
           label Due Date & Time:
+            span.mandatory *
           input(type="text" readonly v-model="clientTask.deadline")
-          i.far.fa-calendar-alt(@click="isDatePicker = true")
-          .datepicker(v-if="isDatePicker")
-            Datepicker(
-              :value="clientTask.deadline"
-              @selected="(e) => setDate(e)"
-              :inline="true"
-              :monday-first="true"
-            )
-        .setting__item
-          label Assigned to:
-          .setting__drop
-            SelectSingle(
-              placeholder="Select"
-              :selectedOption="clientTask.assignedTo.hasOwnProperty('firstName') ? `${clientTask.assignedTo.firstName} ${clientTask.assignedTo.lastName}` : ''"
-              :options="AMsPMs.map(({firstName, lastName}) => `${firstName} ${lastName}`)"
-              @chooseOption="setAssignedUser"
-            )
+          span.date(v-click-outside="closePicker")
+            i.far.fa-calendar-alt(@click="isDatePicker = true")
+            .datepicker(v-if="isDatePicker")
+              Datepicker(
+                :value="clientTask.deadline"
+                @selected="(e) => setDate(e)"
+                :inline="true"
+                :monday-first="true"
+              )
         .setting__item
           label Priority:
           .setting__drop
@@ -44,6 +38,16 @@
               :selectedOption="clientTask.priority"
               :options="['Regular','High']"
               @chooseOption="setPriority"
+            )
+        .setting__item
+          label Assigned to:
+            span.mandatory *
+          .setting__drop
+            SelectSingle(
+              placeholder="Select"
+              :selectedOption="clientTask.assignedTo.hasOwnProperty('firstName') ? `${clientTask.assignedTo.firstName} ${clientTask.assignedTo.lastName}` : ''"
+              :options="AMsPMs.map(({firstName, lastName}) => `${firstName} ${lastName}`)"
+              @chooseOption="setAssignedUser"
             )
         .setting__item
           label Associated With:
@@ -56,8 +60,7 @@
             )
 
       .clientTask__button
-        Button(value="Save" @clicked="createTask" :color="'#48A6A6'")
-
+        Button(value="Save" @clicked="checkCreateUpdateTasks" :color="'#48A6A6'")
 </template>
 
 <script>
@@ -65,9 +68,11 @@
 	import Datepicker from "../../DatepickerWithTime"
 	import moment from "moment"
 	import SelectSingle from "../../SelectSingle"
-  import {mapActions, mapGetters} from "vuex"
+	import { mapActions, mapGetters } from "vuex"
 	import SelectMulti from "../../SelectMulti"
 	import Button from "../../Button"
+	import ValidationErrors from "../../ValidationErrors"
+	import ClickOutside from "vue-click-outside"
 
 	export default {
 		props: {
@@ -77,6 +82,9 @@
 		},
 		data() {
 			return {
+				areErrors: false,
+				errors: [],
+
 				isDatePicker: false,
 				editorConfig: {
 					allowedContent: true,
@@ -86,11 +94,31 @@
 			}
 		},
 		methods: {
-		  ...mapActions({
-        setUpClientProp: 'setUpClientProp'
-      }),
-			async createTask() {
-				const { priority, title, deadline, details, assignedTo, associatedTo } = this.clientTask
+			...mapActions({
+				setUpClientProp: 'setUpClientProp'
+			}),
+			closePicker() {
+				this.isDatePicker = false
+			},
+			closeErrors() {
+				this.errors = []
+				this.areErrors = false
+			},
+			checkCreateUpdateTasks() {
+				this.errors = []
+				if (!this.clientTask.title) this.errors.push('Please, enter title')
+				if (!this.clientTask.details) this.errors.push('Please, enter details')
+				if (!this.clientTask.deadline) this.errors.push('Please, enter deadline')
+				if (!this.clientTask.assignedTo.hasOwnProperty('firstName')) this.errors.push('Please, assigned task to...')
+				if (this.errors.length) {
+					this.areErrors = true
+					return
+				}
+				this.createUpdateTask()
+			},
+			async createUpdateTask() {
+				const { _id, priority, title, deadline, details, assignedTo, associatedTo, stage } = this.clientTask
+
 				const data = {
 					priority,
 					title,
@@ -98,16 +126,20 @@
 					details,
 					assignedTo,
 					associatedTo,
-          client: this.$route.params.id
+					client: this.$route.params.id
 				}
+				let tasks = null
 				try {
-          const tasks = await this.$http.post(`/clientsapi/activity/task`,  { data })
-          this.setUpClientProp({key: "tasks", value: tasks.body})
-          this.closeModal()
-        } catch (e) {
-          console.log(e)
-        }
-
+					if (stage === 'update') {
+						tasks = await this.$http.post(`/clientsapi/activity/task/${ _id }`, { data })
+					} else {
+						tasks = await this.$http.post(`/clientsapi/activity/task`, { data })
+					}
+					this.setUpClientProp({ key: "tasks", value: tasks.data })
+					this.closeModal()
+				} catch (e) {
+					console.log(e)
+				}
 			},
 			setAssociatedTo({ option }) {
 				const position = this.clientTask.associatedTo
@@ -127,7 +159,7 @@
 			setDate(e) {
 				// this.clientTask.deadline = moment(new Date(e)).format('DD-MM-YYYY, HH:mm')
 				this.clientTask.deadline = new Date(e)
-				this.isDatePicker = false
+				this.closePicker()
 			},
 			closeModal() {
 				this.$emit('close')
@@ -147,32 +179,41 @@
 			}
 		},
 		components: {
+			ValidationErrors,
 			Button,
 			SelectMulti,
 			SelectSingle,
 			ckeditor: CKEditor.component,
 			Datepicker
+		},
+		directives: {
+			ClickOutside
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+
   .setting {
     &__drop {
       position: relative;
       width: 191px;
+      height: 30px;
     }
 
     &__item {
       position: relative;
+      position: relative;
+      height: 30px;
+      width: 320px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
 
       .fa-calendar-alt {
-        cursor: pointer;
-        position: absolute;
-        margin-left: -22px;
-        margin-top: 4px;
-        font-size: 20px;
         color: #938676;
+        font-size: 20px;
       }
 
       input {
@@ -193,7 +234,7 @@
     background: white;
     padding: 35px 20px 20px 20px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-    width: 800px;
+    width: 780px;
     position: relative;
 
     &__close {
@@ -224,6 +265,7 @@
 
     &__setting {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
     }
 
@@ -239,12 +281,12 @@
       }
 
       input {
-        font-size: 16px;
+        font-size: 18px;
         padding: 10px 0px 10px 0px;
         display: block;
         width: 100%;
         border: none;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 2px solid #e8e8e8;
         color: #67573e;
       }
 
@@ -253,7 +295,6 @@
       }
 
       label {
-        color: #999;
         font-size: 18px;
         font-weight: normal;
         position: absolute;
@@ -340,8 +381,19 @@
 
   .datepicker {
     position: absolute;
-    left: 180px;
+    left: 32px;
     margin-top: -220px;
-    z-index: 5000;
+    z-index: 60;
+  }
+
+  .mandatory {
+    color: red;
+    margin-left: 2px;
+  }
+
+  .date {
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
   }
 </style>

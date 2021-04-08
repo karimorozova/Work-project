@@ -1,45 +1,55 @@
 <template lang="pug">
   .openActivities
     .openActivities__title Open Activities
-    .openActivities__list
-      .openActivities__item(v-on:click="openActivityDetails")
-        .card
-          .card__check(v-on:click.stop="completeActivity")
-            i.far.fa-check-circle
-          .card__data
-            .card__title Hello Js
-            .card__date
-              span.due Due:
-              span 15-15-1515, 20:20
-          .card__icon
-            i.far.fa-calendar-alt
-
-      .openActivities__item(v-on:click="openActivityDetails")
-        .card
-          .card__check
-            i.far.fa-check-circle
-          .card__data
-            .card__title Hello Js2
-            .card__date
-              span.due Due:
-              span 33-33-3333, 22:22
-          .card__icon
-            i.far.fa-calendar-alt
+    .openActivities__content
+      .openActivities__list(v-for="item in listOfActivity")
+        .openActivities__item(v-on:click="openActivityDetails(item)")
+          .card
+            .card__check(v-on:click.stop="completeActivity")
+              i.far.fa-check-circle
+            .card__data
+              .card__title {{ item.title }}
+              .card__date
+                span.due Due:
+                span {{ item.deadline}}
+            .card__icon
+              span(v-html="renderIcon(item.entity)")
 
 
 </template>
 
 <script>
+	import { mapGetters } from "vuex"
+
 	export default {
 		data() {
 			return {}
 		},
 		methods: {
+			renderIcon(entity) {
+				switch (entity) {
+					case 'task' :
+						return '<i class="fas fa-tasks"></i>'
+				}
+			},
 			completeActivity() {
 				alert('done')
 			},
-			openActivityDetails() {
-				this.$emit('openActivityDetails')
+			openActivityDetails(item) {
+				this.$emit('openActivityDetails', item)
+			}
+		},
+		computed: {
+			...mapGetters({
+				currentClient: "getCurrentClient"
+			}),
+			listOfActivity() {
+				let result = [
+					...this.currentClient.tasks.map(item => {
+						return { ...item, entity: 'task' }
+					})
+				]
+				return result
 			}
 		}
 	}
@@ -47,7 +57,10 @@
 
 <style lang="scss" scoped>
   .openActivities {
-    padding: 20px;
+    &__content {
+      max-height: 45vh;
+      overflow-y: auto;
+    }
 
     &__title {
       font-size: 18px;
@@ -117,4 +130,5 @@
   .due {
     margin-right: 6px;
   }
+
 </style>

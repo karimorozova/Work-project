@@ -3,14 +3,15 @@
     .client-info(v-if="currentClient._id")
       Sidebar(
         @createTask="createTask"
+        @editActivityDetailsTask="editActivityDetailsTask"
         :isSaveClicked="isSaveClicked"
       )
-      transition(name="modal")
-        .client-activity__addTask(v-if="createTaskModal")
-          AddTask(
-            :clientTask="clientTask"
-            @close="closeTaskModal"
-          )
+      //transition(name="modal")
+      .client-activity__addTask(v-if="createTaskModal")
+        AddTask(
+          :clientTask="clientTask"
+          @close="closeTaskModal"
+        )
 
       SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
 
@@ -226,6 +227,11 @@
 			}
 		},
 		methods: {
+			editActivityDetailsTask(taskData) {
+				const { _id, priority, title, deadline, details, assignedTo, associatedTo } = taskData
+				this.clientTask = { _id, priority, title, deadline, details, assignedTo, associatedTo, stage: 'update' }
+				this.createTaskModal = true
+			},
 			closeTaskModal() {
 				this.createTaskModal = false
 			},
@@ -236,7 +242,8 @@
 					deadline: "",
 					details: "",
 					assignedTo: {},
-					associatedTo: []
+					associatedTo: [],
+					stage: 'create'
 				}
 				this.createTaskModal = true
 			},
@@ -360,8 +367,8 @@
 				}
 				if (
 						!this.currentClientOverallData.accountManager ||
-            // !this.currentClientOverallData.salesManager ||
-            !this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
+						// !this.currentClientOverallData.salesManager ||
+						!this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
 
 				// const isSameEmailsExists = await this.checkSameClientEmails(this.currentClientOverallData.email, this.currentClientOverallData._id)
 				// if (isSameEmailsExists) {
@@ -628,21 +635,20 @@
       top: 0%;
       left: 50%;
       transform: translate(-50%, 25%);
-      z-index: 999999;
+      z-index: 50;
     }
   }
 
 
+  /*.modal-enter-active,*/
+  /*.modal-leave-active {*/
+  /*  transition:  opacity .5s;*/
+  /*}*/
 
-  .modal-enter-active,
-  .modal-leave-active {
-    transition: .2s cubic-bezier(.25, .8, .25, 1);
-  }
-
-  .modal-enter,
-  .modal-leave-to {
-    transition: .2s cubic-bezier(.25, .8, .25, 1);
-  }
+  /*.modal-enter,*/
+  /*.modal-leave-to {*/
+  /*  opacity: 0;*/
+  /*}*/
 
   .client-layout {
     display: flex;

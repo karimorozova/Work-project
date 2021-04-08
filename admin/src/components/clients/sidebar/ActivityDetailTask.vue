@@ -5,9 +5,9 @@
         .header__icon
           i.fas.fa-tasks
         .header__title Task
-        .header__status Upcoming
+        .header__status {{taskData.status}}
         .header__crud
-          span.icon(@click="")
+          span.icon(@click="edit(taskData)")
             i.fas.fa-pencil-alt
           span.icon(@click="close")
             i.fas.fa-times-circle
@@ -17,46 +17,53 @@
         .card__check
           i.far.fa-check-circle
         .card__data
-          .card__title Hello Js
+          .card__title {{taskData.title}}
           .card__date
             span.due Due:
-            span 15-15-1515, 20:20
+            span {{taskData.deadline}}
 
       .description
         .side
-
           .side__left
             .description__priority
               .d-title Priority:
-              .description__priorityBlockHigh(v-if="true") High
+              .description__priorityBlockHigh(v-if="taskData.priority === 'High'") High
               .description__priorityBlockRegular(v-else) Regular
 
             .description__assigned
               .d-title Assigned to:
               .assignedImage
-                img(src="../../../assets/images/signin-background.jpg")
+                .tooltip
+                  span#myTooltip.tooltiptext {{taskData.assignedTo.firstName}} {{taskData.assignedTo.lastName}}
+                  img(src="../../../assets/images/signin-background.jpg")
 
           .side__right
-            .description__associated
+            .description__associated(v-if="taskData.associatedTo.length")
               .d-title Associated with:
-              .description__associatedList
+              .description__associatedList(v-for="user in taskData.associatedTo")
                 .associatedUser
                   .associatedUser__block
-                  .associatedUser__title Hello PPPP
-                .associatedUser
-                  .associatedUser__block
-                  .associatedUser__title Hellosdfsd LKSJDFsdfsdf
+                  .associatedUser__title {{user.firstName}} {{user.surname}}
 
             .description__details
               .d-title Details:
-              .details__data(v-html="'Asdkajskdj aksjdk jaskdjasdj jshdjka'")
+              .details__data(id="editor" v-html="taskData.details")
 
 
 </template>
 
 <script>
 	export default {
+		props: {
+			taskData: {
+				type: Object
+			}
+		},
 		methods: {
+			edit(taskData) {
+				this.$emit('editActivityDetailsTask', taskData)
+        this.close()
+			},
 			close() {
 				this.$emit('closeActivityDetailsTask')
 			}
@@ -102,6 +109,7 @@
       background: #D15F45;
       color: white;
       width: fit-content;
+      display: inline-block;
     }
 
     &__priorityBlockRegular {
@@ -109,6 +117,7 @@
       background: #48a6a6;
       color: white;
       width: fit-content;
+      display: inline-block;
     }
 
     &__priority {
@@ -217,11 +226,58 @@
     margin-right: 6px;
   }
 
-  p {
-    margin: 0 !important;
+
+  #editor /deep/ p {
+    margin: 0;
   }
 
   .d-title {
     margin-bottom: 5px;
+  }
+
+  .tooltip {
+    position: relative;
+    display: flex;
+    height: 50px;
+    width: 50px;
+    border-radius: 50px;
+    cursor: help;
+
+    .tooltiptext {
+      font-size: 14px;
+      visibility: hidden;
+      width: 140px;
+      background-color: #67573e;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 50px;
+      left: 50%;
+      margin-left: -75px;
+      opacity: 0;
+      transition: opacity 0.3s;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #67573e transparent transparent transparent;
+      }
+    }
+
+    &:hover {
+      .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+
   }
 </style>

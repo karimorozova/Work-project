@@ -22,12 +22,14 @@
 
           .sidebarMenu__listActivities
             OpenActivities(
-              @openActivityDetails="openActivityDetailsTask"
+              @openActivityDetails="openActivityDetails"
             )
         transition(name='slide-bottom')
-          .sidebarMenu__activityDetails(v-if="isShowDetailsTask")
+          .sidebarMenu__activityDetails(v-if="isShowDetailsTask && !!taskData")
             ActivityDetailTask(
+              @editActivityDetailsTask="editActivityDetailsTask"
               @closeActivityDetailsTask="closeActivityDetailsTask"
+              :taskData="taskData"
             )
 
 </template>
@@ -44,16 +46,30 @@
 		data() {
 			return {
 				isShowMenu: false,
-				isShowDetailsTask: false
+				isShowDetailsTask: false,
+				taskData: null
 
 			}
 		},
 		methods: {
+			openActivityDetails(data) {
+				console.log(data)
+				const { entity } = data
+				switch (entity) {
+					case 'task' :
+						this.openActivityDetailsTask()
+						this.taskData = data
+				}
+			},
+			editActivityDetailsTask(taskData){
+				this.$emit('editActivityDetailsTask', taskData)
+      },
 			openActivityDetailsTask() {
 				this.isShowDetailsTask = true
 			},
 			closeActivityDetailsTask() {
 				this.isShowDetailsTask = false
+				this.taskData = null
 			},
 			createTask() {
 				this.$emit('createTask')
@@ -73,11 +89,15 @@
 <style lang="scss" scoped>
   .sidebarMenu {
     &__generalInfo {
-      padding: 20px;
+      padding: 0 20px 20px 20px;
+    }
+
+    &__listActivities {
+      padding: 0 20px 20px 20px;
     }
 
     &__allActivities {
-      padding: 20px;
+      padding: 0 20px 20px 20px;
 
       .allActivities {
         padding: 10px;
@@ -100,8 +120,9 @@
     }
 
     &__mainIcons {
-      padding: 20px;
       display: flex;
+      padding: 0 20px 20px 20px;
+      align-items: center;
       justify-content: space-between;
     }
 
