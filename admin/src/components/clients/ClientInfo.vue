@@ -471,7 +471,7 @@
 			},
 			async getClientInfo() {
 				if (!this.currentClient._id) {
-					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
+					const client = await this.$http.get(`/clientsapi/client-with-activities?id=${ this.$route.params.id }`)
 					this.storeCurrentClient(client.data)
 					this.storeCurrentClientOverallData(client.data)
 					this.setNewClientDocuments(client.data)
@@ -479,7 +479,7 @@
 			},
 			async getClientInfoWithoutOverallData() {
 				if (!this.currentClient._id) {
-					const client = await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
+					const client = await this.$http.get(`/clientsapi/client-with-activities?id=${ this.$route.params.id }`)
 					this.storeCurrentClient(client.data)
 				}
 			},
