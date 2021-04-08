@@ -61,8 +61,6 @@ async function getClientWithActions(obj) {
       {path: 'assignedTo', select: ['firstName','lastName']}
     ])
 
-  console.log(client)
-
   return client
 }
 

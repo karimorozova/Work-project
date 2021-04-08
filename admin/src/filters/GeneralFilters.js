@@ -39,6 +39,5 @@ Vue.filter("stepsAndTasksStatusFilter", (status) => {
 });
 
 Vue.filter("formatDate", (date) => {
-  console.log(date)
   return moment(date).format('DD-MM-YYYY, HH:mm');
 });
