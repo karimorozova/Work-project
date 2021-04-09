@@ -536,14 +536,16 @@ router.get('/activity/task/:id', async (req, res) => {
 
 })
 
-router.delete('/activity/task/:id', async (req, res) => {
-	try {
-		const { id } = req.params
-		const task = await ClientsTasks.deleteOne({ _id: id })
-		res.send({ status: 'Success', isDeleted: true })
-	} catch (e) {
-		res.status(500).send('Error on client delete')
-	}
+router.delete('/activity/task/:id', async (req,res)=> {
+  try {
+    const { id } = req.params
+    const {client} = req.query
+    await ClientsTasks.deleteOne({_id: id})
+    const tasks = await ClientsTasks.find({"client": client}).populate( 'assignedTo', ['firstName','lastName'])
+    res.send(tasks || [])
+  } catch (e) {
+    res.status(500).send('Error on client delete')
+  }
 
 })
 

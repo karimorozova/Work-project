@@ -1,5 +1,15 @@
 <template lang="pug">
   .activityDetail
+    .modal
+      ApproveModal(
+        v-if="approveModal"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approve"
+        @notApprove="notApprove"
+        @close="closeModal"
+      )
     .activityDetail__header
       .header
         .header__icon
@@ -9,6 +19,8 @@
         .header__crud
           span.icon(@click="edit(taskData)")
             i.fas.fa-pencil-alt
+          span.icon(@click="deleteTask()")
+            i.fas.fa-trash
           span.icon(@click="close")
             i.fas.fa-times-circle
 
@@ -53,20 +65,51 @@
 </template>
 
 <script>
-	export default {
-		props: {
+	import ApproveModal from "../../ApproveModal";
+	import {mapActions} from "vuex"
+  export default {
+    components: {ApproveModal},
+    props: {
 			taskData: {
 				type: Object
-			}
+			},
 		},
+    data() {
+      return {
+        approveModal: false,
+      }
+    },
 		methods: {
+      ...mapActions({
+        setUpClientProp: 'setUpClientProp'
+      }),
 			edit(taskData) {
 				this.$emit('editActivityDetailsTask', taskData)
         this.close()
 			},
+      deleteTask() {
+			  this.approveModal = true
+      },
 			close() {
 				this.$emit('closeActivityDetailsTask')
-			}
+        this.approveModal = false
+			},
+      async approve() {
+			  try {
+          const tasks = await this.$http.delete(`/clientsapi/activity/task/${this.taskData._id}?client=${this.taskData.client}`)
+          this.setUpClientProp({ key: "tasks", value: tasks.data })
+          this.close()
+        } catch (e) {
+          console.log(e)
+        }
+
+      },
+      notApprove() {
+			  this.closeModal()
+      },
+      closeModal() {
+			  this.approveModal = false
+      }
 		}
 
 	}
@@ -85,7 +128,12 @@
       width: 70%;
     }
   }
-
+  .modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
   .associatedUser {
     border: 1px solid #e8e8e8;
     margin-bottom: 5px;
