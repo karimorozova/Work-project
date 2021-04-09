@@ -4,7 +4,7 @@ const apiUrl = require('../helpers/apiurl')
 const fse = require('fs-extra')
 const {
 	getClient,
-  getClientWithActions,
+	getClientWithActions,
 	getClients,
 	getClientRates,
 	updateClientRates,
@@ -20,7 +20,8 @@ const {
 	syncClientRatesCost,
 	updateClientProjectDate,
 	updateClientMatrix,
-	syncClientMatrix
+	syncClientMatrix,
+	updateTaskDataByCondition
 } = require('../clients')
 const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist')
 const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks } = require('../models')
@@ -38,14 +39,14 @@ router.get('/client', async (req, res) => {
 })
 
 router.get('/client-with-activities', async (req, res) => {
-  let { id } = req.query
-  try {
-    const client = await getClientWithActions({ "_id": id })
-    res.send(client)
-  } catch (err) {
-    console.log(err)
-    res.status(500).send("Error on getting Client")
-  }
+	let { id } = req.query
+	try {
+		const client = await getClientWithActions({ "_id": id })
+		res.send(client)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Client")
+	}
 })
 
 router.post('/client-priceListTable-index', async (req, res) => {
@@ -495,54 +496,54 @@ router.post('/delete-notes', async (req, res) => {
 // Activities
 
 // Task
-router.post('/activity/task/', async (req,res)=> {
-  try {
-    const { data } = req.body
-    await ClientsTasks.create(data)
+router.post('/activity/task/', async (req, res) => {
+	try {
+		const { data } = req.body
+		await ClientsTasks.create(data)
 
-    const tasks = await ClientsTasks.find({"client": data.client})
-      .populate( 'assignedTo', ['firstName','lastName'])
+		const tasks = await ClientsTasks.find({ "client": data.client })
+				.populate('assignedTo', [ 'firstName', 'lastName' ])
 
-    res.send(tasks)
+		res.send(tasks)
 
-  }catch (e) {
-    res.status(500).send('Error on client created')
-  }
-
-})
-
-router.post('/activity/task/:id', async (req,res)=> {
-  try {
-    const { id } = req.params
-    const { data } = req.body
-	  await ClientsTasks.updateOne({_id: id}, data)
-	  const tasks = await ClientsTasks.find({"client": data.client}).populate( 'assignedTo', ['firstName','lastName'])
-    res.send(tasks)
-  } catch (e) {
-    res.status(500).send('Error on client update')
-  }
+	} catch (e) {
+		res.status(500).send('Error on client created')
+	}
 
 })
 
-router.get('/activity/task/:id', async (req,res)=> {
-  try {
-    const { id } = req.params
-    const task = await ClientsTasks.find({_id: id})
-    res.send(task)
-  } catch (e) {
-    res.status(500).send('Error on client get')
-  }
+router.post('/activity/task/:id', async (req, res) => {
+	try {
+		const { id } = req.params
+		const { data } = req.body
+		await ClientsTasks.updateOne({ _id: id }, updateTaskDataByCondition(data))
+		const tasks = await ClientsTasks.find({ "client": data.client }).populate('assignedTo', [ 'firstName', 'lastName' ])
+		res.send(tasks)
+	} catch (e) {
+		res.status(500).send('Error on client update')
+	}
 
 })
 
-router.delete('/activity/task/:id', async (req,res)=> {
-  try {
-    const { id } = req.params
-    const task = await ClientsTasks.deleteOne({_id: id})
-    res.send({status: 'Success', isDeleted: true})
-  } catch (e) {
-    res.status(500).send('Error on client delete')
-  }
+router.get('/activity/task/:id', async (req, res) => {
+	try {
+		const { id } = req.params
+		const task = await ClientsTasks.find({ _id: id })
+		res.send(task)
+	} catch (e) {
+		res.status(500).send('Error on client get')
+	}
+
+})
+
+router.delete('/activity/task/:id', async (req, res) => {
+	try {
+		const { id } = req.params
+		const task = await ClientsTasks.deleteOne({ _id: id })
+		res.send({ status: 'Success', isDeleted: true })
+	} catch (e) {
+		res.status(500).send('Error on client delete')
+	}
 
 })
 

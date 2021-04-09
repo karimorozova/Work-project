@@ -4,17 +4,18 @@
             template(v-if="selectedManager")
                 .selected
                     span {{ getFullName(selectedManager) }}
-            template(v-if="!selectedManager") 
+            template(v-if="!selectedManager")
                 span.selected.no-manager Options
             .arrow-button(@click="showManagers")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: dropped}")
         .drop(v-if="dropped")
-            .drop__item(v-for="(manager, index) in managers" @click="changeManager(index)" :class="{'chosen': manager._id == selectedManager._id}")
+            .drop__item(v-for="(manager, index) in currentUsers(users) " @click="changeManager(index)" :class="{'chosen': manager._id == selectedManager._id}")
                 span {{ getFullName(manager) }}
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
+import { mapGetters } from "vuex"
 
 export default {
     props: {
@@ -27,12 +28,19 @@ export default {
     },
     data() {
         return {
-            managers: [],
             dropped: false,
             errors: []
         }
     },
     methods: {
+    	  currentUsers(users){
+		       return users.filter(item => {
+		       	if(this.group){
+			        return item.group.name === this.group
+            }
+		       	return item
+           })
+        },
         showManagers() {
             this.dropped = !this.dropped;
         },
@@ -40,21 +48,8 @@ export default {
             this.dropped = false;
         },
         changeManager(index) {
-            this.$emit("chosenManager", { manager: this.managers[index]});
+            this.$emit("chosenManager", { manager: this.currentUsers(this.users)[index]});
             this.outClick();
-        },
-        async getManagers() {
-            try {
-                const result = await this.$http.get('/users')
-                this.managers = result.data.filter(item => {
-                    if(this.group) {
-                        return item.group.name === this.group;
-                    }
-                    return item;
-                });
-            } catch(err) {
-                console.log(err);
-            }  
         },
         getFullName(manager) {
             const firstName = manager.firstName || "";
@@ -65,9 +60,11 @@ export default {
     directives: {
         ClickOutside
     },
-    mounted () {
-        this.getManagers()
-    }
+	computed: {
+      ...mapGetters({
+	        users: "getUsers"
+      })
+	},
 }
 </script>
 

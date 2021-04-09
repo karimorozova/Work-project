@@ -1,7 +1,8 @@
 <template lang="pug">
   .sidebarMenu
     .sidebarMenu__mainIcon(@click="toggleMenu")
-      i.fas.fa-bars
+      img(src="../../../assets/images/left-menu-close.png" v-if="!isShowMenu")
+      img(src="../../../assets/images/left-menu-open.png" v-else)
     transition(name='slide')
       .sidebarMenu__body(v-if="isShowMenu")
         .sidebarMenu__content
@@ -16,9 +17,7 @@
               span.allActivities__title View All Activities
 
           .sidebarMenu__generalInfo
-            SideGeneral(
-              :isSaveClicked="isSaveClicked"
-            )
+            SideGeneral(:isSaveClicked="isSaveClicked")
 
           .sidebarMenu__listActivities
             OpenActivities(
@@ -61,9 +60,9 @@
 						this.taskData = data
 				}
 			},
-			editActivityDetailsTask(taskData){
+			editActivityDetailsTask(taskData) {
 				this.$emit('editActivityDetailsTask', taskData)
-      },
+			},
 			openActivityDetailsTask() {
 				this.isShowDetailsTask = true
 			},

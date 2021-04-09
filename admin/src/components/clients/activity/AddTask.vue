@@ -105,10 +105,16 @@
 			},
 			checkCreateUpdateTasks() {
 				this.errors = []
+				const taskDate = new Date(this.clientTask.deadline).getTime()
+				const timeNow = new Date().getTime()
+
+				if (taskDate < timeNow) this.errors.push('The date should be future')
 				if (!this.clientTask.title) this.errors.push('Please, enter title')
 				if (!this.clientTask.details) this.errors.push('Please, enter details')
 				if (!this.clientTask.deadline) this.errors.push('Please, enter deadline')
-				if (!this.clientTask.assignedTo.hasOwnProperty('firstName')) this.errors.push('Please, assigned task to...')
+				if (!this.clientTask.assignedTo.hasOwnProperty('firstName')) {
+					this.clientTask.assignedTo = this.user
+				}
 				if (this.errors.length) {
 					this.areErrors = true
 					return
