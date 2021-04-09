@@ -5,13 +5,13 @@
         i.fas.fa-tasks
       .header__title Task
     .main-info
-        .main-info__check
-          i.far.fa-check-circle
-        .main-info__data
-          .main-info__title Hello Js
-        .main-info__date
-          span.due Due:
-          span 15-15-1515, 20:20
+      .main-info__check
+        i.far.fa-check-circle
+      .main-info__data
+        .main-info__title Hello Js
+      .main-info__date
+        span.due Due:
+        span 15-15-1515, 20:20
     .details
       .details__header(@click="clickDetails")
         .details__icon
@@ -47,52 +47,56 @@
 </template>
 
 <script>
-export default {
-  name: "TaskDetailsCard",
-  props: {
-    showDetails: false,
-  },
-  data() {
-    return {
-    }
-  },
-  methods: {
-    clickDetails() {
-      this.showDetails = !this.showDetails
-    }
-  }
-}
+	export default {
+		name: "TaskDetailsCard",
+		props: {
+			showDetails: false
+		},
+		data() {
+			return {}
+		},
+		methods: {
+			clickDetails() {
+				this.showDetails = !this.showDetails
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-  .task{
-    min-width: 800px;
-    border: 2px solid gray;
+  .task {
+    width: 650px;
+    border: 1px solid #e8e8e8;
     padding: 20px;
-    background: white;
-    position: fixed;
-    top: 100px;
-    z-index: 100;
+    background: #fff;
+    height: fit-content;
   }
+
   .header {
     display: flex;
     align-items: center;
+    border-bottom: 1px solid #daeded;
+    padding-bottom: 10px;
 
     &__title {
-      font-size: 18px;
+      font-size: 20px;
+      margin-left: 10px;
     }
 
     &__icon {
       height: 40px;
-      width: 35px;
-      background: white;
+      min-width: 40px;
+      width: 40px;
+      background: #daeded;
       font-size: 20px;
       border-radius: 40px;
       color: #4ba5a5;
       display: flex;
+      justify-content: center;
       align-items: center;
     }
   }
+
   .main-info {
     display: flex;
     align-items: center;
@@ -114,43 +118,49 @@ export default {
     }
 
     &__title {
-      font-size: 20px;
-      margin-bottom: 2px;
+      font-size: 22px;
     }
 
     &__date {
       color: rgba(0, 0, 0, .6);
       margin-left: auto;
+
       & .due {
         margin-right: 5px;
       }
     }
   }
+
   .details {
     &__header {
       font-size: 16px;
       display: flex;
+      cursor: pointer;
+      padding-bottom: 5px;
     }
+
     &__icon {
       color: #48a6a6;
       min-width: 15px;
     }
+
     &__text {
       margin-left: 5px;
     }
+
     &__data {
       display: flex;
     }
   }
+
   .blocks {
-    display: flex;
-    border-bottom: 1px solid #ccc;
     border-top: 1px solid #ccc;
-    padding: 10px 0;
-    margin: 5px 0;
+    padding-top: 15px;
     width: 100%;
+    display: flex;
   }
-  .block{
+
+  .block {
     margin-right: 30px;
   }
 
@@ -180,6 +190,7 @@ export default {
       margin-bottom: 15px;
     }
   }
+
   .assignedImage {
     height: 50px;
     width: 50px;
@@ -206,6 +217,9 @@ export default {
       width: 5px;
       background: #e8e8e8;
     }
+  }
+  .d-title{
+    margin-bottom: 5px;
   }
 
 </style>
