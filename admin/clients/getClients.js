@@ -56,10 +56,12 @@ async function getClientWithActions(obj) {
       {path:'services.services', select: [ 'title', 'steps' ]},
     ]).lean()
 
+  await ClientsTasks.updateMany({client: obj._id, status: "Upcoming", deadline: {$lte:new Date()}},{$set: {status: "Overdue"}})
+
   client.tasks = await ClientsTasks.find({client: obj._id})
     .populate([
       {path: 'assignedTo', select: ['firstName','lastName']}
-    ])
+    ]) || []
 
   return client
 }
