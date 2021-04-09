@@ -41,7 +41,6 @@
             )
         .setting__item
           label Assigned to:
-            span.mandatory *
           .setting__drop
             SelectSingle(
               placeholder="Select"
