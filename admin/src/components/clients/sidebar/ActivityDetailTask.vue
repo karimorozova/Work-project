@@ -17,17 +17,30 @@
         .header__title Task
         .header__status {{taskData.status}}
         .header__crud
-          span.icon(@click="edit(taskData)")
+          span.icon(
+            v-if="(taskData.assignedTo._id.toString() === user._id.toString() || isAdmin) && taskData.status !== 'Completed'"
+            @click="edit(taskData)"
+          )
             i.fas.fa-pencil-alt
-          span.icon(@click="deleteTask()")
+          span.icon(
+            v-if="(taskData.assignedTo._id.toString() === user._id.toString() || isAdmin) && taskData.status !== 'Completed'"
+            @click="deleteTask()"
+          )
             i.fas.fa-trash
           span.icon(@click="close")
             i.fas.fa-times-circle
 
     .activityDetail__content
       .card
-        .card__check
+        .card__check(
+          v-if="taskData.status !== 'Completed'"
+          @click="completeActivity(taskData)"
+          :class="{notActive: taskData.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
+        )
           i.far.fa-check-circle
+        .card__checkDone(v-else)
+          i.far.fa-check-circle
+
         .card__data
           .card__title {{taskData.title}}
           .card__date
@@ -65,57 +78,87 @@
 </template>
 
 <script>
-	import ApproveModal from "../../ApproveModal";
-	import {mapActions} from "vuex"
-  export default {
-    components: {ApproveModal},
-    props: {
+	import ApproveModal from "../../ApproveModal"
+	import { mapActions, mapGetters } from "vuex"
+
+	export default {
+		components: { ApproveModal },
+		props: {
 			taskData: {
 				type: Object
-			},
+			}
 		},
-    data() {
-      return {
-        approveModal: false,
-      }
-    },
+		data() {
+			return {
+				approveModal: false
+			}
+		},
 		methods: {
-      ...mapActions({
-        setUpClientProp: 'setUpClientProp'
-      }),
+			...mapActions({
+				setUpClientProp: 'setUpClientProp',
+				alertToggle: "alertToggle"
+			}),
+			async completeActivity(item) {
+				if (item.assignedTo._id.toString() !== this.user._id.toString() && !this.isAdmin) {
+					return
+				}
+				this.taskData.status = 'Completed'
+				item.status = 'Completed'
+				try {
+					const tasks = await this.$http.post(`/clientsapi/activity/task/${ item._id }`, { data: item })
+					this.setUpClientProp({ key: "tasks", value: tasks.data })
+					this.alertToggle({ message: "Task compleated", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on Completing task", isShow: true, type: "error" })
+				}
+			},
 			edit(taskData) {
 				this.$emit('editActivityDetailsTask', taskData)
-        this.close()
+				this.close()
 			},
-      deleteTask() {
-			  this.approveModal = true
-      },
+			deleteTask() {
+				this.approveModal = true
+			},
 			close() {
 				this.$emit('closeActivityDetailsTask')
-        this.approveModal = false
+				this.approveModal = false
 			},
-      async approve() {
-			  try {
-          const tasks = await this.$http.delete(`/clientsapi/activity/task/${this.taskData._id}?client=${this.taskData.client}`)
-          this.setUpClientProp({ key: "tasks", value: tasks.data })
-          this.close()
-        } catch (e) {
-          console.log(e)
-        }
+			async approve() {
+				try {
+					const tasks = await this.$http.delete(`/clientsapi/activity/task/${ this.taskData._id }?client=${ this.taskData.client }`)
+					this.setUpClientProp({ key: "tasks", value: tasks.data })
+					this.close()
+				} catch (e) {
+					this.alertToggle({ message: "Error on deleting tasks", isShow: true, type: "error" })
+				}
 
-      },
-      notApprove() {
-			  this.closeModal()
-      },
-      closeModal() {
-			  this.approveModal = false
-      }
+			},
+			notApprove() {
+				this.closeModal()
+			},
+			closeModal() {
+				this.approveModal = false
+			}
+		},
+		computed: {
+			...mapGetters({
+				user: "getUser"
+			}),
+			isAdmin() {
+				return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
+			}
 		}
+
 
 	}
 </script>
 
 <style lang="scss" scoped>
+  .notActive {
+    cursor: default !important;
+    color: rgba(0, 0, 0, .1) !important;
+  }
+
   .side {
     width: 100%;
     display: flex;
@@ -128,12 +171,14 @@
       width: 70%;
     }
   }
+
   .modal {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
   }
+
   .associatedUser {
     border: 1px solid #e8e8e8;
     margin-bottom: 5px;
@@ -197,6 +242,15 @@
       }
     }
 
+    &__checkDone {
+      height: 22px;
+      font-size: 22px;
+      width: 22px;
+      margin-right: 10px;
+      color: #4ba5a5;
+      cursor: default;
+    }
+
     &__title {
       font-size: 20px;
       margin-bottom: 2px;
@@ -250,7 +304,7 @@
   }
 
   .icon {
-    margin-left: 10px;
+    margin-left: 15px;
     font-size: 16px;
     color: white;
     transition: ease 0.2s;

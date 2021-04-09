@@ -94,7 +94,8 @@
 		},
 		methods: {
 			...mapActions({
-				setUpClientProp: 'setUpClientProp'
+				setUpClientProp: 'setUpClientProp',
+				alertToggle: "alertToggle"
 			}),
 			closePicker() {
 				this.isDatePicker = false
@@ -142,8 +143,9 @@
 					}
 					this.setUpClientProp({ key: "tasks", value: tasks.data })
 					this.closeModal()
+					this.alertToggle({message: "Task created", isShow: true, type: "success"});
 				} catch (e) {
-					console.log(e)
+					this.alertToggle({message: "Error on Task creating", isShow: true, type: "error"});
 				}
 			},
 			setAssociatedTo({ option }) {

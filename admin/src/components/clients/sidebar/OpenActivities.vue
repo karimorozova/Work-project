@@ -5,7 +5,10 @@
       .openActivities__list(v-for="item in listOfActivity")
         .openActivities__item(v-on:click="openActivityDetails(item)")
           .card
-            .card__check(v-on:click.stop="completeActivity")
+            .card__check(
+              v-on:click.stop="completeActivity(item)"
+              :class="{notActive: item.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
+            )
               i.far.fa-check-circle
             .card__data
               .card__title {{ item.title }}
@@ -19,21 +22,35 @@
 </template>
 
 <script>
-	import { mapGetters } from "vuex"
+	import { mapActions, mapGetters } from "vuex"
 
 	export default {
 		data() {
 			return {}
 		},
 		methods: {
+			...mapActions({
+				setUpClientProp: 'setUpClientProp',
+				alertToggle: "alertToggle"
+			}),
 			renderIcon(entity) {
 				switch (entity) {
 					case 'task' :
 						return '<i class="fas fa-tasks"></i>'
 				}
 			},
-			completeActivity() {
-				alert('done')
+			async completeActivity(item) {
+				if (item.assignedTo._id.toString() !== this.user._id.toString() && !this.isAdmin) {
+					return
+				}
+				item.status = 'Completed'
+				try {
+					const tasks = await this.$http.post(`/clientsapi/activity/task/${ item._id }`, { data: item })
+					this.setUpClientProp({ key: "tasks", value: tasks.data })
+					this.alertToggle({ message: "Task compleated", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on Completing task", isShow: true, type: "error" })
+				}
 			},
 			openActivityDetails(item) {
 				this.$emit('openActivityDetails', item)
@@ -41,13 +58,19 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "getCurrentClient"
+				currentClient: "getCurrentClient",
+				user: "getUser"
 			}),
+			isAdmin(){
+				return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
+      },
 			listOfActivity() {
 				let result = [
-					...this.currentClient.tasks.map(item => {
-						return { ...item, entity: 'task' }
-					})
+					...this.currentClient.tasks
+					    .filter(item => item.status !== 'Completed')
+							.map(item => {
+								return { ...item, entity: 'task' }
+							})
 				]
 				return result
 			}
@@ -56,6 +79,11 @@
 </script>
 
 <style lang="scss" scoped>
+  .notActive {
+    cursor: default !important;
+    color: rgba(0, 0, 0, .1) !important;
+  }
+
   .openActivities {
     &__content {
       max-height: 45vh;
