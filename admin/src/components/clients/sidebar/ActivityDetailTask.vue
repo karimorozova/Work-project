@@ -45,7 +45,7 @@
           .card__title {{taskData.title}}
           .card__date
             span.due Due:
-            span {{taskData.deadline}}
+            span {{taskData.deadline | formatDate}}
 
       .description
         .side

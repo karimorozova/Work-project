@@ -1,17 +1,36 @@
 <template lang="pug">
   .task
+    .modal
+      ApproveModal(
+        v-if="approveModal.show"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approve"
+        @notApprove="notApprove"
+        @close="notApprove"
+      )
     .header
       .header__icon
         i.fas.fa-tasks
       .header__title Task
     .main-info
-      .main-info__check
+      .main-info__check(
+        v-if="taskData.status !== 'Completed'"
+        @click="setStatus(taskData, 'Completed')"
+        :class="{notActive: taskData.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
+      )
+        i.far.fa-check-circle
+      .main-info__checkDone(
+        v-else
+        @click="setUpcomingStatus(taskData)"
+        )
         i.far.fa-check-circle
       .main-info__data
-        .main-info__title Hello Js
+        .main-info__title {{taskData.title}}
       .main-info__date
         span.due Due:
-        span 15-15-1515, 20:20
+        span {{taskData.deadline | formatDate}}
     .details
       .details__header(@click="clickDetails")
         .details__icon
@@ -23,53 +42,123 @@
           .block
             .description__priority
               .d-title Priority:
-              .description__priorityBlockHigh(v-if="true") High
+              .description__priorityBlockHigh(v-if="taskData.priority === 'High'") High
               .description__priorityBlockRegular(v-else) Regular
 
             .description__assigned
               .d-title Assigned to:
               .assignedImage
-                img(src="../../../assets/images/signin-background.jpg")
-          .block(v-if="")
+                .tooltip
+                  span#myTooltip.tooltiptext {{taskData.assignedTo.firstName}} {{taskData.assignedTo.lastName}}
+                  img(src="../../../assets/images/signin-background.jpg")
+          .block(v-if="taskData.associatedTo[0]")
             .description__associated
               .d-title Associated with:
-              .description__associatedList
+              .description__associatedList(v-for="user in taskData.associatedTo")
                 .associatedUser
                   .associatedUser__block
-                  .associatedUser__title Hello PPPP
-                .associatedUser
-                  .associatedUser__block
-                  .associatedUser__title Hellosdfsd LKSJDFsdfsdf
+                  .associatedUser__title {{user.firstName}} {{user.surname}}
           .block
             .description__details
               .d-title Details:
-              .details__data(v-html="'Asdkajskdj aksjdk jaskdjasdj jshdjka'")
+              .details__data(id="editor" v-html="taskData.details")
 </template>
 
 <script>
-	export default {
+	import {mapGetters, mapActions} from "vuex";
+  import ApproveModal from "../../ApproveModal";
+
+  export default {
 		name: "TaskDetailsCard",
 		props: {
-			showDetails: false
+      taskData: null,
 		},
 		data() {
-			return {}
+			return {
+        showDetails: this.taskData.status === "Upcoming",
+        approveModal: {
+          item: null,
+          show: false
+        }
+      }
 		},
 		methods: {
+		  ...mapActions({
+        setUpClientProp: "setUpClientProp",
+        alertToggle: "alertToggle",
+      }),
 			clickDetails() {
 				this.showDetails = !this.showDetails
-			}
-		}
+			},
+      setUpcomingStatus(item) {
+		    this.approveModal = {
+		      item: item,
+          show: true
+        }
+      },
+      async setStatus(item, value) {
+        console.log({item, value})
+        if (item.assignedTo._id.toString() !== this.user._id.toString() && !this.isAdmin) {
+          return
+        }
+        this.taskData.status = value
+        item.status = value
+        try {
+          const tasks = await this.$http.post(`/clientsapi/activity/task/${ item._id }`, { data: item })
+          this.setUpClientProp({ key: "tasks", value: tasks.data })
+          this.alertToggle({ message: "Task status changed", isShow: true, type: "success" })
+        } catch (err) {
+          this.alertToggle({ message: "Error on change task status", isShow: true, type: "error" })
+        }
+      },
+      approve() {
+        this.setStatus(this.approveModal.item, 'Upcoming')
+        this.approveModal = {
+          item: null,
+          show: false
+        }
+      },
+      notApprove() {
+        this.approveModal = {
+          item: null,
+          show: false
+        }
+      }
+		},
+    computed: {
+      ...mapGetters({
+        user: "getUser"
+      }),
+      isAdmin() {
+        return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
+      },
+      details() {
+
+      }
+    },
+    components: { ApproveModal },
 	}
 </script>
 
 <style lang="scss" scoped>
+
+  .notActive {
+    cursor: default !important;
+    color: rgba(0, 0, 0, .1) !important;
+  }
   .task {
-    width: 650px;
     border: 1px solid #e8e8e8;
     padding: 20px;
     background: #fff;
     height: fit-content;
+    margin-bottom: 20px;
+  }
+
+  .modal{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .header {
@@ -115,6 +204,14 @@
         cursor: pointer;
         color: #4ba5a5;
       }
+    }
+    &__checkDone {
+      height: 22px;
+      font-size: 22px;
+      width: 22px;
+      margin-right: 10px;
+      color: #4ba5a5;
+      cursor: pointer;
     }
 
     &__title {
@@ -218,8 +315,59 @@
       background: #e8e8e8;
     }
   }
+
+  .tooltip {
+    position: relative;
+    display: flex;
+    height: 50px;
+    width: 50px;
+    border-radius: 50px;
+    cursor: help;
+
+    .tooltiptext {
+      font-size: 14px;
+      visibility: hidden;
+      width: 140px;
+      background-color: #67573e;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 50px;
+      left: 146%;
+      margin-left: -75px;
+      opacity: 0;
+      transition: opacity 0.3s;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 18%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #67573e transparent transparent transparent;
+      }
+    }
+
+    &:hover {
+      .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+
+  }
+
   .d-title{
     margin-bottom: 5px;
+  }
+
+  #editor /deep/ p {
+    margin: 0;
   }
 
 </style>

@@ -15,7 +15,7 @@
           @click="showCalendarReadonly"
           @change="setDateManually"
           :id="id"
-          :value="formattedValue"
+          :value="formattedValue | formatDate"
           :open-date="openDate"
           :placeholder="placeholder"
           :clear-button="clearButton"
@@ -919,6 +919,8 @@
 					this.selectedDate = null
 					return
 				}
+				this.hours = moment(date).hours()
+				this.minutes = moment(date).minutes()
 				this.selectedDate = date
 				// this.setPageDate(date)
 			},

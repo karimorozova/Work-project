@@ -3,6 +3,7 @@
     .client-info(v-if="currentClient._id")
       Sidebar(
         @createTask="createTask"
+        @openAllActivities="openAllActivitiesModal"
         @editActivityDetailsTask="editActivityDetailsTask"
         :isSaveClicked="isSaveClicked"
       )
@@ -11,6 +12,11 @@
         AddTask(
           :clientTask="clientTask"
           @close="closeTaskModal"
+        )
+      .client-activity__all-activities(v-if="allActivitiesModal")
+        AllActivitiesModal(
+          @close="closeAllActivities"
+          :rowCount="3"
         )
 
       SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
@@ -150,6 +156,7 @@
 	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Sidebar from "./sidebar/SidebarMenu"
 	import AddTask from "./activity/AddTask"
+  import AllActivitiesModal from "./activity/AllActivitiesModal";
 
 	export default {
 		mixins: [ vatChecker ],
@@ -223,7 +230,8 @@
 					'paymentType'
 				],
 
-				createTaskModal: false
+				createTaskModal: false,
+        allActivitiesModal: false,
 			}
 		},
 		methods: {
@@ -235,6 +243,9 @@
 			closeTaskModal() {
 				this.createTaskModal = false
 			},
+      closeAllActivities() {
+        this.allActivitiesModal = false
+      },
 			createTask() {
 				this.clientTask = {
 					priority: "",
@@ -247,6 +258,9 @@
 				}
 				this.createTaskModal = true
 			},
+      openAllActivitiesModal() {
+        this.allActivitiesModal = true
+      },
 			async setMatrixData({ value, key }) {
 				value = value > 100 ? 100 : value < 0 ? 0 : value
 				try {
@@ -578,6 +592,7 @@
 
 		},
 		components: {
+      AllActivitiesModal,
 			Sidebar,
 			SaveCancelPopUp,
 			DiscountChart,
@@ -636,6 +651,13 @@
       left: 50%;
       transform: translate(-50%, 25%);
       z-index: 50;
+    }
+    &__all-activities {
+      position: fixed;
+      top: 20%;
+      left: 25%;
+      z-index: 50;
+      width: 820px;
     }
   }
 

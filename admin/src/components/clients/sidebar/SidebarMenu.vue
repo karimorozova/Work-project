@@ -12,7 +12,7 @@
               i.fas.fa-tasks
 
           .sidebarMenu__allActivities
-            .allActivities
+            .allActivities(@click="openAllActivities")
               i.fas.fa-chart-line
               span.allActivities__title View All Activities
 
@@ -73,6 +73,9 @@
 			createTask() {
 				this.$emit('createTask')
 			},
+      openAllActivities() {
+			  this.$emit('openAllActivities')
+      },
 			toggleMenu() {
 				this.isShowMenu = !this.isShowMenu
 			}

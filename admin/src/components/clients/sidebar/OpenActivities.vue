@@ -14,7 +14,7 @@
               .card__title {{ item.title }}
               .card__date
                 span.due Due:
-                span {{ item.deadline}}
+                span {{ item.deadline | formatDate}}
             .card__icon
               span(v-html="renderIcon(item.entity)")
 
