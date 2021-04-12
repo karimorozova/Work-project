@@ -166,21 +166,18 @@
 					refFiles,
 					quantity
 				} = this.tasksData
+
 				if (this.isRequest) {
 					this.errors = this.checkRequestErrors()
 				}
 				if (this.tasksData.workflow.id === 2917) {
-					if (
-							this.tasksData.stepsDates[0].deadline === "" ||
-							this.tasksData.stepsDates[1].start === ""
-					) {
+					if (this.tasksData.stepsDates[0].deadline === "" || this.tasksData.stepsDates[1].start === "") {
 						this.errors.push("Please, select tasks deadline.")
 					}
 				}
-				if (!this.isMonoService && !source)
-					this.errors.push("Please, select Source language.")
-				if (this.tasksData.stepsAndUnits == null)
-					this.errors.push("Please, select Unit.")
+
+				if (!this.isMonoService && !source) this.errors.push("Please, select Source language.")
+				if (this.tasksData.stepsAndUnits == null) this.errors.push("Please, select Unit.")
 				if (!targets || !targets.length)
 					this.errors.push("Please, select Target language(s).")
 				this.isRequest
@@ -226,12 +223,23 @@
 				}
 			},
 			isDeadlineMissed() {
-				let today = new Date()
-				today.setHours(23, 59, 59)
-				const missedDeadline = this.tasksData.stepsDates.find((item) =>
-						item.deadline && new Date(item.deadline) <= today
-				)
-				return (!!missedDeadline || new Date(this.currentProject.deadline) <= today)
+				let now = new Date().getTime()
+
+				if (new Date(this.currentProject.deadline).getTime() <= now) {
+					return true
+				}
+
+				let deadlines = this.tasksData.stepsDates.map(i => i.deadline)
+
+				if (deadlines.filter(i => !i).length) {
+					return true
+				}
+
+				for (let time of deadlines) {
+					if (new Date(time).getTime() <= now) {
+						return true
+					}
+				}
 			},
 			checkRequestFies() {
 				const { sourceFiles, refFiles } = this.currentProject

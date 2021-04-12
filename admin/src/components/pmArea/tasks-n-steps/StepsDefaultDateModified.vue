@@ -66,7 +66,7 @@
 </template>
 
 <script>
-	import Datepicker from "../../Datepicker"
+	import Datepicker from "../../DatepickerWithTime"
 	import SelectSingle from "@/components/SelectSingle"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import moment from "moment"
