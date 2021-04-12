@@ -24,6 +24,7 @@
       .main-info__checkDone(
         v-else
         @click="setUpcomingStatus(taskData)"
+        :class="{notActive: taskData.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
         )
         i.far.fa-check-circle
       .main-info__data
@@ -91,13 +92,15 @@
 				this.showDetails = !this.showDetails
 			},
       setUpcomingStatus(item) {
+        if (item.assignedTo._id.toString() !== this.user._id.toString() && !this.isAdmin) {
+          return
+        }
 		    this.approveModal = {
 		      item: item,
           show: true
         }
       },
       async setStatus(item, value) {
-        console.log({item, value})
         if (item.assignedTo._id.toString() !== this.user._id.toString() && !this.isAdmin) {
           return
         }
@@ -144,7 +147,7 @@
 
   .notActive {
     cursor: default !important;
-    color: rgba(0, 0, 0, .1) !important;
+    opacity: 0.4;
   }
   .task {
     border: 1px solid #e8e8e8;
