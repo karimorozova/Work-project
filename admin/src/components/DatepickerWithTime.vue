@@ -15,7 +15,7 @@
           @click="showCalendarReadonly"
           @change="setDateManually"
           :id="id"
-          :value="formattedValue | formatDate"
+          :value="formattedValue"
           :open-date="openDate"
           :placeholder="placeholder"
           :clear-button="clearButton"
