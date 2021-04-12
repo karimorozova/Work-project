@@ -156,7 +156,7 @@
 	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Sidebar from "./sidebar/SidebarMenu"
 	import AddTask from "./activity/AddTask"
-  import AllActivitiesModal from "./activity/AllActivitiesModal";
+	import AllActivitiesModal from "./activity/AllActivitiesModal"
 
 	export default {
 		mixins: [ vatChecker ],
@@ -231,7 +231,7 @@
 				],
 
 				createTaskModal: false,
-        allActivitiesModal: false,
+				allActivitiesModal: false
 			}
 		},
 		methods: {
@@ -243,9 +243,9 @@
 			closeTaskModal() {
 				this.createTaskModal = false
 			},
-      closeAllActivities() {
-        this.allActivitiesModal = false
-      },
+			closeAllActivities() {
+				this.allActivitiesModal = false
+			},
 			createTask() {
 				this.clientTask = {
 					priority: "",
@@ -258,9 +258,9 @@
 				}
 				this.createTaskModal = true
 			},
-      openAllActivitiesModal() {
-        this.allActivitiesModal = true
-      },
+			openAllActivitiesModal() {
+				this.allActivitiesModal = true
+			},
 			async setMatrixData({ value, key }) {
 				value = value > 100 ? 100 : value < 0 ? 0 : value
 				try {
@@ -567,6 +567,8 @@
 					let keys = [ ...this.generalKeys ]
 					let billingKeys = [ ...this.billingKeys ]
 
+					console.log(this.currentClientOverallData.contacts, this.currentClient.contacts, JSON.stringify(this.currentClientOverallData.contacts) !== JSON.stringify(this.currentClient.contacts))
+
 					for (let key of keys) {
 						if (JSON.stringify(this.currentClientOverallData[key]) !== JSON.stringify(this.currentClient[key])) {
 							return true
@@ -592,7 +594,7 @@
 
 		},
 		components: {
-      AllActivitiesModal,
+			AllActivitiesModal,
 			Sidebar,
 			SaveCancelPopUp,
 			DiscountChart,
@@ -625,15 +627,16 @@
 				}
 			})
 		},
-		beforeDestroy() {
-			this.storeCurrentClient({})
-		},
+    beforeDestroy(){
+	    this.storeCurrentClient({})
+    },
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
-				if (from.name !== 'contact') {
-					vm.getClientInfo()
-				} else {
+				console.log(from.name)
+				if (from.name === 'contact' || from.name === 'new-contact') {
 					vm.getClientInfoWithoutOverallData()
+				} else {
+					vm.getClientInfo()
 				}
 				vm.fromRoute = from.path
 			})
@@ -652,6 +655,7 @@
       transform: translate(-50%, 25%);
       z-index: 50;
     }
+
     &__all-activities {
       position: fixed;
       top: 20%;

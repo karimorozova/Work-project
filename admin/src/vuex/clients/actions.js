@@ -50,6 +50,7 @@ export const storeClientProperty = ({ commit }, payload) => commit('setClientPro
 export const storeClientPropertyOverallData = ({ commit }, payload) => commit('setClientPropertyOverallData', payload)
 export const storeClientPropertyOverallDataBilling = ({ commit }, payload) => commit('setClientPropertyOverallDataBilling', payload)
 export const storeClientContact = ({ commit }, payload) => commit('addContact', payload)
+export const storeClientContactOverAll = ({ commit }, payload) => commit('addContactOverAll', payload)
 export const updateClientContact = ({ commit }, payload) => commit('updateContact', payload)
 export const updateLeadContact = ({ commit }, payload) => commit('setLeadContact', payload)
 export const storeClientBillingInfoProperty = ({ commit }, payload) => commit('storeClientBillingInfoProperty', payload)

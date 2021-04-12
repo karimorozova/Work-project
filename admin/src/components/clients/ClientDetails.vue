@@ -55,12 +55,12 @@ export default {
         },
         contactSave({file, contact}) {
             this.contactsPhotos.push(file);
-            this.storeClientContact(contact);
-            let newContact = {...contact};  
-            if(this.currentClient.contacts.length === 1) {
-                newContact.leadContact = true;
-            }
-            this.updateClientContact({index: this.currentClient.contacts.length - 1, contact: newContact});
+            this.storeClientContactOverAll(contact);
+            // let newContact = {...contact};
+            // if(this.currentClient.contacts.length === 1) {
+            //     newContact.leadContact = true;
+            // }
+            // this.updateClientContact({index: this.currentClient.contacts.length - 1, contact: newContact});
             this.$router.go(-1);
         },
         loadFile({files, prop}) {
@@ -71,7 +71,8 @@ export default {
             storeClient: "storeClient",
             storeCurrentClient: "storeCurrentClient",
             storeClientContact: "storeClientContact",
-            updateClientContact: "updateClientContact"
+            updateClientContact: "updateClientContact",
+	          storeClientContactOverAll: "storeClientContactOverAll"
         })
     },
     computed: {

@@ -59,7 +59,10 @@ export const mutations = {
         state.currentClient.billingInfo[payload.prop] = payload.value;
     },
     addContact(state, payload) {
-        state.currentClient.contacts.push(payload);
+        state.currentClient.contacts.push(payload)
+    },
+    addContactOverAll(state, payload) {
+        state.currentClientOverallData.contacts.push(payload)
     },
     updateContact(state, payload) {
         const { index, contact } = payload;
