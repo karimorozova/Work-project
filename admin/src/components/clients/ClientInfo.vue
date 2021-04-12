@@ -567,8 +567,6 @@
 					let keys = [ ...this.generalKeys ]
 					let billingKeys = [ ...this.billingKeys ]
 
-					console.log(this.currentClientOverallData.contacts, this.currentClient.contacts, JSON.stringify(this.currentClientOverallData.contacts) !== JSON.stringify(this.currentClient.contacts))
-
 					for (let key of keys) {
 						if (JSON.stringify(this.currentClientOverallData[key]) !== JSON.stringify(this.currentClient[key])) {
 							return true
@@ -632,7 +630,6 @@
     },
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
-				console.log(from.name)
 				if (from.name === 'contact' || from.name === 'new-contact') {
 					vm.getClientInfoWithoutOverallData()
 				} else {
