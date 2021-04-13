@@ -715,59 +715,41 @@ async function updateOtherProject(query, update) {
 	return await MemoqProject.findOneAndUpdate(query, update, { new: false });
 }
 
-/**
- *
- * @param {ObjectId} vendorId
- * @param {ObjectId} stepId
- * @param {ObjectId} projectId
- * @returns nothing - but summons a new function or throws an error
- */
+
 const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	const vendor = await Vendors.findOne({ _id: vendorId });
 	const { steps } = await Projects.findOne({ _id: projectId }).populate('steps.vendor');
 	const users = await getMemoqUsers();
-	const isSecondStep = /(\sS02)/.exec(stepId);
+
 	const neededStep = steps.find(step => step.stepId === stepId);
 	const { memoqProjectId, taskId } = neededStep;
-	let assignedSteps = [];
 
-	if(isSecondStep) {
+	let assignedSteps = [];
+	if( /(\sS02)/.exec(`${stepId}`)) {
 		assignedSteps.push(...steps.filter(item => item.taskId === taskId));
 	} else {
 		assignedSteps.push(neededStep);
 	}
+
 	let projectUsers = [];
 	const currentProjectUsers = await getProjectUsers(memoqProjectId);
-	const isArray = Array.isArray(currentProjectUsers);
 
-	if(isArray) {
-		for (let userInfo of currentProjectUsers) assignPM(userInfo);
-	} else {
-		if(currentProjectUsers.hasOwnProperty('User')) assignPM(currentProjectUsers);
+	if(Array.isArray(currentProjectUsers)){
+		for (let userInfo of currentProjectUsers) assignPM(userInfo)
+	}else{
+		if(currentProjectUsers.hasOwnProperty('User')) assignPM(currentProjectUsers)
 	}
-
 	const memoqUser = users.find(user => user.email === vendor.email);
-	if(memoqUser) projectUsers.push({
-		id: memoqUser.id,
-		isPm: false
-	});
+	if(memoqUser) projectUsers.push({ id: memoqUser.id, isPm: false });
 
-	const areUsersSet = await setMemoqProjectUsers(
-			memoqProjectId,
-			Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i)))
-	);
+	const areUsersSet = await setMemoqProjectUsers(memoqProjectId, Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i))));
 
 	return areUsersSet ? await assignMemoqTranslators({ memoqProjectId, assignedSteps, users })
 			: new Error("Can't set one or all users in memoQ");
 
-	function assignPM(userObject) {
-		const { ProjectRoles, User } = userObject;
-		const { UserGuid } = User;
+	function assignPM({ ProjectRoles, User : { UserGuid } }) {
 		const isPm = ProjectRoles['a:ProjectManager'] === 'true';
-		projectUsers.push({
-			id: UserGuid,
-			isPm
-		});
+		projectUsers.push({ id: UserGuid, isPm });
 	}
 };
 

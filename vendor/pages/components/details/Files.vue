@@ -161,9 +161,10 @@
 					this.documentGuid = DocumentGuid
 					this.backStepModal = true
 				} else {
+					const newUrl = WebTransUrl.replace('116.203.204.212', 'memoq.pangea.global')
 					let link = document.createElement("a")
 					link.target = "_blank"
-					link.href = WebTransUrl
+					link.href = newUrl
 					link.click()
 				}
 			},

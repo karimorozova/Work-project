@@ -28,11 +28,10 @@ async function createTasksForWordcount(newTasksInfo, docs) {
 async function addTasksToProject({ newTasksInfo, project, docs }) {
   try {
     let memoqDocs;
-    for (let target of newTasksInfo.targets) {
+    const currTargets = newTasksInfo.targets.map(item => item.memoq)
       memoqDocs = Array.isArray(docs)
-        ? docs.filter(({ TargetLangCode }) => TargetLangCode === target.memoq)
+        ? docs.filter(({ TargetLangCode }) => currTargets.includes(TargetLangCode))
         : [docs];
-    }
     return await updateProjectTasks({ newTasksInfo, project, memoqDocs });
   } catch (err) {
     console.log(err);
@@ -63,11 +62,6 @@ async function updateProjectTasks(taskData) {
   }
 }
 
-/**
- *
- * @param {Object} taskData
- * @returns {Array} - returns tasks array
- */
 function getWordCountTasks(taskData) {
   const { project, newTasksInfo, memoqDocs } = taskData;
   const {
@@ -98,7 +92,7 @@ function getWordCountTasks(taskData) {
       targetLanguage: targets[i].symbol,
       memoqSource: source.memoq,
       memoqTarget: targets[i].memoq,
-      memoqDocs,
+      memoqDocs: memoqDocs.filter(item => `${item.TargetLangCode}` === `${targets[i].memoq}`),
       memoqFiles: memoqFiles,
       status: "Created",
       cost: "",
