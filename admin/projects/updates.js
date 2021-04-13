@@ -599,7 +599,7 @@ function updateWordcountStepsProgress({ steps, task }) {
 	const { memoqDocs: docs } = task;
 	return steps.map(item => {
 		if(task.taskId === item.taskId) {
-			item.progress = item.status === 'Started' ? setStepsProgress(item.serviceStep.title, docs) : item.progress;
+			item.progress = (item.status === 'Started' || item.status === 'In progress') ? setStepsProgress(item.serviceStep.title, docs) : item.progress;
 		}
 		return item;
 	});
