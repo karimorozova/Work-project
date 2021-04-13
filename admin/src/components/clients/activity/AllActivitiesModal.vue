@@ -5,10 +5,15 @@
         i.fas.fa-expand-all
       .all-activities__btn(@click="close")
         .all-activities__close &#215;
-    .all-activities__wrapper
+    .all-activities__wrapper(v-if="listOfActivity.length >= 1")
       .all-activities__content
         .all-activities__list(v-for="item in listOfActivity")
-          TaskDetailsCard.mb-20(:taskData="item")
+          TaskDetailsCard.mb-20(
+            :taskData="item"
+            @editActivityDetailsTask="editActivityDetailsTask"
+            )
+    .all-activities__no-activity(v-else)
+      span There are no activities now
 </template>
 
 <script>
@@ -35,6 +40,10 @@ export default {
   methods: {
     close() {
       this.$emit('close')
+    },
+    editActivityDetailsTask(taskData) {
+      this.$emit('editActivityDetailsTask', taskData)
+      this.close()
     }
 
   },
@@ -53,17 +62,15 @@ export default {
     position: relative;
 
     &__wrapper {
-      padding: 35px 20px 0 20px;
+      padding: 0 20px;
       max-height: 605px;
       overflow-x: auto;
     }
 
     &__modal-actions {
-      display: flex;
       font-size: 22px;
-      position: absolute;
-      right: 7px;
-      top: 2px;
+      display: flex;
+      justify-content: end;
     }
 
     &__btn {
@@ -83,10 +90,15 @@ export default {
       opacity: 0.8;
       transition: ease 0.2s;
       cursor: pointer;
+      padding: 5px;
 
       &:hover {
         opacity: 1
       }
+    }
+    &__no-activity {
+      padding: 20px;
+      font-size: 16px;
     }
 
   }

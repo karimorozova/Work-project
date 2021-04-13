@@ -10,10 +10,30 @@
         @notApprove="notApprove"
         @close="notApprove"
       )
+      ApproveModal(
+        v-if="showApproveDelete"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approveDelete"
+        @notApprove="close"
+        @close="close"
+      )
     .header
       .header__icon
         i.fas.fa-tasks
       .header__title Task
+      .header__crud
+        span.icon(
+          v-if="(taskData.assignedTo._id.toString() === user._id.toString() || isAdmin) && taskData.status !== 'Completed'"
+          @click="edit(taskData)"
+        )
+          i.fas.fa-pencil-alt
+        span.icon(
+          v-if="(taskData.assignedTo._id.toString() === user._id.toString() || isAdmin) && taskData.status !== 'Completed'"
+          @click="deleteTask()"
+        )
+          i.fas.fa-trash
     .main-info
       .main-info__check(
         v-if="taskData.status !== 'Completed'"
@@ -80,7 +100,8 @@
         approveModal: {
           item: null,
           show: false
-        }
+        },
+        showApproveDelete: false
       }
 		},
 		methods: {
@@ -126,6 +147,26 @@
           item: null,
           show: false
         }
+      },
+      edit(taskData) {
+        this.$emit('editActivityDetailsTask', taskData)
+        this.close()
+      },
+      deleteTask() {
+        this.showApproveDelete = true
+      },
+      async approveDelete() {
+        try {
+          const tasks = await this.$http.delete(`/clientsapi/activity/task/${ this.taskData._id }?client=${ this.taskData.client }`)
+          this.setUpClientProp({ key: "tasks", value: tasks.data })
+          this.close()
+        } catch (e) {
+          this.alertToggle({ message: "Error on deleting tasks", isShow: true, type: "error" })
+        }
+
+      },
+      close() {
+		    this.showApproveDelete = false
       }
 		},
     computed: {
@@ -187,6 +228,16 @@
       justify-content: center;
       align-items: center;
     }
+
+    &__crud {
+      margin-left: auto;
+      & .icon {
+        margin-left: 10px;
+        cursor: pointer;
+      }
+    }
+
+
   }
 
   .main-info {

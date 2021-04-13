@@ -1,7 +1,7 @@
 <template lang="pug">
   .openActivities
     .openActivities__title Open Activities
-    .openActivities__content
+    .openActivities__content(v-if="listOfActivity.length > 0")
       .openActivities__list(v-for="item in listOfActivity")
         .openActivities__item(v-on:click="openActivityDetails(item)")
           .card
@@ -17,6 +17,8 @@
                 span {{ item.deadline | formatDate}}
             .card__icon
               span(v-html="renderIcon(item.entity)")
+    .openActivities__no-activity(v-else)
+      span There are no activities now
 
 
 </template>
@@ -152,6 +154,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    &__no-activity {
+      font-size: 14px;
+      padding-top: 5px;
     }
   }
 

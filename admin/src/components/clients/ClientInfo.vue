@@ -16,6 +16,7 @@
       .client-activity__all-activities(v-if="allActivitiesModal")
         AllActivitiesModal(
           @close="closeAllActivities"
+          @editActivityDetailsTask="editActivityDetailsTask"
           :rowCount="3"
         )
 
@@ -656,8 +657,9 @@
     &__all-activities {
       position: fixed;
       top: 20%;
-      left: 25%;
+      left: 50%;
       z-index: 50;
+      transform: translate(-50%,0%);
       width: 820px;
     }
   }

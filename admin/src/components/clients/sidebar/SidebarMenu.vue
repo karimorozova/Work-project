@@ -7,11 +7,11 @@
       .sidebarMenu__body(v-if="isShowMenu")
         .sidebarMenu__content
 
-          //.sidebarMenu__mainIcons
+          .sidebarMenu__mainIcons
             .icon(@click="createTask")
               i.fas.fa-tasks
 
-          //.sidebarMenu__allActivities
+          .sidebarMenu__allActivities
             .allActivities(@click="openAllActivities")
               i.fas.fa-chart-line
               span.allActivities__title View All Activities
@@ -19,7 +19,7 @@
           .sidebarMenu__generalInfo
             SideGeneral(:isSaveClicked="isSaveClicked")
 
-          //.sidebarMenu__listActivities
+          .sidebarMenu__listActivities
             OpenActivities(
               @openActivityDetails="openActivityDetails"
             )
@@ -52,7 +52,6 @@
 		},
 		methods: {
 			openActivityDetails(data) {
-				console.log(data)
 				const { entity } = data
 				switch (entity) {
 					case 'task' :
@@ -75,6 +74,7 @@
 			},
       openAllActivities() {
 			  this.$emit('openAllActivities')
+        this.closeActivityDetailsTask()
       },
 			toggleMenu() {
 				this.isShowMenu = !this.isShowMenu
