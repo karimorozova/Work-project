@@ -50,7 +50,7 @@
 
       .tasks-files__button(v-if="refFiles.length")
         Button(:value="'Upload'" @clicked="uploadFiles")
-      .tasks-files__tooltip Each file can be <= 2Mb
+      .tasks-files__tooltip Each file can be <= 50Mb
       .tasks-files__tooltip (otherwise it will not be loaded)
 
     .tasks__action
@@ -274,7 +274,7 @@
 				}
 			},
 			uploadRefFiles({ files }) {
-				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 2)
+				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 50)
 				if (filteredFiles.length) {
 					for (let file of files) {
 						if (!this.refFiles.find(item => item.name === file.name)) this.refFiles.push(file)

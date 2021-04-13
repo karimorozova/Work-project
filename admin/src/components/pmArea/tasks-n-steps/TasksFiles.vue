@@ -51,7 +51,9 @@
               @uploadFiles="uploadRefFiles"
               @deleteFile="(e) => deleteFile(e, 'refFiles')"
             )
-      .tasks-files__tooltip Total size must be <= 10Mb, each file can be <= 2Mb
+      .tasks-files__tooltip
+        div <b>Source:</b> total size must be <= 10Mb, each file can be <= 2Mb
+        div <b>Reference:</b> each file can be <= 50Mb
 
     ValidationErrors(
       v-if="showFileSizeWarning"
@@ -133,7 +135,7 @@
 				this.isUploadModal = true
 				document.addEventListener('click', this.outsideClickListener)
 			},
-			checkFiles(files) {
+			checkFilesSource(files) {
 				const sizesSum = files.reduce((acc, cur) => acc + cur.size, 0)
 				return sizesSum / 1000000 <= 10
 			},
@@ -147,7 +149,7 @@
 					const extension = name.split('.').pop()
 					return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
 				})
-				if (filteredFiles.length && this.checkFiles(filteredFiles)) {
+				if (filteredFiles.length && this.checkFilesSource(filteredFiles)) {
 					for (let file of filteredFiles) {
 						const isExist = this.sourceFiles.find(item => item.name === file.name)
 						if (!isExist) {
@@ -161,12 +163,15 @@
 				this.setDataValue({ prop: "sourceFiles", value: this.sourceFiles })
 			},
 			uploadRefFiles({ files }) {
-				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2)
+				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 50)
 				if (filesBiggerThan2MB.length) {
 					this.showFileSizeWarning = true
 				}
-				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 2)
-				if (filteredFiles.length && this.checkFiles(filteredFiles)) {
+				const filteredFiles = Array.from(files).filter(item => {
+					console.log(item)
+          return item.size / 1000000 <= 50
+        })
+				if (filteredFiles.length) {
 					for (let file of files) {
 						const isExist = this.refFiles.find(item => item.name === file.name)
 						if (!isExist) {
