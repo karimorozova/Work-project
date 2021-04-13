@@ -182,7 +182,7 @@
 					const { title } = this.job.serviceStep
 					const statusWord = title === 'Translation' ? 'Translation' : 'Review1'
 					const notFinishedStatus = this.job.memocDocs.find(item => item.WorkflowStatus.indexOf(statusWord) !== -1)
-					return this.progress >= 100 && !notFinishedStatus
+					return this.progress >= 100 && !notFinishedStatus && this.job.status !== 'Ready to Start'
 				}
 				return !!this.deliverables.length
 
