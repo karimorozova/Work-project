@@ -68,6 +68,7 @@
     .review__table
       .review__forbidden(v-if="isReviewing")
       Table(
+        :task="task"
         :isReviewing="isReviewing"
         :files="files"
         @approveFile="approveFile"
@@ -76,6 +77,7 @@
         @checkAll="checkAllFiles"
         @checkFile="checkFile"
         @updateDeliveryData="getDeliveryData"
+        @generateCertificate="generateCertificate"
       )
 
     .review__options
@@ -168,6 +170,18 @@
 				"rollBackReview",
 				"alertToggle"
 			]),
+			async generateCertificate() {
+				try {
+					await this.$http.post('/pm-manage/generate-certificate', {
+						project: this.project,
+						task: this.task
+					})
+					await this.getDeliveryData()
+					this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
+				}
+			},
 			async sendMessage() {
 				try {
 					await this.$http.post('/pm-manage/delivery-comments', {

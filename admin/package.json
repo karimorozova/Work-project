@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "pangea api/admin",
-  "author": "wellyes",
+  "author": "pangea",
   "scripts": {
     "build": "cross-env API_URL='https://admin.pangea.global' node build/build.js",
     "build-test": "cross-env API_URL='http://testadmin.pangea.global' node build/build.js",

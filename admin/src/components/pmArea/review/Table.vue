@@ -9,6 +9,10 @@
         @close="closeModal"
         @notApprove="closeModal"
       )
+
+    //.review-table__actions
+      //.review-table__action(v-if="task.service.title === 'Compliance'")
+        Button(value="Add Certificate" @clicked="generateCertificate")
     .review-table__action
       SelectSingle(
         placeholder="Select action"
@@ -62,9 +66,11 @@
 	import Add from "@/components/Add"
 	import { mapActions } from "vuex"
 	import ApproveModal from "../../ApproveModal"
+	import Button from "../../Button"
 
 	export default {
 		props: {
+			task: { type: Object },
 			files: { type: Array },
 			isReviewing: { type: Boolean }
 		},
@@ -89,9 +95,12 @@
 			}
 		},
 		methods: {
-			...mapActions([ "removeDrFile" ]),
+			...mapActions([ "removeDrFile", "alertToggle" ]),
 			approveFile(index) {
 				this.$emit('approveFile', { index })
+			},
+			generateCertificate() {
+				this.$emit('generateCertificate')
 			},
 			async makeOneAction(index, key) {
 				const file = this.files[index]
@@ -166,6 +175,7 @@
 			}
 		},
 		components: {
+			Button,
 			ApproveModal,
 			DataTable,
 			SelectSingle,
@@ -190,6 +200,11 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    &__actions {
+      display: flex;
+      justify-content: space-between;
     }
 
     &__action {
@@ -228,7 +243,7 @@
     }
 
     &__check-icon {
-      font-size: 20px;
+      font-size: 18px;
       color: $light-brown;
       cursor: pointer;
       transition: ease 0.1s;

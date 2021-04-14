@@ -6,6 +6,7 @@ const fs = require('fs');
 const { Delivery } = require('../models')
 const htmlToPdf = require('html-pdf');
 const apiUrl = require('../helpers/apiurl');
+const { getCertificateTemplate } = require('../emailMessages/complianceCecertificate')
 
 async function storeFiles(filesArr, projectId) {
     try {
@@ -73,7 +74,6 @@ function getParsedFiles(taskFiles) {
 
 async function manageDeliveryFile({fileData, file}) {
     const { path, taskId, isOriginal, projectId } = fileData;
-    console.log(path, taskId, isOriginal, projectId)
 
     const additionFileInfo = `${Math.floor(Math.random()*10000)}DR-${taskId.replace(/\s+/g, '')}`;
     try {
@@ -113,4 +113,33 @@ async function getPdf(allUnits, allSettingsSteps, project, tasksIds = []) {
     }
 }
 
-module.exports = { storeFiles, getDeliverablesLink, manageDeliveryFile, getProjectDeliverables, getPdf };
+const generateAndSaveCertificate = ({ project, task }) => {
+    const template = getCertificateTemplate({ project, task })
+    const pdf = new Promise((resolve, reject) => {
+        htmlToPdf.create(
+            template,
+            {
+                width: '1654', height: '2339', orientation: "landscape", base: apiUrl
+                // height: "900px",
+                // width: "820px",
+                // "format": "A4",
+                // orientation: "portrait",
+                // "border": "0",
+                // base: apiUrl,
+            })
+            .toFile('./dist/uploads/certificatePdf.pdf', function (err, res) {
+                if (err) {
+                    console.log(err)
+                    reject(err)
+                }
+                resolve('./dist/uploads/certificatePdf.pdf')
+            })
+    })
+    // pdf.then((path) => {
+    //     fs.unlink(path.toString(), (err) => {
+    //         if (err) console.log(err)
+    //     })
+    // })
+}
+
+module.exports = { storeFiles, getDeliverablesLink, manageDeliveryFile, getProjectDeliverables, getPdf, generateAndSaveCertificate };

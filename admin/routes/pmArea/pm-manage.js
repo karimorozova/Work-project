@@ -56,7 +56,8 @@ const {
 	assignProjectManagers,
 	sendQuoteMessage,
 	sendCostQuoteMessage,
-	updateProjectFinanceOnDiscountsUpdate
+	updateProjectFinanceOnDiscountsUpdate,
+	generateAndSaveCertificate
 } = require('../../projects')
 
 const {
@@ -719,6 +720,17 @@ router.post('/delivery-comments', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on approve files')
+	}
+})
+
+router.post('/generate-certificate', async (req, res) => {
+	const { project, task } = req.body
+	try {
+		await generateAndSaveCertificate({ project, task })
+		res.send('done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on generate certificate')
 	}
 })
 

@@ -1,5 +1,5 @@
 const { getProject, getProjects, updateProject, getFilteredProjects, getProjectAfterUpdate } = require('./getProjects');
-const { storeFiles, getDeliverablesLink, manageDeliveryFile, getPdf } = require('./files');
+const { storeFiles, getDeliverablesLink, manageDeliveryFile, getPdf, generateAndSaveCertificate } = require('./files');
 const {
   getProjectAfterCancelTasks, updateProjectStatus, setStepsStatus, updateWithApprovedTasks, downloadCompletedFiles,
   updateProjectProgress, getAfterReopenSteps, updateNonWordsTaskTargetFiles, updateOtherProject,
@@ -24,6 +24,7 @@ const { getProjectAfterFinanceUpdated, updateProjectFinanceOnDiscountsUpdate } =
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
 
 module.exports = {
+  generateAndSaveCertificate,
   getProject,
   getProjects,
   updateProject,
