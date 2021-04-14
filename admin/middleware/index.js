@@ -103,6 +103,7 @@ const middleware = {
 
 	checkRoutes(req, res, next) {
 		let routesArray = [
+			'/foo',
 			'/register',
 			'/forgot',
 			'/login',
