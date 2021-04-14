@@ -94,10 +94,11 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 
 
 const getPriceFromPersonRates = (pricelistTable, data) => {
-	const { sourceLanguage, targetLanguage, step, unit, size } = data
+	const { sourceLanguage, targetLanguage, step, unit, size, industry } = data
 	const row = pricelistTable.find(row => (
 			row.sourceLanguage.toString() === sourceLanguage.toString() &&
 			row.targetLanguage.toString() === targetLanguage.toString() &&
+			row.industry.toString() === industry.toString() &&
 			row.step.toString() === step.toString() &&
 			row.unit.toString() === unit.toString() &&
 			row.size.toString() === size.toString()

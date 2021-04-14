@@ -216,7 +216,7 @@ const getStepUserRate = async (user, project, stepName, task) => {
       step: step ? step._id : null,
       unit: unitId,
       size: 1,
-      industry: industry,
+      industry: typeof industry === 'object' && industry.hasOwnProperty('_id') ? industry._id : industry,
     };
     if(source && target && step) {
       let userPrice = getPriceFromPersonRates(pricelistTable, dataForComparison);
