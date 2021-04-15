@@ -3,6 +3,7 @@
     .client-info(v-if="currentClient._id")
       Sidebar(
         @createTask="createTask"
+        @createNote="createNote"
         @openAllActivities="openAllActivitiesModal"
         @editActivityDetailsTask="editActivityDetailsTask"
         :isSaveClicked="isSaveClicked"
@@ -13,10 +14,16 @@
           :clientTask="clientTask"
           @close="closeTaskModal"
         )
+      .client-activity__addNote(v-if="createNoteModal")
+        AddNote(
+          :clientNote="clientNote"
+          @close="closeNoteModal"
+        )
       .client-activity__all-activities(v-if="allActivitiesModal")
         AllActivitiesModal(
           @close="closeAllActivities"
           @editActivityDetailsTask="editActivityDetailsTask"
+          @editActivityDetailsNote="editActivityDetailsNote"
           :rowCount="3"
         )
 
@@ -157,6 +164,7 @@
 	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Sidebar from "./sidebar/SidebarMenu"
 	import AddTask from "./activity/AddTask"
+	import AddNote from "./activity/AddNote"
 	import AllActivitiesModal from "./activity/AllActivitiesModal"
 
 	export default {
@@ -178,6 +186,7 @@
 		data() {
 			return {
 				clientTask: {},
+				clientNote: {},
 				aliases: [],
 				timezones: [],
 				currentDocuments: [],
@@ -232,17 +241,26 @@
 				],
 
 				createTaskModal: false,
+				createNoteModal: false,
 				allActivitiesModal: false
 			}
 		},
 		methods: {
 			editActivityDetailsTask(taskData) {
-				const { _id, priority, title, deadline, details, assignedTo, associatedTo } = taskData
-				this.clientTask = { _id, priority, title, deadline, details, assignedTo, associatedTo, stage: 'update' }
+				const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = taskData
+				this.clientTask = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }
 				this.createTaskModal = true
 			},
+      editActivityDetailsNote(noteData) {
+        const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = noteData
+        this.clientNote = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }
+        this.createNoteModal = true
+      },
 			closeTaskModal() {
 				this.createTaskModal = false
+			},
+      closeNoteModal() {
+				this.createNoteModal = false
 			},
 			closeAllActivities() {
 				this.allActivitiesModal = false
@@ -251,13 +269,25 @@
 				this.clientTask = {
 					priority: "",
 					title: "",
-					deadline: "",
+					dateTime: "",
 					details: "",
 					assignedTo: {},
 					associatedTo: [],
 					stage: 'create'
 				}
 				this.createTaskModal = true
+			},
+      createNote() {
+				this.clientNote = {
+					priority: "",
+					title: "",
+          dateTime: "",
+					details: "",
+					assignedTo: {},
+					associatedTo: [],
+					stage: 'create'
+				}
+				this.createNoteModal = true
 			},
 			openAllActivitiesModal() {
 				this.allActivitiesModal = true
@@ -613,7 +643,8 @@
 			OtherClientInformation,
 			RatesParameters,
 			ClientsNotes,
-			AddTask
+			AddTask,
+      AddNote
 		},
 		created() {
 			this.getClientInfoLangs()
@@ -648,20 +679,29 @@
   .client-activity {
     &__addTask {
       position: fixed;
-      top: 0%;
+      top: 5%;
       left: 50%;
       transform: translate(-50%, 25%);
-      z-index: 50;
+      z-index: 55;
+    }
+
+    &__addNote {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+      transform: translate(-50%, 25%);
+      z-index: 55;
     }
 
     &__all-activities {
       position: fixed;
-      top: 20%;
+      top: 15%;
       left: 50%;
       z-index: 50;
       transform: translate(-50%,0%);
       width: 820px;
     }
+
   }
 
 

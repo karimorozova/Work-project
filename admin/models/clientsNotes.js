@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 
-const ClientsTasksSchema = new Schema({
+const ClientsNotesSchema = new Schema({
   client: {
     type: Schema.Types.ObjectId,
     ref: 'Clients'
@@ -20,11 +20,6 @@ const ClientsTasksSchema = new Schema({
   dateTime: {
     type: Date,
     default: new Date(),
-  },
-  priority: {
-    type: String,
-    default: 'Regular',
-    trim: true,
   },
   assignedTo: {
     type: Schema.Types.ObjectId,
@@ -88,14 +83,9 @@ const ClientsTasksSchema = new Schema({
       type: Boolean,
       default: false
     }
-  }],
-  status: {
-    type: String,
-    default: 'Upcoming',
-    trim: true,
-  }
+  }]
 })
 
-const ClientsTasks = mongoose.model('ClientsTasks', ClientsTasksSchema);
+const ClientsNotes = mongoose.model('ClientsNotes', ClientsNotesSchema);
 
-module.exports = ClientsTasks;
+module.exports = ClientsNotes;

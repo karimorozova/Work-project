@@ -10,6 +10,8 @@
           .sidebarMenu__mainIcons
             .icon(@click="createTask")
               i.fas.fa-tasks
+            .icon(@click="createNote")
+              i.fas.fa-clipboard
 
           .sidebarMenu__allActivities
             .allActivities(@click="openAllActivities")
@@ -72,6 +74,9 @@
 			createTask() {
 				this.$emit('createTask')
 			},
+      createNote() {
+				this.$emit('createNote')
+			},
       openAllActivities() {
 			  this.$emit('openAllActivities')
         this.closeActivityDetailsTask()
@@ -125,7 +130,6 @@
       display: flex;
       padding: 0 20px 20px 20px;
       align-items: center;
-      justify-content: space-between;
     }
 
     &__activityDetails {
@@ -205,6 +209,7 @@
     justify-content: center;
     align-items: center;
     transition: ease 0.2s;
+    margin-right: 5px;
 
     &:hover {
       cursor: pointer;

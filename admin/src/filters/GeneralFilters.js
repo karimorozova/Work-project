@@ -38,6 +38,6 @@ Vue.filter("stepsAndTasksStatusFilter", (status) => {
 	return newStatus;
 });
 
-Vue.filter("formatDate", (date) => {
-  return moment(date).format('DD-MM-YYYY, HH:mm');
+Vue.filter("formatDate", (value) => {
+  return moment(value).format('DD-MM-YYYY, HH:mm');
 });

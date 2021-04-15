@@ -9,8 +9,14 @@
       .all-activities__content
         .all-activities__list(v-for="item in listOfActivity")
           TaskDetailsCard.mb-20(
+            v-if="item.entity === 'task'"
             :taskData="item"
             @editActivityDetailsTask="editActivityDetailsTask"
+            )
+          NoteDetailsCard.mb-20(
+            v-if="item.entity === 'note'"
+            :data="item"
+            @editActivityDetailsNote="editActivityDetailsNote"
             )
     .all-activities__no-activity(v-else)
       span There are no activities now
@@ -19,6 +25,7 @@
 <script>
 import {mapGetters} from "vuex";
 import TaskDetailsCard from "./TaskDetailsCard";
+import NoteDetailsCard from "./NoteDetailsCard";
 
 export default {
   name: "AllActivitiesModal",
@@ -30,11 +37,15 @@ export default {
       currentClient: "getCurrentClient"
     }),
     listOfActivity() {
-      return [
+      const activities =  [
         ...this.currentClient.tasks.map(item => {
           return { ...item, entity: 'task' }
+        }),
+        ...this.currentClient.notes.map(item => {
+          return { ...item, entity: 'note' }
         })
       ]
+      return activities.sort((a,b) => (new Date(b.dateTime) - new Date(a.dateTime)))
     }
   },
   methods: {
@@ -43,12 +54,15 @@ export default {
     },
     editActivityDetailsTask(taskData) {
       this.$emit('editActivityDetailsTask', taskData)
-      this.close()
+    },
+    editActivityDetailsNote(noteData) {
+      this.$emit('editActivityDetailsNote', noteData)
     }
 
   },
   components: {
-    TaskDetailsCard
+    TaskDetailsCard,
+    NoteDetailsCard,
 
   }
 }
@@ -63,14 +77,15 @@ export default {
 
     &__wrapper {
       padding: 0 20px;
-      max-height: 605px;
+      max-height: 700px;
       overflow-x: auto;
     }
 
     &__modal-actions {
       font-size: 22px;
       display: flex;
-      justify-content: end;
+      justify-content: flex-end;
+      margin: 4px 8px;
     }
 
     &__btn {
@@ -82,22 +97,18 @@ export default {
     }
 
     &__close {
-      height: 22px;
-      width: 22px;
-      justify-content: center;
-      display: flex;
-      align-items: center;
+      font-size: 22px;
+      cursor: pointer;
+      font-family: Myriad900;
       opacity: 0.8;
       transition: ease 0.2s;
-      cursor: pointer;
-      padding: 5px;
 
       &:hover {
         opacity: 1
       }
     }
     &__no-activity {
-      padding: 20px;
+      padding: 0 20px 20px 20px;
       font-size: 16px;
     }
 

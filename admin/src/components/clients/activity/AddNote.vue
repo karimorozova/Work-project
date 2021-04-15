@@ -1,65 +1,34 @@
 <template lang="pug">
-  .clientTask
+  .clientNote
     ValidationErrors(v-if="areErrors", :errors="errors", @closeErrors="closeErrors")
-    .clientTask__body
-      .clientTask__close(@click="closeModal") &#215;
-      .clientTask__input
+    .clientNote__body
+      .clientNote__close(@click="closeModal") &#215;
+      .clientNote__input
         .group
-          input(type='text' v-model="clientTask.title" required)
+          input(type='text' v-model="clientNote.title" required)
           span.highlight
           span.bar
-          label Task Title
+          label Note Title
 
-      .clientTask__content
+      .clientNote__content
         ckeditor(
-          v-model="clientTask.details"
+          v-model="clientNote.details"
           :config="editorConfig"
         )
 
-      .clientTask__setting
-        .setting__item
-          label Due Date & Time:
-            span.mandatory *
-          input(type="text" readonly v-model="clientTask.dateTime")
-          span.date(v-click-outside="closePicker")
-            i.far.fa-calendar-alt(@click="isDatePicker = true")
-            .datepicker(v-if="isDatePicker")
-              Datepicker(
-                :value="clientTask.dateTime"
-                @selected="(e) => setDate(e)"
-                :inline="true"
-                :monday-first="true"
-              )
-        .setting__item
-          label Priority:
-          .setting__drop
-            SelectSingle(
-              placeholder="Select"
-              :selectedOption="clientTask.priority"
-              :options="['Regular','High']"
-              @chooseOption="setPriority"
-            )
-        .setting__item
-          label Assigned to:
-          .setting__drop
-            SelectSingle(
-              placeholder="Select"
-              :selectedOption="clientTask.assignedTo.hasOwnProperty('firstName') ? `${clientTask.assignedTo.firstName} ${clientTask.assignedTo.lastName}` : ''"
-              :options="AMsPMs.map(({firstName, lastName}) => `${firstName} ${lastName}`)"
-              @chooseOption="setAssignedUser"
-            )
+      .clientNote__setting
         .setting__item
           label Associated With:
           .setting__drop
             SelectMulti(
               placeholder="Select"
-              :selectedOptions="clientTask.associatedTo.length ? clientTask.associatedTo.map(({firstName, surname}) => `${firstName} ${surname}`) : []"
+              :selectedOptions="clientNote.associatedTo.length ? clientNote.associatedTo.map(({firstName, surname}) => `${firstName} ${surname}`) : []"
               :options="clientContacts.map(({firstName, surname}) => `${firstName} ${surname}`)"
               @chooseOptions="setAssociatedTo"
             )
 
-      .clientTask__button
-        Button(value="Save" @clicked="checkCreateUpdateTasks" :color="'#48A6A6'")
+      .clientNote__button
+        Button(value="Save" @clicked="checkCreateUpdateNotes" :color="'#48A6A6'")
 </template>
 
 <script>
@@ -75,7 +44,7 @@
 
 	export default {
 		props: {
-			clientTask: {
+			clientNote: {
 				type: Object
 			}
 		},
@@ -104,68 +73,63 @@
 				this.errors = []
 				this.areErrors = false
 			},
-			checkCreateUpdateTasks() {
+			checkCreateUpdateNotes() {
 				this.errors = []
-				const taskDate = new Date(this.clientTask.dateTime).getTime()
-				const timeNow = new Date().getTime()
 
-				if (taskDate < timeNow) this.errors.push('The date should be future')
-				if (!this.clientTask.title) this.errors.push('Please, enter title')
-				if (!this.clientTask.details) this.errors.push('Please, enter details')
-				if (!this.clientTask.dateTime) this.errors.push('Please, enter dateTime')
-				if (!this.clientTask.assignedTo.hasOwnProperty('firstName')) {
-					this.clientTask.assignedTo = this.user
+				if (!this.clientNote.title) this.errors.push('Please, enter title')
+				if (!this.clientNote.details) this.errors.push('Please, enter details')
+				if (!this.clientNote.assignedTo.hasOwnProperty('firstName')) {
+					this.clientNote.assignedTo = this.user
 				}
 				if (this.errors.length) {
 					this.areErrors = true
 					return
 				}
-				this.createUpdateTask()
+				this.createUpdateNote()
 			},
-			async createUpdateTask() {
-				const { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage } = this.clientTask
+			async createUpdateNote() {
+				const { _id, title, details, assignedTo, associatedTo, stage } = this.clientNote
 
 				const data = {
-					priority,
 					title,
-					dateTime,
 					details,
 					assignedTo,
 					associatedTo,
+          dateTime: new Date(),
 					client: this.$route.params.id
 				}
-				let tasks = null
+				let notes = null
 				try {
 					if (stage === 'update') {
-						tasks = await this.$http.post(`/clientsapi/activity/task/${ _id }`, { data })
+						notes = await this.$http.post(`/clientsapi/activity/note/${ _id }`, { data })
 					} else {
-						tasks = await this.$http.post(`/clientsapi/activity/task`, { data })
+						notes = await this.$http.post(`/clientsapi/activity/note`, { data })
 					}
-					this.setUpClientProp({ key: "tasks", value: tasks.data })
+					this.setUpClientProp({ key: "notes", value: notes.data })
 					this.closeModal()
-					this.alertToggle({message: "Task created", isShow: true, type: "success"});
+					this.alertToggle({message: "Note created", isShow: true, type: "success"});
 				} catch (e) {
-					this.alertToggle({message: "Error on Task creating", isShow: true, type: "error"});
+					this.alertToggle({message: "Error on Note creating", isShow: true, type: "error"});
 				}
 			},
 			setAssociatedTo({ option }) {
-				const position = this.clientTask.associatedTo
+				const position = this.clientNote.associatedTo
 						.map(item => `${ item.firstName } ${ item.surname }`)
 						.indexOf(option)
 
 				position !== -1 ?
-						this.clientTask.associatedTo.splice(position, 1) :
-						this.clientTask.associatedTo.push(this.clientContacts.find(item => `${ item.firstName } ${ item.surname }` === option))
+						this.clientNote.associatedTo.splice(position, 1) :
+						this.clientNote.associatedTo.push(this.clientContacts.find(item => `${ item.firstName } ${ item.surname }` === option))
 			},
 			setAssignedUser({ option }) {
-				this.clientTask.assignedTo = this.AMsPMs.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
+				this.clientNote.assignedTo = this.AMsPMs.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
 			},
 			setPriority({ option }) {
-				this.clientTask.priority = option
+				this.clientNote.priority = option
 			},
 			setDate(e) {
-				// this.clientTask.dateTime = moment(new Date(e)).format('DD-MM-YYYY, HH:mm')
-				this.clientTask.dateTime = new Date(e)
+				// this.clientNote.deadline = moment(new Date(e)).format('DD-MM-YYYY, HH:mm')
+				this.clientNote.dateTIme = new Date(e)
 				this.closePicker()
 			},
 			closeModal() {
@@ -237,7 +201,7 @@
     }
   }
 
-  .clientTask {
+  .clientNote {
     background: white;
     padding: 35px 20px 20px 20px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;

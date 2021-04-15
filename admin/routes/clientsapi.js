@@ -24,7 +24,7 @@ const {
 	updateTaskDataByCondition
 } = require('../clients')
 const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist')
-const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks } = require('../models')
+const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes } = require('../models')
 const { getProject } = require('../projects')
 
 router.get('/client', async (req, res) => {
@@ -550,6 +550,62 @@ router.delete('/activity/task/:id', async (req,res)=> {
 })
 
 // End Task
+
+// Notes
+router.post('/activity/note/', async (req, res) => {
+  try {
+    const { data } = req.body
+    await ClientsNotes.create(data)
+
+    const notes = await ClientsNotes.find({ "client": data.client })
+      .populate('assignedTo', [ 'firstName', 'lastName' ])
+
+    res.send(notes)
+
+  } catch (e) {
+    res.status(500).send('Error on client created')
+  }
+
+})
+
+router.post('/activity/note/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { data } = req.body
+    await ClientsNotes.updateOne({ _id: id }, updateTaskDataByCondition(data))
+    const notes = await ClientsNotes.find({ "client": data.client }).populate('assignedTo', [ 'firstName', 'lastName' ])
+    res.send(notes)
+  } catch (e) {
+    res.status(500).send('Error on client update')
+  }
+
+})
+
+router.get('/activity/note/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const note = await ClientsNotes.find({ _id: id })
+    res.send(note)
+  } catch (e) {
+    res.status(500).send('Error on client get')
+  }
+
+})
+
+router.delete('/activity/note/:id', async (req,res)=> {
+  try {
+    const { id } = req.params
+    const {client} = req.query
+    await ClientsNotes.deleteOne({_id: id})
+    const notes = await ClientsNotes.find({"client": client}).populate( 'assignedTo', ['firstName','lastName'])
+    res.send(notes || [])
+  } catch (e) {
+    res.status(500).send('Error on client delete')
+  }
+
+})
+
+// End Notes
 // End Activities
 
 module.exports = router
