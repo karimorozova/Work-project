@@ -4,8 +4,27 @@
       WYSIWYG(@closePreview="closePreview", :message="previewMessage", @send="sendMessage")
     .qualifications__form(v-if="isForm")
       VendorLqa(:vendorData="lqaData", @closeForm="closeForm", @saveVendorLqa="saveVendorLqa")
+    .qualifications__approveModal(v-if="isSendMessageModalPassed")
+      ApproveModal(
+        text="Do you want to notify the vendor by email with the attached Passed Test?"
+        :optionWithoutClosing="true"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="sendMessageVendorPassed"
+        @notApprove="notSendMessageVendorPassed"
+      )
     .qualifications__form(v-if="isFormNotPassed")
       VendorLqa(:vendorData="lqaDataNotPassed", @closeForm="closeFormNotPassed", @saveVendorLqa="saveNotPassedTest")
+    .qualifications__approveModal(v-if="isSendMessageModalNotPassed")
+      ApproveModal(
+        text="Do you want to notify the vendor by email with the attached Not Passed Test?"
+        :optionWithoutClosing="true"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="sendMessageVendorNotPassed"
+        @notApprove="notSendMessageVendorNotPassed"
+      )
+
     .qualifications__table
       SettingsTable(
         :fields="fields",
@@ -78,6 +97,7 @@
 	import scrollDrop from "@/mixins/scrollDrop"
 	import crudIcons from "@/mixins/crudIcons"
 	import VendorLqa from "./VendorLqa"
+	import ApproveModal from "../ApproveModal"
 
 	export default {
 		mixins: [ scrollDrop, crudIcons ],
@@ -188,6 +208,12 @@
 				isEditAndSend: false,
 				statusStage: -1,
 				isFormNotPassed: false,
+
+				isSendMessage: true,
+				isSendMessageModalNotPassed: false,
+				isSendMessageModalPassed: false,
+
+				vendorData: null
 			}
 		},
 		methods: {
@@ -259,7 +285,7 @@
 				this.currentTqi = null
 				this.currentSteps = []
 			},
-			handleNotPassedTest(index){
+			handleNotPassedTest(index) {
 				if (this.isSampleStatus(this.qualificationData[index].status, this.currentStatus)) {
 					this.setDefaults()
 					return
@@ -274,7 +300,7 @@
 					}
 				}
 				this.openFormNotPassed(index)
-      },
+			},
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
 				this.errors = []
@@ -285,9 +311,9 @@
 				}
 				if (this.currentStatus === "Passed") {
 					this.handleLqa(index)
-				}else if(this.currentStatus === "Not Passed"){
+				} else if (this.currentStatus === "Not Passed") {
 					this.handleNotPassedTest(index)
-        }else if (this.currentStatus === "Test Sent") {
+				} else if (this.currentStatus === "Test Sent") {
 					const template = await this.$http.post(`/vendorsapi/get-message`, {
 						...this.currentVendor,
 						industries: this.currentIndustries,
@@ -328,27 +354,56 @@
 				}
 				this.openForm(index)
 			},
-      async saveNotPassedTest({ vendorData }){
-	      const { file, grade } = vendorData
-	      let formData = new FormData()
-	      formData.append("vendorId", this.currentVendor._id)
-	      formData.append("qId", this.qualificationData[this.currentActive]._id)
-	      formData.append("file", file)
 
-	      this.currentTqi = grade
 
-        try {
-	      	await this.$http.post('/vendorsapi/qualification-not-passed-path', formData)
-	        await this.manageSaveClick(this.currentActive)
-	        this.alertToggle({ message: "Qualification saved", isShow: true, type: "success" })
-        }catch (err) {
-        }finally {
-          this.closeFormNotPassed()
-        }
+			sendMessageVendorNotPassed() {
+				this.isSendMessage = true
+				this.sendNotPassedTest()
+			},
+			notSendMessageVendorNotPassed() {
+				this.isSendMessage = false
+				this.sendNotPassedTest()
+			},
+      saveNotPassedTest({ vendorData }) {
+				this.isSendMessageModalNotPassed = true
+				this.vendorData = vendorData
+				this.closeFormNotPassed()
+			},
+			async sendNotPassedTest() {
+				const { file, grade } = this.vendorData
+				let formData = new FormData()
+				formData.append("vendorId", this.currentVendor._id)
+				formData.append("qId", this.qualificationData[this.currentActive]._id)
+				formData.append("file", file)
 
-      },
-			async saveVendorLqa({ vendorData }) {
-				const { file, grade } = vendorData
+				this.currentTqi = grade
+
+				try {
+					await this.$http.post('/vendorsapi/qualification-not-passed-path', formData)
+					await this.manageSaveClick(this.currentActive)
+					this.alertToggle({ message: "Qualification saved", isShow: true, type: "success" })
+				} catch (err) {
+				} finally {
+					this.isSendMessageModalNotPassed = false
+					this.vendorData = null
+				}
+			},
+
+			sendMessageVendorPassed() {
+				this.isSendMessage = true
+				this.sendVendorLqa()
+			},
+			notSendMessageVendorPassed() {
+				this.isSendMessage = false
+				this.sendVendorLqa()
+			},
+      saveVendorLqa({ vendorData }) {
+				this.isSendMessageModalPassed = true
+				this.vendorData = vendorData
+				this.closeForm()
+			},
+			async sendVendorLqa() {
+				const { file, grade } = this.vendorData
 				let assessment = {
 					step: this.currentSteps,
 					target: this.currentTarget,
@@ -370,7 +425,7 @@
 				formData.append("assessment", JSON.stringify(assessment))
 				formData.append("assessmentFile", file)
 
-				this.currentTqi = vendorData.grade
+				this.currentTqi = this.vendorData.grade
 
 				try {
 					//TEMPORARY FUNCTIONAL RESTRICTION, ONLY STEP "TRANSLATION"
@@ -382,9 +437,11 @@
 				} catch (err) {
 				} finally {
 					this.$emit("updateRates", true)
-					this.closeForm()
+					this.isSendMessageModalPassed = false
+					this.vendorData = null
 				}
 			},
+
 
 			isSampleStatus(dataStatus, currentStatus) {
 				return dataStatus === currentStatus
@@ -420,6 +477,7 @@
 						vendor: this.currentVendor,
 						index,
 						qualification,
+						isSendMessage: this.isSendMessage,
 						testPath: test ? test.path : "",
 						message: message ? message : ""
 					})
@@ -477,9 +535,9 @@
 			closeForm() {
 				this.isForm = false
 			},
-			closeFormNotPassed(){
+			closeFormNotPassed() {
 				this.isFormNotPassed = false
-      },
+			},
 			openForm() {
 				this.isForm = true
 			},
@@ -561,7 +619,7 @@
 				switch (this.qualificationData[this.currentActive].status) {
 					case "Created":
 					case "Re-Test":
-						result.push("Test Sent","Passed", "Not Passed")
+						result.push("Test Sent", "Passed", "Not Passed")
 						break
 					case "Test Sent":
 						result.push("Test Received")
@@ -583,6 +641,7 @@
 			}
 		},
 		components: {
+			ApproveModal,
 			WYSIWYG,
 			SettingsTable,
 			SelectSingle,
@@ -604,6 +663,14 @@
     @extend %setting-table;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     padding: 20px;
+
+    &__approveModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 99999;
+    }
 
     &__data {
       @extend %table-data;
