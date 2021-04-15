@@ -21,6 +21,7 @@
         )
       .client-activity__all-activities(v-if="allActivitiesModal")
         AllActivitiesModal(
+          @openModalFullSize="toggleModalFullSize"
           @close="closeAllActivities"
           @editActivityDetailsTask="editActivityDetailsTask"
           @editActivityDetailsNote="editActivityDetailsNote"
@@ -29,115 +30,122 @@
 
       SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
 
-      .title General Information
-      .client-info__gen-info
-        General(
-          :isSaveClicked="isSaveClicked"
-          :languages="languages"
-          :timezones="timezones"
-          :allClientAliases="aliases"
-        )
 
-      .title Notes & Comments
-      .client-info__notes
-        ClientsNotes
+      .client-info__layoutActivities(v-if="fullActivityModal")
+        .title All Activities
+        .client-info__gen-info
+          | kalsjdklasjdkljasdklj
 
-      .title Contact Details
-      .client-info__contacts-info
-        ContactsInfo(
-          :client="currentClientOverallData"
-          @contactDetails="contactDetails"
-          @saveContactUpdates="saveContactUpdates"
-          @setLeadContact="setLeadContact"
-          @newContact="addNewContact"
-          @approveDelete="approveContactDelete"
-        )
-
-      .title Services
-      .client-info__services
-        ClientServices(
-          :clientServices="currentClient.services"
-          :defaultPricelist="currentClient.defaultPricelist"
-          :languages="languages"
-          :sourceLanguagesClient="sourceLanguagesClientData"
-          :targetLanguagesClient="targetLanguagesClientData"
-          :industries="industries"
-          :services="services"
-          :clientIndustries="currentClient.industries.map(i => i.name)"
-          @updateRates="updateRates"
-        )
-
-      .title Rates
-      .client-info__rates
-        RatesParameters
-        .client-info__tables-row
-          .lang-table
-            LangTable(
-              :dataArray="currentClient.rates.basicPricesTable"
-              :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-            )
-          .step-table
-            StepTable(
-              :dataArray="currentClient.rates.stepMultipliersTable"
-              :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-              :refresh="isRefreshAfterServiceUpdate"
-            )
-          .industry-table
-            IndustryTable(
-              :dataArray="currentClient.rates.industryMultipliersTable"
-              :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-              :refresh="isRefreshAfterServiceUpdate"
-            )
-
-        .result-table
-          ResultTable(
-            :clientId="currentClient._id"
+      .client-info__layout(v-else)
+        .title General Information
+        .client-info__gen-info
+          General(
+            :isSaveClicked="isSaveClicked"
             :languages="languages"
-            :steps="steps"
-            :units="units"
-            :industries="industries"
-            :isRefreshResultTable="isRefreshResultTable"
-            :refresh="isRefreshAfterServiceUpdate"
+            :timezones="timezones"
+            :allClientAliases="aliases"
           )
 
-      .title Discount Chart
-      .client-info__chart
-        DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+        .title Notes & Comments
+        .client-info__notes
+          ClientsNotes
 
-      .title Documents
-      .client-info__documents
-        ClientDocuments(
-          :documentsData="currentClient.documents"
+        .title Contact Details
+        .client-info__contacts-info
+          ContactsInfo(
+            :client="currentClientOverallData"
+            @contactDetails="contactDetails"
+            @saveContactUpdates="saveContactUpdates"
+            @setLeadContact="setLeadContact"
+            @newContact="addNewContact"
+            @approveDelete="approveContactDelete"
+          )
+
+        .title Services
+        .client-info__services
+          ClientServices(
+            :clientServices="currentClient.services"
+            :defaultPricelist="currentClient.defaultPricelist"
+            :languages="languages"
+            :sourceLanguagesClient="sourceLanguagesClientData"
+            :targetLanguagesClient="targetLanguagesClientData"
+            :industries="industries"
+            :services="services"
+            :clientIndustries="currentClient.industries.map(i => i.name)"
+            @updateRates="updateRates"
+          )
+
+        .title Rates
+        .client-info__rates
+          RatesParameters
+          .client-info__tables-row
+            .lang-table
+              LangTable(
+                :dataArray="currentClient.rates.basicPricesTable"
+                :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+              )
+            .step-table
+              StepTable(
+                :dataArray="currentClient.rates.stepMultipliersTable"
+                :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+            .industry-table
+              IndustryTable(
+                :dataArray="currentClient.rates.industryMultipliersTable"
+                :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+
+          .result-table
+            ResultTable(
+              :clientId="currentClient._id"
+              :languages="languages"
+              :steps="steps"
+              :units="units"
+              :industries="industries"
+              :isRefreshResultTable="isRefreshResultTable"
+              :refresh="isRefreshAfterServiceUpdate"
+            )
+
+        .title Discount Chart
+        .client-info__chart
+          DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+
+        .title Documents
+        .client-info__documents
+          ClientDocuments(
+            :documentsData="currentClient.documents"
+          )
+
+        .title Sales Information
+        .client-info__sales
+          ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
+
+        .title Billing Information
+        .client-info__billing
+          ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+
+        .delete-approve(v-if="isApproveModal")
+          p Are you sure you want to delete?
+          input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
+          input.button(type="button" value="Delete" @click="approveClientDelete")
+
+        ValidationErrors(
+          v-if="areErrorsExist"
+          :errors="errors"
+          @closeErrors="closeErrorsBlock"
         )
 
-      .title Sales Information
-      .client-info__sales
-        ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
+      .client-subinfo(v-if="currentClient._id")
+        //.client-subinfo__general
+          SideGeneral(:isSaveClicked="isSaveClicked")
 
-      .title Billing Information
-      .client-info__billing
-        ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
-
-      .delete-approve(v-if="isApproveModal")
-        p Are you sure you want to delete?
-        input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-        input.button(type="button" value="Delete" @click="approveClientDelete")
-
-      ValidationErrors(
-        v-if="areErrorsExist"
-        :errors="errors"
-        @closeErrors="closeErrorsBlock"
-      )
-
-    .client-subinfo(v-if="currentClient._id")
-      //.client-subinfo__general
-        SideGeneral(:isSaveClicked="isSaveClicked")
-
-      .client-subinfo__date
-        OtherClientInformation
+        .client-subinfo__date
+          OtherClientInformation
 
 </template>
 
@@ -242,10 +250,14 @@
 
 				createTaskModal: false,
 				createNoteModal: false,
-				allActivitiesModal: false
+				allActivitiesModal: false,
+				fullActivityModal: false,
 			}
 		},
 		methods: {
+			toggleModalFullSize(data){
+        this.fullActivityModal = data
+      },
 			editActivityDetailsTask(taskData) {
 				const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = taskData
 				this.clientTask = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }

@@ -1,5 +1,7 @@
 <template lang="pug">
   .all-activities
+    .all-activities__hz
+      span(@click="openModalFullSize") open modal btn
     .all-activities__modal-actions(:class="{'with-scroll': (listOfActivity.length || 1) > rowCount }")
       //.all-activities__btn
         i.fas.fa-expand-all
@@ -32,22 +34,6 @@ export default {
   props: {
     rowCount: Number
   },
-  computed: {
-    ...mapGetters({
-      currentClient: "getCurrentClient"
-    }),
-    listOfActivity() {
-      const activities =  [
-        ...this.currentClient.tasks.map(item => {
-          return { ...item, entity: 'task' }
-        }),
-        ...this.currentClient.notes.map(item => {
-          return { ...item, entity: 'note' }
-        })
-      ]
-      return activities.sort((a,b) => (new Date(b.dateTime) - new Date(a.dateTime)))
-    }
-  },
   methods: {
     close() {
       this.$emit('close')
@@ -57,13 +43,30 @@ export default {
     },
     editActivityDetailsNote(noteData) {
       this.$emit('editActivityDetailsNote', noteData)
-    }
-
+    },
+	  openModalFullSize(){
+		  this.$emit('openModalFullSize', true)
+	  },
   },
+	computed: {
+		...mapGetters({
+			currentClient: "getCurrentClient"
+		}),
+		listOfActivity() {
+			const activities =  [
+				...this.currentClient.tasks.map(item => {
+					return { ...item, entity: 'task' }
+				}),
+				...this.currentClient.notes.map(item => {
+					return { ...item, entity: 'note' }
+				})
+			]
+			return activities.sort((a,b) => (new Date(b.dateTime) - new Date(a.dateTime)))
+		}
+	},
   components: {
     TaskDetailsCard,
     NoteDetailsCard,
-
   }
 }
 </script>
