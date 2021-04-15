@@ -4,10 +4,14 @@
     <p>
       SING IN
     </p>
-    <div class="g-signin2" @click="foo" data-onsuccess="onSignIn"></div>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
 
     <br>
     <a href="#" @click="signOut">Sign out</a>
+    <br>
+    <div @click="foo"> gET PROFILE INFO</div>
+    <h4></h4>
+
 
   </div>
 </template>
@@ -31,12 +35,16 @@
 				// The ID token you need to pass to your backend:
 				var id_token = googleUser.getAuthResponse().id_token
 				console.log("ID Token: " + id_token)
+
+        const el = document.getElementsByTagName('h4')
+        el.innerHTML = "ID: " + profile.getId() + 'Full Name: ' + profile.getName() + 'Given Name: ' + profile.getGivenName() + 'Family Name: ' + profile.getFamilyName() + "Image URL: " + profile.getImageUrl() + "Email: " + profile.getEmail()
 			},
 			foo(){
 				console.log('foo')
 				var auth2 = gapi.auth2.getAuthInstance()
 				if (auth2.isSignedIn.get()) {
 					var profile = auth2.currentUser.get().getBasicProfile();
+					console.log('full', profile)
 					console.log('ID: ' + profile.getId());
 					console.log('Full Name: ' + profile.getName());
 					console.log('Given Name: ' + profile.getGivenName());
