@@ -73,6 +73,7 @@
 			scripts.forEach(script => {
 				let tag = document.createElement("script")
 				tag.setAttribute("src", script)
+				tag.setAttribute("defer","")
 				document.head.appendChild(tag)
 			})
 		}
