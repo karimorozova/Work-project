@@ -1,12 +1,10 @@
 <template lang="pug">
   .all-activities
-    .all-activities__hz
-      span(@click="openModalFullSize") open modal btn
     .all-activities__modal-actions(:class="{'with-scroll': (listOfActivity.length || 1) > rowCount }")
-      //.all-activities__btn
-        i.fas.fa-expand-all
+      .all-activities__btn(@click="openModalFullSize")
+        i.fas.fa-expand-arrows-alt
       .all-activities__btn(@click="close")
-        .all-activities__close &#215;
+        p.all-activities__close &#215;
     .all-activities__wrapper(v-if="listOfActivity.length >= 1")
       .all-activities__content
         .all-activities__list(v-for="item in listOfActivity")
@@ -46,6 +44,7 @@ export default {
     },
 	  openModalFullSize(){
 		  this.$emit('openModalFullSize', true)
+      this.close()
 	  },
   },
 	computed: {
@@ -88,11 +87,15 @@ export default {
       font-size: 22px;
       display: flex;
       justify-content: flex-end;
-      margin: 4px 8px;
+      padding: 10px;
     }
 
     &__btn {
       margin-left: 7px;
+      font-size: 17px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
     }
 
     & .mb20 {
@@ -100,11 +103,14 @@ export default {
     }
 
     &__close {
-      font-size: 22px;
+      font-size: 26px;
       cursor: pointer;
       font-family: Myriad900;
-      opacity: 0.8;
-      transition: ease 0.2s;
+      opacity: .8;
+      transition: .2s ease;
+      line-height: 0.7;
+      margin: 0;
+      height: 20px;
 
       &:hover {
         opacity: 1

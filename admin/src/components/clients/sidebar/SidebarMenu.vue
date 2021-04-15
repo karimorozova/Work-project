@@ -80,6 +80,7 @@
       openAllActivities() {
 			  this.$emit('openAllActivities')
         this.closeActivityDetailsTask()
+        this.isShowMenu = false
       },
 			toggleMenu() {
 				this.isShowMenu = !this.isShowMenu
