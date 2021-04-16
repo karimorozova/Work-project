@@ -27,7 +27,6 @@ import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
 import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
-import TEST from '@/components/TEST'
 
 //------------------------------------------------------------CLIENT------------------------------------------------------------
 //NEW CLIENT
@@ -80,11 +79,6 @@ Vue.use(Router)
 const router = new Router({
     mode: 'history',
     routes: [
-        {
-            path: '/foo',
-            name: 'foo',
-            component: TEST
-        },
         {
             path: '/xtrf',
             name: 'xtrf',
