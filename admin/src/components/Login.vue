@@ -5,7 +5,7 @@
         img.login__image(src="../assets/images/new-logo.png")
 
       .login__enterButtons(v-if="!isSingInEmail")
-        .login__enterButton
+        .login__enterButton(@click="singInGoogle")
           i.fab.fa-google
           span.button-text Sign in with Google
         .login__enterButton(@click="singInEmail")
@@ -72,13 +72,45 @@
 					this.alertToggle({ message: "Cannot log out", isShow: true, type: "error" })
 				}
 			},
+      async singInGoogle() {
+        try {
+          const googleUser = await this.$gAuth.signIn();
+          if (!googleUser) {
+            return null;
+          }
+
+          this.isAllFieldsError = false;
+          const data = await this.$http.post('/login-with-google', {idToken: googleUser.getAuthResponse().id_token});
+          const loginResult =  data.body
+          if(loginResult.status === 'success') {
+            await this.loggingIn(loginResult.data);
+            this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
+            this.$router.push("/")
+
+            this.isSignIn = this.$gAuth.isAuthorized;
+          }
+
+        } catch (error) {
+          //on fail do something
+          console.error(error);
+          return null;
+        }
+      },
 			...mapActions({
 				alertToggle: "alertToggle",
 				loggingIn: "login",
 				loggingOut: "logout"
 			})
-		}
-	}
+		},
+    created() {
+      let that = this;
+      let checkGauthLoad = setInterval(function () {
+        that.isInit = that.$gAuth.isInit;
+        that.isSignIn = that.$gAuth.isAuthorized;
+        if (that.isInit) clearInterval(checkGauthLoad);
+      }, 1000);
+    }
+  }
 </script>
 
 <style lang="scss" scoped>

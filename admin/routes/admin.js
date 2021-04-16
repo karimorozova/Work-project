@@ -196,7 +196,6 @@ router.post('/login', (req, res, next) => {
 
 router.post('/login-with-google',  async (req, res, next) => {
   const { idToken } = req.body
-  console.log(idToken)
   try {
     const ticket = await client.verifyIdToken({
       idToken: idToken,
@@ -206,21 +205,23 @@ router.post('/login-with-google',  async (req, res, next) => {
     });
     const payload = ticket.getPayload();
     const email = payload['email'];
-    console.log(email);
-    // const user = await User.findOne({email: email})
-    // const token = await jwt.sign({ user }, secretKey, { expiresIn: '2h' })
-    // req.session.userId = user._id
-    // res.statusCode = 200
-    // const loggedUser = Object.keys(user).reduce((init, cur) => {
-    //   if (cur !== "__v" && cur !== "password") {
-    //     init[cur] = user[cur]
-    //   }
-    //   return { ...init }
-    // }, {})
-    // res.send({ token, ...loggedUser })
-    res.send({a: email})
+
+    const user = await User.findOne({email: email})
+
+    if (!user) res.send({status: "error"})
+
+    const token = await jwt.sign({ user }, secretKey, { expiresIn: '2h' })
+
+    res.statusCode = 200
+    const loggedUser = Object.keys(user).reduce((init, cur) => {
+      if (cur !== "__v" && cur !== "password") {
+        init[cur] = user[cur]
+      }
+      return { ...init }
+    }, {})
+    res.send({status: "success", token, ...loggedUser })
   } catch (err) {
-    res.send({a: err.message})
+    res.send({status: "error"})
   }
 })
 
