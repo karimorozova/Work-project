@@ -199,13 +199,12 @@ router.post('/login-with-google',  async (req, res, next) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken: idToken,
-      audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com",  // Specify the CLIENT_ID of the app that accesses the backend
-      // Or, if multiple clients access the backend:
-      //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+      audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com",
     });
-    const payload = ticket.getPayload();
-    const email = payload['email'];
 
+    const { email, picture } = ticket.getPayload();
+
+    await User.UpdateOne({email: email},{$set: {photo: picture}})
     const user = await User.findOne({email: email})
 
     if (!user) res.send({status: "error"})

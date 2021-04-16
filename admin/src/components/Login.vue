@@ -83,17 +83,29 @@
           const data = await this.$http.post('/login-with-google', {idToken: googleUser.getAuthResponse().id_token});
           const loginResult =  data.body
           if(loginResult.status === 'success') {
-            await this.loggingIn(loginResult.data);
+            await this.loggingIn(loginResult);
             this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
             this.$router.push("/")
 
             this.isSignIn = this.$gAuth.isAuthorized;
+          }else {
+            this.signOutGoogle()
+            this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
           }
 
         } catch (error) {
           //on fail do something
-          console.error(error);
+          this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
           return null;
+        }
+      },
+      async signOutGoogle() {
+        try {
+          await this.$gAuth.signOut();
+          this.isSignIn = this.$gAuth.isAuthorized;
+          console.log("isSignIn", this.$gAuth.isAuthorized);
+        } catch (error) {
+          console.error(error);
         }
       },
 			...mapActions({
