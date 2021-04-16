@@ -1,6 +1,5 @@
 <template lang="html">
   <div>
-    <meta name="google-signin-client_id" content="852042192934-p9rjqn11t4f38ele1soo143b9ju5mdcf.apps.googleusercontent.com">
     <p>
       SING IN
     </p>
@@ -36,25 +35,16 @@
 				var id_token = googleUser.getAuthResponse().id_token
 				console.log("ID Token: " + id_token)
 
-        const el = document.getElementsByTagName('h4')
-        el.innerHTML = "ID: " + profile.getId() + 'Full Name: ' + profile.getName() + 'Given Name: ' + profile.getGivenName() + 'Family Name: ' + profile.getFamilyName() + "Image URL: " + profile.getImageUrl() + "Email: " + profile.getEmail()
+        // const el = document.getElementsByTagName('h4')
+        // el.innerHTML = "ID: " + profile.getId() + 'Full Name: ' + profile.getName() + 'Given Name: ' + profile.getGivenName() + 'Family Name: ' + profile.getFamilyName() + "Image URL: " + profile.getImageUrl() + "Email: " + profile.getEmail()
 			},
 			// foo(){
-			// 	console.log('foo')
-			// 	var auth2 = gapi.auth2.getAuthInstance()
-			// 	if (auth2.isSignedIn.get()) {
-			// 		var profile = auth2.currentUser.get().getBasicProfile();
-			// 		console.log('full', profile)
-			// 		console.log('ID: ' + profile.getId());
-			// 		console.log('Full Name: ' + profile.getName());
-			// 		console.log('Given Name: ' + profile.getGivenName());
-			// 		console.log('Family Name: ' + profile.getFamilyName());
-			// 		console.log('Image URL: ' + profile.getImageUrl());
-			// 		console.log('Email: ' + profile.getEmail());
-			// 	}
+      //   this.$gAuth.signin2.render('google-signin-button', {
+      //     onsuccess: this.onSignIn
+      //   })
       // },
 			signOut() {
-				var auth2 = gapi.auth2.getAuthInstance()
+				var auth2 = this.$gAuth.auth2.getAuthInstance()
 				auth2.signOut().then(function () {
 					console.log('User signed out.')
 				})
@@ -62,20 +52,11 @@
 
 		},
     mounted() {
-      gapi.signin2.render('google-signin-button', {
+      this.$gAuth.signin2.render('google-signin-button', {
         onsuccess: this.onSignIn
       })
     },
 		created() {
-			const scripts = [
-				"https://apis.google.com/js/platform.js"
-			]
-			scripts.forEach(script => {
-				let tag = document.createElement("script")
-				tag.setAttribute("src", script)
-				tag.setAttribute("defer","")
-				document.head.appendChild(tag)
-			})
 		}
 	}
 </script>
