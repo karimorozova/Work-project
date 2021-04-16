@@ -204,7 +204,7 @@ router.post('/login-with-google',  async (req, res, next) => {
 
     const { email, picture } = ticket.getPayload();
 
-    await User.UpdateOne({email: email},{$set: {photo: picture}})
+    await User.updateOne({email: email},{$set: {photo: picture}})
     const user = await User.findOne({email: email})
 
     if (!user) res.send({status: "error"})
