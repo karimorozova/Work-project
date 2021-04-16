@@ -3,7 +3,16 @@
     .login__main
       .login__logo
         img.login__image(src="../assets/images/new-logo.png")
-      form.login__form(@submit.prevent="checkFields")
+
+      .login__enterButtons(v-if="!isSingInEmail")
+        .login__enterButton(@click="singInGoogle")
+          i.fab.fa-google
+          span.button-text Sign in with Google
+        .login__enterButton(@click="singInEmail")
+          i.fas.fa-envelope
+          span.button-text Sign in with email
+
+      form.login__form(v-if="isSingInEmail" @submit.prevent="checkFields")
         .login__required-message(v-if="isAllFieldsError") All fields are required!
         .login__email
           input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
@@ -20,7 +29,7 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
+	import { mapGetters, mapActions } from "vuex"
 
 	export default {
 		data() {
@@ -29,42 +38,91 @@
 					logemail: "",
 					logpassword: ""
 				},
+				isSingInEmail: false,
 				isAllFieldsError: false
-			};
+			}
 		},
 		methods: {
+			singInEmail() {
+				console.log('asd')
+				this.isSingInEmail = true
+			},
 			async checkFields() {
-				if(!this.form.logemail || !this.form.logpassword) {
-					return this.isAllFieldsError = true;
+				if (!this.form.logemail || !this.form.logpassword) {
+					return this.isAllFieldsError = true
 				}
-				await this.sendForm();
+				await this.sendForm()
 			},
 			async sendForm() {
 				try {
-					this.isAllFieldsError = false;
-					const loginResult = await this.$http.post('/login', this.form);
-					await this.loggingIn(loginResult.body);
-					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
+					this.isAllFieldsError = false
+					const loginResult = await this.$http.post('/login', this.form)
+					await this.loggingIn(loginResult.body)
+					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
 					this.$router.push("/")
 				} catch (err) {
-					this.alertToggle({ message: err.body, isShow: true, type: "error" });
+					this.alertToggle({ message: err.body, isShow: true, type: "error" })
 				}
 			},
 			async logout() {
 				try {
-					await this.loggingOut();
-					this.$router.push("/login");
+					await this.loggingOut()
+					this.$router.push("/login")
 				} catch (err) {
 					this.alertToggle({ message: "Cannot log out", isShow: true, type: "error" })
 				}
 			},
+      async singInGoogle() {
+        try {
+          const googleUser = await this.$gAuth.signIn();
+          if (!googleUser) {
+            return null;
+          }
+
+          this.isAllFieldsError = false;
+          const data = await this.$http.post('/login-with-google', {idToken: googleUser.getAuthResponse().id_token});
+          const loginResult =  data.body
+          if(loginResult.status === 'success') {
+            await this.loggingIn(loginResult);
+            this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
+            this.$router.push("/")
+
+            this.isSignIn = this.$gAuth.isAuthorized;
+          }else {
+            this.signOutGoogle()
+            this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
+          }
+
+        } catch (error) {
+          //on fail do something
+          this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
+          return null;
+        }
+      },
+      async signOutGoogle() {
+        try {
+          await this.$gAuth.signOut();
+          this.isSignIn = this.$gAuth.isAuthorized;
+          console.log("isSignIn", this.$gAuth.isAuthorized);
+        } catch (error) {
+          console.error(error);
+        }
+      },
 			...mapActions({
 				alertToggle: "alertToggle",
 				loggingIn: "login",
 				loggingOut: "logout"
 			})
-		}
-	};
+		},
+    created() {
+      let that = this;
+      let checkGauthLoad = setInterval(function () {
+        that.isInit = that.$gAuth.isInit;
+        that.isSignIn = that.$gAuth.isAuthorized;
+        if (that.isInit) clearInterval(checkGauthLoad);
+      }, 1000);
+    }
+  }
 </script>
 
 <style lang="scss" scoped>
@@ -77,6 +135,32 @@
     align-items: center;
     height: 100vh;
     background-size: cover;
+
+    &__enterButtons {
+      padding: 40px 20px 20px 20px;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    &__enterButton {
+      width: 212px;
+      margin-bottom: 20px;
+      border: 2px solid #dedede;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      border-radius: 8px;
+      transition: .15s ease;
+
+      &:hover {
+        cursor: pointer;
+        border: 2px solid #b1d8d9;
+      }
+
+    }
 
     &__textrow {
       display: flex;
@@ -221,5 +305,15 @@
     &_button-backgr {
       opacity: 1;
     }
+  }
+
+  .button-text {
+    width: 120px;
+  }
+
+  i {
+    width: 30px;
+    font-size: 15px;
+    text-align: center;
   }
 </style>

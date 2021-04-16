@@ -6,6 +6,8 @@ const { requiresLogin } = require('../middleware/index')
 const jwt = require("jsonwebtoken")
 const { secretKey } = require('../configs')
 const { setNewPassword } = require('../users')
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com");
 
 router.get('/logout', (req, res, next) => {
 	if (req.session) {
@@ -113,7 +115,7 @@ router.post('/user', requiresLogin, async (req, res) => {
 		if (_id) {
 			await User.updateOne({ "_id": user._id }, { firstName, lastName, email, position, group })
 		} else {
-			const password = "pangea333"
+			const password = "pangea1234"
 			await User.create({ username, password, firstName, lastName, email, position, group })
 		}
 		res.send("User info saved")
@@ -191,5 +193,36 @@ router.post('/login', (req, res, next) => {
 		return next(err)
 	}
 })
+
+router.post('/login-with-google',  async (req, res, next) => {
+  const { idToken } = req.body
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: idToken,
+      audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com",
+    });
+
+    const { email, picture } = ticket.getPayload();
+
+    await User.updateOne({email: email},{$set: {photo: picture}})
+    const user = await User.findOne({email: email})
+
+    if (!user) res.send({status: "error"})
+
+    const token = await jwt.sign({ user }, secretKey, { expiresIn: '2h' })
+
+    res.statusCode = 200
+    const loggedUser = Object.keys(user).reduce((init, cur) => {
+      if (cur !== "__v" && cur !== "password") {
+        init[cur] = user[cur]
+      }
+      return { ...init }
+    }, {})
+    res.send({status: "success", token, ...loggedUser })
+  } catch (err) {
+    res.send({status: "error"})
+  }
+})
+
 
 module.exports = router
