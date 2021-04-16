@@ -80,11 +80,11 @@ Vue.use(Router)
 const router = new Router({
     mode: 'history',
     routes: [
-        // {
-        //     path: '/foo',
-        //     name: 'foo',
-        //     component: TEST
-        // },
+        {
+            path: '/foo',
+            name: 'foo',
+            component: TEST
+        },
         {
             path: '/xtrf',
             name: 'xtrf',

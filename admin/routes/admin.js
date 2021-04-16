@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken")
 const { secretKey } = require('../configs')
 const { setNewPassword } = require('../users')
 const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client("852042192934-p9rjqn11t4f38ele1soo143b9ju5mdcf");
+const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com");
 
 router.get('/logout', (req, res, next) => {
 	if (req.session) {
@@ -200,7 +200,7 @@ router.post('/login-with-google',  async (req, res, next) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken: idToken,
-      audience: "852042192934-p9rjqn11t4f38ele1soo143b9ju5mdcf",  // Specify the CLIENT_ID of the app that accesses the backend
+      audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com",  // Specify the CLIENT_ID of the app that accesses the backend
       // Or, if multiple clients access the backend:
       //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     });

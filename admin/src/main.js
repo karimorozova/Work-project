@@ -14,7 +14,7 @@ export const bus = new Vue();
 import GAuth from 'vue-google-oauth2'
 
 const gauthOption = {
-  clientId: '852042192934-p9rjqn11t4f38ele1soo143b9ju5mdcf.apps.googleusercontent.com',
+  clientId: '1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com',
 }
 
 
