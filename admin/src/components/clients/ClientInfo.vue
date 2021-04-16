@@ -32,15 +32,17 @@
 
 
       .client-info__layoutActivities(v-if="fullActivityModal")
+
         .title-with-action
           span All Activities
-          i.fas.fa-expand-arrows-alt(@click="closeModalFullSize")
-        .client-info__gen-info
-          AllActivitiesFullScrean(
-            @editActivityDetailsTask="editActivityDetailsTask"
-            @editActivityDetailsNote="editActivityDetailsNote"
-            :rowCount="3"
-            )
+          //i.fas.fa-expand-arrows-alt(@click="closeModalFullSize")
+
+        AllActivitiesFullScrean(
+          @editActivityDetailsTask="editActivityDetailsTask"
+          @editActivityDetailsNote="editActivityDetailsNote"
+          @closeModalFullSize="closeModalFullSize"
+          @backToMainPage="backToMainPage"
+        )
 
       .client-info__layout(v-else)
         .client-info__main-row
@@ -263,11 +265,14 @@
 			}
 		},
 		methods: {
+			backToMainPage(){
+				this.fullActivityModal = false
+      },
 			toggleModalFullSize(data){
         this.fullActivityModal = data
       },
       closeModalFullSize() {
-			  this.toggleModalFullSize(false)
+	      this.fullActivityModal = false
         this.openAllActivitiesModal()
       },
 			editActivityDetailsTask(taskData) {
@@ -315,6 +320,7 @@
 			},
 			openAllActivitiesModal() {
 				this.allActivitiesModal = true
+				this.fullActivityModal = false
 			},
 			async setMatrixData({ value, key }) {
 				value = value > 100 ? 100 : value < 0 ? 0 : value
