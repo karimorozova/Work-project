@@ -21,37 +21,29 @@
       )
     .header
       .header__icon
-        i.fas.fa-tasks
-      .header__title Task
+        i.fas.fa-clipboard
+      .header__title Note {{item}}
       .header__crud
         span.icon(
-          v-if="(taskData.assignedTo._id.toString() === user._id.toString() || isAdmin) && taskData.status !== 'Completed'"
-          @click="edit(taskData)"
+          v-if="(data.assignedTo._id.toString() === user._id.toString() || isAdmin) && data.status !== 'Completed'"
+          @click="edit(data)"
         )
           i.fas.fa-pencil-alt
         span.icon(
-          v-if="(taskData.assignedTo._id.toString() === user._id.toString() || isAdmin) && taskData.status !== 'Completed'"
+          v-if="(data.assignedTo._id.toString() === user._id.toString() || isAdmin) && data.status !== 'Completed'"
           @click="deleteTask()"
         )
           i.fas.fa-trash
     .main-info
       .main-info__check(
-        v-if="taskData.status !== 'Completed'"
-        @click="setStatus(taskData, 'Completed')"
-        :class="{notActive: taskData.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
+        :class="{notActive: data.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
       )
         i.far.fa-check-circle
-      .main-info__checkDone(
-        v-else
-        @click="setUpcomingStatus(taskData)"
-        :class="{notActive: taskData.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
-        )
-        i.far.fa-check-circle
       .main-info__data
-        .main-info__title {{taskData.title}}
+        .main-info__title {{data.title}}
       .main-info__date
         span.due Due:
-        span {{taskData.dateTime | formatDate}}
+        span {{data.dateTime | formatDate}}
     .details
       .details__header(@click="clickDetails")
         .details__icon
@@ -61,28 +53,23 @@
       .details__data(v-if="showDetails")
         .blocks
           .block
-            .description__priority
-              .d-title Priority:
-              .description__priorityBlockHigh(v-if="taskData.priority === 'High'") High
-              .description__priorityBlockRegular(v-else) Regular
-
             .description__assigned
-              .d-title Assigned to:
+              .d-title Created by:
               .assignedImage
                 .tooltip
-                  span#myTooltip.tooltiptext {{taskData.assignedTo.firstName}} {{taskData.assignedTo.lastName}}
+                  span#myTooltip.tooltiptext {{data.assignedTo.firstName}} {{data.assignedTo.lastName}}
                   img(src="../../../assets/images/signin-background.jpg")
-          .block(v-if="taskData.associatedTo[0]")
+          .block(v-if="data.associatedTo[0]")
             .description__associated
               .d-title Associated with:
-              .description__associatedList(v-for="user in taskData.associatedTo")
+              .description__associatedList(v-for="user in data.associatedTo")
                 .associatedUser
                   .associatedUser__block
                   .associatedUser__title {{user.firstName}} {{user.surname}}
           .block
             .description__details
               .d-title Details:
-              .details__data(id="editor" v-html="taskData.details")
+              .details__data(id="editor" v-html="data.details")
 </template>
 
 <script>
@@ -90,13 +77,12 @@
   import ApproveModal from "../../ApproveModal";
 
   export default {
-		name: "TaskDetailsCard",
 		props: {
-      taskData: null,
+      data: null,
 		},
 		data() {
 			return {
-        showDetails: this.taskData.status === "Upcoming",
+        showDetails: this.data.status === "Upcoming",
         approveModal: {
           item: null,
           show: false
@@ -121,35 +107,8 @@
           show: true
         }
       },
-      async setStatus(item, value) {
-        if (item.assignedTo._id.toString() !== this.user._id.toString() && !this.isAdmin) {
-          return
-        }
-        this.taskData.status = value
-        item.status = value
-        try {
-          const tasks = await this.$http.post(`/clientsapi/activity/task/${ item._id }`, { data: item })
-          this.setUpClientProp({ key: "tasks", value: tasks.data })
-          this.alertToggle({ message: "Task status changed", isShow: true, type: "success" })
-        } catch (err) {
-          this.alertToggle({ message: "Error on change task status", isShow: true, type: "error" })
-        }
-      },
-      approve() {
-        this.setStatus(this.approveModal.item, 'Upcoming')
-        this.approveModal = {
-          item: null,
-          show: false
-        }
-      },
-      notApprove() {
-        this.approveModal = {
-          item: null,
-          show: false
-        }
-      },
-      edit(taskData) {
-        this.$emit('editActivityDetailsTask', taskData)
+      edit(data) {
+        this.$emit('editActivityDetailsNote', data)
         this.close()
       },
       deleteTask() {
@@ -157,11 +116,11 @@
       },
       async approveDelete() {
         try {
-          const tasks = await this.$http.delete(`/clientsapi/activity/task/${ this.taskData._id }?client=${ this.taskData.client }`)
-          this.setUpClientProp({ key: "tasks", value: tasks.data })
+          const notes = await this.$http.delete(`/clientsapi/activity/note/${ this.data._id }?client=${ this.data.client }`)
+          this.setUpClientProp({ key: "notes", value: notes.data })
           this.close()
         } catch (e) {
-          this.alertToggle({ message: "Error on deleting tasks", isShow: true, type: "error" })
+          this.alertToggle({ message: "Error on deleting notes", isShow: true, type: "error" })
         }
 
       },
@@ -298,7 +257,6 @@
     &__text {
       margin-left: 5px;
     }
-
   }
 
   .blocks {

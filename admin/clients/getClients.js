@@ -1,4 +1,4 @@
-const { Clients, ClientsTasks } = require('../models/')
+const { Clients, ClientsTasks, ClientsNotes } = require('../models/')
 const { getClientsFilteringQuery } = require('./filter')
 
 /**
@@ -56,9 +56,14 @@ async function getClientWithActions(obj) {
       {path:'services.services', select: [ 'title', 'steps' ]},
     ]).lean()
 
-  await ClientsTasks.updateMany({client: obj._id, status: "Upcoming", deadline: {$lte:new Date()}},{$set: {status: "Overdue"}})
+  await ClientsTasks.updateMany({client: obj._id, status: "Upcoming", dateTime: {$lte:new Date()}},{$set: {status: "Overdue"}})
 
   client.tasks = await ClientsTasks.find({client: obj._id})
+    .populate([
+      {path: 'assignedTo', select: ['firstName','lastName']}
+    ]) || []
+
+  client.notes = await ClientsNotes.find({client: obj._id})
     .populate([
       {path: 'assignedTo', select: ['firstName','lastName']}
     ]) || []

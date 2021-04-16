@@ -38,6 +38,7 @@ const VendorBenchmarkCost = require('./vendorBenchmarkCost');
 const TierInfo = require('./tierInfo');
 const IndustryTierInfo = require('./industryTier');
 const ClientsTasks = require('./clientsTasks')
+const ClientsNotes = require('./clientsNotes')
 
 const Models = {
   Languages,
@@ -80,6 +81,7 @@ const Models = {
   TierInfo,
   IndustryTierInfo,
   ClientsTasks,
+  ClientsNotes,
 };
 
 module.exports = Models;

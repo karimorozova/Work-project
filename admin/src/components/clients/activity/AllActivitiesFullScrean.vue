@@ -1,11 +1,13 @@
 <template lang="pug">
   .all-activities
-    .all-activities__modal-actions(:class="{'with-scroll': (listOfActivity.length || 1) > rowCount }")
-      .all-activities__btn.open(@click="openModalFullSize")
-        i.fas.fa-expand-arrows-alt
-        span  Open as page
-      .all-activities__btn(@click="close")
-        p.all-activities__close &#215;
+    .all-activities__actions
+      .all-activities__action(@click="backToMainPage")
+        i.fas.fa-arrow-left.icon
+        span  Back to page
+      .all-activities__action(@click="closeModalFullSize")
+        i.fas.fa-expand-arrows-alt.icon
+        span  Open as modal
+
     .all-activities__wrapper(v-if="listOfActivity.length >= 1")
       .all-activities__content
         .all-activities__list(v-for="item in listOfActivity")
@@ -29,23 +31,18 @@
 	import NoteDetailsCard from "./NoteDetailsCard"
 
 	export default {
-		name: "AllActivitiesModal",
-		props: {
-			rowCount: Number
-		},
 		methods: {
-			close() {
-				this.$emit('close')
-			},
+			closeModalFullSize(){
+				this.$emit('closeModalFullSize')
+      },
+      backToMainPage(){
+	      this.$emit('backToMainPage')
+      },
 			editActivityDetailsTask(taskData) {
 				this.$emit('editActivityDetailsTask', taskData)
 			},
 			editActivityDetailsNote(noteData) {
 				this.$emit('editActivityDetailsNote', noteData)
-			},
-			openModalFullSize() {
-				this.$emit('openModalFullSize', true)
-				this.close()
 			}
 		},
 		computed: {
@@ -73,24 +70,40 @@
 
 <style lang="scss" scoped>
 
+
   .all-activities {
     background-color: white;
-    box-shadow: 0 2px 5px rgba(103, 87, 62, .3), 0 2px 6px 2px rgba(103, 87, 62, .15);
-    position: relative;
+
+    &__actions {
+      display: flex;
+      padding: 5px 0 15px;
+    }
+
+    &__action {
+      opacity: 0.8;
+      transition: .2s ease;
+      cursor: pointer;
+      cursor: pointer;
+      margin-right: 20px;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
 
     &__wrapper {
-      padding: 0 20px;
-      max-height: 700px;
       overflow-x: auto;
     }
 
     &__modal-actions {
+      font-size: 22px;
       display: flex;
-      justify-content: space-between;
-      padding: 15px 11px 12px 20px;
+      justify-content: flex-end;
+      margin: 4px 8px;
     }
 
     &__btn {
+      margin-left: 7px;
     }
 
     & .mb20 {
@@ -101,11 +114,8 @@
       font-size: 22px;
       cursor: pointer;
       font-family: Myriad900;
-      opacity: .8;
-      transition: .2s ease;
-      line-height: 0.7;
-      margin: 0;
-      margin-top: -3px;
+      opacity: 0.8;
+      transition: ease 0.2s;
 
       &:hover {
         opacity: 1
@@ -116,19 +126,17 @@
       padding: 0 20px 20px 20px;
       font-size: 16px;
     }
+
   }
 
-  .open {
-    opacity: 0.8;
-    transition: .2s ease;
-    cursor: pointer;
-
-    &:hover {
-      opacity: 1;
-    }
+  .with-scroll {
+    right: 17px !important;
+    top: 7px !important;
   }
 
-  .fa-expand-arrows-alt {
+  .icon {
     margin-right: 4px;
   }
+
+
 </style>

@@ -6,7 +6,7 @@
         Button(:value="approveValue")
       .approve-modal__button(@click.stop="notApprove")
         Button(:value="notApproveValue")
-    span.approve-modal__close(@click.stop="close") &#215;
+    span.approve-modal__close(v-if="!optionWithoutClosing" @click.stop="close") &#215;
 </template>
 
 <script>
@@ -23,7 +23,11 @@
 			},
 			notApproveValue: {
 				type: String
-			}
+			},
+      optionWithoutClosing: {
+				type: Boolean,
+        default: false
+      }
 		},
 		data() {
 			return {}
@@ -69,6 +73,11 @@
     background-color: $white;
     max-width: 300px;
     font-size: 16px;
+
+    &__text{
+      text-align: center;
+      margin-top: 10px;
+    }
 
     &__buttons {
       margin-top: 10px;

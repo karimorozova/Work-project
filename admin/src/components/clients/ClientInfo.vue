@@ -3,6 +3,7 @@
     .client-info(v-if="currentClient._id")
       Sidebar(
         @createTask="createTask"
+        @createNote="createNote"
         @openAllActivities="openAllActivitiesModal"
         @editActivityDetailsTask="editActivityDetailsTask"
         :isSaveClicked="isSaveClicked"
@@ -13,124 +14,147 @@
           :clientTask="clientTask"
           @close="closeTaskModal"
         )
+      .client-activity__addNote(v-if="createNoteModal")
+        AddNote(
+          :clientNote="clientNote"
+          @close="closeNoteModal"
+        )
       .client-activity__all-activities(v-if="allActivitiesModal")
         AllActivitiesModal(
+          @openModalFullSize="toggleModalFullSize"
           @close="closeAllActivities"
           @editActivityDetailsTask="editActivityDetailsTask"
+          @editActivityDetailsNote="editActivityDetailsNote"
           :rowCount="3"
         )
 
       SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
 
-      .title General Information
-      .client-info__gen-info
-        General(
-          :isSaveClicked="isSaveClicked"
-          :languages="languages"
-          :timezones="timezones"
-          :allClientAliases="aliases"
+
+      .client-info__layoutActivities(v-if="fullActivityModal")
+
+        .title-with-action
+          span All Activities
+          //i.fas.fa-expand-arrows-alt(@click="closeModalFullSize")
+
+        AllActivitiesFullScrean(
+          @editActivityDetailsTask="editActivityDetailsTask"
+          @editActivityDetailsNote="editActivityDetailsNote"
+          @closeModalFullSize="closeModalFullSize"
+          @backToMainPage="backToMainPage"
         )
 
-      .title Notes & Comments
-      .client-info__notes
-        ClientsNotes
-
-      .title Contact Details
-      .client-info__contacts-info
-        ContactsInfo(
-          :client="currentClientOverallData"
-          @contactDetails="contactDetails"
-          @saveContactUpdates="saveContactUpdates"
-          @setLeadContact="setLeadContact"
-          @newContact="addNewContact"
-          @approveDelete="approveContactDelete"
-        )
-
-      .title Services
-      .client-info__services
-        ClientServices(
-          :clientServices="currentClient.services"
-          :defaultPricelist="currentClient.defaultPricelist"
-          :languages="languages"
-          :sourceLanguagesClient="sourceLanguagesClientData"
-          :targetLanguagesClient="targetLanguagesClientData"
-          :industries="industries"
-          :services="services"
-          :clientIndustries="currentClient.industries.map(i => i.name)"
-          @updateRates="updateRates"
-        )
-
-      .title Rates
-      .client-info__rates
-        RatesParameters
-        .client-info__tables-row
-          .lang-table
-            LangTable(
-              :dataArray="currentClient.rates.basicPricesTable"
-              :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-            )
-          .step-table
-            StepTable(
-              :dataArray="currentClient.rates.stepMultipliersTable"
-              :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-              :refresh="isRefreshAfterServiceUpdate"
-            )
-          .industry-table
-            IndustryTable(
-              :dataArray="currentClient.rates.industryMultipliersTable"
-              :clientId="currentClient._id"
-              @refreshResultTable="refreshResultTable"
-              :refresh="isRefreshAfterServiceUpdate"
+      .client-info__layout(v-else)
+        .client-info__main-row
+          .title General Information
+          .client-info__gen-info
+            General(
+              :isSaveClicked="isSaveClicked"
+              :languages="languages"
+              :timezones="timezones"
+              :allClientAliases="aliases"
             )
 
-        .result-table
-          ResultTable(
-            :clientId="currentClient._id"
-            :languages="languages"
-            :steps="steps"
-            :units="units"
-            :industries="industries"
-            :isRefreshResultTable="isRefreshResultTable"
-            :refresh="isRefreshAfterServiceUpdate"
+          .title Notes & Comments
+          .client-info__notes
+            ClientsNotes
+
+          .title Contact Details
+          .client-info__contacts-info
+            ContactsInfo(
+              :client="currentClientOverallData"
+              @contactDetails="contactDetails"
+              @saveContactUpdates="saveContactUpdates"
+              @setLeadContact="setLeadContact"
+              @newContact="addNewContact"
+              @approveDelete="approveContactDelete"
+            )
+
+          .title Services
+          .client-info__services
+            ClientServices(
+              :clientServices="currentClient.services"
+              :defaultPricelist="currentClient.defaultPricelist"
+              :languages="languages"
+              :sourceLanguagesClient="sourceLanguagesClientData"
+              :targetLanguagesClient="targetLanguagesClientData"
+              :industries="industries"
+              :services="services"
+              :clientIndustries="currentClient.industries.map(i => i.name)"
+              @updateRates="updateRates"
+            )
+
+          .title Rates
+          .client-info__rates
+            RatesParameters
+            .client-info__tables-row
+              .lang-table
+                LangTable(
+                  :dataArray="currentClient.rates.basicPricesTable"
+                  :clientId="currentClient._id"
+                  @refreshResultTable="refreshResultTable"
+                )
+              .step-table
+                StepTable(
+                  :dataArray="currentClient.rates.stepMultipliersTable"
+                  :clientId="currentClient._id"
+                  @refreshResultTable="refreshResultTable"
+                  :refresh="isRefreshAfterServiceUpdate"
+                )
+              .industry-table
+                IndustryTable(
+                  :dataArray="currentClient.rates.industryMultipliersTable"
+                  :clientId="currentClient._id"
+                  @refreshResultTable="refreshResultTable"
+                  :refresh="isRefreshAfterServiceUpdate"
+                )
+
+            .result-table
+              ResultTable(
+                :clientId="currentClient._id"
+                :languages="languages"
+                :steps="steps"
+                :units="units"
+                :industries="industries"
+                :isRefreshResultTable="isRefreshResultTable"
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+
+          .title Discount Chart
+          .client-info__chart
+            DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+
+          .title Documents
+          .client-info__documents
+            ClientDocuments(
+              :documentsData="currentClient.documents"
+            )
+
+          .title Sales Information
+          .client-info__sales
+            ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
+
+          .title Billing Information
+          .client-info__billing
+            ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+
+          .delete-approve(v-if="isApproveModal")
+            p Are you sure you want to delete?
+            input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
+            input.button(type="button" value="Delete" @click="approveClientDelete")
+
+          ValidationErrors(
+            v-if="areErrorsExist"
+            :errors="errors"
+            @closeErrors="closeErrorsBlock"
           )
 
-      .title Discount Chart
-      .client-info__chart
-        DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+        .client-subinfo(v-if="currentClient._id")
+          //.client-subinfo__general
+            SideGeneral(:isSaveClicked="isSaveClicked")
 
-      .title Documents
-      .client-info__documents
-        ClientDocuments(
-          :documentsData="currentClient.documents"
-        )
-
-      .title Sales Information
-      .client-info__sales
-        ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
-
-      .title Billing Information
-      .client-info__billing
-        ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
-
-      .delete-approve(v-if="isApproveModal")
-        p Are you sure you want to delete?
-        input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-        input.button(type="button" value="Delete" @click="approveClientDelete")
-
-      ValidationErrors(
-        v-if="areErrorsExist"
-        :errors="errors"
-        @closeErrors="closeErrorsBlock"
-      )
-
-    .client-subinfo(v-if="currentClient._id")
-      //.client-subinfo__general
-        SideGeneral(:isSaveClicked="isSaveClicked")
-
-      .client-subinfo__date
-        OtherClientInformation
+          .client-subinfo__date
+            OtherClientInformation
 
 </template>
 
@@ -157,7 +181,9 @@
 	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Sidebar from "./sidebar/SidebarMenu"
 	import AddTask from "./activity/AddTask"
+	import AddNote from "./activity/AddNote"
 	import AllActivitiesModal from "./activity/AllActivitiesModal"
+  import AllActivitiesFullScrean from "./activity/AllActivitiesFullScrean";
 
 	export default {
 		mixins: [ vatChecker ],
@@ -178,6 +204,7 @@
 		data() {
 			return {
 				clientTask: {},
+				clientNote: {},
 				aliases: [],
 				timezones: [],
 				currentDocuments: [],
@@ -232,17 +259,37 @@
 				],
 
 				createTaskModal: false,
-				allActivitiesModal: false
+				createNoteModal: false,
+				allActivitiesModal: false,
+				fullActivityModal: false,
 			}
 		},
 		methods: {
+			backToMainPage(){
+				this.fullActivityModal = false
+      },
+			toggleModalFullSize(data){
+        this.fullActivityModal = data
+      },
+      closeModalFullSize() {
+	      this.fullActivityModal = false
+        this.openAllActivitiesModal()
+      },
 			editActivityDetailsTask(taskData) {
-				const { _id, priority, title, deadline, details, assignedTo, associatedTo } = taskData
-				this.clientTask = { _id, priority, title, deadline, details, assignedTo, associatedTo, stage: 'update' }
+				const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = taskData
+				this.clientTask = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }
 				this.createTaskModal = true
 			},
+      editActivityDetailsNote(noteData) {
+        const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = noteData
+        this.clientNote = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }
+        this.createNoteModal = true
+      },
 			closeTaskModal() {
 				this.createTaskModal = false
+			},
+      closeNoteModal() {
+				this.createNoteModal = false
 			},
 			closeAllActivities() {
 				this.allActivitiesModal = false
@@ -251,7 +298,7 @@
 				this.clientTask = {
 					priority: "",
 					title: "",
-					deadline: "",
+					dateTime: "",
 					details: "",
 					assignedTo: {},
 					associatedTo: [],
@@ -259,8 +306,21 @@
 				}
 				this.createTaskModal = true
 			},
+      createNote() {
+				this.clientNote = {
+					priority: "",
+					title: "",
+          dateTime: "",
+					details: "",
+					assignedTo: {},
+					associatedTo: [],
+					stage: 'create'
+				}
+				this.createNoteModal = true
+			},
 			openAllActivitiesModal() {
 				this.allActivitiesModal = true
+				this.fullActivityModal = false
 			},
 			async setMatrixData({ value, key }) {
 				value = value > 100 ? 100 : value < 0 ? 0 : value
@@ -593,6 +653,7 @@
 
 		},
 		components: {
+      AllActivitiesFullScrean,
 			AllActivitiesModal,
 			Sidebar,
 			SaveCancelPopUp,
@@ -613,7 +674,8 @@
 			OtherClientInformation,
 			RatesParameters,
 			ClientsNotes,
-			AddTask
+			AddTask,
+      AddNote
 		},
 		created() {
 			this.getClientInfoLangs()
@@ -648,20 +710,29 @@
   .client-activity {
     &__addTask {
       position: fixed;
-      top: 0%;
+      top: 5%;
       left: 50%;
       transform: translate(-50%, 25%);
-      z-index: 50;
+      z-index: 55;
+    }
+
+    &__addNote {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+      transform: translate(-50%, 25%);
+      z-index: 55;
     }
 
     &__all-activities {
       position: fixed;
-      top: 20%;
+      top: 15%;
       left: 50%;
       z-index: 50;
       transform: translate(-50%,0%);
       width: 820px;
     }
+
   }
 
 
@@ -703,7 +774,9 @@
   .client-info {
     width: 1000px;
     position: relative;
-
+    &__layout {
+      display: flex;
+    }
     &__notes {
       box-sizing: border-box;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
@@ -762,6 +835,13 @@
   .title {
     font-size: 22px;
     padding: 30px 0 10px;
+  }
+
+  .title-with-action {
+    font-size: 22px;
+    padding: 30px 0 10px;
+    display: flex;
+    justify-content: space-between;
   }
 
   .buttons {
