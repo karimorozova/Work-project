@@ -11,6 +11,11 @@ import "./assets/scss/style.scss";
 import VueLodash from 'vue-lodash';
 import "./filters/GeneralFilters";
 export const bus = new Vue();
+import GAuth from 'vue-google-oauth2'
+
+const gauthOption = {
+  clientId: '852042192934-p9rjqn11t4f38ele1soo143b9ju5mdcf.apps.googleusercontent.com',
+}
 
 
 const io = require("socket.io-client");
@@ -28,6 +33,7 @@ axios.interceptors.request.use(config => {
   return Promise.reject(error);
 });
 
+Vue.use(GAuth, gauthOption)
 Vue.use(VueResource);
 Vue.use(require('vue-chartist'))
 
