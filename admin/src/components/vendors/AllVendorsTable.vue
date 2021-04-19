@@ -27,7 +27,7 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .all-vendors-table {
-    max-width: 1200px;
+  width: 1200px;
 }
 
 </style>

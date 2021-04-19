@@ -90,37 +90,14 @@
 
 	export default {
 		mixins: [scrollDrop],
-		props: {
-			nameFilter: {
-				type: String
-			},
-			statusFilter: {
-				type: String
-			},
-			industryFilter: {
-				type: [String, Object],
-				default: ""
-			},
-			sourceFilter: {
-				type: Array,
-				default: () => []
-			},
-			targetFilter: {
-				type: Array,
-				default: () => []
-			},
-			stepFilter: {
-				type: Object
-			}
-		},
 		data() {
 			return {
 				fields: [
 					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "16%", padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0" },
-					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "12%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "12%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Native Language", headerKey: "headerNative", key: "native", width: "12%", padding: "0" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "9%", padding: "0" },
+					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "13%", cellClass: "vendors-table_scroll-y" },
+					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "13%", cellClass: "vendors-table_scroll-y" },
+					{ label: "Native Language", headerKey: "headerNative", key: "native", width: "13%", padding: "0" },
 					{ label: "Industry", headerKey: "headerIndustry", key: "industry", width: "20%", padding: "0" },
 					{ label: "Test", headerKey: "headerTest", key: "test", width: "5%", padding: "0" },
 					{ label: "", headerKey: "headerIcons", key: "icons", width: "11%", padding: "3px" },
