@@ -52,7 +52,7 @@ async function sendAccountDeletedMail(vendors) {
 async function sendPreventDeleteMail(vendors) {
 
   for(const vendor of vendors) {
-    const message = `<p>Dear [${vendor.firstName}],</p>
+    const message = `<p>Dear ${vendor.firstName},</p>
                     <p>You haven't been active for 25 consecutive days. At Pangea, we are always in need of expertise like yours.</p>
 
                     <p>Please set the competencies in your profile</p>
