@@ -1,5 +1,6 @@
 const schedule = require("node-schedule");
 const moment = require('moment');
+const { deleteEmptyOrNotCreatedByManger, sendPreventDeleteNotActiveVendor} = require("./vendors/deleteVendor");
 const { XtrfLqa } = require('./models');
 const { downloadFromMemoqProjectsData } = require("./services/memoqs/projects");
 const { downloadMemoqFile } = require("./services/memoqs/files");
@@ -14,6 +15,9 @@ const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmar
 // downloadFromMemoqProjectsData();
 // clearGarbageProjects(true);
 // updateStatusesForOtherProjects()
+// deleteEmptyOrNotCreatedByManger()
+// sendPreventDeleteNotActiveVendor()
+
 
 schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"));
 
@@ -23,7 +27,9 @@ schedule.scheduleJob('40 8,13,18 * * *', async () => await scheduleJobBody(updat
 schedule.scheduleJob('40 0 * * *', async () => await scheduleJobBody(UpdateLQAFromProject(), "Updating LQA reports from projects data"));
 schedule.scheduleJob('30 0 * * *', async () => await scheduleJobBody(newLQAStatusFromXTRFProjects(), "Updating LQA reports from MemoqProjects data"));
 schedule.scheduleJob('30 23 * * *', async () => await scheduleJobBody(newLangReport(), "Updating lang tier data"));
-// schedule.scheduleJob('10 0 * * *', async () => await scheduleJobBody(deleteEmptyOrNotCreatedByManger(), "Updating lang tier data"));
+
+schedule.scheduleJob('10 0 * * *', async () => await scheduleJobBody(deleteEmptyOrNotCreatedByManger(), "Deleting not active vendor"));
+schedule.scheduleJob('20 0 * * *', async () => await scheduleJobBody(sendPreventDeleteNotActiveVendor(), "Send prevent delete not active vendor"));
 schedule.scheduleJob('30 01 * * *', async () => await scheduleJobBody(updateVendorBenchmarkCost(), "Updating vendor benchmark cost"));
 
 

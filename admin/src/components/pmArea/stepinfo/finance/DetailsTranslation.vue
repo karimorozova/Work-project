@@ -113,7 +113,7 @@
 			checkForErrors() {
 				this.errors = [];
 				if (this.financeData.vendor !== null) {
-					if (!this.currentData.payables.rate) {
+					if (this.currentData.payables.rate < 0) {
 						this.errors.push("Set valid Payables Rate value (integer/float)");
 					}
 					if (!this.currentData.payables.quantityRelative) {
