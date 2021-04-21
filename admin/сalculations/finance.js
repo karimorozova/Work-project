@@ -32,9 +32,11 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 			rates.pricelistTable,
 			dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio)
 
-	let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison)
-			|| getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
-			: 0
+	let vendorPrice = vendor
+    ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison)
+    : 0
+
+  vendorPrice = (vendorPrice !== undefined) ? vendorPrice : getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
 
 	const clientRate = {
 		value: clientPrice,
