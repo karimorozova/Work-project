@@ -76,6 +76,52 @@ const ProjectsSchema = new mongoose.Schema({
 	industry: {
 		type: Schema.Types.ObjectId, ref: 'Industries'
 	},
+  tasksDR1: [{
+    timestamp: {
+      type: Date,
+      default: new Date()
+    },
+    dr1Manager: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    },
+    dr2Manager: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    },
+    status: {
+      type: String,
+      default: "Started",
+      trim: true
+    },
+    instructions: {
+      type: Array,
+      default: [],
+    },
+    taskId: {
+      type: String,
+      default: "",
+      trim: true
+    },
+    files: [
+      {
+        fileName: {
+          type: String,
+          default: "",
+          trim: true
+        },
+        path: {
+          type: String,
+          default: "",
+          trim: true
+        },
+        isFileApproved: {
+          type: Boolean,
+          default: false
+        }
+      }
+    ],
+  }],
 	tasks: {
 		type: Array,
 		default: []

@@ -650,7 +650,8 @@ async function updateNonWordsTaskTargetFiles({ project, jobId, path, fileName })
 	const tasks = project.tasks.map(item => {
 		let targetFiles = item.targetFiles || [];
 		if(taskStep.taskId === item.taskId) {
-			targetFiles.push({ fileName, path, isFileApproved: false });
+      // targetFiles.push({ fileName, path, isFileApproved: false });
+      targetFiles.push({ fileName, path });
 			item.targetFiles = targetFiles;
 		}
 		return item;

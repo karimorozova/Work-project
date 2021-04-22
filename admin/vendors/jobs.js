@@ -2,6 +2,8 @@ const { getProjects, getProject, taskCompleteNotifyPM, notifyManagerStepStarted,
 const { Projects, Delivery, Languages } = require('../models')
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
 const { dr1Instructions } = require('../delivery')
+const fs = require('fs');
+
 async function getJobs(id) {
 	const allLanguages = await Languages.find()
 	try {
@@ -124,7 +126,9 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 		await stepCompletedNotifyPM(project, step)
 		if (isAllStepsCompleted({ jobId, steps })) {
 			await setTaskStatusAndSave({ project, jobId, steps, status: "Pending Approval [DR1]" })
-			await addToDelivery(project, { ...task, status: "Pending Approval [DR1]" })
+      //DELETE
+			// await addToDelivery(project, { ...task, status: "Pending Approval [DR1]" })
+      await pushTasksToDR1(project, task)
 			return await taskCompleteNotifyPM(project, task)
 		}
 		const stage1step = task.service.steps.find(item => item.stage === 'stage1')
@@ -139,42 +143,63 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 	}
 }
 
-async function addToDelivery(project, task) {
-	const files = getTaskTargetFiles(task)
-	const pair = task.sourceLanguage ? `${ task.sourceLanguage } >> ${ task.targetLanguage }` : `${ task.targetLanguage } / ${ task.packageSize }`
-	try {
-		await Delivery.updateOne({ projectId: project.id }, {
-			$push: {
-				tasks: {
-					dr1Manager: project.projectManager,
-					dr2Manager: project.accountManager,
-					status: task.deliveryStatus,
-					pair,
-					taskId: task.taskId,
-					instructions: dr1Instructions,
-					files
-				}
-			}
-		}, { upsert: true })
-	} catch (err) {
-		console.log(err)
-		console.log("Error in the addToDelivery")
-	}
+const pushTasksToDR1 = async (project, task) =>{
+  const {_id, projectManager, accountManager} = project
+
+  const files = getTaskTargetFiles(project,task)
+  project.tasksDR1.push({
+    dr1Manager: projectManager,
+    dr2Manager: accountManager,
+    instructions: dr1Instructions,
+    taskId: task.taskId,
+    files
+  })
+  return await Projects.updateOne({_id: _id}, {tasksDR1: project.tasksDR1})
 }
 
-function getTaskTargetFiles(task) {
-	const taskFiles = task.targetFiles
-	return taskFiles.reduce((acc, cur) => {
-		const fileName = cur.targetFile ? cur.targetFile.split("/").pop() : cur.fileName
-		acc.push({
-			fileName,
-			path: cur.targetFile || cur.path.split("./dist").pop(),
-			isFileApproved: false,
-			isOriginal: true
-		})
-		return [...acc]
-	}, [])
+function getTaskTargetFiles(project,task) {
+  return task.targetFiles.reduce((acc, cur) => {
+    const originalName = cur.path.split("/").pop()
+    const dr1FileName = `${Math.floor(Math.random() * 100000)}-${originalName}`
+
+    fs.copyFile(`./dist/projectFiles/${project._id}/${originalName}`, `./dist/projectFiles/${project._id}/${dr1FileName}`, (err) => {
+      if (err) throw err;
+    });
+
+    acc.push({
+      fileName: dr1FileName,
+      path: `/projectFiles/${project._id}/${dr1FileName}`,
+      isFileApproved: false,
+    })
+
+    return acc
+  }, [])
 }
+
+
+// async function addToDelivery(project, task) {
+// 	const files = getTaskTargetFiles(task)
+// 	const pair = task.sourceLanguage ? `${ task.sourceLanguage } >> ${ task.targetLanguage }` : `${ task.targetLanguage } / ${ task.packageSize }`
+// 	try {
+// 		await Delivery.updateOne({ projectId: project.id }, {
+// 			$push: {
+// 				tasks: {
+// 					dr1Manager: project.projectManager,
+// 					dr2Manager: project.accountManager,
+// 					status: task.deliveryStatus,
+// 					pair,
+// 					taskId: task.taskId,
+// 					instructions: dr1Instructions,
+// 					files
+// 				}
+// 			}
+// 		}, { upsert: true })
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log("Error in the addToDelivery")
+// 	}
+// }
+
 
 function getWithReadyToStartSteps({ task, steps }) {
 	const stage2step = task.service.steps.find(item => item.stage === 'stage2')

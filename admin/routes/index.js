@@ -6,6 +6,7 @@ const reportsapi = require('./reportsapi')
 const admin = require('./admin')
 const vendorRouter = require('./vendors/vendor')
 const pmareaRouter = require('./pmArea/pm-manage')
+const delivery = require('./pmArea/pm-manage')
 const pricelistsRouter = require('./pricelists/prices')
 const currencyRatioRouter = require('./pricelists/currencyRatio')
 const vendorApplicationRouter = require('./vendors/application')
@@ -43,6 +44,7 @@ router.use('/pricelists', requiresLogin, multipliers)
 router.use('/clientsapi', requiresLogin, clientsapiRouter)
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter)
 router.use('/memoqapi', requiresLogin, memoqapiRouter)
+router.use('/delivery', requiresLogin, delivery)
 //ADMIN
 
 //VENDOR
