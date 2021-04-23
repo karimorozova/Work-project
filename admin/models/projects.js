@@ -89,6 +89,10 @@ const ProjectsSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId,
       ref: "User"
     },
+    comment: {
+      type: String,
+      default: '',
+    },
     status: {
       type: String,
       default: "Started",
@@ -197,13 +201,17 @@ const ProjectsSchema = new mongoose.Schema({
         }
       }
     }],
-    sendedTasks: [ {
-      type: String,
-      default: "",
-          trim: true
-      }
-    ]
   },
+  deliveredTasks: [ {
+    taskId: {
+      type: String,
+    },
+    deliveredAt: {
+      type: Date,
+      default: new Date()
+    },
+  }
+  ],
 	tasks: {
 		type: Array,
 		default: []

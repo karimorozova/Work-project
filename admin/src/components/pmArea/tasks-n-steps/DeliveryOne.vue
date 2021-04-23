@@ -50,20 +50,20 @@
       .review__checkTitle
         .review__checkSubTitle(:class="{marginTop: true}") Comments
         .review__notes
-          ckeditor(v-model="editorData" :config="editorConfig")
-          .notes__button(@click="sendMessage") Save &nbsp;
+          ckeditor(v-model="deliveryTask.comment" :config="editorConfig")
+          .notes__button( @click="sendMessage") Save &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
 
-    .review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
+    //.review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
       .dr1Comment__title DR1 Comment
       .dr1Comment__textarea
         .dr1Comment__textareaText(v-html="previousComment")
 
-    span.relative
+    //span.relative
       .split-line
       .review__forbidden(v-if="isReviewing")
 
-    .review__table
+    //.review__table
       .review__forbidden(v-if="isReviewing")
       Table(
         :task="task"
@@ -86,16 +86,8 @@
         //  @check="(e) => toggleOptions(e, true)"
         //  @uncheck="(e) => toggleOptions(e, false)"
         //)
-      .review__forbidden(v-if="isReviewing")
-      Options(
-        v-if="isAllChecked"
-        :isAssign="isAssign"
-        :isDeliver="isDeliver"
-        :isNotify="isNotify"
-        :isReadyForDelivery="isReadyForDelivery"
-        :isDr1="isDr1"
-        @toggleOption="toggleOption"
-      )
+      //.review__forbidden(v-if="isReviewing")
+      //Options(v-if="isAllChecked" :isAssign="isAssign" :isDeliver="isDeliver" :isNotify="isNotify" :isReadyForDelivery="isReadyForDelivery" :isDr1="isDr1" @toggleOption="toggleOption")
 
     .review__buttons(v-if="dr1Manager && dr2Manager && getUser")
       .review__button(v-if="!isDr1")
@@ -142,7 +134,7 @@
 				areFilesChecked: false,
 				areFilesConverted: false,
 				areOptions: true,
-				isDeliver: false,
+				// isDeliver: false,
 				isNotify: false,
 				isReadyForDelivery: false,
 				isAssign: true,
@@ -158,7 +150,7 @@
 				isReviewing: false,
 				isModal: false,
 				rollbackManager: null,
-				previousComment: ''
+				// previousComment: ''
 			}
 		},
 		methods: {
@@ -173,24 +165,26 @@
 				// "rollBackReview",
 				"alertToggle"
 			]),
-			async generateCertificate() {
-				try {
-					await this.$http.post('/pm-manage/generate-certificate', {
-						project: this.project,
-						task: this.task
-					})
-					await this.getDeliveryData()
-					this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
-				} catch (err) {
-					this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
-				}
-			},
+			// async generateCertificate() {
+			// 	try {
+			// 		await this.$http.post('/pm-manage/generate-certificate', {
+			// 			project: this.project,
+			// 			task: this.task
+			// 		})
+			// 		await this.getDeliveryData()
+			// 		this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
+			// 	}
+			// },
 			async sendMessage() {
+        console.log({comment: this.deliveryTask.comment})
 				try {
 					await this.$http.post('/pm-manage/delivery-comments', {
 						projectId: this.project._id,
-						taskStatus: this.task.status === 'Pending Approval [DR2]' ? 'dr2' : 'dr1',
-						comment: this.editorData
+            taskId: this.deliveryTask.taskId,
+						comment: this.deliveryTask.comment
+						// taskStatus: this.task.status === 'Pending Approval [DR2]' ? 'dr2' : 'dr1',
 					})
 					this.alertToggle({ message: "Comment updated!", isShow: true, type: "success" })
 				} catch (err) {
@@ -207,26 +201,26 @@
 			// setContacts({ contacts }) {
 			// 	this.contacts = [ ...contacts ]
 			// },
-			toggleOption({ prop }) {
-				this[prop] = true
-				if (prop === 'isAssign') {
-					this.isDeliver = false
-					this.isReadyForDelivery = false
-					this.isNotify = false
-				} else if (prop === 'isDeliver') {
-					this.isAssign = false
-					this.isReadyForDelivery = false
-					this.isNotify = false
-				} else if (prop === 'isReadyForDelivery') {
-					this.isAssign = false
-					this.isDeliver = false
-					this.isNotify = false
-				} else {
-					this.isAssign = false
-					this.isReadyForDelivery = false
-					this.isDeliver = false
-				}
-			},
+			// toggleOption({ prop }) {
+			// 	this[prop] = true
+			// 	if (prop === 'isAssign') {
+			// 		this.isDeliver = false
+			// 		this.isReadyForDelivery = false
+			// 		this.isNotify = false
+			// 	} else if (prop === 'isDeliver') {
+			// 		this.isAssign = false
+			// 		this.isReadyForDelivery = false
+			// 		this.isNotify = false
+			// 	} else if (prop === 'isReadyForDelivery') {
+			// 		this.isAssign = false
+			// 		this.isDeliver = false
+			// 		this.isNotify = false
+			// 	} else {
+			// 		this.isAssign = false
+			// 		this.isReadyForDelivery = false
+			// 		this.isDeliver = false
+			// 	}
+			// },
 			setRollbackManager({ manager }) {
 				this.rollbackManager = manager
 			},
@@ -411,6 +405,11 @@
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
 			}
 		},
+    watch: {
+      "deliveryTask.comment"(newValue, oldValue) {
+        console.log(newValue, oldValue)
+      }
+    },
 		components: {
       DropsDR1,
 			Drops,
