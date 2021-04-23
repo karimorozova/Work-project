@@ -1,6 +1,7 @@
-const { Delivery } = require("../models");
+const { Delivery , Projects } = require("../models");
 const { managerNotifyMail } = require("../utils/mailTemplate");
 const { managerDr1Assigned , managerDr1Reassign } = require("../emailMessages/internalCommunication");
+const { getProjectAfterUpdate } = require('../projects')
 
 const dr1Instructions = [
     {step: "dr1", text: "Check files/work on Memoq to ensure all segments were translated and mark in green", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
@@ -82,22 +83,25 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
     }
 }
 
-async function changeManager({projectId, taskId, prevManager, manager, prop, isAdmin, status , project}) {
+async function changeManager({ taskId, prevManager, manager, prop, isAdmin, status, project}) {
     const DRNumber = prop === "dr1Manager" ? '1' : '2';
-    const key = `tasks.$.${prop}`;
-    const updateQuery = {[key]: manager._id};
     const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, DRNumber);
     const messageToNew = managerDr1Assigned({taskId, project, manager}, DRNumber);
+
     try {
-        await Delivery.updateOne({projectId, "tasks.taskId": taskId}, updateQuery);
+        const updatedProject = await getProjectAfterUpdate({"_id": project._id, "tasksDR1.taskId": taskId}, { $set: {[`tasksDR1.$.${prop}`]: manager} })
         const isDr1 = prop === "dr1Manager";
         const isDr2 = status === "dr2" && prop === "dr2Manager";
         if(isAdmin && (isDr1 || isDr2)) {
-            await managerNotifyMail(prevManager, messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
-            await managerNotifyMail(manager, messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
+            await managerNotifyMail(returnObj(prevManager), messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
+            await managerNotifyMail(returnObj(manager), messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
         }
+        return updatedProject
     } catch(err) {
-
+      console.log(err, 'on changeManager')
+    }
+    function returnObj(){
+      return Array.isArray(prevManager) ? prevManager[0] : prevManager
     }
 }
 

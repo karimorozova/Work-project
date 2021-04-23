@@ -146,8 +146,9 @@ export const uploadTarget = async ({ dispatch }, payload) => {
 export const changeReviewManager = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
-		const { taskId, projectId, prevManager, manager, prop, isAdmin, status } = payload;
-		await Vue.http.post("/pm-manage/change-manager", { taskId, projectId, prevManager, manager, prop, isAdmin, status });
+		const { taskId, projectId, manager, prop, isAdmin, status } = payload;
+		const updatedProject = await Vue.http.post("/pm-manage/change-manager", { taskId, projectId, manager, prop, isAdmin, status });
+    await dispatch('setCurrentProject', updatedProject.data);
 		dispatch('alertToggle', { message: "Successfully changed!", isShow: true, type: "success" })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });

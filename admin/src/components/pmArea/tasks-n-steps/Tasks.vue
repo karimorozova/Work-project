@@ -159,7 +159,16 @@
 
       )
     .tasks__review(v-if="isDeliveryReview")
-      DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updateReviewTask")
+      DeliveryOne(
+        :project="currentProject"
+        :user="user"
+        :users="users"
+        :task="reviewTask"
+        :deliveryTask="currentProject.tasksDR1.find(({taskId}) => taskId === reviewTask.taskId)"
+        @close="closeReview"
+        @updateTasks="updateReviewTask"
+      )
+      //DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updateReviewTask")
 </template>
 
 <script>
@@ -173,12 +182,13 @@
 	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	const ApproveModal = () => import("../../ApproveModal")
-	const DeliveryReview = () => import("./DeliveryReview")
+	// const DeliveryReview = () => import("./DeliveryReview")
 	import moment from "moment"
 	import { mapGetters, mapActions } from 'vuex'
 	import ApproveModalPayment from "../../ApproveModalPayment"
 	import FilesUpload from "./tasksFiles/FilesUpload"
 	import Button from "../../Button"
+  import DeliveryOne from "./DeliveryOne";
 
 	export default {
 		mixins: [ currencyIconDetected ],
@@ -385,7 +395,8 @@
 				this.storeProject({ ...this.currentProject, tasks: unchecked })
 			},
 			updateReviewTask({ tasksIds }) {
-				this.reviewTask = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1)
+        console.log('UPDATE TASK')
+				// this.reviewTask = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1)
 			},
 			setModalTexts(option) {
 				this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
@@ -586,7 +597,8 @@
 		computed: {
 			...mapGetters({
 				currentProject: 'getCurrentProject',
-				user: 'getUser'
+				user: 'getUser',
+        users: 'getUsers'
 			}),
 			projectClientContacts() {
 				return this.currentProject.clientContacts.map(({ email }) => email)
@@ -619,6 +631,7 @@
 			}
 		},
 		components: {
+      DeliveryOne,
 			Button,
 			FilesUpload,
 			ApproveModalPayment,
@@ -628,7 +641,7 @@
 			CheckBox,
 			SelectSingle,
 			ApproveModal,
-			DeliveryReview,
+			// DeliveryReview,
 			PreviewQuote,
 			Tabs
 		}

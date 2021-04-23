@@ -2,22 +2,20 @@
   .review
     span.review__close(@click="close") &#215;
 
-    .review__modal(v-if="isModal")
+    //.review__modal(v-if="isModal")
       RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBack")
 
-    .review__title Delivery Review {{ dr }}
+    .review__title Delivery Review 1
     span.relative
-      .review__forbidden(v-if="isReviewing")
-      Drops(
-        :isReviewing="isReviewing"
+      //.review__forbidden(v-if="isReviewing")
+      DropsDR1(
         :project="project"
         :user="user"
-        :dr1Manager="dr1Manager"
-        :dr2Manager="dr2Manager"
-        :timestamp="timestamp"
+        :dr1Manager="users.find(({_id}) => `${_id}` === `${deliveryTask.dr1Manager}`)"
+        :dr2Manager="users.find(({_id}) => `${_id}` === `${deliveryTask.dr2Manager}`)"
         @assignManager="assignManager"
-        @setContacts="setContacts"
       )
+      //Drops(:isReviewing="isReviewing" :project="project" :user="user" :dr1Manager="dr1Manager" :dr2Manager="dr2Manager" :timestamp="timestamp")
 
     span.relative
       .review_left-align {{ checklistTile }} Checklist
@@ -122,6 +120,7 @@
 	import Check from "../review/Check"
 	import _ from "lodash"
 	import editorConfig from "../../../mixins/editorConfig"
+  import DropsDR1 from "../review/DropsDR1";
 
 	const Options = () => import("../review/Options")
 	const CheckBox = () => import("@/components/CheckBox")
@@ -133,7 +132,9 @@
 		props: {
 			task: { type: Object },
 			user: { type: Object },
-			project: { type: Object }
+      users: { type: Array },
+			project: { type: Object },
+      deliveryTask: { type: Object },
 		},
 		data() {
 			return {
@@ -147,9 +148,11 @@
 				isAssign: true,
 				isDr1: true,
 				files: [],
-				dr1Manager: null,
-				dr2Manager: null,
-				contacts: [],
+
+				// dr1Manager: null,
+				// dr2Manager: null,
+
+				// contacts: [],
 				timestamp: "",
 				instructions: [],
 				isReviewing: false,
@@ -167,7 +170,7 @@
 				"approveDeliverable",
 				"assignDr2",
 				"changeReviewManager",
-				"rollBackReview",
+				// "rollBackReview",
 				"alertToggle"
 			]),
 			async generateCertificate() {
@@ -201,9 +204,9 @@
 				this.isModal = false
 				this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
 			},
-			setContacts({ contacts }) {
-				this.contacts = [ ...contacts ]
-			},
+			// setContacts({ contacts }) {
+			// 	this.contacts = [ ...contacts ]
+			// },
 			toggleOption({ prop }) {
 				this[prop] = true
 				if (prop === 'isAssign') {
@@ -289,21 +292,21 @@
 				await this.approveDeliveryFile({ taskId: this.task.taskId, isFileApproved: true, paths })
 				await this.getDeliveryData()
 			},
-			async checkPermission() {
-				if (!this.isReviewing) {
-					try {
-						const reviewStatus = await this.$http.get(
-								`/pm-manage/review-status?group=${ this.user.group.name }&projectId=${ this.project._id }&taskId=${ this.task.taskId }&userId=${ this.user._id }`
-						)
-						if (reviewStatus.data === "forbidden") {
-							this.isReviewing = true
-							return this.alertToggle({ message: "This task Delivery Review is forbidden for you", isShow: true, type: "error" })
-						}
-					} catch (err) {
-						this.alertToggle({ message: "Error on checking review status", isShow: true, type: "error" })
-					}
-				}
-			},
+			// async checkPermission() {
+			// 	if (!this.isReviewing) {
+			// 		try {
+			// 			const reviewStatus = await this.$http.get(
+			// 					`/pm-manage/review-status?group=${ this.user.group.name }&projectId=${ this.project._id }&taskId=${ this.task.taskId }&userId=${ this.user._id }`
+			// 			)
+			// 			if (reviewStatus.data === "forbidden") {
+			// 				this.isReviewing = true
+			// 				return this.alertToggle({ message: "This task Delivery Review is forbidden for you", isShow: true, type: "error" })
+			// 			}
+			// 		} catch (err) {
+			// 			this.alertToggle({ message: "Error on checking review status", isShow: true, type: "error" })
+			// 		}
+			// 	}
+			// },
 			async approve() {
 				try {
 					if (this.isDr1 && this.isAssign) {
@@ -329,62 +332,68 @@
 				}
 			},
 			async assignManager({ manager, prop }) {
-				await this.checkPermission()
-				// if (this.isReviewing || this.dr1Manager._id === manager._id) return
-				if (this.isReviewing) return
+				// await this.checkPermission()
+				// if (this.isReviewing || ) return
+				// if (this.isReviewing) return
+        const { dr1Manager, dr2Manager } = this.deliveryTask
+        if(prop === 'dr1Manager'){
+          if(manager._id === dr1Manager) return
+        }else{
+          if(manager._id === dr2Manager) return
+        }
 				await this.changeReviewManager({
-					prevManager: this[prop],
 					manager,
 					prop,
 					projectId: this.project._id,
 					taskId: this.task.taskId,
 					isAdmin: this.isAdmin,
-					status: `dr${ this.dr }`
+					status: 'dr1'
 				})
-				await this.getDeliveryData()
 			},
-			async rollBack() {
-				const rollback = {
-					projectId: this.project._id,
-					taskId: this.task.taskId,
-					manager: this.rollbackManager
-				}
-				await this.rollBackReview(rollback)
-				this.close()
-			},
+			// async rollBack() {
+			// 	const rollback = {
+			// 		projectId: this.project._id,
+			// 		taskId: this.task.taskId,
+			// 		manager: this.rollbackManager
+			// 	}
+			// 	// await this.rollBackReview(rollback)
+			// 	this.close()
+			// },
 			async getDeliveryData() {
-				if (this.task.status === "Pending Approval [DR2]") {
-					this.isDr1 = false
-				}
-				this.isDeliver = this.isDr1 ? false : this.areOptions
 
-				try {
-					const result = await this.$http.post("/pm-manage/delivery-data", {
-						projectId: this.project._id,
-						taskId: this.task.taskId
-					})
-					this.files = result.data.files.map(item => {
-						return { ...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false }
-					})
-					this.dr1Manager = result.data.dr1Manager
-					this.dr2Manager = result.data.dr2Manager
-					this.instructions = result.data.instructions.filter(item => item.step === result.data.status)
-					if (this.task.status === "Pending Approval [DR2]") {
-						this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
-						this.timestamp = result.data.timestamp
-					}
-					const commentsData = await this.$http.get('/pm-manage/delivery-comments/' + this.project._id)
-					const { comments } = commentsData.data
-					this.editorData = this.task.status === 'Pending Approval [DR2]' ? comments.dr2.comment : comments.dr1.comment
-					this.previousComment = this.task.status === 'Pending Approval [DR2]' ? comments.dr1.comment : ''
-				} catch (err) {
-					this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
-				}
+				// if (this.task.status === "Pending Approval [DR2]") {
+				// 	this.isDr1 = false
+				// }
+				// this.isDeliver = this.isDr1 ? false : this.areOptions
+        //
+				// try {
+				// 	const result = await this.$http.post("/pm-manage/delivery-data", {
+				// 		projectId: this.project._id,
+				// 		taskId: this.task.taskId
+				// 	})
+				// 	this.files = result.data.files.map(item => {
+				// 		return { ...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false }
+				// 	})
+				// 	this.dr1Manager = result.data.dr1Manager
+				// 	this.dr2Manager = result.data.dr2Manager
+				// 	this.instructions = result.data.instructions.filter(item => item.step === result.data.status)
+				// 	if (this.task.status === "Pending Approval [DR2]") {
+				// 		this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
+				// 		this.timestamp = result.data.timestamp
+				// 	}
+				// 	const commentsData = await this.$http.get('/pm-manage/delivery-comments/' + this.project._id)
+				// 	const { comments } = commentsData.data
+				// 	this.editorData = this.task.status === 'Pending Approval [DR2]' ? comments.dr2.comment : comments.dr1.comment
+				// 	this.previousComment = this.task.status === 'Pending Approval [DR2]' ? comments.dr1.comment : ''
+				// } catch (err) {
+				// 	this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
+				// }
 			}
+
 		},
 		computed: {
 			...mapGetters({
-				getUser: "getUser"
+				getUser: "getUser",
 			}),
 			groupedInstructions() {
 				return _.groupBy(this.instructions, 'title')
@@ -406,6 +415,7 @@
 			}
 		},
 		components: {
+      DropsDR1,
 			Drops,
 			Table,
 			Check,
@@ -416,8 +426,8 @@
 			ckeditor: CKEditor.component
 		},
 		mounted() {
-			this.checkPermission()
-					.then(res => this.getDeliveryData())
+			// this.checkPermission()
+			// 		.then(res => this.getDeliveryData())
 		}
 	}
 </script>

@@ -646,11 +646,12 @@ router.get('/review-status', async (req, res) => {
 })
 
 router.post('/change-manager', async (req, res) => {
-	const { projectId, taskId, manager, prevManager, prop, isAdmin, status } = req.body
+	const { projectId, taskId, manager, prop, isAdmin, status } = req.body
 	try {
 		const project = await getProject({ '_id': projectId })
-		await changeManager({ projectId, taskId, manager, prevManager, prop, isAdmin, status, project })
-		res.send('updated')
+    const prevManager = await User.find( { "_id": project.tasksDR1.find(item => item.taskId === taskId)[prop] } ).populate('group')
+		const updatedProject = await changeManager({ taskId, manager, prevManager, prop, isAdmin, status, project })
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on changing review manager')
@@ -865,21 +866,21 @@ router.post('/tasks-approve', async (req, res) => {
 	}
 })
 
-router.post('/delivery-data', async (req, res) => {
-	const { taskId, projectId } = req.body
-	try {
-		const projectDelivery = await Delivery.findOne(
-				{ projectId, 'tasks.taskId': taskId },
-				{ 'tasks.$': 1 })
-				.populate('tasks.dr1Manager')
-				.populate('tasks.dr2Manager')
-		const result = projectDelivery.tasks[0]
-		res.send(result)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on getting delivery data')
-	}
-})
+// router.post('/delivery-data', async (req, res) => {
+// 	const { taskId, projectId } = req.body
+// 	try {
+// 		const projectDelivery = await Delivery.findOne(
+// 				{ projectId, 'tasks.taskId': taskId },
+// 				{ 'tasks.$': 1 })
+// 				.populate('tasks.dr1Manager')
+// 				.populate('tasks.dr2Manager')
+// 		const result = projectDelivery.tasks[0]
+// 		res.send(result)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on getting delivery data')
+// 	}
+// })
 
 router.get('/deliverables', async (req, res) => {
 	const { taskId } = req.query
