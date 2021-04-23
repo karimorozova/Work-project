@@ -21,6 +21,7 @@ const {
 const { createTasksForWordcount } = require('./taskForWordcount');
 const { getProjectWithUpdatedFinance } = require('./metrics');
 const { getProjectAfterFinanceUpdated, updateProjectFinanceOnDiscountsUpdate } = require('./porjectFinance');
+const { addDR2 } = require('./delivery');
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
 
 module.exports = {
@@ -73,5 +74,6 @@ module.exports = {
   sendCostQuoteMessage,
   updateProjectFinanceOnDiscountsUpdate,
   getPriceAfterApplyingDiscounts,
-  regainWorkFlowStatusByStepId
+  regainWorkFlowStatusByStepId,
+  addDR2
 }

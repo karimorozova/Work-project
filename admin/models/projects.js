@@ -122,6 +122,88 @@ const ProjectsSchema = new mongoose.Schema({
       }
     ],
   }],
+  tasksDR2: {
+    singleLang: [{
+      timestamp: {
+        type: Date,
+        default: new Date()
+      },
+      sourceLanguage: {
+        type: Schema.Types.ObjectId,
+        ref: 'Language'
+      },
+      targetLanguage: {
+        type: Schema.Types.ObjectId,
+        ref: 'Language'
+      },
+      files: [{
+        fileName: {
+          type: String,
+          default: "",
+          trim: true
+        },
+        path: {
+          type: String,
+          default: "",
+          trim: true
+        },
+        isFileApproved: {
+          type: Boolean,
+          default: false
+        },
+        taskId: {
+          type: String,
+          default: "",
+          trim: true
+        },
+        dr1Manager: {
+          type: Schema.Types.ObjectId,
+          ref: "User"
+        },
+        dr2Manager: {
+          type: Schema.Types.ObjectId,
+          ref: "User"
+        },
+      }]
+    }],
+    multiLang: [{
+      tasks: [{type: String}],
+      dr1Manager: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+      },
+      dr2Manager: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+      },
+      instructions: {
+        type: Array,
+        default: [],
+      },
+      file: {
+        fileName: {
+          type: String,
+          default: "",
+          trim: true
+        },
+        path: {
+          type: String,
+          default: "",
+          trim: true
+        },
+        isFileApproved: {
+          type: Boolean,
+          default: false
+        }
+      }
+    }],
+    sendedTasks: [ {
+      type: String,
+      default: "",
+          trim: true
+      }
+    ]
+  },
 	tasks: {
 		type: Array,
 		default: []
