@@ -18,11 +18,11 @@
       //Drops(:isReviewing="isReviewing" :project="project" :user="user" :dr1Manager="dr1Manager" :dr2Manager="dr2Manager" :timestamp="timestamp")
 
     span.relative
-      .review_left-align {{ checklistTile }} Checklist
-      .review__forbidden(v-if="isReviewing")
+      .review_left-align DR1 Checklist
+      //.review__forbidden(v-if="isReviewing")
 
     .review__check
-      .review__forbidden(v-if="isReviewing")
+      //.review__forbidden(v-if="isReviewing")
       .review__headers
         .review__headers-item Check
         .review__headers-item Not Relevant
@@ -240,7 +240,7 @@
 					taskId: this.task.taskId,
 					instruction
 				})
-				await this.getDeliveryData()
+				// await this.getDeliveryData()
 			},
 			// toggleOptions() {
 			// 	this.isAssign = this.isDr1
@@ -332,9 +332,6 @@
 				}
 			},
 			async assignManager({ manager, prop }) {
-				// await this.checkPermission()
-				// if (this.isReviewing || ) return
-				// if (this.isReviewing) return
         const { dr1Manager, dr2Manager } = this.deliveryTask
         if(prop === 'dr1Manager'){
           if(manager._id === dr1Manager) return
@@ -396,7 +393,7 @@
 				getUser: "getUser",
 			}),
 			groupedInstructions() {
-				return _.groupBy(this.instructions, 'title')
+				return _.groupBy(this.deliveryTask.instructions, 'title')
 			},
 			isAllChecked() {
 				// this.toggleOptions()
@@ -407,9 +404,9 @@
 			dr() {
 				return this.task.status === "Pending Approval [DR1]" ? 1 : 2
 			},
-			checklistTile() {
-				return this.task.status === "Pending Approval [DR1]" ? "DR1" : "DR2"
-			},
+			// checklistTile() {
+			// 	return this.task.status === "Pending Approval [DR1]" ? "DR1" : "DR2"
+			// },
 			isAdmin() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
 			}

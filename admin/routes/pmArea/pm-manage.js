@@ -661,21 +661,16 @@ router.post('/change-manager', async (req, res) => {
 router.post('/approve-instruction', async (req, res) => {
 	const { taskId, projectId, instruction } = req.body
 	try {
-		await Delivery.updateOne(
-				{
-					projectId,
-					'tasks.taskId': taskId,
-					'tasks.instructions.text': instruction.text,
-					'tasks.instructions.step': instruction.step
-				},
-				{
-					'tasks.$[i].instructions.$[j].isChecked': instruction.isChecked,
-					'tasks.$[i].instructions.$[j].isNotRelevant': instruction.isNotRelevant
-				},
-				{
-					arrayFilters: [ { 'i.taskId': taskId }, { 'j.text': instruction.text } ]
-				})
-		res.send('done')
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.instructions.text": instruction.text },
+      {
+        "tasksDR1.$[i].instructions.$[j].isChecked": instruction.isChecked,
+        "tasksDR1.$[i].instructions.$[j].isNotRelevant": instruction.isNotRelevant
+      },
+      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.text': instruction.text } ]}
+    )
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on approve files')
@@ -713,15 +708,16 @@ router.get('/delivery-comments/:projectId', async (req, res) => {
 	}
 })
 router.post('/delivery-comments', async (req, res) => {
-	const { projectId, taskStatus, comment } = req.body
-	try {
-		const query = `comments.${ taskStatus }.comment`
-		await Delivery.updateOne({ 'projectId': projectId }, { [query]: comment })
-		res.send('done')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approve files')
-	}
+    res.send('s')
+	// const { projectId, taskStatus, comment } = req.body
+	// try {
+	// 	const query = "comments.${ taskStatus }.comment`
+	// 	await Delivery.updateOne({ 'projectId': projectId }, { [query]: comment })
+	// 	res.send('done')
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on approve files')
+	// }
 })
 
 router.post('/generate-certificate', async (req, res) => {

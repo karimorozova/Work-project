@@ -44,7 +44,6 @@
 		},
 		methods: {
 			singInEmail() {
-				console.log('asd')
 				this.isSingInEmail = true
 			},
 			async checkFields() {
