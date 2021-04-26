@@ -75,7 +75,7 @@ function getParsedFiles(taskFiles) {
 async function manageDeliveryFile({fileData, file}) {
     const { path, taskId, isOriginal, projectId } = fileData;
 
-    const additionFileInfo = `${Math.floor(Math.random()*10000)}DR-${taskId.replace(/\s+/g, '')}`;
+    const additionFileInfo = `${Math.floor(Math.random()*100000)}-1`;
     try {
         const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
 

@@ -678,20 +678,15 @@ router.post('/approve-instruction', async (req, res) => {
 })
 
 router.post('/approve-files', async (req, res) => {
-	const { taskId, isFileApproved, paths } = req.body
+	const { projectId, taskId, isFileApproved, paths } = req.body
 	try {
-		await Delivery.updateOne(
-				{
-					'tasks.taskId': taskId,
-					'tasks.files.path': { $in: paths }
-				},
-				{
-					'tasks.$[i].files.$[j].isFileApproved': isFileApproved
-				},
-				{
-					arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': { $in: paths } } ]
-				})
-		res.send('done')
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.files.path": { $in: paths } },
+      { "tasksDR1.$[i].files.$[j].isFileApproved": isFileApproved },
+      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': { $in: paths } } ]}
+    )
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on approve files')
@@ -709,18 +704,16 @@ router.post('/approve-files', async (req, res) => {
 // })
 router.post('/delivery-comments', async (req, res) => {
 	const { projectId, taskId, comment } = req.body
-
-  console.log({ projectId, taskId, comment })
-
-    res.send('s')
-	// try {
-	// 	const query = "comments.${ taskStatus }.comment`
-	// 	await Delivery.updateOne({ 'projectId': projectId }, { [query]: comment })
-	// 	res.send('done')
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on approve files')
-	// }
+  try{
+    const updatedProject = await getProjectAfterUpdate(
+      {"_id": projectId, "tasksDR1.taskId": taskId},
+      { $set: {"tasksDR1.$.comment": comment}}
+    )
+    res.send(updatedProject)
+  }catch(err){
+    console.log(err)
+    res.status(500).send('Error on delivery-comments')
+  }
 })
 
 router.post('/generate-certificate', async (req, res) => {
@@ -739,40 +732,21 @@ router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, re
 	try {
 		const files = req.files['targetFile']
 		const newPath = await manageDeliveryFile({ fileData, file: files[0] })
+    const fileName = newPath.split("/").pop()
 		if (!!fileData.path) {
-			await Delivery.updateOne(
-					{
-						'projectId': fileData.projectId,
-						'tasks.taskId': fileData.taskId,
-						'tasks.files.path': fileData.path
-					},
-					{
-						'tasks.$[i].files.$[j]': {
-							isFileApproved: false,
-							isOriginal: false,
-							fileName: files[0].filename,
-							path: newPath
-						}
-					},
-					{ arrayFilters: [ { 'i.taskId': fileData.taskId }, { 'j.path': fileData.path } ] })
+      await Projects.updateOne(
+        { "_id": fileData.projectId, 'tasksDR1.taskId': fileData.taskId, "tasksDR1.files.path": fileData.path  },
+        { "tasksDR1.$[i].files.$[j]": {isFileApproved: false, fileName: fileName, path: newPath }},
+        { arrayFilters: [ { 'i.taskId': fileData.taskId }, { 'j.path': fileData.path } ] }
+      )
 		} else {
-			await Delivery.updateOne(
-					{
-						'projectId': fileData.projectId,
-						'tasks.taskId': fileData.taskId
-					},
-					{
-						$push: {
-							'tasks.$.files': {
-								isFileApproved: false,
-								isOriginal: false,
-								fileName: files[0].filename,
-								path: newPath
-							}
-						}
-					})
+      await Projects.updateOne(
+        { "_id": fileData.projectId, 'tasksDR1.taskId': fileData.taskId },
+        { $push: { 'tasksDR1.$.files': { isFileApproved: false, isOriginal: false, fileName: fileName, path: newPath }}}
+      )
 		}
-		res.send('uploaded')
+    const updatedProject = await getProject({"_id": fileData.projectId})
+    res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on uploading target file')
@@ -780,24 +754,18 @@ router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, re
 })
 
 router.post('/remove-dr-file', async (req, res) => {
-	const { taskId, path, isOriginal } = req.body
+	const { taskId, path, projectId } = req.body
 	try {
-		await Delivery.updateOne(
-				{
-					'tasks.taskId': taskId,
-					'tasks.files.path': path
-				},
-				{ $pull: { 'tasks.$[i].files': { path } } },
-				{ arrayFilters: [ { 'i.taskId': taskId } ] }
-		)
-		if (!isOriginal) {
-			fs.unlink(`./dist${ path }`, (err) => {
-				if (err) throw(err)
-				res.send('done')
-			})
-		} else {
-			res.send('done')
-		}
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.files.path': path },
+      { $pull: { 'tasksDR1.$[i].files': { path } }},
+      { arrayFilters: [ { 'i.taskId': taskId } ] }
+    )
+    fs.unlink(`./dist${ path }`, (err) => {
+      if (err) throw(err)
+    })
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on removing dr file')

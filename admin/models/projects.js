@@ -122,6 +122,10 @@ const ProjectsSchema = new mongoose.Schema({
         isFileApproved: {
           type: Boolean,
           default: false
+        },
+        isFilePushedDR2: {
+          type: Boolean,
+          default: false
         }
       }
     ],

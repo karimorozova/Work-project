@@ -6,13 +6,11 @@ const {
 } = require('../../models')
 
 
-router.post('/singleLang', async (req, res) => {
-  const DR1Info  = req.body
-
+router.post('/file-dr2-push', async (req, res) => {
+  const {projectId, taskId, dr1Manager, dr2Manager, files} = req.body
   try {
-    const DR2 =  await addDR2(DR1Info)
-
-    res.send( DR2 )
+    const DR2 =  await addDR2({projectId, taskId, dr1Manager, dr2Manager, files})
+    res.send( 'DR2' )
   } catch (err) {
     console.log(err)
     res.status(500).send('Error on cancelling tasks / cancel-tasks')

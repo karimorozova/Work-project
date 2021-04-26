@@ -5,57 +5,45 @@ const {
   Languages
 } = require('../models')
 
+const {
+  getProjectAfterUpdate,
+} = require('./getProjects')
 
-async function addDR2({projectId, dr1Info}) {
-  const {taskId, dr1Manager, dr2Manager, files} = dr1Info
+
+async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
+
   const allLang =  await Languages.find({})
-  const project = await Projects.findOne({_id: projectId})
+  const {tasks, tasksDR2 : { singleLang }} = await Projects.findOne({_id: projectId})
 
-  const task = project.tasks.find(({taskId}) => taskId === dr1Info.taskId)
-  const sourceLang = allLang.find(({symbol}) =>  task.sourceLanguage === symbol)
-  const targetLang = allLang.find(({symbol}) =>  task.targetLanguage === symbol)
+  const {sourceLanguage, targetLanguage} = tasks.find(({taskId: tId}) => tId === taskId)
+  const sourceLang = allLang.find(({symbol}) =>  sourceLanguage === symbol)
+  const targetLang = allLang.find(({symbol}) =>  targetLanguage === symbol)
+
   let fileInfo = []
-
-  for(const file of files){
-    const {_id, ...fileWithoutId} = file
-    fileInfo.push({
-      ...fileWithoutId,
-      taskId,
-      dr1Manager,
-      dr2Manager,
-    })
+  for(const { _id, ...fileWithoutId } of files){
+    fileInfo.push({ ...fileWithoutId, taskId, dr1Manager, dr2Manager })
   }
 
+  if (singleLang.length > 0) {
+    const singleLangIndex = singleLang
+      .findIndex( ({ sourceLanguage, targetLanguage }) => `${sourceLanguage}-${targetLanguage}` === `${sourceLang._id}-${targetLang._id}` )
 
-  if (project.tasksDR2.singleLang.length > 0) {
-    const singleLangIndex =
-      project
-        .tasksDR2
-        .singleLang
-        .findIndex(({ sourceLanguage, targetLanguage }) =>
-          sourceLanguage.toString() === sourceLang._id.toString()
-          && targetLanguage.toString() === targetLang._id.toString()
-        )
+    if (singleLangIndex > -1) singleLang[singleLangIndex].files = [ ...singleLang[singleLangIndex].files, ...fileInfo ]
+    else pushFile(sourceLang, targetLang, fileInfo)
 
-    if (singleLangIndex > -1) {
-      project.tasksDR2.singleLang[singleLangIndex].files = [...project.tasksDR2.singleLang[singleLangIndex].files,...fileInfo]
-    }else {
-      project.tasksDR2.singleLang.push({
-        sourceLanguage: sourceLang._id,
-        targetLanguage: targetLang._id,
-        files: fileInfo
-      })
-    }
   } else {
-    project.tasksDR2.singleLang.push({
+    pushFile(sourceLang, targetLang, fileInfo)
+  }
+
+  return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.singleLang" : singleLang } )
+
+  function pushFile(sourceLang, targetLang, fileInfo){
+    singleLang.push({
       sourceLanguage: sourceLang._id,
       targetLanguage: targetLang._id,
       files: fileInfo
     })
   }
-
-   await project.save()
-  return project.tasksDR2
 }
 
 module.exports = {addDR2}

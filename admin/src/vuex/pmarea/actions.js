@@ -110,37 +110,14 @@ export const approveInstruction = async ({ dispatch }, payload) => {
 export const approveDeliveryFile = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
-		const { taskId, isFileApproved, paths } = payload;
-		await Vue.http.post("/pm-manage/approve-files", { taskId, isFileApproved, paths });
+		const {projectId, taskId, isFileApproved, paths } = payload;
+		const updatedProject = await Vue.http.post("/pm-manage/approve-files", {projectId, taskId, isFileApproved, paths });
+    await dispatch('setCurrentProject', updatedProject.data);
 		dispatch('alertToggle', { message: "File check updated!", isShow: true, type: "success" });
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
 		dispatch('decrementRequestCounter');
-	}
-}
-
-export const removeDrFile = async ({ dispatch }, payload) => {
-	dispatch('incrementRequestCounter')
-	try {
-		await Vue.http.post("/pm-manage/remove-dr-file", { ...payload });
-		dispatch('alertToggle', { message: "File removed!", isShow: true, type: "success" })
-	} catch (err) {
-		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
-	} finally {
-		dispatch('decrementRequestCounter')
-	}
-}
-
-export const uploadTarget = async ({ dispatch }, payload) => {
-	dispatch('incrementRequestCounter')
-	try {
-		await Vue.http.post("/pm-manage/target", payload);
-		dispatch('alertToggle', { message: "Files updated!", isShow: true, type: "success" })
-	} catch (err) {
-		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
-	} finally {
-		dispatch('decrementRequestCounter')
 	}
 }
 

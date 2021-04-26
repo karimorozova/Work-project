@@ -63,19 +63,18 @@
       .split-line
       .review__forbidden(v-if="isReviewing")
 
-    //.review__table
-      .review__forbidden(v-if="isReviewing")
-      Table(
+    .review__table
+      //.review__forbidden(v-if="isReviewing")
+      TableDR1(
         :task="task"
-        :isReviewing="isReviewing"
         :files="files"
         @approveFile="approveFile"
         @approveFiles="approveFiles"
         @uploadFile="uploadFile"
         @checkAll="checkAllFiles"
         @checkFile="checkFile"
-        @updateDeliveryData="getDeliveryData"
-        @generateCertificate="generateCertificate"
+        @removeFile="removeFile"
+        @deliverFile="deliverFile"
       )
 
     .review__options
@@ -108,11 +107,12 @@
 	import CKEditor from "ckeditor4-vue"
 	import { mapGetters, mapActions } from "vuex"
 	import Drops from "../review/Drops"
-	import Table from "../review/Table"
+	// import Table from "../review/Table"
 	import Check from "../review/Check"
 	import _ from "lodash"
 	import editorConfig from "../../../mixins/editorConfig"
   import DropsDR1 from "../review/DropsDR1";
+  import TableDR1 from "../review/TableDR1";
 
 	const Options = () => import("../review/Options")
 	const CheckBox = () => import("@/components/CheckBox")
@@ -130,7 +130,7 @@
 		},
 		data() {
 			return {
-				editorData: "",
+        editorData: "",
 				areFilesChecked: false,
 				areFilesConverted: false,
 				areOptions: true,
@@ -157,13 +157,14 @@
 			...mapActions([
 				"approveInstruction",
 				"approveDeliveryFile",
-				"uploadTarget",
+				// "uploadTarget",
 				"approveWithOption",
 				"approveDeliverable",
 				"assignDr2",
 				"changeReviewManager",
 				// "rollBackReview",
-				"alertToggle"
+				"alertToggle",
+        "setCurrentProject"
 			]),
 			// async generateCertificate() {
 			// 	try {
@@ -177,15 +178,23 @@
 			// 		this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
 			// 	}
 			// },
+      async removeFile(file){
+			  try{
+			    const updatedProject = await this.$http.post("/pm-manage/remove-dr-file", {...file, projectId: this.project._id});
+          await this.updatedFiles(updatedProject)
+          this.alertToggle({ message: "File removed!", isShow: true, type: "success" })
+        }catch (err){
+          this.alertToggle({ message: "Error on remove DR1 Files", isShow: true, type: "error" })
+        }
+      },
 			async sendMessage() {
-        console.log({comment: this.deliveryTask.comment})
 				try {
-					await this.$http.post('/pm-manage/delivery-comments', {
+					const updatedProject = await this.$http.post('/pm-manage/delivery-comments', {
 						projectId: this.project._id,
             taskId: this.deliveryTask.taskId,
 						comment: this.deliveryTask.comment
-						// taskStatus: this.task.status === 'Pending Approval [DR2]' ? 'dr2' : 'dr1',
 					})
+          await this.setCurrentProject(updatedProject.data);
 					this.alertToggle({ message: "Comment updated!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Comment not updated!", isShow: true, type: "error" })
@@ -242,9 +251,7 @@
 			// 	this.isNotify = false
 			// },
 			checkAllFiles({ bool }) {
-				this.files = this.files.map(item => {
-					return { ...item, isChecked: bool }
-				})
+			  this.files = this.files.map(item => ({ ...item, isChecked: bool }))
 			},
 			checkFile({ index, bool }) {
 				this.files[index].isChecked = bool
@@ -252,39 +259,58 @@
 			popupRollback() {
 				this.isModal = true
 			},
+      async updatedFiles(updatedProject){
+        const deliveryTask = updatedProject.data.tasksDR1.find(item => item.taskId === this.deliveryTask.taskId)
+        this.files = deliveryTask.files
+          .map(item => ({ ...item, taskId: this.task.taskId, pair: `${this.task.sourceLanguage} >> ${this.task.targetLanguage}`, isChecked: false }))
+      },
 			async uploadFile({ file, index }) {
-				await this.checkPermission()
-				if (this.isReviewing) return
-				const { path, isOriginal } = index !== undefined ? this.files[index] : { path: "", isOriginal: false }
+				const { path } = index !== undefined ? this.files[index] : { path: "", isOriginal: false }
 				const fileData = new FormData()
 				fileData.append("targetFile", file)
 				fileData.append("projectId", this.project._id)
 				fileData.append("path", path)
 				fileData.append("taskId", this.task.taskId)
-				fileData.append("isOriginal", isOriginal)
 				try {
-					await this.uploadTarget(fileData)
-					await this.getDeliveryData()
+				  const updatedProject = await this.$http.post("/pm-manage/target", fileData)
+          await this.setCurrentProject(updatedProject.data);
+          await this.updatedFiles(updatedProject)
 				} catch (err) {
 				}
 			},
+      async deliverFile(index){
+        this.files[index].isFilePushedDR2 = !this.files[index].isFilePushedDR2
+        const { dr1Manager, dr2Manager, taskId } = this.deliveryTask
+        try {
+          await this.$http.post('/delivery/file-dr2-push', {
+              projectId: this.project._id,
+              taskId,
+              dr1Manager,
+              dr2Manager,
+              files: [this.files[index]]
+            })
+        }catch (err){
+        }
+        // console.log(this.files[index])
+        // this.files[index].isFileApproved = !this.files[index].isFileApproved
+      },
 			async approveFile({ index }) {
-				await this.checkPermission()
-				if (this.isReviewing) return
+				// await this.checkPermission()
+				// if (this.isReviewing) return
 				this.files[index].isFileApproved = !this.files[index].isFileApproved
 				const { taskId, isFileApproved, path } = this.files[index]
 				try {
-					await this.approveDeliveryFile({ taskId, isFileApproved, paths: [ path ] })
-					await this.getDeliveryData()
+					await this.approveDeliveryFile({ projectId: this.project._id, taskId, isFileApproved, paths: [ path ] })
+					// await this.getDeliveryData()
 				} catch (err) {
 				}
 			},
 			async approveFiles({ checked }) {
-				await this.checkPermission()
-				if (this.isReviewing) return
+				// await this.checkPermission()
+				// if (this.isReviewing) return
 				const paths = checked.map(item => item.path)
-				await this.approveDeliveryFile({ taskId: this.task.taskId, isFileApproved: true, paths })
-				await this.getDeliveryData()
+				await this.approveDeliveryFile({ projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, paths })
+				// await this.getDeliveryData()
 			},
 			// async checkPermission() {
 			// 	if (!this.isReviewing) {
@@ -390,10 +416,12 @@
 				return _.groupBy(this.deliveryTask.instructions, 'title')
 			},
 			isAllChecked() {
+        console.log('isAllChecked')
+        return true
 				// this.toggleOptions()
-				const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
-				const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
-				return !uncheckedInstructions.length && !uncheckedFiles.length
+				// const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
+				// const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
+				// return !uncheckedInstructions.length && !uncheckedFiles.length
 			},
 			dr() {
 				return this.task.status === "Pending Approval [DR1]" ? 1 : 2
@@ -405,15 +433,11 @@
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
 			}
 		},
-    watch: {
-      "deliveryTask.comment"(newValue, oldValue) {
-        console.log(newValue, oldValue)
-      }
-    },
 		components: {
+      TableDR1,
       DropsDR1,
 			Drops,
-			Table,
+			// Table,
 			Check,
 			Options,
 			CheckBox,
@@ -422,6 +446,8 @@
 			ckeditor: CKEditor.component
 		},
 		mounted() {
+		  this.files = this.deliveryTask.files
+        .map(item => ({ ...item, taskId: this.task.taskId, pair: `${this.task.sourceLanguage} >> ${this.task.targetLanguage}`, isChecked: false }))
 			// this.checkPermission()
 			// 		.then(res => this.getDeliveryData())
 		}

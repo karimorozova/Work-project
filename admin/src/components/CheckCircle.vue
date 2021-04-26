@@ -24,7 +24,7 @@ export default {
 
 .check-circle {
     &__icon {
-        font-size: 18px;
+        font-size: 17px;
         color: $light-brown;
         cursor: pointer;
     }
@@ -32,7 +32,7 @@ export default {
         position: absolute;
     }
     &_green {
-        color: $green-approve;        
+        color: $green-approve;
     }
 }
 
