@@ -279,16 +279,18 @@
 				}
 			},
       async deliverFile(index){
+			  const projectId = this.project._id
         this.files[index].isFilePushedDR2 = !this.files[index].isFilePushedDR2
         const { dr1Manager, dr2Manager, taskId } = this.deliveryTask
+        const { path, isFilePushedDR2 } = this.files[index]
+        const { sourceLanguage, targetLanguage } = this.task
         try {
-          await this.$http.post('/delivery/file-dr2-push', {
-              projectId: this.project._id,
-              taskId,
-              dr1Manager,
-              dr2Manager,
-              files: [this.files[index]]
-            })
+			    if(isFilePushedDR2) {
+            await this.$http.post('/delivery/file-dr2-push', { projectId, taskId, dr1Manager, dr2Manager, files: [ this.files[index] ] } )
+          }else{
+            await this.$http.post('/delivery/file-dr2-pull', { projectId, taskId, path, sourceLanguage, targetLanguage })
+          }
+          await this.$http.post('/pm-manage/is-file-pushed-dr2',{projectId, taskId, isFilePushedDR2, paths: [ path ]})
         }catch (err){
         }
         // console.log(this.files[index])

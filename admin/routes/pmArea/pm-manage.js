@@ -692,6 +692,21 @@ router.post('/approve-files', async (req, res) => {
 		res.status(500).send('Error on approve files')
 	}
 })
+router.post('/is-file-pushed-dr2', async (req, res) => {
+  const { projectId, taskId, isFilePushedDR2, paths } = req.body
+  try {
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.files.path": { $in: paths } },
+      { "tasksDR1.$[i].files.$[j].isFilePushedDR2": isFilePushedDR2 },
+      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': { $in: paths } } ]}
+    )
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on approve files')
+  }
+})
 // router.get('/delivery-comments/:projectId', async (req, res) => {
 // 	const { projectId } = req.params
 // 	try {

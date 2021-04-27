@@ -46,6 +46,25 @@ async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
   }
 }
 
+const removeDR2 = async ({projectId, taskId, path, sourceLanguage: source, targetLanguage: target}) => {
+  const allLang = await Languages.find()
+  const { tasksDR2 : { singleLang } } = await Projects.findOne({_id: projectId})
+  const idx = singleLang
+    .findIndex( ({ sourceLanguage, targetLanguage }) => `${sourceLanguage}-${targetLanguage}` === `${langId(source)}-${langId(target)}`)
+
+  const { files: notFilteredFiles } = singleLang[idx]
+  singleLang[idx].files = notFilteredFiles
+    .filter(file => file.path !== path && file.taskId !== taskId)
+
+  if(!singleLang[idx].files.length) singleLang.splice(idx, 1)
+
+  return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.singleLang" : singleLang } )
+
+  function langId(langSymbol){
+    return allLang.find(({symbol}) => langSymbol === symbol)._id
+  }
+}
+
 async function addMultiLangDR2({projectId, taskIds, file}) {
   let multiLang = {
     tasks: taskIds,
@@ -57,4 +76,4 @@ async function addMultiLangDR2({projectId, taskIds, file}) {
   return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.singleLang" : multiLang } )
 }
 
-module.exports = {addDR2, addMultiLangDR2}
+module.exports = {addDR2, addMultiLangDR2, removeDR2}
