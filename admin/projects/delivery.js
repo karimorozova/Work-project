@@ -46,4 +46,15 @@ async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
   }
 }
 
-module.exports = {addDR2}
+async function addMultiLangDR2({projectId, taskIds, file}) {
+  let multiLang = {
+    tasks: taskIds,
+    file: {
+      ...file
+    }
+  }
+
+  return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.singleLang" : multiLang } )
+}
+
+module.exports = {addDR2, addMultiLangDR2}

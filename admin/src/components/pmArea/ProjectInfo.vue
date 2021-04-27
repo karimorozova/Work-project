@@ -27,6 +27,8 @@
             @closeErrors="closeErrorsBlock"
           )
         .project-info__all-info
+          Deliverables
+        .project-info__all-info
           ProjectFinance
       .project-info__action
         ProjectAction(
@@ -51,6 +53,7 @@
 	const Preview = () => import("./Preview");
 	import { mapGetters, mapActions } from 'vuex';
 	import ProjectSubInformation from './ProjectSubInformation';
+	import Deliverables from './Deliverables';
 
 	export default {
 		data() {
@@ -308,7 +311,8 @@
 			TasksAndSteps,
 			ProjectFinance,
 			Preview,
-			ProjectSubInformation
+			ProjectSubInformation,
+      Deliverables
 		},
 		async created() {
 			await this.getProject();
