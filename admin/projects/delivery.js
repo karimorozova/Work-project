@@ -5,6 +5,8 @@ const {
   Languages
 } = require('../models')
 
+const { dr2Instructions } = require('../enums/deliveryInstructions');
+
 const {
   getProjectAfterUpdate,
 } = require('./getProjects')
@@ -20,8 +22,15 @@ async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
   const targetLang = allLang.find(({symbol}) =>  targetLanguage === symbol)
 
   let fileInfo = []
-  for(const { _id, ...fileWithoutId } of files){
-    fileInfo.push({ ...fileWithoutId, taskId, dr1Manager, dr2Manager })
+  for(const { _id, ...fileWithoutId  } of files){
+    fileInfo.push({
+      ...fileWithoutId,
+      isFileApproved: false,
+      isChecked: false,
+      taskId,
+      dr1Manager,
+      dr2Manager
+    })
   }
 
   if (singleLang.length > 0) {
@@ -41,7 +50,8 @@ async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
     singleLang.push({
       sourceLanguage: sourceLang._id,
       targetLanguage: targetLang._id,
-      files: fileInfo
+      files: fileInfo,
+      instructions: dr2Instructions
     })
   }
 }

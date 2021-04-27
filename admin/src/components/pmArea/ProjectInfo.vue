@@ -26,7 +26,7 @@
             :isAbsolute="isBlockAbsoulte"
             @closeErrors="closeErrorsBlock"
           )
-        .project-info__all-info
+        .project-info__all-info(v-if="currentProject._id")
           Deliverables
         .project-info__all-info
           ProjectFinance

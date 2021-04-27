@@ -134,7 +134,7 @@
 			user: { type: Object },
 			users: { type: Array },
 			project: { type: Object },
-			index: { type: Number },
+			id: { type: String },
 		},
 		data() {
 			return {

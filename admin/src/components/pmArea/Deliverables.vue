@@ -1,7 +1,7 @@
 <template lang="pug">
   .deliverables
     .deliverables__DR2(v-if="isDR2Modal")
-      DeliveryTwo(:user="user" :users="users" :project="currentProject" :index="currentIndex" @close="closeDR2")
+      DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" @close="closeDR2")
     .deliverables__modal(v-if="deliverablesModal")
       .deliverables__title Upload Deliverables
       span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
@@ -41,7 +41,7 @@
     .deliverables-table
     DataTable(
       :fields="fields"
-      :tableData="currentProject.tasksDR2.singleLang"
+      :tableData="deliverables"
       :bodyClass="['review-body', {'tbody_visible-overflow': currentProject.tasksDR2.singleLang.length < 6}]"
       :tableheadRowClass="currentProject.tasksDR2.singleLang.length < 6 ? 'tbody_visible-overflow' : ''"
       :headCellClass="'padding-with-check-box'"
@@ -51,14 +51,14 @@
       .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
-      .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ getLangPair(row, 'lang') }}
+      .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
-      .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
+      .deliverables-table__data(slot="task" slot-scope="{ row }") {{ row.tasks }}
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
         .deliverables-table__icons
             img.deliverables-table__icon(
               :src="icon.src"
-              @click="openDR2(index)")
+              @click="openDR2(row)")
     Add(@add="showModal")
 </template>
 
@@ -67,9 +67,10 @@ import DataTable from "../DataTable";
 import Add from "../Add";
 import Button from "../Button";
 import FilesUpload from "./tasks-n-steps/tasksFiles/FilesUpload"
-import { mapGetters } from "vuex"
+import {mapGetters} from "vuex"
 import SelectMulti from "../SelectMulti";
 import DeliveryTwo from "./tasks-n-steps/DeliveryTwo";
+
 export default {
   data() {
     return {
@@ -86,16 +87,18 @@ export default {
       selectedTasks: [],
       isTableDropMenu: true,
       isDR2Modal: false,
-      currentIndex: null,
+      currentReviewId: null,
+      currentReviewType: null,
     }
   },
   methods: {
-    openDR2(index) {
-      this.currentIndex = index
+    openDR2({_id, type}) {
+      this.currentIndex = _id
+      this.currentReviewType = type
       this.isDR2Modal = true
     },
     closeDR2() {
-      this.currentIndex = null
+      this.currentIndex = this.currentReviewType  = null
       this.isDR2Modal = false
     },
     getLangPair(row, type) {
@@ -163,6 +166,35 @@ export default {
       users: 'getUsers',
       user: 'getUser',
     }),
+    deliverables(){
+      if(!this.currentProject.hasOwnProperty('tasksDR2')) return []
+
+      const { tasksDR2 } = this.currentProject
+
+      const singleLang = tasksDR2.hasOwnProperty('singleLang') ?
+        tasksDR2.singleLang.map(item => {
+        return {
+          _id: item._id,
+          type: 'single',
+          tasks: item.files.map(item => item.taskId),
+          pair: this.getLangPair(item, 'lang'),
+          files: item.files
+        }
+      }) : []
+
+      const multiLang = tasksDR2.hasOwnProperty('multiLang') ?
+        tasksDR2.multiLang.map(item => {
+        return {
+          _id: item._id,
+          type: 'multi',
+          tasks: item.tasks,
+          pair: 'multilingual',
+          files: [item.files]
+        }
+      }) : []
+
+      return [ ...singleLang, ...multiLang ]
+    },
     selectTaskInfo() {
       if(!this.currentProject || !this.currentProject.tasksDR2 || !this.currentProject.tasksDR2.singleLang) return []
       let result = new Set()

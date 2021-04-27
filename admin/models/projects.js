@@ -136,6 +136,10 @@ const ProjectsSchema = new mongoose.Schema({
         type: Date,
         default: new Date()
       },
+      instructions: {
+        type: Array,
+        default: [],
+      },
       sourceLanguage: {
         type: Schema.Types.ObjectId,
         ref: 'Language'
