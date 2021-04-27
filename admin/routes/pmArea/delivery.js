@@ -10,6 +10,7 @@ const {
   Projects
 } = require('../../models')
 
+const { upload } = require('../../utils');
 
 router.post('/file-dr2-push', async (req, res) => {
   const {projectId, taskId, dr1Manager, dr2Manager, files} = req.body
@@ -33,7 +34,7 @@ router.post('/file-dr2-pull', async (req, res) => {
   }
 })
 
-router.post('/multi-file-dr2-push', async (req, res) => {
+router.post('/multi-file-dr2-push',upload.fields([ { name: 'reqFile' } ]), async (req, res) => {
   const {projectId, taskIds, dr1Manager, dr2Manager} = req.body
   const { reqFile } = req.files
 

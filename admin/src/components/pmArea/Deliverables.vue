@@ -1,40 +1,42 @@
 <template lang="pug">
   .deliverables
+    .deliverables__DR2(v-if="isDR2Modal")
+      DeliveryTwo(:user="user" :users="users" :project="currentProject" :index="currentIndex" @close="closeDR2")
     .deliverables__modal(v-if="deliverablesModal")
       .deliverables__title Upload Deliverables
       span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
-      .deliverables__item
-        span Upload deliverables:
-        span.tasks-files__label-red
-        .tasks-files__upload-file
-          FilesUpload(
-            buttonValue="Upload deliverables"
-            inputClass="files-upload__ref-file"
-            :files="refFiles"
-            @uploadFiles="uploadRefFiles"
-            @deleteFile="(e) => deleteFile(e, 'refFiles')"
+      .deliverables__body
+        .deliverables__select
+          SelectMulti(
+            placeholder="Select"
+            :options="selectTaskInfo"
+            :selectedOptions="selectedTasks"
+            @chooseOptions="selectedTasksMethod"
           )
-      .tasks-files__fileItem
-        .deliverable__wrapper
-          .file-list__items(v-for="(file, index) in refFiles")
-            .file-list__item
-              .file-list__name {{file.name}}
-              span.file-list__delete(@click="deleteFile(index)") &#x2715
+        .deliverables__items
+          .deliverables__item
+            span Upload deliverables:
+            span.tasks-files__label-red
+            .tasks-files__upload-file
+              FilesUpload(
+                buttonValue="Upload deliverables"
+                inputClass="files-upload__ref-file"
+                :files="refFiles"
+                @uploadFiles="uploadRefFiles"
+                @deleteFile="(e) => deleteFile(e, 'refFiles')"
+              )
+          .tasks-files__fileItem
+            .deliverable__wrapper
+              .file-list__items(v-for="(file, index) in refFiles")
+                .file-list__item
+                  .file-list__name {{file.name}}
+                  span.file-list__delete(@click="deleteFile(index)") &#x2715
 
-      SelectMulti(
-        :isTableDropMenu="isTableDropMenu"
-        placeholder="Select"
-        :hasSearch="true"
-        :options="selectTaskInfo"
-        :selectedOptions="selectedTasks"
-        @chooseOptions="selectedTasksMethod"
-        :allOptionsButtons="true"
-      )
+          .tasks-files__button(v-if="refFiles.length")
+            Button(:value="'Upload'" @clicked="uploadFiles")
+          .tasks-files__tooltip Each file can be <= 50Mb
+          .tasks-files__tooltip (otherwise it will not be loaded)
 
-      .tasks-files__button(v-if="refFiles.length")
-        Button(:value="'Upload'" @clicked="uploadFiles")
-      .tasks-files__tooltip Each file can be <= 50Mb
-      .tasks-files__tooltip (otherwise it will not be loaded)
     .deliverables__title Deliverables
     .deliverables-table
     DataTable(
@@ -54,10 +56,9 @@
       .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
         .deliverables-table__icons
-          template(v-for="(icon, key) in icons")
             img.deliverables-table__icon(
               :src="icon.src"
-              @click="makeOneAction(index, key)")
+              @click="openDR2(index)")
     Add(@add="showModal")
 </template>
 
@@ -68,6 +69,7 @@ import Button from "../Button";
 import FilesUpload from "./tasks-n-steps/tasksFiles/FilesUpload"
 import { mapGetters } from "vuex"
 import SelectMulti from "../SelectMulti";
+import DeliveryTwo from "./tasks-n-steps/DeliveryTwo";
 export default {
   data() {
     return {
@@ -77,17 +79,25 @@ export default {
         { label: "Task Id", headerKey: "headerTask", key: "task", width: "30%", padding: 0 },
         { label: "Delivery", headerKey: "headerAction", key: "action", width: "10%", padding: 0 },
       ],
-      icons: {
-        send: { src: require("../../assets/images/delivery-review-icon.png") },
-      },
+      icon: { src: require("../../assets/images/delivery-review-icon.png") },
       deliverablesModal: false,
       refFilesForDelete: [],
       refFiles: [],
       selectedTasks: [],
-      isTableDropMenu: true
+      isTableDropMenu: true,
+      isDR2Modal: false,
+      currentIndex: null,
     }
   },
   methods: {
+    openDR2(index) {
+      this.currentIndex = index
+      this.isDR2Modal = true
+    },
+    closeDR2() {
+      this.currentIndex = null
+      this.isDR2Modal = false
+    },
     getLangPair(row, type) {
       const source = this.allLang.find(({_id}) => row.sourceLanguage.toString() === _id.toString())
       const target = this.allLang.find(({_id}) => row.targetLanguage.toString() === _id.toString())
@@ -137,14 +147,21 @@ export default {
     deleteFile(index) {
       this.refFiles.splice(index, 1)
     },
-    selectedTasksMethod( ){
-
+    selectedTasksMethod({ option }) {
+      const position = this.selectedTasks.indexOf(option);
+      if(position !== -1) {
+        this.selectedTasks.splice(position, 1);
+      } else {
+        this.selectedTasks.push(option);
+      }
     }
   },
   computed: {
     ...mapGetters({
       currentProject: 'getCurrentProject',
       allLang: 'getAllLanguages',
+      users: 'getUsers',
+      user: 'getUser',
     }),
     selectTaskInfo() {
       if(!this.currentProject || !this.currentProject.tasksDR2 || !this.currentProject.tasksDR2.singleLang) return []
@@ -152,20 +169,15 @@ export default {
       for(let test of this.currentProject.tasksDR2.singleLang) {
         const langPair = this.getLangPair(test, 'symbol')
           for(let file of test.files) {
-            result.add(`${file.taskId.substring(file.taskId.length - 3)} ${langPair}`)
+            result.add(`${file.taskId}`)
           }
       }
-      // const test =  this.currentProject.tasksDR2.singleLang.reduce((accumulator, currentValue)=> {
-      //   const langPair = this.getLangPair(currentValue, 'symbol')
-      //   currentValue.files.forEach((file)=> {
-      //     accumulator.push(`${file.taskId.substring(file.taskId.length - 3)} ${langPair}`)
-      //   })
-      // }, [])
       console.log([...result])
       return Array.from(result)
     }
   },
   components: {
+    DeliveryTwo,
     SelectMulti,
     DataTable,
     Add,
@@ -188,6 +200,21 @@ export default {
   box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   position: relative;
 
+  &__DR2 {
+    position: absolute;
+    top: -230px;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: fit-content;
+    padding-bottom: 150px;
+  }
+
   &__title{
     font-size: 22px;
     margin-bottom: 20px;
@@ -195,6 +222,12 @@ export default {
     justify-content: space-between;
     align-items: center;
   }
+
+  &__select {
+    position: relative;
+    height: 32px;
+  }
+
   &-table {
     width: 100%;
     box-sizing: border-box;
