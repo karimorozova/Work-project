@@ -290,7 +290,8 @@
           }else{
             await this.$http.post('/delivery/file-dr2-pull', { projectId, taskId, path, sourceLanguage, targetLanguage })
           }
-          await this.$http.post('/pm-manage/is-file-pushed-dr2',{projectId, taskId, isFilePushedDR2, paths: [ path ]})
+          const updatedProject = await this.$http.post('/pm-manage/is-file-pushed-dr2',{projectId, taskId, isFilePushedDR2, paths: [ path ]})
+          await this.setCurrentProject(updatedProject.data);
         }catch (err){
         }
         // console.log(this.files[index])
