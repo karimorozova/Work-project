@@ -4,7 +4,8 @@ const {storeFiles} = require("../../projects/files");
 const {
   addDR2,
   addMultiLangDR2,
-  removeDR2
+  removeDR2,
+  removeMultiDR2,
 } = require("../../projects")
 const {
   Projects
@@ -34,18 +35,31 @@ router.post('/file-dr2-pull', async (req, res) => {
   }
 })
 
-router.post('/multi-file-dr2-push',upload.fields([ { name: 'reqFile' } ]), async (req, res) => {
+router.post('/multi-file-dr2-push',upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
   const {projectId, taskIds, dr1Manager, dr2Manager} = req.body
-  const { reqFile } = req.files
+  const { refFiles } = req.files
 
   try {
-    const file = await storeFiles(reqFile, projectId)
-    const DR2 =  await addMultiLangDR2({projectId, taskIds, dr1Manager, dr2Manager, file})
-    res.send( 'DR2' )
+    const DR2 =  await addMultiLangDR2({projectId, taskIds: JSON.parse(taskIds), dr1Manager, dr2Manager, refFiles})
+    res.send( DR2 )
   } catch (err) {
     console.log(err)
     res.status(500).send('Error on multi-file-dr2-push')
   }
+
+})
+
+router.post('/multi-file-dr2-remove', async (req, res) => {
+  const {projectId, dr2Id} = req.body
+
+  try {
+    const DR2 =  await removeMultiDR2({projectId, dr2Id})
+    res.send( DR2 )
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on multi-file-dr2-push')
+  }
+
 })
 
 module.exports = router

@@ -1,4 +1,6 @@
 const fs = require('fs')
+const {getProject} = require("./getProjects");
+const {moveProjectFile} = require("../utils/movingFile");
 
 const {
   Projects,
@@ -75,15 +77,53 @@ const removeDR2 = async ({projectId, taskId, path, sourceLanguage: source, targe
   }
 }
 
-async function addMultiLangDR2({projectId, taskIds, file}) {
+async function addMultiLangDR2({projectId, taskIds, refFiles}) {
+  const {projectManager, accountManager, tasksDR2} = await Projects.findOne({_id: projectId})
+
+
+  const file = (await storeFile(refFiles[0], projectId))[0]
+
   let multiLang = {
     tasks: taskIds,
+    dr1Manager: projectManager,
+    dr2Manager: accountManager,
+    instructions: dr2Instructions,
     file: {
-      ...file
+      fileName: file.split('/').pop(),
+      path: file,
+      isFileApproved: false,
     }
   }
+// return "tesr";
+  return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.multiLang" : [...tasksDR2.multiLang, multiLang ] })
 
-  return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.singleLang" : multiLang } )
+  async function storeFile(file, projectId) {
+    try {
+      const additionFileInfo = `${Math.floor(Math.random()*100000)}`;
+      let storedFiles = [];
+      if (file) {
+        const newPath = `./dist/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
+        // const newPath = `./dist/projectFiles/${projectId}/${tasks.length + 1}-${file.filename.replace(/\s+/g, '_')}`;
+        await moveProjectFile(file, newPath);
+        storedFiles.push(newPath);
+      }
+      return storedFiles;
+    } catch(err) {
+      console.log(err);
+      console.log("Error in storeFiels")
+    }
+  }
 }
 
-module.exports = {addDR2, addMultiLangDR2, removeDR2}
+async function removeMultiDR2({projectId, dr2Id}) {
+  const {tasksDR2 : { multiLang }} = await Projects.findOne({_id: projectId})
+
+
+  const newMultiLang = multiLang.filter(({_id}) => _id.toString() !== dr2Id.toString())
+  const removedMultiLang = multiLang.filter(({_id}) => _id.toString() === dr2Id.toString())[0]
+  await fs.unlink(removedMultiLang.file.path, (err) => { if(err) console.log(err)});
+
+  return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.multiLang" : newMultiLang })
+}
+
+module.exports = {addDR2, addMultiLangDR2, removeDR2, removeMultiDR2}

@@ -1,7 +1,17 @@
 <template lang="pug">
   .deliverables
+    .deliverables__approveModal(v-if="isDeleteModal")
+      ApproveModal(
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="deleteDR2"
+        @notApprove="closeDeleteModal"
+        @close="closeDeleteModal"
+      )
+
     .deliverables__DR2(v-if="isDR2Modal")
-      DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" @close="closeDR2")
+      DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
     .deliverables__modal(v-if="deliverablesModal")
       .deliverables__title Upload Deliverables
       span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
@@ -19,22 +29,23 @@
             span.tasks-files__label-red
             .tasks-files__upload-file
               FilesUpload(
+                :isMulti="false"
                 buttonValue="Upload deliverables"
                 inputClass="files-upload__ref-file"
                 :files="refFiles"
                 @uploadFiles="uploadRefFiles"
-                @deleteFile="(e) => deleteFile(e, 'refFiles')"
+                @deleteFile="deleteFile()"
               )
           .tasks-files__fileItem
             .deliverable__wrapper
               .file-list__items(v-for="(file, index) in refFiles")
                 .file-list__item
                   .file-list__name {{file.name}}
-                  span.file-list__delete(@click="deleteFile(index)") &#x2715
+                  span.file-list__delete(@click="deleteFile()") &#x2715
 
-          .tasks-files__button(v-if="refFiles.length")
-            Button(:value="'Upload'" @clicked="uploadFiles")
-          .tasks-files__tooltip Each file can be <= 50Mb
+          .tasks-files__button
+            Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
+          .tasks-files__tooltip File can be <= 50Mb
           .tasks-files__tooltip (otherwise it will not be loaded)
 
     .deliverables__title Deliverables
@@ -42,8 +53,8 @@
     DataTable(
       :fields="fields"
       :tableData="deliverables"
-      :bodyClass="['review-body', {'tbody_visible-overflow': currentProject.tasksDR2.singleLang.length < 6}]"
-      :tableheadRowClass="currentProject.tasksDR2.singleLang.length < 6 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['review-body', {'tbody_visible-overflow': deliverables.length < 6}]"
+      :tableheadRowClass="deliverables.length < 6 ? 'tbody_visible-overflow' : ''"
       :headCellClass="'padding-with-check-box'"
     )
       .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
@@ -53,12 +64,16 @@
 
       .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
-      .deliverables-table__data(slot="task" slot-scope="{ row }") {{ row.tasks }}
+      .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
+        .i-table__icons(slot="icons" slot-scope="{ row, index }")
+          img.i-table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'i-table_opacity': isActive(key, index)}")
+
         .deliverables-table__icons
             img.deliverables-table__icon(
+              v-for="(icon, key) in getIcons(row)"
               :src="icon.src"
-              @click="openDR2(row)")
+              @click="dr2Action(row, key)")
     Add(@add="showModal")
 </template>
 
@@ -67,9 +82,10 @@ import DataTable from "../DataTable";
 import Add from "../Add";
 import Button from "../Button";
 import FilesUpload from "./tasks-n-steps/tasksFiles/FilesUpload"
-import {mapGetters} from "vuex"
+import {mapGetters,mapActions} from "vuex"
 import SelectMulti from "../SelectMulti";
 import DeliveryTwo from "./tasks-n-steps/DeliveryTwo";
+import ApproveModal from "../ApproveModal";
 
 export default {
   data() {
@@ -80,25 +96,69 @@ export default {
         { label: "Task Id", headerKey: "headerTask", key: "task", width: "30%", padding: 0 },
         { label: "Delivery", headerKey: "headerAction", key: "action", width: "10%", padding: 0 },
       ],
-      icon: { src: require("../../assets/images/delivery-review-icon.png") },
       deliverablesModal: false,
       refFilesForDelete: [],
       refFiles: [],
       selectedTasks: [],
       isTableDropMenu: true,
       isDR2Modal: false,
+      isDeleteModal: false,
       currentReviewId: null,
       currentReviewType: null,
     }
   },
   methods: {
-    openDR2({_id, type}) {
-      this.currentIndex = _id
-      this.currentReviewType = type
-      this.isDR2Modal = true
+    ...mapActions({
+      alertToggle: "alertToggle",
+      storeProject: "setCurrentProject",
+    }),
+    closeDeleteModal() {
+      this.refFiles = []
+      this.selectedTasks = []
+      this.isDeleteModal = false
+      this.currentReviewId = null
+    },
+    async deleteDR2() {
+      try {
+        const result = await this.$http.post('/delivery/multi-file-dr2-remove', {projectId: this.currentProject._id, dr2Id: this.currentReviewId})
+        this.storeProject(result.data)
+
+        this.closeDeleteModal()
+        this.alertToggle({ message: "Review deleted", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" })
+      } finally {
+        this.closeDeliverablesModal()
+      }
+    },
+    getIcons({type}) {
+      const icons =  {
+        dr2: {src: require("../../assets/images/delivery-review-icon.png") },
+      }
+      if (type === 'multi') {
+        icons.delete = {src: require("../../assets/images/Other/delete-icon-qa-form.png")}
+      }
+
+      return icons
+    },
+    dr2Action({_id, type}, key) {
+      this.currentReviewId = _id
+
+      switch (key) {
+        case "delete":
+          this.isDeleteModal = true
+          break;
+
+        case "dr2":
+          this.currentReviewType = type
+          this.isDR2Modal = true
+          break;
+
+      }
+
     },
     closeDR2() {
-      this.currentIndex = this.currentReviewType  = null
+      this.currentReviewId = this.currentReviewType  = null
       this.isDR2Modal = false
     },
     getLangPair(row, type) {
@@ -107,7 +167,7 @@ export default {
       return source[type] + " >> " + target[type]
     },
     getTasksId(row) {
-      const mySet = new Set(row.files.map(({taskId}) => taskId.substring(taskId.length - 3) ))
+      const mySet = new Set(row.tasks.map((field) => field.substring(field.length - 3) ))
       return [...mySet].join(', ')
     },
     showModal() {
@@ -119,36 +179,33 @@ export default {
     async uploadFiles() {
       let filesData = new FormData()
       filesData.append('projectId', this.currentProject._id)
-      const checkedTasks = this.currentProject.tasks.filter(item => item.isChecked)
-      filesData.append('checkedTasks', JSON.stringify(checkedTasks))
+      filesData.append('taskIds', JSON.stringify(this.selectedTasks))
       try {
-        if (this.refFiles.length) {
-          for (let file of this.refFiles) {
-            filesData.append('refFiles', file)
-          }
-        }
-        // const result = await this.$http.post('/pm-manage/upload-reference-files', filesData)
+          filesData.append('refFiles', this.refFiles[0])
+
+        const result = await this.$http.post('/delivery/multi-file-dr2-push', filesData)
         this.storeProject(result.data)
+
+        this.refFiles = []
+        this.selectedTasks = []
         this.alertToggle({ message: "Files saved", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" })
       } finally {
-        this.closeFileModal()
+        this.closeDeliverablesModal()
       }
     },
     uploadRefFiles({ files }) {
       const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 50)
       if (filteredFiles.length) {
-        for (let file of files) {
-          if (!this.refFiles.find(item => item.name === file.name)) this.refFiles.push(file)
-        }
+          this.refFiles = [files[0]]
       }
       if (!filteredFiles.length) {
         this.clearInputFiles(".files-upload__ref-file")
       }
     },
-    deleteFile(index) {
-      this.refFiles.splice(index, 1)
+    deleteFile() {
+      this.refFiles = []
     },
     selectedTasksMethod({ option }) {
       const position = this.selectedTasks.indexOf(option);
@@ -166,6 +223,9 @@ export default {
       users: 'getUsers',
       user: 'getUser',
     }),
+    checkMultiReview() {
+      return this.refFiles.length > 0 && this.selectedTasks.length > 0
+    },
     deliverables(){
       if(!this.currentProject.hasOwnProperty('tasksDR2')) return []
 
@@ -188,11 +248,10 @@ export default {
           _id: item._id,
           type: 'multi',
           tasks: item.tasks,
-          pair: 'multilingual',
-          files: [item.files]
+          pair: 'Multilingual',
+          files: [item.file]
         }
       }) : []
-
       return [ ...singleLang, ...multiLang ]
     },
     selectTaskInfo() {
@@ -209,6 +268,7 @@ export default {
     }
   },
   components: {
+    ApproveModal,
     DeliveryTwo,
     SelectMulti,
     DataTable,
@@ -231,6 +291,20 @@ export default {
   margin-top: 40px;
   box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   position: relative;
+
+  &__approveModal{
+    position: absolute;
+    z-index: 5555;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+  }
 
   &__DR2 {
     position: absolute;
@@ -303,7 +377,7 @@ export default {
 
     &__icons {
       width: 100%;
-      padding: 0 10px;
+      padding: 0 10px 0 0;
       box-sizing: border-box;
       display: flex;
       justify-content: space-around;

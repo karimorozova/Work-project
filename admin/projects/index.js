@@ -25,7 +25,8 @@ const { getProjectAfterFinanceUpdated, updateProjectFinanceOnDiscountsUpdate } =
 const {
   addDR2,
   addMultiLangDR2,
-  removeDR2
+  removeDR2,
+  removeMultiDR2,
 } = require('./delivery');
 
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
@@ -83,5 +84,6 @@ module.exports = {
   getPriceAfterApplyingDiscounts,
   regainWorkFlowStatusByStepId,
   addDR2,
-  addMultiLangDR2
+  addMultiLangDR2,
+  removeMultiDR2,
 }
