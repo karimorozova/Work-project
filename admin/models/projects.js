@@ -180,17 +180,13 @@ const ProjectsSchema = new mongoose.Schema({
     }],
     multiLang: [{
       tasks: [{type: String}],
-      dr1Manager: {
-        type: Schema.Types.ObjectId,
-        ref: "User"
-      },
-      dr2Manager: {
-        type: Schema.Types.ObjectId,
-        ref: "User"
-      },
       instructions: {
         type: Array,
         default: [],
+      },
+      closedAt: {
+        type: Date,
+        default: new Date()
       },
       file: {
         fileName: {
@@ -206,7 +202,15 @@ const ProjectsSchema = new mongoose.Schema({
         isFileApproved: {
           type: Boolean,
           default: false
-        }
+        },
+        dr1Manager: {
+          type: Schema.Types.ObjectId,
+          ref: "User"
+        },
+        dr2Manager: {
+          type: Schema.Types.ObjectId,
+          ref: "User"
+        },
       }
     }],
   },

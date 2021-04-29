@@ -85,13 +85,13 @@ async function addMultiLangDR2({projectId, taskIds, refFiles}) {
 
   let multiLang = {
     tasks: taskIds,
-    dr1Manager: projectManager,
-    dr2Manager: accountManager,
     instructions: dr2Instructions,
     file: {
       fileName: file.split('/').pop(),
       path: file,
       isFileApproved: false,
+      dr1Manager: projectManager,
+      dr2Manager: accountManager,
     }
   }
 // return "tesr";
