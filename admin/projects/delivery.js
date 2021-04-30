@@ -24,11 +24,10 @@ async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
   const targetLang = allLang.find(({symbol}) =>  targetLanguage === symbol)
 
   let fileInfo = []
-  for(const { _id, ...fileWithoutId  } of files){
+  for(const { _id, isFilePushedDR2, isChecked, ...fileWithoutId  } of files){
     fileInfo.push({
       ...fileWithoutId,
       isFileApproved: false,
-      isChecked: false,
       taskId,
       dr1Manager,
       dr2Manager

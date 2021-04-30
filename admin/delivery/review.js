@@ -3,17 +3,17 @@ const { managerNotifyMail } = require("../utils/mailTemplate");
 const { managerDr1Assigned , managerDr1Reassign } = require("../emailMessages/internalCommunication");
 const { getProjectAfterUpdate } = require('../projects')
 
-const dr1Instructions = [
-    {text: "Check files/work on Memoq to ensure all segments were translated and mark in green", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {text: "Run a QA to see if there are any warnings or comments left by the vendors", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {text: "If there are any failures in the QA- please contact the vendors to modify the output, and re start the PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {text: "Check that the terms are translated according to the client's instructions, and that any character limitations have been followed", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {text: "If QA pass - Complete PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
-    {text: "Open file to see if all is OK", title: "Download deliverables", isChecked: false, isNotRelevant: false},
-    {text: "If file is word/excel/powerpoint/HTML (visual files) - send for sanity checkup to either translator or revisor", title: "Download deliverables", isChecked: false, isNotRelevant: false},
-    {text: "Check Client's brief/instructions ", title: "Download deliverables", isChecked: false, isNotRelevant: false},
-    {text: "Prepare & deliver file to AM", title: "Download deliverables", isChecked: false, isNotRelevant: false},
-]
+// const dr1Instructions = [
+//     {text: "Check files/work on Memoq to ensure all segments were translated and mark in green", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+//     {text: "Run a QA to see if there are any warnings or comments left by the vendors", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+//     {text: "If there are any failures in the QA- please contact the vendors to modify the output, and re start the PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+//     {text: "Check that the terms are translated according to the client's instructions, and that any character limitations have been followed", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+//     {text: "If QA pass - Complete PMQA", title:"On PMQA step we do the following", isChecked: false, isNotRelevant: false},
+//     {text: "Open file to see if all is OK", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+//     {text: "If file is word/excel/powerpoint/HTML (visual files) - send for sanity checkup to either translator or revisor", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+//     {text: "Check Client's brief/instructions ", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+//     {text: "Prepare & deliver file to AM", title: "Download deliverables", isChecked: false, isNotRelevant: false},
+// ]
 const dr2Instructions = [
     {text: "Check Language combinations (If the languages that were requested are the languages we are delivering", title:"", isChecked: false, isNotRelevant: false},
     {text: "Check File Type (Are we delivering the file format that was requested/required)", title:"", isChecked: false, isNotRelevant: false},
@@ -83,26 +83,53 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
     }
 }
 
-async function changeManager({ taskId, prevManager, manager, prop, isAdmin, status, project}) {
-    const DRNumber = prop === "dr1Manager" ? '1' : '2';
-    const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, DRNumber);
-    const messageToNew = managerDr1Assigned({taskId, project, manager}, DRNumber);
-
+async function changeManagerDR2({ taskId, prevManager, manager, prop, isAdmin, status, project, deliveryData, type}) {
+    let { tasksDR2: { singleLang } } = project
+    //Bug send all tasks Ids
+    const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, '2');
+    const messageToNew = managerDr1Assigned({taskId, project, manager}, '2');
     try {
-        const updatedProject = await getProjectAfterUpdate({"_id": project._id, "tasksDR1.taskId": taskId}, { $set: {[`tasksDR1.$.${prop}`]: manager} })
-        const isDr1 = prop === "dr1Manager";
-        const isDr2 = status === "dr2" && prop === "dr2Manager";
-        if(isAdmin && (isDr1 || isDr2)) {
-            await managerNotifyMail(returnObj(prevManager), messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
-            await managerNotifyMail(returnObj(manager), messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
-        }
-        return updatedProject
+      const isDr2 = status === "dr2" && prop === "dr2Manager";
+      if(isAdmin && isDr2) {
+        await managerNotifyMail(prevManager, messageToPrev, `DR2 has been reassigned: ${project.projectId} (I009.0)`);
+        await managerNotifyMail(manager, messageToNew, `The DR2 has been assigned to you: ${project.projectId} (I009.1)`);
+      }
+      if(type === 'single'){
+        let singleLangIndex = singleLang.findIndex(item => `${item.sourceLanguage}-${item.targetLanguage}` === `${deliveryData.sourceLanguage}-${deliveryData.targetLanguage}`)
+        singleLang[singleLangIndex].files = singleLang[singleLangIndex].files.map(item => {
+            item.dr2Manager = manager._id
+            return item
+        })
+        return await getProjectAfterUpdate({"_id": project._id}, { "tasksDR2.singleLang": singleLang } )
+      }else{
+
+      }
     } catch(err) {
-      console.log(err, 'on changeManager')
+      console.log(err, 'on changeManagerDR2')
     }
-    function returnObj(){
-      return Array.isArray(prevManager) ? prevManager[0] : prevManager
+}
+
+async function changeManager({ taskId, prevManager, manager, prop, isAdmin, status, project}) {
+  const DRNumber = prop === "dr1Manager" ? '1' : '2';
+  const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, DRNumber);
+  const messageToNew = managerDr1Assigned({taskId, project, manager}, DRNumber);
+
+  try {
+    const updatedProject = await getProjectAfterUpdate({"_id": project._id, "tasksDR1.taskId": taskId}, { $set: {[`tasksDR1.$.${prop}`]: manager} })
+
+    const isDr1 = prop === "dr1Manager";
+    const isDr2 = status === "dr2" && prop === "dr2Manager";
+    if(isAdmin && (isDr1 || isDr2)) {
+      await managerNotifyMail(returnObj(prevManager), messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
+      await managerNotifyMail(returnObj(manager), messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
     }
+    return updatedProject
+  } catch(err) {
+    console.log(err, 'on changeManager')
+  }
+  function returnObj(){
+    return Array.isArray(prevManager) ? prevManager[0] : prevManager
+  }
 }
 
 async function changeReviewStage({projectId, taskId}) {
@@ -154,4 +181,11 @@ async function rollbackReview({projectId, taskId, manager}) {
     ])
 }
 
-module.exports = { checkPermission, changeManager, changeReviewStage, rollbackReview, dr1Instructions }
+module.exports = {
+  checkPermission,
+  changeManager,
+  changeReviewStage,
+  rollbackReview,
+  // dr1Instructions,
+  changeManagerDR2
+}

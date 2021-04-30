@@ -181,6 +181,7 @@
       async removeFile(file){
 			  try{
 			    const updatedProject = await this.$http.post("/pm-manage/remove-dr-file", {...file, projectId: this.project._id});
+          await this.setCurrentProject(updatedProject.data);
           await this.updatedFiles(updatedProject)
           this.alertToggle({ message: "File removed!", isShow: true, type: "success" })
         }catch (err){
@@ -294,26 +295,18 @@
           await this.setCurrentProject(updatedProject.data);
         }catch (err){
         }
-        // console.log(this.files[index])
-        // this.files[index].isFileApproved = !this.files[index].isFileApproved
       },
 			async approveFile({ index }) {
-				// await this.checkPermission()
-				// if (this.isReviewing) return
 				this.files[index].isFileApproved = !this.files[index].isFileApproved
 				const { taskId, isFileApproved, path } = this.files[index]
 				try {
 					await this.approveDeliveryFile({ projectId: this.project._id, taskId, isFileApproved, paths: [ path ] })
-					// await this.getDeliveryData()
 				} catch (err) {
 				}
 			},
 			async approveFiles({ checked }) {
-				// await this.checkPermission()
-				// if (this.isReviewing) return
 				const paths = checked.map(item => item.path)
 				await this.approveDeliveryFile({ projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, paths })
-				// await this.getDeliveryData()
 			},
 			// async checkPermission() {
 			// 	if (!this.isReviewing) {

@@ -9,7 +9,8 @@ const {
 	changeManager,
 	changeReviewStage,
 	rollbackReview,
-	dr1Instructions
+  changeManagerDR2
+	// dr1Instructions
 } = require("./review")
 
 module.exports = {
@@ -19,7 +20,8 @@ module.exports = {
 	getAfterProjectDelivery,
 	checkPermission,
 	changeManager,
+  changeManagerDR2,
 	changeReviewStage,
 	rollbackReview,
-	dr1Instructions
+	// dr1Instructions
 }

@@ -51,7 +51,7 @@
             .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved || isReviewing}")
               input.review-table__file-input(type="file" :disabled="row.isFileApproved || isReviewing" @change="(e) => uploadFile(e, index)")
           i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
-          i.review-table__check-icon.fas.fa-arrow-alt-circle-right(v-if="row.isFileApproved" :class="{'review-table_green': row.isFilePushedDR2}" @click="deliverFile(index)")
+          //i.review-table__check-icon.fas.fa-arrow-alt-circle-right(v-if="row.isFileApproved" :class="{'review-table_green': row.isFilePushedDR2}" @click="deliverFile(index)")
 
     .review-table__upload.review-table_no-back
       input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
@@ -96,9 +96,9 @@
 			approveFile(index) {
 				this.$emit('approveFile', { index })
 			},
-      deliverFile(index){
-        this.$emit('deliverFile', index)
-      },
+      // deliverFile(index){
+      //   this.$emit('deliverFile', index)
+      // },
 			// generateCertificate() {
 			// 	this.$emit('generateCertificate')
 			// },

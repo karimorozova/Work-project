@@ -140,6 +140,10 @@ const ProjectsSchema = new mongoose.Schema({
         type: Array,
         default: [],
       },
+      comment: {
+        type: String,
+        default: '',
+      },
       sourceLanguage: {
         type: Schema.Types.ObjectId,
         ref: 'Language'
@@ -179,6 +183,10 @@ const ProjectsSchema = new mongoose.Schema({
       }]
     }],
     multiLang: [{
+      comment: {
+        type: String,
+        default: '',
+      },
       tasks: [{type: String}],
       instructions: {
         type: Array,

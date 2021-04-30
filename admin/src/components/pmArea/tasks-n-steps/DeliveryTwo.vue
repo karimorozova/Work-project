@@ -2,83 +2,72 @@
   .review
     span.review__close(@click="close") &#215;
 
-  //  .review__modal(v-if="isModal")
-  //    RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBack")
-  //
-  //  .review__title Delivery Review 2
-  //  span.relative
-  //    .review__forbidden(v-if="isReviewing")
-  //    Drops(
-  //      :isReviewing="isReviewing"
-  //      :project="project"
-  //      :user="user"
-  //      :dr1Manager="dr1Manager"
-  //      :dr2Manager="dr2Manager"
-  //      :timestamp="timestamp"
-  //      @assignManager="assignManager"
-  //      @setContacts="setContacts"
-  //    )
-  //
-  //  span.relative
-  //    .review_left-align {{ checklistTile }} Checklist
-  //    .review__forbidden(v-if="isReviewing")
-  //
-  //  .review__check
-  //    .review__forbidden(v-if="isReviewing")
-  //    .review__headers
-  //      .review__headers-item Check
-  //      .review__headers-item Not Relevant
-  //    .review__checkTitle(v-for="(group, index) in  Object.keys(groupedInstructions)")
-  //      .review__checkSubTitle(:class="{marginTop: !!index}") {{ group }}
-  //      .review__check-item(v-for="instruction in groupedInstructions[group]")
-  //        .review__check-itemText
-  //          span.icon-start-line
-  //            i.fa.fa-angle-double-right(aria-hidden='true')
-  //          span {{ instruction.text }}
-  //        .review__check-itemCheck
-  //          Check(
-  //            @toggleApproval="toggleList"
-  //            :instruction="instruction"
-  //            :isApproved="instruction.isChecked"
-  //            :type="'isChecked'"
-  //          )
-  //        .review__check-itemCheck
-  //          Check(
-  //            @toggleApproval="toggleList"
-  //            :instruction="instruction"
-  //            :isApproved="instruction.isNotRelevant"
-  //            :type="'isNotRelevant'"
-  //          )
-  //    .review__checkTitle
-  //      .review__checkSubTitle(:class="{marginTop: true}") Comments
-  //      .review__notes
-  //        ckeditor(v-model="editorData" :config="editorConfig")
-  //        .notes__button(@click="sendMessage") Save &nbsp;
-  //          i.fa.fa-paper-plane(aria-hidden='true')
-  //
-  //  .review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
-  //    .dr1Comment__title DR1 Comment
-  //    .dr1Comment__textarea
-  //      .dr1Comment__textareaText(v-html="previousComment")
-  //
-  //  span.relative
-  //    .split-line
-  //    .review__forbidden(v-if="isReviewing")
-  //
-  //  .review__table
-  //    .review__forbidden(v-if="isReviewing")
-  //    Table(
-  //      :task="task"
-  //      :isReviewing="isReviewing"
-  //      :files="files"
-  //      @approveFile="approveFile"
-  //      @approveFiles="approveFiles"
-  //      @uploadFile="uploadFile"
-  //      @checkAll="checkAllFiles"
-  //      @checkFile="checkFile"
-  //      @updateDeliveryData="getDeliveryData"
-  //      @generateCertificate="generateCertificate"
-  //    )
+    //  .review__modal(v-if="isModal")
+    //    RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBack")
+    //
+    .review__title Delivery Review 2
+    span.relative
+      //.review__forbidden(v-if="isReviewing")
+      //DropsDR2(:project="project":user="user" :dr1Manager="users.find(({_id}) => `${_id}` === `${deliveryData.dr1Manager}`)" :dr2Manager="users.find(({_id}) => `${_id}` === `${deliveryData.dr2Manager}`)" @assignManager="assignManager" @setContacts="setContacts")
+
+    span.relative
+      //.review_left-align {{ checklistTile }} Checklist
+      //.review__forbidden(v-if="isReviewing")
+
+    .review__check
+      //.review__forbidden(v-if="isReviewing")
+      .review__headers
+        .review__headers-item Check
+        .review__headers-item Not Relevant
+      .review__checkTitle(v-for="(group, index) in  Object.keys(groupedInstructions)")
+        .review__checkSubTitle(:class="{marginTop: !!index}") {{ group }}
+        .review__check-item(v-for="instruction in groupedInstructions[group]")
+          .review__check-itemText
+            span.icon-start-line
+              i.fa.fa-angle-double-right(aria-hidden='true')
+            span {{ instruction.text }}
+          .review__check-itemCheck
+            Check(
+              @toggleApproval="toggleList"
+              :instruction="instruction"
+              :isApproved="instruction.isChecked"
+              :type="'isChecked'"
+            )
+          .review__check-itemCheck
+            Check(
+              @toggleApproval="toggleList"
+              :instruction="instruction"
+              :isApproved="instruction.isNotRelevant"
+              :type="'isNotRelevant'"
+            )
+      .review__checkTitle
+        .review__checkSubTitle(:class="{marginTop: true}") Comments
+        .review__notes
+          ckeditor(v-model="deliveryData.comment" :config="editorConfig")
+          .notes__button(@click="sendComment") Save &nbsp;
+            i.fa.fa-paper-plane(aria-hidden='true')
+    //
+    //  .review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
+    //    .dr1Comment__title DR1 Comment
+    //    .dr1Comment__textarea
+    //      .dr1Comment__textareaText(v-html="previousComment")
+    //
+    //  span.relative
+    //    .split-line
+    //    .review__forbidden(v-if="isReviewing")
+    //
+    .review__table
+      .review__forbidden(v-if="isReviewing")
+      TableDR2(
+        :task="task"
+        :files="files"
+        @approveFile="approveFile"
+        @approveFiles="approveFiles"
+        @uploadFile="uploadFile"
+        @checkAll="checkAllFiles"
+        @checkFile="checkFile"
+        @removeFile="removeFile"
+      )
   //
   //  .review__options
   //    //.review__options-check(v-if="isAllChecked")
@@ -117,16 +106,18 @@
 <script>
 	import CKEditor from "ckeditor4-vue"
 	import { mapGetters, mapActions } from "vuex"
-	import Drops from "../review/Drops"
-	import Table from "../review/Table"
+	// import Drops from "../review/Drops"
+	// import Table from "../review/Table"
 	import Check from "../review/Check"
-	import _ from "lodash"
+	// import _ from "lodash"
 	import editorConfig from "../../../mixins/editorConfig"
-
-	const Options = () => import("../review/Options")
-	const CheckBox = () => import("@/components/CheckBox")
-	const Button = () => import("@/components/Button")
-	const RollbackModal = () => import("../review/RollbackModal")
+  import TableDR2 from "../review/TableDR2";
+  // import DropsDR2 from "../review/DropsDR2";
+  //
+	// const Options = () => import("../review/Options")
+	// const CheckBox = () => import("@/components/CheckBox")
+	// const Button = () => import("@/components/Button")
+	// const RollbackModal = () => import("../review/RollbackModal")
 
 	export default {
 		mixins: [ editorConfig ],
@@ -135,61 +126,67 @@
 			users: { type: Array },
 			project: { type: Object },
 			id: { type: String },
+      type: {type: String }
 		},
 		data() {
 			return {
-				editorData: "",
-				areFilesChecked: false,
-				areFilesConverted: false,
-				areOptions: true,
-				isDeliver: false,
-				isNotify: false,
-				isReadyForDelivery: false,
-				isAssign: true,
-				isDr1: true,
-				files: [],
-				dr1Manager: null,
-				dr2Manager: null,
-				contacts: [],
-				timestamp: "",
-				instructions: [],
-				isReviewing: false,
-				isModal: false,
-				rollbackManager: null,
-				previousComment: ''
+        files: [],
+				// editorData: "",
+				// areFilesChecked: false,
+				// areFilesConverted: false,
+				// areOptions: true,
+				// isDeliver: false,
+				// isNotify: false,
+				// isReadyForDelivery: false,
+				// isAssign: true,
+				// isDr1: true,
+				// files: [],
+				// dr1Manager: null,
+				// dr2Manager: null,
+				// contacts: [],
+				// timestamp: "",
+				// instructions: [],
+				// isReviewing: false,
+				// isModal: false,
+				// rollbackManager: null,
+				// previousComment: ''
 			}
 		},
 		methods: {
 			...mapActions([
-				"approveInstruction",
-				"approveDeliveryFile",
-				"uploadTarget",
-				"approveWithOption",
-				"approveDeliverable",
-				"assignDr2",
-				"changeReviewManager",
-				"rollBackReview",
-				"alertToggle"
+				"approveInstructionDR2",
+				"approveDeliveryFileDR2",
+				// "approveDeliveryFile",
+				// "uploadTarget",
+				// "approveWithOption",
+				// "approveDeliverable",
+				// "assignDr2",
+				"changeReviewManagerDR2",
+				// "rollBackReview",
+				"alertToggle",
+        "setCurrentProject"
 			]),
-			async generateCertificate() {
+			// async generateCertificate() {
+			// 	try {
+			// 		await this.$http.post('/pm-manage/generate-certificate', {
+			// 			project: this.project,
+			// 			task: this.task
+			// 		})
+			// 		await this.getDeliveryData()
+			// 		this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
+			// 	}
+			// },
+			async sendComment() {
 				try {
-					await this.$http.post('/pm-manage/generate-certificate', {
-						project: this.project,
-						task: this.task
+					const updatedProject = await this.$http.post('/pm-manage/delivery-comments-dr2', {
+            projectId: this.project._id,
+            entityId: this.deliveryData._id,
+            type: this.type,
+						comment: this.deliveryData.comment
 					})
-					await this.getDeliveryData()
-					this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
-				} catch (err) {
-					this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
-				}
-			},
-			async sendMessage() {
-				try {
-					await this.$http.post('/pm-manage/delivery-comments', {
-						projectId: this.project._id,
-						taskStatus: this.task.status === 'Pending Approval [DR2]' ? 'dr2' : 'dr1',
-						comment: this.editorData
-					})
+          await this.setCurrentProject(updatedProject.data);
 					this.alertToggle({ message: "Comment updated!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Comment not updated!", isShow: true, type: "error" })
@@ -198,53 +195,53 @@
 			close() {
 				this.$emit("close")
 			},
-			closeRollback() {
-				this.isModal = false
-				this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
-			},
-			setContacts({ contacts }) {
-				this.contacts = [ ...contacts ]
-			},
-			toggleOption({ prop }) {
-				this[prop] = true
-				if (prop === 'isAssign') {
-					this.isDeliver = false
-					this.isReadyForDelivery = false
-					this.isNotify = false
-				} else if (prop === 'isDeliver') {
-					this.isAssign = false
-					this.isReadyForDelivery = false
-					this.isNotify = false
-				} else if (prop === 'isReadyForDelivery') {
-					this.isAssign = false
-					this.isDeliver = false
-					this.isNotify = false
-				} else {
-					this.isAssign = false
-					this.isReadyForDelivery = false
-					this.isDeliver = false
-				}
-			},
-			setRollbackManager({ manager }) {
-				this.rollbackManager = manager
-			},
-			async toggleList({ type, instruction }) {
-				const types = [ 'isChecked', 'isNotRelevant' ]
-				const anotherType = types.filter(item => item !== type)
-				instruction[type] = !instruction[type]
-				instruction[anotherType] = !instruction[type]
-				await this.approveInstruction({
-					projectId: this.project._id,
-					taskId: this.task.taskId,
-					instruction
-				})
-				await this.getDeliveryData()
-			},
-			// toggleOptions() {
-			// 	this.isAssign = this.isDr1
-			// 	this.isDeliver = !this.isDr1
-			// 	this.isNotify = false
+			// closeRollback() {
+			// 	this.isModal = false
+			// 	this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
 			// },
+			setContacts({ contacts }) {
+				// this.contacts = [ ...contacts ]
+			},
+			// toggleOption({ prop }) {
+			// 	this[prop] = true
+			// 	if (prop === 'isAssign') {
+			// 		this.isDeliver = false
+			// 		this.isReadyForDelivery = false
+			// 		this.isNotify = false
+			// 	} else if (prop === 'isDeliver') {
+			// 		this.isAssign = false
+			// 		this.isReadyForDelivery = false
+			// 		this.isNotify = false
+			// 	} else if (prop === 'isReadyForDelivery') {
+			// 		this.isAssign = false
+			// 		this.isDeliver = false
+			// 		this.isNotify = false
+			// 	} else {
+			// 		this.isAssign = false
+			// 		this.isReadyForDelivery = false
+			// 		this.isDeliver = false
+			// 	}
+			// },
+			// setRollbackManager({ manager }) {
+			// 	this.rollbackManager = manager
+			// },
+			async toggleList({ type, instruction }) {
+        const types = [ 'isChecked', 'isNotRelevant' ]
+        const anotherType = types.filter(item => item !== type)
+        instruction[type] = !instruction[type]
+        instruction[anotherType] = !instruction[type]
+        await this.approveInstructionDR2({
+          projectId: this.project._id,
+          entityId: this.deliveryData._id,
+          instruction,
+          type: this.type
+        })
+			},
+			// // toggleOptions() {
+			// // 	this.isAssign = this.isDr1
+			// // 	this.isDeliver = !this.isDr1
+			// // 	this.isNotify = false
+			// // },
 			checkAllFiles({ bool }) {
 				this.files = this.files.map(item => {
 					return { ...item, isChecked: bool }
@@ -253,173 +250,207 @@
 			checkFile({ index, bool }) {
 				this.files[index].isChecked = bool
 			},
-			popupRollback() {
-				this.isModal = true
-			},
-			async uploadFile({ file, index }) {
-				await this.checkPermission()
-				if (this.isReviewing) return
-				const { path, isOriginal } = index !== undefined ? this.files[index] : { path: "", isOriginal: false }
-				const fileData = new FormData()
-				fileData.append("targetFile", file)
-				fileData.append("projectId", this.project._id)
-				fileData.append("path", path)
-				fileData.append("taskId", this.task.taskId)
-				fileData.append("isOriginal", isOriginal)
-				try {
-					await this.uploadTarget(fileData)
-					await this.getDeliveryData()
-				} catch (err) {
-				}
-			},
-			async approveFile({ index }) {
-				await this.checkPermission()
-				if (this.isReviewing) return
-				this.files[index].isFileApproved = !this.files[index].isFileApproved
-				const { taskId, isFileApproved, path } = this.files[index]
-				try {
-					await this.approveDeliveryFile({ taskId, isFileApproved, paths: [ path ] })
-					await this.getDeliveryData()
-				} catch (err) {
-				}
-			},
-			async approveFiles({ checked }) {
-				await this.checkPermission()
-				if (this.isReviewing) return
-				const paths = checked.map(item => item.path)
-				await this.approveDeliveryFile({ taskId: this.task.taskId, isFileApproved: true, paths })
-				await this.getDeliveryData()
-			},
-			async checkPermission() {
-				if (!this.isReviewing) {
-					try {
-						const reviewStatus = await this.$http.get(
-								`/pm-manage/review-status?group=${ this.user.group.name }&projectId=${ this.project._id }&taskId=${ this.task.taskId }&userId=${ this.user._id }`
-						)
-						if (reviewStatus.data === "forbidden") {
-							this.isReviewing = true
-							return this.alertToggle({ message: "This task Delivery Review is forbidden for you", isShow: true, type: "error" })
-						}
-					} catch (err) {
-						this.alertToggle({ message: "Error on checking review status", isShow: true, type: "error" })
-					}
-				}
-			},
-			async approve() {
-				try {
-					if (this.isDr1 && this.isAssign) {
-						await this.assignDr2({
-							projectId: this.project._id,
-							taskId: this.task.taskId,
-							dr2Manager: this.dr2Manager
-						})
-						return await this.getDeliveryData()
-					} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
-						return await this.approveDeliverable(this.task.taskId)
-					} else {
-						return await this.approveWithOption({
-							taskId: this.task.taskId,
-							isDeliver: this.isDeliver,
-							contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
-							user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
-						})
-					}
-				} catch (err) {
-				} finally {
-					this.$emit("close")
-				}
-			},
-			async assignManager({ manager, prop }) {
-				await this.checkPermission()
-				// if (this.isReviewing || this.dr1Manager._id === manager._id) return
-				if (this.isReviewing) return
-				await this.changeReviewManager({
-					prevManager: this[prop],
-					manager,
-					prop,
-					projectId: this.project._id,
-					taskId: this.task.taskId,
-					isAdmin: this.isAdmin,
-					status: `dr${ this.dr }`
-				})
-				await this.getDeliveryData()
-			},
-			async rollBack() {
-				const rollback = {
-					projectId: this.project._id,
-					taskId: this.task.taskId,
-					manager: this.rollbackManager
-				}
-				await this.rollBackReview(rollback)
-				this.close()
-			},
-			async getDeliveryData() {
-				if (this.task.status === "Pending Approval [DR2]") {
-					this.isDr1 = false
-				}
-				this.isDeliver = this.isDr1 ? false : this.areOptions
+			// popupRollback() {
+			// 	this.isModal = true
+			// },
+      async updatedFiles(updatedProject){
+        const { tasksDR2 } = updatedProject.data
+        if(this.type === 'single'){
+          const {files} = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
+          this.files = files.map(item => ({ ...item, isChecked: false }))
+        }else{
 
-				try {
-					const result = await this.$http.post("/pm-manage/delivery-data", {
-						projectId: this.project._id,
-						taskId: this.task.taskId
-					})
-					this.files = result.data.files.map(item => {
-						return { ...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false }
-					})
-					this.dr1Manager = result.data.dr1Manager
-					this.dr2Manager = result.data.dr2Manager
-					this.instructions = result.data.instructions.filter(item => item.step === result.data.status)
-					if (this.task.status === "Pending Approval [DR2]") {
-						this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
-						this.timestamp = result.data.timestamp
-					}
-					const commentsData = await this.$http.get('/pm-manage/delivery-comments/' + this.project._id)
-					const { comments } = commentsData.data
-					this.editorData = this.task.status === 'Pending Approval [DR2]' ? comments.dr2.comment : comments.dr1.comment
-					this.previousComment = this.task.status === 'Pending Approval [DR2]' ? comments.dr1.comment : ''
-				} catch (err) {
-					this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
-				}
-			}
+        }
+      },
+      async removeFile(file){
+        try{
+          const updatedProject = await this.$http.post("/pm-manage/remove-dr2-file", {
+            ...file,
+            projectId: this.project._id,
+            type: this.type,
+            entityId: this.id
+          });
+          await this.setCurrentProject(updatedProject.data);
+          await this.updatedFiles(updatedProject)
+          this.alertToggle({ message: "File removed!", isShow: true, type: "success" })
+        }catch (err){
+          this.alertToggle({ message: "Error on remove DR1 Files", isShow: true, type: "error" })
+        }
+      },
+			async uploadFile({ file, index }) {
+        const { path } = index !== undefined ? this.files[index] : { path: "" }
+        const fileData = new FormData()
+        fileData.append("targetFile", file)
+        fileData.append("projectId", this.project._id)
+        fileData.append("path", path)
+        fileData.append("entityId", this.deliveryData._id)
+        fileData.append("type", this.type)
+        try {
+          if(this.type === 'single'){
+            const updatedProject = await this.$http.post("/pm-manage/target-dr2", fileData)
+            await this.setCurrentProject(updatedProject.data);
+            await this.updatedFiles(updatedProject)
+          }
+        } catch (err) {
+        }
+			},
+      async approveFile({ index }) {
+        this.files[index].isFileApproved = !this.files[index].isFileApproved
+        const { isFileApproved, path } = this.files[index]
+        try {
+          await this.approveDeliveryFileDR2({ type: this.type, entityId: this.id, projectId: this.project._id, isFileApproved, paths: [path] })
+        } catch (err) {
+        }
+      },
+      async approveFiles({ checked }) {
+        const paths = checked.map(item => item.path)
+        await this.approveDeliveryFileDR2({ projectId: this.project._id, isFileApproved: true, paths })
+      },
+			// async checkPermission() {
+			// 	if (!this.isReviewing) {
+			// 		try {
+			// 			const reviewStatus = await this.$http.get(
+			// 					`/pm-manage/review-status?group=${ this.user.group.name }&projectId=${ this.project._id }&taskId=${ this.task.taskId }&userId=${ this.user._id }`
+			// 			)
+			// 			if (reviewStatus.data === "forbidden") {
+			// 				this.isReviewing = true
+			// 				return this.alertToggle({ message: "This task Delivery Review is forbidden for you", isShow: true, type: "error" })
+			// 			}
+			// 		} catch (err) {
+			// 			this.alertToggle({ message: "Error on checking review status", isShow: true, type: "error" })
+			// 		}
+			// 	}
+			// },
+			// async approve() {
+			// 	try {
+			// 		if (this.isDr1 && this.isAssign) {
+			// 			await this.assignDr2({
+			// 				projectId: this.project._id,
+			// 				taskId: this.task.taskId,
+			// 				dr2Manager: this.dr2Manager
+			// 			})
+			// 			return await this.getDeliveryData()
+			// 		} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
+			// 			return await this.approveDeliverable(this.task.taskId)
+			// 		} else {
+			// 			return await this.approveWithOption({
+			// 				taskId: this.task.taskId,
+			// 				isDeliver: this.isDeliver,
+			// 				contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
+			// 				user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
+			// 			})
+			// 		}
+			// 	} catch (err) {
+			// 	} finally {
+			// 		this.$emit("close")
+			// 	}
+			// },
+			async assignManager({ manager, prop }) {
+        // const { dr2Manager, files } = this.deliveryData
+        // if(manager._id === dr2Manager) return
+        //
+        // await this.changeReviewManagerDR2({
+        //   manager,
+        //   prop,
+        //   projectId: this.project._id,
+        //   taskId: files[0].taskId,
+        //   isAdmin: this.isAdmin,
+        //   status: 'dr2',
+        //   deliveryData: this.deliveryData,
+        //   type: this.type
+        // })
+			},
+			// async rollBack() {
+			// 	const rollback = {
+			// 		projectId: this.project._id,
+			// 		taskId: this.task.taskId,
+			// 		manager: this.rollbackManager
+			// 	}
+			// 	await this.rollBackReview(rollback)
+			// 	this.close()
+			// },
+			// async getDeliveryData() {
+			// 	if (this.task.status === "Pending Approval [DR2]") {
+			// 		this.isDr1 = false
+			// 	}
+			// 	this.isDeliver = this.isDr1 ? false : this.areOptions
+      //
+			// 	try {
+			// 		const result = await this.$http.post("/pm-manage/delivery-data", {
+			// 			projectId: this.project._id,
+			// 			taskId: this.task.taskId
+			// 		})
+			// 		this.files = result.data.files.map(item => {
+			// 			return { ...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false }
+			// 		})
+			// 		this.dr1Manager = result.data.dr1Manager
+			// 		this.dr2Manager = result.data.dr2Manager
+			// 		this.instructions = result.data.instructions.filter(item => item.step === result.data.status)
+			// 		if (this.task.status === "Pending Approval [DR2]") {
+			// 			this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
+			// 			this.timestamp = result.data.timestamp
+			// 		}
+			// 		const commentsData = await this.$http.get('/pm-manage/delivery-comments/' + this.project._id)
+			// 		const { comments } = commentsData.data
+			// 		this.editorData = this.task.status === 'Pending Approval [DR2]' ? comments.dr2.comment : comments.dr1.comment
+			// 		this.previousComment = this.task.status === 'Pending Approval [DR2]' ? comments.dr1.comment : ''
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
+			// 	}
+			// }
 		},
 		computed: {
-			...mapGetters({
-				getUser: "getUser"
-			}),
+		  deliveryData(){
+		    if(this.type === 'single'){
+		      const { tasksDR2 } = this.project
+		      const deliveryData = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
+          console.log('deliveryData',deliveryData)
+          return deliveryData
+        }else{
+          {}
+        }
+      },
 			groupedInstructions() {
-				return _.groupBy(this.instructions, 'title')
+				return _.groupBy(this.deliveryData.instructions, 'title')
 			},
-			isAllChecked() {
-				// this.toggleOptions()
-				const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
-				const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
-				return !uncheckedInstructions.length && !uncheckedFiles.length
-			},
-			dr() {
-				return this.task.status === "Pending Approval [DR1]" ? 1 : 2
-			},
-			checklistTile() {
-				return this.task.status === "Pending Approval [DR1]" ? "DR1" : "DR2"
-			},
+			// isAllChecked() {
+			// 	// this.toggleOptions()
+			// 	const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
+			// 	const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
+			// 	return !uncheckedInstructions.length && !uncheckedFiles.length
+			// },
+			// dr() {
+			// 	return this.task.status === "Pending Approval [DR1]" ? 1 : 2
+			// },
+			// checklistTile() {
+			// 	return this.task.status === "Pending Approval [DR1]" ? "DR1" : "DR2"
+			// },
 			isAdmin() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
 			}
 		},
 		components: {
-			Drops,
-			Table,
+      TableDR2,
+      // DropsDR2,
+			// Drops,
+			// Table,
 			Check,
-			Options,
-			CheckBox,
-			Button,
-			RollbackModal,
+			// Options,
+			// CheckBox,
+			// Button,
+			// RollbackModal,
 			ckeditor: CKEditor.component
 		},
-		mounted() {
-			// this.checkPermission()
-			// 		.then(res => this.getDeliveryData())
-		}
+    mounted() {
+      const { tasksDR2 } = this.project
+		  if(this.type === 'single'){
+        const {files} = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
+        this.files = files.map(item => ({ ...item, isChecked: false }))
+      }
+
+      // this.checkPermission()
+      // 		.then(res => this.getDeliveryData())
+    }
 	}
 </script>
 

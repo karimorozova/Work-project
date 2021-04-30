@@ -8,6 +8,7 @@ const {
 	Projects,
 	Pricelist,
 	Units,
+  Languages,
 	Vendors,
 	Discounts
 } = require('../../models')
@@ -86,7 +87,8 @@ const {
 	checkPermission,
 	changeManager,
 	changeReviewStage,
-	rollbackReview
+	rollbackReview,
+  changeManagerDR2
 } = require('../../delivery')
 
 const {
@@ -658,6 +660,20 @@ router.post('/change-manager', async (req, res) => {
 	}
 })
 
+router.post('/change-manager-dr2', async (req, res) => {
+  const { projectId, taskId, manager, prop, isAdmin, status, deliveryData, type } = req.body
+  const { dr2Manager } = deliveryData
+  try {
+    const project = await getProject({ '_id': projectId })
+    let prevManager = await User.findOne( { "_id": dr2Manager } ).populate('group')
+    const updatedProject = await changeManagerDR2({ taskId, manager, prevManager, prop, isAdmin, status, project, deliveryData, type })
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on changing review manager')
+  }
+})
+
 router.post('/approve-instruction', async (req, res) => {
 	const { taskId, projectId, instruction } = req.body
 	try {
@@ -677,6 +693,48 @@ router.post('/approve-instruction', async (req, res) => {
 	}
 })
 
+router.post('/approve-instruction-dr2', async (req, res) => {
+  const { entityId, projectId, instruction, type } = req.body
+  try {
+    if(type === 'single'){
+      await Projects.updateOne(
+        { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.instructions.text": instruction.text },
+        {
+          "tasksDR2.singleLang.$[i].instructions.$[j].isChecked": instruction.isChecked,
+          "tasksDR2.singleLang.$[i].instructions.$[j].isNotRelevant": instruction.isNotRelevant
+        },
+        { arrayFilters: [ { 'i._id': entityId }, { 'j.text': instruction.text } ]}
+      )
+    }else{
+      console.log('multi')
+    }
+
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on approve files')
+  }
+})
+
+router.post('/approve-files-dr2', async (req, res) => {
+  const { type, entityId, projectId, isFileApproved, paths } = req.body
+  try {
+    if(type === 'single'){
+      await Projects.updateOne(
+        { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.files.path": { $in: paths } },
+        { "tasksDR2.singleLang.$[i].files.$[j].isFileApproved": isFileApproved },
+        { arrayFilters: [ { 'i._id': entityId }, { 'j.path': { $in: paths } } ]}
+      )
+    }
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on approve files')
+  }
+})
+
 router.post('/approve-files', async (req, res) => {
 	const { projectId, taskId, isFileApproved, paths } = req.body
 	try {
@@ -692,6 +750,7 @@ router.post('/approve-files', async (req, res) => {
 		res.status(500).send('Error on approve files')
 	}
 })
+
 router.post('/is-file-pushed-dr2', async (req, res) => {
   const { projectId, taskId, isFilePushedDR2, paths } = req.body
   try {
@@ -707,16 +766,7 @@ router.post('/is-file-pushed-dr2', async (req, res) => {
     res.status(500).send('Error on approve files')
   }
 })
-// router.get('/delivery-comments/:projectId', async (req, res) => {
-// 	const { projectId } = req.params
-// 	try {
-// 		const comments = await Delivery.findOne({ 'projectId': projectId }, { comments: 1 })
-// 		res.send(comments)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on approve files')
-// 	}
-// })
+
 router.post('/delivery-comments', async (req, res) => {
 	const { projectId, taskId, comment } = req.body
   try{
@@ -725,6 +775,24 @@ router.post('/delivery-comments', async (req, res) => {
       { $set: {"tasksDR1.$.comment": comment}}
     )
     res.send(updatedProject)
+  }catch(err){
+    console.log(err)
+    res.status(500).send('Error on delivery-comments')
+  }
+})
+
+router.post('/delivery-comments-dr2', async (req, res) => {
+  const { projectId, entityId, type, comment } = req.body
+  try{
+    if(type === 'single'){
+      const updatedProject = await getProjectAfterUpdate(
+        {"_id": projectId, 'tasksDR2.singleLang._id': entityId,},
+        { $set: {"tasksDR2.singleLang.$.comment": comment}}
+      )
+      res.send(updatedProject)
+    }else{
+
+    }
   }catch(err){
     console.log(err)
     res.status(500).send('Error on delivery-comments')
@@ -744,6 +812,7 @@ router.post('/generate-certificate', async (req, res) => {
 
 router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
 	const fileData = { ...req.body }
+  console.log(fileData)
 	try {
 		const files = req.files['targetFile']
 		const newPath = await manageDeliveryFile({ fileData, file: files[0] })
@@ -768,6 +837,60 @@ router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, re
 	}
 })
 
+router.post('/target-dr2', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
+  const fileData = { ...req.body }
+  const files = req.files['targetFile']
+  const { projectId, path, type, entityId } =  fileData
+  const project = await getProject({"_id": projectId})
+  const allLanguages = await Languages.find()
+  if(type === 'single'){
+    try {
+      const singleLang = project.tasksDR2.singleLang.find(({_id}) => _id.toString() === entityId)
+      const { sourceLanguage, targetLanguage } = singleLang
+      const newPath = await manageDeliveryFile({ fileData, file: files[0] })
+      const fileName = newPath.split("/").pop()
+      if (!!path) {
+        const { taskId } = singleLang.files.find(item => item.path === path)
+        if(taskId !== 'Loaded in DR2'){
+          await Projects.updateOne(
+            { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.files.path": path  },
+            { "tasksDR1.$[i].files.$[j]": {isFileApproved: true, isFilePushedDR2: true, fileName: fileName, path: newPath }},
+            { arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': path } ] }
+          )
+          await Projects.updateOne(
+            { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.files.path": path  },
+            { "tasksDR2.singleLang.$[i].files.$[j]": {isFileApproved: false, fileName: fileName, path: newPath, taskId }},
+            { arrayFilters: [ { 'i._id': entityId }, { 'j.path': path } ] }
+          )
+        }else{
+          await Projects.updateOne(
+            { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.files.path": path  },
+            { "tasksDR2.singleLang.$[i].files.$[j]": {isFileApproved: false, pair: getLanguagesPairsSymbols(sourceLanguage, targetLanguage), fileName: fileName, path: newPath, taskId: 'Loaded in DR2' }},
+            { arrayFilters: [ { 'i._id': entityId }, { 'j.path': path } ] }
+          )
+        }
+      } else {
+        await Projects.updateOne(
+          { "_id": projectId, 'tasksDR2.singleLang._id': entityId, },
+          { $push: { 'tasksDR2.singleLang.$.files': { isFileApproved: false, pair: getLanguagesPairsSymbols(sourceLanguage, targetLanguage), fileName: fileName, path: newPath, taskId: 'Loaded in DR2' }}}
+        )
+      }
+
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('Error on uploading target file dr2')
+    }
+  }else{
+
+  }
+  const updatedProject = await getProject({"_id": projectId})
+  res.send(updatedProject)
+
+  function getLanguagesPairsSymbols(source, target){
+    return `${allLanguages.find(({_id}) => `${_id}` === `${source}`).symbol} >> ${allLanguages.find(({_id}) => `${_id}` === `${target}`).symbol}`
+  }
+})
+
 router.post('/remove-dr-file', async (req, res) => {
 	const { taskId, path, projectId } = req.body
 	try {
@@ -785,6 +908,37 @@ router.post('/remove-dr-file', async (req, res) => {
 		console.log(err)
 		res.status(500).send('Error on removing dr file')
 	}
+})
+
+router.post('/remove-dr2-file', async (req, res) => {
+  console.log(req.body)
+  const { type, taskId, projectId, path, entityId } = req.body
+  try {
+    if(type === 'single'){
+      if(taskId !== 'Loaded in DR2'){
+        await Projects.updateOne(
+          { "_id": projectId, 'tasksDR1.files.path': path },
+          { $pull: { 'tasksDR1.$[i].files': { path } }},
+          { arrayFilters: [ { 'i.taskId': taskId } ] }
+        )
+      }
+      await Projects.updateOne(
+        { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.files.path": path },
+        { $pull: { "tasksDR2.singleLang.$[i].files": { path } }},
+        { arrayFilters: [ { 'i._id': entityId }] }
+      )
+      fs.unlink(`./dist${ path }`, (err) => {
+        if (err) throw(err)
+      })
+    }else{
+
+    }
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on removing dr file')
+  }
 })
 
 router.post('/assign-dr2', async (req, res) => {
