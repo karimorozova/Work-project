@@ -1,18 +1,47 @@
 const { updateProject, notifyClientTaskReady, sendClientDeliveries, notifyDeliverablesDownloaded } = require('../projects');
 
-async function getProjectAfterApprove({taskId, project, isDeliver, contacts , user}) {
-    try {
-        if(isDeliver) {
-            await sendClientDeliveries({taskId, project, contacts});
-            return await setTasksDeliveryStatus({taskId, project, status: "Delivered", user})
-        }
-        await notifyClientTaskReady({taskId, project, contacts});
-        return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery", user});
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getProjectAfterApprove");
+// async function getProjectAfterApprove({taskId, project, isDeliver, contacts , user}) {
+//     try {
+//         if(isDeliver) {
+//             await sendClientDeliveries({taskId, project, contacts});
+//             return await setTasksDeliveryStatus({taskId, project, status: "Delivered", user})
+//         }
+//         await notifyClientTaskReady({taskId, project, contacts});
+//         return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery", user});
+//     } catch(err) {
+//         console.log(err);
+//         console.log("Error in getProjectAfterApprove");
+//     }
+// }
+
+async function taskApproveNotify({taskId, project, isDeliver, contacts , user}) {
+  try {
+    if(isDeliver) {
+      await sendClientDeliveries({taskId, project, contacts});
+      return await setTasksDeliveryStatus({taskId, project, status: "Delivered", user})
     }
+    await notifyClientTaskReady({taskId, project, contacts});
+    return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery", user});
+  } catch(err) {
+    console.log(err);
+    console.log("Error in taskApproveNotify");
+  }
 }
+
+async function taskApproveDeliver({taskId, project, isDeliver, contacts , user}) {
+  try {
+    if(isDeliver) {
+      await sendClientDeliveries({taskId, project, contacts});
+      return await setTasksDeliveryStatus({taskId, project, status: "Delivered", user})
+    }
+    await notifyClientTaskReady({taskId, project, contacts});
+    return await setTasksDeliveryStatus({taskId, project, status: "Ready for Delivery", user});
+  } catch(err) {
+    console.log(err);
+    console.log("Error in taskApproveDeliver");
+  }
+}
+
 
 async function setTasksDeliveryStatus({taskId, project, status, user}) {
     const updatedTasks = getUpdatedTasks({taskId, tasks: project.tasks, status , user});
@@ -54,4 +83,9 @@ function getUpdatedTasks({taskId, tasks, status, user}) {
     })
 }
 
-module.exports = { getProjectAfterApprove, setTasksDeliveryStatus }
+module.exports = {
+  // getProjectAfterApprove,
+  taskApproveDeliver,
+  taskApproveNotify,
+  setTasksDeliveryStatus
+}

@@ -68,39 +68,36 @@
         @checkFile="checkFile"
         @removeFile="removeFile"
       )
-  //
-  //  .review__options
-  //    //.review__options-check(v-if="isAllChecked")
-  //      //CheckBox(
-  //      //  :isChecked="areOptions"
-  //      //  customClass="review-options"
-  //      //  @check="(e) => toggleOptions(e, true)"
-  //      //  @uncheck="(e) => toggleOptions(e, false)"
-  //      //)
-  //    .review__forbidden(v-if="isReviewing")
-  //    Options(
-  //      v-if="isAllChecked"
-  //      :isAssign="isAssign"
-  //      :isDeliver="isDeliver"
-  //      :isNotify="isNotify"
-  //      :isReadyForDelivery="isReadyForDelivery"
-  //      :isDr1="isDr1"
-  //      @toggleOption="toggleOption"
-  //    )
-  //
-  //  .review__buttons(v-if="dr1Manager && dr2Manager && getUser")
-  //    .review__button(v-if="!isDr1")
-  //      .review__forbidden(v-if="dr1Manager._id !== getUser._id && dr2Manager._id !== getUser._id && getUser.name === 'Administrators'")
-  //      Button(
-  //        value="Rollback"
-  //        @clicked="popupRollback"
-  //      )
-  //    .review__button(v-if="isAllChecked")
-  //      .review__forbidden(v-if="isReviewing")
-  //      Button(
-  //        value="Approve Deliverable"
-  //        @clicked="approve"
-  //      )
+
+    .review__options
+      //.review__options-check(v-if="isAllChecked")
+        //CheckBox(
+        //  :isChecked="areOptions"
+        //  customClass="review-options"
+        //  @check="(e) => toggleOptions(e, true)"
+        //  @uncheck="(e) => toggleOptions(e, false)"
+        //)
+      OptionsDR2(
+        v-if="true"
+        :isDeliver="isDeliver"
+        :isNotify="isNotify"
+        :isReadyForDelivery="isReadyForDelivery"
+        @toggleOption="toggleOption"
+      )
+
+      //  (v-if="dr1Manager && dr2Manager && getUser")
+      //    .review__button(v-if="!isDr1")
+      //      .review__forbidden(v-if="dr1Manager._id !== getUser._id && dr2Manager._id !== getUser._id && getUser.name === 'Administrators'")
+      //      Button(
+      //        value="Rollback"
+      //        @clicked="popupRollback"
+      //      )
+      .review__buttons
+        .review__button(v-if="true")
+          Button(
+            value="Approve"
+            @clicked="approve"
+          )
 </template>
 
 <script>
@@ -112,11 +109,11 @@
 	// import _ from "lodash"
 	import editorConfig from "../../../mixins/editorConfig"
   import TableDR2 from "../review/TableDR2";
+  import OptionsDR2 from "../review/OptionsDR2";
+  import Button from "../../Button";
   // import DropsDR2 from "../review/DropsDR2";
   //
-	// const Options = () => import("../review/Options")
 	// const CheckBox = () => import("@/components/CheckBox")
-	// const Button = () => import("@/components/Button")
 	// const RollbackModal = () => import("../review/RollbackModal")
 
 	export default {
@@ -135,9 +132,9 @@
 				// areFilesChecked: false,
 				// areFilesConverted: false,
 				// areOptions: true,
-				// isDeliver: false,
-				// isNotify: false,
-				// isReadyForDelivery: false,
+				isDeliver: false,
+				isNotify: false,
+				isReadyForDelivery: true,
 				// isAssign: true,
 				// isDr1: true,
 				// files: [],
@@ -159,8 +156,10 @@
 				// "approveDeliveryFile",
 				// "uploadTarget",
 				// "approveWithOption",
-				// "approveDeliverable",
+				"approveReady",
 				// "assignDr2",
+        "approveNotify",
+				"approveDeliver",
 				"changeReviewManagerDR2",
 				// "rollBackReview",
 				"alertToggle",
@@ -202,26 +201,22 @@
 			setContacts({ contacts }) {
 				// this.contacts = [ ...contacts ]
 			},
-			// toggleOption({ prop }) {
-			// 	this[prop] = true
-			// 	if (prop === 'isAssign') {
-			// 		this.isDeliver = false
-			// 		this.isReadyForDelivery = false
-			// 		this.isNotify = false
-			// 	} else if (prop === 'isDeliver') {
-			// 		this.isAssign = false
-			// 		this.isReadyForDelivery = false
-			// 		this.isNotify = false
-			// 	} else if (prop === 'isReadyForDelivery') {
-			// 		this.isAssign = false
-			// 		this.isDeliver = false
-			// 		this.isNotify = false
-			// 	} else {
-			// 		this.isAssign = false
-			// 		this.isReadyForDelivery = false
-			// 		this.isDeliver = false
-			// 	}
-			// },
+			toggleOption({ prop }) {
+				this[prop] = true
+				if (prop === 'isNotify') {
+					this.isDeliver = false
+					this.isNotify = true
+					this.isReadyForDelivery = false
+				} else if (prop === 'isDeliver') {
+          this.isDeliver = true
+          this.isNotify = false
+          this.isReadyForDelivery = false
+				} else if (prop === 'isReadyForDelivery') {
+          this.isDeliver = false
+          this.isNotify = false
+          this.isReadyForDelivery = true
+				}
+			},
 			// setRollbackManager({ manager }) {
 			// 	this.rollbackManager = manager
 			// },
@@ -321,30 +316,43 @@
 			// 		}
 			// 	}
 			// },
-			// async approve() {
-			// 	try {
-			// 		if (this.isDr1 && this.isAssign) {
-			// 			await this.assignDr2({
-			// 				projectId: this.project._id,
-			// 				taskId: this.task.taskId,
-			// 				dr2Manager: this.dr2Manager
-			// 			})
-			// 			return await this.getDeliveryData()
-			// 		} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
-			// 			return await this.approveDeliverable(this.task.taskId)
-			// 		} else {
-			// 			return await this.approveWithOption({
-			// 				taskId: this.task.taskId,
-			// 				isDeliver: this.isDeliver,
-			// 				contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
-			// 				user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
-			// 			})
-			// 		}
-			// 	} catch (err) {
-			// 	} finally {
-			// 		this.$emit("close")
-			// 	}
-			// },
+			async approve() {
+				// try {
+				// 	if (this.isDr1 && this.isAssign) {
+				// 		await this.assignDr2({
+				// 			projectId: this.project._id,
+				// 			taskId: this.task.taskId,
+				// 			dr2Manager: this.dr2Manager
+				// 		})
+				// 		return await this.getDeliveryData()
+				// 	} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
+				// 		return await this.approveDeliverable(this.task.taskId)
+				// 	} else {
+				// 		return await this.approveWithOption({
+				// 			taskId: this.task.taskId,
+				// 			isDeliver: this.isDeliver,
+				// 			contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
+				// 			user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
+				// 		})
+				// 	}
+				// } catch (err) {
+				// } finally {
+				// 	this.$emit("close")
+				// }
+
+        switch (true) {
+          case this.isReadyForDelivery:
+            console.log("isReadyForDelivery");
+            return await this.approveReady(this.task.taskId)
+          case this.isDeliver:
+            console.log("isDeliver");
+            return await this.approveDeliver(this.task.taskId)
+          case this.isNotify:
+            console.log("isNotify");
+            return await this.approveNotify(this.task.taskId)
+        }
+        this.$emit("close")
+			},
 			async assignManager({ manager, prop }) {
         // const { dr2Manager, files } = this.deliveryData
         // if(manager._id === dr2Manager) return
@@ -430,14 +438,14 @@
 			}
 		},
 		components: {
+      Button,
+      OptionsDR2,
       TableDR2,
       // DropsDR2,
 			// Drops,
 			// Table,
 			Check,
-			// Options,
 			// CheckBox,
-			// Button,
 			// RollbackModal,
 			ckeditor: CKEditor.component
 		},

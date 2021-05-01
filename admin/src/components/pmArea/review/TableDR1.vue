@@ -87,7 +87,7 @@
 					delete: { src: require("../../../assets/images/latest-version/delete-icon.png") }
 				},
 				selectedAction: "",
-				actions: [ "Approve", "Download" ],
+				actions: [ "Approve", "Generate Deliverable", "Download" ],
 				deleteIndex: null,
 				approveModalShow: false
 			}
@@ -124,7 +124,9 @@
 				}
 				if (option === 'Approve') {
 					this.$emit('approveFiles', { checked })
-				}
+				}else if(option === 'Generate Deliverable'){
+          this.$emit('generateDeliverable', { checked })
+        }
 			},
 			async approveModal() {
 				if (this.deleteIndex === null) {

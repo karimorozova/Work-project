@@ -1,6 +1,8 @@
 const {
-	getProjectAfterApprove,
-	setTasksDeliveryStatus
+	// getProjectAfterApprove,
+	setTasksDeliveryStatus,
+  taskApproveDeliver,
+  taskApproveNotify,
 } = require("./approve")
 const { getAfterTasksDelivery } = require("./tasks-deliver")
 const { getAfterProjectDelivery } = require("./projectDeliver")
@@ -14,7 +16,7 @@ const {
 } = require("./review")
 
 module.exports = {
-	getProjectAfterApprove,
+	// getProjectAfterApprove,
 	setTasksDeliveryStatus,
 	getAfterTasksDelivery,
 	getAfterProjectDelivery,
@@ -23,5 +25,7 @@ module.exports = {
   changeManagerDR2,
 	changeReviewStage,
 	rollbackReview,
+  taskApproveDeliver,
+  taskApproveNotify,
 	// dr1Instructions
 }

@@ -75,6 +75,7 @@
         @checkFile="checkFile"
         @removeFile="removeFile"
         @deliverFile="deliverFile"
+        @generateDeliverable="generateDeliverable"
       )
 
     .review__options
@@ -156,11 +157,11 @@
 		methods: {
 			...mapActions([
 				"approveInstruction",
-				"approveDeliveryFile",
+				// "approveDeliveryFile",
 				// "uploadTarget",
-				"approveWithOption",
-				"approveDeliverable",
-				"assignDr2",
+				// "approveWithOption",
+				// "approveDeliverable",
+				// "assignDr2",
 				"changeReviewManager",
 				// "rollBackReview",
 				"alertToggle",
@@ -296,17 +297,43 @@
         }catch (err){
         }
       },
+      async generateDeliverable({ checked }){
+        const files = checked.filter(item => !item.isFilePushedDR2)
+        const { dr1Manager, dr2Manager, taskId } = this.deliveryTask
+
+       if(files.length){
+         const paths = files.map(item => item.path)
+         await this.$http.post('/delivery/file-dr2-push', { projectId: this.project._id, taskId, dr1Manager, dr2Manager, files } )
+         await this.$http.post('/pm-manage/is-file-pushed-dr2',{projectId: this.project._id, taskId, isFilePushedDR2: true, paths,})
+         const updatedProject = await this.$http.post("/pm-manage/approve-files", { projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, paths });
+         await this.setCurrentProject(updatedProject.data);
+         await this.updatedFiles(updatedProject)
+       }
+        // const updatedProject = await this.$http.post("/pm-manage/approve-files", { projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, isFilePushedDR2: true, paths: [ path ] });
+        // await this.$http.post('/delivery/file-dr2-push', { projectId: this.project._id, taskId, dr1Manager, dr2Manager, files: [ this.files[index] ] } )
+        // await this.setCurrentProject(updatedProject.data);
+        // await this.updatedFiles(updatedProject)
+        // console.log(paths)
+
+      },
 			async approveFile({ index }) {
 				this.files[index].isFileApproved = !this.files[index].isFileApproved
 				const { taskId, isFileApproved, path } = this.files[index]
 				try {
-					await this.approveDeliveryFile({ projectId: this.project._id, taskId, isFileApproved, paths: [ path ] })
-				} catch (err) {
+          const updatedProject = await this.$http.post("/pm-manage/approve-files", { projectId: this.project._id, taskId, isFileApproved, paths: [ path ] });
+          await this.setCurrentProject(updatedProject.data);
+          await this.updatedFiles(updatedProject)
+        } catch (err) {
 				}
 			},
 			async approveFiles({ checked }) {
 				const paths = checked.map(item => item.path)
-				await this.approveDeliveryFile({ projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, paths })
+        try {
+        const updatedProject = await this.$http.post("/pm-manage/approve-files", { projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, paths });
+        await this.setCurrentProject(updatedProject.data);
+        await this.updatedFiles(updatedProject)
+        } catch (err) {
+        }
 			},
 			// async checkPermission() {
 			// 	if (!this.isReviewing) {
@@ -323,30 +350,30 @@
 			// 		}
 			// 	}
 			// },
-			async approve() {
-				try {
-					if (this.isDr1 && this.isAssign) {
-						await this.assignDr2({
-							projectId: this.project._id,
-							taskId: this.task.taskId,
-							dr2Manager: this.dr2Manager
-						})
-						return await this.getDeliveryData()
-					} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
-						return await this.approveDeliverable(this.task.taskId)
-					} else {
-						return await this.approveWithOption({
-							taskId: this.task.taskId,
-							isDeliver: this.isDeliver,
-							contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
-							user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
-						})
-					}
-				} catch (err) {
-				} finally {
-					this.$emit("close")
-				}
-			},
+			// async approve() {
+			// 	try {
+			// 		if (this.isDr1 && this.isAssign) {
+			// 			await this.assignDr2({
+			// 				projectId: this.project._id,
+			// 				taskId: this.task.taskId,
+			// 				dr2Manager: this.dr2Manager
+			// 			})
+			// 			return await this.getDeliveryData()
+			// 		} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
+			// 			return await this.approveDeliverable(this.task.taskId)
+			// 		} else {
+			// 			return await this.approveWithOption({
+			// 				taskId: this.task.taskId,
+			// 				isDeliver: this.isDeliver,
+			// 				contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
+			// 				user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
+			// 			})
+			// 		}
+			// 	} catch (err) {
+			// 	} finally {
+			// 		this.$emit("close")
+			// 	}
+			// },
 			async assignManager({ manager, prop }) {
         const { dr1Manager, dr2Manager } = this.deliveryTask
         if(prop === 'dr1Manager'){
@@ -529,6 +556,10 @@
 
     &__check, &__table {
       position: relative;
+    }
+
+    &__table{
+      margin-top: 20px;
     }
 
     &__check-item {

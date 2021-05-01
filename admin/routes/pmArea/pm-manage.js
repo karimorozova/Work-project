@@ -80,7 +80,7 @@ const {
 } = require('../../utils')
 
 const {
-	getProjectAfterApprove,
+	// getProjectAfterApprove,
 	setTasksDeliveryStatus,
 	getAfterTasksDelivery,
 	getAfterProjectDelivery,
@@ -88,7 +88,9 @@ const {
 	changeManager,
 	changeReviewStage,
 	rollbackReview,
-  changeManagerDR2
+  changeManagerDR2,
+  taskApproveDeliver,
+  taskApproveNotify,
 } = require('../../delivery')
 
 const {
@@ -982,7 +984,7 @@ router.post('/tasks-approve-notify', async (req, res) => {
 	const { taskId, isDeliver, contacts, user } = req.body
 	try {
 		const project = await getProject({ 'tasks.taskId': taskId })
-		const updatedProject = await getProjectAfterApprove({ taskId, project, isDeliver, contacts, user })
+		const updatedProject = await taskApproveNotify({ taskId, project, isDeliver, contacts, user })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -990,12 +992,25 @@ router.post('/tasks-approve-notify', async (req, res) => {
 	}
 })
 
+router.post('/tasks-approve-deliver', async (req, res) => {
+  const { taskId, isDeliver, contacts, user } = req.body
+  try {
+    const project = await getProject({ 'tasks.taskId': taskId })
+    const updatedProject = await taskApproveDeliver({ taskId, project, isDeliver, contacts, user })
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on approving deliverable')
+  }
+})
+
 router.post('/tasks-approve', async (req, res) => {
-	const { taskId } = req.body
+  console.log('/tasks-approve')
+	// const { taskId } = req.body
 	try {
-		const project = await getProject({ 'tasks.taskId': taskId })
-		const updatedProject = await setTasksDeliveryStatus({ taskId, project, status: 'Ready for Delivery' })
-		res.send(updatedProject)
+		// const project = await getProject({ 'tasks.taskId': taskId })
+		// const updatedProject = await setTasksDeliveryStatus({ taskId, project, status: 'Ready for Delivery' })
+		res.send('updatedProject')
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on approving deliverable')

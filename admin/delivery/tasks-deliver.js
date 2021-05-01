@@ -1,7 +1,8 @@
-const { getProjectAfterApprove } = require("./approve");
+// const { getProjectAfterApprove } = require("./approve");
 const { getProject } = require("../projects");
 
 async function getAfterTasksDelivery(tasks, user) {
+  console.log('FIX getAfterTasksDelivery')
 	const taskIds = tasks.map(item => item.taskId);
 	try {
 		const project = await getProject({ "tasks.taskId": taskIds[0] });
@@ -10,7 +11,7 @@ async function getAfterTasksDelivery(tasks, user) {
 		});
 		let updatedProject = null;
 		for (let taskId of taskIds) {
-			updatedProject = await getProjectAfterApprove({ taskId, project, isDeliver: true, contacts, user });
+			// updatedProject = await getProjectAfterApprove({ taskId, project, isDeliver: true, contacts, user });
 		}
 		return updatedProject;
 	} catch (err) {
