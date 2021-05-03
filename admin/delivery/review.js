@@ -151,41 +151,41 @@ async function changeReviewStage({projectId, taskId}) {
     }
 }
 
-async function rollbackReview({projectId, taskId, manager}) {
-    await Delivery.bulkWrite([
-        {
-            updateOne:
-                {
-                    filter: {projectId, "tasks.taskId": taskId},
-                    update: {
-                        "tasks.$[i].isAssigned": false,
-                        "tasks.$[i].status": "dr1",
-                        "tasks.$[i].dr1Manager": manager,
-                        $pull: {"tasks.$[i].instructions": {step: "dr2"}},
-                        "tasks.$[i].files.$[j].isFileApproved": false
-                    },
-                    arrayFilters: [{"i.taskId": taskId}, {"j.isFileApproved": true}]
-                }
-        },
-        {
-            updateOne:
-                {
-                    filter: {projectId, "tasks.taskId": taskId},
-                    update: {
-                        "tasks.$[i].instructions.$[k].isChecked": false,
-                        "tasks.$[i].instructions.$[j].isNotRelevant": false,
-                    },
-                    arrayFilters: [{"i.taskId": taskId}, {"k.isChecked": true}, {"j.isNotRelevant": true}]
-                }
-        }
-    ])
-}
+// async function rollbackReview({projectId, taskId, manager}) {
+//     await Delivery.bulkWrite([
+//         {
+//             updateOne:
+//                 {
+//                     filter: {projectId, "tasks.taskId": taskId},
+//                     update: {
+//                         "tasks.$[i].isAssigned": false,
+//                         "tasks.$[i].status": "dr1",
+//                         "tasks.$[i].dr1Manager": manager,
+//                         $pull: {"tasks.$[i].instructions": {step: "dr2"}},
+//                         "tasks.$[i].files.$[j].isFileApproved": false
+//                     },
+//                     arrayFilters: [{"i.taskId": taskId}, {"j.isFileApproved": true}]
+//                 }
+//         },
+//         {
+//             updateOne:
+//                 {
+//                     filter: {projectId, "tasks.taskId": taskId},
+//                     update: {
+//                         "tasks.$[i].instructions.$[k].isChecked": false,
+//                         "tasks.$[i].instructions.$[j].isNotRelevant": false,
+//                     },
+//                     arrayFilters: [{"i.taskId": taskId}, {"k.isChecked": true}, {"j.isNotRelevant": true}]
+//                 }
+//         }
+//     ])
+// }
 
 module.exports = {
   checkPermission,
   changeManager,
   changeReviewStage,
-  rollbackReview,
+  // rollbackReview,
   // dr1Instructions,
   changeManagerDR2
 }

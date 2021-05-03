@@ -2,8 +2,8 @@
   .review
     span.review__close(@click="close") &#215;
 
-    //  .review__modal(v-if="isModal")
-    //    RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBack")
+    .review__modal(v-if="isModalRollback")
+      RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBackApprove")
     //
     .review__title Delivery Review 2
     span.relative
@@ -57,7 +57,7 @@
     //    .review__forbidden(v-if="isReviewing")
     //
     .review__table
-      .review__forbidden(v-if="isReviewing")
+      //.review__forbidden(v-if="isReviewing")
       TableDR2(
         :task="task"
         :files="files"
@@ -67,6 +67,7 @@
         @checkAll="checkAllFiles"
         @checkFile="checkFile"
         @removeFile="removeFile"
+        @rollback="rollback"
       )
 
     .review__options
@@ -111,10 +112,10 @@
   import TableDR2 from "../review/TableDR2";
   import OptionsDR2 from "../review/OptionsDR2";
   import Button from "../../Button";
+  import RollbackModal from "../review/RollbackModal";
   // import DropsDR2 from "../review/DropsDR2";
   //
 	// const CheckBox = () => import("@/components/CheckBox")
-	// const RollbackModal = () => import("../review/RollbackModal")
 
 	export default {
 		mixins: [ editorConfig ],
@@ -135,6 +136,9 @@
 				isDeliver: false,
 				isNotify: false,
 				isReadyForDelivery: true,
+        isModalRollback: false,
+				rollbackManager: null,
+        taskIdRollback: null
 				// isAssign: true,
 				// isDr1: true,
 				// files: [],
@@ -145,7 +149,6 @@
 				// instructions: [],
 				// isReviewing: false,
 				// isModal: false,
-				// rollbackManager: null,
 				// previousComment: ''
 			}
 		},
@@ -153,17 +156,17 @@
 			...mapActions([
 				"approveInstructionDR2",
 				"approveDeliveryFileDR2",
+        "approveReady",
+        "approveNotify",
+        "approveDeliver",
+        "changeReviewManagerDR2",
+        "alertToggle",
+        "setCurrentProject",
+				// "rollBackReview",
 				// "approveDeliveryFile",
 				// "uploadTarget",
 				// "approveWithOption",
-				"approveReady",
 				// "assignDr2",
-        "approveNotify",
-				"approveDeliver",
-				"changeReviewManagerDR2",
-				// "rollBackReview",
-				"alertToggle",
-        "setCurrentProject"
 			]),
 			// async generateCertificate() {
 			// 	try {
@@ -194,10 +197,6 @@
 			close() {
 				this.$emit("close")
 			},
-			// closeRollback() {
-			// 	this.isModal = false
-			// 	this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
-			// },
 			setContacts({ contacts }) {
 				// this.contacts = [ ...contacts ]
 			},
@@ -217,9 +216,6 @@
           this.isReadyForDelivery = true
 				}
 			},
-			// setRollbackManager({ manager }) {
-			// 	this.rollbackManager = manager
-			// },
 			async toggleList({ type, instruction }) {
         const types = [ 'isChecked', 'isNotRelevant' ]
         const anotherType = types.filter(item => item !== type)
@@ -368,15 +364,37 @@
         //   type: this.type
         // })
 			},
-			// async rollBack() {
-			// 	const rollback = {
-			// 		projectId: this.project._id,
-			// 		taskId: this.task.taskId,
-			// 		manager: this.rollbackManager
-			// 	}
-			// 	await this.rollBackReview(rollback)
-			// 	this.close()
-			// },
+      rollback(task){
+        this.isModalRollback = true
+        const { tasksDR1 } = this.project
+        const { dr1Manager } = tasksDR1.find(({ taskId }) => taskId === task)
+        this.rollbackManager = this.users.find(({ _id }) => `${ _id }` === `${ dr1Manager }`)
+        this.taskIdRollback = task
+      },
+      setRollbackManager({ manager }) {
+        this.rollbackManager = manager
+      },
+      closeRollback() {
+        this.isModalRollback = false
+        this.rollbackManager = null
+        this.taskIdRollback = null
+      },
+			async rollBackApprove() {
+				const rollback = {
+          entityId: this.deliveryData._id,
+				  projectId: this.project._id,
+          taskId: this.taskIdRollback,
+          manager: this.rollbackManager
+				}
+				try{
+          const updatedProject = await this.$http.post("/pm-manage/rollback-review", { ...rollback })
+          await this.setCurrentProject(updatedProject.data);
+          await this.updatedFiles(updatedProject)
+        }catch (err){
+          this.alertToggle({ message: "Err in rollback!", isShow: true, type: "error" })
+        }
+				this.closeRollback()
+			},
 			// async getDeliveryData() {
 			// 	if (this.task.status === "Pending Approval [DR2]") {
 			// 		this.isDr1 = false
@@ -438,6 +456,7 @@
 			}
 		},
 		components: {
+      RollbackModal,
       Button,
       OptionsDR2,
       TableDR2,
@@ -446,7 +465,6 @@
 			// Table,
 			Check,
 			// CheckBox,
-			// RollbackModal,
 			ckeditor: CKEditor.component
 		},
     mounted() {
@@ -541,6 +559,10 @@
 
     &__check, &__table {
       position: relative;
+    }
+
+    &__table{
+      margin-top: 20px;
     }
 
     &__check-item {

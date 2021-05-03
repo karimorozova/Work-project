@@ -51,7 +51,7 @@
             .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved || isReviewing}")
               input.review-table__file-input(type="file" :disabled="row.isFileApproved || isReviewing" @change="(e) => uploadFile(e, index)")
           i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
-          //i.review-table__check-icon.fas.fa-arrow-alt-circle-right(v-if="row.isFileApproved" :class="{'review-table_green': row.isFilePushedDR2}" @click="deliverFile(index)")
+          i.review-table__rollback-icon.fas.fa-undo-alt(v-if="!row.isFileApproved && row.taskId !== 'Loaded in DR2'"  @click="rollback(row.taskId)")
 
     .review-table__upload.review-table_no-back
       input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
@@ -78,7 +78,7 @@
 					{ label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
 					{ label: "File Name", headerKey: "headerName", key: "name", width: "36%", padding: 0 },
 					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "24%", padding: 0 },
-					{ label: "Language pair", headerKey: "headerPair", key: "pair", width: "19%", padding: 0 },
+          { label: "Language pair", headerKey: "headerPair", key: "pair", width: "19%", padding: 0 },
 					{ label: "Action", headerKey: "headerAction", key: "action", width: "17%", padding: 0 }
 				],
 				icons: {
@@ -96,13 +96,13 @@
 			approveFile(index) {
 				this.$emit('approveFile', { index })
 			},
-      // deliverFile(index){
-      //   this.$emit('deliverFile', index)
-      // },
+      rollback(task){
+        this.$emit('rollback', task)
+      },
 			// generateCertificate() {
 			// 	this.$emit('generateCertificate')
 			// },
-			async makeOneAction(index, key) {
+			 makeOneAction(index, key) {
 				const file = this.files[index]
 				if (file.isFileApproved) return
 				if (key === 'download') {
@@ -244,6 +244,12 @@
     &__check-icon {
       font-size: 16px;
       color: $light-brown;
+      cursor: pointer;
+      transition: ease 0.1s;
+      margin-right: 7px;
+    }
+    &__rollback-icon {
+      font-size: 16px;
       cursor: pointer;
       transition: ease 0.1s;
       margin-right: 7px;

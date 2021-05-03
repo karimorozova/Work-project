@@ -205,10 +205,10 @@
 			close() {
 				this.$emit("close")
 			},
-			closeRollback() {
-				this.isModal = false
-				this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
-			},
+			// closeRollback() {
+			// 	this.isModal = false
+			// 	this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
+			// },
 			// setContacts({ contacts }) {
 			// 	this.contacts = [ ...contacts ]
 			// },
@@ -232,9 +232,9 @@
 			// 		this.isDeliver = false
 			// 	}
 			// },
-			setRollbackManager({ manager }) {
-				this.rollbackManager = manager
-			},
+			// setRollbackManager({ manager }) {
+			// 	this.rollbackManager = manager
+			// },
 			async toggleList({ type, instruction }) {
 				const types = [ 'isChecked', 'isNotRelevant' ]
 				const anotherType = types.filter(item => item !== type)
@@ -399,7 +399,7 @@
 			// 	// await this.rollBackReview(rollback)
 			// 	this.close()
 			// },
-			async getDeliveryData() {
+			// async getDeliveryData() {
 
 				// if (this.task.status === "Pending Approval [DR2]") {
 				// 	this.isDr1 = false
@@ -428,7 +428,7 @@
 				// } catch (err) {
 				// 	this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
 				// }
-			}
+			// }
 
 		},
 		computed: {

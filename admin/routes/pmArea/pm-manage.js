@@ -960,24 +960,43 @@ router.post('/assign-dr2', async (req, res) => {
 })
 
 router.post('/rollback-review', async (req, res) => {
-	const { taskId, projectId, manager } = req.body
-	try {
-		await rollbackReview({ taskId, projectId, manager })
-		const message = `Delivery review of the task ${ taskId } is assigned to you.`
-		//rollback template
-		await managerNotifyMail(manager, message, 'Task delivery review assignment notification (I016)')
-		const updatedProject = await updateProject(
-				{
-					'_id': projectId,
-					'tasks.taskId': taskId
-				}, {
-					'tasks.$.status': 'Pending Approval [DR1]'
-				})
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
+	const { entityId, taskId, projectId, manager } = req.body
+  const project = await Projects.findOne({ "_id": projectId })
+  const singleLang = project.tasksDR2.singleLang.find(({_id}) => _id.toString() === entityId.toString())
+  const paths = singleLang.files.filter(item => item.taskId === taskId).map(item => item.path)
+
+  try {
+    for await (path of paths) {
+      await removeTaskDR2(projectId, path, entityId)
+      await rollbackManagerDR1(path)
+    }
+
+    const message = `Delivery review of the task ${ taskId } is assigned to you.`
+    await managerNotifyMail(manager, message, 'Task delivery review assignment notification (I016)')
+
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on rollback-review')
+  }
+
+  async function rollbackManagerDR1(path){
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.files.path": path },
+      { "tasksDR1.$[i].dr1Manager" : manager._id, "tasksDR1.$[i].files.$[j].isFileApproved": false, "tasksDR1.$[i].files.$[j].isFilePushedDR2": false },
+      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': path } ]}
+    )
+  }
+
+  async function removeTaskDR2(projectId, path, entityId){
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.files.path": path },
+      { $pull: { "tasksDR2.singleLang.$[i].files": { path } }},
+      { arrayFilters: [ { 'i._id': entityId }] }
+    )
+  }
+
 })
 
 router.post('/tasks-approve-notify', async (req, res) => {
