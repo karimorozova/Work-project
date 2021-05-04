@@ -5,10 +5,9 @@ const { Vendors } = require("../models")
 async function deleteEmptyOrNotCreatedByManger () {
   const notEmptyOrCreatedByManagerFilter = {
       isCreatedByManager: false,
-       status: 'Potential',
-       '$or': [{pendingCompetencies: { $size: 0}}, {pendingCompetencies: { $exists: false}}] ,
-       '$or': [{competencies: { $size: 0}}, {competencies: { $exists: false}}] ,
-       '$or': [{approvedPendingCompetencies: { $size: 0}}, {approvedPendingCompetencies: { $exists: false}}] ,
+      status: 'Potential',
+      pendingCompetencies: { $size: 0} ,
+      competencies: { $size: 0} ,
       'dateInfo.createdAt': { $exists: true, $lte: moment().subtract(30, 'days').set({hours: 23, minutes: 59}).format()}
   }
   const vendors = await Vendors.find(notEmptyOrCreatedByManagerFilter)
@@ -23,9 +22,8 @@ async function sendPreventDeleteNotActiveVendor () {
   const notEmptyOrCreatedByManagerFilter = {
     isCreatedByManager: false,
     status: 'Potential',
-    '$or': [{pendingCompetencies: { $size: 0}}, {pendingCompetencies: { $exists: false}}] ,
-    '$or': [{competencies: { $size: 0}}, {competencies: { $exists: false}}] ,
-    '$or': [{approvedPendingCompetencies: { $size: 0}}, {approvedPendingCompetencies: { $exists: false}}] ,
+    pendingCompetencies: { $size: 0} ,
+    competencies: { $size: 0} ,
     'dateInfo.createdAt': { $exists: true, $lte: moment().subtract(25, 'days').set({hours: 23, minutes: 59}).format(), $gte:  moment().subtract(25, 'days').set({hours: 0, minutes: 0}).format()}
   }
   const vendors = await Vendors.find(notEmptyOrCreatedByManagerFilter)
