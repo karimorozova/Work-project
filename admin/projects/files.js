@@ -6,7 +6,7 @@ const fs = require('fs');
 const { Delivery } = require('../models')
 const htmlToPdf = require('html-pdf');
 let  apiUrl = require('../helpers/apiurl');
-!!apiUrl && (apiUrl = 'https://admin.pangea.global')
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
 const { getCertificateTemplate } = require('../emailMessages/complianceCecertificate')
 
 async function storeFiles(filesArr, projectId) {
