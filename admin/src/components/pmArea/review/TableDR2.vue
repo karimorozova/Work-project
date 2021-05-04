@@ -46,12 +46,18 @@
       .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId }}
       .review-table__data(slot="action" slot-scope="{ row, index }")
         .review-table__icons
-          template(v-for="(icon, key) in allIcons")
-            img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved || key === 'delete' && isReviewing}" @click="makeOneAction(index, key)")
-            .review-table__upload(v-if="key === 'upload'" :class="{'review-table_opacity-04': row.isFileApproved || isReviewing}")
-              input.review-table__file-input(type="file" :disabled="row.isFileApproved || isReviewing" @change="(e) => uploadFile(e, index)")
+          //template(v-for="(icon, key) in allIcons")
+          //template
+            //img.review-table__icon(v-if="key !== 'upload'" :src="icon.src" :class="{'review-table_opacity-04': row.isFileApproved || key === 'delete' && isReviewing}" @click="makeOneAction(index, key)")
+
+          img.review-table__icon(:src="icons.download.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'download')")
+          .review-table__upload( :class="{'review-table_opacity-04': row.isFileApproved}")
+            input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
+          span(v-if="type === 'single'")
+            img.review-table__icon(:src="icons.delete.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'delete')")
           i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
-          i.review-table__rollback-icon.fas.fa-undo-alt(v-if="!row.isFileApproved && row.taskId !== 'Loaded in DR2'"  @click="rollback(row.taskId)")
+          span(v-if="type === 'single'")
+            i.review-table__rollback-icon.fas.fa-undo-alt(v-if="!row.isFileApproved && row.taskId !== 'Loaded in DR2'"  @click="rollback(row.taskId)")
 
     .review-table__upload.review-table_no-back
       input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
@@ -71,6 +77,7 @@
 		props: {
 			task: { type: Object },
 			files: { type: Array },
+      type: {type: String }
 		},
 		data() {
 			return {
@@ -159,16 +166,16 @@
 			}
 		},
 		computed: {
-			allIcons() {
-				let result = this.icons
-				if (this.files.length > 1) {
-					result = {
-						...result,
-						delete: { src: require("../../../assets/images/latest-version/delete-icon.png") }
-					}
-				}
-				return result
-			},
+			// allIcons() {
+			// 	let result = this.icons
+			// 	if (this.files.length > 1) {
+			// 		result = {
+			// 			...result,
+			// 			delete: { src: require("../../../assets/images/latest-version/delete-icon.png") }
+			// 		}
+			// 	}
+			// 	return result
+			// },
 			isAllChecked() {
 				return !this.files.find(item => !item.isChecked)
 			}

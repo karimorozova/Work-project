@@ -13,40 +13,45 @@
     .deliverables__DR2(v-if="isDR2Modal")
       DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
     .deliverables__modal(v-if="deliverablesModal")
-      .deliverables__title Upload Deliverables
+      .deliverables__titleModal Upload Deliverables
       span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
       .deliverables__body
-        .deliverables__select
-          SelectMulti(
-            placeholder="Select"
-            :options="selectTaskInfo"
-            :selectedOptions="selectedTasks"
-            @chooseOptions="selectedTasksMethod"
-          )
-        .deliverables__items
-          .deliverables__item
-            span Upload deliverables:
-            span.tasks-files__label-red
-            .tasks-files__upload-file
-              FilesUpload(
-                :isMulti="false"
-                buttonValue="Upload deliverables"
-                inputClass="files-upload__ref-file"
-                :files="refFiles"
-                @uploadFiles="uploadRefFiles"
-                @deleteFile="deleteFile()"
-              )
-          .tasks-files__fileItem
-            .deliverable__wrapper
-              .file-list__items(v-for="(file, index) in refFiles")
-                .file-list__item
-                  .file-list__name {{file.name}}
-                  span.file-list__delete(@click="deleteFile()") &#x2715
+        .deliverables_items
 
-          .tasks-files__button
-            Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
-          .tasks-files__tooltip File can be <= 50Mb
-          .tasks-files__tooltip (otherwise it will not be loaded)
+          .deliverables__items
+            .deliverables__item
+              .deliverables__uploadItem
+                //span Upload File:
+                //span.tasks-files__label-red
+                .deliverables__selectTitle Upload File:
+                .tasks-files__upload-file
+                  FilesUpload(
+                    :isMulti="false"
+                    buttonValue="Upload deliverables"
+                    inputClass="files-upload__ref-file"
+                    :files="refFiles"
+                    @uploadFiles="uploadRefFiles"
+                    @deleteFile="deleteFile()"
+                  )
+              .tasks-files__fileItem
+                .deliverable__wrapper
+                  .file-list__items(v-for="(file) in refFiles")
+                    .file-list__item
+                      .file-list__name {{file.name}}
+                      span.file-list__delete(@click="deleteFile()") &#x2715
+            div
+              .deliverables__selectTitle Assign to task:
+              .deliverables__select
+                SelectMulti(
+                  placeholder="Select"
+                  :options="selectTaskInfo"
+                  :selectedOptions="selectedTasks"
+                  @chooseOptions="selectedTasksMethod"
+                )
+
+        .tasks-files__button
+          Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
+        .tasks-files__tooltip File can be <= 50Mb (otherwise it will not be loaded)
 
     .deliverables__title Deliverables
     .deliverables-table
@@ -136,7 +141,7 @@ export default {
         dr2: {src: require("../../assets/images/delivery-review-icon.png") },
       }
       if (type === 'multi') {
-        icons.delete = {src: require("../../assets/images/Other/delete-icon-qa-form.png")}
+        icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
       }
 
       return icons
@@ -292,6 +297,14 @@ export default {
   box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   position: relative;
 
+  &__items{
+    display: flex;
+  }
+
+  &__selectTitle{
+    margin-bottom: 4px;
+  }
+
   &__approveModal{
     position: absolute;
     z-index: 5555;
@@ -299,11 +312,15 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
   }
+
+  &__uploadItem{
+    //display: flex;
+    //align-items: center;
+    //justify-content: center;
+  }
+
   &__item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px 0;
+    margin-right: 40px;
   }
 
   &__DR2 {
@@ -321,6 +338,12 @@ export default {
     padding-bottom: 150px;
   }
 
+  &__titleModal{
+    font-size: 22px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: Myriad600;
+  }
   &__title{
     font-size: 22px;
     margin-bottom: 20px;
@@ -332,6 +355,7 @@ export default {
   &__select {
     position: relative;
     height: 32px;
+    width: 191px;
   }
 
   &-table {
@@ -453,7 +477,7 @@ export default {
     }
   }
   &__modal {
-    padding: 20px 40px;
+    padding: 20px;
     background: white;
     position: absolute;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
@@ -493,7 +517,8 @@ export default {
   }
 
   &__upload-file {
-    margin-left: 15px;
+    display: flex;
+    //margin-left: 15px;
   }
 
   &__button {

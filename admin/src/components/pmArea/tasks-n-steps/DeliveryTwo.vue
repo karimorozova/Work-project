@@ -59,6 +59,7 @@
     .review__table
       //.review__forbidden(v-if="isReviewing")
       TableDR2(
+        :type="type"
         :task="task"
         :files="files"
         @approveFile="approveFile"
@@ -427,13 +428,15 @@
 		},
 		computed: {
 		  deliveryData(){
+        const { tasksDR2 } = this.project
 		    if(this.type === 'single'){
-		      const { tasksDR2 } = this.project
 		      const deliveryData = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
-          console.log('deliveryData',deliveryData)
+          console.log('deliveryDataS',deliveryData)
           return deliveryData
         }else{
-          {}
+          const deliveryData = tasksDR2.multiLang.find(item => `${item._id}` === `${this.id}`)
+          console.log('deliveryDataM',deliveryData)
+          return deliveryData
         }
       },
 			groupedInstructions() {
@@ -460,11 +463,7 @@
       Button,
       OptionsDR2,
       TableDR2,
-      // DropsDR2,
-			// Drops,
-			// Table,
 			Check,
-			// CheckBox,
 			ckeditor: CKEditor.component
 		},
     mounted() {
@@ -472,10 +471,10 @@
 		  if(this.type === 'single'){
         const {files} = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
         this.files = files.map(item => ({ ...item, isChecked: false }))
+      }else{
+        const { file, tasks } = tasksDR2.multiLang.find(item => `${item._id}` === `${this.id}`)
+        this.files = [{ ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false}]
       }
-
-      // this.checkPermission()
-      // 		.then(res => this.getDeliveryData())
     }
 	}
 </script>

@@ -101,9 +101,8 @@ async function addMultiLangDR2({projectId, taskIds, refFiles}) {
       const additionFileInfo = `${Math.floor(Math.random()*100000)}`;
       let storedFiles = [];
       if (file) {
-        const newPath = `./dist/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
-        // const newPath = `./dist/projectFiles/${projectId}/${tasks.length + 1}-${file.filename.replace(/\s+/g, '_')}`;
-        await moveProjectFile(file, newPath);
+        const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
+        await moveProjectFile(file, `./dist${newPath}`);
         storedFiles.push(newPath);
       }
       return storedFiles;

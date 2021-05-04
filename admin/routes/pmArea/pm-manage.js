@@ -708,7 +708,14 @@ router.post('/approve-instruction-dr2', async (req, res) => {
         { arrayFilters: [ { 'i._id': entityId }, { 'j.text': instruction.text } ]}
       )
     }else{
-      console.log('multi')
+      await Projects.updateOne(
+        { "_id": projectId, 'tasksDR2.multiLang._id': entityId, "tasksDR2.multiLang.instructions.text": instruction.text },
+        {
+          "tasksDR2.multiLang.$[i].instructions.$[j].isChecked": instruction.isChecked,
+          "tasksDR2.multiLang.$[i].instructions.$[j].isNotRelevant": instruction.isNotRelevant
+        },
+        { arrayFilters: [ { 'i._id': entityId }, { 'j.text': instruction.text } ]}
+      )
     }
 
     const updatedProject = await getProject({"_id": projectId})
@@ -727,6 +734,12 @@ router.post('/approve-files-dr2', async (req, res) => {
         { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.files.path": { $in: paths } },
         { "tasksDR2.singleLang.$[i].files.$[j].isFileApproved": isFileApproved },
         { arrayFilters: [ { 'i._id': entityId }, { 'j.path': { $in: paths } } ]}
+      )
+    }else{
+      await Projects.updateOne(
+        { "_id": projectId, 'tasksDR2.multiLang._id': entityId },
+        { "tasksDR2.multiLang.$[i].file.isFileApproved": isFileApproved },
+        { arrayFilters: [ { 'i._id': entityId } ]}
       )
     }
     const updatedProject = await getProject({"_id": projectId})
@@ -793,7 +806,11 @@ router.post('/delivery-comments-dr2', async (req, res) => {
       )
       res.send(updatedProject)
     }else{
-
+      const updatedProject = await getProjectAfterUpdate(
+        {"_id": projectId, 'tasksDR2.multiLang._id': entityId,},
+        { $set: {"tasksDR2.multiLang.$.comment": comment}}
+      )
+      res.send(updatedProject)
     }
   }catch(err){
     console.log(err)
@@ -932,9 +949,17 @@ router.post('/remove-dr2-file', async (req, res) => {
       fs.unlink(`./dist${ path }`, (err) => {
         if (err) throw(err)
       })
-    }else{
-
     }
+    // else{
+    //   await Projects.updateOne(
+    //     { "_id": projectId, 'tasksDR2.multiLang._id': entityId },
+    //     {  "tasksDR2.multiLang.$[i].file": {} },
+    //     { arrayFilters: [ { 'i._id': entityId }] }
+    //   )
+    //   // fs.unlink(`./dist${ path }`, (err) => {
+    //   //   if (err) throw(err)
+    //   // })
+    // }
     const updatedProject = await getProject({"_id": projectId})
     res.send(updatedProject)
   } catch (err) {
