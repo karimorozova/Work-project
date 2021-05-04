@@ -17,12 +17,9 @@
       span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
       .deliverables__body
         .deliverables_items
-
           .deliverables__items
             .deliverables__item
               .deliverables__uploadItem
-                //span Upload File:
-                //span.tasks-files__label-red
                 .deliverables__selectTitle Upload File:
                 .tasks-files__upload-file
                   FilesUpload(
@@ -33,12 +30,7 @@
                     @uploadFiles="uploadRefFiles"
                     @deleteFile="deleteFile()"
                   )
-              .tasks-files__fileItem
-                .deliverable__wrapper
-                  .file-list__items(v-for="(file) in refFiles")
-                    .file-list__item
-                      .file-list__name {{file.name}}
-                      span.file-list__delete(@click="deleteFile()") &#x2715
+
             div
               .deliverables__selectTitle Assign to task:
               .deliverables__select
@@ -49,6 +41,12 @@
                   @chooseOptions="selectedTasksMethod"
                 )
 
+        .tasks-files__fileItem
+          .deliverable__wrapper
+            .file-list__items(v-for="(file) in refFiles")
+              .file-list__item
+                .file-list__name {{file.name}}
+                span.file-list__delete(@click="deleteFile()") &#x2715
         .tasks-files__button
           Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
         .tasks-files__tooltip File can be <= 50Mb (otherwise it will not be loaded)
@@ -70,15 +68,11 @@
       .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
       .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
-      .deliverables-table__data(slot="action" slot-scope="{ row, index }")
-        .i-table__icons(slot="icons" slot-scope="{ row, index }")
-          img.i-table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'i-table_opacity': isActive(key, index)}")
 
+      .deliverables-table__data(slot="action" slot-scope="{ row, index }")
         .deliverables-table__icons
-            img.deliverables-table__icon(
-              v-for="(icon, key) in getIcons(row)"
-              :src="icon.src"
-              @click="dr2Action(row, key)")
+            img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
+
     Add(@add="showModal")
 </template>
 
@@ -122,10 +116,11 @@ export default {
       this.selectedTasks = []
       this.isDeleteModal = false
       this.currentReviewId = null
+      this.currentReviewType = null
     },
     async deleteDR2() {
       try {
-        const result = await this.$http.post('/delivery/multi-file-dr2-remove', {projectId: this.currentProject._id, dr2Id: this.currentReviewId})
+        const result = await this.$http.post('/delivery/multi-file-dr2-remove', {projectId: this.currentProject._id, type: this.currentReviewType, dr2Id: this.currentReviewId})
         this.storeProject(result.data)
 
         this.closeDeleteModal()
@@ -136,18 +131,20 @@ export default {
         this.closeDeliverablesModal()
       }
     },
-    getIcons({type}) {
-      const icons =  {
+    getIcons({type, files}) {
+      const icons = {
         dr2: {src: require("../../assets/images/delivery-review-icon.png") },
       }
       if (type === 'multi') {
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
+      }else if(type === 'single' && !files.length){
+        icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
       }
-
       return icons
     },
     dr2Action({_id, type}, key) {
       this.currentReviewId = _id
+      this.currentReviewType = type
 
       switch (key) {
         case "delete":
@@ -155,12 +152,9 @@ export default {
           break;
 
         case "dr2":
-          this.currentReviewType = type
           this.isDR2Modal = true
           break;
-
       }
-
     },
     closeDR2() {
       this.currentReviewId = this.currentReviewType  = null
@@ -551,6 +545,7 @@ export default {
   }
 
   &__item {
+    width: 100%;
     border-radius: 5px;
     border: 1px solid #68573e;
     box-sizing: border-box;
@@ -558,12 +553,11 @@ export default {
     font-size: 12px;
     padding: 8px;
     margin: 0;
-    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
-    margin-top: 10px;
+    margin-top: 20px;
     font-family: -webkit-pictograph;
   }
 

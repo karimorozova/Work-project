@@ -50,10 +50,10 @@ router.post('/multi-file-dr2-push',upload.fields([ { name: 'refFiles' } ]), asyn
 })
 
 router.post('/multi-file-dr2-remove', async (req, res) => {
-  const {projectId, dr2Id} = req.body
+  const {projectId, type, dr2Id} = req.body
 
   try {
-    const DR2 =  await removeMultiDR2({projectId, dr2Id})
+    const DR2 =  await removeMultiDR2({projectId, type, dr2Id})
     res.send( DR2 )
   } catch (err) {
     console.log(err)

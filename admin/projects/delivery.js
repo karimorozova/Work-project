@@ -93,7 +93,7 @@ async function addMultiLangDR2({projectId, taskIds, refFiles}) {
       dr2Manager: accountManager,
     }
   }
-// return "tesr";
+
   return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.multiLang" : [...tasksDR2.multiLang, multiLang ] })
 
   async function storeFile(file, projectId) {
@@ -113,15 +113,21 @@ async function addMultiLangDR2({projectId, taskIds, refFiles}) {
   }
 }
 
-async function removeMultiDR2({projectId, dr2Id}) {
-  const {tasksDR2 : { multiLang }} = await Projects.findOne({_id: projectId})
+async function removeMultiDR2({projectId, type, dr2Id}) {
+  const qProject = { "_id": projectId }
+  const {tasksDR2 : { multiLang, singleLang }} = await Projects.findOne(qProject)
 
+  if(type === 'multi'){
+    const newMultiLang = multiLang.filter(({_id}) => `${ _id }` !== `${ dr2Id }`)
+    const removedMultiLang = multiLang.filter(({_id}) => `${ _id }` === `${ dr2Id }`)[0]
+    await fs.unlink(removedMultiLang.file.path, (err) => { if(err) console.log(err)});
 
-  const newMultiLang = multiLang.filter(({_id}) => _id.toString() !== dr2Id.toString())
-  const removedMultiLang = multiLang.filter(({_id}) => _id.toString() === dr2Id.toString())[0]
-  await fs.unlink(removedMultiLang.file.path, (err) => { if(err) console.log(err)});
+    return await getProjectAfterUpdate(qProject, { "tasksDR2.multiLang" : newMultiLang })
+  }else{
+    const newSingleLang = singleLang.filter(({_id}) => `${ _id }` !== `${ dr2Id }`)
+    return await getProjectAfterUpdate(qProject, { "tasksDR2.singleLang" : newSingleLang })
 
-  return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.multiLang" : newMultiLang })
+  }
 }
 
 module.exports = {addDR2, addMultiLangDR2, removeDR2, removeMultiDR2}

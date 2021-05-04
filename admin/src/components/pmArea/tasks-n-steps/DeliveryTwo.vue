@@ -251,7 +251,8 @@
           const {files} = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
           this.files = files.map(item => ({ ...item, isChecked: false }))
         }else{
-
+          const { file, tasks } = tasksDR2.multiLang.find(item => `${item._id}` === `${this.id}`)
+          this.files = [{ ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false}]
         }
       },
       async removeFile(file){
@@ -278,11 +279,9 @@
         fileData.append("entityId", this.deliveryData._id)
         fileData.append("type", this.type)
         try {
-          if(this.type === 'single'){
             const updatedProject = await this.$http.post("/pm-manage/target-dr2", fileData)
             await this.setCurrentProject(updatedProject.data);
             await this.updatedFiles(updatedProject)
-          }
         } catch (err) {
         }
 			},
