@@ -1,4 +1,6 @@
-const apiUrl = require("../helpers/apiurl")
+let apiUrl = require("../helpers/apiurl")
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
+
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const moment = require('moment')
@@ -375,7 +377,7 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
                 <div class="quote__subheader" style="text-align:center;font-weight:bold;padding-top:15px;padding-bottom:15px;padding-right:0;padding-left:0;border: 1px solid #66563D;" >
                     ${ obj.projectName }
                 </div>
-     
+
 	                       <table class="details__table"
 	                            style="width:100%;color:#66563E;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 	                            <tr>
@@ -422,7 +424,7 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 //Check min price in Project
 function generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) {
 	const TMDiscount = taskInfoSubTotal - taskInfoWithoutDiscounts
-	const TMRow = TMDiscount > 0 ? `<td class="main_weight600" style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;"> TM Discount:</td> 
+	const TMRow = TMDiscount > 0 ? `<td class="main_weight600" style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;"> TM Discount:</td>
 <td style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;"> ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ TMDiscount.toFixed(2) }</td>` : `<td style="display: none;"></td><td style="display: none;"></td>`
 	return !fromMinimumCharge ? `<tr>
             <td class="main_weight600"
@@ -439,7 +441,7 @@ function generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDisc
 
 //Check min price in Project
 function showCostHeader(fromMinimumCharge) {
-	return !fromMinimumCharge ? `<td class="main_weight600" 
+	return !fromMinimumCharge ? `<td class="main_weight600"
 						style="color:#fff; width: 12%; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
     			Cost</td>` : `<td style="display: none"></td>`
 }
@@ -472,7 +474,7 @@ function generateTotalRow(taskInfoSubTotal, fromMinimumCharge, obj) {
                   <td style="background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;"></td>
                 <td style="background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;"></td>
                   <td style="background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;"></td>
-					 <td class="main_weight600" 
+					 <td class="main_weight600"
 					 style="color:#fff; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                  ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ taskInfoSubTotal.toFixed(2) }</td>
 					</tr>` : `<tr style="display: none;"></tr>`
@@ -609,7 +611,7 @@ function taskReadyMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ am }</p>
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>   
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
                     <p style="font-weight: 400;">
                         Task ${ obj.task.taskId } (${ obj.task.service.title }) from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready.
                     </p>
@@ -636,7 +638,7 @@ function taskDeliveryMessage(obj) {
                     <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
                         <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                             This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
-                        <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>   
+                        <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
                         <p style="font-weight: 400;">
                             I'm pleased to inform you that task <strong>${ obj.task.taskId } (${ obj.task.service.title })</strong> from project <strong>${ obj.projectId } - ${ obj.projectName }</strong> has been completed and is ready for review.
                         </p>

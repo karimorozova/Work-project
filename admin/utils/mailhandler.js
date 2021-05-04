@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
-const apiUrl = require("../helpers/apiurl");
+let apiUrl = require("../helpers/apiurl");
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
 
 const mailhandler = {
   sendMail(request) {

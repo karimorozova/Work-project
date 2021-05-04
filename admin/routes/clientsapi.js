@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { upload } = require('../utils')
-const apiUrl = require('../helpers/apiurl')
+let apiUrl = require('../helpers/apiurl')
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
 const fse = require('fs-extra')
 const {
 	getClient,

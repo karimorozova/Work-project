@@ -1,4 +1,5 @@
-const apiUrl = require("../helpers/apiurl")
+let apiUrl = require("../helpers/apiurl")
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
