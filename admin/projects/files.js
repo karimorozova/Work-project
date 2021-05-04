@@ -5,7 +5,8 @@ const { getPdfOfQuote } = require("../emailMessages/clientCommunication");
 const fs = require('fs');
 const { Delivery } = require('../models')
 const htmlToPdf = require('html-pdf');
-const apiUrl = require('../helpers/apiurl');
+let  apiUrl = require('../helpers/apiurl');
+!!apiUrl && (apiUrl = 'https://admin.pangea.global')
 const { getCertificateTemplate } = require('../emailMessages/complianceCecertificate')
 
 async function storeFiles(filesArr, projectId) {
