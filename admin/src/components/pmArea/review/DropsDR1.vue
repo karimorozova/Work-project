@@ -12,7 +12,7 @@
       //.drops__header(slot="headerContacts" slot-scope="{ field }") {{ field.label }}
 
       .drops__data(slot="dr1" slot-scope="{ row }")
-        .drops__name(v-if="!isAdmin") {{ `${ dr1Manager.firstName } ${ dr1Manager.lastName }` }}
+        .drops__name(v-if="!canUpdateDr1Manager") {{ `${ dr1Manager.firstName } ${ dr1Manager.lastName }` }}
           //.drops__timestamp(v-if="timestamp")
             img.drops__time-icon(src="../../../assets/images/time_icon.png")
             .drops__time-data {{ getDeliveredTime() }}
@@ -24,7 +24,7 @@
           )
 
       .drops__data(slot="dr2" slot-scope="{ row }")
-        .drops__name(v-if="!isAdmin") {{ dr2Manager.firstName + ' ' + dr2Manager.lastName }}
+        .drops__name(v-if="!canUpdateDr1") {{ dr2Manager.firstName + ' ' + dr2Manager.lastName }}
         .drops__menu(v-else)
           SelectSingle(
             :options="managersNames"
@@ -53,6 +53,7 @@
 			user: { type: Object },
 			dr1Manager: { type: Object },
 			dr2Manager: { type: Object },
+      deliveryTask: { type: Object },
 			// timestamp: { type: String, default: "" },
 			// isReviewing: { type: Boolean }
 		},
@@ -109,7 +110,14 @@
 			},
 			isAdmin() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
-			}
+			},
+      canUpdateDr1() {
+        return this.isAdmin || this.user._id.toString() === this.dr1Manager._id.toString()
+      },
+      canUpdateDr1Manager() {
+        if (this.isAdmin) return true
+        return !this.deliveryTask.instructions.some(({isChecked, isNotRelevant}) => isChecked || isNotRelevant ) && this.user._id.toString() === this.dr1Manager._id.toString()
+      },
 		},
 		components: {
 			SelectSingle,

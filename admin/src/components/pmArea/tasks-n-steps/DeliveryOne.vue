@@ -13,95 +13,100 @@
         :user="user"
         :dr1Manager="users.find(({_id}) => `${_id}` === `${deliveryTask.dr1Manager}`)"
         :dr2Manager="users.find(({_id}) => `${_id}` === `${deliveryTask.dr2Manager}`)"
+        :deliveryTask="deliveryTask"
         @assignManager="assignManager"
       )
       //Drops(:isReviewing="isReviewing" :project="project" :user="user" :dr1Manager="dr1Manager" :dr2Manager="dr2Manager" :timestamp="timestamp")
+
 
     span.relative
       .review_left-align DR1 Checklist
       //.review__forbidden(v-if="isReviewing")
 
-    .review__check
-      //.review__forbidden(v-if="isReviewing")
-      .review__headers
-        .review__headers-item Check
-        .review__headers-item Not Relevant
-      .review__checkTitle(v-for="(group, index) in  Object.keys(groupedInstructions)")
-        .review__checkSubTitle(:class="{marginTop: !!index}") {{ group }}
-        .review__check-item(v-for="instruction in groupedInstructions[group]")
-          .review__check-itemText
-            span.icon-start-line
-              i.fa.fa-angle-double-right(aria-hidden='true')
-            span {{ instruction.text }}
-          .review__check-itemCheck
-            Check(
-              @toggleApproval="toggleList"
-              :instruction="instruction"
-              :isApproved="instruction.isChecked"
-              :type="'isChecked'"
-            )
-          .review__check-itemCheck
-            Check(
-              @toggleApproval="toggleList"
-              :instruction="instruction"
-              :isApproved="instruction.isNotRelevant"
-              :type="'isNotRelevant'"
-            )
-      .review__checkTitle
-        .review__checkSubTitle(:class="{marginTop: true}") Comments
-        .review__notes
-          ckeditor(v-model="deliveryTask.comment" :config="editorConfig")
-          .notes__button( @click="sendMessage") Save &nbsp;
-            i.fa.fa-paper-plane(aria-hidden='true')
+    .review__wrapper
+      .review__wrapper-hide(v-if="!canUpdateDR1")
 
-    //.review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
-      .dr1Comment__title DR1 Comment
-      .dr1Comment__textarea
-        .dr1Comment__textareaText(v-html="previousComment")
+      .review__check
+        //.review__forbidden(v-if="isReviewing")
+        .review__headers
+          .review__headers-item Check
+          .review__headers-item Not Relevant
+        .review__checkTitle(v-for="(group, index) in  Object.keys(groupedInstructions)")
+          .review__checkSubTitle(:class="{marginTop: !!index}") {{ group }}
+          .review__check-item(v-for="instruction in groupedInstructions[group]")
+            .review__check-itemText
+              span.icon-start-line
+                i.fa.fa-angle-double-right(aria-hidden='true')
+              span {{ instruction.text }}
+            .review__check-itemCheck
+              Check(
+                @toggleApproval="toggleList"
+                :instruction="instruction"
+                :isApproved="instruction.isChecked"
+                :type="'isChecked'"
+              )
+            .review__check-itemCheck
+              Check(
+                @toggleApproval="toggleList"
+                :instruction="instruction"
+                :isApproved="instruction.isNotRelevant"
+                :type="'isNotRelevant'"
+              )
+        .review__checkTitle
+          .review__checkSubTitle(:class="{marginTop: true}") Comments
+          .review__notes
+            ckeditor(v-model="deliveryTask.comment" :config="editorConfig")
+            .notes__button( @click="sendMessage") Save &nbsp;
+              i.fa.fa-paper-plane(aria-hidden='true')
 
-    //span.relative
-      .split-line
-      .review__forbidden(v-if="isReviewing")
+      //.review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
+        .dr1Comment__title DR1 Comment
+        .dr1Comment__textarea
+          .dr1Comment__textareaText(v-html="previousComment")
 
-    .review__table
-      //.review__forbidden(v-if="isReviewing")
-      TableDR1(
-        :task="task"
-        :files="files"
-        @approveFile="approveFile"
-        @approveFiles="approveFiles"
-        @uploadFile="uploadFile"
-        @checkAll="checkAllFiles"
-        @checkFile="checkFile"
-        @removeFile="removeFile"
-        @deliverFile="deliverFile"
-        @generateDeliverable="generateDeliverable"
-      )
-
-    .review__options
-      //.review__options-check(v-if="isAllChecked")
-        //CheckBox(
-        //  :isChecked="areOptions"
-        //  customClass="review-options"
-        //  @check="(e) => toggleOptions(e, true)"
-        //  @uncheck="(e) => toggleOptions(e, false)"
-        //)
-      //.review__forbidden(v-if="isReviewing")
-      //Options(v-if="isAllChecked" :isAssign="isAssign" :isDeliver="isDeliver" :isNotify="isNotify" :isReadyForDelivery="isReadyForDelivery" :isDr1="isDr1" @toggleOption="toggleOption")
-
-    .review__buttons(v-if="dr1Manager && dr2Manager && getUser")
-      .review__button(v-if="!isDr1")
-        .review__forbidden(v-if="dr1Manager._id !== getUser._id && dr2Manager._id !== getUser._id && getUser.name === 'Administrators'")
-        Button(
-          value="Rollback"
-          @clicked="popupRollback"
-        )
-      .review__button(v-if="isAllChecked")
+      //span.relative
+        .split-line
         .review__forbidden(v-if="isReviewing")
-        Button(
-          value="Approve Deliverable"
-          @clicked="approve"
+
+      .review__table
+        //.review__forbidden(v-if="isReviewing")
+        TableDR1(
+          :task="task"
+          :files="files"
+          @approveFile="approveFile"
+          @approveFiles="approveFiles"
+          @uploadFile="uploadFile"
+          @checkAll="checkAllFiles"
+          @checkFile="checkFile"
+          @removeFile="removeFile"
+          @deliverFile="deliverFile"
+          @generateDeliverable="generateDeliverable"
         )
+
+      .review__options
+        //.review__options-check(v-if="isAllChecked")
+          //CheckBox(
+          //  :isChecked="areOptions"
+          //  customClass="review-options"
+          //  @check="(e) => toggleOptions(e, true)"
+          //  @uncheck="(e) => toggleOptions(e, false)"
+          //)
+        //.review__forbidden(v-if="isReviewing")
+        //Options(v-if="isAllChecked" :isAssign="isAssign" :isDeliver="isDeliver" :isNotify="isNotify" :isReadyForDelivery="isReadyForDelivery" :isDr1="isDr1" @toggleOption="toggleOption")
+
+      .review__buttons(v-if="dr1Manager && dr2Manager && getUser")
+        .review__button(v-if="!isDr1")
+          .review__forbidden(v-if="dr1Manager._id !== getUser._id && dr2Manager._id !== getUser._id && getUser.name === 'Administrators'")
+          Button(
+            value="Rollback"
+            @clicked="popupRollback"
+          )
+        .review__button(v-if="isAllChecked")
+          .review__forbidden(v-if="isReviewing")
+          Button(
+            value="Approve Deliverable"
+            @clicked="approve"
+          )
 </template>
 
 <script>
@@ -454,7 +459,13 @@
 			// },
 			isAdmin() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
-			}
+			},
+			canUpdateDR1() {
+			  if (!this.deliveryTask) return false
+			  return this.isAdmin
+          || this.user._id.toString() === this.deliveryTask.dr1Manager.toString()
+          || this.user._id.toString() === this.deliveryTask.dr2Manager.toString()
+      }
 		},
 		components: {
       TableDR1,
@@ -518,6 +529,20 @@
     background-color: $white;
     position: relative;
     width: 800px;
+
+    &__wrapper {
+      position: relative;
+    }
+
+    &__wrapper-hide {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, .1);
+      z-index: 10;
+    }
 
     &__checkSubTitle {
       border-bottom: 1px solid #c5bfb5;

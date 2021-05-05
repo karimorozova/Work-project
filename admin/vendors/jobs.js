@@ -1,7 +1,7 @@
 const { getProjects, getProject, taskCompleteNotifyPM, notifyManagerStepStarted, stepCompletedNotifyPM } = require('../projects')
 const { Projects, Delivery, Languages } = require('../models')
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
-const { dr1Instructions } = require('../delivery')
+const { dr1Instructions } = require('../enums')
 const fs = require('fs');
 
 async function getJobs(id) {
