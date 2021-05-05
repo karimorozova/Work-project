@@ -1,6 +1,16 @@
 const fs = require('fs')
-const {getProject} = require("./getProjects");
-const {moveProjectFile} = require("../utils/movingFile");
+const {
+  getProject
+} = require("./getProjects");
+
+const {
+  moveProjectFile
+} = require("../utils/movingFile");
+
+const {
+  notifyClientDeliverablesReady,
+  sendClientDeliveries,
+} = require("./emails")
 
 const {
   Projects,
@@ -13,9 +23,35 @@ const {
   getProjectAfterUpdate,
 } = require('./getProjects')
 
+const taskApproveDeliver= async ({ projectId, type, entityId }) => {
+  console.log('tyts')
+  // await sendClientDeliveries()
+}
+const taskApproveNotify = async ({ projectId, type, entityId, contacts }) => {
+  const project = await getProject({ '_id': projectId })
+  await notifyClientDeliverablesReady({ project, contacts });
+  return await taskApproveReady({ projectId, type, entityId })
+}
+
+const taskApproveReady = async ({ projectId, type, entityId }) =>{
+  const qProject = { "_id": projectId }
+  if(type === 'single'){
+    await Projects.updateOne(
+      { ...qProject, "tasksDR2.singleLang._id": entityId },
+      { "tasksDR2.singleLang.$[i].status": 'Ready for Delivery' },
+      { arrayFilters: [{ 'i._id': entityId }] }
+    )
+  }else{
+    await Projects.updateOne(
+      { ...qProject, "tasksDR2.multiLang._id": entityId },
+      { "tasksDR2.multiLang.$[i].status": 'Ready for Delivery' },
+      { arrayFilters: [{ 'i._id': entityId }] }
+    )
+  }
+  return await getProject(qProject)
+}
 
 async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
-
   const allLang =  await Languages.find({})
   const {tasks, tasksDR2 : { singleLang }} = await Projects.findOne({_id: projectId})
 
@@ -131,4 +167,12 @@ async function removeMultiDR2({projectId, type, dr2Id}) {
   }
 }
 
-module.exports = {addDR2, addMultiLangDR2, removeDR2, removeMultiDR2}
+module.exports = {
+  taskApproveNotify,
+  taskApproveDeliver,
+  taskApproveReady,
+  addDR2,
+  addMultiLangDR2,
+  removeDR2,
+  removeMultiDR2
+}

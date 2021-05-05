@@ -212,45 +212,50 @@ async function getPMnotificationMessage(project, task, user) {
 	}
 }
 
-async function notifyClientTaskReady({ taskId, project, contacts }) {
+async function notifyClientDeliverablesReady({ project, contacts }) {
 	contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
-	const task = project.tasks.find(item => item.taskId === taskId)
+	// const task = project.tasks.find(item => item.taskId === taskId)
 	try {
 		for (let contact of contacts) {
-			const message = taskReadyMessage({ task, contact, project })
-			await sendEmail({ to: contact.email, subject: `Task is ready: ${ taskId } - ${ task.service.title } (ID C006.2)` }, message)
+			const message = taskReadyMessage({
+        // task,
+        contact,
+        project
+			})
+      // const subject = `Task is ready: ${ taskId } - ${ task.service.title } (ID C006.2)`
+			await sendEmail({ to: contact.email, subject: 'In dev' }, message)
 		}
 	} catch (err) {
 		console.log(err)
-		console.log("Error in notifyClientTaskReady")
+		console.log("Error in notifyClientDeliverablesReady")
 	}
 }
 
 async function sendClientDeliveries({ taskId, project, contacts }) {
-	contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
-	try {
-		const accManager = await User.findOne({ "_id": project.accountManager.id })
-		const task = project.tasks.find(item => item.taskId === taskId)
-		const taskIndex = project.tasks.findIndex(item => item.taskId === taskId)
-		const subject = `Delivery: ${ taskId } - ${ task.service.title } (ID C006.1)`
-		const review = await Delivery.findOne({ projectId: project._id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-		const deliverables = task.deliverables || await getDeliverablesLink({ taskId, taskFiles: review.tasks[0].files, projectId: project._id })
-		const content = fs.createReadStream(`./dist${ deliverables }`)
-		const attachments = [ { filename: "deliverables.zip", content } ]
-		await Projects.updateOne({ "_id": project._id }, { [`tasks.${ taskIndex }.deliverables`]: deliverables })
-
-		for await (let contact of contacts) {
-			const finalAttachments = attachments
-					.filter(item => item.filename === 'deliverables.zip')
-					.map(item => ({ filename: item.filename, path: `./dist${ deliverables }` }))
-
-			const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id })
-			await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
-		}
-	} catch (err) {
-		console.log(err)
-		console.log("Error in sendClientDeliveries")
-	}
+	// contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
+	// try {
+	// 	const accManager = await User.findOne({ "_id": project.accountManager.id })
+	// 	const task = project.tasks.find(item => item.taskId === taskId)
+	// 	const taskIndex = project.tasks.findIndex(item => item.taskId === taskId)
+	// 	const subject = `Delivery: ${ taskId } - ${ task.service.title } (ID C006.1)`
+	// 	const review = await Delivery.findOne({ projectId: project._id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
+	// 	const deliverables = task.deliverables || await getDeliverablesLink({ taskId, taskFiles: review.tasks[0].files, projectId: project._id })
+	// 	const content = fs.createReadStream(`./dist${ deliverables }`)
+	// 	const attachments = [ { filename: "deliverables.zip", content } ]
+	// 	await Projects.updateOne({ "_id": project._id }, { [`tasks.${ taskIndex }.deliverables`]: deliverables })
+  //
+	// 	for await (let contact of contacts) {
+	// 		const finalAttachments = attachments
+	// 				.filter(item => item.filename === 'deliverables.zip')
+	// 				.map(item => ({ filename: item.filename, path: `./dist${ deliverables }` }))
+  //
+	// 		const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id })
+	// 		await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
+	// 	}
+	// } catch (err) {
+	// 	console.log(err)
+	// 	console.log("Error in sendClientDeliveries")
+	// }
 }
 
 async function notifyDeliverablesDownloaded(taskId, project, user) {
@@ -369,7 +374,7 @@ module.exports = {
 	stepCancelNotifyVendor,
 	getMessage,
 	taskCompleteNotifyPM,
-	notifyClientTaskReady,
+  notifyClientDeliverablesReady,
 	sendClientDeliveries,
 	notifyDeliverablesDownloaded,
 	notifyProjectDelivery,

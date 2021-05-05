@@ -604,6 +604,7 @@ function emailMessageForContact(obj) {
 // Return template for Task ready for Delivery
 function taskReadyMessage(obj) {
 	const am = `${ obj.project.accountManager.firstName } ${ obj.project.accountManager.lastName }`
+  return `taskReadyMessage in dev`
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >

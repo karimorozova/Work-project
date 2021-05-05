@@ -166,8 +166,7 @@ export const changeReviewManager = async ({ dispatch }, payload) => {
 export const approveNotify = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
-		const { taskId, isDeliver, contacts, user } = payload;
-		const updatedProject = await Vue.http.post("/pm-manage/tasks-approve-notify", { taskId, isDeliver, contacts, user });
+		const updatedProject = await Vue.http.post("/delivery/tasks-approve-notify", payload);
 		await dispatch('setCurrentProject', updatedProject.data);
 		dispatch('alertToggle', { message: "Success", isShow: true, type: "success" })
 	} catch (err) {
@@ -179,8 +178,7 @@ export const approveNotify = async ({ dispatch }, payload) => {
 export const approveDeliver = async ({ dispatch }, payload) => {
   dispatch('incrementRequestCounter')
   try {
-    const { taskId, isDeliver, contacts, user } = payload;
-    const updatedProject = await Vue.http.post("/pm-manage/tasks-approve-deliver", { taskId, isDeliver, contacts, user });
+    const updatedProject = await Vue.http.post("/delivery/tasks-approve-deliver", payload);
     await dispatch('setCurrentProject', updatedProject.data);
     dispatch('alertToggle', { message: "Success", isShow: true, type: "success" })
   } catch (err) {
@@ -193,7 +191,7 @@ export const approveDeliver = async ({ dispatch }, payload) => {
 export const approveReady = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
-		const updatedProject = await Vue.http.post("/pm-manage/tasks-approve", { taskId: payload });
+		const updatedProject = await Vue.http.post("/delivery/tasks-approve-ready", payload);
 		await dispatch('setCurrentProject', updatedProject.data);
 		dispatch('alertToggle', { message: "Success", isShow: true, type: "success" })
 	} catch (err) {

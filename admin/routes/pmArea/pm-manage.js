@@ -89,8 +89,8 @@ const {
 	changeReviewStage,
 	rollbackReview,
   changeManagerDR2,
-  taskApproveDeliver,
-  taskApproveNotify,
+  // taskApproveDeliver,
+  // taskApproveNotify,
 } = require('../../delivery')
 
 const {
@@ -1000,16 +1000,6 @@ router.post('/remove-dr2-file', async (req, res) => {
         if (err) throw(err)
       })
     }
-    // else{
-    //   await Projects.updateOne(
-    //     { "_id": projectId, 'tasksDR2.multiLang._id': entityId },
-    //     {  "tasksDR2.multiLang.$[i].file": {} },
-    //     { arrayFilters: [ { 'i._id': entityId }] }
-    //   )
-    //   // fs.unlink(`./dist${ path }`, (err) => {
-    //   //   if (err) throw(err)
-    //   // })
-    // }
     const updatedProject = await getProject({"_id": projectId})
     res.send(updatedProject)
   } catch (err) {
@@ -1018,21 +1008,21 @@ router.post('/remove-dr2-file', async (req, res) => {
   }
 })
 
-router.post('/assign-dr2', async (req, res) => {
-	const { taskId, projectId, dr2Manager } = req.body
-	try {
-		await changeReviewStage({ taskId, projectId })
-		const updatedProject = await updateProject({
-			'_id': projectId,
-			'tasks.taskId': taskId
-		}, { 'tasks.$.status': 'Pending Approval [DR2]' })
-		await notifyReadyForDr2({ dr2Manager, project: updatedProject, taskId })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
-})
+// router.post('/assign-dr2', async (req, res) => {
+// 	const { taskId, projectId, dr2Manager } = req.body
+// 	try {
+// 		await changeReviewStage({ taskId, projectId })
+// 		const updatedProject = await updateProject({
+// 			'_id': projectId,
+// 			'tasks.taskId': taskId
+// 		}, { 'tasks.$.status': 'Pending Approval [DR2]' })
+// 		await notifyReadyForDr2({ dr2Manager, project: updatedProject, taskId })
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on approving deliverable')
+// 	}
+// })
 
 router.post('/rollback-review', async (req, res) => {
 	const { entityId, taskId, projectId, manager } = req.body
@@ -1072,43 +1062,6 @@ router.post('/rollback-review', async (req, res) => {
     )
   }
 
-})
-
-router.post('/tasks-approve-notify', async (req, res) => {
-	const { taskId, isDeliver, contacts, user } = req.body
-	try {
-		const project = await getProject({ 'tasks.taskId': taskId })
-		const updatedProject = await taskApproveNotify({ taskId, project, isDeliver, contacts, user })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
-})
-
-router.post('/tasks-approve-deliver', async (req, res) => {
-  const { taskId, isDeliver, contacts, user } = req.body
-  try {
-    const project = await getProject({ 'tasks.taskId': taskId })
-    const updatedProject = await taskApproveDeliver({ taskId, project, isDeliver, contacts, user })
-    res.send(updatedProject)
-  } catch (err) {
-    console.log(err)
-    res.status(500).send('Error on approving deliverable')
-  }
-})
-
-router.post('/tasks-approve', async (req, res) => {
-  console.log('/tasks-approve')
-	// const { taskId } = req.body
-	try {
-		// const project = await getProject({ 'tasks.taskId': taskId })
-		// const updatedProject = await setTasksDeliveryStatus({ taskId, project, status: 'Ready for Delivery' })
-		res.send('updatedProject')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
 })
 
 // router.post('/delivery-data', async (req, res) => {

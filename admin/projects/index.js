@@ -7,8 +7,10 @@ const {
   regainWorkFlowStatusByStepId
 } = require('./updates');
 const {
-  stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM, notifyClientTaskReady, notifyManagerStepStarted, notifyStepDecisionMade,
-  sendClientDeliveries, notifyDeliverablesDownloaded, notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
+  stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM,
+  notifyManagerStepStarted, notifyStepDecisionMade,
+  notifyDeliverablesDownloaded,
+  notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
   notifyVendorStepStart, sendQuotes, sendQuoteMessage, sendCostQuoteMessage
 } = require('./emails');
 const {
@@ -27,11 +29,17 @@ const {
   addMultiLangDR2,
   removeDR2,
   removeMultiDR2,
+  taskApproveReady,
+  taskApproveNotify,
+  taskApproveDeliver,
 } = require('./delivery');
 
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
 
 module.exports = {
+  taskApproveDeliver,
+  taskApproveNotify,
+  taskApproveReady,
   removeDR2,
   generateAndSaveCertificate,
   getProject,
@@ -49,9 +57,7 @@ module.exports = {
   createTasks,
   getMessage,
   taskCompleteNotifyPM,
-  notifyClientTaskReady,
   getDeliverablesLink,
-  sendClientDeliveries,
   notifyDeliverablesDownloaded,
   getProjectWithUpdatedFinance,
   updateProjectProgress,
