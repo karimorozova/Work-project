@@ -177,7 +177,7 @@ export default {
     closeDeliverablesModal() {
       this.deliverablesModal = false
     },
-    async uploadFiles() {
+    async uploadFiles( ) {
       let filesData = new FormData()
       filesData.append('projectId', this.currentProject._id)
       filesData.append('taskIds', JSON.stringify(this.selectedTasks))
@@ -259,9 +259,12 @@ export default {
     },
     selectTaskInfo() {
       if(!this.currentProject || !this.currentProject.tasks) return []
+      const multilingualIds = this.currentProject.hasOwnProperty('tasksDR2') ? this.currentProject.tasksDR2.multiLang.map(({tasks}) => tasks).flat() : []
+      console.log({ multilingualIds })
       let result = new Set()
-
-      this.currentProject.tasks.filter(({status}) => status === 'Complete').forEach(({taskId}) => result.add(taskId))
+      this.currentProject.tasksDR1
+        .filter(({files, taskId}) => files.every(({isFileApproved, isFilePushedDR2}) => isFileApproved && !isFilePushedDR2) && !multilingualIds.includes(taskId))
+        .forEach(({taskId}) => result.add(taskId))
 
       return Array.from(result)
     }
