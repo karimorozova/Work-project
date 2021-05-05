@@ -32,6 +32,8 @@
       .review-table__header(slot="headerName" slot-scope="{ field }") {{ field.label }}
       .review-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .review-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
+      .review-table__header(slot="headerDR1" slot-scope="{ field }") {{ field.label }}
+      .review-table__header(slot="headerDR2" slot-scope="{ field }") {{ field.label }}
       .review-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
       .review-table__data.review-table__check-cell(slot="check" slot-scope="{ row, index }")
@@ -43,7 +45,10 @@
         span.review-table__file-name {{ row.fileName }}
 
       .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
-      .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId }}
+      .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId.substring(row.taskId.length - 3)  }}
+      .review-table__data(slot="dr1" slot-scope="{ row }") {{ getManagerName(row.dr1Manager) }}
+      .review-table__data(slot="dr2" slot-scope="{ row }") asdasd
+
       .review-table__data(slot="action" slot-scope="{ row, index }")
         .review-table__icons
 
@@ -74,16 +79,20 @@
 		props: {
 			task: { type: Object },
 			files: { type: Array },
-      type: {type: String }
+      type: {type: String },
+      user: { type: Object },
+      users: { type: Array },
 		},
 		data() {
 			return {
 				fields: [
 					{ label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
-					{ label: "File Name", headerKey: "headerName", key: "name", width: "36%", padding: 0 },
-					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "24%", padding: 0 },
-          { label: "Language pair", headerKey: "headerPair", key: "pair", width: "19%", padding: 0 },
-					{ label: "Action", headerKey: "headerAction", key: "action", width: "17%", padding: 0 }
+					{ label: "File Name", headerKey: "headerName", key: "name", width: "10%", padding: 0 },
+					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "10%", padding: 0 },
+          { label: "Language pair", headerKey: "headerPair", key: "pair", width: "10%", padding: 0 },
+          { label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", width: "10%", padding: 0 },
+          { label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", width: "10%", padding: 0 },
+          { label: "Action", headerKey: "headerAction", key: "action", width: "17%", padding: 0 }
 				],
 				icons: {
 					download: { src: require("../../../assets/images/latest-version/download-file.png") },
@@ -97,6 +106,10 @@
 			}
 		},
 		methods: {
+      getManagerName(id){
+        const { firstName, lastName } =  this.users.find(({_id}) => `${_id}` === `${id}`)
+        return `${firstName} ${lastName}`
+      },
 			approveFile(index) {
 				this.$emit('approveFile', { index })
 			},

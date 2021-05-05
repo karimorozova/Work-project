@@ -63,11 +63,13 @@
       .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
+      .deliverables-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
       .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
       .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
+      .deliverables-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
 
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
         .deliverables-table__icons
@@ -90,10 +92,11 @@ export default {
   data() {
     return {
       fields: [
-        { label: "Language pair", headerKey: "headerPair", key: "pair", width: "30%", padding: 0 },
-        { label: "# Files", headerKey: "headerFile", key: "file", width: "30%", padding: 0 },
-        { label: "Task Id", headerKey: "headerTask", key: "task", width: "30%", padding: 0 },
-        { label: "Delivery", headerKey: "headerAction", key: "action", width: "10%", padding: 0 },
+        { label: "Language pair", headerKey: "headerPair", key: "pair", width: "25%", padding: 0 },
+        { label: "# Files", headerKey: "headerFile", key: "file", width: "10%", padding: 0 },
+        { label: "Task Id", headerKey: "headerTask", key: "task", width: "28.5%", padding: 0 },
+        { label: "Status", headerKey: "headerStatus", key: "status", width: "28.5%", padding: 0 },
+        { label: "Delivery", headerKey: "headerAction", key: "action", width: "8%", padding: 0 },
       ],
       deliverablesModal: false,
       refFilesForDelete: [],
@@ -133,7 +136,7 @@ export default {
     },
     getIcons({type, files}) {
       const icons = {
-        dr2: {src: require("../../assets/images/delivery-review-icon.png") },
+        dr2: {src: require("../../assets/images/latest-version/delivery-list.png") },
       }
       if (type === 'multi') {
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
@@ -150,7 +153,6 @@ export default {
         case "delete":
           this.isDeleteModal = true
           break;
-
         case "dr2":
           this.isDR2Modal = true
           break;
@@ -235,6 +237,7 @@ export default {
         return {
           _id: item._id,
           type: 'single',
+          status: item.status,
           tasks: item.files.map(item => item.taskId),
           pair: this.getLangPair(item, 'lang'),
           files: item.files
@@ -246,6 +249,7 @@ export default {
         return {
           _id: item._id,
           type: 'multi',
+          status: item.status,
           tasks: item.tasks,
           pair: 'Multilingual',
           files: [item.file]
@@ -395,7 +399,7 @@ export default {
 
     &__icons {
       width: 100%;
-      padding: 0 10px 0 0;
+      padding: 0 7px 0 0;
       box-sizing: border-box;
       display: flex;
       justify-content: space-around;
@@ -404,14 +408,6 @@ export default {
 
     &__icon {
       cursor: pointer;
-      max-width: 18px;
-    }
-
-    &__check-icon {
-      font-size: 18px;
-      color: $light-brown;
-      cursor: pointer;
-      transition: ease 0.1s;
     }
 
     &__file-icon {

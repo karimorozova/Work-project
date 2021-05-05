@@ -49,6 +49,7 @@ async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
 
   function pushFile(sourceLang, targetLang, fileInfo){
     singleLang.push({
+      status: 'Pending Approval [DR2]',
       sourceLanguage: sourceLang._id,
       targetLanguage: targetLang._id,
       files: fileInfo,
@@ -79,12 +80,12 @@ const removeDR2 = async ({projectId, taskId, path, sourceLanguage: source, targe
 async function addMultiLangDR2({projectId, taskIds, refFiles}) {
   const {projectManager, accountManager, tasksDR2} = await Projects.findOne({_id: projectId})
 
-
   const file = (await storeFile(refFiles[0], projectId))[0]
 
   let multiLang = {
     tasks: taskIds,
     instructions: dr2Instructions,
+    status: 'Pending Approval [DR2]',
     file: {
       fileName: file.split('/').pop(),
       path: file,
@@ -120,7 +121,7 @@ async function removeMultiDR2({projectId, type, dr2Id}) {
   if(type === 'multi'){
     const newMultiLang = multiLang.filter(({_id}) => `${ _id }` !== `${ dr2Id }`)
     const removedMultiLang = multiLang.filter(({_id}) => `${ _id }` === `${ dr2Id }`)[0]
-    await fs.unlink(removedMultiLang.file.path, (err) => { if(err) console.log(err)});
+    await fs.unlink(`./dist/${removedMultiLang.file.path}` , (err) => { if(err) console.log(err)});
 
     return await getProjectAfterUpdate(qProject, { "tasksDR2.multiLang" : newMultiLang })
   }else{

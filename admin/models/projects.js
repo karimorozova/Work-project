@@ -132,6 +132,10 @@ const ProjectsSchema = new mongoose.Schema({
   }],
   tasksDR2: {
     singleLang: [{
+      status: {
+        type: String,
+        default: '',
+      },
       timestamp: {
         type: Date,
         default: new Date()
@@ -183,6 +187,10 @@ const ProjectsSchema = new mongoose.Schema({
       }]
     }],
     multiLang: [{
+      status: {
+        type: String,
+        default: '',
+      },
       comment: {
         type: String,
         default: '',
@@ -192,7 +200,7 @@ const ProjectsSchema = new mongoose.Schema({
         type: Array,
         default: [],
       },
-      closedAt: {
+      timestamp: {
         type: Date,
         default: new Date()
       },

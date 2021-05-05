@@ -62,6 +62,8 @@
         :type="type"
         :task="task"
         :files="files"
+        :users="users"
+        :user="user"
         @approveFile="approveFile"
         @approveFiles="approveFiles"
         @uploadFile="uploadFile"
