@@ -663,12 +663,11 @@ router.post('/change-manager', async (req, res) => {
 })
 
 router.post('/change-manager-dr2', async (req, res) => {
-  const { projectId, taskId, manager, prop, isAdmin, status, deliveryData, type } = req.body
-  const { dr2Manager } = deliveryData
+  const { projectId, manager, type, file, entityId } = req.body
   try {
     const project = await getProject({ '_id': projectId })
-    let prevManager = await User.findOne( { "_id": dr2Manager } ).populate('group')
-    const updatedProject = await changeManagerDR2({ taskId, manager, prevManager, prop, isAdmin, status, project, deliveryData, type })
+    let prevManager = await User.findOne( { "_id": file.dr2Manager } ).populate('group')
+    const updatedProject = await changeManagerDR2({project, prevManager, manager, type, file, entityId })
     res.send(updatedProject)
   } catch (err) {
     console.log(err)
@@ -943,11 +942,12 @@ router.post('/target-dr2', upload.fields([ { name: 'targetFile' } ]), async (req
       res.status(500).send('Error on uploading target file dr2')
     }
   }else{
+    const { file: { dr1Manager, dr2Manager }} = project.tasksDR2.multiLang.find(({_id}) => _id.toString() === entityId)
     const newPath = await manageDeliveryFile({ fileData, file: files[0] })
     const fileName = newPath.split("/").pop()
     await Projects.updateOne(
       { "_id": projectId, 'tasksDR2.multiLang._id': entityId },
-      { "tasksDR2.multiLang.$[i].file": { isFileApproved: false, fileName: fileName, path: newPath } },
+      { "tasksDR2.multiLang.$[i].file": { isFileApproved: false, dr1Manager, dr2Manager, fileName: fileName, path: newPath } },
       { arrayFilters: [ { 'i._id': entityId } ]}
     )
   }

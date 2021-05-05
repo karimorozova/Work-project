@@ -149,19 +149,19 @@ export const changeReviewManager = async ({ dispatch }, payload) => {
 	}
 }
 
-export const changeReviewManagerDR2 = async ({ dispatch }, payload) => {
-  dispatch('incrementRequestCounter')
-  try {
-    const { taskId, projectId, manager, prop, isAdmin, status, deliveryData, type } = payload;
-    const updatedProject = await Vue.http.post("/pm-manage/change-manager-dr2", { taskId, projectId, manager, prop, isAdmin, status, deliveryData, type });
-    await dispatch('setCurrentProject', updatedProject.data);
-    dispatch('alertToggle', { message: "Successfully changed!", isShow: true, type: "success" })
-  } catch (err) {
-    dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
-  } finally {
-    dispatch('decrementRequestCounter')
-  }
-}
+// export const changeReviewManagerDR2 = async ({ dispatch }, payload) => {
+//   dispatch('incrementRequestCounter')
+//   try {
+//     const { taskId, projectId, manager, prop, isAdmin, status, deliveryData, type } = payload;
+//     const updatedProject = await Vue.http.post("/pm-manage/change-manager-dr2", { taskId, projectId, manager, prop, isAdmin, status, deliveryData, type });
+//     await dispatch('setCurrentProject', updatedProject.data);
+//     dispatch('alertToggle', { message: "Successfully changed!", isShow: true, type: "success" })
+//   } catch (err) {
+//     dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
+//   } finally {
+//     dispatch('decrementRequestCounter')
+//   }
+// }
 
 export const approveNotify = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')

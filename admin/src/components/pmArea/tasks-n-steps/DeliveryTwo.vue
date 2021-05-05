@@ -71,6 +71,7 @@
         @checkFile="checkFile"
         @removeFile="removeFile"
         @rollback="rollback"
+        @assignManager="assignManager"
       )
 
     .review__options
@@ -162,7 +163,7 @@
         "approveReady",
         "approveNotify",
         "approveDeliver",
-        "changeReviewManagerDR2",
+        // "changeReviewManagerDR2",
         "alertToggle",
         "setCurrentProject",
 				// "rollBackReview",
@@ -351,20 +352,22 @@
         }
         this.$emit("close")
 			},
-			async assignManager({ manager, prop }) {
-        // const { dr2Manager, files } = this.deliveryData
-        // if(manager._id === dr2Manager) return
-        //
-        // await this.changeReviewManagerDR2({
-        //   manager,
-        //   prop,
-        //   projectId: this.project._id,
-        //   taskId: files[0].taskId,
-        //   isAdmin: this.isAdmin,
-        //   status: 'dr2',
-        //   deliveryData: this.deliveryData,
-        //   type: this.type
-        // })
+			async assignManager({ manager, type, file }) {
+        if(manager._id === file.dr2Manager) return
+        try{
+          const updatedProject = await this.$http.post("/pm-manage/change-manager-dr2", {
+            projectId: this.project._id,
+            manager,
+            type,
+            file,
+            entityId: this.deliveryData._id,
+          });
+          await this.setCurrentProject(updatedProject.data);
+          await this.updatedFiles(updatedProject)
+          this.alertToggle({ message: "Manager changed!", isShow: true, type: "success" })
+        }catch (err){
+          this.alertToggle({ message: "Err in assignManager!", isShow: true, type: "error" })
+        }
 			},
       rollback(task){
         this.isModalRollback = true

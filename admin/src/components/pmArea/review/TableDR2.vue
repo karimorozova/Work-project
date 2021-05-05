@@ -40,14 +40,22 @@
         CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
       .review-table__data(slot="name" slot-scope="{ row }")
-        span.review-table__file-icon
+        //span.review-table__file-icon
           i.fa.fa-file(aria-hidden='true')
         span.review-table__file-name {{ row.fileName }}
 
       .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId.substring(row.taskId.length - 3)  }}
       .review-table__data(slot="dr1" slot-scope="{ row }") {{ getManagerName(row.dr1Manager) }}
-      .review-table__data(slot="dr2" slot-scope="{ row }") asdasd
+      .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
+        .drops__name(v-if="false") {{ getManagerName(row.dr2Manager) }}
+        .drops__menu(v-else)
+          SelectSingle(
+            :isTableDropMenuNoShadow="true"
+            :options="managersNames"
+            :selectedOption="getManagerName(row.dr2Manager)"
+            @chooseOption="(e) => setManager(e, row)"
+          )
 
       .review-table__data(slot="action" slot-scope="{ row, index }")
         .review-table__icons
@@ -74,8 +82,10 @@
 	import { mapActions } from "vuex"
 	import ApproveModal from "../../ApproveModal"
 	import Button from "../../Button"
+  import reviewManagers from "../../../mixins/reviewManagers";
 
 	export default {
+	  mixins: [reviewManagers],
 		props: {
 			task: { type: Object },
 			files: { type: Array },
@@ -87,11 +97,11 @@
 			return {
 				fields: [
 					{ label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
-					{ label: "File Name", headerKey: "headerName", key: "name", width: "10%", padding: 0 },
-					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "10%", padding: 0 },
-          { label: "Language pair", headerKey: "headerPair", key: "pair", width: "10%", padding: 0 },
-          { label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", width: "10%", padding: 0 },
-          { label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", width: "10%", padding: 0 },
+					{ label: "File Name", headerKey: "headerName", key: "name", width: "20%", padding: 0 },
+					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "9%", padding: 0 },
+          { label: "Language pair", headerKey: "headerPair", key: "pair", width: "14%", padding: 0 },
+          { label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", width: "18%", padding: 0 },
+          { label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", width: "18%", padding: 0},
           { label: "Action", headerKey: "headerAction", key: "action", width: "17%", padding: 0 }
 				],
 				icons: {
@@ -102,10 +112,19 @@
 				selectedAction: "",
 				actions: [ "Approve", "Download" ],
 				deleteIndex: null,
-				approveModalShow: false
+				approveModalShow: false,
+        managers: [],
 			}
 		},
 		methods: {
+      setManager({ option }, file) {
+        const managerIndex = this.managersNames.indexOf(option)
+        this.$emit("assignManager", {
+          manager: this.managers[managerIndex],
+          type: this.type,
+          file
+        })
+      },
       getManagerName(id){
         const { firstName, lastName } =  this.users.find(({_id}) => `${_id}` === `${id}`)
         return `${firstName} ${lastName}`
@@ -190,6 +209,9 @@
 				return !this.files.find(item => !item.isChecked)
 			}
 		},
+    created() {
+      this.getManagers()
+    },
 		components: {
 			Button,
 			ApproveModal,
@@ -204,6 +226,13 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
+  .drops{
+    &__menu {
+      position: relative;
+      height: 30px;
+      width: 100%;
+    }
+  }
   .review-table {
     width: 100%;
     box-sizing: border-box;
@@ -232,11 +261,12 @@
     }
 
     &__data {
-      height: 30px;
       box-sizing: border-box;
-      padding-left: 6px;
-      display: flex;
+      display: grid;
       align-items: center;
+      height: 30px;
+      padding: 6px 5px;
+      overflow-y: auto;
     }
 
     &__check-cell {

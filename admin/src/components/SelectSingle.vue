@@ -1,5 +1,5 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]" :style="positionStyle")
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu-no-shadow': isTableDropMenuNoShadow, 'table-drop-menu': isTableDropMenu}, customClass]" :style="positionStyle")
         .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
@@ -39,6 +39,10 @@ export default {
         isTableDropMenu: {
             type: Boolean,
             default: false
+        },
+        isTableDropMenuNoShadow: {
+          type: Boolean,
+          default: false
         },
         projectsType: {
           type: String
@@ -310,6 +314,18 @@ export default {
         box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
     }
 }
+  .table-drop-menu-no-shadow {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    overflow: visible;
+    .drop {
+      border: 1px solid #BFB09D;
+    }
+    .select {
+      height: 31px;
+    }
+  }
 
 .rates-table {
     .select {

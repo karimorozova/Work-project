@@ -83,26 +83,25 @@ async function checkForReassign({status, dr1Manager, dr2Manager, projectId, task
     }
 }
 
-async function changeManagerDR2({ taskId, prevManager, manager, prop, isAdmin, status, project, deliveryData, type}) {
-    let { tasksDR2: { singleLang } } = project
+  async function changeManagerDR2({ project, prevManager, manager, type, file, entityId }) {
+    let { tasksDR2: { multiLang, singleLang } } = project
     //Bug send all tasks Ids
-    const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, '2');
-    const messageToNew = managerDr1Assigned({taskId, project, manager}, '2');
+    const messageToPrev = managerDr1Reassign({taskId: 'taskId', project, prevManager, manager}, '2');
+    const messageToNew = managerDr1Assigned({taskId: 'taskId', project, manager}, '2');
     try {
-      const isDr2 = status === "dr2" && prop === "dr2Manager";
-      if(isAdmin && isDr2) {
-        await managerNotifyMail(prevManager, messageToPrev, `DR2 has been reassigned: ${project.projectId} (I009.0)`);
-        await managerNotifyMail(manager, messageToNew, `The DR2 has been assigned to you: ${project.projectId} (I009.1)`);
-      }
-      if(type === 'single'){
-        let singleLangIndex = singleLang.findIndex(item => `${item.sourceLanguage}-${item.targetLanguage}` === `${deliveryData.sourceLanguage}-${deliveryData.targetLanguage}`)
-        singleLang[singleLangIndex].files = singleLang[singleLangIndex].files.map(item => {
-            item.dr2Manager = manager._id
-            return item
-        })
-        return await getProjectAfterUpdate({"_id": project._id}, { "tasksDR2.singleLang": singleLang } )
-      }else{
 
+      await managerNotifyMail(prevManager, messageToPrev, `DR2 has been reassigned: ${project.projectId} (I009.0)`);
+      await managerNotifyMail(manager, messageToNew, `The DR2 has been assigned to you: ${project.projectId} (I009.1)`);
+
+      if(type === 'multi'){
+        const idx = multiLang.findIndex(({_id}) => `${_id}` === `${entityId}`)
+        multiLang[idx].file = { ...file, dr2Manager: manager, isFileApproved: false }
+        return await getProjectAfterUpdate({"_id": project._id}, { "tasksDR2.multiLang": multiLang } )
+      }else{
+        const idx = singleLang.findIndex(({_id}) => `${_id}` === `${entityId}`)
+        const idxFile = singleLang[idx].files.findIndex(({_id}) => `${_id}` === `${file._id}`)
+        singleLang[idx].files[idxFile] = {  ...file, dr2Manager: manager, isFileApproved: false }
+        return await getProjectAfterUpdate({"_id": project._id}, { "tasksDR2.singleLang": singleLang } )
       }
     } catch(err) {
       console.log(err, 'on changeManagerDR2')

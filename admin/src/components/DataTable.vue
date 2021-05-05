@@ -163,7 +163,7 @@ export default {
   &__tbody-cell {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 7px 5px 7px 5px;
+    padding: 6px 5px 6px 5px;
     border-bottom: 1px solid $cell-border;
     border-left: 1px solid $cell-border;
     border-right: none;
