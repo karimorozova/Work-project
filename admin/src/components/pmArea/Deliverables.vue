@@ -258,15 +258,11 @@ export default {
       return [ ...singleLang, ...multiLang ]
     },
     selectTaskInfo() {
-      if(!this.currentProject || !this.currentProject.tasksDR2 || !this.currentProject.tasksDR2.singleLang) return []
+      if(!this.currentProject || !this.currentProject.tasks) return []
       let result = new Set()
-      for(let test of this.currentProject.tasksDR2.singleLang) {
-        const langPair = this.getLangPair(test, 'symbol')
-          for(let file of test.files) {
-            result.add(`${file.taskId}`)
-          }
-      }
-      console.log([...result])
+
+      this.currentProject.tasks.filter(({status}) => status === 'Complete').forEach(({taskId}) => result.add(taskId))
+
       return Array.from(result)
     }
   },
