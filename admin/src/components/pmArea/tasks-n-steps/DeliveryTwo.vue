@@ -344,15 +344,20 @@
         switch (true) {
           case this.isReadyForDelivery:
             console.log("isReadyForDelivery");
-            return await this.approveReady(this.task.taskId)
+            await this.approveReady({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type })
+            this.$emit("close")
+            break
           case this.isDeliver:
             console.log("isDeliver");
-            return await this.approveDeliver(this.task.taskId)
+            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user })
+            this.$emit("close")
+            break
           case this.isNotify:
             console.log("isNotify");
-            return await this.approveNotify(this.task.taskId)
+            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: [{email: 'maxyplmr@gmail.com', firstName: 'Max'}] })
+            this.$emit("close")
+            break
         }
-        this.$emit("close")
 			},
 			async assignManager({ manager, type, file }) {
         if(manager._id === file.dr2Manager) return
