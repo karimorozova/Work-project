@@ -218,7 +218,7 @@
 
   .minPrice {
     display: flex;
-    padding: 16px 30px;
+    //padding: 16px 30px;
     background: #F2EFEB;
     border: 2px solid #938676;
     flex-direction: column;
@@ -253,20 +253,18 @@
 
   .project-finance {
     box-sizing: border-box;
-    min-width: 1000px;
+    width: 400px;
+    margin-top: 40px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-    margin: 40px;
 
     &__content {
       padding: 0 20px 20px 20px;
 
       &-displayBlock {
-        width: 80%;
         position: relative;
       }
 
       &-settingBlock {
-        display: flex;
         margin-bottom: 20px;
       }
     }
@@ -284,8 +282,9 @@
 
     &__title {
       padding: 20px;
-      font-size: 22px;
+      font-size: 21px;
       display: flex;
+      font-family: Myriad600;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;

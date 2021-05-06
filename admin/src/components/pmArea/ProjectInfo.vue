@@ -1,15 +1,9 @@
 <template lang="pug">
   .project-info(v-if="currentProject._id")
-    .project-info__all-info
-      Project(:project="currentProject")
-      //- GeneralInstructions(:project="currentProject")
-      ProjectSubInformation(
-        :project="currentProject"
-      )
-    .project-info__all-info(
-        v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices"
-      )
-      .task-and-steps
+
+    .project-info__leftSide
+      Project(:project="currentProject" @refreshProject="refreshProject")
+      .task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
         TasksAndSteps(
           :originallyLanguages="originallyLanguages"
           :originallyUnits="originallyUnits"
@@ -21,25 +15,24 @@
           @setDate="setDate"
           @showErrors="showErrors"
         )
-          ValidationErrors(v-if="areErrorsExist"
-            :errors="errors"
-            :isAbsolute="isBlockAbsoulte"
-            @closeErrors="closeErrorsBlock"
-          )
-        .project-info__all-info(v-if="currentProject._id")
-          Deliverables
-        .project-info__all-info
-          ProjectFinance
+          ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
+      Deliverables
+
+    .project-info__rigthSide
+      ProjectSubInformation(:project="currentProject")
       .project-info__action
         ProjectAction(
           :project="currentProject"
           @editAndSend="editAndSend"
           @setStatus="setStatus"
-          @refreshProject="refreshProject"
         )
+      ProjectFinance
+
+      //- GeneralInstructions(:project="currentProject")
 
     .project-info__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :message="message" @send="sendQuote")
+
 </template>
 
 <script>
@@ -66,11 +59,6 @@
 				message: '',
 				mailSubject: '',
 				customer: null,
-
-				// originallyLanguages: null,
-				// originallyUnits: null,
-				// originallySteps: null,
-				// originallyServices: null,
 			}
 		},
 		methods: {
@@ -224,70 +212,6 @@
 				const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
 				await this.setCurrentProject(curProject.body);
 			},
-			// async getOriginallyLanguages() {
-			// 	try {
-			// 		const result = await this.$http.get("/api/languages");
-			// 		this.originallyLanguages = result.body;
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: "Error in Originally Languages",
-			// 			isShow: true,
-			// 			type: "error",
-			// 		});
-			// 	}
-			// },
-			// async getOriginallyUnits() {
-			// 	try {
-			// 		const result = await this.$http.get('/api/units');
-			// 		this.originallyUnits = result.body;
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: 'Error in Originally Units',
-			// 			isShow: true,
-			// 			type: 'error',
-			// 		});
-			// 	}
-			// },
-      //MM For refactor
-			// async getCustomer() {
-			// 	if(!this.currentClient._id) {
-			// 		try {
-			// 			const client = await this.$http.get(`/clientsapi/client?id=${ this.customer._id }`);
-			// 			await this.storeCurrentClient(client.data);
-			// 		} catch (err) {
-			// 			this.alertToggle({
-			// 				message: 'Error in Get Customer',
-			// 				isShow: true,
-			// 				type: 'error',
-			// 			});
-			// 		}
-			// 	}
-			// },
-			// async getOriginallySteps() {
-			// 	try {
-			// 		const result = await this.$http.get('/api/steps');
-			// 		this.originallySteps = result.body;
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: 'Error in Originally Steps',
-			// 			isShow: true,
-			// 			type: 'error',
-			// 		});
-			// 	}
-			// },
-			// async getOriginallyServices() {
-			// 	try {
-			// 		const result = await this.$http.get('/api/services');
-			// 		this.originallyServices = result.body;
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: 'Error in Originally Steps',
-			// 			isShow: true,
-			// 			type: 'error',
-			// 		});
-			// 	}
-			// },
-
 		},
 		computed: {
 			...mapGetters({
@@ -317,11 +241,6 @@
 		async created() {
 			await this.getProject();
 			await this.getVendorsForProject();
-			// await this.getOriginallyLanguages();
-			// await this.getOriginallyUnits();
-			// await this.getOriginallySteps();
-			// await this.getOriginallyServices();
-			// await this.getCustomer();
 		},
 		beforeRouteEnter(to, from, next) {
 			next(async (vm) => {
@@ -339,16 +258,10 @@
   .project-info {
     position: relative;
     display: flex;
-    flex-direction: column;
+    padding: 40px;
 
-    &__all-info {
-      display: flex;
-      align-items: flex-start;
-      box-sizing: border-box;
-    }
-
-    &__action {
-
+    &__rigthSide{
+      margin-left: 40px;
     }
 
     &__preview {

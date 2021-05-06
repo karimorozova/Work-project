@@ -12,7 +12,7 @@
 
     .project-action__title(:style="{'padding-bottom': '5px'}")
       .project-action__title-text Project Action:
-      .project-action__title-button(@click="refreshProject")
+      //.project-action__title-button(@click="refreshProject")
 
     .project-action__drop-menuSend
       .project-details Project Details:
@@ -185,9 +185,9 @@
 				this.approveActionToDraft = false;
 				this.selectedAction = '';
 			},
-			refreshProject() {
-				this.$emit("refreshProject");
-			},
+			// refreshProject() {
+			// 	this.$emit("refreshProject");
+			// },
 			closePreview() {
 				this.isEditAndSend = false;
 				this.isEditAndSendQuote = false;
@@ -542,7 +542,8 @@
     padding: 20px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     box-sizing: border-box;
-    width: 390px;
+    width: 400px;
+    margin-top: 40px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -583,19 +584,13 @@
     }
 
     &__title {
-      font-size: 22px;
+      font-size: 21px;
+      font-family: Myriad600;
       border-bottom: 1px solid #C5BFB5;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-
-      &-button {
-        background-image: url("../../assets/images/refresh-icon.png");
-        width: 24px;
-        height: 20px;
-        cursor: pointer;
-      }
     }
 
     &__drop-menu {

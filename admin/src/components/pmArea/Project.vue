@@ -345,7 +345,6 @@
 <style lang="scss" scoped>
 
   .project {
-    padding: 40px;
     display: flex;
     flex-direction: column;
 
@@ -397,7 +396,7 @@
     &__name {
       font-size: 22px;
       padding: 0 5px;
-      height: 44px;
+      height: 40px;
       width: 40%;
       border-radius: 5px;
       color: #68573E;

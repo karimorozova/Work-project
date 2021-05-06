@@ -2,9 +2,16 @@
   .sub-information
     .sub-information__preview(v-if="isEditAndSend")
       WYSIWYG(@closePreview="closeWYSIWYG", :message="message", @send="sendMessage")
-    .sub-information__project( id="id") {{ project.projectId }}
-      span(class="click-copy" @click="copyId")
-        i.fa.fa-files-o(aria-hidden="true")
+
+    .sub-information__project
+      .sub-information__project-title(id="id") {{ project.projectId }}
+      .sub-information__project-icons
+        .icon
+          span(class="click-copy" @click="copyId")
+            i.far.fa-copy(aria-hidden="true")
+        .icon
+          i.fas.fa-sync-alt(@click="refreshProject")
+
     .sub-information__row
       .row__title Project Status:
       .row__data {{ project.status }}
@@ -122,6 +129,9 @@
 				alertToggle: "alertToggle",
 				setCurrentProject: "setCurrentProject"
 			}),
+      refreshProject() {
+      	this.$emit("refreshProject");
+      },
 			copyId() {
 				let id = document.getElementById('id')
 				let elementText = id.textContent
@@ -376,10 +386,8 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-top: 40px;
-    margin-bottom: 40px;
-    min-width: 390px;
-    width: 390px;
+    min-width: 400px;
+    width: 400px;
 
     &__row {
       width: 100%;
@@ -389,7 +397,7 @@
 
     .row {
       &__title {
-        width: 160px;
+        width: 170px;
       }
 
       &__data {
@@ -399,8 +407,20 @@
     }
 
     &__project {
-      font-size: 22px;
       margin-bottom: 20px;
+      border-bottom: 1px solid #c5bfb5;
+      width: 100%;
+      padding-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+
+      &-title{
+        font-size: 21px;
+        font-family: 'Myriad600';
+      }
+      &-icons{
+        display: flex;
+      }
     }
 
     .client-table {
@@ -527,16 +547,28 @@
       }
     }
   }
-
-  .click-copy {
-    margin-left: 15px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: ease 0.2s;
-    opacity: 0.8;
+  .icon{
+    width: 40px;
+    background: #d15f45;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 40px;
+    height: 40px;
+    color: white;
+    margin-left: 10px;
+    font-size: 20px;
   }
 
-  .click-copy:hover {
-    opacity: 1;
-  }
+  //.click-copy {
+  //  margin-left: 15px;
+  //  font-size: 18px;
+  //  cursor: pointer;
+  //  transition: ease 0.2s;
+  //  opacity: 0.8;
+  //}
+  //
+  //.click-copy:hover {
+  //  opacity: 1;
+  //}
 </style>
