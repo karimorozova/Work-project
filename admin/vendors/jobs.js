@@ -160,7 +160,7 @@ const pushTasksToDR1 = async (project, task) =>{
 function getTaskTargetFiles(project,task) {
   return task.targetFiles.reduce((acc, cur) => {
     const originalName = cur.path.split("/").pop()
-    const dr1FileName = `${Math.floor(Math.random() * 100000)}-${originalName}`
+    const dr1FileName = `${Math.floor(Math.random() * 1000000)}-${originalName}`
 
     fs.copyFile(`./dist/projectFiles/${project._id}/${originalName}`, `./dist/projectFiles/${project._id}/${dr1FileName}`, (err) => {
       if (err) throw err;

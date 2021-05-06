@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken");
 const { checkClientContact } = require('../middleware');
 const { getClient } = require('../clients');
 const { getService } = require('../services');
-const { getProject, getProjects, updateProjectStatusForClientPortalProject, getDeliverablesLink } = require("../projects/");
+const { getProject, getProjects, updateProjectStatusForClientPortalProject,
+  // getDeliverablesLink
+} = require("../projects/");
 const { getProjectDeliverables } = require('../projects/files');
 const { createRequest, storeRequestFiles, getClientRequests, updateClientRequest, clientRequestNotification, notifyRequestCancelled } = require('../clientRequests');
 const { getAfterTaskStatusUpdate } = require('../clients');
@@ -235,22 +237,23 @@ router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles'
 });
 
 router.get('/deliverables', checkClientContact, async (req, res) => {
-    const { taskId } = req.query;
-    try {
-        const project = await getProject({"tasks.taskId": taskId});
-        const task = project.tasks.find(item => item.taskId === taskId);
-        const taskFiles = task.targetFiles;
-        const link = await getDeliverablesLink({
-            taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
-        });
-        if(link) {
-            await Projects.updateOne({"tasks.taskId": taskId}, {"tasks.$.deliverables": link});
-        }
-        res.send({link});
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on downloading deliverables");
-    }
+  console.log('route IN DEV for clients  => /deliverables')
+  // const { taskId } = req.query;
+    // try {
+    //     const project = await getProject({"tasks.taskId": taskId});
+    //     const task = project.tasks.find(item => item.taskId === taskId);
+    //     const taskFiles = task.targetFiles;
+    //     const link = await getDeliverablesLink({
+    //         taskId, projectId: project.id, taskFiles, unit: task.service.calculationUnit
+    //     });
+    //     if(link) {
+    //         await Projects.updateOne({"tasks.taskId": taskId}, {"tasks.$.deliverables": link});
+    //     }
+    //     res.send({link});
+    // } catch(err) {
+    //     console.log(err);
+    //     res.status(500).send("Error on downloading deliverables");
+    // }
 })
 
 router.post('/project-deliverables', checkClientContact, async (req, res) => {

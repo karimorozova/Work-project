@@ -230,16 +230,28 @@ const ProjectsSchema = new mongoose.Schema({
       }
     }],
   },
-  deliveredTasks: [ {
-    taskId: {
+  tasksDeliverables: [{
+    deliverablesId: {
       type: String,
+    },
+    path: {
+      type: String,
+      default: "",
+      trim: true
     },
     deliveredAt: {
       type: Date,
       default: new Date()
     },
-  }
-  ],
+    deliveredBy: {
+      type: Schema.Types.ObjectId, ref: 'User'
+    }
+  }],
+  projectDeliverables: {
+    type: String,
+    default: "",
+    trim: true
+  },
 	tasks: {
 		type: Array,
 		default: []
@@ -366,11 +378,6 @@ const ProjectsSchema = new mongoose.Schema({
 	},
 	billingDate: {
 		type: Date
-	},
-	deliverables: {
-		type: String,
-		default: "",
-		trim: true
 	},
 	genBrief: {
 		type: String | Object,

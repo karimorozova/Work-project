@@ -39,7 +39,7 @@ const {
 	manageDeliveryFile,
 	createTasksFromRequest,
 	setStepsStatus,
-	getDeliverablesLink,
+	// getDeliverablesLink,
 	getAfterReopenSteps,
 	notifyVendorsProjectCancelled,
 	getProjectAfterFinanceUpdated,
@@ -1081,24 +1081,25 @@ router.post('/rollback-review', async (req, res) => {
 // })
 
 router.get('/deliverables', async (req, res) => {
-	const { taskId } = req.query
-	try {
-		const project = await getProject({ 'tasks.taskId': taskId })
-		const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
-		const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-		if (task.deliverables) {
-			res.send({ link: task.deliverables })
-		} else {
-			const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
-			if (link) {
-				await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
-			}
-			res.send({ link })
-		}
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on downloading deliverables')
-	}
+  console.log('route IN DEV for admin  => /deliverables')
+  // const { taskId } = req.query
+	// try {
+	// 	const project = await getProject({ 'tasks.taskId': taskId })
+	// 	const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
+	// 	const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
+	// 	if (task.deliverables) {
+	// 		res.send({ link: task.deliverables })
+	// 	} else {
+	// 		const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
+	// 		if (link) {
+	// 			await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
+	// 		}
+	// 		res.send({ link })
+	// 	}
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on downloading deliverables')
+	// }
 })
 
 router.post('/deliver', async (req, res) => {

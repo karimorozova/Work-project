@@ -1,9 +1,9 @@
 const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveProjectFile, moveFile } = require('../utils/movingFile');
-const { getProject } = require('./getProjects');
+const { getProject, getProjectAfterUpdate } = require('./getProjects');
 const { getPdfOfQuote } = require("../emailMessages/clientCommunication");
 const fs = require('fs');
-const { Delivery } = require('../models')
+const { Projects } = require('../models')
 const htmlToPdf = require('html-pdf');
 let  apiUrl = require('../helpers/apiurl');
 !apiUrl && (apiUrl = 'https://admin.pangea.global')
@@ -29,54 +29,92 @@ async function storeFiles(filesArr, projectId) {
 }
 
 async function getProjectDeliverables(project) {
-    const { tasks, id: projectId } = project;
-    const { tasks: tasksInDelivery } = await Delivery.findOne({ 'projectId' : projectId })
-    let files = [];
-    try {
-        for(let task of tasks) {
-            if(task.status !== 'Cancelled') {
-                const { taskId } = task;
-                let taskFiles = tasksInDelivery.find(item => item.taskId === taskId).files
-                let taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
-                files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
-            }
-        }
-        const outputPath = `./dist/projectFiles/${projectId}/project-deliverables.zip`;
-        await archiveMultipleFiles({outputPath, files});
-        return outputPath.split("./dist")[1];
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getProjectDeliverables");
-    }
+    console.log('IN DEV => getProjectDeliverables')
+    // const { tasks, id: projectId } = project;
+    // const { tasks: tasksInDelivery } = await Delivery.findOne({ 'projectId' : projectId })
+    // let files = [];
+    // try {
+    //     for(let task of tasks) {
+    //         if(task.status !== 'Cancelled') {
+    //             const { taskId } = task;
+    //             let taskFiles = tasksInDelivery.find(item => item.taskId === taskId).files
+    //             let taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
+    //             files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
+    //         }
+    //     }
+    //     const outputPath = `./dist/projectFiles/${projectId}/project-deliverables.zip`;
+    //     await archiveMultipleFiles({outputPath, files});
+    //     return outputPath.split("./dist")[1];
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in getProjectDeliverables");
+    // }
 }
 
-async function getDeliverablesLink({taskFiles, projectId, taskId}) {
-    try {
-        const files = getParsedFiles(taskFiles);
-        const outputPath = `./dist/projectFiles/${projectId}/deliverables-${taskId.replace(/\s+/g, '_')}.zip`;
-        await archiveMultipleFiles({outputPath, files});
-        return outputPath.split("./dist")[1];
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getDeliverablesLink");
-    }
-}
+// async function getDeliverablesLink({taskFiles, projectId, taskId}) {
+    // try {
+    //     const files = getParsedFiles(taskFiles);
+    //     const outputPath = `./dist/projectFiles/${projectId}/deliverables-${taskId.replace(/\s+/g, '_')}.zip`;
+    //     await archiveMultipleFiles({outputPath, files});
+    //     return outputPath.split("./dist")[1];
+    // } catch(err) {
+    //     console.log(err);
+    //     console.log("Error in getDeliverablesLink");
+    // }
+// }
 
-function getParsedFiles(taskFiles) {
-	return taskFiles.reduce((acc, cur) =>
-					[...acc,
-						{
-							path: cur.path.indexOf('./dist') === 0 ?  cur.path : `./dist${cur.path}`,
-							name: cur.fileName
-						}
-					],
-			[])
+// function getParsedFiles(taskFiles) {
+	// return taskFiles.reduce((acc, cur) =>
+	// 				[...acc,
+	// 					{
+	// 						path: cur.path.indexOf('./dist') === 0 ?  cur.path : `./dist${cur.path}`,
+	// 						name: cur.fileName
+	// 					}
+	// 				],
+	// 		[])
+// }
+
+const createArchiveForDeliverableItem = async ({type, projectId, entityId, user, tasksDR2, tasksDeliverables}) => {
+    const outputPath = `/projectFiles/${projectId}/${Math.floor(Math.random()*1000000)}-deliverables.zip`;
+    const qProject = { "_id": projectId }
+
+    if (type === 'multi') {
+        const { file } = tasksDR2.multiLang.find(({ _id }) => `${ _id }` === `${ entityId }`);
+        await archiveMultipleFiles({ outputPath: `./dist${outputPath}`, files: getParsedFiles([file]) });
+        await setDeliveredStatus('multiLang')
+
+    }
+    if (type === 'single') {
+        const { files } = tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`);
+        await archiveMultipleFiles({ outputPath: `./dist${outputPath}`, files: getParsedFiles(files) });
+        await setDeliveredStatus('singleLang')
+    }
+
+    const idx = tasksDeliverables.findIndex(({deliverablesId}) => `${deliverablesId}` === `${entityId}`)
+    const newDeliverable = { deliverablesId: entityId, path: outputPath, deliveredBy: user }
+    idx === -1 ? tasksDeliverables.push(newDeliverable) : tasksDeliverables.splice(idx, 1, newDeliverable)
+
+    return await getProjectAfterUpdate(qProject, { tasksDeliverables })
+
+    function getParsedFiles(files) {
+        return files.reduce((acc, cur) => [ ...acc, { name: cur.fileName, path: cur.path.indexOf('./dist') === 0 ? cur.path : `./dist${ cur.path }` } ], [])
+    }
+
+    async function setDeliveredStatus(entity){
+        const qEntity = `tasksDR2.${entity}._id`
+        const qEntityStatus = `tasksDR2.${entity}.$[i].status`
+        await Projects.updateOne(
+            { ...qProject, [qEntity]: entityId },
+            { [qEntityStatus]: 'Delivered'},
+            { arrayFilters: [ { 'i._id': entityId }] }
+        )
+    }
 }
 
 async function manageDeliveryFile({fileData, file}) {
     const { path, projectId } = fileData;
 
-    const additionFileInfo = `${Math.floor(Math.random()*100000)}-1`;
+    const additionFileInfo = `${Math.floor(Math.random()*1000000)}`;
     try {
         const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
         await moveFile(file, `./dist${newPath}`);
@@ -142,4 +180,12 @@ const generateAndSaveCertificate = ({ project, task }) => {
     // })
 }
 
-module.exports = { storeFiles, getDeliverablesLink, manageDeliveryFile, getProjectDeliverables, getPdf, generateAndSaveCertificate };
+module.exports = {
+    storeFiles,
+    createArchiveForDeliverableItem,
+    // getDeliverablesLink,
+    manageDeliveryFile,
+    getProjectDeliverables,
+    getPdf,
+    generateAndSaveCertificate
+};

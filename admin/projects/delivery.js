@@ -23,10 +23,10 @@ const {
   getProjectAfterUpdate,
 } = require('./getProjects')
 
-const taskApproveDeliver= async ({ projectId, type, entityId }) => {
-  console.log('tyts')
-  // await sendClientDeliveries()
+const taskApproveDeliver= async ({ projectId, type, entityId, user }) => {
+  return await sendClientDeliveries({ projectId, type, entityId, user })
 }
+
 const taskApproveNotify = async ({ projectId, type, entityId, contacts }) => {
   const project = await getProject({ '_id': projectId })
   await notifyClientDeliverablesReady({ project, contacts });
@@ -135,7 +135,7 @@ async function addMultiLangDR2({projectId, taskIds, refFiles}) {
 
   async function storeFile(file, projectId) {
     try {
-      const additionFileInfo = `${Math.floor(Math.random()*100000)}`;
+      const additionFileInfo = `${Math.floor(Math.random()*1000000)}`;
       let storedFiles = [];
       if (file) {
         const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
@@ -145,7 +145,7 @@ async function addMultiLangDR2({projectId, taskIds, refFiles}) {
       return storedFiles;
     } catch(err) {
       console.log(err);
-      console.log("Error in storeFiels")
+      console.log("Error in storeFiles")
     }
   }
 }
