@@ -75,7 +75,7 @@
         .deliverables-table__icons
             img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
 
-    Add(@add="showModal")
+    Add(v-if="canUpdateDr2" @add="showModal")
 </template>
 
 <script>
@@ -138,9 +138,9 @@ export default {
       const icons = {
         dr2: {src: require("../../assets/images/latest-version/delivery-list.png") },
       }
-      if (type === 'multi') {
+      if (type === 'multi' && this.canUpdateDr2 ) {
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
-      }else if(type === 'single' && !files.length){
+      }else if(type === 'single' && !files.length && this.canUpdateDr2 ){
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
       }
       return icons
@@ -226,6 +226,9 @@ export default {
     }),
     checkMultiReview() {
       return this.refFiles.length > 0 && this.selectedTasks.length > 0
+    },
+    canUpdateDr2() {
+      return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.currentProject.accountManager._id.toString() === this.user._id.toString()
     },
     deliverables(){
       if(!this.currentProject.hasOwnProperty('tasksDR2')) return []

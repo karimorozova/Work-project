@@ -48,7 +48,7 @@
       .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId.substring(row.taskId.length - 3)  }}
       .review-table__data(slot="dr1" slot-scope="{ row }") {{ getManagerName(row.dr1Manager) }}
       .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
-        .review-table__data(v-if="!canChangeDR2Manager") {{ getManagerName(row.dr2Manager) }}
+        .review-table__data(v-if="!canChangeDR2Manager(row)") {{ getManagerName(row.dr2Manager) }}
         .drops__menu(v-else)
           SelectSingle(
             :isTableDropMenuNoShadow="true"
@@ -58,7 +58,7 @@
           )
 
       .review-table__data(slot="action" slot-scope="{ row, index }")
-        .review-table__icons(v-if="canChangeDR2Manager")
+        .review-table__icons(v-if="canChangeDR2Manager(row)")
 
           img.review-table__icon(:src="icons.download.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'download')")
           .review-table__upload( :class="{'review-table_opacity-04': row.isFileApproved}")
@@ -73,7 +73,7 @@
           img.review-table__icon(:src="icons.lock.src" :class="{'review-table_opacity-04': row.isFileApproved}")
 
 
-    .review-table__upload.review-table_no-back(v-if="type === 'single'")
+    .review-table__upload.review-table_no-back(v-if="type === 'single' && canAddDR2Manager ")
       input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
       Add
 </template>
@@ -156,7 +156,9 @@
 				}
 			},
 			async makeActions({ option }) {
-				const checked = this.files.filter(item => item.isChecked)
+				const checked = this.files.filter(item => {
+         return  item.isChecked
+        })
 				if (!checked.length) return
 				if (option === 'Download') {
 					for (let file of checked) {
@@ -197,7 +199,14 @@
 			toggle(e, index, bool) {
 				if (this.isReviewing) return
 				this.$emit("checkFile", { index, bool })
-			}
+			},
+      canChangeDR2Manager({dr2Manager}) {
+        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || dr2Manager.toString() === this.user._id.toString()
+      },
+      canAddDR2Manager() {
+        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
+      },
+
 		},
 		computed: {
 			// allIcons() {
@@ -213,9 +222,6 @@
 			isAllChecked() {
 				return !this.files.find(item => !item.isChecked)
 			},
-			canChangeDR2Manager() {
-        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.files[0].dr2Manager.toString() === this.user._id.toString()
-      },
 		},
     created() {
       this.getManagers()
