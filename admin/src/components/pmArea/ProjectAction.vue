@@ -1,9 +1,12 @@
 <template lang="pug">
   .project-action
+
     .project-action__preview(v-if="isEditAndSendQuote")
       PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageQuotes")
+
     .project-action__preview(v-if="isEditAndSendCostQuote")
       PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageCostQuotes")
+
     .project-action__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
 
@@ -11,13 +14,15 @@
       .project-action__title-text Project Action:
       .project-action__title-button(@click="refreshProject")
 
-    .project-action__drop-menu
-      SelectSingle(
-        :selectedOption="selectedAction"
-        :options="filteredActions"
-        placeholder="Select Action"
-        @chooseOption="setAction"
-      )
+    .project-action__drop-menuSend
+      .project-details Project Details:
+      .project-action__dropBody
+        SelectSingle(
+          :selectedOption="selectedAction"
+          :options="filteredActions"
+          placeholder="Select Action"
+          @chooseOption="setAction"
+        )
 
     .project-action__confirm(v-if="isAction('ReOpen') && project.status !== 'Rejected'")
       .project-action__button
@@ -36,12 +41,15 @@
     .project-action__setting(v-if="isAction('Send a Quote')")
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getSendQuoteMessage")
+
     .project-action__setting(v-if="isAction('Cost Quote')")
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getSendCostQuoteMessage")
-    .project-action__setting(v-if="isAction('Deliver')")
+
+    //.project-action__setting(v-if="isAction('Deliver')")
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getDeliveryMessage")
+
     .project-action__setting(v-if="isAction('Send Project Details')")
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getProjectDetailsMessage")
@@ -86,6 +94,7 @@
             :selectedOption="selectedProjManager"
             @chooseOption="(e) => setManager(e, 'projectManager')")
       slot
+
     .approve-action(v-if="approveAction")
       ApproveModal(
         text="Are you sure you want to re-open the project?"
@@ -95,6 +104,7 @@
         @close="closeModal"
         @notApprove="closeModal"
       )
+
     .approve-action(v-if="approveActionToDraft")
       ApproveModal(
         text="Are you sure you want to re-open the project?"
@@ -157,7 +167,7 @@
 				setProjectStatus: 'setProjectStatus',
 				sendClientQuote: 'sendClientQuote',
 				sendProjectDetails: 'sendProjectDetails',
-				deliverProjectToClient: 'deliverProjectToClient',
+				// deliverProjectToClient: 'deliverProjectToClient',
 				sendCancelProjectMessage: 'sendCancelProjectMessage',
 				sendClientCostQuote: 'sendClientCostQuote',
 			}),
@@ -212,58 +222,47 @@
 			async getCancelMessage() {
 				let cancelStatus = this.getCancelStatus();
 				try {
-					const template = await this.$http.post(
-							"/pm-manage/making-cancel-message",
-							{ ...this.project, cancelStatus, reason: this.selectedReason, isPay: this.isPay }
-					);
-					this.previewMessage = template.body.message;
+					const template = await this.$http.post("/pm-manage/making-cancel-message", { ...this.project, cancelStatus, reason: this.selectedReason, isPay: this.isPay });
+					this.previewMessage = template.data.message;
 					this.openPreview();
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
-			async getDeliveryMessage() {
-				try {
-					const template = await this.$http.post(
-							"/pm-manage/making-delivery-message",
-							{ ...this.project }
-					);
-					this.previewMessage = template.body.message;
-					this.openPreview();
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
-				}
-			},
+			// async getDeliveryMessage() {
+			// 	try {
+			// 		const template = await this.$http.post(
+			// 				"/pm-manage/making-delivery-message",
+			// 				{ ...this.project }
+			// 		);
+			// 		this.previewMessage = template.body.message;
+			// 		this.openPreview();
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" });
+			// 	}
+			// },
 			async getSendCostQuoteMessage() {
 				try {
-					const template = await this.$http.get(
-							`/pm-manage/quote-cost-message?projectId=${ this.project._id }`
-					);
-					this.previewMessage = template.body.message;
+					const template = await this.$http.get(`/pm-manage/quote-cost-message?projectId=${ this.project._id }`);
+					this.previewMessage = template.data.message;
 					this.openPreviewCostQuote();
-
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
 			async getSendQuoteMessage() {
 				try {
-					const template = await this.$http.get(
-							`/pm-manage/quote-message?projectId=${ this.project._id }`
-					);
-					this.previewMessage = template.body.message;
+					const template = await this.$http.get(`/pm-manage/quote-message?projectId=${ this.project._id }`);
+					this.previewMessage = template.data.message;
 					this.openPreviewQuote();
-
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
 			async getProjectDetailsMessage() {
 				try {
-					const template = await this.$http.get(
-							`/pm-manage/project-details?projectId=${ this.project._id }`
-					);
-					this.previewMessage = template.body.message;
+					const template = await this.$http.get(`/pm-manage/project-details?projectId=${ this.project._id }`);
+					this.previewMessage = template.data.message;
 					this.openPreview();
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
@@ -272,17 +271,9 @@
 			async sendMessageCostQuotes({ message, arrayOfEmails }) {
 				try {
 					await this.sendClientCostQuote({ message, arrayOfEmails });
-					this.alertToggle({
-						message: "Cost Quote sent",
-						isShow: true,
-						type: "success"
-					});
+					this.alertToggle({ message: "Cost Quote sent", isShow: true, type: "success" });
 				} catch (err) {
-					this.alertToggle({
-						message: err.message,
-						isShow: true,
-						type: "error"
-					});
+					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				} finally {
 					this.setDefaults();
 					this.closePreview();
@@ -291,17 +282,9 @@
 			async sendMessageQuotes({ message, arrayOfEmails }) {
 				try {
 					await this.clientQuote(message, arrayOfEmails);
-					this.alertToggle({
-						message: "Quote sent",
-						isShow: true,
-						type: "success"
-					});
+					this.alertToggle({message: "Quote sent", isShow: true, type: "success"});
 				} catch (err) {
-					this.alertToggle({
-						message: err.message,
-						isShow: true,
-						type: "error"
-					});
+					this.alertToggle({message: err.message, isShow: true, type: "error"});
 				} finally {
 					this.setDefaults();
 					this.closePreview();
@@ -341,9 +324,9 @@
 						case "Send Project Details":
 							await this.projectDetails(message);
 							break;
-						case "Deliver":
-							await this.deliverProject(message);
-							break;
+						// case "Deliver":
+						// 	await this.deliverProject(message);
+						// 	break;
 						case "Accept/Reject Quote":
 							await this.acceptQuote();
 							break;
@@ -352,11 +335,7 @@
 							break;
 					}
 				} catch (err) {
-					this.alertToggle({
-						message: "Internal server error. Cannot execute chosen action.",
-						isShow: true,
-						type: "error"
-					});
+					this.alertToggle({ message: "Internal server error. Cannot execute chosen action.", isShow: true, type: "error" });
 				} finally {
 					this.setDefaults();
 				}
@@ -392,17 +371,9 @@
 			async projectDetails(message) {
 				try {
 					await this.sendProjectDetails({ message });
-					this.alertToggle({
-						message: "Details sent",
-						isShow: true,
-						type: "success"
-					});
+					this.alertToggle({message: "Details sent", isShow: true, type: "success"});
 				} catch (err) {
-					this.alertToggle({
-						message: err.message,
-						isShow: true,
-						type: "error"
-					});
+					this.alertToggle({message: err.message, isShow: true, type: "error"});
 				}
 			},
 			async makeAlterAction() {
@@ -425,16 +396,9 @@
 				if(this.project.status === "Delivered" || this.project.status === "Closed")
 					return;
 				try {
-					await this.setProjectStatus({
-						status: cancelStatus,
-						reason: this.selectedReason || "",
-					});
+					await this.setProjectStatus({status: cancelStatus, reason: this.selectedReason || "",});
 					await this.sendCancelProjectMessage({ message });
-					this.alertToggle({
-						message: "Letter sent successfully",
-						isShow: true,
-						type: "success"
-					});
+					this.alertToggle({message: "Letter sent successfully", isShow: true, type: "success"});
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				} finally {
@@ -443,15 +407,8 @@
 			},
 			async setStatus(status, reason) {
 				try {
-					await this.setProjectStatus({
-						status,
-						reason
-					});
-					this.alertToggle({
-						message: "Project's status changed",
-						isShow: true,
-						type: "success"
-					});
+					await this.setProjectStatus({status, reason});
+					this.alertToggle({message: "Project's status changed", isShow: true, type: "success"});
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
@@ -471,43 +428,29 @@
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
-			async deliverProject(message) {
-				try {
-					await this.deliverProjectToClient({
-						id: this.project._id,
-						message: message
-					});
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
-				}
-			},
+			// async deliverProject(message) {
+			// 	try {
+			// 		await this.deliverProjectToClient({
+			// 			id: this.project._id,
+			// 			message: message
+			// 		});
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" });
+			// 	}
+			// },
 			async setManager({ option }, prop) {
-				const manager = this.managers.find(
-						item => `${ item.firstName } ${ item.lastName }` === option
-				);
+				const manager = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option);
 				if(manager._id === this.project[prop]._id) return;
-				try {
-					if(this.type === "project") {
-						await this.setProjectValue({
-							id: this.project._id,
-							prop,
-							value: manager
-						});
-					} else {
-					}
-				} catch (err) {
-				}
+        if(this.type === "project") {
+          await this.setProjectValue({id: this.project._id, prop, value: manager});
+        }
 			},
 			async getManagers() {
 				try {
 					const result = await this.$http.get('/users');
 					this.managers = result.data;
 				} catch (err) {
-					this.alertToggle({
-						message: 'Error on getting managers',
-						isShow: true,
-						type: 'error'
-					});
+					this.alertToggle({message: 'Error on getting managers', isShow: true, type: 'error'});
 				}
 			},
 		},
@@ -524,9 +467,7 @@
 			accManagers() {
 				let result = [];
 				if(this.managers.length) {
-					result = this.managers.filter(
-							item => item.group.name === 'Account Managers'
-					);
+					result = this.managers.filter(item => item.group.name === 'Account Managers');
 					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
 				}
 				return result;
@@ -534,26 +475,16 @@
 			projManagers() {
 				let result = [];
 				if(this.managers.length) {
-					result = this.managers.filter(
-							item => item.group.name === "Project Managers"
-					);
+					result = this.managers.filter(item => item.group.name === "Project Managers");
 					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
 				}
 				return result;
 			},
 			selectedAccManager() {
-				return this.project.accountManager
-						? this.project.accountManager.firstName +
-						" " +
-						this.project.accountManager.lastName
-						: "";
+				return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : "";
 			},
 			selectedProjManager() {
-				return this.project.projectManager
-						? this.project.projectManager.firstName +
-						" " +
-						this.project.projectManager.lastName
-						: "";
+				return this.project.projectManager ? this.project.projectManager.firstName + " " + this.project.projectManager.lastName : "";
 			},
 			filteredActions() {
 				let result = this.actions;
@@ -599,18 +530,13 @@
 		async created() {
 			const reasons = await this.$http.get("/api/reasons");
 			for (let key in reasons.data) this.reasons.push(reasons.data[key].reason);
-			this.getManagers();
+			await this.getManagers();
 		}
 	};
 </script>
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
-
-  .approve-action {
-    position: absolute;
-    margin-top: 50px;
-  }
 
   .project-action {
     padding: 20px;
@@ -620,6 +546,13 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+
+    &__dropBody{
+      position: relative;
+      width: 191px;
+      height: 30px;
+      margin-bottom: 20px;
+    }
 
     &__setting {
       display: flex;
@@ -781,11 +714,19 @@
       }
     }
 
-
     %item-style {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
     }
+  }
+
+  .approve-action {
+    position: absolute;
+    margin-top: 50px;
+  }
+
+  .project-details{
+    margin-bottom: 4px;
   }
 </style>

@@ -1116,16 +1116,16 @@ router.post('/deliver', async (req, res) => {
 	}
 })
 
-router.post('/project-delivery', async (req, res) => {
-	const { _id, message } = req.body
-	try {
-		const updatedProject = await getAfterProjectDelivery(_id, message)
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on delivering tasks')
-	}
-})
+// router.post('/project-delivery', async (req, res) => {
+// 	const { _id, message } = req.body
+// 	try {
+// 		const updatedProject = await getAfterProjectDelivery(_id, message)
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on delivering tasks')
+// 	}
+// })
 
 router.post('/step-finance', async (req, res) => {
 	const { step } = req.body
@@ -1307,16 +1307,16 @@ router.post('/making-cancel-message', async (req, res) => {
 	}
 })
 
-router.post('/making-delivery-message', async (req, res) => {
-	const { accManager, contact } = getAccManagerAndContact(req.body)
-	try {
-		const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
-		res.send({ message })
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on making delivery message')
-	}
-})
+// router.post('/making-delivery-message', async (req, res) => {
+// 	const { accManager, contact } = getAccManagerAndContact(req.body)
+// 	try {
+// 		const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
+// 		res.send({ message })
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on making delivery message')
+// 	}
+// })
 
 router.post('/making-tasks-cancel-message', async (req, res) => {
 	const { project, tasks, reason, isPay } = req.body

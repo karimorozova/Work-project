@@ -232,38 +232,27 @@ async function notifyClientDeliverablesReady({ project, contacts }) {
 	}
 }
 
-// async function sendClientDeliveries({ taskId, project, contacts }) {
   async function sendClientDeliveries({ projectId, type, entityId, user }) {
 	// contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
 	try {
 	  const { tasksDR2, tasksDeliverables } = await getProject({ "_id": projectId })
     const updatedProject = await createArchiveForDeliverableItem({ type, entityId, projectId, user, tasksDR2, tasksDeliverables })
 
-
-		// const accManager = await User.findOne({ "_id": project.accountManager.id })
-		// const task = project.tasks.find(item => item.taskId === taskId)
-		// const taskIndex = project.tasks.findIndex(item => item.taskId === taskId)
-    // const subject = `Delivery: ${ taskId } - ${ task.service.title } (ID C006.1)`
+		const accManager = await User.findOne({ "_id": updatedProject.accountManager.id })
     const subject = `Delivery in dev (ID C006.1)`
 
-		// const review = await Delivery.findOne({ projectId: project._id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-		// const deliverables = task.deliverables || await getDeliverablesLink({ taskId, taskFiles: review.tasks[0].files, projectId: project._id })
+    const { path } = updatedProject.tasksDeliverables.find(({ deliverablesId }) => `${ deliverablesId }` === `${entityId}` )
+		const content = fs.createReadStream(`./dist${ path }`)
+		const attachments = [ { filename: "deliverables.zip", content } ]
 
-    // console.log(deliverables)
-		// const content = fs.createReadStream(`./dist${ deliverables }`)
-		// const attachments = [ { filename: "deliverables.zip", content } ]
+		for await (let contact of [{email: 'maxyplmr@gmail.com', firstName: 'MAX'}]) {
+			const finalAttachments = attachments
+			 		.filter(item => item.filename === 'deliverables.zip')
+			 		.map(item => ({ filename: item.filename, path: `./dist${ path }` }))
 
-
-		// await Projects.updateOne({ "_id": project._id }, { [`tasks.${ taskIndex }.deliverables`]: deliverables })
-
-		// for await (let contact of contacts) {
-			// const finalAttachments = attachments
-			// 		.filter(item => item.filename === 'deliverables.zip')
-			// 		.map(item => ({ filename: item.filename, path: `./dist${ deliverables }` }))
-
-			// const message = taskDeliveryMessage({ task, contact, accManager, ...project._doc, id: project.id })
-			// await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
-		// }
+			const message = taskDeliveryMessage({ task: '??', contact, accManager, ...updatedProject, id: updatedProject._id })
+			await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
+		}
     return updatedProject
 	} catch (err) {
 		console.log(err)

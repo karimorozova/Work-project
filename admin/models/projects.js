@@ -247,11 +247,6 @@ const ProjectsSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, ref: 'User'
     }
   }],
-  projectDeliverables: {
-    type: String,
-    default: "",
-    trim: true
-  },
 	tasks: {
 		type: Array,
 		default: []
