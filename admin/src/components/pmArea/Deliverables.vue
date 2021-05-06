@@ -72,6 +72,8 @@
       .deliverables-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
 
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
+        //.deliverables-table__icons(v-if="status === 'Ready for Delivery'")
+        //  i(v-for="(icon) in getIconsFS5(row)")
         .deliverables-table__icons
             img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
 

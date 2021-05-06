@@ -83,7 +83,7 @@
         //  @uncheck="(e) => toggleOptions(e, false)"
         //)
       OptionsDR2(
-        v-if="true"
+        v-if="allChecked"
         :isDeliver="isDeliver"
         :isNotify="isNotify"
         :isReadyForDelivery="isReadyForDelivery"
@@ -98,7 +98,7 @@
       //        @clicked="popupRollback"
       //      )
       .review__buttons
-        .review__button(v-if="true")
+        .review__button(v-if="allChecked")
           Button(
             value="Approve"
             @clicked="approve"
@@ -221,6 +221,7 @@
 				}
 			},
 			async toggleList({ type, instruction }) {
+        if(!this.canAddDR2Manager) return
         const types = [ 'isChecked', 'isNotRelevant' ]
         const anotherType = types.filter(item => item !== type)
         instruction[type] = !instruction[type]
@@ -239,6 +240,7 @@
 			// // },
 			checkAllFiles({ bool }) {
 				this.files = this.files.map(item => {
+          // if (bool && item.dr2Manager !== this.user._id) return { ...item, isChecked: false }
 					return { ...item, isChecked: bool }
 				})
 			},
@@ -467,7 +469,14 @@
 			// },
 			isAdmin() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
-			}
+			},
+      canAddDR2Manager() {
+        return this.isAdmin || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
+      },
+      allChecked() {
+        return this.deliveryData.instructions.every(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant )
+          && this.files.every(({isFileApproved}) => isFileApproved)
+      }
 		},
 		components: {
       RollbackModal,
