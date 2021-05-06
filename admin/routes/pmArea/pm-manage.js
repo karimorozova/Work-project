@@ -901,7 +901,7 @@ router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, re
 router.post('/target-dr2', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
   const fileData = { ...req.body }
   const files = req.files['targetFile']
-  const { projectId, path, type, entityId } =  fileData
+  const { projectId, path, type, entityId, dr1Manager, dr2Manager } =  fileData
   const project = await getProject({"_id": projectId})
   const allLanguages = await Languages.find()
   if(type === 'single'){
@@ -926,14 +926,14 @@ router.post('/target-dr2', upload.fields([ { name: 'targetFile' } ]), async (req
         }else{
           await Projects.updateOne(
             { "_id": projectId, 'tasksDR2.singleLang._id': entityId, "tasksDR2.singleLang.files.path": path  },
-            { "tasksDR2.singleLang.$[i].files.$[j]": { isFileApproved: false, pair: getLanguagesPairsSymbols(sourceLanguage, targetLanguage), fileName: fileName, path: newPath, taskId: 'Loaded in DR2' }},
+            { "tasksDR2.singleLang.$[i].files.$[j]": { isFileApproved: false, pair: getLanguagesPairsSymbols(sourceLanguage, targetLanguage), fileName: fileName, path: newPath, taskId: 'Loaded in DR2',dr1Manager,dr2Manager }},
             { arrayFilters: [ { 'i._id': entityId }, { 'j.path': path } ] }
           )
         }
       } else {
         await Projects.updateOne(
           { "_id": projectId, 'tasksDR2.singleLang._id': entityId, },
-          { $push: { 'tasksDR2.singleLang.$.files': { isFileApproved: false, pair: getLanguagesPairsSymbols(sourceLanguage, targetLanguage), fileName: fileName, path: newPath, taskId: 'Loaded in DR2' }}}
+          { $push: { 'tasksDR2.singleLang.$.files': { isFileApproved: false, pair: getLanguagesPairsSymbols(sourceLanguage, targetLanguage), fileName: fileName, path: newPath, taskId: 'Loaded in DR2',dr1Manager,dr2Manager }}}
         )
       }
 

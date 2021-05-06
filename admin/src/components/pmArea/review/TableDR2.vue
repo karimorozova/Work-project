@@ -48,7 +48,7 @@
       .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId.substring(row.taskId.length - 3)  }}
       .review-table__data(slot="dr1" slot-scope="{ row }") {{ getManagerName(row.dr1Manager) }}
       .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
-        .drops__name(v-if="false") {{ getManagerName(row.dr2Manager) }}
+        .review-table__data(v-if="!canChangeDR2Manager") {{ getManagerName(row.dr2Manager) }}
         .drops__menu(v-else)
           SelectSingle(
             :isTableDropMenuNoShadow="true"
@@ -58,7 +58,7 @@
           )
 
       .review-table__data(slot="action" slot-scope="{ row, index }")
-        .review-table__icons
+        .review-table__icons(v-if="canChangeDR2Manager")
 
           img.review-table__icon(:src="icons.download.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'download')")
           .review-table__upload( :class="{'review-table_opacity-04': row.isFileApproved}")
@@ -68,6 +68,10 @@
           i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
           span(v-if="type === 'single'")
             i.review-table__rollback-icon.fas.fa-undo-alt(v-if="!row.isFileApproved && row.taskId !== 'Loaded in DR2'"  @click="rollback(row.taskId)")
+
+        .review-table__icons(v-else)
+          img.review-table__icon(:src="icons.lock.src" :class="{'review-table_opacity-04': row.isFileApproved}")
+
 
     .review-table__upload.review-table_no-back(v-if="type === 'single'")
       input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
@@ -107,7 +111,8 @@
 				icons: {
 					download: { src: require("../../../assets/images/latest-version/download-file.png") },
 					upload: { src: require("../../../assets/images/latest-version/upload-file.png") },
-					delete: { src: require("../../../assets/images/latest-version/delete-icon.png") }
+					delete: { src: require("../../../assets/images/latest-version/delete-icon.png") },
+					lock: { src: require("../../../assets/images/lock.png") },
 				},
 				selectedAction: "",
 				actions: [ "Approve", "Download" ],
@@ -207,7 +212,10 @@
 			// },
 			isAllChecked() {
 				return !this.files.find(item => !item.isChecked)
-			}
+			},
+			canChangeDR2Manager() {
+        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.files[0].dr2Manager.toString() === this.user._id.toString()
+      },
 		},
     created() {
       this.getManagers()

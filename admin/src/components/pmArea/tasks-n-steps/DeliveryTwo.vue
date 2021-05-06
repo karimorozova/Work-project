@@ -281,6 +281,8 @@
         fileData.append("path", path)
         fileData.append("entityId", this.deliveryData._id)
         fileData.append("type", this.type)
+        fileData.append("dr1Manager", this.project.projectManager._id)
+        fileData.append("dr2Manager", this.project.accountManager._id)
         try {
             const updatedProject = await this.$http.post("/pm-manage/target-dr2", fileData)
             await this.setCurrentProject(updatedProject.data);
