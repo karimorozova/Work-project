@@ -74,6 +74,8 @@
         @assignManager="assignManager"
       )
 
+
+
     .review__options
       //.review__options-check(v-if="isAllChecked")
         //CheckBox(
@@ -82,14 +84,20 @@
         //  @check="(e) => toggleOptions(e, true)"
         //  @uncheck="(e) => toggleOptions(e, false)"
         //)
-      OptionsDR2(
-        v-if="allChecked"
-        :isDeliver="isDeliver"
-        :isNotify="isNotify"
-        :isReadyForDelivery="isReadyForDelivery"
-        @toggleOption="toggleOption"
-      )
-
+      .review__group
+        OptionsDR2(
+          v-if="allChecked"
+          class="max-with-400"
+          :isDeliver="isDeliver"
+          :isNotify="isNotify"
+          :isReadyForDelivery="isReadyForDelivery"
+          @toggleOption="toggleOption"
+        )
+        .review__contacts(v-if="isDeliver || isNotify")
+          SelectMulti(
+            :options="contactsNames"
+            :selectedOptions="selectedContacts"
+            @chooseOptions="setContacts")
       //  (v-if="dr1Manager && dr2Manager && getUser")
       //    .review__button(v-if="!isDr1")
       //      .review__forbidden(v-if="dr1Manager._id !== getUser._id && dr2Manager._id !== getUser._id && getUser.name === 'Administrators'")
@@ -117,6 +125,7 @@
   import OptionsDR2 from "../review/OptionsDR2";
   import Button from "../../Button";
   import RollbackModal from "../review/RollbackModal";
+  import SelectMulti from "../../SelectMulti";
   // import DropsDR2 from "../review/DropsDR2";
   //
 	// const CheckBox = () => import("@/components/CheckBox")
@@ -142,7 +151,9 @@
 				isReadyForDelivery: true,
         isModalRollback: false,
 				rollbackManager: null,
-        taskIdRollback: null
+        taskIdRollback: null,
+        selectedContacts: [],
+        contacts: [],
 				// isAssign: true,
 				// isDr1: true,
 				// files: [],
@@ -200,9 +211,6 @@
 			},
 			close() {
 				this.$emit("close")
-			},
-			setContacts({ contacts }) {
-				// this.contacts = [ ...contacts ]
 			},
 			toggleOption({ prop }) {
 				this[prop] = true
@@ -351,12 +359,20 @@
             break
           case this.isDeliver:
             console.log("isDeliver");
-            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user })
+            if(this.contacts.length <= 0) {
+              this.alertToggle({ message: "Choose contact!", isShow: true, type: "error" })
+              break;
+            }
+            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts: this.contacts })
             this.$emit("close")
             break
           case this.isNotify:
             console.log("isNotify");
-            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: [{email: 'maxyplmr@gmail.com', firstName: 'Max'}] })
+            if(this.contacts.length <= 0) {
+              this.alertToggle({ message: "Manager changed!", isShow: true, type: "error" })
+              break;
+            }
+            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.contacts })
             this.$emit("close")
             break
         }
@@ -438,8 +454,22 @@
 			// 		this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
 			// 	}
 			// }
+      setContacts({ option }) {
+        const position = this.selectedContacts.indexOf(option)
+        position === -1 ? this.selectedContacts.push(option) : this.selectedContacts.splice(position, 1)
+        if (!this.selectedContacts.length) {
+          this.setDefaultContact()
+        } else {
+          this.contacts = this.project.customer.contacts
+            .filter(item => this.selectedContacts.indexOf(`${ item.firstName } ${ item.surname }`) !== -1)
+            .map(item => ({email: item.email, firstName: item.firstName}))
+        }
+      },
 		},
 		computed: {
+      contactsNames() {
+        return this.project.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
+      },
 		  deliveryData(){
         const { tasksDR2 } = this.project
 		    if(this.type === 'single'){
@@ -479,6 +509,7 @@
       }
 		},
 		components: {
+      SelectMulti,
       RollbackModal,
       Button,
       OptionsDR2,
@@ -615,9 +646,6 @@
     &__options {
       align-self: center;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       position: relative;
     }
 
@@ -666,6 +694,16 @@
       z-index: 999;
       background-color: rgba(0, 0, 0, 0.2);
       cursor: not-allowed;
+    }
+    &__contacts {
+      position: relative;
+      width: 191px;
+      height: 30px;
+    }
+    &__group {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
     }
   }
 
@@ -716,5 +754,8 @@
         background: #f2efeb;
       }
     }
+  }
+  .max-with-400 {
+    max-width: 400px;
   }
 </style>

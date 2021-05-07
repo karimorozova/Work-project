@@ -30,9 +30,9 @@ router.post('/tasks-approve-notify', async (req, res) => {
 })
 
 router.post('/tasks-approve-deliver', async (req, res) => {
-  const { projectId, type, entityId, user } = req.body
+  const { projectId, type, entityId, user, contacts } = req.body
   try {
-    const updatedProject = await taskApproveDeliver({ projectId, type, entityId, user })
+    const updatedProject = await taskApproveDeliver({ projectId, type, entityId, user, contacts })
     res.send(updatedProject)
   } catch (err) {
     console.log(err)

@@ -23,8 +23,8 @@ const {
   getProjectAfterUpdate,
 } = require('./getProjects')
 
-const taskApproveDeliver= async ({ projectId, type, entityId, user }) => {
-  return await sendClientDeliveries({ projectId, type, entityId, user })
+const taskApproveDeliver= async ({ projectId, type, entityId, user, contacts }) => {
+  return await sendClientDeliveries({ projectId, type, entityId, user, contacts })
 }
 
 const taskApproveNotify = async ({ projectId, type, entityId, contacts }) => {

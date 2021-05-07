@@ -232,7 +232,7 @@ async function notifyClientDeliverablesReady({ project, contacts }) {
 	}
 }
 
-  async function sendClientDeliveries({ projectId, type, entityId, user }) {
+  async function sendClientDeliveries({ projectId, type, entityId, user, contacts }) {
 	// contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
 	try {
 	  const { tasksDR2, tasksDeliverables } = await getProject({ "_id": projectId })
@@ -245,7 +245,7 @@ async function notifyClientDeliverablesReady({ project, contacts }) {
 		const content = fs.createReadStream(`./dist${ path }`)
 		const attachments = [ { filename: "deliverables.zip", content } ]
 
-		for await (let contact of [{email: 'maxyplmr@gmail.com', firstName: 'MAX'}]) {
+		for await (let contact of contacts) {
 			const finalAttachments = attachments
 			 		.filter(item => item.filename === 'deliverables.zip')
 			 		.map(item => ({ filename: item.filename, path: `./dist${ path }` }))
