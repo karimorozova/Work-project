@@ -9,8 +9,8 @@
         .icon
           span(class="click-copy" @click="copyId")
             i.far.fa-copy(aria-hidden="true")
-        .icon
-          i.fas.fa-sync-alt(@click="refreshProject")
+        .icon(@click="refreshProject")
+          i.fas.fa-sync
 
     .sub-information__row
       .row__title Project Status:
@@ -413,6 +413,7 @@
       padding-bottom: 5px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
 
       &-title{
         font-size: 21px;
@@ -548,27 +549,13 @@
     }
   }
   .icon{
-    width: 40px;
-    background: #d15f45;
     display: flex;
     justify-content: center;
-    align-items: center;
-    border-radius: 40px;
-    height: 40px;
-    color: white;
-    margin-left: 10px;
-    font-size: 20px;
+    color: #67573e;
+    margin-left: 12px;
+    font-size: 16px;
+    transition: .2s ease;
+    align-items: flex-end;
+    cursor: pointer;
   }
-
-  //.click-copy {
-  //  margin-left: 15px;
-  //  font-size: 18px;
-  //  cursor: pointer;
-  //  transition: ease 0.2s;
-  //  opacity: 0.8;
-  //}
-  //
-  //.click-copy:hover {
-  //  opacity: 1;
-  //}
 </style>

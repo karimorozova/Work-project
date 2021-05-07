@@ -11,7 +11,7 @@
       Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
 
     .project-action__title(:style="{'padding-bottom': '5px'}")
-      .project-action__title-text Project Action:
+      .project-action__title-text Project Action
       //.project-action__title-button(@click="refreshProject")
 
     .project-action__drop-menuSend

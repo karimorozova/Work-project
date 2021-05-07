@@ -2,7 +2,7 @@
   .project-info(v-if="currentProject._id")
 
     .project-info__leftSide
-      Project(:project="currentProject" @refreshProject="refreshProject")
+      Project(:project="currentProject")
       .task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
         TasksAndSteps(
           :originallyLanguages="originallyLanguages"
@@ -19,7 +19,7 @@
       Deliverables
 
     .project-info__rigthSide
-      ProjectSubInformation(:project="currentProject")
+      ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
       .project-info__action
         ProjectAction(
           :project="currentProject"
@@ -208,9 +208,14 @@
 				}
 			},
 			async refreshProject() {
-				const { id } = this.$route.params;
-				const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
-				await this.setCurrentProject(curProject.body);
+			  try{
+          const { id } = this.$route.params;
+          const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`);
+          await this.setCurrentProject(curProject.data);
+          this.alertToggle({ message: "Project updated", isShow: true, type: "success" });
+        }catch (err) {
+        }
+
 			},
 		},
 		computed: {
@@ -262,6 +267,7 @@
 
     &__rigthSide{
       margin-left: 40px;
+      padding-right: 40px;
     }
 
     &__preview {

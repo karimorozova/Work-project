@@ -216,7 +216,7 @@
       border-left: 2px solid #938676;
       border-right: 2px solid #938676;
       border-bottom: 1px solid #938676;
-      width: 360px;
+      width: 356px;
     }
 
     &__title {
