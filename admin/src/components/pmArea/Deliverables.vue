@@ -60,22 +60,29 @@
       :tableheadRowClass="deliverables.length < 6 ? 'tbody_visible-overflow' : ''"
       :headCellClass="'padding-with-check-box'"
     )
+      .deliverables-table__header(slot="headerCheck" slot-scope="{ field }") {{ field.label }}
+        CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
       .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
+      .deliverables-table__data(slot="check" slot-scope="{ row }")
+        CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
       .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
       .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
       .deliverables-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
 
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
-        //.deliverables-table__icons(v-if="status === 'Ready for Delivery'")
-        //  i(v-for="(icon) in getIconsFS5(row)")
-        .deliverables-table__icons
-            img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
+
+        .deliverables-table__icons(v-if="row.status === 'Ready for Delivery' && canUpdateDr2")
+          i.fas.fa-truck-loading(@click="delivery(row)")
+
+        .deliverables-table__icons(v-if="row.status !== 'Ready for Delivery'")
+          img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
+
 
     Add(v-if="canUpdateDr2" @add="showModal")
 </template>
@@ -89,16 +96,18 @@ import {mapGetters,mapActions} from "vuex"
 import SelectMulti from "../SelectMulti";
 import DeliveryTwo from "./tasks-n-steps/DeliveryTwo";
 import ApproveModal from "../ApproveModal";
+import CheckBox from "@/components/CheckBox"
 
 export default {
   data() {
     return {
       fields: [
+        { label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
         { label: "Language pair", headerKey: "headerPair", key: "pair", width: "25%", padding: 0 },
         { label: "# Files", headerKey: "headerFile", key: "file", width: "10%", padding: 0 },
-        { label: "Task Id", headerKey: "headerTask", key: "task", width: "28.5%", padding: 0 },
-        { label: "Status", headerKey: "headerStatus", key: "status", width: "28.5%", padding: 0 },
-        { label: "Delivery", headerKey: "headerAction", key: "action", width: "8%", padding: 0 },
+        { label: "Task Id", headerKey: "headerTask", key: "task", width: "26%", padding: 0 },
+        { label: "Status", headerKey: "headerStatus", key: "status", width: "26%", padding: 0 },
+        { label: "Delivery", headerKey: "headerAction", key: "action", width: "9%", padding: 0 },
       ],
       deliverablesModal: false,
       refFilesForDelete: [],
@@ -115,6 +124,7 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle",
       storeProject: "setCurrentProject",
+      approveDeliver: "approveDeliver"
     }),
     closeDeleteModal() {
       this.refFiles = []
@@ -136,14 +146,22 @@ export default {
         this.closeDeliverablesModal()
       }
     },
-    getIcons({type, files}) {
+    getIcons({type, files, status}) {
       const icons = {
-        dr2: {src: require("../../assets/images/latest-version/delivery-list.png") },
       }
-      if (type === 'multi' && this.canUpdateDr2 ) {
+      if (status === 'Delivered') {
+        icons.download = {src: require("../../assets/images/latest-version/download-file.png")}
+        return icons
+      }
+
+      if(type === 'multi' && this.canUpdateDr2 ){
+        icons.dr2 = {src: require("../../assets/images/latest-version/delivery-list.png") }
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
       }else if(type === 'single' && !files.length && this.canUpdateDr2 ){
+        icons.dr2 = {src: require("../../assets/images/latest-version/delivery-list.png") }
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
+      } else {
+        icons.dr2 = {src: require("../../assets/images/latest-version/delivery-list.png") }
       }
       return icons
     },
@@ -158,7 +176,13 @@ export default {
         case "dr2":
           this.isDR2Modal = true
           break;
+        case "download":
+          this.createLinkAndDownload(_id)
+          break;
       }
+    },
+    async delivery(row) {
+      await this.approveDeliver({projectId: this.currentProject._id, entityId: row._id, type: row.type, user: this.user })
     },
     closeDR2() {
       this.currentReviewId = this.currentReviewType  = null
@@ -217,7 +241,14 @@ export default {
       } else {
         this.selectedTasks.push(option);
       }
-    }
+    },
+    createLinkAndDownload(id) {
+      const deliverables = this.currentProject.tasksDeliverables.find(({deliverablesId})=> deliverablesId === id)
+      let link = document.createElement('a')
+      link.href = __WEBPACK__API_URL__ + deliverables.path
+      link.target = "_blank"
+      link.click()
+    },
   },
   computed: {
     ...mapGetters({
@@ -281,7 +312,8 @@ export default {
     DataTable,
     Add,
     Button,
-    FilesUpload
+    FilesUpload,
+    CheckBox,
   }
 }
 </script>
