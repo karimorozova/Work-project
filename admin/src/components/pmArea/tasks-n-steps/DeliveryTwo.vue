@@ -85,15 +85,17 @@
         //  @uncheck="(e) => toggleOptions(e, false)"
         //)
       .review__group
-        OptionsDR2(
-          v-if="allChecked"
-          class="max-with-400"
-          :isDeliver="isDeliver"
-          :isNotify="isNotify"
-          :isReadyForDelivery="isReadyForDelivery"
-          @toggleOption="toggleOption"
-        )
-        .review__contacts(v-if="isDeliver || isNotify")
+        .test
+          span Actions:
+          OptionsDR2(
+            v-if="allChecked"
+            class="max-with-400"
+            :isDeliver="isDeliver"
+            :isNotify="isNotify"
+            :isReadyForDelivery="isReadyForDelivery"
+            @toggleOption="toggleOption"
+          )
+        .review__contacts(v-if="isDeliver || isNotify") Contacts:
           SelectMulti(
             :options="contactsNames"
             :selectedOptions="selectedContacts"
@@ -465,6 +467,11 @@
             .map(item => ({email: item.email, firstName: item.firstName}))
         }
       },
+      setDefaultContact() {
+        const leads = this.project.customer.contacts.filter(item => item.leadContact)
+        this.selectedContacts = leads.map(item => `${ item.firstName } ${ item.surname }`)
+        this.contacts = { contacts: [ leads[0].email ], firstName: leads[0].firstName}
+      },
 		},
 		computed: {
       contactsNames() {
@@ -506,9 +513,10 @@
       allChecked() {
         return this.deliveryData.instructions.every(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant )
           && this.files.every(({isFileApproved}) => isFileApproved)
-      }
+      },
+
 		},
-		components: {
+    components: {
       SelectMulti,
       RollbackModal,
       Button,
@@ -526,6 +534,7 @@
         const { file, tasks } = tasksDR2.multiLang.find(item => `${item._id}` === `${this.id}`)
         this.files = [{ ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false}]
       }
+      this.setDefaultContact()
     }
 	}
 </script>
