@@ -52,6 +52,15 @@
         .tasks-files__tooltip File can be <= 50Mb (otherwise it will not be loaded)
 
     .deliverables__title Deliverables
+    .tasks__action
+      .tasks__title Task Action
+      .tasks__drop-menu
+        SelectSingle(
+          :selectedOption="selectedAction"
+          :options="availableActionsOptions"
+          placeholder="Select Action"
+          @chooseOption="setAction"
+        )
     .deliverables-table
     DataTable(
       :fields="fields"
@@ -61,15 +70,15 @@
       :headCellClass="'padding-with-check-box'"
     )
       .deliverables-table__header(slot="headerCheck" slot-scope="{ field }") {{ field.label }}
-        CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
+        CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="()=>toggleAll(true)" @uncheck="()=>toggleAll( false)" customClass="tasks-n-steps")
       .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
-      .deliverables-table__data(slot="check" slot-scope="{ row }")
-        CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
+      .deliverables-table__data(slot="check" slot-scope="{ index, row }")
+        CheckBox(:isChecked="row.isChecked" @check="()=>toggle( index, true)" @uncheck="()=>toggle( index, false)" customClass="tasks-n-steps")
       .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
       .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
@@ -96,7 +105,8 @@ import {mapGetters,mapActions} from "vuex"
 import SelectMulti from "../SelectMulti";
 import DeliveryTwo from "./tasks-n-steps/DeliveryTwo";
 import ApproveModal from "../ApproveModal";
-import CheckBox from "@/components/CheckBox"
+import CheckBox from "@/components/CheckBox";
+import SelectSingle from "../SelectSingle"
 
 export default {
   data() {
@@ -249,6 +259,14 @@ export default {
       link.target = "_blank"
       link.click()
     },
+    toggleAll( bool) {
+      this.deliverables = this.deliverables.map(item => {
+        return { ...item, isChecked: bool }
+      })
+    },
+    toggle(index, bool ) {
+      this.deliverables[index].isChecked = bool
+    },
   },
   computed: {
     ...mapGetters({
@@ -276,7 +294,8 @@ export default {
           status: item.status,
           tasks: item.files.map(item => item.taskId),
           pair: this.getLangPair(item, 'lang'),
-          files: item.files
+          files: item.files,
+          isChecked: false
         }
       }) : []
 
@@ -288,7 +307,8 @@ export default {
           status: item.status,
           tasks: item.tasks,
           pair: 'Multilingual',
-          files: [item.file]
+          files: [item.file],
+          isChecked: false
         }
       }) : []
       return [ ...singleLang, ...multiLang ]
@@ -303,7 +323,11 @@ export default {
         .forEach(({taskId}) => result.add(taskId))
 
       return Array.from(result)
-    }
+    },
+    isAllChecked() {
+      return !this.deliverables.find(item => !item.isChecked)
+    },
+
   },
   components: {
     ApproveModal,
@@ -314,6 +338,7 @@ export default {
     Button,
     FilesUpload,
     CheckBox,
+    SelectSingle
   }
 }
 </script>
@@ -601,6 +626,21 @@ export default {
       font-weight: bold;
       cursor: pointer;
     }
+  }
+}
+
+.title {
+  &__action {
+    align-self: flex-end;
+  }
+  &__drop-menu {
+    position: relative;
+    width: 191px;
+    height: 28px;
+  }
+  &__title {
+    margin-bottom: 5px;
+    font-size: 16px;
   }
 }
 
