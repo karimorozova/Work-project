@@ -12,6 +12,26 @@
 
     .deliverables__DR2(v-if="isDR2Modal")
       DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
+
+    .deliverables__modal(v-if="isContactsPickerForMany")
+      .deliverables__titleModal Delivery for Contacts
+      span.deliverables__close-modal(@click="isContactsPickerForMany = false") &#215;
+      .deliverables__body
+        .deliverables__itemsContacts
+          .deliverables__items2
+            .deliverables__selectTitle Choose client contacts:
+            .deliverables__select
+              SelectMulti(
+                placeholder="Select"
+                :options="contactsNames"
+                :selectedOptions="selectedContacts"
+                @chooseOptions="setContacts"
+              )
+
+        .tasks-files__button
+          Button(:value="'Deliver'" @clicked="deliverForMany")
+        .tasks-files__tooltip One project client contact is selected by default
+
     .deliverables__modal(v-if="deliverablesModal")
       .deliverables__titleModal Upload Deliverables
       span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
@@ -25,7 +45,7 @@
                   FilesUpload(
                     :isMulti="false"
                     buttonValue="Upload deliverables"
-                    inputClass="files-upload__ref-file"
+                    inputClass="files-upload__multiLang"
                     :files="refFiles"
                     @uploadFiles="uploadRefFiles"
                     @deleteFile="deleteFile()"
@@ -51,16 +71,19 @@
           Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
         .tasks-files__tooltip File can be <= 50Mb (otherwise it will not be loaded)
 
-    .deliverables__title Deliverables
-    .tasks__action
-      .tasks__title Task Action
-      .tasks__drop-menu
-        SelectSingle(
-          :selectedOption="selectedAction"
-          :options="availableActionsOptions"
-          placeholder="Select Action"
-          @chooseOption="setAction"
-        )
+
+    .deliverables__header
+      .deliverables__title Deliverables
+      .deliverablesActions
+        .deliverablesActions__title Deliverables Action:
+        .deliverablesActions__drop-menu
+          SelectSingle(
+            :selectedOption="selectedAction"
+            :options="availableActionsOptions"
+            placeholder="Select Action"
+            @chooseOption="setAction"
+          )
+
     .deliverables-table
     DataTable(
       :fields="fields"
@@ -70,7 +93,7 @@
       :headCellClass="'padding-with-check-box'"
     )
       .deliverables-table__header(slot="headerCheck" slot-scope="{ field }") {{ field.label }}
-        CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="()=>toggleAll(true)" @uncheck="()=>toggleAll( false)" customClass="tasks-n-steps")
+        CheckBox(:isChecked="!!isAllChecked" :isWhite="true" @check="()=>toggleAll(true)" @uncheck="()=>toggleAll(false)" customClass="tasks-n-steps")
       .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
       .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
@@ -78,7 +101,7 @@
       .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
       .deliverables-table__data(slot="check" slot-scope="{ index, row }")
-        CheckBox(:isChecked="row.isChecked" @check="()=>toggle( index, true)" @uncheck="()=>toggle( index, false)" customClass="tasks-n-steps")
+        CheckBox(:isChecked="!!row.isChecked" @check="()=> toggle(row, true)" @uncheck="()=>toggle(row, false)" customClass="tasks-n-steps")
       .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
       .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
@@ -101,7 +124,7 @@ import DataTable from "../DataTable";
 import Add from "../Add";
 import Button from "../Button";
 import FilesUpload from "./tasks-n-steps/tasksFiles/FilesUpload"
-import {mapGetters,mapActions} from "vuex"
+import { mapGetters, mapActions } from "vuex"
 import SelectMulti from "../SelectMulti";
 import DeliveryTwo from "./tasks-n-steps/DeliveryTwo";
 import ApproveModal from "../ApproveModal";
@@ -128,7 +151,13 @@ export default {
       isDeleteModal: false,
       currentReviewId: null,
       currentReviewType: null,
+      selectedAction: '',
+      isContactsPickerForMany: false,
+      selectedContacts: [],
     }
+  },
+  mounted(){
+    this.setDefaultContact()
   },
   methods: {
     ...mapActions({
@@ -136,6 +165,29 @@ export default {
       storeProject: "setCurrentProject",
       approveDeliver: "approveDeliver"
     }),
+    deliverForMany(){
+      console.log('go')
+    },
+    setContacts({ option }) {
+      const position = this.selectedContacts.indexOf(option)
+      if(position === -1){
+        this.selectedContacts.push(option)
+      }else{
+        if(this.selectedContacts.length > 1){
+          this.selectedContacts.splice(position, 1)
+        }
+      }
+    },
+    setDefaultContact() {
+      const { firstName, surname } = this.currentProject.clientContacts[0]
+      this.selectedContacts.push(`${firstName} ${surname}`)
+    },
+    setAction({ option }){
+      this.selectedAction = option
+      if(option === 'Deliver'){
+        this.isContactsPickerForMany = true
+      }
+    },
     closeDeleteModal() {
       this.refFiles = []
       this.selectedTasks = []
@@ -147,7 +199,6 @@ export default {
       try {
         const result = await this.$http.post('/delivery/multi-file-dr2-remove', {projectId: this.currentProject._id, type: this.currentReviewType, dr2Id: this.currentReviewId})
         this.storeProject(result.data)
-
         this.closeDeleteModal()
         this.alertToggle({ message: "Review deleted", isShow: true, type: "success" })
       } catch (err) {
@@ -192,7 +243,7 @@ export default {
       }
     },
     async delivery(row) {
-      await this.approveDeliver({projectId: this.currentProject._id, entityId: row._id, type: row.type, user: this.user })
+      // await this.approveDeliver({projectId: this.currentProject._id, entityId: row._id, type: row.type, user: this.user })
     },
     closeDR2() {
       this.currentReviewId = this.currentReviewType  = null
@@ -238,7 +289,7 @@ export default {
           this.refFiles = [files[0]]
       }
       if (!filteredFiles.length) {
-        this.clearInputFiles(".files-upload__ref-file")
+        this.clearInputFiles(".files-upload__multiLang")
       }
     },
     deleteFile() {
@@ -259,13 +310,40 @@ export default {
       link.target = "_blank"
       link.click()
     },
-    toggleAll( bool) {
-      this.deliverables = this.deliverables.map(item => {
-        return { ...item, isChecked: bool }
-      })
+    toggleAll(bool) {
+      if(this.currentProject.tasksDR2.hasOwnProperty('singleLang')){
+        for(let [index] of this.currentProject.tasksDR2.singleLang.entries()){
+          this.currentProject.tasksDR2.singleLang.splice(index, 1, {...this.currentProject.tasksDR2.singleLang[index], isChecked: bool})
+        }
+      }
+      if(this.currentProject.tasksDR2.hasOwnProperty('multiLang')){
+        for(let [index] of this.currentProject.tasksDR2.multiLang.entries()){
+          this.currentProject.tasksDR2.multiLang.splice(index, 1, {...this.currentProject.tasksDR2.multiLang[index], isChecked: bool})
+        }
+      }
     },
-    toggle(index, bool ) {
-      this.deliverables[index].isChecked = bool
+    toggle(row, bool) {
+      const { type, _id: id } = row
+
+      if(type === 'single'){
+        const { tasksDR2: { singleLang } } = this.currentProject
+        this.currentProject.tasksDR2.singleLang
+          .splice(idx(singleLang), 1, {
+            ...this.currentProject.tasksDR2.singleLang[idx(singleLang)],
+            isChecked: bool
+          })
+      }else{
+        const { tasksDR2: { multiLang } } = this.currentProject
+        this.currentProject.tasksDR2.multiLang
+          .splice(idx(multiLang), 1, {
+            ...this.currentProject.tasksDR2.multiLang[idx(multiLang)],
+            isChecked: bool
+          })
+      }
+
+      function idx(arr){
+        return arr.findIndex(({_id}) => `${_id}` === `${id}`)
+      }
     },
   },
   computed: {
@@ -275,48 +353,54 @@ export default {
       users: 'getUsers',
       user: 'getUser',
     }),
+    availableActionsOptions(){
+      const getArrayOfChecked = this.deliverables.filter(item => !!item.isChecked)
+
+      if(getArrayOfChecked.length) if(getArrayOfChecked.every(({status}) => status === 'Ready for Delivery')){
+        return ['Deliver']
+      }
+    },
     checkMultiReview() {
       return this.refFiles.length > 0 && this.selectedTasks.length > 0
     },
     canUpdateDr2() {
       return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.currentProject.accountManager._id.toString() === this.user._id.toString()
     },
+
     deliverables(){
       if(!this.currentProject.hasOwnProperty('tasksDR2')) return []
 
-      const { tasksDR2 } = this.currentProject
+      const singleLang = this.currentProject.tasksDR2.hasOwnProperty('singleLang') ?
+        this.currentProject.tasksDR2.singleLang.map(item => {
+          return {
+            _id: item._id,
+            type: 'single',
+            status: item.status,
+            tasks: item.files.map(item => item.taskId),
+            pair: this.getLangPair(item, 'lang'),
+            files: item.files,
+            isChecked: item.isChecked
+          }
+        }) : []
 
-      const singleLang = tasksDR2.hasOwnProperty('singleLang') ?
-        tasksDR2.singleLang.map(item => {
-        return {
-          _id: item._id,
-          type: 'single',
-          status: item.status,
-          tasks: item.files.map(item => item.taskId),
-          pair: this.getLangPair(item, 'lang'),
-          files: item.files,
-          isChecked: false
-        }
-      }) : []
-
-      const multiLang = tasksDR2.hasOwnProperty('multiLang') ?
-        tasksDR2.multiLang.map(item => {
-        return {
-          _id: item._id,
-          type: 'multi',
-          status: item.status,
-          tasks: item.tasks,
-          pair: 'Multilingual',
-          files: [item.file],
-          isChecked: false
-        }
-      }) : []
+      const multiLang = this.currentProject.tasksDR2.hasOwnProperty('multiLang') ?
+        this.currentProject.tasksDR2.multiLang.map(item => {
+          return {
+            _id: item._id,
+            type: 'multi',
+            status: item.status,
+            tasks: item.tasks,
+            pair: 'Multilingual',
+            files: [item.file],
+            isChecked: item.isChecked
+          }
+        }) : []
       return [ ...singleLang, ...multiLang ]
     },
+
     selectTaskInfo() {
       if(!this.currentProject || !this.currentProject.tasks) return []
       const multilingualIds = this.currentProject.hasOwnProperty('tasksDR2') ? this.currentProject.tasksDR2.multiLang.map(({tasks}) => tasks).flat() : []
-      console.log({ multilingualIds })
       let result = new Set()
       this.currentProject.tasksDR1
         .filter(({files, taskId}) => files.every(({isFileApproved, isFilePushedDR2}) => isFileApproved && !isFilePushedDR2) && !multilingualIds.includes(taskId))
@@ -325,7 +409,16 @@ export default {
       return Array.from(result)
     },
     isAllChecked() {
-      return !this.deliverables.find(item => !item.isChecked)
+      const single = this.currentProject.tasksDR2.hasOwnProperty('singleLang') ?
+        this.currentProject.tasksDR2.singleLang.every(item => item.isChecked) :
+        true
+      const multi = this.currentProject.tasksDR2.hasOwnProperty('multiLang') ?
+        this.currentProject.tasksDR2.multiLang.every(item => item.isChecked) :
+        true
+      return multi && single
+    },
+    contactsNames() {
+      return this.currentProject.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
     },
 
   },
@@ -346,6 +439,20 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
 
+.deliverablesActions{
+  position: relative;
+  width: 191px;
+
+  &__drop-menu{
+    height: 30px;
+  }
+
+  &__title{
+    margin-bottom: 4px;
+  }
+
+}
+
 .deliverables {
   box-sizing: border-box;
   min-width: 1000px;
@@ -355,8 +462,18 @@ export default {
   box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   position: relative;
 
+  &__header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+  }
+
   &__items{
     display: flex;
+  }
+  &__itemsContacts{
+    display: flex;
+    justify-content: center;
   }
 
   &__selectTitle{
@@ -397,17 +514,17 @@ export default {
   }
 
   &__titleModal{
-    font-size: 22px;
+    font-size: 21px;
     margin-bottom: 20px;
     text-align: center;
     font-family: Myriad600;
   }
   &__title{
-    font-size: 22px;
-    margin-bottom: 20px;
+    font-size: 21px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-family: Myriad600;
   }
 
   &__select {
@@ -446,7 +563,7 @@ export default {
     &__data {
       height: 30px;
       box-sizing: border-box;
-      padding-left: 7px;
+      padding-left: 5px;
       display: flex;
       align-items: center;
     }

@@ -1,7 +1,7 @@
 <template lang="pug">
   .steps
     .steps__action
-      .steps__title Step Action
+      .steps__title Step Action:
       .steps__drop-menu
         SelectSingle(
           :selectedOption="selectedAction"
@@ -603,8 +603,7 @@
     }
 
     &__title {
-      margin-bottom: 5px;
-      font-size: 16px;
+      margin-bottom: 4px;
     }
 
     &__drop-menu {

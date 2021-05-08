@@ -54,7 +54,7 @@
       .tasks-files__tooltip (otherwise it will not be loaded)
 
     .tasks__action
-      .tasks__title Task Action
+      .tasks__title Task Action:
       .tasks__drop-menu
         SelectSingle(
           :selectedOption="selectedAction"
@@ -117,7 +117,7 @@
             ProgressLine(:progress="progress(row, index)")
         template(slot="status" slot-scope="{ row }")
           .tasks__task-data {{ row.status | stepsAndTasksStatusFilter }}
-            .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
+            //.tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
               img.tasks__time-icon(src="../../../assets/images/time_icon.png")
               .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
 
@@ -792,8 +792,7 @@
     }
 
     &__title {
-      margin-bottom: 5px;
-      font-size: 16px;
+      margin-bottom: 4px;
     }
 
     &__drop-menu {

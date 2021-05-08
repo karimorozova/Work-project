@@ -116,21 +116,20 @@
 </template>
 
 <script>
-	import CKEditor from "ckeditor4-vue"
-	import { mapGetters, mapActions } from "vuex"
 	// import Drops from "../review/Drops"
 	// import Table from "../review/Table"
-	import Check from "../review/Check"
 	// import _ from "lodash"
+  // import DropsDR2 from "../review/DropsDR2";
+  // const CheckBox = () => import("@/components/CheckBox")
+	import CKEditor from "ckeditor4-vue"
+	import { mapGetters, mapActions } from "vuex"
+	import Check from "../review/Check"
 	import editorConfig from "../../../mixins/editorConfig"
   import TableDR2 from "../review/TableDR2";
   import OptionsDR2 from "../review/OptionsDR2";
   import Button from "../../Button";
   import RollbackModal from "../review/RollbackModal";
   import SelectMulti from "../../SelectMulti";
-  // import DropsDR2 from "../review/DropsDR2";
-  //
-	// const CheckBox = () => import("@/components/CheckBox")
 
 	export default {
 		mixins: [ editorConfig ],
@@ -155,7 +154,7 @@
 				rollbackManager: null,
         taskIdRollback: null,
         selectedContacts: [],
-        contacts: [],
+        // contacts: [],
 				// isAssign: true,
 				// isDr1: true,
 				// files: [],
@@ -314,45 +313,7 @@
         const paths = checked.map(item => item.path)
         await this.approveDeliveryFileDR2({ projectId: this.project._id, isFileApproved: true, paths })
       },
-			// async checkPermission() {
-			// 	if (!this.isReviewing) {
-			// 		try {
-			// 			const reviewStatus = await this.$http.get(
-			// 					`/pm-manage/review-status?group=${ this.user.group.name }&projectId=${ this.project._id }&taskId=${ this.task.taskId }&userId=${ this.user._id }`
-			// 			)
-			// 			if (reviewStatus.data === "forbidden") {
-			// 				this.isReviewing = true
-			// 				return this.alertToggle({ message: "This task Delivery Review is forbidden for you", isShow: true, type: "error" })
-			// 			}
-			// 		} catch (err) {
-			// 			this.alertToggle({ message: "Error on checking review status", isShow: true, type: "error" })
-			// 		}
-			// 	}
-			// },
 			async approve() {
-				// try {
-				// 	if (this.isDr1 && this.isAssign) {
-				// 		await this.assignDr2({
-				// 			projectId: this.project._id,
-				// 			taskId: this.task.taskId,
-				// 			dr2Manager: this.dr2Manager
-				// 		})
-				// 		return await this.getDeliveryData()
-				// 	} else if (!this.isNotify && !this.isDeliver && this.isReadyForDelivery) {
-				// 		return await this.approveDeliverable(this.task.taskId)
-				// 	} else {
-				// 		return await this.approveWithOption({
-				// 			taskId: this.task.taskId,
-				// 			isDeliver: this.isDeliver,
-				// 			contacts: this.project.clientContacts.map(({ email, firstName }) => ({ email, firstName })),
-				// 			user: { firstName: this.getUser.firstName, lastName: this.getUser.lastName, _id: this.getUser._id }
-				// 		})
-				// 	}
-				// } catch (err) {
-				// } finally {
-				// 	this.$emit("close")
-				// }
-
         switch (true) {
           case this.isReadyForDelivery:
             console.log("isReadyForDelivery");
@@ -361,19 +322,17 @@
             break
           case this.isDeliver:
             console.log("isDeliver");
-            if(this.contacts.length <= 0) {
-              this.alertToggle({ message: "Choose contact!", isShow: true, type: "error" })
-              break;
-            }
-            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts: this.contacts })
+            const contacts = this.selectedContacts
+              .map(item => this.project.clientContacts.find(({firstName, surname}) => `${firstName} ${surname}` === item))
+              .map(item => ({email: item.email, firstName: `${item.firstName} ${item.surname}`}))
+
+            console.log(contacts)
+            // await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts,  })
             this.$emit("close")
             break
           case this.isNotify:
             console.log("isNotify");
-            if(this.contacts.length <= 0) {
-              this.alertToggle({ message: "Manager changed!", isShow: true, type: "error" })
-              break;
-            }
+
             await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.contacts })
             this.$emit("close")
             break
@@ -427,50 +386,19 @@
         }
 				this.closeRollback()
 			},
-			// async getDeliveryData() {
-			// 	if (this.task.status === "Pending Approval [DR2]") {
-			// 		this.isDr1 = false
-			// 	}
-			// 	this.isDeliver = this.isDr1 ? false : this.areOptions
-      //
-			// 	try {
-			// 		const result = await this.$http.post("/pm-manage/delivery-data", {
-			// 			projectId: this.project._id,
-			// 			taskId: this.task.taskId
-			// 		})
-			// 		this.files = result.data.files.map(item => {
-			// 			return { ...item, taskId: this.task.taskId, pair: result.data.pair, isChecked: false }
-			// 		})
-			// 		this.dr1Manager = result.data.dr1Manager
-			// 		this.dr2Manager = result.data.dr2Manager
-			// 		this.instructions = result.data.instructions.filter(item => item.step === result.data.status)
-			// 		if (this.task.status === "Pending Approval [DR2]") {
-			// 			this.rollbackManager = JSON.parse(JSON.stringify(this.dr1Manager))
-			// 			this.timestamp = result.data.timestamp
-			// 		}
-			// 		const commentsData = await this.$http.get('/pm-manage/delivery-comments/' + this.project._id)
-			// 		const { comments } = commentsData.data
-			// 		this.editorData = this.task.status === 'Pending Approval [DR2]' ? comments.dr2.comment : comments.dr1.comment
-			// 		this.previousComment = this.task.status === 'Pending Approval [DR2]' ? comments.dr1.comment : ''
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: "Error on getting delivery data", isShow: true, type: "error" })
-			// 	}
-			// }
       setContacts({ option }) {
         const position = this.selectedContacts.indexOf(option)
-        position === -1 ? this.selectedContacts.push(option) : this.selectedContacts.splice(position, 1)
-        if (!this.selectedContacts.length) {
-          this.setDefaultContact()
-        } else {
-          this.contacts = this.project.customer.contacts
-            .filter(item => this.selectedContacts.indexOf(`${ item.firstName } ${ item.surname }`) !== -1)
-            .map(item => ({email: item.email, firstName: item.firstName}))
+        if(position === -1){
+          this.selectedContacts.push(option)
+        }else{
+          if(this.selectedContacts.length > 1){
+            this.selectedContacts.splice(position, 1)
+          }
         }
       },
       setDefaultContact() {
-        const leads = this.project.customer.contacts.filter(item => item.leadContact)
-        this.selectedContacts = leads.map(item => `${ item.firstName } ${ item.surname }`)
-        this.contacts = { contacts: [ leads[0].email ], firstName: leads[0].firstName}
+        const { firstName, surname } = this.project.clientContacts[0]
+        this.selectedContacts.push(`${firstName} ${surname}`)
       },
 		},
 		computed: {
