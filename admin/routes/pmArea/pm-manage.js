@@ -687,6 +687,39 @@ router.post('/approve-instruction', async (req, res) => {
       { arrayFilters: [ { 'i.taskId': taskId }, { 'j.text': instruction.text } ]}
     )
 
+    // const tasksDR1Info = await Projects.findOne({_id: projectId, "tasksDR1.taskId": taskId},{"tasksDR1.$": 1})
+    // const isAllChecklist= tasksDR1Info.tasksDR1[0].instructions.every(({isChecked, isNotRelevant}) => isChecked || isNotRelevant)
+    // const isAllFiles = tasksDR1Info.tasksDR1[0].files.every(({isFileApproved}) => isFileApproved)
+    //
+    // if( isAllChecklist && isAllFiles ) {
+    //   await changeTaskStatus(projectId, taskId, 'Pending Approval [DR1]', "Complete", new Date())
+    // }else{
+    //   await changeTaskStatus(projectId, taskId, "Complete", 'Pending Approval [DR1]', null)
+    // }
+
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on approve files')
+	}
+
+  // async function changeTaskStatus(projectId,taskId, withStatus , changeStatusTo, completedAtDate) {
+  //   await Projects.updateOne(
+  //     {"_id": projectId, 'tasks': {$elemMatch: {'taskId': taskId, 'status': withStatus}}},
+  //     {
+  //       "tasks.$[i].status": changeStatusTo,
+  //       "tasksDR1.$[i].timestamp": completedAtDate,
+  //     },
+  //     { arrayFilters: [ { 'i.taskId': taskId }]}
+  //   )
+  // }
+})
+
+router.post('/change-task-status', async (req, res) => {
+	const { taskId, projectId } = req.body
+
+	try {
     const tasksDR1Info = await Projects.findOne({_id: projectId, "tasksDR1.taskId": taskId},{"tasksDR1.$": 1})
     const isAllChecklist= tasksDR1Info.tasksDR1[0].instructions.every(({isChecked, isNotRelevant}) => isChecked || isNotRelevant)
     const isAllFiles = tasksDR1Info.tasksDR1[0].files.every(({isFileApproved}) => isFileApproved)
@@ -781,14 +814,14 @@ router.post('/approve-files', async (req, res) => {
     )
 
 
-    const tasksDR1Info = await Projects.findOne({_id: projectId, "tasksDR1.taskId": taskId},{"tasksDR1.$": 1})
-    const isAllChecklist= tasksDR1Info.tasksDR1[0].instructions.every(({isChecked, isNotRelevant}) => isChecked || isNotRelevant)
-    const isAllFiles = tasksDR1Info.tasksDR1[0].files.every(({isFileApproved}) => isFileApproved)
-    if( isAllChecklist && isAllFiles ) {
-      await changeTaskStatus(projectId, taskId, 'Pending Approval [DR1]', "Complete", new Date())
-    }else{
-      await changeTaskStatus(projectId, taskId, "Complete", 'Pending Approval [DR1]', null)
-    }
+    // const tasksDR1Info = await Projects.findOne({_id: projectId, "tasksDR1.taskId": taskId},{"tasksDR1.$": 1})
+    // const isAllChecklist= tasksDR1Info.tasksDR1[0].instructions.every(({isChecked, isNotRelevant}) => isChecked || isNotRelevant)
+    // const isAllFiles = tasksDR1Info.tasksDR1[0].files.every(({isFileApproved}) => isFileApproved)
+    // if( isAllChecklist && isAllFiles ) {
+    //   await changeTaskStatus(projectId, taskId, 'Pending Approval [DR1]', "Complete", new Date())
+    // }else{
+    //   await changeTaskStatus(projectId, taskId, "Complete", 'Pending Approval [DR1]', null)
+    // }
 
     const updatedProject = await getProject({"_id": projectId})
     res.send(updatedProject)
@@ -796,16 +829,16 @@ router.post('/approve-files', async (req, res) => {
 		console.log(err)
 		res.status(500).send('Error on approve files')
 	}
-	async function changeTaskStatus(projectId,taskId, withStatus , changeStatusTo, completedAtDate) {
-    await Projects.updateOne(
-      {"_id": projectId, 'tasks': {$elemMatch: {'taskId': taskId, 'status': withStatus}}},
-      {
-        "tasks.$[i].status": changeStatusTo,
-        "tasksDR1.$[i].timestamp": completedAtDate,
-      },
-      { arrayFilters: [ { 'i.taskId': taskId }]}
-    )
-  }
+	// async function changeTaskStatus(projectId,taskId, withStatus , changeStatusTo, completedAtDate) {
+  //   await Projects.updateOne(
+  //     {"_id": projectId, 'tasks': {$elemMatch: {'taskId': taskId, 'status': withStatus}}},
+  //     {
+  //       "tasks.$[i].status": changeStatusTo,
+  //       "tasksDR1.$[i].timestamp": completedAtDate,
+  //     },
+  //     { arrayFilters: [ { 'i.taskId': taskId }]}
+  //   )
+  // }
 })
 
 router.post('/is-file-pushed-dr2', async (req, res) => {

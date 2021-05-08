@@ -144,7 +144,7 @@
         template(slot="delivery" slot-scope="{ row }")
           .tasks__task-data
             img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
-            img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1 || row.status === 'Complete'" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
+            img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
 
     .tasks__approve-action(v-if="isApproveActionShow")
       ApproveModalPayment(

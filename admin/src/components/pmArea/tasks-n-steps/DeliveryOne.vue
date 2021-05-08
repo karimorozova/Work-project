@@ -1,6 +1,15 @@
 <template lang="pug">
   .review
     span.review__close(@click="close") &#215;
+    .review__approve(v-if="isApproveModal")
+      ApproveModal(
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="changeStatus"
+        @notApprove="closeApproveModal"
+        @close="closeApproveModal"
+      )
 
     //.review__modal(v-if="isModal")
       RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBack")
@@ -107,6 +116,12 @@
             value="Approve Deliverable"
             @clicked="approve"
           )
+
+      .review__button-complete(v-if="canCompleteTask")
+        Button(
+          value="Approve Deliverable"
+          @clicked="openApproveModal"
+        )
 </template>
 
 <script>
@@ -119,10 +134,11 @@
 	import editorConfig from "../../../mixins/editorConfig"
   import DropsDR1 from "../review/DropsDR1";
   import TableDR1 from "../review/TableDR1";
+  import Button from "@/components/Button";
+  import ApproveModal from "../../ApproveModal";
 
 	const Options = () => import("../review/Options")
 	const CheckBox = () => import("@/components/CheckBox")
-	const Button = () => import("@/components/Button")
 	const RollbackModal = () => import("../review/RollbackModal")
 
 	export default {
@@ -156,6 +172,7 @@
 				isReviewing: false,
 				isModal: false,
 				rollbackManager: null,
+        isApproveModal: false
 				// previousComment: ''
 			}
 		},
@@ -172,6 +189,13 @@
 				"alertToggle",
         "setCurrentProject"
 			]),
+      openApproveModal () {
+        this.isApproveModal = true
+      },
+      closeApproveModal () {
+        this.isApproveModal = false
+      },
+
 			// async generateCertificate() {
 			// 	try {
 			// 		await this.$http.post('/pm-manage/generate-certificate', {
@@ -321,6 +345,16 @@
         // console.log(paths)
 
       },
+      async changeStatus() {
+        try {
+          const updatedProject = await this.$http.post("/pm-manage/change-task-status", { projectId: this.project._id, taskId: this.deliveryTask.taskId });
+          await this.setCurrentProject(updatedProject.data);
+          await this.updatedFiles(updatedProject)
+          this.closeApproveModal()
+          this.close()
+        } catch (err) {
+        }
+      },
 			async approveFile({ index }) {
 				this.files[index].isFileApproved = !this.files[index].isFileApproved
 				const { taskId, isFileApproved, path } = this.files[index]
@@ -451,6 +485,10 @@
 				// const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
 				// return !uncheckedInstructions.length && !uncheckedFiles.length
 			},
+      canCompleteTask() {
+        return this.deliveryTask.instructions.every(({isChecked, isNotRelevant})=> isChecked || isNotRelevant )
+          && this.deliveryTask.files.every(({isFileApproved}) => isFileApproved)
+			},
 			dr() {
 				return this.task.status === "Pending Approval [DR1]" ? 1 : 2
 			},
@@ -468,6 +506,7 @@
       }
 		},
 		components: {
+      ApproveModal,
       TableDR1,
       DropsDR1,
 			Drops,
@@ -532,6 +571,14 @@
 
     &__wrapper {
       position: relative;
+    }
+
+    &__approve {
+      position: absolute;
+      z-index: 10;
+      transform: translate(-50%, 0);
+      left: 50%;
+      bottom: 20%;
     }
 
     &__wrapper-hide {
@@ -639,6 +686,12 @@
     &__button {
       margin: 0 10px;
       position: relative;
+    }
+
+    &__button-complete {
+      display: flex;
+      justify-content: center;
+      padding-top: 10px;
     }
 
     &_left-align {
