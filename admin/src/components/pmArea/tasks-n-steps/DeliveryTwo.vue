@@ -313,27 +313,23 @@
         const paths = checked.map(item => item.path)
         await this.approveDeliveryFileDR2({ projectId: this.project._id, isFileApproved: true, paths })
       },
+      listOfContactsForDeliver(){
+        return this.selectedContacts
+          .map(item => this.currentProject.clientContacts.find(({firstName, surname}) => `${firstName} ${surname}` === item))
+          .map(item => ({email: item.email, firstName: `${item.firstName} ${item.surname}`}))
+      },
 			async approve() {
         switch (true) {
           case this.isReadyForDelivery:
-            console.log("isReadyForDelivery");
             await this.approveReady({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type })
             this.$emit("close")
             break
           case this.isDeliver:
-            console.log("isDeliver");
-            const contacts = this.selectedContacts
-              .map(item => this.project.clientContacts.find(({firstName, surname}) => `${firstName} ${surname}` === item))
-              .map(item => ({email: item.email, firstName: `${item.firstName} ${item.surname}`}))
-
-            console.log(contacts)
-            // await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts,  })
+            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts: this.listOfContactsForDeliver() })
             this.$emit("close")
             break
           case this.isNotify:
-            console.log("isNotify");
-
-            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.contacts })
+            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.listOfContactsForDeliver() })
             this.$emit("close")
             break
         }
@@ -397,7 +393,8 @@
         }
       },
       setDefaultContact() {
-        const { firstName, surname } = this.project.clientContacts[0]
+        this.selectedContacts = []
+        const { firstName, surname } = this.currentProject.clientContacts[0]
         this.selectedContacts.push(`${firstName} ${surname}`)
       },
 		},

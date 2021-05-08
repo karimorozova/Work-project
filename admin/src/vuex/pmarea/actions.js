@@ -217,6 +217,19 @@ export const deliverTasks = async ({ dispatch }, payload) => {
 	}
 }
 
+export const approveDeliverMany = async ({ dispatch }, payload) => {
+  dispatch('incrementRequestCounter')
+  try {
+    const updatedProject = await Vue.http.post("/delivery/tasks-approve-deliver-many", payload);
+    await dispatch('setCurrentProject', updatedProject.data);
+    dispatch('alertToggle', { message: "Success", isShow: true, type: "success" })
+  } catch (err) {
+    dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
+  } finally {
+    dispatch('decrementRequestCounter')
+  }
+}
+
 export const reopenSteps = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {

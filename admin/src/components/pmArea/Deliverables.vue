@@ -13,9 +13,9 @@
     .deliverables__DR2(v-if="isDR2Modal")
       DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
 
-    .deliverables__modal(v-if="isContactsPickerForMany")
+    .deliverables__modal(v-if="isContactsPickerForMany || isContactsPickerForOne")
       .deliverables__titleModal Delivery for Contacts
-      span.deliverables__close-modal(@click="isContactsPickerForMany = false") &#215;
+      span.deliverables__close-modal(@click="closeContactsModal()") &#215;
       .deliverables__body
         .deliverables__itemsContacts
           .deliverables__items2
@@ -28,8 +28,10 @@
                 @chooseOptions="setContacts"
               )
 
-        .tasks-files__button
+        .tasks-files__button(v-if="isContactsPickerForMany")
           Button(:value="'Deliver'" @clicked="deliverForMany")
+        .tasks-files__button(v-if="isContactsPickerForOne")
+          Button(:value="'Deliver'" @clicked="deliverForOne")
         .tasks-files__tooltip One project client contact is selected by default
 
     .deliverables__modal(v-if="deliverablesModal")
@@ -110,13 +112,14 @@
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
 
         .deliverables-table__icons(v-if="row.status === 'Ready for Delivery' && canUpdateDr2")
-          i.fas.fa-truck-loading(@click="delivery(row)")
+          .deliverables-table__icon(@click="openContactsModalOne(row)")
+            i.fas.fa-truck-loading
 
         .deliverables-table__icons(v-if="row.status !== 'Ready for Delivery'")
           img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
 
 
-    Add(v-if="canUpdateDr2" @add="showModal")
+    Add(v-if="canUpdateDr2 && currentProject.status !== 'Closed'" @add="showModal")
 </template>
 
 <script>
@@ -135,8 +138,8 @@ export default {
   data() {
     return {
       fields: [
-        { label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
-        { label: "Language pair", headerKey: "headerPair", key: "pair", width: "25%", padding: 0 },
+        { label: "", headerKey: "headerCheck", key: "check", width: "3.2%", padding: 0 },
+        { label: "Language pair", headerKey: "headerPair", key: "pair", width: "25.8%", padding: 0 },
         { label: "# Files", headerKey: "headerFile", key: "file", width: "10%", padding: 0 },
         { label: "Task Id", headerKey: "headerTask", key: "task", width: "26%", padding: 0 },
         { label: "Status", headerKey: "headerStatus", key: "status", width: "26%", padding: 0 },
@@ -153,7 +156,9 @@ export default {
       currentReviewType: null,
       selectedAction: '',
       isContactsPickerForMany: false,
+      isContactsPickerForOne: false,
       selectedContacts: [],
+      selectedRow: null
     }
   },
   mounted(){
@@ -163,10 +168,48 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle",
       storeProject: "setCurrentProject",
-      approveDeliver: "approveDeliver"
+      approveDeliver: "approveDeliver",
+      approveDeliverMany: "approveDeliverMany"
     }),
-    deliverForMany(){
-      console.log('go')
+    closeContactsModal(){
+      this.isContactsPickerForMany = this.isContactsPickerForOne = false
+    },
+    openContactsModalOne(row){
+      this.selectedRow = row
+      this.isContactsPickerForOne = true
+    },
+    openContactsModalMany(){
+      this.isContactsPickerForMany = true
+    },
+    async deliverForMany(){
+      const entitiesForDeliver = this.deliverables.filter(item => !!item.isChecked).map(item => ({ entityId: item._id, type: item.type }))
+      await this.approveDeliverMany({
+        projectId: this.currentProject._id,
+        entitiesForDeliver,
+        user: this.user,
+        contacts: this.listOfContactsForDeliver()
+      })
+      this.closeContactsModal()
+      this.setDefaultContact()
+      this.selectedAction = ''
+      this.toggleAll(false)
+    },
+    async deliverForOne() {
+      await this.approveDeliver({
+        projectId: this.currentProject._id,
+        entityId: this.selectedRow._id,
+        type: this.selectedRow.type,
+        user: this.user,
+        contacts: this.listOfContactsForDeliver()
+      })
+      this.closeContactsModal()
+      this.setDefaultContact()
+      this.selectedRow = null
+    },
+    listOfContactsForDeliver(){
+      return this.selectedContacts
+        .map(item => this.currentProject.clientContacts.find(({firstName, surname}) => `${firstName} ${surname}` === item))
+        .map(item => ({email: item.email, firstName: `${item.firstName} ${item.surname}`}))
     },
     setContacts({ option }) {
       const position = this.selectedContacts.indexOf(option)
@@ -179,13 +222,14 @@ export default {
       }
     },
     setDefaultContact() {
+      this.selectedContacts = []
       const { firstName, surname } = this.currentProject.clientContacts[0]
       this.selectedContacts.push(`${firstName} ${surname}`)
     },
     setAction({ option }){
       this.selectedAction = option
       if(option === 'Deliver'){
-        this.isContactsPickerForMany = true
+        this.openContactsModalMany()
       }
     },
     closeDeleteModal() {
@@ -241,9 +285,6 @@ export default {
           this.createLinkAndDownload(_id)
           break;
       }
-    },
-    async delivery(row) {
-      // await this.approveDeliver({projectId: this.currentProject._id, entityId: row._id, type: row.type, user: this.user })
     },
     closeDR2() {
       this.currentReviewId = this.currentReviewType  = null

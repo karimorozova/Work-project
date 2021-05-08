@@ -20,7 +20,8 @@ const {
   notifyManagerStepStarted, notifyStepDecisionMade,
   notifyDeliverablesDownloaded,
   notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
-  notifyVendorStepStart, sendQuotes, sendQuoteMessage, sendCostQuoteMessage
+  notifyVendorStepStart, sendQuotes, sendQuoteMessage, sendCostQuoteMessage,
+  sendClientManyDeliveries
 } = require('./emails');
 const {
   createProject,
@@ -42,11 +43,13 @@ const {
   taskApproveReady,
   taskApproveNotify,
   taskApproveDeliver,
+  taskApproveDeliverMany
 } = require('./delivery');
 
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
 
 module.exports = {
+  taskApproveDeliverMany,
   createArchiveForDeliverableItem,
   taskApproveDeliver,
   taskApproveNotify,

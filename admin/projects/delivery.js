@@ -10,6 +10,7 @@ const {
 const {
   notifyClientDeliverablesReady,
   sendClientDeliveries,
+  sendClientManyDeliveries
 } = require("./emails")
 
 const {
@@ -22,6 +23,10 @@ const { dr2Instructions } = require('../enums/deliveryInstructions');
 const {
   getProjectAfterUpdate,
 } = require('./getProjects')
+
+const taskApproveDeliverMany= async ({ projectId, entitiesForDeliver, user, contacts }) => {
+  return await sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts })
+}
 
 const taskApproveDeliver= async ({ projectId, type, entityId, user, contacts }) => {
   return await sendClientDeliveries({ projectId, type, entityId, user, contacts })
@@ -174,5 +179,6 @@ module.exports = {
   addDR2,
   addMultiLangDR2,
   removeDR2,
-  removeMultiDR2
+  removeMultiDR2,
+  taskApproveDeliverMany
 }

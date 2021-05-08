@@ -10,6 +10,7 @@ const {
   taskApproveReady,
   taskApproveNotify,
   taskApproveDeliver,
+  taskApproveDeliverMany
 } = require("../../projects")
 
 const {
@@ -17,6 +18,17 @@ const {
 } = require('../../models')
 
 const { upload } = require('../../utils');
+
+router.post('/tasks-approve-deliver-many', async (req, res) => {
+  const { projectId, entitiesForDeliver, user, contacts } = req.body
+  try {
+    const updatedProject = await taskApproveDeliverMany({ projectId, entitiesForDeliver, user, contacts })
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on approving deliverable')
+  }
+})
 
 router.post('/tasks-approve-notify', async (req, res) => {
   const { projectId, type, entityId, contacts } = req.body

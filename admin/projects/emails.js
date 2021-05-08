@@ -232,6 +232,35 @@ async function notifyClientDeliverablesReady({ project, contacts }) {
 	}
 }
 
+  async function sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts }) {
+    // contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
+    let updatedProject = await getProject({ "_id": projectId })
+
+    for ( const { entityId, type } of entitiesForDeliver) {
+      updatedProject = await createArchiveForDeliverableItem({type, entityId, projectId, user, tasksDR2: updatedProject.tasksDR2, tasksDeliverables: updatedProject.tasksDeliverables })
+    }
+
+    let archiveNumber = 0
+    let attachmentsPaths = []
+    for ( const { entityId } of entitiesForDeliver) {
+      archiveNumber++
+      const { path } = updatedProject.tasksDeliverables.find(({ deliverablesId }) => `${ deliverablesId }` === `${entityId}` )
+      const filename = `${archiveNumber}-deliverables.zip`
+      attachmentsPaths.push({ filename, path })
+    }
+
+    const accManager = await User.findOne({ "_id": updatedProject.accountManager.id })
+    const subject = `Delivery in dev (ID C006.1)`
+    for await (let contact of contacts) {
+      const finalAttachments = attachmentsPaths.map(item => ({ filename: item.filename, path: `./dist${ item.path }` }))
+
+      const message = taskDeliveryMessage({ task: '??', contact, accManager, ...updatedProject, id: updatedProject._id })
+      await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
+    }
+
+    return updatedProject
+  }
+
   async function sendClientDeliveries({ projectId, type, entityId, user, contacts }) {
 	// contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
 	try {
@@ -388,5 +417,6 @@ module.exports = {
 	notifyVendorStepStart,
 	sendQuoteMessage,
 	getCostMessage,
-	sendCostQuoteMessage
+	sendCostQuoteMessage,
+  sendClientManyDeliveries
 }
