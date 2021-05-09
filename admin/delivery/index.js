@@ -4,7 +4,7 @@ const {
   // taskApproveDeliver,
   // taskApproveNotify,
 } = require("./approve")
-const { getAfterTasksDelivery } = require("./tasks-deliver")
+// const { getAfterTasksDelivery } = require("./tasks-deliver")
 // const { getAfterProjectDelivery } = require("./projectDeliver")
 const {
 	checkPermission,
@@ -18,7 +18,7 @@ const {
 module.exports = {
 	// getProjectAfterApprove,
 	// setTasksDeliveryStatus,
-	getAfterTasksDelivery,
+	// getAfterTasksDelivery,
 	// getAfterProjectDelivery,
 	checkPermission,
 	changeManager,

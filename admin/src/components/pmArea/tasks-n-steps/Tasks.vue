@@ -143,8 +143,8 @@
 
         template(slot="delivery" slot-scope="{ row }")
           .tasks__task-data
-            img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
-            img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
+            //img.tasks__delivery-image(v-if="row.status === 'Ready for Delivery' || row.status === 'Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
+            img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
 
     .tasks__approve-action(v-if="isApproveActionShow")
       ApproveModalPayment(
@@ -414,9 +414,9 @@
 						case 'Cancel':
 							await this.cancelTasks(checkedTasks)
 							break
-						case 'Deliver':
-							await this.deliverTasks({ tasks: checkedTasks, user: this.user })
-							break
+						// case 'Deliver':
+						// 	await this.deliverTasks({ tasks: checkedTasks, user: this.user })
+						// 	break
 					}
 				} catch (err) {
 					this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
@@ -521,7 +521,7 @@
 						.map(({ title }) => title)
 
 				let taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId)
-				taskSteps = taskSteps.filter(item => !item.stepId.includes('Canceled'))
+				taskSteps = taskSteps.filter(item => !item.stepId.includes('Cancelled'))
 				if (CATServices.includes(task.service.title)) {
 					const [ firstStep, secondStep ] = taskSteps
 					if (taskSteps.length === 2) {
@@ -591,7 +591,7 @@
 				setProjectProp: "setProjectProp",
 				storeProject: "setCurrentProject",
 				setProjectStatus: "setProjectStatus",
-				deliverTasks: "deliverTasks"
+				// deliverTasks: "deliverTasks"
 			})
 		},
 		computed: {
@@ -802,8 +802,6 @@
     }
 
     &__delivery-image {
-      height: 18px;
-      width: 18px;
       cursor: pointer;
     }
 

@@ -32,6 +32,10 @@
       .project-action__button
         Button(:value="'Confirm'" @clicked="approveActionToDraft = true")
 
+    .project-action__confirm(v-if="isAction('Close Project')")
+      .project-action__button
+        Button(:value="'Confirm'" @clicked="makeApprovedAction")
+
     .project-action__confirm(v-if="isAction('Accept/Reject Quote')")
       .project-action__button
         Button(:value="'Accept'" @clicked="makeApprovedAction")
@@ -314,8 +318,8 @@
 				this.isAlternativeAction = false;
 				if(this.selectedAction === "Accept/Reject Quote") {
 					this.approveButtonValue = "Accept";
-					(this.alternativeButtonValue = "Reject");
-					(this.isAlternativeAction = true);
+					this.alternativeButtonValue = "Reject";
+					this.isAlternativeAction = true;
 				}
 			},
 			async makeApprovedAction(message) {
@@ -324,6 +328,10 @@
 						case "Send Project Details":
 							await this.projectDetails(message);
 							break;
+            case "Close Project":
+              const updatedProject = await this.$http.post('/pm-manage/close-project', {projectId: this.project._id})
+              await this.storeProject(updatedProject.data)
+              break
 						// case "Deliver":
 						// 	await this.deliverProject(message);
 						// 	break;
@@ -453,6 +461,18 @@
 					this.alertToggle({message: 'Error on getting managers', isShow: true, type: 'error'});
 				}
 			},
+      isAllDeliveredTasks(tasksDR2){
+			  let statuses = []
+			  if(tasksDR2.hasOwnProperty('singleLang')){
+          const { singleLang } = tasksDR2
+          for (const {status} of singleLang) statuses.push(status)
+        }
+        if(tasksDR2.hasOwnProperty('multiLang')){
+          const { multiLang } = tasksDR2
+          for (const {status} of multiLang) statuses.push(status)
+        }
+        return statuses.every(item => item === 'Delivered')
+      }
 		},
 		computed: {
 			...mapGetters({
@@ -502,11 +522,18 @@
 					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel"];
 				}
 				if(this.project.status === 'Started' || this.project.status === 'In progress') {
-					result = ["Send Project Details", "Cancel"];
+				  const { tasks, tasksDR2 } = this.project
+          const isAllTasksCompleted =  tasks.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({status}) => status === 'Completed')
+
+          if(isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)){
+            result = ["Close Project"];
+          }else{
+            result = ["Send Project Details", "Cancel"];
+          }
 				}
-				if(this.project.status === "Ready for Delivery") {
-					result = ["Deliver", "Cancel"];
-				}
+ 				// if(this.project.status === "Ready for Delivery") {
+				// 	result = ["Deliver", "Cancel"];
+				// }
 				if(this.project.status === 'Closed') {
 					result = ['ReOpen'];
 				}

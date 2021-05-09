@@ -85,17 +85,15 @@
         //  @uncheck="(e) => toggleOptions(e, false)"
         //)
       .review__group
-        .test
-          span Actions:
-          OptionsDR2(
-            v-if="allChecked"
-            class="max-with-400"
-            :isDeliver="isDeliver"
-            :isNotify="isNotify"
-            :isReadyForDelivery="isReadyForDelivery"
-            @toggleOption="toggleOption"
-          )
-        .review__contacts(v-if="isDeliver || isNotify") Contacts:
+        OptionsDR2(
+          v-if="allChecked"
+          class="max-with-400"
+          :isDeliver="isDeliver"
+          :isNotify="isNotify"
+          :isReadyForDelivery="isReadyForDelivery"
+          @toggleOption="toggleOption"
+        )
+        .review__contacts(v-if="(isDeliver || isNotify) && allChecked") Contacts:
           SelectMulti(
             :options="contactsNames"
             :selectedOptions="selectedContacts"
@@ -394,7 +392,7 @@
       },
       setDefaultContact() {
         this.selectedContacts = []
-        const { firstName, surname } = this.currentProject.clientContacts[0]
+        const { firstName, surname } = this.project.clientContacts[0]
         this.selectedContacts.push(`${firstName} ${surname}`)
       },
 		},
@@ -632,12 +630,14 @@
     &__contacts {
       position: relative;
       width: 191px;
-      height: 30px;
+      height: 50px;
+      margin-top: 20px;
     }
     &__group {
       display: flex;
-      justify-content: space-around;
       margin-top: 10px;
+      flex-direction: column;
+      align-items: center;
     }
   }
 

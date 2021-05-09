@@ -456,7 +456,8 @@ export default {
       const multi = this.currentProject.tasksDR2.hasOwnProperty('multiLang') ?
         this.currentProject.tasksDR2.multiLang.every(item => item.isChecked) :
         true
-      return multi && single
+
+      return !this.deliverables.length ? false : multi && single
     },
     contactsNames() {
       return this.currentProject.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)

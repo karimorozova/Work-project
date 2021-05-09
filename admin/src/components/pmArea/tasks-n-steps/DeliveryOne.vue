@@ -110,7 +110,7 @@
             value="Rollback"
             @clicked="popupRollback"
           )
-        .review__button(v-if="isAllChecked")
+        //.review__button(v-if="isAllChecked")
           .review__forbidden(v-if="isReviewing")
           Button(
             value="Approve Deliverable"
@@ -119,7 +119,7 @@
 
       .review__button-complete(v-if="canCompleteTask")
         Button(
-          value="Approve Deliverable"
+          value="Complete Task"
           @clicked="openApproveModal"
         )
 </template>

@@ -716,6 +716,18 @@ router.post('/approve-instruction', async (req, res) => {
   // }
 })
 
+router.post('/close-project', async (req, res) => {
+  const { projectId } = req.body
+  try{
+    const updatedProject = await getProjectAfterUpdate({ _id: projectId }, { status: 'Closed' })
+    res.send(updatedProject)
+  }catch (err) {
+    console.log(err)
+    res.status(500).send('Error on close project')
+  }
+  console.log(req.body)
+})
+
 router.post('/change-task-status', async (req, res) => {
 	const { taskId, projectId } = req.body
 
@@ -725,9 +737,9 @@ router.post('/change-task-status', async (req, res) => {
     const isAllFiles = tasksDR1Info.tasksDR1[0].files.every(({isFileApproved}) => isFileApproved)
 
     if( isAllChecklist && isAllFiles ) {
-      await changeTaskStatus(projectId, taskId, 'Pending Approval [DR1]', "Complete", new Date())
+      await changeTaskStatus(projectId, taskId, 'Pending Approval [DR1]', "Completed", new Date())
     }else{
-      await changeTaskStatus(projectId, taskId, "Complete", 'Pending Approval [DR1]', null)
+      await changeTaskStatus(projectId, taskId, "Completed", 'Pending Approval [DR1]', null)
     }
 
     const updatedProject = await getProject({"_id": projectId})
@@ -1069,6 +1081,12 @@ router.post('/rollback-review', async (req, res) => {
       await rollbackManagerDR1(path)
     }
 
+    await Projects.updateOne(
+      { "_id": projectId, 'tasks.taskId': taskId},
+      { "tasks.$[i].status" : "Pending Approval [DR1]" },
+      { arrayFilters: [ { 'i.taskId': taskId }]}
+    )
+
     const message = `Delivery review of the task ${ taskId } is assigned to you.`
     await managerNotifyMail(manager, message, 'Task delivery review assignment notification (I016)')
 
@@ -1113,8 +1131,8 @@ router.post('/rollback-review', async (req, res) => {
 // 	}
 // })
 
-router.get('/deliverables', async (req, res) => {
-  console.log('route IN DEV for admin  => /deliverables')
+// router.get('/deliverables', async (req, res) => {
+  // console.log('route IN DEV for admin  => /deliverables')
   // const { taskId } = req.query
 	// try {
 	// 	const project = await getProject({ 'tasks.taskId': taskId })
@@ -1133,21 +1151,21 @@ router.get('/deliverables', async (req, res) => {
 	// 	console.log(err)
 	// 	res.status(500).send('Error on downloading deliverables')
 	// }
-})
+// })
 
-router.post('/deliver', async (req, res) => {
-	const { tasks, user } = req.body
-	try {
-		const updatedProject = await getAfterTasksDelivery(tasks, user)
-		if (updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
-			await notifyProjectDelivery(updatedProject)
-		}
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on delivering tasks')
-	}
-})
+// router.post('/deliver', async (req, res) => {
+// 	const { tasks, user } = req.body
+// 	try {
+// 		const updatedProject = await getAfterTasksDelivery(tasks, user)
+// 		if (updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
+// 			await notifyProjectDelivery(updatedProject)
+// 		}
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on delivering tasks')
+// 	}
+// })
 
 // router.post('/project-delivery', async (req, res) => {
 // 	const { _id, message } = req.body
