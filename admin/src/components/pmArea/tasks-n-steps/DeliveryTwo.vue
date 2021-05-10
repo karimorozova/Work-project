@@ -290,7 +290,7 @@
         fileData.append("path", path)
         fileData.append("entityId", this.deliveryData._id)
         fileData.append("type", this.type)
-        fileData.append("user", this.user)
+        fileData.append("user", this.user._id)
         fileData.append("dr1Manager", this.project.projectManager._id)
         try {
             const updatedProject = await this.$http.post("/pm-manage/target-dr2", fileData)
