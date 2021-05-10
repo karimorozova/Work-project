@@ -209,6 +209,7 @@
 			// 	}
 			// },
       async removeFile(file){
+        if (!this.canUpdateDR1) return
 			  try{
 			    const updatedProject = await this.$http.post("/pm-manage/remove-dr-file", {...file, projectId: this.project._id});
           await this.setCurrentProject(updatedProject.data);
@@ -219,6 +220,7 @@
         }
       },
 			async sendMessage() {
+        if (!this.canUpdateDR1) return
 				try {
 					const updatedProject = await this.$http.post('/pm-manage/delivery-comments', {
 						projectId: this.project._id,
@@ -265,6 +267,7 @@
 			// 	this.rollbackManager = manager
 			// },
 			async toggleList({ type, instruction }) {
+        if (!this.canUpdateDR1) return
 				const types = [ 'isChecked', 'isNotRelevant' ]
 				const anotherType = types.filter(item => item !== type)
 				instruction[type] = !instruction[type]
@@ -291,11 +294,13 @@
 				this.isModal = true
 			},
       async updatedFiles(updatedProject){
+        if (!this.canUpdateDR1) return
         const deliveryTask = updatedProject.data.tasksDR1.find(item => item.taskId === this.deliveryTask.taskId)
         this.files = deliveryTask.files
           .map(item => ({ ...item, taskId: this.task.taskId, pair: `${this.task.sourceLanguage} >> ${this.task.targetLanguage}`, isChecked: false }))
       },
 			async uploadFile({ file, index }) {
+        if (!this.canUpdateDR1) return
 				const { path } = index !== undefined ? this.files[index] : { path: "", isOriginal: false }
 				const fileData = new FormData()
 				fileData.append("targetFile", file)
@@ -310,6 +315,7 @@
 				}
 			},
       async deliverFile(index){
+        if (!this.canUpdateDR1) return
 			  const projectId = this.project._id
         this.files[index].isFilePushedDR2 = !this.files[index].isFilePushedDR2
         const { dr1Manager, dr2Manager, taskId } = this.deliveryTask
@@ -327,6 +333,7 @@
         }
       },
       async generateDeliverable({ checked }){
+        if (!this.canUpdateDR1) return
         const files = checked.filter(item => !item.isFilePushedDR2)
         const { dr1Manager, dr2Manager, taskId } = this.deliveryTask
 
@@ -346,6 +353,8 @@
 
       },
       async changeStatus() {
+
+        if (!this.canUpdateDR1) return
         try {
           const updatedProject = await this.$http.post("/pm-manage/change-task-status", { projectId: this.project._id, taskId: this.deliveryTask.taskId });
           await this.setCurrentProject(updatedProject.data);
@@ -356,6 +365,7 @@
         }
       },
 			async approveFile({ index }) {
+        if (!this.canUpdateDR1) return
 				this.files[index].isFileApproved = !this.files[index].isFileApproved
 				const { taskId, isFileApproved, path } = this.files[index]
 				try {
@@ -366,6 +376,7 @@
 				}
 			},
 			async approveFiles({ checked }) {
+			  if (!this.canUpdateDR1) return
 				const paths = checked.map(item => item.path)
         try {
         const updatedProject = await this.$http.post("/pm-manage/approve-files", { projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, paths });
@@ -502,7 +513,6 @@
 			  if (!this.deliveryTask) return false
 			  return this.isAdmin
           || this.user._id.toString() === this.deliveryTask.dr1Manager.toString()
-          || this.user._id.toString() === this.deliveryTask.dr2Manager.toString()
       }
 		},
 		components: {
