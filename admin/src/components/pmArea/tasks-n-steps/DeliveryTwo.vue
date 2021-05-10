@@ -313,7 +313,7 @@
       },
       listOfContactsForDeliver(){
         return this.selectedContacts
-          .map(item => this.currentProject.clientContacts.find(({firstName, surname}) => `${firstName} ${surname}` === item))
+          .map(item => this.project.clientContacts.find(({firstName, surname}) => `${firstName} ${surname}` === item))
           .map(item => ({email: item.email, firstName: `${item.firstName} ${item.surname}`}))
       },
 			async approve() {
@@ -397,9 +397,6 @@
       },
 		},
 		computed: {
-      ...mapGetters({
-        currentProject: 'getCurrentProject',
-      }),
       contactsNames() {
         return this.project.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
       },
