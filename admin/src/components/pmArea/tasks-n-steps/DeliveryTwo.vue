@@ -397,6 +397,9 @@
       },
 		},
 		computed: {
+      ...mapGetters({
+        currentProject: 'getCurrentProject',
+      }),
       contactsNames() {
         return this.project.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
       },
