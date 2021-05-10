@@ -46,7 +46,12 @@
 
       .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId.substring(row.taskId.length - 3)  }}
-      .review-table__data(slot="dr1" slot-scope="{ row }") {{ getManagerName(row.dr1Manager) }}
+      .review-table__data(slot="dr1" slot-scope="{ row }")
+        .review-table__data-manager
+          .tooltip
+            span#myTooltip.tooltiptext-left asdasdas
+            img(:style="{ cursor: 'help' }" src="../../../assets/images/red-info-icon.png")
+          span {{ getManagerName(row.dr1Manager) }}
       .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
         .review-table__data(v-if="!canChangeDR2Manager(row)") {{ getManagerName(row.dr2Manager) }}
         .drops__menu(v-else)
@@ -74,7 +79,7 @@
 
 
     .review-table__upload.review-table_no-back(v-if="type === 'single' && canAddDR2Manager ")
-      input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
+      input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing")
       Add
 </template>
 
@@ -281,7 +286,12 @@
       align-items: center;
       height: 30px;
       padding: 6px 5px;
-      overflow-y: auto;
+      //overflow-y: auto;
+      //overflow-x: hidden;
+
+      &-manager{
+        display: flex;
+      }
     }
 
     &__check-cell {
@@ -320,6 +330,20 @@
     &__file-icon {
       margin-right: 7px;
       color: #938676;
+    }
+    &__file-inputButton {
+      padding-left: 0;
+      padding-right: 0;
+      width: 35px;
+      height: 30px;
+      border: none;
+      outline: none;
+      opacity: 0;
+      z-index: 2;
+      position: absolute;
+      left: -5px;
+      cursor: pointer;
+      font-size: 0;
     }
 
     &__upload {
@@ -368,6 +392,47 @@
       input[type=file],
       input[type=file]::-webkit-file-upload-button {
         cursor: default;
+      }
+    }
+  }
+
+  .tooltip {
+    position: relative;
+    display: flex;
+
+    .tooltiptext-left {
+      font-size: 14px;
+      visibility: hidden;
+      width: 140px;
+      background-color: #67573e;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      left: 40px;
+      opacity: 0;
+      top: -2px;
+      transition: opacity .3s;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 0;
+        margin-left: -10px;
+        transform: rotate(90deg);
+        border-width: 5px;
+        border-style: solid;
+        border-color: #67573e transparent transparent;
+      }
+    }
+
+    &:hover {
+      .tooltiptext-left {
+        visibility: visible;
+        opacity: 1;
       }
     }
   }
