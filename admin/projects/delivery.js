@@ -79,7 +79,9 @@ async function addDR2({projectId, taskId, dr1Manager, dr2Manager, files}) {
     const singleLangIndex = singleLang
       .findIndex( ({ sourceLanguage, targetLanguage }) => `${sourceLanguage}-${targetLanguage}` === `${sourceLang._id}-${targetLang._id}` )
 
-    if (singleLangIndex > -1) singleLang[singleLangIndex].files = [ ...singleLang[singleLangIndex].files, ...fileInfo ]
+    const { status } = singleLang[singleLangIndex]
+
+    if (singleLangIndex > -1 && status !== 'Delivered') singleLang[singleLangIndex].files = [ ...singleLang[singleLangIndex].files, ...fileInfo ]
     else pushFile(sourceLang, targetLang, fileInfo)
 
   } else {
