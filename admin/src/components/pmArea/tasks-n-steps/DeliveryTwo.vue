@@ -44,7 +44,7 @@
         .review__checkSubTitle(:class="{marginTop: true}") Comments
         .review__notes
           ckeditor(v-model="deliveryData.comment" :config="editorConfig")
-          .notes__button(@click="sendComment") Save &nbsp;
+          .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
     //
     //  .review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
@@ -290,8 +290,8 @@
         fileData.append("path", path)
         fileData.append("entityId", this.deliveryData._id)
         fileData.append("type", this.type)
+        fileData.append("user", this.user)
         fileData.append("dr1Manager", this.project.projectManager._id)
-        fileData.append("dr2Manager", this.project.accountManager._id)
         try {
             const updatedProject = await this.$http.post("/pm-manage/target-dr2", fileData)
             await this.setCurrentProject(updatedProject.data);

@@ -203,9 +203,7 @@
       canChangeDR2Manager({dr2Manager}) {
         return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || dr2Manager.toString() === this.user._id.toString()
       },
-      canAddDR2Manager() {
-        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
-      },
+
 
 		},
 		computed: {
@@ -219,6 +217,9 @@
 			// 	}
 			// 	return result
 			// },
+      canAddDR2Manager() {
+        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
+      },
 			isAllChecked() {
 				return !this.files.find(item => !item.isChecked)
 			},
