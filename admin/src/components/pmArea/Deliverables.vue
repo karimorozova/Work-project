@@ -119,7 +119,7 @@
           img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
 
 
-    Add(v-if="canUpdateDr2 && currentProject.status !== 'Closed'" @add="showModal")
+    Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showModal")
 </template>
 
 <script>
@@ -252,17 +252,17 @@ export default {
       }
     },
     getIcons({type, files, status}) {
-      const icons = {
-      }
+      const { accountManager: {_id: AMId}, projectManager: {_id: PMId}  } = this.currentProject
+      const icons = {}
       if (status === 'Delivered') {
         icons.download = {src: require("../../assets/images/latest-version/download-file.png")}
         return icons
       }
-
       if(type === 'multi' && this.canUpdateDr2 ){
         icons.dr2 = {src: require("../../assets/images/latest-version/delivery-list.png") }
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
-      }else if(type === 'single' && !files.length && this.canUpdateDr2 ){
+      }else if(type === 'single' && !files.length && (this.isAdmin || `${AMId}` === `${this.user._id}` || `${PMId}` === `${this.user._id}`)
+      ){
         icons.dr2 = {src: require("../../assets/images/latest-version/delivery-list.png") }
         icons.delete = {src: require("../../assets/images/latest-version/delete-icon.png")}
       } else {
@@ -407,6 +407,12 @@ export default {
     canUpdateDr2() {
       return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.currentProject.accountManager._id.toString() === this.user._id.toString()
     },
+    canUploadDR1() {
+      return this.user.group.name === "Administrators" ||
+        this.user.group.name === "Developers" ||
+        this.currentProject.projectManager._id.toString() === this.user._id.toString() ||
+        this.currentProject.tasksDR1.map(({dr1Manager}) => dr1Manager.toString()).includes(this.user._id.toString())
+    },
 
     deliverables(){
       if(!this.currentProject.hasOwnProperty('tasksDR2')) return []
@@ -461,6 +467,10 @@ export default {
     },
     contactsNames() {
       return this.currentProject.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
+    },
+    isAdmin(){
+      const { _id, group: { name } } = this.user
+      return name === 'Administrators' || name === 'Developers'
     },
 
   },
