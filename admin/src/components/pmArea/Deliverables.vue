@@ -512,7 +512,7 @@ export default {
   padding: 20px;
   margin-top: 40px;
   box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-  position: relative;
+  //position: relative;
 
   &__header{
     display: flex;
@@ -552,9 +552,8 @@ export default {
 
   &__DR2 {
     position: absolute;
-    top: -230px;
-    right: 0;
-    left: 0;
+    top: 538px;
+    left: 40px;
     bottom: 0;
     z-index: 50;
     box-sizing: border-box;

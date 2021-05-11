@@ -3,8 +3,8 @@
     DataTable(
       :fields="fields"
       :tableData="allProjects"
-      :bodyClass="['all-projects', {'tbody_visible-overflow': allProjects.length < 17}]"
-      :tableheadRowClass="allProjects.length < 17 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['all-projects', {'tbody_visible-overflow': allProjects.length < 5}]"
+      :tableheadRowClass="allProjects.length < 5 ? 'tbody_visible-overflow' : ''"
       @onRowClicked="onRowClicked"
       @bottomScrolled="bottomScrolled"
     )

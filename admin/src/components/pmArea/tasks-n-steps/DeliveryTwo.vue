@@ -469,9 +469,9 @@
     &__title {
       border-bottom: 1px solid #c5bfb5;
       font-family: Myriad600;
-      width: 78%;
-      margin-bottom: 10px;
-      padding-bottom: 2px;
+      width: 80%;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
     }
 
     &__textareaText {
@@ -502,21 +502,21 @@
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     background-color: $white;
     position: relative;
-    width: 800px;
+    width: 1000px;
 
     &__checkSubTitle {
       border-bottom: 1px solid #c5bfb5;
       font-family: Myriad600;
-      width: 78%;
-      margin-bottom: 10px;
-      padding-bottom: 2px;
+      width: 80%;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
     }
 
 
     &__title {
-      font-size: 22px;
-      text-align: center;
+      font-size: 21px;
       margin-bottom: 20px;
+      font-family: 'Myriad600';
     }
 
     &__close {
@@ -549,16 +549,18 @@
 
     &__check-item {
       display: flex;
-      margin-top: 6px;
+      padding: 5px 0;
+      &:nth-child(even){
+        background-color: #f4f2f1;
+      }
     }
 
     &__headers {
       display: flex;
       justify-content: flex-end;
-      margin-top: 15px;
 
       &-item {
-        width: 11%;
+        width: 10%;
         display: flex;
         justify-content: center;
         font-family: 'Myriad600';
@@ -566,11 +568,11 @@
     }
 
     &__check-itemText {
-      width: 78%;
+      width: 80%;
     }
 
     &__check-itemCheck {
-      width: 11%;
+      width: 10%;
       justify-content: center;
       display: flex;
     }
@@ -663,7 +665,7 @@
   .notes {
     &__button {
       position: absolute;
-      left: 83%;
+      left: 88%;
       bottom: 45px;
       width: 100px;
       height: 30px;

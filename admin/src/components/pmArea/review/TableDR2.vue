@@ -39,7 +39,7 @@
       .review-table__data.review-table__check-cell(slot="check" slot-scope="{ row, index }")
         CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
-      .review-table__data(slot="name" slot-scope="{ row }")
+      .review-table__dataFilename(slot="name" slot-scope="{ row }")
         //span.review-table__file-icon
           i.fa.fa-file(aria-hidden='true')
         span.review-table__file-name {{ row.fileName }}
@@ -49,8 +49,12 @@
       .review-table__data(slot="dr1" slot-scope="{ row }")
         .review-table__data-manager
           .tooltip
-            span#myTooltip.tooltiptext-left asdasdas
-            img(:style="{ cursor: 'help' }" src="../../../assets/images/red-info-icon.png")
+            span#myTooltip2.tooltiptext-left Closed At: 123-123-123 123:123
+            i.far.fa-clock
+          .tooltip
+            span#myTooltip.tooltiptext-left sfhsdjfhsjdf
+            i.far.fa-comment
+
           span {{ getManagerName(row.dr1Manager) }}
       .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
         .review-table__data(v-if="!canChangeDR2Manager(row)") {{ getManagerName(row.dr2Manager) }}
@@ -261,6 +265,7 @@
 
 
     &__approveModal {
+      z-index: 6000;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -279,7 +284,15 @@
       align-self: flex-end;
       margin-bottom: 20px;
     }
-
+    &__dataFilename{
+      box-sizing: border-box;
+      display: grid;
+      align-items: center;
+      height: 30px;
+      padding: 6px 5px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
     &__data {
       box-sizing: border-box;
       display: grid;
@@ -403,7 +416,7 @@
     .tooltiptext-left {
       font-size: 14px;
       visibility: hidden;
-      width: 140px;
+      width: 220px;
       background-color: #67573e;
       color: #fff;
       text-align: center;

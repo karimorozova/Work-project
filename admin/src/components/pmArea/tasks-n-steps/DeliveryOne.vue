@@ -16,7 +16,6 @@
 
     .review__title Delivery Review 1
     span.relative
-      //.review__forbidden(v-if="isReviewing")
       DropsDR1(
         :project="project"
         :user="user"
@@ -25,18 +24,13 @@
         :deliveryTask="deliveryTask"
         @assignManager="assignManager"
       )
-      //Drops(:isReviewing="isReviewing" :project="project" :user="user" :dr1Manager="dr1Manager" :dr2Manager="dr2Manager" :timestamp="timestamp")
 
 
     span.relative
-      .review_left-align DR1 Checklist
-      //.review__forbidden(v-if="isReviewing")
-
     .review__wrapper
       .review__wrapper-hide(v-if="!canUpdateDR1")
 
       .review__check
-        //.review__forbidden(v-if="isReviewing")
         .review__headers
           .review__headers-item Check
           .review__headers-item Not Relevant
@@ -127,8 +121,6 @@
 <script>
 	import CKEditor from "ckeditor4-vue"
 	import { mapGetters, mapActions } from "vuex"
-	import Drops from "../review/Drops"
-	// import Table from "../review/Table"
 	import Check from "../review/Check"
 	import _ from "lodash"
 	import editorConfig from "../../../mixins/editorConfig"
@@ -519,8 +511,6 @@
       ApproveModal,
       TableDR1,
       DropsDR1,
-			Drops,
-			// Table,
 			Check,
 			Options,
 			CheckBox,
@@ -544,9 +534,9 @@
     &__title {
       border-bottom: 1px solid #c5bfb5;
       font-family: Myriad600;
-      width: 78%;
-      margin-bottom: 10px;
-      padding-bottom: 2px;
+      width: 80%;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
     }
 
     &__textareaText {
@@ -577,7 +567,7 @@
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     background-color: $white;
     position: relative;
-    width: 800px;
+    width: 1000px;
 
     &__wrapper {
       position: relative;
@@ -604,16 +594,16 @@
     &__checkSubTitle {
       border-bottom: 1px solid #c5bfb5;
       font-family: Myriad600;
-      width: 78%;
-      margin-bottom: 10px;
-      padding-bottom: 2px;
+      width: 80%;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
     }
 
 
     &__title {
-      font-size: 22px;
-      text-align: center;
+      font-size: 21px;
       margin-bottom: 20px;
+      font-family: 'Myriad600';
     }
 
     &__close {
@@ -646,16 +636,19 @@
 
     &__check-item {
       display: flex;
-      margin-top: 6px;
+      padding: 5px 0;
+      &:nth-child(even){
+        background-color: #f4f2f1;
+      }
     }
 
     &__headers {
       display: flex;
       justify-content: flex-end;
-      margin-top: 15px;
+      margin-bottom: -15px;
 
       &-item {
-        width: 11%;
+        width: 10%;
         display: flex;
         justify-content: center;
         font-family: 'Myriad600';
@@ -663,11 +656,11 @@
     }
 
     &__check-itemText {
-      width: 78%;
+      width: 80%;
     }
 
     &__check-itemCheck {
-      width: 11%;
+      width: 10%;
       justify-content: center;
       display: flex;
     }
@@ -757,7 +750,7 @@
   .notes {
     &__button {
       position: absolute;
-      left: 83%;
+      left: 88%;
       bottom: 45px;
       width: 100px;
       height: 30px;

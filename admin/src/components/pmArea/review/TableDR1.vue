@@ -38,8 +38,6 @@
         CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
       .review-table__data(slot="name" slot-scope="{ row }")
-        span.review-table__file-icon
-          i.fa.fa-file(aria-hidden='true')
         span.review-table__file-name {{ row.fileName }}
 
       .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
