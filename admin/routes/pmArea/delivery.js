@@ -1,5 +1,10 @@
 const router = require('express').Router()
 const fs = require('fs')
+const User = require("../../models/user");
+const {updateProject} = require("../../projects");
+const {getProjectAfterUpdate} = require("../../projects");
+const {changeManager} = require("../../delivery");
+const {getProject} = require("../../projects");
 const {storeFiles} = require("../../projects/files");
 
 const {
@@ -108,5 +113,95 @@ router.post('/multi-file-dr2-remove', async (req, res) => {
     res.status(500).send('Error on multi-file-dr2-push')
   }
 })
+
+//==========================================================================================================
+
+router.post('/change-manager', async (req, res) => {
+  const { projectId, taskId, manager, prop, isAdmin, status } = req.body
+  try {
+    const project = await getProject({ '_id': projectId })
+    const prevManager = await User.find( { "_id": project.tasksDR1.find(item => item.taskId === taskId)[prop] } ).populate('group')
+    const updatedProject = await changeManager({ taskId, manager, prevManager, prop, isAdmin, status, project })
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on changing review manager')
+  }
+})
+
+router.post('/approve-instruction', async (req, res) => {
+  const { taskId, projectId, instruction } = req.body
+  try {
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.instructions.text": instruction.text },
+      {
+        "tasksDR1.$[i].instructions.$[j].isChecked": instruction.isChecked,
+        "tasksDR1.$[i].instructions.$[j].isNotRelevant": instruction.isNotRelevant
+      },
+      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.text': instruction.text } ]}
+    )
+
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on approve files')
+  }
+
+})
+
+router.post('/delivery-comments', async (req, res) => {
+  const { projectId, taskId, comment } = req.body
+  try{
+    const updatedProject = await getProjectAfterUpdate(
+      {"_id": projectId, "tasksDR1.taskId": taskId},
+      { $set: {"tasksDR1.$.comment": comment}}
+    )
+    res.send(updatedProject)
+  }catch(err){
+    console.log(err)
+    res.status(500).send('Error on delivery-comments')
+  }
+})
+
+router.post('/approve-files', async (req, res) => {
+  const { projectId, taskId, isFileApproved, paths } = req.body
+  try {
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.files.path": { $in: paths } },
+      { "tasksDR1.$[i].files.$[j].isFileApproved": isFileApproved },
+      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': { $in: paths } } ]}
+    )
+
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on approve files')
+  }
+
+})
+
+router.post('/remove-reference-files', async (req, res) => {
+  try {
+    const { projectId, checkedTasksId, filePath } = req.body
+    let { _id, tasks } = await getProject({ '_id': projectId })
+
+    fs.unlink(filePath, (err) => {
+      if (err) throw(err)
+    })
+
+    const taskIndex = tasks.findIndex(({ taskId }) => taskId === checkedTasksId)
+    tasks[taskIndex].refFiles = tasks[taskIndex].refFiles.filter(item => item !== filePath)
+
+    const updatedProject = await updateProject({ '_id': _id }, { tasks })
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on adding tasks ref files')
+  }
+})
+
+
 
 module.exports = router

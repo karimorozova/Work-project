@@ -250,7 +250,7 @@
 			async removeRefFile() {
 				const { taskId: checkedTasksId } = this.currentProject.tasks.find(item => item.isChecked)
 				try {
-					const result = await this.$http.post('/pm-manage/remove-reference-files', {
+					const result = await this.$http.post('/delivery/remove-reference-files', {
 						filePath: this.removeFile,
 						checkedTasksId,
 						projectId: this.currentProject._id

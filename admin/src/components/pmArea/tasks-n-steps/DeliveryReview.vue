@@ -184,7 +184,7 @@
 			},
 			async sendMessage() {
 				try {
-					await this.$http.post('/pm-manage/delivery-comments', {
+					await this.$http.post('/delivery/delivery-comments', {
 						projectId: this.project._id,
 						taskStatus: this.task.status === 'Pending Approval [DR2]' ? 'dr2' : 'dr1',
 						comment: this.editorData

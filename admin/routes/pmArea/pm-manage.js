@@ -187,25 +187,7 @@ router.post('/new-project', async (req, res) => {
 	}
 })
 
-router.post('/remove-reference-files', async (req, res) => {
-	try {
-		const { projectId, checkedTasksId, filePath } = req.body
-		let { _id, tasks } = await getProject({ '_id': projectId })
 
-		fs.unlink(filePath, (err) => {
-			if (err) throw(err)
-		})
-
-		const taskIndex = tasks.findIndex(({ taskId }) => taskId === checkedTasksId)
-		tasks[taskIndex].refFiles = tasks[taskIndex].refFiles.filter(item => item !== filePath)
-
-		const updatedProject = await updateProject({ '_id': _id }, { tasks })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on adding tasks ref files')
-	}
-})
 
 router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
 	try {
@@ -649,18 +631,6 @@ router.get('/review-status', async (req, res) => {
 	}
 })
 
-router.post('/change-manager', async (req, res) => {
-	const { projectId, taskId, manager, prop, isAdmin, status } = req.body
-	try {
-		const project = await getProject({ '_id': projectId })
-    const prevManager = await User.find( { "_id": project.tasksDR1.find(item => item.taskId === taskId)[prop] } ).populate('group')
-		const updatedProject = await changeManager({ taskId, manager, prevManager, prop, isAdmin, status, project })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on changing review manager')
-	}
-})
 
 router.post('/change-manager-dr2', async (req, res) => {
   const { projectId, manager, type, file, entityId } = req.body
@@ -675,46 +645,6 @@ router.post('/change-manager-dr2', async (req, res) => {
   }
 })
 
-router.post('/approve-instruction', async (req, res) => {
-	const { taskId, projectId, instruction } = req.body
-	try {
-    await Projects.updateOne(
-      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.instructions.text": instruction.text },
-      {
-        "tasksDR1.$[i].instructions.$[j].isChecked": instruction.isChecked,
-        "tasksDR1.$[i].instructions.$[j].isNotRelevant": instruction.isNotRelevant
-      },
-      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.text': instruction.text } ]}
-    )
-
-    // const tasksDR1Info = await Projects.findOne({_id: projectId, "tasksDR1.taskId": taskId},{"tasksDR1.$": 1})
-    // const isAllChecklist= tasksDR1Info.tasksDR1[0].instructions.every(({isChecked, isNotRelevant}) => isChecked || isNotRelevant)
-    // const isAllFiles = tasksDR1Info.tasksDR1[0].files.every(({isFileApproved}) => isFileApproved)
-    //
-    // if( isAllChecklist && isAllFiles ) {
-    //   await changeTaskStatus(projectId, taskId, 'Pending Approval [DR1]', "Complete", new Date())
-    // }else{
-    //   await changeTaskStatus(projectId, taskId, "Complete", 'Pending Approval [DR1]', null)
-    // }
-
-    const updatedProject = await getProject({"_id": projectId})
-    res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approve files')
-	}
-
-  // async function changeTaskStatus(projectId,taskId, withStatus , changeStatusTo, completedAtDate) {
-  //   await Projects.updateOne(
-  //     {"_id": projectId, 'tasks': {$elemMatch: {'taskId': taskId, 'status': withStatus}}},
-  //     {
-  //       "tasks.$[i].status": changeStatusTo,
-  //       "tasksDR1.$[i].timestamp": completedAtDate,
-  //     },
-  //     { arrayFilters: [ { 'i.taskId': taskId }]}
-  //   )
-  // }
-})
 
 router.post('/close-project', async (req, res) => {
   const { projectId } = req.body
@@ -816,42 +746,6 @@ router.post('/approve-files-dr2', async (req, res) => {
   }
 })
 
-router.post('/approve-files', async (req, res) => {
-	const { projectId, taskId, isFileApproved, paths } = req.body
-	try {
-    await Projects.updateOne(
-      { "_id": projectId, 'tasksDR1.taskId': taskId, "tasksDR1.files.path": { $in: paths } },
-      { "tasksDR1.$[i].files.$[j].isFileApproved": isFileApproved },
-      { arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': { $in: paths } } ]}
-    )
-
-
-    // const tasksDR1Info = await Projects.findOne({_id: projectId, "tasksDR1.taskId": taskId},{"tasksDR1.$": 1})
-    // const isAllChecklist= tasksDR1Info.tasksDR1[0].instructions.every(({isChecked, isNotRelevant}) => isChecked || isNotRelevant)
-    // const isAllFiles = tasksDR1Info.tasksDR1[0].files.every(({isFileApproved}) => isFileApproved)
-    // if( isAllChecklist && isAllFiles ) {
-    //   await changeTaskStatus(projectId, taskId, 'Pending Approval [DR1]', "Complete", new Date())
-    // }else{
-    //   await changeTaskStatus(projectId, taskId, "Complete", 'Pending Approval [DR1]', null)
-    // }
-
-    const updatedProject = await getProject({"_id": projectId})
-    res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approve files')
-	}
-	// async function changeTaskStatus(projectId,taskId, withStatus , changeStatusTo, completedAtDate) {
-  //   await Projects.updateOne(
-  //     {"_id": projectId, 'tasks': {$elemMatch: {'taskId': taskId, 'status': withStatus}}},
-  //     {
-  //       "tasks.$[i].status": changeStatusTo,
-  //       "tasksDR1.$[i].timestamp": completedAtDate,
-  //     },
-  //     { arrayFilters: [ { 'i.taskId': taskId }]}
-  //   )
-  // }
-})
 
 router.post('/is-file-pushed-dr2', async (req, res) => {
   const { projectId, taskId, isFilePushedDR2, paths } = req.body
@@ -869,19 +763,7 @@ router.post('/is-file-pushed-dr2', async (req, res) => {
   }
 })
 
-router.post('/delivery-comments', async (req, res) => {
-	const { projectId, taskId, comment } = req.body
-  try{
-    const updatedProject = await getProjectAfterUpdate(
-      {"_id": projectId, "tasksDR1.taskId": taskId},
-      { $set: {"tasksDR1.$.comment": comment}}
-    )
-    res.send(updatedProject)
-  }catch(err){
-    console.log(err)
-    res.status(500).send('Error on delivery-comments')
-  }
-})
+
 
 router.post('/delivery-comments-dr2', async (req, res) => {
   const { projectId, entityId, type, comment } = req.body

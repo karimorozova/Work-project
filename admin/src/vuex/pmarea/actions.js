@@ -97,7 +97,7 @@ export const approveInstruction = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
 		const { taskId, projectId, instruction } = payload;
-		const updatedProject = await Vue.http.post("/pm-manage/approve-instruction", { taskId, projectId, instruction });
+		const updatedProject = await Vue.http.post("/delivery/approve-instruction", { taskId, projectId, instruction });
     await dispatch('setCurrentProject', updatedProject.data);
 		dispatch('alertToggle', { message: "Instruction updated!", isShow: true, type: "success" });
 	} catch (err) {
@@ -139,7 +139,7 @@ export const changeReviewManager = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
 		const { taskId, projectId, manager, prop, isAdmin, status } = payload;
-		const updatedProject = await Vue.http.post("/pm-manage/change-manager", { taskId, projectId, manager, prop, isAdmin, status });
+		const updatedProject = await Vue.http.post("/delivery/change-manager", { taskId, projectId, manager, prop, isAdmin, status });
     await dispatch('setCurrentProject', updatedProject.data);
 		dispatch('alertToggle', { message: "Successfully changed!", isShow: true, type: "success" })
 	} catch (err) {
