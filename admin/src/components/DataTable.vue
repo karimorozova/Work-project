@@ -258,6 +258,7 @@ export default {
 }
 
 .review-body {
+  max-height: 800px;
   .table__body-row {
     cursor: default;
   }

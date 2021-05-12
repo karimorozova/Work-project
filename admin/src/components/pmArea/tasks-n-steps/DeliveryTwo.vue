@@ -665,7 +665,7 @@
   .notes {
     &__button {
       position: absolute;
-      left: 88%;
+      left: 86%;
       bottom: 45px;
       width: 100px;
       height: 30px;

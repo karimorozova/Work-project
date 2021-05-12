@@ -23,8 +23,8 @@
     DataTable(
       :fields="fields"
       :tableData="files"
-      :bodyClass="['review-body', {'tbody_visible-overflow': files.length < 6}]"
-      :tableheadRowClass="files.length < 6 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['review-body', {'tbody_visible-overflow': files.length < 12}]"
+      :tableheadRowClass="files.length < 12 ? 'tbody_visible-overflow' : ''"
       :headCellClass="'padding-with-check-box'"
     )
       .review-table__header.review-table__check-cell(slot="headerCheck" slot-scope="{ field }")
@@ -40,20 +40,20 @@
         CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
       .review-table__dataFilename(slot="name" slot-scope="{ row }")
-        //span.review-table__file-icon
-          i.fa.fa-file(aria-hidden='true')
         span.review-table__file-name {{ row.fileName }}
 
       .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
-      .review-table__data(slot="task" slot-scope="{ row }") {{ row.taskId.substring(row.taskId.length - 3)  }}
+      .review-table__dataTasks(slot="task" slot-scope="{ row }")
+        span(v-if="type ==='multi'") {{ getTasksIds(row.taskId) }}
+        span(v-if="type ==='single'") {{ row.taskId.substring(row.taskId.length - 3)  }}
       .review-table__data(slot="dr1" slot-scope="{ row }")
         .review-table__data-manager
-          .tooltip
-            span#myTooltip2.tooltiptext-left Closed At: 123-123-123 123:123
+          .tooltip(v-if="row.taskId !== 'Loaded in DR2' && type !== 'multi'")
+            span#myTooltip2.tooltiptext-left Closed At: {{ getTimeAndComment(row).getTime() }}
             i.far.fa-clock
-          .tooltip
-            span#myTooltip.tooltiptext-left sfhsdjfhsjdf
-            i.far.fa-comment
+          .tooltip(v-if="row.taskId !== 'Loaded in DR2'")
+            span#myTooltip.tooltiptext-left(v-html="getTimeAndComment(row).getComment()")
+            i.far.fa-comment(v-if="getTimeAndComment(row).getComment().length")
 
           span {{ getManagerName(row.dr1Manager) }}
       .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
@@ -92,7 +92,8 @@
 	import SelectSingle from "@/components/SelectSingle"
 	import CheckBox from "@/components/CheckBox"
 	import Add from "@/components/Add"
-	import { mapActions } from "vuex"
+	import { mapActions, mapGetters } from "vuex"
+  import moment from "moment"
 	import ApproveModal from "../../ApproveModal"
 	import Button from "../../Button"
   import reviewManagers from "../../../mixins/reviewManagers";
@@ -110,12 +111,12 @@
 			return {
 				fields: [
 					{ label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
-					{ label: "File Name", headerKey: "headerName", key: "name", width: "20%", padding: 0 },
-					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "9%", padding: 0 },
+					{ label: "File Name", headerKey: "headerName", key: "name", width: "21%", padding: 0 },
+					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "8%", padding: 0 },
           { label: "Language pair", headerKey: "headerPair", key: "pair", width: "14%", padding: 0 },
-          { label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", width: "18%", padding: 0 },
-          { label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", width: "18%", padding: 0},
-          { label: "Action", headerKey: "headerAction", key: "action", width: "17%", padding: 0 }
+          { label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", width: "19%", padding: 0 },
+          { label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", width: "19%", padding: 0},
+          { label: "Action", headerKey: "headerAction", key: "action", width: "15%", padding: 0 }
 				],
 				icons: {
 					download: { src: require("../../../assets/images/latest-version/download-file.png") },
@@ -131,6 +132,37 @@
 			}
 		},
 		methods: {
+      getTasksIds(str){
+       return  str.split(',').reduce((acc, curr) => {
+          acc = acc + curr.substring(curr.length - 3) + '; '
+          return acc
+        }, '')
+      },
+      getTimeAndComment(row){
+        if(this.type === 'multi'){
+          const { taskId } = row
+          const tasksIds = taskId.split(',')
+          const comments = tasksIds.reduce((acc, curr) => {
+            const taskId = curr.substring(curr.length - 3)
+            const { comment } = this.currentProject.tasksDR1.find(item => item.taskId === curr.trim())
+            if(comment){
+              acc = acc + `<div><p>${ taskId }:</p> ${comment}</div>`
+            }
+            return acc
+          },'')
+          console.log({comments})
+          return {
+            getComment: () => comments,
+          }
+        }else{
+          const { taskId } = row
+          const { timestamp, comment} = this.currentProject.tasksDR1.find(item => item.taskId === taskId)
+          return {
+            getComment: () => comment,
+            getTime: () => moment(timestamp).format('DD-MM-YYYY, HH:mm')
+          }
+        }
+      },
       setManager({ option }, file) {
         const managerIndex = this.managersNames.indexOf(option)
         this.$emit("assignManager", {
@@ -226,6 +258,9 @@
 			// 	}
 			// 	return result
 			// },
+      ...mapGetters({
+        currentProject: 'getCurrentProject',
+      }),
       canAddDR2Manager() {
         return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
       },
@@ -284,7 +319,8 @@
       align-self: flex-end;
       margin-bottom: 20px;
     }
-    &__dataFilename{
+    &__dataFilename,
+    &__dataTasks{
       box-sizing: border-box;
       display: grid;
       align-items: center;
@@ -293,6 +329,7 @@
       overflow-y: auto;
       overflow-x: hidden;
     }
+
     &__data {
       box-sizing: border-box;
       display: grid;
@@ -323,7 +360,7 @@
 
     &__icon {
       cursor: pointer;
-      margin-right: 7px;
+      margin-right: 10px;
     }
 
     &__check-icon {
@@ -331,19 +368,15 @@
       color: $light-brown;
       cursor: pointer;
       transition: ease 0.1s;
-      margin-right: 7px;
+      margin-right: 10px;
     }
     &__rollback-icon {
       font-size: 16px;
       cursor: pointer;
       transition: ease 0.1s;
-      margin-right: 7px;
+      margin-right: 10px;
     }
 
-    &__file-icon {
-      margin-right: 7px;
-      color: #938676;
-    }
     &__file-inputButton {
       padding-left: 0;
       padding-right: 0;
@@ -360,7 +393,7 @@
     }
 
     &__upload {
-      margin-right: 7px;
+      margin-right: 10px;
       position: relative;
       background: url("../../../assets/images/latest-version/upload-file.png");
       height: 16px;
@@ -412,6 +445,9 @@
   .tooltip {
     position: relative;
     display: flex;
+    font-size: 16px;
+    margin-right: 5px;
+    cursor: help;
 
     .tooltiptext-left {
       font-size: 14px;
@@ -424,9 +460,9 @@
       padding: 5px;
       position: absolute;
       z-index: 1;
-      left: 40px;
+      left: 38px;
       opacity: 0;
-      top: -2px;
+      top: -5px;
       transition: opacity .3s;
 
       &::after {

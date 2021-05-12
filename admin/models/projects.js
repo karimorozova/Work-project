@@ -79,7 +79,7 @@ const ProjectsSchema = new mongoose.Schema({
   tasksDR1: [{
     timestamp: {
       type: Date,
-      default: new Date()
+      default: ""
     },
     dr1Manager: {
       type: Schema.Types.ObjectId,
@@ -93,11 +93,11 @@ const ProjectsSchema = new mongoose.Schema({
       type: String,
       default: '',
     },
-    status: {
-      type: String,
-      default: "Started",
-      trim: true
-    },
+    // status: {
+    //   type: String,
+    //   default: "Started",
+    //   trim: true
+    // },
     instructions: {
       type: Array,
       default: [],
@@ -138,7 +138,7 @@ const ProjectsSchema = new mongoose.Schema({
       },
       timestamp: {
         type: Date,
-        default: new Date()
+        default: '',
       },
       instructions: {
         type: Array,
@@ -202,7 +202,7 @@ const ProjectsSchema = new mongoose.Schema({
       },
       timestamp: {
         type: Date,
-        default: new Date()
+        default: ""
       },
       file: {
         fileName: {

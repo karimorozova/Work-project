@@ -23,8 +23,8 @@
     DataTable(
       :fields="fields"
       :tableData="files"
-      :bodyClass="['review-body', {'tbody_visible-overflow': files.length < 6}]"
-      :tableheadRowClass="files.length < 6 ? 'tbody_visible-overflow' : ''"
+      :bodyClass="['review-body', {'tbody_visible-overflow': files.length < 12}]"
+      :tableheadRowClass="files.length < 12 ? 'tbody_visible-overflow' : ''"
       :headCellClass="'padding-with-check-box'"
     )
       .review-table__header.review-table__check-cell(slot="headerCheck" slot-scope="{ field }")
@@ -73,11 +73,11 @@
 		data() {
 			return {
 				fields: [
-					{ label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
-					{ label: "File Name", headerKey: "headerName", key: "name", width: "36%", padding: 0 },
-					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "24%", padding: 0 },
-					{ label: "Language pair", headerKey: "headerPair", key: "pair", width: "19%", padding: 0 },
-					{ label: "Action", headerKey: "headerAction", key: "action", width: "17%", padding: 0 }
+					{ label: "", headerKey: "headerCheck", key: "check", width: "3.5%", padding: 0 },
+					{ label: "File Name", headerKey: "headerName", key: "name", width: "36.5%", padding: 0 },
+					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "25%", padding: 0 },
+					{ label: "Language pair", headerKey: "headerPair", key: "pair", width: "20%", padding: 0 },
+					{ label: "Action", headerKey: "headerAction", key: "action", width: "15%", padding: 0 }
 				],
 				icons: {
 					download: { src: require("../../../assets/images/latest-version/download-file.png") },
@@ -238,7 +238,7 @@
 
     &__icon {
       cursor: pointer;
-      margin-right: 7px;
+      margin-right: 10px;
     }
 
     &__check-icon {
@@ -246,16 +246,11 @@
       color: $light-brown;
       cursor: pointer;
       transition: ease 0.1s;
-      margin-right: 7px;
-    }
-
-    &__file-icon {
-      margin-right: 7px;
-      color: #938676;
+      margin-right: 10px;
     }
 
     &__upload {
-      margin-right: 7px;
+      margin-right: 10px;
       position: relative;
       background: url("../../../assets/images/latest-version/upload-file.png");
       height: 16px;
