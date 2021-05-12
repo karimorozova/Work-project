@@ -202,6 +202,24 @@ router.post('/remove-reference-files', async (req, res) => {
   }
 })
 
+router.post('/change-managers', async (req, res) => {
+  try {
+    const { projectId, checkedTasksId, manager } = req.body
+
+    await Projects.updateOne(
+      { "_id": projectId, 'tasksDR1.taskId': { $in: checkedTasksId}},
+      { "tasksDR1.$[i].dr1Manager": manager._id },
+      { arrayFilters: [ { 'i.taskId': { $in: checkedTasksId} } ]}
+    )
+
+    const updatedProject = await getProject({"_id": projectId})
+    res.send(updatedProject)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on adding tasks ref files')
+  }
+})
+
 
 
 module.exports = router
