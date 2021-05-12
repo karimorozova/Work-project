@@ -101,13 +101,19 @@ const taskApproveReady = async ({ projectId, type, entityId }) =>{
   if(type === 'single'){
     await Projects.updateOne(
       { ...qProject, "tasksDR2.singleLang._id": entityId },
-      { "tasksDR2.singleLang.$[i].status": 'Ready for Delivery' },
+      {
+                "tasksDR2.singleLang.$[i].status": 'Ready for Delivery',
+                "tasksDR2.singleLang.$[i].timestamp": new Date(),
+            },
       { arrayFilters: [{ 'i._id': entityId }] }
     )
   }else{
     await Projects.updateOne(
       { ...qProject, "tasksDR2.multiLang._id": entityId },
-      { "tasksDR2.multiLang.$[i].status": 'Ready for Delivery' },
+      {
+                "tasksDR2.multiLang.$[i].status": 'Ready for Delivery',
+                "tasksDR2.multiLang.$[i].timestamp": new Date(),
+              },
       { arrayFilters: [{ 'i._id': entityId }] }
     )
   }
