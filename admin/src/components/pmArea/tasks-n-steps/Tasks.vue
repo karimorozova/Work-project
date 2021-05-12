@@ -13,7 +13,7 @@
       .tasks__body
         .tasks__itemsContacts
           .tasks__items2
-            .tasks__selectTitle Choose DR2 Manager:
+            .tasks__selectTitle Change Manager:
             .tasks__select
               SelectSingle(
                 :options="managersNames"
@@ -22,8 +22,8 @@
                 @chooseOption="setManager"
               )
 
-        .tasks-files__button(v-if="!!selectedManager")
-          Button(value="Change" @clicked="changeManager")
+        .tasks-files__button-change
+          Button(value="Change" :isDisabled="!selectedManager" @clicked="changeManager")
 
 
     .tasks__refFiles(v-if="manageFileModal")
@@ -291,6 +291,7 @@
       },
       closeManagerModal() {
         this.changeManagerModal = false
+        this.selectedAction = ""
       },
 			async removeRefFile() {
 				const { taskId: checkedTasksId } = this.currentProject.tasks.find(item => item.isChecked)
@@ -795,6 +796,11 @@
       margin-top: 20px;
       text-align: center;
       margin-bottom: 20px;
+    }
+
+    &__button-change {
+      margin-top: 20px;
+      text-align: center;
     }
 
     &__tooltip {
