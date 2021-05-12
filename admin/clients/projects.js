@@ -1,7 +1,6 @@
 const { notifyDeliverablesDownloaded } = require('../projects/emails');
 const { updateProject } = require('../projects/getProjects');
 const { updateWithApprovedTasks } = require('../projects/updates');
-const { setTasksDeliveryStatus } = require("../delivery/approve");
 const { Clients } = require('../models');
 
 

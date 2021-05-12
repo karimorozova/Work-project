@@ -497,7 +497,7 @@
 						await this.setProjectStatus({ status: "Cancelled" })
 					} else {
 						const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id })
-						await this.storeProject(updatedProject.body)
+						await this.storeProject(updatedProject.data)
 						await this.messageTemplateFormation(filteredTasks)
 					}
 					this.alertToggle({ message: "Tasks cancelled", isShow: true, type: "success" })
@@ -517,7 +517,7 @@
 							reason: this.reason,
 							isPay: this.isPay
 						})
-						this.previewMessage = template.body.message
+						this.previewMessage = template.data.message
 						this.openPreview()
 					} catch (err) {
 						this.alertToggle({ message: "Cannot formation message", isShow: true, type: "error" })
@@ -631,7 +631,7 @@
 					let href = task.deliverables
 					if (!href) {
 						const result = await this.$http.get(`/pm-manage/deliverables?taskId=${ task.taskId }`)
-						href = result.body.link
+						href = result.data.link
 					}
 					let link = document.createElement('a')
 					link.href = __WEBPACK__API_URL__ + href

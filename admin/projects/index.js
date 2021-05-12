@@ -43,12 +43,16 @@ const {
   taskApproveReady,
   taskApproveNotify,
   taskApproveDeliver,
-  taskApproveDeliverMany
+  taskApproveDeliverMany,
+  changeManagerDR2,
+  changeManager,
 } = require('./delivery');
 
 const { getPriceAfterApplyingDiscounts } = require('./helpers');
 
 module.exports = {
+  changeManagerDR2,
+  changeManager,
   taskApproveDeliverMany,
   createArchiveForDeliverableItem,
   taskApproveDeliver,

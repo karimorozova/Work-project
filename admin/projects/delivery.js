@@ -1,5 +1,14 @@
 const fs = require('fs')
 const {
+  managerNotifyMail
+} = require("../utils");
+
+const {
+  managerDr1Reassign,
+  managerDr1Assigned
+} = require("../emailMessages/internalCommunication");
+
+const {
   getProject
 } = require("./getProjects");
 
@@ -23,6 +32,55 @@ const { dr2Instructions } = require('../enums/deliveryInstructions');
 const {
   getProjectAfterUpdate,
 } = require('./getProjects')
+
+
+async function changeManagerDR2({ project, prevManager, manager, type, file, entityId }) {
+  let { tasksDR2: { multiLang, singleLang } } = project
+  //Bug send all tasks Ids
+  const messageToPrev = managerDr1Reassign({taskId: 'taskId', project, prevManager, manager}, '2');
+  const messageToNew = managerDr1Assigned({taskId: 'taskId', project, manager}, '2');
+  try {
+
+    await managerNotifyMail(prevManager, messageToPrev, `DR2 has been reassigned: ${project.projectId} (I009.0)`);
+    await managerNotifyMail(manager, messageToNew, `The DR2 has been assigned to you: ${project.projectId} (I009.1)`);
+
+    if(type === 'multi'){
+      const idx = multiLang.findIndex(({_id}) => `${_id}` === `${entityId}`)
+      multiLang[idx].file = { ...file, dr2Manager: manager, isFileApproved: false }
+      return await getProjectAfterUpdate({"_id": project._id}, { "tasksDR2.multiLang": multiLang } )
+    }else{
+      const idx = singleLang.findIndex(({_id}) => `${_id}` === `${entityId}`)
+      const idxFile = singleLang[idx].files.findIndex(({_id}) => `${_id}` === `${file._id}`)
+      singleLang[idx].files[idxFile] = {  ...file, dr2Manager: manager, isFileApproved: false }
+      return await getProjectAfterUpdate({"_id": project._id}, { "tasksDR2.singleLang": singleLang } )
+    }
+  } catch(err) {
+    console.log(err, 'on changeManagerDR2')
+  }
+}
+
+async function changeManager({ taskId, prevManager, manager, prop, isAdmin, status, project}) {
+  const DRNumber = prop === "dr1Manager" ? '1' : '2';
+  const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, DRNumber);
+  const messageToNew = managerDr1Assigned({taskId, project, manager}, DRNumber);
+
+  try {
+    const updatedProject = await getProjectAfterUpdate({"_id": project._id, "tasksDR1.taskId": taskId}, { $set: {[`tasksDR1.$.${prop}`]: manager} })
+
+    const isDr1 = prop === "dr1Manager";
+    const isDr2 = status === "dr2" && prop === "dr2Manager";
+    if(isAdmin && (isDr1 || isDr2)) {
+      await managerNotifyMail(returnObj(prevManager), messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
+      await managerNotifyMail(returnObj(manager), messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
+    }
+    return updatedProject
+  } catch(err) {
+    console.log(err, 'on changeManager')
+  }
+  function returnObj(){
+    return Array.isArray(prevManager) ? prevManager[0] : prevManager
+  }
+}
 
 const taskApproveDeliverMany= async ({ projectId, entitiesForDeliver, user, contacts }) => {
   return await sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts })
@@ -182,5 +240,7 @@ module.exports = {
   addMultiLangDR2,
   removeDR2,
   removeMultiDR2,
-  taskApproveDeliverMany
+  taskApproveDeliverMany,
+  changeManagerDR2,
+  changeManager
 }

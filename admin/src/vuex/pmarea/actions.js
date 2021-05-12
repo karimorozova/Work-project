@@ -111,7 +111,7 @@ export const approveInstructionDR2 = async ({ dispatch }, payload) => {
   dispatch('incrementRequestCounter')
   try {
     const { entityId, projectId, instruction, type } = payload;
-    const updatedProject = await Vue.http.post("/pm-manage/approve-instruction-dr2", { entityId, projectId, instruction, type });
+    const updatedProject = await Vue.http.post("/delivery/approve-instruction-dr2", { entityId, projectId, instruction, type });
     await dispatch('setCurrentProject', updatedProject.data);
     dispatch('alertToggle', { message: "Instruction updated!", isShow: true, type: "success" });
   } catch (err) {
@@ -125,7 +125,7 @@ export const approveDeliveryFileDR2 = async ({ dispatch }, payload) => {
   dispatch('incrementRequestCounter')
   try {
     const {type, entityId, projectId, isFileApproved, paths } = payload;
-    const updatedProject = await Vue.http.post("/pm-manage/approve-files-dr2", {type, entityId, projectId, isFileApproved, paths});
+    const updatedProject = await Vue.http.post("/delivery/approve-files-dr2", {type, entityId, projectId, isFileApproved, paths});
     await dispatch('setCurrentProject', updatedProject.data);
     dispatch('alertToggle', { message: "File check updated!", isShow: true, type: "success" });
   } catch (err) {

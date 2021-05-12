@@ -203,7 +203,7 @@
       async removeFile(file){
         if (!this.canUpdateDR1) return
 			  try{
-			    const updatedProject = await this.$http.post("/pm-manage/remove-dr-file", {...file, projectId: this.project._id});
+			    const updatedProject = await this.$http.post("/delivery/remove-dr-file", {...file, projectId: this.project._id});
           await this.setCurrentProject(updatedProject.data);
           await this.updatedFiles(updatedProject)
           this.alertToggle({ message: "File removed!", isShow: true, type: "success" })
@@ -300,7 +300,7 @@
 				fileData.append("path", path)
 				fileData.append("taskId", this.task.taskId)
 				try {
-				  const updatedProject = await this.$http.post("/pm-manage/target", fileData)
+				  const updatedProject = await this.$http.post("/delivery/target", fileData)
           await this.setCurrentProject(updatedProject.data);
           await this.updatedFiles(updatedProject)
 				} catch (err) {
@@ -319,7 +319,7 @@
           }else{
             await this.$http.post('/delivery/file-dr2-pull', { projectId, taskId, path, sourceLanguage, targetLanguage })
           }
-          const updatedProject = await this.$http.post('/pm-manage/is-file-pushed-dr2',{projectId, taskId, isFilePushedDR2, paths: [ path ]})
+          const updatedProject = await this.$http.post('/delivery/is-file-pushed-dr2',{projectId, taskId, isFilePushedDR2, paths: [ path ]})
           await this.setCurrentProject(updatedProject.data);
         }catch (err){
         }
@@ -332,7 +332,7 @@
        if(files.length){
          const paths = files.map(item => item.path)
          await this.$http.post('/delivery/file-dr2-push', { projectId: this.project._id, taskId, dr1Manager, dr2Manager, files } )
-         await this.$http.post('/pm-manage/is-file-pushed-dr2',{projectId: this.project._id, taskId, isFilePushedDR2: true, paths,})
+         await this.$http.post('/delivery/is-file-pushed-dr2',{projectId: this.project._id, taskId, isFilePushedDR2: true, paths,})
          const updatedProject = await this.$http.post("/delivery/approve-files", { projectId: this.project._id, taskId: this.task.taskId, isFileApproved: true, paths });
          await this.setCurrentProject(updatedProject.data);
          await this.updatedFiles(updatedProject)
@@ -348,7 +348,7 @@
 
         if (!this.canUpdateDR1) return
         try {
-          const updatedProject = await this.$http.post("/pm-manage/change-task-status", { projectId: this.project._id, taskId: this.deliveryTask.taskId });
+          const updatedProject = await this.$http.post("/delivery/change-task-status", { projectId: this.project._id, taskId: this.deliveryTask.taskId });
           await this.setCurrentProject(updatedProject.data);
           await this.updatedFiles(updatedProject)
           this.closeApproveModal()

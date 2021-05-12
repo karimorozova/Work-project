@@ -196,7 +196,7 @@
 			// },
 			async sendComment() {
 				try {
-					const updatedProject = await this.$http.post('/pm-manage/delivery-comments-dr2', {
+					const updatedProject = await this.$http.post('/delivery/delivery-comments-dr2', {
             projectId: this.project._id,
             entityId: this.deliveryData._id,
             type: this.type,
@@ -269,7 +269,7 @@
       },
       async removeFile(file){
         try{
-          const updatedProject = await this.$http.post("/pm-manage/remove-dr2-file", {
+          const updatedProject = await this.$http.post("/delivery/remove-dr2-file", {
             ...file,
             projectId: this.project._id,
             type: this.type,
@@ -293,7 +293,7 @@
         fileData.append("user", this.user._id)
         fileData.append("dr1Manager", this.project.projectManager._id)
         try {
-            const updatedProject = await this.$http.post("/pm-manage/target-dr2", fileData)
+            const updatedProject = await this.$http.post("/delivery/target-dr2", fileData)
             await this.setCurrentProject(updatedProject.data);
             await this.updatedFiles(updatedProject)
         } catch (err) {
@@ -335,7 +335,7 @@
 			async assignManager({ manager, type, file }) {
         if(manager._id === file.dr2Manager) return
         try{
-          const updatedProject = await this.$http.post("/pm-manage/change-manager-dr2", {
+          const updatedProject = await this.$http.post("/delivery/change-manager-dr2", {
             projectId: this.project._id,
             manager,
             type,
@@ -372,7 +372,7 @@
           manager: this.rollbackManager
 				}
 				try{
-          const updatedProject = await this.$http.post("/pm-manage/rollback-review", { ...rollback })
+          const updatedProject = await this.$http.post("/delivery/rollback-review", { ...rollback })
           await this.setCurrentProject(updatedProject.data);
           await this.updatedFiles(updatedProject)
         }catch (err){

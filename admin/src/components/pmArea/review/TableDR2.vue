@@ -150,7 +150,6 @@
             }
             return acc
           },'')
-          console.log({comments})
           return {
             getComment: () => comments,
           }
