@@ -18,6 +18,7 @@
               SelectSingle(
                 :options="managersNames"
                 :selectedOption="selectedDr1Manager"
+                placeholder="Select Manager"
                 @chooseOption="setManager"
               )
 
@@ -282,6 +283,8 @@
 
           await this.storeProject(result.body)
           this.closeManagerModal()
+          this.selectedAction = ""
+          this.selectedManager = null
         } catch (err) {
           this.alertToggle({ message: err.message, isShow: true, type: "error" })
         }
@@ -675,8 +678,17 @@
 							return [ 'Cancel' ]
 						}
 					} else if (this.isEvery("Ready for Delivery")) return [ 'Deliver' ]
-          else if (this.isEvery("Pending Approval [DR1]")) return [ 'Manage DR1 manager' ]
-					else if (this.isEvery("Pending Approval [DR1]") && checkedTasks.length === 1) return [ 'Delivery Review [1]' ]
+
+          else if (this.isEvery("Pending Approval [DR1]")) {
+            let elements = []
+
+            if(checkedTasks.length === 1) elements.push('Delivery Review [1]' )
+
+            if(this.canChangeDR1Manager) elements.push('Manage DR1 manager' )
+
+            return elements
+          }
+
 					else if (this.isEvery('Pending Approval [DR2]') && checkedTasks.length === 1) return [ 'Delivery Review [2]' ]
 					else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {
 						return [ 'Upload reference files', 'Cancel' ]
@@ -688,7 +700,21 @@
 			isAllSelected() {
 				const unchecked = this.currentProject.tasks.find(item => !item.isChecked)
 				return !unchecked
-			}
+			},
+			canChangeDR1Manager() {
+        const checkedIds = this.currentProject.tasks
+          .filter(item => item.isChecked)
+          .map(({ taskId }) => taskId)
+
+        const { _id, group: { name } } = this.user
+
+        return name === 'Administrators'
+          || name === 'Developers'
+          || this.currentProject.tasksDR1.filter(({taskId}) => checkedIds.includes(taskId)).every(({dr1Manager}) => {
+            console.log({dr1Manager, _id})
+            return dr1Manager === _id
+          })
+      }
 		},
     created() {
       this.getManagers()
