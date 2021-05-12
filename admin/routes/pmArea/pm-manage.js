@@ -58,7 +58,8 @@ const {
 	sendQuoteMessage,
 	sendCostQuoteMessage,
 	updateProjectFinanceOnDiscountsUpdate,
-	generateAndSaveCertificate
+	generateAndSaveCertificate,
+  getFilteredProjects
 } = require('../../projects')
 
 const {
@@ -138,6 +139,16 @@ const {
 	pushNewLangs
 } = require('../../multipliers')
 
+router.post('/allprojects', async (req, res) => {
+    const filters = {...req.body};
+    try {
+        const projects = await getFilteredProjects(filters);
+        res.send(projects)
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Something wrong with DB while getting projects!');
+    }
+});
 
 router.get('/project', async (req, res) => {
 	const { id } = req.query

@@ -57,6 +57,12 @@ async function getFilteredProjects(filters) {
       }
     },
     {
+      $unset: [
+        "billingDate", "brief", "clientContacts", "clientProjectNumber",
+        "crossRate", "dateFormatted", "discounts", "genBrief", "industry"
+      ]
+    },
+    {
       $match: {
         ...query
       }
