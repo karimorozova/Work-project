@@ -6,6 +6,25 @@
       PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
 
 
+
+    .tasks__modal(v-if="changeManagerModal")
+      .tasks__titleModal Select new DR1
+      span.tasks__close-modal(@click="closeManagerModal()") &#215;
+      .tasks__body
+        .tasks__itemsContacts
+          .tasks__items2
+            .tasks__selectTitle Choose DR2 Manager:
+            .tasks__select
+              SelectSingle(
+                :options="managersNames"
+                :selectedOption="selectedDr1Manager"
+                @chooseOption="setManager"
+              )
+
+        .tasks-files__button(v-if="!!selectedManager")
+          Button(value="Change" @clicked="changeManager")
+
+
     .tasks__refFiles(v-if="manageFileModal")
       span.tasks__refFilesClose(@click="closeManageModal") &#215;
       .tasks-files__fileItem
@@ -190,8 +209,10 @@
 	import Button from "../../Button"
   import DeliveryOne from "./DeliveryOne";
 
+  import reviewManagers from "@/mixins/reviewManagers"
+
 	export default {
-		mixins: [ currencyIconDetected ],
+		mixins: [ currencyIconDetected, reviewManagers ],
 		props: {
 			allTasks: {
 				type: Array
@@ -240,13 +261,34 @@
 				refFiles: [],
 				refFilesForDelete: [],
 				removeFile: null,
-				manageApprovalModal: false
+				manageApprovalModal: false,
+        changeManagerModal: false,
+        managers: [],
+        selectedManager: null
 			}
 		},
 		methods: {
 			closeManageApprovalModal() {
 				this.manageApprovalModal = false
 			},
+      async changeManager() {
+
+        try {
+          const result = await this.$http.post('/delivery/change-managers', {
+            projectId: this.currentProject._id,
+            checkedTasksId: this.currentProject.tasks.filter(item => item.isChecked).map(({taskId}) => taskId),
+            manager: this.selectedManager,
+          })
+
+          await this.storeProject(result.body)
+          this.closeManagerModal()
+        } catch (err) {
+          this.alertToggle({ message: err.message, isShow: true, type: "error" })
+        }
+      },
+      closeManagerModal() {
+        this.changeManagerModal = false
+      },
 			async removeRefFile() {
 				const { taskId: checkedTasksId } = this.currentProject.tasks.find(item => item.isChecked)
 				try {
@@ -371,6 +413,8 @@
 					this.isDeliveryReview = true
 				} else if (option === 'Send a Quote') {
 					await this.getSendQuoteMessage()
+				} else if (option === 'Manage DR1 manager') {
+					await this.manageDR1()
 				} else if (option === 'Cancel' || option === 'Deliver') {
 					this.setModalTexts(option)
 					this.isApproveActionShow = true
@@ -383,6 +427,18 @@
 					this.manageFileModal = true
 				}
 			},
+      async manageDR1() {
+			  this.changeManagerModal = true
+
+      },
+      setManager({ option }) {
+        console.log(option);
+        const managerIndex = this.managersNames.indexOf(option)
+        this.selectedManager = this.managers[managerIndex]
+        // this.$emit("assignManager", {
+        //   manager: this.managers[managerIndex]
+        // })
+      },
 			reviewForDelivery(task) {
 				this.reviewTask = task
 				this.isDeliveryReview = true
@@ -600,6 +656,9 @@
 				user: 'getUser',
         users: 'getUsers'
 			}),
+      selectedDr1Manager() {
+        return this.selectedManager ? `${ this.selectedManager.firstName } ${ this.selectedManager.lastName }` : ""
+      },
 			projectClientContacts() {
 				return this.currentProject.clientContacts.map(({ email }) => email)
 			},
@@ -616,6 +675,7 @@
 							return [ 'Cancel' ]
 						}
 					} else if (this.isEvery("Ready for Delivery")) return [ 'Deliver' ]
+          else if (this.isEvery("Pending Approval [DR1]")) return [ 'Manage DR1 manager' ]
 					else if (this.isEvery("Pending Approval [DR1]") && checkedTasks.length === 1) return [ 'Delivery Review [1]' ]
 					else if (this.isEvery('Pending Approval [DR2]') && checkedTasks.length === 1) return [ 'Delivery Review [2]' ]
 					else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {
@@ -630,7 +690,10 @@
 				return !unchecked
 			}
 		},
-		components: {
+    created() {
+      this.getManagers()
+    },
+    components: {
       DeliveryOne,
 			Button,
 			FilesUpload,
@@ -814,9 +877,9 @@
 
     &__review {
       position: absolute;
-      top: -230px;
-      right: 0;
-      left: 0;
+      top: -64px;
+      right: -20px;
+      left: -20px;
       bottom: 0;
       z-index: 50;
       box-sizing: border-box;
@@ -858,5 +921,61 @@
       z-index: -2;
       transition: all 0.2s;
     }
+
+    &__modal {
+      padding: 20px;
+      background: white;
+      position: absolute;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 500;
+    }
+
+    &__titleModal{
+      font-size: 21px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-family: Myriad600;
+    }
+
+    &__close-modal {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+
+
+    &__itemsContacts{
+      display: flex;
+      justify-content: center;
+    }
+
+    &__selectTitle{
+      margin-bottom: 4px;
+    }
+
+
+    &__select {
+      position: relative;
+      height: 32px;
+      width: 191px;
+    }
+
   }
 </style>
