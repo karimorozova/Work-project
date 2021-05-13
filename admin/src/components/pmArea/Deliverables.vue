@@ -27,6 +27,12 @@
                 :selectedOptions="selectedContacts"
                 @chooseOptions="setContacts"
               )
+        .deliverables__email-comment
+          .deliverables__email-checkbox
+            CheckBox(:isChecked="isComment" @check="toggleCommentEmail"  @uncheck="toggleCommentEmail")
+            span Do you want to external comment? &nbsp;&nbsp;
+          .deliverables__notes(v-if="isComment")
+            ckeditor(v-model="comment" :config="editorConfig")
 
         .tasks-files__button(v-if="isContactsPickerForMany")
           Button(:value="'Deliver'" @clicked="deliverForMany")
@@ -124,6 +130,7 @@
 
 <script>
 import DataTable from "../DataTable";
+import CKEditor from "ckeditor4-vue";
 import Add from "../Add";
 import Button from "../Button";
 import FilesUpload from "./tasks-n-steps/tasksFiles/FilesUpload"
@@ -132,9 +139,11 @@ import SelectMulti from "../SelectMulti";
 import DeliveryTwo from "./tasks-n-steps/DeliveryTwo";
 import ApproveModal from "../ApproveModal";
 import CheckBox from "@/components/CheckBox";
-import SelectSingle from "../SelectSingle"
+import SelectSingle from "../SelectSingle";
+import editorConfig from "../../mixins/editorConfig";
 
 export default {
+  mixins: [ editorConfig ],
   data() {
     return {
       fields: [
@@ -158,7 +167,9 @@ export default {
       isContactsPickerForMany: false,
       isContactsPickerForOne: false,
       selectedContacts: [],
-      selectedRow: null
+      selectedRow: null,
+      isComment: false,
+      comment: '',
     }
   },
   mounted(){
@@ -171,6 +182,9 @@ export default {
       approveDeliver: "approveDeliver",
       approveDeliverMany: "approveDeliverMany"
     }),
+    toggleCommentEmail() {
+      this.isComment = !this.isComment
+    },
     closeContactsModal(){
       this.isContactsPickerForMany = this.isContactsPickerForOne = false
     },
@@ -187,7 +201,8 @@ export default {
         projectId: this.currentProject._id,
         entitiesForDeliver,
         user: this.user,
-        contacts: this.listOfContactsForDeliver()
+        contacts: this.listOfContactsForDeliver(),
+        comment: this.comment,
       })
       this.closeContactsModal()
       this.setDefaultContact()
@@ -200,7 +215,8 @@ export default {
         entityId: this.selectedRow._id,
         type: this.selectedRow.type,
         user: this.user,
-        contacts: this.listOfContactsForDeliver()
+        contacts: this.listOfContactsForDeliver(),
+        comment: this.comment,
       })
       this.closeContactsModal()
       this.setDefaultContact()
@@ -483,7 +499,8 @@ export default {
     Button,
     FilesUpload,
     CheckBox,
-    SelectSingle
+    SelectSingle,
+    ckeditor: CKEditor.component
   }
 }
 </script>
@@ -723,6 +740,24 @@ export default {
     &:hover {
       opacity: 1
     }
+  }
+
+  &__email-comment {
+    position: relative;
+    margin: 20px 0;
+  }
+
+  &__email-checkbox {
+    display: flex;
+    font-size: 14px;
+    justify-content: center;
+    margin-bottom: 10px;
+
+    & span {
+      padding-left: 5px;
+
+    }
+
   }
 }
 

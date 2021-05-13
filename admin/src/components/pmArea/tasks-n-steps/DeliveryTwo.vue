@@ -93,6 +93,16 @@
           :isReadyForDelivery="isReadyForDelivery"
           @toggleOption="toggleOption"
         )
+
+        .review__email-comment(v-if="(isDeliver || isNotify) && allChecked")
+          .review__email-checkbox
+            CheckBox(:isChecked="isComment" @check="toggleCommentEmail"  @uncheck="toggleCommentEmail")
+            span Do you want to external comment? &nbsp;&nbsp;
+          .review__notes(v-if="isComment")
+            ckeditor(v-model="comment" :config="editorConfig")
+            //.notes__button-email(v-if="canAddDR2Manager" @click="sendComment") Save &nbsp;
+              i.fa.fa-paper-plane(aria-hidden='true')
+
         .review__contacts(v-if="(isDeliver || isNotify) && allChecked") Contacts:
           SelectMulti(
             :options="contactsNames"
@@ -128,6 +138,7 @@
   import Button from "../../Button";
   import RollbackModal from "../review/RollbackModal";
   import SelectMulti from "../../SelectMulti";
+  import CheckBox from "../../CheckBox";
 
 	export default {
 		mixins: [ editorConfig ],
@@ -152,6 +163,8 @@
 				rollbackManager: null,
         taskIdRollback: null,
         selectedContacts: [],
+        comment: "",
+        isComment: false,
         // contacts: [],
 				// isAssign: true,
 				// isDr1: true,
@@ -194,6 +207,9 @@
 			// 		this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
 			// 	}
 			// },
+      toggleCommentEmail() {
+        this.isComment = !this.isComment
+      },
 			async sendComment() {
 				try {
 					const updatedProject = await this.$http.post('/delivery/delivery-comments-dr2', {
@@ -323,11 +339,11 @@
             this.$emit("close")
             break
           case this.isDeliver:
-            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts: this.listOfContactsForDeliver() })
+            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts: this.listOfContactsForDeliver(), comment: this.comment })
             this.$emit("close")
             break
           case this.isNotify:
-            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.listOfContactsForDeliver() })
+            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.listOfContactsForDeliver(), comment: this.comment })
             this.$emit("close")
             break
         }
@@ -440,6 +456,7 @@
 
 		},
     components: {
+      CheckBox,
       SelectMulti,
       RollbackModal,
       Button,
@@ -512,6 +529,23 @@
       padding-bottom: 4px;
     }
 
+    &__email-comment {
+      position: relative;
+      margin: 20px 0;
+    }
+
+    &__email-checkbox {
+      display: flex;
+      font-size: 14px;
+      justify-content: center;
+      margin-bottom: 10px;
+
+      & span {
+        padding-left: 5px;
+
+      }
+
+    }
 
     &__title {
       font-size: 21px;
@@ -633,7 +667,6 @@
       position: relative;
       width: 191px;
       height: 50px;
-      margin-top: 20px;
     }
     &__group {
       display: flex;
@@ -667,6 +700,33 @@
       position: absolute;
       left: 86%;
       bottom: 45px;
+      width: 100px;
+      height: 30px;
+      border-radius: 7px;
+      font-size: 14px;
+      background-color: #fff;
+      color: #938676;
+      outline: none;
+      border: none;
+      transition: 0.2s ease-out;
+      text-align: center;
+      line-height: 30px;
+      letter-spacing: 0.2px;
+      border: 2px solid #938676;
+
+      &:active {
+        transform: scale(.98);
+      }
+
+      &:hover {
+        cursor: pointer;
+        background: #f2efeb;
+      }
+    }
+    &__button-email {
+      position: absolute;
+      right: 3%;
+      bottom: 48px;
       width: 100px;
       height: 30px;
       border-radius: 7px;
