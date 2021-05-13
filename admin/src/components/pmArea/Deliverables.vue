@@ -113,7 +113,13 @@
       .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
       .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
-      .deliverables-table__data(slot="status" slot-scope="{ row }") {{ row.status }}
+      .deliverables-table__data(slot="status" slot-scope="{ row }")
+        .deliverables-table__data-status
+          .tooltip(v-if="row.status === 'Delivered'")
+            span#myTooltip2.tooltiptext-left(v-html="getDeliveryTimeAndPerson(row)")
+            i.far.fa-clock
+
+          span {{ row.status }}
 
       .deliverables-table__data(slot="action" slot-scope="{ row, index }")
 
@@ -141,6 +147,7 @@ import ApproveModal from "../ApproveModal";
 import CheckBox from "@/components/CheckBox";
 import SelectSingle from "../SelectSingle";
 import editorConfig from "../../mixins/editorConfig";
+import moment from "moment";
 
 export default {
   mixins: [ editorConfig ],
@@ -182,6 +189,14 @@ export default {
       approveDeliver: "approveDeliver",
       approveDeliverMany: "approveDeliverMany"
     }),
+    getDeliveryTimeAndPerson(row) {
+      const {deliveredAt, deliveredBy} = this.currentProject.tasksDeliverables.find(({deliverablesId}) => deliverablesId === row._id)
+      const time = moment(deliveredAt).format('DD-MM-YYYY, HH:mm')
+      const { firstName, lastName } = this.users.find(({_id}) => _id.toString() === deliveredBy.toString())
+
+      return `At: ${time} <br> By: ${firstName} ${lastName}`
+
+    },
     toggleCommentEmail() {
       this.isComment = !this.isComment
     },
@@ -607,6 +622,10 @@ export default {
     display: flex;
     flex-direction: column;
 
+    &__data-status {
+      display: flex;
+    }
+
 
     &__approveModal {
       position: absolute;
@@ -760,6 +779,51 @@ export default {
 
   }
 }
+
+.tooltip {
+  position: relative;
+  display: flex;
+  font-size: 16px;
+  margin-right: 5px;
+  cursor: help;
+
+  .tooltiptext-left {
+    font-size: 14px;
+    visibility: hidden;
+    width: 220px;
+    background-color: #67573e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    left: 38px;
+    opacity: 0;
+    top: -5px;
+    transition: opacity .3s;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 0;
+      margin-left: -10px;
+      transform: rotate(90deg);
+      border-width: 5px;
+      border-style: solid;
+      border-color: #67573e transparent transparent;
+    }
+  }
+
+  &:hover {
+    .tooltiptext-left {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+
 
 .tasks-files {
   &__item {
