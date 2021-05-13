@@ -61,24 +61,19 @@ async function changeManagerDR2({ project, prevManager, manager, type, file, ent
 
 async function changeManager({ taskId, prevManager, manager, prop, isAdmin, status, project}) {
   const DRNumber = prop === "dr1Manager" ? '1' : '2';
-  const messageToPrev = managerDr1Reassign({taskId, project, prevManager, manager}, DRNumber);
-  const messageToNew = managerDr1Assigned({taskId, project, manager}, DRNumber);
-
+  const messageToPrev = managerDr1Reassign({ taskId, project, prevManager, manager }, DRNumber);
+  const messageToNew = managerDr1Assigned({ taskId, project, manager }, DRNumber);
   try {
     const updatedProject = await getProjectAfterUpdate({"_id": project._id, "tasksDR1.taskId": taskId}, { $set: {[`tasksDR1.$.${prop}`]: manager} })
-
     const isDr1 = prop === "dr1Manager";
     const isDr2 = status === "dr2" && prop === "dr2Manager";
     if(isAdmin && (isDr1 || isDr2)) {
-      await managerNotifyMail(returnObj(prevManager), messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
-      await managerNotifyMail(returnObj(manager), messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
+      await managerNotifyMail(prevManager, messageToPrev, `DR${DRNumber} has been reassigned: ${taskId} (I009.0)`);
+      await managerNotifyMail(manager, messageToNew, `The DR${DRNumber} has been assigned to you: ${taskId} (I009.1)`);
     }
     return updatedProject
   } catch(err) {
     console.log(err, 'on changeManager')
-  }
-  function returnObj(){
-    return Array.isArray(prevManager) ? prevManager[0] : prevManager
   }
 }
 
@@ -86,13 +81,13 @@ const taskApproveDeliverMany= async ({ projectId, entitiesForDeliver, user, cont
   return await sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts })
 }
 
-const taskApproveDeliver= async ({ projectId, type, entityId, user, contacts }) => {
-  return await sendClientDeliveries({ projectId, type, entityId, user, contacts })
+const taskApproveDeliver= async ({ projectId, type, entityId, user, contacts, comment }) => {
+  return await sendClientDeliveries({ projectId, type, entityId, user, contacts, comment })
 }
 
 const taskApproveNotify = async ({ projectId, type, entityId, contacts }) => {
   const project = await getProject({ '_id': projectId })
-  await notifyClientDeliverablesReady({ project, contacts });
+  await notifyClientDeliverablesReady({ project, contacts, type, entityId });
   return await taskApproveReady({ projectId, type, entityId })
 }
 

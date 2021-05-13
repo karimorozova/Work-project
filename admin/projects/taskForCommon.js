@@ -17,10 +17,13 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
   try {
     const { customer: { _id: customer }, _id, industry, discounts, finance, projectId, minimumCharge } = project;
     let steps = [];
-    let tasksWithoutFinance = await getTasksForCustomUnits({
+    let tasksWithoutFinanceOriginal = await getTasksForCustomUnits({
       ...allInfo,
       projectId,
     });
+
+    let tasksWithoutFinance = JSON.parse(JSON.stringify(tasksWithoutFinanceOriginal))
+
     if (stepsAndUnits.length === 2) {
       steps = await getStepsForDuoUnits(
         { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts });
@@ -29,7 +32,8 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
         { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts });
     }
     steps = checkIsSameVendor(steps);
-    const tasks = tasksWithoutFinance.map(item =>
+
+    const tasks = tasksWithoutFinanceOriginal.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
     const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);

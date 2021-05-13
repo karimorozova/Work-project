@@ -7,6 +7,7 @@ const {
 // const {changeManager} = require("../../delivery");
 
 const {storeFiles} = require("../../projects/files");
+const { rollbackDR1Template } = require("../../emailMessages/internalCommunication")
 
 const {
   addDR2,
@@ -24,6 +25,9 @@ const {
   changeManagerDR2,
   changeManager,
 } = require("../../projects")
+
+const { managerNotifyMail } = require("../../utils")
+
 
 const {
   Projects
@@ -49,7 +53,7 @@ router.post('/rollback-review', async (req, res) => {
       { arrayFilters: [ { 'i.taskId': taskId }]}
     )
 
-    const message = `Delivery review of the task ${ taskId } is assigned to you.`
+    const message = rollbackDR1Template(taskId, projectId)
     await managerNotifyMail(manager, message, 'Task delivery review assignment notification (I016)')
 
     const updatedProject = await getProject({"_id": projectId})
@@ -373,9 +377,9 @@ router.post('/tasks-approve-notify', async (req, res) => {
 })
 
 router.post('/tasks-approve-deliver', async (req, res) => {
-  const { projectId, type, entityId, user, contacts } = req.body
+  const { projectId, type, entityId, user, contacts, comment } = req.body
   try {
-    const updatedProject = await taskApproveDeliver({ projectId, type, entityId, user, contacts })
+    const updatedProject = await taskApproveDeliver({ projectId, type, entityId, user, contacts, comment })
     res.send(updatedProject)
   } catch (err) {
     console.log(err)
@@ -446,7 +450,7 @@ router.post('/change-manager', async (req, res) => {
   const { projectId, taskId, manager, prop, isAdmin, status } = req.body
   try {
     const project = await getProject({ '_id': projectId })
-    const prevManager = await User.find( { "_id": project.tasksDR1.find(item => item.taskId === taskId)[prop] } ).populate('group')
+    const prevManager = await User.findOne( { "_id": project.tasksDR1.find(item => item.taskId === taskId)[prop] } ).populate('group')
     const updatedProject = await changeManager({ taskId, manager, prevManager, prop, isAdmin, status, project })
     res.send(updatedProject)
   } catch (err) {

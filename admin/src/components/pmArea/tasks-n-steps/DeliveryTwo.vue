@@ -94,7 +94,7 @@
           @toggleOption="toggleOption"
         )
 
-        .review__email-comment(v-if="(isDeliver || isNotify) && allChecked")
+        .review__email-comment(v-if="(isDeliver) && allChecked")
           .review__email-checkbox
             CheckBox(:isChecked="isComment" @check="toggleCommentEmail"  @uncheck="toggleCommentEmail")
             span Do you want to external comment? &nbsp;&nbsp;
@@ -343,7 +343,7 @@
             this.$emit("close")
             break
           case this.isNotify:
-            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.listOfContactsForDeliver(), comment: this.comment })
+            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.listOfContactsForDeliver() })
             this.$emit("close")
             break
         }
@@ -531,7 +531,7 @@
 
     &__email-comment {
       position: relative;
-      margin: 20px 0;
+      margin-top: 20px;
     }
 
     &__email-checkbox {
@@ -667,6 +667,7 @@
       position: relative;
       width: 191px;
       height: 50px;
+      margin-top: 20px;
     }
     &__group {
       display: flex;

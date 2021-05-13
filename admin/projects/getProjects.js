@@ -57,11 +57,18 @@ async function getFilteredProjects(filters) {
       }
     },
     {
-      $unset: [
-        "billingDate", "brief", "clientContacts", "clientProjectNumber",
-        "crossRate", "dateFormatted", "discounts", "genBrief", "industry"
-      ]
+      $project: {
+        billingDate: 0,
+        "customer.aliases": 0,
+        "customer.billingInfo": 0
+      }
     },
+    // {
+    //   $unset: [
+    //     "billingDate", "brief", "clientContacts", "clientProjectNumber",
+    //     "crossRate", "dateFormatted", "discounts", "genBrief", "industry"
+    //   ]
+    // },
     {
       $match: {
         ...query

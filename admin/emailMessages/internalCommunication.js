@@ -343,18 +343,33 @@ function readyForDr2Message(obj, user) {
             </div>`;
 }
 
-//Template for DR has been reassigned
-function managerDr1Reassign(obj, DRNumber) {
-	const lastNamePrevManager = obj.prevManager.lastName || "";
-	const lastNameNextManager = obj.manager.lastName || "";
+function rollbackDR1Template(taskId, projectId){
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.prevManager.firstName } ${ lastNamePrevManager }</span></p>
                     <p style="font-width: 400;">
-                        The Delivery Review ${DRNumber} for ${ obj.taskId } from project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> has been reassigned to ${ obj.manager.firstName } ${ lastNameNextManager }.
+                    	Delivery review of the task <a href="https://admin.pangea.global/project-details/${projectId}" target="_blank" style="color: #D15F45"> ${ taskId }</a> is assigned to you.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+//Template for DR has been reassigned
+function managerDr1Reassign(obj, DRNumber) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.prevManager.firstName } ${  obj.prevManager.lastName || "" }</span></p>
+                    <p style="font-width: 400;">
+                        The Delivery Review ${DRNumber} for ${ obj.taskId } from project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> has been reassigned to ${ obj.manager.firstName } ${ obj.manager.lastName || "" }.
                     </p>
                 </div>
                 <footer>
@@ -404,5 +419,5 @@ module.exports = {
 	readyForDr2Message,
 	managerDr1Reassign,
 	managerDr1Assigned,
-
+	rollbackDR1Template
 };

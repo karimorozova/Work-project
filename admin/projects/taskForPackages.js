@@ -14,7 +14,9 @@ async function createTasksWithPackagesUnit (allInfo) {
   const { project, stepsAndUnits, stepsDates } = allInfo;
   try {
     const { customer: { _id: customer }, _id, industry, discounts, projectId, finance, minimumCharge } = project;
-    const tasksWithoutFinance = await getTasksForCustomUnits({ ...allInfo, projectId });
+    const tasksWithoutFinanceOriginal = await getTasksForCustomUnits({ ...allInfo, projectId });
+
+    let tasksWithoutFinance = JSON.parse(JSON.stringify(tasksWithoutFinanceOriginal))
     let steps = stepsAndUnits.length === 2 ? await getStepsForDuoUnits({
         tasks: tasksWithoutFinance,
         customer,
@@ -33,7 +35,8 @@ async function createTasksWithPackagesUnit (allInfo) {
         projectId: _id,
       });
     steps = checkIsSameVendor(steps);
-    const tasks = tasksWithoutFinance.map(item =>
+
+    const tasks = tasksWithoutFinanceOriginal.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
     const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);

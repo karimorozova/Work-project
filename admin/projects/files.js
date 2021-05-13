@@ -106,10 +106,10 @@ const createArchiveForDeliverableItem = async ({type, projectId, entityId, user,
         const qEntityTime = `tasksDR2.${entity}.$[i].timestamp`
         await Projects.updateOne(
             { ...qProject, [qEntity]: entityId },
-          {
-                      [qEntityStatus]: 'Delivered',
-                      [qEntityTime]: new Date(),
-                 },
+            {
+                [qEntityStatus]: 'Delivered',
+                [qEntityTime]: new Date()
+            },
             { arrayFilters: [ { 'i._id': entityId }] }
         )
     }
