@@ -772,7 +772,6 @@
   }
 
   .client-info {
-    width: 1000px;
     position: relative;
     &__layout {
       display: flex;
