@@ -36,7 +36,7 @@
     margin-right: 40px;
 
     &__title {
-      font-size: 22px;
+      font-size: 21px;
       border-bottom: 1px solid #c5bfb5;
       padding-bottom: 5px;
     }

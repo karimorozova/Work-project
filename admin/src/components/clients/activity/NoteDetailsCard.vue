@@ -206,7 +206,7 @@
 
     &__check {
       height: 22px;
-      font-size: 22px;
+      font-size: 21px;
       width: 22px;
       margin-right: 10px;
       color: rgba(0, 0, 0, .6);
@@ -220,7 +220,7 @@
     }
     &__checkDone {
       height: 22px;
-      font-size: 22px;
+      font-size: 21px;
       width: 22px;
       margin-right: 10px;
       color: #4ba5a5;
@@ -228,7 +228,7 @@
     }
 
     &__title {
-      font-size: 22px;
+      font-size: 21px;
     }
 
     &__date {

@@ -29,7 +29,7 @@ export default {
   padding: 20px;
 
   &__title {
-    font-size: 22px;
+    font-size: 21px;
     border-bottom: 1px solid #c5bfb5;
     padding-bottom: 5px;
   }
@@ -47,7 +47,7 @@ export default {
     height: 28px;
 
     i {
-      font-size: 22px;
+      font-size: 21px;
       cursor: pointer;
     }
     

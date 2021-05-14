@@ -711,7 +711,7 @@
   }
 
   .title {
-    font-size: 22px;
+    font-size: 21px;
     padding: 30px 0 10px;
   }
 
