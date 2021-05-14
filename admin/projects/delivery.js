@@ -77,8 +77,8 @@ async function changeManager({ taskId, prevManager, manager, prop, isAdmin, stat
   }
 }
 
-const taskApproveDeliverMany= async ({ projectId, entitiesForDeliver, user, contacts }) => {
-  return await sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts })
+const taskApproveDeliverMany= async ({ projectId, entitiesForDeliver, user, contacts, comment }) => {
+  return await sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts, comment })
 }
 
 const taskApproveDeliver= async ({ projectId, type, entityId, user, contacts, comment }) => {

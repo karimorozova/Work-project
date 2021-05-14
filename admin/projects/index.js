@@ -19,7 +19,8 @@ const {
   stepCancelNotifyVendor, getMessage, taskCompleteNotifyPM,
   notifyManagerStepStarted, notifyStepDecisionMade,
   notifyDeliverablesDownloaded,
-  notifyProjectDelivery, stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
+  // notifyProjectDelivery,
+  stepCompletedNotifyPM, notifyReadyForDr2, notifyStepReopened,
   notifyVendorStepStart, sendQuotes, sendQuoteMessage, sendCostQuoteMessage,
   sendClientManyDeliveries
 } = require('./emails');
@@ -86,7 +87,7 @@ module.exports = {
   createTasksFromRequest,
   createTasksForWordcount,
   downloadCompletedFiles,
-  notifyProjectDelivery,
+  // notifyProjectDelivery,
   notifyManagerStepStarted,
   stepCompletedNotifyPM,
   notifyStepDecisionMade,

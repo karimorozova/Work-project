@@ -355,9 +355,9 @@ router.post('/remove-dr-file', async (req, res) => {
 })
 
 router.post('/tasks-approve-deliver-many', async (req, res) => {
-  const { projectId, entitiesForDeliver, user, contacts } = req.body
+  const { projectId, entitiesForDeliver, user, contacts, comment } = req.body
   try {
-    const updatedProject = await taskApproveDeliverMany({ projectId, entitiesForDeliver, user, contacts })
+    const updatedProject = await taskApproveDeliverMany({ projectId, entitiesForDeliver, user, contacts, comment })
     res.send(updatedProject)
   } catch (err) {
     console.log(err)

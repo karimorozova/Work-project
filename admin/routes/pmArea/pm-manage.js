@@ -46,7 +46,7 @@ const {
 	updateProjectProgress,
 	updateNonWordsTaskTargetFiles,
 	storeFiles,
-	notifyProjectDelivery,
+	// notifyProjectDelivery,
 	notifyReadyForDr2,
 	notifyStepReopened,
 	getPdf,

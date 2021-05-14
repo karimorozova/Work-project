@@ -3,6 +3,7 @@ const {
 	managerNotifyMail,
 	clientQuoteToEmails
 } = require('../utils/mailTemplate')
+
 const {
 	managerTaskCompleteNotificationMessage,
 	deliverablesDownloadedMessage,
@@ -11,6 +12,7 @@ const {
 	stepDecisionMessage,
 	readyForDr2Message
 } = require("../emailMessages/internalCommunication")
+
 const {
 	messageForClientSendQuote,
 	emailMessageForContact,
@@ -18,23 +20,28 @@ const {
 	getDeliveryMessage,
 	messageForClientSendCostQuote,
 	notifyAssignmentIsReady,
-	notifyMultilingualIsReady
+	notifyMultilingualIsReady,
+	projectDeliveryMessage
 } = require('../emailMessages/clientCommunication')
+
 const {
 	stepCancelledMessage,
 	stepMiddleCancelledMessage,
 	stepReopenedMessage,
 	stepReadyToStartMessage
 } = require('../emailMessages/vendorCommunication')
+
 const { getProject } = require("./getProjects")
 const { getService } = require("../services/getServices")
 const { User, Units, Step, Languages, Services, Projects } = require("../models")
+
 const {
 	getDeliverablesLink,
   createArchiveForDeliverableItem,
   getProjectDeliverables,
 	getPdf
 } = require("./files")
+
 const { flatten } = require('lodash')
 const fs = require('fs')
 
@@ -293,29 +300,38 @@ async function notifyClientDeliverablesReady({ project, contacts, type, entityId
 	}
 }
 
-  async function sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts }) {
-    // contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
+  async function sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts, comment }) {
+    contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
     let updatedProject = await getProject({ "_id": projectId })
+	  const allLanguages = await Languages.find()
 
     for ( const { entityId, type } of entitiesForDeliver) {
       updatedProject = await createArchiveForDeliverableItem({type, entityId, projectId, user, tasksDR2: updatedProject.tasksDR2, tasksDeliverables: updatedProject.tasksDeliverables })
     }
 
-    let archiveNumber = 0
     let attachmentsPaths = []
-    for ( const { entityId } of entitiesForDeliver) {
-      archiveNumber++
+    for ( const { entityId, type } of entitiesForDeliver) {
+    	let slug = ''
+    	if(type === 'single'){
+    		const { sourceLanguage, targetLanguage }  = updatedProject.tasksDR2.singleLang.find(({_id}) => `${_id}` === `${entityId}`)
+		    const { lang: source } = allLanguages.find(({_id}) => `${_id}` === `${sourceLanguage}`)
+		    const { lang: target } = allLanguages.find(({_id}) => `${_id}` === `${targetLanguage}`)
+		    slug = source === target ? target : `${source} >> ${target}`
+	    }
+    	if(type === 'multi'){
+		    slug = 'Multilingual'
+	    }
       const { path } = updatedProject.tasksDeliverables.find(({ deliverablesId }) => `${ deliverablesId }` === `${entityId}` )
-      const filename = `${archiveNumber}-deliverables.zip`
+      const filename = `${slug}-deliverables.zip`
       attachmentsPaths.push({ filename, path })
     }
 
     const accManager = await User.findOne({ "_id": updatedProject.accountManager.id })
-    const subject = `Delivery in dev (ID C006.1)`
+    const subject = `Delivery ${updatedProject.projectId} - ${updatedProject.projectName} (ID C006.0)`
     for await (let contact of contacts) {
       const finalAttachments = attachmentsPaths.map(item => ({ filename: item.filename, path: `./dist${ item.path }` }))
 
-      const message = getDeliveryMessage({ task: '??', contact, accManager, ...updatedProject, id: updatedProject._id })
+      const message = projectDeliveryMessage({comment, contact, accManager, projectId: updatedProject.projectId, projectName: updatedProject.projectName, id: updatedProject._id })
       await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
     }
 
@@ -323,7 +339,7 @@ async function notifyClientDeliverablesReady({ project, contacts, type, entityId
   }
 
   async function sendClientDeliveries({ projectId, type, entityId, user, contacts, comment }) {
-	// contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
+		contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
 	  const allLanguages = await Languages.find()
 
 	  try {
@@ -344,14 +360,14 @@ async function notifyClientDeliverablesReady({ project, contacts, type, entityId
 			const langPair = source === target ? target : `${source} >> ${target}`
 			for await (let contact of contacts) {
 				const finalAttachments = attachments.map(item => ({ filename: `${langPair}-${item.filename}`, path: `./dist${ path }` }))
-				const message = getDeliveryMessage({comment, langPair, contact, accManager, ...updatedProject, id: updatedProject._id })
+				const message = getDeliveryMessage({comment, langPair, contact, accManager, projectId: updatedProject.projectId, projectName: updatedProject.projectName, id: updatedProject._id })
 				await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
 			}
 		}
 		if(type === 'multi'){
 			for await (let contact of contacts) {
 				const finalAttachments = attachments.map(item => ({ filename: `Multilingual-${item.filename}`, path: `./dist${ path }` }))
-				const message = getDeliveryMessage({comment, langPair: 'Multilingual', contact, accManager, ...updatedProject, id: updatedProject._id })
+				const message = getDeliveryMessage({comment, langPair: 'Multilingual', contact, accManager, projectId: updatedProject.projectId, projectName: updatedProject.projectName, id: updatedProject._id })
 				await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
 			}
 		}
@@ -375,7 +391,7 @@ async function notifyDeliverablesDownloaded(taskId, project, user) {
 	}
 }
 
-async function notifyProjectDelivery(project, template) {
+// async function notifyProjectDelivery(project, template) {
 	// const notifyContacts = project.clientContacts.map(({ email }) => email)
 	// const message = template
 	// const subject = `Delivery: ${ project.projectId } - ${ project.projectName } (ID C006.0)`
@@ -397,7 +413,7 @@ async function notifyProjectDelivery(project, template) {
 	// 	const name = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear Account Managers</span></p>`
 	// 	return message.replace(`<div id="client-name-row">&nbsp;</div>`, name)
 	// }
-}
+// }
 
 async function notifyManagerStepStarted(project, step) {
 	const { projectManager, accManager } = await getAMPMbyProject(project)
@@ -481,7 +497,7 @@ module.exports = {
   notifyClientDeliverablesReady,
 	sendClientDeliveries,
 	notifyDeliverablesDownloaded,
-	notifyProjectDelivery,
+	// notifyProjectDelivery,
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	notifyStepDecisionMade,

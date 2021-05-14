@@ -1,137 +1,139 @@
 <template lang="pug">
-  .deliverables
-    .deliverables__approveModal(v-if="isDeleteModal")
-      ApproveModal(
-        text="Are you sure?"
-        approveValue="Yes"
-        notApproveValue="Cancel"
-        @approve="deleteDR2"
-        @notApprove="closeDeleteModal"
-        @close="closeDeleteModal"
-      )
+  .body
+    .content
+      .content__DR2(v-if="isDR2Modal")
+        DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
 
-    .deliverables__DR2(v-if="isDR2Modal")
-      DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
+    .deliverables
+      .deliverables__approveModal(v-if="isDeleteModal")
+        ApproveModal(
+          text="Are you sure?"
+          approveValue="Yes"
+          notApproveValue="Cancel"
+          @approve="deleteDR2"
+          @notApprove="closeDeleteModal"
+          @close="closeDeleteModal"
+        )
 
-    .deliverables__modal(v-if="isContactsPickerForMany || isContactsPickerForOne")
-      .deliverables__titleModal Delivery for Contacts
-      span.deliverables__close-modal(@click="closeContactsModal()") &#215;
-      .deliverables__body
-        .deliverables__itemsContacts
-          .deliverables__items2
-            .deliverables__selectTitle Choose client contacts:
-            .deliverables__select
-              SelectMulti(
-                placeholder="Select"
-                :options="contactsNames"
-                :selectedOptions="selectedContacts"
-                @chooseOptions="setContacts"
-              )
-        .deliverables__email-comment
-          .deliverables__email-checkbox
-            CheckBox(:isChecked="isComment" @check="toggleCommentEmail"  @uncheck="toggleCommentEmail")
-            span Do you want to external comment? &nbsp;&nbsp;
-          .deliverables__notes(v-if="isComment")
-            ckeditor(v-model="comment" :config="editorConfig")
-
-        .tasks-files__button(v-if="isContactsPickerForMany")
-          Button(:value="'Deliver'" @clicked="deliverForMany")
-        .tasks-files__button(v-if="isContactsPickerForOne")
-          Button(:value="'Deliver'" @clicked="deliverForOne")
-        .tasks-files__tooltip One project client contact is selected by default
-
-    .deliverables__modal(v-if="deliverablesModal")
-      .deliverables__titleModal Upload Deliverables
-      span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
-      .deliverables__body
-        .deliverables_items
-          .deliverables__items
-            .deliverables__item
-              .deliverables__uploadItem
-                .deliverables__selectTitle Upload File:
-                .tasks-files__upload-file
-                  FilesUpload(
-                    :isMulti="false"
-                    buttonValue="Upload deliverables"
-                    inputClass="files-upload__multiLang"
-                    :files="refFiles"
-                    @uploadFiles="uploadRefFiles"
-                    @deleteFile="deleteFile()"
-                  )
-
-            div
-              .deliverables__selectTitle Assign to task:
+      .deliverables__modal(v-if="isContactsPickerForMany || isContactsPickerForOne")
+        .deliverables__titleModal Delivery for Contacts
+        span.deliverables__close-modal(@click="closeContactsModal()") &#215;
+        .deliverables__body
+          .deliverables__itemsContacts
+            .deliverables__items2
+              .deliverables__selectTitle Choose client contacts:
               .deliverables__select
                 SelectMulti(
                   placeholder="Select"
-                  :options="selectTaskInfo"
-                  :selectedOptions="selectedTasks"
-                  @chooseOptions="selectedTasksMethod"
+                  :options="contactsNames"
+                  :selectedOptions="selectedContacts"
+                  @chooseOptions="setContacts"
                 )
+          .deliverables__email-comment
+            .deliverables__email-checkbox
+              CheckBox(:isChecked="isComment" @check="toggleCommentEmail"  @uncheck="toggleCommentEmail")
+              span Do you want to external comment? &nbsp;&nbsp;
+            .deliverables__notes(v-if="isComment")
+              ckeditor(v-model="comment" :config="editorConfig")
 
-        .tasks-files__fileItem
-          .deliverable__wrapper
-            .file-list__items(v-for="(file) in refFiles")
-              .file-list__item
-                .file-list__name {{file.name}}
-                span.file-list__delete(@click="deleteFile()") &#x2715
-        .tasks-files__button
-          Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
-        .tasks-files__tooltip File can be <= 50Mb (otherwise it will not be loaded)
+          .tasks-files__button(v-if="isContactsPickerForMany")
+            Button(:value="'Deliver'" @clicked="deliverForMany")
+          .tasks-files__button(v-if="isContactsPickerForOne")
+            Button(:value="'Deliver'" @clicked="deliverForOne")
+          .tasks-files__tooltip One project client contact is selected by default
 
+      .deliverables__modal(v-if="deliverablesModal")
+        .deliverables__titleModal Upload Deliverables
+        span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
+        .deliverables__body
+          .deliverables_items
+            .deliverables__items
+              .deliverables__item
+                .deliverables__uploadItem
+                  .deliverables__selectTitle Upload File:
+                  .tasks-files__upload-file
+                    FilesUpload(
+                      :isMulti="false"
+                      buttonValue="Upload deliverables"
+                      inputClass="files-upload__multiLang"
+                      :files="refFiles"
+                      @uploadFiles="uploadRefFiles"
+                      @deleteFile="deleteFile()"
+                    )
 
-    .deliverables__header
-      .deliverables__title Deliverables
-      .deliverablesActions
-        .deliverablesActions__title Deliverables Action:
-        .deliverablesActions__drop-menu
-          SelectSingle(
-            :selectedOption="selectedAction"
-            :options="availableActionsOptions"
-            placeholder="Select Action"
-            @chooseOption="setAction"
-          )
+              div
+                .deliverables__selectTitle Assign to task:
+                .deliverables__select
+                  SelectMulti(
+                    placeholder="Select"
+                    :options="selectTaskInfo"
+                    :selectedOptions="selectedTasks"
+                    @chooseOptions="selectedTasksMethod"
+                  )
 
-    .deliverables-table
-    DataTable(
-      :fields="fields"
-      :tableData="deliverables"
-      :bodyClass="['review-body', {'tbody_visible-overflow': deliverables.length < 6}]"
-      :tableheadRowClass="deliverables.length < 6 ? 'tbody_visible-overflow' : ''"
-      :headCellClass="'padding-with-check-box'"
-    )
-      .deliverables-table__header(slot="headerCheck" slot-scope="{ field }") {{ field.label }}
-        CheckBox(:isChecked="!!isAllChecked" :isWhite="true" @check="()=>toggleAll(true)" @uncheck="()=>toggleAll(false)" customClass="tasks-n-steps")
-      .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
-      .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
-      .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
-      .deliverables-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
-      .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
-
-      .deliverables-table__data(slot="check" slot-scope="{ index, row }")
-        CheckBox(:isChecked="!!row.isChecked" @check="()=> toggle(row, true)" @uncheck="()=>toggle(row, false)" customClass="tasks-n-steps")
-      .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
-      .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
-      .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
-      .deliverables-table__data(slot="status" slot-scope="{ row }")
-        .deliverables-table__data-status
-          .tooltip(v-if="row.status === 'Delivered'")
-            span#myTooltip2.tooltiptext-left(v-html="getDeliveryTimeAndPerson(row)")
-            i.far.fa-clock
-
-          span {{ row.status }}
-
-      .deliverables-table__data(slot="action" slot-scope="{ row, index }")
-
-        .deliverables-table__icons(v-if="row.status === 'Ready for Delivery' && canUpdateDr2")
-          .deliverables-table__icon(@click="openContactsModalOne(row)")
-            i.fas.fa-truck-loading
-
-        .deliverables-table__icons(v-if="row.status !== 'Ready for Delivery'")
-          img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
+          .tasks-files__fileItem
+            .deliverable__wrapper
+              .file-list__items(v-for="(file) in refFiles")
+                .file-list__item
+                  .file-list__name {{file.name}}
+                  span.file-list__delete(@click="deleteFile()") &#x2715
+          .tasks-files__button
+            Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
+          .tasks-files__tooltip File can be <= 50Mb (otherwise it will not be loaded)
 
 
-    Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showModal")
+      .deliverables__header
+        .deliverables__title Deliverables
+        .deliverablesActions
+          .deliverablesActions__title Deliverables Action:
+          .deliverablesActions__drop-menu
+            SelectSingle(
+              :selectedOption="selectedAction"
+              :options="availableActionsOptions"
+              placeholder="Select Action"
+              @chooseOption="setAction"
+            )
+
+      .deliverables-table
+      DataTable(
+        :fields="fields"
+        :tableData="deliverables"
+        :bodyClass="['review-body', {'tbody_visible-overflow': deliverables.length < 6}]"
+        :tableheadRowClass="deliverables.length < 6 ? 'tbody_visible-overflow' : ''"
+        :headCellClass="'padding-with-check-box'"
+      )
+        .deliverables-table__header(slot="headerCheck" slot-scope="{ field }") {{ field.label }}
+          CheckBox(:isChecked="!!isAllChecked" :isWhite="true" @check="()=>toggleAll(true)" @uncheck="()=>toggleAll(false)" customClass="tasks-n-steps")
+        .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
+        .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
+        .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
+        .deliverables-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
+        .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
+
+        .deliverables-table__data(slot="check" slot-scope="{ index, row }")
+          CheckBox(:isChecked="!!row.isChecked" @check="()=> toggle(row, true)" @uncheck="()=>toggle(row, false)" customClass="tasks-n-steps")
+        .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
+        .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
+        .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
+        .deliverables-table__data(slot="status" slot-scope="{ row }")
+          .deliverables-table__data-status
+            .tooltip(v-if="row.status === 'Delivered'")
+              span#myTooltip2.tooltiptext-left(v-html="getDeliveryTimeAndPerson(row)")
+              i.far.fa-clock
+
+            span {{ row.status }}
+
+        .deliverables-table__data(slot="action" slot-scope="{ row, index }")
+
+          .deliverables-table__icons(v-if="row.status === 'Ready for Delivery' && canUpdateDr2")
+            .deliverables-table__icon(@click="openContactsModalOne(row)")
+              i.fas.fa-truck-loading
+
+          .deliverables-table__icons(v-if="row.status !== 'Ready for Delivery'")
+            img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
+
+
+      Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showModal")
 </template>
 
 <script>
@@ -223,6 +225,8 @@ export default {
       this.setDefaultContact()
       this.selectedAction = ''
       this.toggleAll(false)
+      this.isComment = false
+      this.comment = ''
     },
     async deliverForOne() {
       await this.approveDeliver({
@@ -236,6 +240,8 @@ export default {
       this.closeContactsModal()
       this.setDefaultContact()
       this.selectedRow = null
+	    this.isComment = false
+	    this.comment = ''
     },
     listOfContactsForDeliver(){
       return this.selectedContacts
@@ -536,6 +542,21 @@ export default {
   }
 
 }
+.content{
+  &__DR2 {
+    position: absolute;
+    top: 538px;
+    left: 40px;
+    bottom: 0;
+    z-index: 50;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: fit-content;
+    padding-bottom: 150px;
+  }
+}
 
 .deliverables {
   box-sizing: border-box;
@@ -544,7 +565,7 @@ export default {
   padding: 20px;
   margin-top: 40px;
   box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-  //position: relative;
+  position: relative;
 
   &__header{
     display: flex;
@@ -580,20 +601,6 @@ export default {
 
   &__item {
     margin-right: 40px;
-  }
-
-  &__DR2 {
-    position: absolute;
-    top: 538px;
-    left: 40px;
-    bottom: 0;
-    z-index: 50;
-    box-sizing: border-box;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    height: fit-content;
-    padding-bottom: 150px;
   }
 
   &__titleModal{

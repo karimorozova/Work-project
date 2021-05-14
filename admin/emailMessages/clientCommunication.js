@@ -701,7 +701,6 @@ function notifyAssignmentIsReady(obj) {
 
 // Return template for Task for Delivery
 function getDeliveryMessage(obj) {
-
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                     <header style="background-color:#66563E;text-align:center;" >
                         <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -784,27 +783,6 @@ function projectMiddleCancelledMessage(obj) {
 
 }
 
-//MM Not used
-// function tasksCancelledMessage(obj) {
-// 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-//                 <header style="background-color:#66563E;text-align:center;" >
-//                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
-//                 </header>
-//                 <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-//                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
-//                         This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
-//                     <h4 class="contact-name">Dear ${ obj.contact.firstName } ${ obj.contact.surname }</h4>
-//                     <p>
-//                         The task <strong>${ obj.taskId }</strong> from your project <strong>${ obj.projectId } - ${ obj.projectName }</strong> has been cancelled.
-//                     </p>
-//                 </div>
-//                 <footer>
-//                     <hr size="15" color="#66563E">
-//                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
-//                 </footer>
-//             </div>`;
-// }
-
 function listOfPaymentTasks(obj, taskList, steps) {
 	let tableBody = ""
 	for (let task of taskList) {
@@ -882,18 +860,20 @@ function projectDeliveryMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-right:40px;padding-left:40px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
-                    <div id="client-name-row"></div>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
                     <p style="font-weight: 400;">
-                        I'm pleased to inform you that project: <strong>${ obj.projectId } - ${ obj.projectName }</strong>, has been completed and is ready
-                        for review.
+                    		I'm pleased to inform you the following languages tasks from  project: ${ obj.projectId } - ${ obj.projectName } have been completed and is ready for review.
                     </p>
                     <p style="font-weight: 400;">
                         The files are available for you in our
                         <a href="${ apiUrl }/dashboard/details/${ obj.id }">Portal</a>
                         and attached to this email in a zip format.
                     </p>
+                     <div style="font-weight: 400;">
+                        	${obj.comment}
+											</div>
                     <p style="font-weight: 400;">
-                        In case of any questions, please do not hesitate to contact us
+                        In case of any questions, please do not hesitate to contact us :-)
                     </p>
                 </div>
                 <footer>
