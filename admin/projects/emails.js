@@ -497,7 +497,6 @@ module.exports = {
   notifyClientDeliverablesReady,
 	sendClientDeliveries,
 	notifyDeliverablesDownloaded,
-	// notifyProjectDelivery,
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	notifyStepDecisionMade,
