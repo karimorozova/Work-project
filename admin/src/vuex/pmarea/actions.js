@@ -8,6 +8,8 @@ export const clearTasksData = ({ commit }) => commit('CLEAR_DATA');
 
 export const setMemoqProjectMessage = ({ commit }, payload) => commit('SET_MEMOQ_PROJECT_MESSAGE', payload);
 
+export const setShowTasksAndDeliverables = ({ commit }, payload) => commit('SET_SHOW_TASK_AND_DELIVERABLES', payload);
+
 export const resetFileCounter = ({ commit }) => commit('RESET_FILE_COUNTER');
 
 export const incrementFileCounter = ({ commit }) => commit('INCREMENT_FILE_COUNTER');

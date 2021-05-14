@@ -7,7 +7,12 @@ const {
 // const {changeManager} = require("../../delivery");
 
 const {storeFiles} = require("../../projects/files");
-const { rollbackDR1Template } = require("../../emailMessages/internalCommunication")
+
+const {
+  rollbackDR1Template,
+  severalDr1Assign,
+  severalDr1reAssign
+} = require("../../emailMessages/internalCommunication")
 
 const {
   addDR2,
@@ -28,6 +33,7 @@ const {
 
 const { managerNotifyMail } = require("../../utils")
 
+const _ = require('lodash');
 
 const {
   Projects
@@ -444,8 +450,6 @@ router.post('/multi-file-dr2-remove', async (req, res) => {
   }
 })
 
-//==========================================================================================================
-
 router.post('/change-manager', async (req, res) => {
   const { projectId, taskId, manager, prop, isAdmin, status } = req.body
   try {
@@ -535,6 +539,33 @@ router.post('/remove-reference-files', async (req, res) => {
 router.post('/change-managers', async (req, res) => {
   try {
     const { projectId, checkedTasksId, manager } = req.body
+    const allUsers = await User.find().populate('group')
+    let project = await getProject({ '_id': projectId })
+
+    const message = severalDr1Assign({ manager, project, checkedTasksId })
+    await managerNotifyMail(manager, message, `DR1 has been assigned to you ${project.projectId} (I009.1)`)
+
+    let tasksAndManagersForReassign = []
+    let finalManagerTasks = []
+
+    for(let taskId of checkedTasksId){
+      const { tasksDR1 } = project
+      const { dr1Manager } = tasksDR1.find(item => item.taskId === taskId)
+      tasksAndManagersForReassign.push({taskId, manager: dr1Manager })
+    }
+
+    const managersTasks = _.chain(tasksAndManagersForReassign).groupBy("manager").value()
+    for(let manager in managersTasks){
+      finalManagerTasks.push({
+        manager: allUsers.find(({_id}) => `${_id}` === `${manager}`),
+        checkedTasksId: managersTasks[manager].map(({taskId}) => taskId)
+      })
+    }
+
+    for (let item of finalManagerTasks){
+      const message = severalDr1reAssign({ prevManager: item.manager, manager, project, checkedTasksId: item.checkedTasksId })
+      await managerNotifyMail(item.manager, message, `DR1 has been assigned to you ${project.projectId} (I009.1)`)
+    }
 
     await Projects.updateOne(
       { "_id": projectId, 'tasksDR1.taskId': { $in: checkedTasksId}},

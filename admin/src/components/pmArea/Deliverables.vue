@@ -4,7 +4,7 @@
       .content__DR2(v-if="isDR2Modal")
         DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
 
-    .deliverables
+    .deliverables(:class="{'no-box-shadow': !isShowTasksAndDeliverables}")
       .deliverables__approveModal(v-if="isDeleteModal")
         ApproveModal(
           text="Are you sure?"
@@ -61,7 +61,7 @@
                       @deleteFile="deleteFile()"
                     )
 
-              div
+              div(style="z-index: 50")
                 .deliverables__selectTitle Assign to task:
                 .deliverables__select
                   SelectMulti(
@@ -189,7 +189,8 @@ export default {
       alertToggle: "alertToggle",
       storeProject: "setCurrentProject",
       approveDeliver: "approveDeliver",
-      approveDeliverMany: "approveDeliverMany"
+      approveDeliverMany: "approveDeliverMany",
+	    setShowTasksAndDeliverables: "setShowTasksAndDeliverables"
     }),
     getDeliveryTimeAndPerson(row) {
       const {deliveredAt, deliveredBy} = this.currentProject.tasksDeliverables.find(({deliverablesId}) => deliverablesId === row._id)
@@ -317,6 +318,7 @@ export default {
           break;
         case "dr2":
           this.isDR2Modal = true
+          this.setShowTasksAndDeliverables(false)
           break;
         case "download":
           this.createLinkAndDownload(_id)
@@ -326,6 +328,7 @@ export default {
     closeDR2() {
       this.currentReviewId = this.currentReviewType  = null
       this.isDR2Modal = false
+	    this.setShowTasksAndDeliverables(true)
     },
     getLangPair(row, type) {
       const source = this.allLang.find(({_id}) => row.sourceLanguage.toString() === _id.toString())
@@ -426,7 +429,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentProject: 'getCurrentProject',
+	    isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
+	    currentProject: 'getCurrentProject',
       allLang: 'getAllLanguages',
       users: 'getUsers',
       user: 'getUser',
@@ -916,6 +920,9 @@ export default {
     margin-bottom: 5px;
     font-size: 16px;
   }
+}
+.no-box-shadow{
+  box-shadow: none;
 }
 
 </style>

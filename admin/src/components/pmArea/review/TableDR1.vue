@@ -52,7 +52,7 @@
           i.review-table__check-icon.fas.fa-arrow-alt-circle-right(v-if="row.isFileApproved" :class="{'review-table_green': row.isFilePushedDR2}" @click="deliverFile(index)")
 
     .review-table__upload.review-table_no-back
-      input.review-table__file-input(type="file" @change="uploadFile" :disabled="isReviewing")
+      input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing")
       Add
 </template>
 
@@ -273,6 +273,21 @@
       padding-right: 0;
       width: 25px;
       height: 20px;
+      border: none;
+      outline: none;
+      opacity: 0;
+      z-index: 2;
+      position: absolute;
+      left: -5px;
+      cursor: pointer;
+      font-size: 0;
+    }
+
+    &__file-inputButton {
+      padding-left: 0;
+      padding-right: 0;
+      width: 35px;
+      height: 30px;
       border: none;
       outline: none;
       opacity: 0;

@@ -1,5 +1,5 @@
 <template lang="pug">
-  .tasks-steps
+  .tasks-steps(:class="{'no-box-shadow': !isShowTasksAndDeliverables}")
     transition(name="slide-fade")
       .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
         .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
@@ -7,7 +7,7 @@
       img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
       TasksData(
-        v-if="isTaskData && !isFinishedStatus && originallyLanguages.length"
+        v-if="isTaskData && !isFinishedStatus && originallyLanguages.length && isShowTasksAndDeliverables"
         :originallyLanguages="originallyLanguages"
         :originallyUnits="originallyUnits"
         :originallySteps="originallySteps"
@@ -215,6 +215,7 @@
 		},
 		computed: {
 			...mapGetters({
+				isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
 				currentProject: 'getCurrentProject',
 				selectedInfoMessage: 'getMemoqProjectMessage',
 				fileCounter: 'getTranslateFileCounter'
@@ -313,6 +314,9 @@
   .slide-fade-enter, .slide-fade-leave-to {
     transform: translateY(10px);
     opacity: 0;
+  }
+  .no-box-shadow{
+    box-shadow: none;
   }
 
 </style>

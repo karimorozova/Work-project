@@ -402,6 +402,58 @@ function managerDr1Assigned(obj, DRNumber) {
             </div>`;
 }
 
+function severalDr1Assign(obj) {
+	const tasks = obj.checkedTasksId.reduce((acc, curr) => {
+		acc = acc + `<li>${curr}</li>`
+		return acc
+	}, '')
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.manager.firstName } ${  obj.manager.lastName || "" }</span></p>
+                    <p style="font-width: 400;">
+                        DR1 for project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> 
+                        has been assigned to you for the following tasks
+                    </p>
+                    <ul style="font-width: 400;">
+                    	${tasks}
+										</ul>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+function severalDr1reAssign(obj) {
+	const tasks = obj.checkedTasksId.reduce((acc, curr) => {
+		acc = acc + `<li>${curr}</li>`
+		return acc
+	}, '')
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.prevManager.firstName } ${  obj.prevManager.lastName || "" }</span></p>
+                    <p style="font-width: 400;">
+                        DR1 from project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> 
+                        has been reassigned to ${ obj.manager.firstName } ${  obj.manager.lastName || "" } for the following tasks:
+                    </p>
+                    <ul style="font-width: 400;">
+                    	${tasks}
+										</ul>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
 
 module.exports = {
 	getMessageWithRandomPassword,
@@ -419,5 +471,7 @@ module.exports = {
 	readyForDr2Message,
 	managerDr1Reassign,
 	managerDr1Assigned,
-	rollbackDR1Template
+	rollbackDR1Template,
+	severalDr1Assign,
+	severalDr1reAssign
 };

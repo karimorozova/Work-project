@@ -5,15 +5,13 @@
     .tasks__preview(v-if="isEditAndSendQuote")
       PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
 
-
-
     .tasks__modal(v-if="changeManagerModal")
-      .tasks__titleModal Select new DR1
+      .tasks__titleModal Set New DR1
       span.tasks__close-modal(@click="closeManagerModal()") &#215;
       .tasks__body
         .tasks__itemsContacts
           .tasks__items2
-            .tasks__selectTitle Change Manager:
+            .tasks__selectTitle Choose Manager:
             .tasks__select
               SelectSingle(
                 :options="managersNames"
@@ -273,7 +271,6 @@
 				this.manageApprovalModal = false
 			},
       async changeManager() {
-
         try {
           const result = await this.$http.post('/delivery/change-managers', {
             projectId: this.currentProject._id,
@@ -436,7 +433,6 @@
 
       },
       setManager({ option }) {
-        console.log(option);
         const managerIndex = this.managersNames.indexOf(option)
         this.selectedManager = this.managers[managerIndex]
         // this.$emit("assignManager", {
@@ -446,6 +442,7 @@
 			reviewForDelivery(task) {
 				this.reviewTask = task
 				this.isDeliveryReview = true
+				this.setShowTasksAndDeliverables(false)
 			},
 			unCheckAllTasks() {
 				const unchecked = this.allTasks.map(item => {
@@ -625,6 +622,7 @@
 			closeReview() {
 				this.isDeliveryReview = false
 				this.selectedAction = ""
+				this.setShowTasksAndDeliverables(true)
 			},
 			async downloadFiles(task) {
 				try {
@@ -651,7 +649,7 @@
 				setProjectProp: "setProjectProp",
 				storeProject: "setCurrentProject",
 				setProjectStatus: "setProjectStatus",
-				// deliverTasks: "deliverTasks"
+				setShowTasksAndDeliverables: "setShowTasksAndDeliverables"
 			})
 		},
 		computed: {
