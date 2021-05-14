@@ -319,13 +319,21 @@
         this.files[index].isFileApproved = !this.files[index].isFileApproved
         const { isFileApproved, path } = this.files[index]
         try {
-          await this.approveDeliveryFileDR2({ type: this.type, entityId: this.id, projectId: this.project._id, isFileApproved, paths: [path] })
+	        const updatedProject = await this.$http.post("/delivery/approve-files-dr2", { type: this.type, entityId: this.id, projectId: this.project._id, isFileApproved, paths: [path] });
+	        await this.setCurrentProject(updatedProject.data);
         } catch (err) {
+	        this.alertToggle({ message: "Err in approveFile!", isShow: true, type: "error" })
         }
       },
       async approveFiles({ checked }) {
         const paths = checked.map(item => item.path)
-        await this.approveDeliveryFileDR2({ projectId: this.project._id, isFileApproved: true, paths })
+        try{
+	        const updatedProject = await this.$http.post("/delivery/approve-files-dr2", { type: this.type, entityId: this.id, projectId: this.project._id, isFileApproved: true, paths })
+	        await this.setCurrentProject(updatedProject.data);
+	        await this.updatedFiles(updatedProject)
+        }catch (err) {
+	        this.alertToggle({ message: "Err in approveFiles!", isShow: true, type: "error" })
+        }
       },
       listOfContactsForDeliver(){
         return this.selectedContacts

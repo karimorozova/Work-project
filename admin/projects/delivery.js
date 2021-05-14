@@ -36,9 +36,8 @@ const {
 
 async function changeManagerDR2({ project, prevManager, manager, type, file, entityId }) {
   let { tasksDR2: { multiLang, singleLang } } = project
-  //Bug send all tasks Ids
-  const messageToPrev = managerDr1Reassign({taskId: 'taskId', project, prevManager, manager}, '2');
-  const messageToNew = managerDr1Assigned({taskId: 'taskId', project, manager}, '2');
+  const messageToPrev = managerDr1Reassign({taskId: file.taskId, project, prevManager, manager}, '2');
+  const messageToNew = managerDr1Assigned({taskId: file.taskId, project, manager}, '2');
   try {
 
     await managerNotifyMail(prevManager, messageToPrev, `DR2 has been reassigned: ${project.projectId} (I009.0)`);
