@@ -50,7 +50,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
                     <img class="logo" src="cid:logo@pan" alt="pangea"
                         style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;">
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;">
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;">
                     <div id="client-name-row"></div>
                     <p class="main_italic main_line15 main_weight600"
                         style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;">
@@ -196,7 +196,7 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
                     <img class="logo" src="cid:logo@pan" alt="pangea"
                         style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;">
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;">
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;">
                     <div id="client-name-row"></div>
                     <p class="main_italic main_line15 main_weight600"
                         style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;">
@@ -608,7 +608,7 @@ function notifyLanguagePairIsReady(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ am }</p>
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
@@ -639,7 +639,7 @@ function notifyMultilingualIsReady(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ am }</p>
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
@@ -681,7 +681,7 @@ function notifyAssignmentIsReady(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ am }</p>
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
@@ -705,7 +705,7 @@ function getDeliveryMessage(obj) {
                     <header style="background-color:#66563E;text-align:center;" >
                         <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                     </header>
-                    <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                    <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                         <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                             This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
                         <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
@@ -734,7 +734,7 @@ function projectCancelledMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                 		<div id="client-name-row">&nbsp;</div>
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
@@ -761,7 +761,7 @@ function projectMiddleCancelledMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
 		                <div id="client-name-row">&nbsp;</div>
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
