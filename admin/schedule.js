@@ -28,8 +28,8 @@ schedule.scheduleJob('40 0 * * *', async () => await scheduleJobBody(UpdateLQAFr
 schedule.scheduleJob('30 0 * * *', async () => await scheduleJobBody(newLQAStatusFromXTRFProjects(), "Updating LQA reports from MemoqProjects data"));
 schedule.scheduleJob('30 23 * * *', async () => await scheduleJobBody(newLangReport(), "Updating lang tier data"));
 
-schedule.scheduleJob('10 0 * * *', async () => await scheduleJobBody(deleteEmptyOrNotCreatedByManger(), "Deleting not active vendor"));
-schedule.scheduleJob('20 0 * * *', async () => await scheduleJobBody(sendPreventDeleteNotActiveVendor(), "Send prevent delete not active vendor"));
+// schedule.scheduleJob('10 0 * * *', async () => await scheduleJobBody(deleteEmptyOrNotCreatedByManger(), "Deleting not active vendor"));
+// schedule.scheduleJob('20 0 * * *', async () => await scheduleJobBody(sendPreventDeleteNotActiveVendor(), "Send prevent delete not active vendor"));
 schedule.scheduleJob('30 01 * * *', async () => await scheduleJobBody(updateVendorBenchmarkCost(), "Updating vendor benchmark cost"));
 
 
