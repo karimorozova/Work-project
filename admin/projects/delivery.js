@@ -163,7 +163,7 @@ const taskApproveReady = async ({ projectId, type, entityId }) => {
 
 async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 	const allLang = await Languages.find({})
-	const { tasks, tasksDR2: { singleLang } } = await Projects.findOne({ _id: projectId })
+	const { projectId: strId, tasks, tasksDR2: { singleLang, multiLang } } = await Projects.findOne({ _id: projectId })
 
 	const { sourceLanguage, targetLanguage } = tasks.find(({ taskId: tId }) => tId === taskId)
 	const sourceLang = allLang.find(({ symbol }) => sourceLanguage === symbol)
@@ -197,12 +197,32 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 
 	function pushFile(sourceLang, targetLang, fileInfo) {
 		singleLang.push({
+			deliveryInternalId: returnNewDeliveryId(strId, singleLang, multiLang),
 			status: 'Pending Approval [DR2]',
 			sourceLanguage: sourceLang._id,
 			targetLanguage: targetLang._id,
 			files: fileInfo,
 			instructions: dr2Instructions
 		})
+	}
+}
+
+function returnNewDeliveryId(projectId, singleLang, multiLang) {
+	if(!singleLang.length && !multiLang.length) return `${projectId} D01`
+
+	let arrayOfDeliveryIds = []
+	if(singleLang.length) for(let { deliveryInternalId } of singleLang) arrayOfDeliveryIds.push(deliveryInternalId)
+	if(multiLang.length) for(let { deliveryInternalId } of multiLang) arrayOfDeliveryIds.push(deliveryInternalId)
+
+	return findAndReturnBiggestId(arrayOfDeliveryIds)
+
+	function findAndReturnBiggestId(arr){
+		const formattedArr = arr.map(item => /\d*$/ig.exec(item)[0]).map(item => {
+			const [first, ...rest] = item;
+			return +rest[0]
+		})
+		const maxNumberInArray = Math.max.apply(null, formattedArr);
+		return `${projectId} D0${maxNumberInArray+1}`
 	}
 }
 
@@ -226,11 +246,12 @@ const removeDR2 = async ({ projectId, taskId, path, sourceLanguage: source, targ
 }
 
 async function addMultiLangDR2({ projectId, taskIds, refFiles }) {
-	const { projectManager, accountManager, tasksDR2 } = await Projects.findOne({ _id: projectId })
+	const {projectId: strId, tasksDR2: { singleLang, multiLang: projectMultiLang }, projectManager, accountManager, tasksDR2 } = await Projects.findOne({ _id: projectId })
 
 	const file = (await storeFile(refFiles[0], projectId))[0]
 
 	let multiLang = {
+		deliveryInternalId: returnNewDeliveryId(strId, singleLang, projectMultiLang),
 		tasks: taskIds,
 		instructions: dr2Instructions,
 		status: 'Pending Approval [DR2]',

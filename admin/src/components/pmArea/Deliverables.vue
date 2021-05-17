@@ -104,6 +104,7 @@
       )
         .deliverables-table__header(slot="headerCheck" slot-scope="{ field }") {{ field.label }}
           CheckBox(:isChecked="!!isAllChecked" :isWhite="true" @check="()=>toggleAll(true)" @uncheck="()=>toggleAll(false)" customClass="tasks-n-steps")
+        .deliverables-table__header(slot="headerID" slot-scope="{ field }") {{ field.label }}
         .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
         .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
         .deliverables-table__header(slot="headerTask" slot-scope="{ field }") {{ field.label }}
@@ -112,6 +113,7 @@
 
         .deliverables-table__data(slot="check" slot-scope="{ index, row }")
           CheckBox(:isChecked="!!row.isChecked" @check="()=> toggle(row, true)" @uncheck="()=>toggle(row, false)" customClass="tasks-n-steps")
+        .deliverables-table__data(slot="ID" slot-scope="{ row }") {{ row.deliveryInternalId }}
         .deliverables-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
         .deliverables-table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
         .deliverables-table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
@@ -131,7 +133,6 @@
 
           .deliverables-table__icons(v-if="row.status !== 'Ready for Delivery'")
             img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
-
 
       Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showModal")
 </template>
@@ -157,10 +158,11 @@ export default {
     return {
       fields: [
         { label: "", headerKey: "headerCheck", key: "check", width: "3.2%", padding: 0 },
-        { label: "Language pair", headerKey: "headerPair", key: "pair", width: "25.8%", padding: 0 },
+	      { label: "ID", headerKey: "headerID", key: "ID", width: "18%", padding: 0 },
+	      { label: "Language pair", headerKey: "headerPair", key: "pair", width: "23.8%", padding: 0 },
         { label: "# Files", headerKey: "headerFile", key: "file", width: "10%", padding: 0 },
-        { label: "Task Id", headerKey: "headerTask", key: "task", width: "26%", padding: 0 },
-        { label: "Status", headerKey: "headerStatus", key: "status", width: "26%", padding: 0 },
+        { label: "Task ID", headerKey: "headerTask", key: "task", width: "16%", padding: 0 },
+        { label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: 0 },
         { label: "Delivery", headerKey: "headerAction", key: "action", width: "9%", padding: 0 },
       ],
       deliverablesModal: false,
@@ -462,6 +464,7 @@ export default {
         this.currentProject.tasksDR2.singleLang.map(item => {
           return {
             _id: item._id,
+	          deliveryInternalId: item.deliveryInternalId,
             type: 'single',
             status: item.status,
             tasks: item.files.map(item => item.taskId),
@@ -475,7 +478,8 @@ export default {
         this.currentProject.tasksDR2.multiLang.map(item => {
           return {
             _id: item._id,
-            type: 'multi',
+	          deliveryInternalId: item.deliveryInternalId,
+	          type: 'multi',
             status: item.status,
             tasks: item.tasks,
             pair: 'Multilingual',
@@ -549,7 +553,7 @@ export default {
 .content{
   &__DR2 {
     position: absolute;
-    top: 538px;
+    top: 505px;
     left: 40px;
     bottom: 0;
     z-index: 50;

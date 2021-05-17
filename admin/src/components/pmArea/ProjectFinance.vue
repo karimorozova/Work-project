@@ -239,7 +239,7 @@
     }
 
     .minPrice-item {
-      width: 260px;
+      width: 250px;
       min-height: 30px;
       display: flex;
       align-items: center;

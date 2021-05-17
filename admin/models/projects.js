@@ -132,6 +132,11 @@ const ProjectsSchema = new mongoose.Schema({
   }],
   tasksDR2: {
     singleLang: [{
+	    deliveryInternalId:{
+		    type: String,
+		    default: '',
+		    trim: true
+	    },
       status: {
         type: String,
         default: '',
@@ -187,6 +192,11 @@ const ProjectsSchema = new mongoose.Schema({
       }]
     }],
     multiLang: [{
+	    deliveryInternalId:{
+		    type: String,
+		    default: '',
+		    trim: true
+	    },
       status: {
         type: String,
         default: '',
