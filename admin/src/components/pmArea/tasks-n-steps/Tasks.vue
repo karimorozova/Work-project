@@ -71,7 +71,7 @@
       .tasks-files__tooltip Each file can be <= 50Mb
       .tasks-files__tooltip (otherwise it will not be loaded)
 
-    .tasks__action
+    .tasks__action(v-if="!isProjectFinished")
       .tasks__title Task Action:
       .tasks__drop-menu
         SelectSingle(
@@ -713,7 +713,11 @@
             console.log({dr1Manager, _id})
             return dr1Manager === _id
           })
-      }
+      },
+			isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
     created() {
       this.getManagers()

@@ -6,7 +6,7 @@
 
     .project-finance__header
       .project-finance__titleFinance Finance
-      .actionsButton
+      .actionsButton(v-if="!isProjectFinished")
         .actionsButton__icon
           img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
           img.opacity(v-else :src="icons.edit.icon")
@@ -191,7 +191,11 @@
 					profit: (basePrice - Price.payables).toFixed(2),
 					margin: ((1 - (Price.payables / basePrice)) * 100).toFixed(2)
 				}
-			}
+			},
+			isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
 		components: {
 			Discounts

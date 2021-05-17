@@ -17,18 +17,19 @@
       .row__data {{ project.status }}
     .sub-information__row
       .row__title Payment Profile:
-      .row__data
+      .row__data(v-if="!isProjectFinished")
         SelectSingle.drop(
           placeholder="Select",
           :selectedOption="project.paymentProfile",
           :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
           @chooseOption="setPayment"
         )
+      .row__data(v-else) {{ project.paymentProfile }}
     .sub-information__row
       .row__title Urgent:
       .row__data
         .checkbox
-          input#urgent(type="checkbox", :checked="project.isUrgent", @change="setUrgentStatus")
+          input#urgent(type="checkbox", :disabled="isProjectFinished" :checked="project.isUrgent", @change="setUrgentStatus")
           label(for="urgent")
 
     .client-table
@@ -62,20 +63,23 @@
         template(slot="icons", slot-scope="{ row, index }")
           .client-table__height
             .client-table__icons
-              i.client-table__icon.fa.fa-envelope(
-                @click="openWYSIWYG(index)",
-                :class="{ 'client-table_opacity': true }",
-                aria-hidden="true"
-              )
-              i.client-table__icon.fas.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
-              img.client-table__icon(
-                v-for="(icon, key) in icons",
-                :src="icon.icon",
-                @click="makeAction(index, key)",
-                :class="{ 'client-table_opacity': isActive(key, index) }"
-              )
+              span(v-if="!isProjectFinished")
+                i.client-table__icon.fa.fa-envelope(
+                  @click="openWYSIWYG(index)",
+                  :class="{ 'client-table_opacity': true }",
+                  aria-hidden="true"
+                )
+                i.client-table__icon.fas.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
+                img.client-table__icon(
+                  v-for="(icon, key) in icons",
+                  :src="icon.icon",
+                  @click="makeAction(index, key)",
+                  :class="{ 'client-table_opacity': isActive(key, index) }"
+                )
+              span(v-else)
+                img(src="../../assets/images/latest-version/lock.png")
 
-    Add(@add="addData")
+    Add(@add="addData" v-if="!isProjectFinished")
 </template>
 
 <script>
@@ -361,7 +365,11 @@
 				if (this.project) {
 					return this.project.customer.contacts.map((i) => i.firstName)
 				}
-			}
+			},
+			isProjectFinished(){
+				const { status } = this.project
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
 		created() {
 			this.project && this.getClientContacts()

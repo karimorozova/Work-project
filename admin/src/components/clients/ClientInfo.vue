@@ -773,6 +773,9 @@
 
   .client-info {
     position: relative;
+    &__main-row{
+      width: 1000px;
+    }
     &__layout {
       display: flex;
     }

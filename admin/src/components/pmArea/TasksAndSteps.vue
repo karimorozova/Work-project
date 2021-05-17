@@ -4,7 +4,7 @@
       .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
         .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
     .tasks-steps__tasks-title Tasks and Steps
-      img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
+      img.tasks-steps__arrow(v-if="!isProjectFinished" src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
       TasksData(
         v-if="isTaskData && !isFinishedStatus && originallyLanguages.length && isShowTasksAndDeliverables"
@@ -37,7 +37,7 @@
         @setDate="setDate"
         @showTab="showTab"
       )
-      Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics" :isDisabled="isDisabled")
+      Button(v-if="currentProject.tasks.length && !isProjectFinished" :value="metricsButton" @clicked="getMetrics" :isDisabled="isDisabled")
 </template>
 
 <script>
@@ -227,7 +227,11 @@
 			isDisabled() {
 				const statuses = [ "Closed", "Cancelled" ]
 				return statuses.indexOf(this.currentProject.status) !== -1
-			}
+			},
+      isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+      },
 		},
 		components: {
 			TasksData,

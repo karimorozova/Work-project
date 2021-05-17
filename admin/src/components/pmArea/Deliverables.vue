@@ -84,7 +84,7 @@
 
       .deliverables__header
         .deliverables__title Deliverables
-        .deliverablesActions
+        .deliverablesActions(v-if="!isProjectFinished")
           .deliverablesActions__title Deliverables Action:
           .deliverablesActions__drop-menu
             SelectSingle(
@@ -517,6 +517,10 @@ export default {
       const { _id, group: { name } } = this.user
       return name === 'Administrators' || name === 'Developers'
     },
+	  isProjectFinished(){
+		  const { status } = this.currentProject
+		  return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+	  },
 
   },
   components: {
@@ -621,7 +625,6 @@ export default {
     font-size: 21px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
     font-family: Myriad600;
   }
 

@@ -13,13 +13,35 @@
           .input-title
             .input-title__text Start Date & Time:
             span.require *
-          DatepickerWithTime(v-model="project.startDate" @selected="(e) => updateProjectDate(e, 'startDate')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-project-info" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start" :disabledPicker="disabledPicker")
+          DatepickerWithTime(
+            v-model="project.startDate"
+            @selected="(e) => updateProjectDate(e, 'startDate')"
+            :highlighted="highlighted"
+            monday-first=true
+            inputClass="datepicker-custom-project-info"
+            calendarClass="calendar-custom"
+            :format="customFormatter"
+            :disabled="disabled"
+            ref="start"
+            :disabledPicker="disabledPicker && isProjectFinished"
+          )
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
         .project__date
           .input-title
             .input-title__text Deadline:
             span.require *
-          DatepickerWithTime(v-model="project.deadline" @selected="(e) => updateProjectDate(e, 'deadline')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-project-info" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+          DatepickerWithTime(
+            v-model="project.deadline"
+            @selected="(e) => updateProjectDate(e, 'deadline')"
+            :highlighted="highlighted"
+            monday-first=true
+            inputClass="datepicker-custom-project-info"
+            calendarClass="calendar-custom"
+            :format="customFormatter"
+            :disabledPicker="isBilling && isProjectFinished"
+            :disabled="disabled"
+            ref="deadline"
+          )
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
         .project__date
           .input-title
@@ -33,13 +55,13 @@
             inputClass="datepicker-custom-project-info"
             calendarClass="calendar-custom"
             :format="customFormatter"
-            :disabledPicker="isBilling"
+            :disabledPicker="isBilling && isProjectFinished"
             :disabled="disabled"
           )
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="billingOpen")
 
         .project__same.checkbox
-          input(type="checkbox" id="same" :checked="isBilling" @change="setSameDate")
+          input(type="checkbox" id="same" :disabled="isProjectFinished" :checked="isBilling" @change="setSameDate")
           label(for="same") As deadline
 
       .project__info-row
@@ -75,7 +97,7 @@
           .input-title
             .input-title__text Client Project Number:
             span.require *
-          input.project__input-text(type="text" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
+          input.project__input-text(type="text" :disabled="isProjectFinished" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
           label(for="test") Test
@@ -333,7 +355,11 @@
 			},
 			disabledPicker() {
 				return !!(this.project._id && this.project.tasks && this.project.tasks.length)
-			}
+			},
+			isProjectFinished(){
+				const { status } = this.project
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
 		components: {
 			DatepickerWithTime,

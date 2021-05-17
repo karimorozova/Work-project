@@ -29,7 +29,7 @@
 
   .progress-line {
     width: 100%;
-    height: 15px;
+    height: 14px;
     border: 1px solid $brown-border;
     position: relative;
     box-sizing: border-box;

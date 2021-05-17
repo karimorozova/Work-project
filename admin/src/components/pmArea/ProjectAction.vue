@@ -12,7 +12,6 @@
 
     .project-action__title(:style="{'padding-bottom': '5px'}")
       .project-action__title-text Project Action
-      //.project-action__title-button(@click="refreshProject")
 
     .project-action__drop-menuSend
       .project-details Project Details:
@@ -84,19 +83,23 @@
       .drops__item
         .drops__label Account Manager:
           img.drops__assigned-icon(v-if="!project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
-        .drops__menu
+        .drops__menu(v-if="!isProjectFinished")
           SelectSingle(
             :options="accManagers"
             :selectedOption="selectedAccManager"
-            @chooseOption="(e) => setManager(e, 'accountManager')")
+            @chooseOption="(e) => setManager(e, 'accountManager')"
+          )
+        .drops__menuTitle(v-else) {{ selectedAccManager }}
       .drops__item
         .drops__label Project Manager:
           img.drops__assigned-icon(v-if="project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
-        .drops__menu
+        .drops__menu(v-if="!isProjectFinished")
           SelectSingle(
             :options="projManagers"
             :selectedOption="selectedProjManager"
-            @chooseOption="(e) => setManager(e, 'projectManager')")
+            @chooseOption="(e) => setManager(e, 'projectManager')"
+          )
+        .drops__menuTitle(v-else) {{ selectedProjManager }}
       slot
 
     .approve-action(v-if="approveAction")
@@ -189,9 +192,6 @@
 				this.approveActionToDraft = false;
 				this.selectedAction = '';
 			},
-			// refreshProject() {
-			// 	this.$emit("refreshProject");
-			// },
 			closePreview() {
 				this.isEditAndSend = false;
 				this.isEditAndSendQuote = false;
@@ -478,6 +478,10 @@
 			...mapGetters({
 				currentClient: 'getCurrentClient'
 			}),
+			isProjectFinished(){
+				const { status } = this.project
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 			projectClientContacts() {
 				return this.project.clientContacts.map(({ email }) => email)
 			},
@@ -711,6 +715,12 @@
         position: relative;
         width: 190px;
         height: 30px;
+      }
+      &__menuTitle{
+        width: 190px;
+        height: 30px;
+        display: flex;
+        align-items: center;
       }
 
       &__item {

@@ -1,6 +1,6 @@
 <template lang="pug">
   .steps
-    .steps__action
+    .steps__action(v-if="!isProjectFinished")
       .steps__title Step Action:
       .steps__drop-menu
         SelectSingle(
@@ -541,7 +541,11 @@
 			isDatePickDisabled() {
 				const statuses = ["Closed", "Rejected", "Cancelled", "Cancelled Halfway"]
 				return statuses.indexOf(this.currentProject.status) !== -1
-			}
+			},
+			isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
 		components: {
 			ProgressLineStep,
