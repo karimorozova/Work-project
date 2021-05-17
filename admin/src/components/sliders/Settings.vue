@@ -30,8 +30,9 @@ export default {
 	      { title: "Cancellation Reasons" },
         { title: "Instructions" },
         { title: "LQA" },
-        {title: "Industry Tiers"},
+        { title: "Industry Tiers" },
         { title: "Lead Sources" },
+        { title: "Clients Api" },
       ],
       sidebarTitle: "SETTINGS",
       activeLinkIndex: -1
@@ -53,6 +54,9 @@ export default {
           break;
         case "Industries":
           this.$router.push("/settings/industries");
+          break;
+        case "Clients Api":
+          this.$router.push("/settings/api-clients");
           break;
         case "Lead Sources":
           this.$router.push("/settings/leadsources");
