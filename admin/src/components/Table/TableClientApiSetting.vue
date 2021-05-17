@@ -39,7 +39,7 @@
             )
 
         template(slot="clientName" slot-scope="{ row, index }")
-          .client-api__data(v-if="currentActive !== index") {{ presentServices(row.clientName) }}
+          .client-api__data(v-if="currentActive !== index") {{ row.clientName }}
           .client-api__drop-menu(v-else-if="selectedAffiliation === 'System'")
             SelectSingle(
               :isTableDropMenu="isTableDropMenu"
@@ -55,13 +55,13 @@
 
 
         template(slot="industry" slot-scope="{ row, index }")
-          .client-api__data(v-if="currentActive !== index") {{ presentServices(row.industry) }}
+          .client-api__data(v-if="currentActive !== index") {{ row.industry.map(({name})=> name ).join(", ") }}
           .client-api__drop-menu(v-else)
             SelectMulti(
               placeholder="Select"
               :hasSearch="true"
-              :options="getIndustry.map(({ name }) => name)"
-              :selectedOptions="selectedIndustry"
+              :options="getIndustry"
+              :selectedOptions="selectedIndustry.map(({ name })=> name )"
               :isTableDropMenu="isTableDropMenu"
               @chooseOptions="choseIndustries"
             )
@@ -146,17 +146,21 @@ export default {
       currentActive: -1,
       isTableDropMenu: true,
       affiliationData: ['Input', 'System'],
+      clientName: '',
     };
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle",
     }),
-    getClientsApi() {
-
+    async getClientsApi() {
+      let result = await this.$http.get('/api-settings/clients-api')
+      this.clientApi = result.data
+      this.currentActive = -1
+      this.clientName = ""
     },
     activeClasses(index) {
-      return this.currentActive === index ? 'client-api_active client-api_flex' : "";
+      return this.currentActive === index ? 'client-api_active client-api_flex' : ""
     },
     setAffiliation({ option }) {
       this.selectedAffiliation = option
@@ -168,8 +172,7 @@ export default {
       this.selectedIndustry = []
     },
     async getAllClients() {
-      let result = await this.$http.post('/api-settings/all-clients');
-      console.log({ test: result.data })
+      let result = await this.$http.post('/api-settings/all-clients')
       this.allClients = result.data
     },
     uploadIcon(event) {
@@ -184,16 +187,12 @@ export default {
       }
     },
     choseIndustries({ option }) {
-      const position = this.selectedIndustry.indexOf(option);
+      const position = this.selectedIndustry.findIndex(({ name }) => name === option.name);
       if (position !== -1) {
         this.selectedIndustry.splice(position, 1);
       } else {
         this.selectedIndustry.push(option);
       }
-    },
-    presentServices(services) {
-      if (!services.length) return "";
-      return services.reduce((acc, cur) => acc + `${cur.title}; `, "");
     },
     toggleActive(index) {
       if (this.currentActive !== index) return;
@@ -216,9 +215,12 @@ export default {
     },
     setEditionData(index) {
       this.currentActive = index;
-      // this.currentSizes = this.clientApi[index].sizes;
-      this.currentClientApi = this.clientApi[index].type;
-      this.currentServices = Array.from(this.clientApi[index].steps);
+      this.logo = logo
+      this.selectedAffiliation = affiliation
+      this.selectedClients = clientName
+      this.clientName = clientName
+      this.selectedIndustry = industry
+      this.isDisplay = isDisplay
     },
     closeErrors() {
       this.areErrors = false;
@@ -239,17 +241,21 @@ export default {
         await this.getClientsApi();
       }
       if (key === "delete") {
-        if (!this.clientApi[index]._id) {
-          this.clientApi.splice(index, 1);
-          return this.cancel();
-        }
-        this.deleteIndex = index;
-        this.isDeleting = true;
+        this.deleteClientsApi(index);
+      }
+    },
+    async deleteClientsApi(index) {
+      const id = this.clientApi[index]._id
+      try {
+        await this.$http.post(`/api-settings/clients-api/${id}/delete`);
+        await this.getClientsApi()
+      } catch (err) {
+        this.alertToggle({ message: "Error on saving Industry info", isShow: true, type: "error" });
       }
     },
     async saveChanges(index) {
 
-      const id = this.industries[index]._id;
+      const id = this.clientApi[index]._id;
       const newData = this.collectData(index);
       try {
         if(!id) {
@@ -257,7 +263,9 @@ export default {
         } else {
           await this.updateClientApi(id, newData, index);
         }
-        await this.getIndustries();
+        await this.getClientsApi()
+        this.iconFile = []
+        this.imageData = ''
         this.alertToggle({ message: "Saved", isShow: true, type: "success" });
 
       } catch (error) {
@@ -270,26 +278,25 @@ export default {
     },
     collectData(index) {
       const newData = new FormData();
-      newData.append("logo", this.imageData[0]);
+      newData.append("logo", this.iconFile[0]);
       newData.append("affiliation", this.selectedAffiliation);
-      newData.append("clientName", this.selectedClients);
-      newData.append("industry", this.selectedIndustry);
-      newData.append("isDisplay", this.allClients[index].isDisplay);
+      newData.append("clientName", this.selectedAffiliation === "System" ? this.selectedClients : this.clientName);
+      newData.append("industry", JSON.stringify(this.selectedIndustry));
+      newData.append("isDisplay", this.clientApi[index].isDisplay);
       return newData;
     },
     async createNew(newData) {
       try {
-        const result = await this.$http.post(`/api-settings/clients-api-setting/new`, newData);
+        const result = await this.$http.post(`/api-settings/clients-api/new`, newData);
         this.clientApi = result.data.clientsApi
       } catch (err) {
         this.alertToggle({ message: "Error on saving Industry info", isShow: true, type: "error" });
       }
     },
     async updateClientApi(id, newData, index) {
-      const oldIndustry = this.industries[index];
-      oldIndustry.active = !oldIndustry.active;
       try {
-        await this.$http.post(`/api-settings/clients-api-setting/${ id }`, newData);
+        await this.$http.post(`/api-settings/clients-api/${ id }`, newData);
+        this.clientApi = result.data.clientsApi
 
       } catch (err) {
         this.alertToggle({ message: "Error on saving Industry info", isShow: true, type: "error" });
@@ -301,7 +308,7 @@ export default {
     },
     async checkErrors(index) {
 
-      this.saveChanges()
+      this.saveChanges(index)
     },
 
   },
@@ -311,7 +318,7 @@ export default {
     }),
 
     getIndustry() {
-      if(this.selectedClients.length > 0 && this.selectedAffiliation === 'System') {
+      if(this.selectedClients && this.selectedClients.length > 0 && this.selectedAffiliation === 'System') {
         return this.allClients.filter(({ name }) => name === this.selectedClients)[0].industries
       }
       return this.industries
@@ -327,6 +334,7 @@ export default {
   },
   mounted() {
     this.getAllClients()
+    this.getClientsApi()
   },
 };
 </script>

@@ -6,8 +6,8 @@ const { ClientsApiSetting } = require('../models/')
  * @returns {Object} returns client with populated(fullfilled) rows
  */
 async function getClientsApi(obj) {
-	return await ClientsApiSetting.findOne(obj)
-			.populate('industries', [ 'name', 'icon' ])
+	return await ClientsApiSetting.find(obj)
+			.populate('industry', [ 'name', 'icon' ])
 }
 
 
