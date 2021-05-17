@@ -16,7 +16,7 @@
           @showErrors="showErrors"
         )
           ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
-      Deliverables
+      Deliverables(v-if="isStageDelivery")
 
     .project-info__rigthSide
       ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
@@ -204,7 +204,6 @@
 						await this.storeCurrentClient(curProject.body.customer);
 					}
 				} catch (err) {
-
 				}
 			},
 			async refreshProject() {
@@ -215,7 +214,6 @@
           this.alertToggle({ message: "Project updated", isShow: true, type: "success" });
         }catch (err) {
         }
-
 			},
 		},
 		computed: {
@@ -227,6 +225,9 @@
 				originallyServices: "getAllServices",
 				originallyUnits: "getAllUnits",
 			}),
+			isStageDelivery(){
+        return this.currentProject.tasks.some(({status}) => status === 'Completed' || status === 'Pending Approval [DR1]')
+      },
 			isFinishedStatus() {
 				const finishedStatuses = ['Delivered', 'Closed', 'Cancelled', 'Cancelled Halfway'];
 				return finishedStatuses.indexOf(this.currentProject.status) !== -1;

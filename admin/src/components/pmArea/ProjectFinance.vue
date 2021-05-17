@@ -16,7 +16,7 @@
 
     .project-finance__details
       .project-finance__empty(v-if="!currentProject.tasks.length")
-        b No information available.
+        span No information available.
       .project-finance__noEmpty(v-else)
         .project-finance__content-displayBlock
           .finance-info__bars
@@ -222,7 +222,7 @@
   .minPrice {
     display: flex;
     padding: 5px 5px 2px 5px;
-    background: #F2EFEB;
+    background: #f4f2f1;
     border: 2px solid #938676;
     flex-direction: column;
     margin-bottom: 20px;

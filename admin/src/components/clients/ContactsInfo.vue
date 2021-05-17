@@ -90,12 +90,12 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Full Name", headerKey: "headerName", key: "name", width: "18%", padding: "0" },
-					{ label: "Email", headerKey: "headerEmail", key: "email", width: "18%", padding: "0" },
-					{ label: "Position", headerKey: "headerPosition", key: "position", width: "18%", padding: "0" },
-					{ label: "Phone number", headerKey: "headerPhone", key: "phone", width: "16%", padding: "0" },
-					{ label: "Notes", headerKey: "headerNotes", key: "notes", width: "16%", padding: "0" },
-					{ label: "Lead", headerKey: "headerLead", key: "lead", width: "7%", padding: "0" },
+					{ label: "Full Name", headerKey: "headerName", key: "name", width: "21%", padding: "0" },
+					{ label: "Email", headerKey: "headerEmail", key: "email", width: "21%", padding: "0" },
+					{ label: "Position", headerKey: "headerPosition", key: "position", width: "15%", padding: "0" },
+					{ label: "Phone number", headerKey: "headerPhone", key: "phone", width: "15%", padding: "0" },
+					{ label: "Notes", headerKey: "headerNotes", key: "notes", width: "15%", padding: "0" },
+					{ label: "Lead", headerKey: "headerLead", key: "lead", width: "6%", padding: "0" },
 					{ label: "", headerKey: "headerIcons", key: "icons", width: "7%", padding: "0" }
 				],
 				icons: {

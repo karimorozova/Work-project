@@ -1247,10 +1247,20 @@
     }
   }
 
-  .datepicker-custom {
+  .datepicker-custom-project-info {
     border-radius: 5px;
     border: 1px solid #68573E;
-    height: 28px;
+    height: 30px;
+    color: #68573E;
+    padding-left: 5px;
+    outline: none;
+    width: 191px;
+  }
+
+  .datepicker-custom{
+    border-radius: 5px;
+    border: 1px solid #68573E;
+    height: 30px;
     color: #68573E;
     padding-left: 5px;
     outline: none;

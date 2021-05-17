@@ -43,7 +43,7 @@
       width: 128px;
       font-size: 14px;
       padding: 20px;
-      background: #F2EFEB;
+      background: #f4f2f1;
       border: 2px solid #938676;
       margin-top: 62px;
     }

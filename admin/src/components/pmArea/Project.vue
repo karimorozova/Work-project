@@ -1,76 +1,93 @@
 <template lang="pug">
   .project
     .project__all-info
+
       .project__info-row
-        input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name")
+        input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name" style="margin-bottom: 10px")
         span.project__nameBody(v-else)
-          input.project__name(v-if="!existProjectAccessChangeName" type="text" :value="nameOfProject" placeholder="Project Name" disabled)
+          .project__nameDisabled(v-if="!existProjectAccessChangeName") {{ nameOfProject }}
           input.project__name(v-else type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
+
       .project__info-row
         .project__date
-          LabelValue(label="Start Date & Time" :isRequired="isRequiredField" customClass="project_margin")
-            DatepickerWithTime(v-model="project.startDate" @selected="(e) => updateProjectDate(e, 'startDate')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start" :disabledPicker="disabledPicker")
+          .input-title
+            .input-title__text Start Date & Time:
+            span.require *
+          DatepickerWithTime(v-model="project.startDate" @selected="(e) => updateProjectDate(e, 'startDate')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-project-info" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="start" :disabledPicker="disabledPicker")
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
         .project__date
-          LabelValue(label="Deadline" :isRequired="isRequiredField" customClass="project_margin")
-            DatepickerWithTime(v-model="project.deadline" @selected="(e) => updateProjectDate(e, 'deadline')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
+          .input-title
+            .input-title__text Deadline:
+            span.require *
+          DatepickerWithTime(v-model="project.deadline" @selected="(e) => updateProjectDate(e, 'deadline')" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-project-info" calendarClass="calendar-custom" :format="customFormatter" :disabled="disabled" ref="deadline")
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
         .project__date
-          LabelValue(label="Billing Date" customClass="project_margin")
-            DatepickerWithTime(
-              v-model="project.billingDate"
-              ref="billingDate"
-              @selected="(e) => updateProjectDate(e, 'billingDate')"
-              :highlighted="highlighted"
-              monday-first=true
-              inputClass="datepicker-custom"
-              calendarClass="calendar-custom"
-              :format="customFormatter"
-              :disabledPicker="isBilling"
-              :disabled="disabled"
-            )
+          .input-title
+            .input-title__text Billing Date:
+          DatepickerWithTime(
+            v-model="project.billingDate"
+            ref="billingDate"
+            @selected="(e) => updateProjectDate(e, 'billingDate')"
+            :highlighted="highlighted"
+            monday-first=true
+            inputClass="datepicker-custom-project-info"
+            calendarClass="calendar-custom"
+            :format="customFormatter"
+            :disabledPicker="isBilling"
+            :disabled="disabled"
+          )
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="billingOpen")
+
         .project__same.checkbox
           input(type="checkbox" id="same" :checked="isBilling" @change="setSameDate")
           label(for="same") As deadline
+
       .project__info-row
         .project__client
-          LabelValue(label="Client Name" :isRequired="isRequiredField" customClass="project_margin")
-            .project__input-icons(v-if="project._id")
-              i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
-              input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
+          .input-title
+            .input-title__text Client Name:
+            span.require *
+          .project__input-icons(v-if="project._id")
+            i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
+            input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
 
-            .project__drop-menu(v-else)
-              SelectSingle(
-                :selectedOption="project.customer.name"
-                :options="clients"
-                :hasSearch="isSearchClient"
-                placeholder="Name"
-                @chooseOption="(e) => setValue(e, 'customer')"
-              )
+          .project__drop-menu(v-else)
+            SelectSingle(
+              :selectedOption="project.customer.name"
+              :options="clients"
+              :hasSearch="isSearchClient"
+              placeholder="Name"
+              @chooseOption="(e) => setValue(e, 'customer')"
+            )
         .project__industry
-          LabelValue(label="Industry" :isRequired="isRequiredField" customClass="project_margin")
-            input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" disabled)
-            .project__drop-menu(v-else)
-              SelectSingle(
-                :selectedOption="selectedIndustry.name || project.industry.name"
-                :options="industriesList"
-                @chooseOption="setIndustry"
-                placeholder="Industry"
-              )
+          .input-title
+            .input-title__text Industry:
+            span.require *
+          input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" disabled)
+          .project__drop-menu(v-else)
+            SelectSingle(
+              :selectedOption="selectedIndustry.name || project.industry.name"
+              :options="industriesList"
+              @chooseOption="setIndustry"
+              placeholder="Industry"
+            )
         .project__number
-          LabelValue(label="Client Project Number" customClass="project_margin")
-            input.project__input-text(type="text" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
+          .input-title
+            .input-title__text Client Project Number:
+            span.require *
+          input.project__input-text(type="text" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
           label(for="test") Test
+
       .project__info-row.project_no-margin
         .project__textarea
           LabelValue(label="Project Brief" customClass="project_textarea")
-            textarea.project__text(type="text" rows="10" v-model="project.brief")
+            textarea.project__text(type="text" rows="9" v-model="project.brief")
         .project__textarea
           LabelValue(label="Internal Notes" customClass="project_textarea")
-            textarea.project__text(type="text" rows="10" v-model="project.notes")
+            textarea.project__text(type="text" rows="9" v-model="project.notes")
+
       .project__button(v-if="!project.projectId")
         Button(
           value="Create Project"
@@ -93,7 +110,7 @@
 	import Button from "../Button"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
-  import DatepickerWithTime from "../DatepickerWithTime";
+	import DatepickerWithTime from "../DatepickerWithTime"
 
 	export default {
 		props: {
@@ -106,12 +123,11 @@
 				isBilling: false,
 				isTest: false,
 				selectedIndustry: "",
-				// industries: [],
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
 				highlighted: {
-					days: [6, 0]
+					days: [ 6, 0 ]
 				},
 				startDate: new Date(),
 				deadline: "",
@@ -242,17 +258,13 @@
 				this.project.customer = customer._id
 				this.project.isTest = this.isTest
 				try {
-					const newProject = await this.$http.post("/pm-manage/new-project", {project: this.project, user: this.user})
+					const newProject = await this.$http.post("/pm-manage/new-project", { project: this.project, user: this.user })
 					this.$emit('projectCreated', { project: newProject.data, customer: customer })
 					this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
 				}
 			},
-/*			async getIndustries() {
-				const industries = await this.$http.get('/api/industries')
-				this.industries = industries.body
-			},*/
 			startOpen() {
 				this.$refs.start.showCalendar()
 			},
@@ -271,7 +283,7 @@
 					if (!this.project._id) {
 						if (!this.clients.length) {
 							let result = await this.$http.get(`/active-clients`)
-							this.clients = [...result.body]
+							this.clients = [ ...result.body ]
 						}
 					}
 				} catch (err) {
@@ -297,7 +309,7 @@
 		computed: {
 			...mapGetters({
 				industries: "getAllIndustries",
-        user: "getUser"
+				user: "getUser"
 			}),
 			existProjectAccessChangeName() {
 				if (this.project) {
@@ -324,7 +336,7 @@
 			}
 		},
 		components: {
-      DatepickerWithTime,
+			DatepickerWithTime,
 			SelectSingle,
 			SelectMulti,
 			Datepicker,
@@ -335,7 +347,6 @@
 		async created() {
 			await this.getProjectData()
 			this.getCustomers()
-			// this.getIndustries()
 			this.isBillingDate()
 			!this.project._id && this.setIsBillingTrue()
 		}
@@ -343,10 +354,30 @@
 </script>
 
 <style lang="scss" scoped>
-
+  .input-title{
+    display: flex;
+    &__text{
+      margin-bottom: 4px;
+    }
+    .require{
+      color: red;
+    }
+  }
   .project {
     display: flex;
     flex-direction: column;
+
+    &__nameDisabled{
+      display: flex;
+      font-family: Myriad600;
+      align-items: center;
+      cursor: default;
+      font-size: 21px;
+      height: 38px;
+      width: 40%;
+      color: #68573e;
+      border: 1px solid white;
+    }
 
     &__input-icons {
       position: relative;
@@ -361,12 +392,11 @@
     }
 
     &__same {
-      width: 113px;
+      width: 120px;
     }
 
     &__project-template {
       position: relative;
-      width: 191px;
       margin-bottom: 60px;
     }
 
@@ -382,21 +412,23 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
 
       ::-webkit-input-placeholder {
         color: #68573E;
-        opacity: 0.47;
+        opacity: 0.4;
       }
     }
-    &__nameBody{
+
+    &__nameBody {
       width: 100%;
+      margin-bottom: 10px;
     }
 
     &__name {
-      font-size: 22px;
+      font-size: 21px;
       padding: 0 5px;
-      height: 40px;
+      height: 38px;
       width: 40%;
       border-radius: 5px;
       color: #68573E;
@@ -408,22 +440,19 @@
     }
 
     &__date {
-      width: fit-content;
       position: relative;
     }
 
     &__client, &__industry, &__number {
-      width: fit-content;
+      width: 191px;
     }
 
     &__drop-menu {
       position: relative;
-      height: 28px;
-      width: 170px;
+      height: 30px;
     }
 
     &__client-link {
-      width: 170px;
       display: flex;
       justify-content: flex-start;
     }
@@ -438,7 +467,7 @@
     }
 
     &__input-text {
-      width: 158px;
+      width: 179px;
       height: 28px;
       border: 1px solid #68573E;
       border-radius: 5px;
@@ -452,7 +481,7 @@
     }
 
     &__input-text2 {
-      width: 133px;
+      width: 179px;
       height: 28px;
       border: 1px solid #68573E;
       border-radius: 5px;
@@ -460,7 +489,6 @@
       color: #68573E;
       font-size: 14px;
       outline: none;
-      padding-right: 30px;
 
       &:focus {
       }
@@ -472,7 +500,7 @@
 
     &__text {
       width: 100%;
-      margin-top: 10px;
+      margin-top: 4px;
       border-radius: 10px;
       border: 1px solid #68573E;
       padding: 5px;
@@ -487,7 +515,7 @@
 
     &__calendar-icon {
       position: absolute;
-      top: 5px;
+      bottom: 6px;
       right: 5px;
       width: 18px;
       cursor: pointer;
@@ -504,6 +532,7 @@
 
     &__test {
       height: 24px;
+      width: 120px;
     }
 
     .checkbox {
@@ -564,8 +593,12 @@
     }
   }
 
+  #same,
+  #test{
+    width: 0;
+  }
   input:disabled {
-    background-color: #F2EFEB;
+    background-color: #f4f2f1;
   }
 
 </style>

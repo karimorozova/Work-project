@@ -223,7 +223,7 @@
       height: 30px;
       line-height: 30px;
       padding-left: 5px;
-      background: #F2EFEB;
+      background: #f4f2f1;
       border-bottom: 1px solid #938676;
       display: flex;
 
