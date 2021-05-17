@@ -200,7 +200,6 @@
 	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	const ApproveModal = () => import("../../ApproveModal")
-	// const DeliveryReview = () => import("./DeliveryReview")
 	import moment from "moment"
 	import { mapGetters, mapActions } from 'vuex'
 	import ApproveModalPayment from "../../ApproveModalPayment"
@@ -733,7 +732,6 @@
 			CheckBox,
 			SelectSingle,
 			ApproveModal,
-			// DeliveryReview,
 			PreviewQuote,
 			Tabs
 		}

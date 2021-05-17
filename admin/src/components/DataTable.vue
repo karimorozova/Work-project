@@ -17,7 +17,7 @@
       )
         .table__tbody-cell(
           v-for="field of fields"
-          :style="{width: field.width, padding: field.padding}"
+          :style="{width: field.width, padding: field.padding, ...field.style}"
           :class="[bodyCellClass, field.cellClass]"
         )
           slot(:name="field.key" :row="row" :index="index")

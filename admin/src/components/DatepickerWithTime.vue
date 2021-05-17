@@ -1286,6 +1286,7 @@
     width: 100%;
     background-color: transparent;
     cursor: pointer;
+    outline: 0;
   }
 
   .steps__calendar-custom {
