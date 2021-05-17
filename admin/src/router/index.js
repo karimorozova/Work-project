@@ -73,6 +73,7 @@ import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
 import {default as PendingCompetenciesLayout} from "../components/vendors/pending-competencies/Layout"
 import { store } from '../vuex/store'
+import TableClientApiSetting from "../components/Table/TableClientApiSetting";
 
 Vue.use(Router)
 
@@ -152,6 +153,11 @@ const router = new Router({
                             path: 'discounts',
                             name: 'discounts',
                             component: TableDiscounts
+                        },
+                        {
+                            path: 'api-clients',
+                            name: 'api-clients',
+                            component: TableClientApiSetting
                         },
                         {
                             path: 'leadsources',
