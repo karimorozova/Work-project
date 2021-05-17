@@ -262,10 +262,10 @@
   .button {
     min-width: 120px;
     padding: 0 24px 0 24px;
-    height: 34px;
+    height: 32px;
     color: $white;
     font-size: 14px;
-    border-radius: 7px;
+    border-radius: 4px;
     background-color: $orange;
     border: none;
     transition: .1s ease;

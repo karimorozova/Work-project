@@ -14,8 +14,10 @@
                         label Lead Source:
                         .clients-filters__drop-menu
                             ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="leadSourceFilter" @chosenLeadsource="chosenLeadsource")
-                .clients-filters__row-button
-                    input.add-button(type="submit" value="Add client" @click="addClient")
+                    .clients-filters__item
+                    .clients-filters__itemButton
+                        input.add-button(type="submit" value="Add client" @click="addClient")
+
             ClientsTable(
                 :clients="allClients"
                 :nameFilter="nameFilter"
@@ -176,7 +178,7 @@ export default {
 }
 
 label {
-    margin-bottom: 0;
+    margin-bottom: 3px;
 }
 
 .clients-filters {
@@ -187,19 +189,16 @@ label {
     }
     &__row {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 30px;
         margin-bottom: 20px;
+        height: 50px;
+        align-items: flex-end;
     }
     &__drop-menu {
         width: 191px;
-        height: 28px;
+        height: 30px;
         position: relative;
-        margin-left: 15px;
     }
     &__input-field {
-        margin-left: 15px;
         width: 191px;
         height: 30px;
         padding-left: 5px;
@@ -209,10 +208,16 @@ label {
         outline: none;
         box-sizing: border-box;
     }
+    &__itemButton{
+      display: grid;
+      width: 232px;
+      align-items: flex-end;
+      justify-content: end;
+    }
     &__item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        display: grid;
+        width: 232px;
+        align-items: flex-end;
         ::-webkit-input-placeholder {
             opacity: 0.5;
         }
@@ -226,12 +231,12 @@ label {
 }
 
 .add-button {
-  min-width: 120px;
+  width: 140px;
   padding: 0 24px 0 24px;
-  height: 34px;
+  height: 32px;
   color: #fff;
   font-size: 14px;
-  border-radius: 7px;
+  border-radius: 4px;
   background-color: #d15f45;
   border: none;
   transition: .1s ease;

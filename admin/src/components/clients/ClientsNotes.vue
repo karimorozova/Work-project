@@ -209,7 +209,7 @@
       bottom: 45px;
       width: 100px;
       height: 30px;
-      border-radius: 7px;
+      border-radius: 4px;
       font-size: 14px;
       background-color: #fff;
       color: #938676;

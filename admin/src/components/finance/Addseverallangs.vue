@@ -387,7 +387,7 @@ export default {
     &__drop-menu {
         position: relative;
         width: 191px;
-        height: 34px;
+        height: 32px;
     }
     &__button {
         background-color: #D15F45;
