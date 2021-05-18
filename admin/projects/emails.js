@@ -363,7 +363,7 @@ async function notifyClientDeliverablesReady({ project, contacts, type, entityId
 			}
 		}
 		if(type === 'multi'){
-			const { deliveryInternalId } = tasksDR2.singleLang.find(({_id}) => `${_id}` === `${entityId}`)
+			const { deliveryInternalId } = tasksDR2.multiLang.find(({_id}) => `${_id}` === `${entityId}`)
 			const subject = `Delivery: ${deliveryInternalId} (ID C006.1)`
 			for await (let contact of contacts) {
 				const finalAttachments = attachments.map(item => ({ filename: `Multilingual-${item.filename}`, path: `./dist${ path }` }))
