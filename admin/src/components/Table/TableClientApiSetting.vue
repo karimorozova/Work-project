@@ -8,7 +8,6 @@
     )
     .client-api__table
       SettingsTable(
-        v-if="clientApi.length"
         :fields="fields"
         :tableData="clientApi"
       )
