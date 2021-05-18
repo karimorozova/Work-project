@@ -48,24 +48,24 @@
 				//MAX
 				//   return this.getQuotePairs(row);
 			},
-			getQuotePairs(task) {
-				return `${task.sourceLanguage} >> ${task.targetLanguage}`
-				// let ratesProp = 'monoRates';
-				// if(task.service.calculationUnit !== 'Packages') {
-				// 	ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
-				// }
-				//MAX
-				// return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
-			},
-			getMonoPair(task) {
-				const targets = this.clientLanguages.monoRates.map(item => item.target);
-				const pairLang = targets.find(item => item.symbol === task.targetLanguage);
-				return `${ pairLang.lang } / ${ task.packageSize }`;
-			},
-			getDuoPair(task, ratesProp) {
-				const pair = this.clientLanguages[ratesProp].find(item => item.source.symbol === task.sourceLanguage && item.target.symbol === task.targetLanguage);
-				return `${ pair.source.lang } => ${ pair.target.lang }`;
-			}
+			// getQuotePairs(task) {
+			// 	return `${task.sourceLanguage} >> ${task.targetLanguage}`
+			// 	// let ratesProp = 'monoRates';
+			// 	// if(task.service.calculationUnit !== 'Packages') {
+			// 	// 	ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
+			// 	// }
+			// 	//MAX
+			// 	// return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
+			// },
+			// getMonoPair(task) {
+			// 	const targets = this.clientLanguages.monoRates.map(item => item.target);
+			// 	const pairLang = targets.find(item => item.symbol === task.targetLanguage);
+			// 	return `${ pairLang.lang } / ${ task.packageSize }`;
+			// },
+			// getDuoPair(task, ratesProp) {
+			// 	const pair = this.clientLanguages[ratesProp].find(item => item.source.symbol === task.sourceLanguage && item.target.symbol === task.targetLanguage);
+			// 	return `${ pair.source.lang } => ${ pair.target.lang }`;
+			// }
 		},
 		computed: {
 			...mapGetters({

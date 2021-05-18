@@ -95,16 +95,19 @@ router.get('/projects', checkClientContact, async (req, res) => {
       const verificationResult = jwt.verify(token, secretKey);
       const client = await getClient({ '_id': verificationResult.clientId });
       const projects = await getProjects({ $and: [{ status: { $nin: ['Draft', 'Cost Quote'] } }, { 'customer': verificationResult.clientId }] });
-      const memoqProjects = await getMemoqProjectsForClientPortal(
-        { $and: [{ customer: verificationResult.clientId }, { status: { $ne: null } }] }
-      );
+
+      //Not Delete this section
+      // const memoqProjects = await getMemoqProjectsForClientPortal(
+      //   { $and: [{ customer: verificationResult.clientId }, { status: { $ne: null } }] }
+      // );
+
       const requests = await getClientRequests({
         'customer': verificationResult.clientId,
         status: { $ne: 'Cancelled' }
       });
       const languages = await Languages.find();
       const user = client.contacts.find(item => item.email === verificationResult.contactEmail);
-      res.send({ client, user, projects, memoqProjects, requests, languages });
+      res.send({ client, user, projects, memoqProjects: [], requests, languages });
     } catch(err) {
         console.log(err);
         res.status(500).send("Error on getting Projects.");

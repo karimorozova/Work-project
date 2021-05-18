@@ -21,6 +21,11 @@
       QuoteTasks
     .main-info__tasks(v-else)
       ProjectTasks
+    .main-info__tasks(v-if="project.tasksDeliverables.length")
+      DeliveryTable(
+        :project="project"
+      )
+
     .main-info__buttons(v-if="project.status === 'Quote sent' && !project.hasOwnProperty('fromXTRF')")
       .main-info__button
         Button(value="Approve Quote" :color="'#48A6A6'" buttonClass="tasks-approve" @clicked="updateQuote('approve')")
@@ -50,6 +55,7 @@
 	import ProjectTasks from "./ProjectTasks"
 	import { mapGetters, mapActions } from "vuex"
 	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
+	import DeliveryTable from "../../../../components/DeliveryTable"
 
 	export default {
 		mixins: [currencyIconDetected],
@@ -128,6 +134,7 @@
 			}
 		},
 		components: {
+			DeliveryTable,
 			LabelValue,
 			Button,
 			QuoteTasks,
@@ -169,7 +176,7 @@
     }
 
     &__tasks {
-      padding: 20px;
+      padding: 20px 20px 0px 20px;
     }
 
     &__buttons {
