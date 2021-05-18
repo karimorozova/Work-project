@@ -30,6 +30,11 @@ async function getClient(obj) {
 			.populate('services.services', [ 'title', 'steps' ])
 }
 
+async function getSimpleClients(find = {}, filter = {}) {
+  return await Clients.find(find, filter)
+    .populate('industries', [ 'name', 'icon' ])
+}
+
 async function getClientWithActions(obj) {
 
   const client =  await Clients.findOne(obj)
@@ -179,5 +184,6 @@ module.exports = {
 	gerFilteredClients,
 	getClientsForNewProject,
 	getClientRates,
-  getClientWithActions
+  getClientWithActions,
+  getSimpleClients,
 }

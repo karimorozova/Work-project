@@ -56,7 +56,7 @@ export default {
           this.$router.push("/settings/industries");
           break;
         case "Clients Api":
-          this.$router.push("/settings/api-clients");
+          this.$router.push("/settings/api-customers");
           break;
         case "Lead Sources":
           this.$router.push("/settings/leadsources");

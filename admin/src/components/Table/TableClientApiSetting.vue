@@ -10,7 +10,6 @@
       SettingsTable(
         :fields="fields"
         :tableData="clientApi"
-
       )
         template(slot="headerLogo" slot-scope="{ field }")
           .client-api__header {{ field.label }}
@@ -356,7 +355,10 @@ export default {
 
     getIndustry() {
       if(this.selectedClients && this.selectedClients.length > 0 && this.selectedAffiliation === 'System') {
-        return this.allClients.filter(({ name }) => name === this.selectedClients)[0].industries
+        const industries =  this.allClients.filter(({ name }) => name === this.selectedClients)[0].industries
+
+        this.selectedIndustry = industries
+        return industries
       }
       return this.industries
     }

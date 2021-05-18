@@ -5,7 +5,8 @@ const {
 	gerFilteredClients,
 	getClientsForNewProject,
 	getClientRates,
-	getClientWithActions
+	getClientWithActions,
+  getSimpleClients,
 } = require('./getClients')
 
 const {
@@ -74,7 +75,8 @@ const clients = {
 	syncClientMatrix,
 	getClientAfterCombinationsUpdated,
 	filteredCombinationsResultRatesTable,
-  updateTaskDataByCondition
+  updateTaskDataByCondition,
+  getSimpleClients
 }
 
 module.exports = clients
