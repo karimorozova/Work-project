@@ -91,7 +91,7 @@ const createArchiveForDeliverableItem = async ({type, projectId, entityId, user,
     }
 
     const idx = tasksDeliverables.findIndex(({deliverablesId}) => `${deliverablesId}` === `${entityId}`)
-    const newDeliverable = { deliverablesId: entityId, path: outputPath, deliveredBy: user }
+    const newDeliverable = { deliverablesId: entityId, path: outputPath, deliveredBy: user, deliveredAt: new Date() }
     idx === -1 ? tasksDeliverables.push(newDeliverable) : tasksDeliverables.splice(idx, 1, newDeliverable)
 
     return await getProjectAfterUpdate(qProject, { tasksDeliverables })
