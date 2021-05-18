@@ -3,8 +3,9 @@
     DataTable(
       :fields="fields"
       :tableData="projectTasks"
-      :bodyClass="projectTasks.length < 10 ? 'tbody_visible-overflow' : ''"
-      :tableHeadRowClass="projectTasks.length < 10 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="cursor-default"
+      :bodyClass="[{ 'tbody_visible-overflow': projectTasks.length < 6 }]",
+      :tableheadRowClass="[{ 'tbody_visible-overflow':projectTasks.length < 6 }]",
       :rowClass="'withoutCursor'"
     )
       .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}

@@ -4,8 +4,9 @@
       :rowClass="'withoutCursor'"
       :fields="fields"
       :tableData="project.tasks"
-      :bodyClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
-      :tableHeadRowClass="project.tasks.length < 10 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="cursor-default"
+      :bodyClass="[{ 'tbody_visible-overflow': project.tasks.length < 6 }]",
+      :tableheadRowClass="[{ 'tbody_visible-overflow': project.tasks.length < 6 }]",
     )
       .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .tasks-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
@@ -30,7 +31,7 @@
 	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 
 	export default {
-		mixins: [taskPair, currencyIconDetected],
+		mixins: [ taskPair, currencyIconDetected ],
 		data() {
 			return {
 				fields: [
@@ -46,7 +47,7 @@
 		},
 		methods: {
 			isDownload(task) {
-				const statuses = ['Ready for Delivery', 'Delivered']
+				const statuses = [ 'Ready for Delivery', 'Delivered' ]
 				return statuses.indexOf(task.status) !== -1
 			},
 			async download(task) {

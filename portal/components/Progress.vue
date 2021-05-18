@@ -18,7 +18,7 @@ export default {
     data() {
         return {
             size: 60,
-            strokeWidth: 5
+            strokeWidth: 4
         }
     },
     computed: {
@@ -49,10 +49,9 @@ export default {
     align-content: center;
     justify-content: center;
     &__bar {
-        width: 85px;
-        height: 85px;
-        font-size: 11px;
-        margin-top: 5px;
+        width: 90px;
+        height: 90px;
+        font-size: 10px;
     }
     &__circle {
         transition: 0.5s ease-in-out all;

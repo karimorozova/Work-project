@@ -98,7 +98,7 @@
 
     &__describe {
       width: 30%;
-      background-color: #F2EFEB;
+      background-color: #f4f2f1;
     }
   }
 

@@ -1,17 +1,13 @@
 <template lang="pug">
   .dashboard
     .dashboard__item
-      .dashboard__drop-menu(:class="{'dashboard_cornered': isQuotesOpened}")
-        .dashboard__select(@click="toggleQuotes") Open Quotes
-          img(src="../../../assets/images/open-close-arrow-brown.png" :class="{'dashboard_rotate-180': isQuotesOpened}")
-        .dashboard__table(v-if="isQuotesOpened")
-          Table(:projects="filteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'filteredQuotes')")
+      .dashboard__title Open Quotes
+      .dashboard__table
+        Table(:projects="filteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'filteredQuotes')")
     .dashboard__item
-      .dashboard__drop-menu(:class="{'dashboard_cornered': isProjectsOpened}")
-        .dashboard__select(@click="toggleProjects") Open Projects
-          img(src="../../../assets/images/open-close-arrow-brown.png" :class="{'dashboard_rotate-180': isProjectsOpened}")
-        .dashboard__table(v-if="isProjectsOpened")
-          Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')" :isOpenProjects="true")
+      .dashboard__title Open Projects
+      .dashboard__table
+        Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')" :isOpenProjects="true")
 </template>
 
 <script>
@@ -29,20 +25,12 @@
 		},
 		data() {
 			return {
-				isQuotesOpened: true,
-				isProjectsOpened: true
 			}
 		},
 		methods: {
 			...mapActions({
 				updateQuoteStatus: "updateQuoteStatus"
 			}),
-			toggleQuotes() {
-				this.isQuotesOpened = !this.isQuotesOpened
-			},
-			toggleProjects() {
-				this.isProjectsOpened = !this.isProjectsOpened
-			},
 			filterByStatus(statuses) {
 				return this.projects.filter(item => {
 					return statuses.indexOf(item.status) !== -1
@@ -63,14 +51,14 @@
 		},
 		computed: {
 			filteredProjects() {
-				let statuses = ['Started', 'Approved', 'In progress', 'Ready for Delivery']
+				let statuses = [ 'Started', 'Approved', 'In progress', 'Ready for Delivery' ]
 				const result = this.filterByStatus(statuses)
 				return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1)
 			},
 			filteredQuotes() {
-				let statuses = ['Quote sent', 'Requested']
+				let statuses = [ 'Quote sent', 'Requested' ]
 				const projects = this.filterByStatus(statuses)
-				const result = [...this.requests, ...projects]
+				const result = [ ...this.requests, ...projects ]
 				return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1)
 			}
 		},
@@ -89,14 +77,11 @@
     flex-direction: column;
 
     &__item {
-      width: 1010px;
+      width: 1040px;
       display: flex;
       flex-direction: column;
       justify-content: center;
 
-      &:first-child {
-        margin-bottom: 40px;
-      }
     }
 
     &__drop-menu {
@@ -106,7 +91,7 @@
       align-items: center;
       width: 100%;
       border-radius: 18px;
-      box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       margin-right: 36px;
       margin-bottom: 10px;
       padding: 0 14px;
@@ -124,9 +109,16 @@
       font-size: 18px;
     }
 
+    &__title{
+      margin: 30px 0 10px;
+      font-family: Myriad400;
+      font-size: 20px;
+      color: #67573e;
+    }
+
     &__table {
-      width: 100%;
-      transition: all 0.2s;
+      box-shadow: rgba(103, 87, 62, .3) 0px 2px 5px, rgba(103, 87, 62, .15) 0px 2px 6px 2px;
+      padding: 20px;
     }
 
     &_cornered {

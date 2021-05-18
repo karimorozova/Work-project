@@ -53,7 +53,7 @@ export default {
     padding: 40px;
     box-sizing: border-box;
     position: relative;
-    box-shadow: 0 0 5px $deep-brown;
+    box-shadow: 0 0 5px $main-color;
     border-radius: 15px;
     margin-bottom: 40px;
     &__submit {

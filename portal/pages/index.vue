@@ -50,7 +50,7 @@
           .logoImage(v-if="expander")
           .balloons(v-else)
       .clientsMainWrapper__inner
-        .breadCrumbs
+        //.breadCrumbs
           span.accountName {{ user.firstName }}
           span.arrows(v-if="user.firstName")
             i.fa.fa-angle-double-right(aria-hidden='true')
@@ -83,28 +83,28 @@
 						imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
 						active: false
 					},
-					{
-						title: "INVOICES",
-						path: "/invoices",
-						imgBrown: require("../assets/images/CATEGORIES/INVOICES.png"),
-						active: false
-					},
-					{
-						title: "DOCUMENTS",
-						path: "/documents",
-						imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
-						imgBrown: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
-						active: false
-					}
+					// {
+					// 	title: "INVOICES",
+					// 	path: "/invoices",
+					// 	imgBrown: require("../assets/images/CATEGORIES/INVOICES.png"),
+					// 	active: false
+					// },
+					// {
+					// 	title: "DOCUMENTS",
+					// 	path: "/documents",
+					// 	imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
+					// 	imgBrown: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
+					// 	active: false
+					// }
 				],
 				openQuotes: true,
 				openProjects: true,
 				expander: false,
 				accountMenuVisible: false,
 				newProject: [
-					{ title: "Translation", path: "/translation" },
-					{ title: "Copywriting", path: "/copywriting" },
-					{ title: "Marketing", path: "/marketing" }
+					// { title: "Translation", path: "/translation" },
+					// { title: "Copywriting", path: "/copywriting" },
+					// { title: "Marketing", path: "/marketing" }
 					//   {title: "Proofing/QA", path: "/proofing"},
 					//   {title: "Graphic Localization", path: "/graphic-localization"}
 				],
@@ -123,11 +123,7 @@
 			},
 			toggleSideBar(isFirstRender) {
 				for (let elem of this.navbarList) {
-					if (window.location.toString().indexOf(elem.path) !== -1) {
-						elem.active = true
-					} else {
-						elem.active = false
-					}
+					elem.active = window.location.toString().indexOf(elem.path) !== -1;
 				}
 			},
 			thankYou(data) {
@@ -574,7 +570,7 @@
   .clientsMainWrapper {
     box-sizing: border-box;
     padding-top: 6vh;
-    padding-left: 150px;
+    padding-left: 135px;
     display: flex;
     height: 100%;
     position: relative;
@@ -582,7 +578,7 @@
     &__inner {
       width: 100%;
       box-sizing: border-box;
-      padding: 30px;
+      padding: 20px 40px;
     }
 
     .maininfoWrapper {
@@ -638,12 +634,12 @@
 
       &__sideBar {
         padding: 25px 0;
-        background-color: #998e7e;
-        width: 150px;
+        background-color: #948977;
+        width: 135px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+        box-shadow: 0 0 10px rgba(104, 87, 62, 0.6);
         z-index: 2;
         overflow: hidden;
       }
@@ -673,7 +669,7 @@
         font-size: 14px;
         font-weight: 700;
         padding: 0;
-        width: 167px;
+        width: 150px;
         height: 77vh;
         margin-bottom: 0;
         overflow-y: scroll;
@@ -815,18 +811,18 @@
     }
   }
 
-  .breadCrumbs {
-    max-height: 50px;
-    margin: 0px 0px 30px 0;
-    color: #67573e;
-    font-size: 22px;
+  /*.breadCrumbs {*/
+  /*  max-height: 50px;*/
+  /*  margin: 0px 0px 30px 0;*/
+  /*  color: #67573e;*/
+  /*  font-size: 22px;*/
 
-    .arrows {
-      font-size: 16px;
-      opacity: 0.6;
-      margin: 0 10px;
-    }
-  }
+  /*  .arrows {*/
+  /*    font-size: 16px;*/
+  /*    opacity: 0.6;*/
+  /*    margin: 0 10px;*/
+  /*  }*/
+  /*}*/
 
   @font-face {
     font-family: 'Myriad300';

@@ -4,8 +4,9 @@
       :fields="fields"
       :rowClass="'withoutCursor'"
       :tableData="tableData"
-      :bodyClass="tableData.length < 10 ? 'tbody_visible-overflow' : ''"
-      :tableHeadRowClass="tableData.length < 10 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="cursor-default"
+      :bodyClass="[{ 'tbody_visible-overflow': tableData.length < 6 }]",
+      :tableheadRowClass="[{ 'tbody_visible-overflow':tableData.length < 6 }]",
     )
       .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .tasks-table__header(slot="headerWordcount" slot-scope="{ field }") {{ field.label }}

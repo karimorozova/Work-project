@@ -5,8 +5,8 @@
       DataTable(
         :fields="fields"
         :tableData="projects"
-        :bodyClass="projects.length < 12 ? 'tbody_visible-overflow' : ''"
-        :tableHeadRowClass="projects.length < 12 ? 'tbody_visible-overflow' : ''"
+        :bodyClass="['vendors-table__body',{'tbody_visible-overflow': projects.length < 14}]"
+        :tableheadRowClass="[{ 'tbody_visible-overflow': projects.length < 14 }]",
         @onRowClicked="getDetails"
       )
         .projects-table__header(slot="headerRequestDate" slot-scope="{ field }") {{ field.label }}

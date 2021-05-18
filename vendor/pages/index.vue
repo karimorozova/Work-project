@@ -360,7 +360,7 @@
       }
 
       &:hover {
-        background-color: #f2efeb;
+        background-color: #f4f2f1;
       }
     }
 

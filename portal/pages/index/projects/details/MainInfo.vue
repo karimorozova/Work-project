@@ -19,9 +19,9 @@
       ProjectTasks
     .main-info__buttons(v-if="project.status === 'Quote sent' && !project.hasOwnProperty('fromXTRF')")
       .main-info__button
-        Button(value="Approve Quote" buttonClass="tasks-approve" @makeAction="updateQuote('approve')")
+        Button(value="Approve Quote" :color="'#48A6A6'" @clicked="updateQuote('approve')")
       .main-info__button
-        Button(value="Reject Quote" @makeAction="updateQuote('reject')")
+        Button(value="Reject Quote" @clicked="updateQuote('reject')")
 </template>
 
 <script>
@@ -104,7 +104,7 @@
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
-      height: 90px;
+      height: 92px;
       padding: 20px;
     }
 

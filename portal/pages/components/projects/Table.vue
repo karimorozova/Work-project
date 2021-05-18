@@ -3,8 +3,8 @@
         DataTable(
             :fields="fields"
             :tableData="projects"
-            :bodyClass="projects.length < 7 ? 'tbody_visible-overflow tbody_height-200' : 'tbody_height-200'"
-            :tableHeadRowClass="projects.length < 7 ? 'tbody_visible-overflow' : ''"
+            :bodyClass="[{ 'tbody_visible-overflow': projects.length < 6 }]",
+            :tableheadRowClass="[{ 'tbody_visible-overflow': projects.length < 6 }]",
             @onRowClicked="getDetails"
         )
             .data-table__header(slot="headerRequestDate" slot-scope="{ field }") {{ field.label }}

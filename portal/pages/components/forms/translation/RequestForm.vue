@@ -25,7 +25,7 @@
                 .form__block
                     QuoteDecision(:quoteDecision="quoteDecision" @setQuoteDecision="setQuoteDecision")
                 .form__block.form_centered
-                    Button(value="Submit" @makeAction="checkErrors")
+                    Button(value="Submit" @clicked="checkErrors")
         OrderInfo(
             :service="service.title"
             :industry="selectedIndustry"
