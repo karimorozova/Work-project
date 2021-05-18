@@ -1,5 +1,11 @@
 <template lang="pug">
   .client-api
+    ValidationErrors(
+      v-if="errors.length"
+      :errors="errors"
+      :isAbsolute="isAbsolute"
+      @closeErrors="closeErrors"
+    )
     .client-api__table
       SettingsTable(
         :fields="fields"
@@ -76,6 +82,7 @@
             img.client-api__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'client-api_opacity': isActive(key, index)}")
 
     Add(@add="addClientApi")
+
 </template>
 
 <script>
@@ -85,6 +92,7 @@ import { mapGetters, mapActions } from "vuex";
 import SelectSingle from "../SelectSingle"
 import crudIcons from "@/mixins/crudIcons";
 import SelectMulti from "../SelectMulti";
+import ValidationErrors from "../ValidationErrors";
 
 export default {
   mixins: [crudIcons],
@@ -147,6 +155,7 @@ export default {
       isTableDropMenu: true,
       affiliationData: ['Input', 'System'],
       clientName: '',
+      errors: [],
     };
   },
   methods: {
@@ -215,15 +224,14 @@ export default {
     },
     setEditionData(index) {
       this.currentActive = index;
-      this.logo = logo
+
+      const {affiliation, clientName, industry, isDisplay} = this.clientApi[index]
+
       this.selectedAffiliation = affiliation
       this.selectedClients = clientName
       this.clientName = clientName
       this.selectedIndustry = industry
       this.isDisplay = isDisplay
-    },
-    closeErrors() {
-      this.areErrors = false;
     },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
@@ -264,8 +272,13 @@ export default {
           await this.updateClientApi(id, newData, index);
         }
         await this.getClientsApi()
+
         this.iconFile = []
         this.imageData = ''
+        this.selectedClients = ''
+        this.clientName = ''
+        this.selectedIndustry = []
+
         this.alertToggle({ message: "Saved", isShow: true, type: "success" });
 
       } catch (error) {
@@ -280,10 +293,13 @@ export default {
       const newData = new FormData();
       newData.append("logo", this.iconFile[0]);
       newData.append("affiliation", this.selectedAffiliation);
-      newData.append("clientName", this.selectedAffiliation === "System" ? this.selectedClients : this.clientName);
+      newData.append("clientName", this.getClientName());
       newData.append("industry", JSON.stringify(this.selectedIndustry));
       newData.append("isDisplay", this.clientApi[index].isDisplay);
       return newData;
+    },
+    getClientName() {
+      return this.selectedAffiliation === "System" ? this.selectedClients : this.clientName
     },
     async createNew(newData) {
       try {
@@ -306,7 +322,28 @@ export default {
       this.currentActive = -1;
       this.isDeleting = false;
     },
+    closeErrors() {
+      this.errors = []
+    },
     async checkErrors(index) {
+      this.errors = []
+
+      if(!this.selectedAffiliation.length ) {
+        this.errors.push("Select affiliation");
+      }
+      if(!this.getClientName().length ) {
+        this.errors.push("Select or write some Client Name");
+      }
+      if(!this.selectedIndustry.length) {
+        this.errors.push("Select some Industries");
+      }
+      if(this.clientApi.some(({clientName}, i) => (this.getClientName() === clientName) && (i !== index) )) {
+        this.errors.push("This Client Name already exist");
+      }
+
+      if(this.errors.length) {
+        return
+      }
 
       this.saveChanges(index)
     },
@@ -325,6 +362,7 @@ export default {
     }
   },
   components: {
+    ValidationErrors,
     SelectSingle,
     SettingsTable,
     Add,

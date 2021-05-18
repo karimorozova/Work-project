@@ -21,13 +21,13 @@ const memoqapiRouter = require('./memoqapi')
 const multipliers = require('./pricelists/multipliers')
 const settings = require('./settings')
 const dashboard = require('./dashboard')
-const apiWP = require('./apiWP')
+const OpenPangea = require('./OpenPangea')
 
 
 //ADMIN
 router.use('/', admin)
 router.use('/api', apiRouter)
-router.use('/wp-api', apiWP)
+router.use('/open-pangea', OpenPangea)
 router.use('/service', serviceRouter)
 router.use('/zoho', zohoRouter)
 router.use('/vendors/application', vendorApplicationRouter)
