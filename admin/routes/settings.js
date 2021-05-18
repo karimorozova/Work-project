@@ -2,7 +2,7 @@ const router = require('express').Router()
 const fs = require('fs')
 const { upload, moveFile } = require('../utils/')
 const { updateLanguage, getTierInfo, updateTierInfo, getIndustryTier, updateIndustryTier, getClientsApi } = require('../settings')
-const { getClients } = require('../clients')
+const { getSimpleClients  } = require('../clients')
 const { Languages, ClientsApiSetting } = require('../models')
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
@@ -140,7 +140,7 @@ router.post('/clients-api/:id/delete', async (req, res) => {
 
 router.post('/all-clients', async (req, res) => {
 	try {
-		const clients = await getClients({})
+		const clients = await getSimpleClients({}, {'name': 1, industry: 1})
 		res.send(clients)
 	} catch (err) {
 		console.log(err)

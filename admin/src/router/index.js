@@ -155,8 +155,8 @@ const router = new Router({
                             component: TableDiscounts
                         },
                         {
-                            path: 'api-clients',
-                            name: 'api-clients',
+                            path: 'api-customers',
+                            name: 'api-customers',
                             component: TableClientApiSetting
                         },
                         {
