@@ -311,6 +311,7 @@ const ProjectsSchema = new mongoose.Schema({
 		isVendorRead: { type: Boolean, default: false },
 		previousStatus: ""
 	} ],
+	// TODO: refactoring
 	totalCost: {
 		type: String,
 		default: '',
@@ -337,6 +338,7 @@ const ProjectsSchema = new mongoose.Schema({
 	accountManager: {
 		type: Schema.Types.ObjectId, ref: 'User'
 	},
+// TODO: refactoring
 	service: {
 		type: Schema.Types.ObjectId, ref: 'Services'
 	},
@@ -345,11 +347,13 @@ const ProjectsSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	// TODO: refactoring
 	sourceLanguage: {
 		type: Object,
 		default: {},
 		trim: true
 	},
+	// TODO: refactoring
 	targetLanguages: {
 		type: Array,
 		default: [],
@@ -371,11 +375,13 @@ const ProjectsSchema = new mongoose.Schema({
 		type: String,
 		default: ''
 	},
+	// TODO: refactoring
 	sourceFiles: {
 		type: Array,
 		default: [],
 		trim: true
 	},
+	// TODO: refactoring
 	refFiles: {
 		type: Array,
 		default: [],

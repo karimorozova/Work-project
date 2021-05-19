@@ -1,6 +1,5 @@
 <template lang="pug">
   .details(v-if="project._id")
-    | project / details
     .details__title {{ title }}
     .details__data
       .details__info
@@ -11,8 +10,8 @@
 </template>
 
 <script>
-	import MainInfo from "./MainInfo"
-	import OtherInfo from "./OtherInfo"
+	import MainInfo from "../../dashboard/details/MainInfo"
+	import OtherInfo from "../../dashboard/details/OtherInfo"
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
@@ -93,11 +92,11 @@
     }
 
     &__main {
-      width: 70%;
+      width: 72%;
     }
 
     &__describe {
-      width: 30%;
+      width: 28%;
       background-color: #f4f2f1;
     }
   }

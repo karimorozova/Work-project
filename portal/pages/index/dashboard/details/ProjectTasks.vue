@@ -32,7 +32,10 @@
       .tasks-table__data.tasks-table_centered(slot="icons" slot-scope="{ row }")
         .tasks-table__icons(v-if="isApproveReject(row)")
           img.tasks-table__icon(v-for="(icon, key) in icons" :src="icon.src" @click="makeDecision(row, key)")
-        img.tasks-table__download(v-if="isDownload(row)" src="../../../../assets/images/download.png" @click="download(row)")
+        .tasks-table__icons(v-else) -
+
+    div(v-if="!projectTasks.length") No information available...
+
 
 </template>
 
@@ -54,7 +57,7 @@
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "15%", padding: "0" },
 					{ label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "15%", padding: "0" },
 					{ label: "Cost", headerKey: "headerCost", key: "cost", width: "15%", padding: "0" },
-					{ label: " ", headerKey: "headerDownload", key: "icons", width: "15%", padding: "0" }
+					{ label: "Quote Action", headerKey: "headerDownload", key: "icons", width: "15%", padding: "0" }
 				],
 				domain: "",
 				icons: {
@@ -80,9 +83,9 @@
 			isApproveReject(task) {
 				return task.status === 'Quote sent'
 			},
-			isDownload(task) {
-				return task.status === 'Ready for Delivery' || task.status === 'Delivered'
-			},
+			// isDownload(task) {
+			// 	return task.status === 'Ready for Delivery' || task.status === 'Delivered'
+			// },
 			async makeDecision(task, key) {
 				const status = key === 'approve' ? 'Approved' : 'Rejected'
 				try {
@@ -90,24 +93,24 @@
 				} catch (err) {
 				}
 			},
-			async download(task) {
-				try {
-					let href = task.deliverables
-					if (!href) {
-						const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`)
-						href = result.data.link
-					}
-					let link = document.createElement('a')
-					link.href = this.domain + href
-					link.target = "_blank"
-					link.click()
-					if (task.status === "Ready for Delivery") {
-						await this.updateTaskStatus({ task, status: 'Delivered' })
-					}
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" })
-				}
-			},
+			// async download(task) {
+			// 	try {
+			// 		let href = task.deliverables
+			// 		if (!href) {
+			// 			const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`)
+			// 			href = result.data.link
+			// 		}
+			// 		let link = document.createElement('a')
+			// 		link.href = this.domain + href
+			// 		link.target = "_blank"
+			// 		link.click()
+			// 		if (task.status === "Ready for Delivery") {
+			// 			await this.updateTaskStatus({ task, status: 'Delivered' })
+			// 		}
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" })
+			// 	}
+			// },
 			getProgress(task, index) {
 				if (this.project.hasOwnProperty('fromXTRF')) {
 					return this.project.tasks[index].progress
