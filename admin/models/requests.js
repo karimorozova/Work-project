@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const USD = {
 	type: Number,
@@ -84,8 +85,8 @@ const RequestSchema = new mongoose.Schema({
 		status: "",
 		clientRate: {},
 		targetFile: "",
-		finance: stepFinance,
-		nativeFinance: stepFinance,
+		// finance: stepFinance,
+		// nativeFinance: stepFinance,
 		defaultStepPrice: 0,
 		vendorRate: "",
 		nativeVendorRate: "",
@@ -282,6 +283,6 @@ const RequestSchema = new mongoose.Schema({
 //   return this.date.getTime();
 // }
 //
-// const Requests = mongoose.model('Requests', RequestSchema);
+const Requests = mongoose.model('Requests', RequestSchema);
 
 module.exports = Requests;
