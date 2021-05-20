@@ -306,7 +306,7 @@
     justify-content: space-between;
     background-color: #67573e;
     position: fixed;
-    height: 5vh;
+    height: 40px;
     width: 100%;
     z-index: 1000;
 
@@ -315,7 +315,7 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      margin-left: 135px;
+      margin-left: 150px;
 
       a {
         text-decoration: none;
@@ -325,7 +325,7 @@
       .adminPortal {
         color: #fff;
         width: 100%;
-        font-size: 24px;
+        font-size: 22px;
         font-family: Myriad600;
       }
     }
@@ -499,7 +499,7 @@
 
   .admin-main-wrapper {
     box-sizing: border-box;
-    padding-top: 5vh;
+    padding-top: 40px;
     display: flex;
     height: 100%;
     position: relative;
@@ -516,7 +516,7 @@
       left: 0;
       z-index: 999;
       display: flex;
-      min-height: 95vh;
+      min-height: calc(100vh - 40px);
 
       &__sidebar {
         padding: 25px 0;
@@ -613,7 +613,6 @@
   }
 
   .new-request {
-    height: 34px;
     width: 239px;
     margin-right: 83px;
     z-index: 3;

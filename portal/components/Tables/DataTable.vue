@@ -28,45 +28,45 @@
 	export default {
 		props: {
 			fields: {
-				type: Array,
+				type: Array
 			},
 			tableData: {
-				type: Array,
+				type: Array
 			},
 			activeIndex: {
-				type: Number,
+				type: Number
 			},
 			headCellClass: {
-				type: String,
+				type: String
 			},
 			bodyClass: {
-				type: [String, Array],
+				type: [ String, Array ]
 			},
 			bodyRowClass: {
-				type: String,
+				type: String
 			},
 			bodyCellClass: {
-				type: String,
+				type: String
 			},
 			tableheadClass: {
-				type: [String, Array],
+				type: [ String, Array ]
 			},
 			tableheadRowClass: {
-				type: [String, Array],
-			},
+				type: [ String, Array ]
+			}
 		},
 		methods: {
 			onClick(index) {
-				this.$emit("onRowClicked", { index });
+				this.$emit("onRowClicked", { index })
 			},
 			handleBodyScroll(e) {
-				const element = e.target;
+				const element = e.target
 				if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
-					this.$emit("bottomScrolled");
+					this.$emit("bottomScrolled")
 				}
-			},
-		},
-	};
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -75,14 +75,17 @@
   .table {
     width: 100%;
     color: #67573e;
+
     &__thead {
       border: 1px solid #938676;
       border-bottom: none;
+
       .table__head-row {
         background-color: $thead-background;
         color: $white;
       }
     }
+
     &__tbody {
       max-height: 192px;
       overflow-y: scroll;
@@ -91,21 +94,25 @@
       border-top: none;
 
       .table__body-row {
-        .steps-cell{
+        .steps-cell {
           padding: 7px 5px 7px 5px;
         }
+
         cursor: pointer;
+
         &:nth-of-type(odd) {
           .table__tbody-cell {
             background-color: $table-row-zebra-background;
           }
         }
+
         &:hover {
           .table__tbody-cell {
             background-color: $cell-background;
           }
         }
       }
+
       .cursor-default,
       .steps-table-row,
       .rates-matrix-row {
@@ -115,6 +122,7 @@
       .setting-table-body {
         max-height: 400px;
       }
+
       .settings-table-row {
         cursor: default;
       }
@@ -123,11 +131,14 @@
         max-height: 400px;
         border: none !important;
       }
+
       .client-pricelist-table-row {
         cursor: default;
       }
+
       .delivery_no-hover-change {
         cursor: default;
+
         &:hover {
           .table__tbody-cell {
             background-color: $table-row-zebra-background;
@@ -143,13 +154,16 @@
       border: 1px solid $cell-border;
       border-right: none;
       border-left: 1px solid $white;
+
       &:first-child {
         border-left: 1px solid $cell-border;
       }
+
       &:last-child {
         border-right: 1px solid $cell-border;
       }
     }
+
     &__thead-cell-icon {
       box-sizing: border-box;
       font-size: 14px;
@@ -157,10 +171,12 @@
       border: 0.5px solid $cell-border;
       border-right: none;
       border-left: 0.5px solid $white;
+
       &:last-child {
         border-right: 0.5px solid $cell-border;
       }
     }
+
     &__tbody-cell {
       box-sizing: border-box;
       font-size: 14px;
@@ -169,20 +185,23 @@
       border-left: 1px solid $cell-border;
       border-right: none;
       border-top: none;
-      min-height: 32px;
+      min-height: 30px;
 
       &:last-child {
         border-right: 1px solid $cell-border;
       }
+
       &:focus-within {
         box-shadow: inset 0 0 5px $cell-border;
       }
     }
+
     &__head-row,
     &__body-row {
       display: flex;
       flex-wrap: wrap;
     }
+
     &__head-row {
       overflow-y: scroll;
     }
@@ -204,16 +223,20 @@
   .all-projects {
     max-height: 600px;
   }
+
   .other-all-projects {
     max-height: calc(90vh - 240px);
   }
-  .other-project-cell{
+
+  .other-project-cell {
     max-height: 120px;
     overflow-y: auto;
   }
-  .vendor-table-cell{
+
+  .vendor-table-cell {
     max-height: 120px;
   }
+
   .reports__table {
     margin-bottom: 0;
   }
@@ -226,8 +249,9 @@
   .matrix-table {
     max-height: 350px;
   }
-  .candidates-vendor-table{
-    max-height: 600px!important;
+
+  .candidates-vendor-table {
+    max-height: 600px !important;
     overflow-y: scroll;
     margin-bottom: 20px;
     border: 0.5px solid $cell-border;
@@ -260,6 +284,7 @@
 
   .review-body {
     max-height: 800px;
+
     .table__body-row {
       cursor: default;
     }
@@ -267,40 +292,51 @@
 
   .table__header {
     height: 33px;
+
     .table__header-row {
       height: 100%;
     }
   }
+
   .table__body-row-custom {
     height: 33px;
   }
+
   .flex-content {
     display: flex;
     align-items: center;
   }
+
   .request-files_table {
     max-height: 136px;
   }
+
   .height-700 {
     max-height: 700px;
   }
+
   .height-500 {
     max-height: 500px;
   }
+
   .pricelist-icon-header {
     background: white;
   }
+
   .pricelist-icon-body {
     background-color: white !important;
     border: none;
   }
+
   .table__thead-cell-icon:nth-child(2) {
     border-left: 0.5px solid #938676;
   }
+
   .client-pricelist-table-head {
     height: auto;
   }
-  .matrix-table{
+
+  .matrix-table {
     box-sizing: border-box;
     font-size: 14px;
     padding: 0 0 0 5px;
@@ -311,9 +347,14 @@
     border-right: none;
     border-top: none;
   }
-  .padding-with-check-box{
+
+  .padding-with-check-box {
     padding: 5px 5px 5px 6px;
     align-items: center;
     display: flex;
+  }
+
+  .hideHead {
+    height: 1px;
   }
 </style>

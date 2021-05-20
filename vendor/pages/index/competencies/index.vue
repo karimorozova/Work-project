@@ -620,7 +620,7 @@
     font-family: 'Myriad900';
   }
   .title1 {
-    font-size: 18px;
+    font-size: 16px;
     padding-bottom: 10px;
     padding-top: 20px;
     text-transform: uppercase;

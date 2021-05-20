@@ -2,7 +2,7 @@
   .clientsportalWrapper
     .clientsTop
       .clientsTop__clientName
-        h2.clientsPortal CLIENT PORTAL
+        .clientsPortal CLIENT PORTAL
       .clientsTop__searchBlock
         .dropdownWrapper(v-click-outside="closeRequestsMenu")
           .sel_project_block(@click="showDropdown")
@@ -13,6 +13,7 @@
               .clientsTop__dropdown
                 .additional(v-if="dropdownVisible")
                   .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
+
         .account-menu(v-click-outside="hideAccountMenu")
           .womanWrapper
             img.womanWrapper__photo(v-if="user.photo" :src="domain+user.photo")
@@ -102,11 +103,12 @@
 				expander: false,
 				accountMenuVisible: false,
 				newProject: [
-					// { title: "Translation", path: "/translation" },
-					// { title: "Copywriting", path: "/copywriting" },
-					// { title: "Marketing", path: "/marketing" }
-					//   {title: "Proofing/QA", path: "/proofing"},
-					//   {title: "Graphic Localization", path: "/graphic-localization"}
+					{ title: "Compliance", path: "/compliance" },
+					{ title: "Translation", path: "/translation" },
+					{ title: "Copywriting", path: "/copywriting" },
+					{ title: "Marketing", path: "/marketing" },
+          {title: "Proofing/QA", path: "/proofing"},
+          {title: "Graphic Localization", path: "/graphic-localization"}
 				],
 				dropdownVisible: false,
 				clientRequestShow: false,
@@ -247,7 +249,7 @@
     justify-content: space-between;
     background-color: #67573e;
     position: fixed;
-    height: 6vh;
+    height: 40px;
     width: 100%;
     z-index: 1000;
 
@@ -272,6 +274,8 @@
       }
 
       .clientsPortal {
+        font-size: 22px;
+        font-family: Myriad600;
         color: #fff;
         width: 100%;
       }
@@ -293,18 +297,18 @@
       border: 2px solid #fff;
       width: 30%;
       visibility: hidden;
-      @media screen and (max-width: 1520px) {
-        margin-right: 20px;
-      }
-      @media screen and (max-width: 1430px) {
-        margin-right: 40px;
-      }
-      @media screen and (max-width: 1380px) {
-        margin-right: 55px;
-      }
-      @media screen and (max-width: 1330px) {
-        margin-right: 85px;
-      }
+      /*@media screen and (max-width: 1520px) {*/
+      /*  margin-right: 20px;*/
+      /*}*/
+      /*@media screen and (max-width: 1430px) {*/
+      /*  margin-right: 40px;*/
+      /*}*/
+      /*@media screen and (max-width: 1380px) {*/
+      /*  margin-right: 55px;*/
+      /*}*/
+      /*@media screen and (max-width: 1330px) {*/
+      /*  margin-right: 85px;*/
+      /*}*/
 
       img {
         padding-right: 514px;
@@ -316,6 +320,7 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
+      height: 40px;
 
       .account-menu {
         display: flex;
@@ -323,22 +328,21 @@
       }
 
       .dropdownWrapper {
-        height: 34px;
+        height: 32px;
         width: 239px;
-        margin-right: 119px;
+        margin-right: 40px;
         z-index: 3;
         position: relative;
 
         .sel_project_block {
           margin-right: 150px;
           background-color: #D15F45;
-          border-radius: 14px;
-          width: 100%;
-          height: 34px;
+          border-radius: 4px;
+          width: 191px;
+          height: 32px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
           cursor: pointer;
 
           &__proj {
@@ -380,29 +384,29 @@
         .clientsTop__dropdown {
           z-index: -1;
           position: absolute;
-          right: 0;
-          top: 41px;
+          right: 48px;
+          top: 36px;
+          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.20);
 
           .additional {
-            border: 2px solid #978d7e;
             color: #67573e;
             background-color: #fff;
-            font-size: 16px;
-            width: 240px;
+            font-size: 14px;
+            width: 191px;
 
             &__listItem {
-              padding: 15px;
-              border-bottom: 0.2px solid #978d7e;
+              padding: 12px;
               cursor: pointer;
+              border-bottom: 0.5px solid #f4f2f1;
 
               &:hover {
-                background-color: #ddd3c8;
+                background-color: #f4f2f1;
               }
             }
 
             .first {
               &:hover {
-                background-color: #ddd3c8;
+                background-color: #f4f2f1;
               }
             }
           }
@@ -569,14 +573,13 @@
 
   .clientsMainWrapper {
     box-sizing: border-box;
-    padding-top: 6vh;
+    padding-top: 40px;
     padding-left: 135px;
     display: flex;
     height: 100%;
     position: relative;
 
     &__inner {
-      width: 100%;
       box-sizing: border-box;
       padding: 20px 40px;
     }
@@ -630,7 +633,7 @@
       left: 0;
       z-index: 999;
       display: flex;
-      min-height: 94vh;
+      min-height: calc(100vh - 40px) ;
 
       &__sideBar {
         padding: 25px 0;
