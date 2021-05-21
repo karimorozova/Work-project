@@ -83,7 +83,7 @@
 						path: "/projects",
 						imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
 						active: false
-					},
+					}
 					// {
 					// 	title: "INVOICES",
 					// 	path: "/invoices",
@@ -103,12 +103,12 @@
 				expander: false,
 				accountMenuVisible: false,
 				newProject: [
-					{ title: "Compliance", path: "/compliance" },
-					{ title: "Translation", path: "/translation" },
-					{ title: "Copywriting", path: "/copywriting" },
-					{ title: "Marketing", path: "/marketing" },
-          {title: "Proofing/QA", path: "/proofing"},
-          {title: "Graphic Localization", path: "/graphic-localization"}
+					{ title: "Compliance", path: "/compliance" }
+					// { title: "Translation", path: "/translation" },
+					// { title: "Copywriting", path: "/copywriting" },
+					// { title: "Marketing", path: "/marketing" },
+					// {title: "Proofing/QA", path: "/proofing"},
+					// {title: "Graphic Localization", path: "/graphic-localization"}
 				],
 				dropdownVisible: false,
 				clientRequestShow: false,
@@ -125,7 +125,7 @@
 			},
 			toggleSideBar(isFirstRender) {
 				for (let elem of this.navbarList) {
-					elem.active = window.location.toString().indexOf(elem.path) !== -1;
+					elem.active = window.location.toString().indexOf(elem.path) !== -1
 				}
 			},
 			thankYou(data) {
@@ -431,7 +431,7 @@
             width: 230px;
             height: 124px;
             background-color: #fff;
-            box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+            box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
             position: absolute;
             top: 44px;
             right: -115px;
@@ -633,7 +633,7 @@
       left: 0;
       z-index: 999;
       display: flex;
-      min-height: calc(100vh - 40px) ;
+      min-height: calc(100vh - 40px);
 
       &__sideBar {
         padding: 25px 0;
@@ -781,7 +781,7 @@
         align-items: center;
         width: 100%;
         border-radius: 18px;
-        box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+        box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
         margin-right: 36px;
         margin-bottom: 10px;
         padding: 0 14px;
