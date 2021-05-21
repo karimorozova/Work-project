@@ -131,7 +131,9 @@
   }
 
   .disabled {
+
     .action-button__button {
+      cursor: default;
       opacity: 0.5;
       min-width: 120px;
       padding: 0 24px 0 24px;

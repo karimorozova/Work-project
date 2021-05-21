@@ -136,8 +136,8 @@
             text="I approve for the project to begin immediately and to receive the quote just for reference."
             @check="(e) => setQuoteDecision('Start')"
           )
-        .form__submit(v-if="isCompleteForm")
-          Button(@clicked="" value="Submit")
+        .form__submit
+          Button(@clicked="" value="Submit" :isDisabled="!isCompleteForm")
 
       div
         .content__order
