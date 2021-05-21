@@ -52,11 +52,11 @@ const {
 	createTasksFromRequest
 } = require('./create')
 
-const {
-	getClientsRequests,
-	getClientRequestById,
-	updateClientRequestProps,
-} = require('./requests/getClientsRequests')
+// const {
+// 	getClientsRequests,
+// 	getClientRequestById,
+// 	updateClientRequestProps,
+// } = require('../clientRequests/getClientsRequests')
 
 const {
 	createTasksForWordcount
@@ -158,6 +158,6 @@ module.exports = {
 	addDR2,
 	addMultiLangDR2,
 	removeMultiDR2,
-	getClientsRequests,
-	getClientRequestById,
+	// getClientsRequests,
+	// getClientRequestById,
 }

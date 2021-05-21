@@ -16,6 +16,17 @@ const { secretKey } = require('../configs');
 const { upload } = require('../utils/');
 const { setClientsContactNewPassword, updateAccountDetails } = require('../users');
 
+router.post('/compliance-service', checkClientContact, upload.fields([{ name: 'refFiles' }, { name: 'sourceFiles' }]), async (req, res) => {
+  const formData = req.body
+  try{
+    console.log(req.files)
+    console.log(formData)
+
+  }catch (err) {
+
+  }
+})
+
 router.post("/auth", async (req, res, next) => {
   if (req.body.logemail && req.body.logpassword) {
     Clients.authenticate(req.body.logemail, req.body.logpassword, async (error, data) => {

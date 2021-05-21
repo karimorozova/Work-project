@@ -1,4 +1,4 @@
-const {ClientRequest} = require("../../models")
+const {ClientRequest} = require("../models")
 
 
 function getRequestsQuery (filters) {
@@ -34,8 +34,6 @@ function getRequestsQuery (filters) {
 	}
 	return query;
 }
-
-
 
 async function getClientsRequests(filters) {
 	const query = getRequestsQuery(filters);

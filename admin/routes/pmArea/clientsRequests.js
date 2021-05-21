@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { getClientsRequests, getClientRequestById, updateClientRequestProps  } = require("../../projects")
+const { getClientsRequests, getClientRequestById, updateClientRequestProps  } = require("../../clientRequests")
 
 router.post('/all', async (req, res) => {
 	const filters = {...req.body};

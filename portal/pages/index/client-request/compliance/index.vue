@@ -137,7 +137,8 @@
             @check="(e) => setQuoteDecision('Start')"
           )
         .form__submit
-          Button(@clicked="" value="Submit" :isDisabled="!isCompleteForm")
+          //Button(@clicked="addService" value="Submit" :isDisabled="!isCompleteForm")
+          Button(@clicked="addService" value="Submit")
 
       div
         .content__order
@@ -265,6 +266,27 @@
 			}
 		},
 		methods: {
+			async addService() {
+				let formData = new FormData()
+				formData.append('deadline', this.currentDeadline)
+				formData.append('projectName', this.currentProjectName)
+				formData.append('sourceLanguage', JSON.stringify(this.currentSourceLang))
+				formData.append('targetLanguages', JSON.stringify(this.currentTargetLang))
+				formData.append('industry', JSON.stringify(this.currentIndustries))
+				formData.append('brief', this.currentBrief)
+				formData.append('startOption', this.startOption)
+				formData.append('complianceTemplate', JSON.stringify(this.currentComplianceTemplate))
+				formData.append('clientContacts', JSON.stringify(this.currentContacts))
+
+				if (this.refFiles.length) for (let file of this.refFiles) formData.append('refFiles', file)
+				if (this.sourceFiles.length) for (let file of this.sourceFiles) formData.append('sourceFiles', file)
+
+				try {
+					await this.$axios.post('/portal/compliance-service', formData)
+				} catch (err) {
+
+				}
+			},
 			removeContact(index) {
 				this.currentContacts.splice(index, 1)
 			},
