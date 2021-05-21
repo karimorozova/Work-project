@@ -236,17 +236,38 @@ const ClientRequestSchema = new mongoose.Schema({
 			default: {}
 		}
 	},
-	// checkedForm:{
-	// 	projectName:{
-	// 		isAM: false,
-	// 		isPm: false,
-	// 	},
-	//
-	// 	AM:{
-	// 		isProject: false,
-	// 		isG: false,
-	// 	}
-	// }
+	checkedForm:{
+		projectName:{
+			isCheckAM: {
+				type:Boolean,
+				default: false,
+			},
+			isCheckPM: {
+				type:Boolean,
+				default: false,
+			}
+		},
+		deadline:{
+			isCheckAM: {
+				type:Boolean,
+				default: false,
+			},
+			isCheckPM: {
+				type:Boolean,
+				default: false,
+			}
+		},
+		brief:{
+			isCheckAM: {
+				type:Boolean,
+				default: false,
+			},
+			isCheckPM: {
+				type:Boolean,
+				default: false,
+			}
+		},
+	}
 
 
 	//  type: {
