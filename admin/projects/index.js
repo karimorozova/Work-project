@@ -53,6 +53,12 @@ const {
 } = require('./create')
 
 const {
+	getClientsRequests,
+	getClientRequestById,
+	updateClientRequestProps,
+} = require('./requests/getClientsRequests')
+
+const {
 	createTasksForWordcount
 } = require('./taskForWordcount')
 
@@ -151,5 +157,7 @@ module.exports = {
 	regainWorkFlowStatusByStepId,
 	addDR2,
 	addMultiLangDR2,
-	removeMultiDR2
+	removeMultiDR2,
+	getClientsRequests,
+	getClientRequestById,
 }

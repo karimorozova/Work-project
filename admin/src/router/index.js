@@ -12,6 +12,7 @@ import ClientsSettings from '@/components/sliders/ClientsSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
 import RequestInfo from '@/components/pmArea/RequestInfo'
+import clientRequestInfo from '@/components/pmArea/clientRequests/clientRequestInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import Pricelists from '@/components/finance/Pricelists'
 import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayout'
@@ -416,10 +417,15 @@ const router = new Router({
                     name: 'project-details',
                     component: ProjectInfo
                 },
+                // {
+                //     path: 'request-details/:id',
+                //     name: 'request-details',
+                //     component: RequestInfo
+                // },
                 {
                     path: 'request-details/:id',
                     name: 'request-details',
-                    component: RequestInfo
+                    component: clientRequestInfo
                 },
                 {
                     path: 'other-project-details/:id',

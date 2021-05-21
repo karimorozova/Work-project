@@ -8,24 +8,25 @@
         @onRowClicked="onRowClicked"
         @bottomScrolled="bottomScrolled"
     )
-        template(slot="headerProjectId" slot-scope="{ field }")
-            span.requests-table__label {{ field.label }}
-        template(slot="headerClientName" slot-scope="{ field }")
-            span.requests-table__label {{ field.label }}
+        //template(slot="headerProjectId" slot-scope="{ field }")
+        //    span.requests-table__label {{ field.label }}
+        //template(slot="headerClientName" slot-scope="{ field }")
+        //    span.requests-table__label {{ field.label }}
         template(slot="headerProjectName" slot-scope="{ field }")
             span.requests-table__label {{ field.label }}
-        template(slot="headerLanguages" slot-scope="{ field }")
-            span.requests-table__label {{ field.label }}
-        template(slot="headerStatus" slot-scope="{ field }")
-            span.requests-table__label {{ field.label }}
-        template(slot="headerStartDate" slot-scope="{ field }") 
-            span.requests-table__label {{ field.label }}
-        template(slot="headerDeadline" slot-scope="{ field }")
-            span.requests-table__label {{ field.label }}
-        template(slot="headerProjectManager" slot-scope="{ field }")
-            span.requests-table__label {{ field.label }}
-        template(slot="headerEdit" slot-scope="{ field }")
-            span.requests-table__label
+        //template(slot="headerLanguages" slot-scope="{ field }")
+        //    span.requests-table__label {{ field.label }}
+        //template(slot="headerStatus" slot-scope="{ field }")
+        //    span.requests-table__label {{ field.label }}
+        //template(slot="headerStartDate" slot-scope="{ field }")
+        //    span.requests-table__label {{ field.label }}
+        //template(slot="headerDeadline" slot-scope="{ field }")
+        //    span.requests-table__label {{ field.label }}
+        //template(slot="headerProjectManager" slot-scope="{ field }")
+        //    span.requests-table__label {{ field.label }}
+        //template(slot="headerEdit" slot-scope="{ field }")
+        //    span.requests-table__label
+
         template(slot="projectId" slot-scope="{ row }")
             span {{ getId(row) }}
         template(slot="clientName" slot-scope="{ row }")
@@ -59,15 +60,18 @@ export default {
     data() {
         return {
             fields: [
-                {label: "ID", headerKey: "headerProjectId", key: "projectId", width: "9%"},
-                {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%"},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "12%"},
-                {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "20%"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "8%"},
-                {label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "9%"},
-                {label: "Suggested Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%"},
-                {label: "Assigned To", headerKey: "headerProjectManager", key: "projectManager", width: "14%"},
-                {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},
+              {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "100%"},
+
+
+              // {label: "ID", headerKey: "headerProjectId", key: "projectId", width: "9%"},
+                // {label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%"},
+                // {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "12%"},
+                // {label: "Languages", headerKey: "headerLanguages", key: "languages", width: "20%"},
+                // {label: "Status", headerKey: "headerStatus", key: "status", width: "8%"},
+                // {label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "9%"},
+                // {label: "Suggested Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%"},
+                // {label: "Assigned To", headerKey: "headerProjectManager", key: "projectManager", width: "14%"},
+                // {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},
             ],
         }
     },
