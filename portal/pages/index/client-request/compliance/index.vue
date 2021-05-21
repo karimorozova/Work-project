@@ -25,6 +25,7 @@
                   :format="customFormatter"
                   inputClass="datepicker-custom-project-info"
                   calendarClass="calendar-custom"
+                  :disabled="disabled"
                   ref="deadline"
                 )
             .form__col
@@ -210,6 +211,9 @@
 				currentContacts: [],
 
 				isFileModal: false,
+				disabled: {
+					to: moment().add(-1, 'day').endOf('day').toDate()
+				},
 				fields: [
 					{ label: "File Name", headerKey: "headerFile", key: "file", width: "70%" },
 					{ label: "File Type", headerKey: "headerType", key: "type", width: "20%" },

@@ -58,7 +58,6 @@
                 ) {{ day.date }}
 
         .time-select
-          p.time__name Time:
           .change-time.hour
             span(
               @click="() => checkHours(+hours+1)"
@@ -1038,8 +1037,7 @@
     position: absolute;
     z-index: 100;
     background: #fff;
-    width: 300px;
-    border: 1px solid #ccc;
+    border: 1px solid #eee;
   }
 
   @media (max-width: 350px) {
@@ -1070,7 +1068,8 @@
 
   .vdp-datepicker__calendar header .up {
     color: #D15F45;
-    font-size: 18px;
+    font-size: 16px;
+    font-family: 'Myriad900';
   }
 
   .vdp-datepicker__calendar header .prev:after,
@@ -1128,8 +1127,8 @@
     display: inline-block;
     padding: 0 5px;
     width: 14.285714285714286%;
-    height: 40px;
-    line-height: 40px;
+    height: 32px;
+    line-height: 32px;
     text-align: center;
     vertical-align: middle;
     border: 1px solid transparent;
@@ -1144,36 +1143,34 @@
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
-    border: 1px solid #4bd;
+    border: 1px solid #D15F45;
   }
 
   .vdp-datepicker__calendar .cell.selected {
-    background: #ccc;
-    font-weight: bold;
+    color: #d15f45;
+    font-family: 'Myriad600';
   }
 
-  .vdp-datepicker__calendar .cell.selected:hover {
-    background: #4bd;
-  }
+  /*.vdp-datepicker__calendar .cell.selected:hover {*/
+  /*  font-family: Myriad600;*/
+  /*}*/
 
-  .vdp-datepicker__calendar .cell.selected.highlighted {
-    background: #4bd;
-  }
+  /*.vdp-datepicker__calendar .cell.selected.highlighted {*/
+  /*  background: #4bd;*/
+  /*}*/
 
-  .vdp-datepicker__calendar .cell.highlighted,
-  .vdp-datepicker__calendar .cell.disabled.weekend {
-    background: #cde1f7;
-    color: rgba(0, 0, 0, 0.4);
+  .vdp-datepicker__calendar .cell.highlighted{
+    /*background: #daeded;*/
   }
 
   .vdp-datepicker__calendar .cell.today {
     background-color: #D15F45;
-    color: #FFF;
-    font-weight: bold;
+    color: #FFF !important;
+    font-family: Myriad600;
   }
 
   .vdp-datepicker__calendar .cell.beforeToday {
-    color: rgba(0, 0, 0, 0.4);
+    color: #c5bfb5;
   }
 
   .vdp-datepicker__calendar .cell.highlighted.disabled {
@@ -1189,15 +1186,11 @@
   }
 
   .vdp-datepicker__calendar .cell.day-header {
-    font-size: 16px;
     white-space: no-wrap;
     cursor: inherit;
-    background-color: #d3d3d3;
-    font-weight: bold;
-  }
-
-  .vdp-datepicker__calendar .cell.day-header:hover {
-    background: inherit;
+    background-color: #d15f45;
+    cursor: default;
+    color: white;
   }
 
   .vdp-datepicker__calendar .month,
@@ -1218,13 +1211,13 @@
   }
 
   .vdp-datepicker__calendar .cell.notCurrentMonth {
-    color: rgba(0, 0, 0, 0.2);
+    color: #c5bfb566;
   }
 
 
   /* Custom styles for different components */
   .vendor__calendar-custom {
-    width: 250px;
+    width: 260px;
     margin-right: 20px;
 
     .cell.beforeToday {
@@ -1257,7 +1250,7 @@
     width: 191px;
   }
 
-  .datepicker-custom{
+  .datepicker-custom {
     border-radius: 5px;
     border: 1px solid #68573E;
     height: 30px;
@@ -1290,7 +1283,6 @@
   }
 
   .steps__calendar-custom {
-    width: 200px;
     right: -6px;
     top: 24px;
   }
@@ -1311,14 +1303,20 @@
   }
 
   .calendar-custom {
-    width: 220px;
+    width: 260px;
     right: 0;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   }
 
   .calendar-custom .cell,
   .steps__calendar-custom .cell {
-    height: 30px;
-    line-height: 30px;
+    /*height: 26px;*/
+    /*line-height: 26px;*/
+  }
+
+  .cell.day-header {
+    height: 28px;
+    line-height: 28px;
   }
 
   .custom-fonts .cell.day,
@@ -1334,42 +1332,73 @@
   .request_background {
     background-color: rgba(229, 105, 97, 0.24);
   }
+
   .time-select {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
   }
+
   .time-select i {
     color: #d15f45;
   }
+
   .time-select span {
     width: 100%;
     text-align: center;
     cursor: pointer;
+    padding: 5px;
+    background: #eee;
+    transition: 0.1s ease-in;
   }
+
+  .time-select span:hover {
+    background: #ddd;
+  }
+
   .time__name {
-    margin-right: 15px;
+    margin-right: 5px;
   }
+
   .change-time {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 5px;
   }
-  .date-input{
-    width: 55px;
+
+  .date-input {
+    width: 129px;
     text-align: center;
     padding: 5px;
     outline: none;
+    border: none;
   }
+
   .separator {
-    font-size: 32px;
+    font-size: 22px;
+    height: 30px;
+    position: absolute;
   }
-  .select-date{
-    padding: 5px;
+
+  .select-date {
+    margin: 20px 10px;
     text-align: center;
   }
 
+  .action-button {
+    margin-top: 10px;
+  }
+
+  ::-webkit-input-placeholder {
+    opacity: 0.5;
+    color: #67573e;
+  }
+
+  .prev,
+  .next {
+    font-size: 12px;
+  }
 
 </style>

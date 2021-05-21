@@ -131,8 +131,8 @@
 </template>
 
 <script>
-	import DateUtils from '@/utils/DateUtils.js'
-	import DateLanguages from '@/utils/DateLanguages.js'
+	import DateUtils from "../utils/DateUtils"
+	import DateLanguages from "../utils/DateLanguages"
 	import moment from 'moment'
 	import Button from "./buttons/Button"
 
@@ -1154,20 +1154,6 @@
     font-family: 'Myriad600';
   }
 
-  /*.vdp-datepicker__calendar .cell.selected:hover {*/
-  /*  font-family: Myriad600;*/
-  /*}*/
-
-  /*.vdp-datepicker__calendar .cell.selected.highlighted {*/
-  /*  background: #4bd;*/
-  /*}*/
-
-  .vdp-datepicker__calendar .cell.highlighted,
-  .vdp-datepicker__calendar .cell.disabled.weekend {
-    background: #cde1f7;
-    color: rgba(0, 0, 0, 0.4);
-  }
-
   .vdp-datepicker__calendar .cell.today {
     background-color: #D15F45;
     color: #FFF !important;
@@ -1219,8 +1205,6 @@
     color: #c5bfb566;
   }
 
-
-  /* Custom styles for different components */
   .vendor__calendar-custom {
     width: 260px;
     margin-right: 20px;
@@ -1312,12 +1296,6 @@
     width: 260px;
     right: 0;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  }
-
-  .calendar-custom .cell,
-  .steps__calendar-custom .cell {
-    /*height: 26px;*/
-    /*line-height: 26px;*/
   }
 
   .cell.day-header {

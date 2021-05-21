@@ -33,7 +33,6 @@
           DatepickerWithTime(
             v-model="project.deadline"
             @selected="(e) => updateProjectDate(e, 'deadline')"
-            :highlighted="highlighted"
             monday-first=true
             inputClass="datepicker-custom-project-info"
             calendarClass="calendar-custom"
@@ -50,12 +49,11 @@
             v-model="project.billingDate"
             ref="billingDate"
             @selected="(e) => updateProjectDate(e, 'billingDate')"
-            :highlighted="highlighted"
             monday-first=true
             inputClass="datepicker-custom-project-info"
             calendarClass="calendar-custom"
             :format="customFormatter"
-            :disabledPicker="isBilling && isProjectFinished"
+            :disabledPicker="isBilling || isProjectFinished"
             :disabled="disabled"
           )
           img.project__calendar-icon(src="../../assets/images/calendar.png" @click="billingOpen")

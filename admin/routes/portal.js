@@ -174,28 +174,26 @@ router.get('/clientinfo', checkClientContact, async (req, res) => {
     }
 });
 
-router.get('/projectFiles', checkClientContact, async (req, res) => {
-    res.send('ok');
-});
-
-
-router.get('/deleteZip', (req, res) => {
-    let fileName = 'project';
-    let fileId = req.query.projectId;
-    try {
-        if (req.query.taskId) {
-            fileName = 'task';
-            fileId = req.query.taskId;
-        }
-        setTimeout(() => {
-            fs.unlink(`./dist/${fileName}${fileId}.zip`, (err) => console.log(err));
-        }, 6000);
-        res.send('Deleted');
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on deleting file');
-    }
-});
+// router.get('/projectFiles', checkClientContact, async (req, res) => {
+//     res.send('ok');
+// });
+// router.get('/deleteZip', (req, res) => {
+//     let fileName = 'project';
+//     let fileId = req.query.projectId;
+//     try {
+//         if (req.query.taskId) {
+//             fileName = 'task';
+//             fileId = req.query.taskId;
+//         }
+//         setTimeout(() => {
+//             fs.unlink(`./dist/${fileName}${fileId}.zip`, (err) => console.log(err));
+//         }, 6000);
+//         res.send('Deleted');
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).send('Error on deleting file');
+//     }
+// });
 
 router.post('/approve-reject', checkClientContact, async (req, res) => {
     const { quote, key } = req.body;
@@ -219,25 +217,25 @@ router.get('/reject', checkClientContact, async (req, res) => {
     }
 });
 
-router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
-    const { ...request } = req.body;
-    try {
-        let createdRequest = await createRequest(request);
-        const { detailFiles: sourceFiles, refFiles } = req.files;
-        if(sourceFiles) {
-            createdRequest.sourceFiles = await storeRequestFiles(sourceFiles, createdRequest.id);
-        }
-        if(refFiles) {
-            createdRequest.refFiles = await storeRequestFiles(refFiles, createdRequest.id);
-        }
-        await createdRequest.save();
-        await clientRequestNotification(createdRequest);
-        res.send(createdRequest);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Error on creating a request!');
-    }
-});
+// router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
+//     const { ...request } = req.body;
+//     try {
+//         let createdRequest = await createRequest(request);
+//         const { detailFiles: sourceFiles, refFiles } = req.files;
+//         if(sourceFiles) {
+//             createdRequest.sourceFiles = await storeRequestFiles(sourceFiles, createdRequest.id);
+//         }
+//         if(refFiles) {
+//             createdRequest.refFiles = await storeRequestFiles(refFiles, createdRequest.id);
+//         }
+//         await createdRequest.save();
+//         await clientRequestNotification(createdRequest);
+//         res.send(createdRequest);
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).send('Error on creating a request!');
+//     }
+// });
 
 router.get('/deliverables', checkClientContact, async (req, res) => {
   console.log('route IN DEV for clients  => /deliverables')
