@@ -34,6 +34,10 @@ const ProjectsSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	requestId:{
+		type: Schema.Types.ObjectId, ref: 'ClientRequest',
+		default: null
+	},
 	projectName: {
 		type: String,
 		default: '',
