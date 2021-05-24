@@ -12,7 +12,6 @@ const complianceService = async (formData, client) => {
 	const industry = JSON.parse(formData.industry)
 	const complianceTemplate = JSON.parse(formData.complianceTemplate)
 	const clientContacts = JSON.parse(formData.clientContacts)
-
 	return await ClientRequest.create({
 		projectId: "Req " + moment(new Date()).format("YYYY MM DD") + " " + await getNextNumberForProjectName(),
 		projectName,
@@ -32,7 +31,7 @@ const complianceService = async (formData, client) => {
 			sourceLanguage,
 			targetLanguages: [ targetLanguages ],
 			startOption,
-			service: await getComplianceService(),
+			service: await Services.findOne({ title: 'Compliance' }),
 			complianceOptions: complianceTemplate
 		}
 	})
@@ -45,10 +44,6 @@ const complianceService = async (formData, client) => {
 		todayEnd.setUTCHours(23, 59, 59, 0)
 		const todayProjects = await ClientRequest.find({ startDate: { $gte: todayStart, $lt: todayEnd } })
 		return todayProjects.length < 10 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]"
-	}
-
-	async function getComplianceService() {
-		await Services.find({ title: 'Compliance' })
 	}
 }
 

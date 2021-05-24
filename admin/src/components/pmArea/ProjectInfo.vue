@@ -28,8 +28,6 @@
         )
       ProjectFinance
 
-      //- GeneralInstructions(:project="currentProject")
-
     .project-info__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :message="message" @send="sendQuote")
 
@@ -38,7 +36,6 @@
 <script>
 	const ValidationErrors = () => import("../ValidationErrors");
 	import Project from "./Project";
-	import GeneralInstructions from "./GeneralInstructions";
 	import ProjectAction from "./ProjectAction";
 	import ProjectFinance from "./ProjectFinance";
 	import TasksAndSteps from "./TasksAndSteps";
@@ -236,7 +233,6 @@
 		components: {
 			ValidationErrors,
 			Project,
-			GeneralInstructions,
 			ProjectAction,
 			TasksAndSteps,
 			ProjectFinance,
