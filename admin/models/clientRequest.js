@@ -30,6 +30,9 @@ const ClientRequestSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now
 	},
+	billingDate: {
+		type: Date
+	},
 	industry: {
 		type: Schema.Types.ObjectId, ref: 'Industries'
 	},
