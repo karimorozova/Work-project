@@ -137,8 +137,7 @@
             @check="(e) => setQuoteDecision('Start')"
           )
         .form__submit
-          //Button(@clicked="addService" value="Submit" :isDisabled="!isCompleteForm")
-          Button(@clicked="addService" value="Submit")
+          Button(@clicked="addService" value="Submit" :isDisabled="!isCompleteForm")
 
       div
         .content__order

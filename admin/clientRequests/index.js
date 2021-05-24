@@ -1,16 +1,18 @@
-// const { getClientRequest, getClientRequests, updateClientRequest, getFilteredClientRequests } = require("./get");
-// const { createRequest } = require("./create");
-// const { storeRequestFiles, addRequestFile, removeRequestFile, removeRequestFiles, removeClientRequest } = require('./files');
-// const { clientRequestNotification, sendNotificationToManager, notifyRequestCancelled } = require('./emails');
-
-
 const  {
 	getClientRequestById,
 	updateClientRequestProps,
-	getClientsRequests 
+	getClientsRequests,
+	getClientRequestAfterUpdate
 } = require('./getClientsRequests')
 
+const {
+	complianceService,
+	createComplianceFiles
+} = require('./creatingRequiestsFromForms')
+
 module.exports = {
+	complianceService,
+	createComplianceFiles,
 	// getClientRequest,
 	// getClientRequests,
 	// updateClientRequest,
@@ -26,5 +28,6 @@ module.exports = {
 	// notifyRequestCancelled
 	getClientsRequests,
 	getClientRequestById,
-	updateClientRequestProps
+	updateClientRequestProps,
+	getClientRequestAfterUpdate
 }

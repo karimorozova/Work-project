@@ -1,35 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-
-const USD = {
-	type: Number,
-	default: 0
-}
-const EUR = {
-	type: Number,
-	default: 0
-}
-const GBP = {
-	type: Number,
-	default: 0
-}
-
-const stepFinance = {
-	'Wordcount': {
-		receivables: "",
-		payables: "",
-		halfReceivables: "",
-		halfPayables: ""
-	},
-	'Price': {
-		receivables: "",
-		payables: "",
-		halfReceivables: "",
-		halfPayables: ""
-	}
-}
-
 const ClientRequestSchema = new mongoose.Schema({
 	projectId: {
 		type: String,
@@ -106,12 +77,6 @@ const ClientRequestSchema = new mongoose.Schema({
 		status: "",
 		clientRate: {},
 		targetFile: "",
-		finance: stepFinance,
-		// nativeFinance: stepFinance,
-		defaultStepPrice: 0,
-		vendorRate: "",
-		nativeVendorRate: "",
-		// check: false,
 		vendorsClickedOffer: Array,
 		isVendorRead: { type: Boolean, default: false },
 		previousStatus: ""
@@ -138,44 +103,6 @@ const ClientRequestSchema = new mongoose.Schema({
 		type: String,
 		default: ''
 	},
-	finance: {
-		type: Object,
-		default: {
-			'Wordcount': {},
-			'Price': {}
-		}
-	},
-	minimumCharge: {
-		value: {
-			type: Number,
-			default: 0
-		},
-		toIgnore: {
-			type: Boolean,
-			default: false
-		}
-	},
-	projectCurrency: {
-		type: String,
-		default: ''
-	},
-	crossRate: {
-		EUR: {
-			EUR,
-			USD,
-			GBP
-		},
-		USD: {
-			USD,
-			EUR,
-			GBP
-		},
-		GBP: {
-			GBP,
-			USD,
-			EUR
-		}
-	},
 	requestForm: {
 		sourceLanguage: {
 			type: Schema.Types.ObjectId, ref: 'Languages'
@@ -183,7 +110,7 @@ const ClientRequestSchema = new mongoose.Schema({
 		targetLanguages: [ {
 			type: Schema.Types.ObjectId, ref: 'Languages'
 		} ],
-		sourceFiles: [{
+		sourceFiles: [ {
 			filename: {
 				type: String,
 				default: '',
@@ -194,16 +121,12 @@ const ClientRequestSchema = new mongoose.Schema({
 				default: '',
 				trim: true
 			},
-			isCheckAM: {
-				type:Boolean,
-				default: false,
-			},
-			isCheckPM: {
-				type:Boolean,
-				default: false,
+			isCheck: {
+				type: Boolean,
+				default: false
 			}
-		}],
-		refFiles: [{
+		} ],
+		refFiles: [ {
 			filename: {
 				type: String,
 				default: '',
@@ -214,15 +137,11 @@ const ClientRequestSchema = new mongoose.Schema({
 				default: '',
 				trim: true
 			},
-			isCheckAM: {
-				type:Boolean,
-				default: false,
-			},
-			isCheckPM: {
-				type:Boolean,
-				default: false,
+			isCheck: {
+				type: Boolean,
+				default: false
 			}
-		}],
+		} ],
 		startOption: {
 			type: String,
 			default: '',
@@ -236,39 +155,20 @@ const ClientRequestSchema = new mongoose.Schema({
 			default: {}
 		}
 	},
-	checkedForm:{
-		projectName:{
-			isCheckAM: {
-				type:Boolean,
-				default: false,
-			},
-			isCheckPM: {
-				type:Boolean,
-				default: false,
-			}
+	checkedForm: {
+		isCheckProjectName: {
+			type: Boolean,
+			default: false
 		},
-		deadline:{
-			isCheckAM: {
-				type:Boolean,
-				default: false,
-			},
-			isCheckPM: {
-				type:Boolean,
-				default: false,
-			}
+		isCheckDeadline: {
+			type: Boolean,
+			default: false
 		},
-		brief:{
-			isCheckAM: {
-				type:Boolean,
-				default: false,
-			},
-			isCheckPM: {
-				type:Boolean,
-				default: false,
-			}
-		},
+		isCheckBrief: {
+			type: Boolean,
+			default: false
+		}
 	}
-
 
 	//  type: {
 	//      type: String,

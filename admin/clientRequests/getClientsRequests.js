@@ -34,7 +34,6 @@ function getRequestsQuery (filters) {
 	}
 	return query;
 }
-
 async function getClientsRequests(filters) {
 	const query = getRequestsQuery(filters);
 	try {
@@ -66,6 +65,7 @@ async function getClientsRequests(filters) {
 	}
 }
 
+
 async function getClientRequestById(id) {
 	try {
 		const requests = await ClientRequest.findOne({_id: id})
@@ -74,6 +74,16 @@ async function getClientRequestById(id) {
 		console.log(err);
 		console.log("Error on getting filtered client requests");
 	}
+}
+
+async function getClientRequestAfterUpdate(query, update) {
+	return await ClientRequest.findOneAndUpdate(query, update, { new: true })
+			.populate('industry')
+			.populate('customer')
+			// .populate('service')
+			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+			// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
 }
 
 async function updateClientRequestProps(id, key, value) {
@@ -92,4 +102,5 @@ module.exports = {
 	getClientsRequests,
 	getClientRequestById,
 	updateClientRequestProps,
+	getClientRequestAfterUpdate,
 }

@@ -1,8 +1,8 @@
-// const { ClientRequest } = require('../models');
-// const { moveFile } = require('../utils/movingFile');
-// const fs = require('fs');
-// const rimraf = require('rimraf');
-//
+const { ClientRequest } = require('../models')
+const { moveFile } = require('../utils/movingFile')
+const fs = require('fs')
+const rimraf = require('rimraf')
+
 // async function removeClientRequest(_id) {
 //     try {
 //         await ClientRequest.deleteOne({_id});
@@ -17,24 +17,25 @@
 //         console.log("Error in removeClientRequest");
 //     }
 // }
-//
-// async function storeRequestFiles(filesArr, requestId) {
-//     try {
-//         let storedFiles = [];
-//         if(filesArr.length) {
-//             for(let file of filesArr) {
-//                 const newPath = `/reqfiles/${requestId}/${file.filename.replace(/\s+/g, '_')}`;
-//                 await moveFile(file, `./dist${newPath}`);
-//                 storedFiles.push({path: newPath, fileName: file.filename, isApproved: false, size: file.size});
-//             }
-//         }
-//         return storedFiles;
-//     } catch(err) {
-//         console.log(err);
-//       console.log('Error in storeFiles');
-//     }
-// }
-//
+
+async function storeRequestFiles(filesArr, requestId) {
+	try {
+		let storedFiles = []
+		if (filesArr.length) {
+			for (let file of filesArr) {
+				const additionalName = `${ Math.floor(Math.random() * 1000000) }-${ file.filename.replace(/\s+/g, '_') }`
+				const newPath = `/requestFiles/${ requestId }/${ additionalName }`
+				await moveFile(file, `./dist${ newPath }`)
+				storedFiles.push({ path: newPath, filename: additionalName, isCheck: false })
+			}
+		}
+		return storedFiles
+	} catch (err) {
+		console.log(err)
+		console.log('Error in storeFiles')
+	}
+}
+
 // async function addRequestFile({request, files, existingFile, prop}) {
 //     try {
 //         let requestFiles = request[prop];
@@ -50,7 +51,7 @@
 //         console.log("Error in addRequestFile");
 //     }
 // }
-//
+
 // async function removeRequestFiles(removingFiles, requestFiles) {
 //     const removingPaths = removingFiles.map(item => item.path);
 //     try {
@@ -63,7 +64,7 @@
 //         console.log("Error in removeRequestFiles");
 //     }
 // }
-//
+
 // async function removeRequestFile({path, files}) {
 //     try {
 //         await deleteOldFile(`./dist${path}`);
@@ -73,7 +74,7 @@
 //         console.log("Error in removeRequestFile");
 //     }
 // }
-//
+
 // function deleteOldFile(path) {
 //     return new Promise((resolve, reject) => {
 //         fs.unlink(path, (err, res) => {
@@ -85,5 +86,11 @@
 //         });
 //     })
 // }
-//
-// module.exports = { storeRequestFiles, addRequestFile, removeRequestFile, removeRequestFiles, removeClientRequest };
+
+module.exports = {
+	storeRequestFiles
+	// addRequestFile,
+	// removeRequestFile,
+	// removeRequestFiles,
+	// removeClientRequest
+}
