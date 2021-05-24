@@ -193,6 +193,8 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 		pushFile(sourceLang, targetLang, fileInfo)
 	}
 
+	await sendNotificationToDR2(projectId, taskId, dr2Manager)
+
 	return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.singleLang": singleLang })
 
 	function pushFile(sourceLang, targetLang, fileInfo) {
@@ -205,6 +207,13 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 			instructions: dr2Instructions
 		})
 	}
+}
+
+const sendNotificationToDR2 = async (projectId, taskIds, accountManager) => {
+	const project = await Projects.findOne({ _id: projectId })
+	const allUsers = await User.find().populate('group')
+	const messageToNew = managerDr1Assigned({ taskId: taskIds, project, manager: allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`), }, '2')
+	await managerNotifyMail(allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`), messageToNew, `The DR2 has been assigned to you: ${ project.projectId } (I009.1)`)
 }
 
 function returnNewDeliveryId(projectId, singleLang, multiLang) {
@@ -263,6 +272,8 @@ async function addMultiLangDR2({ projectId, taskIds, refFiles }) {
 			dr2Manager: accountManager
 		}
 	}
+
+	await sendNotificationToDR2(projectId, taskIds, accountManager)
 
 	return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.multiLang": [ ...tasksDR2.multiLang, multiLang ] })
 
