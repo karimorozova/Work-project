@@ -1,9 +1,13 @@
 <template lang="pug">
-  pre {{ clientRequest }}
+  .layout
+    FormLayout(v-if="false")
+    ProjectLayout
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex"
+import FormLayout from "./FormLayout"
+import ProjectLayout from "./ProjectLayout"
 
 export default {
   data(){
@@ -31,6 +35,7 @@ export default {
       currentClientRequest: "getCurrentClientRequest"
     }),
   },
+  components: { ProjectLayout, FormLayout },
   created() {
     if(!this.getCurrentClientRequest) {
       this.getClientRequest();
