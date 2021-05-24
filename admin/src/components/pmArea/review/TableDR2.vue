@@ -57,14 +57,14 @@
 
           span {{ getManagerName(row.dr1Manager) }}
       .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
-        .review-table__data(v-if="!canChangeDR2Manager(row)") {{ getManagerName(row.dr2Manager) }}
-        .drops__menu(v-else)
+        .drops__menu(v-if="canChangeDR2Manager(row) || getManagerName(row.dr1Manager) === getManagerName(user._id)")
           SelectSingle(
             :isTableDropMenuNoShadow="true"
             :options="managersNames"
             :selectedOption="getManagerName(row.dr2Manager)"
             @chooseOption="(e) => setManager(e, row)"
           )
+        .review-table__data(v-else) {{ getManagerName(row.dr2Manager) }}
 
       .review-table__data(slot="action" slot-scope="{ row, index }")
         .review-table__icons(v-if="canChangeDR2Manager(row)")
