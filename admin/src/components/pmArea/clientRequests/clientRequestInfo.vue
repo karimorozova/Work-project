@@ -1,7 +1,9 @@
 <template lang="pug">
-  .layout
-    FormLayout(v-if="false")
-    ProjectLayout
+  .layout(v-if="currentClientRequest._id")
+    .content(v-if="currentClientRequest.status === 'Client Request'")
+      FormLayout
+    .content(v-else)
+      ProjectLayout
 </template>
 
 <script>

@@ -1,27 +1,24 @@
 <template lang="pug">
   .form-layout
-    FormProject(:project="currentClientRequest")
+    | FORM
 </template>
 
 <script>
-import FormProject from "./subComponents/FormProject"
-import { mapGetters, mapActions } from "vuex"
+	import { mapGetters, mapActions } from "vuex"
 
-export default {
-  data(){
-    return {
-      clientRequest: {}
-    }
-  },
-  computed: {
-    ...mapGetters({
-      currentClientRequest: "getCurrentClientRequest"
-    }),
-  },
-  components: { FormProject }
-}
+	export default {
+		data() {
+			return {
+				clientRequest: {}
+			}
+		},
+		computed: {
+			...mapGetters({
+				currentClientRequest: "getCurrentClientRequest"
+			})
+		},
+		components: {}
+	}
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
