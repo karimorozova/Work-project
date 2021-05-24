@@ -54,10 +54,13 @@ async function getClientsRequests(filters) {
 			{$unwind: "$customer"}
 		]).sort({startDate: -1}).limit(25)
 		return await ClientRequest.populate(requests, [
-			'industry',
-			'service',
-			'projectManager',
-			'accountManager'
+      "requestForm.sourceLanguage",
+      "requestForm.targetLanguages",
+      "requestForm.service",
+      "industry",
+      "customer",
+      "accountManager",
+      "projectManager",
 		])
 	} catch(err) {
 		console.log(err);
@@ -69,6 +72,15 @@ async function getClientsRequests(filters) {
 async function getClientRequestById(id) {
 	try {
 		const requests = await ClientRequest.findOne({_id: id})
+      .populate([
+        "requestForm.sourceLanguage",
+        "requestForm.targetLanguages",
+        "requestForm.service",
+        "industry",
+        "customer",
+      ])
+      .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+      .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 		return requests
 	} catch(err) {
 		console.log(err);
@@ -77,13 +89,16 @@ async function getClientRequestById(id) {
 }
 
 async function getClientRequestAfterUpdate(query, update) {
-	return await ClientRequest.findOneAndUpdate(query, update, { new: true })
-			.populate('industry')
-			.populate('customer')
-			// .populate('service')
+	return await (ClientRequest.findOneAndUpdate(query, update, { new: true })
+			.populate([
+        "requestForm.sourceLanguage",
+        "requestForm.targetLanguages",
+        "requestForm.service",
+        "industry",
+        "customer",
+      ])
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
 }
 
 async function updateClientRequestProps(id, key, value) {

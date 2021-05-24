@@ -108,10 +108,10 @@ const ClientRequestSchema = new mongoose.Schema({
 	},
 	requestForm: {
 		sourceLanguage: {
-			type: Schema.Types.ObjectId, ref: 'Languages'
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		targetLanguages: [ {
-			type: Schema.Types.ObjectId, ref: 'Languages'
+			type: Schema.Types.ObjectId, ref: 'Language'
 		} ],
 		sourceFiles: [ {
 			filename: {
