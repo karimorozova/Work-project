@@ -1,14 +1,14 @@
 <template lang="pug">
   .layout(v-if="currentClientRequest._id")
     .content(v-if="currentClientRequest.status === 'Client Request'")
-      FormLayout
+      FormLayoutCompliance
     .content(v-else)
       ProjectLayout
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex"
-import FormLayout from "./FormLayout"
+import FormLayoutCompliance from "./FormLayoutCompliance"
 import ProjectLayout from "./ProjectLayout"
 
 export default {
@@ -37,7 +37,7 @@ export default {
       currentClientRequest: "getCurrentClientRequest"
     }),
   },
-  components: { ProjectLayout, FormLayout },
+  components: { ProjectLayout, FormLayoutCompliance },
   created() {
     if(!this.getCurrentClientRequest) {
       this.getClientRequest();

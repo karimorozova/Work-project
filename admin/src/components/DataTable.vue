@@ -315,4 +315,8 @@ export default {
     align-items: center;
     display: flex;
   }
+
+.hideHead {
+  height: 1px;
+}
 </style>

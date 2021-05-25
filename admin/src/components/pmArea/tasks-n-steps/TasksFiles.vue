@@ -52,8 +52,8 @@
               @deleteFile="(e) => deleteFile(e, 'refFiles')"
             )
       .tasks-files__tooltip
-        div <b>Source:</b> total size must be <= 10Mb, each file can be <= 2Mb
-        div <b>Reference:</b> each file can be <= 50Mb
+        div Source: total size must be <= 10Mb, each file can be <= 2Mb
+        div Reference: each file can be <= 50Mb
 
     ValidationErrors(
       v-if="showFileSizeWarning"

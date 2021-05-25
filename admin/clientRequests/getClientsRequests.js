@@ -58,7 +58,6 @@ async function getClientsRequests(filters) {
       "requestForm.targetLanguages",
       "requestForm.service",
       "industry",
-      "customer",
       "accountManager",
       "projectManager",
 		])
