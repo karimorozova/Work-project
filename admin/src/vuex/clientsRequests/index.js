@@ -4,7 +4,7 @@ import { mutations } from './mutations';
 
 const state = {
     clientsRequests: [],
-    currentClientsRequests: {},
+    currentClientsRequest: {},
 };
 
 export const clientsRequests = {

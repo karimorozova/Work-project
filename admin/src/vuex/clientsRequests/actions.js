@@ -19,7 +19,7 @@ export const updateClientsRequestsProps = async ({ dispatch, commit }, payload) 
   try {
     const { projectId, value } = payload
     const updatedRequest = await Vue.http.post(`/clients-requests/${projectId}/update-prop`, { value });
-    await commit('SET_CUR_CLIENTS_REQUESTS', updatedRequest.data);
+    await commit('SET_CUR_CLIENTS_REQUEST', updatedRequest.data);
   } catch (err) {
     dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
   } finally {
@@ -42,7 +42,7 @@ export const updateClientContacts = async ({ dispatch, commit }, payload) => {
 export const setCurrentClientRequest = async ({ dispatch, commit }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
-		await commit('SET_CUR_CLIENTS_REQUESTS', payload);
+		await commit('SET_CUR_CLIENTS_REQUEST', payload);
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
 	} finally {
