@@ -2,9 +2,7 @@
   .project
     .project__all-info
       .project__info-row
-        //input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name" style="margin-bottom: 10px")
         span.project__nameBody
-          //.project__nameDisabled(v-if="!existProjectAccessChangeName") {{ nameOfProject }}
           input.project__name(type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
 
       .project__info-row
@@ -68,16 +66,16 @@
             span.require *
           .project__input-icons(v-if="project._id")
             i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
-            input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
+            input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly disabled="false")
 
-          .project__drop-menu(v-else)
-            SelectSingle(
-              :selectedOption="project.customer.name"
-              :options="clients"
-              :hasSearch="isSearchClient"
-              placeholder="Name"
-              @chooseOption="(e) => setValue(e, 'customer')"
-            )
+          //.project__drop-menu(v-else)
+          //  SelectSingle(
+          //    :selectedOption="project.customer.name"
+          //    :options="clients"
+          //    :hasSearch="isSearchClient"
+          //    placeholder="Name"
+          //    @chooseOption="(e) => setValue(e, 'customer')"
+          //  )
         .project__industry
           .input-title
             .input-title__text Industry:
@@ -85,11 +83,13 @@
           input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" disabled)
           .project__drop-menu(v-else)
             SelectSingle(
-              :selectedOption="selectedIndustry.name || project.industry.name"
+              :selectedOption="project.industry.name"
               :options="industriesList"
               @chooseOption="setIndustry"
               placeholder="Industry"
             )
+        .hide-elem
+        .hide-elem
       //TODO: delete
         //.project__number
         //  .input-title
@@ -103,10 +103,10 @@
       .project__info-row.project_no-margin
         .project__textarea
           LabelValue(label="Project Brief" customClass="project_textarea")
-            textarea.project__text(type="text" rows="9" v-model="project.brief")
+            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.brief")
         .project__textarea
           LabelValue(label="Internal Notes" customClass="project_textarea")
-            textarea.project__text(type="text" rows="9" v-model="project.notes")
+            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.notes")
 
       .project__button(v-if="!project.projectId")
         Button(
@@ -131,6 +131,7 @@
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
 	import DatepickerWithTime from "../../../DatepickerWithTime"
+  import {updateClientsRequests, updateClientsRequestsProps} from "../../../../vuex/clientsRequests/actions";
 
 	export default {
 		props: {
@@ -156,14 +157,16 @@
 				isRequiredField: true,
 				errors: [],
 				areErrorsExist: false,
-				clients: []
+				clients: [],
+        managers: []
 			}
 		},
 		methods: {
 			...mapActions([
 				"alertToggle",
 				"setProjectDate",
-				"setCurrentProject"
+				"setCurrentProject",
+        "updateClientsRequestsProps",
 			]),
 			async changeProjectName(projectName) {
 				this.errors = []
@@ -181,42 +184,32 @@
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			async updateProjectDate(e, prop) {
-				if (this.project._id) {
 					if (prop === 'deadline' && this.isBilling) {
 						const date = { ['billingDate']: e }
 						await this.setDate('billingDate', date)
 					}
 					const date = { [prop]: e }
 					await this.setDate(prop, date)
-				} else {
-					if (prop === 'deadline' && this.isBilling) {
-						this.project.billingDate = e
-					}
-				}
 			},
 			async setDate(prop, date) {
 				if (prop === 'startDate' && this.project.tasks.length) return
-        //TODO: Change vuex
-        await this.setProjectDate({ date, projectId: this.project._id })
+        await this.updateClientsRequestsProps({ projectId: this.project._id, value: date })
 			},
 			async setTest(e) {
 				if (!this.project._id) {
 					this.isTest = e.target.checked
 				} else {
-          //TODO: Change vuex
-          await this.setProjectProp({ prop: 'isTest', value: e.target.checked })
+          await this.updateClientsRequestsProps({ projectId: this.project._id, value: {'isTest': e.target.checked} })
 				}
 			},
 			async setSameDate(e) {
 				this.isBilling = e.target.checked
-				if (!this.project._id) {
-					this.project.billingDate = e.target.checked ? this.project.deadline : this.project.billingDate
-				} else {
-          e.target.checked ?
-							this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
-							this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
-				}
+        e.target.checked ?
+            this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
+            this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
+
 			},
+
 			async setClientNumber(e) {
 				const { value } = e.target
 				if (!this.project._id) {
@@ -226,8 +219,7 @@
 			},
 			async setProjectProp({ prop, value }) {
 				try {
-					const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop, value })
-					await this.setCurrentProject(result.body)
+					await this.updateClientsRequestsProps({ projectId: this.project._id, value: {[prop]: value} })
 					this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
@@ -239,8 +231,9 @@
 					this.selectedIndustry = option.industries[0]
 				}
 			},
-			setIndustry({ option }) {
-				this.selectedIndustry = option
+		  async	setIndustry({ option }) {
+        await this.updateClientsRequestsProps({ projectId: this.project._id, value: {industry: option} })
+				// this.selectedIndustry = option
 			},
 			closeErrors() {
 				this.areErrorsExist = false
@@ -320,11 +313,11 @@
 			// 		await this.setCurrentProject(curProject.body)
 			// 	}
 			// },
-			// isBillingDate() {
-			// 	if (this.$refs.deadline.value === "") {
-			// 		this.isBilling = false
-			// 	} else this.isBilling = this.$refs.deadline.value === this.$refs.billingDate.value
-			// },
+			isBillingDate() {
+				if (this.project.deadline.value === "") {
+					this.isBilling = false
+				} else this.isBilling = this.project.deadline.value === this.project.billingDate.value
+			},
 			// setIsBillingTrue() {
 			// 	this.isBilling = true
 			// }
@@ -343,11 +336,11 @@
 			industriesList() {
 				let result = []
 				if (this.project.customer.name) {
-					const industries = this.project.customer.industries
-					if (industries[0].name) {
-						return result = industries
+					const projectIndustries = this.project.customer.industries
+					if (projectIndustries[0].name) {
+						return result = projectIndustries
 					}
-					return result = result.filter(item => industries.indexOf(item._id) !== -1)
+					return result = this.industries.filter(item => projectIndustries.indexOf(item._id) !== -1)
 				}
 				return result
 			},
@@ -374,7 +367,7 @@
 		async created() {
 			// await this.getProjectData()
 			// this.getCustomers()
-			// this.isBillingDate()
+			this.isBillingDate()
 			// !this.project._id && this.setIsBillingTrue()
 		}
 	}
@@ -390,10 +383,13 @@
       color: red;
     }
   }
+  .hide-elem {
+    width: 155px;
+  }
   .project {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 960px;
 
     &__nameDisabled{
       display: flex;

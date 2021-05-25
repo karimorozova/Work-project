@@ -9,8 +9,6 @@
         .icon
           span(class="click-copy" @click="copyId")
             i.far.fa-copy(aria-hidden="true")
-        .icon(@click="refreshProject")
-          i.fas.fa-sync
 
     .sub-information__row
       .row__title Project Status:
@@ -131,7 +129,9 @@
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
-				setCurrentProject: "setCurrentProject"
+				setCurrentProject: "setCurrentProject",
+        updateClientsRequestsProps: "updateClientsRequestsProps",
+        updateClientContacts: "updateClientContacts",
 			}),
       refreshProject() {
       	this.$emit("refreshProject");
@@ -270,13 +270,20 @@
 			},
 			async manageSaveClick(index) {
 				try {
-					const result = await this.$http.post("/pm-manage/client-contact", {
-						projectId: this.project._id,
-						contact: this.currentClientContact,
-						oldContact: this.oldClientContact
-					})
-          this.setCurrentProject(result.data)
-					this.projectClientContacts = result.data.clientContacts
+					// const result = await this.$http.post("/pm-manage/client-contact", {
+					// 	projectId: this.project._id,
+					// 	contact: this.currentClientContact,
+					// 	oldContact: this.oldClientContact
+					// })
+          // this.setCurrentProject(result.data)
+
+          await this.updateClientContacts(
+            {
+              projectId: this.project._id,
+              contact: this.currentClientContact,
+              oldContact: this.oldClientContact
+
+            })
 					this.alertToggle({
 						message: "Saved project client contact",
 						isShow: true,
@@ -319,11 +326,7 @@
 			},
 			async setPayment({ option }) {
 				try {
-					const result = await this.$http.post("/pm-manage/payment-profile", {
-						projectId: this.project._id,
-						paymentProfile: option
-					})
-					this.project.paymentProfile = result.data.paymentProfile
+          await this.updateClientsRequestsProps({ projectId: this.project._id, value: {paymentProfile: option} })
 					this.alertToggle({
 						message: "Project payment profile updated",
 						isShow: true,
@@ -339,10 +342,7 @@
 			},
 			async setUrgentStatus(event) {
 				try {
-					const result = await this.$http.post("/pm-manage/urgent", {
-						projectId: this.project._id,
-						isUrgent: event.target.checked
-					})
+          await this.updateClientsRequestsProps({ projectId: this.project._id, value: {isUrgent: event.target.checked} })
 					this.alertToggle({
 						message: "Urgent status updated",
 						isShow: true,
@@ -366,6 +366,7 @@
 					return this.project.customer.contacts.map((i) => i.firstName)
 				}
 			},
+      //TODO: remove
 			isProjectFinished(){
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'

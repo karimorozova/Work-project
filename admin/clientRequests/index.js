@@ -1,8 +1,6 @@
 const  {
 	getClientRequestById,
-	updateClientRequestProps,
 	getClientsRequests,
-	getClientRequestAfterUpdate
 } = require('./getClientsRequests')
 
 const {
@@ -16,7 +14,9 @@ const {
 } =  require('./clientRequestStep1')
 
 const {
-
+  updateClientRequestProps,
+  getClientRequestAfterUpdate,
+  updateClientContacts,
 } =  require('./clientRequestStep2')
 
 
@@ -39,5 +39,6 @@ module.exports = {
 	getClientsRequests,
 	getClientRequestById,
 	updateClientRequestProps,
-	getClientRequestAfterUpdate
+	getClientRequestAfterUpdate,
+  updateClientContacts,
 }

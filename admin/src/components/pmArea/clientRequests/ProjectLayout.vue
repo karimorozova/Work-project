@@ -35,7 +35,6 @@ export default {
   }
 
   .main-wrapper {
-    width: 1160px;
   }
 
   .sub-wrapper {

@@ -4,7 +4,7 @@ const {
 	getClientsRequests,
 	getClientRequestById,
 	updateClientRequestProps,
-
+  updateClientContacts,
 } = require("../../clientRequests")
 
 
@@ -42,16 +42,40 @@ router.post('/:id/update', async (req, res) => {
 	}
 })
 
-router.post('/:id/updateProp', async (req, res) => {
-	const { prop, value } = req.body
+router.post('/:id/update-prop', async (req, res) => {
+	const { value } = req.body
 	const { id } = req.params
 	try {
-		const requests = await updateClientRequestProps({ id, prop, value })
+    const requests = await updateClientRequestProps({ id, value })
 		res.send(requests)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong with DB while getting requests!')
 	}
+})
+
+// router.post('/:id/pushProp', async (req, res) => {
+// 	const { value } = req.body
+// 	const { id } = req.params
+// 	try {
+//     const requests = await pushClientRequestProps({ id, value })
+// 		res.send(requests)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Something wrong with DB while getting requests!')
+// 	}
+// })
+
+router.post('/:id/update-client-contact', async (req, res) => {
+  const { contact, oldContact } = req.body
+  const { id } = req.params
+  try {
+    const result = await updateClientContacts({id, contact, oldContact})
+    res.send(result)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on updating/creating client contact')
+  }
 })
 
 
