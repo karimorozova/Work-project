@@ -258,12 +258,12 @@
 						description: '<li>Profit & Loss: line by line translation</li><li>Balance sheet: line by line translation</li><li>Additional notes: line by line for all table type notes</li><li>Any information regarding payments to shareholders and directors</li>'
 					}
 				],
-				forbiddenExtensions: [
-					'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
-					'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
-					'png', 'gif', 'bmp', 'tiff', 'ppm', 'pgm', 'jpg', 'svg', 'bat',
-					'mp3', 'aac', '3gp', 'aa', 'aax', 'aiff', 'alac', 'm4p', 'mpc'
-				],
+				// forbiddenExtensions: [
+				// 	'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
+				// 	'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
+				// 	'png', 'gif', 'bmp', 'tiff', 'ppm', 'pgm', 'jpg', 'svg', 'bat',
+				// 	'mp3', 'aac', '3gp', 'aa', 'aax', 'aiff', 'alac', 'm4p', 'mpc'
+				// ],
 				isUploadModal: false,
 				isDeleteModal: false,
 				deleteFileType: null,
@@ -500,7 +500,8 @@
 				const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
-					return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
+					// return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
+					return size / 1000000 <= 2
 				})
 
 				let formData = new FormData()
@@ -524,7 +525,8 @@
 				const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
-					return size / 1000000 <= 50 && this.forbiddenExtensions.indexOf(extension) === -1
+					//return size / 1000000 <= 50 && this.forbiddenExtensions.indexOf(extension) === -1
+					return size / 1000000 <= 50
 				})
 
 				let formData = new FormData()

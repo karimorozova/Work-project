@@ -386,10 +386,14 @@
 				]
 			},
 			mappedSourceLanguages() {
-				return this.clientSourceLanguages && this.clientSourceLanguages.map(i => i.lang)
+				return this.clientSourceLanguages && this.clientSourceLanguages
+						.map(i => i.lang)
+						.filter(i => i !== 'English' && i !== 'English (United States)')
 			},
 			mappedTargetLanguages() {
-				return this.clientTargetLanguages && this.clientTargetLanguages.map(i => i.lang)
+				return this.clientTargetLanguages && this.clientTargetLanguages
+						.map(i => i.lang)
+						.filter(i => i !== 'English' && i !== 'English (United States)')
 			},
 			mappedIndustries() {
 				return this.getClientIndustries && this.getClientIndustries.map(i => i.name)
