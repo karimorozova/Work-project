@@ -24,12 +24,6 @@
         @selectProject="selectProject"
         @bottomScrolled="bottomScrolled"
       )
-      RequestsTable(
-        v-if="projectsType === 'requests'"
-        :allProjects="tableData"
-        @selectProject="selectProject"
-        @bottomScrolled="bottomScrolled"
-      )
 </template>
 
 <script>

@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Register from '@/components/Register'
 import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
 import Main from '@/components/Main'
@@ -86,11 +85,6 @@ const router = new Router({
             name: 'xtrf',
             component: Xtrf
         },
-        // {
-        //     path: '/register',
-        //     name: 'register',
-        //     component: Register
-        // },
         {
             path: '/login',
             name: 'login',

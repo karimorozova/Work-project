@@ -10,9 +10,9 @@
     )
       template(slot="headerProjectId" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
-      template(slot="headerClientName" slot-scope="{ field }")
-        span.projects-table__label {{ field.label }}
       template(slot="headerProjectName" slot-scope="{ field }")
+        span.projects-table__label {{ field.label }}
+      template(slot="headerClientName" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
       template(slot="headerLanguages" slot-scope="{ field }")
         span.projects-table__label {{ field.label }}
@@ -37,10 +37,10 @@
 
       template(slot="projectId" slot-scope="{ row }")
         span {{ getId(row) }}
-      template(slot="clientName" slot-scope="{ row }")
-        span {{ clientName(row.customer) }}
       template(slot="projectName" slot-scope="{ row }")
         span {{ row.projectName }}
+      template(slot="clientName" slot-scope="{ row }")
+        span {{ clientName(row.customer) }}
       template(slot="languages" slot-scope="{ row }")
         span(v-html="projectLangs(row)")
       template(slot="status" slot-scope="{ row }")
@@ -67,7 +67,7 @@
         span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
       template(slot="projectManager" slot-scope="{ row }")
         span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
-      template(slot="projectDelivery" slot-scope="{ row, index }")
+      //template(slot="projectDelivery" slot-scope="{ row, index }")
         div.size-16(v-html="deliveryStatistic(index)")
       template(slot="projectTest" slot-scope="{ row, index }")
         .checkbox(@click.stop="")
@@ -92,8 +92,8 @@
 			return {
 				fields: [
 					{ label: "ID", headerKey: "headerProjectId", key: "projectId", width: "11%" },
-					{ label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%" },
 					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "10%" },
+					{ label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "10%" },
 					{ label: "Languages", headerKey: "headerLanguages", key: "languages", width: "10%" },
 					{ label: "Status", headerKey: "headerStatus", key: "status", width: "8%" },
 					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "6%" },
@@ -101,8 +101,8 @@
 					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "6%" },
 					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%" },
-					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "10%" },
-					{ label: "Del", headerKey: "headerDelivery", key: "projectDelivery", width: "4%" },
+					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "14%" },
+					// { label: "Del", headerKey: "headerDelivery", key: "projectDelivery", width: "4%" },
 					{ label: "Test", headerKey: "headerTest", key: "projectTest", width: "4%" }
 				]
 			}
@@ -120,12 +120,12 @@
 					value: event.target.checked
 				})
 			},
-			deliveryStatistic(index) {
-				let { tasks } = this.allProjects[index]
-				tasks = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
-				const { length: deliveryLength } = tasks.filter(({ status }) => status === 'Delivered')
-				return deliveryLength === tasks.length && tasks.length ? '<i class="fa fa-check" aria-hidden="true"></i>' : (deliveryLength && deliveryLength < tasks.length) ? `${ deliveryLength } / ${ tasks.length }` : ''
-			},
+			// deliveryStatistic(index) {
+			// 	let { tasks } = this.allProjects[index]
+			// 	tasks = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+			// 	const { length: deliveryLength } = tasks.filter(({ status }) => status === 'Delivered')
+			// 	return deliveryLength === tasks.length && tasks.length ? '<i class="fa fa-check" aria-hidden="true"></i>' : (deliveryLength && deliveryLength < tasks.length) ? `${ deliveryLength } / ${ tasks.length }` : ''
+			// },
 			toFixedFinalCost(num) {
 				return num && num.toFixed(2)
 			},
@@ -250,7 +250,8 @@
   .size-16 {
     font-size: 16px;
   }
-  .finance-margin{
+
+  .finance-margin {
     margin-left: -4px;
   }
 </style>
