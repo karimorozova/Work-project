@@ -131,7 +131,7 @@
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
 	import DatepickerWithTime from "../../../DatepickerWithTime"
-  import {updateClientsRequests, updateClientsRequestsProps} from "../../../../vuex/clientsRequests/actions";
+	import { updateClientsRequests, updateClientsRequestsProps } from "../../../../vuex/clientsRequests/actions"
 
 	export default {
 		props: {
@@ -158,7 +158,7 @@
 				errors: [],
 				areErrorsExist: false,
 				clients: [],
-        managers: []
+				managers: []
 			}
 		},
 		methods: {
@@ -166,7 +166,7 @@
 				"alertToggle",
 				"setProjectDate",
 				"setCurrentProject",
-        "updateClientsRequestsProps",
+				"updateClientsRequestsProps"
 			]),
 			async changeProjectName(projectName) {
 				this.errors = []
@@ -176,7 +176,7 @@
 					return
 				}
 				if (!this.errors.length) {
-				  //TODO: Change vuex
+					//TODO: Change vuex
 					await this.setProjectProp({ prop: 'projectName', value: projectName })
 				}
 			},
@@ -184,30 +184,29 @@
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			async updateProjectDate(e, prop) {
-					if (prop === 'deadline' && this.isBilling) {
-						const date = { ['billingDate']: e }
-						await this.setDate('billingDate', date)
-					}
-					const date = { [prop]: e }
-					await this.setDate(prop, date)
+				if (prop === 'deadline' && this.isBilling) {
+					const date = { ['billingDate']: e }
+					await this.setDate('billingDate', date)
+				}
+				const date = { [prop]: e }
+				await this.setDate(prop, date)
 			},
 			async setDate(prop, date) {
 				if (prop === 'startDate' && this.project.tasks.length) return
-        await this.updateClientsRequestsProps({ projectId: this.project._id, value: date })
+				await this.updateClientsRequestsProps({ projectId: this.project._id, value: date })
 			},
 			async setTest(e) {
 				if (!this.project._id) {
 					this.isTest = e.target.checked
 				} else {
-          await this.updateClientsRequestsProps({ projectId: this.project._id, value: {'isTest': e.target.checked} })
+					await this.updateClientsRequestsProps({ projectId: this.project._id, value: { 'isTest': e.target.checked } })
 				}
 			},
 			async setSameDate(e) {
 				this.isBilling = e.target.checked
-        e.target.checked ?
-            this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
-            this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
-
+				e.target.checked ?
+						this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
+						this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
 			},
 
 			async setClientNumber(e) {
@@ -219,7 +218,7 @@
 			},
 			async setProjectProp({ prop, value }) {
 				try {
-					await this.updateClientsRequestsProps({ projectId: this.project._id, value: {[prop]: value} })
+					await this.updateClientsRequestsProps({ projectId: this.project._id, value: { [prop]: value } })
 					this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
@@ -231,8 +230,8 @@
 					this.selectedIndustry = option.industries[0]
 				}
 			},
-		  async	setIndustry({ option }) {
-        await this.updateClientsRequestsProps({ projectId: this.project._id, value: {industry: option} })
+			async setIndustry({ option }) {
+				await this.updateClientsRequestsProps({ projectId: this.project._id, value: { industry: option } })
 				// this.selectedIndustry = option
 			},
 			closeErrors() {
@@ -294,33 +293,13 @@
 				const route = this.$router.resolve({ path: `/clients/details/${ this.project.customer._id }` })
 				window.open(route.href, "_blank")
 			},
-			// async getCustomers() {
-			// 	try {
-			// 		if (!this.project._id) {
-			// 			if (!this.clients.length) {
-			// 				let result = await this.$http.get(`/active-clients`)
-			// 				this.clients = [ ...result.body ]
-			// 			}
-			// 		}
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: "Error on getting customers", isShow: true, type: "error" })
-			// 	}
-			// },
-			// async getProjectData() {
-			// 	const { id } = this.$route.params
-			// 	if (id !== undefined) {
-			// 		const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
-			// 		await this.setCurrentProject(curProject.body)
-			// 	}
-			// },
 			isBillingDate() {
-				if (this.project.deadline.value === "") {
+				if (this.project.deadline === "") {
 					this.isBilling = false
-				} else this.isBilling = this.project.deadline.value === this.project.billingDate.value
-			},
-			// setIsBillingTrue() {
-			// 	this.isBilling = true
-			// }
+				} else {
+					this.isBilling = this.project.deadline === this.project.billingDate
+				}
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -350,10 +329,10 @@
 			disabledPicker() {
 				return !!(this.project._id && this.project.tasks && this.project.tasks.length)
 			},
-			isProjectFinished(){
+			isProjectFinished() {
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			},
+			}
 		},
 		components: {
 			DatepickerWithTime,
@@ -364,34 +343,35 @@
 			Button,
 			ValidationErrors
 		},
-		async created() {
-			// await this.getProjectData()
-			// this.getCustomers()
+		mounted() {
 			this.isBillingDate()
-			// !this.project._id && this.setIsBillingTrue()
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-  .input-title{
+  .input-title {
     display: flex;
-    &__text{
+
+    &__text {
       margin-bottom: 4px;
     }
-    .require{
+
+    .require {
       color: red;
     }
   }
+
   .hide-elem {
     width: 155px;
   }
+
   .project {
     display: flex;
     flex-direction: column;
-    width: 960px;
+    width: 1000px;
 
-    &__nameDisabled{
+    &__nameDisabled {
       display: flex;
       font-family: Myriad600;
       align-items: center;
@@ -617,9 +597,10 @@
   }
 
   #same,
-  #test{
+  #test {
     width: 0;
   }
+
   input:disabled {
     background-color: #f4f2f1;
   }

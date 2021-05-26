@@ -1,23 +1,17 @@
 <template lang="pug">
   .tasks-steps
-    transition(name="slide-fade")
-      .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
-        .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
     .tasks-steps__tasks-title Tasks and Steps
-      img.tasks-steps__arrow(v-if="!isProjectFinished" src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
+      img.tasks-steps__arrow(src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
     transition(name="slide-fade")
-      TasksData(
+      RequestTasksData(
+        v-if="isTaskData"
         :originallyLanguages="originallyLanguages"
         :originallyUnits="originallyUnits"
         :originallySteps="originallySteps"
         :originallyServices="originallyServices"
         @setValue="setValue"
-        @showErrors="showErrors"
         @addTasks="addTasks"
-        :isProject="isProject"
       )
-        template(slot="errors")
-          slot
     //.tasks-steps__tables
     //  Tasks(v-if="currentProject.tasks.length && isTasksShow"
     //    :allTasks="this.currentProject.tasks"
@@ -40,7 +34,7 @@
 </template>
 
 <script>
-	import TasksData from "./tasks-n-steps/TasksData"
+	import RequestTasksData from "./tasks-n-steps/RequestTasksData"
 	// import Button from "../../Button"
 	// import Tasks from "./tasks-n-steps/Tasks"
 	// import Steps from "./tasks-n-steps/Steps"
@@ -48,25 +42,17 @@
 
 	export default {
 		props: {
-			// originallyLanguages: {
-			// 	type: Array
-			// },
-			// originallyUnits: {
-			// 	type: Array
-			// },
-			// originallySteps: {
-			// 	type: Array
-			// },
-			// originallyServices: {
-			// 	type: Array
-			// }
+			originallyLanguages: { type: Array },
+			originallyUnits: { type: Array },
+			originallySteps: { type: Array },
+			originallyServices: { type: Array }
 		},
 		data() {
 			return {
 				isTaskData: false,
 				// isStepsShow: false,
 				// isTasksShow: true,
-				// isInfo: false,
+				isInfo: false
 				// translateFilesAmount: 0
 			}
 		},
@@ -76,21 +62,20 @@
 				"addProjectTasks",
 				"addProjectWordsTasks",
 				"clearTasksData",
-				"getServices",
+				// "getServices",
 				'setCurrentProject'
 			]),
 			updateTasks(data) {
 				// this.currentProject.tasks = data
 			},
 			setDefaultIsTaskData() {
-				// if (!this.currentProject.tasks || !this.currentProject.tasks.length) {
-				// 	this.isTaskData = true
-				// }
+				console.log('this.currentProject.tasks.length', this.currentProject.tasks.length)
+				if (!this.currentProject.tasks.length) {
+					this.isTaskData = true
+				}
 			},
 			toggleTaskData() {
-				// if (this.currentProject.status !== 'Delivered') {
-					this.isTaskData = !this.isTaskData
-				// }
+				this.isTaskData = !this.isTaskData
 			},
 			setValue({ option, prop }) {
 				// this[prop] = option
@@ -124,7 +109,7 @@
 			getDataForTasks(dataForTasks) {
 				// let tasksData = new FormData()
 				// const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : ""
-        //
+				//
 				// tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits))
 				// tasksData.append('customerName', this.currentProject.customer.name)
 				// if (dataForTasks.stepsAndUnits.find(item => item.template)) {
@@ -144,12 +129,13 @@
 				// return tasksData
 			},
 			async addTasks(dataForTasks) {
+				console.log('dataForTasks', dataForTasks)
 				// await this.refreshMetricsIfStepsWereNotCreated()
-        //
+				//
 				// let tasksData = this.getDataForTasks(dataForTasks)
 				// const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
 				// const { sourceFiles, refFiles } = dataForTasks
-        //
+				//
 				// if (sourceFiles && sourceFiles.length) {
 				// 	this.translateFilesAmount = sourceFiles.length
 				// 	for (let file of sourceFiles) {
@@ -161,7 +147,7 @@
 				// 		tasksData.append('refFiles', file)
 				// 	}
 				// }
-        //
+				//
 				// for (const iterator of calculationUnit) {
 				// 	if (iterator === 'CAT Wordcount') {
 				// 		try {
@@ -175,7 +161,7 @@
 				// 		}
 				// 	}
 				// }
-        //
+				//
 				// if (calculationUnit.includes('CAT Wordcount')) {
 				// 	await this.saveProjectWordsTasks(tasksData)
 				// } else {
@@ -206,17 +192,12 @@
 			},
 			getMetrics() {
 				// this.$emit("getMetrics")
-			},
-			showErrors({ errors }) {
-				// this.$emit("showErrors", { errors })
 			}
 		},
 		computed: {
 			...mapGetters({
 				// isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
-				// currentProject: 'getCurrentProject',
-				// selectedInfoMessage: 'getMemoqProjectMessage',
-				// fileCounter: 'getTranslateFileCounter'
+				currentProject: 'getCurrentClientRequest'
 			}),
 			metricsButton() {
 				// const wordsUnit = this.currentProject.tasks.find(item => item.service.calculationUnit === 'Words')
@@ -226,13 +207,13 @@
 				// const statuses = [ "Closed", "Cancelled" ]
 				// return statuses.indexOf(this.currentProject.status) !== -1
 			},
-      isProjectFinished(){
+			isProjectFinished() {
 				// const { status } = this.currentProject
 				// return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-      },
+			}
 		},
 		components: {
-			TasksData,
+			RequestTasksData
 			// Button,
 			// Tasks,
 			// Steps
@@ -241,7 +222,7 @@
 			// this.getServices()
 		},
 		mounted() {
-			// this.setDefaultIsTaskData()
+			this.setDefaultIsTaskData()
 		}
 	}
 </script>
@@ -251,8 +232,7 @@
 
   .tasks-steps {
     box-sizing: border-box;
-    min-width: 960px;
-    width: 960px;
+    width: 1000px;
     padding: 20px;
     margin-top: 40px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
@@ -317,7 +297,8 @@
     transform: translateY(10px);
     opacity: 0;
   }
-  .no-box-shadow{
+
+  .no-box-shadow {
     box-shadow: none;
   }
 

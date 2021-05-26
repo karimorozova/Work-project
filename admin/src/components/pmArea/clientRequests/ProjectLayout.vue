@@ -2,7 +2,12 @@
   .client-req__layout
     .main-wrapper
       FormProject(:project="currentClientRequest")
-      TasksAndSteps
+      RequestTasksAndSteps(
+        :originallyLanguages="originallyLanguages"
+        :originallyUnits="originallyUnits"
+        :originallySteps="originallySteps"
+        :originallyServices="originallyServices"
+      )
     .sub-wrapper
       ProjectSubInformation(:project="currentClientRequest")
 
@@ -12,7 +17,7 @@
 import FormProject from "./subComponents/FormProject"
 import { mapGetters, mapActions } from "vuex"
 import ProjectSubInformation from "../ProjectSubInformation"
-import TasksAndSteps from "./TasksAndSteps";
+import RequestTasksAndSteps from "./RequestTasksAndSteps";
 
 export default {
   data(){
@@ -20,12 +25,25 @@ export default {
       clientRequest: {}
     }
   },
+	methods: {
+		showErrors() {
+
+		},
+		setDate(){
+
+    },
+
+	},
   computed: {
     ...mapGetters({
-      currentClientRequest: "getCurrentClientRequest"
+      currentClientRequest: "getCurrentClientRequest",
+	    originallyLanguages: 'getAllLanguages',
+	    originallySteps: 'getAllSteps',
+	    originallyServices: "getAllServices",
+	    originallyUnits: "getAllUnits",
     }),
   },
-  components: {TasksAndSteps, ProjectSubInformation, FormProject }
+  components: {RequestTasksAndSteps, ProjectSubInformation, FormProject }
 }
 </script>
 

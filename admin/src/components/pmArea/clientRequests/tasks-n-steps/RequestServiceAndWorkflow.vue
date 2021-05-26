@@ -124,7 +124,7 @@
 					}
 				}
 				if (this.selectedWorkflow.id === 2890) {
-					this.setDataValue({ prop: "stepsDates", value: [this.stepsDates[0]] })
+					this.setDataValue({ prop: "stepsDates", value: [ this.stepsDates[0] ] })
 				} else {
 					this.setDataValue({ prop: "stepsDates", value: this.stepsDates })
 				}
@@ -345,7 +345,8 @@
   .fade-leave-to {
     opacity: 0;
   }
-  .label-red{
+
+  .label-red {
     color: red;
     font-size: 14px;
   }

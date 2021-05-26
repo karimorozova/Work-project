@@ -3,88 +3,88 @@
     .tasks-data__main
       //.tasks-data__item(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
       .tasks-data__item
-        ServiceAndWorkflow(
+        RequestServiceAndWorkflow(
           :originallyLanguages="originallyLanguages"
-          @setSourceLanguage="setSourceLang",
-          @setTargets="setTargets",
           :originallyUnits="originallyUnits"
           :originallySteps="originallySteps"
           :originallyServices="originallyServices"
+          @setSourceLanguage="setSourceLang",
+          @setTargets="setTargets",
           :templates="templates"
         )
 
-      .tasks-data__item(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
-        .tasks-data__item-title Job Settings
-        .tasks-data__langs(v-if="originallyLanguages.length")
-          span(v-if="isMonoService")
-            TasksLangs(
-              :originallyLanguages="originallyLanguages"
-              :targetLanguages="targetLanguages"
-              @setSourceLanguage="setSourceLang",
-              @setTargets="setTargets",
-            )
-          span(v-if="!isMonoService")
-            TasksLangsDuo(
-              :originallyLanguages="originallyLanguages",
-              :calculationUnit="currentUnit",
-              :sourceLanguages="sourceLanguages",
-              @setSourceLanguage="setSourceLang",
-              @setTargets="setTargets",
-              :isRequest="isRequest"
-              :setPossibleTargetsAction="setPossibleTargetsAction"
-            )
+      //.tasks-data__item(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
+      //  .tasks-data__item-title Job Settings
+      //  .tasks-data__langs(v-if="originallyLanguages.length")
+      //    span(v-if="isMonoService")
+      //      TasksLangs(
+      //        :originallyLanguages="originallyLanguages"
+      //        :targetLanguages="targetLanguages"
+      //        @setSourceLanguage="setSourceLang",
+      //        @setTargets="setTargets",
+      //      )
+      //    span(v-if="!isMonoService")
+      //      TasksLangsDuo(
+      //        :originallyLanguages="originallyLanguages",
+      //        :calculationUnit="currentUnit",
+      //        :sourceLanguages="sourceLanguages",
+      //        @setSourceLanguage="setSourceLang",
+      //        @setTargets="setTargets",
+      //        :isRequest="isRequest"
+      //        :setPossibleTargetsAction="setPossibleTargetsAction"
+      //      )
+      //
+      //  .tasks-data__services
+      //    .tasks-data__service-steps(v-if="countCATWordcount === 2")
+      //      div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length")
+      //        JobSettings(
+      //          :tasksDataProp="tasksData",
+      //          v-for="(step, index) in [sortedJobs[0]]",
+      //          :currentJob="step",
+      //          :currentIndex="index"
+      //          :templates="templates"
+      //          :originallyUnits="originallyUnits"
+      //        )
+      //
+      //    .tasks-data__service-steps(v-else)
+      //      div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length")
+      //        JobSettings(
+      //          :tasksDataProp="tasksData",
+      //          v-for="(step, index) in sortedJobs",
+      //          :currentJob="step",
+      //          :currentIndex="index"
+      //          :templates="templates"
+      //          :originallyUnits="originallyUnits"
+      //        )
 
-        .tasks-data__services
-          .tasks-data__service-steps(v-if="countCATWordcount === 2")
-            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length")
-              JobSettings(
-                :tasksDataProp="tasksData",
-                v-for="(step, index) in [sortedJobs[0]]",
-                :currentJob="step",
-                :currentIndex="index"
-                :templates="templates"
-                :originallyUnits="originallyUnits"
-              )
-
-          .tasks-data__service-steps(v-else)
-            div(v-if="tasksData.hasOwnProperty('stepsAndUnits') && templates.length && originallyUnits.length")
-              JobSettings(
-                :tasksDataProp="tasksData",
-                v-for="(step, index) in sortedJobs",
-                :currentJob="step",
-                :currentIndex="index"
-                :templates="templates"
-                :originallyUnits="originallyUnits"
-              )
-
-    .tasks-data__filesOptions(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
-      .tasks-data__filesOptions-title File Preparation
-      .tasks-data__files(v-if="currentProject.status !== 'Requested'")
-        TasksFiles(:tasksData="tasksData")
-
-    span(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
-      .tasks-data__add-tasks(v-if="isProject && isButton")
-        Button(value="Add tasks", @clicked="checkForErrors")
-
-    .tasks-data__buttons(v-if="isRequest && isButton")
-      .tasks-data__button
-        Button(:value="currentProject.isAssigned ? 'Assign to AM' : 'Assign to PM'", @clicked="assignManager")
-      .tasks-data__button
-        Button(value="Add tasks", @clicked="checkForErrors", :isDisabled="isAddTasksDisabled")
+    //.tasks-data__filesOptions(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
+    //  .tasks-data__filesOptions-title File Preparation
+    //  .tasks-data__files(v-if="currentProject.status !== 'Requested'")
+    //    TasksFiles(:tasksData="tasksData")
+    //
+    //span(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
+    //  .tasks-data__add-tasks(v-if="isProject && isButton")
+    //    Button(value="Add tasks", @clicked="checkForErrors")
+    //
+    //.tasks-data__buttons(v-if="isRequest && isButton")
+    //  .tasks-data__button
+    //    Button(:value="currentProject.isAssigned ? 'Assign to AM' : 'Assign to PM'", @clicked="assignManager")
+    //  .tasks-data__button
+    //    Button(value="Add tasks", @clicked="checkForErrors", :isDisabled="isAddTasksDisabled")
 
     //.tasks-data__files.tasks-data_m-bottom-40(v-else)
       TasksFilesRequested
-    slot(name="errors")
+    //slot(name="errors")
 </template>
 
 <script>
-	import TasksLangs from "./TasksLangs"
-	import TasksLangsDuo from "./TasksLangsDuo"
+	// import TasksLangs from "./TasksLangs"
+	// import TasksLangsDuo from "./TasksLangsDuo"
 	// import TasksFiles from "./TasksFiles"
 	// import TasksFilesRequested from "./TasksFilesRequested"
 	// import JobSettings from "./JobSettings"
 	// import SelectSingle from "../../../SelectSingle"
-	import ServiceAndWorkflow from "./ServiceAndWorkflow"
+	import RequestServiceAndWorkflow from "./RequestServiceAndWorkflow"
 	// import Button from "../../../Button"
 	// import BigToggler from "@/components/BigToggler"
 	import { mapGetters, mapActions } from "vuex"
@@ -92,21 +92,10 @@
 
 	export default {
 		props: {
-			// isRequest: {
-			// 	type: Boolean
-			// },
-			// originallyLanguages: {
-			// 	type: Array
-			// },
-			// originallyUnits: {
-			// 	type: Array
-			// },
-			// originallySteps: {
-			// 	type: Array
-			// },
-			// originallyServices: {
-			// 	type: Array
-			// }
+			originallyLanguages: { type: Array },
+			originallyUnits: { type: Array },
+			originallySteps: { type: Array },
+			originallyServices: { type: Array }
 		},
 		data() {
 			return {
@@ -167,7 +156,7 @@
 				// 	refFiles,
 				// 	quantity
 				// } = this.tasksData
-        //
+				//
 				// if (this.isRequest) {
 				// 	this.errors = this.checkRequestErrors()
 				// }
@@ -176,7 +165,7 @@
 				// 		this.errors.push("Please, select tasks deadline.")
 				// 	}
 				// }
-        //
+				//
 				// if (!this.isMonoService && !source) this.errors.push("Please, select Source language.")
 				// if (this.tasksData.stepsAndUnits == null) this.errors.push("Please, select Unit.")
 				// if (!targets || !targets.length)
@@ -186,21 +175,21 @@
 				// 		: this.checkFiles(sourceFiles, refFiles)
 				// if (this.isDeadlineMissed())
 				// 	this.errors.push("Please, update deadline (Project's or tasks).")
-        //
+				//
 				// const isUnitCAT = this.tasksData.stepsAndUnits
 				// 		.map((i) => i.unit)
 				// 		.includes("CAT Wordcount")
-        //
+				//
 				// const isStepLanguageOnTargetLanguage = this.tasksData.targets
 				// 		.map((i) => i.lang)
 				// 		.includes(this.tasksData.source.lang)
-        //
+				//
 				// if (isUnitCAT && isStepLanguageOnTargetLanguage) {
 				// 	this.errors.push(
 				// 			'Target and Source Languages cannot be a same if a unit "CAT Wordcount" is selected'
 				// 	)
 				// }
-        //
+				//
 				// if (this.countCATWordcount >= 1) {
 				// 	let isCATWordcount = []
 				// 	this.tasksData.stepsAndUnits.forEach((element) => {
@@ -225,17 +214,17 @@
 			},
 			isDeadlineMissed() {
 				// let now = new Date().getTime()
-        //
+				//
 				// if (new Date(this.currentProject.deadline).getTime() <= now) {
 				// 	return true
 				// }
-        //
+				//
 				// let deadlines = this.tasksData.stepsDates.map(i => i.deadline)
-        //
+				//
 				// if (deadlines.filter(i => !i).length) {
 				// 	return true
 				// }
-        //
+				//
 				// for (let time of deadlines) {
 				// 	if (new Date(time).getTime() <= now) {
 				// 		return true
@@ -244,10 +233,10 @@
 			},
 			checkRequestFies() {
 				// const { sourceFiles, refFiles } = this.currentProject
-        //
+				//
 				// if (this.currentUnit === "CAT Wordcount" && !sourceFiles.length)
 				// 	this.errors.push("Please, upload Source file(s).")
-        //
+				//
 				// reference file is not mandatory!
 				// if (this.currentUnit !== "CAT Wordcount" && !refFiles.length)
 				//   this.errors.push("Please, upload Reference file(s).");
@@ -256,16 +245,16 @@
 				// if (this.currentUnit === "CAT Wordcount") {
 				// 	if (!sourceFiles || !sourceFiles.length)
 				// 		this.errors.push("Please, upload Source file(s).")
-					//REF FILES SAME AS SOURCE!
-					//   if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource())
-					//     this.errors.push("Reference file cannot be the same as Source!");
-					// } else {
-					//
-					// }
-					//reference file is not mandatory!
-					// if (!refFiles || !refFiles.length) {
-					//   this.errors.push("Please, upload Reference file(s).");
-					// }
+				//REF FILES SAME AS SOURCE!
+				//   if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource())
+				//     this.errors.push("Reference file cannot be the same as Source!");
+				// } else {
+				//
+				// }
+				//reference file is not mandatory!
+				// if (!refFiles || !refFiles.length) {
+				//   this.errors.push("Please, upload Reference file(s).");
+				// }
 				// }
 			},
 			// checkHoursSteps() {
@@ -320,7 +309,7 @@
 			...mapGetters({
 				currentProject: "getCurrentClientRequest",
 				languages: "getAllLanguages",
-				tasksData: "getTasksData",
+				tasksData: "getTasksData"
 			}),
 			countCATWordcount() {
 				// if (this.tasksData.stepsAndUnits) {
@@ -383,22 +372,22 @@
 		},
 		components: {
 			// DataTable,
-			TasksLangs,
-			TasksLangsDuo,
+			// TasksLangs,
+			// TasksLangsDuo,
 			// TasksFiles,
 			// TasksFilesRequested,
 			// JobSettings,
 			// SelectSingle,
 			// Button,
-			ServiceAndWorkflow,
+			RequestServiceAndWorkflow
 			// BigToggler
 		},
 		async created() {
-      console.log({test: this.currentProject.customer})
-		  if(!this.currentProject.customer) {
-        const curClientRequest = await this.$http.post(`/clients-requests/by-id/${ id }`);
-        this.setCurrentClientRequest(curClientRequest.data);
-      }
+			// console.log({ testcreated: this.currentProject.customer })
+			// if (!this.currentProject.customer) {
+			// 	const curClientRequest = await this.$http.post(`/clients-requests/by-id/${ id }`)
+			// 	this.setCurrentClientRequest(curClientRequest.data)
+			// }
 			// await this.getMemoqTemplates()
 		}
 	}
