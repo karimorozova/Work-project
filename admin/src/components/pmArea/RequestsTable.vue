@@ -46,7 +46,7 @@
       template(slot="deadline" slot-scope="{ row }")
         span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
       template(slot="projectManager" slot-scope="{ row }")
-        span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
+        span(v-if="row.projectManager") {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
       //template(slot="edit" slot-scope="{ row }" style="{'z-index': 100}")
         span.requests-table__icon(@click.stop="edit")
           img.requests-table__edit(src="../../assets/images/edit-icon-qa.png")

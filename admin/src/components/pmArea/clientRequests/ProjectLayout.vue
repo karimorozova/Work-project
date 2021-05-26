@@ -2,14 +2,17 @@
   .client-req__layout
     .main-wrapper
       FormProject(:project="currentClientRequest")
+      TasksAndSteps
     .sub-wrapper
       ProjectSubInformation(:project="currentClientRequest")
+
 </template>
 
 <script>
 import FormProject from "./subComponents/FormProject"
 import { mapGetters, mapActions } from "vuex"
 import ProjectSubInformation from "../ProjectSubInformation"
+import TasksAndSteps from "./TasksAndSteps";
 
 export default {
   data(){
@@ -22,7 +25,7 @@ export default {
       currentClientRequest: "getCurrentClientRequest"
     }),
   },
-  components: { ProjectSubInformation, FormProject }
+  components: {TasksAndSteps, ProjectSubInformation, FormProject }
 }
 </script>
 

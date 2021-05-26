@@ -22,12 +22,10 @@ export default {
     async getClientRequest() {
       const { id } = this.$route.params;
       try {
-        if(!this.currentClientRequest._id) {
+        // if(!this.currentClientRequest._id && id !== this.currentClientRequest._id) {
           const curClientRequest = await this.$http.post(`/clients-requests/by-id/${ id }`);
-          console.log(curClientRequest.data)
-          this.clientRequest = curClientRequest.data;
           this.setCurrentClientRequest(curClientRequest.data);
-        }
+        // }
       } catch (err) {
       }
     }
