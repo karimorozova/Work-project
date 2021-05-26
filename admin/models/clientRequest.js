@@ -170,6 +170,10 @@ const ClientRequestSchema = new mongoose.Schema({
 		isCheckBrief: {
 			type: Boolean,
 			default: false
+		},
+		isCheckComplianceTemplate: {
+			type: Boolean,
+			default: false
 		}
 	}
 

@@ -1013,7 +1013,7 @@
 
 <style lang="scss" scoped>
   input:disabled {
-    background-color: #F2EFEB;
+    background-color: #f4f2f1;
   }
 
   .vdp-datepicker__calendar div .cell {

@@ -1,13 +1,69 @@
 const router = require('express').Router()
-
+const fs = require('fs')
 const {
 	getClientsRequests,
 	getClientRequestById,
 	updateClientRequestProps,
-  updateClientContacts,
+	updateClientContacts,
+	uploadRequestFiles,
+	checkRequestedFiles,
+	manageClientContacts
 } = require("../../clientRequests")
 
+const { upload } = require('../../utils')
 
+const { ClientRequest } = require('../../models')
+
+router.post('/manage-client-contact', async (req, res) => {
+	const { contact, action, projectId } = req.body
+	try {
+		const updatedProject = await manageClientContacts({ contact, action, projectId })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on target-dr2')
+	}
+})
+
+router.post('/check-form-file', async (req, res) => {
+	const { projectId, path, check, type } = req.body
+	try {
+		const updatedProject = await checkRequestedFiles({ projectId, path, check, type })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on target-dr2')
+	}
+})
+
+router.post('/add-form-file', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
+	const formData = { ...req.body }
+	const files = req.files
+	try {
+		const updatedProject = await uploadRequestFiles(formData, files)
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on target-dr2')
+	}
+})
+
+router.post('/remove-form-file', async (req, res) => {
+	const { type, projectId, path } = req.body
+	try {
+		if (type === 'Source') await ClientRequest.updateOne({ "_id": projectId, 'requestForm.sourceFiles.path': path }, { $pull: { 'requestForm.sourceFiles': { path } } })
+		if (type === 'Reference') await ClientRequest.updateOne({ "_id": projectId, 'requestForm.refFiles.path': path }, { $pull: { 'requestForm.refFiles': { path } } })
+
+		fs.unlink(`./dist${ path }`, (err) => {
+			if (err) throw(err)
+		})
+		const updatedProject = await getClientRequestById({ "_id": projectId })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on removing file')
+	}
+})
 
 router.post('/all', async (req, res) => {
 	const filters = { ...req.body }
@@ -46,7 +102,7 @@ router.post('/:id/update-prop', async (req, res) => {
 	const { value } = req.body
 	const { id } = req.params
 	try {
-    const requests = await updateClientRequestProps({ id, value })
+		const requests = await updateClientRequestProps({ id, value })
 		res.send(requests)
 	} catch (err) {
 		console.log(err)
@@ -67,15 +123,15 @@ router.post('/:id/update-prop', async (req, res) => {
 // })
 
 router.post('/:id/update-client-contact', async (req, res) => {
-  const { contact, oldContact } = req.body
-  const { id } = req.params
-  try {
-    const result = await updateClientContacts({id, contact, oldContact})
-    res.send(result)
-  } catch (err) {
-    console.log(err)
-    res.status(500).send('Error on updating/creating client contact')
-  }
+	const { contact, oldContact } = req.body
+	const { id } = req.params
+	try {
+		const result = await updateClientContacts({ id, contact, oldContact })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on updating/creating client contact')
+	}
 })
 
 

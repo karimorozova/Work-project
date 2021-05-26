@@ -10,7 +10,9 @@ const {
 
 
 const {
-
+	uploadRequestFiles,
+	checkRequestedFiles,
+	manageClientContacts,
 } =  require('./clientRequestStep1')
 
 const {
@@ -23,6 +25,9 @@ const {
 module.exports = {
 	complianceService,
 	createComplianceFiles,
+	uploadRequestFiles,
+	checkRequestedFiles,
+	manageClientContacts,
 	// getClientRequest,
 	// getClientRequests,
 	// updateClientRequest,

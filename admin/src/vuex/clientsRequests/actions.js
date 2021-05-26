@@ -1,8 +1,6 @@
 import Vue from "vue";
 
 export const setRequests = ({ commit }, payload) => commit('SET_REQUESTS', payload);
-
-
 export const setClientsRequests = async ({ dispatch, commit }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
@@ -38,7 +36,6 @@ export const updateClientContacts = async ({ dispatch, commit }, payload) => {
     dispatch('decrementRequestCounter')
   }
 }
-
 export const setCurrentClientRequest = async ({ dispatch, commit }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {

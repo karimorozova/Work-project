@@ -132,18 +132,19 @@
 
   .disabled {
     .action-button__button {
-      opacity: 0.5;
+      opacity: 0.4;
       min-width: 120px;
       padding: 0 24px 0 24px;
       height: 32px;
       color: $white;
       font-size: 14px;
       border-radius: 4px;
-      background-color: $orange;
+      background-color: $orange!important;
       border: none;
       transition: .1s ease;
       outline: none;
       letter-spacing: 0.2px;
+      cursor: default;
 
       &:hover {
         box-shadow: none;

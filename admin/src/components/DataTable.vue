@@ -191,10 +191,11 @@ export default {
   max-height: 320px;
 }
 
-.steps-table-cell {
-  /*display: flex;*/
-  /*align-items: center;*/
-  /*box-sizing: border-box;*/
+.form-table-body {
+  max-height: 320px;
+  .table__body-row {
+    cursor: default;
+  }
 }
 
 .vendors-table__body,

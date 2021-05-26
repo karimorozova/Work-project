@@ -36,6 +36,11 @@
     color: #67573E;
   }
 
+  input:disabled,
+  textarea:disabled {
+    background-color: #eee!important;
+  }
+
   ::-webkit-file-upload-button { cursor:pointer; }
 
   .b-log-in,
@@ -123,47 +128,7 @@
     src: url('./assets/fonts/MYRIADPRO-BOLD.woff') format('woff');
   }
 
-  /* Custom scroll-bar */
   #app {
-    /* ------- If buttons needed ---------
 
-    ::-webkit-scrollbar-button:vertical:decrement {
-      border-bottom: 14px solid rgba(103, 87, 62, 0.3);
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-radius: 4px;
-      &:hover {
-        border-bottom: 14px solid rgba(103, 87, 62, 0.6);
-      }
-    }
-    ::-webkit-scrollbar-button:vertical:increment {
-      border-top: 14px solid rgba(103, 87, 62, 0.3);
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-radius: 4px;
-      &:hover {
-        border-top: 14px solid rgba(103, 87, 62, 0.6);
-      }
-    }
-    ::-webkit-scrollbar-button:horizontal:decrement {
-      border-right: 14px solid rgba(103, 87, 62, 0.3);
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      border-radius: 4px;
-      &:hover {
-        border-right: 14px solid rgba(103, 87, 62, 0.6);
-      }
-    }
-    ::-webkit-scrollbar-button:horizontal:increment {
-      border-left: 14px solid rgba(103, 87, 62, 0.3);
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      border-radius: 4px;
-      &:hover {
-        border-left: 14px solid rgba(103, 87, 62, 0.6);
-      }
-    }
-
-    -----------  */
   }
 </style>

@@ -1,6 +1,6 @@
 <template lang="pug">
   .check-line
-    i.check-line__icon.fa.fa-check-circle(@click="click" :class="{'check-line_green': isApproved}")
+    i.check-line__icon.fa.fa-check-circle(@click="click" :class="[{'check-line_green': isApproved}, {'disabled': isDisabled}]")
 </template>
 
 <script>
@@ -8,6 +8,10 @@
 		props: {
 			isApproved: {
 				type: Boolean
+			},
+			isDisabled: {
+				type: Boolean,
+				default: false
 			}
 		},
 		methods: {
@@ -20,6 +24,11 @@
 
 <style lang="scss" scoped>
   @import "../assets/scss/colors.scss";
+
+  .disabled {
+    cursor: default !important;
+    color: transparent !important;
+  }
 
   .check-line {
     display: flex;
