@@ -57,7 +57,7 @@
                 @click="setDay(day)"
                 ) {{ day.date }}
 
-        .time-select
+        .time-select(v-if="isTime")
           .change-time.hour
             span(
               @click="() => checkHours(+hours+1)"
@@ -190,6 +190,7 @@
 				type: String,
 				default: 'year'
 			},
+      isTime: { type: Boolean, default: true },
 		},
 		data() {
 			const startDate = this.openDate ? new Date(this.openDate) : new Date()
@@ -1299,6 +1300,16 @@
   .filters .datepicker-custom {
     width: 166px;
     height: 30px;
+  }
+
+  .filters .datepicker-custom-filter {
+    border-radius: 5px;
+    border: 1px solid #68573E;
+    width: 191px;
+    height: 30px;
+    color: #68573E;
+    padding-left: 5px;
+    outline: none;
   }
 
   .datepicker-height-30 {

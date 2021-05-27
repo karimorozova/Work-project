@@ -1,7 +1,7 @@
 <template lang="pug">
   .all-projects
     .all-projects__filters
-      ProjectFilters(
+      RequestFilters(
         :clientName="clientFilter"
         :sourceLangs="sourceFilter"
         :targetLangs="targetFilter"
@@ -32,6 +32,7 @@ import ProjectInfo from "./ProjectInfo";
 import ProjectFilters from "./ProjectFilters";
 import { mapGetters, mapActions } from 'vuex';
 import { setClientsRequests } from "../../vuex/clientsRequests/actions"
+import RequestFilters from "./clientRequests/RequestFilters";
 
 export default {
   props: {
@@ -47,22 +48,27 @@ export default {
       startFilter: "",
       deadlineFilter: "",
       managers: [],
-      statuses: [],
+      statuses: ["All", "Client Request", "Request Approved"],
     }
   },
   methods: {
     ...mapActions(["setCurrentProject", "setClientsRequests"]),
     setFilter({ option, prop }) {
       this[prop] = option;
-      this.$emit('filterProjects', this.filters);
+      this.refreshProjects()
+      // this.setClientsRequests({filters: this.filters});
+      // this.$emit('filterProjects', this.filters);
     },
     removeLangFilter({ from, position }) {
       this[from].splice(position, 1);
-      this.$emit('filterProjects', this.filters);
+      this.refreshProjects()
+      // this.setClientsRequests({filters: this.filters});
+      // this.$emit('filterProjects', this.filters);
     },
     addLangFilter({ to, lang }) {
-      this[to].push(lang.symbol);
-      this.$emit('filterProjects', this.filters);
+      this[to].push(lang);
+      this.refreshProjects()
+      // this.setClientsRequests({filters: this.filters});
     },
     selectProject({ project }) {
       this.setCurrentProject(project);
@@ -80,16 +86,7 @@ export default {
       this.$emit("bottomScrolled", { filters: this.filters });
     },
     refreshProjects() {
-      this.$emit('filterProjects', this.filters);
-    },
-    setStatuses(name) {
-      if(name === 'open-projects') {
-        this.statuses = ["All", "Approved", "Cancelled", "Cancelled Halfway", "In progress", "Rejected", "Ready for Delivery"]
-      } else if(name === 'quote-projects') {
-        this.statuses = ["All", "Draft", "Quote sent", "Cost Quote"]
-      } else {
-        this.statuses = ["Closed"]
-      }
+      this.setClientsRequests({filters: this.filters});
     },
   },
   computed: {
@@ -126,13 +123,10 @@ export default {
     this.getManagers();
   },
   mounted() {
-    if(this.projectsType === "requests") {
-      this.statusFilter = "Requested";
-    }
     this.setClientsRequests({});
-    this.setStatuses(this.$route.name);
   },
   components: {
+    RequestFilters,
     ProjectsTable,
     RequestsTable,
     ProjectInfo,

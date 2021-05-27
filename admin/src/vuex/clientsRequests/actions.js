@@ -1,10 +1,10 @@
 import Vue from "vue";
 
 export const setRequests = ({ commit }, payload) => commit('SET_REQUESTS', payload);
-export const setClientsRequests = async ({ dispatch, commit }, payload) => {
+export const setClientsRequests = async ({ dispatch, commit }, {filters}) => {
 	dispatch('incrementRequestCounter')
 	try {
-		const updatedRequest = await Vue.http.post("/clients-requests/all", payload);
+		const updatedRequest = await Vue.http.post("/clients-requests/all", filters);
 		await commit('SET_CLIENTS_REQUESTS', updatedRequest.data);
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });

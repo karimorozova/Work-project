@@ -46,8 +46,8 @@
 
         .filters__drop-menu.filters_medium-menu
           LanguagesSelect(
-            :selectedLangs="sourceLangs"
-            @chosenLang="({lang}) => addLang({lang}, 'sourceFilter')"
+            :selectedLangs="sourceLangs.map(({symbol}) => symbol)"
+            @chosenLang="(lang) => addLang(lang, 'sourceFilter')"
           )
       .filters__item.filters_flex-end
         //LabelValue(label="Target Langs")
@@ -55,10 +55,9 @@
         label.filters__filter-title Target Langs:
         .filters__drop-menu.filters_medium-menu
           LanguagesSelect(
-            :selectedLangs="targetLangs"
-            @chosenLang="({lang}) => addLang({lang}, 'targetFilter')"
+            :selectedLangs="targetLangs.map(({symbol}) => symbol)"
+            @chosenLang="(lang) => addLang(lang, 'targetFilter')"
           )
-
 
     .filters__row
       .filters__date
@@ -75,7 +74,7 @@
         label.filters__filter-title Deadline:
 
         datepicker-with-time(@selected="setDeadline" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
-        span.calendar-wrapper( @click="deadlineOpen")
+        span.calendar-wrapper(@click="deadlineOpen")
           i.calendar.far.fa-calendar-alt
         //img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
       //.filters__itemLeft
@@ -83,14 +82,14 @@
 </template>
 
 <script>
-	import SelectSingle from "../SelectSingle"
-	import SelectMulti from "../SelectMulti"
-	import LanguagesSelect from "../LanguagesSelect"
-	import Datepicker from "../Datepicker"
-	import LabelValue from "./LabelValue"
+	import SelectSingle from "../../SelectSingle"
+	import SelectMulti from "../../SelectMulti"
+	import LanguagesSelect from "../../LanguagesSelect"
+	import Datepicker from "../../Datepicker"
+	import LabelValue from "../LabelValue"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
-  import DatepickerWithTime from "../DatepickerWithTime";
+  import DatepickerWithTime from "../../DatepickerWithTime";
 
 	export default {
 		props: {
@@ -145,7 +144,7 @@
 			},
 			addLang({ lang }, goal) {
 				const prop = goal === 'sourceFilter' ? 'sourceLangs' : 'targetLangs'
-				const position = this[prop].indexOf(lang.symbol)
+				const position = this[prop].findIndex(({symbol}) => symbol === lang.symbol)
 				if (position !== -1) {
 					this.$emit('removeLangFilter', { from: goal, position })
 				} else {
@@ -207,7 +206,7 @@
 
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss";
+@import "../../../assets/scss/colors.scss";
 
 .filters {
   width: 100%;

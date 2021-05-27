@@ -1,4 +1,5 @@
 const {ClientRequest} = require("../models")
+const ObjectId = require('mongodb').ObjectID
 
 
 function getRequestsQuery (filters) {
@@ -6,6 +7,10 @@ function getRequestsQuery (filters) {
 	if (filters.lastDate) {
 		query.startDate = { $lt: new Date(filters.lastDate) };
 	}
+	if (filters.statusFilter && filters.statusFilter !== "All") {
+		query.status = { $eq: filters.statusFilter };
+	}
+
 	if (filters.startFilter) {
 		query.startDate = filters.lastDate ? {
 			$lt: new Date(filters.lastDate),
@@ -19,10 +24,10 @@ function getRequestsQuery (filters) {
 		query["customer.name"] = {"$regex": new RegExp(`${filters.clientFilter}`, 'i')};
 	}
 	if(filters.sourceFilter && filters.sourceFilter.length) {
-		query["sourceLanguage.symbol"] = {$in: filters.sourceFilter};
+		query["requestForm.sourceLanguage"] = {$in: filters.sourceFilter.map(({_id}) => ObjectId(_id))};
 	}
 	if(filters.targetFilter && filters.targetFilter.length) {
-		query["targetLanguages.symbol"] = {$in: filters.targetFilter};
+		query["requestForm.targetLanguages"] = {$in: filters.targetFilter.map(({_id}) => ObjectId(_id))};
 	}
 	if(filters.pmIds) {
 		const managerFilter = filters.pmIds.map(item => ObjectId(item._id));
