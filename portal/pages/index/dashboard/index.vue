@@ -8,11 +8,16 @@
       .dashboard__title Open Projects
       .dashboard__table
         Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')" :isOpenProjects="true")
+    .dashboard__item
+      .dashboard__title Open Requests
+      .dashboard__table
+        Table(:projects="filteredRequest" :isOpenRequest="true" )
 </template>
 
 <script>
 	import Table from "../../components/projects/Table"
 	import { mapActions, mapGetters } from "vuex"
+  import {getClientInfo, getToken, getUserInfo} from "../../../store/getters";
 
 	export default {
 		props: {
@@ -29,7 +34,7 @@
 		},
 		methods: {
 			...mapActions({
-				updateQuoteStatus: "updateQuoteStatus"
+				updateQuoteStatus: "updateQuoteStatus",
 			}),
 			filterByStatus(statuses) {
 				return this.projects.filter(item => {
@@ -50,6 +55,9 @@
 			}
 		},
 		computed: {
+		  ...mapGetters({
+        clientRequests: "getClientRequests",
+      }),
 			filteredProjects() {
 				let statuses = [ 'Started', 'Approved', 'In progress', 'Ready for Delivery' ]
 				const result = this.filterByStatus(statuses)
@@ -58,14 +66,17 @@
 			filteredQuotes() {
 				let statuses = [ 'Quote sent', 'Requested' ]
 				const projects = this.filterByStatus(statuses)
-				const result = [ ...this.requests, ...projects ]
-				return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1)
+				return projects
+			},
+      filteredRequest() {
+				// let statuses = [ 'Quote sent', 'Requested' ]
+				return this.clientRequests
 			}
 		},
 		components: {
 			Table
-		}
-	}
+		},
+  }
 
 </script>
 

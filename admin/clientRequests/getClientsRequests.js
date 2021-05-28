@@ -7,6 +7,9 @@ function getRequestsQuery (filters) {
 	if (filters.lastDate) {
 		query.startDate = { $lt: new Date(filters.lastDate) };
 	}
+  if (filters.clientIdFilter) {
+    query["customer._id"] =  ObjectId(filters.clientIdFilter)
+  }
 	if (filters.statusFilter && filters.statusFilter !== "All") {
 		query.status = { $eq: filters.statusFilter };
 	}

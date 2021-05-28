@@ -13,7 +13,7 @@ const { getProjectDeliverables } = require('../projects/files')
 const {
 	createRequest,
 	storeRequestFiles,
-	getClientRequests,
+  getClientsRequests,
 	updateClientRequest,
 	clientRequestNotification,
 	notifyRequestCancelled,
@@ -125,14 +125,13 @@ router.get('/projects', checkClientContact, async (req, res) => {
 		//   { $and: [{ customer: verificationResult.clientId }, { status: { $ne: null } }] }
 		// );
 
-    //TODO: потом заменить на наши!
-		// const requests = await getClientRequests({
-		// 	'customer': verificationResult.clientId,
-		// 	status: { $ne: 'Cancelled' }
-		// })
+		const requests = await getClientsRequests({
+			'clientIdFilter': verificationResult.clientId,
+			status: { $ne: 'Closed' }
+		})
 		const languages = await Languages.find()
 		const user = client.contacts.find(item => item.email === verificationResult.contactEmail)
-		res.send({ client, user, projects, memoqProjects: [], requests: [], languages })
+		res.send({ client, user, projects, memoqProjects: [], requests, languages })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")

@@ -21,7 +21,7 @@
             .data-table__data(slot="deadline" slot-scope="{ row, index }") {{ getFormattedDate(row.deadline) }}
             .data-table__data(slot="status" slot-scope="{ row, index }") {{ row.status }}
             .data-table__data(slot="totalCost" slot-scope="{ row, index }")
-                .data-table__payment(v-if="row.status !== 'Requested'") {{ row.finance.Price.receivables }}
+                .data-table__payment(v-if="row.status !== 'Requested' && row.finance") {{ row.finance.Price.receivables }}
                     span.data-table__currency(v-if="row.finance.Price.receivables")
                     span(v-html="currencyIconDetected(row.projectCurrency)")
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
@@ -44,6 +44,10 @@ export default {
             default: () => []
         },
         isOpenProjects: {
+            type: Boolean,
+            default: false
+        },
+        isOpenRequest: {
             type: Boolean,
             default: false
         }
@@ -96,6 +100,15 @@ export default {
                 let progressElement = {...this.fields[this.fields.length-1], label: 'Progress', key: 'progress', width: "11.5%"};
                 this.fields.pop();
                 this.fields.splice(3, 0, progressElement);
+            }
+            if(this.isOpenRequest) {
+              this.fields = [
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "20%", padding: "0", cellClass: 'delivery_no-hover-change'},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "30%", padding: "0", cellClass: 'delivery_no-hover-change'},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0", cellClass: 'delivery_no-hover-change'},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "15%", padding: "0", cellClass: 'delivery_no-hover-change'},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "15%", padding: "0", cellClass: 'delivery_no-hover-change'},
+              ]
             }
         }
     },

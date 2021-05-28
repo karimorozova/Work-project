@@ -1,8 +1,13 @@
 <template lang="pug">
   .content
-    .title Compliance form
-    .content__body
+
+    .title(v-if="!isSent") Compliance form
+    .content__body(v-if="!isSent")
       .content__form
+        Validation-errors(v-if="showError"
+          :errors="errors"
+          :isAbsolute="true"
+          @closeErrors="closeErrors")
         .form__title general information
         .form__part
           .form__row
@@ -137,9 +142,9 @@
             @check="(e) => setQuoteDecision('Start')"
           )
         .form__submit
-          Button(@clicked="addService" value="Submit" :isDisabled="!isCompleteForm")
+          Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm")
 
-      div
+      div(v-if="!isSent")
         .content__order
           .form__title Project contacts
           div(v-if="Object.keys(user).length")
@@ -180,6 +185,11 @@
             .order__subTitle Deadline:
             .order__value {{ customFormatter(currentDeadline) }}
 
+    client-request-completed(v-else :values="groupAllData()")
+
+
+
+
 
 </template>
 
@@ -194,6 +204,9 @@
 	import Add from "../../../../components/buttons/Add"
 	import ClientTable from "../../../../components/ClientTable"
 	import Button from "../../../../components/buttons/Button"
+  import ClientRequestCompleted from "../../../../components/completedOrder/clientRequestCompleted";
+  import ValidationErrors from "../../../../components/ValidationErrors";
+  import error from "../../../../../vendor/layouts/error";
 
 	export default {
 		data() {
@@ -210,6 +223,8 @@
 				currentComplianceTemplate: '',
 				currentContacts: [],
 
+        isSent: false,
+
 				isFileModal: false,
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
@@ -219,6 +234,9 @@
 					{ label: "File Type", headerKey: "headerType", key: "type", width: "20%" },
 					{ label: "", headerKey: "headerIcon", key: "icon", width: "10%" }
 				],
+
+        errors: [],
+        showError: false,
 
 				complianceTemplates: [
 					{
@@ -265,7 +283,41 @@
 			}
 		},
 		methods: {
-			async addService() {
+		  groupAllData() {
+		    return {
+		      currentProjectName: this.currentProjectName,
+          currentDeadline: this.customFormatter(this.currentDeadline),
+          currentIndustries: this.currentIndustries,
+          currentSourceLang: this.currentSourceLang,
+          currentTargetLang: this.currentTargetLang,
+          files: this.files,
+          currentBrief: this.currentBrief,
+          currentComplianceTemplate: this.currentComplianceTemplate,
+          startOption: this.startOption,
+        }
+      },
+      checkProjectName() {
+        const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/
+        return regex.test(this.currentProjectName)
+      },
+      closeErrors() {
+
+        this.showError = false
+        this.errors = []
+      },
+      checkError() {
+        this.closeErrors()
+
+        if (!this.currentProjectName || (this.currentProjectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+        if (new Set(this.files.map(({name})=> name)).size !== this.files.length) this.errors.push("Please, do not select some files.")
+
+        if (this.errors.length > 0) {
+          this.showError = true
+        } else {
+          this.addService()
+        }
+      },
+      async addService() {
 				let formData = new FormData()
 				formData.append('deadline', this.currentDeadline)
 				formData.append('projectName', this.currentProjectName)
@@ -282,6 +334,7 @@
 
 				try {
 					await this.$axios.post('/portal/compliance-service', formData)
+          this.isSent = true
 				} catch (err) {
 
 				}
@@ -402,11 +455,14 @@
 				return this.complianceTemplates.map(i => i.title)
 			}
 		},
-		components: { Button, Add, DataTable, TextRadio, UploadFileButton, DatepickerWithTime, SelectSingle, ClientTable }
+		components: {
+      ValidationErrors,
+      ClientRequestCompleted, Button, Add, DataTable, TextRadio, UploadFileButton, DatepickerWithTime, SelectSingle, ClientTable }
 	}
 </script>
 
 <style lang="scss" scoped>
+
   .fileModal {
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     position: absolute;
@@ -634,6 +690,7 @@
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       padding: 0 20px 20px 20px;
       width: 740px;
+      position: relative;
     }
   }
 

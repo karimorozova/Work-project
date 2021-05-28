@@ -5,6 +5,7 @@ const state = {
   services: [],
   projects: [],
   requests: [],
+  clientRequests: [],
   token: "",
   orderDetails: {},
   requestQuoteDetails: {},

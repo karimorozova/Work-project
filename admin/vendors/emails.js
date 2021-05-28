@@ -1,6 +1,6 @@
 const { Vendors } = require('../models');
 const { testSentMessage, testNotPassedMessage, testPassedMessage } = require('../emailMessages/candidateCommunication');
-const { sendEmail } = require('../utils/mailTemplate');
+const { sendEmail, sendEmailCandidates } = require('../utils/mailTemplate');
 const fs = require('fs');
 
 async function notifyTestStatus ({ vendor, qualification, testPath, template }) {
@@ -12,13 +12,13 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
   try {
     if (status === 'Test Sent') {
       const attachments = [{ filename: testPath.split('/').pop(), content: fs.createReadStream(`./dist${testPath}`) }];
-      return await sendEmail({ to: vendor.email, subject, attachments }, message);
+      return await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
     }
     messageId = status === 'Passed' ? 'CAN003.0' : 'CAN002.0';
     subject = status === 'Passed' ?
       `${target.lang} - Translator@Pangea position - Test Passed (ID ${messageId})`
       : `${target.lang} - Translator@Pangea position - Test Not Passed (ID ${messageId})`;
-    message = status === 'Passed' ? testPassedMessage(vendor) : testNotPassedMessage({ ...vendor, target });
+    message = status === 'Passed' ? testPassedMessage(vendor) :  ({ ...vendor, target });
 
     if (status === 'Passed') {
       const vendorAssessment = vendor.assessments.find((assessments) => assessments.sourceLanguage._id === source._id && assessments.targetLanguage._id === target._id)
@@ -28,7 +28,7 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       })
 
       const attachments = [{ filename: assessmentStep.tqi.fileName, content: fs.createReadStream(`./dist${assessmentStep.tqi.path}`)}];
-      return await sendEmail({ to: vendor.email, subject, attachments }, message);
+      return await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
     }
     if(status === 'Not Passed') {
       const { _id: qId } = vendor.qualifications.find(item =>
@@ -40,7 +40,7 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       const {fileName, path} = vendor.notPassedQualifications.find(item => item.qId.toString() === qId.toString())
 
       const attachments = [{ filename: fileName, content: fs.createReadStream(`./dist${path}`)}];
-      return await sendEmail({ to: vendor.email, subject, attachments }, message);
+      return await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
     }
 
   } catch (err) {

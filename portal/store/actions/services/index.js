@@ -33,7 +33,8 @@ export const getProjectsAndRequests = async function({ commit, dispatch, state})
     projects.push(...memoqProjects);
     projects = projects.sort((a, b) => b.startDate - a.startDate);
     commit('SET_PROJECTS', projects);
-    commit('SET_REQUESTS', requests);
+    // commit('SET_REQUESTS', requests);
+    dispatch('setClientRequests', requests);
     commit('SET_USER', user);
     commit('SET_CLIENT', client);
     commit('SET_LANGUAGES', languages);

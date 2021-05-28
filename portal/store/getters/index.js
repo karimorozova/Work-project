@@ -17,3 +17,4 @@ export const clientSourceLanguages = state => state.clientInfo.sourceLanguages;
 export const clientTargetLanguages = state => state.clientInfo.targetLanguages;
 export const allLanguages = state => state.languages;
 export const getPreviousLink = state => state.previousLink;
+export const getClientRequests = state => state.clientRequests;
