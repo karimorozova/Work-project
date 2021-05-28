@@ -12,7 +12,8 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
   try {
     if (status === 'Test Sent') {
       const attachments = [{ filename: testPath.split('/').pop(), content: fs.createReadStream(`./dist${testPath}`) }];
-      return await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
+      await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
+      return await sendEmailCandidates({ to: 'career@pangea.global', subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject, attachments }, message);
     }
     messageId = status === 'Passed' ? 'CAN003.0' : 'CAN002.0';
     subject = status === 'Passed' ?
@@ -28,7 +29,8 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       })
 
       const attachments = [{ filename: assessmentStep.tqi.fileName, content: fs.createReadStream(`./dist${assessmentStep.tqi.path}`)}];
-      return await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
+      await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
+      return await sendEmailCandidates({ to: 'career@pangea.global',  subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject, attachments }, message);
     }
     if(status === 'Not Passed') {
       const { _id: qId } = vendor.qualifications.find(item =>
@@ -40,7 +42,8 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       const {fileName, path} = vendor.notPassedQualifications.find(item => item.qId.toString() === qId.toString())
 
       const attachments = [{ filename: fileName, content: fs.createReadStream(`./dist${path}`)}];
-      return await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
+      await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
+      return await sendEmailCandidates({ to: 'career@pangea.global',  subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject, attachments }, message);
     }
 
   } catch (err) {
