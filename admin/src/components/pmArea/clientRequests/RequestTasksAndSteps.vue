@@ -65,10 +65,8 @@
 		methods: {
 			...mapActions([
 				"alertToggle",
-				"addProjectTasks",
-				"addProjectWordsTasks",
-				"clearTasksData",
-				'setCurrentProject'
+				"clearTasksDataRequest",
+        "setCurrentClientRequest",
 			]),
 			closeErrorsBlock() {
 				this.areErrorsExist = false;
@@ -110,28 +108,22 @@
 
 			getDataForTasks(dataForTasks) {
 				let tasksData = new FormData()
-				const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : ""
 
+				if (dataForTasks.stepsAndUnits.find(item => item.template)) tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id)
 				tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits))
-				tasksData.append('customerName', this.currentProject.customer.name)
-				if (dataForTasks.stepsAndUnits.find(item => item.template)) {
-					tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id)
-				}
 				tasksData.append('workflow', dataForTasks.workflow.id)
 				tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates))
 				tasksData.append('service', JSON.stringify(dataForTasks.service))
-				tasksData.append('source', source)
+				tasksData.append('source', dataForTasks.source ? JSON.stringify(dataForTasks.source) : "")
 				tasksData.append('targets', JSON.stringify(dataForTasks.targets))
-				tasksData.append('projectId', this.currentProject._id)
-				tasksData.append('projectName', `${ this.currentProject.projectId } - ${ this.currentProject.projectName }`)
-				tasksData.append('industry', this.currentProject.industry.name.replace('&', 'and'))
-				tasksData.append('packageSize', dataForTasks.packageSize)
-				tasksData.append('quantity', dataForTasks.quantity)
-				tasksData.append('projectManager', this.currentProject.projectManager._id)
+				tasksData.append('requestId', this.currentProject._id)
+				if(dataForTasks.refFilesVault) tasksData.append('refFilesVault', JSON.stringify(dataForTasks.refFilesVault))
+				if(dataForTasks.refFilesVault) tasksData.append('sourceFilesVault', JSON.stringify(dataForTasks.sourceFilesVault))
+
 				return tasksData
 			},
 			async addTasks(dataForTasks) {
-				console.log('dataForTasks', dataForTasks)
+				console.log('dataForTasks ===>>>> ', dataForTasks)
 
 				let tasksData = this.getDataForTasks(dataForTasks)
 				const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
@@ -170,21 +162,22 @@
 				}
 			},
 			async saveProjectTasks(tasksData) {
-				// try {
-				// 	await this.addProjectTasks(tasksData)
-				// 	this.isTaskData = false
-				// 	this.clearTasksData()
-				// } catch (err) {
-				// 	this.alertToggle({ message: err.message, isShow: true, type: "error" })
-				// } finally {
-				// 	this.isInfo = false
-				// }
+				try {
+					const updatedProject = await this.$http.post('/pm-manage/request-tasks', tasksData);
+					this.setCurrentClientRequest(updatedProject.data)
+					this.isTaskData = false
+					this.clearTasksDataRequest()
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
+				} finally {
+					this.isInfo = false
+				}
 			},
 			async saveProjectWordsTasks(tasksData) {
 				// try {
 				// 	await this.addProjectWordsTasks(tasksData)
 				// 	this.isTaskData = false
-				// 	this.clearTasksData()
+				// 	this.clearTasksDataRequest()
 				// } catch (err) {
 				// 	this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				// } finally {
@@ -197,7 +190,6 @@
 		},
 		computed: {
 			...mapGetters({
-				// isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
 				currentProject: 'getCurrentClientRequest'
 			}),
 			metricsButton() {

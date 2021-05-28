@@ -46,4 +46,5 @@ export const setCurrentClientRequest = async ({ dispatch, commit }, payload) => 
 		dispatch('decrementRequestCounter')
 	}
 }
-export const setTasksDataValueRequest = ({ commit }, payload) => commit('SET_TASKS_DATA_VALUE', payload);
+export const setTasksDataValueRequest = ({ commit }, payload) => commit('SET_TASKS_DATA_VALUE_REQUEST', payload);
+export const clearTasksDataRequest = ({ commit }) => commit('CLEAR_DATA_REQUEST');

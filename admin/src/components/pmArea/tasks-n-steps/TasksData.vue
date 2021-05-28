@@ -190,6 +190,18 @@
 						isCATWordcount.push(element.hasOwnProperty("template"))
 					})
 					if (!isCATWordcount.includes(true)) this.errors.push("Please, select Template.")
+				} else {
+					if (workflow.id === 2917) {
+						const [ elem1, elem2 ] = stepsAndUnits
+						this.checkUnitQuantity(elem1)
+						this.checkUnitQuantity(elem2)
+						this.checkUnitSize(elem1)
+						this.checkUnitSize(elem2)
+					} else {
+						const [ elem1 ] = stepsAndUnits
+						this.checkUnitQuantity(elem1)
+						this.checkUnitSize(elem1)
+					}
 				}
 
 				if (this.errors.length) return this.$emit("showErrors", { errors: this.errors })
@@ -199,6 +211,12 @@
 				} catch (err) {
 					this.alertToggle({ message: "Error on adding tasks", isShow: true, type: "error" })
 				}
+			},
+			checkUnitSize(elem) {
+				if (!elem.size) this.errors.push("Please, select step size.")
+			},
+			checkUnitQuantity(elem) {
+				if (!elem.hours && !elem.quantity) this.errors.push("Please, select unit quantity.")
 			},
 			isDeadlineMissed() {
 				let now = new Date().getTime()

@@ -70,16 +70,17 @@ export const addProjectWordsTasks = async ({ dispatch }, payload) => {
 }
 
 export const addTasksFromRequest = async ({ dispatch }, payload) => {
-	dispatch('incrementRequestCounter')
-	try {
-		const updatedProject = await Vue.http.post('/pm-manage/request-tasks', payload);
-		await dispatch('setCurrentProject', updatedProject.data);
-		dispatch('alertToggle', { message: "Project is created and tasks were added", isShow: true, type: "success" })
-	} catch (err) {
-		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
-	} finally {
-		dispatch('decrementRequestCounter');
-	}
+	//#rafactoring
+	// dispatch('incrementRequestCounter')
+	// try {
+	// 	const updatedProject = await Vue.http.post('/pm-manage/request-tasks', payload);
+	// 	await dispatch('setCurrentProject', updatedProject.data);
+	// 	dispatch('alertToggle', { message: "Project is created and tasks were added", isShow: true, type: "success" })
+	// } catch (err) {
+	// 	dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
+	// } finally {
+	// 	dispatch('decrementRequestCounter');
+	// }
 }
 
 export const updateProgress = async ({ dispatch }, payload) => {

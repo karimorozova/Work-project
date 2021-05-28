@@ -8,7 +8,7 @@ const {
 	Projects,
 	Pricelist,
 	Units,
-  Languages,
+	Languages,
 	Vendors,
 	Discounts
 } = require('../../models')
@@ -59,7 +59,8 @@ const {
 	sendCostQuoteMessage,
 	updateProjectFinanceOnDiscountsUpdate,
 	generateAndSaveCertificate,
-  getFilteredProjects
+	getFilteredProjects,
+	createRequestTasks
 } = require('../../projects')
 
 const {
@@ -140,15 +141,15 @@ const {
 } = require('../../multipliers')
 
 router.post('/allprojects', async (req, res) => {
-    const filters = {...req.body};
-    try {
-        const projects = await getFilteredProjects(filters);
-        res.send(projects)
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Something wrong with DB while getting projects!');
-    }
-});
+	const filters = { ...req.body }
+	try {
+		const projects = await getFilteredProjects(filters)
+		res.send(projects)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB while getting projects!')
+	}
+})
 
 router.get('/project', async (req, res) => {
 	const { id } = req.query
@@ -197,7 +198,6 @@ router.post('/new-project', async (req, res) => {
 })
 
 
-
 router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
 	try {
 		const { refFiles } = req.files
@@ -226,16 +226,26 @@ router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), 
 	}
 })
 
+router.post('/request-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
+	try {
+		let tasksInfo = { ...req.body }
+		const { sourceFiles, refFiles } = req.files
+		const updatedProject = await createRequestTasks({ tasksInfo, sourceFiles, refFiles })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding project tasks')
+	}
+})
+
 router.post('/project-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
 		let tasksInfo = { ...req.body }
-		if (tasksInfo.source) {
-			tasksInfo.source = JSON.parse(tasksInfo.source)
-		}
+		if (tasksInfo.source) tasksInfo.source = JSON.parse(tasksInfo.source)
 		tasksInfo.targets = JSON.parse(tasksInfo.targets)
 		tasksInfo.service = JSON.parse(tasksInfo.service)
-		const { sourceFiles, refFiles } = req.files
-		const updatedProject = await createTasks({ tasksInfo, sourceFiles, refFiles })
+		const { sourceFiles } = req.files
+		const updatedProject = await createTasks({ tasksInfo, sourceFiles })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -642,15 +652,15 @@ router.post('/steps-reopen', async (req, res) => {
 
 
 router.post('/close-project', async (req, res) => {
-  const { projectId } = req.body
-  try{
-    const updatedProject = await getProjectAfterUpdate({ _id: projectId }, { status: 'Closed' })
-    res.send(updatedProject)
-  }catch (err) {
-    console.log(err)
-    res.status(500).send('Error on close project')
-  }
-  console.log(req.body)
+	const { projectId } = req.body
+	try {
+		const updatedProject = await getProjectAfterUpdate({ _id: projectId }, { status: 'Closed' })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on close project')
+	}
+	console.log(req.body)
 })
 
 router.post('/generate-certificate', async (req, res) => {
@@ -698,25 +708,25 @@ router.post('/generate-certificate', async (req, res) => {
 // })
 
 // router.get('/deliverables', async (req, res) => {
-  // console.log('route IN DEV for admin  => /deliverables')
-  // const { taskId } = req.query
-	// try {
-	// 	const project = await getProject({ 'tasks.taskId': taskId })
-	// 	const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
-	// 	const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-	// 	if (task.deliverables) {
-	// 		res.send({ link: task.deliverables })
-	// 	} else {
-	// 		const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
-	// 		if (link) {
-	// 			await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
-	// 		}
-	// 		res.send({ link })
-	// 	}
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on downloading deliverables')
-	// }
+// console.log('route IN DEV for admin  => /deliverables')
+// const { taskId } = req.query
+// try {
+// 	const project = await getProject({ 'tasks.taskId': taskId })
+// 	const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
+// 	const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
+// 	if (task.deliverables) {
+// 		res.send({ link: task.deliverables })
+// 	} else {
+// 		const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
+// 		if (link) {
+// 			await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
+// 		}
+// 		res.send({ link })
+// 	}
+// } catch (err) {
+// 	console.log(err)
+// 	res.status(500).send('Error on downloading deliverables')
+// }
 // })
 
 // router.post('/deliver', async (req, res) => {
@@ -872,17 +882,17 @@ router.post('/project-value', async (req, res) => {
 })
 
 router.post('/request-tasks', async (req, res) => {
-	const { dataForTasks, request, isWords } = req.body
-	const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request
-	try {
-		const updatedProject = await createProject(project)
-		const newProject = await createTasksFromRequest({ project: updatedProject, dataForTasks, isWords })
-		await removeClientRequest(_id)
-		res.send(newProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on adding tasks')
-	}
+	// const { dataForTasks, request, isWords } = req.body
+	// const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request
+	// try {
+	// 	const updatedProject = await createProject(project)
+	// 	const newProject = await createTasksFromRequest({ project: updatedProject, dataForTasks, isWords })
+	// 	await removeClientRequest(_id)
+	// 	res.send(newProject)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on adding tasks')
+	// }
 })
 
 router.post('/step-target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {

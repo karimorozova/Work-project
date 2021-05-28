@@ -5,6 +5,8 @@ const { createTasksAndStepsForCustomUnits } = require('./taskForCommon');
 const { storeFiles } = require('./files');
 const { getModifiedFiles, createProjectFolder } = require('./helpers');
 const { calculateCrossRate } = require('../helpers/commonFunctions')
+const { storeRequestFilesForTasksAndSteps, getTaskCopiedFiles } = require('../clientRequests')
+const fs = require('fs')
 
 const moment = require('moment');
 
@@ -47,12 +49,70 @@ async function createProject(project, user) {
   }
 }
 
-/**
- *
- * @param {Object} tasksInfo
- * @param {Array} refFiles
- * @returns {Object}
- */
+async function createRequestTasks ({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) {
+  try {
+    tasksInfo.stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits)
+    tasksInfo.stepsDates = JSON.parse(tasksInfo.stepsDates)
+    tasksInfo.service = JSON.parse(tasksInfo.service)
+    tasksInfo.source = JSON.parse(tasksInfo.source)
+    tasksInfo.targets = JSON.parse(tasksInfo.targets)
+    if(tasksInfo.refFilesVault ){
+        tasksInfo.refFilesVault = JSON.parse(tasksInfo.refFilesVault)
+      console.log(tasksInfo.refFilesVault)
+        const newref = getTaskCopiedFiles(tasksInfo.requestId, tasksInfo.refFilesVault)
+        console.log(newref)
+    }
+    tasksInfo.sourceFilesVault && (tasksInfo.sourceFilesVault = JSON.parse(tasksInfo.sourceFilesVault))
+
+    // ref/ source length
+    const refFiles = await storeRequestFilesForTasksAndSteps(sourceUploadFiles, tasksInfo.requestId);
+    const sourceFiles = await storeRequestFilesForTasksAndSteps(refUploadFiles, tasksInfo.requestId);
+
+    console.log(refFiles, sourceFiles)
+
+
+
+
+
+    // const source = JSON.parse(tasksInfo.source)
+    // const targets = JSON.parse(tasksInfo.targets)
+    // const service = JSON.parse(tasksInfo.service)
+    // const stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits);
+    // const stepsDates = JSON.parse(tasksInfo.stepsDates);
+    //
+
+
+
+    // const project = await getProject({ _id: tasksInfo.projectId });
+    // const allInfo = { ...tasksInfo, taskRefFiles, stepsAndUnits, stepsDates, project };
+
+	  // console.log(allInfo)
+
+  //   if (stepsAndUnits.length === 2) {
+  //     const onlyPackages = stepsAndUnits.every(
+  //         ({ unit }) => unit === "Packages"
+  //     );
+  //     if (!onlyPackages) {
+  //       await createTasksAndStepsForCustomUnits(allInfo);
+  //     } else {
+  //       await createTasksWithPackagesUnit(allInfo);
+  //     }
+  //   } else {
+  //     const [{ unit }] = stepsAndUnits;
+  //     if (unit !== "Packages") {
+  //       await createTasksAndStepsForCustomUnits(allInfo);
+  //     } else {
+  //       await createTasksWithPackagesUnit(allInfo);
+  //     }
+  //   }
+	//
+  //   return await getProject({ _id: tasksInfo.projectId });
+  } catch (err) {
+    console.log(err);
+    console.log("Error in createTasks");
+  }
+}
+
 async function createTasks ({ tasksInfo, refFiles }) {
   try {
     const stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits);
@@ -90,56 +150,51 @@ async function createTasks ({ tasksInfo, refFiles }) {
   }
 }
 
-/**
- *
- * @param {Object} project
- * @param {Object} dataForTasks
- * @param {Boolean} isWords
- * @returns {Object}
- */
+
 async function createTasksFromRequest ({ project, dataForTasks, isWords }) {
-  const stepsAndUnits = JSON.parse(dataForTasks.stepsAndUnits);
-  let newTasksInfo = { ...dataForTasks };
-  const sourceFiles = getModifiedFiles(project.sourceFiles);
-  const refFiles = getModifiedFiles(project.refFiles);
-  try {
-    if (isWords) {
-      newTasksInfo.translateFiles = await storeFiles(sourceFiles, project.id);
-      newTasksInfo.referenceFiles = refFiles.length
-        ? await storeFiles(refFiles, project.id)
-        : [];
-      return { project, newTasksInfo };
-    } else {
-      const taskRefFiles = await storeFiles(refFiles, project.id);
-      const allInfo = { ...dataForTasks, taskRefFiles, project, stepsAndUnits };
-      if (stepsAndUnits.length === 2) {
-        const isOnlyPackages =
-          stepsAndUnits[0].unit === "Packages" &&
-          stepsAndUnits[1].unit === "Packages";
-        if (!isOnlyPackages) {
-          await createTasksAndStepsForCustomUnits(allInfo);
-        } else {
-          await createTasksWithPackagesUnit(allInfo);
-        }
-      } else {
-        const isPackage = stepsAndUnits[0].unit === "Packages";
-        if (!isPackage) {
-          await createTasksAndStepsForCustomUnits(allInfo);
-        } else {
-          await createTasksWithPackagesUnit(allInfo);
-        }
-      }
-    }
-    return await getProject({ _id: project.projectId });
-  } catch (err) {
-    console.log(err);
-    console.log('Error in createTasksFromRequest');
-  }
+  // const stepsAndUnits = JSON.parse(dataForTasks.stepsAndUnits);
+  // let newTasksInfo = { ...dataForTasks };
+  // const sourceFiles = getModifiedFiles(project.sourceFiles);
+  // const refFiles = getModifiedFiles(project.refFiles);
+  // try {
+  //   if (isWords) {
+  //     newTasksInfo.translateFiles = await storeFiles(sourceFiles, project.id);
+  //     newTasksInfo.referenceFiles = refFiles.length
+  //       ? await storeFiles(refFiles, project.id)
+  //       : [];
+  //     return { project, newTasksInfo };
+  //   } else {
+  //     const taskRefFiles = await storeFiles(refFiles, project.id);
+  //     const allInfo = { ...dataForTasks, taskRefFiles, project, stepsAndUnits };
+  //     if (stepsAndUnits.length === 2) {
+  //       const isOnlyPackages =
+  //         stepsAndUnits[0].unit === "Packages" &&
+  //         stepsAndUnits[1].unit === "Packages";
+  //       if (!isOnlyPackages) {
+  //         await createTasksAndStepsForCustomUnits(allInfo);
+  //       } else {
+  //         await createTasksWithPackagesUnit(allInfo);
+  //       }
+  //     } else {
+  //       const isPackage = stepsAndUnits[0].unit === "Packages";
+  //       if (!isPackage) {
+  //         await createTasksAndStepsForCustomUnits(allInfo);
+  //       } else {
+  //         await createTasksWithPackagesUnit(allInfo);
+  //       }
+  //     }
+  //   }
+  //   return await getProject({ _id: project.projectId });
+  // } catch (err) {
+  //   console.log(err);
+  //   console.log('Error in createTasksFromRequest');
+  // }
 }
 
 
 module.exports = {
   createProject,
   createTasks,
-  createTasksFromRequest
+  createTasksFromRequest,
+  createRequestTasks
 };

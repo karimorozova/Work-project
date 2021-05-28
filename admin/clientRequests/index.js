@@ -21,6 +21,11 @@ const {
   updateClientContacts,
 } =  require('./clientRequestStep2')
 
+const {
+	storeRequestFilesForTasksAndSteps,
+	getTaskCopiedFiles
+} = require('./files')
+
 
 module.exports = {
 	complianceService,
@@ -28,6 +33,8 @@ module.exports = {
 	uploadRequestFiles,
 	checkRequestedFiles,
 	manageClientContacts,
+	storeRequestFilesForTasksAndSteps,
+	getTaskCopiedFiles,
 	// getClientRequest,
 	// getClientRequests,
 	// updateClientRequest,

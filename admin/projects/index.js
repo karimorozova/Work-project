@@ -49,7 +49,8 @@ const {
 const {
 	createProject,
 	createTasks,
-	createTasksFromRequest
+	createTasksFromRequest,
+	createRequestTasks
 } = require('./create')
 
 // const {
@@ -97,6 +98,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	createRequestTasks,
 	changeManagersDR1,
 	approveFilesDR2,
 	approveInstructionDR2,

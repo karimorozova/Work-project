@@ -36,6 +36,39 @@ async function storeRequestFiles(filesArr, requestId) {
 	}
 }
 
+async function storeRequestFilesForTasksAndSteps(filesArr, requestId) {
+	try {
+		let storedFiles = []
+		if (filesArr.length) {
+			for (let file of filesArr) {
+				const additionalName = `${ Math.floor(Math.random() * 1000000) }-${ file.filename.replace(/\s+/g, '_') }`
+				const newPath = `/requestFiles/${ requestId }/${ additionalName }`
+				await moveFile(file, `./dist${ newPath }`)
+				storedFiles.push({ path: newPath, filename: additionalName })
+			}
+		}
+		return storedFiles
+	} catch (err) {
+		console.log(err)
+		console.log('Error in storeFiles')
+	}
+}
+
+const getTaskCopiedFiles = (requestId, arrFiles) => {
+	return arrFiles.reduce((acc, cur) => {
+		const originalName = cur.path.split("/").pop()
+		const newFileName = `${Math.floor(Math.random() * 1000000)}-${originalName}`
+
+		fs.copyFile(`./dist/requestFiles/${requestId}/${originalName}`, `./dist/requestFiles/${requestId}/${newFileName}`, (err) => {
+			if (err) throw err;
+		});
+
+		acc.push({ fileName: newFileName, path: `/projectFiles/${requestId}/${newFileName}`, })
+
+		return acc
+	}, [])
+}
+
 // async function addRequestFile({request, files, existingFile, prop}) {
 //     try {
 //         let requestFiles = request[prop];
@@ -88,7 +121,9 @@ async function storeRequestFiles(filesArr, requestId) {
 // }
 
 module.exports = {
-	storeRequestFiles
+	storeRequestFiles,
+	storeRequestFilesForTasksAndSteps,
+	getTaskCopiedFiles,
 	// addRequestFile,
 	// removeRequestFile,
 	// removeRequestFiles,

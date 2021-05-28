@@ -166,7 +166,20 @@
 					if (!isCATWordcount.includes(true)) {
 						this.errors.push("Please, select Template.")
 					}
+				} else {
+					if (workflow.id === 2917) {
+						const [ elem1, elem2 ] = stepsAndUnits
+						this.checkUnitQuantity(elem1)
+						this.checkUnitQuantity(elem2)
+						this.checkUnitSize(elem1)
+						this.checkUnitSize(elem2)
+					} else {
+						const [ elem1 ] = stepsAndUnits
+						this.checkUnitQuantity(elem1)
+						this.checkUnitSize(elem1)
+					}
 				}
+
 				if (this.errors.length) {
 					return this.$emit("showErrors", { errors: this.errors })
 				}
@@ -175,6 +188,12 @@
 				} catch (err) {
 					this.alertToggle({ message: "Error on adding tasks", isShow: true, type: "error" })
 				}
+			},
+			checkUnitSize(elem) {
+				if (!elem.size) this.errors.push("Please, select step size.")
+			},
+			checkUnitQuantity(elem) {
+				if (!elem.hours && !elem.quantity) this.errors.push("Please, select unit quantity.")
 			},
 			isDeadlineMissed() {
 				let now = new Date().getTime()
@@ -199,11 +218,11 @@
 				//   this.errors.push("Please, upload Reference file(s).");
 			},
 			checkFiles(sourceFiles, refFiles) {
-          if (this.currentUnit === "CAT Wordcount") {
-            if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).")
-            //REF FILES SAME AS SOURCE!
-            if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) this.errors.push("Reference file cannot be the same as Source!");
-          }
+				if (this.currentUnit === "CAT Wordcount") {
+					if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).")
+					//REF FILES SAME AS SOURCE!
+					if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) this.errors.push("Reference file cannot be the same as Source!")
+				}
 
 			},
 			// checkHoursSteps() {
@@ -228,7 +247,7 @@
 				// })
 			},
 			async addTasks() {
-				this.$emit("addTasks", { ...this.tasksData, refFiles: this.tasksData.refFiles || [], })
+				this.$emit("addTasks", { ...this.tasksData, refFiles: this.tasksData.refFiles || [] })
 				// this.clearInputFiles(".tasks-data__source-file")
 				// this.clearInputFiles(".tasks-data__ref-file")
 			},
