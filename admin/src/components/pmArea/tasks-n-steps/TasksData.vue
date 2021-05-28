@@ -71,8 +71,6 @@
       .tasks-data__button
         Button(value="Add tasks", @clicked="checkForErrors", :isDisabled="isAddTasksDisabled")
 
-    //.tasks-data__files.tasks-data_m-bottom-40(v-else)
-      TasksFilesRequested
     slot(name="errors")
 </template>
 
@@ -80,7 +78,6 @@
 	import TasksLangs from "./TasksLangs"
 	import TasksLangsDuo from "./TasksLangsDuo"
 	import TasksFiles from "./TasksFiles"
-	import TasksFilesRequested from "./TasksFilesRequested"
 	import JobSettings from "./JobSettings"
 	import SelectSingle from "../../SelectSingle"
 	import ServiceAndWorkflow from "./ServiceAndWorkflow"
@@ -161,65 +158,46 @@
 				const {
 					source,
 					targets,
-					packageSize,
 					sourceFiles,
 					refFiles,
-					quantity
+					workflow,
+					stepsDates,
+					stepsAndUnits
 				} = this.tasksData
 
 				if (this.isRequest) {
 					this.errors = this.checkRequestErrors()
 				}
-				if (this.tasksData.workflow.id === 2917) {
-					if (this.tasksData.stepsDates[0].deadline === "" || this.tasksData.stepsDates[1].start === "") {
-						this.errors.push("Please, select tasks deadline.")
-					}
+				if (workflow.id === 2917) {
+					if (stepsDates[0].deadline === "" || stepsDates[1].start === "") this.errors.push("Please, select tasks deadline.")
 				}
 
 				if (!this.isMonoService && !source) this.errors.push("Please, select Source language.")
-				if (this.tasksData.stepsAndUnits == null) this.errors.push("Please, select Unit.")
-				if (!targets || !targets.length)
-					this.errors.push("Please, select Target language(s).")
-				this.isRequest
-						? this.checkRequestFies()
-						: this.checkFiles(sourceFiles, refFiles)
-				if (this.isDeadlineMissed())
-					this.errors.push("Please, update deadline (Project's or tasks).")
+				if (stepsAndUnits == null) this.errors.push("Please, select Unit.")
+				if (!targets || !targets.length) this.errors.push("Please, select Target language(s).")
+				this.checkFiles(sourceFiles, refFiles)
+				if (this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).")
 
-				const isUnitCAT = this.tasksData.stepsAndUnits
-						.map((i) => i.unit)
-						.includes("CAT Wordcount")
+				const isUnitCAT = stepsAndUnits.map((i) => i.unit).includes("CAT Wordcount")
+				const isStepLanguageOnTargetLanguage = targets.map((i) => i.lang).includes(source.lang)
 
-				const isStepLanguageOnTargetLanguage = this.tasksData.targets
-						.map((i) => i.lang)
-						.includes(this.tasksData.source.lang)
+				if (isUnitCAT && isStepLanguageOnTargetLanguage) this.errors.push('Target and Source Languages cannot be a same if a unit "CAT Wordcount" is selected')
 
-				if (isUnitCAT && isStepLanguageOnTargetLanguage) {
-					this.errors.push(
-							'Target and Source Languages cannot be a same if a unit "CAT Wordcount" is selected'
-					)
-				}
 
 				if (this.countCATWordcount >= 1) {
 					let isCATWordcount = []
-					this.tasksData.stepsAndUnits.forEach((element) => {
+					stepsAndUnits.forEach((element) => {
 						isCATWordcount.push(element.hasOwnProperty("template"))
 					})
-					if (!isCATWordcount.includes(true)) {
-						this.errors.push("Please, select Template.")
-					}
+					if (!isCATWordcount.includes(true)) this.errors.push("Please, select Template.")
 				}
-				if (this.errors.length) {
-					return this.$emit("showErrors", { errors: this.errors })
-				}
+
+				if (this.errors.length) return this.$emit("showErrors", { errors: this.errors })
+
 				try {
 					await this.addTasks()
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on adding tasks",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on adding tasks", isShow: true, type: "error" })
 				}
 			},
 			isDeadlineMissed() {
@@ -240,16 +218,6 @@
 						return true
 					}
 				}
-			},
-			checkRequestFies() {
-				const { sourceFiles, refFiles } = this.currentProject
-
-				if (this.currentUnit === "CAT Wordcount" && !sourceFiles.length)
-					this.errors.push("Please, upload Source file(s).")
-
-				//reference file is not mandatory!
-				// if (this.currentUnit !== "CAT Wordcount" && !refFiles.length)
-				//   this.errors.push("Please, upload Reference file(s).");
 			},
 			checkFiles(sourceFiles, refFiles) {
 				if (this.currentUnit === "CAT Wordcount") {
@@ -385,7 +353,6 @@
 			TasksLangs,
 			TasksLangsDuo,
 			TasksFiles,
-			TasksFilesRequested,
 			JobSettings,
 			SelectSingle,
 			Button,

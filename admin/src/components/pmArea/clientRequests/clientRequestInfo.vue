@@ -36,6 +36,9 @@
 		components: { ProjectLayout, FormLayoutCompliance },
 		created() {
 			this.getClientRequest()
+		},
+		beforeDestroy() {
+			this.setCurrentClientRequest({})
 		}
 	}
 </script>

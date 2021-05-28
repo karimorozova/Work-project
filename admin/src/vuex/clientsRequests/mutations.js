@@ -10,7 +10,13 @@ export const mutations = {
     SET_CUR_CLIENTS_CONTACTS(state, payload) {
       state.currentClientsRequest.clientContacts = [...payload]
       // Vue.set(state.currentClientsRequest, 'clientContacts', payload)
-    }
+    },
+    SET_TASKS_DATA_VALUE(state, payload) {
+        const { prop, value } = payload;
+        console.log('payload', payload)
+        state.tasksData = {...state.tasksData, [prop]: value};
+    },
+
     // SET_TASKS_DATA_VALUE(state, payload) {
     //     const { prop, value } = payload;
     //     state.tasksData = {...state.tasksData, [prop]: value};

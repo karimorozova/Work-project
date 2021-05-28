@@ -36,53 +36,40 @@ const ClientRequestSchema = new mongoose.Schema({
 	industry: {
 		type: Schema.Types.ObjectId, ref: 'Industries'
 	},
-	tasks: {
-		type: Array,
-		default: []
-	},
-	steps: [ {
-		vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
-		stepId: '',
-		taskId: "",
-		serviceStep: {
-			step: { type: Schema.Types.ObjectId, ref: 'Step' },
-			unit: { type: Schema.Types.ObjectId, ref: 'Units' },
-			size: {
-				type: Number,
-				default: 1
-			},
-			memoqAssignmentRole: {
-				type: Number
-			},
-			title: {
+	tasksAndSteps: [ {
+		taskId: {
+			type: String,
+			default: '',
+			trim: true
+		},
+		taskData: {
+			type: Object,
+			default: {}
+		},
+		sourceFiles: [ {
+			filename: {
 				type: String,
+				default: '',
+				trim: true
+			},
+			path: {
+				type: String,
+				default: '',
 				trim: true
 			}
-		},
-		name: "",
-		sourceLanguage: "",
-		targetLanguage: "",
-		memoqProjectId: "",
-		memoqSource: "",
-		memoqTarget: "",
-		memoqDocIds: [],
-		packageSize: "",
-		hours: "",
-		quantity: "",
-		size: {
-			type: Number,
-			default: 1
-		},
-		totalWords: "",
-		start: {},
-		deadline: {},
-		progress: "",
-		status: "",
-		clientRate: {},
-		targetFile: "",
-		vendorsClickedOffer: Array,
-		isVendorRead: { type: Boolean, default: false },
-		previousStatus: ""
+		} ],
+		refFiles: [ {
+			filename: {
+				type: String,
+				default: '',
+				trim: true
+			},
+			path: {
+				type: String,
+				default: '',
+				trim: true
+			}
+		} ]
 	} ],
 	customer: {
 		type: Schema.Types.ObjectId, ref: 'Clients'

@@ -38,7 +38,7 @@
 		},
 		methods: {
 			...mapActions({
-				setDataValue: "setTasksDataValue",
+				setDataValue: "setTasksDataValueRequest",
 				alertToggle: "alertToggle"
 			}),
 			setLanguage({ option }) {
@@ -50,7 +50,7 @@
 		computed: {
 			...mapGetters({
 				currentProject: "getCurrentProject",
-				tasksData: "getTasksData"
+				tasksData: "getTasksDataRequest"
 			}),
 			possibleTargetLanguages() {
 				if (this.currentProject._id) {

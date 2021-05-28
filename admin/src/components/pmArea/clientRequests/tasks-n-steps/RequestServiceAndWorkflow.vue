@@ -4,12 +4,10 @@
     .workflow__wrapper
       .workflow__drop-menu
         label.workflow__menu-title.workflow_relative Service:
-          span.label-red *
         SelectSingle(
           :selectedOption="service"
           :options="allServices"
           placeholder="Service"
-          @chooseOption="setService"
           :positionStyle="positionStyle"
         )
       .workflow__drop-menu
@@ -23,7 +21,7 @@
         )
 
     .workflow__default-dates(v-if="selectedWorkflow.id === 2917")
-      StepsDefaultDateModified(
+      RequestStepsDefaultDateModified(
         :workflowId="2917"
         v-for="count in stepsCounter"
         :stepCounter="count"
@@ -38,7 +36,7 @@
         :originallySteps="originallySteps"
       )
     .workflow__default-dates(v-if="selectedWorkflow.id === 2890")
-      StepsDefaultDateModified(
+      RequestStepsDefaultDateModified(
         :workflowId="2890"
         v-for="count in 1"
         :stepCounter="count"
@@ -60,13 +58,13 @@
 
 <script>
 	import SelectSingle from "../../../SelectSingle"
-	import StepsDefaultDateModified from "./StepsDefaultDateModified"
+	import RequestStepsDefaultDateModified from "./RequestStepsDefaultDateModified"
 	import { mapGetters, mapActions } from "vuex"
-	import setDefaultTasksService from "@/mixins/setDefaultTasksService"
-	import TasksLanguages from "../../../../mixins/TasksLanguages"
+	// import setDefaultTasksService from "@/mixins/setDefaultTasksService"
+	// import TasksLanguages from "../../../../mixins/TasksLanguages"
 
 	export default {
-		mixins: [ setDefaultTasksService, TasksLanguages ],
+		// mixins: [ TasksLanguages ],
 		props: {
 			originallyLanguages: {
 				type: Array
@@ -79,6 +77,9 @@
 			},
 			originallyServices: {
 				type: Array
+			},
+			currentProject: {
+				type: Object
 			},
 			templates: {
 				type: Array
@@ -106,14 +107,34 @@
 		},
 		methods: {
 			...mapActions({
-				setDataValue: "setTasksDataValue"
+				setDataValue: "setTasksDataValueRequest"
 			}),
-			showError() {
-				this.isError = true
-				setTimeout(() => {
-					this.isError = false
-				}, 4000)
+			setDefaultService() {
+				const service = this.currentProject.requestForm.service
+				this.service = service.title
+				if (!service.steps.length) return this.showError()
+				this.setDataValue({ prop: "service", value: service })
+				const countStepsInService = service.steps.length === 1 ? "1 Step" : "2 Steps"
+				this.setWorkflow({ option: countStepsInService })
+				this.setDefaultLanguages(service)
 			},
+			setDefaultLanguages({ languageForm }) {
+				const language = this.currentProject.requestForm.sourceLanguage
+				const { symbol } = language
+				if (languageForm === 'Duo') {
+					this.$emit("setSourceLanguage", { symbol })
+				} else {
+					this.$emit("setTargets", { targets: [ language ] })
+					this.$emit("setSourceLanguage", { symbol })
+				}
+			},
+
+			// showError() {
+			// 	this.isError = true
+			// 	setTimeout(() => {
+			// 		this.isError = false
+			// 	}, 4000)
+			// },
 			setDate({ date, prop }, count) {
 				this.stepsDates[count - 1][prop] = date
 				if (this.stepsDates[count] && prop === "deadline") {
@@ -195,16 +216,6 @@
 					this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
 				}
 			},
-
-			setService({ option }) {
-				const service = this.services.find((item) => item.title === option)
-				this.service = service.title
-				if (!service.steps.length) return this.showError()
-				this.setDataValue({ prop: "service", value: service })
-				const countStepsInService = service.steps.length === 1 ? "1 Step" : "2 Steps"
-				this.setWorkflow({ option: countStepsInService })
-				this.setDefaultLanguages(service)
-			},
 			setWorkflow({ option }) {
 				const workflowSteps = this.workflowSteps.find((item) => item.name === option)
 				this.workFlowOption = workflowSteps.name
@@ -259,11 +270,13 @@
 				}
 			}
 		},
+		created() {
+			this.setDefaultService()
+		},
 		computed: {
 			...mapGetters({
-				services: "getVuexServices",
-				tasksData: "getTasksData",
-				currentProject: "getCurrentClientRequest"
+				services: "getAllServices",
+				tasksData: "getTasksDataRequest"
 			}),
 			selectedWorkflow() {
 				return this.tasksData.workflow ? this.tasksData.workflow : { name: "" }
@@ -276,15 +289,12 @@
 				return result
 			},
 			allServices() {
-				if (this.services.length) {
-					return this.currentClientServices().map((i) => i.title)
-				}
-				return []
+				return [ this.currentProject.requestForm.service ].map((i) => i.title)
 			}
 		},
 		components: {
 			SelectSingle,
-			StepsDefaultDateModified
+			RequestStepsDefaultDateModified
 		}
 	}
 </script>

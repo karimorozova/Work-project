@@ -79,7 +79,7 @@
                   @deleteFile="(e) => deleteFile(e, 'refFiles')"
                 )
           .tasks-files__tooltip
-            div Source: each file can be <= 2Mb
+            div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
             div Reference: each file can be <= 50Mb
 
       .form__table
@@ -500,15 +500,23 @@
 				const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
+          if(this.currentClientRequest.requestForm.service.title === 'Compliance'){
+	          return size / 1000000 <= 50
+          }else{
+	          return size / 1000000 <= 2
+          }
 					// return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
-					return size / 1000000 <= 2
 				})
 
 				let formData = new FormData()
 				formData.append("type", 'Source')
 				formData.append("projectId", this.currentClientRequest._id)
 
-				if (filteredFiles.length) for (let file of filteredFiles) formData.append('sourceFiles', file)
+				if (filteredFiles.length) {
+					for (let file of filteredFiles) formData.append('sourceFiles', file)
+				} else {
+					return
+				}
 
 				try {
 					const updatedProject = await this.$http.post("/clients-requests/add-form-file", formData)
@@ -533,7 +541,11 @@
 				formData.append("type", 'Reference')
 				formData.append("projectId", this.currentClientRequest._id)
 
-				if (filteredFiles.length) for (let file of filteredFiles) formData.append('refFiles', file)
+				if (filteredFiles.length){
+					for (let file of filteredFiles) formData.append('refFiles', file)
+				} else {
+					return
+				}
 
 				try {
 					const updatedProject = await this.$http.post("/clients-requests/add-form-file", formData)

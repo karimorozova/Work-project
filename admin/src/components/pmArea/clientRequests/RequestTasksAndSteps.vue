@@ -3,15 +3,18 @@
     .tasks-steps__tasks-title Tasks and Steps
       img.tasks-steps__arrow(src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
     transition(name="slide-fade")
-      RequestTasksData(
-        v-if="isTaskData"
-        :originallyLanguages="originallyLanguages"
-        :originallyUnits="originallyUnits"
-        :originallySteps="originallySteps"
-        :originallyServices="originallyServices"
-        @setValue="setValue"
-        @addTasks="addTasks"
-      )
+      div
+        RequestTasksData(
+          v-if="isTaskData"
+          :originallyLanguages="originallyLanguages"
+          :originallyUnits="originallyUnits"
+          :originallySteps="originallySteps"
+          :originallyServices="originallyServices"
+          @setValue="setValue"
+          @addTasks="addTasks"
+          @showErrors="showErrors"
+        )
+        ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="true" @closeErrors="closeErrorsBlock")
     //.tasks-steps__tables
     //  Tasks(v-if="currentProject.tasks.length && isTasksShow"
     //    :allTasks="this.currentProject.tasks"
@@ -39,6 +42,7 @@
 	// import Tasks from "./tasks-n-steps/Tasks"
 	// import Steps from "./tasks-n-steps/Steps"
 	import { mapGetters, mapActions } from 'vuex'
+	import ValidationErrors from "../../ValidationErrors"
 
 	export default {
 		props: {
@@ -49,7 +53,9 @@
 		},
 		data() {
 			return {
+				errors: [],
 				isTaskData: false,
+				areErrorsExist: false,
 				// isStepsShow: false,
 				// isTasksShow: true,
 				isInfo: false
@@ -62,15 +68,21 @@
 				"addProjectTasks",
 				"addProjectWordsTasks",
 				"clearTasksData",
-				// "getServices",
 				'setCurrentProject'
 			]),
+			closeErrorsBlock() {
+				this.areErrorsExist = false;
+				this.errors = [];
+			},
+			showErrors({ errors }) {
+				this.errors = [...errors];
+				this.areErrorsExist = true;
+			},
 			updateTasks(data) {
 				// this.currentProject.tasks = data
 			},
 			setDefaultIsTaskData() {
-				console.log('this.currentProject.tasks.length', this.currentProject.tasks.length)
-				if (!this.currentProject.tasks.length) {
+				if (!this.currentProject.tasksAndSteps.length) {
 					this.isTaskData = true
 				}
 			},
@@ -95,78 +107,67 @@
 			setDate({ date, prop, index }) {
 				// this.$emit("setDate", { date, prop, index })
 			},
-			async refreshMetricsIfStepsWereNotCreated() {
-				// let ifNeedRefreshMetrics = false
-				// for (let task of this.currentProject.tasks) {
-				// 	if (!ifNeedRefreshMetrics) if (!this.currentProject.steps.map(({ taskId }) => taskId).includes(task.taskId)) ifNeedRefreshMetrics = true
-				// }
-				// if (ifNeedRefreshMetrics) {
-				// 	await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id })
-				// 	const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`)
-				// 	await this.setCurrentProject(updatedProject.body)
-				// }
-			},
+
 			getDataForTasks(dataForTasks) {
-				// let tasksData = new FormData()
-				// const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : ""
-				//
-				// tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits))
-				// tasksData.append('customerName', this.currentProject.customer.name)
-				// if (dataForTasks.stepsAndUnits.find(item => item.template)) {
-				// 	tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id)
-				// }
-				// tasksData.append('workflow', dataForTasks.workflow.id)
-				// tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates))
-				// tasksData.append('service', JSON.stringify(dataForTasks.service))
-				// tasksData.append('source', source)
-				// tasksData.append('targets', JSON.stringify(dataForTasks.targets))
-				// tasksData.append('projectId', this.currentProject._id)
-				// tasksData.append('projectName', `${ this.currentProject.projectId } - ${ this.currentProject.projectName }`)
-				// tasksData.append('industry', this.currentProject.industry.name.replace('&', 'and'))
-				// tasksData.append('packageSize', dataForTasks.packageSize)
-				// tasksData.append('quantity', dataForTasks.quantity)
-				// tasksData.append('projectManager', this.currentProject.projectManager._id)
-				// return tasksData
+				let tasksData = new FormData()
+				const source = dataForTasks.source ? JSON.stringify(dataForTasks.source) : ""
+
+				tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits))
+				tasksData.append('customerName', this.currentProject.customer.name)
+				if (dataForTasks.stepsAndUnits.find(item => item.template)) {
+					tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id)
+				}
+				tasksData.append('workflow', dataForTasks.workflow.id)
+				tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates))
+				tasksData.append('service', JSON.stringify(dataForTasks.service))
+				tasksData.append('source', source)
+				tasksData.append('targets', JSON.stringify(dataForTasks.targets))
+				tasksData.append('projectId', this.currentProject._id)
+				tasksData.append('projectName', `${ this.currentProject.projectId } - ${ this.currentProject.projectName }`)
+				tasksData.append('industry', this.currentProject.industry.name.replace('&', 'and'))
+				tasksData.append('packageSize', dataForTasks.packageSize)
+				tasksData.append('quantity', dataForTasks.quantity)
+				tasksData.append('projectManager', this.currentProject.projectManager._id)
+				return tasksData
 			},
 			async addTasks(dataForTasks) {
 				console.log('dataForTasks', dataForTasks)
-				// await this.refreshMetricsIfStepsWereNotCreated()
-				//
-				// let tasksData = this.getDataForTasks(dataForTasks)
-				// const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
-				// const { sourceFiles, refFiles } = dataForTasks
-				//
-				// if (sourceFiles && sourceFiles.length) {
-				// 	this.translateFilesAmount = sourceFiles.length
-				// 	for (let file of sourceFiles) {
-				// 		tasksData.append('sourceFiles', file)
-				// 	}
-				// }
-				// if (refFiles && refFiles.length) {
-				// 	for (let file of refFiles) {
-				// 		tasksData.append('refFiles', file)
-				// 	}
-				// }
-				//
-				// for (const iterator of calculationUnit) {
-				// 	if (iterator === 'CAT Wordcount') {
-				// 		try {
-				// 			const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
-				// 			const { creatorUserId } = memoqCreatorUser.data
-				// 			if (!creatorUserId) throw new Error("No such user in memoq")
-				// 			tasksData.append('creatorUserId', creatorUserId)
-				// 			this.isInfo = true
-				// 		} catch (err) {
-				// 			this.alertToggle({ message: err.message, isShow: true, type: "error" })
-				// 		}
-				// 	}
-				// }
-				//
-				// if (calculationUnit.includes('CAT Wordcount')) {
-				// 	await this.saveProjectWordsTasks(tasksData)
-				// } else {
-				// 	await this.saveProjectTasks(tasksData)
-				// }
+
+				let tasksData = this.getDataForTasks(dataForTasks)
+				const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
+				const { sourceFiles, refFiles } = dataForTasks
+
+				if (sourceFiles && sourceFiles.length) {
+					this.translateFilesAmount = sourceFiles.length
+					for (let file of sourceFiles) {
+						tasksData.append('sourceFiles', file)
+					}
+				}
+				if (refFiles && refFiles.length) {
+					for (let file of refFiles) {
+						tasksData.append('refFiles', file)
+					}
+				}
+
+				for (const iterator of calculationUnit) {
+					if (iterator === 'CAT Wordcount') {
+						try {
+							const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
+							const { creatorUserId } = memoqCreatorUser.data
+							if (!creatorUserId) throw new Error("No such user in memoq")
+							tasksData.append('creatorUserId', creatorUserId)
+							this.isInfo = true
+						} catch (err) {
+							this.alertToggle({ message: err.message, isShow: true, type: "error" })
+						}
+					}
+				}
+
+				if (calculationUnit.includes('CAT Wordcount')) {
+					await this.saveProjectWordsTasks(tasksData)
+				} else {
+					await this.saveProjectTasks(tasksData)
+				}
 			},
 			async saveProjectTasks(tasksData) {
 				// try {
@@ -213,6 +214,7 @@
 			}
 		},
 		components: {
+			ValidationErrors,
 			RequestTasksData
 			// Button,
 			// Tasks,

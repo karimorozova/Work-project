@@ -102,7 +102,7 @@
 			},
 			originallySteps: {
 				type: Array
-			},
+			}
 		},
 		data() {
 			return {
@@ -113,15 +113,13 @@
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
 				isReadonly: false,
-				// originallyUnits: null,
-				services: null,
 				currentUnit: '',
 				steps: null
 			}
 		},
 		methods: {
 			...mapActions({
-				setDataValue: "setTasksDataValue",
+				setDataValue: "setTasksDataValueRequest",
 				getSteps: "getSteps",
 				getServices: "getServices"
 			}),
@@ -133,32 +131,6 @@
 				this.currentUnit = this.originallyUnits.find(item => item.type === option)
 				this.sendUnit()
 			},
-			// async getUnits(){
-			//   try {
-			//     const result = await this.$http.get("/api/originallyUnits");
-			//     this.originallyUnits = result.body.filter(item => item.active);
-			//   } catch (err) {
-			//     this.alertToggle({
-			//       message: "Erorr on getting Units",
-			//       isShow: true,
-			//       type: "error"
-			//     });
-			//   }
-			// },
-			// async getServiceSteps() {
-			// 	try {
-			// 		const services = await this.$http.get("/api/services")
-			// 		const steps = await this.$http.get("/api/steps")
-			// 		this.services = services.body
-			// 		this.steps = steps.body
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: "Erorr on getting Services or Steps",
-			// 			isShow: true,
-			// 			type: "error"
-			// 		})
-			// 	}
-			// },
 			customFormatter(date) {
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
@@ -182,22 +154,15 @@
 				console.log(message)
 			}
 		},
-		created() {
-			// this.getServiceSteps()
-		},
-		mounted() {
-			// this.getServiceSteps();
-			// this.getUnits();
-		},
 		computed: {
 			setSteps() {
 				if (this.originallyServices) {
-					return this.originallyServices.filter(item => item.title == this.service)
+					return this.originallyServices.filter(item => item.title === this.service)
 				}
 			},
 			optionUnits() {
 				const currentStep = this.setSteps[0].steps[this.stepCounter - 1].step.title
-				return this.originallySteps.filter(item => item.title == currentStep)[0]
+				return this.originallySteps.filter(item => item.title === currentStep)[0]
 						.calculationUnit.map(item => item.type)
 			},
 			disabledStart() {

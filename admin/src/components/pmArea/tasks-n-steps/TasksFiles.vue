@@ -168,7 +168,6 @@
 					this.showFileSizeWarning = true
 				}
 				const filteredFiles = Array.from(files).filter(item => {
-					console.log(item)
           return item.size / 1000000 <= 50
         })
 				if (filteredFiles.length) {

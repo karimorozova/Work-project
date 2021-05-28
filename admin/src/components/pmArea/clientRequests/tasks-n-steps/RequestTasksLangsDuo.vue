@@ -52,9 +52,6 @@
 			sourceLanguages: {
 				type: Array
 			},
-			isRequest: {
-				type: Boolean
-			},
 			setPossibleTargetsAction: {
 				type: Boolean
 			}
@@ -73,7 +70,7 @@
 		methods: {
 			...mapActions({
 				storeProject: "setCurrentProject",
-				setDataValue: "setTasksDataValue"
+				setDataValue: "setTasksDataValueRequest"
 			}),
 			sortLanguages(arrProp) {
 				this[arrProp].sort((a, b) => {
@@ -89,19 +86,22 @@
 
 			setPossibleTargets() {
 				if (this.tasksData.hasOwnProperty('service')) {
-					const { source, service } = this.tasksData
-					const { customer: { services }, industry } = this.currentProject
-
-					this.targetAll = services
-							.filter(({ industries, services, sourceLanguage }) =>
-									services[0] === service._id &&
-									industries[0] === industry._id &&
-									sourceLanguage === source._id
-							)
-							.map(({ targetLanguages }) =>
-									this.originallyLanguages.find(({ _id }) => targetLanguages[0] === _id)
-							)
+					this.targetAll = this.currentProject.requestForm.targetLanguages
 				}
+				// if (this.tasksData.hasOwnProperty('service')) {
+				// 	const { source, service } = this.tasksData
+				// 	const { customer: { services }, industry } = this.currentProject
+				//
+				// 	this.targetAll = services
+				// 			.filter(({ industries, services, sourceLanguage }) =>
+				// 					services[0] === service._id &&
+				// 					industries[0] === industry._id &&
+				// 					sourceLanguage === source._id
+				// 			)
+				// 			.map(({ targetLanguages }) =>
+				// 					this.originallyLanguages.find(({ _id }) => targetLanguages[0] === _id)
+				// 			)
+				// }
 			},
 			emitTargets() {
 				this.$emit("setTargets", { targets: this.targetChosen })
@@ -167,8 +167,8 @@
 		},
 		computed: {
 			...mapGetters({
-				currentProject: "getCurrentProject",
-				tasksData: "getTasksData"
+				currentProject: "getCurrentClientRequest",
+				tasksData: "getTasksDataRequest"
 			}),
 			possibleSourceLanguages() {
 				if (this.currentProject._id) {
