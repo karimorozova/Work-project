@@ -11,15 +11,21 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
   template ? message = template : message = testSentMessage({ ...vendor, source, target, industries });
   try {
     if (status === 'Test Sent') {
-      const attachments = [{ filename: testPath.split('/').pop(), content: fs.createReadStream(`./dist${testPath}`) }];
-      await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
-      return await sendEmailCandidates({ to: 'career@pangea.global', subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject, attachments }, message);
+      await sendEmailCandidates({
+        to: vendor.email,
+        subject,
+        attachments: [{ filename: testPath.split('/').pop(), content: fs.createReadStream(`./dist${testPath}`) }] }, message);
+
+      return await sendEmailCandidates({
+        to: 'career@pangea.global',
+        subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject,
+        attachments: [{ filename: testPath.split('/').pop(), content: fs.createReadStream(`./dist${testPath}`) }] }, message);
     }
     messageId = status === 'Passed' ? 'CAN003.0' : 'CAN002.0';
     subject = status === 'Passed' ?
       `${target.lang} - Translator@Pangea position - Test Passed (ID ${messageId})`
       : `${target.lang} - Translator@Pangea position - Test Not Passed (ID ${messageId})`;
-    message = status === 'Passed' ? testPassedMessage(vendor) :  ({ ...vendor, target });
+    message = status === 'Passed' ? testPassedMessage(vendor) :  testNotPassedMessage({ ...vendor, target });
 
     if (status === 'Passed') {
       const vendorAssessment = vendor.assessments.find((assessments) => assessments.sourceLanguage._id === source._id && assessments.targetLanguage._id === target._id)
@@ -28,9 +34,16 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
         return  qualification.steps.map(({_id})=> _id).includes(step._id)
       })
 
-      const attachments = [{ filename: assessmentStep.tqi.fileName, content: fs.createReadStream(`./dist${assessmentStep.tqi.path}`)}];
-      await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
-      return await sendEmailCandidates({ to: 'career@pangea.global',  subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject, attachments }, message);
+      await sendEmailCandidates({
+        to: vendor.email,
+        subject,
+        attachments: [{ filename: assessmentStep.tqi.fileName, content: fs.createReadStream(`./dist${assessmentStep.tqi.path}`)}] },
+        message);
+      return await sendEmailCandidates({
+        to: 'career@pangea.global',
+        subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject,
+        attachments: [{ filename: assessmentStep.tqi.fileName, content: fs.createReadStream(`./dist${assessmentStep.tqi.path}`)}] },
+        message);
     }
     if(status === 'Not Passed') {
       const { _id: qId } = vendor.qualifications.find(item =>
@@ -41,9 +54,15 @@ async function notifyTestStatus ({ vendor, qualification, testPath, template }) 
       )
       const {fileName, path} = vendor.notPassedQualifications.find(item => item.qId.toString() === qId.toString())
 
-      const attachments = [{ filename: fileName, content: fs.createReadStream(`./dist${path}`)}];
-      await sendEmailCandidates({ to: vendor.email, subject, attachments }, message);
-      return await sendEmailCandidates({ to: 'career@pangea.global',  subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject, attachments }, message);
+      await sendEmailCandidates({
+        to: vendor.email,
+        subject, attachments: [{ filename: fileName, content: fs.createReadStream(`./dist${path}`)}] },
+        message);
+      return await sendEmailCandidates({
+        to: 'career@pangea.global',
+        subject: `(${vendor.firstName} ${vendor.surname || ''}) ` + subject,
+        attachments: [{ filename: fileName, content: fs.createReadStream(`./dist${path}`)}] },
+        message);
     }
 
   } catch (err) {
