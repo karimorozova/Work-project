@@ -1,117 +1,166 @@
 <template lang="pug">
   .formLayout
     .form
-      .form__inputs
-        .form__projectName
-          .input__title Project Name:
-          input(type="text" :disabled="currentClientRequest.checkedForm.isCheckProjectName" v-model="currentClientRequest.projectName" @change="changeProjectName('projectName', currentClientRequest.projectName)" placeholder="Project Name")
-          Check(id="checkProject" @click="checkProjectName", :isApproved="currentClientRequest.checkedForm.isCheckProjectName")
-        .form__projectDeadline
-          .input__title Suggested Deadline:
-          DatepickerWithTime(
-            placeholder="Suggested Deadline"
-            v-model="currentClientRequest.deadline"
-            @selected="(e) => updateProjectDate(e)"
-            monday-first=true
-            inputClass="datepicker-custom-compliance"
-            calendarClass="calendar-custom"
-            :format="customFormatter"
-            :disabledPicker="currentClientRequest.checkedForm.isCheckDeadline"
-            :disabled="disabled"
-            ref="deadline"
-          )
-          span(id="calendar" @click="deadlineOpen")
-            i.calendar.far.fa-calendar-alt
-          Check(id="checkDeadline" @click="checkProjectDeadline", :isApproved="currentClientRequest.checkedForm.isCheckDeadline")
-
-      .form__table
-        .approveModal(v-if="isDeleteModal")
-          ApproveModal(
-            text="Delete file?"
-            approveValue="Yes"
-            notApproveValue="Cancel"
-            @approve="deleteFile"
-            @notApprove="closeDeleteFileApprovalModal"
-            @close="closeDeleteFileApprovalModal"
-          )
-        DataTable(
-          :fields="fields"
-          :tableData="files"
-          :bodyClass="['form-table-body', {'tbody_visible-overflow': files.length < 10}]"
-          :tableheadRowClass="files.length < 10 ? 'tbody_visible-overflow' : ''"
-        )
-          .form__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
-          .form__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
-          .form__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
-
-          .form__data(slot="file" slot-scope="{ row }") {{row.filename}}
-          .form__data(slot="type" slot-scope="{ row }") {{row.type}}
-          .form__dataIcons(slot="icon" slot-scope="{ row }")
-            img(src="../../../assets/images/latest-version/download-file.png" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}" @click="downloadFile(row.path, row.isCheck)")
-            span(@click="(e) => openDeleteFileApprovalModal(row.type, row.path, row.isCheck)" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}")
-              i.fas.fa-trash
-            Check(@click="(e) => checkFile(e, row)", :isApproved="row.isCheck")
-
-        .tasks-files__add(id="add")
-          Add(@add="openUploadModal")
-
-        .tasks-files__main(v-if="isUploadModal" id="modal")
-          .tasks-files__items
-            span.tasks-files__close(@click="closeUploadModal") &#215;
-            .tasks-files__item
-              span Source file:
-              span.tasks-files__label-red
-              .tasks-files__upload-file
-                FilesUpload(
-                  inputClass="files-upload__source-file"
-                  :files="sourceFiles"
-                  @uploadFiles="uploadSourceFiles"
-                  @deleteFile="(e) => deleteFile(e, 'sourceFiles')"
-                )
-            .tasks-files__item
-              span Reference file:
-              span.tasks-files__label-red
-              .tasks-files__upload-file
-                FilesUpload(
-                  inputClass="files-upload__ref-file"
-                  :files="refFiles"
-                  @uploadFiles="uploadRefFiles"
-                  @deleteFile="(e) => deleteFile(e, 'refFiles')"
-                )
-          .tasks-files__tooltip
-            div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
-            div Reference: each file can be <= 50Mb
-
-      .form__table
-        DataTable(
-          :fields="fields2"
-          :tableData="[currentClientRequest.requestForm.complianceOptions]"
-          :bodyClass="['form-table-body', {'tbody_visible-overflow': [currentClientRequest.requestForm.complianceOptions].length < 10}]"
-          :tableheadRowClass="[currentClientRequest.requestForm.complianceOptions].length < 10 ? 'tbody_visible-overflow' : ''"
-        )
-          .form__header(slot="headerTemplate" slot-scope="{ field }") {{ field.label }}
-          .form__header(slot="headerDescriptions" slot-scope="{ field }") {{ field.label }}
-          .form__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
-
-          template(slot="template" slot-scope="{ row, index }")
-            .form__data(v-if="currentActive !== index") {{row.title}}
-            .contacts__dataDrop(v-else)
+      .form__wrapper(v-if="!canUpdateRequest()")
+      .form__group
+        .form__inputsGroup
+          .form__inputs
+            .form__projectName
+              .input__title Project Name:
+              input(type="text" :disabled="currentClientRequest.checkedForm.isCheckProjectName" v-model="currentClientRequest.projectName" @change="changeProjectName('projectName', currentClientRequest.projectName)" placeholder="Project Name")
+              Check(id="checkProject" @click="checkProjectName", :isApproved="currentClientRequest.checkedForm.isCheckProjectName")
+            .form__assignedPm
+              .input__title Assign to Project Manager:
               SelectSingle(
-                :isTableDropMenu="true",
-                placeholder="Select",
-                :selectedOption="currentTemplate.title",
-                :options="complianceTemplates.map(({title}) => title)",
-                @chooseOption="setTemplate"
+                :options="managers",
+                placeholder="Project Manager",
+                :selectedOption="currentClientRequest.projectManager ? `${currentClientRequest.projectManager.firstName} ${currentClientRequest.projectManager.lastName}` : ''",
+                @chooseOption="setPM"
               )
 
-          template(slot="description" slot-scope="{ row, index }")
-            .form__description(v-if="currentActive !== index") {{ replaceDescription(row.description) }}
-            .form__description(v-else) {{ replaceDescription(currentTemplate.description) }}
 
-          template(slot="icons" slot-scope="{ row, index }")
-            .form__icons
-              img.form__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="[{'opacity-1': isActive(key, index)}, {'opacity-04': currentClientRequest.checkedForm.isCheckComplianceTemplate}]")
-              Check(@click="(e) => checkTemplate(e)", :isApproved="currentClientRequest.checkedForm.isCheckComplianceTemplate" :isDisabled="currentActive === index")
+          .form__inputs
+            .form__projectDeadline
+              .input__title Suggested Deadline:
+              DatepickerWithTime(
+                placeholder="Suggested Deadline"
+                v-model="currentClientRequest.deadline"
+                @selected="(e) => updateProjectDate(e)"
+                monday-first=true
+                inputClass="datepicker-custom-compliance"
+                calendarClass="calendar-custom"
+                :format="customFormatter"
+                :disabledPicker="currentClientRequest.checkedForm.isCheckDeadline"
+                :disabled="disabled"
+                ref="deadline"
+              )
+              span(id="calendar" @click="deadlineOpen")
+                i.calendar.far.fa-calendar-alt
+              Check(id="checkDeadline" @click="checkProjectDeadline", :isApproved="currentClientRequest.checkedForm.isCheckDeadline")
+
+            .form__assignedPm
+              .input__title Assign to Account Manager:
+              SelectSingle(
+                :options="accountManagers",
+                placeholder="Account Manager",
+                :selectedOption="currentClientRequest.accountManager ? `${currentClientRequest.accountManager.firstName} ${currentClientRequest.accountManager.lastName}` : ''",
+                @chooseOption="setAM"
+              )
+
+        .form__contacts
+          .input__title Client Contacts
+          DataTable(
+            :fields="fields3"
+            :tableData="currentClientRequest.clientContacts"
+            :bodyClass="['form-table-body', {'tbody_visible-overflow': currentClientRequest.clientContacts.length < 10}]"
+            :tableheadRowClass="currentClientRequest.clientContacts.length < 10 ? 'tbody_visible-overflow' : ''"
+            :headCellClass="'padding-with-check-box'"
+            :tableheadClass="'hideHead'"
+            )
+            div(slot="name" slot-scope="{ row, index }")
+              .contacts__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
+              .contacts__dataDrop(v-else)
+                SelectSingle(
+                  :isTableDropMenu="true"
+                  :options="availableContacts"
+                  @chooseOption="setContact"
+              )
+
+            .contacts__dataIcon(slot="icon" slot-scope="{ row, index }")
+              span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
+                i.fas.fa-trash
+
+          Add(v-if="canUpdateRequest()" @add="addContact")
+
+      .form__table-box
+        .form__table
+          .approveModal(v-if="isDeleteModal")
+            ApproveModal(
+              text="Delete file?"
+              approveValue="Yes"
+              notApproveValue="Cancel"
+              @approve="deleteFile"
+              @notApprove="closeDeleteFileApprovalModal"
+              @close="closeDeleteFileApprovalModal"
+            )
+          DataTable(
+            :fields="fields"
+            :tableData="files"
+            :bodyClass="['form-table-body', {'tbody_visible-overflow': files.length < 10}]"
+            :tableheadRowClass="files.length < 10 ? 'tbody_visible-overflow' : ''"
+          )
+            .form__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
+            .form__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
+            .form__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
+
+            .form__data(slot="file" slot-scope="{ row }") {{row.filename}}
+            .form__data(slot="type" slot-scope="{ row }") {{row.type}}
+            .form__dataIcons(slot="icon" slot-scope="{ row }")
+              img(src="../../../assets/images/latest-version/download-file.png" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}" @click="downloadFile(row.path, row.isCheck)")
+              span(@click="(e) => openDeleteFileApprovalModal(row.type, row.path, row.isCheck)" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}")
+                i.fas.fa-trash
+              Check(@click="(e) => checkFile(e, row)", :isApproved="row.isCheck")
+
+          .tasks-files__add(id="add")
+            Add(v-if="canUpdateRequest()" @add="openUploadModal")
+
+          .tasks-files__main(v-if="isUploadModal" id="modal")
+            .tasks-files__items
+              span.tasks-files__close(@click="closeUploadModal") &#215;
+              .tasks-files__item
+                span Source file:
+                span.tasks-files__label-red
+                .tasks-files__upload-file
+                  FilesUpload(
+                    inputClass="files-upload__source-file"
+                    :files="sourceFiles"
+                    @uploadFiles="uploadSourceFiles"
+                    @deleteFile="(e) => deleteFile(e, 'sourceFiles')"
+                  )
+              .tasks-files__item
+                span Reference file:
+                span.tasks-files__label-red
+                .tasks-files__upload-file
+                  FilesUpload(
+                    inputClass="files-upload__ref-file"
+                    :files="refFiles"
+                    @uploadFiles="uploadRefFiles"
+                    @deleteFile="(e) => deleteFile(e, 'refFiles')"
+                  )
+            .tasks-files__tooltip
+              div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
+              div Reference: each file can be <= 50Mb
+
+        .form__table
+          DataTable(
+            :fields="fields2"
+            :tableData="[currentClientRequest.requestForm.complianceOptions]"
+            :bodyClass="['form-table-body', {'tbody_visible-overflow': [currentClientRequest.requestForm.complianceOptions].length < 10}]"
+            :tableheadRowClass="[currentClientRequest.requestForm.complianceOptions].length < 10 ? 'tbody_visible-overflow' : ''"
+          )
+            .form__header(slot="headerTemplate" slot-scope="{ field }") {{ field.label }}
+            .form__header(slot="headerDescriptions" slot-scope="{ field }") {{ field.label }}
+            .form__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
+
+            template(slot="template" slot-scope="{ row, index }")
+              .form__data(v-if="currentActive !== index") {{row.title}}
+              .contacts__dataDrop(v-else)
+                SelectSingle(
+                  :isTableDropMenu="true",
+                  placeholder="Select",
+                  :selectedOption="currentTemplate.title",
+                  :options="complianceTemplates.map(({title}) => title)",
+                  @chooseOption="setTemplate"
+                )
+
+            template(slot="description" slot-scope="{ row, index }")
+              .form__description(v-if="currentActive !== index") {{ replaceDescription(row.description) }}
+              .form__description(v-else) {{ replaceDescription(currentTemplate.description) }}
+
+            template(slot="icons" slot-scope="{ row, index }")
+              .form__icons
+                img.form__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="[{'opacity-1': isActive(key, index)}, {'opacity-04': currentClientRequest.checkedForm.isCheckComplianceTemplate}]")
+                Check(@click="(e) => checkTemplate(e)", :isApproved="currentClientRequest.checkedForm.isCheckComplianceTemplate" :isDisabled="currentActive === index")
 
       .form__comments
         .form__commentsBlock
@@ -127,10 +176,19 @@
 
     .side
       .side__info
-        .order__row
-          .order__subTitle Request:
-          .order__value {{ currentClientRequest.projectId }}
-            .order__details {{ currentClientRequest.startOption === 'Send' ? 'Send a Quote' : 'Start Immediately' }}
+        .form__project
+          .form__project-title
+            span(id="id") {{ currentClientRequest.projectId }}
+            span.order__details {{ currentClientRequest.startOption === 'Send' ? 'Send a Quote' : 'Start Immediately' }}
+          .form__project-icons
+            .icon
+              span(class="click-copy" @click="copyId")
+                i.far.fa-copy(aria-hidden="true")
+        //.order__title
+        //  span {{ currentClientRequest.projectId }}
+        //  span {{ currentClientRequest.startOption === 'Send' ? 'Send a Quote' : 'Start Immediately' }}
+        //.order__value {{ currentClientRequest.projectId }}
+        //  .order__details
         .order__row
           .order__subTitle Status:
           .order__value {{ currentClientRequest.status }}
@@ -143,41 +201,35 @@
         .order__row
           .order__subTitle Target:
           .order__value {{ currentClientRequest.requestForm.targetLanguages[0].lang }}
+        Button(customClass="middle" @clicked="setCurrentAm" :isDisabled="isAmSet() || !isAm()" value="Get This Project")
 
 
-      .side__contacts
-        .form__contacts
-          DataTable(
-            :fields="fields3"
-            :tableData="currentClientRequest.clientContacts"
-            :bodyClass="['form-table-body', {'tbody_visible-overflow': currentClientRequest.clientContacts.length < 10}]"
-            :tableheadRowClass="currentClientRequest.clientContacts.length < 10 ? 'tbody_visible-overflow' : ''"
-            :headCellClass="'padding-with-check-box'"
-            :tableheadClass="'hideHead'"
-          )
-            div(slot="name" slot-scope="{ row, index }")
-              .contacts__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
-              .contacts__dataDrop(v-else)
-                SelectSingle(
-                  :isTableDropMenu="true"
-                  :options="availableContacts"
-                  @chooseOption="setContact"
-                )
+      //.side__contacts
+      //  .form__contacts
+      //    DataTable(
+      //      :fields="fields3"
+      //      :tableData="currentClientRequest.clientContacts"
+      //      :bodyClass="['form-table-body', {'tbody_visible-overflow': currentClientRequest.clientContacts.length < 10}]"
+      //      :tableheadRowClass="currentClientRequest.clientContacts.length < 10 ? 'tbody_visible-overflow' : ''"
+      //      :headCellClass="'padding-with-check-box'"
+      //      :tableheadClass="'hideHead'"
+      //    )
+      //      div(slot="name" slot-scope="{ row, index }")
+      //        .contacts__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
+      //        .contacts__dataDrop(v-else)
+      //          SelectSingle(
+      //            :isTableDropMenu="true"
+      //            :options="availableContacts"
+      //            @chooseOption="setContact"
+      //          )
+      //
+      //      .contacts__dataIcon(slot="icon" slot-scope="{ row, index }")
+      //        span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
+      //          i.fas.fa-trash
+      //
+      //    Add(@add="addContact")
+      ////.side__pm
 
-            .contacts__dataIcon(slot="icon" slot-scope="{ row, index }")
-              span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
-                i.fas.fa-trash
-
-          Add(@add="addContact")
-      .side__pm
-        .input__title Assign to Project Manager:
-        .pm__drop
-          SelectSingle(
-            :options="managers",
-            placeholder="Project Manager",
-            :selectedOption="currentClientRequest.projectManager ? `${currentClientRequest.projectManager.firstName} ${currentClientRequest.projectManager.lastName}` : ''",
-            @chooseOption="setPM"
-          )
 </template>
 
 <script>
@@ -208,9 +260,9 @@
 					{ label: "", headerKey: "headerIcon", key: "icon", width: "16%", padding: 0 }
 				],
 				fields2: [
-					{ label: "File Name", headerKey: "headerTemplate", key: "template", width: "54%", padding: 0 },
-					{ label: "File Type", headerKey: "headerDescriptions", key: "description", width: "30%", padding: 0 },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "16%", padding: 0 }
+					{ label: "Template", headerKey: "headerTemplate", key: "template", width: "47%", padding: 0 },
+					{ label: "Description", headerKey: "headerDescriptions", key: "description", width: "30%", padding: 0 },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "23%", padding: 0 }
 				],
 				fields3: [
 					{ label: "Name", headerKey: "headerName", key: "name", width: "70%", padding: 0 },
@@ -280,8 +332,41 @@
 				setCurrentClientRequest: "setCurrentClientRequest",
 				alertToggle: "alertToggle"
 			}),
+      copyId() {
+        let id = document.getElementById('id')
+        let elementText = id.textContent
+        navigator.clipboard.writeText(elementText)
+        try {
+          document.execCommand('copy')
+          this.alertToggle({
+            message: "Text copied successfully",
+            isShow: true,
+            type: "success"
+          })
+        } catch (err) {
+          this.alertToggle({
+            message: "Text not copied",
+            isShow: true,
+            type: "error"
+          })
+        }
+      },
+      setCurrentAm() {
+        if (this.isAmSet()) return
+          this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": this.user._id } })
+      },
+      canUpdateRequest() {
+        if(!this.currentClientRequest.accountManager) return false
+
+			  const group = this.user.group.name
+			  const isAdmin = group === "Administrators" || group === "Developers"
+			  const currentAm = group === "Account Managers" && this.currentClientRequest.accountManager._id === this.user._id
+
+        return isAdmin || currentAm
+      },
 			approveRequest() {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
 					this.alertToggle({ message: "Project approved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -289,7 +374,7 @@
 				}
 			},
 			openDeleteFileApprovalModal(type, path, bool) {
-				if (bool) return
+				if (!this.canUpdateRequest() || bool) return
 				this.isDeleteModal = true
 				this.deleteFileType = type
 				this.deleteFilePath = path
@@ -300,7 +385,8 @@
 				this.deleteFilePath = null
 			},
 			async deleteFile() {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					const updatedProject = await this.$http.post("/clients-requests/remove-form-file", {
 						path: this.deleteFilePath,
 						projectId: this.currentClientRequest._id,
@@ -316,7 +402,8 @@
 				}
 			},
 			changeProjectName(key, value) {
-				const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/
+        if (!this.canUpdateRequest()) return
+        const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/
 				if (!regex.test(value) || !value) {
 					this.alertToggle({ message: "Project name not saved!", isShow: true, type: "error" })
 					return
@@ -329,7 +416,8 @@
 				}
 			},
 			changeBrief(data) {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': data } })
 					this.alertToggle({ message: "Project brief saved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -337,7 +425,8 @@
 				}
 			},
 			changeNotes(data) {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'notes': data } })
 					this.alertToggle({ message: "Project notes saved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -345,7 +434,8 @@
 				}
 			},
 			async makeAction(index, key) {
-				if (this.currentActive !== -1 && this.currentActive !== index) {
+        if (!this.canUpdateRequest()) return
+        if (this.currentActive !== -1 && this.currentActive !== index) {
 					return this.isEditing()
 				}
 				switch (key) {
@@ -361,7 +451,8 @@
 				}
 			},
 			setEditingData(index) {
-				if (this.currentClientRequest.checkedForm.isCheckComplianceTemplate) return
+        if (!this.canUpdateRequest()) return
+        if (this.currentClientRequest.checkedForm.isCheckComplianceTemplate) return
 				this.currentActive = index
 				this.currentTemplate = this.currentClientRequest.requestForm.complianceOptions
 			},
@@ -369,10 +460,12 @@
 				this.currentActive = -1
 			},
 			setTemplate({ option }) {
-				this.currentTemplate = this.complianceTemplates.find(({ title }) => title === option)
+        if (!this.canUpdateRequest()) return
+        this.currentTemplate = this.complianceTemplates.find(({ title }) => title === option)
 			},
 			saveTemplate(index) {
-				if (this.currentActive === -1 || this.currentActive !== index) return
+        if (!this.canUpdateRequest()) return
+        if (this.currentActive === -1 || this.currentActive !== index) return
 				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "requestForm.complianceOptions": this.currentTemplate } })
 					this.alertToggle({ message: "Project template saved!", isShow: true, type: "success" })
@@ -384,7 +477,8 @@
 				}
 			},
 			setPM({ option }) {
-				const pm = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
+        if (!this.canUpdateRequest()) return
+        const pm = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
 				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "projectManager": pm } })
 					this.alertToggle({ message: "Project managers added!", isShow: true, type: "success" })
@@ -392,8 +486,25 @@
 					this.alertToggle({ message: "Project managers not added!", isShow: true, type: "error" })
 				}
 			},
+      isAmSet() {
+			  return this.currentClientRequest.accountManager !== null
+      },
+      isAm() {
+			  return this.user.group.name === 'Account Managers'
+      },
+			setAM({ option }) {
+        if (!this.canUpdateRequest()) return
+        const am = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
+				try {
+					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": am } })
+					this.alertToggle({ message: "Account managers added!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Account managers not added!", isShow: true, type: "error" })
+				}
+			},
 			async removeContact(row) {
-				if (this.currentClientRequest.clientContacts.length === 1) {
+        if (!this.canUpdateRequest()) return
+        if (this.currentClientRequest.clientContacts.length === 1) {
 					this.alertToggle({ message: 'One contact should remain', isShow: true, type: "error" })
 					return
 				}
@@ -406,7 +517,8 @@
 				}
 			},
 			async setContact({ option }) {
-				const contact = this.currentClientRequest.customer.contacts.find(item => `${ item.firstName } ${ item.surname }` === option)
+        if (!this.canUpdateRequest()) return
+        const contact = this.currentClientRequest.customer.contacts.find(item => `${ item.firstName } ${ item.surname }` === option)
 				try {
 					const updatedProject = await this.$http.post('/clients-requests/manage-client-contact', { projectId: this.currentClientRequest._id, contact, action: 'Add' })
 					this.setCurrentClientRequest(updatedProject.data)
@@ -416,10 +528,12 @@
 				}
 			},
 			addContact() {
-				this.currentClientRequest.clientContacts.push({})
+        if (!this.canUpdateRequest()) return
+        this.currentClientRequest.clientContacts.push({})
 			},
 			checkTemplate(data) {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckComplianceTemplate": data } })
 					this.alertToggle({ message: "Template checked!", isShow: true, type: "success" })
 				} catch (err) {
@@ -437,6 +551,7 @@
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			checkProjectName(data) {
+			  if (!this.canUpdateRequest()) return
 				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckProjectName": data } })
 					this.alertToggle({ message: "Project checked!", isShow: true, type: "success" })
@@ -445,7 +560,8 @@
 				}
 			},
 			checkBrief(data) {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckBrief": data } })
 					this.alertToggle({ message: "Project brief checked!", isShow: true, type: "success" })
 				} catch (err) {
@@ -453,7 +569,8 @@
 				}
 			},
 			async checkFile(data, { path, type }) {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					const updatedProject = await this.$http.post("/clients-requests/check-form-file", { projectId: this.currentClientRequest._id, path, check: data, type })
 					this.setCurrentClientRequest(updatedProject.data)
 					this.restructuredFiles(updatedProject.data)
@@ -465,7 +582,8 @@
 				}
 			},
 			checkProjectDeadline(data) {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckDeadline": data } })
 					this.alertToggle({ message: "Project deadline checked!", isShow: true, type: "success" })
 				} catch (err) {
@@ -473,7 +591,8 @@
 				}
 			},
 			async updateProjectDate(data) {
-				try {
+        if (!this.canUpdateRequest()) return
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'deadline': data } })
 					this.alertToggle({ message: "Project deadline saved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -481,23 +600,27 @@
 				}
 			},
 			restructuredFiles(project) {
-				const { requestForm: { sourceFiles, refFiles } } = project
+        // if (!this.canUpdateRequest()) return
+        const { requestForm: { sourceFiles, refFiles } } = project
 				this.files = [
 					...sourceFiles.map(i => ({ ...i, type: 'Source' })),
 					...refFiles.map(i => ({ ...i, type: 'Reference' }))
 				]
 			},
 			deadlineOpen() {
-				this.$refs.deadline.showCalendar()
+        if (!this.canUpdateRequest()) return
+        this.$refs.deadline.showCalendar()
 			},
 			clearInputFiles(str) {
-				let inputFiles = document.querySelectorAll(str)
+        if (!this.canUpdateRequest()) return
+        let inputFiles = document.querySelectorAll(str)
 				for (let elem of inputFiles) {
 					elem.value = ''
 				}
 			},
 			async uploadSourceFiles({ files }) {
-				const filteredFiles = Array.from(files).filter(item => {
+        if (!this.canUpdateRequest()) return
+        const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
           if(this.currentClientRequest.requestForm.service.title === 'Compliance'){
@@ -530,7 +653,8 @@
 				}
 			},
 			async uploadRefFiles({ files }) {
-				const filteredFiles = Array.from(files).filter(item => {
+        if (!this.canUpdateRequest()) return
+        const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
 					//return size / 1000000 <= 50 && this.forbiddenExtensions.indexOf(extension) === -1
@@ -579,7 +703,8 @@
 				document.addEventListener('click', this.outsideClickListener)
 			},
 			replaceDescription(str) {
-				return str.split(/<\/li>/).join('').split(/<li>/).filter(i => !!i).reduce((acc, curr) => {
+        if (!this.canUpdateRequest()) return
+        return str.split(/<\/li>/).join('').split(/<li>/).filter(i => !!i).reduce((acc, curr) => {
 					acc = acc + curr + '; '
 					return acc
 				}, '')
@@ -590,6 +715,7 @@
 		},
 		computed: {
 			...mapGetters({
+				user: "getUser",
 				users: "getUsers",
 				currentClientRequest: "getCurrentClientRequest"
 			}),
@@ -604,6 +730,12 @@
 					if (name === 'Project Managers') return `${ firstName } ${ lastName }`
 				}).filter(i => !!i)
 			},
+      accountManagers() {
+        return this.users.map(item => {
+          const { group: { name }, firstName, lastName } = item
+          if (name === 'Account Managers') return `${ firstName } ${ lastName }`
+        }).filter(i => !!i)
+      },
 			manageIcons() {
 				const { delete: del, ...result } = this.icons
 				return result
@@ -631,8 +763,11 @@
 			DataTable,
 			Check,
 			DatepickerWithTime
-		}
-	}
+		},
+    created() {
+		  // this.currentClientRequest = this.
+    }
+  }
 </script>
 
 <style scoped lang="scss">
@@ -655,20 +790,34 @@
     }
 
     &__info {
+
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-      padding: 10px 20px 20px 20px;
-      width: 240px;
-      height: fit-content;
+      padding: 10px 20px 20px;
+      width: 369px;
+      max-width: 369px;
+      box-sizing: border-box;
+      //height: fit-content;
       margin-left: 40px;
       margin-bottom: 40px;
     }
   }
 
   .form {
+    position: relative;
     padding: 20px;
-    min-width: 720px;
-    max-width: 720px;
+    min-width: 1000px;
+    max-width: 1000px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+
+    &__wrapper {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, .2);
+      z-index: 2;
+    }
 
     &__description {
       height: 30px;
@@ -702,9 +851,20 @@
       width: 48%;
     }
 
+    &__table-box {
+      display: flex;
+      justify-content: space-between;
+    }
+
     &__table {
-      margin-bottom: 40px;
+      margin-bottom: 20px;
       position: relative;
+      width: 48%;
+    }
+
+    &__contacts {
+      width: 240px;
+      margin-left: 150px;
     }
 
     &__dataIcons {
@@ -717,7 +877,17 @@
     &__inputs {
       display: flex;
       justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    &__group {
+      display: flex;
+    }
+
+    &__inputsGroup {
+      flex-grow: 1;
       margin-bottom: 40px;
+
     }
 
     &__projectName {
@@ -729,6 +899,10 @@
       position: relative;
     }
 
+    &__assignedPm {
+      position: relative;
+      width: 240px;
+    }
 
     &__icons {
       @extend %table-icons;
@@ -737,6 +911,24 @@
 
     &__icon {
       @extend %table-icon;
+    }
+
+    &__project {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #c5bfb5;
+      width: 100%;
+      padding-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      &-title{
+        font-size: 21px;
+        font-family: 'Myriad600';
+      }
+      &-icons{
+        display: flex;
+      }
     }
   }
 
@@ -854,11 +1046,17 @@
       font-size: 12px;
       font-family: 'Myriad400';
       opacity: 0.6;
+      padding-left: 5px;
     }
 
     &__subTitle {
       opacity: 0.6;
-      width: 70px;
+      width: 170px;
+    }
+
+    &__title {
+      font-size: 21px;
+      font-family: Myriad600;
     }
 
     &__value {
@@ -867,7 +1065,11 @@
 
     &__row {
       display: -webkit-box;
-      margin-top: 10px;
+      //margin-bottom: 15px;
+      width: 100%;
+      //display: -ms-flexbox;
+      //display: flex;
+      height: 40px;
     }
 
   }

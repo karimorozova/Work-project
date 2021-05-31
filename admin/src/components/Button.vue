@@ -167,4 +167,8 @@
     }
   }
 
+  .middle {
+    text-align: center;
+  }
+
 </style>
