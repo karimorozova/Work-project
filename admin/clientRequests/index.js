@@ -1,5 +1,6 @@
 const  {
 	getClientRequestById,
+  getClientRequestAfterUpdate,
 	getClientsRequests,
 } = require('./getClientsRequests')
 
@@ -17,7 +18,6 @@ const {
 
 const {
   updateClientRequestProps,
-  getClientRequestAfterUpdate,
   updateClientContacts,
 } =  require('./clientRequestStep2')
 

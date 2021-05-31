@@ -123,4 +123,5 @@ async function updateClientRequestProps(id, key, value) {
 module.exports = {
 	getClientsRequests,
 	getClientRequestById,
+  getClientRequestAfterUpdate,
 }

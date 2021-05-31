@@ -1,18 +1,7 @@
 const { ClientRequest } = require("../models")
 const { getClientRequestById } = require("./getClientsRequests")
 
-async function getClientRequestAfterUpdate(query, update) {
-  return await (ClientRequest.findOneAndUpdate(query, update, { new: true })
-    .populate([
-      "requestForm.sourceLanguage",
-      "requestForm.targetLanguages",
-      "requestForm.service",
-      "industry",
-      "customer",
-    ])
-    .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-    .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
-}
+
 
 async function updateClientRequestProps({id, value}) {
   try {
@@ -44,6 +33,5 @@ async function updateClientContacts({id, contact, oldContact}) {
 
 module.exports = {
   updateClientRequestProps,
-  getClientRequestAfterUpdate,
   updateClientContacts,
 }
