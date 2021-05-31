@@ -68,7 +68,7 @@ async function getClientWithActions(obj) {
       {path: 'assignedTo', select: ['firstName','lastName']}
     ]) || []
 
-  client.notes = await ClientsNotes.find({client: obj._id})
+  client.activityNotes = await ClientsNotes.find({client: obj._id})
     .populate([
       {path: 'assignedTo', select: ['firstName','lastName']}
     ]) || []

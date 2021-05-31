@@ -105,7 +105,7 @@
 					} else {
 						notes = await this.$http.post(`/clientsapi/activity/note`, { data })
 					}
-					this.setUpClientProp({ key: "notes", value: notes.data })
+					this.setUpClientProp({ key: "activityNotes", value: notes.data })
 					this.closeModal()
 					this.alertToggle({message: "Note created", isShow: true, type: "success"});
 				} catch (e) {

@@ -116,11 +116,11 @@
       },
       async approveDelete() {
         try {
-          const notes = await this.$http.delete(`/clientsapi/activity/note/${ this.data._id }?client=${ this.data.client }`)
-          this.setUpClientProp({ key: "notes", value: notes.data })
+          const activityNotes = await this.$http.delete(`/clientsapi/activity/note/${ this.data._id }?client=${ this.data.client }`)
+          this.setUpClientProp({ key: "activityNotes", value: activityNotes.data })
           this.close()
         } catch (e) {
-          this.alertToggle({ message: "Error on deleting notes", isShow: true, type: "error" })
+          this.alertToggle({ message: "Error on deleting activityNotes", isShow: true, type: "error" })
         }
 
       },
