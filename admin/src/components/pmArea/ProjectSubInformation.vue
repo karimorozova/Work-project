@@ -127,12 +127,10 @@
 			}
 		},
 		methods: {
-			...mapActions({
-				alertToggle: "alertToggle",
-				setCurrentProject: "setCurrentProject",
-        updateClientsRequestsProps: "updateClientsRequestsProps",
-        updateClientContacts: "updateClientContacts",
-			}),
+      ...mapActions({
+        alertToggle: "alertToggle",
+        setCurrentProject: "setCurrentProject"
+      }),
       refreshProject() {
       	this.$emit("refreshProject");
       },
@@ -268,37 +266,30 @@
 				}
 				await this.manageSaveClick(index)
 			},
-			async manageSaveClick(index) {
-				try {
-					const result = await this.$http.post("/pm-manage/client-contact", {
-						projectId: this.project._id,
-						contact: this.currentClientContact,
-						oldContact: this.oldClientContact
-					})
+      async manageSaveClick(index) {
+        try {
+          const result = await this.$http.post("/pm-manage/client-contact", {
+            projectId: this.project._id,
+            contact: this.currentClientContact,
+            oldContact: this.oldClientContact
+          })
           this.setCurrentProject(result.data)
           this.projectClientContacts = result.data.clientContacts
-          await this.updateClientContacts(
-            {
-              projectId: this.project._id,
-              contact: this.currentClientContact,
-              oldContact: this.oldClientContact
-
-            })
-					this.alertToggle({
-						message: "Saved project client contact",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Error on Saving project client contact",
-						isShow: true,
-						type: "error"
-					})
-				} finally {
-					this.setDefaults()
-				}
-			},
+          this.alertToggle({
+            message: "Saved project client contact",
+            isShow: true,
+            type: "success"
+          })
+        } catch (err) {
+          this.alertToggle({
+            message: "Error on Saving project client contact",
+            isShow: true,
+            type: "error"
+          })
+        } finally {
+          this.setDefaults()
+        }
+      },
 			manageCancelEdition(index) {
 				if (!this.projectClientContacts[index]._id) {
 					this.projectClientContacts.splice(index, 1)
@@ -324,38 +315,45 @@
 			setClientContact({ option }) {
 				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option)
 			},
-			async setPayment({ option }) {
-				try {
-          await this.updateClientsRequestsProps({ projectId: this.project._id, value: {paymentProfile: option} })
-					this.alertToggle({
-						message: "Project payment profile updated",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Cannot update project payment profile",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			async setUrgentStatus(event) {
-				try {
-          await this.updateClientsRequestsProps({ projectId: this.project._id, value: {isUrgent: event.target.checked} })
-					this.alertToggle({
-						message: "Urgent status updated",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Cannot update Urgent status",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
+      async setPayment({ option }) {
+        try {
+          const result = await this.$http.post("/pm-manage/payment-profile", {
+            projectId: this.project._id,
+            paymentProfile: option
+          })
+          this.project.paymentProfile = result.data.paymentProfile
+          this.alertToggle({
+            message: "Project payment profile updated",
+            isShow: true,
+            type: "success"
+          })
+        } catch (err) {
+          this.alertToggle({
+            message: "Cannot update project payment profile",
+            isShow: true,
+            type: "error"
+          })
+        }
+      },
+      async setUrgentStatus(event) {
+        try {
+          const result = await this.$http.post("/pm-manage/urgent", {
+            projectId: this.project._id,
+            isUrgent: event.target.checked
+          })
+          this.alertToggle({
+            message: "Urgent status updated",
+            isShow: true,
+            type: "success"
+          })
+        } catch (err) {
+          this.alertToggle({
+            message: "Cannot update Urgent status",
+            isShow: true,
+            type: "error"
+          })
+        }
+      },
 			getClientContacts() {
 				this.projectClientContacts = this.project.clientContacts
 			}
@@ -366,7 +364,6 @@
 					return this.project.customer.contacts.map((i) => i.firstName)
 				}
 			},
-      //TODO: remove
 			isProjectFinished(){
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
