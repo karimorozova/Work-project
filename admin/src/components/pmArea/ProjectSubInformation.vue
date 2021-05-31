@@ -270,13 +270,13 @@
 			},
 			async manageSaveClick(index) {
 				try {
-					// const result = await this.$http.post("/pm-manage/client-contact", {
-					// 	projectId: this.project._id,
-					// 	contact: this.currentClientContact,
-					// 	oldContact: this.oldClientContact
-					// })
-          // this.setCurrentProject(result.data)
-
+					const result = await this.$http.post("/pm-manage/client-contact", {
+						projectId: this.project._id,
+						contact: this.currentClientContact,
+						oldContact: this.oldClientContact
+					})
+          this.setCurrentProject(result.data)
+          this.projectClientContacts = result.data.clientContacts
           await this.updateClientContacts(
             {
               projectId: this.project._id,
