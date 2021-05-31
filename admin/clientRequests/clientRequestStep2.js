@@ -1,5 +1,5 @@
 const { ClientRequest } = require("../models")
-const { getClientRequestById } = require("./getClientsRequests")
+const { getClientRequestById, getClientRequestAfterUpdate } = require("./getClientsRequests")
 
 
 

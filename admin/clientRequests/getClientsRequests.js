@@ -96,7 +96,7 @@ async function getClientRequestById(id) {
 }
 
 async function getClientRequestAfterUpdate(query, update) {
-	return await (ClientRequest.findOneAndUpdate(query, update, { new: true })
+	return  (await ClientRequest.findOneAndUpdate(query, update, { new: true })
 			.populate([
         "requestForm.sourceLanguage",
         "requestForm.targetLanguages",
