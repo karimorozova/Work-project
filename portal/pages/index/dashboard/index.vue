@@ -11,7 +11,7 @@
     .dashboard__item
       .dashboard__title Open Requests
       .dashboard__table
-        Table(:projects="filteredRequest" :isOpenRequest="true" )
+        Table(:projects="filteredRequest"  @getDetails="getRequestDetails" :isOpenRequest="true" )
 </template>
 
 <script>
@@ -45,6 +45,10 @@
 				const id = this[prop][index]._id
 				this.$router.push(`/dashboard/details/${ id }`)
 			},
+      getRequestDetails({index}) {
+        const id = this.filteredRequest[index]._id
+        this.$router.push(`/client-request/details/${ id }`)
+      },
 			async makeQuoteAction({ index, key }) {
 				const quote = this.filteredQuotes[index]
 				try {

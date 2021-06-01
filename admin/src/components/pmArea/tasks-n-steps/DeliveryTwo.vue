@@ -459,7 +459,7 @@
       },
       allChecked() {
         return this.deliveryData.instructions.every(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant )
-          && this.files.every(({isFileApproved}) => isFileApproved)
+          && this.files.every(({isFileApproved}) => isFileApproved) && this.files.length > 0
       },
 
 		},

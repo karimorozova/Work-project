@@ -240,43 +240,43 @@
 
 				complianceTemplates: [
 					{
-						title: 'POI (Proof of Identity Documents)',
+						title: '[1] POI (Proof of Identity Documents)',
 						description: '<li>Full name</li><li>DOB</li><li>Issue date</li><li>Expiry date if there is any</li>'
 					},
 					{
-						title: 'POA (Proof of Address Documents)',
+						title: '[2] POA (Proof of Address Documents)',
 						description: '<li>Full name</li><li>Address</li><li>Issue date</li>'
 					},
 					{
-						title: 'Tax declarations',
+						title: '[3] Tax declarations',
 						description: '<li>Name</li><li>Net annual declared income</li><li>Year of declaration</li><li>Issue date</li><li>Currency</li>'
 					},
 					{
-						title: 'Salary certificates / letters of employment',
+						title: '[4] Salary certificates / letters of employment',
 						description: '<li>Name</li><li>Net salary</li><li>Employer</li><li>Issue date</li><li>Currency</li>'
 					},
 					{
-						title: 'Sales / purchase agreements',
+						title: '[5] Sales / purchase agreements',
 						description: '<li>Name of seller</li><li>Name of buyer if any</li><li>Amount of the sale</li><li>Date of agreement</li><li>Issuing authority</li><li>Currency</li>'
 					},
 					{
-						title: 'Cancellation letters of bank accounts / CCs',
+						title: '[6] Cancellation letters of bank accounts / CCs',
 						description: '<li>Account holder name</li><li>Account number</li><li>Issuing credit institution</li><li>CC digits</li><li>Issue date</li>'
 					},
 					{
-						title: 'Specific transactions on bank statements',
+						title: '[7] Specific transactions on bank statements',
 						description: '<li>Brief description of specific transaction</li>'
 					},
 					{
-						title: 'Proof of relation documents (eg birth certificates, marriage certificates)',
+						title: '[8] Proof of relation documents (eg birth certificates, marriage certificates)',
 						description: '<li>Type of doc</li><li>Names involved</li><li>Relation</li>'
 					},
 					{
-						title: 'Corporate: Company Info',
+						title: '[9] Corporate: Company Info',
 						description: '<li>Registered name</li><li>Incorporation date</li><li>Directors and Authorised Signatories</li><li>Shareholders/ Beneficial Owners</li><li>Registered AND Business address (if available)</li><li>Share capital</li><li>Any information on Directors and Shareholders</li>'
 					},
 					{
-						title: 'Corporate: Financial statements',
+						title: '[10] Corporate: Financial statements',
 						description: '<li>Profit & Loss: line by line translation</li><li>Balance sheet: line by line translation</li><li>Additional notes: line by line for all table type notes</li><li>Any information regarding payments to shareholders and directors</li>'
 					}
 				]
