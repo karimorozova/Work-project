@@ -33,6 +33,7 @@
               @setSourceLanguage="setSourceLang",
               @setTargets="setTargets",
               :setPossibleTargetsAction="setPossibleTargetsAction"
+              :currentTaskId="currentTaskId"
             )
 
         .tasks-data__services

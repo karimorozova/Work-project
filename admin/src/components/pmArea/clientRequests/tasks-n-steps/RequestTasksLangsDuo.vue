@@ -46,6 +46,7 @@
 	export default {
 		mixins: [ TasksLanguages ],
 		props: {
+			currentTaskId: { type: String },
 			originallyLanguages: {
 				type: Array
 			},
@@ -152,6 +153,13 @@
 					}
 				}
 			},
+			runPossibleTargetsForEditing() {
+				console.log('Watcher2')
+				const { taskData: { targets } } = this.currentProject.tasksAndSteps.filter(item => item.taskId === this.currentTaskId)
+				this.targetAll = this.currentProject.requestForm.targetLanguages.filter(item => !targets.map(item => item.lang).includes(item.lang))
+				this.targetChosen.push(...targets)
+				this.$emit("setTargets", { targets: this.targetChosen })
+			},
 			runPossibleTargets() {
 				console.log('Watcher')
 				this.setPossibleTargets()
@@ -160,7 +168,8 @@
 		},
 		watch: {
 			setPossibleTargetsAction(val) {
-				if (val) this.runPossibleTargets()
+				if (val && !this.currentTaskId) this.runPossibleTargets()
+				if (val && this.currentTaskId) this.runPossibleTargetsForEditing()
 			}
 		},
 		created() {
