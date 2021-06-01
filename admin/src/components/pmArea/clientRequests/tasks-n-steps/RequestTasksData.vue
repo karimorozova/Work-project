@@ -12,6 +12,7 @@
           @setSourceLanguage="setSourceLang",
           @setTargets="setTargets",
           :templates="templates"
+          :currentTaskId="currentTaskId"
         )
 
       .tasks-data__item
@@ -85,6 +86,7 @@
 
 	export default {
 		props: {
+			currentTaskId: { type: String },
 			originallyLanguages: { type: Array },
 			originallyUnits: { type: Array },
 			originallySteps: { type: Array },
@@ -103,6 +105,7 @@
 			...mapActions([ "alertToggle", "setTasksDataValueRequest", "setRequestValue", "setCurrentClientRequest" ]),
 
 			setSourceLang({ symbol }) {
+				console.log('setSourceLang => ')
 				const language = this.originallyLanguages.find((item) => item.symbol === symbol)
 				this.setTasksDataValueRequest({ prop: "source", value: language })
 				this.sourceLanguages = [ language.symbol ]
@@ -113,6 +116,7 @@
 				}, 1000)
 			},
 			setTargets({ targets }) {
+				console.log('setTargets => ')
 				this.setTasksDataValueRequest({ prop: "targets", value: targets })
 				this.targetLanguages = [ ...targets ]
 			},

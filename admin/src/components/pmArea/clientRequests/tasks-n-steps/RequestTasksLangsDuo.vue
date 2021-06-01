@@ -153,6 +153,7 @@
 				}
 			},
 			runPossibleTargets() {
+				console.log('Watcher')
 				this.setPossibleTargets()
 				this.targetChosen = []
 			}

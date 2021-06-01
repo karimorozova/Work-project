@@ -66,6 +66,7 @@
 	export default {
 		// mixins: [ TasksLanguages ],
 		props: {
+			currentTaskId: { type: String },
 			originallyLanguages: {
 				type: Array
 			},
@@ -110,6 +111,8 @@
 				setDataValue: "setTasksDataValueRequest"
 			}),
 			setDefaultService() {
+				console.log('Start')
+				console.log(this.currentTaskId)
 				const service = this.currentProject.requestForm.service
 				this.service = service.title
 				if (!service.steps.length) return this.showError()
@@ -128,13 +131,6 @@
 					this.$emit("setSourceLanguage", { symbol })
 				}
 			},
-
-			// showError() {
-			// 	this.isError = true
-			// 	setTimeout(() => {
-			// 		this.isError = false
-			// 	}, 4000)
-			// },
 			setDate({ date, prop }, count) {
 				this.stepsDates[count - 1][prop] = date
 				if (this.stepsDates[count] && prop === "deadline") {
@@ -217,7 +213,7 @@
 				}
 			},
 			setWorkflow({ option }) {
-				const workflowSteps = this.workflowSteps.find((item) => item.name === option)
+        const workflowSteps = this.workflowSteps.find((item) => item.name === option)
 				this.workFlowOption = workflowSteps.name
 				this.setDataValue({ prop: "workflow", value: workflowSteps })
 				this.setDefaultStepsAndUnits(this.workFlowOption)

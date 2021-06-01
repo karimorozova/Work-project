@@ -27,6 +27,7 @@
       Add(@add="openVaultModal")
 
     .tasks-files__vault(v-if="isVaultModal")
+      .tasks-files__title Client's Vault
       .tasks-files__items
         span.tasks-files__close(@click="closeVaultModal") &#215;
         DataTable(
@@ -356,6 +357,11 @@
   .tasks-files {
     position: relative;
 
+    &__title{
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
     &__button {
       margin-bottom: 20px;
       display: flex;
@@ -392,7 +398,7 @@
     }
 
     &__vault {
-      padding: 35px 20px 20px 20px;
+      padding: 20px 20px 20px 20px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       position: absolute;
       z-index: 777;

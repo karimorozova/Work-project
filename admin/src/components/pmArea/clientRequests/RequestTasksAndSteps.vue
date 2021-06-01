@@ -2,19 +2,81 @@
   .tasks-steps
     .tasks-steps__tasks-title Tasks and Steps
       img.tasks-steps__arrow(src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
-    transition(name="slide-fade")
-      div
-        RequestTasksData(
-          v-if="isTaskData"
-          :originallyLanguages="originallyLanguages"
-          :originallyUnits="originallyUnits"
-          :originallySteps="originallySteps"
-          :originallyServices="originallyServices"
-          @setValue="setValue"
-          @addTasks="addTasks"
-          @showErrors="showErrors"
+    div
+      RequestTasksData(
+        v-if="isTaskData"
+        :originallyLanguages="originallyLanguages"
+        :originallyUnits="originallyUnits"
+        :originallySteps="originallySteps"
+        :originallyServices="originallyServices"
+        :currentTaskId="currentTaskId"
+        @setValue="setValue"
+        @addTasks="addTasks"
+        @showErrors="showErrors"
+      )
+      ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="true" @closeErrors="closeErrorsBlock")
+
+    .tasks-steps__tables
+      .tasks__tabs
+        Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
+      .tasks__table(v-if="isTasksShow")
+        DataTable(
+          :fields="fields1"
+          :tableData="currentTasks"
+          :bodyClass="currentTasks.length < 6 ? 'tbody_visible-overflow' : ''"
+          :tableheadRowClass="currentTasks.length < 6 ? 'tbody_visible-overflow' : ''"
+          bodyRowClass="steps-table-row"
         )
-        ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="true" @closeErrors="closeErrorsBlock")
+          template(v-for="field in fields1", :slot="field.headerKey", slot-scope="{ field }")
+            .tasks__head-title {{ field.label }}
+
+          template(slot="id" slot-scope="{ row, index }")
+            .tasks__data {{ row.taskId }}
+          template(slot="language" slot-scope="{ row, index }")
+            .tasks__data {{ row.language }}
+          template(slot="service" slot-scope="{ row, index }")
+            .tasks__data {{ row.service }}
+          template(slot="start" slot-scope="{ row, index }")
+            .tasks__data {{ row.start }}
+          template(slot="deadline" slot-scope="{ row, index }")
+            .tasks__data {{ row.deadline }}
+          template(slot="source" slot-scope="{ row, index }")
+            .tasks__data {{ row.source }}
+          template(slot="ref" slot-scope="{ row, index }")
+            .tasks__data {{ row.ref }}
+          template(slot="icons" slot-scope="{ row, index }")
+            .tasks__icons
+              .tasks__icon(@click="editTasksData(row.taskId)")
+                img(src="../../../assets/images/Other/edit-icon-qa.png")
+              .tasks__icon
+                img(src="../../../assets/images/latest-version/delete-icon.png")
+
+      .tasks__table(v-if="isStepsShow")
+        DataTable(
+          :fields="fields2"
+          :tableData="currentSteps"
+          :bodyClass="currentSteps.length < 6 ? 'tbody_visible-overflow' : ''"
+          :tableheadRowClass="currentSteps.length < 6 ? 'tbody_visible-overflow' : ''"
+          bodyRowClass="steps-table-row"
+        )
+          template(v-for="field in fields2", :slot="field.headerKey", slot-scope="{ field }")
+            .tasks__head-title {{ field.label }}
+
+          template(slot="id" slot-scope="{ row, index }")
+            .tasks__data {{ row.stepId }}
+          template(slot="language" slot-scope="{ row, index }")
+            .tasks__data {{ row.language }}
+          template(slot="step" slot-scope="{ row, index }")
+            .tasks__data {{ row.step }}
+          template(slot="unit" slot-scope="{ row, index }")
+            .tasks__data {{ row.unit }}
+          template(slot="quantity" slot-scope="{ row, index }")
+            .tasks__data {{ row.quantitySize }}
+          template(slot="start" slot-scope="{ row, index }")
+            .tasks__data {{ row.start }}
+          template(slot="deadline" slot-scope="{ row, index }")
+            .tasks__data {{ row.deadline }}
+
     //.tasks-steps__tables
     //  Tasks(v-if="currentProject.tasks.length && isTasksShow"
     //    :allTasks="this.currentProject.tasks"
@@ -43,6 +105,9 @@
 	// import Steps from "./tasks-n-steps/Steps"
 	import { mapGetters, mapActions } from 'vuex'
 	import ValidationErrors from "../../ValidationErrors"
+	import Tabs from "../../Tabs"
+	import DataTable from "../../DataTable"
+	import moment from 'moment'
 
 	export default {
 		props: {
@@ -53,28 +118,83 @@
 		},
 		data() {
 			return {
+				icons: {
+					delete: '../../../assets/images/latest-version/delete-icon.png',
+					edit: '../../../assets/images/Other/edit-icon-qa.png'
+				},
 				errors: [],
 				isTaskData: false,
 				areErrorsExist: false,
-				// isStepsShow: false,
-				// isTasksShow: true,
-				isInfo: false
-				// translateFilesAmount: 0
+				tabs: [ 'Tasks', 'Steps' ],
+				isStepsShow: false,
+				isTasksShow: true,
+				isInfo: false,
+				isEditData: false,
+				selectedTab: 'Tasks',
+				currentTaskId: '',
+				fields1: [
+					{ label: "Task Id", headerKey: "headerId", key: "id", width: "20%", padding: 0 },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
+					{ label: "Service", headerKey: "headerService", key: "service", width: "14%", padding: 0 },
+					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 },
+					{ label: "# Source", headerKey: "headerSource", key: "source", width: "8%", padding: 0 },
+					{ label: "# Ref.", headerKey: "headerRef", key: "ref", width: "8%", padding: 0 },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "9%", padding: 0 }
+				],
+
+				fields2: [
+					{ label: "Step Id", headerKey: "headerId", key: "id", width: "20%", padding: 0 },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
+					{ label: "Step", headerKey: "headerStep", key: "step", width: "13%", padding: 0 },
+					{ label: "Unit", headerKey: "headerUnit", key: "unit", width: "13%", padding: 0 },
+					{ label: "Quantity / Size", headerKey: "headerSize", key: "quantity", width: "13%", padding: 0 },
+					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 }
+				]
 			}
 		},
 		methods: {
 			...mapActions([
 				"alertToggle",
 				"clearTasksDataRequest",
-        "setCurrentClientRequest",
+				"setCurrentClientRequest",
+				"setTasksDataValueRequest"
 			]),
+			editTasksData(taskId) {
+				this.isEditData = true
+				// const { taskData } = this.currentProject.tasksAndSteps.find(item => item.taskId === taskId)
+        // this.currentTaskDataForAutofill = taskData
+				this.currentTaskId = taskId
+				this.isTaskData = true
+
+
+				// { name: "1 Step", id: 2890 },
+				// { name: "2 Steps", id: 2917 }
+				// this.setTasksDataValueRequest({ prop: "service", value: taskData.service })
+				// this.setTasksDataValueRequest({ prop: "workflow", value: {id: +taskData.workflow, name: +taskData.workflow === 2890 ? '1 Step' : '2 Steps'} })
+
+				// this.setTasksDataValueRequest({ prop: "service", value: taskData.service })
+			},
+			setDataForUpdate() {
+				// const { taskData } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
+        // const { workflow, stepsAndUnits, stepsDates } = taskData
+				// this.setTasksDataValueRequest({ prop: "workflow", value: { id: +workflow, name: +workflow === 2890 ? '1 Step' : '2 Steps' } })
+				// this.setTasksDataValueRequest({ prop: "stepsAndUnits", value: stepsAndUnits })
+				// this.setTasksDataValueRequest({ prop: "stepsDates", value: stepsDates })
+				// // this.setTasksDataValueRequest({ prop: "source", value: source })
+				// // this.setTasksDataValueRequest({ prop: "targets", value: targets })
+				// console.log('finish')
+				// this.currentTaskId = null
+				// this.currentTaskDataForAutofill = {}
+			},
 			closeErrorsBlock() {
-				this.areErrorsExist = false;
-				this.errors = [];
+				this.areErrorsExist = false
+				this.errors = []
 			},
 			showErrors({ errors }) {
-				this.errors = [...errors];
-				this.areErrorsExist = true;
+				this.errors = [ ...errors ]
+				this.areErrorsExist = true
 			},
 			updateTasks(data) {
 				// this.currentProject.tasks = data
@@ -86,18 +206,15 @@
 			},
 			toggleTaskData() {
 				this.isTaskData = !this.isTaskData
+				this.currentTaskId = ''
 			},
 			setValue({ option, prop }) {
 				// this[prop] = option
 			},
-			showTab({ tab }) {
-				// if (tab === 'Tasks') {
-				// 	this.isStepsShow = false
-				// 	this.isTasksShow = true
-				// } else {
-				// 	this.isStepsShow = true
-				// 	this.isTasksShow = false
-				// }
+			setTab({ index }) {
+				this.isTasksShow = index === 0
+				this.isStepsShow = !this.isTasksShow
+				this.selectedTab = this.tabs[index]
 			},
 			setVendor({ vendor, index }) {
 				// this.$emit("setVendor", { vendor, index })
@@ -117,8 +234,8 @@
 				tasksData.append('source', dataForTasks.source ? JSON.stringify(dataForTasks.source) : "")
 				tasksData.append('targets', JSON.stringify(dataForTasks.targets))
 				tasksData.append('requestId', this.currentProject._id)
-				if(dataForTasks.refFilesVault) tasksData.append('refFilesVault', JSON.stringify(dataForTasks.refFilesVault))
-				if(dataForTasks.refFilesVault) tasksData.append('sourceFilesVault', JSON.stringify(dataForTasks.sourceFilesVault))
+				if (dataForTasks.refFilesVault) tasksData.append('refFilesVault', JSON.stringify(dataForTasks.refFilesVault))
+				if (dataForTasks.refFilesVault) tasksData.append('sourceFilesVault', JSON.stringify(dataForTasks.sourceFilesVault))
 
 				return tasksData
 			},
@@ -163,7 +280,7 @@
 			},
 			async saveProjectTasks(tasksData) {
 				try {
-					const updatedProject = await this.$http.post('/pm-manage/request-tasks', tasksData);
+					const updatedProject = await this.$http.post('/pm-manage/request-tasks', tasksData)
 					this.setCurrentClientRequest(updatedProject.data)
 					this.isTaskData = false
 					this.clearTasksDataRequest()
@@ -190,8 +307,54 @@
 		},
 		computed: {
 			...mapGetters({
-				currentProject: 'getCurrentClientRequest'
+				currentProject: 'getCurrentClientRequest',
+				tasksData: "getTasksDataRequest"
 			}),
+			currentTasks() {
+				return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
+					const { source, targets, service, stepsDates } = taskData
+
+					let start, deadline
+					if (stepsDates.length === 1) {
+						[ start, deadline ] = Object.values(stepsDates[0])
+					} else {
+						start = stepsDates[0].start
+						deadline = stepsDates[1].deadline
+					}
+
+					return {
+						taskId,
+						language: `${ source.symbol } >> ${ targets[0].symbol }`,
+						service: service.title,
+						start: moment(start).format('DD-MM-YYYY, HH:mm'),
+						deadline: moment(deadline).format('DD-MM-YYYY, HH:mm'),
+						source: sourceFiles.length,
+						ref: refFiles.length
+					}
+				})
+			},
+			currentSteps() {
+				let a = this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
+					let result = []
+					const { source, targets, service, stepsDates, stepsAndUnits } = taskData
+					for (let i = 0; i < stepsAndUnits.length; i++) {
+						const item = stepsAndUnits[i]
+						result.push({
+							stepId: `${ taskId } S0${ i + 1 }`,
+							language: `${ source.symbol } >> ${ targets[0].symbol }`,
+							step: item.step,
+							unit: item.unit,
+							quantitySize: item.hasOwnProperty('hours') ? `${ item.hours } / ${ item.size }` : `${ item.quantity } / ${ item.size }`,
+							start: moment(stepsDates[i].start).format('DD-MM-YYYY, HH:mm'),
+							deadline: moment(stepsDates[i].deadline).format('DD-MM-YYYY, HH:mm')
+						})
+					}
+					return result
+				})
+				console.log(a.flat())
+				return a.flat()
+			},
+
 			metricsButton() {
 				// const wordsUnit = this.currentProject.tasks.find(item => item.service.calculationUnit === 'Words')
 				// return !wordsUnit || this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
@@ -206,6 +369,8 @@
 			}
 		},
 		components: {
+			DataTable,
+			Tabs,
 			ValidationErrors,
 			RequestTasksData
 			// Button,
@@ -279,21 +444,28 @@
     }
   }
 
-  .slide-fade-enter-active {
-    transition: all .3s ease;
-  }
-
-  .slide-fade-leave-active {
-    transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-  }
-
-  .slide-fade-enter, .slide-fade-leave-to {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-
   .no-box-shadow {
     box-shadow: none;
+  }
+
+  .tasks {
+    &__data {
+      display: flex;
+      align-items: center;
+      padding-left: 5px;
+      height: 30px;
+    }
+
+    &__icons {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      height: 31px;
+    }
+
+    &__icon {
+      cursor: pointer;
+    }
   }
 
 </style>

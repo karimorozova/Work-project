@@ -1,11 +1,11 @@
-const { Projects, Clients, CurrencyRatio } = require('../models');
+const { Projects, Clients, CurrencyRatio, ClientRequest } = require('../models');
 const { getProject } = require('./getProjects');
 const { createTasksWithPackagesUnit } = require('./taskForPackages');
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon');
 const { storeFiles } = require('./files');
 const { getModifiedFiles, createProjectFolder } = require('./helpers');
 const { calculateCrossRate } = require('../helpers/commonFunctions')
-const { storeRequestFilesForTasksAndSteps, getTaskCopiedFiles } = require('../clientRequests')
+const { storeRequestFilesForTasksAndSteps, getTaskCopiedFiles,  getClientRequestAfterUpdate, getClientRequestById} = require('../clientRequests')
 const fs = require('fs')
 
 const moment = require('moment');
@@ -49,67 +49,47 @@ async function createProject(project, user) {
   }
 }
 
-async function createRequestTasks ({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) {
+async function createRequestTasks({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) {
   try {
-    tasksInfo.stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits)
-    tasksInfo.stepsDates = JSON.parse(tasksInfo.stepsDates)
-    tasksInfo.service = JSON.parse(tasksInfo.service)
-    tasksInfo.source = JSON.parse(tasksInfo.source)
-    tasksInfo.targets = JSON.parse(tasksInfo.targets)
-    if(tasksInfo.refFilesVault ){
-        tasksInfo.refFilesVault = JSON.parse(tasksInfo.refFilesVault)
-      console.log(tasksInfo.refFilesVault)
-        const newref = getTaskCopiedFiles(tasksInfo.requestId, tasksInfo.refFilesVault)
-        console.log(newref)
+    const { requestId: _id } = tasksInfo
+    const { projectId, tasksAndSteps } = await getClientRequestById(_id)
+    for (let key of [ 'stepsAndUnits', 'stepsDates', 'service', 'source', 'targets' ]) {
+      tasksInfo[key] = JSON.parse(tasksInfo[key])
     }
-    tasksInfo.sourceFilesVault && (tasksInfo.sourceFilesVault = JSON.parse(tasksInfo.sourceFilesVault))
 
-    // ref/ source length
-    const refFiles = await storeRequestFilesForTasksAndSteps(sourceUploadFiles, tasksInfo.requestId);
-    const sourceFiles = await storeRequestFilesForTasksAndSteps(refUploadFiles, tasksInfo.requestId);
+    let [ refFiles, sourceFiles ] = [ [], [] ]
+    if(tasksInfo.sourceFilesVault) sourceFiles.push(...getTaskCopiedFiles(_id, JSON.parse(tasksInfo.sourceFilesVault)))
+    if(tasksInfo.refFilesVault) refFiles.push(...getTaskCopiedFiles(_id, JSON.parse(tasksInfo.refFilesVault)))
 
-    console.log(refFiles, sourceFiles)
+    if(sourceUploadFiles) sourceFiles.push(...await storeRequestFilesForTasksAndSteps(sourceUploadFiles, _id))
+    if(refUploadFiles) refFiles.push(...await storeRequestFilesForTasksAndSteps(refUploadFiles, _id))
 
+    delete tasksInfo.refFilesVault
+    delete tasksInfo.sourceFilesVault
+    delete tasksInfo.requestId
 
+    const tasksAndStepsForSave = tasksInfo.targets.map(item => {
+      delete tasksInfo.targets
+      return {
+        targets: [ item ],
+        ...tasksInfo
+      }
+    }).map(item => {
+      return {
+        taskId: projectId + `${tasksAndSteps.length < 10 ? ` T0${tasksAndSteps.length + 1}` : ` T${tasksAndSteps.length + 1}`}`,
+        taskData: { ...item, },
+        refFiles,
+        sourceFiles
+      }
+    })
 
+    return await getClientRequestAfterUpdate({_id}, {
+      $push: { "tasksAndSteps": tasksAndStepsForSave }
+    })
 
-
-    // const source = JSON.parse(tasksInfo.source)
-    // const targets = JSON.parse(tasksInfo.targets)
-    // const service = JSON.parse(tasksInfo.service)
-    // const stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits);
-    // const stepsDates = JSON.parse(tasksInfo.stepsDates);
-    //
-
-
-
-    // const project = await getProject({ _id: tasksInfo.projectId });
-    // const allInfo = { ...tasksInfo, taskRefFiles, stepsAndUnits, stepsDates, project };
-
-	  // console.log(allInfo)
-
-  //   if (stepsAndUnits.length === 2) {
-  //     const onlyPackages = stepsAndUnits.every(
-  //         ({ unit }) => unit === "Packages"
-  //     );
-  //     if (!onlyPackages) {
-  //       await createTasksAndStepsForCustomUnits(allInfo);
-  //     } else {
-  //       await createTasksWithPackagesUnit(allInfo);
-  //     }
-  //   } else {
-  //     const [{ unit }] = stepsAndUnits;
-  //     if (unit !== "Packages") {
-  //       await createTasksAndStepsForCustomUnits(allInfo);
-  //     } else {
-  //       await createTasksWithPackagesUnit(allInfo);
-  //     }
-  //   }
-	//
-  //   return await getProject({ _id: tasksInfo.projectId });
   } catch (err) {
-    console.log(err);
-    console.log("Error in createTasks");
+    console.log(err)
+    console.log("Error in createTasks")
   }
 }
 
