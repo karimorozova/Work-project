@@ -81,7 +81,7 @@
                 div(style="width: 575px")
                   textarea.form__textarea(rows="4" v-model="values.currentBrief" disabled="true")
 
-        .form__ckeckbox
+        .form__ckeckbox(v-if="isStartOption")
           TextRadio(
             :isChecked="values.startOption === 'Send'"
             title="Send a Quote"
@@ -109,6 +109,10 @@ export default {
   components: {TextRadio, DataTable, Button},
   props: {
     values: {},
+    isStartOption: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {

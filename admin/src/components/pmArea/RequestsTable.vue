@@ -26,6 +26,8 @@
         span.requests-table__label {{ field.label }}
       template(slot="headerProjectManager" slot-scope="{ field }")
         span.requests-table__label {{ field.label }}
+      template(slot="headerAccountManager" slot-scope="{ field }")
+        span.requests-table__label {{ field.label }}
       //template(slot="headerEdit" slot-scope="{ field }")
       //    span.requests-table__label
 
@@ -47,6 +49,8 @@
         span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
       template(slot="projectManager" slot-scope="{ row }")
         span(v-if="row.projectManager") {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
+      template(slot="accountManager" slot-scope="{ row }")
+        span(v-if="row.accountManager") {{ row.accountManager.firstName }} {{ row.accountManager.lastName }}
       //template(slot="edit" slot-scope="{ row }" style="{'z-index': 100}")
         span.requests-table__icon(@click.stop="edit")
           img.requests-table__edit(src="../../assets/images/edit-icon-qa.png")
@@ -66,13 +70,14 @@
 				fields: [
 					{ label: "ID", headerKey: "headerProjectId", key: "projectId", width: "11%" },
 					{ label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "10%" },
-					{ label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "14%" },
+					{ label: "Client Name", headerKey: "headerClientName", key: "clientName", width: "12%" },
 					{ label: "Service", headerKey: "headerService", key: "service", width: "11%" },
-					{ label: "Languages", headerKey: "headerLanguages", key: "languages", width: "11%" },
+					{ label: "Languages", headerKey: "headerLanguages", key: "languages", width: "9%" },
 					{ label: "Status", headerKey: "headerStatus", key: "status", width: "11%" },
-					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "9%" },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%" },
-					{ label: "Assigned To", headerKey: "headerProjectManager", key: "projectManager", width: "14%" }
+					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%" },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%" },
+					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%" },
+					{ label: "Account Manager", headerKey: "headerAccountManager", key: "accountManager", width: "11%" },
 					// {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},
 				]
 			}

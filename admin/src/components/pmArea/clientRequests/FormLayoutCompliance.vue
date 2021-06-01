@@ -1,6 +1,16 @@
 <template lang="pug">
   .formLayout
     .form
+      .form__approve
+        ApproveModal(
+          v-if="selected"
+          text="Do you want to change manager?"
+          approveValue="Yes"
+          notApproveValue="Cancel"
+          @approve="setAM"
+          @notApprove="setDefault"
+          @close="setDefault"
+        )
       .form__wrapper(v-if="!canUpdateRequest()")
       .form__group
         .form__inputsGroup
@@ -44,7 +54,7 @@
                 :options="accountManagers",
                 placeholder="Account Manager",
                 :selectedOption="currentClientRequest.accountManager ? `${currentClientRequest.accountManager.firstName} ${currentClientRequest.accountManager.lastName}` : ''",
-                @chooseOption="setAM"
+                @chooseOption="approveChangeAM"
               )
 
         .form__contacts
@@ -270,43 +280,43 @@
 				],
 				complianceTemplates: [
 					{
-						title: 'POI (Proof of Identity Documents)',
+						title: '[1] POI (Proof of Identity Documents)',
 						description: '<li>Full name</li><li>DOB</li><li>Issue date</li><li>Expiry date if there is any</li>'
 					},
 					{
-						title: 'POA (Proof of Address Documents)',
+						title: '[2] POA (Proof of Address Documents)',
 						description: '<li>Full name</li><li>Address</li><li>Issue date</li>'
 					},
 					{
-						title: 'Tax declarations',
+						title: '[3] Tax declarations',
 						description: '<li>Name</li><li>Net annual declared income</li><li>Year of declaration</li><li>Issue date</li><li>Currency</li>'
 					},
 					{
-						title: 'Salary certificates / letters of employment',
+						title: '[4] Salary certificates / letters of employment',
 						description: '<li>Name</li><li>Net salary</li><li>Employer</li><li>Issue date</li><li>Currency</li>'
 					},
 					{
-						title: 'Sales / purchase agreements',
+						title: '[5] Sales / purchase agreements',
 						description: '<li>Name of seller</li><li>Name of buyer if any</li><li>Amount of the sale</li><li>Date of agreement</li><li>Issuing authority</li><li>Currency</li>'
 					},
 					{
-						title: 'Cancellation letters of bank accounts / CCs',
+						title: '[6] Cancellation letters of bank accounts / CCs',
 						description: '<li>Account holder name</li><li>Account number</li><li>Issuing credit institution</li><li>CC digits</li><li>Issue date</li>'
 					},
 					{
-						title: 'Specific transactions on bank statements',
+						title: '[7] Specific transactions on bank statements',
 						description: '<li>Brief description of specific transaction</li>'
 					},
 					{
-						title: 'Proof of relation documents (eg birth certificates, marriage certificates)',
+						title: '[8] Proof of relation documents (eg birth certificates, marriage certificates)',
 						description: '<li>Type of doc</li><li>Names involved</li><li>Relation</li>'
 					},
 					{
-						title: 'Corporate: Company Info',
+						title: '[9] Corporate: Company Info',
 						description: '<li>Registered name</li><li>Incorporation date</li><li>Directors and Authorised Signatories</li><li>Shareholders/ Beneficial Owners</li><li>Registered AND Business address (if available)</li><li>Share capital</li><li>Any information on Directors and Shareholders</li>'
 					},
 					{
-						title: 'Corporate: Financial statements',
+						title: '[10] Corporate: Financial statements',
 						description: '<li>Profit & Loss: line by line translation</li><li>Balance sheet: line by line translation</li><li>Additional notes: line by line for all table type notes</li><li>Any information regarding payments to shareholders and directors</li>'
 					}
 				],
@@ -323,7 +333,8 @@
 				currentActive: -1,
 				sourceFiles: [],
 				refFiles: [],
-				currentTemplate: ''
+				currentTemplate: '',
+        selected: '',
 			}
 		},
 		methods: {
@@ -492,10 +503,17 @@
       isAm() {
 			  return this.user.group.name === 'Account Managers'
       },
-			setAM({ option }) {
+      approveChangeAM({ option }) {
+        this.selected = option
+      },
+      setDefault() {
+			  this.selected = ''
+      },
+			setAM() {
         if (!this.canUpdateRequest()) return
-        const am = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
-				try {
+        const am = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === this.selected)
+        this.selected = ''
+        try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": am } })
 					this.alertToggle({ message: "Account managers added!", isShow: true, type: "success" })
 				} catch (err) {
@@ -790,11 +808,9 @@
     }
 
     &__info {
-
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-      padding: 10px 20px 20px;
-      width: 369px;
-      max-width: 369px;
+      padding: 20px;
+      width: 400px;
       box-sizing: border-box;
       //height: fit-content;
       margin-left: 40px;
@@ -807,7 +823,16 @@
     padding: 20px;
     min-width: 1000px;
     max-width: 1000px;
+    box-sizing: border-box;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+
+    &__approve {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 1;
+    }
 
     &__wrapper {
       position: absolute;
@@ -1050,7 +1075,6 @@
     }
 
     &__subTitle {
-      opacity: 0.6;
       width: 170px;
     }
 

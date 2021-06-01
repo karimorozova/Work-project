@@ -261,7 +261,10 @@
         currentProject: 'getCurrentProject',
       }),
       canAddDR2Manager() {
-        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
+        return this.user.group.name === "Administrators"
+          || this.user.group.name === "Developers"
+          || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
+          || this.user._id === this.currentProject.accountManager._id
       },
 			isAllChecked() {
 				return !this.files.find(item => !item.isChecked)
