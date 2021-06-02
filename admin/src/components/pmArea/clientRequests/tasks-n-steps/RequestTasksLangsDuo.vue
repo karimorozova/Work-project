@@ -154,14 +154,13 @@
 				}
 			},
 			runPossibleTargetsForEditing() {
-				console.log('Watcher2')
-				const { taskData: { targets } } = this.currentProject.tasksAndSteps.filter(item => item.taskId === this.currentTaskId)
+				const { taskData: { targets } } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
 				this.targetAll = this.currentProject.requestForm.targetLanguages.filter(item => !targets.map(item => item.lang).includes(item.lang))
 				this.targetChosen.push(...targets)
 				this.$emit("setTargets", { targets: this.targetChosen })
+        this.$emit("endOfSettingTaskData")
 			},
 			runPossibleTargets() {
-				console.log('Watcher')
 				this.setPossibleTargets()
 				this.targetChosen = []
 			}

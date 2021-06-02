@@ -1,7 +1,7 @@
 <template lang="pug">
   .client-req__layout
     .main-wrapper
-      FormProject(:project="currentClientRequest")
+      Request(:project="currentClientRequest")
       RequestTasksAndSteps(
         :originallyLanguages="originallyLanguages"
         :originallyUnits="originallyUnits"
@@ -9,14 +9,14 @@
         :originallyServices="originallyServices"
       )
     .sub-wrapper
-      ProjectRequestSubInformation(:project="currentClientRequest")
+      RequestSubInformation(:project="currentClientRequest")
 
 </template>
 
 <script>
-import FormProject from "./subComponents/FormProject"
+import Request from "./subComponents/Request"
 import { mapGetters, mapActions } from "vuex"
-import ProjectSubInformation from "./subComponents/ProjectRequestSubInformation"
+import RequestSubInformation from "./subComponents/RequestSubInformation"
 import RequestTasksAndSteps from "./RequestTasksAndSteps";
 
 export default {
@@ -43,7 +43,7 @@ export default {
 	    originallyUnits: "getAllUnits",
     }),
   },
-  components: {RequestTasksAndSteps, ProjectSubInformation, FormProject }
+  components: {RequestTasksAndSteps, RequestSubInformation, Request }
 }
 </script>
 

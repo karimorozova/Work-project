@@ -23,10 +23,10 @@
           span.step-files__data.step-files__dataIcon(@click="removeFile(row.name, row.category, row.path)")
             img(src="../../../../assets/images/Other/delete-icon-qa-form.png")
 
-    .tasks-files__tableAdd
+    .tasks-files__tableAdd(id="add")
       Add(@add="openVaultModal")
 
-    .tasks-files__vault(v-if="isVaultModal")
+    .tasks-files__vault(v-if="isVaultModal" id="modal")
       .tasks-files__title Client's Vault
       .tasks-files__items
         span.tasks-files__close(@click="closeVaultModal") &#215;
@@ -55,9 +55,9 @@
           Button(@clicked="addFileToAllTypes" value="Add")
 
       .tasks-files__browse
-        Button(@clicked="openUploadModal()" id="add" value="Browse my computer" :color="'#938676'")
+        Button(@clicked="openUploadModal()" value="Browse my computer" :color="'#938676'")
 
-    .tasks-files__main(v-if="isUploadModal" id="modal")
+    .tasks-files__main(v-if="isUploadModal" id="modal2")
       .tasks-files__items
         span.tasks-files__close(@click="closeUploadModal") &#215;
         .tasks-files__item
@@ -105,6 +105,9 @@
 
 	export default {
 		props: {
+			currentTaskIdForUpdate: {
+				type: String
+      },
 			tasksData: {
 				type: Object
 			},
@@ -124,6 +127,8 @@
 					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "65%", padding: 0 },
 					{ label: "Category", headerKey: "headerCategory", key: "category", width: "30%", padding: 0 }
 				],
+        filesFromDB: [],
+
 				filesVaultAll: [],
 
 				sourceFiles: [],
@@ -199,11 +204,12 @@
 				this.isUploadModal = false
 			},
 			openUploadModal() {
-				this.isUploadModal = true
 				this.closeVaultModal()
+				this.isUploadModal = true
 			},
 			openVaultModal() {
 				this.isVaultModal = true
+				this.isUploadModal = false
 			},
 			closeVaultModal() {
 				this.isVaultModal = false
@@ -221,9 +227,9 @@
 				const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
-					if(this.currentProject.requestForm.service.title === 'Compliance'){
+					if (this.currentProject.requestForm.service.title === 'Compliance') {
 						return size / 1000000 <= 50
-					}else{
+					} else {
 						return size / 1000000 <= 2
 					}
 					// return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
@@ -303,6 +309,9 @@
 		computed: {
 			filesData() {
 				let filesArr = []
+				if(this.currentTaskIdForUpdate){
+					// const { sourceFiles, refFiles } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskIdForUpdate)
+        }
 				this.sourceFiles.forEach(elem => filesArr.push({ name: elem.name, category: 'Source' }))
 				this.sourceFilesVault.forEach(elem => filesArr.push({ name: elem.filename, category: 'Source', path: elem.path }))
 				this.refFiles.forEach(elem => filesArr.push({ name: elem.name, category: 'Reference' }))
@@ -357,7 +366,7 @@
   .tasks-files {
     position: relative;
 
-    &__title{
+    &__title {
       font-size: 18px;
       margin-bottom: 20px;
     }

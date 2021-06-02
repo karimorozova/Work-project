@@ -416,7 +416,7 @@
       cursor: default;
       font-size: 21px;
       height: 38px;
-      width: 40%;
+      width: 459px;
       color: #68573e;
       border: 1px solid white;
     }
@@ -471,7 +471,7 @@
       font-size: 21px;
       padding: 0 5px;
       height: 38px;
-      width: 40%;
+      width: 459px;
       border-radius: 5px;
       color: #68573E;
       border: 1px solid #68573E;
@@ -537,7 +537,7 @@
     }
 
     &__textarea {
-      width: 48%;
+      width: 471px;
     }
 
     &__text {

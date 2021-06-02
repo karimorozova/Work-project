@@ -1,7 +1,6 @@
 <template lang="pug">
   .tasks-data
     .tasks-data__main
-      //.tasks-data__item(v-if="originallySteps && originallyServices && originallyUnits && templates.length")
       .tasks-data__item(v-if="currentProject._id")
         RequestServiceAndWorkflow(
           :currentProject="currentProject"
@@ -34,6 +33,7 @@
               @setTargets="setTargets",
               :setPossibleTargetsAction="setPossibleTargetsAction"
               :currentTaskId="currentTaskId"
+              @endOfSettingTaskData="endOfSettingTaskData"
             )
 
         .tasks-data__services
@@ -63,6 +63,7 @@
         RequestTasksFiles(
           :tasksData="tasksData"
           :currentProject="currentProject"
+          :currentTaskIdForUpdate="currentTaskIdForUpdate"
         )
 
     .tasks-data__add-tasks
@@ -87,6 +88,7 @@
 
 	export default {
 		props: {
+			currentTaskIdForUpdate: { type: String },
 			currentTaskId: { type: String },
 			originallyLanguages: { type: Array },
 			originallyUnits: { type: Array },
@@ -104,9 +106,10 @@
 		},
 		methods: {
 			...mapActions([ "alertToggle", "setTasksDataValueRequest", "setRequestValue", "setCurrentClientRequest" ]),
-
+			endOfSettingTaskData() {
+        this.$emit('endOfSettingTaskData')
+			},
 			setSourceLang({ symbol }) {
-				console.log('setSourceLang => ')
 				const language = this.originallyLanguages.find((item) => item.symbol === symbol)
 				this.setTasksDataValueRequest({ prop: "source", value: language })
 				this.sourceLanguages = [ language.symbol ]
@@ -117,25 +120,18 @@
 				}, 1000)
 			},
 			setTargets({ targets }) {
-				console.log('setTargets => ')
 				this.setTasksDataValueRequest({ prop: "targets", value: targets })
 				this.targetLanguages = [ ...targets ]
 			},
-			isRefFilesHasSource() {
-				// const { sourceFiles, refFiles } = this.tasksData
-				// if (!refFiles || !refFiles.length) return false
-				// for (let file of refFiles) {
-				// 	const sourceFile = sourceFiles.find((item) => item.name === file.name)
-				// 	if (sourceFile) return true
-				// }
-				// return false
-			},
-			isValidQuantity(quantity) {
-				// if (!quantity) {
-				// 	return false
-				// }
-				// return /^[1-9]{1,}(\d{1,})?/.test(quantity)
-			},
+			// isRefFilesHasSource() {
+			// 	const { sourceFiles, refFiles } = this.tasksData
+			// 	if (!refFiles || !refFiles.length) return false
+			// 	for (let file of refFiles) {
+			// 		const sourceFile = sourceFiles.find((item) => item.name === file.name)
+			// 		if (sourceFile) return true
+			// 	}
+			// 	return false
+			// },
 			async checkForErrors() {
 				this.errors = []
 				const {
@@ -148,19 +144,23 @@
 					stepsAndUnits
 				} = this.tasksData
 
-        const allFiles = [...sourceFiles, ...refFiles]
-
 				if (workflow.id === 2917) {
 					if (stepsDates[0].deadline === "" || stepsDates[1].start === "") this.errors.push("Please, select tasks deadline.")
 				}
 
-        if (new Set(allFiles.map(({name})=> name)).size !== allFiles.length) this.errors.push("Please, do not select the same files.")
-
 				if (!this.isMonoService && !source) this.errors.push("Please, select Source language.")
 				if (stepsAndUnits == null) this.errors.push("Please, select Unit.")
 				if (!targets || !targets.length) this.errors.push("Please, select Target language(s).")
-				this.checkFiles(sourceFiles, refFiles)
+
+				if (this.currentUnit === "CAT Wordcount") {
+					if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).")
+				}
+
 				if (this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).")
+
+				if((refFiles && refFiles.length) && (sourceFiles && sourceFiles.length)) {
+					if (new Set( [...sourceFiles, ...refFiles].map(({name})=> name)).size !==  [...sourceFiles, ...refFiles].length) this.errors.push("Reference file cannot be the same as Source.")
+				}
 
 				const isUnitCAT = stepsAndUnits.map((i) => i.unit).includes("CAT Wordcount")
 
@@ -226,14 +226,6 @@
 				// reference file is not mandatory!
 				// if (this.currentUnit !== "CAT Wordcount" && !refFiles.length)
 				//   this.errors.push("Please, upload Reference file(s).");
-			},
-			checkFiles(sourceFiles, refFiles) {
-				if (this.currentUnit === "CAT Wordcount") {
-					if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).")
-					//REF FILES SAME AS SOURCE!
-					if (sourceFiles && sourceFiles.length && this.isRefFilesHasSource()) this.errors.push("Reference file cannot be the same as Source!")
-				}
-
 			},
 			// checkHoursSteps() {
 			//     if(this.currentUnit === 'Hours') {
@@ -336,7 +328,6 @@
 			// BigToggler
 		},
 		async created() {
-			// console.log({ testcreated: this.currentProject.customer })
 			// if (!this.currentProject.customer) {
 			// 	const curClientRequest = await this.$http.post(`/clients-requests/by-id/${ id }`)
 			// 	this.setCurrentClientRequest(curClientRequest.data)

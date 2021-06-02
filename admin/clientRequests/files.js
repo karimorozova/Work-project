@@ -23,7 +23,7 @@ async function storeRequestFiles(filesArr, requestId) {
 		let storedFiles = []
 		if (filesArr.length) {
 			for (let file of filesArr) {
-				const additionalName = `${ Math.floor(Math.random() * 1000000) }-${ file.filename.replace(/\s+/g, '_') }`
+				const additionalName = `${ Math.floor(Math.random() * 1000000) }-${ file.filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
 				const newPath = `/requestFiles/${ requestId }/${ additionalName }`
 				await moveFile(file, `./dist${ newPath }`)
 				storedFiles.push({ path: newPath, filename: additionalName, isCheck: false })
@@ -41,7 +41,7 @@ async function storeRequestFilesForTasksAndSteps(filesArr, requestId) {
 		let storedFiles = []
 		if (filesArr.length) {
 			for (let file of filesArr) {
-				const additionalName = `${ Math.floor(Math.random() * 1000000) }-${ file.filename.replace(/\s+/g, '_') }`
+				const additionalName = `${ Math.floor(Math.random() * 1000000) }-${ file.filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
 				const newPath = `/requestFiles/${ requestId }/${ additionalName }`
 				await moveFile(file, `./dist${ newPath }`)
 				storedFiles.push({ path: newPath, filename: additionalName })

@@ -3,13 +3,13 @@
     .content(v-if="currentClientRequest.status === 'Client Request'")
       FormLayoutCompliance
     .content(v-if="currentClientRequest.status === 'Request Approved'")
-      ProjectLayout
+      RequestLayout
 </template>
 
 <script>
 	import { mapGetters, mapActions } from "vuex"
 	import FormLayoutCompliance from "./FormLayoutCompliance"
-	import ProjectLayout from "./ProjectLayout"
+	import RequestLayout from "./RequestLayout"
 
 	export default {
 		data() {
@@ -33,7 +33,7 @@
 				currentClientRequest: "getCurrentClientRequest"
 			})
 		},
-		components: { ProjectLayout, FormLayoutCompliance },
+		components: { RequestLayout, FormLayoutCompliance },
 		created() {
 			this.getClientRequest()
 		},

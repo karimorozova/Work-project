@@ -1,5 +1,7 @@
 <template lang="pug">
   .tasks-steps
+    | 1 - {{ currentTaskId }}
+    | 2 - {{ currentTaskIdForUpdate }}
     .tasks-steps__tasks-title Tasks and Steps
       img.tasks-steps__arrow(src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
     div
@@ -10,7 +12,8 @@
         :originallySteps="originallySteps"
         :originallyServices="originallyServices"
         :currentTaskId="currentTaskId"
-        @setValue="setValue"
+        :currentTaskIdForUpdate="currentTaskIdForUpdate"
+        @endOfSettingTaskData="endOfSettingTaskData"
         @addTasks="addTasks"
         @showErrors="showErrors"
       )
@@ -132,6 +135,7 @@
 				isEditData: false,
 				selectedTab: 'Tasks',
 				currentTaskId: '',
+				currentTaskIdForUpdate: '',
 				fields1: [
 					{ label: "Task Id", headerKey: "headerId", key: "id", width: "20%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
@@ -161,32 +165,15 @@
 				"setCurrentClientRequest",
 				"setTasksDataValueRequest"
 			]),
+			endOfSettingTaskData(){
+				console.log('finish')
+				this.currentTaskId = ''
+      },
 			editTasksData(taskId) {
 				this.isEditData = true
-				// const { taskData } = this.currentProject.tasksAndSteps.find(item => item.taskId === taskId)
-        // this.currentTaskDataForAutofill = taskData
 				this.currentTaskId = taskId
+				this.currentTaskIdForUpdate = taskId
 				this.isTaskData = true
-
-
-				// { name: "1 Step", id: 2890 },
-				// { name: "2 Steps", id: 2917 }
-				// this.setTasksDataValueRequest({ prop: "service", value: taskData.service })
-				// this.setTasksDataValueRequest({ prop: "workflow", value: {id: +taskData.workflow, name: +taskData.workflow === 2890 ? '1 Step' : '2 Steps'} })
-
-				// this.setTasksDataValueRequest({ prop: "service", value: taskData.service })
-			},
-			setDataForUpdate() {
-				// const { taskData } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
-        // const { workflow, stepsAndUnits, stepsDates } = taskData
-				// this.setTasksDataValueRequest({ prop: "workflow", value: { id: +workflow, name: +workflow === 2890 ? '1 Step' : '2 Steps' } })
-				// this.setTasksDataValueRequest({ prop: "stepsAndUnits", value: stepsAndUnits })
-				// this.setTasksDataValueRequest({ prop: "stepsDates", value: stepsDates })
-				// // this.setTasksDataValueRequest({ prop: "source", value: source })
-				// // this.setTasksDataValueRequest({ prop: "targets", value: targets })
-				// console.log('finish')
-				// this.currentTaskId = null
-				// this.currentTaskDataForAutofill = {}
 			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false
@@ -208,19 +195,10 @@
 				this.isTaskData = !this.isTaskData
 				this.currentTaskId = ''
 			},
-			setValue({ option, prop }) {
-				// this[prop] = option
-			},
 			setTab({ index }) {
 				this.isTasksShow = index === 0
 				this.isStepsShow = !this.isTasksShow
 				this.selectedTab = this.tabs[index]
-			},
-			setVendor({ vendor, index }) {
-				// this.$emit("setVendor", { vendor, index })
-			},
-			setDate({ date, prop, index }) {
-				// this.$emit("setDate", { date, prop, index })
 			},
 
 			getDataForTasks(dataForTasks) {
@@ -240,8 +218,9 @@
 				return tasksData
 			},
 			async addTasks(dataForTasks) {
-				console.log('dataForTasks ===>>>> ', dataForTasks)
+				// console.log('dataForTasks ===>>>> ', dataForTasks)
 
+        // return
 				let tasksData = this.getDataForTasks(dataForTasks)
 				const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
 				const { sourceFiles, refFiles } = dataForTasks
@@ -351,7 +330,6 @@
 					}
 					return result
 				})
-				console.log(a.flat())
 				return a.flat()
 			},
 

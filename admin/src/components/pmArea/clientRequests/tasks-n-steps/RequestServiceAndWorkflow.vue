@@ -111,8 +111,6 @@
 				setDataValue: "setTasksDataValueRequest"
 			}),
 			setDefaultService() {
-				console.log('Start')
-				console.log(this.currentTaskId)
 				const service = this.currentProject.requestForm.service
 				this.service = service.title
 				if (!service.steps.length) return this.showError()
@@ -147,6 +145,17 @@
 				}
 			},
 			setDefaultStepsAndUnits(option) {
+				if (this.currentTaskId) {
+					const { taskData: { stepsAndUnits } } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
+					if (option === "2 Steps") {
+						this.stepsAndUnits = stepsAndUnits
+          }else{
+						this.stepsAndUnitsMono = stepsAndUnits
+          }
+					this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
+					return
+        }
+
 				let defaultStepsAndUnits
 				const currentSteps = this.services.find(item => item.title === this.service)
 
@@ -213,27 +222,43 @@
 				}
 			},
 			setWorkflow({ option }) {
-        const workflowSteps = this.workflowSteps.find((item) => item.name === option)
-				this.workFlowOption = workflowSteps.name
-				this.setDataValue({ prop: "workflow", value: workflowSteps })
+				if (this.currentTaskId) {
+					const { taskData: { workflow } } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
+					const name = +workflow === 2890 ? '1 Step' : '2 Steps'
+					this.workFlowOption = name
+					this.setDataValue({ prop: "workflow", value: { id: +workflow, name } })
+					if (+workflow === 2890) this.setNotDefaultStepDates()
+					else this.setDefaultStepDates()
+				} else {
+					const workflowSteps = this.workflowSteps.find((item) => item.name === option)
+					this.workFlowOption = workflowSteps.name
+					this.setDataValue({ prop: "workflow", value: workflowSteps })
+					if (+workflowSteps.id === 2890) this.setNotDefaultStepDates()
+					else this.setDefaultStepDates()
+				}
 				this.setDefaultStepsAndUnits(this.workFlowOption)
 				this.setDefaultTemplate()
-				workflowSteps.id === 2890 ? this.setNotDefaultStepDates() : this.setDefaultStepDates()
 			},
 			setNotDefaultStepDates() {
-				this.stepsDates = [
-					{ start: this.currentProject.startDate, deadline: this.currentProject.deadline },
-					{ start: "", deadline: "" }
-				]
-				let stepDates = { ...this.stepsDates[0], deadline: this.currentProject.deadline }
-				this.setDataValue({ prop: "stepsDates", value: [ stepDates ] })
+				if (this.currentTaskId) {
+					const { taskData: { stepsDates } } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
+					this.stepsDates = [ { start: stepsDates[0].start, deadline: stepsDates[0].deadline }, { start: "", deadline: "" } ]
+					this.setDataValue({ prop: "stepsDates", value: [ this.stepsDates[0] ] })
+				} else {
+					this.stepsDates = [ { start: this.currentProject.startDate, deadline: this.currentProject.deadline }, { start: "", deadline: "" } ]
+					let stepDates = { ...this.stepsDates[0], deadline: this.currentProject.deadline }
+					this.setDataValue({ prop: "stepsDates", value: [ stepDates ] })
+				}
 			},
 			setDefaultStepDates() {
-				this.stepsDates = [
-					{ start: this.currentProject.startDate, deadline: "" },
-					{ start: "", deadline: this.currentProject.deadline }
-				]
-				this.setDataValue({ prop: "stepsDates", value: this.stepsDates })
+				if (this.currentTaskId) {
+					const { taskData: { stepsDates } } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
+					this.stepsDates = [ { start: stepsDates[0].start, deadline: stepsDates[0].deadline }, { start: stepsDates[1].start, deadline: stepsDates[1].deadline } ]
+					this.setDataValue({ prop: "stepsDates", value: stepsDates })
+				} else {
+					this.stepsDates = [ { start: this.currentProject.startDate, deadline: "" }, { start: "", deadline: this.currentProject.deadline } ]
+					this.setDataValue({ prop: "stepsDates", value: this.stepsDates })
+				}
 			},
 			pushStepAndUnit(data) {
 				if (this.selectedWorkflow.id === 2890) {
