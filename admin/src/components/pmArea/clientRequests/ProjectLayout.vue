@@ -9,14 +9,14 @@
         :originallyServices="originallyServices"
       )
     .sub-wrapper
-      ProjectSubInformation(:project="currentClientRequest")
+      ProjectRequestSubInformation(:project="currentClientRequest")
 
 </template>
 
 <script>
 import FormProject from "./subComponents/FormProject"
 import { mapGetters, mapActions } from "vuex"
-import ProjectSubInformation from "../ProjectSubInformation"
+import ProjectSubInformation from "./subComponents/ProjectRequestSubInformation"
 import RequestTasksAndSteps from "./RequestTasksAndSteps";
 
 export default {

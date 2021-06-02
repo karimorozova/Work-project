@@ -148,9 +148,14 @@
 					stepsAndUnits
 				} = this.tasksData
 
+        const allFiles = [...sourceFiles, ...refFiles]
+
 				if (workflow.id === 2917) {
 					if (stepsDates[0].deadline === "" || stepsDates[1].start === "") this.errors.push("Please, select tasks deadline.")
 				}
+
+        if (new Set(allFiles.map(({name})=> name)).size !== allFiles.length) this.errors.push("Please, do not select the same files.")
+
 				if (!this.isMonoService && !source) this.errors.push("Please, select Source language.")
 				if (stepsAndUnits == null) this.errors.push("Please, select Unit.")
 				if (!targets || !targets.length) this.errors.push("Please, select Target language(s).")

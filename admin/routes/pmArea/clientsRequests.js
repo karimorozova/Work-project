@@ -7,7 +7,9 @@ const {
 	updateClientContacts,
 	uploadRequestFiles,
 	checkRequestedFiles,
-	manageClientContacts
+	manageClientContacts,
+  removeContactClientRequest,
+  sendMailToClient,
 } = require("../../clientRequests")
 
 const { upload } = require('../../utils')
@@ -144,6 +146,31 @@ router.post('/:id/delete', async (req, res) => {
 		console.log(err)
 		res.status(500).send('Something wrong with DB while getting requests!')
 	}
+})
+
+
+router.post('/:id/delete-contact/', async (req, res) => {
+	const { contactId} = { ...req.body }
+	const { id } = { ...req.params }
+	try {
+		await removeContactClientRequest({projectId: id, contactId})
+		const requests = await getClientRequestById( id)
+		res.send(requests)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB while getting requests!')
+	}
+})
+
+router.post('/contact-email', async (req, res) => {
+  const { id, contactId, template } = req.body
+  try {
+    await sendMailToClient({id, contactId, template})
+    res.send(true)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Error on sending message to client\'s contact')
+  }
 })
 
 

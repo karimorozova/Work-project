@@ -309,7 +309,7 @@
         this.closeErrors()
 
         if (!this.currentProjectName || (this.currentProjectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
-        if (new Set(this.files.map(({name})=> name)).size !== this.files.length) this.errors.push("Please, do not select some files.")
+        if (new Set(this.files.map(({name})=> name)).size !== this.files.length) this.errors.push("Please, do not select the same files.")
 
         if (this.errors.length > 0) {
           this.showError = true

@@ -23,7 +23,7 @@ const complianceService = async (formData, client) => {
 		industry,
 		customer: _id,
 		projectManager: null,
-		accountManager,
+		accountManager: null,
 		status: "Client Request",
 		brief,
 

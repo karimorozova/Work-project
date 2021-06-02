@@ -238,12 +238,15 @@
 				this.areErrorsExist = false
 			},
 			checkProjectName() {
-				const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/
+        const regex = /^([^\d\W]|[A-z])[\w \.]*$/
 				return regex.test(this.project.projectName)
 			},
 			async checkForErrors() {
 				this.errors = []
-				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+        if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())){
+          this.errors.push("Please, enter valid Project name.")
+          this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
+        }
 				if (!this.project.startDate) this.errors.push("Please, set the start date.")
 				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
 				if (!this.project.customer.name) this.errors.push("Please, select a Client.")

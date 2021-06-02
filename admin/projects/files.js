@@ -16,7 +16,8 @@ async function storeFiles(filesArr, projectId) {
         let storedFiles = [];
         if (filesArr && filesArr.length) {
           for (let file of filesArr) {
-            const newPath = `./dist/projectFiles/${projectId}/${tasks.length + 1}-${file.filename.replace(/\s+/g, '_')}`;
+            const additionFileInfo = `${Math.floor(Math.random()*1000000)}`;
+            const newPath = `./dist/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/( *[^\w\.]+ *)+/g, '_')}`;
             await moveProjectFile(file, newPath);
             storedFiles.push(newPath);
           }

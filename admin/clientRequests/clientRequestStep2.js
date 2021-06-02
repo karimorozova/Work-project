@@ -1,3 +1,4 @@
+const {sendEmail} = require("../utils");
 const { ClientRequest } = require("../models")
 const { getClientRequestById, getClientRequestAfterUpdate } = require("./getClientsRequests")
 
@@ -31,7 +32,24 @@ async function updateClientContacts({id, contact, oldContact}) {
   }
 }
 
+async function removeContactClientRequest({projectId, contactId}) {
+  return (await ClientRequest.updateOne(
+    { "_id": projectId},
+    {"$pull": {'clientContacts': {"_id": contactId } }}
+  ))
+}
+
+async function sendMailToClient({id, contactId, template}) {
+  const { clientContacts } = await ClientRequest.findOne({ _id: id })
+  const { email } = clientContacts.find(contact => contact._id.toString() === contactId.toString())
+  const subject = 'Pangea translation services'
+  await sendEmail({ to: email, subject }, template, true)
+}
+
+
 module.exports = {
   updateClientRequestProps,
   updateClientContacts,
+  removeContactClientRequest,
+  sendMailToClient,
 }

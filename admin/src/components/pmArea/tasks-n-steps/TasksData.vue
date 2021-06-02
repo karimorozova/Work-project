@@ -178,6 +178,10 @@
 				this.checkFiles(sourceFiles, refFiles)
 				if (this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).")
 
+        if(refFiles.length && sourceFiles.length) {
+          if (new Set( [...sourceFiles, ...refFiles].map(({name})=> name)).size !==  [...sourceFiles, ...refFiles].length) this.errors.push("Please, do not select the same files.")
+        }
+
 				const isUnitCAT = stepsAndUnits.map((i) => i.unit).includes("CAT Wordcount")
 				const isStepLanguageOnTargetLanguage = targets.map((i) => i.lang).includes(source.lang)
 

@@ -103,10 +103,10 @@
       .project__info-row.project_no-margin
         .project__textarea
           LabelValue(label="Project Brief" customClass="project_textarea")
-            textarea.project__text(type="text" rows="9" v-model="project.brief")
+            textarea.project__text(type="text" rows="9" v-model="project.brief" @change="updateBrief")
         .project__textarea
           LabelValue(label="Internal Notes" customClass="project_textarea")
-            textarea.project__text(type="text" rows="9" v-model="project.notes")
+            textarea.project__text(type="text" rows="9" v-model="project.notes"  @change="updateNotes")
 
       .project__button(v-if="!project.projectId")
         Button(
@@ -165,9 +165,24 @@
 				"setProjectDate",
 				"setCurrentProject"
 			]),
+      async updateBrief(e) {
+        const { value } = e.target
+        if (!this.project._id) {
+          return this.$emit('setValue', { prop: 'brief', option: value })
+        }
+        await this.setProjectProp({ prop: 'brief', value })
+      },
+      async updateNotes(e) {
+        const { value } = e.target
+        if (!this.project._id) {
+          return this.$emit('setValue', { prop: 'notes', option: value })
+        }
+        await this.setProjectProp({ prop: 'notes', value })
+      },
 			async changeProjectName(projectName) {
 				this.errors = []
 				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+				// if (!this.project.projectName || (this.project.projectName )) this.errors.push("Please, enter valid Project name.")
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					return
@@ -243,13 +258,16 @@
 				this.areErrorsExist = false
 			},
 			checkProjectName() {
-				const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/
+				const regex = /^([^\d\W]|[A-z])[\w \.]*$/
 				return regex.test(this.project.projectName)
 			},
 			async checkForErrors() {
-				this.errors = []
-				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
-				if (!this.project.startDate) this.errors.push("Please, set the start date.")
+        this.errors = []
+        if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())){
+          // this.errors.push("Please, enter valid Project name.")
+          this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
+        }
+        if (!this.project.startDate) this.errors.push("Please, set the start date.")
 				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
 				if (!this.project.customer.name) this.errors.push("Please, select a Client.")
 				if (!this.selectedIndustry) this.errors.push("Please, choose an industry.")
@@ -519,7 +537,7 @@
     }
 
     &__textarea {
-      width: 43%;
+      width: 48%;
     }
 
     &__text {

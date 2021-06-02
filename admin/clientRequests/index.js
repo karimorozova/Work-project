@@ -19,6 +19,8 @@ const {
 const {
   updateClientRequestProps,
   updateClientContacts,
+  removeContactClientRequest,
+  sendMailToClient,
 } =  require('./clientRequestStep2')
 
 const {
@@ -53,4 +55,6 @@ module.exports = {
 	updateClientRequestProps,
 	getClientRequestAfterUpdate,
   updateClientContacts,
+  removeContactClientRequest,
+  sendMailToClient,
 }
