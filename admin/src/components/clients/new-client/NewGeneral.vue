@@ -5,14 +5,14 @@
                 label.block-item__label.block-item_relative Company Name:
                     Asterisk(:customStyle="asteriskStyle")
                 input(type="text" placeholder="Company Name" v-model="client.name" :class="{'general-info_error-shadow': !client.name && isSaveClicked}")
-            .block-item
+            .block-item(v-if="!isIndividual")
                 label.block-item__label.block-item_relative Official Company Name:
                 input(type="text" placeholder="Official Company Name" v-model="client.officialCompanyName")
             .block-item
                 label.block-item__label.block-item_relative Email:
                     Asterisk(:customStyle="asteriskStyle")
                 input(type="text" placeholder="Email" v-model="client.email" :class="{'general-info_error-shadow': !client.email && isSaveClicked}")
-            .block-item
+            .block-item(v-if="!isIndividual")
                 label.block-item__label Website:
                 input(type="text" placeholder="Website" v-model="client.website")
             .block-item
@@ -21,7 +21,7 @@
                 .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.industries.length}")
                     MultiClientIndustrySelect(:selectedInd="client.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")
         .general-info__block
-            .block-item
+            .block-item(v-if="!isIndividual")
                 label.block-item__label.block-item_relative Time Zone:
                 .block-item__drop.block-item_medium-index
                     SelectSingle(
@@ -31,7 +31,7 @@
                         :options="timezoneData"
                         @chooseOption="setTimezone"
                     )
-            .block-item
+            .block-item(v-if="!isIndividual")
                 label.block-item__label.block-item_relative Native Language:
                 .block-item__drop
                     SelectSingle(
@@ -81,6 +81,10 @@ export default {
   props: {
     client: {
       type: Object
+    },
+    isIndividual: {
+      type: Boolean,
+      default: false
     },
     isSaveClicked: {
       type: Boolean

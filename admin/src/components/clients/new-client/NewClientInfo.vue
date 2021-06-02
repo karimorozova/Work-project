@@ -2,20 +2,25 @@
   .client-layout
     .new-client-info(v-if="clientShow")
       .buttons
-        .button
-          Button(value="Save" @clicked="checkForErrors")
-        .button
-          Button(value="Cancel" @clicked="cancel")
+        .buttons__radio
+          RadioButton.radio(name="Company" :selected="clientType" @toggleRadio="toggleRadio")
+          RadioButton.radio(name="Individual" :selected="clientType" @toggleRadio="toggleRadio")
+        .button-group
+          .button
+            Button(value="Save" @clicked="checkForErrors")
+          .button
+            Button(value="Cancel" @clicked="cancel")
       .title General Information
       .new-client-info__gen-info
         NewGeneral(
           :client="client"
+          :isIndividual="isIndividual"
           :isSaveClicked="isSaveClicked"
           :languages="languages"
           :timezones="timezones"
         )
-      .title Contact Details
-      .new-client-info__contacts-info(:class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
+      .title(v-if="!isIndividual") Contact Details
+      .new-client-info__contacts-info(v-if="!isIndividual" :class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
         NewContactsInfo(
           :client="client"
           @contactDetails="contactDetails"
@@ -45,8 +50,8 @@
           :isEmpty="isLeadEmpty"
         )
 
-      .title Billing Information
-      .new-client-info__billing
+      .title(v-if="!isIndividual") Billing Information
+      .new-client-info__billing(v-if="!isIndividual")
         NewClientBillInfo(
           :client="client"
           :errorFields="billErrors"
@@ -79,6 +84,7 @@
 	import { mapGetters, mapActions } from "vuex"
 	import vatChecker from "../../../mixins/Client/vatChecker"
 	import NewContactsInfo from "./NewContactsInfo"
+  import RadioButton from "../../RadioButton";
 
 	export default {
 		mixins: [ vatChecker ],
@@ -114,6 +120,7 @@
 				contractFile: [],
 				ndaFile: [],
 				documentsFiles: [],
+        clientType: 'Company',
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
 			}
 		},
@@ -122,6 +129,16 @@
 			this.getTimezones()
 		},
 		methods: {
+      toggleRadio({value}) {
+        this.clientType = value
+        if (value === "Individual") {
+          this.resetFieldsToIndividualType()
+        }
+      },
+      resetFieldsToIndividualType () {
+        this.client.industries = [this.industries.find(({name}) => name === "Other")]
+        this.client.leadSource = "Online Search"
+      },
 			async getLangs() {
 				try {
 					const result = await this.$http.get("/api/languages")
@@ -202,10 +219,10 @@
 				if (!this.client.industries.length) this.errors.push('Please, choose at least one industry.')
 				if (!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.')
 				if (!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.')
-				if (!this.client.contacts.length) this.errors.push('Please, add at least one contact.')
+				if (this.clientType !=="Individual" && !this.client.contacts.length) this.errors.push('Please, add at least one contact.')
 				if (!this.client.currency.length) this.errors.push('Please, add currency.')
 				if (this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.')
-				if (!this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.')
+				if (this.clientType !=="Individual" && !this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.')
 				if (!this.client.status) this.errors.push('Please, choose status.')
 				if (!this.client.leadSource) {
 					this.errors.push('Please, choose lead source.')
@@ -217,7 +234,7 @@
 				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) {
 					this.errors.push('Please provide a valid email in General Information.')
 				}
-				if (this.client.billingInfo.paymentType === '') {
+				if (this.clientType !=="Individual" && this.client.billingInfo.paymentType === '') {
 					this.errors.push('Please, add Payment type.')
 					this.billErrors.push('payment')
 				}
@@ -234,7 +251,7 @@
 				if (isSameEmailsExists) {
 					this.errors.push("A client with such Email already exists, the client's Email should be unique!")
 				}
-				if (this.client.website) {
+				if (this.clientType !=="Individual" && this.client.website) {
 					if (this.websiteRegEx.exec(this.client.website) === null) {
 						this.errors.push("The website field must contain a link")
 					}
@@ -251,8 +268,9 @@
 					this.isSaveClicked = true
 					return
 				}
-				await this.saveClient()
-			},
+				this.clientType === "Company" ? await this.saveClient() : await this.saveClientIndividual()
+
+      },
 
 			async checkSameClientEmails(clientEmail) {
 				const clientMails = await this.$http.get('/clientsapi/all-clients-emails')
@@ -264,6 +282,61 @@
 			uploadFiles(data) {
 				this.documentsFiles = data
 			},
+      async saveClientIndividual () {
+        let sendData = new FormData()
+
+
+        this.client.nativeLanguage = null
+        this.client.timeZone = null
+        this.client.website = ""
+        this.client.officialCompanyName = this.client.name
+        this.client.clientType = "Individual"
+
+        this.client.billingInfo= {
+              officialCompanyName: this.client.name,
+              vat: false,
+              vatId: '',
+              dueDate: '',
+              address: '',
+              invoiceSending: false,
+              paymentType: "PPP"
+        }
+
+        this.client.contacts = [{
+          leadContact: true,
+          firstName:  this.client.name,
+          surname: "",
+          password: "12345",
+          email: this.client.email,
+          gender: "",
+          position: "Manager",
+          phone: "",
+          photo: "",
+          whatsApp: "",
+          skype: "",
+          linkedIn: "",
+          country: "",
+          notes: "",
+        }]
+
+        sendData.append('client', JSON.stringify(this.client))
+        for (let i = 0; i < this.contactsPhotos.length; i++) {
+          sendData.append('photos', this.contactsPhotos[i])
+        }
+        for (const document of this.documentsFiles) {
+          sendData.append(document.category, document.file)
+        }
+        try {
+          // console.log(this.client)
+          const result = await this.$http.post('/clientsapi/update-client', sendData)
+          const newClient = { ...result.data.client }
+          await this.addNewClient(newClient)
+          this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
+          await this.$router.push(`/clients/details/${ newClient._id }`)
+        } catch (err) {
+          this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
+        }
+      },
 			async saveClient() {
 				let sendData = new FormData()
 
@@ -298,7 +371,8 @@
 		},
 		computed: {
 			...mapGetters({
-				allClients: "getClients"
+				allClients: "getClients",
+        industries: "getAllIndustries",
 			}),
 			selectedIndNames() {
 				let result = []
@@ -308,9 +382,13 @@
 					}
 				}
 				return result
-			}
+			},
+      isIndividual() {
+			  return this.clientType === 'Individual'
+      }
 		},
 		components: {
+      RadioButton,
 			NewContactsInfo,
 			NewGeneral,
 			Button,
@@ -371,7 +449,20 @@
   .buttons {
     margin-right: 10px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+
+    &__radio{
+      display: flex;
+
+      .radio {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .button-group {
+    display: flex;
     align-items: center;
   }
 

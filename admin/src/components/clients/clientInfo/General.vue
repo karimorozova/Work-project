@@ -5,14 +5,14 @@
         label.block-item__label.block-item_relative Company Name:
           Asterisk(:customStyle="asteriskStyle")
         input(type="text" placeholder="Company Name" :value="currentClient.name" @change="(e) => changeProperty(e, 'name')" :class="{'general-info_error-shadow': !currentClient.name && isSaveClicked}")
-      .block-item
+      .block-item(v-if="!isIndividual")
         label.block-item__label.block-item_relative Official Company Name:
         input(type="text" placeholder="Official Company Name" :value="currentClient.officialCompanyName" @change="(e) => changeProperty(e, 'officialCompanyName')")
       .block-item
         label.block-item__label.block-item_relative Email:
           Asterisk(:customStyle="asteriskStyle")
         input(type="text" placeholder="Email" :value="currentClient.email" @change="(e) => changeProperty(e, 'email')" :class="{'general-info_error-shadow': !currentClient.email && isSaveClicked}")
-      .block-item
+      .block-item(v-if="!isIndividual")
         label.block-item__label Website:
         input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
       .block-item
@@ -21,7 +21,7 @@
         .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
           MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")
     .general-info__block
-      .block-item
+      .block-item(v-if="!isIndividual")
         label.block-item__label.block-item_relative Time Zone:
         .block-item__drop.block-item_medium-index
           SelectSingle(
@@ -31,7 +31,7 @@
             :options="timezoneData"
             @chooseOption="setTimezone"
           )
-      .block-item
+      .block-item(v-if="!isIndividual")
         label.block-item__label.block-item_relative Native Language:
         .block-item__drop
           SelectSingle(
@@ -100,6 +100,10 @@
 		props: {
 			isSaveClicked: {
 				type: Boolean
+			},
+      isIndividual: {
+				type: Boolean,
+        default: true
 			},
 			languages: {
 				type: Array

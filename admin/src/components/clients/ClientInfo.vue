@@ -46,10 +46,14 @@
 
       .client-info__layout(v-else)
         .client-info__main-row
+          .client-info__radio
+            RadioButton.radio(name="Company" :selected="currentClientOverallData.clientType" @toggleRadio="toggleRadio")
+            RadioButton.radio(name="Individual" :selected="currentClientOverallData.clientType" @toggleRadio="toggleRadio")
           .title General Information
           .client-info__gen-info
             General(
               :isSaveClicked="isSaveClicked"
+              :isIndividual="isIndividual"
               :languages="languages"
               :timezones="timezones"
               :allClientAliases="aliases"
@@ -59,8 +63,8 @@
           .client-info__notes
             ClientsNotes
 
-          .title Contact Details
-          .client-info__contacts-info
+          .title(v-if="!isIndividual") Contact Details
+          .client-info__contacts-info(v-if="!isIndividual")
             ContactsInfo(
               :client="currentClientOverallData"
               @contactDetails="contactDetails"
@@ -134,8 +138,8 @@
           .client-info__sales
             ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
 
-          .title Billing Information
-          .client-info__billing
+          .title(v-if="!isIndividual") Billing Information
+          .client-info__billing(v-if="!isIndividual")
             ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
 
           .delete-approve(v-if="isApproveModal")
@@ -184,6 +188,7 @@
 	import AddNote from "./activity/AddNote"
 	import AllActivitiesModal from "./activity/AllActivitiesModal"
   import AllActivitiesFullScrean from "./activity/AllActivitiesFullScrean";
+  import RadioButton from "../RadioButton";
 
 	export default {
 		mixins: [ vatChecker ],
@@ -230,6 +235,7 @@
 
 				generalKeys: [
 					'name',
+          'clientType',
 					'officialCompanyName',
 					'email',
 					'website',
@@ -265,6 +271,9 @@
 			}
 		},
 		methods: {
+      toggleRadio({value}) {
+        this.storeClientPropertyOverallData({ prop: "clientType", value })
+      },
 			backToMainPage(){
 				this.fullActivityModal = false
       },
@@ -459,7 +468,9 @@
 					this.isSaveClicked = true
 					return
 				}
-				await this.updateClient()
+				this.currentClientOverallData.clientType !== 'Individual'
+          ? await this.updateClient()
+          : await this.updateClientIndividual()
 			},
 
 			async checkSameClientEmails(clientEmail, clientId) {
@@ -474,9 +485,74 @@
 				let clientForSave = { ...this.currentClient }
 				let keys = [ ...this.generalKeys ]
 				let billingKeys = [ ...this.billingKeys ]
-
 				for (let key of keys) clientForSave[key] = this.currentClientOverallData[key]
 				for (let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
+
+				let sendData = new FormData()
+				let dataForClient = clientForSave
+				this.getClientDocumentInfo().then(
+						(result) => (dataForClient.documents = result.data.documents)
+				)
+				sendData.append("client", JSON.stringify(dataForClient))
+				for (let i = 0; i < this.contactsPhotos.length; i++) {
+					sendData.append("photos", this.contactsPhotos[i])
+				}
+				try {
+					const result = await this.$http.post("/clientsapi/update-client", sendData)
+					const { client } = result.data
+
+					await this.storeClient(client)
+					await this.storeCurrentClient(client)
+					this.storeCurrentClientOverallData(client)
+
+					this.$socket.emit('updatedClientData', { _id: this.$route.params.id, data: this.currentClientOverallData })
+
+					this.alertToggle({
+						message: "Client info has been updated", isShow: true, type: "success"
+					})
+				} catch (err) {
+					this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
+				}
+			},
+
+			async updateClientIndividual() {
+				let clientForSave = { ...this.currentClient }
+				let keys = [ ...this.generalKeys ]
+				// let billingKeys
+				for (let key of keys) clientForSave[key] = this.currentClientOverallData[key]
+				// for (let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
+
+        clientForSave.nativeLanguage = null
+        clientForSave.timeZone = null
+        clientForSave.website = ""
+        clientForSave.officialCompanyName = this.currentClientOverallData.name
+
+        clientForSave.contacts = [{
+          leadContact: true,
+          firstName:  this.currentClientOverallData.name,
+          surname: "",
+          password: "12345",
+          email: this.currentClientOverallData.email,
+          gender: "",
+          position: "Manager",
+          phone: "",
+          photo: "",
+          whatsApp: "",
+          skype: "",
+          linkedIn: "",
+          country: "",
+          notes: "",
+        }]
+
+        clientForSave.billingInfo= {
+          officialCompanyName: this.currentClientOverallData.name,
+          vat: false,
+          vatId: '',
+          dueDate: '',
+          address: '',
+          invoiceSending: false,
+          paymentType: "PPP"
+        }
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
@@ -649,7 +725,10 @@
 				if (this.clientDataInCreated.targetLanguages.length) {
 					return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
 				}
-			}
+			},
+      isIndividual() {
+        return this.currentClientOverallData.clientType === 'Individual'
+      }
 
 		},
 		components: {
@@ -675,7 +754,8 @@
 			RatesParameters,
 			ClientsNotes,
 			AddTask,
-      AddNote
+      AddNote,
+      RadioButton
 		},
 		created() {
 			this.getClientInfoLangs()
@@ -782,6 +862,12 @@
     &__notes {
       box-sizing: border-box;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    }
+    &__radio{
+      display: flex;
+      .radio {
+        margin-right: 10px;
+      }
     }
 
     &__gen-info,
