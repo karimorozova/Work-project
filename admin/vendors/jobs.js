@@ -80,6 +80,10 @@ async function updateStepProp({ jobId, prop, value }) {
 		const steps = project.steps.map(item => {
 			if (item.id === jobId) {
 				item[prop] = value
+				
+				if(prop === "status" || value === "Accepted" || value === "Rejected" ) {
+				item.vendorsClickedOffer = [item.vendor]
+				}
 			}
 			return item
 		})

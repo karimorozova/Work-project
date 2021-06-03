@@ -471,6 +471,7 @@
 				this.currentClientOverallData.clientType !== 'Individual'
           ? await this.updateClient()
           : await this.updateClientIndividual()
+        this.refreshResultTable()
 			},
 
 			async checkSameClientEmails(clientEmail, clientId) {
@@ -842,7 +843,7 @@
     }
 
     &__date {
-      margin-top: 65px;
+      margin-top: 80px;
       margin-left: 40px;
       width: 390px;
       height: 270px;
