@@ -91,7 +91,7 @@ const createProjectFromRequest = async (requestId) => {
   })
 
   await createProjectFolder(createdProject.id)
-  await ClientRequest.updateOne( { _id: requestId }, { status: 'Closed' } )
+  // await ClientRequest.updateOne( { _id: requestId }, { status: 'Closed' } )
   return await getProject({ _id: createdProject.id })
 }
 
@@ -222,7 +222,6 @@ async function createTasks ({ tasksInfo, refFiles }) {
       stepsDates,
       project
     };
-    console.log(tasksInfo)
 
     if (stepsAndUnits.length === 2) {
       const onlyPackages = stepsAndUnits.every(({ unit }) => unit === "Packages");
@@ -244,6 +243,7 @@ async function createTasks ({ tasksInfo, refFiles }) {
 const autoCreatingTaskInProject = async (project, requestId) => {
   try {
     const { tasksAndSteps, industry, customer } = await getClientRequestById(requestId)
+    let iterator = 0
     for(let { refFiles, sourceFiles, taskData } of tasksAndSteps){
       const { stepsAndUnits, stepsDates, workflow, service, source, targets } = taskData
       const taskRefFiles = [
@@ -268,13 +268,14 @@ const autoCreatingTaskInProject = async (project, requestId) => {
 
       if (stepsAndUnits.length === 2) {
         const onlyPackages = stepsAndUnits.every(({ unit }) => unit === "Packages");
-        if (!onlyPackages) await createTasksAndStepsForCustomUnits(allInfo);
-        else await createTasksWithPackagesUnit(allInfo);
+        if (!onlyPackages) await createTasksAndStepsForCustomUnits(allInfo, iterator);
+        else await createTasksWithPackagesUnit(allInfo, iterator);
       } else {
         const [{ unit }] = stepsAndUnits;
-        if (unit !== "Packages") await createTasksAndStepsForCustomUnits(allInfo);
-        else await createTasksWithPackagesUnit(allInfo);
+        if (unit !== "Packages") await createTasksAndStepsForCustomUnits(allInfo, iterator);
+        else await createTasksWithPackagesUnit(allInfo, iterator);
       }
+      iterator++
     }
 
     return await getProject({ _id: project._id });
