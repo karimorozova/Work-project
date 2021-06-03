@@ -1,7 +1,5 @@
 <template lang="pug">
   .tasks-steps
-    | 1 - {{ currentTaskId }}
-    | 2 - {{ currentTaskIdForUpdate }}
     .tasks-steps__tasks-title Tasks and Steps
       img.tasks-steps__arrow(src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
     div
@@ -80,30 +78,14 @@
           template(slot="deadline" slot-scope="{ row, index }")
             .tasks__data {{ row.deadline }}
 
-    //.tasks-steps__tables
-    //  Tasks(v-if="currentProject.tasks.length && isTasksShow"
-    //    :allTasks="this.currentProject.tasks"
-    //    :originallyUnits="originallyUnits"
-    //    :originallySteps="originallySteps"
-    //    :originallyServices="originallyServices"
-    //    @showTab="showTab"
-    //    @updateTasks="updateTasks"
-    //  )
-    //  Steps(v-if="currentProject.steps.length && isStepsShow"
-    //    :allSteps="currentProject.steps"
-    //    :tasks="currentProject.tasks"
-    //    :originallyLanguages="originallyLanguages"
-    //    :originallyUnits="originallyUnits"
-    //    @setVendor="setVendor"
-    //    @setDate="setDate"
-    //    @showTab="showTab"
-    //  )
-    //  Button(v-if="currentProject.tasks.length && !isProjectFinished" :value="metricsButton" @clicked="getMetrics" :isDisabled="isDisabled")
+    .button(v-if="!isTaskData && currentTasks.length")
+      .button__convert
+        Button(value="Convert into Project" @clicked="convertIntoProject")
+
 </template>
 
 <script>
 	import RequestTasksData from "./tasks-n-steps/RequestTasksData"
-	// import Button from "../../Button"
 	// import Tasks from "./tasks-n-steps/Tasks"
 	// import Steps from "./tasks-n-steps/Steps"
 	import { mapGetters, mapActions } from 'vuex'
@@ -111,6 +93,7 @@
 	import Tabs from "../../Tabs"
 	import DataTable from "../../DataTable"
 	import moment from 'moment'
+	import Button from "../../Button"
 
 	export default {
 		props: {
@@ -165,18 +148,26 @@
 				"setCurrentClientRequest",
 				"setTasksDataValueRequest"
 			]),
-			async deleteTask(taskId){
-				try{
-          const updatedProject = await this.$http.delete(`/pm-manage/delete-request-tasks/${taskId}/${this.currentProject._id}`)
+			async convertIntoProject() {
+				try {
+					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
+          this.$router.push(`/project-details/${ projectId.data }`);
+				} catch (err) {
+					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
+				}
+			},
+			async deleteTask(taskId) {
+				try {
+					const updatedProject = await this.$http.delete(`/pm-manage/delete-request-tasks/${ taskId }/${ this.currentProject._id }`)
 					await this.setCurrentClientRequest(updatedProject.data)
 					this.alertToggle({ message: 'Task deleted!', isShow: true, type: "success" })
-        }catch (err) {
+				} catch (err) {
 					this.alertToggle({ message: 'Error on deleting task!', isShow: true, type: "error" })
 				}
-      },
-			endOfSettingTaskData(){
+			},
+			endOfSettingTaskData() {
 				this.currentTaskId = ''
-      },
+			},
 			editTasksData(taskId) {
 				this.isEditData = true
 				this.currentTaskId = taskId
@@ -203,6 +194,10 @@
 				this.isTaskData = !this.isTaskData
 				this.currentTaskId = ''
 				this.currentTaskIdForUpdate = ''
+				if (!this.isTaskData) {
+					//TODO: чистить и выбраные таргет языки
+					this.clearTasksDataRequest()
+				}
 			},
 			setTab({ index }) {
 				this.isTasksShow = index === 0
@@ -268,8 +263,8 @@
 					!!this.currentTaskIdForUpdate && tasksData.append('taskIdForUpdate', this.currentTaskIdForUpdate)
 
 					const updatedProject = !!this.currentTaskIdForUpdate ?
-              await this.$http.post('/pm-manage/update-request-tasks', tasksData) :
-              await this.$http.post('/pm-manage/request-tasks', tasksData)
+							await this.$http.post('/pm-manage/update-request-tasks', tasksData) :
+							await this.$http.post('/pm-manage/request-tasks', tasksData)
 
 					await this.setCurrentClientRequest(updatedProject.data)
 					this.isTaskData = false
@@ -361,16 +356,11 @@
 			}
 		},
 		components: {
+			Button,
 			DataTable,
 			Tabs,
 			ValidationErrors,
 			RequestTasksData
-			// Button,
-			// Tasks,
-			// Steps
-		},
-		created() {
-			// this.getServices()
 		},
 		mounted() {
 			this.setDefaultIsTaskData()
@@ -380,6 +370,14 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .button {
+    &__convert {
+      display: flex;
+      justify-content: center;
+      padding-top: 10px;
+    }
+  }
 
   .tasks-steps {
     box-sizing: border-box;

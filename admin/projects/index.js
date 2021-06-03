@@ -52,6 +52,8 @@ const {
 	createTasksFromRequest,
 	createRequestTasks,
 	updateRequestTasks,
+	createProjectFromRequest,
+	autoCreatingTaskInProject
 } = require('./create')
 
 // const {
@@ -99,6 +101,8 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	autoCreatingTaskInProject,
+	createProjectFromRequest,
 	updateRequestTasks,
 	createRequestTasks,
 	changeManagersDR1,

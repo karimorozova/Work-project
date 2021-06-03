@@ -69,6 +69,17 @@ const getTaskCopiedFiles = (requestId, arrFiles) => {
 	}, [])
 }
 
+const getTaskCopiedFilesFromRequestToProject = (projectId, requestId, arrFiles) => {
+	return arrFiles.reduce((acc, cur) => {
+		const originalName = cur.path.split("/").pop()
+		fs.copyFile(`./dist/requestFiles/${requestId}/${originalName}`, `./dist/projectFiles/${projectId}/${originalName}`, (err) => {
+			if (err) throw err;
+		});
+		acc.push( `./dist/projectFiles/${projectId}/${originalName}`)
+		return acc
+	}, [])
+}
+
 // async function addRequestFile({request, files, existingFile, prop}) {
 //     try {
 //         let requestFiles = request[prop];
@@ -124,6 +135,7 @@ module.exports = {
 	storeRequestFiles,
 	storeRequestFilesForTasksAndSteps,
 	getTaskCopiedFiles,
+	getTaskCopiedFilesFromRequestToProject,
 	// addRequestFile,
 	// removeRequestFile,
 	// removeRequestFiles,

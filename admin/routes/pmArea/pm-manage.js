@@ -62,7 +62,9 @@ const {
 	generateAndSaveCertificate,
 	getFilteredProjects,
 	createRequestTasks,
-	updateRequestTasks
+	updateRequestTasks,
+	createProjectFromRequest,
+	autoCreatingTaskInProject
 } = require('../../projects')
 
 const {
@@ -229,6 +231,18 @@ router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), 
 	}
 })
 
+router.post('/convert-request-into-project', async (req, res) => {
+	try {
+		const { projectId: requestId } = req.body
+		const project = await createProjectFromRequest(requestId)
+		await autoCreatingTaskInProject(project, requestId)
+		res.send(project._id)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on converting project')
+	}
+})
+
 router.post('/request-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
 		let tasksInfo = { ...req.body }
@@ -293,8 +307,8 @@ router.post('/project-tasks', upload.fields([ { name: 'sourceFiles' }, { name: '
 		if (tasksInfo.source) tasksInfo.source = JSON.parse(tasksInfo.source)
 		tasksInfo.targets = JSON.parse(tasksInfo.targets)
 		tasksInfo.service = JSON.parse(tasksInfo.service)
-		const { sourceFiles } = req.files
-		const updatedProject = await createTasks({ tasksInfo, sourceFiles })
+		const { sourceFiles, refFiles } = req.files
+		const updatedProject = await createTasks({ tasksInfo, refFiles })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)

@@ -25,7 +25,8 @@ const {
 
 const {
 	storeRequestFilesForTasksAndSteps,
-	getTaskCopiedFiles
+	getTaskCopiedFiles,
+	getTaskCopiedFilesFromRequestToProject,
 } = require('./files')
 
 
@@ -37,6 +38,7 @@ module.exports = {
 	manageClientContacts,
 	storeRequestFilesForTasksAndSteps,
 	getTaskCopiedFiles,
+	getTaskCopiedFilesFromRequestToProject,
 	// getClientRequest,
 	// getClientRequests,
 	// updateClientRequest,

@@ -82,7 +82,6 @@
     .drops
       .drops__item
         .drops__label Account Manager:
-          img.drops__assigned-icon(v-if="!project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
         .drops__menu(v-if="!isProjectFinished")
           SelectSingle(
             :options="accManagers"
@@ -92,7 +91,6 @@
         .drops__menuTitle(v-else) {{ selectedAccManager }}
       .drops__item
         .drops__label Project Manager:
-          img.drops__assigned-icon(v-if="project.isAssigned && project.requestId" src="../../assets/images/Other/assigned_status.png")
         .drops__menu(v-if="!isProjectFinished")
           SelectSingle(
             :options="projManagers"

@@ -5,7 +5,7 @@ const { createTasksAndStepsForCustomUnits } = require('./taskForCommon');
 const { storeFiles } = require('./files');
 const { getModifiedFiles, createProjectFolder } = require('./helpers');
 const { calculateCrossRate } = require('../helpers/commonFunctions')
-const { storeRequestFilesForTasksAndSteps, getTaskCopiedFiles,  getClientRequestAfterUpdate, getClientRequestById} = require('../clientRequests')
+const { storeRequestFilesForTasksAndSteps, getTaskCopiedFiles, getTaskCopiedFilesFromRequestToProject,  getClientRequestAfterUpdate, getClientRequestById} = require('../clientRequests')
 const fs = require('fs')
 
 const moment = require('moment');
@@ -49,6 +49,52 @@ async function createProject(project, user) {
   }
 }
 
+const createProjectFromRequest = async (requestId) => {
+  let todayStart = new Date()
+  todayStart.setUTCHours(0, 0, 0, 0)
+  let todayEnd = new Date(todayStart)
+  todayEnd.setUTCHours(23, 59, 59, 0)
+
+  const request = await getClientRequestById(requestId)
+  const { projectManager, accountManager, paymentProfile, clientContacts, projectName, isUrgent, brief, notes, startDate, deadline, billingDate, industry, customer } = request
+  const { discounts, minPrice, currency } = customer
+
+  const { USD, GBP } = await CurrencyRatio.findOne()
+  const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lt: todayEnd } })
+  const nextNumber = todayProjects.length < 10 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]"
+
+  let project = {
+    requestId: request._id,
+    projectName,
+    industry,
+    customer,
+    startDate,
+    deadline,
+    billingDate,
+    notes,
+    brief,
+    isUrgent,
+    status: "Draft",
+    projectId: "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber,
+    projectManager,
+    accountManager,
+    paymentProfile,
+    clientContacts,
+    discounts,
+    minimumCharge: { value: minPrice, toIgnore: false },
+    crossRate: calculateCrossRate(USD, GBP),
+    projectCurrency: currency
+  }
+
+  const createdProject = await Projects.create({
+    ...project
+  })
+
+  await createProjectFolder(createdProject.id)
+  await ClientRequest.updateOne( { _id: requestId }, { status: 'Closed' } )
+  return await getProject({ _id: createdProject.id })
+}
+
 const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) => {
   const { requestId: _id, taskIdForUpdate } = tasksInfo
   const { projectId, tasksAndSteps } = await getClientRequestById(_id)
@@ -67,8 +113,6 @@ const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
   delete tasksInfo.sourceFilesVault
   delete tasksInfo.requestId
   delete tasksInfo.taskIdForUpdate
-
-  console.log(taskIdForUpdate)
 
   let existingTasksIds = tasksAndSteps.map(item => item.taskId).filter(item => item !== taskIdForUpdate).map(item => /\d*$/ig.exec(item)[0]).map(item => {
     const [first, ...rest] = item;
@@ -100,7 +144,7 @@ const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
     if(existingTasksIds.includes(num)) return req(num+1)
     else return num
   }
-  
+
   function copyFiles(key, arr) {
     if(key) arr.push(...getTaskCopiedFiles(_id, JSON.parse(key)))
   }
@@ -178,27 +222,65 @@ async function createTasks ({ tasksInfo, refFiles }) {
       stepsDates,
       project
     };
+    console.log(tasksInfo)
+
     if (stepsAndUnits.length === 2) {
-      const onlyPackages = stepsAndUnits.every(
-        ({ unit }) => unit === "Packages"
-      );
-      if (!onlyPackages) {
-        await createTasksAndStepsForCustomUnits(allInfo);
-      } else {
-        await createTasksWithPackagesUnit(allInfo);
-      }
+      const onlyPackages = stepsAndUnits.every(({ unit }) => unit === "Packages");
+      if (!onlyPackages) await createTasksAndStepsForCustomUnits(allInfo);
+       else await createTasksWithPackagesUnit(allInfo);
     } else {
       const [{ unit }] = stepsAndUnits;
-      if (unit !== "Packages") {
-        await createTasksAndStepsForCustomUnits(allInfo);
-      } else {
-        await createTasksWithPackagesUnit(allInfo);
-      }
+      if (unit !== "Packages") await createTasksAndStepsForCustomUnits(allInfo);
+      else await createTasksWithPackagesUnit(allInfo);
     }
+
     return await getProject({ _id: tasksInfo.projectId });
   } catch (err) {
     console.log(err);
     console.log("Error in createTasks");
+  }
+}
+
+const autoCreatingTaskInProject = async (project, requestId) => {
+  try {
+    const { tasksAndSteps, industry, customer } = await getClientRequestById(requestId)
+    for(let { refFiles, sourceFiles, taskData } of tasksAndSteps){
+      const { stepsAndUnits, stepsDates, workflow, service, source, targets } = taskData
+      const taskRefFiles = [
+        ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, sourceFiles),
+        ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, refFiles)
+      ]
+      const allInfo = {
+        taskRefFiles,
+        stepsAndUnits,
+        stepsDates,
+        workflow,
+        service,
+        source,
+        targets,
+        customerName: customer.name,
+        projectName: project.projectName,
+        projectId: project._id,
+        industry: industry.name,
+        projectManager: (project.projectManager._id).toString(),
+        project
+      }
+
+      if (stepsAndUnits.length === 2) {
+        const onlyPackages = stepsAndUnits.every(({ unit }) => unit === "Packages");
+        if (!onlyPackages) await createTasksAndStepsForCustomUnits(allInfo);
+        else await createTasksWithPackagesUnit(allInfo);
+      } else {
+        const [{ unit }] = stepsAndUnits;
+        if (unit !== "Packages") await createTasksAndStepsForCustomUnits(allInfo);
+        else await createTasksWithPackagesUnit(allInfo);
+      }
+    }
+
+    return await getProject({ _id: project._id });
+  } catch (err) {
+    console.log(err);
+    console.log("Error in autoCreatingTaskInProject");
   }
 }
 
@@ -247,5 +329,7 @@ module.exports = {
   createProject,
   createTasks,
   createTasksFromRequest,
-  createRequestTasks
+  createRequestTasks,
+  createProjectFromRequest,
+  autoCreatingTaskInProject
 };
