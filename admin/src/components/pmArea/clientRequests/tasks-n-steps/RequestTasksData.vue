@@ -67,7 +67,7 @@
         )
 
     .tasks-data__add-tasks
-      Button(value="Add tasks", @clicked="checkForErrors")
+      Button(:value="!!currentTaskIdForUpdate ? 'Update Tasks' : 'Add Tasks' ", @clicked="checkForErrors")
 
 </template>
 

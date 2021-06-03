@@ -49,8 +49,67 @@ async function createProject(project, user) {
   }
 }
 
-async function createRequestTasks({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) {
-  try {
+const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) => {
+  const { requestId: _id, taskIdForUpdate } = tasksInfo
+  const { projectId, tasksAndSteps } = await getClientRequestById(_id)
+  for (let key of [ 'stepsAndUnits', 'stepsDates', 'service', 'source', 'targets' ]) {
+    tasksInfo[key] = JSON.parse(tasksInfo[key])
+  }
+  const currIdx  = tasksAndSteps.findIndex(item => item.taskId === taskIdForUpdate)
+  let { refFiles, sourceFiles } = tasksAndSteps[currIdx]
+
+  await setFiles(sourceUploadFiles, sourceFiles)
+  await setFiles(refUploadFiles, refFiles)
+  copyFiles(tasksInfo.sourceFilesVault, sourceFiles)
+  copyFiles(tasksInfo.refFilesVault, refFiles)
+
+  delete tasksInfo.refFilesVault
+  delete tasksInfo.sourceFilesVault
+  delete tasksInfo.requestId
+  delete tasksInfo.taskIdForUpdate
+
+  console.log(taskIdForUpdate)
+
+  let existingTasksIds = tasksAndSteps.map(item => item.taskId).filter(item => item !== taskIdForUpdate).map(item => /\d*$/ig.exec(item)[0]).map(item => {
+    const [first, ...rest] = item;
+    return +rest[0]
+  })
+
+  const tasksAndStepsForSave = tasksInfo.targets.map(item => {
+    delete tasksInfo.targets
+    return {
+      targets: [ item ],
+      ...tasksInfo
+    }
+  }).map(item => {
+    const id = !existingTasksIds.length ? 1 : req(1)
+    existingTasksIds.push(id)
+    const taskId = projectId +  `${id < 10 ? ` T0${id}` : ` T${id}`}`
+    return {
+      taskId,
+      taskData: { ...item },
+      refFiles,
+      sourceFiles
+    }
+  })
+  tasksAndSteps.splice(currIdx, 1, ...tasksAndStepsForSave)
+
+  return await getClientRequestAfterUpdate({_id}, { tasksAndSteps })
+
+  function req(num){
+    if(existingTasksIds.includes(num)) return req(num+1)
+    else return num
+  }
+  
+  function copyFiles(key, arr) {
+    if(key) arr.push(...getTaskCopiedFiles(_id, JSON.parse(key)))
+  }
+  async function setFiles(key, arr) {
+    if(key) arr.push(...await storeRequestFilesForTasksAndSteps(key, _id))
+  }
+}
+
+const createRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) => {
     const { requestId: _id } = tasksInfo
     const { projectId, tasksAndSteps } = await getClientRequestById(_id)
     for (let key of [ 'stepsAndUnits', 'stepsDates', 'service', 'source', 'targets' ]) {
@@ -58,15 +117,19 @@ async function createRequestTasks({ tasksInfo, sourceFiles: sourceUploadFiles, r
     }
 
     let [ refFiles, sourceFiles ] = [ [], [] ]
-    if(tasksInfo.sourceFilesVault) sourceFiles.push(...getTaskCopiedFiles(_id, JSON.parse(tasksInfo.sourceFilesVault)))
-    if(tasksInfo.refFilesVault) refFiles.push(...getTaskCopiedFiles(_id, JSON.parse(tasksInfo.refFilesVault)))
-
-    if(sourceUploadFiles) sourceFiles.push(...await storeRequestFilesForTasksAndSteps(sourceUploadFiles, _id))
-    if(refUploadFiles) refFiles.push(...await storeRequestFilesForTasksAndSteps(refUploadFiles, _id))
+    copyFiles(tasksInfo.sourceFilesVault, sourceFiles)
+    copyFiles(tasksInfo.refFilesVault, refFiles)
+    await setFiles(sourceUploadFiles, sourceFiles)
+    await setFiles(refUploadFiles, refFiles)
 
     delete tasksInfo.refFilesVault
     delete tasksInfo.sourceFilesVault
     delete tasksInfo.requestId
+
+    let existingTasksIds = tasksAndSteps.map(item => item.taskId).map(item => /\d*$/ig.exec(item)[0]).map(item => {
+      const [first, ...rest] = item;
+      return +rest[0]
+    })
 
     const tasksAndStepsForSave = tasksInfo.targets.map(item => {
       delete tasksInfo.targets
@@ -74,10 +137,13 @@ async function createRequestTasks({ tasksInfo, sourceFiles: sourceUploadFiles, r
         targets: [ item ],
         ...tasksInfo
       }
-    }).map(item => {
+    }).map((item) => {
+      const id = !existingTasksIds.length ? 1 : req(1)
+      existingTasksIds.push(id)
+      const taskId = projectId +  `${id < 10 ? ` T0${id}` : ` T${id}`}`
       return {
-        taskId: projectId + `${tasksAndSteps.length < 10 ? ` T0${tasksAndSteps.length + 1}` : ` T${tasksAndSteps.length + 1}`}`,
-        taskData: { ...item, },
+        taskId,
+        taskData: { ...item },
         refFiles,
         sourceFiles
       }
@@ -87,10 +153,16 @@ async function createRequestTasks({ tasksInfo, sourceFiles: sourceUploadFiles, r
       $push: { "tasksAndSteps": tasksAndStepsForSave }
     })
 
-  } catch (err) {
-    console.log(err)
-    console.log("Error in createTasks")
-  }
+    function req(num){
+      if(existingTasksIds.includes(num)) return req(num+1)
+      else return num
+    }
+    function copyFiles(key, arr) {
+      if(key) arr.push(...getTaskCopiedFiles(_id, JSON.parse(key)))
+    }
+    async function setFiles(key, arr) {
+      if(key) arr.push(...await storeRequestFilesForTasksAndSteps(key, _id))
+    }
 }
 
 async function createTasks ({ tasksInfo, refFiles }) {
@@ -129,7 +201,6 @@ async function createTasks ({ tasksInfo, refFiles }) {
     console.log("Error in createTasks");
   }
 }
-
 
 async function createTasksFromRequest ({ project, dataForTasks, isWords }) {
   // const stepsAndUnits = JSON.parse(dataForTasks.stepsAndUnits);
@@ -171,8 +242,8 @@ async function createTasksFromRequest ({ project, dataForTasks, isWords }) {
   // }
 }
 
-
 module.exports = {
+  updateRequestTasks,
   createProject,
   createTasks,
   createTasksFromRequest,

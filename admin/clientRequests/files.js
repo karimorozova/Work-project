@@ -63,7 +63,7 @@ const getTaskCopiedFiles = (requestId, arrFiles) => {
 			if (err) throw err;
 		});
 
-		acc.push({ fileName: newFileName, path: `/projectFiles/${requestId}/${newFileName}`, })
+		acc.push({ filename: newFileName, path: `/requestFiles/${requestId}/${newFileName}`, })
 
 		return acc
 	}, [])

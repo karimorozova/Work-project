@@ -20,8 +20,11 @@
         template(slot="category" slot-scope="{ row, index }")
           span.step-files__data {{ row.category }}
         template(slot="icon" slot-scope="{ row, index }")
-          span.step-files__data.step-files__dataIcon(@click="removeFile(row.name, row.category, row.path)")
-            img(src="../../../../assets/images/Other/delete-icon-qa-form.png")
+          .step-files__icons
+            span.step-files__data.step-files__dataIcon(v-if="!!row.path" @click="downloadFile(row.path)")
+              img(src="../../../../assets/images/latest-version/download-file.png" )
+            span.step-files__data.step-files__dataIcon(@click="removeFile(row)")
+              img(src="../../../../assets/images/Other/delete-icon-qa-form.png")
 
     .tasks-files__tableAdd(id="add")
       Add(@add="openVaultModal")
@@ -107,7 +110,7 @@
 		props: {
 			currentTaskIdForUpdate: {
 				type: String
-      },
+			},
 			tasksData: {
 				type: Object
 			},
@@ -127,9 +130,11 @@
 					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "65%", padding: 0 },
 					{ label: "Category", headerKey: "headerCategory", key: "category", width: "30%", padding: 0 }
 				],
-        filesFromDB: [],
 
 				filesVaultAll: [],
+
+				sourceFilesFromDB: [],
+				refFilesFromDB: [],
 
 				sourceFiles: [],
 				refFiles: [],
@@ -151,15 +156,31 @@
 			}
 		},
 		mounted() {
-			this.filesVaultAll = [
-				...this.currentProject.requestForm.sourceFiles.map(item => ({ ...item, category: 'Source', isCheck: false })),
-				...this.currentProject.requestForm.refFiles.map(item => ({ ...item, category: 'Reference', isCheck: false }))
-			]
+			this.setFiles()
 		},
 		methods: {
 			...mapActions({
-				setDataValue: "setTasksDataValueRequest"
+				setDataValue: "setTasksDataValueRequest",
+				setCurrentClientRequest: "setCurrentClientRequest",
+				alertToggle: "alertToggle"
 			}),
+			downloadFile(path) {
+				let link = document.createElement('a')
+				link.href = __WEBPACK__API_URL__ + path
+				link.target = "_blank"
+				link.click()
+			},
+			setFiles() {
+				this.filesVaultAll = [
+					...this.currentProject.requestForm.sourceFiles.map(item => ({ ...item, category: 'Source', isCheck: false })),
+					...this.currentProject.requestForm.refFiles.map(item => ({ ...item, category: 'Reference', isCheck: false }))
+				]
+				if (this.currentTaskIdForUpdate) {
+					const { sourceFiles, refFiles } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskIdForUpdate)
+					this.sourceFilesFromDB = sourceFiles.map(item => ({ ...item, fromDB: true }))
+					this.refFilesFromDB = refFiles.map(item => ({ ...item, fromDB: true }))
+				}
+			},
 			addFileToAllTypes() {
 				const mappedFilesVault = [ ...this.sourceFilesVault.map(item => item.filename), ...this.refFilesVault.map(item => item.filename) ]
 
@@ -183,7 +204,23 @@
 			toggle(e, index, bool) {
 				this.filesVaultAll[index].isCheck = bool
 			},
-			removeFile(name, category, path) {
+			async removeFile({ name, category, path, fromDB }) {
+				if (fromDB) {
+					try {
+						const updatedProject = await this.$http.post('/pm-manage/remove-request-file', {
+							_id: this.currentProject._id,
+							taskId: this.currentTaskIdForUpdate,
+							category,
+							path
+						})
+						await this.setCurrentClientRequest(updatedProject.data)
+						this.setFiles()
+						this.alertToggle({ message: 'File deleted!', isShow: true, type: "success" })
+					} catch (err) {
+						this.alertToggle({ message: 'Files error', isShow: true, type: "error" })
+					}
+					return
+				}
 				if (!path) {
 					if (category === 'Source') {
 						this.deleteFile({ index: this.sourceFiles.findIndex(item => item.name === name) }, 'sourceFiles')
@@ -309,9 +346,10 @@
 		computed: {
 			filesData() {
 				let filesArr = []
-				if(this.currentTaskIdForUpdate){
-					// const { sourceFiles, refFiles } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskIdForUpdate)
-        }
+				if (this.currentTaskIdForUpdate) {
+					this.sourceFilesFromDB.forEach(elem => filesArr.push({ name: elem.filename, category: 'Source', path: elem.path, fromDB: elem.fromDB }))
+					this.refFilesFromDB.forEach(elem => filesArr.push({ name: elem.filename, category: 'Reference', path: elem.path, fromDB: elem.fromDB }))
+				}
 				this.sourceFiles.forEach(elem => filesArr.push({ name: elem.name, category: 'Source' }))
 				this.sourceFilesVault.forEach(elem => filesArr.push({ name: elem.filename, category: 'Source', path: elem.path }))
 				this.refFiles.forEach(elem => filesArr.push({ name: elem.name, category: 'Reference' }))
@@ -351,6 +389,12 @@
   }
 
   .step-files {
+    &__icons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
     &__data {
       display: flex;
       align-items: center;

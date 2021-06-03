@@ -26,8 +26,8 @@
         DataTable(
           :fields="fields1"
           :tableData="currentTasks"
-          :bodyClass="currentTasks.length < 6 ? 'tbody_visible-overflow' : ''"
-          :tableheadRowClass="currentTasks.length < 6 ? 'tbody_visible-overflow' : ''"
+          :bodyClass="currentTasks.length < 7 ? 'tbody_visible-overflow' : ''"
+          :tableheadRowClass="currentTasks.length < 7 ? 'tbody_visible-overflow' : ''"
           bodyRowClass="steps-table-row"
         )
           template(v-for="field in fields1", :slot="field.headerKey", slot-scope="{ field }")
@@ -51,15 +51,15 @@
             .tasks__icons
               .tasks__icon(@click="editTasksData(row.taskId)")
                 img(src="../../../assets/images/Other/edit-icon-qa.png")
-              .tasks__icon
+              .tasks__icon(@click="deleteTask(row.taskId)")
                 img(src="../../../assets/images/latest-version/delete-icon.png")
 
       .tasks__table(v-if="isStepsShow")
         DataTable(
           :fields="fields2"
           :tableData="currentSteps"
-          :bodyClass="currentSteps.length < 6 ? 'tbody_visible-overflow' : ''"
-          :tableheadRowClass="currentSteps.length < 6 ? 'tbody_visible-overflow' : ''"
+          :bodyClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
+          :tableheadRowClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
           bodyRowClass="steps-table-row"
         )
           template(v-for="field in fields2", :slot="field.headerKey", slot-scope="{ field }")
@@ -165,8 +165,16 @@
 				"setCurrentClientRequest",
 				"setTasksDataValueRequest"
 			]),
+			async deleteTask(taskId){
+				try{
+          const updatedProject = await this.$http.delete(`/pm-manage/delete-request-tasks/${taskId}/${this.currentProject._id}`)
+					await this.setCurrentClientRequest(updatedProject.data)
+					this.alertToggle({ message: 'Task deleted!', isShow: true, type: "success" })
+        }catch (err) {
+					this.alertToggle({ message: 'Error on deleting task!', isShow: true, type: "error" })
+				}
+      },
 			endOfSettingTaskData(){
-				console.log('finish')
 				this.currentTaskId = ''
       },
 			editTasksData(taskId) {
@@ -194,6 +202,7 @@
 			toggleTaskData() {
 				this.isTaskData = !this.isTaskData
 				this.currentTaskId = ''
+				this.currentTaskIdForUpdate = ''
 			},
 			setTab({ index }) {
 				this.isTasksShow = index === 0
@@ -218,9 +227,6 @@
 				return tasksData
 			},
 			async addTasks(dataForTasks) {
-				// console.log('dataForTasks ===>>>> ', dataForTasks)
-
-        // return
 				let tasksData = this.getDataForTasks(dataForTasks)
 				const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
 				const { sourceFiles, refFiles } = dataForTasks
@@ -259,14 +265,22 @@
 			},
 			async saveProjectTasks(tasksData) {
 				try {
-					const updatedProject = await this.$http.post('/pm-manage/request-tasks', tasksData)
-					this.setCurrentClientRequest(updatedProject.data)
+					!!this.currentTaskIdForUpdate && tasksData.append('taskIdForUpdate', this.currentTaskIdForUpdate)
+
+					const updatedProject = !!this.currentTaskIdForUpdate ?
+              await this.$http.post('/pm-manage/update-request-tasks', tasksData) :
+              await this.$http.post('/pm-manage/request-tasks', tasksData)
+
+					await this.setCurrentClientRequest(updatedProject.data)
 					this.isTaskData = false
 					this.clearTasksDataRequest()
+					!!this.currentTaskIdForUpdate && this.alertToggle({ message: 'Task updated!', isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" })
+					this.alertToggle({ message: 'Error on creating/updating task', isShow: true, type: "error" })
 				} finally {
 					this.isInfo = false
+					this.currentTaskId = ''
+					this.currentTaskIdForUpdate = ''
 				}
 			},
 			async saveProjectWordsTasks(tasksData) {

@@ -10,7 +10,8 @@ const {
 	Units,
 	Languages,
 	Vendors,
-	Discounts
+	Discounts,
+	ClientRequest
 } = require('../../models')
 
 const {
@@ -60,7 +61,8 @@ const {
 	updateProjectFinanceOnDiscountsUpdate,
 	generateAndSaveCertificate,
 	getFilteredProjects,
-	createRequestTasks
+	createRequestTasks,
+	updateRequestTasks
 } = require('../../projects')
 
 const {
@@ -104,13 +106,14 @@ const {
 } = require('../../projectTasks')
 
 const {
-	getClientRequest,
-	updateClientRequest,
-	addRequestFile,
-	removeRequestFile,
-	removeRequestFiles,
-	sendNotificationToManager,
-	removeClientRequest
+	// getClientRequest,
+	// updateClientRequest,
+	// addRequestFile,
+	// removeRequestFile,
+	// removeRequestFiles,
+	// sendNotificationToManager,
+	// removeClientRequest
+		getClientRequestById
 } = require('../../clientRequests')
 
 const {
@@ -235,6 +238,52 @@ router.post('/request-tasks', upload.fields([ { name: 'sourceFiles' }, { name: '
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on adding project tasks')
+	}
+})
+
+router.post('/remove-request-file', async (req, res) => {
+	const { _id, taskId, category, path } = req.body
+	try {
+		if (category === 'Source') {
+			await ClientRequest.updateOne({ "_id": _id, 'tasksAndSteps.taskId': taskId, "tasksAndSteps.sourceFiles.path": path },
+					{ $pull: { "tasksAndSteps.$[i].sourceFiles": { path } } }, { arrayFilters: [ { 'i.taskId': taskId } ] })
+		} else {
+			await ClientRequest.updateOne({ "_id": _id, 'tasksAndSteps.taskId': taskId, "tasksAndSteps.refFiles.path": path },
+					{ $pull: { "tasksAndSteps.$[i].refFiles": { path } } }, { arrayFilters: [ { 'i.taskId': taskId } ] })
+		}
+		fs.unlink(`./dist${ path }`, (err) => {
+			if (err) throw(err)
+		})
+		const updatedProject =  await getClientRequestById(_id)
+		res.send(updatedProject)
+
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on removing request file')
+	}
+})
+
+router.post('/update-request-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
+	try {
+		let tasksInfo = { ...req.body }
+		const { sourceFiles, refFiles } = req.files
+		const updatedProject = await updateRequestTasks({ tasksInfo, sourceFiles, refFiles })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding project tasks')
+	}
+})
+
+router.delete('/delete-request-tasks/:id/:projectId', async (req,res) => {
+	const { id: taskId, projectId } = req.params;
+	try{
+		await ClientRequest.updateOne({ "_id": projectId }, { $pull: { "tasksAndSteps": { "taskId": taskId } } })
+		const updatedProject = await getClientRequestById(projectId)
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on deleting task')
 	}
 })
 
@@ -635,7 +684,7 @@ router.post('/steps-reopen', async (req, res) => {
 		res.status(500).send('Error on reopening steps')
 	}
 })
-
+// TODO: refactoring client request
 // router.get('/review-status', async (req, res) => {
 // 	const { group, projectId, taskId, userId } = req.query
 // 	try {
@@ -674,7 +723,7 @@ router.post('/generate-certificate', async (req, res) => {
 	}
 })
 
-
+// TODO: refactoring client request
 // router.post('/assign-dr2', async (req, res) => {
 // 	const { taskId, projectId, dr2Manager } = req.body
 // 	try {
@@ -768,98 +817,99 @@ router.post('/step-finance', async (req, res) => {
 	}
 })
 
+// TODO: refactoring client request
 router.post('/request-file', upload.fields([ { name: 'newFile' } ]), async (req, res) => {
-	const { id, oldFile } = req.body
-	const files = req.files['newFile']
-	const existingFile = JSON.parse(oldFile)
-	const prop = existingFile.type === 'Source File' ? 'sourceFiles' : 'refFiles'
-	try {
-		let request = await getClientRequest({ '_id': id })
-		const requestFiles = await addRequestFile({ request, files, existingFile, prop })
-		request[prop] = requestFiles
-		await request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on saving request file')
-	}
+	// const { id, oldFile } = req.body
+	// const files = req.files['newFile']
+	// const existingFile = JSON.parse(oldFile)
+	// const prop = existingFile.type === 'Source File' ? 'sourceFiles' : 'refFiles'
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	const requestFiles = await addRequestFile({ request, files, existingFile, prop })
+	// 	request[prop] = requestFiles
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on saving request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/remove-request-file', async (req, res) => {
-	const { id, prop, path } = req.body
-	try {
-		let request = await getClientRequest({ '_id': id })
-		request[prop] = await removeRequestFile({ path, files: request[prop] })
-		await request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on removing request file')
-	}
+	// const { id, prop, path } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	request[prop] = await removeRequestFile({ path, files: request[prop] })
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on removing request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/delete-request-files', async (req, res) => {
-	const { id, sourceFiles, refFiles } = req.body
-	try {
-		let request = await getClientRequest({ '_id': id })
-		if (sourceFiles.length) {
-			request.sourceFiles = await removeRequestFiles(sourceFiles, request.sourceFiles)
-		}
-		if (refFiles.length) {
-			request.refFiles = await removeRequestFiles(refFiles, request.refFiles)
-		}
-		await request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on removing request file')
-	}
+	// const { id, sourceFiles, refFiles } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	if (sourceFiles.length) {
+	// 		request.sourceFiles = await removeRequestFiles(sourceFiles, request.sourceFiles)
+	// 	}
+	// 	if (refFiles.length) {
+	// 		request.refFiles = await removeRequestFiles(refFiles, request.refFiles)
+	// 	}
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on removing request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/file-approvement', async (req, res) => {
-	const { id, file, prop } = req.body
-	try {
-		let request = await getClientRequest({ '_id': id })
-		request[prop] = request[prop].map(item => {
-			if (item.fileName === file.fileName && item.path === file.path) {
-				return { ...item, isApproved: file.isApproved }
-			}
-			return item
-		})
-		await request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approvement of request file')
-	}
+	// const { id, file, prop } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	request[prop] = request[prop].map(item => {
+	// 		if (item.fileName === file.fileName && item.path === file.path) {
+	// 			return { ...item, isApproved: file.isApproved }
+	// 		}
+	// 		return item
+	// 	})
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on approvement of request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/prop-approvement', async (req, res) => {
-	const { id, prop } = req.body
-	try {
-		let request = await getClientRequest({ '_id': id })
-		request[prop] = !request[prop]
-		request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approvement of request file')
-	}
+	// const { id, prop } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	request[prop] = !request[prop]
+	// 	request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on approvement of request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/request-value', async (req, res) => {
-	const { id, prop, value, isEmail } = req.body
-	let updateQuery = prop === 'accountManager' ? { [prop]: value, isAssigned: false } : { [prop]: value }
-	try {
-		const updatedRequest = await updateClientRequest({ '_id': id }, updateQuery)
-		if (isEmail) {
-			await sendNotificationToManager(updatedRequest, prop)
-		}
-		res.send(updatedRequest)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on saving request property value')
-	}
+	// const { id, prop, value, isEmail } = req.body
+	// let updateQuery = prop === 'accountManager' ? { [prop]: value, isAssigned: false } : { [prop]: value }
+	// try {
+	// 	const updatedRequest = await updateClientRequest({ '_id': id }, updateQuery)
+	// 	if (isEmail) {
+	// 		await sendNotificationToManager(updatedRequest, prop)
+	// 	}
+	// 	res.send(updatedRequest)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on saving request property value')
+	// }
 })
 
 router.post('/project-value', async (req, res) => {
@@ -880,7 +930,7 @@ router.post('/project-value', async (req, res) => {
 		res.status(500).send('Error on saving project property value')
 	}
 })
-
+// TODO: refactoring client request
 router.post('/request-tasks', async (req, res) => {
 	// const { dataForTasks, request, isWords } = req.body
 	// const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request
@@ -933,7 +983,7 @@ router.post('/making-cancel-message', async (req, res) => {
 		res.status(500).send('Error on making project cancelled message')
 	}
 })
-
+// TODO: refactoring client request
 // router.post('/making-delivery-message', async (req, res) => {
 // 	const { accManager, contact } = getAccManagerAndContact(req.body)
 // 	try {

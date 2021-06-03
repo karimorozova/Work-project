@@ -50,7 +50,7 @@ export default {
 <style scoped lang="scss">
   .client-req {
     &__layout {
-      margin: 30px;
+      margin: 40px;
       display: flex;
     }
   }
