@@ -49,13 +49,14 @@
 
 	export default {
 		mixins: [taskPair, currencyIconDetected],
+		// mixins: [currencyIconDetected],
 		data() {
 			return {
 				fields: [
-					{ label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "20%", padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0" },
+					{ label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "28%", padding: "0" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "15%", padding: "0" },
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "15%", padding: "0" },
-					{ label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "15%", padding: "0" },
+					{ label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "12%", padding: "0" },
 					{ label: "Cost", headerKey: "headerCost", key: "cost", width: "15%", padding: "0" },
 					{ label: "Quote Action", headerKey: "headerDownload", key: "icons", width: "15%", padding: "0" }
 				],
@@ -69,7 +70,7 @@
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
-				updateTaskStatus: "updateTaskStatus"
+				updateTaskStatus: "updateTaskStatus",
 			}),
 			getWordcount(row) {
 				return row.finance.Wordcount.receivables
@@ -130,7 +131,8 @@
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				clientLanguages: "getCombinations"
+				clientLanguages: "getCombinations",
+        languages: "allLanguages",
 			}),
 			projectTasks() {
 				return this.project.tasks.filter(({ status }) => status !== 'Created')

@@ -27,6 +27,7 @@
 	import DataTable from "~/components/Tables/DataTable";
 	import { mapGetters, mapActions } from "vuex";
 	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
+  import {allLanguages} from "../../../../store/getters";
 
 	export default {
 		mixins: [currencyIconDetected],
@@ -44,10 +45,15 @@
 				// if(this.project.status === "Requested") {
 				// 	return this.project.packageSize ? `${ row.lang } / ${ this.project.packageSize.size }` : `${ this.project.sourceLanguage.lang } => ${ row.lang }`;
 				// }
-				return `${row.sourceLanguage} >> ${row.targetLanguage}`
+        const sourceLang = this.getLangInfoBySymbol(row.sourceLanguage)
+        const targetLang = this.getLangInfoBySymbol(row.targetLanguage)
+				return `${sourceLang.lang} >> ${targetLang.lang}`
 				//MAX
 				//   return this.getQuotePairs(row);
 			},
+      getLangInfoBySymbol(symbol) {
+			  return this.languages.find((lang) => lang.symbol === symbol )
+      }
 			// getQuotePairs(task) {
 			// 	return `${task.sourceLanguage} >> ${task.targetLanguage}`
 			// 	// let ratesProp = 'monoRates';
@@ -70,7 +76,8 @@
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				clientLanguages: "getCombinations"
+				clientLanguages: "getCombinations",
+        languages: "allLanguages",
 			}),
 			tableData() {
 				if(this.project.status !== 'Requested') {

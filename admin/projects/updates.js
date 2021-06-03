@@ -394,7 +394,7 @@ async function updateProjectStatusForClientPortalProject(projectId, action) {
 		})
 	}
 
-	return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, }
+	return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, isClientOfferClicked: true, }
 	);
 }
 

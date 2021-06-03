@@ -26,7 +26,7 @@
                   .personal__data
                     .personal__data_name {{ user.firstName }}
                     .personal__data_email {{ user.email }}
-                .accountBlock__myaccount__wrapper(@click="showAccountInfo")
+                //.accountBlock__myaccount__wrapper(@click="showAccountInfo")
                   router-link.accountBlock__myaccount(to="/account")
                     .human_icon
                       img(src="../assets/images/man.png")
@@ -83,7 +83,13 @@
 						path: "/projects",
 						imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
 						active: false
-					}
+					},
+          // {
+          //   title: "PROFILE",
+          //   path: "/account",
+          //   imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
+          //   active: false
+          // }
 					// {
 					// 	title: "INVOICES",
 					// 	path: "/invoices",
@@ -429,7 +435,7 @@
         .accountMenuWrapper {
           .accountBlock {
             width: 230px;
-            height: 124px;
+            //height: 124px;
             background-color: #fff;
             box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
             position: absolute;
