@@ -33,7 +33,8 @@
 <style lang='scss'>
   body {
     font-family: Myriad400;
-    color: #67573E;
+    color: #66563d;
+    font-size: 14px;
   }
 
   input:disabled,

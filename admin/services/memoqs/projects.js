@@ -663,13 +663,16 @@ async function documentsWithMetrics(documents, ServerProjectGuid){
 	return documents
 }
 
-async function updateMemoqProjectsData() {
+async function updateMemoqProjectsData(allProjects) {
 	const clients = await Clients.find();
 	const vendors = await Vendors.find();
 	const allProjectsInSystem = await MemoqProject.find();
+	const mappedProjectGuid = allProjects.map(({ serverProjectGuid }) => serverProjectGuid)
 
 	for (let project of allProjectsInSystem) {
 		let { _id, documents, serverProjectGuid } = project
+		if(!mappedProjectGuid.includes(serverProjectGuid)) return
+
 		documents = await documentsWithMetrics(documents, serverProjectGuid)
 
 		project = checkProjectStructure(clients, vendors, project, documents) ?
@@ -681,8 +684,8 @@ async function updateMemoqProjectsData() {
 }
 
 async function downloadFromMemoqProjectsData() {
+	let allProjects = await getMemoqAllProjects();
 	try {
-		let allProjects = await getMemoqAllProjects();
 		const languages = await Languages.find({}, { lang: 1, symbol: 1, memoq: 1, xtm: 1, iso: 1, iso2: 1 });
 		const allProjectsInSystem = await MemoqProject.find();
 
@@ -698,13 +701,14 @@ async function downloadFromMemoqProjectsData() {
 				await MemoqProject.updateOne({ serverProjectGuid: ServerProjectGuid }, { ...memoqProject, users, documents }, { upsert: true })
 			}
 		}
+
 	} catch (err) {
 		console.log('Error in downloadFromMemoqProjectsData');
 		console.log(err);
 		throw new Error(err.message);
 	} finally {
 		await clearGarbageProjects(true);
-		await updateMemoqProjectsData()
+		await updateMemoqProjectsData(allProjects)
 	}
 }
 

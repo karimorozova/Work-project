@@ -7,7 +7,6 @@ import { store } from './vuex/store'
 import axios from 'axios';
 import VueResource from 'vue-resource';
 import 'normalize.css';
-import "./assets/scss/style.scss";
 import VueLodash from 'vue-lodash';
 import "./filters/GeneralFilters";
 export const bus = new Vue();
