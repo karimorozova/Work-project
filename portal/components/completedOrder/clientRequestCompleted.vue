@@ -104,6 +104,7 @@ import moment from "moment";
 import Button from "../buttons/Button";
 import DataTable from "../Tables/DataTable";
 import TextRadio from "../../pages/components/forms/TextRadio";
+import { mapActions } from "vuex";
 
 export default {
   components: {TextRadio, DataTable, Button},
@@ -123,7 +124,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      getProjectsAndRequests: "getProjectsAndRequests"
+   }),
     goToMainPage( ) {
+      this.getProjectsAndRequests()
       this.$router.push('/')
     },
   }

@@ -827,6 +827,12 @@
     box-sizing: border-box;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
 
+    &__project-icons {
+      color: #67573e;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
     &__approve {
       position: absolute;
       top: 25%;
@@ -860,9 +866,10 @@
 
     &__data {
       height: 30px;
-      display: flex;
+      display: grid;
       align-items: center;
       padding: 0 5px;
+      overflow-y: auto;
     }
 
     &__comments {
@@ -1085,7 +1092,7 @@
     }
 
     &__value {
-      font-family: 'Myriad600';
+      font-family: 'Myriad400';
     }
 
     &__row {

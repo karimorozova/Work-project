@@ -3,7 +3,7 @@
     .project__all-info
       .project__info-row
         span.project__nameBody
-          input.project__name(type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
+          input.project__name(type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name" :disabled="!canUpdateRequest")
 
       .project__info-row
         .project__date
@@ -20,7 +20,7 @@
             :format="customFormatter"
             :disabled="disabled"
             ref="start"
-            :disabledPicker="disabledPicker && isProjectFinished"
+            :disabledPicker="disabledPicker && isProjectFinished || !canUpdateRequest"
           )
           img.project__calendar-icon(src="../../../../assets/images/calendar.png" @click="startOpen")
         .project__date
@@ -34,7 +34,7 @@
             inputClass="datepicker-custom-project-info"
             calendarClass="calendar-custom"
             :format="customFormatter"
-            :disabledPicker="isBilling && isProjectFinished"
+            :disabledPicker="isBilling && isProjectFinished || !canUpdateRequest"
             :disabled="disabled"
             ref="deadline"
           )
@@ -50,13 +50,13 @@
             inputClass="datepicker-custom-project-info"
             calendarClass="calendar-custom"
             :format="customFormatter"
-            :disabledPicker="isBilling || isProjectFinished"
+            :disabledPicker="isBilling || isProjectFinished || !canUpdateRequest"
             :disabled="disabled"
           )
           img.project__calendar-icon(src="../../../../assets/images/calendar.png" @click="billingOpen")
 
         .project__same.checkbox
-          input(type="checkbox" id="same" :disabled="isProjectFinished" :checked="isBilling" @change="setSameDate")
+          input(type="checkbox" id="same" :disabled="isProjectFinished || !canUpdateRequest" :checked="isBilling" @change="setSameDate")
           label(for="same") As deadline
 
       .project__info-row
@@ -66,7 +66,7 @@
             span.require *
           .project__input-icons(v-if="project._id")
             i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
-            input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly disabled="false")
+            input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly :disabled="!canUpdateRequest")
 
           //.project__drop-menu(v-else)
           //  SelectSingle(
@@ -80,13 +80,14 @@
           .input-title
             .input-title__text Industry:
             span.require *
-          input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" disabled)
+          input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" :disabled="!canUpdateRequest")
           .project__drop-menu(v-else)
             SelectSingle(
               :selectedOption="project.industry.name"
               :options="industriesList"
               @chooseOption="setIndustry"
               placeholder="Industry"
+              :isDisabled="!canUpdateRequest"
             )
         .hide-elem
         .hide-elem
@@ -103,13 +104,14 @@
       .project__info-row.project_no-margin
         .project__textarea
           LabelValue(label="Project Brief" customClass="project_textarea")
-            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.brief")
+            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.brief" aria-disabled="!canUpdateRequest")
         .project__textarea
           LabelValue(label="Internal Notes" customClass="project_textarea")
-            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.notes")
+            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.notes" aria-disabled="!canUpdateRequest")
 
       .project__button(v-if="!project.projectId")
         Button(
+          is-disabled="!canUpdateRequest"
           value="Approve Project"
           @clicked="checkForErrors"
         )
@@ -335,7 +337,12 @@
 			isProjectFinished() {
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			}
+			},
+      canUpdateRequest() {
+        return this.user.group.name === "Administrators"
+            ||  this.user.group.name === "Developers"
+            ||  this.project.projectManager._id === this.user._id
+      }
 		},
 		components: {
 			DatepickerWithTime,

@@ -61,7 +61,7 @@
         template(slot="icons", slot-scope="{ row, index }")
           .client-table__height
             .client-table__icons
-              span(v-if="!isProjectFinished")
+              span(v-if="!isProjectFinished && canUpdateRequest")
                 i.client-table__icon.fa.fa-envelope(
                   @click="openWYSIWYG(index)",
                   :class="{ 'client-table_opacity': true }",
@@ -77,11 +77,11 @@
               span(v-else)
                 img(src="../../../../assets/images/latest-version/lock.png")
 
-    Add(@add="addData" v-if="!isProjectFinished")
+    Add(@add="addData" v-if="!isProjectFinished && canUpdateRequest")
 </template>
 
 <script>
-import {mapActions} from "vuex"
+import {mapActions, mapGetters} from "vuex"
 import Add from "../../../Add"
 import scrollDrop from "@/mixins/scrollDrop"
 import crudIcons from "@/mixins/crudIcons"
@@ -363,16 +363,24 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      user: "getUser"
+    }),
     clientData() {
       if (this.project) {
         return this.project.customer.contacts.map((i) => i.firstName)
       }
     },
-    //TODO: remove
     isProjectFinished() {
       const {status} = this.project
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
     },
+    canUpdateRequest() {
+      return this.user.group.name === "Administrators"
+          ||  this.user.group.name === "Developers"
+          ||  this.project.projectManager._id === this.user._id
+    }
+
   },
   created() {
     this.project && this.getClientContacts()

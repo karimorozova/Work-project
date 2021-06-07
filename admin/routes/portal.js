@@ -76,8 +76,9 @@ router.post("/account-details", checkClientContact, upload.fields([ { name: 'pho
 			user: client.contacts[userIndex]._doc, clientId: client.id, accountData, photoFile
 		})
 		client.contacts[userIndex] = updatedUser
-		client.save()
-		res.send({ user: updatedUser })
+		await client.save()
+		const {token, ...resultData } = updatedUser
+		res.send({ user: resultData })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on saving account info")

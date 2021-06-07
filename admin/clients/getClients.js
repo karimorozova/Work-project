@@ -140,6 +140,7 @@ async function gerFilteredClients(filters) {
 					website: 1,
 					industries: 1,
 					leadSource: 1,
+					isTest: 1,
 				})
 				.sort({ _id: 1 }).limit(25)
 				.populate('industries', [ 'icon' ])

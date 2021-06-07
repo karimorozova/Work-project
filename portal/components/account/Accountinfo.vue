@@ -1,14 +1,23 @@
 <template lang="pug">
   .account
     .account__item
-      .account__title Profile
+      .account__title
+        span Profile
+        .account__buttons
+          Button(value="Save" class="account__button" @clicked="checkErrors")
+          Button(value="Cancel" @clicked="setDefault")
       .account__body
+        ValidationErrors(
+          v-if="areErrors"
+          :errors="errors"
+          :isAbsolute="true"
+          @closeErrors="closeErrors"
+        )
         .contact-details
           .content__form
             .contact-details__title general info
             .contact-details__part
               .contact-details__row
-
                 .contact-details__photo
                   .photo(v-if="!user.photo")
                     img.photo__image(v-if="imageExist")
@@ -25,131 +34,98 @@
                 .contact-details__items
                   .contact-details__item
                     label.contact-details__item-title Name:
-                    input.contact-details__item-field(type="text" v-model="user.firstName" placeholder="Vendor Name"  @keyup="filterByName")
+                    input.contact-details__item-field(type="text" :value="getActualField('firstName')" placeholder="Your Name" @change="(e) => setValue(e.target.value, 'firstName')")
                   .contact-details__item
                     label.contact-details__item-title Surname:
-                    input.contact-details__item-field(type="text" v-model="user.surname" placeholder="Vendor Name"  @keyup="filterByName")
+                    input.contact-details__item-field(type="text" :value="getActualField('surname')" placeholder="Your Surname" @change="(e) => setValue(e.target.value, 'surname')")
                   .contact-details__item
                     label.contact-details__item-title Email:
-                    input.contact-details__item-field(type="text" v-model="user.email" placeholder="Vendor Name"  @keyup="filterByName")
+                    input.contact-details__item-field(type="text" :value="getActualField('email')" placeholder="Your E-mail" @change="(e) => setValue(e.target.value, 'email')")
                   .contact-details__item
                     label.contact-details__item-title Gender:
                     .select_wrapper
                       SelectSingle(
                         :options="genders"
-                        :selectedOption="user.gender"
-                        placeholder="Gender"
-                        @chooseOption="setGender"
+                        :selectedOption="getActualField('gender')"
+                        placeholder="Your Gender"
+                        @chooseOption="({option}) => setValue(option, 'gender')"
                       )
                   .contact-details__item
                     label.contact-details__item-title Phone:
-                    input.contact-details__item-field(type="text" v-model="user.phone" placeholder="Vendor Name"  @keyup="filterByName")
+                    input.contact-details__item-field(type="text" :value="getActualField('phone')" placeholder="Your Phone" @change="(e) => setValue(e.target.value, 'phone')")
                   .contact-details__item
                     label.contact-details__item-title Skype:
-                    input.contact-details__item-field(type="text" v-model="user.skype" placeholder="Vendor Name"  @keyup="filterByName")
+                    input.contact-details__item-field(type="text" :value="getActualField('skype')" placeholder="Your Skype" @change="(e) => setValue(e.target.value, 'skype')")
                   .contact-details__item
                     label.contact-details__item-title LinkedIn:
-                    input.contact-details__item-field(type="text" v-model="user.linkedIn" placeholder="Vendor Name"  @keyup="filterByName")
+                    input.contact-details__item-field(type="text" :value="getActualField('linkedIn')" placeholder="Your LinkedIn" @change="(e) => setValue(e.target.value, 'linkedIn')")
                   .contact-details__item
                     label.contact-details__item-title Country:
                     .select_wrapper
                       SelectSingle(
                         :options="countries"
-                        :selectedOption="user.gender"
-                        placeholder="Gender"
-                        @chooseOption="setGender"
+                        :selectedOption="getActualField('country')"
+                        placeholder="Your Country"
+                        @chooseOption="({option}) => setValue(option, 'country')"
                       )
                   .contact-details__item
                     label.contact-details__item-title Time Zone:
                     .select_wrapper
                       SelectSingle(
-                        :options="genders"
-                        :selectedOption="user.gender"
-                        placeholder="Gender"
-                        @chooseOption="setGender"
+                        :options="timezones"
+                        :selectedOption="getActualField('timezone')"
+                        placeholder="Your Timezone"
+                        @chooseOption="({option}) => setValue(option, 'timezone')"
                       )
         .content__form
           .contact-details__title security
           .contact-details__part
             .contact-details__row
               .contact-details__items
-                .contact-details__item
-                  label.contact-details__item-title Password:
-                  input.contact-details__item-field(:type="passType" placeholder="Vendor Name"  @keyup="filterByName")
-                .contact-details__item
-                  label.contact-details__item-title Retype password:
-                  input.contact-details__item-field(:type="passType" placeholder="Vendor Name"  @keyup="filterByName")
+                .contact-details__password
+                  label.contact-details__password-title Password:
+                  input.contact-details__password-field(:type="passType1" placeholder="New Password"  v-model="newData.password" )
+                  span.showPass(@mousedown.stop="passType1 = 'text'" @mouseup="passType1 = 'password'" @mouseleave="passType1 = 'password'")
+                    i.fa.fa-eye
 
-                span(@mousedown="passType = 'text'" @mouseup="passType = 'password'") show pass
-
-    //.account
-    //    .account__main
-            //.contact-details
-                .title Contact Details
-                    img.title__icon(src="../../assets/images/edit-brown.png" @click="editCred")
-                .contact-details__info
-                    .contact-details__photo
-                        .photo(v-if="!user.photo")
-                            img.photo__image(v-if="imageExist")
-                        .photo(v-else)
-                            img.photo__image(:src="domain+user.photo")
-                        .upload-button(v-if="!readonly")
-                            input.upload-button__input(type="file" @change="previewPhoto")
-                            img.upload-button__icon(src="../../assets/images/edit-brown.png")
-                        .tip(v-if="!isFileError && !readonly") Maximum file size should be 2Mb (only png/jpg/jpeg types)
-                        .file-error(v-if="isFileError && !readonly") Incorrect file type or size
-                    .contact-details__data
-                        .contact-details__data-item
-                            .contact-details__name
-                                DetailItem(label="First Name" :value="user.firstName" :isBorder="!readonly" @setValue="(e) => setValue(e, 'firstName')" :isShort="true")
-                                DetailItem(label="Surname" :value="user.surname" :isBorder="!readonly" @setValue="(e) => setValue(e, 'surname')" :isShort="true")
-                            DetailItem(label="Password" :value="password" :isBorder="!readonly" :isPassword="true" @setPassword="(e) => setValue(e, 'password')")
-                            DetailItem(label="Confirm your Password" :value="confirmPassword" :isBorder="!readonly" :isPassword="true" @setPassword="(e) => setValue(e, 'confirmPassword')")
-                        .contact-details__data-item
-                            DetailItem(label="Email" :value="user.email" :isBorder="!readonly" @setValue="(e) => setValue(e, 'email')")
-                            DetailItem(label="Phone Number" :value="user.phone" :isBorder="!readonly" @setValue="(e) => setValue(e, 'phone')")
-                            DetailItem(label="Skype Name" :value="user.skype" :isBorder="!readonly" @setValue="(e) => setValue(e, 'skype')")
-                .contact-details__buttons(v-if="!readonly")
-                    .contact-details__button
-                        Button(value="Save" @makeAction="checkErrors")
-                    .contact-details__button
-                        Button(value="Cancel" @makeAction="cancelEdit")
-                ValidationErrors(v-if="areErrors" :errors="errors" @closeErrors="closeErrors" :isAbsolute="true")
+                .contact-details__password
+                  label.contact-details__password-title Retype password:
+                  input.contact-details__password-field(:type="confirmPassType2" placeholder="Confirm Password" v-model="confirmPassword")
+                  span.showPass(@mousedown.stop="confirmPassType2 = 'text'" @mouseup="confirmPassType2 = 'password'" @mouseleave="confirmPassType2 = 'password'")
+                    i.fa.fa-eye
 </template>
 
 <script>
 import Button from "../buttons/Button";
 import ValidationErrors from "../ValidationErrors";
-import CompanyDetails from "./CompanyDetails";
-import DetailItem from "./DetailItem";
 import {mapActions} from "vuex";
-import SocialIcons from "../SocialIcons";
 import SelectSingle from "../dropdowns/SelectSingle";
 
 export default {
   props: {
-    // client: {
-    //   type: Object
-    // },
     user: {
       type: Object
     }
   },
   data() {
     return {
-      passType: "password",
+      passType1: "password",
+      confirmPassType2: "password",
       genders: ['Female', 'Male'],
-      countries: [],
       errors: [],
       areErrors: false,
-      photoFile: [],
       readonly: true,
+      photoFile: [],
+      countries: [],
+      timezones: [],
+
+
       password: "",
+
+      newData: {},
+
       confirmPassword: "",
-      email: "",
-      firstName: "",
-      phone: "",
-      skype: "",
+
       imageExist: false,
       isFileError: false,
       domain: "",
@@ -162,14 +138,24 @@ export default {
     ]),
     async getCountries() {
       try {
-        const result = await this.$http.get('/api/countries');
-        this.countries = result.body;
+        const result = await this.$axios.get('/api/countries');
+        this.countries = result.data;
       } catch(err) {
         console.log(err)
       }
     },
-    filterByName() {
-
+    async getTimezones() {
+      try {
+        const result = await this.$axios.get('/api/timezones')
+        this.timezones = result.data.map(({zone}) => zone );
+      } catch(err) {
+        console.log(err)
+      }
+    },
+    getActualField(name) {
+      return this.newData[name] !== undefined
+          ? this.newData[name]
+          : this.user[name]
     },
     previewPhoto() {
       let input = document.getElementsByClassName('upload-button__input')[0];
@@ -203,28 +189,15 @@ export default {
       }
       return false;
     },
-    editCred() {
-      this.readonly = false;
-      this.firstName = this.user.firstName;
-      this.surname = this.user.surname;
-      this.email = this.user.email;
-      this.phone = this.user.phone;
-      this.skype = this.user.skype;
-    },
-    cancelEdit() {
-      this.readonly = true;
-      this.photoFile = [];
-      this.password = "";
-      this.confirmPassword = "";
-      this.email = "";
-      this.firstName = "";
-      this.surname = "";
-      this.phone = "";
-      this.skype = "";
+    setDefault() {
+      this.newData = {}
+      this.password = ''
+      this.confirmPassword = ""
+      document.getElementsByClassName('photo__image')[0].src = this.domain + this.user.photo
       this.closeErrors();
     },
-    setValue({value}, prop) {
-      this[prop] = value;
+    setValue(value, prop) {
+      this.$set(this.newData, prop, value)
     },
     closeErrors() {
       this.areErrors = false;
@@ -232,11 +205,11 @@ export default {
     async checkErrors() {
       this.errors = [];
       const phoneReg = /^[1-9][0-9]*$/;
-      const namesReg = /^[-\sa-zA-Z]+$/;
-      if (!this.firstName || !namesReg.test(this.firstName)) this.errors.push("Enter a valid first name");
-      if (this.surname && !namesReg.test(this.surname)) this.errors.push("Enter a valid surname");
-      if (this.phone && !phoneReg.test(this.phone)) this.errors.push("Only number are allowed in Phone number field");
-      if (this.password && !this.areEqualPasswords()) this.errors.push("The password and confirm password fields do not match");
+      const namesReg = /^[-\sA-z]+$/;
+      if (this.newData.hasOwnProperty("firstName") && (this.newData.firstName.length < 4 || !namesReg.test(this.newData.firstName))) this.errors.push("Enter a valid first name");
+      if (this.newData.hasOwnProperty("surname") && (this.newData.surname.length < 4 || !namesReg.test(this.newData.surname))) this.errors.push("Enter a valid surname");
+      if (this.newData.phone && !phoneReg.test(this.newData.phone)) this.errors.push("Only number are allowed in Phone number field");
+      if (this.newData.password && !this.areEqualPasswords()) this.errors.push("The password and confirm password fields do not match");
       await this.checkEmail();
       if (this.errors.length) {
         return this.areErrors = true;
@@ -245,7 +218,7 @@ export default {
     },
     async checkEmail() {
       const emailReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-      if (!this.email || !emailReg.test(this.email)) this.errors.push("Enter a valid email");
+      if (!this.user.email || !emailReg.test(this.user.email)) this.errors.push("Enter a valid email");
       try {
         const existingUser = await this.$axios.get(`/portal/unique-email?email=${this.email}`);
         if (this.email !== this.user.email && existingUser.data === "exist") this.errors.push("The entered email is already used in our system.")
@@ -254,32 +227,35 @@ export default {
       }
     },
     areEqualPasswords() {
-      return this.password.trim() === this.confirmPassword.trim();
+      return this.newData.password.trim() === this.confirmPassword.trim();
     },
     async saveInfo() {
-      const data = {
-        password: this.password,
-        email: this.email,
-        firstName: this.firstName,
-        surname: this.surname,
-        phone: this.phone,
-        skype: this.skype,
-        photo: this.photoFile[0]
+      try {
+        this.newData.photo = this.photoFile[0]
+        await this.saveAccountDetails(this.newData);
+        this.setDefault();
+        this.alertToggle({message: "Updated", isShow: true, type: "success"});
+      }catch (err) {
+        this.alertToggle({message: "Error on saving changes", isShow: true, type: "error"});
       }
-      await this.saveAccountDetails(data);
-      this.cancelEdit();
+    }
+  },
+  watch: {
+    photoFile() {
+      this.newData.photo = this.photoFile[0]
     }
   },
   components: {
     SelectSingle,
-    SocialIcons,
     Button,
-    CompanyDetails,
-    DetailItem,
     ValidationErrors
   },
   mounted() {
     this.domain = process.env.domain;
+  },
+  created() {
+    this.getCountries()
+    this.getTimezones()
   }
 }
 </script>
@@ -290,7 +266,12 @@ export default {
   position: relative;
   width: 191px;
 }
-
+.showPass {
+  position: absolute;
+  font-size: 18px;
+  right: 5px;
+  bottom: 4px;
+}
 .account {
   width: 100%;
   display: flex;
@@ -299,6 +280,9 @@ export default {
   color: #67573e;
 
   &__title {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
     margin: 30px 0 10px;
     font-family: Myriad400;
     font-size: 20px;
@@ -308,6 +292,16 @@ export default {
     width: 1000px;
     box-shadow: rgba(103, 87, 62, .3) 0px 2px 5px, rgba(103, 87, 62, .15) 0px 2px 6px 2px;
     padding: 20px;
+  }
+
+  &__buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 50px;
+  }
+
+  &__button {
+      margin: 0 20px;
   }
 }
 
@@ -388,6 +382,29 @@ export default {
       width: 191px;
       height: 30px !important;
       padding-left: 5px;
+      border: 1px solid $main-color;
+      border-radius: 5px;
+      outline: none;
+      font-size: 14px;
+    }
+  }
+
+  &__password {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    &-title {
+      margin-bottom: 3px;
+    }
+
+    &-field {
+      box-sizing: border-box;
+      color: $main-color;
+      width: 191px;
+      height: 30px !important;
+      padding-left: 5px;
+      padding-right: 28px;
       border: 1px solid $main-color;
       border-radius: 5px;
       outline: none;

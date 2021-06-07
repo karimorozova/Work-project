@@ -1,8 +1,8 @@
 <template lang="pug">
   .tasks-steps
     .tasks-steps__tasks-title Tasks and Steps
-      img.tasks-steps__arrow(src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
-    div
+      img.tasks-steps__arrow(v-if="canUpdateRequest" src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
+    div(v-if="canUpdateRequest")
       RequestTasksData(
         v-if="isTaskData"
         :originallyLanguages="originallyLanguages"
@@ -46,11 +46,16 @@
           template(slot="ref" slot-scope="{ row, index }")
             .tasks__data {{ row.ref }}
           template(slot="icons" slot-scope="{ row, index }")
-            .tasks__icons
+            .tasks__icons(v-if="canUpdateRequest")
               .tasks__icon(@click="editTasksData(row.taskId)")
                 img(src="../../../assets/images/Other/edit-icon-qa.png")
               .tasks__icon(@click="deleteTask(row.taskId)")
                 img(src="../../../assets/images/latest-version/delete-icon.png")
+
+
+            .tasks__icons(v-else)
+              .tasks__icon
+                img(src="../../../assets/images/latest-version/lock.png")
 
       .tasks__table(v-if="isStepsShow")
         DataTable(
@@ -78,7 +83,7 @@
           template(slot="deadline" slot-scope="{ row, index }")
             .tasks__data {{ row.deadline }}
 
-    .button(v-if="!isTaskData && currentTasks.length")
+    .button(v-if="!isTaskData && currentTasks.length && canUpdateRequest")
       .button__convert
         Button(value="Convert into Project" @clicked="convertIntoProject")
 
@@ -94,6 +99,7 @@
 	import DataTable from "../../DataTable"
 	import moment from 'moment'
 	import Button from "../../Button"
+  import { getUser } from "../../../vuex/general/getters"
 
 	export default {
 		props: {
@@ -296,7 +302,8 @@
 		computed: {
 			...mapGetters({
 				currentProject: 'getCurrentClientRequest',
-				tasksData: "getTasksDataRequest"
+				tasksData: "getTasksDataRequest",
+        user: "getUser",
 			}),
 			currentTasks() {
 				return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
@@ -353,7 +360,12 @@
 			isProjectFinished() {
 				// const { status } = this.currentProject
 				// return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			}
+			},
+      canUpdateRequest() {
+        return this.user.group.name === "Administrators"
+            ||  this.user.group.name === "Developers"
+            ||  this.currentProject.projectManager._id === this.user._id
+      }
 		},
 		components: {
 			Button,
@@ -364,7 +376,7 @@
 		},
 		mounted() {
 			this.setDefaultIsTaskData()
-		}
+    }
 	}
 </script>
 

@@ -2,6 +2,7 @@ const { sendEmail, moveFile } = require('../utils');
 const { getMessageWithRandomPassword } = require('../emailMessages/internalCommunication');
 const passwordGen = require('generate-password');
 const bcrypt = require('bcryptjs');
+const fs = require("fs");
 
 function getMessageWithNewPassword() {
     const password = passwordGen.generate({length: 8, numbers: true});
@@ -48,17 +49,13 @@ async function setVendorNewPassword(vendor, email) {
 }
 
 async function updateAccountDetails({user, clientId, accountData, photoFile}) {
-    const { email, firstName, surname, password, phone, skype } = accountData;
+    const {  token, ...newData } = accountData;
     const updatedUser = {
         ...user,
-        firstName,
-        surname,
-        email: email || user.email,
-        phone: phone || user.phone,
-        skype: skype || user.skype
+        ...newData,
     }
     try {
-        updatedUser.password = password ? await bcrypt.hash(password, 10) : user.password;
+        updatedUser.password = newData.password ? await bcrypt.hash(newData.password, 10) : user.password;
         updatedUser.photo = photoFile ? await updateAccountPhoto(photoFile, updatedUser, clientId) : user.photo;
         return updatedUser;
     } catch(err) {
@@ -70,7 +67,9 @@ async function updateAccountDetails({user, clientId, accountData, photoFile}) {
 async function updateAccountPhoto(photoFile, user, clientId) {
     try {
         if(user.photo) {
-            await fs.unlink('./dist' + user.photo);
+            await fs.unlink('./dist' + user.photo,  (err) => {
+                console.log(err);
+            });
         }
         const newPath = `/clientsDocs/${clientId}/contacts/${user.firstName.replace(/ /g,"_")}-${user.surname.replace(/ /g,"_")}-${photoFile.filename.replace(/ /g,"_")}`;
         await moveFile(photoFile, `./dist${newPath}`);
