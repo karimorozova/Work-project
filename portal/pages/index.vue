@@ -84,12 +84,13 @@
 						imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
 						active: false
 					},
-          // {
-          //   title: "PROFILE",
-          //   path: "/account",
-          //   imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
-          //   active: false
-          // }
+          {
+            title: "PROFILE",
+            path: "/account",
+            imgBrown: require("../assets/images/CATEGORIES/my-account.png"),
+            imgWhite: require("../assets/images/CATEGORIES/my-account(selected).png"),
+            active: false
+          },
 					// {
 					// 	title: "INVOICES",
 					// 	path: "/invoices",

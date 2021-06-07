@@ -18,7 +18,7 @@ const gauthOption = {
 
 
 const io = require("socket.io-client");
-const socket = io('https://admin.pangea.global')
+const socket = io(window.location.origin)
 Vue.prototype.$socket = socket
 
 
