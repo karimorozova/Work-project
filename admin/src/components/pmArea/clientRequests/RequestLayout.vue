@@ -10,7 +10,7 @@
       )
     .sub-wrapper
       RequestSubInformation(:project="currentClientRequest")
-      ProjectRequestAction(:project="currentClientRequest")
+      RequestAction(:project="currentClientRequest")
 
 </template>
 
@@ -19,7 +19,7 @@ import Request from "./subComponents/Request"
 import { mapGetters, mapActions } from "vuex"
 import RequestSubInformation from "./subComponents/RequestSubInformation"
 import RequestTasksAndSteps from "./RequestTasksAndSteps";
-import ProjectRequestAction from "./subComponents/ProjectRequestAction"
+import RequestAction from "./subComponents/RequestAction"
 
 export default {
   data(){
@@ -45,7 +45,7 @@ export default {
 	    originallyUnits: "getAllUnits",
     }),
   },
-  components: { ProjectRequestAction, RequestTasksAndSteps, RequestSubInformation, Request }
+  components: { RequestAction, RequestTasksAndSteps, RequestSubInformation, Request }
 }
 </script>
 

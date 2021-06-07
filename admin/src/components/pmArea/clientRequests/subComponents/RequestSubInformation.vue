@@ -15,7 +15,7 @@
       .row__data {{ project.status }}
     .sub-information__row
       .row__title Payment Profile:
-      .row__data(v-if="!isProjectFinished")
+      .row__data(v-if="canUpdateRequest")
         SelectSingle.drop(
           placeholder="Select",
           :selectedOption="project.paymentProfile",
@@ -343,6 +343,7 @@ export default {
       }
     },
     async setUrgentStatus(event) {
+    	if(!this.canUpdateRequest) return
       try {
         await this.updateClientsRequestsProps({projectId: this.project._id, value: {isUrgent: event.target.checked}})
         this.alertToggle({
