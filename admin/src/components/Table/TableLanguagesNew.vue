@@ -217,7 +217,7 @@
 
     Add(v-if="isAdmin" @add="addData")
 
-    .testTable
+    //.testTable
       GeneralTable
 
 

@@ -195,18 +195,6 @@
 				// "approveWithOption",
 				// "assignDr2",
 			]),
-			// async generateCertificate() {
-			// 	try {
-			// 		await this.$http.post('/pm-manage/generate-certificate', {
-			// 			project: this.project,
-			// 			task: this.task
-			// 		})
-			// 		await this.getDeliveryData()
-			// 		this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
-			// 	}
-			// },
       toggleCommentEmail() {
         this.isComment = !this.isComment
       },

@@ -1,193 +1,193 @@
 @import "colors";
 
 //TODO: scss refactoring
-//input {
-//  &::-webkit-inner-spin-button,
-//  &::-webkit-outer-spin-button {
-//    -webkit-appearance: none;
-//    margin: 0;
-//  }
-//}
-//
-//.details {
-//  &__editing-data {
-//    padding: 7px 5px 5px 6px;
-//    display: flex;
-//    align-items: center;
-//    box-sizing: border-box;
-//    width: 33.3%;
-//    border: 1px solid #938676;
-//    outline: none;
-//    color: $main-color;
-//    background-color: transparent;
-//    font-size: 14px;
-//    height: 32px;
-//  }
-//
-//  &__editing-data {
-//    box-shadow: inset 0 0 7px $brown-shadow;
-//  }
-//
-//  &__icons {
-//    display: flex;
-//    width: 100%;
-//    justify-content: flex-end;
-//    height: 20px;
-//    position: absolute;
-//    margin-top: -38px;
-//    align-items: center;
-//  }
-//
-//  &__icon {
-//    margin-left: 10px;
-//    cursor: pointer;
-//  }
-//
-//  &__col {
-//    justify-content: flex-start;
-//    display: grid;
-//  }
-//
-//  &__row {
-//    width: 100%;
-//    box-sizing: border-box;
-//    display: flex;
-//    height: 50px;
-//    align-items: center;
-//    justify-content: space-between;
-//  }
-//
-//  &__item {
-//    margin-bottom: 25px;
-//  }
-//
-//  &__data {
-//    display: inline-block;
-//    margin-left: 10px;
-//    width: 70px;
-//  }
-//
-//  &_opacity-06 {
-//    opacity: 0.6;
-//  }
-//
-//  &_border-top {
-//    border-top: 2px solid #938676;
-//  }
-//
-//  &_no-margin-bottom {
-//    margin-bottom: 0;
-//  }
-//
-//  &_margin-top {
-//    margin-top: 20px;
-//  }
-//}
-//
-//
-//
-//.table {
-//  width: 100%;
-//
-//  &__thead {
-//    border: 0.5px solid #938676;
-//    border-bottom: none;
-//
-//    .table__head-row {
-//      background-color: $thead-background;
-//      color: $white;
-//    }
-//  }
-//
-//  &__tbody {
-//    max-height: 180px;
-//    overflow-y: scroll;
-//    margin-bottom: 20px;
-//    border: 0.5px solid $cell-border;
-//    border-bottom: 1px solid $cell-border;
-//    border-top: none;
-//
-//    .table__body-row {
-//      cursor: default;
-//
-//      &:nth-of-type(odd) {
-//        .table__tbody-cell {
-//          background-color: $table-row-zebra-background;
-//        }
-//      }
-//
-//      &:hover {
-//        .table__tbody-cell {
-//          background-color: $cell-background;
-//        }
-//      }
-//    }
-//  }
-//
-//  &__thead-cell {
-//    box-sizing: border-box;
-//    font-size: 14px;
-//    padding: 7px 5px 5px 6px;
-//    border: 0.5px solid $cell-border;
-//    border-right: none;
-//    border-left: 0.5px solid $white;
-//    width: 33.3%;
-//
-//    &:first-child {
-//      border-left: 0.5px solid $cell-border;
-//    }
-//
-//    &:last-child {
-//      border-right: 0.5px solid $cell-border;
-//    }
-//  }
-//
-//  &__thead-cell-icon {
-//    box-sizing: border-box;
-//    font-size: 14px;
-//    padding: 7px 5px 5px 6px;
-//    border: 0.5px solid $cell-border;
-//    border-right: none;
-//    border-left: 0.5px solid $white;
-//
-//    &:last-child {
-//      border-right: 0.5px solid $cell-border;
-//    }
-//  }
-//
-//  &__tbody-cell {
-//    box-sizing: border-box;
-//    font-size: 14px;
-//    padding: 7px 5px 5px 6px;
-//    border: 1px solid $cell-border;
-//    border-right: none;
-//    width: 33.3%;
-//    height: 32px;
-//
-//    &:last-child {
-//      border-right: 0.5px solid $cell-border;
-//    }
-//
-//    &:focus-within {
-//      box-shadow: inset 0 0 5px $cell-border;
-//    }
-//  }
-//
-//  &__head-row,
-//  &__body-row {
-//    display: flex;
-//    flex-wrap: wrap;
-//  }
-//
-//  &__head-row {
-//    overflow-y: scroll;
-//  }
-//}
-//
-//.tbody_visible-overflow {
-//  overflow: visible;
-//}
-//
-//.table__thead-cell-icon:nth-child(2) {
-//  border-left: 0.5px solid #938676;
-//}
+input {
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.details {
+  &__editing-data {
+    padding: 7px 5px 5px 6px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 33.3%;
+    border: 1px solid #938676;
+    outline: none;
+    color: $main-color;
+    background-color: transparent;
+    font-size: 14px;
+    height: 32px;
+  }
+
+  &__editing-data {
+    box-shadow: inset 0 0 7px $brown-shadow;
+  }
+
+  &__icons {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    height: 20px;
+    position: absolute;
+    margin-top: -38px;
+    align-items: center;
+  }
+
+  &__icon {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  &__col {
+    justify-content: flex-start;
+    display: grid;
+  }
+
+  &__row {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    height: 50px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__item {
+    margin-bottom: 25px;
+  }
+
+  &__data {
+    display: inline-block;
+    margin-left: 10px;
+    width: 70px;
+  }
+
+  &_opacity-06 {
+    opacity: 0.6;
+  }
+
+  &_border-top {
+    border-top: 2px solid #938676;
+  }
+
+  &_no-margin-bottom {
+    margin-bottom: 0;
+  }
+
+  &_margin-top {
+    margin-top: 20px;
+  }
+}
+
+
+
+.table {
+  width: 100%;
+
+  &__thead {
+    border: 0.5px solid #938676;
+    border-bottom: none;
+
+    .table__head-row {
+      background-color: $thead-background;
+      color: $white;
+    }
+  }
+
+  &__tbody {
+    max-height: 180px;
+    overflow-y: scroll;
+    margin-bottom: 20px;
+    border: 0.5px solid $cell-border;
+    border-bottom: 1px solid $cell-border;
+    border-top: none;
+
+    .table__body-row {
+      cursor: default;
+
+      &:nth-of-type(odd) {
+        .table__tbody-cell {
+          background-color: $table-row-zebra-background;
+        }
+      }
+
+      &:hover {
+        .table__tbody-cell {
+          background-color: $cell-background;
+        }
+      }
+    }
+  }
+
+  &__thead-cell {
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 7px 5px 5px 6px;
+    border: 0.5px solid $cell-border;
+    border-right: none;
+    border-left: 0.5px solid $white;
+    width: 33.3%;
+
+    &:first-child {
+      border-left: 0.5px solid $cell-border;
+    }
+
+    &:last-child {
+      border-right: 0.5px solid $cell-border;
+    }
+  }
+
+  &__thead-cell-icon {
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 7px 5px 5px 6px;
+    border: 0.5px solid $cell-border;
+    border-right: none;
+    border-left: 0.5px solid $white;
+
+    &:last-child {
+      border-right: 0.5px solid $cell-border;
+    }
+  }
+
+  &__tbody-cell {
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 7px 5px 5px 6px;
+    border: 1px solid $cell-border;
+    border-right: none;
+    width: 33.3%;
+    height: 32px;
+
+    &:last-child {
+      border-right: 0.5px solid $cell-border;
+    }
+
+    &:focus-within {
+      box-shadow: inset 0 0 5px $cell-border;
+    }
+  }
+
+  &__head-row,
+  &__body-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__head-row {
+    overflow-y: scroll;
+  }
+}
+
+.tbody_visible-overflow {
+  overflow: visible;
+}
+
+.table__thead-cell-icon:nth-child(2) {
+  border-left: 0.5px solid #938676;
+}

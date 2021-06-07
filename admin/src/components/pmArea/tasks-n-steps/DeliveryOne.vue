@@ -3,8 +3,8 @@
     span.review__close(@click="close") &#215;
     .review__approve(v-if="isApproveModal")
       ApproveModal(
-        text="Are you sure?"
-        approveValue="Yes"
+        text="Before you finish the task, check carefully all the files sent to Deliverables section (if it is necessary)"
+        approveValue="Complete"
         notApproveValue="Cancel"
         @approve="changeStatus"
         @notApprove="closeApproveModal"
@@ -67,12 +67,10 @@
         .dr1Comment__textarea
           .dr1Comment__textareaText(v-html="previousComment")
 
-      //span.relative
-        .split-line
-        .review__forbidden(v-if="isReviewing")
+      .review__button-certificate(v-if="!isCertificateExistInTaskDeliverablesComplianceServiceOnly")
+        Button(value="Add Certificate" @clicked="generateCertificate")
 
       .review__table
-        //.review__forbidden(v-if="isReviewing")
         TableDR1(
           :task="task"
           :files="files"
@@ -97,7 +95,7 @@
         //.review__forbidden(v-if="isReviewing")
         //Options(v-if="isAllChecked" :isAssign="isAssign" :isDeliver="isDeliver" :isNotify="isNotify" :isReadyForDelivery="isReadyForDelivery" :isDr1="isDr1" @toggleOption="toggleOption")
 
-      .review__buttons(v-if="dr1Manager && dr2Manager && getUser")
+      //.review__buttons(v-if="dr1Manager && dr2Manager && getUser")
         .review__button(v-if="!isDr1")
           .review__forbidden(v-if="dr1Manager._id !== getUser._id && dr2Manager._id !== getUser._id && getUser.name === 'Administrators'")
           Button(
@@ -152,7 +150,7 @@
 				isNotify: false,
 				isReadyForDelivery: false,
 				isAssign: true,
-				isDr1: true,
+				// isDr1: true,
 				files: [],
 
 				// dr1Manager: null,
@@ -187,19 +185,20 @@
       closeApproveModal () {
         this.isApproveModal = false
       },
-
-			// async generateCertificate() {
-			// 	try {
-			// 		await this.$http.post('/pm-manage/generate-certificate', {
-			// 			project: this.project,
-			// 			task: this.task
-			// 		})
-			// 		await this.getDeliveryData()
-			// 		this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
-			// 	}
-			// },
+			async generateCertificate() {
+				try {
+					const updatedProject = await this.$http.post('/pm-manage/generate-certificate', {
+						project: this.project,
+						task: this.task,
+						deliveryTask: this.deliveryTask,
+					})
+					await this.setCurrentProject(updatedProject.data);
+					await this.updatedFiles(updatedProject)
+					this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
+				}
+			},
       async removeFile(file){
         if (!this.canUpdateDR1) return
 			  try{
@@ -282,9 +281,9 @@
 			checkFile({ index, bool }) {
 				this.files[index].isChecked = bool
 			},
-			popupRollback() {
-				this.isModal = true
-			},
+			// popupRollback() {
+			// 	this.isModal = true
+			// },
       async updatedFiles(updatedProject){
         if (!this.canUpdateDR1) return
         const deliveryTask = updatedProject.data.tasksDR1.find(item => item.taskId === this.deliveryTask.taskId)
@@ -480,14 +479,17 @@
 			groupedInstructions() {
 				return _.groupBy(this.deliveryTask.instructions, 'title')
 			},
-			isAllChecked() {
-        console.log('isAllChecked')
-        return true
-				// this.toggleOptions()
-				// const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
-				// const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
-				// return !uncheckedInstructions.length && !uncheckedFiles.length
-			},
+      isCertificateExistInTaskDeliverablesComplianceServiceOnly(){
+				if(this.files.length){
+					const filesNames = this.files.map(i => i.fileName)
+					for(let str of filesNames){
+						if(str.indexOf('certificate') !== -1) return true
+					}
+        }
+	      const { service: { title } } = this.task
+	      if (title !== 'Compliance') return true
+        return false
+      },
       canCompleteTask() {
         return this.deliveryTask.instructions.every(({isChecked, isNotRelevant})=> isChecked || isNotRelevant )
           && this.deliveryTask.files.every(({isFileApproved}) => isFileApproved)
@@ -568,6 +570,13 @@
     background-color: $white;
     position: relative;
     width: 1000px;
+
+    &__button-certificate{
+      position: absolute;
+      margin-top: 20px;
+      left: 0;
+      z-index: 10;
+    }
 
     &__wrapper {
       position: relative;

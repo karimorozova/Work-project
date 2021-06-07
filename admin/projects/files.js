@@ -3,7 +3,7 @@ const { moveProjectFile, moveFile } = require('../utils/movingFile');
 const { getProject, getProjectAfterUpdate } = require('./getProjects');
 const { getPdfOfQuote } = require("../emailMessages/clientCommunication");
 const fs = require('fs');
-const { Projects } = require('../models')
+const { Projects, Languages } = require('../models')
 const htmlToPdf = require('html-pdf');
 let  apiUrl = require('../helpers/apiurl');
 !apiUrl && (apiUrl = 'https://admin.pangea.global')
@@ -156,19 +156,19 @@ async function getPdf(allUnits, allSettingsSteps, project, tasksIds = []) {
     }
 }
 
-const generateAndSaveCertificate = ({ project, task }) => {
-    const template = getCertificateTemplate({ project, task })
+const generateAndSaveCertificate = async ({ project, task, deliveryTask }) => {
+    const allLanguages = await Languages.find()
+    const template = getCertificateTemplate({ project, task, deliveryTask, allLanguages })
     const pdf = new Promise((resolve, reject) => {
         htmlToPdf.create(
             template,
             {
-                width: '1654', height: '2339', orientation: "landscape", base: apiUrl
-                // height: "900px",
-                // width: "820px",
-                // "format": "A4",
-                // orientation: "portrait",
-                // "border": "0",
-                // base: apiUrl,
+                type: 'pdf',
+                width: '612px',
+                height: '792px',
+                orientation: "landscape",
+                base: apiUrl,
+                border: 0
             })
             .toFile('./dist/uploads/certificatePdf.pdf', function (err, res) {
                 if (err) {
@@ -178,6 +178,7 @@ const generateAndSaveCertificate = ({ project, task }) => {
                 resolve('./dist/uploads/certificatePdf.pdf')
             })
     })
+    return pdf
     // pdf.then((path) => {
     //     fs.unlink(path.toString(), (err) => {
     //         if (err) console.log(err)

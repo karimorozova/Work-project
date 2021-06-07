@@ -93,7 +93,7 @@ const {
 	approveInstructionDR2,
 	approveFilesDR2,
 	changeManagersDR1,
-
+	saveCertificateTODR1Files,
 } = require('./delivery')
 
 const {
@@ -101,6 +101,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	saveCertificateTODR1Files,
 	autoCreatingTaskInProject,
 	createProjectFromRequest,
 	updateRequestTasks,

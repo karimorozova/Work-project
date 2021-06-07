@@ -1,5 +1,6 @@
 const fs = require('fs')
 const _ = require('lodash')
+const { moveFile } = require('../utils/movingFile')
 
 const {
 	managerNotifyMail
@@ -437,7 +438,7 @@ const targetFileDR1 = async (fileData, files) => {
 		} else {
 			await Projects.updateOne(
 					{ "_id": fileData.projectId, 'tasksDR1.taskId': fileData.taskId },
-					{ $push: { 'tasksDR1.$.files': { isFileApproved: false, isOriginal: false, fileName: fileName, path: newPath } } }
+					{ $push: { 'tasksDR1.$.files': { isFileApproved: false, fileName: fileName, path: newPath } } }
 			)
 		}
 		return await getProject({ "_id": fileData.projectId })
@@ -526,7 +527,24 @@ const changeManagersDR1 = async ({ projectId, checkedTasksId, manager }) => {
 		return await getProject({ "_id": projectId })
 }
 
+const saveCertificateTODR1Files = async ({ _id }, { taskId }) => {
+	const additionFileInfo = `${ Math.floor(Math.random() * 1000000) }`
+	const newPath = `/projectFiles/${ _id }/${ additionFileInfo }-certificate.pdf`
+	try {
+		await moveFile({ path: './dist/uploads/certificatePdf.pdf' }, `./dist${ newPath }`)
+		await Projects.updateOne(
+				{ _id, 'tasksDR1.taskId': taskId },
+				{ $push: { 'tasksDR1.$.files': { isFileApproved: false, fileName: `${ additionFileInfo }-certificate.pdf`, path: newPath } } }
+		)
+	} catch (err) {
+		console.log(err)
+		console.log("Error in saveCertificateTODR1Files")
+	}
+	return await getProject({ _id })
+}
+
 module.exports = {
+	saveCertificateTODR1Files,
 	changeManagersDR1,
 	approveFilesDR2,
 	approveInstructionDR2,

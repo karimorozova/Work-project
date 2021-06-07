@@ -64,7 +64,8 @@ const {
 	createRequestTasks,
 	updateRequestTasks,
 	createProjectFromRequest,
-	autoCreatingTaskInProject
+	autoCreatingTaskInProject,
+	saveCertificateTODR1Files
 } = require('../../projects')
 
 const {
@@ -84,18 +85,6 @@ const {
 	notifyClientProjectCancelled,
 	notifyClientTasksCancelled
 } = require('../../utils')
-
-// const {
-// 	// getProjectAfterApprove,
-// 	setTasksDeliveryStatus,
-// 	getAfterTasksDelivery,
-// 	getAfterProjectDelivery,
-// 	checkPermission,
-// 	changeReviewStage,
-// 	rollbackReview,
-//   // taskApproveDeliver,
-//   // taskApproveNotify,
-// } = require('../../delivery')
 
 const {
 	getStepsWithFinanceUpdated,
@@ -727,10 +716,11 @@ router.post('/close-project', async (req, res) => {
 })
 
 router.post('/generate-certificate', async (req, res) => {
-	const { project, task } = req.body
+	const { project, task, deliveryTask } = req.body
 	try {
-		await generateAndSaveCertificate({ project, task })
-		res.send('done')
+		await generateAndSaveCertificate({ project, task, deliveryTask })
+		const updatedProject = await saveCertificateTODR1Files(project, deliveryTask)
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on generate certificate')
