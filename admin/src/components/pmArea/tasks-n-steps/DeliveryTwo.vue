@@ -179,6 +179,9 @@
 				// previousComment: ''
 			}
 		},
+		beforeDestroy(){
+			this.setShowTasksAndDeliverables(true)
+		},
 		methods: {
 			...mapActions([
 				"approveInstructionDR2",
@@ -189,6 +192,7 @@
         // "changeReviewManagerDR2",
         "alertToggle",
         "setCurrentProject",
+				"setShowTasksAndDeliverables"
 				// "rollBackReview",
 				// "approveDeliveryFile",
 				// "uploadTarget",

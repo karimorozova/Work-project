@@ -164,8 +164,8 @@ const generateAndSaveCertificate = async ({ project, task, deliveryTask }) => {
             template,
             {
                 type: 'pdf',
-                width: '612px',
-                height: '792px',
+                width: '814',
+                height: '1054',
                 orientation: "landscape",
                 base: apiUrl,
                 border: 0

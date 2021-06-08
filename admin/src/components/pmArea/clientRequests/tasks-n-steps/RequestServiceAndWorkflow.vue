@@ -198,6 +198,15 @@
 							size: null
 						}
 					]
+
+          if(this.currentProject.status === "Request Approved"){
+          	const { requestForm: { complianceOptions: { title } } } = this.currentProject
+            if(currentSteps.steps[0].step.title === 'Compliance'){
+	            let templateNumber = /(\d+)/.exec(title) !== null ? /(\d+)/.exec(title) : ["1"]
+	            defaultStepsAndUnits[0].size = templateNumber[0]
+            }
+          }
+
 					this.stepsAndUnitsMono = defaultStepsAndUnits
 				}
 

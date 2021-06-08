@@ -166,6 +166,9 @@
 				// previousComment: ''
 			}
 		},
+    beforeDestroy(){
+			this.setShowTasksAndDeliverables(true)
+    },
 		methods: {
 			...mapActions([
 				"approveInstruction",
@@ -177,7 +180,8 @@
 				"changeReviewManager",
 				// "rollBackReview",
 				"alertToggle",
-        "setCurrentProject"
+        "setCurrentProject",
+				"setShowTasksAndDeliverables"
 			]),
       openApproveModal () {
         this.isApproveModal = true

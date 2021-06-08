@@ -13,7 +13,7 @@
               )
           .hours-steps__packages-item
             .hours-steps__packages-item
-              .hours-steps__sub-title Size:
+              .hours-steps__sub-title {{ currentJob.step === 'Compliance' ? 'Compliance Template' : 'Size' }}:
               .hours-steps__drop-menu
                 SelectSingle(
                   placeholder="Select"
@@ -88,14 +88,6 @@
 			}
 		},
 		methods: {
-			// async getUnits() {
-			// 	try {
-			// 		const result = await this.$http.get('/api/units');
-			// 		this.originallyUnits = result.data;
-			// 	} catch (err) {
-			// 		this.alertToggle({message: "Error on getting units", isShow: true, type: "error"});
-			// 	}
-			// },
 			...mapActions({
 				setDataValue: "setTasksDataValueRequest",
 				alertToggle: "alertToggle"
@@ -170,7 +162,6 @@
 		// async created() {
 		// await this.getMemoqTemplates();
 		// this.setStartedTempalte();
-		// await this.getUnits();
 		// },
 		computed: {
 			...mapGetters({

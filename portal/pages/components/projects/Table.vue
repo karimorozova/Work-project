@@ -103,11 +103,11 @@ export default {
             }
             if(this.isOpenRequest) {
               this.fields = [
-                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "20%", padding: "0", cellClass: 'delivery_no-hover-change'},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "30%", padding: "0", cellClass: 'delivery_no-hover-change'},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0", cellClass: 'delivery_no-hover-change'},
-                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "15%", padding: "0", cellClass: 'delivery_no-hover-change'},
-                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "15%", padding: "0", cellClass: 'delivery_no-hover-change'},
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "20%", padding: "0"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "30%", padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0"},
+                {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "15%", padding: "0"},
+                {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "15%", padding: "0"},
               ]
             }
         }
