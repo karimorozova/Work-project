@@ -559,6 +559,10 @@
 					result = ['ReOpen' , 'Delete'];
 				}
 
+				if(this.project.status === 'Draft') {
+					result = ['Cancel' , 'Delete'];
+				}
+
 				return result;
 			},
 		},
