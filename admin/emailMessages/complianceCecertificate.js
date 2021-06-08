@@ -4,7 +4,7 @@ const moment = require('moment')
 !apiUrl && (apiUrl = 'https://admin.pangea.global')
 apiUrl = 'http://localhost:3001'
 
-const logo = apiUrl + '/static/certificate-images/new-logo.png'
+const logo = apiUrl + '/static/certificate-images/logo.png'
 const background = apiUrl + '/static/certificate-images/watermark.png'
 const stamp = apiUrl + '/static/certificate-images/stamp.png'
 const dateNow = new Date()
@@ -21,7 +21,7 @@ module.exports.getCertificateTemplate = ({ project, task, deliveryTask, allLangu
     <div class="header2" style="padding-top: 50px; position: relative;">
        <div class="green-row" style="width: 476px;background: #48A7A6;height: 27px;margin-bottom: 25px;"></div>
        <div class="green-row-image" style="position: absolute; top: 30px; right: 40px;">
-	         <img src="${ logo }">
+         	<div style="background-image: url(${ logo });height: 72px;width: 253;background-size: contain;background-repeat: no-repeat;"></div>
 	      </div>
 	   </div>
 	   <div class="content">
