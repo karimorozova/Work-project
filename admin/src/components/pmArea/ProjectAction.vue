@@ -561,7 +561,14 @@
 				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
 					result = ['ReOpen'];
 				}
-				if (this.project.status !== "Closed" && this.canDelete) {
+				if (
+				    this.project.status === "Draft"
+            && this.project.status === "Quote sent"
+            && this.project.status === "Cost Quote" 
+            && this.project.status === "Cancelled"
+            && this.project.status === "Rejected"
+            && this.canDelete
+        ) {
 				  result.push('Delete')
         }
 				return result;
