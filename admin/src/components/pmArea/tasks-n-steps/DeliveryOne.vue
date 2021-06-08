@@ -59,7 +59,7 @@
           .review__checkSubTitle(:class="{marginTop: true}") Comments
           .review__notes
             ckeditor(v-model="deliveryTask.comment" :config="editorConfig")
-            .notes__button( @click="sendMessage") Save &nbsp;
+            .notes__button( @click="sendMessage") Save Comment &nbsp;
               i.fa.fa-paper-plane(aria-hidden='true')
 
       //.review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
@@ -649,7 +649,7 @@
 
     &__check-item {
       display: flex;
-      padding: 5px 0;
+      padding: 6px 0;
       &:nth-child(even){
         background-color: #f4f2f1;
       }
@@ -763,9 +763,9 @@
   .notes {
     &__button {
       position: absolute;
-      left: 86%;
+      left: 82%;
       bottom: 45px;
-      width: 100px;
+      width: 140px;
       height: 30px;
       border-radius: 7px;
       font-size: 14px;
