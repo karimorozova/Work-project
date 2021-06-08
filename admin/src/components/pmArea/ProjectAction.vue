@@ -562,11 +562,11 @@
 					result = ['ReOpen'];
 				}
 				if (
-				    this.project.status === "Draft"
-            && this.project.status === "Quote sent"
-            && this.project.status === "Cost Quote" 
-            && this.project.status === "Cancelled"
-            && this.project.status === "Rejected"
+            (this.project.status === "Draft"
+            || this.project.status === "Quote sent"
+            || this.project.status === "Cost Quote"
+            || this.project.status === "Cancelled"
+            || this.project.status === "Rejected")
             && this.canDelete
         ) {
 				  result.push('Delete')
