@@ -141,7 +141,7 @@
             label(for="test")
 
       .vendor-subinfo__action
-        VendorAction(@openPreview="openPreview")
+        VendorAction(@openPreview="openPreview" @openVendor="openVendor")
 
     ValidationErrors(v-if="areErrorsExist", :errors="errors", @closeErrors="closeErrors")
 </template>
@@ -336,6 +336,11 @@
 			},
 			openPreview() {
 				this.isEditAndSend = true
+			},
+			async openVendor() {
+        const { data } = await this.$http.post("/service-login/vendor", {vendorId: this.vendorId})
+        document.cookie = `vendor=${data}; path=/; domain=localhost`
+        window.open(`http://localhost:3002/dashboard`, '_blank')
 			},
 			async sendQuote(message) {
 				try {

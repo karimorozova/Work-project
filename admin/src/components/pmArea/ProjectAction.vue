@@ -22,6 +22,9 @@
           placeholder="Select Action"
           @chooseOption="setAction"
         )
+    .project-action__confirm(v-if="isAction('Delete') && project.status !== 'Closed'")
+      .project-action__button
+        Button(:value="'Confirm'" @clicked="makeApprovedAction")
 
     .project-action__confirm(v-if="isAction('ReOpen') && project.status !== 'Rejected'")
       .project-action__button
@@ -130,6 +133,7 @@
 	import { mapGetters, mapActions } from 'vuex';
 	import ApproveModal from '../ApproveModal';
 	import PreviewQuote from "./WYSIWYGMultiMails";
+  import { deleteProject } from "../../vuex/pmarea/actions"
 
 	export default {
 		props: {
@@ -172,6 +176,7 @@
 				setProjectStatus: 'setProjectStatus',
 				sendClientQuote: 'sendClientQuote',
 				sendProjectDetails: 'sendProjectDetails',
+        deleteProject: 'deleteProject',
 				// deliverProjectToClient: 'deliverProjectToClient',
 				sendCancelProjectMessage: 'sendCancelProjectMessage',
 				sendClientCostQuote: 'sendClientCostQuote',
@@ -339,6 +344,9 @@
 						case "Cancel":
 							await this.cancelProjectMessage(message);
 							break;
+						case "Delete":
+							await this.deleteProjectAction();
+							break;
 					}
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error. Cannot execute chosen action.", isShow: true, type: "error" });
@@ -346,6 +354,10 @@
 					this.setDefaults();
 				}
 			},
+      async deleteProjectAction() {
+        await this.deleteProject({ projectId: this.project._id })
+        this.$router.back()
+      },
 			async reOpenProjectToDraft() {
 				await this.setStatus('Draft', "");
 			},
@@ -474,11 +486,15 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: 'getCurrentClient'
+				currentClient: 'getCurrentClient',
+        user: 'getUser',
 			}),
 			isProjectFinished(){
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
+			canDelete(){
+				return status !== 'Closed' && this.project.projectManager._id === this.user._id
 			},
 			projectClientContacts() {
 				return this.project.clientContacts.map(({ email }) => email)
@@ -545,6 +561,9 @@
 				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
 					result = ['ReOpen'];
 				}
+				if (this.project.status !== "Closed" && this.canDelete) {
+				  result.push('Delete')
+        }
 				return result;
 			},
 		},

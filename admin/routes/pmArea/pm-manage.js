@@ -870,6 +870,17 @@ router.post('/delete-request-files', async (req, res) => {
 	// }
 })
 // TODO: refactoring client request
+router.post('/delete-project', async (req, res) => {
+	const { projectId} = req.body
+	try {
+		await Projects.remove({_id: projectId})
+		res.send('')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on removing request file')
+	}
+})
+// TODO: refactoring client request
 router.post('/file-approvement', async (req, res) => {
 	// const { id, file, prop } = req.body
 	// try {

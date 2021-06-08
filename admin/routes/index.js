@@ -23,6 +23,7 @@ const multipliers = require('./pricelists/multipliers')
 const settings = require('./settings')
 const dashboard = require('./dashboard')
 const OpenPangea = require('./OpenPangea')
+const autoLogin = require('./autoLogin')
 
 
 //ADMIN
@@ -37,6 +38,7 @@ router.use('/clients-requests', clientsRequests)
 
 //ProjectQuotes Api, all routes are protected.
 router.use('/projectsapi', projectsRouter)
+router.use('/service-login',requiresLogin, autoLogin)
 
 router.use('/api-settings', requiresLogin, settings)
 router.use('/dashboard', dashboard)

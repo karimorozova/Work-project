@@ -322,6 +322,17 @@ export const deleteRequestFiles = async ({ commit, dispatch }, payload) => {
 	}
 }
 
+export const deleteProject = async ({ commit, dispatch }, payload) => {
+	dispatch('incrementRequestCounter')
+	try {
+		await Vue.http.post("/pm-manage/delete-project", payload);
+	} catch (err) {
+		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" });
+	} finally {
+		dispatch('decrementRequestCounter')
+	}
+}
+
 export const reassignVendor = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
