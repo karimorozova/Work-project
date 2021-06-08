@@ -25,7 +25,7 @@
 
   .progress-line {
     width: 100%;
-    height: 15px;
+    height: 14px;
     border: 1px solid #938676;
     position: relative;
     box-sizing: border-box;

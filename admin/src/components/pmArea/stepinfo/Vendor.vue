@@ -18,11 +18,13 @@
         span.step-vendor__no-vendor(v-if="!vendor") No Vendor
       .step-vendor__contacts
         .step-vendor__icon(@click="gotToVendorInfo")
-          i.fas.fa-info-circle
+          i.fas.fa-external-link-alt
         .step-vendor__icon(@click="sendEmail")
           i.fa.fa-envelope
-        .step-vendor__icon
-          i.fab.fa-slack-hash
+        //.step-vendor__icon
+        //  i.fab.fa-slack-hash
+        .step-vendor__icon(@click="goToVendor")
+          i.fas.fa-sign-in-alt
     .step-vendor__options(v-if="isVendorSelect")
       .step-vendor__check
         CustomRadio(:isChecked="isAfterRejectCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterRejectCheck')")
@@ -112,6 +114,13 @@
 			gotToVendorInfo() {
 				window.open(`/vendors/details/${ this.vendor._id }`, '_blank')
 			},
+      async goToVendor() {
+        const { data } = await this.$http.post("/service-login/vendor", {vendorId: this.vendor._id})
+        const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
+        const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
+        document.cookie = `vendor=${data}; path=/; domain=${domain}`
+        window.open(redirectTo, '_blank')
+      },
 			...mapActions({
 				alertToggle: "alertToggle",
 				setStepVendor: "setStepVendor",
@@ -181,7 +190,7 @@
       height: 28px;
 
       i {
-        font-size: 24px;
+        font-size: 18px;
         cursor: pointer;
       }
 

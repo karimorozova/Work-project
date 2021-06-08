@@ -29,7 +29,7 @@ const allowedOrigins = [
 	"http://localhost:3000",
 	"http://localhost:3002",
 	"http://localhost:8081",
-	"http://testadmin.pangea.global",
+	"https://testadmin.pangea.global",
 	"http://testvendor.pangea.global",
 	"http://testportal.pangea.global",
 	"http://95.216.165.38"
@@ -85,7 +85,7 @@ const httpServer = require("http").createServer(app);
 
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "https://admin.pangea.global:*",
+    origin: "https://admin.pangea.global:*, http://localhost:*",
     methods: ["GET", "POST"]
   },
   secure: true,

@@ -12,6 +12,7 @@ export const mutations = {
     setCurrentClientOverallData(state, payload) {
         let keys = [
             'name',
+            'clientType',
             'officialCompanyName',
             'email',
             'website',

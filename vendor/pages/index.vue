@@ -250,7 +250,7 @@
       justify-content: space-between;
       background-color: #67573e;
       position: fixed;
-      height: 6vh;
+      height: 40px;
       width: 100%;
       z-index: 10000;
     }
@@ -266,14 +266,14 @@
     &__adminPortal {
       color: #fff;
       width: 100%;
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 22px;
+      font-family: Myriad600;
     }
 
     &__account {
       display: flex;
       align-items: center;
-      height: 6vh;
+      height: 40px;
     }
 
     &__dropdown-wrapper {
@@ -360,7 +360,7 @@
       }
 
       &:hover {
-        background-color: #f2efeb;
+        background-color: #f4f2f1;
       }
     }
 
@@ -379,7 +379,7 @@
 
     &__main {
       box-sizing: border-box;
-      padding-top: 6vh;
+      padding-top: 40px;
       padding-left: 135px;
       display: flex;
       height: 100%;
@@ -395,7 +395,7 @@
       left: 0;
       z-index: 999;
       display: flex;
-      min-height: 94vh;
+      min-height: calc(100vh - 40px);
     }
 
     &__sidebar {

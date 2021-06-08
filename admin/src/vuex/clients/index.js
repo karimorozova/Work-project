@@ -11,6 +11,7 @@ const state = {
 
     currentClientOverallData: {
         name: null,
+        clientType: null,
         officialCompanyName: null,
         email: null,
         website: null,

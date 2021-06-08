@@ -74,16 +74,16 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
     }
 });
 
-router.post('/allprojects', async (req, res) => {
-    const filters = {...req.body};
-    try {
-        const projects = await getFilteredProjects(filters);
-        res.send(projects)
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Something wrong with DB while getting projects!');
-    }
-});
+// router.post('/allprojects', async (req, res) => {
+//     const filters = {...req.body};
+//     try {
+//         const projects = await getFilteredProjects(filters);
+//         res.send(projects)
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).send('Something wrong with DB while getting projects!');
+//     }
+// });
 
 router.post('/all-requests', async (req, res) => {
     const filters = {...req.body};

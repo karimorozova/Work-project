@@ -30,6 +30,11 @@ async function getClient(obj) {
 			.populate('services.services', [ 'title', 'steps' ])
 }
 
+async function getSimpleClients(find = {}, filter = {}) {
+  return await Clients.find(find, filter)
+    .populate('industries', [ 'name', 'icon' ])
+}
+
 async function getClientWithActions(obj) {
 
   const client =  await Clients.findOne(obj)
@@ -63,7 +68,7 @@ async function getClientWithActions(obj) {
       {path: 'assignedTo', select: ['firstName','lastName']}
     ]) || []
 
-  client.notes = await ClientsNotes.find({client: obj._id})
+  client.activityNotes = await ClientsNotes.find({client: obj._id})
     .populate([
       {path: 'assignedTo', select: ['firstName','lastName']}
     ]) || []
@@ -135,6 +140,7 @@ async function gerFilteredClients(filters) {
 					website: 1,
 					industries: 1,
 					leadSource: 1,
+					isTest: 1,
 				})
 				.sort({ _id: 1 }).limit(25)
 				.populate('industries', [ 'icon' ])
@@ -179,5 +185,6 @@ module.exports = {
 	gerFilteredClients,
 	getClientsForNewProject,
 	getClientRates,
-  getClientWithActions
+  getClientWithActions,
+  getSimpleClients,
 }

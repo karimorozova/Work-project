@@ -4,23 +4,17 @@ const { getStepFinanceData } = require('../сalculations/finance');
 const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
-/**
- *
- * @param {Object} allInfo
- * @returns {Object} - returns an updated project
- */
-async function createTasksAndStepsForCustomUnits (allInfo) {
-  const {
-    project,
-    stepsAndUnits,
-  } = allInfo;
+
+async function createTasksAndStepsForCustomUnits (allInfo, iterator = 0) {
+  const { project, stepsAndUnits } = allInfo;
+
   try {
     const { customer: { _id: customer }, _id, industry, discounts, finance, projectId, minimumCharge } = project;
     let steps = [];
-    let tasksWithoutFinance = await getTasksForCustomUnits({
-      ...allInfo,
-      projectId,
-    });
+    let tasksWithoutFinanceOriginal = await getTasksForCustomUnits({ ...allInfo, projectId }, iterator);
+
+    let tasksWithoutFinance = JSON.parse(JSON.stringify(tasksWithoutFinanceOriginal))
+
     if (stepsAndUnits.length === 2) {
       steps = await getStepsForDuoUnits(
         { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts });
@@ -29,7 +23,8 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
         { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts });
     }
     steps = checkIsSameVendor(steps);
-    const tasks = tasksWithoutFinance.map(item =>
+
+    const tasks = tasksWithoutFinanceOriginal.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
     const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);
@@ -43,25 +38,13 @@ async function createTasksAndStepsForCustomUnits (allInfo) {
   }
 }
 
-/**
- *
- * @param {Object} tasksInfo
- * @returns {Array} - returns array of new tasks
- */
-async function getTasksForCustomUnits (tasksInfo) {
-  const {
-    stepsAndUnits,
-    projectId,
-    service,
-    targets,
-    source,
-    stepsDates,
-    taskRefFiles,
-  } = tasksInfo;
+async function getTasksForCustomUnits (tasksInfo, iterator) {
+  const { stepsAndUnits, projectId, service, targets, source, stepsDates, taskRefFiles, } = tasksInfo;
+
   let tasks = [];
   let tasksLength = tasksInfo.project.tasks.length + 1;
   for (let i = 0; i < targets.length; i++) {
-    const idNumber = tasksLength < 10 ? `T0${tasksLength}` : `T${tasksLength}`;
+    const idNumber = tasksLength < 10 ? `T0${tasksLength + iterator}` : `T${tasksLength + iterator}`;
     const taskId = projectId + ` ${idNumber}`;
     tasks.push({
       taskId,
@@ -85,11 +68,7 @@ async function getTasksForCustomUnits (tasksInfo) {
   return tasks;
 }
 
-/**
- *
- * @param {Object} allInfo
- * @returns {Array} - returns array of new steps
- */
+
 async function getStepsForDuoUnits (allInfo) {
   const { tasks, stepsAndUnits, stepsDates, industry, customer, discounts, projectId } = allInfo;
   const steps = [];
@@ -133,7 +112,6 @@ async function getStepsForDuoUnits (allInfo) {
       finance,
       defaultStepPrice,
       progress: 0,
-      // check: false,
       vendorsClickedOffer: [],
       isVendorRead: false,
       nativeFinance,
@@ -142,12 +120,7 @@ async function getStepsForDuoUnits (allInfo) {
   }
 }
 
-/**
- *
- * @param {Object} allInfo
- * @param {Boolean}common
- * @returns {Array} - returns array of new steps
- */
+
 async function getStepsForMonoUnits (allInfo, common = false) {
   let { tasks, stepsDates, industry, customer, discounts, projectId } = allInfo;
   const steps = [];
@@ -178,7 +151,6 @@ async function getStepsForMonoUnits (allInfo, common = false) {
       finance,
       defaultStepPrice,
       progress: 0,
-      // check: false,
       vendorsClickedOffer: [],
       isVendorRead: false,
       nativeFinance,

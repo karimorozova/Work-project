@@ -12,7 +12,8 @@ const state = {
         dbSteps: "Adding steps to the Project  in DB ..."
     },
     memoqProjectMessage: "",
-    fileCounter: 0
+    fileCounter: 0,
+    isShowTasksAndDeliverables: true,
 };
 
 export const pmarea = {

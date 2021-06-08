@@ -5,16 +5,14 @@ const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = r
 const { getStepsForDuoUnits, getTasksForCustomUnits } = require('./taskForCommon');
 const ObjectId = require('mongodb').ObjectID;
 
-/**
- *
- * @param {Object} allInfo
- * @returns {Object} - returns an updated project
- */
-async function createTasksWithPackagesUnit (allInfo) {
+
+async function createTasksWithPackagesUnit (allInfo, iterator = 0) {
   const { project, stepsAndUnits, stepsDates } = allInfo;
   try {
     const { customer: { _id: customer }, _id, industry, discounts, projectId, finance, minimumCharge } = project;
-    const tasksWithoutFinance = await getTasksForCustomUnits({ ...allInfo, projectId });
+    const tasksWithoutFinanceOriginal = await getTasksForCustomUnits({ ...allInfo, projectId }, iterator);
+
+    let tasksWithoutFinance = JSON.parse(JSON.stringify(tasksWithoutFinanceOriginal))
     let steps = stepsAndUnits.length === 2 ? await getStepsForDuoUnits({
         tasks: tasksWithoutFinance,
         customer,
@@ -33,7 +31,8 @@ async function createTasksWithPackagesUnit (allInfo) {
         projectId: _id,
       });
     steps = checkIsSameVendor(steps);
-    const tasks = tasksWithoutFinance.map(item =>
+
+    const tasks = tasksWithoutFinanceOriginal.map(item =>
       getFinanceForCustomUnits(item, steps)
     );
     const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge);
@@ -47,17 +46,6 @@ async function createTasksWithPackagesUnit (allInfo) {
   }
 }
 
-/**
- *
- * @param {Array} tasks
- * @param {Array} stepsDates
- * @param {Object} industry
- * @param {Object} customer
- * @param {Array} discounts
- * @param {Boolean} common
- * @param {string} projectId
- * @returns {Array} - returns steps array
- */
 async function getStepsForMonoStepPackages({ tasks, stepsDates, industry, customer, discounts, projectId }, common = false) {
   const steps = [];
   for (let i = 0; i < tasks.length; i++) {
@@ -86,7 +74,6 @@ async function getStepsForMonoStepPackages({ tasks, stepsDates, industry, custom
       vendorRate,
       finance,
       defaultStepPrice,
-      // check: false,
       vendorsClickedOffer: [],
       isVendorRead: false,
       nativeFinance,

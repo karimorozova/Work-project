@@ -116,11 +116,11 @@
       },
       async approveDelete() {
         try {
-          const notes = await this.$http.delete(`/clientsapi/activity/note/${ this.data._id }?client=${ this.data.client }`)
-          this.setUpClientProp({ key: "notes", value: notes.data })
+          const activityNotes = await this.$http.delete(`/clientsapi/activity/note/${ this.data._id }?client=${ this.data.client }`)
+          this.setUpClientProp({ key: "activityNotes", value: activityNotes.data })
           this.close()
         } catch (e) {
-          this.alertToggle({ message: "Error on deleting notes", isShow: true, type: "error" })
+          this.alertToggle({ message: "Error on deleting activityNotes", isShow: true, type: "error" })
         }
 
       },
@@ -206,7 +206,7 @@
 
     &__check {
       height: 22px;
-      font-size: 22px;
+      font-size: 21px;
       width: 22px;
       margin-right: 10px;
       color: rgba(0, 0, 0, .6);
@@ -220,7 +220,7 @@
     }
     &__checkDone {
       height: 22px;
-      font-size: 22px;
+      font-size: 21px;
       width: 22px;
       margin-right: 10px;
       color: #4ba5a5;
@@ -228,7 +228,7 @@
     }
 
     &__title {
-      font-size: 22px;
+      font-size: 21px;
     }
 
     &__date {

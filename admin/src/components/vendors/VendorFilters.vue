@@ -1,11 +1,11 @@
 <template lang="pug">
   .v-filters
-    .v-filters__col
-      .v-filters__item.v-filters_margin-bottom-20
+    .v-filters__row
+
+      .v-filters__item
         label.v-filters__filter-title Name:
         input.v-filters__input-field(type="text" placeholder="Vendor Name" v-model="nameFilter" @keyup="filterByName")
 
-    .v-filters__col
       .v-filters__item
         label.v-filters__filter-title Source:
         .v-filters__drop-menu
@@ -17,7 +17,6 @@
             @chooseOption="setSourceFilter"
           )
 
-    .v-filters__col
       .v-filters__item
         label.v-filters__filter-title Target:
         .v-filters__drop-menu
@@ -29,11 +28,13 @@
             @chooseOption="setTargetFilter"
           )
 
-    .v-filters__col
       .v-filters__item
         label.v-filters__filter-title Industry:
         .v-filters__drop-menu
           VendorIndustrySelect(:isAllExist="isAllForIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenIndustry")
+
+      .v-filters__itemButton
+        Button(value="Add vendor" @clicked="addVendor" :class="['width-140']")
 
 
 </template>
@@ -43,6 +44,7 @@
 	import LanguagesSelect from "@/components/LanguagesSelect"
 	import SelectSingle from "@/components/SelectSingle"
 	import { mapActions, mapGetters } from "vuex"
+	import Button from "../Button"
 
 	export default {
 		props: {
@@ -76,6 +78,9 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			addVendor() {
+				this.$router.push("/vendors/new-vendor")
+			},
 			setSourceFilter({ option }) {
 				this.$emit('setSourceFilter', option)
 			},
@@ -102,6 +107,7 @@
 			})
 		},
 		components: {
+			Button,
 			VendorIndustrySelect,
 			LanguagesSelect,
 			SelectSingle
@@ -116,26 +122,30 @@
     width: 100%;
     display: flex;
 
-    &__col {
+    &__row{
       display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      margin-right: 50px;
+      margin-bottom: 20px;
+      height: 50px;
+      align-items: flex-end;
     }
 
     &__filter-title {
-      margin-bottom: 0;
-      margin-right: 10px;
-      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    &__itemButton{
+      position: relative;
+      display: grid;
+      align-items: end;
+      width: 232px;
+      justify-content: end;
     }
 
     &__item {
-      width: 100%;
       position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: grid;
+      align-items: end;
+      width: 232px;
 
       ::-webkit-input-placeholder {
         opacity: 0.5;
@@ -157,13 +167,9 @@
     &__drop-menu {
       position: relative;
       width: 191px;
-      height: 31px;
+      height: 30px;
       box-sizing: border-box;
       z-index: 10;
-    }
-
-    &_margin-bottom-20 {
-      margin-bottom: 20px;
     }
   }
 

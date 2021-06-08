@@ -2,7 +2,7 @@
   .clientsportalWrapper
     .clientsTop
       .clientsTop__clientName
-        h2.clientsPortal CLIENT PORTAL
+        .clientsPortal CLIENT PORTAL
       .clientsTop__searchBlock
         .dropdownWrapper(v-click-outside="closeRequestsMenu")
           .sel_project_block(@click="showDropdown")
@@ -13,6 +13,7 @@
               .clientsTop__dropdown
                 .additional(v-if="dropdownVisible")
                   .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
+
         .account-menu(v-click-outside="hideAccountMenu")
           .womanWrapper
             img.womanWrapper__photo(v-if="user.photo" :src="domain+user.photo")
@@ -25,7 +26,7 @@
                   .personal__data
                     .personal__data_name {{ user.firstName }}
                     .personal__data_email {{ user.email }}
-                .accountBlock__myaccount__wrapper(@click="showAccountInfo")
+                //.accountBlock__myaccount__wrapper(@click="showAccountInfo")
                   router-link.accountBlock__myaccount(to="/account")
                     .human_icon
                       img(src="../assets/images/man.png")
@@ -50,7 +51,7 @@
           .logoImage(v-if="expander")
           .balloons(v-else)
       .clientsMainWrapper__inner
-        .breadCrumbs
+        //.breadCrumbs
           span.accountName {{ user.firstName }}
           span.arrows(v-if="user.firstName")
             i.fa.fa-angle-double-right(aria-hidden='true')
@@ -83,30 +84,38 @@
 						imgBrown: require("../assets/images/CATEGORIES/PROJECTS.png"),
 						active: false
 					},
-					{
-						title: "INVOICES",
-						path: "/invoices",
-						imgBrown: require("../assets/images/CATEGORIES/INVOICES.png"),
-						active: false
-					},
-					{
-						title: "DOCUMENTS",
-						path: "/documents",
-						imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
-						imgBrown: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
-						active: false
-					}
+          {
+            title: "PROFILE",
+            path: "/account",
+            imgBrown: require("../assets/images/CATEGORIES/my-account.png"),
+            imgWhite: require("../assets/images/CATEGORIES/my-account(selected).png"),
+            active: false
+          },
+					// {
+					// 	title: "INVOICES",
+					// 	path: "/invoices",
+					// 	imgBrown: require("../assets/images/CATEGORIES/INVOICES.png"),
+					// 	active: false
+					// },
+					// {
+					// 	title: "DOCUMENTS",
+					// 	path: "/documents",
+					// 	imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
+					// 	imgBrown: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
+					// 	active: false
+					// }
 				],
 				openQuotes: true,
 				openProjects: true,
 				expander: false,
 				accountMenuVisible: false,
 				newProject: [
-					{ title: "Translation", path: "/translation" },
-					{ title: "Copywriting", path: "/copywriting" },
-					{ title: "Marketing", path: "/marketing" }
-					//   {title: "Proofing/QA", path: "/proofing"},
-					//   {title: "Graphic Localization", path: "/graphic-localization"}
+					{ title: "Compliance", path: "/compliance" }
+					// { title: "Translation", path: "/translation" },
+					// { title: "Copywriting", path: "/copywriting" },
+					// { title: "Marketing", path: "/marketing" },
+					// {title: "Proofing/QA", path: "/proofing"},
+					// {title: "Graphic Localization", path: "/graphic-localization"}
 				],
 				dropdownVisible: false,
 				clientRequestShow: false,
@@ -123,11 +132,7 @@
 			},
 			toggleSideBar(isFirstRender) {
 				for (let elem of this.navbarList) {
-					if (window.location.toString().indexOf(elem.path) !== -1) {
-						elem.active = true
-					} else {
-						elem.active = false
-					}
+					elem.active = window.location.toString().indexOf(elem.path) !== -1
 				}
 			},
 			thankYou(data) {
@@ -251,7 +256,7 @@
     justify-content: space-between;
     background-color: #67573e;
     position: fixed;
-    height: 6vh;
+    height: 40px;
     width: 100%;
     z-index: 1000;
 
@@ -276,6 +281,8 @@
       }
 
       .clientsPortal {
+        font-size: 22px;
+        font-family: Myriad600;
         color: #fff;
         width: 100%;
       }
@@ -297,18 +304,18 @@
       border: 2px solid #fff;
       width: 30%;
       visibility: hidden;
-      @media screen and (max-width: 1520px) {
-        margin-right: 20px;
-      }
-      @media screen and (max-width: 1430px) {
-        margin-right: 40px;
-      }
-      @media screen and (max-width: 1380px) {
-        margin-right: 55px;
-      }
-      @media screen and (max-width: 1330px) {
-        margin-right: 85px;
-      }
+      /*@media screen and (max-width: 1520px) {*/
+      /*  margin-right: 20px;*/
+      /*}*/
+      /*@media screen and (max-width: 1430px) {*/
+      /*  margin-right: 40px;*/
+      /*}*/
+      /*@media screen and (max-width: 1380px) {*/
+      /*  margin-right: 55px;*/
+      /*}*/
+      /*@media screen and (max-width: 1330px) {*/
+      /*  margin-right: 85px;*/
+      /*}*/
 
       img {
         padding-right: 514px;
@@ -320,6 +327,7 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
+      height: 40px;
 
       .account-menu {
         display: flex;
@@ -327,22 +335,21 @@
       }
 
       .dropdownWrapper {
-        height: 34px;
+        height: 32px;
         width: 239px;
-        margin-right: 119px;
+        margin-right: 40px;
         z-index: 3;
         position: relative;
 
         .sel_project_block {
           margin-right: 150px;
           background-color: #D15F45;
-          border-radius: 14px;
-          width: 100%;
-          height: 34px;
+          border-radius: 4px;
+          width: 191px;
+          height: 32px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
           cursor: pointer;
 
           &__proj {
@@ -384,29 +391,29 @@
         .clientsTop__dropdown {
           z-index: -1;
           position: absolute;
-          right: 0;
-          top: 41px;
+          right: 48px;
+          top: 36px;
+          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.20);
 
           .additional {
-            border: 2px solid #978d7e;
             color: #67573e;
             background-color: #fff;
-            font-size: 16px;
-            width: 240px;
+            font-size: 14px;
+            width: 191px;
 
             &__listItem {
-              padding: 15px;
-              border-bottom: 0.2px solid #978d7e;
+              padding: 12px;
               cursor: pointer;
+              border-bottom: 0.5px solid #f4f2f1;
 
               &:hover {
-                background-color: #ddd3c8;
+                background-color: #f4f2f1;
               }
             }
 
             .first {
               &:hover {
-                background-color: #ddd3c8;
+                background-color: #f4f2f1;
               }
             }
           }
@@ -429,9 +436,9 @@
         .accountMenuWrapper {
           .accountBlock {
             width: 230px;
-            height: 124px;
+            //height: 124px;
             background-color: #fff;
-            box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+            box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
             position: absolute;
             top: 44px;
             right: -115px;
@@ -573,16 +580,15 @@
 
   .clientsMainWrapper {
     box-sizing: border-box;
-    padding-top: 6vh;
-    padding-left: 150px;
+    padding-top: 40px;
+    padding-left: 135px;
     display: flex;
     height: 100%;
     position: relative;
 
     &__inner {
-      width: 100%;
       box-sizing: border-box;
-      padding: 30px;
+      padding: 20px 40px;
     }
 
     .maininfoWrapper {
@@ -634,16 +640,16 @@
       left: 0;
       z-index: 999;
       display: flex;
-      min-height: 94vh;
+      min-height: calc(100vh - 40px);
 
       &__sideBar {
         padding: 25px 0;
-        background-color: #998e7e;
-        width: 150px;
+        background-color: #948977;
+        width: 135px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+        box-shadow: 0 0 10px rgba(104, 87, 62, 0.6);
         z-index: 2;
         overflow: hidden;
       }
@@ -673,7 +679,7 @@
         font-size: 14px;
         font-weight: 700;
         padding: 0;
-        width: 167px;
+        width: 150px;
         height: 77vh;
         margin-bottom: 0;
         overflow-y: scroll;
@@ -782,7 +788,7 @@
         align-items: center;
         width: 100%;
         border-radius: 18px;
-        box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
+        box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
         margin-right: 36px;
         margin-bottom: 10px;
         padding: 0 14px;
@@ -815,18 +821,18 @@
     }
   }
 
-  .breadCrumbs {
-    max-height: 50px;
-    margin: 0px 0px 30px 0;
-    color: #67573e;
-    font-size: 22px;
+  /*.breadCrumbs {*/
+  /*  max-height: 50px;*/
+  /*  margin: 0px 0px 30px 0;*/
+  /*  color: #67573e;*/
+  /*  font-size: 22px;*/
 
-    .arrows {
-      font-size: 16px;
-      opacity: 0.6;
-      margin: 0 10px;
-    }
-  }
+  /*  .arrows {*/
+  /*    font-size: 16px;*/
+  /*    opacity: 0.6;*/
+  /*    margin: 0 10px;*/
+  /*  }*/
+  /*}*/
 
   @font-face {
     font-family: 'Myriad300';

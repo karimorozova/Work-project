@@ -6,6 +6,8 @@ const reportsapi = require('./reportsapi')
 const admin = require('./admin')
 const vendorRouter = require('./vendors/vendor')
 const pmareaRouter = require('./pmArea/pm-manage')
+const clientsRequests = require('./pmArea/clientsRequests')
+const delivery = require('./pmArea/delivery')
 const pricelistsRouter = require('./pricelists/prices')
 const currencyRatioRouter = require('./pricelists/currencyRatio')
 const vendorApplicationRouter = require('./vendors/application')
@@ -20,18 +22,23 @@ const memoqapiRouter = require('./memoqapi')
 const multipliers = require('./pricelists/multipliers')
 const settings = require('./settings')
 const dashboard = require('./dashboard')
+const OpenPangea = require('./OpenPangea')
+const autoLogin = require('./autoLogin')
 
 
 //ADMIN
 router.use('/', admin)
 router.use('/api', apiRouter)
+router.use('/open-pangea', OpenPangea)
 router.use('/service', serviceRouter)
 router.use('/zoho', zohoRouter)
 router.use('/vendors/application', vendorApplicationRouter)
 router.use('/industry', industryRouter)
+router.use('/clients-requests', clientsRequests)
 
 //ProjectQuotes Api, all routes are protected.
 router.use('/projectsapi', projectsRouter)
+router.use('/service-login',requiresLogin, autoLogin)
 
 router.use('/api-settings', requiresLogin, settings)
 router.use('/dashboard', dashboard)
@@ -43,6 +50,7 @@ router.use('/pricelists', requiresLogin, multipliers)
 router.use('/clientsapi', requiresLogin, clientsapiRouter)
 router.use('/vendorsapi', requiresLogin, vendorsapiRouter)
 router.use('/memoqapi', requiresLogin, memoqapiRouter)
+router.use('/delivery', requiresLogin, delivery)
 //ADMIN
 
 //VENDOR

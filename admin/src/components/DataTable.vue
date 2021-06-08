@@ -17,7 +17,7 @@
       )
         .table__tbody-cell(
           v-for="field of fields"
-          :style="{width: field.width, padding: field.padding}"
+          :style="{width: field.width, padding: field.padding, ...field.style}"
           :class="[bodyCellClass, field.cellClass]"
         )
           slot(:name="field.key" :row="row" :index="index")
@@ -91,7 +91,7 @@ export default {
 
     .table__body-row {
       .steps-cell{
-        padding: 7px 5px 7px 5px;
+        padding: 6px 5px 6px 5px;
       }
       cursor: pointer;
       &:nth-of-type(odd) {
@@ -138,7 +138,7 @@ export default {
   &__thead-cell {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 7px 5px 7px 5px;
+    padding: 6px 5px 6px 5px;
     border: 1px solid $cell-border;
     border-right: none;
     border-left: 1px solid $white;
@@ -152,7 +152,7 @@ export default {
   &__thead-cell-icon {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 7px 5px 7px 5px;
+    padding: 6px 5px 6px 5px;
     border: 0.5px solid $cell-border;
     border-right: none;
     border-left: 0.5px solid $white;
@@ -163,7 +163,7 @@ export default {
   &__tbody-cell {
     box-sizing: border-box;
     font-size: 14px;
-    padding: 7px 5px 7px 5px;
+    padding: 6px 5px 6px 5px;
     border-bottom: 1px solid $cell-border;
     border-left: 1px solid $cell-border;
     border-right: none;
@@ -191,10 +191,11 @@ export default {
   max-height: 320px;
 }
 
-.steps-table-cell {
-  /*display: flex;*/
-  /*align-items: center;*/
-  /*box-sizing: border-box;*/
+.form-table-body {
+  max-height: 320px;
+  .table__body-row {
+    cursor: default;
+  }
 }
 
 .vendors-table__body,
@@ -258,6 +259,7 @@ export default {
 }
 
 .review-body {
+  max-height: 800px;
   .table__body-row {
     cursor: default;
   }
@@ -314,4 +316,8 @@ export default {
     align-items: center;
     display: flex;
   }
+
+.hideHead {
+  height: 1px;
+}
 </style>

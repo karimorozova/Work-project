@@ -4,7 +4,7 @@ function getMessageWithRandomPassword(password) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear pangea system user,</span></p>
                    	<p style="font-weight: 400;">
                    		We generated new password for you to sign in to the system.
@@ -25,7 +25,7 @@ function managerAssignmentNotifyingMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.user.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Quote  <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.projectId } - ${ obj.projectName }</a> has been accepted. Please, assign Vendor(s) for the task(s) to start project.
@@ -44,7 +44,7 @@ function managerTaskCompleteNotificationMessage(obj, user) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                 		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Task ${ obj.task.taskId } from project <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.projectId } - ${ obj.projectName } </a>  is completed and ready for DR1.
@@ -70,7 +70,7 @@ function deliverablesDownloadedMessage(obj, user) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.manager.firstName } ${ lastName }</span></p>  
                     <p style="font-weight: 400;">
                         Task ${ obj.taskId } from project  <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.project_id } - ${ obj.projectName}</a>  has been reviewed and delivered by ${user.firstName} ${user.lastName || ""}
@@ -94,7 +94,7 @@ function managerRequestNotifyingMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.user.firstName }</span></p>  
                     <p>
                         Client ${ obj.customer.name } has send a request.
@@ -144,7 +144,7 @@ function managerRequestAssignedMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.user.firstName }</span></p>  
                     <p>
                         Request ${ obj.requestId } - ${ obj.projectName } has been assigned to you.
@@ -194,7 +194,7 @@ function managerProjectAcceptedMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <h4 class="contact-name">Dear ${ obj.accManager }</h4>
                     <p>
                         Client ${ obj.customer.name } has just accepted quote:  <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.projectId } - ${ obj.projectName }</a>
@@ -215,7 +215,7 @@ function managerProjectRejectedMessage(obj) {
             <header style="background-color:#66563E;text-align:center;" >
                 <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
             </header>
-            <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+            <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                 <h4 class="contact-name">Dear ${ obj.manager }</h4>
                 <p>
                     Client ${ obj.customer.name } has just rejected quote: <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.projectId } - ${ obj.projectName }</a>
@@ -238,7 +238,7 @@ function stepStartedMessage(obj, user) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                    	<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Vendor ${ obj.step.vendor.firstName } ${ vendorSurname } just start the step: ${ obj.step.stepId } from <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.projectId } - ${ obj.projectName }</a>
@@ -261,7 +261,7 @@ function stepCompletedMessage(obj, user) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Vendor ${ obj.step.vendor.firstName } ${ vendorSurname } just completed the step: ${ obj.step.stepId } from <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.projectId } - ${ obj.projectName }</a>
@@ -280,7 +280,7 @@ function requestCancelledMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <h4 class="contact-name">Dear ${ obj.accountManager.firstName } ${ lastName }</h4>
                     <p>
                         Client${ obj.customer.name } has cancelled the project: ${ obj.requestId } - ${ obj.projectName }.
@@ -302,7 +302,7 @@ function stepDecisionMessage(obj, user) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                  		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Vendor ${ obj.step.vendor.firstName } ${ vendorSurname } has ${ decision } the assigned step: ${ obj.step.stepId } from <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a>
@@ -324,7 +324,7 @@ function readyForDr2Message(obj, user) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
                     <p style="font-weight: 400;">
                         The Delivery Review for ${ obj.taskId } from project <a href="https://admin.pangea.global/project-details/${obj._id}" target="_blank" style="color: #D15F45">${ obj.projectId } - ${ obj.projectName }</a> has been finished. 
@@ -343,18 +343,33 @@ function readyForDr2Message(obj, user) {
             </div>`;
 }
 
-//Template for DR has been reassigned
-function managerDr1Reassign(obj, DRNumber) {
-	const lastNamePrevManager = obj.prevManager.lastName || "";
-	const lastNameNextManager = obj.manager.lastName || "";
+function rollbackDR1Template(taskId, projectId){
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
-                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.prevManager.firstName } ${ lastNamePrevManager }</span></p>
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="font-width: 400;">
-                        The Delivery Review ${DRNumber} for ${ obj.taskId } from project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> has been reassigned to ${ obj.manager.firstName } ${ lastNameNextManager }.
+                    	Delivery review of the task <a href="https://admin.pangea.global/project-details/${projectId}" target="_blank" style="color: #D15F45"> ${ taskId }</a> is assigned to you.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+//Template for DR has been reassigned
+function managerDr1Reassign(obj, DRNumber) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.prevManager.firstName } ${  obj.prevManager.lastName || "" }</span></p>
+                    <p style="font-width: 400;">
+                        The Delivery Review ${DRNumber} for ${ obj.taskId } from project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> has been reassigned to ${ obj.manager.firstName } ${ obj.manager.lastName || "" }.
                     </p>
                 </div>
                 <footer>
@@ -371,7 +386,7 @@ function managerDr1Assigned(obj, DRNumber) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.manager.firstName } ${ lastName }</span></p>
                     <p style="font-weight: 400;">
                         Delivery review ${DRNumber} for ${ obj.taskId } from project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> has been assigned to you.
@@ -379,6 +394,58 @@ function managerDr1Assigned(obj, DRNumber) {
                     <p style="font-weight: 400;">
                         Project deadline is: ${ obj.project.deadline }
                     </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+function severalDr1Assign(obj) {
+	const tasks = obj.checkedTasksId.reduce((acc, curr) => {
+		acc = acc + `<li>${curr}</li>`
+		return acc
+	}, '')
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.manager.firstName } ${  obj.manager.lastName || "" }</span></p>
+                    <p style="font-width: 400;">
+                        DR1 for project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> 
+                        has been assigned to you for the following tasks
+                    </p>
+                    <ul style="font-width: 400;">
+                    	${tasks}
+										</ul>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+function severalDr1reAssign(obj) {
+	const tasks = obj.checkedTasksId.reduce((acc, curr) => {
+		acc = acc + `<li>${curr}</li>`
+		return acc
+	}, '')
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.prevManager.firstName } ${  obj.prevManager.lastName || "" }</span></p>
+                    <p style="font-width: 400;">
+                        DR1 from project <a href="https://admin.pangea.global/project-details/${obj.project._id}" target="_blank" style="color: #D15F45">${ obj.project.projectId } - ${ obj.project.projectName }</a> 
+                        has been reassigned to ${ obj.manager.firstName } ${  obj.manager.lastName || "" } for the following tasks:
+                    </p>
+                    <ul style="font-width: 400;">
+                    	${tasks}
+										</ul>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -404,5 +471,7 @@ module.exports = {
 	readyForDr2Message,
 	managerDr1Reassign,
 	managerDr1Assigned,
-
+	rollbackDR1Template,
+	severalDr1Assign,
+	severalDr1reAssign
 };

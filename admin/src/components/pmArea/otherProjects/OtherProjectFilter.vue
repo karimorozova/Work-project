@@ -199,13 +199,13 @@
     }
 
     &__text {
-      line-height: 34px;
+      line-height: 32px;
     }
 
     &__update-btn {
       width: auto;
       padding: 0 15px;
-      height: 34px;
+      height: 32px;
       color: white;
       font-size: 14px;
       border-radius: 8px;

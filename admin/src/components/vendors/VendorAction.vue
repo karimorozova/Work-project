@@ -2,12 +2,14 @@
 .action
   .action__title Action
   .action__row
-    .action__icon
-      i.fas.fa-info-circle
+    //.action__icon
+    //  i.fas.fa-info-circle
     .action__icon
       i.fa.fa-envelope(@click="openPreview")
-    .action__icon
-      i.fab.fa-slack-hash
+    //.action__icon
+    //  i.fab.fa-slack-hash
+    .action__icon(@click="goToVendor")
+      i.fas.fa-sign-in-alt
 
 </template> 
 <script>
@@ -15,7 +17,10 @@ export default {
   methods:{
     openPreview(){
       this.$emit("openPreview");
-    }
+    },
+    goToVendor() {
+      this.$emit("openVendor");
+    },
   }
 };
 </script>
@@ -29,7 +34,7 @@ export default {
   padding: 20px;
 
   &__title {
-    font-size: 22px;
+    font-size: 21px;
     border-bottom: 1px solid #c5bfb5;
     padding-bottom: 5px;
   }
@@ -47,7 +52,7 @@ export default {
     height: 28px;
 
     i {
-      font-size: 22px;
+      font-size: 18px;
       cursor: pointer;
     }
     

@@ -110,7 +110,7 @@ export default {
 
     .icons-link {
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       margin-left: 3px;
       margin-right: 3px;
     }

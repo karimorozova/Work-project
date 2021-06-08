@@ -1,7 +1,7 @@
 <template lang="pug">
   .files-upload
     UploadFileButton(:text="buttonValue")
-      input.files-upload__file-input(type="file" @change='uploadFiles' multiple :class="inputClass")
+      input.files-upload__file-input(type="file" @change='uploadFiles' :multiple='isMulti' :class="inputClass")
     //.files-upload__files-list(:class="{'files-upload_bordered': isFilesShow && files.length}")
       .files-upload__files-expander(v-if="files.length")
         .files-upload__list-title(@click="toggleList") Files list
@@ -20,6 +20,10 @@
 				type: Array,
 				default: () => []
 			},
+      isMulti: {
+        type: Boolean,
+        default: true,
+      },
 			inputClass: { type: String }
 		},
 		data() {

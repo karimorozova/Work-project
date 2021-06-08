@@ -1,52 +1,46 @@
 <template lang="pug">
-.add-button(@click="makeAction")
-    span.add-button__sign +
+  .add-button(@click="click")
+    span.add-button__sign
+      span +
 </template>
 
 <script>
-export default {
-    methods: {
-        makeAction() {
-            this.$emit("makeAction");
-        }
-    }
-}
+	export default {
+		methods: {
+			click() {
+				this.$emit("add")
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
 
-.add-button {
-    border: 1px solid #66563D;
+  .add-button {
+    border: 2px solid #938676;
     border-radius: 50%;
     width: 25px;
     height: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0.8;
+    opacity: 0.7;
+    transition: ease 0.2s;
     cursor: pointer;
+
     &__sign {
-        font-size: 29px;
+      margin-top: -6px;
+      height: 25px;
+      width: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
     }
-    .language-pairs__delete & {
-        @media (max-width: 450px) {
-            position: absolute;
-            right: -173px;
-            top: -265px;
-        }
-        @media (max-width: 380px) {
-            right: -154px;
-            top: -247px;
-        }
-        @media (max-width: 360px) {
-            right: -145px;
-            top: -237px;
-        }
-        @media (max-width: 320px) {
-            right: -122px;
-            top: -215px;
-        }
-    }
-}
+  }
+
+  .add-button:hover {
+    opacity: 1;
+  }
 
 </style>

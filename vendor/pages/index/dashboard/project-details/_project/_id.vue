@@ -211,7 +211,7 @@
   .details {
     color: $main-color;
     width: 100%;
-    padding: 30px;
+    padding: 20px 40px;
 
     &__data {
       width: 1040px;
@@ -241,7 +241,7 @@
 
     &__describe {
       width: 30%;
-      background-color: #F2EFEB;
+      background-color: #f4f2f1;
     }
 
     &__modal {

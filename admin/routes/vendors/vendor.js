@@ -45,10 +45,10 @@ router.post("/reset-pass", async (req, res) => {
 	try {
 		const vendor = await Vendors.findOne({ "email": email })
 		if (!vendor) {
-			return res.status(400).send("No such user")
+			return res.status(400).send("No such a user in the system. Please, contact vendor coordinator.")
 		}
 		await setVendorNewPassword(vendor, email)
-		res.send("new password sent")
+		res.send("New password sent.")
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Server error. Try again later.")

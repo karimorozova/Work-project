@@ -26,6 +26,7 @@
 				client: {
 					name: "",
 					status: "",
+          clientType: "Company",
 					website: "",
 					contract: "",
 					isTest: false,

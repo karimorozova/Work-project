@@ -1,12 +1,12 @@
 <template lang="pug">
-    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]" :style="positionStyle")
+    .drop-select(v-click-outside="outOptions" :class="[{'z-index': isDropped, 'table-drop-menu-no-shadow': isTableDropMenuNoShadow, 'table-drop-menu': isTableDropMenu, 'disabled': isDisabled}, customClass]" :style="positionStyle")
         .select
             span.selected(v-if="selectedOption") {{ selectedOption }}
             span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
             .arrow-button(@click="toggleOptions" :class="{'no-border': projectsType === 'requests'}")
                 img(src="../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
         .drop(v-if="isDropped")
-            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search" ref="search")
+            input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" placeholder="Search" ref="search" :disabled="isDisabled")
             .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
                 span {{ showOption(option) }}
             .drop__item(v-if="isRemoveOption" @click="removeOption")
@@ -40,6 +40,10 @@ export default {
             type: Boolean,
             default: false
         },
+        isTableDropMenuNoShadow: {
+          type: Boolean,
+          default: false
+        },
         projectsType: {
           type: String
         },
@@ -49,6 +53,10 @@ export default {
         isRemoveOption: {
 	        type: Boolean,
 	        default: false
+        },
+        isDisabled: {
+          type: Boolean,
+          default: false
         }
     },
     data() {
@@ -82,7 +90,7 @@ export default {
             this.searchValue = "";
         },
         toggleOptions(event) {
-            if (this.projectsType === 'requests') {
+            if (this.projectsType === 'requests' || this.isDisabled) {
               return
             }
             this.isDropped = !this.isDropped;
@@ -310,6 +318,22 @@ export default {
         box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
     }
 }
+  .table-drop-menu-no-shadow {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    overflow: visible;
+    .drop {
+      border: 1px solid #BFB09D;
+    }
+    .select {
+      height: 31px;
+    }
+  }
+
+  .disabled {
+    background-color: #eee;
+  }
 
 .rates-table {
     .select {

@@ -248,7 +248,7 @@
       position: absolute;
       top: 5px;
       right: 7px;
-      font-size: 22px;
+      font-size: 21px;
       cursor: pointer;
       height: 22px;
       width: 22px;

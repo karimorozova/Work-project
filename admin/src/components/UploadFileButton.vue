@@ -40,10 +40,10 @@
       /*overflow: hidden;*/
       position: relative;
       width: 55px;
-      height: 34px;
+      height: 32px;
       color: #fff;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 4px;
       text-align: center;
       background-color: #d15f45;
       display: flex;
@@ -98,7 +98,7 @@
       font-size: 30px;
       font-family: Myriad400;
       width: 55px;
-      height: 34px;
+      height: 32px;
     }
   }
 </style>

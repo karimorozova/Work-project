@@ -1,8 +1,7 @@
 <template lang="pug">
-  .details
-    .details__data(v-if="project._id")
-      .details__header
-        .details__title {{ title }}
+  .details(v-if="project._id")
+    .details__title {{ title }}
+    .details__data
       .details__info
         .details__main
           MainInfo
@@ -75,14 +74,11 @@
     color: $main-color;
     width: 100%;
     box-sizing: border-box;
-    display: flex;
-    align-items: center;
+    width: 1040px;
 
     &__data {
-      width: 1038px;
-      min-width: 1038px;
-      box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
       box-sizing: border-box;
+      box-shadow: rgba(103, 87, 62, .3) 0px 2px 5px, rgba(103, 87, 62, .15) 0px 2px 6px 2px;
     }
 
     &__header {
@@ -91,7 +87,8 @@
     }
 
     &__title {
-      font-size: 18px;
+      margin: 30px 0 10px;
+      font-size: 20px;
     }
 
     &__info {
@@ -100,12 +97,12 @@
     }
 
     &__main {
-      width: 75%;
+      width: 72%;
     }
 
     &__describe {
-      width: 25%;
-      background-color: #F4F0EE;
+      width: 28%;
+      background-color: #f4f2f1;
     }
   }
 

@@ -1,19 +1,24 @@
 <template lang="pug">
   .project-finance
-    .project-finance__title(@click="toggleFinance") Finance
-      img.project-finance__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
-    .project-finance__content(v-if="isFinanceShow")
+    //.project-finance__title(@click="toggleFinance") Finance
+      //img.project-finance__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
+    //.project-finance__content(v-if="isFinanceShow")
+
+    .project-finance__header
+      .project-finance__titleFinance Finance
+      .actionsButton(v-if="!isProjectFinished")
+        .actionsButton__icon
+          img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+          img.opacity(v-else :src="icons.edit.icon")
+        .actionsButton__icon
+          img.defaultIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+          img.opacity(v-else :src="icons.cancel.icon")
+
+    .project-finance__details
       .project-finance__empty(v-if="!currentProject.tasks.length")
-        b No information available.
+        span No information available.
       .project-finance__noEmpty(v-else)
         .project-finance__content-displayBlock
-          .actionsButton
-            .actionsButton__icon
-              img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
-              img.opacity(v-else :src="icons.edit.icon")
-            .actionsButton__icon
-              img.defaultIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-              img.opacity(v-else :src="icons.cancel.icon")
           .finance-info__bars
             .bar
               .bar__green(:style="{ width: barsStatistic.receivables.width }")
@@ -186,7 +191,11 @@
 					profit: (basePrice - Price.payables).toFixed(2),
 					margin: ((1 - (Price.payables / basePrice)) * 100).toFixed(2)
 				}
-			}
+			},
+			isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
 		components: {
 			Discounts
@@ -199,8 +208,6 @@
 
   .actionsButton {
     display: flex;
-    position: absolute;
-    right: -195px;
 
     &__icon {
       margin-left: 5px;
@@ -218,11 +225,11 @@
 
   .minPrice {
     display: flex;
-    padding: 16px 30px;
-    background: #F2EFEB;
+    padding: 5px 5px 2px 5px;
+    background: #f4f2f1;
     border: 2px solid #938676;
     flex-direction: column;
-    margin-right: 40px;
+    margin-bottom: 20px;
 
     .minPrice-item-check {
       min-height: 30px;
@@ -236,7 +243,7 @@
     }
 
     .minPrice-item {
-      width: 230px;
+      width: 250px;
       min-height: 30px;
       display: flex;
       align-items: center;
@@ -253,20 +260,33 @@
 
   .project-finance {
     box-sizing: border-box;
-    min-width: 1000px;
+    width: 400px;
+    margin-top: 40px;
+    padding: 20px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-    margin: 40px;
 
-    &__content {
-      padding: 0 20px 20px 20px;
+    &__titleFinance{
+      font-size: 21px;
+      font-family: Myriad600;
+    }
+    &__header{
+      margin-bottom: 20px;
+      border-bottom: 1px solid #c5bfb5;
+      width: 100%;
+      padding-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__details {
+      //padding: 0 20px 20px 20px;
 
       &-displayBlock {
-        width: 80%;
         position: relative;
       }
 
       &-settingBlock {
-        display: flex;
         margin-bottom: 20px;
       }
     }
@@ -276,6 +296,7 @@
       border-top: 1px solid #C5BFB5;
       display: flex;
       font-family: Myriad900;
+      margin-top: 10px;
 
       &-title {
         width: 60px;
@@ -284,8 +305,9 @@
 
     &__title {
       padding: 20px;
-      font-size: 22px;
+      font-size: 21px;
       display: flex;
+      font-family: Myriad600;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
@@ -301,8 +323,8 @@
 
     &__dashboard {
       display: flex;
-      border: 2px solid #938676;
-      border-radius: 8px;
+      border: 1px solid #67573E;
+      border-radius: 5px;
       align-items: center;
       margin-bottom: 20px;
     }
@@ -311,8 +333,8 @@
       width: 33%;
       display: flex;
       justify-content: center;
-      border-left: 2px solid #938676;
-      padding: 6.5px;
+      border-left: 1px solid #67573E;
+      padding: 6px 3px;
 
       &:first-child {
         border-left: none;
@@ -324,7 +346,7 @@
 
       &-value {
         min-width: 10%;
-        margin-left: 10px;
+        margin-left: 6px;
 
       }
     }
@@ -421,7 +443,7 @@
     color: #67573e;
     height: 22px;
     border-radius: 5px;
-    width: 50px;
+    width: 70px;
     border: 1px solid #67573e;
   }
 

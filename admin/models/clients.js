@@ -13,6 +13,11 @@ const ClientSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	clientType: {
+		type: String,
+		default: 'Company',
+		trim: true
+	},
 	email: {
 		type: String,
 		trim: true

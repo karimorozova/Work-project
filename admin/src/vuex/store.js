@@ -6,6 +6,7 @@ import { vendors } from "./vendors/";
 import { clients } from "./clients/";
 import { pmarea } from "./pmarea/";
 import { settings } from "./settings/";
+import { clientsRequests } from "./clientsRequests/";
 
 
 Vue.use(Vuex);
@@ -17,6 +18,7 @@ export const store = new Vuex.Store({
         c: vendors,
         d: clients,
         e: pmarea,
-        f: settings
+        f: settings,
+        clientsRequests
     }
 });

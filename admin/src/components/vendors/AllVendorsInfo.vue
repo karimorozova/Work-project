@@ -15,9 +15,6 @@
         @setTargetFilter="setTargetFilter"
       )
 
-      .all-vendors__new-vendor
-        input.all-vendors__add-vendor(type="submit" value="Add vendor" @click="addVendor")
-
       VendorsTable(
         @bottomScrolled="bottomScrolled"
         @update="update"
@@ -81,9 +78,7 @@
 					await this.getVendors()
 				}
 			},
-			addVendor() {
-				this.$router.push("/vendors/new-vendor")
-			},
+
 			async setFilter({ option }, prop) {
 				this[prop] = option
 				await this.getVendors()
@@ -149,29 +144,6 @@
     &__new-vendor {
       display: flex;
       margin-bottom: 20px;
-    }
-
-    &__add-vendor {
-      min-width: 120px;
-      padding: 0 24px 0 24px;
-      height: 34px;
-      color: $white;
-      font-size: 14px;
-      border-radius: 7px;
-      background-color: $orange;
-      border: none;
-      transition: .1s ease;
-      outline: none;
-      letter-spacing: 0.2px;
-
-      &:hover {
-        cursor: pointer;
-        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
-      }
-
-      &:active {
-        transform: scale(.98);
-      }
     }
   }
 </style>

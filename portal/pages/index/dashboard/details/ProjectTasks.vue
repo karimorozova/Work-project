@@ -3,8 +3,9 @@
     DataTable(
       :fields="fields"
       :tableData="projectTasks"
-      :bodyClass="projectTasks.length < 10 ? 'tbody_visible-overflow' : ''"
-      :tableHeadRowClass="projectTasks.length < 10 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="cursor-default"
+      :bodyClass="[{ 'tbody_visible-overflow': projectTasks.length < 6 }]",
+      :tableheadRowClass="[{ 'tbody_visible-overflow':projectTasks.length < 6 }]",
       :rowClass="'withoutCursor'"
     )
       .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
@@ -31,7 +32,10 @@
       .tasks-table__data.tasks-table_centered(slot="icons" slot-scope="{ row }")
         .tasks-table__icons(v-if="isApproveReject(row)")
           img.tasks-table__icon(v-for="(icon, key) in icons" :src="icon.src" @click="makeDecision(row, key)")
-        img.tasks-table__download(v-if="isDownload(row)" src="../../../../assets/images/download.png" @click="download(row)")
+        .tasks-table__icons(v-else) -
+
+    div(v-if="!projectTasks.length") No information available...
+
 
 </template>
 
@@ -45,15 +49,16 @@
 
 	export default {
 		mixins: [taskPair, currencyIconDetected],
+		// mixins: [currencyIconDetected],
 		data() {
 			return {
 				fields: [
-					{ label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "20%", padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0" },
+					{ label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "28%", padding: "0" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "15%", padding: "0" },
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "15%", padding: "0" },
-					{ label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "15%", padding: "0" },
+					{ label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "12%", padding: "0" },
 					{ label: "Cost", headerKey: "headerCost", key: "cost", width: "15%", padding: "0" },
-					{ label: " ", headerKey: "headerDownload", key: "icons", width: "15%", padding: "0" }
+					{ label: "Quote Action", headerKey: "headerDownload", key: "icons", width: "15%", padding: "0" }
 				],
 				domain: "",
 				icons: {
@@ -65,7 +70,7 @@
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
-				updateTaskStatus: "updateTaskStatus"
+				updateTaskStatus: "updateTaskStatus",
 			}),
 			getWordcount(row) {
 				return row.finance.Wordcount.receivables
@@ -79,9 +84,9 @@
 			isApproveReject(task) {
 				return task.status === 'Quote sent'
 			},
-			isDownload(task) {
-				return task.status === 'Ready for Delivery' || task.status === 'Delivered'
-			},
+			// isDownload(task) {
+			// 	return task.status === 'Ready for Delivery' || task.status === 'Delivered'
+			// },
 			async makeDecision(task, key) {
 				const status = key === 'approve' ? 'Approved' : 'Rejected'
 				try {
@@ -89,24 +94,24 @@
 				} catch (err) {
 				}
 			},
-			async download(task) {
-				try {
-					let href = task.deliverables
-					if (!href) {
-						const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`)
-						href = result.data.link
-					}
-					let link = document.createElement('a')
-					link.href = this.domain + href
-					link.target = "_blank"
-					link.click()
-					if (task.status === "Ready for Delivery") {
-						await this.updateTaskStatus({ task, status: 'Delivered' })
-					}
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" })
-				}
-			},
+			// async download(task) {
+			// 	try {
+			// 		let href = task.deliverables
+			// 		if (!href) {
+			// 			const result = await this.$axios.get(`/portal/deliverables?taskId=${ task.taskId }`)
+			// 			href = result.data.link
+			// 		}
+			// 		let link = document.createElement('a')
+			// 		link.href = this.domain + href
+			// 		link.target = "_blank"
+			// 		link.click()
+			// 		if (task.status === "Ready for Delivery") {
+			// 			await this.updateTaskStatus({ task, status: 'Delivered' })
+			// 		}
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" })
+			// 	}
+			// },
 			getProgress(task, index) {
 				if (this.project.hasOwnProperty('fromXTRF')) {
 					return this.project.tasks[index].progress
@@ -126,7 +131,8 @@
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				clientLanguages: "getCombinations"
+				clientLanguages: "getCombinations",
+        languages: "allLanguages",
 			}),
 			projectTasks() {
 				return this.project.tasks.filter(({ status }) => status !== 'Created')

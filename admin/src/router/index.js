@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Register from '@/components/Register'
 import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
 import Main from '@/components/Main'
@@ -12,6 +11,7 @@ import ClientsSettings from '@/components/sliders/ClientsSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
 import RequestInfo from '@/components/pmArea/RequestInfo'
+import clientRequestInfo from '@/components/pmArea/clientRequests/clientRequestInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import Pricelists from '@/components/finance/Pricelists'
 import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayout'
@@ -73,6 +73,7 @@ import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
 import {default as PendingCompetenciesLayout} from "../components/vendors/pending-competencies/Layout"
 import { store } from '../vuex/store'
+import TableClientApiSetting from "../components/Table/TableClientApiSetting";
 
 Vue.use(Router)
 
@@ -84,11 +85,6 @@ const router = new Router({
             name: 'xtrf',
             component: Xtrf
         },
-        // {
-        //     path: '/register',
-        //     name: 'register',
-        //     component: Register
-        // },
         {
             path: '/login',
             name: 'login',
@@ -152,6 +148,11 @@ const router = new Router({
                             path: 'discounts',
                             name: 'discounts',
                             component: TableDiscounts
+                        },
+                        {
+                            path: 'api-customers',
+                            name: 'api-customers',
+                            component: TableClientApiSetting
                         },
                         {
                             path: 'leadsources',
@@ -410,10 +411,15 @@ const router = new Router({
                     name: 'project-details',
                     component: ProjectInfo
                 },
+                // {
+                //     path: 'request-details/:id',
+                //     name: 'request-details',
+                //     component: RequestInfo
+                // },
                 {
                     path: 'request-details/:id',
                     name: 'request-details',
-                    component: RequestInfo
+                    component: clientRequestInfo
                 },
                 {
                     path: 'other-project-details/:id',

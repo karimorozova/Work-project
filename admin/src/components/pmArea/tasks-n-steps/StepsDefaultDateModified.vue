@@ -302,7 +302,7 @@
 
     &__image {
       position: absolute;
-      top: 8px;
+      top: 9px;
       right: 5px;
       width: 18px;
       cursor: pointer;

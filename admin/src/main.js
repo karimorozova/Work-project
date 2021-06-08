@@ -7,7 +7,6 @@ import { store } from './vuex/store'
 import axios from 'axios';
 import VueResource from 'vue-resource';
 import 'normalize.css';
-import "./assets/scss/style.scss";
 import VueLodash from 'vue-lodash';
 import "./filters/GeneralFilters";
 export const bus = new Vue();
@@ -19,7 +18,7 @@ const gauthOption = {
 
 
 const io = require("socket.io-client");
-const socket = io('https://admin.pangea.global')
+const socket = io(window.location.origin)
 Vue.prototype.$socket = socket
 
 

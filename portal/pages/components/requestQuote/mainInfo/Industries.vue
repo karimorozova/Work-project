@@ -64,7 +64,7 @@ export default {
     &__item {
         display: flex;
         align-items: center;
-        border: 1px solid $deep-brown;
+        border: 1px solid $main-color;
         border-radius: 10px;
         width: 30%;
         height: 75px;
@@ -73,7 +73,7 @@ export default {
         box-sizing: border-box;
         cursor: pointer;
         &:hover {
-            background-color: $deep-brown;
+            background-color: $main-color;
             color: $white;
             .industries__icon {
                 filter: invert(100%) brightness(5);;
@@ -94,7 +94,7 @@ export default {
         padding: 5px 0 0 10px;
     }
     &_active {
-        background-color: $deep-brown;
+        background-color: $main-color;
         color: $white;
         .industries__icon {
             filter: invert(100%) brightness(5);;

@@ -91,7 +91,7 @@
 
       .table__body-row {
         .steps-cell{
-          padding: 7px 5px 7px 5px;
+          padding: 6px 5px 6px 5px;
         }
         cursor: pointer;
         &:nth-of-type(odd) {
@@ -138,7 +138,7 @@
     &__thead-cell {
       box-sizing: border-box;
       font-size: 14px;
-      padding: 7px 5px 7px 5px;
+      padding: 6px 5px 6px 5px;
       border: 1px solid $cell-border;
       border-right: none;
       border-left: 1px solid $white;
@@ -152,7 +152,7 @@
     &__thead-cell-icon {
       box-sizing: border-box;
       font-size: 14px;
-      padding: 7px 5px 7px 5px;
+      padding: 6px 5px 6px 5px;
       border: 0.5px solid $cell-border;
       border-right: none;
       border-left: 0.5px solid $white;
@@ -163,7 +163,7 @@
     &__tbody-cell {
       box-sizing: border-box;
       font-size: 14px;
-      padding: 7px 5px 7px 5px;
+      padding: 6px 5px 6px 5px;
       border-bottom: 1px solid $cell-border;
       border-left: 1px solid $cell-border;
       border-right: none;

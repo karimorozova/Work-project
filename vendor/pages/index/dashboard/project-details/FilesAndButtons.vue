@@ -74,27 +74,32 @@
 				if (!this.job.isVendorRead) return
 				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
 				try {
-					const memoqUsers = await this.$axios.get(`vendor/get-memoq-users?token=${ this.getToken }`)
-					const memoqUsersData = JSON.parse(window.atob(memoqUsers.data))
-					const memoqUserGuids = memoqUsersData.map(({ id }) => id)
-					const memoqUserMails = memoqUsersData.map(({ email }) => email)
 					const typeCAT = type === 'CAT Wordcount'
-					const noUserGuidInMemoq = !memoqUserGuids.includes(this.getVendor.guid)
-					const includesEmailInMemoq = memoqUserMails.includes(this.getVendor.email)
-					switch (true) {
-						case typeCAT && this.getVendor.guid === null && !includesEmailInMemoq:
-							await this.createMemoqTranslator()
-							break
-						case typeCAT && !!this.getVendor.guid && noUserGuidInMemoq && !includesEmailInMemoq:
-							this.createMemoqTranslator()
-							break
-						case typeCAT && this.getVendor.guid === null && includesEmailInMemoq:
-							await this.rewriteGuid(memoqUsersData)
-							break
-						case typeCAT && !!this.getVendor.guid && noUserGuidInMemoq && includesEmailInMemoq:
-							await this.rewriteGuid(memoqUsersData)
-							break
-					}
+
+					if(typeCAT){
+						const memoqUsers = await this.$axios.get(`vendor/get-memoq-users?token=${ this.getToken }`)
+						const memoqUsersData = JSON.parse(window.atob(memoqUsers.data))
+						const memoqUserGuids = memoqUsersData.map(({ id }) => id)
+						const memoqUserMails = memoqUsersData.map(({ email }) => email)
+
+						const noUserGuidInMemoq = !memoqUserGuids.includes(this.getVendor.guid)
+						const includesEmailInMemoq = memoqUserMails.includes(this.getVendor.email)
+						switch (true) {
+							case typeCAT && this.getVendor.guid === null && !includesEmailInMemoq:
+								await this.createMemoqTranslator()
+								break
+							case typeCAT && !!this.getVendor.guid && noUserGuidInMemoq && !includesEmailInMemoq:
+								this.createMemoqTranslator()
+								break
+							case typeCAT && this.getVendor.guid === null && includesEmailInMemoq:
+								await this.rewriteGuid(memoqUsersData)
+								break
+							case typeCAT && !!this.getVendor.guid && noUserGuidInMemoq && includesEmailInMemoq:
+								await this.rewriteGuid(memoqUsersData)
+								break
+						}
+          }
+
 				} catch (err) {
 					console.log(err)
 					this.alertToggle({ message: "Error in creating Vendor in MemoQ or guid recovering!", isShow: true, type: "error" })

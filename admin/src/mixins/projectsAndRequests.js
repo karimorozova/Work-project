@@ -6,7 +6,7 @@ export default {
 		},
 		async bottomScrolled({ filters }) {
 			if(this.isDataRemain) {
-				const result = await this.$http.post(`/api/${ this.endpoint }`, { ...filters, lastDate: this.lastDate });
+				const result = await this.$http.post(`/pm-manage/${ this.endpoint }`, { ...filters, lastDate: this.lastDate });
 				this.prop === 'requests' ? this.setRequests([...this.requests, ...result.body]) : this.setAllProjects([...this.projects, ...result.body]);
 				this.isDataRemain = result.body.length === 25;
 				this.lastDate = result.body && result.body.length ? result.body[result.body.length - 1].startDate : "";
@@ -32,28 +32,28 @@ export default {
 			let result;
 			switch (name) {
 				case 'closed-projects':
-					result = await this.$http.post(`/api/${ this.endpoint }`, {
+					result = await this.$http.post(`/pm-manage/${ this.endpoint }`, {
 						...filters,
 						lastDate: this.lastDate,
 						projectType: "Closed"
 					});
 					break;
 				case 'quote-projects':
-					result = await this.$http.post(`/api/${ this.endpoint }`, {
+					result = await this.$http.post(`/pm-manage/${ this.endpoint }`, {
 						...filters,
 						lastDate: this.lastDate,
 						projectType: "Quote"
 					});
 					break;
 				case 'open-projects':
-					result = await this.$http.post(`/api/${ this.endpoint }`, {
+					result = await this.$http.post(`/pm-manage/${ this.endpoint }`, {
 						...filters,
 						lastDate: this.lastDate,
 						projectType: "Open"
 					});
 					break;
 				default:
-					result = await this.$http.post(`/api/${ this.endpoint }`, {
+					result = await this.$http.post(`/pm-manage/${ this.endpoint }`, {
 						...filters,
 						lastDate: this.lastDate
 					});

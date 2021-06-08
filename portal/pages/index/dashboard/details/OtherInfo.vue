@@ -112,14 +112,16 @@
     }
 
     &__photo {
-      width: 44px;
-      height: 44px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
-      border: 1px solid $light-brown;
+      border: 1px solid #c5bfb5;
       margin-bottom: 10px;
       box-sizing: border-box;
-      display: flex;
+      display: -webkit-box;
+      -webkit-box-pack: center;
       justify-content: center;
+      -webkit-box-align: center;
       align-items: center;
       overflow: hidden;
 

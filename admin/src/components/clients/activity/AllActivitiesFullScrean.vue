@@ -17,7 +17,7 @@
             @editActivityDetailsTask="editActivityDetailsTask"
           )
           NoteDetailsCard.mb-20(
-            v-if="item.entity === 'note'"
+            v-if="item.entity === 'activityNotes'"
             :data="item"
             @editActivityDetailsNote="editActivityDetailsNote"
           )
@@ -54,8 +54,8 @@
 					...this.currentClient.tasks.map(item => {
 						return { ...item, entity: 'task' }
 					}),
-					...this.currentClient.notes.map(item => {
-						return { ...item, entity: 'note' }
+					...this.currentClient.activityNotes.map(item => {
+						return { ...item, entity: 'activityNotes' }
 					})
 				]
 				return activities.sort((a, b) => (new Date(b.dateTime) - new Date(a.dateTime)))
@@ -73,6 +73,7 @@
 
   .all-activities {
     background-color: white;
+    min-width: 1000px;
 
     &__actions {
       display: flex;
@@ -96,7 +97,7 @@
     }
 
     &__modal-actions {
-      font-size: 22px;
+      font-size: 21px;
       display: flex;
       justify-content: flex-end;
       margin: 4px 8px;
@@ -111,7 +112,7 @@
     }
 
     &__close {
-      font-size: 22px;
+      font-size: 21px;
       cursor: pointer;
       font-family: Myriad900;
       opacity: 0.8;

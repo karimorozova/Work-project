@@ -57,7 +57,7 @@ export default {
   }
 
   &__calendar {
-    max-width: 25px;
+    max-width: 20px;
     cursor: pointer;
   }
 

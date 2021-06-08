@@ -99,24 +99,24 @@
 				}
 			},
 			async addWordsTasksFromRequest({ dataForTasks, request }) {
-				try {
-					const newProject = await this.$http.post('/pm-manage/request-tasks', { dataForTasks, request, isWords: true });
-					const { project, newTasksInfo } = newProject.data;
-					let { isAssigned, requestId, refFiles, template, ...tasksData } = newTasksInfo;
-					tasksData.template = template.id;
-					tasksData.projectId = project._id;
-					tasksData.projectName = `${ project.projectId } - ${ project.projectName }`;
-					tasksData.customerName = project.customer.name;
-					tasksData.industry = project.industry.name.replace('&', 'and');
-					this.translateFilesAmount = tasksData.translateFiles.length;
-					this.isInfo = true;
-					await this.addProjectWordsTasks({ ...tasksData, isRequest: true });
-				} catch (err) {
-					console.log(err);
-					this.alertToggle({ message: "Error on adding tasks from request", isShow: true, type: "error" });
-				} finally {
-					this.isInfo = false;
-				}
+				// try {
+				// 	const newProject = await this.$http.post('/pm-manage/request-tasks', { dataForTasks, request, isWords: true });
+				// 	const { project, newTasksInfo } = newProject.data;
+				// 	let { isAssigned, requestId, refFiles, template, ...tasksData } = newTasksInfo;
+				// 	tasksData.template = template.id;
+				// 	tasksData.projectId = project._id;
+				// 	tasksData.projectName = `${ project.projectId } - ${ project.projectName }`;
+				// 	tasksData.customerName = project.customer.name;
+				// 	tasksData.industry = project.industry.name.replace('&', 'and');
+				// 	this.translateFilesAmount = tasksData.translateFiles.length;
+				// 	this.isInfo = true;
+				// 	await this.addProjectWordsTasks({ ...tasksData, isRequest: true });
+				// } catch (err) {
+				// 	console.log(err);
+				// 	this.alertToggle({ message: "Error on adding tasks from request", isShow: true, type: "error" });
+				// } finally {
+				// 	this.isInfo = false;
+				// }
 			}
 		},
 		computed: {

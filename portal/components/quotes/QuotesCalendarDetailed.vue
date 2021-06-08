@@ -20,7 +20,7 @@
         .datepickers__picker
             input(type="text" :value="dateTo" readonly)
             datepicker(wrapperClass="small" monday-first=true :inline="true" :highlighted='state.highlighted' @selected="(date) => setDate(date, 'to')" v-model="datesFilter.to")
-        .datepickers__button
+        //.datepickers__button
           Button(value="Close" @makeAction="close")
 </template>
 

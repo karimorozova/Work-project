@@ -8,8 +8,10 @@ const {
 	Projects,
 	Pricelist,
 	Units,
+	Languages,
 	Vendors,
-	Discounts
+	Discounts,
+	ClientRequest
 } = require('../../models')
 
 const {
@@ -38,14 +40,14 @@ const {
 	manageDeliveryFile,
 	createTasksFromRequest,
 	setStepsStatus,
-	getDeliverablesLink,
+	// getDeliverablesLink,
 	getAfterReopenSteps,
 	notifyVendorsProjectCancelled,
 	getProjectAfterFinanceUpdated,
 	updateProjectProgress,
 	updateNonWordsTaskTargetFiles,
 	storeFiles,
-	notifyProjectDelivery,
+	// notifyProjectDelivery,
 	notifyReadyForDr2,
 	notifyStepReopened,
 	getPdf,
@@ -57,7 +59,13 @@ const {
 	sendQuoteMessage,
 	sendCostQuoteMessage,
 	updateProjectFinanceOnDiscountsUpdate,
-	generateAndSaveCertificate
+	generateAndSaveCertificate,
+	getFilteredProjects,
+	createRequestTasks,
+	updateRequestTasks,
+	createProjectFromRequest,
+	autoCreatingTaskInProject,
+	saveCertificateTODR1Files
 } = require('../../projects')
 
 const {
@@ -79,17 +87,6 @@ const {
 } = require('../../utils')
 
 const {
-	getProjectAfterApprove,
-	setTasksDeliveryStatus,
-	getAfterTasksDelivery,
-	getAfterProjectDelivery,
-	checkPermission,
-	changeManager,
-	changeReviewStage,
-	rollbackReview
-} = require('../../delivery')
-
-const {
 	getStepsWithFinanceUpdated,
 	reassignVendor,
 	removeVendorFromStep
@@ -100,13 +97,14 @@ const {
 } = require('../../projectTasks')
 
 const {
-	getClientRequest,
-	updateClientRequest,
-	addRequestFile,
-	removeRequestFile,
-	removeRequestFiles,
-	sendNotificationToManager,
-	removeClientRequest
+	// getClientRequest,
+	// updateClientRequest,
+	// addRequestFile,
+	// removeRequestFile,
+	// removeRequestFiles,
+	// sendNotificationToManager,
+	// removeClientRequest
+		getClientRequestById
 } = require('../../clientRequests')
 
 const {
@@ -136,6 +134,16 @@ const {
 	pushNewLangs
 } = require('../../multipliers')
 
+router.post('/allprojects', async (req, res) => {
+	const filters = { ...req.body }
+	try {
+		const projects = await getFilteredProjects(filters)
+		res.send(projects)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB while getting projects!')
+	}
+})
 
 router.get('/project', async (req, res) => {
 	const { id } = req.query
@@ -183,25 +191,6 @@ router.post('/new-project', async (req, res) => {
 	}
 })
 
-router.post('/remove-reference-files', async (req, res) => {
-	try {
-		const { projectId, checkedTasksId, filePath } = req.body
-		let { _id, tasks } = await getProject({ '_id': projectId })
-
-		fs.unlink(filePath, (err) => {
-			if (err) throw(err)
-		})
-
-		const taskIndex = tasks.findIndex(({ taskId }) => taskId === checkedTasksId)
-		tasks[taskIndex].refFiles = tasks[taskIndex].refFiles.filter(item => item !== filePath)
-
-		const updatedProject = await updateProject({ '_id': _id }, { tasks })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on adding tasks ref files')
-	}
-})
 
 router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
 	try {
@@ -231,16 +220,84 @@ router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), 
 	}
 })
 
+router.post('/convert-request-into-project', async (req, res) => {
+	try {
+		const { projectId: requestId } = req.body
+		const project = await createProjectFromRequest(requestId)
+		await autoCreatingTaskInProject(project, requestId)
+		res.send(project._id)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on converting project')
+	}
+})
+
+router.post('/request-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
+	try {
+		let tasksInfo = { ...req.body }
+		const { sourceFiles, refFiles } = req.files
+		const updatedProject = await createRequestTasks({ tasksInfo, sourceFiles, refFiles })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding project tasks')
+	}
+})
+
+router.post('/remove-request-file', async (req, res) => {
+	const { _id, taskId, category, path } = req.body
+	try {
+		if (category === 'Source') {
+			await ClientRequest.updateOne({ "_id": _id, 'tasksAndSteps.taskId': taskId, "tasksAndSteps.sourceFiles.path": path },
+					{ $pull: { "tasksAndSteps.$[i].sourceFiles": { path } } }, { arrayFilters: [ { 'i.taskId': taskId } ] })
+		} else {
+			await ClientRequest.updateOne({ "_id": _id, 'tasksAndSteps.taskId': taskId, "tasksAndSteps.refFiles.path": path },
+					{ $pull: { "tasksAndSteps.$[i].refFiles": { path } } }, { arrayFilters: [ { 'i.taskId': taskId } ] })
+		}
+		fs.unlink(`./dist${ path }`, (err) => {
+			if (err) throw(err)
+		})
+		const updatedProject =  await getClientRequestById(_id)
+		res.send(updatedProject)
+
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on removing request file')
+	}
+})
+
+router.post('/update-request-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
+	try {
+		let tasksInfo = { ...req.body }
+		const { sourceFiles, refFiles } = req.files
+		const updatedProject = await updateRequestTasks({ tasksInfo, sourceFiles, refFiles })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding project tasks')
+	}
+})
+
+router.delete('/delete-request-tasks/:id/:projectId', async (req,res) => {
+	const { id: taskId, projectId } = req.params;
+	try{
+		await ClientRequest.updateOne({ "_id": projectId }, { $pull: { "tasksAndSteps": { "taskId": taskId } } })
+		const updatedProject = await getClientRequestById(projectId)
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on deleting task')
+	}
+})
+
 router.post('/project-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
 		let tasksInfo = { ...req.body }
-		if (tasksInfo.source) {
-			tasksInfo.source = JSON.parse(tasksInfo.source)
-		}
+		if (tasksInfo.source) tasksInfo.source = JSON.parse(tasksInfo.source)
 		tasksInfo.targets = JSON.parse(tasksInfo.targets)
 		tasksInfo.service = JSON.parse(tasksInfo.service)
 		const { sourceFiles, refFiles } = req.files
-		const updatedProject = await createTasks({ tasksInfo, sourceFiles, refFiles })
+		const updatedProject = await createTasks({ tasksInfo, refFiles })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -630,302 +687,125 @@ router.post('/steps-reopen', async (req, res) => {
 		res.status(500).send('Error on reopening steps')
 	}
 })
+// TODO: refactoring client request
+// router.get('/review-status', async (req, res) => {
+// 	const { group, projectId, taskId, userId } = req.query
+// 	try {
+// 		if (group === 'Administrators' || group === 'Developers') {
+// 			return res.send('available')
+// 		}
+// 		const reviewStatus = await checkPermission({ projectId, taskId, userId })
+// 		res.send(reviewStatus)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on checking delivery review status')
+// 	}
+// })
 
-router.get('/review-status', async (req, res) => {
-	const { group, projectId, taskId, userId } = req.query
-	try {
-		if (group === 'Administrators' || group === 'Developers') {
-			return res.send('available')
-		}
-		const reviewStatus = await checkPermission({ projectId, taskId, userId })
-		res.send(reviewStatus)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on checking delivery review status')
-	}
-})
 
-router.post('/change-manager', async (req, res) => {
-	const { projectId, taskId, manager, prevManager, prop, isAdmin, status } = req.body
+router.post('/close-project', async (req, res) => {
+	const { projectId } = req.body
 	try {
-		const project = await getProject({ '_id': projectId })
-		await changeManager({ projectId, taskId, manager, prevManager, prop, isAdmin, status, project })
-		res.send('updated')
+		const updatedProject = await getProjectAfterUpdate({ _id: projectId }, { status: 'Closed' })
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
-		res.status(500).send('Error on changing review manager')
+		res.status(500).send('Error on close project')
 	}
-})
-
-router.post('/approve-instruction', async (req, res) => {
-	const { taskId, projectId, instruction } = req.body
-	try {
-		await Delivery.updateOne(
-				{
-					projectId,
-					'tasks.taskId': taskId,
-					'tasks.instructions.text': instruction.text,
-					'tasks.instructions.step': instruction.step
-				},
-				{
-					'tasks.$[i].instructions.$[j].isChecked': instruction.isChecked,
-					'tasks.$[i].instructions.$[j].isNotRelevant': instruction.isNotRelevant
-				},
-				{
-					arrayFilters: [ { 'i.taskId': taskId }, { 'j.text': instruction.text } ]
-				})
-		res.send('done')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approve files')
-	}
-})
-
-router.post('/approve-files', async (req, res) => {
-	const { taskId, isFileApproved, paths } = req.body
-	try {
-		await Delivery.updateOne(
-				{
-					'tasks.taskId': taskId,
-					'tasks.files.path': { $in: paths }
-				},
-				{
-					'tasks.$[i].files.$[j].isFileApproved': isFileApproved
-				},
-				{
-					arrayFilters: [ { 'i.taskId': taskId }, { 'j.path': { $in: paths } } ]
-				})
-		res.send('done')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approve files')
-	}
-})
-router.get('/delivery-comments/:projectId', async (req, res) => {
-	const { projectId } = req.params
-	try {
-		const comments = await Delivery.findOne({ 'projectId': projectId }, { comments: 1 })
-		res.send(comments)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approve files')
-	}
-})
-router.post('/delivery-comments', async (req, res) => {
-	const { projectId, taskStatus, comment } = req.body
-	try {
-		const query = `comments.${ taskStatus }.comment`
-		await Delivery.updateOne({ 'projectId': projectId }, { [query]: comment })
-		res.send('done')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approve files')
-	}
+	console.log(req.body)
 })
 
 router.post('/generate-certificate', async (req, res) => {
-	const { project, task } = req.body
+	const { project, task, deliveryTask } = req.body
 	try {
-		await generateAndSaveCertificate({ project, task })
-		res.send('done')
+		await generateAndSaveCertificate({ project, task, deliveryTask })
+		const updatedProject = await saveCertificateTODR1Files(project, deliveryTask)
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on generate certificate')
 	}
 })
 
-router.post('/target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
-	const fileData = { ...req.body }
-	try {
-		const files = req.files['targetFile']
-		const newPath = await manageDeliveryFile({ fileData, file: files[0] })
-		if (!!fileData.path) {
-			await Delivery.updateOne(
-					{
-						'projectId': fileData.projectId,
-						'tasks.taskId': fileData.taskId,
-						'tasks.files.path': fileData.path
-					},
-					{
-						'tasks.$[i].files.$[j]': {
-							isFileApproved: false,
-							isOriginal: false,
-							fileName: files[0].filename,
-							path: newPath
-						}
-					},
-					{ arrayFilters: [ { 'i.taskId': fileData.taskId }, { 'j.path': fileData.path } ] })
-		} else {
-			await Delivery.updateOne(
-					{
-						'projectId': fileData.projectId,
-						'tasks.taskId': fileData.taskId
-					},
-					{
-						$push: {
-							'tasks.$.files': {
-								isFileApproved: false,
-								isOriginal: false,
-								fileName: files[0].filename,
-								path: newPath
-							}
-						}
-					})
-		}
-		res.send('uploaded')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on uploading target file')
-	}
-})
+// TODO: refactoring client request
+// router.post('/assign-dr2', async (req, res) => {
+// 	const { taskId, projectId, dr2Manager } = req.body
+// 	try {
+// 		await changeReviewStage({ taskId, projectId })
+// 		const updatedProject = await updateProject({
+// 			'_id': projectId,
+// 			'tasks.taskId': taskId
+// 		}, { 'tasks.$.status': 'Pending Approval [DR2]' })
+// 		await notifyReadyForDr2({ dr2Manager, project: updatedProject, taskId })
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on approving deliverable')
+// 	}
+// })
 
-router.post('/remove-dr-file', async (req, res) => {
-	const { taskId, path, isOriginal } = req.body
-	try {
-		await Delivery.updateOne(
-				{
-					'tasks.taskId': taskId,
-					'tasks.files.path': path
-				},
-				{ $pull: { 'tasks.$[i].files': { path } } },
-				{ arrayFilters: [ { 'i.taskId': taskId } ] }
-		)
-		if (!isOriginal) {
-			fs.unlink(`./dist${ path }`, (err) => {
-				if (err) throw(err)
-				res.send('done')
-			})
-		} else {
-			res.send('done')
-		}
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on removing dr file')
-	}
-})
+// router.post('/delivery-data', async (req, res) => {
+// 	const { taskId, projectId } = req.body
+// 	try {
+// 		const projectDelivery = await Delivery.findOne(
+// 				{ projectId, 'tasks.taskId': taskId },
+// 				{ 'tasks.$': 1 })
+// 				.populate('tasks.dr1Manager')
+// 				.populate('tasks.dr2Manager')
+// 		const result = projectDelivery.tasks[0]
+// 		res.send(result)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on getting delivery data')
+// 	}
+// })
 
-router.post('/assign-dr2', async (req, res) => {
-	const { taskId, projectId, dr2Manager } = req.body
-	try {
-		await changeReviewStage({ taskId, projectId })
-		const updatedProject = await updateProject({
-			'_id': projectId,
-			'tasks.taskId': taskId
-		}, { 'tasks.$.status': 'Pending Approval [DR2]' })
-		await notifyReadyForDr2({ dr2Manager, project: updatedProject, taskId })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
-})
+// router.get('/deliverables', async (req, res) => {
+// console.log('route IN DEV for admin  => /deliverables')
+// const { taskId } = req.query
+// try {
+// 	const project = await getProject({ 'tasks.taskId': taskId })
+// 	const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
+// 	const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
+// 	if (task.deliverables) {
+// 		res.send({ link: task.deliverables })
+// 	} else {
+// 		const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
+// 		if (link) {
+// 			await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
+// 		}
+// 		res.send({ link })
+// 	}
+// } catch (err) {
+// 	console.log(err)
+// 	res.status(500).send('Error on downloading deliverables')
+// }
+// })
 
-router.post('/rollback-review', async (req, res) => {
-	const { taskId, projectId, manager } = req.body
-	try {
-		await rollbackReview({ taskId, projectId, manager })
-		const message = `Delivery review of the task ${ taskId } is assigned to you.`
-		//rollback template
-		await managerNotifyMail(manager, message, 'Task delivery review assignment notification (I016)')
-		const updatedProject = await updateProject(
-				{
-					'_id': projectId,
-					'tasks.taskId': taskId
-				}, {
-					'tasks.$.status': 'Pending Approval [DR1]'
-				})
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
-})
+// router.post('/deliver', async (req, res) => {
+// 	const { tasks, user } = req.body
+// 	try {
+// 		const updatedProject = await getAfterTasksDelivery(tasks, user)
+// 		if (updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
+// 			await notifyProjectDelivery(updatedProject)
+// 		}
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on delivering tasks')
+// 	}
+// })
 
-router.post('/tasks-approve-notify', async (req, res) => {
-	const { taskId, isDeliver, contacts, user } = req.body
-	try {
-		const project = await getProject({ 'tasks.taskId': taskId })
-		const updatedProject = await getProjectAfterApprove({ taskId, project, isDeliver, contacts, user })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
-})
-
-router.post('/tasks-approve', async (req, res) => {
-	const { taskId } = req.body
-	try {
-		const project = await getProject({ 'tasks.taskId': taskId })
-		const updatedProject = await setTasksDeliveryStatus({ taskId, project, status: 'Ready for Delivery' })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving deliverable')
-	}
-})
-
-router.post('/delivery-data', async (req, res) => {
-	const { taskId, projectId } = req.body
-	try {
-		const projectDelivery = await Delivery.findOne(
-				{ projectId, 'tasks.taskId': taskId },
-				{ 'tasks.$': 1 })
-				.populate('tasks.dr1Manager')
-				.populate('tasks.dr2Manager')
-		const result = projectDelivery.tasks[0]
-		res.send(result)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on getting delivery data')
-	}
-})
-
-router.get('/deliverables', async (req, res) => {
-	const { taskId } = req.query
-	try {
-		const project = await getProject({ 'tasks.taskId': taskId })
-		const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
-		const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-		if (task.deliverables) {
-			res.send({ link: task.deliverables })
-		} else {
-			const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
-			if (link) {
-				await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
-			}
-			res.send({ link })
-		}
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on downloading deliverables')
-	}
-})
-
-router.post('/deliver', async (req, res) => {
-	const { tasks, user } = req.body
-	try {
-		const updatedProject = await getAfterTasksDelivery(tasks, user)
-		if (updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
-			await notifyProjectDelivery(updatedProject)
-		}
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on delivering tasks')
-	}
-})
-
-router.post('/project-delivery', async (req, res) => {
-	const { _id, message } = req.body
-	try {
-		const updatedProject = await getAfterProjectDelivery(_id, message)
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on delivering tasks')
-	}
-})
+// router.post('/project-delivery', async (req, res) => {
+// 	const { _id, message } = req.body
+// 	try {
+// 		const updatedProject = await getAfterProjectDelivery(_id, message)
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on delivering tasks')
+// 	}
+// })
 
 router.post('/step-finance', async (req, res) => {
 	const { step } = req.body
@@ -941,98 +821,110 @@ router.post('/step-finance', async (req, res) => {
 	}
 })
 
+// TODO: refactoring client request
 router.post('/request-file', upload.fields([ { name: 'newFile' } ]), async (req, res) => {
-	const { id, oldFile } = req.body
-	const files = req.files['newFile']
-	const existingFile = JSON.parse(oldFile)
-	const prop = existingFile.type === 'Source File' ? 'sourceFiles' : 'refFiles'
-	try {
-		let request = await getClientRequest({ '_id': id })
-		const requestFiles = await addRequestFile({ request, files, existingFile, prop })
-		request[prop] = requestFiles
-		await request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on saving request file')
-	}
+	// const { id, oldFile } = req.body
+	// const files = req.files['newFile']
+	// const existingFile = JSON.parse(oldFile)
+	// const prop = existingFile.type === 'Source File' ? 'sourceFiles' : 'refFiles'
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	const requestFiles = await addRequestFile({ request, files, existingFile, prop })
+	// 	request[prop] = requestFiles
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on saving request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/remove-request-file', async (req, res) => {
-	const { id, prop, path } = req.body
-	try {
-		let request = await getClientRequest({ '_id': id })
-		request[prop] = await removeRequestFile({ path, files: request[prop] })
-		await request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on removing request file')
-	}
+	// const { id, prop, path } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	request[prop] = await removeRequestFile({ path, files: request[prop] })
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on removing request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/delete-request-files', async (req, res) => {
-	const { id, sourceFiles, refFiles } = req.body
+	// const { id, sourceFiles, refFiles } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	if (sourceFiles.length) {
+	// 		request.sourceFiles = await removeRequestFiles(sourceFiles, request.sourceFiles)
+	// 	}
+	// 	if (refFiles.length) {
+	// 		request.refFiles = await removeRequestFiles(refFiles, request.refFiles)
+	// 	}
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on removing request file')
+	// }
+})
+// TODO: refactoring client request
+router.post('/delete-project', async (req, res) => {
+	const { projectId} = req.body
 	try {
-		let request = await getClientRequest({ '_id': id })
-		if (sourceFiles.length) {
-			request.sourceFiles = await removeRequestFiles(sourceFiles, request.sourceFiles)
-		}
-		if (refFiles.length) {
-			request.refFiles = await removeRequestFiles(refFiles, request.refFiles)
-		}
-		await request.save()
-		res.send(request)
+		await Projects.remove({_id: projectId})
+		res.send('')
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on removing request file')
 	}
 })
-
+// TODO: refactoring client request
 router.post('/file-approvement', async (req, res) => {
-	const { id, file, prop } = req.body
-	try {
-		let request = await getClientRequest({ '_id': id })
-		request[prop] = request[prop].map(item => {
-			if (item.fileName === file.fileName && item.path === file.path) {
-				return { ...item, isApproved: file.isApproved }
-			}
-			return item
-		})
-		await request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approvement of request file')
-	}
+	// const { id, file, prop } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	request[prop] = request[prop].map(item => {
+	// 		if (item.fileName === file.fileName && item.path === file.path) {
+	// 			return { ...item, isApproved: file.isApproved }
+	// 		}
+	// 		return item
+	// 	})
+	// 	await request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on approvement of request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/prop-approvement', async (req, res) => {
-	const { id, prop } = req.body
-	try {
-		let request = await getClientRequest({ '_id': id })
-		request[prop] = !request[prop]
-		request.save()
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approvement of request file')
-	}
+	// const { id, prop } = req.body
+	// try {
+	// 	let request = await getClientRequest({ '_id': id })
+	// 	request[prop] = !request[prop]
+	// 	request.save()
+	// 	res.send(request)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on approvement of request file')
+	// }
 })
-
+// TODO: refactoring client request
 router.post('/request-value', async (req, res) => {
-	const { id, prop, value, isEmail } = req.body
-	let updateQuery = prop === 'accountManager' ? { [prop]: value, isAssigned: false } : { [prop]: value }
-	try {
-		const updatedRequest = await updateClientRequest({ '_id': id }, updateQuery)
-		if (isEmail) {
-			await sendNotificationToManager(updatedRequest, prop)
-		}
-		res.send(updatedRequest)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on saving request property value')
-	}
+	// const { id, prop, value, isEmail } = req.body
+	// let updateQuery = prop === 'accountManager' ? { [prop]: value, isAssigned: false } : { [prop]: value }
+	// try {
+	// 	const updatedRequest = await updateClientRequest({ '_id': id }, updateQuery)
+	// 	if (isEmail) {
+	// 		await sendNotificationToManager(updatedRequest, prop)
+	// 	}
+	// 	res.send(updatedRequest)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on saving request property value')
+	// }
 })
 
 router.post('/project-value', async (req, res) => {
@@ -1053,19 +945,19 @@ router.post('/project-value', async (req, res) => {
 		res.status(500).send('Error on saving project property value')
 	}
 })
-
+// TODO: refactoring client request
 router.post('/request-tasks', async (req, res) => {
-	const { dataForTasks, request, isWords } = req.body
-	const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request
-	try {
-		const updatedProject = await createProject(project)
-		const newProject = await createTasksFromRequest({ project: updatedProject, dataForTasks, isWords })
-		await removeClientRequest(_id)
-		res.send(newProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on adding tasks')
-	}
+	// const { dataForTasks, request, isWords } = req.body
+	// const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request
+	// try {
+	// 	const updatedProject = await createProject(project)
+	// 	const newProject = await createTasksFromRequest({ project: updatedProject, dataForTasks, isWords })
+	// 	await removeClientRequest(_id)
+	// 	res.send(newProject)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error on adding tasks')
+	// }
 })
 
 router.post('/step-target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
@@ -1106,17 +998,17 @@ router.post('/making-cancel-message', async (req, res) => {
 		res.status(500).send('Error on making project cancelled message')
 	}
 })
-
-router.post('/making-delivery-message', async (req, res) => {
-	const { accManager, contact } = getAccManagerAndContact(req.body)
-	try {
-		const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
-		res.send({ message })
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on making delivery message')
-	}
-})
+// TODO: refactoring client request
+// router.post('/making-delivery-message', async (req, res) => {
+// 	const { accManager, contact } = getAccManagerAndContact(req.body)
+// 	try {
+// 		const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
+// 		res.send({ message })
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on making delivery message')
+// 	}
+// })
 
 router.post('/making-tasks-cancel-message', async (req, res) => {
 	const { project, tasks, reason, isPay } = req.body

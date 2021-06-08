@@ -141,7 +141,7 @@
             label(for="test")
 
       .vendor-subinfo__action
-        VendorAction(@openPreview="openPreview")
+        VendorAction(@openPreview="openPreview" @openVendor="openVendor")
 
     ValidationErrors(v-if="areErrorsExist", :errors="errors", @closeErrors="closeErrors")
 </template>
@@ -336,6 +336,13 @@
 			},
 			openPreview() {
 				this.isEditAndSend = true
+			},
+			async openVendor() {
+        const { data } = await this.$http.post("/service-login/vendor", {vendorId: this.vendorId})
+        const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
+        const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
+        document.cookie = `vendor=${data}; path=/; domain=${domain}`
+        window.open(redirectTo, '_blank')
 			},
 			async sendQuote(message) {
 				try {
@@ -711,7 +718,7 @@
   }
 
   .title {
-    font-size: 22px;
+    font-size: 21px;
     padding: 30px 0 10px;
   }
 
@@ -865,10 +872,10 @@
     min-width: 120px;
     padding: 0 24px 0 24px;
     margin: 0 10px;
-    height: 34px;
+    height: 32px;
     color: $white;
     font-size: 14px;
-    border-radius: 7px;
+    border-radius: 4px;
     background-color: $orange;
     border: none;
     transition: .1s ease;

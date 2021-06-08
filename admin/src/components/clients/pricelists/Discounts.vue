@@ -216,14 +216,14 @@
       border-left: 2px solid #938676;
       border-right: 2px solid #938676;
       border-bottom: 1px solid #938676;
-      width: 360px;
+      width: 356px;
     }
 
     &__title {
       height: 30px;
       line-height: 30px;
       padding-left: 5px;
-      background: #F2EFEB;
+      background: #f4f2f1;
       border-bottom: 1px solid #938676;
       display: flex;
 

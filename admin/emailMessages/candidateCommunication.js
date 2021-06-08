@@ -7,7 +7,7 @@ function testSentMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.firstName }</span></p>
                     <p style="font-weight: 400;">
                         As part of our initial process, please find attached our sample text in: ${ sourceLang }. <br>
@@ -41,7 +41,7 @@ function testNotPassedMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
                     <p style="font-weight: 400;" >
                         Thank you again for applying for the ${ obj.target.lang }-Translator@Pangea position. <br>
@@ -66,7 +66,7 @@ function testPassedMessage(obj) {
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Your test was evaluated and received positive feedback <br>
@@ -89,7 +89,7 @@ function rejectedPendingCompetenceTemplate({vendorName, sourceLanguage, targetLa
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
-                <div class="main" style="padding-top:40px;padding-bottom:40px;padding-right:40px;padding-left:40px;" >
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ vendorName },</span></p>
                     <p style="font-weight: 400;" >
                       We appreciate the time and effort you invested in completing this form.

@@ -5,6 +5,24 @@
     .tasks__preview(v-if="isEditAndSendQuote")
       PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
 
+    .tasks__modal(v-if="changeManagerModal")
+      .tasks__titleModal Set New DR1
+      span.tasks__close-modal(@click="closeManagerModal()") &#215;
+      .tasks__body
+        .tasks__itemsContacts
+          .tasks__items2
+            .tasks__selectTitle Choose Manager:
+            .tasks__select
+              SelectSingle(
+                :options="managersNames"
+                :selectedOption="selectedDr1Manager"
+                placeholder="Select Manager"
+                @chooseOption="setManager"
+              )
+
+        .tasks-files__button-change
+          Button(value="Change" :isDisabled="!selectedManager" @clicked="changeManager")
+
 
     .tasks__refFiles(v-if="manageFileModal")
       span.tasks__refFilesClose(@click="closeManageModal") &#215;
@@ -53,8 +71,8 @@
       .tasks-files__tooltip Each file can be <= 50Mb
       .tasks-files__tooltip (otherwise it will not be loaded)
 
-    .tasks__action
-      .tasks__title Task Action
+    .tasks__action(v-if="!isProjectFinished")
+      .tasks__title Task Action:
       .tasks__drop-menu
         SelectSingle(
           :selectedOption="selectedAction"
@@ -117,7 +135,7 @@
             ProgressLine(:progress="progress(row, index)")
         template(slot="status" slot-scope="{ row }")
           .tasks__task-data {{ row.status | stepsAndTasksStatusFilter }}
-            .tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
+            //.tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
               img.tasks__time-icon(src="../../../assets/images/time_icon.png")
               .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
 
@@ -143,8 +161,8 @@
 
         template(slot="delivery" slot-scope="{ row }")
           .tasks__task-data
-            img.tasks__delivery-image(v-if="row.status==='Ready for Delivery' || row.status==='Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
-            img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/delivery-review-icon.png" @click="reviewForDelivery(row)")
+            //img.tasks__delivery-image(v-if="row.status === 'Ready for Delivery' || row.status === 'Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
+            img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
 
     .tasks__approve-action(v-if="isApproveActionShow")
       ApproveModalPayment(
@@ -159,7 +177,16 @@
 
       )
     .tasks__review(v-if="isDeliveryReview")
-      DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updateReviewTask")
+      DeliveryOne(
+        :project="currentProject"
+        :user="user"
+        :users="users"
+        :task="reviewTask"
+        :deliveryTask="currentProject.tasksDR1.find(({taskId}) => taskId === reviewTask.taskId)"
+        @close="closeReview"
+        @updateTasks="updateReviewTask"
+      )
+      //DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updateReviewTask")
 </template>
 
 <script>
@@ -173,15 +200,17 @@
 	import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 	const ApproveModal = () => import("../../ApproveModal")
-	const DeliveryReview = () => import("./DeliveryReview")
 	import moment from "moment"
 	import { mapGetters, mapActions } from 'vuex'
 	import ApproveModalPayment from "../../ApproveModalPayment"
 	import FilesUpload from "./tasksFiles/FilesUpload"
 	import Button from "../../Button"
+  import DeliveryOne from "./DeliveryOne";
+
+  import reviewManagers from "@/mixins/reviewManagers"
 
 	export default {
-		mixins: [ currencyIconDetected ],
+		mixins: [ currencyIconDetected, reviewManagers ],
 		props: {
 			allTasks: {
 				type: Array
@@ -230,17 +259,40 @@
 				refFiles: [],
 				refFilesForDelete: [],
 				removeFile: null,
-				manageApprovalModal: false
+				manageApprovalModal: false,
+        changeManagerModal: false,
+        managers: [],
+        selectedManager: null
 			}
 		},
 		methods: {
 			closeManageApprovalModal() {
 				this.manageApprovalModal = false
 			},
+      async changeManager() {
+        try {
+          const result = await this.$http.post('/delivery/change-managers', {
+            projectId: this.currentProject._id,
+            checkedTasksId: this.currentProject.tasks.filter(item => item.isChecked).map(({taskId}) => taskId),
+            manager: this.selectedManager,
+          })
+
+          await this.storeProject(result.body)
+          this.closeManagerModal()
+          this.selectedAction = ""
+          this.selectedManager = null
+        } catch (err) {
+          this.alertToggle({ message: err.message, isShow: true, type: "error" })
+        }
+      },
+      closeManagerModal() {
+        this.changeManagerModal = false
+        this.selectedAction = ""
+      },
 			async removeRefFile() {
 				const { taskId: checkedTasksId } = this.currentProject.tasks.find(item => item.isChecked)
 				try {
-					const result = await this.$http.post('/pm-manage/remove-reference-files', {
+					const result = await this.$http.post('/delivery/remove-reference-files', {
 						filePath: this.removeFile,
 						checkedTasksId,
 						projectId: this.currentProject._id
@@ -361,6 +413,8 @@
 					this.isDeliveryReview = true
 				} else if (option === 'Send a Quote') {
 					await this.getSendQuoteMessage()
+				} else if (option === 'Manage DR1 manager') {
+					await this.manageDR1()
 				} else if (option === 'Cancel' || option === 'Deliver') {
 					this.setModalTexts(option)
 					this.isApproveActionShow = true
@@ -373,9 +427,21 @@
 					this.manageFileModal = true
 				}
 			},
+      async manageDR1() {
+			  this.changeManagerModal = true
+
+      },
+      setManager({ option }) {
+        const managerIndex = this.managersNames.indexOf(option)
+        this.selectedManager = this.managers[managerIndex]
+        // this.$emit("assignManager", {
+        //   manager: this.managers[managerIndex]
+        // })
+      },
 			reviewForDelivery(task) {
 				this.reviewTask = task
 				this.isDeliveryReview = true
+				this.setShowTasksAndDeliverables(false)
 			},
 			unCheckAllTasks() {
 				const unchecked = this.allTasks.map(item => {
@@ -385,7 +451,8 @@
 				this.storeProject({ ...this.currentProject, tasks: unchecked })
 			},
 			updateReviewTask({ tasksIds }) {
-				this.reviewTask = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1)
+        console.log('UPDATE TASK')
+				// this.reviewTask = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1)
 			},
 			setModalTexts(option) {
 				this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
@@ -403,9 +470,9 @@
 						case 'Cancel':
 							await this.cancelTasks(checkedTasks)
 							break
-						case 'Deliver':
-							await this.deliverTasks({ tasks: checkedTasks, user: this.user })
-							break
+						// case 'Deliver':
+						// 	await this.deliverTasks({ tasks: checkedTasks, user: this.user })
+						// 	break
 					}
 				} catch (err) {
 					this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
@@ -426,7 +493,7 @@
 						await this.setProjectStatus({ status: "Cancelled" })
 					} else {
 						const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id })
-						await this.storeProject(updatedProject.body)
+						await this.storeProject(updatedProject.data)
 						await this.messageTemplateFormation(filteredTasks)
 					}
 					this.alertToggle({ message: "Tasks cancelled", isShow: true, type: "success" })
@@ -446,7 +513,7 @@
 							reason: this.reason,
 							isPay: this.isPay
 						})
-						this.previewMessage = template.body.message
+						this.previewMessage = template.data.message
 						this.openPreview()
 					} catch (err) {
 						this.alertToggle({ message: "Cannot formation message", isShow: true, type: "error" })
@@ -510,7 +577,7 @@
 						.map(({ title }) => title)
 
 				let taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId)
-				taskSteps = taskSteps.filter(item => !item.stepId.includes('Canceled'))
+				taskSteps = taskSteps.filter(item => !item.stepId.includes('Cancelled'))
 				if (CATServices.includes(task.service.title)) {
 					const [ firstStep, secondStep ] = taskSteps
 					if (taskSteps.length === 2) {
@@ -554,13 +621,14 @@
 			closeReview() {
 				this.isDeliveryReview = false
 				this.selectedAction = ""
+				this.setShowTasksAndDeliverables(true)
 			},
 			async downloadFiles(task) {
 				try {
 					let href = task.deliverables
 					if (!href) {
 						const result = await this.$http.get(`/pm-manage/deliverables?taskId=${ task.taskId }`)
-						href = result.body.link
+						href = result.data.link
 					}
 					let link = document.createElement('a')
 					link.href = __WEBPACK__API_URL__ + href
@@ -580,14 +648,18 @@
 				setProjectProp: "setProjectProp",
 				storeProject: "setCurrentProject",
 				setProjectStatus: "setProjectStatus",
-				deliverTasks: "deliverTasks"
+				setShowTasksAndDeliverables: "setShowTasksAndDeliverables"
 			})
 		},
 		computed: {
 			...mapGetters({
 				currentProject: 'getCurrentProject',
-				user: 'getUser'
+				user: 'getUser',
+        users: 'getUsers'
 			}),
+      selectedDr1Manager() {
+        return this.selectedManager ? `${ this.selectedManager.firstName } ${ this.selectedManager.lastName }` : ""
+      },
 			projectClientContacts() {
 				return this.currentProject.clientContacts.map(({ email }) => email)
 			},
@@ -604,7 +676,17 @@
 							return [ 'Cancel' ]
 						}
 					} else if (this.isEvery("Ready for Delivery")) return [ 'Deliver' ]
-					else if (this.isEvery("Pending Approval [DR1]") && checkedTasks.length === 1) return [ 'Delivery Review [1]' ]
+
+          else if (this.isEvery("Pending Approval [DR1]")) {
+            let elements = []
+
+            if(checkedTasks.length === 1) elements.push('Delivery Review [1]' )
+
+            if(this.canChangeDR1Manager) elements.push('Manage DR1 manager' )
+
+            return elements
+          }
+
 					else if (this.isEvery('Pending Approval [DR2]') && checkedTasks.length === 1) return [ 'Delivery Review [2]' ]
 					else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {
 						return [ 'Upload reference files', 'Cancel' ]
@@ -616,9 +698,31 @@
 			isAllSelected() {
 				const unchecked = this.currentProject.tasks.find(item => !item.isChecked)
 				return !unchecked
-			}
+			},
+			canChangeDR1Manager() {
+        const checkedIds = this.currentProject.tasks
+          .filter(item => item.isChecked)
+          .map(({ taskId }) => taskId)
+
+        const { _id, group: { name } } = this.user
+
+        return name === 'Administrators'
+          || name === 'Developers'
+          || this.currentProject.tasksDR1.filter(({taskId}) => checkedIds.includes(taskId)).every(({dr1Manager}) => {
+            console.log({dr1Manager, _id})
+            return dr1Manager === _id
+          })
+      },
+			isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
-		components: {
+    created() {
+      this.getManagers()
+    },
+    components: {
+      DeliveryOne,
 			Button,
 			FilesUpload,
 			ApproveModalPayment,
@@ -628,7 +732,6 @@
 			CheckBox,
 			SelectSingle,
 			ApproveModal,
-			DeliveryReview,
 			PreviewQuote,
 			Tabs
 		}
@@ -693,6 +796,11 @@
       margin-top: 20px;
       text-align: center;
       margin-bottom: 20px;
+    }
+
+    &__button-change {
+      margin-top: 20px;
+      text-align: center;
     }
 
     &__tooltip {
@@ -779,8 +887,7 @@
     }
 
     &__title {
-      margin-bottom: 5px;
-      font-size: 16px;
+      margin-bottom: 4px;
     }
 
     &__drop-menu {
@@ -790,8 +897,6 @@
     }
 
     &__delivery-image {
-      height: 18px;
-      width: 18px;
       cursor: pointer;
     }
 
@@ -804,9 +909,9 @@
 
     &__review {
       position: absolute;
-      top: -230px;
-      right: 0;
-      left: 0;
+      top: -64px;
+      right: -20px;
+      left: -20px;
       bottom: 0;
       z-index: 50;
       box-sizing: border-box;
@@ -848,5 +953,61 @@
       z-index: -2;
       transition: all 0.2s;
     }
+
+    &__modal {
+      padding: 20px;
+      background: white;
+      position: absolute;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 500;
+    }
+
+    &__titleModal{
+      font-size: 21px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-family: Myriad600;
+    }
+
+    &__close-modal {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+
+
+    &__itemsContacts{
+      display: flex;
+      justify-content: center;
+    }
+
+    &__selectTitle{
+      margin-bottom: 4px;
+    }
+
+
+    &__select {
+      position: relative;
+      height: 32px;
+      width: 191px;
+    }
+
   }
 </style>

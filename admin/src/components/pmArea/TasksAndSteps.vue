@@ -1,13 +1,13 @@
 <template lang="pug">
-  .tasks-steps
+  .tasks-steps(:class="{'no-box-shadow': !isShowTasksAndDeliverables}")
     transition(name="slide-fade")
       .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
         .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
     .tasks-steps__tasks-title Tasks and Steps
-      img.tasks-steps__arrow(src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
+      img.tasks-steps__arrow(v-if="!isProjectFinished" src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
     transition(name="slide-fade")
       TasksData(
-        v-if="isTaskData && !isFinishedStatus && originallyLanguages.length"
+        v-if="isTaskData && !isFinishedStatus && originallyLanguages.length && isShowTasksAndDeliverables"
         :originallyLanguages="originallyLanguages"
         :originallyUnits="originallyUnits"
         :originallySteps="originallySteps"
@@ -37,7 +37,7 @@
         @setDate="setDate"
         @showTab="showTab"
       )
-      Button(v-if="currentProject.tasks.length" :value="metricsButton" @clicked="getMetrics" :isDisabled="isDisabled")
+      Button(v-if="currentProject.tasks.length && !isProjectFinished" :value="metricsButton" @clicked="getMetrics" :isDisabled="isDisabled")
 </template>
 
 <script>
@@ -215,6 +215,7 @@
 		},
 		computed: {
 			...mapGetters({
+				isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
 				currentProject: 'getCurrentProject',
 				selectedInfoMessage: 'getMemoqProjectMessage',
 				fileCounter: 'getTranslateFileCounter'
@@ -226,7 +227,11 @@
 			isDisabled() {
 				const statuses = [ "Closed", "Cancelled" ]
 				return statuses.indexOf(this.currentProject.status) !== -1
-			}
+			},
+      isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+      },
 		},
 		components: {
 			TasksData,
@@ -251,7 +256,7 @@
     min-width: 1000px;
     width: 1000px;
     padding: 20px;
-    margin: 0 40px;
+    margin-top: 40px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     position: relative;
 
@@ -277,11 +282,12 @@
     }
 
     &__tasks-title {
-      font-size: 22px;
+      font-size: 21px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-family: Myriad600;
     }
 
     &__menu-title {
@@ -312,6 +318,9 @@
   .slide-fade-enter, .slide-fade-leave-to {
     transform: translateY(10px);
     opacity: 0;
+  }
+  .no-box-shadow{
+    box-shadow: none;
   }
 
 </style>

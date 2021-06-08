@@ -150,7 +150,7 @@
   .button {
     &__update-btn {
       width: 120px;
-      height: 34px;
+      height: 32px;
       color: #67573e;
       font-size: 14px;
       border-radius: 10px;

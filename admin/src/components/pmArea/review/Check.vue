@@ -36,7 +36,7 @@
 
     &__icon {
       color: $light-brown;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
       transition: ease 0.1s;
     }

@@ -3,7 +3,6 @@
     .request-info__title Request Details : {{currentRequest.requestId}}
     .request-info__all-info
       Request(:request="currentRequest")
-      GeneralInstructions(:project="currentRequest" @reassignManager="reassignManager")
         .request-info__modal(v-if="isModal")
           ApproveModal(
             text="Are you sure you want to reassign this project?"
@@ -33,7 +32,6 @@
 <script>
 	const ValidationErrors = () => import("../ValidationErrors");
 	import Request from "./Request";
-	import GeneralInstructions from "./GeneralInstructions";
 	import RequestTasksData from "./RequestTasksData";
 	import ApproveModal from "@/components/ApproveModal";
 	import { mapGetters, mapActions } from 'vuex';
@@ -179,7 +177,6 @@
 		components: {
 			ValidationErrors,
 			Request,
-			GeneralInstructions,
 			RequestTasksData,
 			ApproveModal
 		},

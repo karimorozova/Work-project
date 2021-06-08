@@ -1,8 +1,9 @@
 const router = require('express').Router()
 const fs = require('fs')
-const { upload } = require('../utils/')
-const { updateLanguage, getTierInfo, updateTierInfo, getIndustryTier, updateIndustryTier } = require('../settings')
-const { Languages } = require('../models')
+const { upload, moveFile } = require('../utils/')
+const { updateLanguage, getTierInfo, updateTierInfo, getIndustryTier, updateIndustryTier, getClientsApi } = require('../settings')
+const { getSimpleClients  } = require('../clients')
+const { Languages, ClientsApiSetting } = require('../models')
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
 	const flag = req.files["flag"]
@@ -65,6 +66,85 @@ router.put('/update-industry-tier', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on language setting saving')
+	}
+})
+
+router.get('/clients-api', async (req, res) => {
+	try {
+		const clients = await getClientsApi({})
+		res.send(clients)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Clients from DB ")
+	}
+})
+
+router.post('/clients-api/new', upload.fields([{ name: 'logo' }]), async (req, res) => {
+	let { affiliation,clientName,industry,isDisplay } = req.body
+	const iconFile = req.files["logo"];
+
+	try {
+		let logoPath
+		const date = new Date();
+		const formattedDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
+		if(iconFile) {
+			const newIconPath = `./dist/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
+			await moveFile(iconFile[0], newIconPath);
+			logoPath = `/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
+		}
+		await ClientsApiSetting.create( { logo: logoPath, affiliation,clientName,industry: JSON.parse(industry),isDisplay })
+		const clientsApi = await ClientsApiSetting.find()
+		res.send('ok')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Clients from DB ")
+	}
+})
+
+router.post('/clients-api/:id', upload.fields([{ name: 'logo' }]), async (req, res) => {
+	let { id } = req.params
+	let { affiliation,clientName,industry,isDisplay } = req.body
+	const iconFile = req.files["logo"];
+
+	try {
+		let logoPath
+		let updateData = {  affiliation, clientName, industry: JSON.parse(industry), isDisplay }
+		const date = new Date();
+		const formattedDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
+		if(iconFile) {
+			const newIconPath = `./dist/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
+			await moveFile(iconFile[0], newIconPath);
+			logoPath = `/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
+			updateData.logo =  logoPath
+		}
+		await ClientsApiSetting.updateOne({_id: id}, updateData)
+		const clientsApi = await ClientsApiSetting.find()
+		res.send('ok')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Clients from DB ")
+	}
+})
+
+router.post('/clients-api/:id/delete', async (req, res) => {
+	let { id } = req.params
+	try {
+		await ClientsApiSetting.deleteOne({_id: id})
+		const clientsApi = await ClientsApiSetting.find()
+		res.send(clientsApi)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Clients from DB ")
+	}
+})
+
+router.post('/all-clients', async (req, res) => {
+	try {
+		const clients = await getSimpleClients({}, {'name': 1, industry: 1})
+		res.send(clients)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Clients from DB ")
 	}
 })
 

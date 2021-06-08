@@ -5,7 +5,7 @@ export default {
                 save: {icon: require("../assets/images/Other/save-icon-qa-form.png")}, 
                 edit: {icon: require("../assets/images/Other/edit-icon-qa.png")},
                 cancel: {icon: require("../assets/images/cancel-icon.png")},
-                delete: {icon: require("../assets/images/Other/delete-icon-qa-form.png")}
+                delete: {icon: require("../assets/images/latest-version/delete-icon.png")}
             },
         }
     },

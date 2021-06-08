@@ -378,7 +378,7 @@ export default {
 }
 
 .title {
-  font-size: 22px;
+  font-size: 21px;
   padding: 30px 0 10px;
   width: 1000px;
 }
@@ -527,10 +527,10 @@ export default {
   min-width: 120px;
   padding: 0 24px 0 24px;
   margin: 0 10px;
-  height: 34px;
+  height: 32px;
   color: $white;
   font-size: 14px;
-  border-radius: 7px;
+  border-radius: 4px;
   background-color: $orange;
   border: none;
   transition: .1s ease;

@@ -298,7 +298,7 @@
 
       &-link {
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 5px;
         margin-right: 4px;
       }

@@ -73,11 +73,11 @@ export default {
 
 .langs-menu {
     width: 100%;
-    box-shadow: 0 2px 10px $deep-brown;
+    box-shadow: 0 2px 10px $main-color;
     border-radius: 12px;
     overflow: hidden;
     &:hover {
-        box-shadow: 0 1px 10px $deep-brown;
+        box-shadow: 0 1px 10px $main-color;
     }
     &__title {
         font-size: 14px;
@@ -159,7 +159,7 @@ export default {
             content: "";
             display: block;
             position: absolute;
-            background-color: $deep-brown;
+            background-color: $main-color;
             left: -8px;
         }
         &:before {

@@ -189,10 +189,11 @@ async function getTaskTargetFiles({ task, projectId, stepName }) {
 			// const exportPath = doc.ExportPath.slice(1);
 			// const pathParts = exportPath.split(".");
 			// const fileName = pathParts.slice(0, -1).join();
-			const fileName = doc.ImportPath
-			const path = `/projectFiles/${ projectId }/${Math.floor(Math.random()*10000)}${ stepName }_${ fileName }`;
+			const fileName = `${Math.floor(Math.random()*1000000)}}-${doc.ImportPath}`
+			const path = `/projectFiles/${ projectId }/${ fileName }`;
 			await downloadMemoqFile({ memoqProjectId, docId: doc.DocumentGuid, path: `./dist${ path }` });
-			targetFiles.push({ fileName: doc.DocumentName, path });
+      // targetFiles.push({ fileName: doc.DocumentName, path });
+      targetFiles.push({ fileName, path });
 		}
 		return targetFiles;
 	} catch (err) {
@@ -393,7 +394,7 @@ async function updateProjectStatusForClientPortalProject(projectId, action) {
 		})
 	}
 
-	return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, }
+	return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, isClientOfferClicked: true, }
 	);
 }
 
@@ -650,7 +651,8 @@ async function updateNonWordsTaskTargetFiles({ project, jobId, path, fileName })
 	const tasks = project.tasks.map(item => {
 		let targetFiles = item.targetFiles || [];
 		if(taskStep.taskId === item.taskId) {
-			targetFiles.push({ fileName, path, isFileApproved: false });
+      // targetFiles.push({ fileName, path, isFileApproved: false });
+      targetFiles.push({ fileName, path });
 			item.targetFiles = targetFiles;
 		}
 		return item;

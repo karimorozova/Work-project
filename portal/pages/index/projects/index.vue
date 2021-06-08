@@ -34,5 +34,7 @@
 </script>
 
 <style scoped>
-
+  .all-projects{
+    color: #67573e;
+  }
 </style>

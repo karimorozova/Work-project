@@ -558,10 +558,10 @@ router.post('/activity/note/', async (req, res) => {
     const { data } = req.body
     await ClientsNotes.create(data)
 
-    const notes = await ClientsNotes.find({ "client": data.client })
+    const activityNote = await ClientsNotes.find({ "client": data.client })
       .populate('assignedTo', [ 'firstName', 'lastName' ])
 
-    res.send(notes)
+    res.send(activityNote)
 
   } catch (e) {
     res.status(500).send('Error on client created')
@@ -574,8 +574,8 @@ router.post('/activity/note/:id', async (req, res) => {
     const { id } = req.params
     const { data } = req.body
     await ClientsNotes.updateOne({ _id: id }, updateTaskDataByCondition(data))
-    const notes = await ClientsNotes.find({ "client": data.client }).populate('assignedTo', [ 'firstName', 'lastName' ])
-    res.send(notes)
+    const activityNotes = await ClientsNotes.find({ "client": data.client }).populate('assignedTo', [ 'firstName', 'lastName' ])
+    res.send(activityNotes)
   } catch (e) {
     res.status(500).send('Error on client update')
   }
@@ -585,8 +585,8 @@ router.post('/activity/note/:id', async (req, res) => {
 router.get('/activity/note/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const note = await ClientsNotes.find({ _id: id })
-    res.send(note)
+    const activityNote = await ClientsNotes.find({ _id: id })
+    res.send(activityNote)
   } catch (e) {
     res.status(500).send('Error on client get')
   }
@@ -598,8 +598,8 @@ router.delete('/activity/note/:id', async (req,res)=> {
     const { id } = req.params
     const {client} = req.query
     await ClientsNotes.deleteOne({_id: id})
-    const notes = await ClientsNotes.find({"client": client}).populate( 'assignedTo', ['firstName','lastName'])
-    res.send(notes || [])
+    const activityNotes = await ClientsNotes.find({"client": client}).populate( 'assignedTo', ['firstName','lastName'])
+    res.send(activityNotes || [])
   } catch (e) {
     res.status(500).send('Error on client delete')
   }

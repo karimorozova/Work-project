@@ -217,7 +217,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/style.scss";
   @import "../../assets/scss/colors.scss";
   @import "../../assets/styles/settingsTable";
 

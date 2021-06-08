@@ -30,7 +30,7 @@ emitter.on('projectRejectedNotification', async (project) => {
 })
 
 emitter.on('stepAcceptAction', async (obj) => {
-    const { project, index, vendorId, decision } = obj;
+  const { project, index, vendorId, decision } = obj;
   let { steps, status: projectStatus } = project;
   const isProjectApproved = projectStatus === 'Approved' || projectStatus === 'In progress';
   const status = decision === 'accept' ? 'Accepted' : 'Rejected';
@@ -38,10 +38,10 @@ emitter.on('stepAcceptAction', async (obj) => {
     steps[index].vendorsClickedOffer.push(vendorId);
     steps = setStepsStatus({steps: [{...steps[index], _id: steps[index].id}], status: steps[index].status, project});
     try {
-        const isStart = steps[index].status === "Ready to Start" || steps[index].status === "Waiting to Start"
-        if(isStart && steps[index].serviceStep.calculationUnit === "Words") {
-            await updateMemoqProjectUsers(steps);
-        }
+        // const isStart = steps[index].status === "Ready to Start" || steps[index].status === "Waiting to Start"
+        // if(isStart && steps[index].serviceStep.calculationUnit === "Words") {
+        //     await updateMemoqProjectUsers(steps);
+        // }
         await Projects.updateOne({"_id": project.id}, { steps });
         await notifyStepDecisionMade({project, step: steps[index], decision});
     } catch(err) {

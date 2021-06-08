@@ -482,7 +482,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/style.scss";
   @import "../../assets/styles/settingsTable.scss";
 
   .competencies {

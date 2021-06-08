@@ -217,6 +217,10 @@
 
     Add(v-if="isAdmin" @add="addData")
 
+    //.testTable
+      GeneralTable
+
+
 </template>
 <script>
 	import SettingsTable from "./SettingsTable"
@@ -227,6 +231,7 @@
 	import scrollEnd from "../../mixins/scrollEnd"
 	import SelectSingle from "../SelectSingle"
 	import Button from "../Button"
+  import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons, scrollEnd ],
@@ -537,7 +542,8 @@
 			Button,
 			SelectSingle,
 			Add,
-			SettingsTable
+			SettingsTable,
+			GeneralTable
 		},
 		directives: {
 			ClickOutside

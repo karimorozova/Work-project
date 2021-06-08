@@ -40,7 +40,7 @@
           h3.message__title Error(s)!
           li(v-for='error in errors') {{ error.error }}
       .startProject
-        Button(value="Create Project" @makeAction="newProject" )
+        Button(value="Create Project" @clicked="newProject" )
     .summaryInfo
       .orderInfo
         .orderInfo__title

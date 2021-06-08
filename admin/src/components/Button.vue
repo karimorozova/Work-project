@@ -47,10 +47,10 @@
       border: 2px solid #d15f45;
       min-width: 120px;
       padding: 0 24px 0 24px;
-      height: 34px;
+      height: 32px;
       color: #d15f45;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 4px;
       background-color: white;
       outline: none;
       letter-spacing: 0.2px;
@@ -77,10 +77,10 @@
     &__button {
       min-width: 120px;
       padding: 0 24px 0 24px;
-      height: 34px;
+      height: 32px;
       color: $white;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 4px;
       background-color: $orange;
       border: none;
       transition: .1s ease;
@@ -109,10 +109,10 @@
     .action-button__button {
       min-width: 120px;
       padding: 0 24px 0 24px;
-      height: 34px;
+      height: 32px;
       color: $white;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 4px;
       background-color: $orange;
       border: none;
       transition: .1s ease;
@@ -132,18 +132,19 @@
 
   .disabled {
     .action-button__button {
-      opacity: 0.5;
+      opacity: 0.4;
       min-width: 120px;
       padding: 0 24px 0 24px;
-      height: 34px;
+      height: 32px;
       color: $white;
       font-size: 14px;
-      border-radius: 7px;
-      background-color: $orange;
+      border-radius: 4px;
+      background-color: $orange!important;
       border: none;
       transition: .1s ease;
       outline: none;
       letter-spacing: 0.2px;
+      cursor: default;
 
       &:hover {
         box-shadow: none;
@@ -159,6 +160,15 @@
     .action-button__button {
       width: 191px;
     }
+  }
+  .width-140 {
+    .action-button__button {
+      width: 140px;
+    }
+  }
+
+  .middle {
+    text-align: center;
   }
 
 </style>

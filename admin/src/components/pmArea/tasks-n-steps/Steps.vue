@@ -1,7 +1,7 @@
 <template lang="pug">
   .steps
-    .steps__action
-      .steps__title Step Action
+    .steps__action(v-if="!isProjectFinished")
+      .steps__title Step Action:
       .steps__drop-menu
         SelectSingle(
           :selectedOption="selectedAction"
@@ -83,30 +83,30 @@
 
         template(slot="start" slot-scope="{ row, index }")
           .steps__step-date
-            Datepicker(
-              @selected="(e) => changeDate(e, 'start', index)"
-              v-model="row.start"
-              inputClass="steps__custom-input"
-              calendarClass="steps__calendar-custom"
-              :format="customFormatter"
-              monday-first=true
-              :disabledPicker="isDatePickDisabled"
-              :highlighted="highlighted"
-              @scrollDrop="scrollDrop")
+             Datepicker(
+               @selected="(e) => changeDate(e, 'start', index)"
+               v-model="row.start"
+               inputClass="steps__custom-input"
+               calendarClass="steps__calendar-custom"
+               :format="customFormatter"
+               monday-first=true
+               :disabledPicker="isDatePickDisabled"
+               :highlighted="highlighted"
+               @scrollDrop="scrollDrop")
 
         template(slot="deadline" slot-scope="{ row, index }")
           .steps__step-date
-            Datepicker(
-              @selected="(e) => changeDate(e, 'deadline', index)"
-              v-model="row.deadline"
-              inputClass="steps__custom-input"
-              calendarClass="steps__calendar-custom"
-              :format="customFormatter"
-              monday-first=true
-              :disabled="disabled"
-              :disabledPicker="isDatePickDisabled"
-              :highlighted="highlighted"
-              @scrollDrop="scrollDrop")
+             Datepicker(
+               @selected="(e) => changeDate(e, 'deadline', index)"
+               v-model="row.deadline"
+               inputClass="steps__custom-input"
+               calendarClass="steps__calendar-custom"
+               :format="customFormatter"
+               monday-first=true
+               :disabled="disabled"
+               :disabledPicker="isDatePickDisabled"
+               :highlighted="highlighted"
+               @scrollDrop="scrollDrop")
 
         template(slot="progress" slot-scope="{ row, index }")
           .steps__step-progress
@@ -181,8 +181,8 @@
 	const Reassignment = () => import("../stepinfo/Reassignment")
 	import SelectSingle from "../../SelectSingle"
 
-	const Datepicker = () => import("../../Datepicker")
 	const ValidationErrors = () => import("../../ValidationErrors")
+  import Datepicker from "../../DatepickerWithTime"
 	import moment from "moment"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import stepVendor from "@/mixins/stepVendor"
@@ -217,8 +217,8 @@
 				},
 				tabs: ['Tasks', 'Steps'],
 				fields: [
-					{ label: "Check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0  },
-					{ label: "", headerKey: "headerInfo", key: "info", width: "3%", padding: 0  },
+					{ label: "Check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0 },
+					{ label: "", headerKey: "headerInfo", key: "info", width: "3%", padding: 0, style: {'border-left': 0} },
 					{ label: "Step", headerKey: "headerName", key: "name", width: "10%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0  },
 					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "13%", padding: 0 },
@@ -541,7 +541,11 @@
 			isDatePickDisabled() {
 				const statuses = ["Closed", "Rejected", "Cancelled", "Cancelled Halfway"]
 				return statuses.indexOf(this.currentProject.status) !== -1
-			}
+			},
+			isProjectFinished(){
+				const { status } = this.currentProject
+				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
 		},
 		components: {
 			ProgressLineStep,
@@ -603,8 +607,7 @@
     }
 
     &__title {
-      margin-bottom: 5px;
-      font-size: 16px;
+      margin-bottom: 4px;
     }
 
     &__drop-menu {

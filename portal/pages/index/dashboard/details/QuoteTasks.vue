@@ -4,8 +4,9 @@
       :fields="fields"
       :rowClass="'withoutCursor'"
       :tableData="tableData"
-      :bodyClass="tableData.length < 10 ? 'tbody_visible-overflow' : ''"
-      :tableHeadRowClass="tableData.length < 10 ? 'tbody_visible-overflow' : ''"
+      bodyRowClass="cursor-default"
+      :bodyClass="[{ 'tbody_visible-overflow': tableData.length < 6 }]",
+      :tableheadRowClass="[{ 'tbody_visible-overflow':tableData.length < 6 }]",
     )
       .tasks-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
       .tasks-table__header(slot="headerWordcount" slot-scope="{ field }") {{ field.label }}
@@ -26,6 +27,7 @@
 	import DataTable from "~/components/Tables/DataTable";
 	import { mapGetters, mapActions } from "vuex";
 	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
+  import {allLanguages} from "../../../../store/getters";
 
 	export default {
 		mixins: [currencyIconDetected],
@@ -43,33 +45,39 @@
 				// if(this.project.status === "Requested") {
 				// 	return this.project.packageSize ? `${ row.lang } / ${ this.project.packageSize.size }` : `${ this.project.sourceLanguage.lang } => ${ row.lang }`;
 				// }
-				return `${row.sourceLanguage} >> ${row.targetLanguage}`
+        const sourceLang = this.getLangInfoBySymbol(row.sourceLanguage)
+        const targetLang = this.getLangInfoBySymbol(row.targetLanguage)
+				return `${sourceLang.lang} >> ${targetLang.lang}`
 				//MAX
 				//   return this.getQuotePairs(row);
 			},
-			getQuotePairs(task) {
-				return `${task.sourceLanguage} >> ${task.targetLanguage}`
-				// let ratesProp = 'monoRates';
-				// if(task.service.calculationUnit !== 'Packages') {
-				// 	ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
-				// }
-				//MAX
-				// return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
-			},
-			getMonoPair(task) {
-				const targets = this.clientLanguages.monoRates.map(item => item.target);
-				const pairLang = targets.find(item => item.symbol === task.targetLanguage);
-				return `${ pairLang.lang } / ${ task.packageSize }`;
-			},
-			getDuoPair(task, ratesProp) {
-				const pair = this.clientLanguages[ratesProp].find(item => item.source.symbol === task.sourceLanguage && item.target.symbol === task.targetLanguage);
-				return `${ pair.source.lang } => ${ pair.target.lang }`;
-			}
+      getLangInfoBySymbol(symbol) {
+			  return this.languages.find((lang) => lang.symbol === symbol )
+      }
+			// getQuotePairs(task) {
+			// 	return `${task.sourceLanguage} >> ${task.targetLanguage}`
+			// 	// let ratesProp = 'monoRates';
+			// 	// if(task.service.calculationUnit !== 'Packages') {
+			// 	// 	ratesProp = task.service.calculationUnit.toLowerCase() + 'Rates';
+			// 	// }
+			// 	//MAX
+			// 	// return ratesProp === 'monoRates' ? this.getMonoPair(task) : this.getDuoPair(task, ratesProp);
+			// },
+			// getMonoPair(task) {
+			// 	const targets = this.clientLanguages.monoRates.map(item => item.target);
+			// 	const pairLang = targets.find(item => item.symbol === task.targetLanguage);
+			// 	return `${ pairLang.lang } / ${ task.packageSize }`;
+			// },
+			// getDuoPair(task, ratesProp) {
+			// 	const pair = this.clientLanguages[ratesProp].find(item => item.source.symbol === task.sourceLanguage && item.target.symbol === task.targetLanguage);
+			// 	return `${ pair.source.lang } => ${ pair.target.lang }`;
+			// }
 		},
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				clientLanguages: "getCombinations"
+				clientLanguages: "getCombinations",
+        languages: "allLanguages",
 			}),
 			tableData() {
 				if(this.project.status !== 'Requested') {
