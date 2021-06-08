@@ -30,19 +30,24 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '21d' })
 
 	total = !toIgnore ? (value > total ? value : total.toFixed(2)) : total.toFixed(2)
+
 	let detailHeader = "Please see below the quote details:"
 	if (obj.isPriceUpdated) {
 		detailHeader = "Your quote has been updated - please see below the quote details:"
 	}
 	const reason = obj.reason ? `<p>Reason ${ obj.reason }</p><p>Please see below the updated quote details</p>` : ""
-	let acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-acceptquote?projectId=${ obj.id }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ (obj.finance.Price.receivables).toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
-	let declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-declinequote?projectId=${ obj.id }&to=${ date }t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ (obj.finance.Price.receivables).toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
+	let acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-acceptquote?projectId=${ obj.id }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ total } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
+	let declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-declinequote?projectId=${ obj.id }&to=${ date }t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ total } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
 	if (obj.selectedTasks.length) {
 		let taskIdsString = ''
 		obj.selectedTasks.forEach(task => taskIdsString += `${ task.taskId };`)
+		const totalForSelected = obj.selectedTasks.reduce((acc, curr) => {
+			acc = curr.finance.Price.receivables
+			return acc
+		},0)
 		taskIdsString = taskIdsString.replace(/[' ']/g, '%')
-		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ (obj.finance.Price.receivables).toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
-		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ (obj.finance.Price.receivables).toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
+		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ totalForSelected.toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
+		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ totalForSelected.toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
 	}
 
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;">
