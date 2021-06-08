@@ -437,14 +437,14 @@ export default {
       ]
     },
     mappedSourceLanguages() {
-      return this.clientSourceLanguages && this.clientSourceLanguages
-          .map(i => i.lang)
-          .filter(i => i !== 'English' && i !== 'English (United States)')
+    	if(this.clientInfo.services){
+    		return [...new Set(this.clientInfo.services.map(i => i.sourceLanguage.lang).filter(i => i !== 'English' && i !== 'English (United States)'))]
+	    }
     },
     mappedTargetLanguages() {
-      return this.clientTargetLanguages && this.clientTargetLanguages
-          .map(i => i.lang)
-          .filter(i => i !== 'English' && i !== 'English (United States)')
+	    if(this.clientInfo.services){
+		    return [...new Set(this.clientInfo.services.map(i => i.targetLanguages[0].lang).filter(i => i !== 'English' && i !== 'English (United States)'))]
+	    }
     },
     mappedIndustries() {
       if (this.getClientIndustries && this.getClientIndustries.length === 3) this.setIndustry({option: this.getClientIndustries[0].name})
