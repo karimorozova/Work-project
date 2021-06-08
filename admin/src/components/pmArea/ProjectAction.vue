@@ -22,6 +22,9 @@
           placeholder="Select Action"
           @chooseOption="setAction"
         )
+    .project-action__confirm(v-if="isAction('Delete') && project.status !== 'Closed'")
+      .project-action__button
+        Button(:value="'Confirm'" @clicked="makeApprovedAction" :isDisabled="!canDelete")
 
     .project-action__confirm(v-if="isAction('ReOpen') && project.status !== 'Rejected'")
       .project-action__button
@@ -130,6 +133,7 @@
 	import { mapGetters, mapActions } from 'vuex';
 	import ApproveModal from '../ApproveModal';
 	import PreviewQuote from "./WYSIWYGMultiMails";
+	import { deleteProject } from "../../vuex/pmarea/actions"
 
 	export default {
 		props: {
@@ -172,6 +176,7 @@
 				setProjectStatus: 'setProjectStatus',
 				sendClientQuote: 'sendClientQuote',
 				sendProjectDetails: 'sendProjectDetails',
+				deleteProject: 'deleteProject',
 				// deliverProjectToClient: 'deliverProjectToClient',
 				sendCancelProjectMessage: 'sendCancelProjectMessage',
 				sendClientCostQuote: 'sendClientCostQuote',
@@ -339,11 +344,23 @@
 						case "Cancel":
 							await this.cancelProjectMessage(message);
 							break;
+						case "Delete":
+							await this.deleteProjectAction();
+							break;
 					}
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error. Cannot execute chosen action.", isShow: true, type: "error" });
 				} finally {
 					this.setDefaults();
+				}
+			},
+			async deleteProjectAction() {
+				try {
+					await this.deleteProject({ projectId: this.project._id })
+					this.$router.back()
+					this.alertToggle({message: "Project deleted!", isShow: true, type: "success"});
+				}catch (err) {
+					this.alertToggle({message: "Project not deleted!", isShow: true, type: "error"});
 				}
 			},
 			async reOpenProjectToDraft() {
@@ -474,11 +491,16 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: 'getCurrentClient'
+				currentClient: 'getCurrentClient',
+				user: 'getUser',
 			}),
 			isProjectFinished(){
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+			},
+			canDelete(){
+				return status !== 'Closed'
+						&& (this.project.projectManager._id === this.user._id || this.user.group.name === 'Administrators'  || this.user.group.name === 'Developers' )
 			},
 			projectClientContacts() {
 				return this.project.clientContacts.map(({ email }) => email)
@@ -518,10 +540,10 @@
 					"Cancelled"
 				];
 				if(this.project.status === "Approved") {
-					result = ["Cancel"];
+					result = ["Cancel", 'Delete'];
 				}
 				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
-					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel"];
+					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel", 'Delete'];
 				}
 				if(this.project.status === 'Started' || this.project.status === 'In progress') {
 					const { tasks, tasksDR2 } = this.project
@@ -533,17 +555,14 @@
 						result = ["Send Project Details", "Cancel"];
 					}
 				}
-				// if(this.project.status === "Ready for Delivery") {
-				// 	result = ["Deliver", "Cancel"];
-				// }
 				if(this.project.status === 'Closed') {
 					result = ['ReOpen'];
 				}
 				if(this.project.status === 'Rejected') {
-					result = ['ReOpen', 'Cancel'];
+					result = ['ReOpen', 'Cancel', 'Delete'];
 				}
 				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-					result = ['ReOpen'];
+					result = ['ReOpen' , 'Delete'];
 				}
 				return result;
 			},
