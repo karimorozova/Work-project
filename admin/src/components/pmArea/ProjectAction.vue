@@ -534,10 +534,10 @@
 					"Cancelled"
 				];
 				if(this.project.status === "Approved") {
-					result = ["Cancel"];
+					result = ["Cancel", 'Delete'];
 				}
 				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
-					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel"];
+					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel", 'Delete'];
 				}
 				if(this.project.status === 'Started' || this.project.status === 'In progress') {
 				  const { tasks, tasksDR2 } = this.project
@@ -549,28 +549,16 @@
             result = ["Send Project Details", "Cancel"];
           }
 				}
- 				// if(this.project.status === "Ready for Delivery") {
-				// 	result = ["Deliver", "Cancel"];
-				// }
 				if(this.project.status === 'Closed') {
 					result = ['ReOpen'];
 				}
 				if(this.project.status === 'Rejected') {
-					result = ['ReOpen', 'Cancel'];
+					result = ['ReOpen', 'Cancel', 'Delete'];
 				}
 				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-					result = ['ReOpen'];
+					result = ['ReOpen' , 'Delete'];
 				}
-				if (
-            (this.project.status === "Draft"
-            || this.project.status === "Quote sent"
-            || this.project.status === "Cost Quote"
-            || this.project.status === "Cancelled"
-            || this.project.status === "Rejected")
-            && this.canDelete
-        ) {
-				  result.push('Delete')
-        }
+
 				return result;
 			},
 		},
