@@ -24,7 +24,7 @@
         )
     .project-action__confirm(v-if="isAction('Delete') && project.status !== 'Closed'")
       .project-action__button
-        Button(:value="'Confirm'" @clicked="makeApprovedAction")
+        Button(:value="'Confirm'" @clicked="makeApprovedAction" :isDisabled="!canDelete")
 
     .project-action__confirm(v-if="isAction('ReOpen') && project.status !== 'Rejected'")
       .project-action__button
@@ -494,7 +494,8 @@
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
 			},
 			canDelete(){
-				return status !== 'Closed' && this.project.projectManager._id === this.user._id
+				return status !== 'Closed'
+            && (this.project.projectManager._id === this.user._id || this.user.group.name === 'Administrators'  || this.user.group.name === 'Developers' )
 			},
 			projectClientContacts() {
 				return this.project.clientContacts.map(({ email }) => email)
