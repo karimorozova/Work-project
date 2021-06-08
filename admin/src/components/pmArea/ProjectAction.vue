@@ -22,9 +22,6 @@
           placeholder="Select Action"
           @chooseOption="setAction"
         )
-    .project-action__confirm(v-if="isAction('Delete') && project.status !== 'Closed'")
-      .project-action__button
-        Button(:value="'Confirm'" @clicked="makeApprovedAction" :isDisabled="!canDelete")
 
     .project-action__confirm(v-if="isAction('ReOpen') && project.status !== 'Rejected'")
       .project-action__button
@@ -133,7 +130,6 @@
 	import { mapGetters, mapActions } from 'vuex';
 	import ApproveModal from '../ApproveModal';
 	import PreviewQuote from "./WYSIWYGMultiMails";
-  import { deleteProject } from "../../vuex/pmarea/actions"
 
 	export default {
 		props: {
@@ -176,7 +172,6 @@
 				setProjectStatus: 'setProjectStatus',
 				sendClientQuote: 'sendClientQuote',
 				sendProjectDetails: 'sendProjectDetails',
-        deleteProject: 'deleteProject',
 				// deliverProjectToClient: 'deliverProjectToClient',
 				sendCancelProjectMessage: 'sendCancelProjectMessage',
 				sendClientCostQuote: 'sendClientCostQuote',
@@ -331,21 +326,18 @@
 						case "Send Project Details":
 							await this.projectDetails(message);
 							break;
-            case "Close Project":
-              const updatedProject = await this.$http.post('/pm-manage/close-project', {projectId: this.project._id})
-              await this.storeProject(updatedProject.data)
-              break
-						// case "Deliver":
-						// 	await this.deliverProject(message);
-						// 	break;
+						case "Close Project":
+							const updatedProject = await this.$http.post('/pm-manage/close-project', {projectId: this.project._id})
+							await this.storeProject(updatedProject.data)
+							break
+							// case "Deliver":
+							// 	await this.deliverProject(message);
+							// 	break;
 						case "Accept/Reject Quote":
 							await this.acceptQuote();
 							break;
 						case "Cancel":
 							await this.cancelProjectMessage(message);
-							break;
-						case "Delete":
-							await this.deleteProjectAction();
 							break;
 					}
 				} catch (err) {
@@ -354,10 +346,6 @@
 					this.setDefaults();
 				}
 			},
-      async deleteProjectAction() {
-        await this.deleteProject({ projectId: this.project._id })
-        this.$router.back()
-      },
 			async reOpenProjectToDraft() {
 				await this.setStatus('Draft', "");
 			},
@@ -459,9 +447,9 @@
 			async setManager({ option }, prop) {
 				const manager = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option);
 				if(manager._id === this.project[prop]._id) return;
-        if(this.type === "project") {
-          await this.setProjectValue({id: this.project._id, prop, value: manager});
-        }
+				if(this.type === "project") {
+					await this.setProjectValue({id: this.project._id, prop, value: manager});
+				}
 			},
 			async getManagers() {
 				try {
@@ -471,31 +459,26 @@
 					this.alertToggle({message: 'Error on getting managers', isShow: true, type: 'error'});
 				}
 			},
-      isAllDeliveredTasks(tasksDR2){
-			  let statuses = []
-			  if(tasksDR2.hasOwnProperty('singleLang')){
-          const { singleLang } = tasksDR2
-          for (const {status} of singleLang) statuses.push(status)
-        }
-        if(tasksDR2.hasOwnProperty('multiLang')){
-          const { multiLang } = tasksDR2
-          for (const {status} of multiLang) statuses.push(status)
-        }
-        return statuses.every(item => item === 'Delivered')
-      }
+			isAllDeliveredTasks(tasksDR2){
+				let statuses = []
+				if(tasksDR2.hasOwnProperty('singleLang')){
+					const { singleLang } = tasksDR2
+					for (const {status} of singleLang) statuses.push(status)
+				}
+				if(tasksDR2.hasOwnProperty('multiLang')){
+					const { multiLang } = tasksDR2
+					for (const {status} of multiLang) statuses.push(status)
+				}
+				return statuses.every(item => item === 'Delivered')
+			}
 		},
 		computed: {
 			...mapGetters({
-				currentClient: 'getCurrentClient',
-        user: 'getUser',
+				currentClient: 'getCurrentClient'
 			}),
 			isProjectFinished(){
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			},
-			canDelete(){
-				return status !== 'Closed'
-            && (this.project.projectManager._id === this.user._id || this.user.group.name === 'Administrators'  || this.user.group.name === 'Developers' )
 			},
 			projectClientContacts() {
 				return this.project.clientContacts.map(({ email }) => email)
@@ -529,41 +512,39 @@
 				let result = this.actions;
 				const nonStartedStatuses = [
 					"Draft",
-          "Cost Quote",
+					"Cost Quote",
 					"Quote sent",
 					"Requested",
 					"Cancelled"
 				];
 				if(this.project.status === "Approved") {
-					result = ["Cancel", 'Delete'];
+					result = ["Cancel"];
 				}
 				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
-					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel", 'Delete'];
+					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel"];
 				}
 				if(this.project.status === 'Started' || this.project.status === 'In progress') {
-				  const { tasks, tasksDR2 } = this.project
-          const isAllTasksCompleted =  tasks.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({status}) => status === 'Completed')
+					const { tasks, tasksDR2 } = this.project
+					const isAllTasksCompleted =  tasks.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({status}) => status === 'Completed')
 
-          if(isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)){
-            result = ["Close Project"];
-          }else{
-            result = ["Send Project Details", "Cancel"];
-          }
+					if(isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)){
+						result = ["Close Project"];
+					}else{
+						result = ["Send Project Details", "Cancel"];
+					}
 				}
+				// if(this.project.status === "Ready for Delivery") {
+				// 	result = ["Deliver", "Cancel"];
+				// }
 				if(this.project.status === 'Closed') {
 					result = ['ReOpen'];
 				}
 				if(this.project.status === 'Rejected') {
-					result = ['ReOpen', 'Cancel', 'Delete'];
+					result = ['ReOpen', 'Cancel'];
 				}
 				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-					result = ['ReOpen' , 'Delete'];
+					result = ['ReOpen'];
 				}
-
-				if(this.project.status === 'Draft') {
-					result = ['Cancel' , 'Delete'];
-				}
-
 				return result;
 			},
 		},
