@@ -116,7 +116,7 @@
 			},
       async goToVendor() {
         const { data } = await this.$http.post("/service-login/vendor", {vendorId: this.vendor._id})
-        const domain = window.location.origin.indexOf('pangea') !== -1 ? '*.pangea.global' : 'localhost'
+        const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
         const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
         document.cookie = `vendor=${data}; path=/; domain=${domain}`
         window.open(redirectTo, '_blank')
