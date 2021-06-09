@@ -90,6 +90,9 @@
 
           .title Rates
           .client-info__rates
+            PullButton(
+              @refreshResultTable="refreshResultTable"
+            )
             RatesParameters
             .client-info__tables-row
               .lang-table
@@ -189,6 +192,7 @@
 	import AllActivitiesModal from "./activity/AllActivitiesModal"
   import AllActivitiesFullScrean from "./activity/AllActivitiesFullScrean";
   import RadioButton from "../RadioButton";
+	import PullButton from "./pricelists/PullButton"
 
 	export default {
 		mixins: [ vatChecker ],
@@ -733,6 +737,7 @@
 
 		},
 		components: {
+			PullButton,
       AllActivitiesFullScrean,
 			AllActivitiesModal,
 			Sidebar,
