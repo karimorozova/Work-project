@@ -244,33 +244,42 @@
     justify-content: space-between;
     padding-bottom: 20px;
     align-items: flex-end;
-    max-width: 1400px;
+    max-width: 1500px;
 
     &__title {
       display: flex;
       align-items: flex-end;
-      font-size: 28px;
+      font-size: 22px;
     }
   }
 
   .update-btn {
-    height: 31px;
-    color: #fff;
-    font-size: 14px;
-    border-radius: 10px;
-    box-shadow: 0 3px 5px rgba(103, 87, 62, .5);
-    background-color: #d15f45;
-    border: 1px solid #d15f45;
-    cursor: pointer;
-    outline: none;
-    padding: 0 30px;
-    line-height: 31px;
-    margin-right: 20px;
+      min-width: 120px;
+      padding: 0 24px 0 24px;
+      height: 32px;
+      color: white;
+      font-size: 14px;
+      border-radius: 4px;
+      background-color: #d15f45;
+      border: none;
+      transition: .1s ease;
+      outline: none;
+      letter-spacing: 0.2px;
+      margin-right: 20px;
+      line-height: 32px;
+
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      }
+
+      &:active {
+        transform: scale(.98);
+      }
   }
 
   .priceLayout {
-    width: calc(100%);
-    max-width: 1400px;
+    width: 1500px;
     box-shadow: 0 0 10px #67573e;
 
     &__setting {

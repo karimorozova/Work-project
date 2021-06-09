@@ -6,7 +6,7 @@ const { createNewIndustry, updateIndustry, deleteIndustryFiles } = require('../s
 router.post("/industry/:id", upload.fields([{ name: "icon" }, { name: "generic" }]), async (req, res) => {
   const { name, active } = req.body;
   const { id } = req.params;
-  const isActive = active === "true" ? true : false;
+  const isActive = active === "true";
   const iconFile = req.files["icon"];
   const genericFile = req.files["generic"];
   try {

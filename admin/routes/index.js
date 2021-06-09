@@ -1,65 +1,49 @@
-const router = require('express').Router()
-const { requiresLogin } = require('../middleware')
+const router = require("express").Router()
+const { requiresLogin } = require("../middleware")
 
-const apiRouter = require('./api')
-const reportsapi = require('./reportsapi')
-const admin = require('./admin')
-const vendorRouter = require('./vendors/vendor')
-const pmareaRouter = require('./pmArea/pm-manage')
-const clientsRequests = require('./pmArea/clientsRequests')
-const delivery = require('./pmArea/delivery')
-const pricelistsRouter = require('./pricelists/prices')
-const currencyRatioRouter = require('./pricelists/currencyRatio')
-const vendorApplicationRouter = require('./vendors/application')
-const portalRouter = require('./portal')
-const industryRouter = require('./industry')
-const serviceRouter = require('./service')
-const zohoRouter = require('./zoho')
-const clientsapiRouter = require('./clientsapi')
-const vendorsapiRouter = require('./vendorsapi')
-const projectsRouter = require('./projectsapi')
-const memoqapiRouter = require('./memoqapi')
-const multipliers = require('./pricelists/multipliers')
-const settings = require('./settings')
-const dashboard = require('./dashboard')
-const OpenPangea = require('./OpenPangea')
-const autoLogin = require('./autoLogin')
+// TODO: not used (refactoring soon...)
+// const zohoRouter = require('./zoho')
+// router.use('/zoho',  require('./zoho'))
+
+//--- TODO: перенести в общий роут с насройками
+router.use("/industry", require("./industry"))
+router.use("/service", require("./service"))
+// --------------------------------------------
 
 
-//ADMIN
-router.use('/', admin)
-router.use('/api', apiRouter)
-router.use('/open-pangea', OpenPangea)
-router.use('/service', serviceRouter)
-router.use('/zoho', zohoRouter)
-router.use('/vendors/application', vendorApplicationRouter)
-router.use('/industry', industryRouter)
-router.use('/clients-requests', clientsRequests)
+//SYSTEM API  =======================================================================
+router.use("/clientsapi", requiresLogin, require("./clientsapi"))
+router.use("/vendorsapi", requiresLogin, require("./vendorsapi"))
+router.use("/memoqapi", requiresLogin, require("./memoqapi"))
+router.use("/currency", requiresLogin, require("./pricelists/currencyRatio"))
+router.use("/pricelists", requiresLogin, require("./pricelists/multipliers"))
+router.use("/api-settings", requiresLogin, require("./settings"))
+router.use("/dashboard", requiresLogin, require("./dashboard"))
+router.use("/service-login", requiresLogin, require("./autoLogin"))
+router.use("/prices", requiresLogin, require("./pricelists/prices"))
+router.use("/delivery", requiresLogin, require("./pmArea/delivery"))
+router.use("/clients-requests", requiresLogin, require("./pmArea/clientsRequests"))
+router.use("/pm-manage", requiresLogin, require("./pmArea/pm-manage"))
+router.use("/reportsapi", requiresLogin, require("./reportsapi"))
 
-//ProjectQuotes Api, all routes are protected.
-router.use('/projectsapi', projectsRouter)
-router.use('/service-login',requiresLogin, autoLogin)
 
-router.use('/api-settings', requiresLogin, settings)
-router.use('/dashboard', dashboard)
-router.use('/reportsapi', requiresLogin, reportsapi)
-router.use('/pm-manage', requiresLogin, pmareaRouter)
-router.use('/prices', requiresLogin, pricelistsRouter)
-router.use('/currency', requiresLogin, currencyRatioRouter)
-router.use('/pricelists', requiresLogin, multipliers)
-router.use('/clientsapi', requiresLogin, clientsapiRouter)
-router.use('/vendorsapi', requiresLogin, vendorsapiRouter)
-router.use('/memoqapi', requiresLogin, memoqapiRouter)
-router.use('/delivery', requiresLogin, delivery)
-//ADMIN
+//Open API ==========================================================================
+router.use("/open-pangea", require("./OpenPangea"))
+router.use("/projectsapi", require("./projectsapi"))
+// TODO: refactoring routes in api route. (hide half of them)
+router.use("/api", require("./api"))
+// TODO: refactoring routes in admin route. (not protected)
+router.use("/", require("./admin"))
 
-//VENDOR
-router.use('/vendor', vendorRouter)
-//VENDOR
 
-//PORTAL
-router.use('/portal', portalRouter)
-//PORTAL
+//VENDOR PORTAL ROUTE ==============================================================
+router.use("/vendor", require("./vendors/vendor"))
+router.use("/vendors/application", require("./vendors/application"))
+
+
+//CLIENT PORTAL ROUTE ==============================================================
+router.use("/portal", require("./portal"))
 
 
 module.exports = router
+
