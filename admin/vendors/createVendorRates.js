@@ -1,11 +1,86 @@
 const _ = require('lodash');
 const { Pricelist, Vendors, Step } = require('../models');
+const { filterExtraCombinationsForPriceListTable } = require('./deleteVendorRates')
+const { uniqBy } = require('lodash')
+const { getVendor } = require('./getVendors')
+
 const {
 	getNeededLangPair,
 	getNeededCurrency,
 	getStepMultipliersCombinations,
-	generateNewPricelistCombinations
+	generateNewPricelistCombinations,
+	// filteredCombinationsResultRatesTable
 } = require('../clients');
+
+
+const updateClientRatesFromSettings = async (vendorId) => {
+	const { competencies, qualifications, rates } = await Vendors.findOne({ _id: vendorId })
+	const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true })
+	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates
+
+	let allQualificationsCombinationsRow = generateQualificationsCombinations(qualifications)
+
+	let overallStepsArr = []
+	competencies.forEach(({ sourceLanguage, targetLanguage, step, industry }) => {
+		const obj = allQualificationsCombinationsRow.find(({ sourceLanguage: sourceLanguageQ, targetLanguage: targetLanguageQ, step: stepQ, industry: industryQ }) => {
+			return `${ sourceLanguage }-${ targetLanguage }-${ step }-${ industry }` === `${ sourceLanguageQ }-${ targetLanguageQ }-${ stepQ }-${ industryQ }`
+		})
+		!obj ? overallStepsArr.push(step) : obj.status === 'Passed' && overallStepsArr.push(step)
+	})
+
+	const universalSteps = [ ...new Set(overallStepsArr.map(i => i.toString())) ]
+
+	let allCombinationsSteps = []
+	for (let step of universalSteps) allCombinationsSteps.push(...await getStepMultipliersCombinations({ _id: step }, defaultPricelist))
+
+	allCombinationsSteps = _.uniqBy(allCombinationsSteps, item => (item.step.toString() + item.unit.toString() + item.size))
+
+	for (let elem of stepMultipliersTable) {
+		const idx = allCombinationsSteps.findIndex(item => `${ item.step }-${ item.unit }-${ item.size }` === `${ elem.step }-${ elem.unit }-${ elem.size }`)
+		if (idx !== -1) {
+			delete elem._id
+			allCombinationsSteps[idx] = elem
+		}
+	}
+
+	const allCombinations = generateNewPricelistCombinations(basicPricesTable, allCombinationsSteps, industryMultipliersTable)
+	let newPricelistTable = getPriceListTableUnique(filterExtraCombinationsForPriceListTable(allCombinations, competencies, null, qualifications))
+
+
+	for (let elem of pricelistTable) {
+		const idx = newPricelistTable.findIndex(item => `${ item.sourceLanguage }-${ item.targetLanguage }-${ item.step }-${ item.unit }-${ item.size }-${ item.industry }` ===
+				`${ elem.sourceLanguage }-${ elem.targetLanguage }-${ elem.step }-${ elem.unit }-${ elem.size }-${ elem.industry }`)
+		delete elem._id
+		newPricelistTable[idx] = elem
+	}
+
+	await Vendors.updateOne({ _id: vendorId }, {
+		rates: {
+			basicPricesTable, stepMultipliersTable: allCombinationsSteps, industryMultipliersTable, pricelistTable: newPricelistTable
+		}
+	})
+
+	return await getVendor({ _id: vendorId })
+
+	function generateQualificationsCombinations(qualifications) {
+		let listOfQualifications = []
+		for (const { source, target, steps, industries, status } of qualifications) {
+			steps.forEach(step => {
+				industries.forEach(industry => {
+					listOfQualifications.push({ sourceLanguage: `${ source._id }`, targetLanguage: `${ target._id }`, industry: `${ industry._id }`, step: `${ step._id }`, status })
+				})
+			})
+		}
+		return listOfQualifications
+	}
+
+	function getPriceListTableUnique(pricelistTable) {
+		return uniqBy(pricelistTable, ({ sourceLanguage, targetLanguage, step, unit, size, industry }) => (
+				sourceLanguage.toString() + targetLanguage.toString() + step.toString() + unit.toString() + size.toString() + industry.toString()
+		))
+	}
+
+}
 
 
 const createRateCombinations = async (listForRates, vendorId) => {
@@ -160,5 +235,6 @@ module.exports = {
 	createRateCombinations,
 	createRateRowFromQualification,
 	splitRatesArr,
+	updateClientRatesFromSettings,
 	combineVendorRates
 };

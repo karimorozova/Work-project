@@ -74,14 +74,14 @@
 		destroyed() {
 			document.body.style.overflow = "auto";
 		},
-		watch: {
-			currentTemplate: {
-				handler(val) {
-					this.editorData = val.message
-				},
-				deep: true
-			}
-		},
+		// watch: {
+		// 	currentTemplate: {
+		// 		handler(val) {
+		// 			this.editorData = val.message
+		// 		},
+		// 		deep: true
+		// 	}
+		// },
 		computed: {
 			templatesData() {
 				return this.templates.map(item => item.title);

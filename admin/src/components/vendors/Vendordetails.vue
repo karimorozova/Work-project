@@ -43,6 +43,9 @@
 
       .title Rates
       .vendor-info__rates
+        PullButton(
+          @refreshResultTable="refreshResultTable"
+        )
         .vendor-info__tables-row
           .lang-table(v-if="languages.length")
             LangTable(
@@ -180,6 +183,7 @@
 	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
   import VendorMainInfo from "./VendorGeneralInfo";
   import SaveCancelPopUp from "../SaveCancelPopUp";
+	import PullButton from "./pricelists/PullButton"
 
 	export default {
 		mixins: [ photoPreview ],
@@ -532,6 +536,7 @@
 			}
 		},
 		components: {
+			PullButton,
       SaveCancelPopUp,
       VendorMainInfo,
 			PendingCompetencies,

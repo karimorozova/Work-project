@@ -27,13 +27,14 @@ const { notifyTestStatus, sendMessageToVendor } = require('./emails')
 const {
 	updateVendorCompetencies,
 	deleteVendorCompetencies,
-	generateCompetenciesCombinations
+	generateCompetenciesCombinations,
 } = require('./competencies')
+
 const { updateVendorMatrix, syncVendorMatrix } = require('./vendorMatrix')
 const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications')
 const { updateVendorsRatePrices, getVendorAfterCombinationsUpdated } = require('./updateVendorRates')
 const { syncVendorRatesCost } = require('./syncVendorRatesCost')
-const { createRateRowFromQualification } = require('./createVendorRates')
+const { createRateRowFromQualification, updateClientRatesFromSettings } = require('./createVendorRates')
 const { getVendorAssessmentsWordCount } = require('./getVendorAssessments')
 
 const {
@@ -87,5 +88,6 @@ module.exports = {
 	rejectedPendingCompetence,
 	deletePendingCompetence,
 	getFilteredVendorsPotential,
-	saveNotPassedTest
+	saveNotPassedTest,
+	updateClientRatesFromSettings
 }

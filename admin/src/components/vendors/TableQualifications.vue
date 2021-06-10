@@ -571,7 +571,7 @@
 				}
 			}
 		},
-		watch: {
+		// watch: {
 			// async refresh() {
 			// 	if (this.refresh) {
 			// 		try {
@@ -584,7 +584,7 @@
 			// 		}
 			// 	}
 			// }
-		},
+		// },
 		computed: {
 			...mapGetters({
 				currentVendorQualifications: "getCurrentVendorQualifications"
