@@ -233,10 +233,11 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
 	const allSteps = await Step.find()
 
 	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates
+	const originalBasicPriceTable = [ ...basicPricesTable ]
 
-	const freshBasicPriceRows = []
-	const newStepMultiplierCombinations = []
-	const newIndustryMultiplierCombinations = []
+	let freshBasicPriceRows = []
+	let newStepMultiplierCombinations = []
+	let newIndustryMultiplierCombinations = []
 
 	for (let newService of newServicesArr) {
 
@@ -256,8 +257,7 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
 
 		const newIndustries = newService.industries.map(item => item._id)
 		for (let industry of newIndustries) {
-			const neededIndustryRow = boundPricelist.industryMultipliersTable
-					.find(item => item.industry.toString() === industry.toString())
+			const neededIndustryRow = boundPricelist.industryMultipliersTable.find(item => item.industry.toString() === industry.toString())
 			const multiplier = neededIndustryRow ? neededIndustryRow.multiplier : 100
 			newIndustryMultiplierCombinations.push({ industry, multiplier })
 		}
@@ -283,8 +283,23 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
 				const multiplier = !!neededIndustryRow ? neededIndustryRow.multiplier : 100
 				industryMultipliersTable.push({ industry: _id, multiplier })
 			}
-
 	}
+
+	for (let elem of originalBasicPriceTable) {
+		const idx = freshBasicPriceRows.findIndex(item => `${ item.sourceLanguage }-${ item.targetLanguage }` === `${ elem.sourceLanguage }-${ elem.targetLanguage }`)
+		if (idx !== -1) freshBasicPriceRows[idx].basicPrice = elem.basicPrice
+	}
+
+	for (let elem of stepMultipliersTable) {
+		const idx = newStepMultiplierCombinations.findIndex(item => `${ item.step }-${ item.unit }-${ item.size }` === `${ elem.step }-${ elem.unit }-${ elem.size }`)
+		if (idx !== -1) newStepMultiplierCombinations[idx].multiplier = elem.multiplier
+	}
+
+	for (let elem of industryMultipliersTable) {
+		const idx = newIndustryMultiplierCombinations.findIndex(item => `${ item.industry }` === `${ elem.industry }`)
+		if (idx !== -1) newIndustryMultiplierCombinations[idx].multiplier = elem.multiplier
+	}
+
 	pricelistTable = [ ...pricelistTable, ...generateNewPricelistCombinations(freshBasicPriceRows, newStepMultiplierCombinations, newIndustryMultiplierCombinations) ]
 
 	basicPricesTable = _.uniqBy(basicPricesTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString()))
