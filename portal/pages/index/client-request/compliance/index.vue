@@ -388,13 +388,13 @@ export default {
       this[value] = this.allLanguages.find(({ lang }) => lang === option)
     },
     setSourceFiles({ files }) {
-      const filteredFiles = Array.from(files).filter(item => item.size < 50000000)
-      this.sourceFiles = [ ...filteredFiles ]
+      const filteredFiles = Array.from(files).filter(item => item.size < 50000000).filter(item => !this.sourceFiles.map(item => item.name).includes(item.name))
+      this.sourceFiles.push(...filteredFiles )
       this.clearFileInput('sourceFiles')
     },
     setRefFiles({ files }) {
-      const filteredFiles = Array.from(files).filter(item => item.size < 50000000)
-      this.refFiles = [ ...filteredFiles ]
+      const filteredFiles = Array.from(files).filter(item => item.size < 50000000).filter(item => !this.refFiles.map(item => item.name).includes(item.name))
+	    this.refFiles.push(...filteredFiles )
       this.clearFileInput('refFiles')
     },
     clearFileInput(name) {
