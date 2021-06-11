@@ -11,12 +11,6 @@
     DataTable(
       :fields="fields"
       :tableData="dataArray"
-      :errors="errors"
-      :areErrors="areErrors"
-      :isApproveModal="isDeleting"
-      @closeErrors="closeErrors"
-      @notApprove="setDefaults"
-      @closeModal="setDefaults"
       :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
       :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
@@ -27,39 +21,36 @@
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentSourceLang" disabled)
+        .price__data {{ row.sourceLanguage.lang }}
 
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentTargetLang" disabled)
+        .price__data {{ row.targetLanguage.lang }}
 
       template(slot="eur" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(id="eur") {{row.euroBasicPrice}}
           label(for="eur") &euro;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" :onchange="currentRatio" v-model="currentBasicPriceEUR")
+          input.price__data-input(type="number" @change="setRowValue(index)" v-model="dataArray[index].euroBasicPrice")
 
       template(slot="usd" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(id="usd") {{row.usdBasicPrice}}
           label(for="usd") &#36;
         .price__data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceUSD" disabled)
+          input.price__data-input(type="number" :value="dataArray[index].usdBasicPrice" disabled)
 
       template(slot="gbp" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(id="gbp") {{row.gbpBasicPrice}}
           label(for="gbp") &pound;
         .price__data(v-else)
-          input.price__data-input(type="number" v-model="currentBasicPriceGBP" disabled)
+          input.price__data-input(type="number" :value="dataArray[index].gbpBasicPrice" disabled)
 
-      template(slot="icons" slot-scope="{ row, index }")
+      //template(slot="icons" slot-scope="{ row, index }")
         .price__icons
           img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
+
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
@@ -83,6 +74,7 @@
 		},
 		data() {
 			return {
+				isEdit: true,
 				fields: [
 					{
 						label: "Source Lang",
@@ -118,38 +110,20 @@
 						key: "gbp",
 						width: "14%",
 						padding: "0"
-					},
-					{
-						label: "",
-						headerKey: "headerIcons",
-						key: "icons",
-						width: "18%",
-						padding: "0"
 					}
+					// {
+					// 	label: "",
+					// 	headerKey: "headerIcons",
+					// 	key: "icons",
+					// 	width: "18%",
+					// 	padding: "0"
+					// }
 				],
 				dataArray: [],
-				currentSourceLang: "",
-				currentTargetLang: "",
-				currentSourceLangObj: "",
-				currentTargetLangObj: "",
-				currentBasicPriceUSD: "",
-				currentBasicPriceEUR: "",
-				currentBasicPriceGBP: "",
-
-				calculatedBasicPriceUSD: "",
-				calculatedBasicPriceGBP: "",
-
 				currency: {},
-
 				typeFilter: "",
 				sourceFilter: "",
 				targetFilter: "",
-
-				areErrors: false,
-				errors: [],
-				isDeleting: false,
-				deleteIndex: -1,
-				currentActive: -1,
 				isDataRemain: true
 			}
 		},
@@ -161,52 +135,12 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
-			async makeAction(index, key) {
-				if (this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing()
-				}
-				switch (key) {
-					case "edit":
-						this.setEditingData(index)
-						break
-					case "cancel":
-						this.manageCancelEdition()
-						break
-					case "delete":
-						alert("delete")
-						break
-					default:
-						await this.checkErrors(index)
-				}
-			},
-			setEditingData(index) {
-				this.currentActive = index
-				this.currentSourceLangObj = this.dataArray[index].sourceLanguage
-				this.currentTargetLangObj = this.dataArray[index].targetLanguage
-				this.currentSourceLang = this.dataArray[index].sourceLanguage.lang
-				this.currentTargetLang = this.dataArray[index].targetLanguage.lang
-				this.currentBasicPriceUSD = this.dataArray[index].usdBasicPrice
-				this.currentBasicPriceEUR = this.dataArray[index].euroBasicPrice
-				this.currentBasicPriceGBP = this.dataArray[index].gbpBasicPrice
-			},
-			manageCancelEdition() {
-				this.setDefaults()
-				this.isDeleting = false
-			},
-			setDefaults() {
-				this.currentActive = -1
-				this.isDeleting = false
+			async setRowValue(index) {
+				await this.checkErrors(index)
 			},
 			async checkErrors(index) {
-				if (this.currentActive === -1) return
-				this.errors = []
-				if (this.currentBasicPriceUSD === "") return
-				if (this.currentBasicPriceEUR === "") return
-				if (this.currentBasicPriceGBP === "") return
-				if (this.errors.length) {
-					this.areErrors = true
-					return
-				}
+				if (!this.isEdit) return
+				if (this.dataArray[index].euroBasicPrice === "") this.dataArray[index].euroBasicPrice = 0.1
 				await this.manageSaveClick(index)
 			},
 			async bottomScrolled() {
@@ -227,49 +161,32 @@
 					})
 					this.dataArray = result.data
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Languages",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting Languages", isShow: true, type: "error" })
 				}
 			},
 			refreshResultTable() {
 				this.$emit('refreshResultTable')
 			},
 			async manageSaveClick(index) {
-				if (this.currentActive === -1) return
-				const id = this.dataArray[index]._id
+				if (!this.isEdit) return
+				const { _id, type, sourceLanguage, targetLanguage, euroBasicPrice } = this.dataArray[index]
 				try {
 					const result = await this.$http.post("/pricelists/basic-prices-update/" + this.priceId, {
 						basicPrice: {
-							_id: id,
-							type: this.dataArray[index].type,
-							sourceLanguage: this.currentSourceLangObj,
-							targetLanguage: this.currentTargetLangObj,
-							usdBasicPrice: this.calculatedBasicPriceUSD,
-							euroBasicPrice: this.currentBasicPriceEUR,
-							gbpBasicPrice: this.calculatedBasicPriceGBP
+							_id,
+							type,
+							sourceLanguage,
+							targetLanguage,
+							usdBasicPrice: euroBasicPrice * this.currency.USD,
+							euroBasicPrice,
+							gbpBasicPrice: euroBasicPrice * this.currency.GBP
 						}
 					})
-					this.alertToggle({
-						message: "Saved successfully",
-						isShow: true,
-						type: "success"
-					})
-					this.setDefaults()
-					this.dataArray[index] = result.data
+					this.dataArray.splice(index, 1, result.data)
 					this.refreshResultTable()
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on saving Steps",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
 				}
-			},
-			closeErrors() {
-				this.areErrors = false
 			},
 			async setFilter({ option, prop }) {
 				this[prop] = option
@@ -280,11 +197,7 @@
 					const result = await this.$http.get("/currency/currency-ratio")
 					this.currency = result.data
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting currency",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting currency", isShow: true, type: "error" })
 				}
 			}
 		},
@@ -297,14 +210,6 @@
 			}
 		},
 		computed: {
-			currentRatio() {
-				this.calculatedBasicPriceUSD = this.currentBasicPriceEUR * this.currency.USD
-				this.calculatedBasicPriceGBP = this.currentBasicPriceEUR * this.currency.GBP
-			},
-			manageIcons() {
-				const { delete: del, ...result } = this.icons
-				return result
-			},
 			allFilters() {
 				let result = {
 					typeFilter: this.typeFilter,
@@ -326,15 +231,10 @@
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
 
   .price {
-    @extend %setting-table;
-    width: 36%;
     background-color: #fff;
-    padding: 20px 10px 20px 20px;
     box-shadow: none;
-
 
     input {
       &::-webkit-inner-spin-button,

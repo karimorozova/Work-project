@@ -267,9 +267,7 @@
   @import "../../../assets/styles/settingsTable";
 
   .price {
-    @extend %setting-table;
     background-color: #fff;
-    padding: 0 20px 20px 20px;
     box-shadow: none;
 
     input {

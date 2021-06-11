@@ -92,7 +92,6 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors.scss";
 .pricelistDiscountChart {
-  margin-top: 5px;
   &__rate {
     color: #67573e;
     border: none;

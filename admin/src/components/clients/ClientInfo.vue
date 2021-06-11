@@ -90,33 +90,34 @@
 
           .title Rates
           .client-info__rates
-            PullButton(
-              @refreshResultTable="refreshResultTable"
-            )
+            PullButton(:style="'margin: 0 0 20px;'" @refreshResultTable="refreshResultTable")
             RatesParameters
-            .client-info__tables-row
-              .lang-table
-                LangTable(
-                  :dataArray="currentClient.rates.basicPricesTable"
-                  :clientId="currentClient._id"
-                  @refreshResultTable="refreshResultTable"
-                )
-              .step-table
-                StepTable(
-                  :dataArray="currentClient.rates.stepMultipliersTable"
-                  :clientId="currentClient._id"
-                  @refreshResultTable="refreshResultTable"
-                  :refresh="isRefreshAfterServiceUpdate"
-                )
-              .industry-table
-                IndustryTable(
-                  :dataArray="currentClient.rates.industryMultipliersTable"
-                  :clientId="currentClient._id"
-                  @refreshResultTable="refreshResultTable"
-                  :refresh="isRefreshAfterServiceUpdate"
-                )
-
-            .result-table
+            Tabs(
+              :tabs="tabs"
+              :selectedTab="selectedTab"
+              @setTab="setTab"
+            )
+            .lang-table(v-if="selectedTab === 'Basic Price'")
+              LangTable(
+                :dataArray="currentClient.rates.basicPricesTable"
+                :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+              )
+            .step-table(v-if="selectedTab === 'Steps / Units'")
+              StepTable(
+                :dataArray="currentClient.rates.stepMultipliersTable"
+                :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+            .industry-table(v-if="selectedTab === 'Industries'")
+              IndustryTable(
+                :dataArray="currentClient.rates.industryMultipliersTable"
+                :clientId="currentClient._id"
+                @refreshResultTable="refreshResultTable"
+                :refresh="isRefreshAfterServiceUpdate"
+              )
+            .result-table(v-if="selectedTab === 'Overall Prices'")
               ResultTable(
                 :clientId="currentClient._id"
                 :languages="languages"
@@ -126,10 +127,8 @@
                 :isRefreshResultTable="isRefreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
               )
-
-          .title Discount Chart
-          .client-info__chart
-            DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+            .chart(v-if="selectedTab === 'Discount Chart'")
+              DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
           .title Documents
           .client-info__documents
@@ -190,9 +189,10 @@
 	import AddTask from "./activity/AddTask"
 	import AddNote from "./activity/AddNote"
 	import AllActivitiesModal from "./activity/AllActivitiesModal"
-  import AllActivitiesFullScrean from "./activity/AllActivitiesFullScrean";
-  import RadioButton from "../RadioButton";
+	import AllActivitiesFullScrean from "./activity/AllActivitiesFullScrean"
+	import RadioButton from "../RadioButton"
 	import PullButton from "./pricelists/PullButton"
+	import Tabs from "../Tabs"
 
 	export default {
 		mixins: [ vatChecker ],
@@ -212,6 +212,8 @@
 		},
 		data() {
 			return {
+				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Overall Prices', 'Discount Chart' ],
+				selectedTab: 'Overall Prices',
 				clientTask: {},
 				clientNote: {},
 				aliases: [],
@@ -239,7 +241,7 @@
 
 				generalKeys: [
 					'name',
-          'clientType',
+					'clientType',
 					'officialCompanyName',
 					'email',
 					'website',
@@ -271,37 +273,40 @@
 				createTaskModal: false,
 				createNoteModal: false,
 				allActivitiesModal: false,
-				fullActivityModal: false,
+				fullActivityModal: false
 			}
 		},
 		methods: {
-      toggleRadio({value}) {
-        this.storeClientPropertyOverallData({ prop: "clientType", value })
-      },
-			backToMainPage(){
+			setTab({ index: i }) {
+				this.selectedTab = this.tabs.find((item, index) => index === i)
+			},
+			toggleRadio({ value }) {
+				this.storeClientPropertyOverallData({ prop: "clientType", value })
+			},
+			backToMainPage() {
 				this.fullActivityModal = false
-      },
-			toggleModalFullSize(data){
-        this.fullActivityModal = data
-      },
-      closeModalFullSize() {
-	      this.fullActivityModal = false
-        this.openAllActivitiesModal()
-      },
+			},
+			toggleModalFullSize(data) {
+				this.fullActivityModal = data
+			},
+			closeModalFullSize() {
+				this.fullActivityModal = false
+				this.openAllActivitiesModal()
+			},
 			editActivityDetailsTask(taskData) {
 				const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = taskData
 				this.clientTask = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }
 				this.createTaskModal = true
 			},
-      editActivityDetailsNote(noteData) {
-        const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = noteData
-        this.clientNote = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }
-        this.createNoteModal = true
-      },
+			editActivityDetailsNote(noteData) {
+				const { _id, priority, title, dateTime, details, assignedTo, associatedTo } = noteData
+				this.clientNote = { _id, priority, title, dateTime, details, assignedTo, associatedTo, stage: 'update' }
+				this.createNoteModal = true
+			},
 			closeTaskModal() {
 				this.createTaskModal = false
 			},
-      closeNoteModal() {
+			closeNoteModal() {
 				this.createNoteModal = false
 			},
 			closeAllActivities() {
@@ -319,11 +324,11 @@
 				}
 				this.createTaskModal = true
 			},
-      createNote() {
+			createNote() {
 				this.clientNote = {
 					priority: "",
 					title: "",
-          dateTime: "",
+					dateTime: "",
 					details: "",
 					assignedTo: {},
 					associatedTo: [],
@@ -473,9 +478,9 @@
 					return
 				}
 				this.currentClientOverallData.clientType !== 'Individual'
-          ? await this.updateClient()
-          : await this.updateClientIndividual()
-        this.refreshResultTable()
+						? await this.updateClient()
+						: await this.updateClientIndividual()
+				this.refreshResultTable()
 			},
 
 			async checkSameClientEmails(clientEmail, clientId) {
@@ -527,37 +532,37 @@
 				for (let key of keys) clientForSave[key] = this.currentClientOverallData[key]
 				// for (let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
 
-        clientForSave.nativeLanguage = null
-        clientForSave.timeZone = null
-        clientForSave.website = ""
-        clientForSave.officialCompanyName = this.currentClientOverallData.name
+				clientForSave.nativeLanguage = null
+				clientForSave.timeZone = null
+				clientForSave.website = ""
+				clientForSave.officialCompanyName = this.currentClientOverallData.name
 
-        clientForSave.contacts = [{
-          leadContact: true,
-          firstName:  this.currentClientOverallData.name,
-          surname: "",
-          password: "12345",
-          email: this.currentClientOverallData.email,
-          gender: "",
-          position: "Manager",
-          phone: "",
-          photo: "",
-          whatsApp: "",
-          skype: "",
-          linkedIn: "",
-          country: "",
-          notes: "",
-        }]
+				clientForSave.contacts = [ {
+					leadContact: true,
+					firstName: this.currentClientOverallData.name,
+					surname: "",
+					password: "12345",
+					email: this.currentClientOverallData.email,
+					gender: "",
+					position: "Manager",
+					phone: "",
+					photo: "",
+					whatsApp: "",
+					skype: "",
+					linkedIn: "",
+					country: "",
+					notes: ""
+				} ]
 
-        clientForSave.billingInfo= {
-          officialCompanyName: this.currentClientOverallData.name,
-          vat: false,
-          vatId: '',
-          dueDate: '',
-          address: '',
-          invoiceSending: false,
-          paymentType: "PPP"
-        }
+				clientForSave.billingInfo = {
+					officialCompanyName: this.currentClientOverallData.name,
+					vat: false,
+					vatId: '',
+					dueDate: '',
+					address: '',
+					invoiceSending: false,
+					paymentType: "PPP"
+				}
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
@@ -731,14 +736,15 @@
 					return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
 				}
 			},
-      isIndividual() {
-        return this.currentClientOverallData.clientType === 'Individual'
-      }
+			isIndividual() {
+				return this.currentClientOverallData.clientType === 'Individual'
+			}
 
 		},
 		components: {
+			Tabs,
 			PullButton,
-      AllActivitiesFullScrean,
+			AllActivitiesFullScrean,
 			AllActivitiesModal,
 			Sidebar,
 			SaveCancelPopUp,
@@ -760,8 +766,8 @@
 			RatesParameters,
 			ClientsNotes,
 			AddTask,
-      AddNote,
-      RadioButton
+			AddNote,
+			RadioButton
 		},
 		created() {
 			this.getClientInfoLangs()
@@ -774,9 +780,9 @@
 				}
 			})
 		},
-    beforeDestroy(){
-	    this.storeCurrentClient({})
-    },
+		beforeDestroy() {
+			this.storeCurrentClient({})
+		},
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
 				if (from.name === 'contact' || from.name === 'new-contact') {
@@ -815,22 +821,11 @@
       top: 15%;
       left: 50%;
       z-index: 50;
-      transform: translate(-50%,0%);
+      transform: translate(-50%, 0%);
       width: 820px;
     }
 
   }
-
-
-  /*.modal-enter-active,*/
-  /*.modal-leave-active {*/
-  /*  transition:  opacity .5s;*/
-  /*}*/
-
-  /*.modal-enter,*/
-  /*.modal-leave-to {*/
-  /*  opacity: 0;*/
-  /*}*/
 
   .client-layout {
     display: flex;
@@ -859,18 +854,23 @@
 
   .client-info {
     position: relative;
-    &__main-row{
+
+    &__main-row {
       width: 1000px;
     }
+
     &__layout {
       display: flex;
     }
+
     &__notes {
       box-sizing: border-box;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     }
-    &__radio{
+
+    &__radio {
       display: flex;
+
       .radio {
         margin-right: 10px;
       }
@@ -881,7 +881,6 @@
     &__contacts-info,
     &__sales,
     &__documents,
-    &__chart,
     &__billing {
       padding: 20px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
@@ -906,23 +905,6 @@
 
     &_error-shadow {
       box-shadow: 0 0 5px $red;
-    }
-
-    &__tables-row {
-      display: flex;
-      padding-top: 20px;
-
-      .lang-table {
-        width: 33%;
-      }
-
-      .industry-table {
-        width: 26%;
-      }
-
-      .step-table {
-        width: 42%;
-      }
     }
   }
 

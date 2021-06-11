@@ -1,6 +1,6 @@
 <template lang="pug">
   .pull
-    Button(value="Update information from Setting / Pricelist" @clicked="setInformation")
+    Button(value="Update information from Setting" @clicked="setInformation")
 
 </template>
 

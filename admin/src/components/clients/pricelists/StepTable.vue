@@ -249,12 +249,9 @@
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
 
   .price {
-    @extend %setting-table;
     background-color: #fff;
-    padding: 0px 5px;
     box-shadow: none;
 
     input {

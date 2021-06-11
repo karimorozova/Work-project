@@ -376,14 +376,9 @@
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
 
   .price {
-    @extend %setting-table;
-    width: 40%;
     background-color: #fff;
-    padding: 20px 0;
-    box-shadow: none;
 
     input {
       &::-webkit-inner-spin-button,
