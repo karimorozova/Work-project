@@ -37,50 +37,37 @@
         .price__data {{ row.industry }}
 
       template(slot="eur" slot-scope="{ row, index }")
-        .price__data
+        .price__data(v-if="!row.euroMinPrice")
           span(id="eur") {{row.eurPrice}}
           label(for="eur") &euro;
+        .price__data(v-else)
+          span(id="eur") (fix) {{row.euroMinPrice}}
+          label(for="eur") &euro;
 
-      template(slot="minEur" slot-scope="{ row, index }")
-        .price__data
-          span(v-if="!row.euroMinPrice")
-            span n/a
-          span(v-else)
-            span(id="minEur") {{row.euroMinPrice}}
-            label(for="minEur") &euro;
 
       template(slot="usd" slot-scope="{ row, index }")
-        .price__data
+        .price__data(v-if="!row.usdMinPrice")
           span(id="usd") {{row.usdPrice}}
           label(for="usd") &#36;
+        .price__data(v-else)
+          span(id="usd") (fix) {{row.usdMinPrice}}
+          label(for="usd") &#36;
 
-      template(slot="minUsd" slot-scope="{ row, index }")
-        .price__data
-          span(v-if="!row.usdMinPrice")
-            span n/a
-          span(v-else)
-            span(id="minUsd") {{row.usdMinPrice}}
-            label(for="minUsd") &#36;
 
       template(slot="gbp" slot-scope="{ row, index }")
-        .price__data
+        .price__data(v-if="!row.gbpMinPrice")
           span(id="gbp") {{row.gbpPrice}}
           label(for="gbp") &pound;
+        .price__data(v-else)
+          span(id="gbp") (fix) {{row.gbpMinPrice}}
+          label(for="gbp") &pound;
 
-      template(slot="minGbp" slot-scope="{ row, index }")
-        .price__data
-          span(v-if="!row.gbpMinPrice")
-            span n/a
-          span(v-else)
-            span(id="minGbp") {{row.gbpMinPrice}}
-            label(for="minGbp") &pound;
-
-    .price__empty(v-if="!dataArray.length") Nothing found...                                               
+    .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 	import DataTable from "../../DataTable"
 	import ResultFilter from "./ResultFilter"
-	import { mapGetters, mapActions } from "vuex"
+	import { mapActions } from "vuex"
 
 	export default {
 		props: {
@@ -110,77 +97,56 @@
 						label: "Source Language",
 						headerKey: "headerLanguageSource",
 						key: "sourceLang",
-						width: "11%",
+						width: "15%",
 						padding: "0"
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerLanguageTarget",
 						key: "targetLang",
-						width: "11%",
+						width: "15%",
 						padding: "0"
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "11%",
+						width: "15%",
 						padding: "0"
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "11%",
+						width: "15%",
 						padding: "0"
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "14%",
+						width: "16%",
 						padding: "0"
 					},
 					{
-						label: "Price (EUR)",
+						label: "EUR",
 						headerKey: "headerPriceEUR",
 						key: "eur",
-						width: "7%",
+						width: "8%",
 						padding: "0"
 					},
 					{
-						label: "Fix Price (EUR)",
-						headerKey: "headerMinPriceEUR",
-						key: "minEur",
-						width: "7%",
-						padding: "0"
-					},
-					{
-						label: "Price (USD)",
+						label: "USD",
 						headerKey: "headerPriceUSD",
 						key: "usd",
-						width: "7%",
+						width: "8%",
 						padding: "0"
 					},
 					{
-						label: "Fix Price (USD)",
-						headerKey: "headerMinPriceUSD",
-						key: "minUsd",
-						width: "7%",
-						padding: "0"
-					},
-					{
-						label: "Price (GBP)",
+						label: "GBP",
 						headerKey: "headerPriceGBP",
 						key: "gbp",
-						width: "7%",
-						padding: "0"
-					},
-					{
-						label: "Fix Price (GBP)",
-						headerKey: "headerMinPriceGBP",
-						key: "minGbp",
-						width: "7%",
+						width: "8%",
 						padding: "0"
 					}
 				],
@@ -220,11 +186,7 @@
 					})
 					this.dataArray = result.data
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Pricelist",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting Pricelist", isShow: true, type: "error" })
 				}
 			}
 		},

@@ -84,7 +84,7 @@
 				isRefreshResultTable: false,
 				languageModal: false,
 				newLanguagesPairs: [],
-				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Overall Prices', 'Discount Chart' ],
+				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
 				selectedTab: 'Basic Price'
 
 			}

@@ -47,20 +47,14 @@
         .price__data(v-else)
           input.price__data-input(type="number" :value="dataArray[index].gbpBasicPrice" disabled)
 
-      //template(slot="icons" slot-scope="{ row, index }")
-        .price__icons
-          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
-
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 	import DataTable from "../../DataTable"
-	import crudIcons from "@/mixins/crudIcons"
 	import LangFilter from "./LangFilter"
-	import { mapGetters, mapActions } from "vuex"
+	import { mapActions } from "vuex"
 
 	export default {
-		mixins: [ crudIcons ],
 		props: {
 			priceId: {
 				type: String
@@ -70,54 +64,50 @@
 			},
 			isRefresh: {
 				type: Boolean
+			},
+			isEdit: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
 			return {
-				isEdit: true,
 				fields: [
 					{
 						label: "Source Lang",
 						headerKey: "headerSourceLang",
 						key: "sourceLang",
-						width: "20%",
+						width: "29%",
 						padding: "0"
 					},
 					{
 						label: "Target Lang",
 						headerKey: "headerTargetLang",
 						key: "targetLang",
-						width: "20%",
+						width: "29%",
 						padding: "0"
 					},
 					{
-						label: "Basic price (EUR)",
+						label: "EUR",
 						headerKey: "headerBasicPriceEUR",
 						key: "eur",
 						width: "14%",
 						padding: "0"
 					},
 					{
-						label: "Basic price (USD)",
+						label: "USD",
 						headerKey: "headerBasicPriceUSD",
 						key: "usd",
 						width: "14%",
 						padding: "0"
 					},
 					{
-						label: "Basic price (GBP)",
+						label: "GBP",
 						headerKey: "headerBasicPriceGBP",
 						key: "gbp",
 						width: "14%",
 						padding: "0"
 					}
-					// {
-					// 	label: "",
-					// 	headerKey: "headerIcons",
-					// 	key: "icons",
-					// 	width: "18%",
-					// 	padding: "0"
-					// }
 				],
 				dataArray: [],
 				currency: {},
@@ -168,7 +158,6 @@
 				this.$emit('refreshResultTable')
 			},
 			async manageSaveClick(index) {
-				if (!this.isEdit) return
 				const { _id, type, sourceLanguage, targetLanguage, euroBasicPrice } = this.dataArray[index]
 				try {
 					const result = await this.$http.post("/pricelists/basic-prices-update/" + this.priceId, {

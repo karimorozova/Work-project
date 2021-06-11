@@ -12,12 +12,6 @@
     DataTable(
       :fields="fields"
       :tableData="dataArray"
-      :errors="errors"
-      :areErrors="areErrors"
-      :isApproveModal="isDeleting"
-      @closeErrors="closeErrors"
-      @notApprove="setDefaults"
-      @closeModal="setDefaults"
       :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
       :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
@@ -28,70 +22,59 @@
         .price-title {{ field.label }}
 
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentStep" disabled)
+        .price__data {{ row.step.title }}
 
       template(slot="unit" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.unit.type }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentUnit" disabled)
+        .price__data {{ row.unit.type }}
 
       template(slot="size" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.size }}
-        .price__data(v-else)
-          input.price__data-input(type="text" v-model="currentSize" disabled)
+        .price__data {{ row.size }}
 
       template(slot="multiplier" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(id="multiplier") {{row.multiplier}}
           label(for="multiplier") &#37;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentMultiplier")
+          input.price__data-input(type="number"  @change="setRowValue(index)" v-model="dataArray[index].multiplier")
 
       template(slot="eur" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(v-if="!row.euroMinPrice")
             span n/a
           span(v-else)
             span(id="eur") {{row.euroMinPrice}}
             label(for="eur") &euro;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" :onchange="currentRatio" v-model="currentMinPriceEUR")
+          input.price__data-input(type="number"  @change="setRowValue(index)"  v-model="dataArray[index].euroMinPrice")
 
       template(slot="usd" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(v-if="!row.usdMinPrice")
             span n/a
           span(v-else)
             span(id="usd") {{row.usdMinPrice}}
             label(for="usd") &#36;
         .price__data(v-else)
-          input.price__data-input(type="number" v-model="currentMinPriceUSD" disabled)
+          input.price__data-input(type="number" :value="dataArray[index].usdMinPrice" disabled)
 
       template(slot="gbp" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(v-if="!row.gbpMinPrice")
             span n/a
           span(v-else)
             span(id="gbp") {{row.gbpMinPrice}}
             label(for="gbp") &pound;
         .price__data(v-else)
-          input.price__data-input(type="number" v-model="currentMinPriceGBP" disabled)
+          input.price__data-input(type="number" :value="dataArray[index].gbpMinPrice" disabled)
 
-      template(slot="icons" slot-scope="{ row, index }")
-        .price__icons
-          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
 	import DataTable from "../../DataTable"
-	import crudIcons from "@/mixins/crudIcons"
 	import StepFilter from "./StepFilter"
-	import { mapGetters, mapActions } from "vuex"
+	import { mapActions } from "vuex"
 
 	export default {
-		mixins: [ crudIcons ],
 		props: {
 			steps: {
 				type: Array
@@ -107,6 +90,10 @@
 			},
 			isRefresh: {
 				type: Boolean
+			},
+			isEdit: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -116,72 +103,53 @@
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "16%",
+						width: "25%",
 						padding: "0"
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "16%",
+						width: "25%",
 						padding: "0"
 					},
 					{
 						label: "Size",
 						headerKey: "headerSize",
 						key: "size",
-						width: "7%",
+						width: "10%",
 						padding: "0"
 					},
 					{
-						label: "Multiplier (%)",
+						label: "Multiplier %",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
 						width: "10%",
 						padding: "0"
 					},
 					{
-						label: "Fix price (EUR)",
+						label: "Fix EUR",
 						headerKey: "headerMinPriceEUR",
 						key: "eur",
-						width: "12%",
+						width: "10%",
 						padding: "0"
 					},
 					{
-						label: "Fix price (USD)",
+						label: "Fix USD",
 						headerKey: "headerMinPriceUSD",
 						key: "usd",
-						width: "12%",
+						width: "10%",
 						padding: "0"
 					},
 					{
-						label: "Fix price (GBP)",
+						label: "Fix GBP",
 						headerKey: "headerMinPriceGBP",
 						key: "gbp",
-						width: "12%",
-						padding: "0"
-					},
-					{
-						label: "",
-						headerKey: "headerIcons",
-						key: "icons",
-						width: "15%",
+						width: "10%",
 						padding: "0"
 					}
 				],
 				dataArray: [],
-				currentStep: "",
-				currentUnit: "",
-				currentStepObj: "",
-				currentUnitObj: "",
-				currentSize: "",
-				currentMultiplier: "",
-				currentMinPriceUSD: "",
-				currentMinPriceEUR: "",
-				currentMinPriceGBP: "",
-
-				calculatedMinPriceUSD: "",
-				calculatedMinPriceGBP: "",
 
 				currency: {},
 
@@ -189,11 +157,6 @@
 				unitFilter: "",
 				sizeFilter: "",
 
-				areErrors: false,
-				errors: [],
-				isDeleting: false,
-				deleteIndex: -1,
-				currentActive: -1,
 				isDataRemain: true
 			}
 		},
@@ -205,24 +168,6 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
-			async makeAction(index, key) {
-				if (this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing()
-				}
-				switch (key) {
-					case "edit":
-						this.setEditingData(index)
-						break
-					case "cancel":
-						this.manageCancelEdition()
-						break
-					case "delete":
-						alert("delete")
-						break
-					default:
-						await this.checkErrors(index)
-				}
-			},
 			async bottomScrolled() {
 				if (this.isDataRemain) {
 					const result = await this.$http.post("/pricelists/step-multipliers/" + this.priceId, {
@@ -233,39 +178,13 @@
 					this.isDataRemain = result.body.length === 25
 				}
 			},
-			setEditingData(index) {
-				this.currentActive = index
-				this.currentStepObj = this.dataArray[index].step
-				this.currentUnitObj = this.dataArray[index].unit
-				this.currentStep = this.dataArray[index].step.title
-				this.currentUnit = this.dataArray[index].unit.type
-				this.currentSize = this.dataArray[index].size
-				this.currentMultiplier = this.dataArray[index].multiplier
-				this.currentMinPriceUSD = this.dataArray[index].usdMinPrice
-				this.currentMinPriceEUR = this.dataArray[index].euroMinPrice
-				this.currentMinPriceGBP = this.dataArray[index].gbpMinPrice
-			},
-			manageCancelEdition() {
-				this.setDefaults()
-				this.isDeleting = false
-			},
-			setDefaults() {
-				this.currentActive = -1
-				this.isDeleting = false
-				this.currentTest = ""
+			async setRowValue(index) {
+				await this.checkErrors(index)
 			},
 			async checkErrors(index) {
-				if (this.currentActive === -1) return
-				this.errors = []
-				if (this.currentMultiplier === "") return
-				if (Math.sign(this.currentMultiplier) === -1) return
-				if (this.currentMinPriceUSD === "") return
-				if (this.currentMinPriceEUR === "") return
-				if (this.currentMinPriceGBP === "") return
-				if (this.errors.length) {
-					this.areErrors = true
-					return
-				}
+				if (!this.isEdit) return
+				if (this.dataArray[index].multiplier === "") this.dataArray[index].multiplier = 100
+				if (this.dataArray[index].euroMinPrice === "") this.dataArray[index].euroMinPrice = 0
 				await this.manageSaveClick(index)
 			},
 			async getSteps(filters, count = 0) {
@@ -287,39 +206,25 @@
 				this.$emit('refreshResultTable')
 			},
 			async manageSaveClick(index) {
-				if (this.currentActive === -1) return
-				const id = this.dataArray[index]._id
+				const { _id, step, unit, size, multiplier, euroMinPrice } = this.dataArray[index]
 				try {
 					const result = await this.$http.post("/pricelists/step-multipliers-update/" + this.priceId, {
 						stepMultiplier: {
-							_id: id,
-							step: this.currentStepObj,
-							unit: this.currentUnitObj,
-							size: this.currentSize,
-							multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-							usdMinPrice: this.calculatedMinPriceUSD,
-							euroMinPrice: this.currentMinPriceEUR,
-							gbpMinPrice: this.calculatedMinPriceGBP
+							_id,
+							step,
+							unit,
+							size,
+							multiplier: parseFloat(multiplier).toFixed(0),
+							usdMinPrice: euroMinPrice * this.currency.USD,
+							euroMinPrice,
+							gbpMinPrice: euroMinPrice * this.currency.GBP
 						}
 					})
-					this.alertToggle({
-						message: "Saved successfully",
-						isShow: true,
-						type: "success"
-					})
-					this.setDefaults()
-					this.dataArray[index] = result.data
+					this.dataArray.splice(index, 1, result.data)
 					this.refreshResultTable()
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on saving Steps",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
 				}
-			},
-			closeErrors() {
-				this.areErrors = false
 			},
 			async setFilter({ option, prop }) {
 				this[prop] = option
@@ -330,11 +235,7 @@
 					const result = await this.$http.get("/currency/currency-ratio")
 					this.currency = result.data
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting currency",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting currency", isShow: true, type: "error" })
 				}
 			}
 		},
@@ -347,14 +248,10 @@
 			}
 		},
 		computed: {
-			currentRatio() {
-				this.calculatedMinPriceUSD = this.currentMinPriceEUR * this.currency.USD
-				this.calculatedMinPriceGBP = this.currentMinPriceEUR * this.currency.GBP
-			},
-			manageIcons() {
-				const { delete: del, ...result } = this.icons
-				return result
-			},
+			// currentRatio() {
+			// 	this.calculatedMinPriceUSD = this.currentMinPriceEUR * this.currency.USD
+			// 	this.calculatedMinPriceGBP = this.currentMinPriceEUR * this.currency.GBP
+			// },
 			allFilters() {
 				let result = {
 					stepFilter: this.stepFilter,
