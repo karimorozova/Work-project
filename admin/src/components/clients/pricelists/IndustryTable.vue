@@ -3,12 +3,6 @@
     DataTable(
       :fields="fields"
       :tableData="dataArray"
-      :errors="errors"
-      :areErrors="areErrors"
-      :isApproveModal="isDeleting"
-      @closeErrors="closeErrors"
-      @notApprove="setDefaults"
-      @closeModal="setDefaults"
       :bodyClass="['client-pricelist-table-body', {'tbody_visible-overflow': dataArray.length < 6}]"
       :tableheadRowClass="['client-pricelist-table-head', {'tbody_visible-overflow': dataArray.length < 6}]"
       bodyRowClass="client-pricelist-table-row"
@@ -19,21 +13,14 @@
         .price-title {{ field.label }}
 
       template(slot="industry" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
-          .tooltip
-            span#myTooltip.tooltiptext-left {{ row.industry.name }}
-            img.price__main-icon(:style="{ cursor: 'help' }" :src="row.industry.icon")
-        .price__data(v-else)
-          .tooltip
-            span#myTooltip.tooltiptext-left {{ row.industry.name }}
-            img.price__main-icon(:style="{ cursor: 'help' }" :src="row.industry.icon")
+        .price__data {{ row.industry.name }}
 
       template(slot="multiplier" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(id="multiplier") {{row.multiplier}}
           label(for="multiplier") &#37;
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentMultiplier")
+          input.price__data-input(type="number" @change="setRowValue(index)" v-model="dataArray[index].multiplier")
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
@@ -44,7 +31,6 @@
               span(v-else)
                 span#myTooltip.tooltiptext {{ row.notification }}
               img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png")
-          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link(@click="getRowPrice(index)")
               i.fa.fa-link(aria-hidden='true')
@@ -57,17 +43,19 @@
 </template>
 <script>
 	import DataTable from "../../DataTable"
-	import crudIcons from "@/mixins/crudIcons"
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		mixins: [ crudIcons ],
 		props: {
 			dataArray: {
 				type: Array
 			},
 			clientId: {
 				type: String
+			},
+			isEdit: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -77,34 +65,24 @@
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "27%",
+						width: "80%",
 						padding: "0"
 					},
 					{
 						label: "%",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-						width: "21%",
+						width: "10%",
 						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "52%",
+						width: "10%",
 						padding: "0"
 					}
-				],
-
-				currentIndustry: "",
-				currentMultiplier: "",
-				currentIndustryObj: null,
-
-				areErrors: false,
-				errors: [],
-				isDeleting: false,
-				deleteIndex: -1,
-				currentActive: -1
+				]
 			}
 		},
 		methods: {
@@ -120,100 +98,43 @@
 					})
 					const result = await this.$http.post(`/clientsapi/client-rate-by-key`, { id: this.clientId, key: 'industryMultipliersTable' })
 					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'industryMultipliersTable', value: result.data })
-					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
-			async makeAction(index, key) {
-				if (this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing()
-				}
-				switch (key) {
-					case "edit":
-						this.setEditingData(index)
-						break
-					case "cancel":
-						this.manageCancelEdition()
-						break
-					case "delete":
-						alert("delete")
-						break
-					default:
-						await this.checkErrors(index)
-				}
-			},
-			setEditingData(index) {
-				this.currentActive = index
-				this.currentIndustryObj = this.dataArray[index].industry
-				this.currentIndustry = this.dataArray[index].industry.icon
-				this.currentMultiplier = this.dataArray[index].multiplier
-			},
-			manageCancelEdition() {
-				this.setDefaults()
-				this.isDeleting = false
-			},
-			setDefaults() {
-				this.currentActive = -1
-				this.isDeleting = false
+			async setRowValue(index) {
+				await this.checkErrors(index)
 			},
 			async checkErrors(index) {
-				if (this.currentActive === -1) return
-				this.errors = []
-				if (this.currentMultiplier == "") return
-				if (Math.sign(this.currentMultiplier) == -1) return
-				if (this.errors.length) {
-					this.areErrors = true
-					return
-				}
+				if (!this.isEdit) return
+				if (this.dataArray[index].multiplier === "") this.dataArray[index].multiplier = 100
 				await this.manageSaveClick(index)
 			},
 			refreshResultTable() {
 				this.$emit("refreshResultTable")
 			},
 			async manageSaveClick(index) {
-				if (this.currentActive === -1) return
 				try {
-					const id = this.dataArray[index]._id
-					const serviceId = this.dataArray[index].serviceId
-					await this.$http.post(
-							"/clientsapi/rates/" + this.clientId,
-							{
-								itemIdentifier: "Industry Multipliers Table",
-								updatedItem: {
-									_id: id,
-									serviceId,
-									industry: this.currentIndustryObj,
-									multiplier: parseFloat(this.currentMultiplier).toFixed(0),
-									altered: true
-								}
-							}
-					)
-					this.alertToggle({ message: "Saved successfully", isShow: true, type: "success" })
-					const updatedData = await this.$http.get(
-							"/clientsapi/rates/" + this.clientId
-					)
+					const { _id, industry, multiplier } = this.dataArray[index]
+					await this.$http.post("/clientsapi/rates/" + this.clientId, {
+						itemIdentifier: "Industry Multipliers Table",
+						updatedItem: {
+							_id,
+							industry,
+							multiplier: parseFloat(multiplier).toFixed(0),
+							altered: true
+						}
+					})
+					const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
 					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'industryMultipliersTable', value: updatedData.data.industryMultipliersTable })
-					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Industry",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting Industry", isShow: true, type: "error" })
 				}
-			},
-			closeErrors() {
-				this.areErrors = false
 			}
 		},
 		computed: {
-			manageIcons() {
-				const { delete: del, ...result } = this.icons
-				return result
-			},
 			...mapGetters({
 				currentClient: "getCurrentClient"
 			})

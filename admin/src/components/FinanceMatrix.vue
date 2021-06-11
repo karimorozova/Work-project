@@ -65,7 +65,6 @@ export default {
     &__rate {
     color: #67573e;
     border: none;
-    width: 94%;
     background: inherit;
     outline: none;
         &::-webkit-inner-spin-button,
