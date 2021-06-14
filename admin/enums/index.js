@@ -2,7 +2,7 @@ const { differenceOperationType } = require('./differenceOperationType');
 const { tableKeys } = require('./ratesTableKeys');
 const { defaultFinanceObj } = require('./defaultFinanceObj');
 const { langTierIndustries } = require('./langTierIndustries');
-const { dr1Instructions,  dr2Instructions } = require('./deliveryInstructions');
+const { dr1Instructions,  dr2Instructions, drInstructionsCompliance } = require('./deliveryInstructions');
 
 module.exports = {
   differenceOperationType,
@@ -11,4 +11,5 @@ module.exports = {
   langTierIndustries,
   dr1Instructions,
   dr2Instructions,
+  drInstructionsCompliance
 };

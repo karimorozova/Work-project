@@ -20,7 +20,9 @@ const {
 	changePricelistTable,
 	generateNewPricelistCombinations,
 	getClientAfterCombinationsUpdated,
-	filteredCombinationsResultRatesTable
+	filteredCombinationsResultRatesTable,
+	updateClientRatesFromSettings
+
 } = require('./clientRates')
 
 const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info')
@@ -76,7 +78,8 @@ const clients = {
 	getClientAfterCombinationsUpdated,
 	filteredCombinationsResultRatesTable,
   updateTaskDataByCondition,
-  getSimpleClients
+  getSimpleClients,
+	updateClientRatesFromSettings
 }
 
 module.exports = clients

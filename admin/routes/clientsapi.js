@@ -3,6 +3,7 @@ const { upload } = require('../utils')
 let apiUrl = require('../helpers/apiurl')
 !apiUrl && (apiUrl = 'https://admin.pangea.global')
 const fse = require('fs-extra')
+
 const {
 	getClient,
 	getClientWithActions,
@@ -22,8 +23,10 @@ const {
 	updateClientProjectDate,
 	updateClientMatrix,
 	syncClientMatrix,
-	updateTaskDataByCondition
+	updateTaskDataByCondition,
+	updateClientRatesFromSettings
 } = require('../clients')
+
 const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist')
 const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes } = require('../models')
 const { getProject } = require('../projects')
@@ -340,6 +343,18 @@ router.put('/set-min-price', async (req, res) => {
 	}
 })
 
+router.post('/updated-retest-from-settings', async (req, res) => {
+	const { clientId } = req.body
+	try {
+		const updatedClient = await updateClientRatesFromSettings(clientId)
+		res.send(updatedClient)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on updating Client rates from settings')
+	}
+})
+
+
 router.post('/services', async (req, res) => {
 	const { clientId, currentData, oldData } = req.body
 	try {
@@ -537,16 +552,16 @@ router.get('/activity/task/:id', async (req, res) => {
 
 })
 
-router.delete('/activity/task/:id', async (req,res)=> {
-  try {
-    const { id } = req.params
-    const {client} = req.query
-    await ClientsTasks.deleteOne({_id: id})
-    const tasks = await ClientsTasks.find({"client": client}).populate( 'assignedTo', ['firstName','lastName'])
-    res.send(tasks || [])
-  } catch (e) {
-    res.status(500).send('Error on client delete')
-  }
+router.delete('/activity/task/:id', async (req, res) => {
+	try {
+		const { id } = req.params
+		const { client } = req.query
+		await ClientsTasks.deleteOne({ _id: id })
+		const tasks = await ClientsTasks.find({ "client": client }).populate('assignedTo', [ 'firstName', 'lastName' ])
+		res.send(tasks || [])
+	} catch (e) {
+		res.status(500).send('Error on client delete')
+	}
 
 })
 
@@ -554,55 +569,55 @@ router.delete('/activity/task/:id', async (req,res)=> {
 
 // Notes
 router.post('/activity/note/', async (req, res) => {
-  try {
-    const { data } = req.body
-    await ClientsNotes.create(data)
+	try {
+		const { data } = req.body
+		await ClientsNotes.create(data)
 
-    const activityNote = await ClientsNotes.find({ "client": data.client })
-      .populate('assignedTo', [ 'firstName', 'lastName' ])
+		const activityNote = await ClientsNotes.find({ "client": data.client })
+				.populate('assignedTo', [ 'firstName', 'lastName' ])
 
-    res.send(activityNote)
+		res.send(activityNote)
 
-  } catch (e) {
-    res.status(500).send('Error on client created')
-  }
+	} catch (e) {
+		res.status(500).send('Error on client created')
+	}
 
 })
 
 router.post('/activity/note/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-    const { data } = req.body
-    await ClientsNotes.updateOne({ _id: id }, updateTaskDataByCondition(data))
-    const activityNotes = await ClientsNotes.find({ "client": data.client }).populate('assignedTo', [ 'firstName', 'lastName' ])
-    res.send(activityNotes)
-  } catch (e) {
-    res.status(500).send('Error on client update')
-  }
+	try {
+		const { id } = req.params
+		const { data } = req.body
+		await ClientsNotes.updateOne({ _id: id }, updateTaskDataByCondition(data))
+		const activityNotes = await ClientsNotes.find({ "client": data.client }).populate('assignedTo', [ 'firstName', 'lastName' ])
+		res.send(activityNotes)
+	} catch (e) {
+		res.status(500).send('Error on client update')
+	}
 
 })
 
 router.get('/activity/note/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-    const activityNote = await ClientsNotes.find({ _id: id })
-    res.send(activityNote)
-  } catch (e) {
-    res.status(500).send('Error on client get')
-  }
+	try {
+		const { id } = req.params
+		const activityNote = await ClientsNotes.find({ _id: id })
+		res.send(activityNote)
+	} catch (e) {
+		res.status(500).send('Error on client get')
+	}
 
 })
 
-router.delete('/activity/note/:id', async (req,res)=> {
-  try {
-    const { id } = req.params
-    const {client} = req.query
-    await ClientsNotes.deleteOne({_id: id})
-    const activityNotes = await ClientsNotes.find({"client": client}).populate( 'assignedTo', ['firstName','lastName'])
-    res.send(activityNotes || [])
-  } catch (e) {
-    res.status(500).send('Error on client delete')
-  }
+router.delete('/activity/note/:id', async (req, res) => {
+	try {
+		const { id } = req.params
+		const { client } = req.query
+		await ClientsNotes.deleteOne({ _id: id })
+		const activityNotes = await ClientsNotes.find({ "client": client }).populate('assignedTo', [ 'firstName', 'lastName' ])
+		res.send(activityNotes || [])
+	} catch (e) {
+		res.status(500).send('Error on client delete')
+	}
 
 })
 

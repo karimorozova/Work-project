@@ -13,7 +13,7 @@
               )
           .hours-steps__packages-item
             .hours-steps__packages-item
-              .hours-steps__sub-title Size:
+              .hours-steps__sub-title {{ currentJob.step === 'Compliance' ? 'Compliance Template:' : 'Size:' }}
               .hours-steps__drop-menu
                 SelectSingle(
                   placeholder="Select"

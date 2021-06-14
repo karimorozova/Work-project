@@ -122,7 +122,6 @@
     justify-content: space-between;
     position: relative;
     padding-bottom: 20px;
-    border-bottom: 1px solid #C5BFB5;
   }
 
   .discounts {
@@ -143,7 +142,7 @@
   }
 
   .opacity {
-    opacity: .5;
+    opacity: .4;
     cursor: default;
   }
 

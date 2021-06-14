@@ -18,10 +18,10 @@ module.exports.getCertificateTemplate = ({ project, task, deliveryTask, allLangu
 	}
 	return `<style>* { margin: 0; padding: 0; }</style>
 	<div class="layout" style="background-image: url(${ background });color: #333;height: 1054px;width: 814px;background-size: 65%;background-repeat: no-repeat;background-position: center;font-family: Arial, sans-serif;">
-	   <div class="header" style="padding-top: 40px;">
-	      <div class="green-row" style="width: 476px;background: #48A7A6;height: 27px;margin-bottom: 25px;display: inline-block;"></div>
-	      <div class="green-row-image" style="margin-left: 40px; display: inline-block; margin-right: 40px;">
-	         <img src="${ logo }">
+    <div class="header2" style="padding-top: 50px; position: relative;">
+       <div class="green-row" style="width: 476px;background: #48A7A6;height: 27px;margin-bottom: 25px;"></div>
+       <div class="green-row-image" style="position: absolute; top: 30px; right: 40px;">
+         	<div style="background-image: url(${ logo });height: 72px;width: 253;background-size: contain;background-repeat: no-repeat;"></div>
 	      </div>
 	   </div>
 	   <div class="content">
@@ -41,7 +41,7 @@ module.exports.getCertificateTemplate = ({ project, task, deliveryTask, allLangu
 	      <div class="sub-text" style="padding: 0 40px;">
 	         A copy of the translation is attached with this certification.
 	      </div>
-	      <div class="ceo-container" style="float: right;width: 38%;margin-top: 180px;position: relative;">
+	      <div class="ceo-container" style="float: right;width: 38%;margin-top: 160px;position: relative;">
 	         <div class="pangea-row" style="height: 2px;width: 210px;background: #333;position: absolute; top: 147px;"></div>
 	         <div class="ceo-image" style="width: 191px; margin-left: 12px;">
 	            <img src="${ stamp }" style="width: 100%;">

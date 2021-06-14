@@ -3,12 +3,6 @@
     DataTable(
       :fields="fields",
       :tableData="dataArray",
-      :errors="errors",
-      :areErrors="areErrors",
-      :isApproveModal="isDeleting",
-      @closeErrors="closeErrors",
-      @notApprove="setDefaults",
-      @closeModal="setDefaults",
       :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 6 }]",
       :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 6 }]",
       bodyRowClass="client-pricelist-table-row",
@@ -18,26 +12,20 @@
         .price-title {{ field.label }}
 
       template(slot="step", slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }}
-        .price__data(v-else)
-          input.price__data-input(type="text", v-model="currentStep", disabled)
+        .price__data {{ row.step.title }}
 
       template(slot="unit", slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.unit.type }}
-        .price__data(v-else)
-          input.price__data-input(type="text", v-model="currentUnit", disabled)
+        .price__data {{ row.unit.type }}
 
       template(slot="size", slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.size }}
-        .price__data(v-else)
-          input.price__data-input(type="text", v-model="currentSize", disabled)
+        .price__data {{ row.size }}
 
       template(slot="multiplier", slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span#multiplier {{ row.multiplier }}
           label(for="multiplier") &#37;
         .price__editing-data(v-else)
-          input.price__data-input(type="number", v-model="currentMultiplier")
+          input.price__data-input(type="number", @change="setRowValue(index)" v-model="dataArray[index].multiplier")
 
       template(slot="icons", slot-scope="{ row, index }")
         .price__icons
@@ -48,12 +36,6 @@
               span(v-else)
                 span#myTooltip.tooltiptext {{ row.notification }}
               img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png")
-          img.price__icon(
-            v-for="(icon, key) in manageIcons",
-            :src="icon.icon",
-            @click="makeAction(index, key)",
-            :class="{ price_opacity: isActive(key, index) }"
-          )
           span(v-if="row.altered")
             .price__icons-link(@click="getRowPrice(index)")
               i.fa.fa-link(aria-hidden="true")
@@ -65,11 +47,9 @@
 </template>
 <script>
 	import DataTable from "../../DataTable"
-	import crudIcons from "@/mixins/crudIcons"
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		mixins: [ crudIcons ],
 		props: {
 			dataArray: {
 				type: Array
@@ -77,6 +57,10 @@
 			clientId: {
 				type: String
 			},
+			isEdit: {
+				type: Boolean,
+				default: false
+			}
 		},
 		data() {
 			return {
@@ -85,14 +69,14 @@
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "23%",
+						width: "30%",
 						padding: "0"
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "23%",
+						width: "30%",
 						padding: "0"
 					},
 					{
@@ -106,29 +90,18 @@
 						label: "%",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-						width: "13%",
+						width: "10%",
 						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "31%",
+						width: "10%",
 						padding: "0"
 					}
 				],
-				currentStep: "",
-				currentUnit: "",
-				currentStepObj: "",
-				currentUnitObj: "",
-				currentSize: "",
-				currentMultiplier: "",
 
-				areErrors: false,
-				errors: [],
-				isDeleting: false,
-				deleteIndex: -1,
-				currentActive: -1,
 				isDataRemain: true
 			}
 		},
@@ -145,116 +118,60 @@
 					})
 					const result = await this.$http.post(`/clientsapi/client-rate-by-key`, { id: this.clientId, key: 'stepMultipliersTable' })
 					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'stepMultipliersTable', value: result.data })
-					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
-			async makeAction(index, key) {
-				if (this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing()
-				}
-				switch (key) {
-					case "edit":
-						this.setEditingData(index)
-						break
-					case "cancel":
-						this.manageCancelEdition()
-						break
-					case "delete":
-						alert("delete")
-						break
-					default:
-						await this.checkErrors(index)
-				}
+			async setRowValue(index) {
+				await this.checkErrors(index)
 			},
-			setEditingData(index) {
-				this.currentActive = index
-				this.currentStepObj = this.dataArray[index].step
-				this.currentUnitObj = this.dataArray[index].unit
-				this.currentStep = this.dataArray[index].step.title
-				this.currentUnit = this.dataArray[index].unit.type
-				this.currentSize = this.dataArray[index].size
-				this.currentMultiplier = this.dataArray[index].multiplier
-			},
-			manageCancelEdition() {
-				this.setDefaults()
-				this.isDeleting = false
-			},
-			setDefaults() {
-				this.currentActive = -1
-				this.isDeleting = false
-			},
+
 			async checkErrors(index) {
-				if (this.currentActive === -1) return
-				if (this.currentMultiplier == "") return
-				if (Math.sign(this.currentMultiplier) == -1) return
+				if (!this.isEdit) return
+				if (this.dataArray[index].multiplier === "") this.dataArray[index].multiplier = 100
 				await this.manageSaveClick(index)
 			},
 			refreshResultTable() {
 				this.$emit("refreshResultTable")
 			},
 			async manageSaveClick(index) {
-				if (this.currentActive === -1) return
-				const id = this.dataArray[index]._id
-				const serviceId = this.dataArray[index].serviceId
+				const { _id, step, unit, size, multiplier } = this.dataArray[index]
 				try {
 					await this.$http.post("/clientsapi/rates/" + this.clientId, {
 						itemIdentifier: "Step Multipliers Table",
 						updatedItem: {
-							_id: id,
-							serviceId,
-							step: this.currentStepObj,
-							unit: this.currentUnitObj,
-							size: this.currentSize,
-							multiplier: parseFloat(this.currentMultiplier).toFixed(0),
+							_id,
+							step,
+							unit,
+							size,
+							multiplier: parseFloat(multiplier).toFixed(0),
 							altered: true
 						}
 					})
-					this.alertToggle({
-						message: "Saved successfully",
-						isShow: true,
-						type: "success"
-					})
 					const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
 					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'stepMultipliersTable', value: updatedData.data.stepMultipliersTable })
-					this.setDefaults()
 					this.refreshResultTable()
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on saving Steps",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
 				}
-			},
-			closeErrors() {
-				this.areErrors = false
 			}
 		},
 		computed: {
-			manageIcons() {
-				const { delete: del, ...result } = this.icons
-				return result
-			},
 			...mapGetters({
 				currentClient: "getCurrentClient"
 			})
 		},
 		components: {
 			DataTable
-		},
+		}
 	}
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
 
   .price {
-    @extend %setting-table;
     background-color: #fff;
-    padding: 0px 5px;
     box-shadow: none;
 
     input {
@@ -277,7 +194,7 @@
       align-items: center;
       box-sizing: border-box;
     }
-    
+
     &__empty {
       font-size: 14px;
       margin-bottom: 15px;

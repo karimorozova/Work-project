@@ -34,8 +34,10 @@ const {
 	sendVendorTestAndUpdateQualification,
 	rejectedPendingCompetence,
 	deletePendingCompetence,
-	saveNotPassedTest
+	saveNotPassedTest,
+	updateClientRatesFromSettings
 } = require('../vendors')
+
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests')
@@ -260,6 +262,17 @@ router.post('/filtered-vendors', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting filtered Vendors")
+	}
+})
+
+router.post('/updated-retest-from-settings', async (req, res) => {
+	const { vendorId } = req.body
+	try {
+		const vendor = await updateClientRatesFromSettings(vendorId)
+		res.send(vendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Vendor Competencies')
 	}
 })
 

@@ -1,7 +1,7 @@
 const { getProjects, getProject, taskCompleteNotifyPM, notifyManagerStepStarted, stepCompletedNotifyPM } = require('../projects')
 const { Projects, Delivery, Languages } = require('../models')
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
-const { dr1Instructions } = require('../enums')
+const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs');
 
 async function getJobs(id) {
@@ -132,7 +132,7 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 			await setTaskStatusAndSave({ project, jobId, steps, status: "Pending Approval [DR1]" })
       //DELETE
 			// await addToDelivery(project, { ...task, status: "Pending Approval [DR1]" })
-      await pushTasksToDR1(project, task)
+      await pushTasksToDR1(project, task, step)
 			return await taskCompleteNotifyPM(project, task)
 		}
 		const stage1step = task.service.steps.find(item => item.stage === 'stage1')
@@ -147,14 +147,14 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 	}
 }
 
-const pushTasksToDR1 = async (project, task) =>{
+const pushTasksToDR1 = async (project, task, step) =>{
   const {_id, projectManager, accountManager} = project
-
+	const instructions = step.serviceStep.title === 'Compliance' ? drInstructionsCompliance : dr1Instructions
   const files = getTaskTargetFiles(project,task)
   project.tasksDR1.push({
     dr1Manager: projectManager,
     dr2Manager: accountManager,
-    instructions: dr1Instructions,
+    instructions,
     taskId: task.taskId,
     files
   })

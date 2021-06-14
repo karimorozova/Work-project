@@ -91,7 +91,7 @@ const createProjectFromRequest = async (requestId) => {
   })
 
   await createProjectFolder(createdProject.id)
-  // await ClientRequest.updateOne( { _id: requestId }, { status: 'Closed' } )
+  await ClientRequest.updateOne( { _id: requestId }, { status: 'Closed' } )
   return await getProject({ _id: createdProject.id })
 }
 

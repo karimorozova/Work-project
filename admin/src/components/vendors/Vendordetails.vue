@@ -43,29 +43,34 @@
 
       .title Rates
       .vendor-info__rates
-        .vendor-info__tables-row
-          .lang-table(v-if="languages.length")
-            LangTable(
-              :dataArray="currentVendor.rates.basicPricesTable",
-              :vendorId="currentVendor._id",
-              :vendor="currentVendor"
-              @refreshResultTable="refreshResultTable",
-            )
-          .step-table(v-if="steps.length && units.length")
-            StepTable(
-              :dataArray="currentVendor.rates.stepMultipliersTable",
-              :vendorId="currentVendor._id",
-              :vendor="currentVendor"
-              @refreshResultTable="refreshResultTable",
-            )
-          .industry-table(v-if="industries.length")
-            IndustryTable(
-              :dataArray="currentVendor.rates.industryMultipliersTable",
-              :vendorId="currentVendor._id",
-              :vendor="currentVendor"
-              @refreshResultTable="refreshResultTable",
-            )
-        .result-table
+        PullButton(:style="'margin: 0 0 20px;'" @refreshResultTable="refreshResultTable")
+        Tabs(
+          :tabs="tabs"
+          :selectedTab="selectedTab"
+          @setTab="setTab"
+        )
+        .lang-table(v-if="selectedTab === 'Basic Price'")
+          LangTable(
+            :dataArray="currentVendor.rates.basicPricesTable",
+            :vendorId="currentVendor._id",
+            :vendor="currentVendor"
+            @refreshResultTable="refreshResultTable",
+          )
+        .step-table(v-if="selectedTab === 'Steps / Units'")
+          StepTable(
+            :dataArray="currentVendor.rates.stepMultipliersTable",
+            :vendorId="currentVendor._id",
+            :vendor="currentVendor"
+            @refreshResultTable="refreshResultTable",
+          )
+        .industry-table(v-if="selectedTab === 'Industries'")
+          IndustryTable(
+            :dataArray="currentVendor.rates.industryMultipliersTable",
+            :vendorId="currentVendor._id",
+            :vendor="currentVendor"
+            @refreshResultTable="refreshResultTable",
+          )
+        .result-table(v-if="selectedTab === 'Overall Prices'")
           ResultTable(
             :vendorId="currentVendor._id",
             :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
@@ -75,10 +80,9 @@
             :isRefreshResultTable="isRefreshResultTable",
             :refresh="isRefreshAfterServiceUpdate"
           )
+        .chart(v-if="selectedTab === 'Discount Chart'")
+          FinanceMatrixWithReset(:entity="currentVendor" @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
-      .title Discount Chart
-      .vendor-info__drop-matrix
-        FinanceMatrixWithReset(:entity="currentVendor" @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
 
       .title Documents
       TableDocuments(:documentsData="currentVendor.documents", :vendorId="vendorId")
@@ -180,11 +184,15 @@
 	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
   import VendorMainInfo from "./VendorGeneralInfo";
   import SaveCancelPopUp from "../SaveCancelPopUp";
+	import PullButton from "./pricelists/PullButton"
+	import Tabs from "../Tabs"
 
 	export default {
 		mixins: [ photoPreview ],
 		data() {
 			return {
+				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Overall Prices', 'Discount Chart' ],
+				selectedTab: 'Overall Prices',
 				aliases: [],
 				currentVendorAliases: [],
 				memoqAction: "",
@@ -238,6 +246,9 @@
         updateVendorGeneralData: "updateVendorGeneralData",
         updateVendorRatesByKey: 'updateVendorRatesFromServer',
 			}),
+			setTab({ index: i }) {
+				this.selectedTab = this.tabs.find((item, index) => index === i)
+			},
 			setAlias({ option }) {
 				if (this.currentVendor.hasOwnProperty('aliases')) {
 					if (this.currentVendor.aliases.length) {
@@ -532,6 +543,8 @@
 			}
 		},
 		components: {
+			Tabs,
+			PullButton,
       SaveCancelPopUp,
       VendorMainInfo,
 			PendingCompetencies,
@@ -662,15 +675,9 @@
   .vendor-info {
     position: relative;
     width: 1000px;
+    min-width: 1000px;
 
     &__competencies {
-      box-sizing: border-box;
-      padding: 20px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-      position: relative;
-    }
-
-    &__drop-matrix {
       box-sizing: border-box;
       padding: 20px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
@@ -698,22 +705,6 @@
       box-sizing: border-box;
       padding: 20px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-    }
-
-    &__tables-row {
-      display: flex;
-
-      .lang-table {
-        width: 33%;
-      }
-
-      .industry-table {
-        width: 26%;
-      }
-
-      .step-table {
-        width: 42%;
-      }
     }
   }
 

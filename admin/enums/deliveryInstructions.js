@@ -23,7 +23,15 @@ const dr2Instructions = [
   {text: "Comments (If any)", title: "Check if instructions followed", isChecked: false, isNotRelevant: false},
 ]
 
+const drInstructionsCompliance = [
+  {text: "Check Template", title: "", isChecked: false, isNotRelevant: false},
+  {text: "Check Language combinations", title: "", isChecked: false, isNotRelevant: false},
+  {text: "Check Number of files", title: "", isChecked: false, isNotRelevant: false},
+  {text: "Check Certificate", title: "", isChecked: false, isNotRelevant: false},
+]
+
 module.exports = {
   dr1Instructions,
-  dr2Instructions
+  dr2Instructions,
+  drInstructionsCompliance
 }

@@ -86,7 +86,6 @@
   @import "../../assets/scss/colors.scss";
 
   .finance-matrix {
-    margin-top: 5px;
 
     &__icons {
       display: flex;

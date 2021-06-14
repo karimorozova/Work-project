@@ -27,39 +27,29 @@
         .price-title {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
-        .price__data(v-else)
-          input.price__data-input( type="text" v-model="currentSourceLanguage" disabled)
+        .price__data {{ row.sourceLanguage.lang }}
 
       template(slot="targetLang" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
-        .price__data(v-else)
-          input.price__data-input( type="text" v-model="currentTargetLanguage" disabled)
+        .price__data {{ row.targetLanguage.lang }}
 
       template(slot="step" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.step.title }}
-        .price__data(v-else)
-          input.price__data-input( type="text" v-model="currentStep" disabled)
+        .price__data {{ row.step.title }}
 
       template(slot="unit" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.unit.type }} / {{row.size}}
-        .price__data(v-else)
-          input.price__data-input( type="text" v-model="currentUnit" disabled)
+        .price__data {{ row.unit.type }} / {{row.size}}
 
       template(slot="industry" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index") {{ row.industry.name }}
-        .price__data(v-else)
-          input.price__data-input( type="text" v-model="currentIndustry" disabled)
+        .price__data {{ row.industry.name }}
 
       template(slot="price" slot-scope="{ row, index }")
-        .price__data(v-if="currentActive !== index")
+        .price__data(v-if="!isEdit")
           span(id="currencyType") {{row.price}}
           label(for="currencyType" v-if="currentClient.currency === 'EUR'" ) &euro;
           label(for="currencyType" v-if="currentClient.currency === 'USD'" ) &#36;
           label(for="currencyType" v-if="currentClient.currency === 'GBP'" ) &pound;
 
         .price__editing-data(v-else)
-          input.price__data-input(type="number" v-model="currentPrice")
+          input.price__data-input(type="number" @change="setRowValue(row)" v-model="row.price")
 
       template(slot="icons" slot-scope="{ row, index }")
         .price__icons
@@ -70,7 +60,6 @@
               span(v-else)
                 span#myTooltip.tooltiptext {{ row.notification }}
               img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png")
-          img.price__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key, row)" :class="{'price_opacity': isActive(key, index)}")
           span(v-if="row.altered")
             .price__icons-link(@click="getRowPrice(index, row)")
               i.fa.fa-link(aria-hidden='true')
@@ -83,11 +72,9 @@
 <script>
 	import DataTable from "../../DataTable"
 	import ResultFilter from "./ResultFilter"
-	import crudIcons from "@/mixins/crudIcons"
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
-		mixins: [ crudIcons ],
 		props: {
 			languages: {
 				type: Array
@@ -109,6 +96,10 @@
 			},
 			refresh: {
 				type: Boolean
+			},
+			isEdit: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -165,20 +156,12 @@
 					}
 				],
 
-				currentSourceLanguage: "",
-				currentTargetLanguage: "",
-				currentStep: "",
-				currentUnit: "",
-				currentIndustry: "",
-				currentPrice: "",
-
 				sourceFilter: "",
 				targetFilter: "",
 				stepFilter: "",
 				unitFilter: "",
 				industryFilter: "",
 				isDataRemain: true,
-				currentActive: -1,
 				currentServices: null
 			}
 		},
@@ -193,76 +176,32 @@
 						tableKey: "Pricelist Table",
 						row
 					})
-
 					this.updateClientRatesProp({ key: "pricelistTable" })
 				} catch (err) {
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
-			async makeAction(index, key, row) {
-				if (this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing()
-				}
-				switch (key) {
-					case "edit":
-						this.setEditingData(index, row)
-						break
-					case "cancel":
-						this.manageCancelEdition()
-						break
-					case "delete":
-						alert("delete")
-						break
-					default:
-						await this.checkErrors(index, row)
-				}
+			async setRowValue(row) {
+				await this.checkErrors(row)
 			},
-			setEditingData(index, row) {
-				this.currentActive = index
-				this.currentSourceLanguage = row.sourceLanguage.lang
-				this.currentTargetLanguage = row.targetLanguage.lang
-				this.currentStep = row.step.title
-				this.currentUnit = row.unit.type
-				this.currentIndustry = row.industry.name
-				this.currentPrice = row.price
+			async checkErrors(row) {
+				if (!this.isEdit) return
+				if (row.price === "") row.price = 1
+				await this.manageSaveClick(row)
 			},
-			async checkErrors(index, row) {
-				if (this.currentActive === -1) return
-				if (this.currentPrice === "") return
-				await this.manageSaveClick(index, row)
-			},
-
-			async manageSaveClick(index, row) {
-				if (this.currentActive === -1) return
-				const id = row._id
+			async manageSaveClick(row) {
+				const { _id, price } = row
 				try {
 					await this.$http.post("/clientsapi/rates/change-pricelist/" + this.clientId, {
-								_id: id,
-								price: parseFloat(this.currentPrice).toFixed(4),
-								altered: true,
-								notification: "Price disconnected from function"
-							}
-					)
-					this.alertToggle({
-						message: "Saved successfully",
-						isShow: true,
-						type: "success"
+						_id,
+						price: parseFloat(price).toFixed(4),
+						altered: true,
+						notification: "Price disconnected from function"
 					})
 					this.updateClientRatesProp({ key: "pricelistTable" })
-					this.setDefaults()
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on saving Result pricelist",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on saving Result pricelist", isShow: true, type: "error" })
 				}
-			},
-			manageCancelEdition() {
-				this.setDefaults()
-			},
-			setDefaults() {
-				this.currentActive = -1
 			},
 			setFilter({ option, prop }) {
 				this.isDataRemain = true
@@ -354,7 +293,7 @@
 					{ filter: this.targetFilter, query: 'item.targetLanguage.lang === this.targetFilter' },
 					{ filter: this.stepFilter, query: 'item.step.title === this.stepFilter' },
 					{ filter: this.unitFilter, query: 'item.unit.type === this.unitFilter' },
-					{ filter: this.industryFilter, query: 'item.industry.name === this.industryFilter' },
+					{ filter: this.industryFilter, query: 'item.industry.name === this.industryFilter' }
 				]
 
 				let neededFields = fields.filter(({ filter }) => !!filter && filter !== 'All')
@@ -369,10 +308,6 @@
 				}
 
 				return result
-			},
-			manageIcons() {
-				const { delete: del, ...result } = this.icons
-				return result
 			}
 		},
 		components: {
@@ -383,10 +318,8 @@
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
 
   .price {
-    @extend %setting-table;
     background-color: #fff;
     padding: 0;
     box-shadow: none;

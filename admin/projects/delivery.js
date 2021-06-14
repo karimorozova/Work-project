@@ -36,7 +36,7 @@ const {
 	User
 } = require('../models')
 
-const { dr2Instructions } = require('../enums/deliveryInstructions')
+const { dr2Instructions, drInstructionsCompliance } = require('../enums/deliveryInstructions')
 
 const {
 	getProjectAfterUpdate
@@ -166,7 +166,7 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 	const allLang = await Languages.find({})
 	const { projectId: strId, tasks, tasksDR2: { singleLang, multiLang } } = await Projects.findOne({ _id: projectId })
 
-	const { sourceLanguage, targetLanguage } = tasks.find(({ taskId: tId }) => tId === taskId)
+	const { sourceLanguage, targetLanguage, service } = tasks.find(({ taskId: tId }) => tId === taskId)
 	const sourceLang = allLang.find(({ symbol }) => sourceLanguage === symbol)
 	const targetLang = allLang.find(({ symbol }) => targetLanguage === symbol)
 
@@ -199,13 +199,14 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 	return await getProjectAfterUpdate({ "_id": projectId }, { "tasksDR2.singleLang": singleLang })
 
 	function pushFile(sourceLang, targetLang, fileInfo) {
+		const instructions = service.title === 'Compliance' ? drInstructionsCompliance : dr2Instructions
 		singleLang.push({
 			deliveryInternalId: returnNewDeliveryId(strId, singleLang, multiLang),
 			status: 'Pending Approval [DR2]',
 			sourceLanguage: sourceLang._id,
 			targetLanguage: targetLang._id,
 			files: fileInfo,
-			instructions: dr2Instructions
+			instructions
 		})
 	}
 }

@@ -62,11 +62,9 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/scss/colors.scss";
 .finance-matrix {
-    margin-top: 5px;
     &__rate {
     color: #67573e;
     border: none;
-    width: 94%;
     background: inherit;
     outline: none;
         &::-webkit-inner-spin-button,
