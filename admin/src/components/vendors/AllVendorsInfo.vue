@@ -88,6 +88,7 @@
 				this.isDataRemain = true
 				try {
 					const result = await this.$http.post('/vendorsapi/filtered-vendors', { filters: this.filters })
+          console.log(result)
 					const mappedResult = result.data.map(item => {
 						return {
 							...item,

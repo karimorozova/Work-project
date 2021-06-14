@@ -1,13 +1,6 @@
 <template lang="pug">
 .clients
-    .clients__sidebar
-        Sidebar(
-            title="CLIENTS" 
-            :links="sidebarLinks" 
-            linkClass="client-details"
-            :activeIndex="currentIndex"
-            @onLinkClick="toggleLink"
-            )
+
     .clients__all
         router-view
 </template>

@@ -1,12 +1,6 @@
 <template lang="pug">
   .settings
-    .settings__sidebar
-      Sidebar(
-        :title="sidebarTitle"
-        :links="fullSideLinks"
-        :activeIndex="activeLinkIndex"
-        @onLinkClick="onLinkClick"
-      )
+
     .settings__inner
       .settings__table
         router-view

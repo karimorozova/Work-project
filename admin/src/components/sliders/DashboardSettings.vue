@@ -1,12 +1,12 @@
 <template lang="pug">
 .dashboard
   .dashboard__sidebar
-    Sidebar(
-      title="DASHBOARD", 
-      :links="sidebarLinks", 
-      :activeIndex="currentIndex", 
-      @onLinkClick="toggleLink"
-    )
+    //Sidebar(
+    //  title="DASHBOARD",
+    //  :links="sidebarLinks",
+    //  :activeIndex="currentIndex",
+    //  @onLinkClick="toggleLink"
+    //)
   router-view
 </template>
 

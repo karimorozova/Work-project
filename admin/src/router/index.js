@@ -74,6 +74,8 @@ import IndustryLqa from '@/components/Table/IndustryLqa'
 import {default as PendingCompetenciesLayout} from "../components/vendors/pending-competencies/Layout"
 import { store } from '../vuex/store'
 import TableClientApiSetting from "../components/Table/TableClientApiSetting";
+import Navbar from "../components/Navbar"
+import clearRouterView from "../components/clearRouterView"
 
 Vue.use(Router)
 
@@ -99,7 +101,7 @@ const router = new Router({
             path: '/',
             name: 'main',
             redirect: '/dashboard/overall-view',
-            component: Main,
+            component: Navbar,
             props: true,
             beforeEnter: (to, from, next) => {
                 const token = localStorage.getItem("token");
@@ -116,7 +118,7 @@ const router = new Router({
                     component: ZohoCode
                 },
                 {
-                    path: 'account-info',
+                    path: '/account/settings',
                     name: 'account-info',
                     component: Accountinfo
                 },
@@ -245,21 +247,45 @@ const router = new Router({
                             component: InactiveVendors
                         },
                         {
-                            path: 'potential',
-                            name: 'potential-vendors',
-                            props: true,
-                            component: PotentialVendors
+                            path: 'candidates',
+                            name: '',
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: 'potential',
+                                    name: 'potential-vendors',
+                                    props: true,
+                                    component: PotentialVendors
+                                },
+                                {
+                                    path: 'tests',
+                                    name: 'tests-vendors',
+                                    props: true,
+                                    component: VendorsCandidatesTests
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'vendor-details',
+                                    component: Vendordetails
+                                },
+                            ]
                         },
                         {
-                            path: 'pending-competencies-vendors',
-                            name: 'pending-competencies-vendors',
-                            component: PendingCompetenciesLayout
-                        },
-                        {
-                            path: 'tests',
-                            name: 'tests-vendors',
-                            props: true,
-                            component: VendorsCandidatesTests
+                            path: 'report',
+                            name: '',
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: 'pending-competencies-vendors',
+                                    name: 'pending-competencies-vendors',
+                                    component: PendingCompetenciesLayout
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'vendor-details',
+                                    component: Vendordetails
+                                },
+                            ]
                         },
                         {
                             path: 'details/:id',
@@ -281,7 +307,7 @@ const router = new Router({
                 {
                     path: 'clients',
                     name: '',
-                    component: ClientsSettings,
+                    component: clearRouterView,
                     children: [
                         {
                             path: '',
@@ -384,33 +410,47 @@ const router = new Router({
                             component: ClosedProjects
                         },
                         {
-                            path: 'open-other-projects',
-                            name: 'open-other-projects',
-                            component: OtherProjects
-                        },
-                        {
-                            path: 'closed-other-projects',
-                            name: 'closed-other-projects',
-                            component: OtherProjects
-                        },
-                        {
-                            path: 'quote-other-projects',
-                            name: 'quote-other-projects',
-                            component: OtherProjects
+                            path: 'xtrf',
+                            name: '',
+                            component: clearRouterView,
+                            props: true,
+                            children: [
+                                {
+                                    path: 'open-other-projects',
+                                    name: 'open-other-projects',
+                                    component: OtherProjects
+                                },
+                                {
+                                    path: 'closed-other-projects',
+                                    name: 'closed-other-projects',
+                                    component: OtherProjects
+                                },
+                                {
+                                    path: 'quote-other-projects',
+                                    name: 'quote-other-projects',
+                                    component: OtherProjects
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'details',
+                                    component: OtherProjectInfo
+                                },
+                            ]
                         },
                         {
                             path: 'quote-projects',
                             name: 'quote-projects',
                             component: QuoteProjects
                         },
+                        {
+                            path: 'details/:id',
+                            name: 'details',
+                            component: ProjectInfo
+                        },
 
                     ]
                 },
-                {
-                    path: 'project-details/:id',
-                    name: 'project-details',
-                    component: ProjectInfo
-                },
+
                 // {
                 //     path: 'request-details/:id',
                 //     name: 'request-details',
@@ -421,11 +461,7 @@ const router = new Router({
                     name: 'request-details',
                     component: clientRequestInfo
                 },
-                {
-                    path: 'other-project-details/:id',
-                    name: 'other-project-details',
-                    component: OtherProjectInfo
-                },
+
                 {
                     path: 'create-project',
                     name: 'create-project',

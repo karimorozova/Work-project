@@ -1,12 +1,6 @@
 <template lang="pug">
   .vendors
-    .vendors__sidebar
-      Sidebar(
-        @onLinkClickMulti="toggleLink",
-        :isMultiLinks="true",
-        :multiLinks="sidebarLinksMulti",
-        :multiActiveIndex="currentIndex"
-      )
+
     .vendors__all
       router-view
 </template>

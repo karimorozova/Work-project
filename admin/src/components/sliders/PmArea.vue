@@ -1,12 +1,6 @@
 <template lang="pug">
   .projects-area
-    .projects-area__sidebar
-      Sidebar(
-        @onLinkClickMulti="toggleLink",
-        :isMultiLinks="true",
-        :multiLinks="sidebarLinksMulti",
-        :multiActiveIndex="currentIndex"
-      )
+
     .projects-area__table
       router-view
 

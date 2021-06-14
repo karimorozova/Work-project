@@ -7,13 +7,7 @@ export const servicesGetting = ({ commit }, payload) => commit('servicesFill', p
 export const setAllCustomers = ({ commit }, payload) => commit('allCustomers', payload);
 export const gettingClientLangs = ({ commit }, payload) => commit('customerlangs', payload);
 
-export const allLanguages = ({ commit }, payload) => commit('allLangs', payload);
-export const allIndustries = ({ commit }, payload) => commit('allIndustries', payload);
-export const allSteps = ({ commit }, payload) => commit('allSteps', payload);
 export const setVendorsForProject = ({ commit }, payload) => commit('allVendorsForProject', payload);
-export const allUnits = ({ commit }, payload) => commit('allUnits', payload);
-export const allServices = ({ commit }, payload) => commit('allServices', payload);
-export const allUsers = ({ commit }, payload) => commit('allUsers', payload);
 
 
 export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload);
@@ -265,3 +259,36 @@ export const setUser = async ({commit, state}) => {
         commit('endRequest');
     }
 }
+
+export const setAllServices = async ({commit}) => {
+    let result = await Vue.http.get('/api/services')
+    commit('allServices', result.data)
+}
+export const setAllUnits = async ({commit}) => {
+    let result = await Vue.http.get('/api/units')
+    commit('allUnits', result.data)
+}
+export const setLanguages= async ({commit}) => {
+    let result = await Vue.http.get('/api/languages')
+    commit('allLangs', result.data)
+}
+export const setAllUsers = async ({commit}) => {
+    const result = await Vue.http.get("/users-full");
+    commit('allUsers', result.data)
+}
+export const setIndustries = async ({commit}) => {
+    let result = await Vue.http.get('/api/industries')
+    commit('allIndustries', result.data)
+}
+export const setSteps = async ({commit}) => {
+    let result = await Vue.http.get('/api/steps')
+    commit('allSteps', result.data)
+}
+// export const allUsers = ({ commit }, payload) => commit('allUsers', payload);
+//
+// export const allLanguages = ({ commit }, payload) => commit('allLangs', payload);
+//
+// export const allIndustries = ({ commit }, payload) => commit('allIndustries', payload);
+// export const allSteps = ({ commit }, payload) => commit('allSteps', payload);
+// export const allUnits = ({ commit }, payload) => commit('allUnits', payload);
+// export const allServices = ({ commit }, payload) => commit('allServices', payload);

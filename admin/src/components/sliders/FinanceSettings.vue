@@ -1,7 +1,7 @@
 <template lang="pug">
 .finance-settings
-  Sidebar(title="FINANCE")
-    //-   router-view
+
+  //-   router-view
   button.button(@click="downloadPdf") Get pdf
 </template>
 

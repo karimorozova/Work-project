@@ -1,12 +1,5 @@
 <template lang="pug">
 .reports
-    .reports__sidebar
-        Sidebar(
-            title="REPORTS" 
-            :links="sidebarLinks"
-            :activeIndex="sidebarIndex"
-            @onLinkClick="toggleLink"
-        )
 
     .reports__table
         router-view(:allXtrfLangs="allXtrfLangs")
