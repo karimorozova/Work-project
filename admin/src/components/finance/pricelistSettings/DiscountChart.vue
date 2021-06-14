@@ -16,14 +16,10 @@
         template(slot="text", slot-scope="{ row }")
           span.pricelistDiscountChart__text {{ row.text }}
         template(slot="rate", slot-scope="{ row }")
-          input.pricelistDiscountChart__rate(
-            type="number",
-            min="0",
-            max="100",
-            :value="row.rate | maxRateCount",
-            @change="(e) => setMatrixData(e, row.key)"
-          )
-          span.pricelistDiscountChart__percent %
+          .table__data(v-if="!isEdit") {{ row.rate }}
+          .table__dataEdit(v-else)
+            input.pricelistDiscountChart__rate(type="number", min="0", max="100", :value="row.rate | maxRateCount", @change="(e) => setMatrixData(e, row.key)")
+            span.pricelistDiscountChart__percent %
 </template>
 
 <script>
@@ -37,6 +33,10 @@
 			},
 			pricelistId: {
 				type: String
+			},
+			isEdit: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {

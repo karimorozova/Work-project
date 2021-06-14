@@ -233,7 +233,7 @@
   }
 
   .opacity {
-    opacity: .5;
+    opacity: .4;
     cursor: default;
   }
 

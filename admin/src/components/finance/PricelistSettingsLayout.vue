@@ -15,6 +15,14 @@
           Button(value="Back", @clicked="goBack")
 
     .priceLayout
+      .priceLayout__editIcons
+        .actionsButton__icon
+          img.priceLayout__editIcons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+          img.priceLayout__editIcons-opacity05(v-else :src="icons.edit.icon")
+        .actionsButton__icon
+          img.priceLayout__editIcons-opacity1(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+          img.priceLayout__editIcons-opacity05(v-else :src="icons.cancel.icon")
+
       .priceLayout__currency
         CurrencyRatio(@refreshPage="getAllData", @refreshResultTable="refreshResultTable")
 
@@ -30,6 +38,7 @@
             :languages="languages",
             :isRefresh="isRefresh",
             @refreshResultTable="refreshResultTable"
+            :isEdit="isEdit"
           )
         .priceLayout__table(v-if="selectedTab === 'Steps / Units'")
           StepTable(
@@ -39,9 +48,14 @@
             :sizes="sizes",
             :isRefresh="isRefresh",
             @refreshResultTable="refreshResultTable"
+            :isEdit="isEdit"
           )
         .priceLayout__table(v-if="selectedTab === 'Industries'")
-          IndustryTable(:priceId="priceId", @refreshResultTable="refreshResultTable")
+          IndustryTable(
+            :priceId="priceId",
+            @refreshResultTable="refreshResultTable"
+            :isEdit="isEdit"
+          )
 
         .priceLayout__table(v-if="selectedTab === 'Overall Prices'")
           ResultTable(
@@ -54,7 +68,11 @@
           )
         .priceLayout__table(v-if="selectedTab === 'Discount Chart'")
           .discountChartLayout(v-if="this.pricelists != null")
-            DiscountChart(:discountChart="discountChart", :pricelistId="priceId")
+            DiscountChart(
+              :discountChart="discountChart",
+              :pricelistId="priceId"
+              :isEdit="isEdit"
+            )
 
 </template>
 <script>
@@ -72,6 +90,11 @@
 	export default {
 		data() {
 			return {
+				icons: {
+					edit: { icon: require("../../assets/images/latest-version/edit.png") },
+					cancel: { icon: require("../../assets/images/cancel-icon.png") }
+				},
+				paramsIsEdit: false,
 				priceId: null,
 				pricelists: null,
 				languages: null,
@@ -85,7 +108,8 @@
 				languageModal: false,
 				newLanguagesPairs: [],
 				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
-				selectedTab: 'Basic Price'
+				selectedTab: 'Basic Price',
+				isEdit: false
 
 			}
 		},
@@ -221,6 +245,10 @@
 				setTimeout(() => {
 					this.isRefresh = false
 				}, 2000)
+			},
+			crudActions(actionType) {
+				this.paramsIsEdit = actionType !== 'cancel'
+				this.isEdit = this.paramsIsEdit
 			}
 		},
 		computed: {
@@ -300,6 +328,27 @@
   .priceLayout {
     width: 1000px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    position: relative;
+
+    &__editIcons {
+      display: flex;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      gap: 7px;
+      height: 20px;
+      align-items: center;
+
+      &-opacity1 {
+        opacity: 1;
+        cursor: pointer;
+      }
+
+      &-opacity05 {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
 
     &__allTabs {
       padding: 20px;
