@@ -239,7 +239,7 @@ export default {
           isShow: true,
           type: "success"
         });
-        this.$router.push(`/vendors/details/${this.currentVendor._id}`);
+        this.$router.push(`/vendors/candidates/details/${this.currentVendor._id}`);
       } catch (err) {
         this.alertToggle({
           message: "Server error / Cannot update Vendor info",

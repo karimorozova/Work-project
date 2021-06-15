@@ -109,7 +109,7 @@ export default {
   display: flex;
   min-height: 95vh;
   position: relative;
-  width: 100%;
+  width: calc(100vw - 285px);
   &__sidebar {
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
   }

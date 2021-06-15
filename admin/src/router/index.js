@@ -2,15 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
-import Main from '@/components/Main'
 import DashboardSettings from '@/components/sliders/DashboardSettings'
 import Settings from '@/components/sliders/Settings'
 import VendorsSettings from '@/components/sliders/VendorsSettings'
 import LanguagesSettings from '@/components/sliders/LanguagesSettings'
-import ClientsSettings from '@/components/sliders/ClientsSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
-import RequestInfo from '@/components/pmArea/RequestInfo'
 import clientRequestInfo from '@/components/pmArea/clientRequests/clientRequestInfo'
 import FinanceSettings from '@/components/sliders/FinanceSettings'
 import Pricelists from '@/components/finance/Pricelists'
@@ -45,8 +42,6 @@ import ActiveClients from '@/components/clients/ActiveClients'
 import InactiveClients from '@/components/clients/InactiveClients'
 import PotentialClients from '@/components/clients/PotentialClients'
 //------------------------------------------------------------CLIENT------------------------------------------------------------
-
-
 import Vendordetails from '@/components/vendors/Vendordetails'
 import AllVendorsTable from '@/components/vendors/AllVendorsTable'
 import ActiveVendors from '@/components/vendors/ActiveVendors'
@@ -71,9 +66,9 @@ import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
-import {default as PendingCompetenciesLayout} from "../components/vendors/pending-competencies/Layout"
+import { default as PendingCompetenciesLayout } from "../components/vendors/pending-competencies/Layout"
 import { store } from '../vuex/store'
-import TableClientApiSetting from "../components/Table/TableClientApiSetting";
+import TableClientApiSetting from "../components/Table/TableClientApiSetting"
 import Navbar from "../components/Navbar"
 import clearRouterView from "../components/clearRouterView"
 
@@ -232,19 +227,58 @@ const router = new Router({
                             path: 'all',
                             name: 'all-vendors',
                             props: true,
-                            component: AllVendorsTable
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'all-vendors',
+                                    props: true,
+                                    component: AllVendorsTable,
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'vendor-details',
+                                    component: Vendordetails
+                                },
+                            ]
                         },
                         {
                             path: 'active',
                             name: 'active-vendors',
                             props: true,
-                            component: ActiveVendors
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'all-vendors',
+                                    props: true,
+                                    component: ActiveVendors,
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'vendor-details',
+                                    component: Vendordetails
+                                },
+                            ]
                         },
                         {
                             path: 'inactive',
                             name: 'inactive-vendors',
                             props: true,
-                            component: InactiveVendors
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'all-vendors',
+                                    props: true,
+                                    component: InactiveVendors,
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'vendor-details',
+                                    component: Vendordetails
+                                },
+                            ]
                         },
                         {
                             path: 'candidates',
@@ -255,7 +289,20 @@ const router = new Router({
                                     path: 'potential',
                                     name: 'potential-vendors',
                                     props: true,
-                                    component: PotentialVendors
+                                    component: clearRouterView,
+                                    children: [
+                                        {
+                                            path: '',
+                                            name: 'all-vendors',
+                                            props: true,
+                                            component: PotentialVendors,
+                                        },
+                                        {
+                                            path: 'details/:id',
+                                            name: 'vendor-details',
+                                            component: Vendordetails
+                                        },
+                                    ]
                                 },
                                 {
                                     path: 'tests',
@@ -263,11 +310,11 @@ const router = new Router({
                                     props: true,
                                     component: VendorsCandidatesTests
                                 },
-                                {
-                                    path: 'details/:id',
-                                    name: 'vendor-details',
-                                    component: Vendordetails
-                                },
+                                // {
+                                //     path: 'details/:id',
+                                //     name: 'vendor-details',
+                                //     component: Vendordetails
+                                // },
                             ]
                         },
                         {
@@ -310,10 +357,24 @@ const router = new Router({
                     component: clearRouterView,
                     children: [
                         {
-                            path: '',
+                            path: 'all',
                             name: 'all-clients',
-                            component: Allclients,
-                            props: true
+                            component: clearRouterView,
+                            props: true,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'client-info',
+                                    component: Allclients,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: '',
+                                    component: ClientInfo,
+                                    props: true,
+                                }
+                            ]
                         },
                         {
                             path: 'active',

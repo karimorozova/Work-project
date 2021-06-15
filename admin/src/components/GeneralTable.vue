@@ -1,20 +1,21 @@
 <template lang="pug">
   .go
-    //.th__modals
-    //  ValidationErrors(
-    //    v-if="areErrors"
-    //    :errors="errors"
-    //    :isAbsolute="isAbsolute"
-    //    @closeErrors="closeErrors"
-    //  )
-    //  ApproveModal(
-    //    text="Are you sure?"
-    //    approveValue="Yes"
-    //    notApproveValue="Cancel"
-    //    @approve="approve"
-    //    @notApprove="notApprove"
-    //    @close="closeModal"
-    //  )
+    .th__modals
+      ValidationErrors(
+        v-if="areErrors"
+        :errors="errors"
+        :isAbsolute="isAbsolute"
+        @closeErrors="closeErrors"
+      )
+      ApproveModal(
+        v-if="areErrors"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approve"
+        @notApprove="notApprove"
+        @close="closeModal"
+      )
     span(@click="showFilters = !showFilters") 'show filter'
     table
       thead
@@ -28,9 +29,9 @@
                   i.fas.fa-caret-up(v-else-if="header.sortInfo.order === 'desc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.key, sortField: header.slotDataName, order: 'asc'})")
                 i.fas.fa-times-circle(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"  @click.stop="removeSortKey({sortInfo: header.sortInfo, key: header.key, sortField: header.slotDataName, order: 'asc'})")
                 i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo: header.sortInfo, key: header.key, sortField: header.slotDataName, order: 'asc'})")
-            .th__filter(v-if="header.hasFilter && showFilters")
-              input(:ref='header.slotDataName' @keyup="(e) => setFilter({value: e.target.value, key: header.key, filterField: header.slotDataName})")
-              i.fas.fa-times-circle.th__filter-close( @click.stop="removeFilter({filterField: header.slotDataName})")
+            .th__filter(v-if="header.filterInfo.isFilter && showFilters")
+              input(:ref='header.slotDataName' @keyup="(e) => setFilter({filterInfo: header.filterInfo, value: e.target.value, key: header.key, filterField: header.slotDataName})")
+              i.fas.fa-times-circle.th__filter-close(v-if="header.filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo: header.filterInfo , filterField: header.slotDataName})")
 
       tbody
         tr.data(
@@ -42,6 +43,8 @@
 </template>
 
 <script>
+import ApproveModal from './ApproveModal'
+import ValidationErrors from './ValidationErrors'
 	export default {
 	  props: {
 	    //Array of header Info
@@ -52,11 +55,11 @@
       tableData: {
         type: Array,
       },
-      //Shows filters inputs toggle
-      // showFilters: {
-      //   type: Boolean,
-      //   default: false
-      // }
+
+      areErrors: {
+        type: Boolean,
+        default: false
+      }
     },
 	  data() {
 	    return {
@@ -64,11 +67,23 @@
       }
     },
     methods: {
+      closeErrors() {
+        this.$emit('closeErrors')
+      },
+      approve() {
+        this.$emit('approve')
+      },
+      notApprove() {
+        this.$emit('notApprove')
+      },
+      closeModal() {
+        this.$emit('closeModal')
+      },
+
       addSortKey(field) {
         this.$emit('addSortKey', field)
       },
       changeSortKey(field) {
-        console.log('this')
         this.$emit('changeSortKey', field)
       },
       removeSortKey(field) {
@@ -79,18 +94,26 @@
         this.$emit('setFilter', field)
       },
       removeFilter(field) {
-
-        // console.log({ parrent: this.$parent })
-        // console.log(this.$refs, field)
-        this.$refs['header.slotDataName'].value = ''
+        this.$refs[field.filterField][0].value = ''
         this.$emit('removeFilter', field)
       }
+    },
+    components: {
+      ValidationErrors,
+      ApproveModal
     }
   }
 </script>
 
 <style lang="scss" scoped>
   .th {
+    &__modals {
+      position: absolute;
+      z-index: 10;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%);
+    }
     &__sort-icon {
       display: flex;
       width: 25px;

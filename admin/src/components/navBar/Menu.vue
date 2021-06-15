@@ -7,7 +7,7 @@
         i.fas.fa-chevron-down(v-if="element.isOpen")
         i.fas.fa-chevron-left(v-else)
       Menu(v-if="element.type === 'group' && openSubMenu(element)" class="group" :elements="element.children" :path='path' @closeGroup="closeGroup")
-      router-link(v-if="element.type === 'link'" class="link" :to="{ path: element.path}") {{element.name}}
+      router-link(v-if="element.type === 'link'" class="link" :class="{'red-color': element.isOpen}" :to="{ path: element.path}") {{element.name}}
 
 </template>
 
@@ -79,6 +79,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.link.router-link-active,
+.link.router-link-exact-active {
+  background-color: indianred;
+}
 .menu {
   font-size: 18px;
   font-family: 'Myriad600', sans-serif;

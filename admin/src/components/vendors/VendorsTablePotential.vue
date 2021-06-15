@@ -316,7 +316,7 @@
 					return
 				}
 				const vendor = this.vendors[index];
-        window.open(`/vendors/details/${ vendor._id }`, "_blank");
+        window.open(`/vendors/candidates/potential/details/${ vendor._id }`, "_blank");
         // this.$router.push(`/vendors/details/${ vendor._id }`);
 			}
 		},

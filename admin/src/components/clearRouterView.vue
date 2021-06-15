@@ -11,6 +11,5 @@ export default {
 
 <style scoped lang="scss">
 .wrapper {
-  margin: 40px;
 }
 </style>

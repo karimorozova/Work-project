@@ -171,7 +171,7 @@
 	import ValidationErrors from "../ValidationErrors";
 	import ApproveModal from "../ApproveModal";
 
-	export default {
+export default {
 		mixins: [scrollDrop],
 		data() {
 			return {

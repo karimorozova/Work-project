@@ -162,7 +162,7 @@
             slotHeaderName: "headerSource",
             slotDataName: "sourceLanguage",
             key: 'lang',
-            hasFilter: true,
+            filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: false, order: 'default',},
             style: {"width": "20%"},
           },
@@ -171,7 +171,7 @@
 						slotHeaderName: "headerTarget",
             slotDataName: "targetLanguages",
             key: 'lang',
-            hasFilter: true,
+            filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: true, order: 'default',},
             style: {"width": "20%"},
           },
@@ -180,7 +180,7 @@
             slotHeaderName: "headerService",
             slotDataName: "services",
             key: 'title',
-            hasFilter: false,
+            filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: true,  order: 'default',},
             style: {"width": "20%"},
           },
@@ -189,7 +189,7 @@
             slotHeaderName: "headerIndustry",
 						slotDataName: "industries",
             key: 'name',
-            hasFilter: true,
+            filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: true, order: 'default',},
             style: {"width": "20%"},
           },
@@ -199,7 +199,7 @@
             slotHeaderName: "headerIcons",
 						slotDataName: "icons",
             key: 'name',
-            hasFilter: false,
+            filterInfo:{isFilter: false, isFilterSet: false},
             sortInfo: { isSort: false, isArray: false, order: 'default',},
             style: {"width": "20%"}
           }
@@ -238,20 +238,28 @@
       addSortKey({ sortInfo, key, sortField, order }) {
         sortInfo.order = order
         this.sortKeys.push({sortField, key, sortInfo})
+        this.setDefaults()
       },
       changeSortKey({ sortInfo, order }) {
         sortInfo.order = order
         this.sortKeys = [...this.sortKeys]
+        this.setDefaults()
       },
       removeSortKey({ sortInfo, sortField}) {
         sortInfo.order = 'default'
         this.sortKeys = this.sortKeys.filter((sortKey) => sortKey.sortField !== sortField)
+        this.setDefaults()
       },
-      setFilter({value, key, filterField}) {
+      setFilter({value, key, filterField, filterInfo}) {
+        filterInfo.isFilterSet = true
         this.filtersData[filterField] = {value, key}
+        this.setDefaults()
       },
-      removeFilter({ filterField}) {
+      removeFilter({ filterInfo, filterField}) {
+        filterInfo.isFilterSet = false
         this.filtersData[filterField] = {value: '', key: ''}
+        this.setDefaults()
+
       },
       sortData({ sortInfo, key, sortField }) {
         this.sortedData.sort((a,b) => {
@@ -269,9 +277,10 @@
       },
       filterData({ filterKey, value, fieldName }) {
         this.sortedData = this.sortedData.filter((data) => {
-          const regex = new RegExp(`${value}`,'gi')
-          const dataReadyForSearch = !Array.isArray(data[filterKey]) ? data[filterKey][fieldName] : data[filterKey].map(elem => elem[fieldName]).join(' ')
-          return regex.test(dataReadyForSearch)
+          // const regex = new RegExp(`${value}`,'gi')
+          const dataReadyForSearch = !Array.isArray(data[filterKey]) ? data[filterKey][fieldName].toLowerCase() : data[filterKey].map(elem => elem[fieldName]).join(' ').toLowerCase()
+          // return regex.test(dataReadyForSearch)
+          return dataReadyForSearch.includes(value.toLowerCase())
         })
       },
 

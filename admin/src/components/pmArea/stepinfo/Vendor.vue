@@ -112,7 +112,7 @@
 				}
 			},
 			gotToVendorInfo() {
-				window.open(`/vendors/details/${ this.vendor._id }`, '_blank')
+				window.open(`/vendors/candidates/details/${ this.vendor._id }`, '_blank')
 			},
       async goToVendor() {
         const { data } = await this.$http.post("/service-login/vendor", {vendorId: this.vendor._id})

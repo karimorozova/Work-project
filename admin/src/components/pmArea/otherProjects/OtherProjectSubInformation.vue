@@ -368,7 +368,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-top: 40px;
+    //margin-top: 40px;
     margin-bottom: 40px;
     min-width: 390px;
     width: 390px;

@@ -28,6 +28,7 @@
                 @update="update"
                 @bottomScrolled="bottomScrolled"
             )
+            //router-view
 </template>
 
 <script>
@@ -165,6 +166,7 @@ export default {
 .all-clients {
     position: relative;
     width: 1200px;
+    margin: 40px;
     &__table {
         padding: 20px;
         font-size: 14px;

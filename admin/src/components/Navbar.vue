@@ -108,7 +108,7 @@ export default {
             {
               type: 'link',
               name: 'All',
-              path: '/clients',
+              path: '/clients/all',
             },
             {
               type: 'link',

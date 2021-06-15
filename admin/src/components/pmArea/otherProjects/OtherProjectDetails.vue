@@ -135,7 +135,8 @@
   }
 
   .project {
-    padding: 40px;
+    margin-right: 40px;
+    margin-bottom: 40px;
     display: flex;
     flex-direction: column;
 

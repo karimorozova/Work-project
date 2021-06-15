@@ -94,7 +94,7 @@
 					} else {
 						await this.addWordsTasksFromRequest({ dataForTasks, request });
 					}
-					this.$router.push(`/project-details/${ this.currentProject._id }`);
+					this.$router.push(`/projects/details/${ this.currentProject._id }`);
 				} catch (err) {
 				}
 			},

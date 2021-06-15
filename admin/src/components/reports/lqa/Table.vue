@@ -174,7 +174,7 @@
       },
 
       getVendorProfileLink(vendorId) {
-        return '/vendors/details/' + vendorId
+        return '/vendors/candidates/details/' + vendorId
       },
       canNextStep(row, step, previousStep = ''){
         const reformStepName = this.reformStep(step)

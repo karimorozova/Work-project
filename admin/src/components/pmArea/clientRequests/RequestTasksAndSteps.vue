@@ -157,7 +157,7 @@
 			async convertIntoProject() {
 				try {
 					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
-          this.$router.push(`/project-details/${ projectId.data }`);
+          this.$router.push(`/projects/details/${ projectId.data }`);
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
 				}

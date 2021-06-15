@@ -74,7 +74,7 @@
 				if(request) {
 					return this.$router.push(`/request-details/${ project._id }`);
 				}
-				this.$router.push(`/project-details/${ project._id }`);
+				this.$router.push(`/projects/details/${ project._id }`);
 			},
 			async getManagers() {
 				const managers = await this.$http.get("/pm-manage/all-managers?groupFilters=Project%20Managers,Sales");

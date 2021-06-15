@@ -64,7 +64,7 @@
     min-width: 1000px;
     width: 1000px;
     padding: 20px;
-    margin: 0 40px;
+    margin-right: 40px;
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     position: relative;
 

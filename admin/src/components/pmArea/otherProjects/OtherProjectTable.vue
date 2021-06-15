@@ -195,7 +195,7 @@
 				}
 			},
 			async onRowClicked({ index }) {
-				this.$router.push(`/other-project-details/${ this.allProjects[index]._id }`);
+				this.$router.push(`/projects/xtrf/details/${ this.allProjects[index]._id }`);
 			},
 			formateDate: time => moment(time).format("DD-MM-YYYY"),
 			projectLangs(row) {

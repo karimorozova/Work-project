@@ -260,7 +260,7 @@
   .project-info {
     position: relative;
     display: flex;
-    padding: 40px;
+    //padding: 40px;
 
     &__rigthSide{
       margin-left: 40px;
