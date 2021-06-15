@@ -127,7 +127,7 @@
     }
 
     &__rate {
-      color: #67573e;
+      color: #66563d;
       border: none;
       width: 94%;
       background: inherit;
@@ -153,7 +153,7 @@
       font-size: 14px;
       visibility: hidden;
       width: 140px;
-      background-color: #67573e;
+      background-color: #66563d;
       color: #fff;
       text-align: center;
       border-radius: 4px;
@@ -174,7 +174,7 @@
         margin-left: -5px;
         border-width: 5px;
         border-style: solid;
-        border-color: #67573e transparent transparent transparent;
+        border-color: #66563d transparent transparent transparent;
       }
     }
 

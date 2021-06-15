@@ -314,7 +314,7 @@ export default {
         padding-left: 70px;
         padding-top: 30px;
         margin-left: 10px;
-        border-top:1px solid #67573E;
+        border-top:1px solid #66563d;
     }
     &__close {
         position: relative;
@@ -334,11 +334,11 @@ export default {
         top: -5px;
         cursor: pointer;
         padding: 1px 5px;
-        border: 1px solid #67573E;
+        border: 1px solid #c1bbb1;
         border-radius: 4px;
         transition: all 0.2s;
         &:hover {
-            background-color: #67573E;
+            background-color: #66563d;
             color: #FFF;
         }
     }
@@ -381,7 +381,7 @@ export default {
     }
     &__drop-menu {
         position: relative;
-        width: 191px;
+        width: 200px;
         height: 34px;
     }
     &__button {

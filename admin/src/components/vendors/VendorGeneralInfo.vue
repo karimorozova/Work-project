@@ -235,7 +235,7 @@ export default {
 .gen-info {
   box-sizing: border-box;
   padding: 20px;
-  box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
 }
 
 .gen-info {
@@ -269,7 +269,7 @@ export default {
 
   &__drop-menu {
     position: relative;
-    width: 191px;
+    width: 200px;
     height: 28px;
     box-sizing: border-box;
   }
@@ -288,12 +288,12 @@ export default {
 
   &__input-filed {
     font-size: 14px;
-    color: #67573e;
-    border: 1px solid #67573e;
+    color: #66563d;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     padding: 0 5px;
     outline: none;
-    width: 191px;
+    width: 200px;
     height: 30px;
     box-sizing: border-box;
   }
@@ -311,7 +311,7 @@ export default {
 .photo-wrap {
   width: 195px;
   height: 160px;
-  border: 1px solid #67573e;
+  border: 1px solid #c1bbb1;
   position: relative;
   overflow: hidden;
   margin-bottom: 20px;

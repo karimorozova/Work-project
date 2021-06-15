@@ -354,7 +354,7 @@ export default {
   &__part {
     padding: 20px 10px;
     border: 2px solid #f4f2f1;
-    border-radius: 10px;
+    border-radius: 4px;
     position: relative;
   }
 
@@ -383,7 +383,7 @@ export default {
       height: 30px !important;
       padding-left: 5px;
       border: 1px solid $main-color;
-      border-radius: 5px;
+      border-radius: 4px;
       outline: none;
       font-size: 14px;
     }
@@ -406,7 +406,7 @@ export default {
       padding-left: 5px;
       padding-right: 28px;
       border: 1px solid $main-color;
-      border-radius: 5px;
+      border-radius: 4px;
       outline: none;
       font-size: 14px;
     }

@@ -92,7 +92,7 @@ export default {
         outline: none;
         width: 50%;
         border: 1px solid $main-color;
-        border-radius: 8px;
+        border-radius: 4px;
         margin-left: 5px;
         box-sizing: border-box;
         padding: 5px;

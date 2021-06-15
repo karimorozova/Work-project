@@ -245,13 +245,13 @@ export default {
     box-sizing: border-box;
     font-size: 14px;
     border: 1px solid #67573e;
-    border-radius: 5px;
+    border-radius: 4px;
   }
 
   &__part {
     padding: 20px 10px;
     border: 2px solid #f4f2f1;
-    border-radius: 10px;
+    border-radius: 4px;
     position: relative;
   }
 }

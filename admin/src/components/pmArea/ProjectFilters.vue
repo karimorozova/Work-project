@@ -221,7 +221,7 @@
   }
 
   &__input {
-    width: 191px;
+    width: 200px;
   }
 
   &__date {
@@ -240,7 +240,7 @@
       transition: all 0.2s;
 
       &:focus {
-        box-shadow: 0 0 3px #68573E;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       }
     }
 
@@ -270,7 +270,7 @@
   &__input-field {
     box-sizing: border-box;
     color: $main-color;
-    width: 191px;
+    width: 200px;
     height: 30px !important;
     padding-left: 5px;
     border: 1px solid $main-color;
@@ -281,7 +281,7 @@
 
   &__drop-menu {
     position: relative;
-    width: 191px;
+    width: 200px;
     height: 30px;
     box-sizing: border-box;
     z-index: 10;

@@ -278,7 +278,7 @@ export default {
     padding: 20px;
     margin-top: 20px;
     box-sizing: border-box;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 0 10px #66563d9d;
   }
   &__header,
   &__data,

@@ -105,7 +105,7 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     background-color: $white;
     max-width: 300px;
     font-size: 16px;
@@ -130,7 +130,7 @@
     }
 
     &__drop-menu {
-      width: 191px;
+      width: 200px;
       height: 28px;
       position: relative;
       margin-bottom: 20px;
@@ -195,7 +195,7 @@
         &:checked {
           + {
             .slider {
-              background-color: #67573e;
+              background-color: #66563d;
 
               &:before {
                 -webkit-transform: translateX(26px);

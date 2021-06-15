@@ -171,7 +171,7 @@ export default {
         padding: 20px;
         font-size: 14px;
         font-weight: normal;
-        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 }
 
@@ -196,16 +196,16 @@ label {
         align-items: flex-end;
     }
     &__drop-menu {
-        width: 191px;
+        width: 200px;
         height: 30px;
         position: relative;
     }
     &__input-field {
-        width: 191px;
+        width: 200px;
         height: 30px;
         padding-left: 5px;
-        border: 1px solid #67573E;
-        color: #67573E;
+        border: 1px solid #c1bbb1;
+        color: #66563d;
         border-radius: 4px;
         outline: none;
         box-sizing: border-box;
@@ -247,7 +247,7 @@ label {
 
   &:hover {
     cursor: pointer;
-    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
   }
 
   &:active {

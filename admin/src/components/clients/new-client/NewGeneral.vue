@@ -238,7 +238,7 @@ export default {
   }
   &__drop {
     position: relative;
-    width: 191px;
+    width: 200px;
     height: 28px;
   }
   &_high-index {
@@ -249,13 +249,13 @@ export default {
   }
   input {
     font-size: 14px;
-    color: #67573e;
-    border: 1px solid #67573e;
+    color: #66563d;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     box-sizing: border-box;
     padding: 0 5px;
     outline: none;
-    width: 191px;
+    width: 200px;
     height: 30px;
   }
   ::-webkit-input-placeholder {

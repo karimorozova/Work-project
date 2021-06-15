@@ -82,14 +82,14 @@
 
     &__drop-menu {
       position: relative;
-      width: 191px;
+      width: 200px;
       margin-top: 3px;
       height: 30px;
 
     }
 
     &__input {
-      width: 191px;
+      width: 200px;
     }
   }
 

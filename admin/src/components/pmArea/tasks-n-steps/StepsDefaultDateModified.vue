@@ -248,7 +248,7 @@
 
     &__drop-menu {
       position: relative;
-      width: 191px;
+      width: 200px;
       border-radius: 4px;
       height: 30px;
       background: #fff;

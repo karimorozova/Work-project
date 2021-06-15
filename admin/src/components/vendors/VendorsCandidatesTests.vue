@@ -577,7 +577,7 @@ export default {
   .vendorTests {
     @extend %setting-table;
     width: 1160px;
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     position: relative !important;
 
     &__approve {
@@ -687,8 +687,8 @@ export default {
 
       &__input {
         font-size: 14px;
-        color: #67573e;
-        border: 1px solid #67573e;
+        color: #66563d;
+        border: 1px solid #c1bbb1;
         border-radius: 4px;
         padding: 0 5px;
         outline: none;
@@ -725,7 +725,7 @@ export default {
   }
 
   $color1: #fff;
-  $color2: #67573e;
+  $color2: #66563d;
   span {
     margin-left: 10px;
   }
@@ -753,7 +753,7 @@ export default {
         &:before {
           content: "";
           border-radius: 100%;
-          border: 1px solid #67573e;
+          border: 1px solid #c1bbb1;
           display: inline-block;
           width: 16px;
           height: 16px;

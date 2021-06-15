@@ -86,7 +86,7 @@ export default {
 .drop-select {
     position: absolute;
     width: 100%;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     overflow: hidden;
     z-index: 5;
@@ -100,9 +100,9 @@ export default {
             outline: none;
             border: none;
             padding: 5px 0 5px 5px;
-            color: #67573E;
+            color: #66563d;
             box-sizing: border-box;
-            box-shadow: inset 0 0 5px #67573E;
+            box-shadow: inset 0 0 5px #66563d;
         }
     }
     .drop {
@@ -129,7 +129,7 @@ export default {
         }
     }
     .block-item & {
-        width: 191px;
+        width: 200px;
     }
 }
 

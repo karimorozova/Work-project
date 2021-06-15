@@ -68,7 +68,7 @@ export default {
 .services-menu {
     width: 100%;
     box-shadow: 0 2px 10px $main-color;
-    border-radius: 12px;
+    border-radius: 4px;
     &:hover {
         box-shadow: 0 1px 10px $main-color;
     }
@@ -98,7 +98,7 @@ export default {
         font-size: 12px;
         width: 50%;
         border: 1px solid $main-color;
-        border-radius: 3px;
+        border-radius: 4px;
         box-sizing: border-box;
         padding: 5px;
         cursor: pointer;

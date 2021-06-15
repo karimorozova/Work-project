@@ -92,8 +92,8 @@ export default {
 
 .languages {
   height: 160px;
-  width: 191px;
-  border: 1px solid #67573e;
+  width: 200px;
+  border: 1px solid #c1bbb1;
   border-radius: 4px;
   overflow: hidden;
   box-sizing: border-box;

@@ -246,7 +246,7 @@
       position: absolute;
       padding: 30px 0 20px 20px;
       box-sizing: border-box;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       left: -530px;
       cursor: default;
       margin-top: 10px;
@@ -292,7 +292,7 @@
     &__input-field {
       box-sizing: border-box;
       color: $main-color;
-      width: 191px;
+      width: 200px;
       height: 30px !important;
       padding-left: 5px;
       border: 1px solid $main-color;
@@ -303,7 +303,7 @@
 
     &__drop-menu {
       position: relative;
-      width: 191px;
+      width: 200px;
       height: 30px;
       box-sizing: border-box;
       z-index: 10;

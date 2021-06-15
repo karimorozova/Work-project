@@ -111,7 +111,7 @@ export default {
         box-sizing: border-box;
         padding: 5px;
         border: 1px solid $light-brown;
-        border-radius: 10px;
+        border-radius: 4px;
         outline: none;
         &:focus {
             box-shadow: 0 0 5px $light-brown;

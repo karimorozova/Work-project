@@ -154,14 +154,14 @@
 
     &__project-template {
       position: relative;
-      width: 191px;
+      width: 200px;
       margin-bottom: 60px;
     }
 
     &__all-info {
       width: 960px;
       padding: 20px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 
     &__info-row {
@@ -206,11 +206,11 @@
     &__drop-menu {
       position: relative;
       height: 28px;
-      width: 191px;
+      width: 200px;
     }
 
     &__client-link {
-      width: 191px;
+      width: 200px;
       display: flex;
       justify-content: flex-start;
     }
@@ -358,7 +358,7 @@
   }
 
   .fa:hover {
-    color: #67573E;
+    color: #66563d;
   }
 
   .tooltip {
@@ -369,7 +369,7 @@
       font-size: 14px;
       visibility: hidden;
       width: 140px;
-      background-color: #67573e;
+      background-color: #66563d;
       color: #fff;
       text-align: center;
       border-radius: 4px;
@@ -390,7 +390,7 @@
         margin-left: -5px;
         border-width: 5px;
         border-style: solid;
-        border-color: #67573e transparent transparent transparent;
+        border-color: #66563d transparent transparent transparent;
       }
     }
 

@@ -151,10 +151,10 @@
     &__update-btn {
       width: 120px;
       height: 32px;
-      color: #67573e;
+      color: #66563d;
       font-size: 14px;
       border-radius: 4px;
-      box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       background-color: #DDD3C8;
       border: 1px solid #DDD3C8;
       cursor: pointer;
@@ -176,7 +176,7 @@
     flex-direction: column;
     position: relative;
     background-color: $white;
-    box-shadow: 0 0 10px $brown-shadow;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     padding: 20px;
 
     &_top-50 {
@@ -209,7 +209,7 @@
     }
 
     &__text {
-      width: 191px;
+      width: 200px;
       height: 30px;
       color: $main-color;
       padding: 0 5px;
@@ -220,13 +220,13 @@
       transition: all 0.2s;
 
       &:focus {
-        box-shadow: 0 0 5px $brown-shadow;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       }
     }
 
     &__drop-menu {
       position: relative;
-      width: 191px;
+      width: 200px;
       height: 30px;
     }
 

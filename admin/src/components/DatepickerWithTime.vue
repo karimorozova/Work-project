@@ -1222,11 +1222,11 @@
     margin-right: 20px;
 
     .cell.beforeToday {
-      color: #67573e;
+      color: #66563d;
     }
 
     .cell.day {
-      color: #67573e;
+      color: #66563d;
     }
 
     .cell.today {
@@ -1248,7 +1248,7 @@
     color: #68573E;
     padding-left: 5px;
     outline: none;
-    width: 191px;
+    width: 200px;
   }
   .datepicker-custom-compliance {
     border-radius: 4px;
@@ -1280,7 +1280,7 @@
   }
 
   .datepicker-custom-mod {
-    width: 191px;
+    width: 200px;
   }
 
   .steps__custom-input {
@@ -1305,7 +1305,7 @@
   .filters .datepicker-custom-filter {
     border-radius: 4px;
     border: 1px solid #68573E;
-    width: 191px;
+    width: 200px;
     height: 30px;
     color: #68573E;
     padding-left: 5px;
@@ -1325,7 +1325,7 @@
   .calendar-custom {
     width: 260px;
     right: 0;
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
   }
 
   .calendar-custom .cell,
@@ -1413,7 +1413,7 @@
 
   ::-webkit-input-placeholder {
     opacity: 0.5;
-    color: #67573e;
+    color: #66563d;
   }
 
   .prev,

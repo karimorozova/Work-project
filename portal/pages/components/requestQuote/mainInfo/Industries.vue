@@ -65,7 +65,7 @@ export default {
         display: flex;
         align-items: center;
         border: 1px solid $main-color;
-        border-radius: 10px;
+        border-radius: 4px;
         width: 30%;
         height: 75px;
         padding: 5px;

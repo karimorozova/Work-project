@@ -68,7 +68,7 @@
     align-items: center;
     flex-direction: column;
     background-color: $white;
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     box-sizing: border-box;
     padding: 20px;
     width: 500px;
@@ -81,7 +81,7 @@
     &__menu {
       position: relative;
       height: 30px;
-      width: 191px;
+      width: 200px;
       margin: 20px 0;
     }
 

@@ -134,7 +134,7 @@ export default {
     &__text {
         box-sizing: border-box;
         color: $main-color;
-        width: 191px;
+        width: 200px;
         height: 30px;
         padding: 0 5px;
         outline: none;
@@ -145,7 +145,7 @@ export default {
     &__drop {
         position: relative;
         height: 30px;
-        width: 191px;
+        width: 200px;
         margin-left: 8px;
     }
     &_no-space {

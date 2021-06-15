@@ -125,7 +125,7 @@ export default {
 .drop-select {
     position: absolute;
     width: 100%;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     overflow: hidden;
     box-sizing: border-box;
@@ -137,7 +137,7 @@ export default {
         overflow-x: hidden;
         background-color: white;
         z-index: 10;
-        border-top: 1px solid #67573E; 
+        border-top: 1px solid #66563d;
         box-sizing: border-box; 
         z-index: 10;
         &__item {
@@ -181,7 +181,7 @@ export default {
             width: 100%;
             box-sizing: border-box;
             padding: 6px 0 6px 5px;
-            color: #67573E;
+            color: #66563d;
             outline: none;
             box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
             border: 1px solid rgba(104, 87, 62, 0.3);
@@ -260,7 +260,7 @@ export default {
 .checkbox {
     min-width: 13px;
     height: 13px;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     margin-right: 3px;
     .checked {
         width: 100%;
@@ -270,7 +270,7 @@ export default {
             content: '';
             position: absolute;
             width: 5px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 6px;
             left: 1px;
             transform: rotate(45deg);
@@ -279,7 +279,7 @@ export default {
             content: '';
             position: absolute;
             width: 6px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 5px;
             left: 3px;
             transform: rotate(-58deg);

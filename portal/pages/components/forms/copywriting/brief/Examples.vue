@@ -78,7 +78,7 @@ export default {
         padding: 10px;
         margin-bottom: 5px;
         border: 1px solid $main-color;
-        border-radius: 10px;
+        border-radius: 4px;
         outline: none;
     }
     &__text {

@@ -60,7 +60,7 @@ export default {
         justify-content: space-around;
         align-items: center;
         border: 1px solid $main-color;
-        border-radius: 15px;
+        border-radius: 4px;
         padding: 5px;
         box-sizing: border-box;
         cursor: pointer;

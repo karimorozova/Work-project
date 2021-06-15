@@ -800,7 +800,7 @@
   .side {
     &__contacts,
     &__pm {
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       padding: 20px;
       width: 240px;
       height: fit-content;
@@ -809,7 +809,7 @@
     }
 
     &__info {
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       padding: 20px;
       width: 400px;
       box-sizing: border-box;
@@ -825,10 +825,10 @@
     min-width: 1000px;
     max-width: 1000px;
     box-sizing: border-box;
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
 
     &__project-icons {
-      color: #67573e;
+      color: #66563d;
       font-size: 16px;
       cursor: pointer;
     }
@@ -994,7 +994,7 @@
 
     &__main {
       padding: 30px 20px 20px 20px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       position: absolute;
       z-index: 9999;
       background: white;
@@ -1133,8 +1133,8 @@
   }
 
   input {
-    color: #67573e;
-    border: 1px solid #67573e;
+    color: #66563d;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     padding: 0 5px;
     outline: none;

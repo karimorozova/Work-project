@@ -442,7 +442,7 @@
             position: absolute;
             top: 44px;
             right: -115px;
-            border-radius: 5px;
+            border-radius: 4px;
             z-index: 5;
             overflow: hidden;
 
@@ -623,7 +623,7 @@
           font-size: 15px;
           box-shadow: 0 5px 8px rgba(103, 87, 62, 0.5);
           background-color: #D15F45;
-          border-radius: 18px;
+          border-radius: 4px;
           border: none;
           width: 180px;
           height: 43px;
@@ -787,7 +787,7 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        border-radius: 18px;
+        border-radius: 4px;
         box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
         margin-right: 36px;
         margin-bottom: 10px;

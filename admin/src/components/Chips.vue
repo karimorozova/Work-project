@@ -41,7 +41,7 @@ export default {
     line-height: 20px;
     border-radius: 4px;
     margin-right: 5px;
-    border: 1px solid #67573e;
+    border: 1px solid #c1bbb1;
   }
   .closebtn {
     padding-left: 10px;
@@ -53,7 +53,7 @@ export default {
   }
 
   .closebtn:hover {
-    color: #67573e;
+    color: #66563d;
   }
 }
 input::placeholder {
@@ -65,7 +65,7 @@ input::placeholder {
   font-size: 14px;
   border-radius: 4px;
   width: 65px;
-  border: 1px solid #67573e;
+  border: 1px solid #c1bbb1;
   background: transparent;
 }
 #myInput:focus {

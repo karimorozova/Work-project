@@ -49,7 +49,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
-        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         background-color: #fff;
       }
 
@@ -62,7 +62,7 @@
       }
 
       &__messages {
-        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         background-color: white;
         padding: 20px;
         border: 2px solid $orange;
@@ -107,7 +107,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
-        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         background-color: #fff;
       }
 
@@ -120,7 +120,7 @@
       }
 
       &__messages {
-        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         background-color: white;
         padding: 20px;
         border: 2px solid $orange;

@@ -90,7 +90,7 @@ export default {
     color: $main-color;
     margin-left: 20px;
     border: 1px solid $main-color;
-    border-radius: 15px;
+    border-radius: 4px;
     width: 250px;
     box-sizing: border-box;
     &__title {

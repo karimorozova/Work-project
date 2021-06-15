@@ -44,7 +44,7 @@ export default {
     width: 450px;
     display: flex;
     flex-direction: column;
-    border-radius: 10px;
+    border-radius: 4px;
     box-shadow: 0 0px 15px $main-color;
     padding: 10px;
     box-sizing: border-box;

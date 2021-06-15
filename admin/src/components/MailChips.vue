@@ -102,7 +102,7 @@
 <style lang="scss" scoped>
   .selectBox {
     margin: 10px 30px;
-    color: #67573E;
+    color: #66563d;
     z-index: 5555;
     position: relative;
 
@@ -115,7 +115,7 @@
     }
 
     &__body {
-      border: 1px solid #67573E;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       box-shadow: 0 10px 6px -6px #333;
       max-height: 260px;
@@ -137,7 +137,7 @@
       &-icon {
         height: 25px;
         width: 25px;
-        background: #67573E;
+        background: #66563d;
         color: white;
         border-radius: 50%;
         text-align: center;
@@ -154,10 +154,10 @@
   }
 
   .mailBox {
-    border-top: 1px solid #67573E;
-    border-bottom: 1px solid #67573E;
+    border-top: 1px solid #66563d;
+    border-bottom: 1px solid #66563d;
     display: flex;
-    color: #67573E;
+    color: #66563d;
 
 
     &__to {
@@ -182,7 +182,7 @@
         height: 50px;
         outline: none;
         border: none;
-        color: #67573E;
+        color: #66563d;
         font-size: 14px;
       }
 
@@ -195,7 +195,7 @@
     &__chips {
       padding: 5px 12px;
       margin-left: 10px;
-      border: 1px solid #67573E;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       min-height: 10px;
       margin-top: 10px;

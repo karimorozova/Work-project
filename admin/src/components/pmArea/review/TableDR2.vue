@@ -316,7 +316,7 @@
 
     &__action {
       position: relative;
-      width: 191px;
+      width: 200px;
       height: 30px;
       align-self: flex-end;
       margin-bottom: 20px;
@@ -455,7 +455,7 @@
       font-size: 14px;
       visibility: hidden;
       width: 220px;
-      background-color: #67573e;
+      background-color: #66563d;
       color: #fff;
       text-align: center;
       border-radius: 4px;
@@ -476,7 +476,7 @@
         transform: rotate(90deg);
         border-width: 5px;
         border-style: solid;
-        border-color: #67573e transparent transparent;
+        border-color: #66563d transparent transparent;
       }
     }
 

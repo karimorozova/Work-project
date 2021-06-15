@@ -47,7 +47,7 @@ export default {
         padding: 0 5px;
         outline: none;
         border: 1px solid $main-color;
-        border-radius: 5px;
+        border-radius: 4px;
         font-size: 14px;
         margin-top: 5px;
         &::-webkit-input-placeholder {

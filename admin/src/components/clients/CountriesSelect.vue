@@ -80,7 +80,7 @@ export default {
     position: absolute;
     width: 100%;
     overflow: hidden;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     box-sizing: border-box;
     z-index: 6;
@@ -94,8 +94,8 @@ export default {
             outline: none;
             border: none;
             padding: 5px 0 5px 5px;
-            color: #67573E;
-            box-shadow: inset 0 0 5px #67573E;
+            color: #66563d;
+            box-shadow: inset 0 0 5px #66563d;
         }
     }
     .drop {

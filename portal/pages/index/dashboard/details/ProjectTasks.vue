@@ -210,7 +210,7 @@
       width: 150px;
       background-color: $white;
       padding: 3px;
-      border-radius: 3px;
+      border-radius: 4px;
       margin-left: 22px;
       box-shadow: 0 2px 4px 0 rgba(103,87,62,.3), 0 2px 16px 0 rgba(103,87,62,.2);
       opacity: 0;

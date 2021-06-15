@@ -160,7 +160,7 @@ export default {
 }
 .drop-select {
     position: absolute;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     box-sizing: border-box;
     width: 100%;
@@ -203,7 +203,7 @@ export default {
 .checkbox {
     width: 13px;
     height: 13px;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     margin-right: 3px;
     .checked {
         width: 100%;
@@ -213,7 +213,7 @@ export default {
             content: '';
             position: absolute;
             width: 5px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 6px;
             left: 1px;
             transform: rotate(45deg);
@@ -222,7 +222,7 @@ export default {
             content: '';
             position: absolute;
             width: 6px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 5px;
             left: 3px;
             transform: rotate(-58deg);

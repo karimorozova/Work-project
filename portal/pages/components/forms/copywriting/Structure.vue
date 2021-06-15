@@ -79,7 +79,7 @@ export default {
         padding: 5px;
         box-sizing: border-box;
         border: 1px solid $main-color;
-        border-radius: 8px;
+        border-radius: 4px;
     }
 }
 

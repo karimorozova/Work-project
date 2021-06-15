@@ -209,7 +209,7 @@
 
     &__action {
       position: relative;
-      width: 191px;
+      width: 200px;
       height: 30px;
       align-self: flex-end;
       margin-bottom: 20px;

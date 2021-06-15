@@ -249,7 +249,7 @@
       &-item {
         display: flex;
         flex-direction: column;
-        width: 191px;
+        width: 200px;
       }
 
       &-title {
@@ -269,7 +269,7 @@
 
     &__main {
       display: flex;
-      width: 191px;
+      width: 200px;
       flex-direction: column;
     }
 
@@ -279,12 +279,12 @@
       height: 30px;
       background: #fff;
       margin-top: 3px;
-      width: 191px;
+      width: 200px;
     }
 
     &__input {
       color: $main-color;
-      width: 191px;
+      width: 200px;
       outline: none;
       border: 1px solid $main-color;
       border-radius: 4px;

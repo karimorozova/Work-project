@@ -145,7 +145,7 @@
     width: 67%;
     padding: 20px;
     margin: 0 20px 20px 20px;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: 0 0 10px #66563d9d;
     position: relative;
     @media (max-width: 1600px) {
       width: 70%;
@@ -164,7 +164,7 @@
       right: 0;
       width: 300px;
       border: 1px solid $main-color;
-      box-shadow: 0 0 10px #67573e9d;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 
     &__file-counter {

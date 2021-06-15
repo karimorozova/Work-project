@@ -56,7 +56,7 @@ export default {
     box-sizing: border-box;
     padding: 5px;
     border: 1px solid $main-color;
-    border-radius: 8px;
+    border-radius: 4px;
     width: 100%;
 }
 

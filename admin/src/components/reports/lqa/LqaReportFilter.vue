@@ -161,7 +161,7 @@
 
       &:hover {
         cursor: pointer;
-        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       }
 
       &:active {
@@ -187,7 +187,7 @@
     &__text {
       box-sizing: border-box;
       color: $main-color;
-      width: 191px;
+      width: 200px;
       height: 30px;
       padding: 0 5px;
       outline: none;
@@ -199,7 +199,7 @@
     &__drop {
       position: relative;
       height: 30px;
-      width: 191px;
+      width: 200px;
       margin-left: 8px;
     }
 

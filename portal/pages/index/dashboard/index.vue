@@ -105,7 +105,7 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      border-radius: 18px;
+      border-radius: 4px;
       box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       margin-right: 36px;
       margin-bottom: 10px;

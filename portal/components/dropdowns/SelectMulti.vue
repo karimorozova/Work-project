@@ -127,7 +127,7 @@
     position: absolute;
     width: 100%;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     overflow: hidden;
     box-sizing: border-box;
 
@@ -224,7 +224,7 @@
   }
 
   .select {
-    border-radius: 15px;
+    border-radius: 4px;
     width: 100%;
     height: 28px;
     display: flex;

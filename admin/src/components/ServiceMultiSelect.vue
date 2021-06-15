@@ -164,7 +164,7 @@ export default {
     width: 100%;
     background-color: white;
     z-index: 5;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     box-sizing: border-box;
     .drop {
@@ -209,7 +209,7 @@ export default {
 .checkbox {
     width: 13px;
     height: 13px;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     margin-right: 3px;
     .checked {
         width: 100%;
@@ -219,7 +219,7 @@ export default {
             content: '';
             position: absolute;
             width: 5px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 6px;
             left: 1px;
             transform: rotate(45deg);
@@ -228,7 +228,7 @@ export default {
             content: '';
             position: absolute;
             width: 6px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 5px;
             left: 4px;
             transform: rotate(-58deg);

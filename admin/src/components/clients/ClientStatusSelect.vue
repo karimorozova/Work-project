@@ -144,7 +144,7 @@ export default {
     position: absolute;
     box-sizing: border-box;
     width: 100%;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     z-index: 11;
     overflow: hidden;

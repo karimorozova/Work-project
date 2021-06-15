@@ -543,7 +543,7 @@ export default {
 
 .deliverablesActions{
   position: relative;
-  width: 191px;
+  width: 200px;
 
   &__drop-menu{
     height: 30px;
@@ -576,7 +576,7 @@ export default {
   width: 1000px;
   padding: 20px;
   margin-top: 40px;
-  box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
   position: relative;
 
   &__header{
@@ -631,7 +631,7 @@ export default {
   &__select {
     position: relative;
     height: 32px;
-    width: 191px;
+    width: 200px;
   }
 
   &-table {
@@ -659,7 +659,7 @@ export default {
 
     &__action {
       position: relative;
-      width: 191px;
+      width: 200px;
       height: 30px;
       align-self: flex-end;
       margin-bottom: 20px;
@@ -752,7 +752,7 @@ export default {
     padding: 20px;
     background: white;
     position: absolute;
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -809,7 +809,7 @@ export default {
     font-size: 14px;
     visibility: hidden;
     width: 220px;
-    background-color: #67573e;
+    background-color: #66563d;
     color: #fff;
     text-align: center;
     border-radius: 4px;
@@ -830,7 +830,7 @@ export default {
       transform: rotate(90deg);
       border-width: 5px;
       border-style: solid;
-      border-color: #67573e transparent transparent;
+      border-color: #66563d transparent transparent;
     }
   }
 
@@ -920,7 +920,7 @@ export default {
   }
   &__drop-menu {
     position: relative;
-    width: 191px;
+    width: 200px;
     height: 28px;
   }
   &__title {

@@ -43,7 +43,7 @@ export default {
     padding: 10px 5px;
     box-sizing: border-box;
     color: $main-color;
-    border-radius: 15px;
+    border-radius: 4px;
     border: none;
     outline: none;
     width: 270px;

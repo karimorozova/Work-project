@@ -21,7 +21,7 @@ export default {
 
 .help-info {
     border: 1px solid $main-color;
-    border-radius: 15px;
+    border-radius: 4px;
     margin-top: 20px;
     max-width: 250px;
     box-sizing: border-box;

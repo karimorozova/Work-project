@@ -320,7 +320,7 @@
 
     &__drop {
       position: relative;
-      width: 191px;
+      width: 200px;
       height: 28px;
     }
 
@@ -334,14 +334,19 @@
 
     input {
       font-size: 14px;
-      color: #67573e;
-      border: 1px solid #67573e;
+      color: #66563d;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       box-sizing: border-box;
-      padding: 0 5px;
+      padding: 0 8px;
       outline: none;
-      width: 191px;
-      height: 30px;
+      width: 200px;
+      height: 32px;
+      transition: .1s ease;
+
+      &:focus{
+        border: 1px solid #938877;
+      }
     }
 
     ::-webkit-input-placeholder {

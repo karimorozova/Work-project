@@ -88,7 +88,7 @@
 
   .pricelistDiscountChart {
     &__rate {
-      color: #67573e;
+      color: #66563d;
       border: none;
       width: 80%;
       background: inherit;

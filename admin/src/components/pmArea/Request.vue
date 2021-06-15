@@ -210,7 +210,7 @@ export default {
     }
     &__all-info {
         padding: 20px;
-        box-shadow: 0 0 10px #67573e9d;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
     &__info-row {
         width: 100%;
@@ -234,7 +234,7 @@ export default {
         border: 1px solid #68573E;
         outline: none;
         &:focus {
-            box-shadow: 0 0 5px #68573E;
+          box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         }
     }
     &__date {
@@ -256,10 +256,10 @@ export default {
     &__drop-menu {
         position: relative;
         height: 28px;
-        width: 191px;
+        width: 200px;
     }
     &__client-link {
-        width: 191px;
+        width: 200px;
         display: flex;
         justify-content: flex-start;
     }
@@ -277,7 +277,7 @@ export default {
         font-size: 14px;
         outline: none;
         &:focus {
-            box-shadow: 0 0 5px #68573E;
+          box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         }
     }
     &__textarea {
@@ -295,7 +295,7 @@ export default {
         outline: none;
         box-sizing: border-box;
         &:focus {
-            box-shadow: 0 0 5px #68573E;
+          box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         }
     }
     &__calendar-icon {

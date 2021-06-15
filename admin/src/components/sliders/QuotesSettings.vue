@@ -63,11 +63,11 @@ export default {
     // transform: translate(-50%);
     background-color: #fff;
     width: 175px;
-    box-shadow: 7px 1px 10px rgba(103, 87, 62, 0.4);
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     display: flex;
     flex-direction: column;
     font-family: Myriad400;
-    color: #67573e;
+    color: #66563d;
     font-size: 22px;
     transition: all 1s;
     span {

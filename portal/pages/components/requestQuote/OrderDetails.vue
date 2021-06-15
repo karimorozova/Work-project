@@ -76,7 +76,7 @@ export default {
     padding: 15px 0;
     color: $main-color;
     border: 1px solid $main-color;
-    border-radius: 15px;
+    border-radius: 4px;
     width: 250px;
     box-sizing: border-box;
     &__title {

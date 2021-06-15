@@ -235,7 +235,7 @@
     }
 
     &__icon {
-      color: #67573e;
+      color: #66563d;
       display: flex;
       height: 31px;
       align-items: center;

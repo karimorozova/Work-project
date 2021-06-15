@@ -56,7 +56,7 @@
     border-left: 3px solid transparent;
     border-right: 3px solid transparent;
     background-clip: content-box;
-    border-radius: 6px;
+    border-radius: 4px;
     min-height: 25px;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -69,7 +69,7 @@
     border-top: 3px solid transparent;
     border-bottom: 3px solid transparent;
     background-clip: content-box;
-    border-radius: 7px;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(103, 87, 62, 0.6);

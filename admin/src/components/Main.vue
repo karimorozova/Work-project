@@ -304,7 +304,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #67573e;
+    background-color: #66563d;
     position: fixed;
     height: 40px;
     width: 100%;
@@ -353,7 +353,7 @@
 
         .account-menu-wrapper {
           .account-block {
-            width: 191px;
+            width: 200px;
             height: 124px;
             background-color: #fff;
             box-shadow: 1px 1px 11px black;
@@ -379,7 +379,7 @@
               }
 
               .personal__data {
-                color: #67573e;
+                color: #66563d;
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
@@ -414,7 +414,7 @@
 
               .my_account {
                 font-size: 12px;
-                color: #67573e;
+                color: #66563d;
                 margin-left: 10px;
               }
 
@@ -439,7 +439,7 @@
 
               .sign_out {
                 font-size: 12px;
-                color: #67573e;
+                color: #66563d;
                 margin-left: 7%;
               }
 
@@ -526,7 +526,7 @@
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         transition: all 0.5s;
         z-index: 2;
         overflow: hidden;
@@ -622,7 +622,7 @@
   .additional {
     position: absolute;
     border: 2px solid $thead-background;;
-    color: #67573e;
+    color: #66563d;
     background-color: #fff;
     font-size: 16px;
     width: 100%;

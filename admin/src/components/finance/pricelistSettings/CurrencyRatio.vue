@@ -116,11 +116,11 @@ export default {
   }
 }
 input {
-  color: #67573e;
+  color: #66563d;
   height: 22px;
   border-radius: 4px;
   width: 35px;
-  border: 1px solid #67573e;
+  border: 1px solid #c1bbb1;
 }
 input {
   &::-webkit-inner-spin-button,

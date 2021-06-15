@@ -37,7 +37,7 @@
     justify-content: flex-start;
     border: 2px solid #f4f2f1;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 4px;
     cursor: pointer;
     color: $main-color;
 

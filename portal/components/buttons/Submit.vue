@@ -21,7 +21,7 @@ export default {
         height: 33px;
         color: $white;
         font-size: 14px;
-        border-radius: 10px;
+        border-radius: 4px;
         box-shadow: 0 3px 5px $brown-shadow;
         background-color: $orange;
         border: 1px solid $orange;

@@ -254,7 +254,7 @@
 
       &-label {
         font-size: 16px;
-        color: #67573E;
+        color: #66563d;
         margin-bottom: 0;
         margin-left: 6px;
       }

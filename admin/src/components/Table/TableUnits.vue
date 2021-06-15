@@ -138,7 +138,7 @@ export default {
     formatSizes(array) {
       let sizes = "";
       array.forEach((element) => {
-        sizes += `<span style="display:inline-flex;padding:0 10px;height:20px;font-size:14px;line-height:20px;border-radius:8px;margin-right:5px;border:1px solid #67573e" class="test">${element}</span>`;
+        sizes += `<span style="display:inline-flex;padding:0 10px;height:20px;font-size:14px;line-height:20px;border-radius:8px;margin-right:5px;border:1px solid #66563d" class="test">${element}</span>`;
       });
       return sizes;
     },

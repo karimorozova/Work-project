@@ -65,7 +65,7 @@ export default {
 
   &__drop-menu {
     position: relative;
-    width: 191px;
+    width: 200px;
     height: 30px;
   }
 }

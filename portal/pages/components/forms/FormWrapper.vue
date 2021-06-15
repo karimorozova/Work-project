@@ -17,7 +17,7 @@ export default {
 .form-wrapper {
     width: 682px;
     box-sizing: border-box;
-    border-radius: 15px;
+    border-radius: 4px;
     border: 1px solid $main-color;
     padding: 40px 80px 20px 80px;
     margin-bottom: 40px;

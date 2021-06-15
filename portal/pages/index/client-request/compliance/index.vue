@@ -529,7 +529,7 @@ export default {
 
 .order {
   &__files-item {
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #ddd;
     background-color: transparent;
     font-size: 12px;
@@ -670,13 +670,13 @@ export default {
     box-sizing: border-box;
     font-size: 14px;
     border: 1px solid #67573e;
-    border-radius: 5px;
+    border-radius: 4px;
   }
 
   &__part {
     padding: 20px 10px;
     border: 2px solid #f4f2f1;
-    border-radius: 10px;
+    border-radius: 4px;
     position: relative;
   }
 }
@@ -729,7 +729,7 @@ export default {
 input {
   color: #67573e;
   border: 1px solid #67573e;
-  border-radius: 5px;
+  border-radius: 4px;
   padding: 0 5px;
   outline: none;
   width: 191px;

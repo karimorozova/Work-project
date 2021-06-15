@@ -25,7 +25,7 @@
                 <animateTransform id="an_arrow" attributeName="transform" type="rotate" from="-10 100 100" :to="arrowTo" dur="1s" repeatCount="0" fill="freeze" />
             </path>
             <text class="center-text" x="100" y="100" fill="#D15F45" text-anchor="middle" alignment-baseline="central">{{currentVal}}</text>
-            <text class="bottom-text" x="100" y="190" fill="#67573E" text-anchor="middle" alignment-baseline="central">{{recordName}}</text>
+            <text class="bottom-text" x="100" y="190" fill="#66563d" text-anchor="middle" alignment-baseline="central">{{recordName}}</text>
         </svg>
         <div class="radial__num radial_right">{{ total }}<div>
     </div>

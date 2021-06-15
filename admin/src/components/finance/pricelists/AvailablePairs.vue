@@ -66,7 +66,7 @@ export default {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 5px 15px rgba(85, 55, 0, 0.5);
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         border-radius: 4px;
         background-color: #FFF;
         width: 400px;

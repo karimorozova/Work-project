@@ -220,7 +220,7 @@
   }
 
   &__input {
-    width: 191px;
+    width: 200px;
   }
 
   &__date {
@@ -269,7 +269,7 @@
   &__input-field {
     box-sizing: border-box;
     color: $main-color;
-    width: 191px;
+    width: 200px;
     height: 30px !important;
     padding-left: 5px;
     border: 1px solid $main-color;
@@ -280,7 +280,7 @@
 
   &__drop-menu {
     position: relative;
-    width: 191px;
+    width: 200px;
     height: 30px;
     box-sizing: border-box;
     z-index: 10;

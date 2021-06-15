@@ -43,7 +43,7 @@ module.exports.getCertificateTemplate = ({ project, task, deliveryTask, allLangu
 	      </div>
 	      <div class="ceo-container" style="float: right;width: 38%;margin-top: 160px;position: relative;">
 	         <div class="pangea-row" style="height: 2px;width: 210px;background: #333;position: absolute; top: 147px;"></div>
-	         <div class="ceo-image" style="width: 191px; margin-left: 12px;">
+	         <div class="ceo-image" style="width: 200px; margin-left: 12px;">
 	            <img src="${ stamp }" style="width: 100%;">
 	         </div>
 	            

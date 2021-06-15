@@ -112,7 +112,7 @@
 
   .project-action {
     padding: 20px;
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     box-sizing: border-box;
     width: 400px;
     margin-top: 40px;
@@ -122,7 +122,7 @@
 
     &__dropBody{
       position: relative;
-      width: 191px;
+      width: 200px;
       height: 30px;
       margin-bottom: 20px;
     }
@@ -143,7 +143,7 @@
     }
 
     &__text-input {
-      width: 191px;
+      width: 200px;
       margin-top: 5px;
       border-radius: 4px;
       border: 1px solid #68573e;
@@ -166,7 +166,7 @@
     }
 
     &__drop-menu {
-      width: 191px;
+      width: 200px;
       height: 28px;
       position: relative;
       margin-bottom: 20px;
@@ -227,7 +227,7 @@
         &:checked {
           + {
             .slider {
-              background-color: #67573e;
+              background-color: #66563d;
 
               &:before {
                 -webkit-transform: translateX(26px);

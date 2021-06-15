@@ -163,7 +163,7 @@ export default {
 .drop-select {
   position: absolute;
   width: 100%;
-  border: 1px solid #67573E;
+  border: 1px solid #c1bbb1;
   border-radius: 4px;
   overflow: hidden;
   flex-direction: column;
@@ -174,7 +174,7 @@ export default {
     overflow-y: auto;
     overflow-x: hidden;
     background-color: #FFF;
-    border-top: 1px solid #67573E;
+    border-top: 1px solid #66563d;
     box-sizing: border-box;
     z-index: 10;
 
@@ -182,7 +182,7 @@ export default {
       width: 100%;
       box-sizing: border-box;
       padding: 6px 0 6px 5px;
-      color: #67573E;
+      color: #66563d;
       outline: none;
       box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
       border: 1px solid rgba(104, 87, 62, 0.3);

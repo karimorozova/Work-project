@@ -374,8 +374,7 @@
     }
 
     &__active {
-      /*padding: 5px;*/
-      box-shadow: inset 0 0 5px $brown-shadow;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 
     &__input {
@@ -405,7 +404,7 @@
       width: 300px;
       padding: 0 20px;
       border: 1px solid $orange;
-      box-shadow: 0 0 5px $orange;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       background-color: $white;
       font-weight: bolder;
       font-size: 14px;
@@ -432,7 +431,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 0 10px $main-color;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       background-color: $white;
       z-index: 20;
 

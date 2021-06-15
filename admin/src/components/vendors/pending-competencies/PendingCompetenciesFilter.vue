@@ -147,7 +147,7 @@
     &__text {
       box-sizing: border-box;
       color: $main-color;
-      width: 191px;
+      width: 200px;
       height: 32px;
       padding: 0 5px;
       outline: none;
@@ -159,7 +159,7 @@
     &__drop {
       position: relative;
       height: 32px;
-      width: 191px;
+      width: 200px;
       margin-left: 8px;
     }
 

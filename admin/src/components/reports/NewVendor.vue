@@ -174,7 +174,7 @@ export default {
     padding: 20px;
     box-sizing: border-box;
     border: 1px solid $main-color;
-    box-shadow: 0 0 10px $main-color;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     &__close {
         position: absolute;
         top: 0;
@@ -201,11 +201,11 @@ export default {
     }
     &__drop {
         position: relative;
-        width: 191px;
+        width: 200px;
         height: 30px;
     }
     &__text {
-        width: 191px;
+        width: 200px;
         height: 30px;
         box-sizing: border-box;
         padding: 0 5px;

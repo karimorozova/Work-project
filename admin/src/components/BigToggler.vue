@@ -49,7 +49,7 @@ export default {
         background: -webkit-linear-gradient(top, rgba(238, 238, 238, 0.76) 11%,rgba(170, 170, 170,1) 100%);
         background: linear-gradient(to bottom, rgb(238, 238, 238) 11%,rgba(170, 170, 170,1) 100%);
         filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
-        box-shadow: 0 0 3px rgba(102, 86, 61, 0.6);
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         z-index: 2;
         transition: all 0.3s;        
     }

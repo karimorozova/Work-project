@@ -95,7 +95,7 @@
       color: $main-color;
       padding: 0 10px;
       box-sizing: border-box;
-      border-radius: 8px;
+      border-radius: 4px;
       border: 2px solid #dedede;
       margin-top: 20px;
 
@@ -120,7 +120,7 @@
     &__send {
       width: 165px;
       height: 36px;
-      border-radius: 8px;
+      border-radius: 4px;
       font-size: 18px;
       background-color: #4BA5A5;
       color: #fff;

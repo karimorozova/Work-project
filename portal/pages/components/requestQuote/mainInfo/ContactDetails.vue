@@ -89,7 +89,7 @@ export default {
         box-sizing: border-box;
         padding: 10px 5px;
         border: 1px solid $main-color;
-        border-radius: 10px;
+        border-radius: 4px;
         outline: none;
         margin: 5px 0 20px 0;
         &:focus {

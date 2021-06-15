@@ -37,7 +37,7 @@ export default {
     }
     &__text {
         border: 1px solid $main-color;
-        border-radius: 15px;
+        border-radius: 4px;
         overflow: hidden;
         display: flex;
     }

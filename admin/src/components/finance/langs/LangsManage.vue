@@ -134,11 +134,11 @@ export default {
         top: -5px;
         cursor: pointer;
         padding: 1px 5px;
-        border: 1px solid #67573E;
+        border: 1px solid #c1bbb1;
         border-radius: 4px;
         transition: all 0.2s;
         &:hover {
-            background-color: #67573E;
+            background-color: #66563d;
             color: #FFF;
         }
     }

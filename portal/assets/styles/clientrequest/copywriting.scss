@@ -15,7 +15,7 @@
         align-items: center;
         padding: 40px 80px 0 80px;
         border: 1px solid #67563D;
-        border-radius: 15px;;
+        border-radius: 4px;;
         color: #67563D;
         position: relative;
 
@@ -47,7 +47,7 @@
                                 height: 28px;
                                 padding-left: 5px;
                                 padding-right: 5px;
-                                border-radius: 7px;
+                                border-radius: 4px;
                                 border: 1px solid rgba(102, 86, 61, 0.5);
                                 outline: none;
                                 font-family: Myriad400;
@@ -76,7 +76,7 @@
                                 font-size: 14px;
                                 text-align: center;
                                 opacity: 0.7;
-                                border-radius: 10px;
+                                border-radius: 4px;
                                 border: none;
                                 padding: 8px;
                                 width: 190px;
@@ -120,7 +120,7 @@
                             align-items: center;
                             color: #67563D;
                             border: 1px solid #67563D;
-                            border-radius: 16px;
+                            border-radius: 4px;
                             padding: 7px;
                             background-color: #fff;
                             cursor: pointer;
@@ -161,7 +161,7 @@
                         display: flex;
                         flex-direction: column;
                         box-shadow: 0 0 10px rgba(102, 86, 61, 0.6);
-                        border-radius: 10px;
+                        border-radius: 4px;
                         .select-text {
                             position: relative;
                             display: flex;
@@ -267,7 +267,7 @@
                                     }
                                     &:hover {
                                         box-shadow: 0px 0 15px rgba(102, 86, 61, 0.3);
-                                        border-radius: 5px;
+                                        border-radius: 4px;
                                         span {
                                             transition: all 0.2s;
                                             transform: translateX(3px);
@@ -367,7 +367,7 @@
                     margin-bottom: 20px;
                     .ta-block2 {
                         font-family: Myriad400;
-                        border-radius: 8px;
+                        border-radius: 4px;
                         outline: none;
                         width: 98%;
                         padding-top: 4px;
@@ -408,7 +408,7 @@
                 .in-block3 {
                     input {
                         font-family: Myriad400;
-                        border-radius: 8px;
+                        border-radius: 4px;
                         outline: none;
                         width: 98%;
                         border: 1px solid #bfb09d;
@@ -425,7 +425,7 @@
                 .in-block4 {
                     input {
                         font-family: Myriad400;
-                        border-radius: 8px;
+                        border-radius: 4px;
                         outline: none;
                         width: 98%;
                         border: 1px solid #bfb09d;
@@ -469,7 +469,7 @@
                                 width: 55%;
                                     textarea {
                                         font-family: Myriad400;
-                                        border-radius: 8px;
+                                        border-radius: 4px;
                                         outline: none;
                                         width: 100%;
                                         border: 1px solid #bfb09d;
@@ -487,7 +487,7 @@
                                     border: 0;
                                     width: 114px;
                                     height: 40px;
-                                    border-radius: 12px;
+                                    border-radius: 4px;
                                     background-color: #D15F45;
                                     box-shadow: 1px 1px 5px rgba(102, 86, 61, 0.6);
                                     font-size: 14px;
@@ -580,7 +580,7 @@
                                 margin-bottom: 12px;
                             }
                             .in {
-                                border-radius: 12px;
+                                border-radius: 4px;
                                 outline: none;
                                 border-style: none;
                                 border: 1px solid #66563D;
@@ -610,7 +610,7 @@
                                 position: relative;
                                 width: 65%;
                                 padding: 11px 30px;
-                                border-radius: 12px;
+                                border-radius: 4px;
                                 -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
                                 box-shadow: 0 3px 5px rgba(102, 86, 61, 0.6);
                                 background-color: #D15F45;
@@ -686,7 +686,7 @@
                     .textarea_vis {
                         font-family: Myriad400;
                         display: block;
-                        border-radius: 8px;
+                        border-radius: 4px;
                         border-style: ridge;
                         padding: 20px 12px;
                         margin-left: 10px;
@@ -769,7 +769,7 @@
                         height: 28px;
                         margin-left: 10px;
                         border: 1px solid rgba(102, 86, 61, 0.7);
-                        border-radius: 5px;
+                        border-radius: 4px;
                         font-family: Myriad400;
                         outline: none;        
                     }
@@ -903,7 +903,7 @@
                             height: 28px;
                             margin-left: 10px;
                             border: 1px solid rgba(102, 86, 61, 0.7);
-                            border-radius: 5px;
+                            border-radius: 4px;
                             font-family: Myriad400;
                             outline: none;        
                         }
@@ -1034,7 +1034,7 @@
                             }
                             input {
                                 width: 75%;
-                                border-radius: 10px;
+                                border-radius: 4px;
                                 outline: none;
                                 border: 1px solid #66563D;
                                 height: 24px;
@@ -1059,7 +1059,7 @@
                                 width: 164px;
                                 height: 40px;
                                 border: none;
-                                border-radius: 10px;
+                                border-radius: 4px;
                                 margin-top: 15px;
                                 cursor: pointer;
                             }
@@ -1081,7 +1081,7 @@
 
         .empty-check {
             border: 1px solid #bfb09d;
-            border-radius: 18px;
+            border-radius: 4px;
             width: 16px;
             height: 16px;
             margin: 10px;
@@ -1093,7 +1093,7 @@
         .check-sel {
             width: 12px;
             height: 12px;
-            border-radius: 12px;
+            border-radius: 4px;
             background-color: #67563D;
             border-radius: 14px;
         }
@@ -1116,7 +1116,7 @@ transition: all 0.7s;
 margin-left: 30px;
 padding-bottom: 20px;
 border: 1px solid #66563D;
-border-radius: 15px;
+border-radius: 4px;
 position: sticky;
 top: 7px;
 right: 20px;
@@ -1302,7 +1302,7 @@ align-items: center;
             height: 28px;
             margin-left: 10px;
             border: 1px solid rgba(102, 86, 61, 0.7);
-            border-radius: 5px;
+            border-radius: 4px;
             font-family: Myriad400;
             outline: none;        
         }

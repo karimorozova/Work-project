@@ -212,7 +212,7 @@ export default {
     background-color: white;
     z-index: 5;
     box-sizing: border-box;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     .drop {
         font-size: 14px;
@@ -261,14 +261,14 @@ export default {
         z-index: 4;
     }
     .all-projects__filters & {
-        border: 1px solid #67573E;
+        border: 1px solid #c1bbb1;
         overflow: hidden;
     }
     .search {
         width: 100%;
         box-sizing: border-box;
         padding: 5px 0 5px 5px;
-        color: #67573E;
+        color: #66563d;
         outline: none;
         box-shadow: inset 0 0 5px rgba(104, 87, 62, 0.5);
         border: 1px solid rgba(104, 87, 62, 0.3);
@@ -278,7 +278,7 @@ export default {
 .checkbox {
     width: 13px;
     height: 13px;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     margin-right: 3px;
     .checked {
         width: 100%;
@@ -288,7 +288,7 @@ export default {
             content: '';
             position: absolute;
             width: 5px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 6px;
             left: 1px;
             transform: rotate(45deg);
@@ -297,7 +297,7 @@ export default {
             content: '';
             position: absolute;
             width: 6px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             top: 5px;
             left: 4px;
             transform: rotate(-58deg);

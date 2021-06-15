@@ -1139,11 +1139,11 @@ input:disabled {
   margin-right: 20px;
 
   .cell.beforeToday {
-    color: #67573e;
+    color: #66563d;
   }
 
   .cell.day {
-    color: #67573e;
+    color: #66563d;
   }
 
   .cell.today {
@@ -1178,7 +1178,7 @@ input:disabled {
 }
 
 .datepicker-custom-mod {
-  width: 191px;
+  width: 200px;
 }
 
 .steps__custom-input {

@@ -73,7 +73,7 @@
           font-size: 20px;
           color: #66563d;
           padding-left: 3%;
-          border-radius: 8px;
+          border-radius: 4px;
           border: 2px solid #dedede;
           margin: 1% 0 3% 9%;
           font-family: Myriad400;
@@ -102,7 +102,7 @@
         button {
           width: 142px;
           height: 35px;
-          border-radius: 8px;
+          border-radius: 4px;
           font-size: 20px;
           background-color: #84ca8e;
           color: #66563d;

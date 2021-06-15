@@ -414,7 +414,7 @@
     &__general {
       margin-top: 97px;
       width: 390px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
     }
 
@@ -422,7 +422,7 @@
       margin-top: 40px;
       width: 390px;
       height: 270px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
   }
 
@@ -432,7 +432,7 @@
 
     &__gen-info, &__rates, &__documents, &__contacts-info, &__sales, &__billing {
       padding: 20px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       box-sizing: border-box;
     }
 
@@ -481,7 +481,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 0 10px #67573E;
+    box-shadow: 0 0 10px #66563d;
     background-color: #FFF;
     z-index: 20;
 
@@ -497,7 +497,7 @@
   }
 
   input {
-    color: #67573E;
+    color: #66563d;
   }
 
 </style>

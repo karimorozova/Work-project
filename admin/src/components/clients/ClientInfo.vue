@@ -891,7 +891,7 @@
       margin-top: 66px;
       width: 390px;
       height: 270px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
 
     }
@@ -901,8 +901,7 @@
       margin-left: 40px;
       width: 390px;
       height: 270px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
   }
 
@@ -919,7 +918,7 @@
 
     &__notes {
       box-sizing: border-box;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 
     &__radio {
@@ -937,14 +936,16 @@
     &__documents,
     &__billing {
       padding: 20px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       box-sizing: border-box;
+      background: white;
+      border-radius: 4px;
     }
 
     &__rates {
       padding: 0;
       padding: 20px;
-      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       position: relative;
       box-sizing: border-box;
     }
@@ -996,7 +997,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 0 10px #67573e;
+    box-shadow: 0 0 10px #66563d;
     background-color: #fff;
     z-index: 20;
 
@@ -1012,6 +1013,6 @@
   }
 
   input {
-    color: #67573e;
+    color: #66563d;
   }
 </style>

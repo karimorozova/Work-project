@@ -219,7 +219,7 @@
     margin-top: 3px;
 
     a{
-      color: #67573e;
+      color: #66563d;
       text-decoration: none;
 
       .icon-link {

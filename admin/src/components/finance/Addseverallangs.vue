@@ -291,7 +291,7 @@ export default {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 5px 15px rgba(85, 55, 0, 0.5);
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         border-radius: 4px;
         background-color: #FFF;
         width: 690px;
@@ -319,7 +319,7 @@ export default {
         padding-left: 70px;
         padding-top: 30px;
         margin-left: 10px;
-        border-top:1px solid #67573E;
+        border-top:1px solid #66563d;
     }
     &__close {
         position: relative;
@@ -339,11 +339,11 @@ export default {
         top: -5px;
         cursor: pointer;
         padding: 1px 5px;
-        border: 1px solid #67573E;
+        border: 1px solid #c1bbb1;
         border-radius: 4px;
         transition: all 0.2s;
         &:hover {
-            background-color: #67573E;
+            background-color: #66563d;
             color: #FFF;
         }
     }
@@ -386,7 +386,7 @@ export default {
     }
     &__drop-menu {
         position: relative;
-        width: 191px;
+        width: 200px;
         height: 32px;
     }
     &__button {
@@ -401,11 +401,11 @@ export default {
         border-radius: 4px;
         border: none;
         outline: none;
-        box-shadow: 0 5px 10px rgba(103, 87, 62, 0.6);
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         margin-bottom: 25px;
         cursor: pointer;
         &:active {
-            box-shadow: 0 0 5px rgba(103, 87, 62, 0.6);
+          box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         }
     }
 }

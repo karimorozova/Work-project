@@ -143,14 +143,14 @@
       border: 1px solid $cell-border;
       outline: none;
       width: 65%;
-      border-radius: 5px;
+      border-radius: 4px;
     }
 
     &__drop-menu {
       position: relative;
       height: 25px;
       width: 65%;
-      border-radius: 5px;
+      border-radius: 4px;
 
     }
 

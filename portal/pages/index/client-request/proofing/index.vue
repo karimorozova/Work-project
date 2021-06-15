@@ -333,7 +333,7 @@
       }
       padding-bottom: 20px;
       border: 1px solid;
-      border-radius: 15px;
+      border-radius: 4px;
       position: sticky;
       top: 7px;
       right: 20px;
@@ -415,7 +415,7 @@
           height: 28px;
           padding-left: 5px;
           padding-right: 5px;
-          border-radius: 7px;
+          border-radius: 4px;
           border: 1px solid rgba(102, 86, 61, 0.6);
         }
         label {
@@ -433,7 +433,7 @@
           height: 34px;
           padding: 5px;
           border: 1px solid rgba(102, 86, 61, 0.6);
-          border-radius: 10px;
+          border-radius: 4px;
         }
         .date {
           display: flex;
@@ -673,7 +673,7 @@
     width: 170px;
     height: 35px;
     border: none;
-    border-radius: 10px;
+    border-radius: 4px;
     margin-top: 15px;
     box-shadow: 0 3px 5px rgba(102, 86, 61, 0.6);
     font-size: 15px;

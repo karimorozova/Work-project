@@ -263,7 +263,7 @@
     width: 400px;
     margin-top: 40px;
     padding: 20px;
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
 
     &__titleFinance{
       font-size: 21px;
@@ -323,7 +323,7 @@
 
     &__dashboard {
       display: flex;
-      border: 1px solid #67573E;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       align-items: center;
       margin-bottom: 20px;
@@ -333,7 +333,7 @@
       width: 33%;
       display: flex;
       justify-content: center;
-      border-left: 1px solid #67573E;
+      border-left: 1px solid #66563d;
       padding: 6px 3px;
 
       &:first-child {
@@ -440,11 +440,11 @@
   }
 
   input {
-    color: #67573e;
+    color: #66563d;
     height: 22px;
     border-radius: 4px;
     width: 70px;
-    border: 1px solid #67573e;
+    border: 1px solid #c1bbb1;
   }
 
   input {

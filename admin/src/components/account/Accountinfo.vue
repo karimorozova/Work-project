@@ -47,7 +47,7 @@ export default {
 .account {
     position: relative;
     width: 80%;
-    color: #67573e;
+    color: #66563d;
     &__form {
         padding: 20px 40px;
         display: flex;

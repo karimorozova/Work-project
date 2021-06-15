@@ -207,7 +207,7 @@
 
   .reassignment {
     background-color: $white;
-    box-shadow: 0 0 10px #67573e9d;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     padding: 20px;
     width: 400px;
     box-sizing: border-box;
@@ -227,7 +227,7 @@
     &__drop {
       position: relative;
       height: 28px;
-      width: 191px;
+      width: 200px;
     }
 
     &__check {
@@ -251,7 +251,7 @@
       transition: all 0.2s;
 
       &:focus {
-        box-shadow: 0 0 5px $light-brown;
+        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       }
     }
 

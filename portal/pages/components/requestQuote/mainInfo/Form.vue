@@ -54,7 +54,7 @@ export default {
     box-sizing: border-box;
     position: relative;
     box-shadow: 0 0 5px $main-color;
-    border-radius: 15px;
+    border-radius: 4px;
     margin-bottom: 40px;
     &__submit {
         text-align: center;

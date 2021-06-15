@@ -64,7 +64,7 @@ export default {
     width: 100%;
     box-sizing: border-box;
     box-shadow: 0 2px 15px $brown-shadow;
-    border-radius: 10px;
+    border-radius: 4px;
     position: absolute;
     background-color: $white;
     z-index: 5;
@@ -99,7 +99,7 @@ export default {
         align-items: center;
         cursor: pointer;
         &:hover {
-            border-radius: 10px;
+            border-radius: 4px;
             box-shadow: 0 0 5px $brown-shadow;
             .multi-langs__language {
                 padding-left: 3px;

@@ -44,7 +44,7 @@ export default {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -56,7 +56,7 @@ export default {
     border-radius: 50%;
   }
   &_checked {
-    background-color: #67573E;
+    background-color: #66563d;
   }
 }
 

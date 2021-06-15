@@ -1099,7 +1099,7 @@ export default {
     font-size: 18px;
     text-align: center;
     opacity: 0.7;
-    border-radius: 10px;
+    border-radius: 4px;
     border: none;
     padding: 8px;
     width: 150px;

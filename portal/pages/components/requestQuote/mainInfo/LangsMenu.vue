@@ -74,7 +74,7 @@ export default {
 .langs-menu {
     width: 100%;
     box-shadow: 0 2px 10px $main-color;
-    border-radius: 12px;
+    border-radius: 4px;
     overflow: hidden;
     &:hover {
         box-shadow: 0 1px 10px $main-color;
@@ -108,7 +108,7 @@ export default {
         }
     }
     &__item {
-        border-radius: 3px;
+        border-radius: 4px;
         box-sizing: border-box;
         cursor: pointer;
         transition: all 0.2s;

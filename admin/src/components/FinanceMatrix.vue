@@ -63,7 +63,7 @@ export default {
 @import "../assets/scss/colors.scss";
 .finance-matrix {
     &__rate {
-    color: #67573e;
+    color: #66563d;
     border: none;
     background: inherit;
     outline: none;

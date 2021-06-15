@@ -96,7 +96,7 @@ body {
       font-size: 20px;
       color: #66563d;
       padding-left: 3%;
-      border-radius: 8px;
+      border-radius: 4px;
       border: 2px solid #dedede;
       margin-bottom: 3%;
       margin-left: 4%;
@@ -138,7 +138,7 @@ body {
         background-color: #84ca8e;
         color: #66563d;
         opacity: 0.4;
-        border-radius: 8px;
+        border-radius: 4px;
         font-size: 20px;
       }
       .changeRegisterButton {

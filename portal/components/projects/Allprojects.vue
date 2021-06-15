@@ -124,7 +124,7 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      border-radius: 18px;
+      border-radius: 4px;
       box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
       margin-bottom: 10px;
       padding: 0 14px;
@@ -137,7 +137,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-radius: 18px;
+      border-radius: 4px;
       padding: 20px;
       cursor: pointer;
       font-size: 18px;

@@ -291,7 +291,7 @@ export default {
 
     &:hover {
       cursor: pointer;
-      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 
     &:active {
@@ -300,7 +300,7 @@ export default {
 }
 
 .details {
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -318,7 +318,7 @@ export default {
         .photo-wrap {
             width: 180px;
             height: 157px;
-            border: 1px solid #67573E;
+            border: 1px solid #c1bbb1;
             position: relative;
             overflow: hidden;
             display: flex;
@@ -418,7 +418,7 @@ export default {
     width: 240px;
     height: 28px;
     padding: 0 5px;
-    border: 1px solid #67573E;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     outline: none;
 }
@@ -431,7 +431,7 @@ textarea.non-personal {
     height: 60px;
     resize: none;
     padding-top: 5px;
-    color: #67573E;
+    color: #66563d;
 }
 
 ::-webkit-input-placeholder {
@@ -449,7 +449,7 @@ textarea.non-personal {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 0 10px #67573E;
+    box-shadow: 0 0 10px #66563d;
     background-color: #FFF;
     z-index: 20;
     p {
@@ -463,7 +463,7 @@ textarea.non-personal {
 }
 
 input {
-    color: #67573E;
+    color: #66563d;
 }
 
 </style>
