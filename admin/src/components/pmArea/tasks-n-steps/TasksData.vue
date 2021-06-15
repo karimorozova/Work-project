@@ -377,7 +377,7 @@
       margin-top: 20px;
       border: 2px solid #938676;
       padding: 20px 15px;
-      border-radius: 10px;
+      border-radius: 4px;
 
       &-title {
         font-size: 18px;
@@ -406,9 +406,9 @@
       padding: 20px 15px;
       width: 49%;
       border: 2px solid #938676;
-      border-radius: 2px;
+      border-radius: 4px;
       box-sizing: border-box;
-      border-radius: 10px;
+      border-radius: 4px;
 
       &-title {
         font-size: 18px;

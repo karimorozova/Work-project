@@ -98,8 +98,8 @@ function generateTemplateForAcceptQuote(obj, link) {
             Heads up! The action cannot be undone.
         </p>
         <div class="btn-row" style="display: flex;justify-content: center;">
-            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Accept</div></a>
-            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
+            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Accept</div></a>
+            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
         </div>
     </div>
 </div>`
@@ -171,8 +171,8 @@ function generateTemplateForRejectQuote(obj, link) {
             Heads up! The action cannot be undone.
         </p>
         <div class="btn-row" style="display: flex;justify-content: center;">
-            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Reject</div></a>
-            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
+            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Reject</div></a>
+            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
         </div>
     </div>
 </div>`
@@ -394,8 +394,8 @@ function generateTemplateForTasksAcceptOrRejectQuote(obj, tasks, prop, link) {
             Heads up! The action cannot be undone.
         </p>
         <div class="btn-row" style="display: flex;justify-content: center;">
-            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">${ btnName }</div></a>
-            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
+            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">${ btnName }</div></a>
+            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
         </div>
     </div>
 </div>`
@@ -546,8 +546,8 @@ function generateTemplateForTasksAcceptOrRejectVendor(obj, step, prop, link) {
         </div>
 	     	${ description }
         <div class="btn-row" style="display: flex;justify-content: center;">
-            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">${ btnName }</div></a>
-            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 8px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
+            <a href="${ link }" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">${ btnName }</div></a>
+            <a href="" class="no_underline" style="text-decoration: none;"><div class="button" style="text-align: center;line-height: 32px;width: 165px;height: 32px;border-radius: 4px;font-size: 16px;color: #fff;background-color: #D15F45;outline: none;border: none;transition: .1s ease;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);margin-right: 20px;">Cancel</div></a>
         </div>
     </div>
 </div>`

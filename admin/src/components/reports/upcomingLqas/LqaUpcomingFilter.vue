@@ -137,7 +137,7 @@ export default {
     height: 34px;
     color: #fff;
     font-size: 14px;
-    border-radius: 10px;
+    border-radius: 4px;
     box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
     background-color: #D15F45;
     border: 1px solid #D15F45;
@@ -176,7 +176,7 @@ export default {
     padding: 0 5px;
     outline: none;
     border: 1px solid $main-color;
-    border-radius: 5px;
+    border-radius: 4px;
     margin-left: 5px;
   }
 

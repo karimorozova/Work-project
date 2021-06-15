@@ -31,7 +31,7 @@ export default {
   width: 100%;
   height: 14px;
   background-color: #e5e5e5;
-  border-radius: 8px;
+  border-radius: 4px;
   position: relative;
   &__filler {
     background-color: $orange;

@@ -73,8 +73,8 @@
 
         template(slot="display" slot-scope="{ row, index }")
           .client-api__data.client-api_centered(:class="{'client-api_active': currentActive === index}")
-            img.client-api__checkbox(v-if="row.isDisplay" src="../../assets/images/selected-checkbox.png" @click="toggleActive(index)" :class="{'client-api_opacity': currentActive === index}")
-            img.client-api__checkbox(v-else src="../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'client-api_opacity': currentActive === index}")
+            img.client-api__checkbox(v-if="row.isDisplay" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'client-api_opacity': currentActive === index}")
+            img.client-api__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'client-api_opacity': currentActive === index}")
 
         template(slot="icons" slot-scope="{ row, index }")
           .client-api__icons

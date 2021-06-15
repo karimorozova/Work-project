@@ -111,12 +111,12 @@
       background: white;
       width: 100%;
       z-index: 9000;
-      border-radius: 5px;
+      border-radius: 4px;
     }
 
     &__body {
       border: 1px solid #67573E;
-      border-radius: 5px;
+      border-radius: 4px;
       box-shadow: 0 10px 6px -6px #333;
       max-height: 260px;
       overflow-y: auto;
@@ -196,7 +196,7 @@
       padding: 5px 12px;
       margin-left: 10px;
       border: 1px solid #67573E;
-      border-radius: 5px;
+      border-radius: 4px;
       min-height: 10px;
       margin-top: 10px;
       width: fit-content;

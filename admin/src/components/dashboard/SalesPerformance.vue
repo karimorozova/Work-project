@@ -318,7 +318,7 @@ export default {
   }
   &__input {
     border: 1px solid $light-brown;
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
     padding: 2px 5px;
     width: 400px;

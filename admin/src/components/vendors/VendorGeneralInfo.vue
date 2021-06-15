@@ -290,7 +290,7 @@ export default {
     font-size: 14px;
     color: #67573e;
     border: 1px solid #67573e;
-    border-radius: 5px;
+    border-radius: 4px;
     padding: 0 5px;
     outline: none;
     width: 191px;
@@ -304,7 +304,7 @@ export default {
 
   &_error-shadow {
     box-shadow: 0 0 5px red;
-    border-radius: 5px;
+    border-radius: 4px;
   }
 }
 

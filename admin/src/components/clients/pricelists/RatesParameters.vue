@@ -217,7 +217,7 @@
   input {
     color: #67573e;
     height: 22px;
-    border-radius: 5px;
+    border-radius: 4px;
     width: 70px;
     border: 1px solid #67573e;
   }

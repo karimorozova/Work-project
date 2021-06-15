@@ -187,7 +187,7 @@
       height: 71px;
       width: 185px;
       border: 1px solid #67573e;
-      border-radius: 5px;
+      border-radius: 4px;
       outline: none;
       resize: none;
 
@@ -240,7 +240,7 @@
       input {
         color: #67573e;
         border: 1px solid #67573e;
-        border-radius: 5px;
+        border-radius: 4px;
         padding: 0 5px;
         outline: none;
         width: 191px;

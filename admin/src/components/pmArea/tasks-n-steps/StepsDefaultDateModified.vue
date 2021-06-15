@@ -239,7 +239,7 @@
     border: 1px solid #938676;
     margin-top: 40px;
     position: relative;
-    border-radius: 5px;
+    border-radius: 4px;
     padding: 10px 15px 5px;
 
     &__input {
@@ -249,7 +249,7 @@
     &__drop-menu {
       position: relative;
       width: 191px;
-      border-radius: 5px;
+      border-radius: 4px;
       height: 30px;
       background: #fff;
     }

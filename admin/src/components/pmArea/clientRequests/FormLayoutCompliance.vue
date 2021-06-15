@@ -1123,7 +1123,7 @@
 
   textarea {
     width: 100%;
-    border-radius: 10px;
+    border-radius: 4px;
     border: 1px solid #68573E;
     padding: 5px;
     color: #68573E;
@@ -1135,7 +1135,7 @@
   input {
     color: #67573e;
     border: 1px solid #67573e;
-    border-radius: 5px;
+    border-radius: 4px;
     padding: 0 5px;
     outline: none;
     width: 240px;

@@ -212,7 +212,7 @@ export default {
         color: $main-color;
         outline: none;
         border: 1px solid $main-color;
-        border-radius: 5px;
+        border-radius: 4px;
     }
     &__error-message {
         color: $red;

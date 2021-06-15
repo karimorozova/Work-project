@@ -472,7 +472,7 @@
       padding: 0 5px;
       height: 38px;
       width: 459px;
-      border-radius: 5px;
+      border-radius: 4px;
       color: #68573E;
       border: 1px solid #68573E;
       outline: none;
@@ -512,7 +512,7 @@
       width: 179px;
       height: 28px;
       border: 1px solid #68573E;
-      border-radius: 5px;
+      border-radius: 4px;
       padding: 0 5px;
       color: #68573E;
       font-size: 14px;
@@ -526,7 +526,7 @@
       width: 179px;
       height: 28px;
       border: 1px solid #68573E;
-      border-radius: 5px;
+      border-radius: 4px;
       padding: 0 5px;
       color: #68573E;
       font-size: 14px;
@@ -543,7 +543,7 @@
     &__text {
       width: 100%;
       margin-top: 4px;
-      border-radius: 10px;
+      border-radius: 4px;
       border: 1px solid #68573E;
       padding: 5px;
       color: #68573E;

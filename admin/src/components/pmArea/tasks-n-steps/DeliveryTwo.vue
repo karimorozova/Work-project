@@ -505,7 +505,7 @@
 
     &__textarea {
       border: 2px solid #c5bfb5;
-      border-radius: 8px;
+      border-radius: 4px;
       width: 100%;
       heigth: 60px;
     }

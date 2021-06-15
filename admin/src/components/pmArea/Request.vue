@@ -229,7 +229,7 @@ export default {
         padding: 0 5px;
         height: 44px;
         width: 33%;
-        border-radius: 5px;
+        border-radius: 4px;
         color: #68573E;
         border: 1px solid #68573E;
         outline: none;
@@ -271,7 +271,7 @@ export default {
         width: 151px;
         height: 28px;
         border: 1px solid #68573E;
-        border-radius: 5px;
+        border-radius: 4px;
         padding: 0 5px;
         color: #68573E;
         font-size: 14px;
@@ -287,7 +287,7 @@ export default {
     &__text {
         width: 100%;
         margin-top: 10px;
-        border-radius: 10px;
+        border-radius: 4px;
         border: 1px solid #68573E;
         padding: 5px;
         color: #68573E;

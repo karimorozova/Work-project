@@ -34,13 +34,13 @@
         template(slot="active" slot-scope="{ row, index }")
           .discounts__data.discounts_centered(:class="{'discounts_active': currentActive === index}")
             img.discounts__checkbox(
-              v-if="row.isActive" src="../../assets/images/selected-checkbox.png"
+              v-if="row.isActive" src="../../assets/images/latest-version/checkbox-brown-1.png"
               @click="toggleActive(index)"
               :class="{'discounts_opacity': currentActive === index}"
             )
             img.discounts__checkbox(
               v-else
-              src="../../assets/images/unselected-checkbox.png"
+              src="../../assets/images/latest-version/checkbox-brown-0.png"
               @click="toggleActive(index)"
               :class="{'discounts_opacity': currentActive === index}"
             )

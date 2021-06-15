@@ -812,7 +812,7 @@ export default {
     background-color: #67573e;
     color: #fff;
     text-align: center;
-    border-radius: 6px;
+    border-radius: 4px;
     padding: 5px;
     position: absolute;
     z-index: 1;
@@ -887,7 +887,7 @@ export default {
 
   &__item {
     width: 100%;
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #68573e;
     box-sizing: border-box;
     background-color: #fff;

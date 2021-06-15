@@ -311,7 +311,7 @@
       color: $orange;
       box-sizing: border-box;
       padding: 3px;
-      border-radius: 8px;
+      border-radius: 4px;
     }
 
     &__step-no-select {

@@ -153,7 +153,7 @@
       height: 32px;
       color: #67573e;
       font-size: 14px;
-      border-radius: 10px;
+      border-radius: 4px;
       box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
       background-color: #DDD3C8;
       border: 1px solid #DDD3C8;
@@ -215,7 +215,7 @@
       padding: 0 5px;
       box-sizing: border-box;
       border: 1px solid $main-color;
-      border-radius: 5px;
+      border-radius: 4px;
       outline: none;
       transition: all 0.2s;
 

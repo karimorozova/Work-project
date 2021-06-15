@@ -87,7 +87,7 @@ export default {
     position: absolute;
     width: 100%;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     overflow: hidden;
     z-index: 5;
     box-sizing: border-box;

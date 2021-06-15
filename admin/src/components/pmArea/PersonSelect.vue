@@ -227,13 +227,13 @@
 
     .project-details__drop-menu &, .step-vendor & {
       border: 1px solid $brown-border;
-      border-radius: 5px;
+      border-radius: 4px;
     }
   }
 
   .bordered {
     border: 1px solid $brown-border;
-    border-radius: 5px;
+    border-radius: 4px;
   }
 
   .arrow-20 {

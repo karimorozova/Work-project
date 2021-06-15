@@ -292,7 +292,7 @@ export default {
         justify-content: center;
         align-items: center;
         box-shadow: 0 5px 15px rgba(85, 55, 0, 0.5);
-        border-radius: 3px;
+        border-radius: 4px;
         background-color: #FFF;
         width: 690px;
     }
@@ -340,7 +340,7 @@ export default {
         cursor: pointer;
         padding: 1px 5px;
         border: 1px solid #67573E;
-        border-radius: 8px;
+        border-radius: 4px;
         transition: all 0.2s;
         &:hover {
             background-color: #67573E;
@@ -398,7 +398,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 10px;
+        border-radius: 4px;
         border: none;
         outline: none;
         box-shadow: 0 5px 10px rgba(103, 87, 62, 0.6);

@@ -43,8 +43,8 @@
               .industries__generic-preview
         template(slot="active" slot-scope="{ row, index }")
           .industries__data.industries_centered(:class="{'industries_active': currentActive === index}")
-            img.industries__checkbox(v-if="row.active" src="../../assets/images/selected-checkbox.png" @click="toggleActive(index)" :class="{'industries_opacity': currentActive === index}")
-            img.industries__checkbox(v-else src="../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'industries_opacity': currentActive === index}")
+            img.industries__checkbox(v-if="row.active" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'industries_opacity': currentActive === index}")
+            img.industries__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'industries_opacity': currentActive === index}")
         template(slot="icons" slot-scope="{ row, index }")
           .industries__icons
             img.industries__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'industries_opacity': isActive(key, index)}")
@@ -310,8 +310,6 @@
     }
 
     &__checkbox {
-      width: 22px;
-      height: 22px;
       cursor: pointer;
       opacity: 0.5;
     }

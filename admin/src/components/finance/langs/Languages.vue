@@ -94,7 +94,7 @@ export default {
   height: 160px;
   width: 191px;
   border: 1px solid #67573e;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
   box-sizing: border-box;
 

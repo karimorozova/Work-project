@@ -81,7 +81,7 @@ export default {
     width: 100%;
     overflow: hidden;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
     z-index: 6;
     .search-country {

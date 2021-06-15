@@ -281,7 +281,7 @@
       background-color: #67573e;
       color: #fff;
       text-align: center;
-      border-radius: 6px;
+      border-radius: 4px;
       padding: 5px;
       position: absolute;
       z-index: 1;
@@ -310,7 +310,7 @@
       background-color: #67573e;
       color: #fff;
       text-align: center;
-      border-radius: 6px;
+      border-radius: 4px;
       padding: 5px;
       position: absolute;
       z-index: 1;
@@ -340,7 +340,7 @@
       background-color: #67573e;
       color: #fff;
       text-align: center;
-      border-radius: 6px;
+      border-radius: 4px;
       padding: 5px;
       position: absolute;
       z-index: 1;

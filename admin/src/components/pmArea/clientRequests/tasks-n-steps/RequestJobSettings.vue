@@ -219,7 +219,7 @@
       border: 1px solid #938676;
       box-sizing: border-box;
       background-color: $active-background;
-      border-radius: 5px;
+      border-radius: 4px;
       padding: 10px 15px 15px;
     }
 
@@ -266,7 +266,7 @@
 
     &__drop-menu {
       position: relative;
-      border-radius: 5px;
+      border-radius: 4px;
       height: 30px;
       background: #fff;
       margin-top: 3px;
@@ -278,7 +278,7 @@
       width: 191px;
       outline: none;
       border: 1px solid $main-color;
-      border-radius: 5px;
+      border-radius: 4px;
       box-sizing: border-box;
       transition: all 0.2s;
       height: 30px;

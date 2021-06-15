@@ -34,14 +34,14 @@
                         )
 
                 .steps__data.steps_centered(slot="stage1" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
-                    img.steps__checkbox(v-if="isSelected('isStage1', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
-                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-if="isSelected('isStage1', index)" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index, 'isStage1')" :class="{'steps_opacity': currentActive === index}")
                 .steps__data.steps_centered(slot="stage2" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
-                    img.steps__checkbox(v-if="isSelected('isStage2', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isStage2')" :class="{'steps_opacity': currentActive === index}")
-                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index,'isStage2')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-if="isSelected('isStage2', index)" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index, 'isStage2')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index,'isStage2')" :class="{'steps_opacity': currentActive === index}")
                 .steps__data.steps_centered(slot="active" slot-scope="{ row, index }" :class="{'steps_active': currentActive === index}")
-                    img.steps__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
-                    img.steps__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
+                    img.steps__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index, 'isActive')" :class="{'steps_opacity': currentActive === index}")
                 .steps__icons(slot="icons" slot-scope="{ row, index }")
                     img.steps__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'steps_opacity': isActive(key, index)}")
         Add(@add="addStep")
@@ -260,8 +260,6 @@ export default {
         box-shadow: inset 0 0 7px $brown-shadow;
     }
     &__checkbox {
-        width: 22px;
-        height: 22px;
         cursor: pointer;
         opacity: 0.5;
     }

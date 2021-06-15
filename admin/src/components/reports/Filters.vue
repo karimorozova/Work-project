@@ -139,7 +139,7 @@ export default {
         padding: 0 5px;
         outline: none;
         border: 1px solid $main-color;
-        border-radius: 5px;
+        border-radius: 4px;
         margin-left: 5px;
     }
     &__drop {

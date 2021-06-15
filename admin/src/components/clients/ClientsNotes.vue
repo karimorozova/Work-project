@@ -272,7 +272,7 @@
       min-width: 360px;
       background: white;
       margin-left: 20px;
-      border-radius: 8px;
+      border-radius: 4px;
       position: relative;
     }
 

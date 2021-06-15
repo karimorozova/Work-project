@@ -752,7 +752,7 @@
     }
 
     &__item {
-      border-radius: 5px;
+      border-radius: 4px;
       border: 1px solid #68573e;
       box-sizing: border-box;
       background-color: #fff;
@@ -946,7 +946,7 @@
       width: 150px;
       background-color: $white;
       padding: 3px;
-      border-radius: 3px;
+      border-radius: 4px;
       margin-left: 22px;
       box-shadow: 0 0 10px $brown-shadow;
       opacity: 0;

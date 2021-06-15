@@ -196,7 +196,7 @@
 
       .fa-slack {
         border: 1px solid $light-brown;
-        border-radius: 5px;
+        border-radius: 4px;
       }
     }
 
@@ -237,7 +237,7 @@
 
     &__time-select {
       margin-left: 10px;
-      border-radius: 5px;
+      border-radius: 4px;
       border: 1px solid $light-brown;
       overflow: hidden;
       color: $main-color;

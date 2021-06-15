@@ -296,7 +296,7 @@
       height: 30px !important;
       padding-left: 5px;
       border: 1px solid $main-color;
-      border-radius: 5px;
+      border-radius: 4px;
       outline: none;
       font-size: 14px;
     }

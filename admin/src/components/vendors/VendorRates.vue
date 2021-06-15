@@ -109,7 +109,7 @@ export default {
         display: flex;
         flex-direction: column;
         box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
-        border-radius: 10px;
+        border-radius: 4px;
         padding: 0 2px;
         margin-bottom: 60px;
         &:last-child {

@@ -53,8 +53,8 @@
 
             template(slot="active" slot-scope="{ row, index }")
                 .units__data.units_centered(:class="{'units_active': currentActive === index}")
-                    img.units__checkbox(v-if="row.active" src="../../assets/images/selected-checkbox.png" @click="toggleActive(index)" :class="{'units_opacity': currentActive === index}")
-                    img.units__checkbox(v-else src="../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'units_opacity': currentActive === index}")
+                    img.units__checkbox(v-if="row.active" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'units_opacity': currentActive === index}")
+                    img.units__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'units_opacity': currentActive === index}")
 
             template(slot="icons" slot-scope="{ row, index }")
                 .units__icons

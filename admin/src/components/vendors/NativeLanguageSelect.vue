@@ -155,7 +155,7 @@ export default {
 .drop-select {
     position: absolute;
     border: 1px solid $main-color;
-    border-radius: 5px;
+    border-radius: 4px;
     width: 100%;
     overflow: hidden;
     z-index: 6;

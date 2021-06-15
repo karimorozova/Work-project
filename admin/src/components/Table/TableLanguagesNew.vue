@@ -186,13 +186,13 @@
           .languages__data.languages_centered(:class="{'languages_active': currentActive === index}")
             img.languages__checkbox(
               v-if="row.active"
-              src="../../assets/images/selected-checkbox.png"
+              src="../../assets/images/latest-version/checkbox-brown-1.png"
               @click="toggleActive(index)"
               :class="{'languages_opacity': currentActive === index}"
             )
             img.languages__checkbox(
               v-else
-              src="../../assets/images/unselected-checkbox.png"
+              src="../../assets/images/latest-version/checkbox-brown-0.png"
               @click="toggleActive(index)"
               :class="{'languages_opacity': currentActive === index}"
             )
@@ -663,8 +663,6 @@
     }
 
     &__checkbox {
-      width: 22px;
-      height: 22px;
       cursor: pointer;
       opacity: 0.5;
     }

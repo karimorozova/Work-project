@@ -374,7 +374,7 @@
       top: 45%;
       padding: 5px;
       border: 1px solid $orange;
-      border-radius: 8px;
+      border-radius: 4px;
       color: $orange;
       font-weight: 700;
       z-index: 10;

@@ -39,7 +39,7 @@ export default {
     height: 20px;
     font-size: 14px;
     line-height: 20px;
-    border-radius: 8px;
+    border-radius: 4px;
     margin-right: 5px;
     border: 1px solid #67573e;
   }
@@ -63,7 +63,7 @@ input::placeholder {
 #myInput {
   height: 18px;
   font-size: 14px;
-  border-radius: 8px;
+  border-radius: 4px;
   width: 65px;
   border: 1px solid #67573e;
   background: transparent;

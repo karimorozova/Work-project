@@ -360,7 +360,7 @@
             position: absolute;
             top: 44px;
             right: -140px;
-            border-radius: 6px;
+            border-radius: 4px;
             z-index: 5;
             overflow: hidden;
 

@@ -67,13 +67,13 @@
             )
         template(slot="isRequestQuote" slot-scope="{ row, index }")
           .services__data.services_centered(:class="{'services_active': currentActive === index}")
-            img.services__checkbox(v-if="row.isRequestQuote" src="../../../assets/images/selected-checkbox.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
-            img.services__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
+            img.services__checkbox(v-if="row.isRequestQuote" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
+            img.services__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
 
         template(slot="active" slot-scope="{ row, index }")
           .services__data.services_centered(:class="{'services_active': currentActive === index}")
-            img.services__checkbox(v-if="row.active" src="../../../assets/images/selected-checkbox.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
-            img.services__checkbox(v-else src="../../../assets/images/unselected-checkbox.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
+            img.services__checkbox(v-if="row.active" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
+            img.services__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
         template(slot="icons" slot-scope="{ row, index }")
           .services__icons
             img.services__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'services_opacity': isActive(key, index)}")
@@ -362,8 +362,6 @@
     }
 
     &__checkbox {
-      width: 22px;
-      height: 22px;
       cursor: pointer;
       opacity: 0.5;
     }

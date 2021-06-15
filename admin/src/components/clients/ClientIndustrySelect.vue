@@ -161,7 +161,7 @@ export default {
 .drop-select {
     position: absolute;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
     width: 100%;
     z-index: 6;

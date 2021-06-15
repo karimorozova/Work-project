@@ -122,7 +122,7 @@ export default {
     &__tooltip {
         position: absolute;
         box-shadow: 0 0 5px $brown-shadow;
-        border-radius: 8px;
+        border-radius: 4px;
         color: $orange;
         padding: 1px 5px;
         top: -85%;

@@ -323,7 +323,7 @@
       z-index: 10;
       background-color: $white;
       padding: 0 5px;
-      border-radius: 10px;
+      border-radius: 4px;
     }
 
     &__error-message {

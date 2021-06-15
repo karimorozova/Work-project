@@ -112,7 +112,7 @@ export default {
     }
     &__text {
         border: 1px solid black;
-        border-radius: 5px;
+        border-radius: 4px;
         margin: 5px 0;
         padding: 5px;
         box-sizing: border-box;

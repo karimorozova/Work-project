@@ -416,7 +416,7 @@
     height: 28px;
     padding: 0 5px;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     outline: none;
   }
 

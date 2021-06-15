@@ -163,7 +163,7 @@ export default {
     background-color: white;
     z-index: 5;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
     .drop {
         font-size: 14px;

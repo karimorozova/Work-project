@@ -140,7 +140,7 @@ export default {
   &__text {
     outline: none;
     border: 1px solid $main-color;
-    border-radius: 10px;
+    border-radius: 4px;
     box-sizing: border-box;
     padding: 5px;
     color: $main-color;

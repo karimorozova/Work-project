@@ -34,7 +34,7 @@
     display: flex;
     align-items: center;
     border: 2px solid #938676;
-    border-radius: 8px;
+    border-radius: 4px;
     box-sizing: border-box;
     font-size: 14px;
     overflow: hidden;

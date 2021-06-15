@@ -85,7 +85,7 @@ export default {
 <style lang="scss" scoped>
 .select {
     border: 1px solid #BFB09D;
-    border-radius: 5px;
+    border-radius: 4px;
     width: 100%;
     display: flex;
     justify-content: space-between;

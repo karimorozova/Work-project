@@ -81,7 +81,7 @@
     height: 31px;
     color: #fff;
     font-size: 14px;
-    border-radius: 10px;
+    border-radius: 4px;
     box-shadow: 0 3px 5px rgba(103, 87, 62, .5);
     background-color: #d15f45;
     border: 1px solid #d15f45;

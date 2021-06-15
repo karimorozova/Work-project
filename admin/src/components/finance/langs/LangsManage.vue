@@ -135,7 +135,7 @@ export default {
         cursor: pointer;
         padding: 1px 5px;
         border: 1px solid #67573E;
-        border-radius: 8px;
+        border-radius: 4px;
         transition: all 0.2s;
         &:hover {
             background-color: #67573E;

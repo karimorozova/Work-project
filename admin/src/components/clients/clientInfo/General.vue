@@ -336,7 +336,7 @@
       font-size: 14px;
       color: #67573e;
       border: 1px solid #67573e;
-      border-radius: 5px;
+      border-radius: 4px;
       box-sizing: border-box;
       padding: 0 5px;
       outline: none;

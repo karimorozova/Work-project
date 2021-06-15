@@ -206,7 +206,7 @@ label {
         padding-left: 5px;
         border: 1px solid #67573E;
         color: #67573E;
-        border-radius: 5px;
+        border-radius: 4px;
         outline: none;
         box-sizing: border-box;
     }

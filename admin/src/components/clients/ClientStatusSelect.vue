@@ -145,7 +145,7 @@ export default {
     box-sizing: border-box;
     width: 100%;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     z-index: 11;
     overflow: hidden;
     .drop {

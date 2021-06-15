@@ -621,7 +621,7 @@
     &__text-input {
       width: 191px;
       margin-top: 5px;
-      border-radius: 5px;
+      border-radius: 4px;
       border: 1px solid #68573e;
       padding: 5px;
       color: #68573e;

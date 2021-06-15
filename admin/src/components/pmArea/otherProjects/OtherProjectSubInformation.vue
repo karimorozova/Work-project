@@ -393,7 +393,7 @@
         width: 133px;
         height: 28px;
         border: 1px solid #68573E;
-        border-radius: 5px;
+        border-radius: 4px;
         padding: 0 5px;
         color: #68573E;
         font-size: 14px;
