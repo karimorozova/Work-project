@@ -34,7 +34,7 @@
       height: 34px;
       color: $white;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 4px;
       background-color: $orange;
       border: none;
       transition: .1s ease;
@@ -66,7 +66,7 @@
       height: 34px;
       color: $white;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 4px;
       background-color: $orange;
       border: none;
       transition: .1s ease;
@@ -92,7 +92,7 @@
       height: 34px;
       color: $white;
       font-size: 14px;
-      border-radius: 7px;
+      border-radius: 4px;
       background-color: $orange;
       border: none;
       transition: .1s ease;

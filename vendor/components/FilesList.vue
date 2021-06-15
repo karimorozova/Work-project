@@ -34,7 +34,7 @@
     }
 
     &__item {
-      border-radius: 10px;
+      border-radius: 4px;
       border: 1px solid #c3c5c5;
       box-sizing: border-box;
       background-color: transparent;

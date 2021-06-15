@@ -321,7 +321,7 @@
       position: absolute;
       top: 44px;
       right: -120px;
-      border-radius: 8px;
+      border-radius: 4px;
       z-index: 5;
       overflow: hidden;
       box-sizing: border-box;

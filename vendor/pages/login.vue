@@ -148,7 +148,7 @@
       color: #66563d;
       padding-left: 10px;
       padding-right: 10px;
-      border-radius: 8px;
+      border-radius: 4px;
       border: 2px solid #dedede;
 
 
@@ -185,7 +185,7 @@
     &__button {
       width: 165px;
       height: 36px;
-      border-radius: 8px;
+      border-radius: 4px;
       font-size: 18px;
       background-color: #4BA5A5;
       color: #fff;

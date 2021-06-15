@@ -181,7 +181,7 @@
       width: 33.5%;
       padding: 30px 50px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-      border-radius: 7px;
+      border-radius: 4px;
       display: flex;
       flex-direction: column;
       @media (max-width: 1440px) {

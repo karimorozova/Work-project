@@ -79,7 +79,7 @@
       width: 191px;
       height: 28px;
       border: 1px solid $main-color;
-      border-radius: 5px;
+      border-radius: 4px;
       padding: 0 5px;
     }
 

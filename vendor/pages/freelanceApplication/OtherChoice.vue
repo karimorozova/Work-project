@@ -48,7 +48,7 @@ export default {
     flex-direction: column;
     align-items: center;
     border: 1px solid #66563D;
-    border-radius: 20px;
+    border-radius: 4px;
     width: 331px;
     padding: 30px 0 20px;
     box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
@@ -70,7 +70,7 @@ export default {
         width: 68%;
         padding: 12px 10px;
         border: 1px solid #66563D;
-        border-radius: 15px;
+        border-radius: 4px;
         outline: none;
         box-shadow: 0 3px 8px rgba(103, 87, 62, 0.5);
         &:focus {

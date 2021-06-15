@@ -106,7 +106,7 @@ export default {
 }
 
 .select {
-    border-radius: 15px;
+    border-radius: 4px;
     width: 100%;
     display: flex;
     justify-content: space-between;

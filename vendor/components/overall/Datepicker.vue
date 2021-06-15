@@ -1159,7 +1159,7 @@
   }
 
   .datepicker-custom {
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #68573E;
     height: 28px;
     color: #68573E;
@@ -1168,7 +1168,7 @@
   }
 
   .datepicker-custom-client {
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #68573E;
     height: 30px;
     color: #68573E;
@@ -1201,7 +1201,7 @@
   }
 
   .datepicker-height-30 {
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #68573E;
     height: 30px;
     color: #68573E;

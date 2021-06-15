@@ -123,7 +123,7 @@ import SelectSingle from "../SelectSingle";
         padding: 6px 5px;
         border: 1px solid #66563D;
         color: #66563D;
-        border-radius: 5px;
+        border-radius: 4px;
         outline: none;
         box-sizing: border-box;
       }

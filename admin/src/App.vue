@@ -35,6 +35,7 @@
     font-family: Myriad400;
     color: #66563d;
     font-size: 14px;
+    background: #fbfbfb;
   }
 
   input:disabled,

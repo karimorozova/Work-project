@@ -162,7 +162,7 @@
     position: absolute;
     width: 100%;
     border: 1px solid #67573E;
-    border-radius: 5px;
+    border-radius: 4px;
     overflow: hidden;
     flex-direction: column;
     box-sizing: border-box;

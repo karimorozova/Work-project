@@ -26,7 +26,7 @@
 
     &__textarea {
       border: 2px solid rgb(197, 191, 181);
-      border-radius: 10px;
+      border-radius: 4px;
     }
 
     &__text {

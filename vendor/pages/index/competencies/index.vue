@@ -455,7 +455,7 @@
         padding: 6px 6px;
         border: 1px solid #66563D;
         color: #66563D;
-        border-radius: 5px;
+        border-radius: 4px;
         outline: none;
         width: 100%;
         box-sizing: border-box;
@@ -508,7 +508,7 @@
         height: 34px;
         color: #fff;
         font-size: 14px;
-        border-radius: 7px;
+        border-radius: 4px;
         background-color: #d15f45;
         border: none;
         transition: .1s ease;

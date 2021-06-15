@@ -85,7 +85,7 @@ export default {
     top: 20px;
     width: 268px;
     border: 1px solid #67573E;
-    border-radius: 7px;
+    border-radius: 4px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -132,7 +132,7 @@ export default {
 }
 
 .select {
-    border-radius: 15px;
+    border-radius: 4px;
     width: 100%;
     height: 36px;
     display: flex;

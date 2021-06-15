@@ -78,7 +78,7 @@
     position: absolute;
     width: 100%;
     border: 1px solid #c3c5c5;
-    border-radius: 10px;
+    border-radius: 4px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -121,7 +121,7 @@
   }
 
   .select {
-    border-radius: 15px;
+    border-radius: 4px;
     width: 100%;
     height: 36px;
     display: flex;
@@ -196,7 +196,7 @@
   }
 
   .filters {
-    border-radius: 5px;
+    border-radius: 4px;
     top: 0;
     box-shadow: none;
     box-sizing: border-box;

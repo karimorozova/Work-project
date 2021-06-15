@@ -61,7 +61,7 @@ body {
   border-left: 2px solid transparent;
   border-right: 2px solid transparent;
   background-clip: content-box;
-  border-radius: 5px;
+  border-radius: 4px;
   min-height: 25px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -74,7 +74,7 @@ body {
   border-top: 2px solid transparent;
   border-bottom: 2px solid transparent;
   background-clip: content-box;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background-color: #938676;

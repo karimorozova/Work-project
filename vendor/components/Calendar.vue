@@ -221,7 +221,7 @@ export default {
           .col2 {
             button {
               background-color: #D15F45;
-              border-radius: 8px;
+              border-radius: 4px;
               color: #fff;
               width: 120px;
               height: 30px;

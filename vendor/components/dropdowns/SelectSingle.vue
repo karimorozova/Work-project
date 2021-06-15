@@ -79,7 +79,7 @@
     width: 100%;
     top: 0;
     border: 1px solid #c3c5c5;
-    border-radius: 10px;
+    border-radius: 4px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -131,7 +131,7 @@
   }
 
   .select {
-    border-radius: 15px;
+    border-radius: 4px;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -169,7 +169,7 @@
   }
 
   .account {
-    border-radius: 5px;
+    border-radius: 4px;
     top: 0;
     box-shadow: none;
     box-sizing: border-box;

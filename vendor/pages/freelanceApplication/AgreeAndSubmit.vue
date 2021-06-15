@@ -199,7 +199,7 @@ export default {
       height: 38px;
       color: #fff;
       font-size: 14px;
-      border-radius: 10px;
+      border-radius: 4px;
       background-color: #d15f45;
       border: none;
       transition: .1s ease;

@@ -436,7 +436,7 @@
       padding: 10px;
       resize: none;
       border: 1px solid #c3c5c5;
-      border-radius: 10px;
+      border-radius: 4px;
       color: #66563D;
       outline: none;
 

@@ -31,7 +31,7 @@
       padding: 20px;
       color: $orange;
       border: 2px solid $orange;
-      border-radius: 10px;
+      border-radius: 4px;
     }
   }
 

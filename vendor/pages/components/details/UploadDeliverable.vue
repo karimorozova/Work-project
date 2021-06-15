@@ -30,7 +30,7 @@
     padding: 35px 0 10px;
     position: relative;
     border: 2px dotted rgb(197, 191, 181);
-    border-radius: 10px;
+    border-radius: 4px;
   }
 
   .text {
@@ -53,7 +53,7 @@
 
     &:hover {
       box-shadow: 0 0 0px 2px rgb(197, 191, 181);
-      border-radius: 10px;
+      border-radius: 4px;
     }
 
     &__input {

@@ -56,14 +56,14 @@
 
       padding: 10px 10px;
       border: 1px solid #c3c5c5;
-      border-radius: 10px;
+      border-radius: 4px;
       outline: none;
 
       /*padding: 5px;*/
       /*height: 30px;*/
       /*outline: none;*/
       /*border: 1px solid #67573E;*/
-      /*border-radius: 7px;*/
+      /*border-radius: 4px;*/
       /*color: #67573E;*/
 
       /*&:focus {*/

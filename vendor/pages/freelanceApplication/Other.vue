@@ -138,7 +138,7 @@ export default {
         padding: 12px 10px;
         border: 1px solid #66563D;
         color: #66563D;
-        border-radius: 7px;
+        border-radius: 4px;
         outline: none;
         &:focus {
           cursor: pointer;
@@ -152,7 +152,7 @@ export default {
         padding: 10px;
         resize: none;
         border: 1px solid #66563D;
-        border-radius: 7px;
+        border-radius: 4px;
         margin-top: 10px;
         color: #66563D;
         outline: none;

@@ -103,7 +103,7 @@ export default {
     flex-direction: column;
     width: 100%;
     border: 1px solid #66563D;
-    border-radius: 7px;
+    border-radius: 4px;
     justify-content: center;
     padding: 10px 0;
 
