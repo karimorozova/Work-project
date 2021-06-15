@@ -19,12 +19,15 @@
         template(slot="text" slot-scope="{ row }")
           span.finance-matrix__text {{ row.text }}
         template(slot="rate" slot-scope="{ row }")
-          input.finance-matrix__rate(
-            type="number" min="0" max ="100"
-            :value="row.rate | maxRateCount"
-            @change="(e) => setMatrixData(e, row.key)"
-          )
-          span.finance-matrix__percent %
+          .table__data(v-if="!isEdit")
+            span {{ row.rate }}
+            span.finance-matrix__percent %
+          div(v-else)
+            input.finance-matrix__rate(
+              type="number" min="0" max ="100"
+              :value="row.rate | maxRateCount"
+              @change="(e) => setMatrixData(e, row.key)"
+            )
 
         template(slot="icons" slot-scope="{ row }")
           .finance-matrix__icons
@@ -43,30 +46,34 @@
 </template>
 
 <script>
-	import DataTable from "../DataTable";
+	import DataTable from "../DataTable"
 
 	export default {
 		props: {
 			entity: {
 				type: Object
+			},
+			isEdit: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
 			return {
 				fields: [
-					{label: "Translation match", headerKey: "headerText", key: "text", width: "46%"},
-					{label: "Value %", headerKey: "headerRate", key: "rate", width: "46%"},
-					{label: "", headerKey: "headerIcons", key: "icons", width: "8%"}
-				],
+					{ label: "Translation match", headerKey: "headerText", key: "text", width: "46%" },
+					{ label: "Value %", headerKey: "headerRate", key: "rate", width: "46%" },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "8%" }
+				]
 			}
 		},
 		methods: {
 			setMatrixData(e, key) {
-				this.$emit("setMatrixData", {value: e.target.value, key});
+				this.$emit("setMatrixData", { value: e.target.value, key })
 			},
 			getDefaultValues(key) {
-				this.$emit('getDefaultValues', key);
-			},
+				this.$emit('getDefaultValues', key)
+			}
 
 		},
 		components: {
@@ -75,8 +82,8 @@
 		computed: {
 			tableData() {
 				return Object.keys(this.entity.matrix).map(key => {
-					return {...this.entity.matrix[key], key}
-				});
+					return { ...this.entity.matrix[key], key }
+				})
 			}
 		}
 	}
@@ -85,8 +92,13 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
 
-  .finance-matrix {
+  .table {
+    &__dataEdit {
+      box-shadow: inset 0 0 7px $brown-shadow;
+    }
+  }
 
+  .finance-matrix {
     &__icons {
       display: flex;
       align-items: center;

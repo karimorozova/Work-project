@@ -18,7 +18,13 @@
       @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title {{ field.label }}
+        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
+          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+        .price-title(v-else) {{ field.label }}
+
+      template(slot="check" slot-scope="{ row, index }")
+        .price__data(v-if="isEdit")
+          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="sourceLang" slot-scope="{ row, index }")
         .price__data {{ row.sourceLanguage.lang }}
@@ -53,6 +59,7 @@
 	import DataTable from "../../DataTable"
 	import LangFilter from "./LangFilter"
 	import { mapActions } from "vuex"
+	import CheckBox from "../../CheckBox"
 
 	export default {
 		props: {
@@ -74,17 +81,24 @@
 			return {
 				fields: [
 					{
+						label: "",
+						headerKey: "headerCheck",
+						key: "check",
+						width: "4%",
+						padding: 0
+					},
+					{
 						label: "Source Lang",
 						headerKey: "headerSourceLang",
 						key: "sourceLang",
-						width: "29%",
+						width: "27%",
 						padding: "0"
 					},
 					{
 						label: "Target Lang",
 						headerKey: "headerTargetLang",
 						key: "targetLang",
-						width: "29%",
+						width: "27%",
 						padding: "0"
 					},
 					{
@@ -125,6 +139,15 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			toggleCheck(index, val) {
+				this.dataArray[index].isCheck = val
+			},
+			toggleAll(val) {
+				this.dataArray = this.dataArray.reduce((acc, cur) => {
+					acc.push({ ...cur, isCheck: val })
+					return acc
+				}, [])
+			},
 			async setRowValue(index) {
 				await this.checkErrors(index)
 			},
@@ -139,7 +162,7 @@
 						...this.allFilters,
 						countFilter: this.dataArray.length
 					})
-					this.dataArray.push(...result.data)
+					this.dataArray.push(...result.data.map(i => ({ ...i, isCheck: false })))
 					this.isDataRemain = result.data.length === 25
 				}
 			},
@@ -149,7 +172,7 @@
 						...filters,
 						countFilter: count
 					})
-					this.dataArray = result.data
+					this.dataArray = result.data.map(i => ({ ...i, isCheck: false }))
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Languages", isShow: true, type: "error" })
 				}
@@ -171,7 +194,7 @@
 							gbpBasicPrice: euroBasicPrice * this.currency.GBP
 						}
 					})
-					this.dataArray.splice(index, 1, result.data)
+					this.dataArray.splice(index, 1, { ...result.data, isCheck: false })
 					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
@@ -199,6 +222,9 @@
 			}
 		},
 		computed: {
+			isAllSelected() {
+				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+			},
 			allFilters() {
 				let result = {
 					typeFilter: this.typeFilter,
@@ -213,6 +239,7 @@
 			}
 		},
 		components: {
+			CheckBox,
 			DataTable,
 			LangFilter
 		}

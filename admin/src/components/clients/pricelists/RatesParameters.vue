@@ -12,7 +12,7 @@
           .rates-item__title Min Price:
           .rates-item__input
             .ratio__input
-              input(v-if="ratesParamsIsEdit" type="number" ref="minPrice" :value="currentClient.minPrice" @change="updateMinPrice")
+              input(v-if="isEdit" type="number" ref="minPrice" :value="currentClient.minPrice" @change="updateMinPrice")
               span(v-else) {{ currentClient.minPrice }}
               span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
         //.rates-item
@@ -23,17 +23,9 @@
               label(for="ignoreMinPrice")
     .discounts
       Discounts(
-        :paramsIsEdit="ratesParamsIsEdit",
+        :paramsIsEdit="isEdit",
         :enum="'client'"
       )
-      .actionsButton
-        .actionsButton__icon
-          img.defaultIcon(v-if="!ratesParamsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
-          img.opacity(v-else :src="icons.edit.icon")
-        .actionsButton__icon
-          img.defaultIcon(v-if="ratesParamsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-          img.opacity(v-else :src="icons.cancel.icon")
-
 
 </template>
 <script>
@@ -42,6 +34,12 @@
 
 	export default {
 		components: { Discounts },
+		props: {
+			isEdit: {
+				type: Boolean,
+				default: false
+			}
+		},
 		data() {
 			return {
 				icons: {
@@ -49,21 +47,10 @@
 					cancel: { icon: require("../../../assets/images/cancel-icon.png") }
 				},
 				ignoreMinPrice: false,
-				ratesParamsIsEdit: false
 			}
 		},
 		methods: {
 			...mapActions([ 'setUpClientProp', 'alertToggle' ]),
-			crudActions(actionType) {
-				switch (actionType) {
-					case 'cancel':
-						this.ratesParamsIsEdit = false
-						break
-					case 'edit':
-						this.ratesParamsIsEdit = true
-						break
-				}
-			},
 			async updateMinPrice() {
 				try {
 					await this.$http.put('/clientsapi/set-min-price', {

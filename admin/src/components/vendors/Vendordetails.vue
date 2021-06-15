@@ -43,6 +43,13 @@
 
       .title Rates
       .vendor-info__rates
+        .rates__icons
+          .rates__icon
+            img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+            img.rates__icons-opacity05(v-else :src="icons.edit.icon")
+          .rates__icon
+            img.rates__icons-opacity1(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+            img.rates__icons-opacity05(v-else :src="icons.cancel.icon")
         PullButton(:style="'margin: 0 0 20px;'" @refreshResultTable="refreshResultTable")
         Tabs(
           :tabs="tabs"
@@ -51,27 +58,31 @@
         )
         .lang-table(v-if="selectedTab === 'Basic Price'")
           LangTable(
-            :dataArray="currentVendor.rates.basicPricesTable",
+            :rates="currentVendor.rates.basicPricesTable.map(i => ({...i, isCheck: false}))",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
+            :isEdit="isEdit"
           )
         .step-table(v-if="selectedTab === 'Steps / Units'")
           StepTable(
-            :dataArray="currentVendor.rates.stepMultipliersTable",
+            :rates="currentVendor.rates.stepMultipliersTable.map(i => ({...i, isCheck: false}))",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
+            :isEdit="isEdit"
           )
         .industry-table(v-if="selectedTab === 'Industries'")
           IndustryTable(
-            :dataArray="currentVendor.rates.industryMultipliersTable",
+            :rates="currentVendor.rates.industryMultipliersTable.map(i => ({...i, isCheck: false}))",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
+            :isEdit="isEdit"
           )
         .result-table(v-if="selectedTab === 'Overall Prices'")
           ResultTable(
+            :rates="currentVendor.rates.pricelistTable.map(i => ({...i, isCheck: false}))"
             :vendorId="currentVendor._id",
             :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
             :steps="steps.map((i) => i.title)",
@@ -79,9 +90,15 @@
             :industries="industries.map((i) => i.name)",
             :isRefreshResultTable="isRefreshResultTable",
             :refresh="isRefreshAfterServiceUpdate"
+            :isEdit="isEdit"
           )
         .chart(v-if="selectedTab === 'Discount Chart'")
-          FinanceMatrixWithReset(:entity="currentVendor" @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+          FinanceMatrixWithReset(
+            :entity="currentVendor"
+            @getDefaultValues="getDefaultValuesDC"
+            @setMatrixData="setMatrixData"
+            :isEdit="isEdit"
+          )
 
 
       .title Documents
@@ -182,8 +199,8 @@
 	import ApproveModal from "../ApproveModal"
 	import SelectMulti from "../SelectMulti"
 	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
-  import VendorMainInfo from "./VendorGeneralInfo";
-  import SaveCancelPopUp from "../SaveCancelPopUp";
+	import VendorMainInfo from "./VendorGeneralInfo"
+	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import PullButton from "./pricelists/PullButton"
 	import Tabs from "../Tabs"
 
@@ -191,6 +208,12 @@
 		mixins: [ photoPreview ],
 		data() {
 			return {
+				icons: {
+					edit: { icon: require("../../assets/images/latest-version/edit.png") },
+					cancel: { icon: require("../../assets/images/cancel-icon.png") }
+				},
+				paramsIsEdit: false,
+				isEdit: false,
 				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Overall Prices', 'Discount Chart' ],
 				selectedTab: 'Overall Prices',
 				aliases: [],
@@ -214,7 +237,7 @@
 				oldEmail: "",
 				isFileError: false,
 				isEditAndSend: false,
-        editorConfig: {
+				editorConfig: {
 					allowedContent: true,
 					uiColor: "#F4F0EE",
 					resize_minHeight: "130",
@@ -232,7 +255,7 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				updateVendorProp: "updateVendorProp",
-        updateWithOutSocketVendorProp: "updateWithOutSocketVendorProp",
+				updateWithOutSocketVendorProp: "updateWithOutSocketVendorProp",
 				updateCurrentVendor: "updateCurrentVendor",
 				deleteCurrentVendor: "deleteCurrentVendor",
 				storeCurrentVendor: "storeCurrentVendor",
@@ -241,11 +264,16 @@
 				updateVendorStatus: "updateVendorStatus",
 				setVendorsMatrixData: "setVendorsMatrixData",
 				setDefaultValuesMatrixData: "setDefaultValuesMatrixData",
-        initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
-        updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
-        updateVendorGeneralData: "updateVendorGeneralData",
-        updateVendorRatesByKey: 'updateVendorRatesFromServer',
+				initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
+				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
+				updateVendorGeneralData: "updateVendorGeneralData",
+				updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
+			crudActions(actionType) {
+				this.paramsIsEdit = actionType !== 'cancel'
+				this.isEdit = this.paramsIsEdit
+
+			},
 			setTab({ index: i }) {
 				this.selectedTab = this.tabs.find((item, index) => index === i)
 			},
@@ -284,17 +312,9 @@
 			async sendVendorToMemoq(link, action) {
 				try {
 					await this.$http.get(link)
-					this.alertToggle({
-						message: `Vendor in Memoq are ${ action }`,
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: `Vendor in Memoq are ${ action }`, isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on action with Memoq & Vendor",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on action with Memoq & Vendor", isShow: true, type: "error" })
 				}
 			},
 			async setMatrixData({ value, key }) {
@@ -314,7 +334,7 @@
 				}
 			},
 			refreshResultTable() {
-        this.updateVendorRatesByKey({key: 'pricelistTable'})
+				this.updateVendorRatesByKey({ key: 'pricelistTable' })
 			},
 			updateRates(action) {
 				this.isRefreshAfterServiceUpdate = action
@@ -329,17 +349,9 @@
 				}
 				try {
 					await this.updateVendorStatus(vendor)
-					this.alertToggle({
-						message: "Vendor status updated",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Vendor status updated", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Server error / Cannot update Vendor status",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Server error / Cannot update Vendor status", isShow: true, type: "error" })
 				}
 			},
 			closePreview() {
@@ -349,11 +361,11 @@
 				this.isEditAndSend = true
 			},
 			async openVendor() {
-        const { data } = await this.$http.post("/service-login/vendor", {vendorId: this.vendorId})
-        const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
-        const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
-        document.cookie = `vendor=${data}; path=/; domain=${domain}`
-        window.open(redirectTo, '_blank')
+				const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendorId })
+				const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
+				const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
+				document.cookie = `vendor=${ data }; path=/; domain=${ domain }`
+				window.open(redirectTo, '_blank')
 			},
 			async sendQuote(message) {
 				try {
@@ -391,7 +403,9 @@
 					try {
 						const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.currentVendor.email }`)
 						const isUnique = !result.data
-						isUnique ? "" : this.errors.push("The email you've entered is already used in our system!")
+						if (!isUnique) {
+							this.errors.push("The email you've entered is already used in our system!")
+						}
 					} catch (err) {
 						this.alertToggle({
 							message: "Error on email uniqueness checking",
@@ -426,14 +440,14 @@
 			},
 			async updateVendor() {
 				let sendData = new FormData()
-				sendData.append("vendor", JSON.stringify({...this.getVendorUpdatedData, _id: this.$route.params.id}))
+				sendData.append("vendor", JSON.stringify({ ...this.getVendorUpdatedData, _id: this.$route.params.id }))
 				sendData.append("photo", this.photoFile[0])
 				try {
 					await this.updateCurrentVendor(sendData)
-          this.initCurrentVendorGeneralData(this.currentVendor)
+					this.initCurrentVendorGeneralData(this.currentVendor)
 					this.oldEmail = this.getVendorUpdatedData.email
-          this.$socket.emit('updatedVendorData', {id:  this.$route.params.id})
-          // this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, data: this.getVendorUpdatedData})
+					this.$socket.emit('updatedVendorData', { id: this.$route.params.id })
+					// this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, data: this.getVendorUpdatedData})
 					this.alertToggle({
 						message: "Vendor info updated",
 						isShow: true,
@@ -456,7 +470,7 @@
 				this.updateCurrentVendorGeneralData({ key: "status", value: option })
 			},
 			cancel() {
-			  this.initCurrentVendorGeneralData(this.currentVendor)
+				this.initCurrentVendorGeneralData(this.currentVendor)
 			},
 			async approveVendorDelete() {
 				this.isApproveModal = false
@@ -466,41 +480,25 @@
 				try {
 					const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ this.currentVendor._id }`)
 					if (isAssigned.body) {
-						return this.alertToggle({
-							message: "The vendor was assigned to a step and cannot be deleted.",
-							isShow: true,
-							type: "error"
-						})
+						return this.alertToggle({ message: "The vendor was assigned to a step and cannot be deleted.", isShow: true, type: "error" })
 					}
 					await this.deleteCurrentVendor({ id: this.currentVendor._id })
-					this.alertToggle({
-						message: "Vendor removed",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Vendor removed", isShow: true, type: "success" })
 					this.$router.go(-1)
 				} catch (err) {
-					this.alertToggle({
-						message: "Server error / Cannot delete the Vendor",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Server error / Cannot delete the Vendor", isShow: true, type: "error" })
 				}
 			},
 			async getVendor() {
 				this.vendorId = this.$route.params.id
 				const id = this.$route.params.id
 				try {
-          const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
-          await this.storeCurrentVendor(vendor.data)
-          this.initCurrentVendorGeneralData(vendor.data)
-          this.oldEmail = this.currentVendor.email
+					const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+					await this.storeCurrentVendor(vendor.data)
+					this.initCurrentVendorGeneralData(vendor.data)
+					this.oldEmail = this.currentVendor.email
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Vendor's info",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting Vendor's info", isShow: true, type: "error" })
 				}
 			}
 		},
@@ -512,29 +510,27 @@
 				services: "getAllServices",
 				units: "getAllUnits",
 				industries: "getAllIndustries",
-        getVendorUpdatedData: "getCurrentVendorGeneralData"
+				getVendorUpdatedData: "getCurrentVendorGeneralData"
 			}),
 			vendorAliases() {
 				if (this.aliases) {
 					return this.aliases
 				}
 			},
-      isChangedVendorGeneralInfo() {
-        if (this.currentVendor.hasOwnProperty('firstName')) {
-          let keys = [ 'firstName', 'surname', 'email','phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender','status','matrix','professionalLevel','notes']
-          for (let key of keys) {
-            if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
-              return true
-            }
-          }
-        }
-      },
+			isChangedVendorGeneralInfo() {
+				if (this.currentVendor.hasOwnProperty('firstName')) {
+					let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender', 'status', 'professionalLevel', 'notes' ]
+					for (let key of keys) {
+						if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
+							return true
+						}
+					}
+				}
+			},
 			selectedIndNames() {
 				let result = []
 				if (this.currentVendor.industries && this.currentVendor.industries.length) {
-					for (let ind of this.currentVendor.industries) {
-						result.push(ind.name)
-					}
+					for (let ind of this.currentVendor.industries) result.push(ind.name)
 				}
 				return result
 			},
@@ -545,8 +541,8 @@
 		components: {
 			Tabs,
 			PullButton,
-      SaveCancelPopUp,
-      VendorMainInfo,
+			SaveCancelPopUp,
+			VendorMainInfo,
 			PendingCompetencies,
 			SelectMulti,
 			ApproveModal,
@@ -582,19 +578,17 @@
 		created() {
 			this.getVendor()
 
-      this.$socket.on('setFreshVendorData', ({ id}) => {
-        if (id == this.$route.params.id){
-          this.getVendor()
-        }
-      })
+			this.$socket.on('setFreshVendorData', ({ id }) => {
+				if (id.toString() === this.$route.params.id.toString()) {
+					this.getVendor()
+				}
+			})
 
-      this.$socket.on('socketUpdateVendorProp', ({id, key, value}) => {
-        if (this.$route.params.id === id) {
-          this.updateWithOutSocketVendorProp({key,value})
-        }
-      })
-
-
+			this.$socket.on('socketUpdateVendorProp', ({ id, key, value }) => {
+				if (this.$route.params.id === id) {
+					this.updateWithOutSocketVendorProp({ key, value })
+				}
+			})
 		},
 		mounted() {
 			this.oldEmail = this.currentVendor.email
@@ -608,6 +602,28 @@
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
+
+  .rates {
+    &__icons {
+      display: flex;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      gap: 7px;
+      height: 20px;
+      align-items: center;
+
+      &-opacity1 {
+        opacity: 1;
+        cursor: pointer;
+      }
+
+      &-opacity05 {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
+  }
 
   .block-item-subinfo {
     display: flex;
@@ -702,6 +718,7 @@
     }
 
     &__rates {
+      position: relative;
       box-sizing: border-box;
       padding: 20px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;

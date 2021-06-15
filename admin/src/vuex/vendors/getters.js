@@ -2,7 +2,6 @@ export const getCurrentVendor = state => state.currentVendor;
 export const getFilteredVendors = state => state.filteredVendors;
 export const getVendorDuoCombs = state => state.vendorDuoRates;
 export const getVendorMonoCombs = state => state.vendorMonoRates;
-export const getVendorPriceList = state => state.currentVendor.rates.pricelistTable;
 
 export const getCurrentVendorEducations = state => state.currentVendorEducations;
 export const getCurrentVendorProfessionalExperience = state => state.currentVendorProfessionalExperience;

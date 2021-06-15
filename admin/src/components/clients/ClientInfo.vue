@@ -90,8 +90,18 @@
 
           .title Rates
           .client-info__rates
+            .rates__icons
+              .rates__icon
+                img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+                img.rates__icons-opacity05(v-else :src="icons.edit.icon")
+              .rates__icon
+                img.rates__icons-opacity1(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+                img.rates__icons-opacity05(v-else :src="icons.cancel.icon")
+
             PullButton(:style="'margin: 0 0 20px;'" @refreshResultTable="refreshResultTable")
-            RatesParameters
+            RatesParameters(
+              :isEdit="isEdit"
+            )
             Tabs(
               :tabs="tabs"
               :selectedTab="selectedTab"
@@ -99,26 +109,30 @@
             )
             .lang-table(v-if="selectedTab === 'Basic Price'")
               LangTable(
-                :dataArray="currentClient.rates.basicPricesTable"
+                :rates="currentClient.rates.basicPricesTable.map(i => ({...i, isCheck: false}))"
                 :clientId="currentClient._id"
                 @refreshResultTable="refreshResultTable"
+                :isEdit="isEdit"
               )
             .step-table(v-if="selectedTab === 'Steps / Units'")
               StepTable(
-                :dataArray="currentClient.rates.stepMultipliersTable"
+                :rates="currentClient.rates.stepMultipliersTable.map(i => ({...i, isCheck: false}))"
                 :clientId="currentClient._id"
                 @refreshResultTable="refreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
+                :isEdit="isEdit"
               )
             .industry-table(v-if="selectedTab === 'Industries'")
               IndustryTable(
-                :dataArray="currentClient.rates.industryMultipliersTable"
+                :rates="currentClient.rates.industryMultipliersTable.map(i => ({...i, isCheck: false}))"
                 :clientId="currentClient._id"
                 @refreshResultTable="refreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
+                :isEdit="isEdit"
               )
             .result-table(v-if="selectedTab === 'Overall Prices'")
               ResultTable(
+                :rates="currentClient.rates.pricelistTable.map(i => ({...i, isCheck: false}))"
                 :clientId="currentClient._id"
                 :languages="languages"
                 :steps="steps"
@@ -126,9 +140,15 @@
                 :industries="industries"
                 :isRefreshResultTable="isRefreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
+                :isEdit="isEdit"
               )
             .chart(v-if="selectedTab === 'Discount Chart'")
-              DiscountChart(:entity="currentClient", @getDefaultValues="getDefaultValuesDC" @setMatrixData="setMatrixData")
+              DiscountChart(
+                :entity="currentClient",
+                @getDefaultValues="getDefaultValuesDC"
+                @setMatrixData="setMatrixData"
+                :isEdit="isEdit"
+              )
 
           .title Documents
           .client-info__documents
@@ -212,6 +232,10 @@
 		},
 		data() {
 			return {
+				icons: {
+					edit: { icon: require("../../assets/images/latest-version/edit.png") },
+					cancel: { icon: require("../../assets/images/cancel-icon.png") }
+				},
 				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Overall Prices', 'Discount Chart' ],
 				selectedTab: 'Overall Prices',
 				clientTask: {},
@@ -223,6 +247,8 @@
 					sourceLanguages: [],
 					targetLanguages: []
 				},
+				paramsIsEdit: false,
+
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/,
 
 				isApproveModal: false,
@@ -273,10 +299,15 @@
 				createTaskModal: false,
 				createNoteModal: false,
 				allActivitiesModal: false,
-				fullActivityModal: false
+				fullActivityModal: false,
+				isEdit: false
 			}
 		},
 		methods: {
+			crudActions(actionType) {
+				this.paramsIsEdit = actionType !== 'cancel'
+				this.isEdit = this.paramsIsEdit
+			},
 			setTab({ index: i }) {
 				this.selectedTab = this.tabs.find((item, index) => index === i)
 			},
@@ -774,7 +805,7 @@
 			this.getTimezones()
 			this.getAliases()
 			this.$socket.on('refreshClientData', ({ _id, data }) => {
-				if (_id == this.$route.params.id) {
+				if (_id.toString() === this.$route.params.id.toString()) {
 					this.storeCurrentClient({ ...this.currentClient, ...data })
 					this.storeCurrentClientOverallData(data)
 				}
@@ -798,6 +829,29 @@
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
+
+  .rates {
+    &__icons {
+      display: flex;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      gap: 7px;
+      height: 20px;
+      align-items: center;
+
+      &-opacity1 {
+        opacity: 1;
+        cursor: pointer;
+      }
+
+      &-opacity05 {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
+  }
+
 
   .client-activity {
     &__addTask {
@@ -891,7 +945,7 @@
       padding: 0;
       padding: 20px;
       box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
-
+      position: relative;
       box-sizing: border-box;
     }
 

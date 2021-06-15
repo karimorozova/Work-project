@@ -9,7 +9,13 @@
       bodyCellClass="client-pricelist-table-cell"
     )
       template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-        .price-title {{ field.label }}
+        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
+          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+        .price-title(v-else) {{ field.label }}
+
+      template(slot="check" slot-scope="{ row, index }")
+        .price__data(v-if="isEdit")
+          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="step", slot-scope="{ row, index }")
         .price__data {{ row.step.title }}
@@ -48,10 +54,11 @@
 <script>
 	import DataTable from "../../DataTable"
 	import { mapGetters, mapActions } from "vuex"
+	import CheckBox from "../../CheckBox"
 
 	export default {
 		props: {
-			dataArray: {
+			rates: {
 				type: Array
 			},
 			clientId: {
@@ -60,23 +67,31 @@
 			isEdit: {
 				type: Boolean,
 				default: false
-			}
+			},
+
 		},
 		data() {
 			return {
 				fields: [
 					{
+						label: "",
+						headerKey: "headerCheck",
+						key: "check",
+						width: "4%",
+						padding: 0
+					},
+					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "30%",
+						width: "28%",
 						padding: "0"
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "30%",
+						width: "28%",
 						padding: "0"
 					},
 					{
@@ -101,7 +116,7 @@
 						padding: "0"
 					}
 				],
-
+				dataArray: JSON.parse(JSON.stringify(this.rates)),
 				isDataRemain: true
 			}
 		},
@@ -110,6 +125,15 @@
 				alertToggle: "alertToggle",
 				setUpClientRatesProp: "setUpClientRatesProp"
 			}),
+			toggleCheck(index, val) {
+				this.dataArray[index].isCheck = val
+			},
+			toggleAll(val) {
+				this.dataArray = this.dataArray.reduce((acc, cur) => {
+					acc.push({ ...cur, isCheck: val })
+					return acc
+				}, [])
+			},
 			async getRowPrice(index) {
 				try {
 					await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
@@ -160,9 +184,13 @@
 		computed: {
 			...mapGetters({
 				currentClient: "getCurrentClient"
-			})
+			}),
+			isAllSelected() {
+				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+			},
 		},
 		components: {
+			CheckBox,
 			DataTable
 		}
 	}

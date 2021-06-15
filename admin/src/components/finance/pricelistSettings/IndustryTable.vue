@@ -10,7 +10,13 @@
     )
 
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title {{ field.label }}
+        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
+          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+        .price-title(v-else) {{ field.label }}
+
+      template(slot="check" slot-scope="{ row, index }")
+        .price__data(v-if="isEdit")
+          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="industry" slot-scope="{ row, index }")
         .price__data {{ row.industry.name }}
@@ -26,6 +32,7 @@
 <script>
 	import DataTable from "../../DataTable"
 	import { mapActions } from "vuex"
+	import CheckBox from "../../CheckBox"
 
 	export default {
 		props: {
@@ -41,10 +48,17 @@
 			return {
 				fields: [
 					{
+						label: "",
+						headerKey: "headerCheck",
+						key: "check",
+						width: "4%",
+						padding: 0
+					},
+					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "85%",
+						width: "81%",
 						padding: "0"
 					},
 					{
@@ -71,10 +85,19 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			toggleCheck(index, val) {
+				this.dataArray[index].isCheck = val
+			},
+			toggleAll(val) {
+				this.dataArray = this.dataArray.reduce((acc, cur) => {
+					acc.push({ ...cur, isCheck: val })
+					return acc
+				}, [])
+			},
 			async getIndustries() {
 				try {
 					const result = await this.$http.get("/pricelists/industry-multipliers/" + this.priceId)
-					this.dataArray = result.data
+					this.dataArray = result.data.map(i => ({ ...i, isCheck: false }))
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Industries", isShow: true, type: "error" })
 				}
@@ -101,14 +124,20 @@
 							multiplier: parseFloat(multiplier).toFixed(0)
 						}
 					})
-					this.dataArray.splice(index, 1, result.data)
+					this.dataArray.splice(index, 1, { ...result.data, isCheck: false })
 					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Industry", isShow: true, type: "error" })
 				}
 			}
 		},
+		computed: {
+			isAllSelected() {
+				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+			}
+		},
 		components: {
+			CheckBox,
 			DataTable
 		}
 	}

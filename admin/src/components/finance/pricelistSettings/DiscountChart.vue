@@ -16,15 +16,17 @@
         template(slot="text", slot-scope="{ row }")
           span.pricelistDiscountChart__text {{ row.text }}
         template(slot="rate", slot-scope="{ row }")
-          .table__data(v-if="!isEdit") {{ row.rate }}
+          .table__data(v-if="!isEdit")
+            span {{ row.rate }}
+            span.pricelistDiscountChart__percent %
           .table__dataEdit(v-else)
             input.pricelistDiscountChart__rate(type="number", min="0", max="100", :value="row.rate | maxRateCount", @change="(e) => setMatrixData(e, row.key)")
-            span.pricelistDiscountChart__percent %
+
 </template>
 
 <script>
 	import DataTable from "../../DataTable"
-	import { mapGetters, mapActions } from "vuex"
+	import { mapActions } from "vuex"
 
 	export default {
 		props: {
@@ -50,12 +52,13 @@
 		},
 		methods: {
 			...mapActions([ "alertToggle" ]),
-			async setMatrixData(e, key) {
+			async setMatrixData({ target }, key) {
+				const value = target.value < 0 ? 0 : target.value > 100 ? 100 : target.value
 				try {
 					const result = await this.$http.post(`/pm-manage/update-discount/${ this.pricelistId }`, {
 						updatedRowObj: {
 							key,
-							value: e.target.value
+							value
 						}
 					})
 					this.currentDiscountChart = result.data
@@ -100,6 +103,11 @@
 
     &__percent {
       margin-left: 3px;
+    }
+  }
+  .table{
+    &__dataEdit{
+      box-shadow: inset 0 0 7px $brown-shadow;
     }
   }
 </style>

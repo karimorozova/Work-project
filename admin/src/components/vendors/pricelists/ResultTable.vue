@@ -22,7 +22,13 @@
       bodyCellClass="client-pricelist-table-cell"
     )
       template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-        .price-title {{ field.label }}
+        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
+          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+        .price-title(v-else) {{ field.label }}
+
+      template(slot="check" slot-scope="{ row, index }")
+        .price__data(v-if="isEdit")
+          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(row, true)" @uncheck="toggleCheck(row, false)")
 
       template(slot="sourceLang", slot-scope="{ row, index }")
         .price__data {{ row.sourceLanguage.lang }}
@@ -65,12 +71,13 @@
             .price__icons-link-opacity
               i.fa.fa-link(aria-hidden="true")
 
-    .price__empty(v-if="!currentVendorPriceList.length") Nothing found...
+    .price__empty(v-if="!currentVendorPriceListFiltered.length") Nothing found...
 </template>
 <script>
 	import DataTable from "../../DataTable"
 	import ResultFilter from "./ResultFilter"
 	import { mapActions, mapGetters } from "vuex"
+	import CheckBox from "../../CheckBox"
 
 	export default {
 		props: {
@@ -98,51 +105,61 @@
 			isEdit: {
 				type: Boolean,
 				default: false
+			},
+			rates: {
+				type: Array
 			}
 		},
 		data() {
 			return {
 				fields: [
 					{
+						label: "",
+						headerKey: "headerCheck",
+						key: "check",
+						width: "4%",
+						padding: 0
+					},
+					{
 						label: "Source Language",
 						headerKey: "headerLanguageSource",
 						key: "sourceLang",
-						width: "15%",
+						width: "14%",
 						padding: "0"
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerLanguageTarget",
 						key: "targetLang",
-						width: "15%",
+						width: "14%",
 						padding: "0"
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "15%",
+						width: "14%",
 						padding: "0"
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "15%",
+						width: "14%",
 						padding: "0"
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "15%",
+						width: "14%",
 						padding: "0"
 					},
 					{
 						label: "Price",
 						headerKey: "headerPrice",
 						key: "price",
-						width: "12%",
+						width: "13%",
 						padding: "0"
 					},
 					{
@@ -159,7 +176,9 @@
 				stepFilter: "",
 				unitFilter: "",
 				industryFilter: "",
-				isDataRemain: true
+				isDataRemain: true,
+				dataArray: JSON.parse(JSON.stringify(this.rates))
+
 			}
 		},
 		methods: {
@@ -167,6 +186,20 @@
 				alertToggle: "alertToggle",
 				updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
+			toggleCheck({ _id }, val) {
+				const index = idx(this.dataArray, _id)
+				this.dataArray[index].isCheck = val
+
+				function idx(arr, id) {
+					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				}
+			},
+			toggleAll(val) {
+				this.dataArray = this.dataArray.reduce((acc, cur) => {
+					acc.push({ ...cur, isCheck: val })
+					return acc
+				}, [])
+			},
 			async getRowPrice(index, row) {
 				try {
 					await this.$http.post("/vendorsapi/rates/sync-cost/" + this.$route.params.id, {
@@ -218,9 +251,11 @@
 		},
 		computed: {
 			...mapGetters({
-				currentVendor: "getCurrentVendor",
-				currentVendorPriceList: "getVendorPriceList"
+				currentVendor: "getCurrentVendor"
 			}),
+			isAllSelected() {
+				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+			},
 			dataForSourceFilter() {
 				if (this.currentVendor.rates.pricelistTable.length) {
 					return this.getAllConcatUniqueValues('sourceLanguage', "lang")
@@ -247,7 +282,7 @@
 				}
 			},
 			currentVendorPriceListFiltered() {
-				let result = this.currentVendorPriceList
+				let result = this.dataArray
 
 				let fields = [
 					{ filter: this.sourceFilter, query: 'item.sourceLanguage.lang === this.sourceFilter' },
@@ -272,6 +307,7 @@
 			}
 		},
 		components: {
+			CheckBox,
 			DataTable,
 			ResultFilter
 		}
