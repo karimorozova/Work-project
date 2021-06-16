@@ -1,6 +1,8 @@
-const { ClientRequest, Projects, Services } = require('../models')
+const { ClientRequest, Projects, Services, User, Clients } = require('../models')
 const moment = require('moment')
 const { storeRequestFiles } = require('./files')
+const { allManagersMessageRequestIsCreated } = require('../emailMessages/internalCommunication')
+const { managerNotifyMail } = require('../utils/mailTemplate')
 
 
 const complianceService = async (formData, client) => {
@@ -52,11 +54,22 @@ const createComplianceFiles = async (request, files) => {
 	const sourceFiles = files.sourceFiles ? await storeRequestFiles(files.sourceFiles, _id) : []
 	const refFiles = files.refFiles ? await storeRequestFiles(files.refFiles, _id) : []
 
-	await ClientRequest.updateOne({_id}, {requestForm: { ...requestForm, sourceFiles, refFiles }})
+	await ClientRequest.updateOne({ _id }, { requestForm: { ...requestForm, sourceFiles, refFiles } })
+}
+
+const notifyAMsRequestCreated = async (request) => {
+	const client = await Clients.findOne({ _id: request.customer })
+	const users = await User.find({}, { firstName: 1, lastName: 1, group: 1, email: 1 }).populate('group')
+	const managers = users.filter(i => i.group.name === 'Account Managers')
+	for await (let user of managers) {
+		const message = allManagersMessageRequestIsCreated(user, request, client)
+		await managerNotifyMail({ email: user.email }, message, `Client Request - ${ request.requestForm.service.title }, created (I0011.0)`)
+	}
 }
 
 
 module.exports = {
 	complianceService,
+	notifyAMsRequestCreated,
 	createComplianceFiles
 }

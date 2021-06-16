@@ -6,7 +6,8 @@ const  {
 
 const {
 	complianceService,
-	createComplianceFiles
+	createComplianceFiles,
+	notifyAMsRequestCreated
 } = require('./creatingRequiestsFromForms')
 
 
@@ -31,6 +32,7 @@ const {
 
 
 module.exports = {
+	notifyAMsRequestCreated,
 	complianceService,
 	createComplianceFiles,
 	uploadRequestFiles,

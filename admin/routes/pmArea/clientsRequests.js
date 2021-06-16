@@ -8,9 +8,12 @@ const {
 	uploadRequestFiles,
 	checkRequestedFiles,
 	manageClientContacts,
-  removeContactClientRequest,
-  sendMailToClient,
+	removeContactClientRequest,
+	sendMailToClient
 } = require("../../clientRequests")
+
+const { pmAssignInRequest } = require('../../emailMessages/internalCommunication')
+const { managerNotifyMail } = require('../../utils/mailTemplate')
 
 const { upload } = require('../../utils')
 
@@ -105,6 +108,10 @@ router.post('/:id/update-prop', async (req, res) => {
 	const { id } = req.params
 	try {
 		const requests = await updateClientRequestProps({ id, value })
+		if (value.status !== undefined) {
+			const message = pmAssignInRequest(requests)
+			await managerNotifyMail({ email: requests.projectManager.email }, message, `Client Request - ${ requests.requestForm.service.title }, has been assign to you (ID I0011.1)`)
+		}
 		res.send(requests)
 	} catch (err) {
 		console.log(err)
@@ -150,11 +157,11 @@ router.post('/:id/delete', async (req, res) => {
 
 
 router.post('/:id/delete-contact/', async (req, res) => {
-	const { contactId} = { ...req.body }
+	const { contactId } = { ...req.body }
 	const { id } = { ...req.params }
 	try {
-		await removeContactClientRequest({projectId: id, contactId})
-		const requests = await getClientRequestById( id)
+		await removeContactClientRequest({ projectId: id, contactId })
+		const requests = await getClientRequestById(id)
 		res.send(requests)
 	} catch (err) {
 		console.log(err)
@@ -163,14 +170,14 @@ router.post('/:id/delete-contact/', async (req, res) => {
 })
 
 router.post('/contact-email', async (req, res) => {
-  const { id, contactId, template } = req.body
-  try {
-    await sendMailToClient({id, contactId, template})
-    res.send(true)
-  } catch (err) {
-    console.log(err)
-    res.status(500).send('Error on sending message to client\'s contact')
-  }
+	const { id, contactId, template } = req.body
+	try {
+		await sendMailToClient({ id, contactId, template })
+		res.send(true)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on sending message to client\'s contact')
+	}
 })
 
 

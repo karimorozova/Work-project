@@ -129,7 +129,7 @@
 				currentTaskId: '',
 				currentTaskIdForUpdate: '',
 				fields1: [
-					{ label: "Task Id", headerKey: "headerId", key: "id", width: "29%", padding: 0 },
+					{ label: "Task Id", headerKey: "headerId", key: "id", width: "19%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
 					{ label: "Service", headerKey: "headerService", key: "service", width: "15%", padding: 0 },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
