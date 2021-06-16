@@ -77,16 +77,16 @@
 			refreshFinance({ costs }) {
 				// console.log("refresh finance", costs);
 			},
-			async getDeliveryFiles() {
-				try {
-					const result = await this.$http.post("/pm-manage/delivery-data", {
-						projectId: this.currentProject._id,
-						taskId: this.task.taskId
-					})
-					this.delivery = result.data
-				} catch (err) {
-				}
-			},
+			// async getDeliveryFiles() {
+			// 	try {
+			// 		const result = await this.$http.post("/pm-manage/delivery-data", {
+			// 			projectId: this.currentProject._id,
+			// 			taskId: this.task.taskId
+			// 		})
+			// 		this.delivery = result.data
+			// 	} catch (err) {
+			// 	}
+			// },
 			closeInfo() {
 				this.$emit("closeStepInfo")
 			},
@@ -96,10 +96,10 @@
 			})
 		},
 		mounted() {
-			const { status } = this.task
-			if (status === 'Pending Approval [DR1]' || status === 'Pending Approval [DR2]' || status === 'Ready for Delivery') {
-				this.getDeliveryFiles()
-			}
+			// const { status } = this.task
+			// if (status === 'Pending Approval [DR1]' || status === 'Pending Approval [DR2]' || status === 'Ready for Delivery') {
+			// 	this.getDeliveryFiles()
+			// }
 		},
 		computed: {
 			...mapGetters({

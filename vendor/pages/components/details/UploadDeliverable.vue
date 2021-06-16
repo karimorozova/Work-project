@@ -1,20 +1,36 @@
 <template lang="pug">
   .deliverable-upload
     .text(v-if="!files.length") Drag and drop deliverable file here or click here to select deliverable file from your computer
-    .text(v-else) Uploaded file:
-      span.text_strong {{ files[0].name }}
-    .upload-area
+    .text(v-else) Uploaded file(s): &nbsp;
+
+      span.text_strong(v-if="job.serviceStep.title === 'Compliance'") {{ filesNames() }}
+      span.text_strong(v-else) {{ files[0].name }}
+
+    .upload-area(v-if="job.serviceStep.title === 'Compliance'")
+      input.upload-area__input(type="file" @change="setFile" multiple)
+    .upload-area(v-else)
       input.upload-area__input(type="file" @change="setFile")
 </template>
 
 <script>
 	export default {
+		props: {
+			job: {
+				type: Object
+			}
+		},
 		data() {
 			return {
 				files: []
 			}
 		},
 		methods: {
+			filesNames() {
+				return this.files.reduce((a, c) => {
+					a = a + c.name + '; '
+					return a
+				}, '')
+			},
 			setFile(e) {
 				this.files = Array.from(e.target.files)
 				this.$emit('setDeliverables', { files: this.files })

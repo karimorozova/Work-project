@@ -99,7 +99,7 @@
 	import DataTable from "../../DataTable"
 	import moment from 'moment'
 	import Button from "../../Button"
-  import { getUser } from "../../../vuex/general/getters"
+	import { getUser } from "../../../vuex/general/getters"
 
 	export default {
 		props: {
@@ -157,7 +157,8 @@
 			async convertIntoProject() {
 				try {
 					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
-          this.$router.push(`/project-details/${ projectId.data }`);
+					const route = this.$router.resolve({ path: `/project-details/${ projectId.data }` })
+					window.open(route.href, "_self");
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
 				}
@@ -303,7 +304,7 @@
 			...mapGetters({
 				currentProject: 'getCurrentClientRequest',
 				tasksData: "getTasksDataRequest",
-        user: "getUser",
+				user: "getUser"
 			}),
 			currentTasks() {
 				return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
@@ -361,11 +362,11 @@
 				// const { status } = this.currentProject
 				// return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
 			},
-      canUpdateRequest() {
-        return this.user.group.name === "Administrators"
-            ||  this.user.group.name === "Developers"
-            ||  this.currentProject.projectManager._id === this.user._id
-      }
+			canUpdateRequest() {
+				return this.user.group.name === "Administrators"
+						|| this.user.group.name === "Developers"
+						|| this.currentProject.projectManager._id === this.user._id
+			}
 		},
 		components: {
 			Button,
@@ -376,7 +377,7 @@
 		},
 		mounted() {
 			this.setDefaultIsTaskData()
-    }
+		}
 	}
 </script>
 

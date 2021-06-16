@@ -630,15 +630,9 @@ function setStepsProgress(title, docs) {
 	return { ...stepProgress, ...totalProgress };
 }
 
-/**
- *
- * @param {Object} project
- * @param {ObjectId} jobId
- * @param {String} path
- * @param {String} fileName
- * @returns nothing - but updates needed project
- */
-async function updateNonWordsTaskTargetFiles({ project, jobId, path, fileName }) {
+
+
+async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) {
 	const steps = project.steps.map(item => {
 		if(item.id === jobId) {
 			item.status = 'Completed';
@@ -666,12 +660,39 @@ async function updateNonWordsTaskTargetFiles({ project, jobId, path, fileName })
 	}
 }
 
-/**
- *
- * @param {Array} steps
- * @param {Object} project
- * @returns nothing - but updates needed project
- */
+async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
+
+	const steps = project.steps.map(item => {
+		if(item.id === jobId) {
+			item.status = 'Completed';
+			item.progress = 100;
+			item.targetFile = paths;
+		}
+		return item;
+	});
+
+	const taskStep = steps.find(item => item.id === jobId);
+
+	const tasks = project.tasks.map(item => {
+		let targetFiles = item.targetFiles || [];
+		if(taskStep.taskId === item.taskId) {
+			for (let path of paths){
+				targetFiles.push({ fileName: path.split("/").pop(), path });
+			}
+			item.targetFiles = targetFiles;
+		}
+		return item;
+	});
+	try {
+		return await updateProject({ "_id": project.id }, { steps, tasks });
+	} catch (err) {
+		console.log(err);
+		console.log("Error in updateNonWordsTaskTargetFiles");
+		throw new Error(err.message);
+	}
+}
+
+
 async function getAfterReopenSteps(steps, project) {
 	try {
 		const updatedSteps = setStepsStatus({ steps, status: 'Started', project });
@@ -845,6 +866,7 @@ module.exports = {
 	updateProjectProgress,
 	updateWithApprovedTasks,
 	getAfterReopenSteps,
+	updateNonWordsTaskTargetFile,
 	updateNonWordsTaskTargetFiles,
 	updateOtherProject,
 	assignMemoqTranslator,

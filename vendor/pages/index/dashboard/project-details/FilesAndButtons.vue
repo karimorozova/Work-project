@@ -3,7 +3,10 @@
     Files
 
     .files-buttons__upload(v-if="isFileUpload")
-      UploadDeliverable(@setDeliverables="setDeliverables")
+      UploadDeliverable(
+        @setDeliverables="setDeliverables"
+        :job="job"
+      )
 
     .files-buttons__terms(v-if="job.status !== 'Completed' && job.status !== 'Request Sent' ")
       TermsAgree(v-if="job._id" :job="job")
