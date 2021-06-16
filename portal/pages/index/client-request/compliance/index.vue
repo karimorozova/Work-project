@@ -447,7 +447,7 @@ export default {
 	    }
     },
     mappedIndustries() {
-      if (this.getClientIndustries && this.getClientIndustries.length === 3) this.setIndustry({option: this.getClientIndustries[0].name})
+      if (this.getClientIndustries && this.getClientIndustries.length === 1) this.setIndustry({option: this.getClientIndustries[0].name})
 
       return this.getClientIndustries && this.getClientIndustries.map(i => i.name)
     },
