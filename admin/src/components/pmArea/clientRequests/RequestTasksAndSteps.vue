@@ -66,6 +66,9 @@
           bodyRowClass="steps-table-row"
         )
           template(v-for="field in fields2", :slot="field.headerKey", slot-scope="{ field }")
+            .tasks__head-title(v-if="field.headerKey === 'headerSize'")
+              span(v-if="currentProject.requestForm.service.title === 'Compliance'") Quantity / Template
+              span(v-else) Quantity / Size
             .tasks__head-title {{ field.label }}
 
           template(slot="id" slot-scope="{ row, index }")
@@ -126,9 +129,9 @@
 				currentTaskId: '',
 				currentTaskIdForUpdate: '',
 				fields1: [
-					{ label: "Task Id", headerKey: "headerId", key: "id", width: "20%", padding: 0 },
+					{ label: "Task Id", headerKey: "headerId", key: "id", width: "29%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
-					{ label: "Service", headerKey: "headerService", key: "service", width: "14%", padding: 0 },
+					{ label: "Service", headerKey: "headerService", key: "service", width: "15%", padding: 0 },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 },
 					{ label: "# Source", headerKey: "headerSource", key: "source", width: "8%", padding: 0 },
@@ -137,11 +140,11 @@
 				],
 
 				fields2: [
-					{ label: "Step Id", headerKey: "headerId", key: "id", width: "20%", padding: 0 },
+					{ label: "Step Id", headerKey: "headerId", key: "id", width: "19%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
 					{ label: "Step", headerKey: "headerStep", key: "step", width: "13%", padding: 0 },
 					{ label: "Unit", headerKey: "headerUnit", key: "unit", width: "13%", padding: 0 },
-					{ label: "Quantity / Size", headerKey: "headerSize", key: "quantity", width: "13%", padding: 0 },
+					{ label: "", headerKey: "headerSize", key: "quantity", width: "14%", padding: 0 },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 }
 				]
