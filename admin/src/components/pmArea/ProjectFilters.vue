@@ -61,6 +61,16 @@
 
 
     .filters__row
+      .filters__item
+        label.filters__filter-title Project Id:
+        input.filters__text-input(type="text" id="clientId" @keyup="filterById")
+
+      .filters__item
+        label.filters__filter-title Project Name:
+        input.filters__text-input(type="text" :value="clientName" @keyup="filterByProjectName")
+      //.filters__item
+      //  LabelValue(label="Client Name")
+      //    input.filters__text-input(type="text" :v-model="clientName" id="clientName" @keyup="filterByName")
       .filters__date
         //LabelValue(label="Start Date and Time")
         label.filters__filter-title Start Date and Time:
@@ -118,6 +128,26 @@
 			}
 		},
 		methods: {
+      filterById(e) {
+        const { value } = e.target
+        clearTimeout(this.typingTimer)
+        this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval)
+        const vm = this
+
+        function doneTyping() {
+          vm.$emit("setFilter", { option: value, prop: "idFilter" })
+        }
+      },
+      filterByProjectName(e) {
+        const { value } = e.target
+        clearTimeout(this.typingTimer)
+        this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval)
+        const vm = this
+
+        function doneTyping() {
+          vm.$emit('setFilter', { option: value, prop: 'projectFilter' })
+        }
+      },
 			refreshProjects() {
 				this.$emit('refreshProjects')
 			},

@@ -57,7 +57,8 @@ const createProjectFromRequest = async (requestId) => {
 
   const request = await getClientRequestById(requestId)
   const { projectManager, accountManager, paymentProfile, clientContacts, projectName, isUrgent, brief, notes, startDate, deadline, billingDate, industry, customer } = request
-  const { discounts, minPrice, currency } = customer
+  const { _id,  minPrice, currency } = customer
+  const { discounts } = await Clients.findOne({ '_id': _id }).populate('discounts');
 
   const { USD, GBP } = await CurrencyRatio.findOne()
   const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lt: todayEnd } })

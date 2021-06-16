@@ -57,7 +57,7 @@
 
           span {{ getManagerName(row.dr1Manager) }}
       .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
-        .drops__menu(v-if="canChangeDR2Manager(row) || getManagerName(row.dr1Manager) === getManagerName(user._id)")
+        .drops__menu(v-if="canChangeDR2Manager(row) || user.group.name === 'Project Managers' || getManagerName(row.dr1Manager) === getManagerName(user._id)")
           SelectSingle(
             :isTableDropMenuNoShadow="true"
             :options="managersNames"

@@ -66,6 +66,9 @@
           bodyRowClass="steps-table-row"
         )
           template(v-for="field in fields2", :slot="field.headerKey", slot-scope="{ field }")
+            .tasks__head-title(v-if="field.headerKey === 'headerSize'")
+              span(v-if="currentProject.requestForm.service.title === 'Compliance'") Quantity / Template
+              span(v-else) Quantity / Size
             .tasks__head-title {{ field.label }}
 
           template(slot="id" slot-scope="{ row, index }")
@@ -99,7 +102,7 @@
 	import DataTable from "../../DataTable"
 	import moment from 'moment'
 	import Button from "../../Button"
-  import { getUser } from "../../../vuex/general/getters"
+	import { getUser } from "../../../vuex/general/getters"
 
 	export default {
 		props: {
@@ -126,9 +129,9 @@
 				currentTaskId: '',
 				currentTaskIdForUpdate: '',
 				fields1: [
-					{ label: "Task Id", headerKey: "headerId", key: "id", width: "20%", padding: 0 },
+					{ label: "Task Id", headerKey: "headerId", key: "id", width: "19%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
-					{ label: "Service", headerKey: "headerService", key: "service", width: "14%", padding: 0 },
+					{ label: "Service", headerKey: "headerService", key: "service", width: "15%", padding: 0 },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 },
 					{ label: "# Source", headerKey: "headerSource", key: "source", width: "8%", padding: 0 },
@@ -137,11 +140,11 @@
 				],
 
 				fields2: [
-					{ label: "Step Id", headerKey: "headerId", key: "id", width: "20%", padding: 0 },
+					{ label: "Step Id", headerKey: "headerId", key: "id", width: "19%", padding: 0 },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
 					{ label: "Step", headerKey: "headerStep", key: "step", width: "13%", padding: 0 },
 					{ label: "Unit", headerKey: "headerUnit", key: "unit", width: "13%", padding: 0 },
-					{ label: "Quantity / Size", headerKey: "headerSize", key: "quantity", width: "13%", padding: 0 },
+					{ label: "", headerKey: "headerSize", key: "quantity", width: "14%", padding: 0 },
 					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 }
 				]
@@ -157,7 +160,8 @@
 			async convertIntoProject() {
 				try {
 					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
-          this.$router.push(`/projects/details/${ projectId.data }`);
+					const route = this.$router.resolve({ path: `/project-details/${ projectId.data }` })
+					window.open(route.href, "_self");
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
 				}
@@ -303,7 +307,7 @@
 			...mapGetters({
 				currentProject: 'getCurrentClientRequest',
 				tasksData: "getTasksDataRequest",
-        user: "getUser",
+				user: "getUser"
 			}),
 			currentTasks() {
 				return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
@@ -361,11 +365,11 @@
 				// const { status } = this.currentProject
 				// return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
 			},
-      canUpdateRequest() {
-        return this.user.group.name === "Administrators"
-            ||  this.user.group.name === "Developers"
-            ||  this.currentProject.projectManager._id === this.user._id
-      }
+			canUpdateRequest() {
+				return this.user.group.name === "Administrators"
+						|| this.user.group.name === "Developers"
+						|| this.currentProject.projectManager._id === this.user._id
+			}
 		},
 		components: {
 			Button,
@@ -376,7 +380,7 @@
 		},
 		mounted() {
 			this.setDefaultIsTaskData()
-    }
+		}
 	}
 </script>
 

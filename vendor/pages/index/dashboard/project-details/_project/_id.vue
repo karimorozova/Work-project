@@ -54,7 +54,8 @@
 				getJobs: "getJobs",
 				selectJob: "selectJob",
 				alertToggle: "alertToggle",
-				setJobStatus: "setJobStatus"
+				setJobStatus: "setJobStatus",
+				setJobComplianceStatus: "setJobComplianceStatus"
 			}),
 			closeModal() {
 				this.isApproveModal = false
@@ -95,9 +96,12 @@
 				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
 				this.closeModal()
 				try {
-					await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
 					if (type === 'CAT Wordcount') {
 						await this.$axios.post('/vendor/set-workFlowStatus', { token: this.getToken, stepId: this.job.stepId, stepAction: 'Finish' })
+					}else if(this.job.serviceStep.title === "Compliance"){
+						await this.setJobComplianceStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles })
+					}else{
+						await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
 					}
 					this.setCurrentJob()
 					this.targetFiles = []

@@ -11,14 +11,15 @@ const {
 const { getProjectDeliverables } = require('../projects/files')
 
 const {
-	createRequest,
-	storeRequestFiles,
-  getClientsRequests,
-	updateClientRequest,
-	clientRequestNotification,
-	notifyRequestCancelled,
-  complianceService,
+	// createRequest,
+	// storeRequestFiles,
+	getClientsRequests,
+	// updateClientRequest,
+	// clientRequestNotification,
+	// notifyRequestCancelled,
+	complianceService,
 	createComplianceFiles,
+	notifyAMsRequestCreated
 } = require('../clientRequests')
 
 const { getAfterTaskStatusUpdate } = require('../clients')
@@ -34,9 +35,11 @@ router.post('/compliance-service', checkClientContact, upload.fields([ { name: '
 		let client = await getClient({ "_id": verificationResult.clientId })
 		const request = await complianceService(req.body, client)
 		await createComplianceFiles(request, req.files)
-    res.send('Done')
+		notifyAMsRequestCreated(request)
+		res.send('Done')
 	} catch (err) {
-
+		console.log(err)
+		res.status(500).send("Server Error on incoming request")
 	}
 })
 
@@ -77,7 +80,7 @@ router.post("/account-details", checkClientContact, upload.fields([ { name: 'pho
 		})
 		client.contacts[userIndex] = updatedUser
 		await client.save()
-		const {token, ...resultData } = updatedUser
+		const { token, ...resultData } = updatedUser
 		res.send({ user: resultData })
 	} catch (err) {
 		console.log(err)
@@ -305,16 +308,16 @@ router.post('/task-status', checkClientContact, async (req, res) => {
 	}
 })
 
-router.post('/cancel-quote', checkClientContact, async (req, res) => {
-	const { id } = req.body
-	try {
-		const request = await updateClientRequest({ "_id": id }, { status: "Cancelled" })
-		await notifyRequestCancelled(request)
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Error on request quote status update")
-	}
-})
+// router.post('/cancel-quote', checkClientContact, async (req, res) => {
+// 	const { id } = req.body
+// 	try {
+// 		const request = await updateClientRequest({ "_id": id }, { status: "Cancelled" })
+// 		await notifyRequestCancelled(request)
+// 		res.send(request)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send("Error on request quote status update")
+// 	}
+// })
 
 module.exports = router

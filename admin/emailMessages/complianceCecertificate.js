@@ -7,10 +7,9 @@ apiUrl = 'http://localhost:3001'
 const logo = apiUrl + '/static/certificate-images/logo.png'
 const background = apiUrl + '/static/certificate-images/watermark.png'
 const stamp = apiUrl + '/static/certificate-images/stamp.png'
-const dateNow = new Date()
-
 
 module.exports.getCertificateTemplate = ({ project, task, deliveryTask, allLanguages }) => {
+	const dateNow = new Date()
 	const { targetLanguage, sourceLanguage } = task
 	function getLang(arg){
 		const { lang } = allLanguages.find(({symbol}) => symbol === arg )

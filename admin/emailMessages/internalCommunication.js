@@ -454,8 +454,48 @@ function severalDr1reAssign(obj) {
             </div>`;
 }
 
+function allManagersMessageRequestIsCreated(user, request, client) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                   <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName } ${ user.lastName || '' }</span></p>
+                    <p style="font-weight: 400;">
+                        Incoming request: <a href="https://admin.pangea.global/request-details/${request._id}" target="_blank" style="color: #D15F45">${ request.projectId } - ${ request.projectName }</a> 
+                        from client: ${client.name}, in service: ${request.requestForm.service.title}, has been created. Please, check.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
+function pmAssignInRequest(request) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                   <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ request.projectManager.firstName } ${ request.projectManager.lastName || '' }</span></p>
+                    <p style="font-weight: 400;">
+                        Incoming request: <a href="https://admin.pangea.global/request-details/${request._id}" target="_blank" style="color: #D15F45">${ request.projectId } - ${ request.projectName }</a> 
+                        from client: ${request.customer.name}, in service: ${request.requestForm.service.title}, has been assign to you. Please, check.
+                    </p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`;
+}
+
 
 module.exports = {
+	pmAssignInRequest,
+	allManagersMessageRequestIsCreated,
 	getMessageWithRandomPassword,
 	managerAssignmentNotifyingMessage,
 	managerTaskCompleteNotificationMessage,
