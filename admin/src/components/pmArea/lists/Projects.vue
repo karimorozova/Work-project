@@ -1,7 +1,7 @@
 <template lang="pug">
   .all-projects
     .all-projects__filters
-      RequestFilters(
+      ProjectFilters(
         :clientName="clientFilter"
         :sourceLangs="sourceFilter"
         :targetLangs="targetFilter"
@@ -13,11 +13,13 @@
         @addLangFilter="addLangFilter"
         @removeLangFilter="removeLangFilter"
         @setFilter="setFilter"
+        :projectsType="projectsType"
         @refreshProjects="refreshProjects"
         :statuses="statuses"
       )
     .all-projects__table
-      RequestsTable(
+      ProjectsTable(
+        v-if="projectsType !== 'requests'"
         :allProjects="tableData"
         @selectProject="selectProject"
         @bottomScrolled="bottomScrolled"
@@ -25,17 +27,20 @@
 </template>
 
 <script>
+import projectsAndRequsets from '@/mixins/projectsAndRequests';
 import moment from "moment";
-import ProjectsTable from "./ProjectsTable";
-import RequestsTable from "./RequestsTable";
-import ProjectInfo from "./ProjectInfo";
-import ProjectFilters from "./ProjectFilters";
+import ProjectsTable from "../ProjectsTable";
+import RequestsTable from "../RequestsTable";
+import ProjectInfo from "../ProjectInfo";
+import ProjectFilters from "../ProjectFilters";
 import { mapGetters, mapActions } from 'vuex';
-import { setClientsRequests } from "../../vuex/clientsRequests/actions"
-import RequestFilters from "./clientRequests/RequestFilters";
 
 export default {
+  mixins: [projectsAndRequsets],
   props: {
+    projectsType: {
+      type: String
+    }
   },
   data() {
     return {
@@ -48,27 +53,29 @@ export default {
       startFilter: "",
       deadlineFilter: "",
       managers: [],
-      statuses: ["All", "Client Request", "Request Approved"],
+      statuses: [],
+      isDataRemain: true,
+      lastDate: new Date(),
+      endpoint: "allprojects",
+      prop: "projects",
     }
   },
   methods: {
-    ...mapActions(["setCurrentProject", "setClientsRequests"]),
+    ...mapActions(["setCurrentProject", "setAllProjects", "alertToggle"]),
+    async setProjects(filters) {
+      await this.getData(filters);
+    },
     setFilter({ option, prop }) {
       this[prop] = option;
-      this.refreshProjects()
-      // this.setClientsRequests({filters: this.filters});
-      // this.$emit('filterProjects', this.filters);
+      this.$emit('filterProjects', this.filters);
     },
     removeLangFilter({ from, position }) {
       this[from].splice(position, 1);
-      this.refreshProjects()
-      // this.setClientsRequests({filters: this.filters});
-      // this.$emit('filterProjects', this.filters);
+      this.$emit('filterProjects', this.filters);
     },
     addLangFilter({ to, lang }) {
-      this[to].push(lang);
-      this.refreshProjects()
-      // this.setClientsRequests({filters: this.filters});
+      this[to].push(lang.symbol);
+      this.$emit('filterProjects', this.filters);
     },
     selectProject({ project }) {
       this.setCurrentProject(project);
@@ -76,7 +83,7 @@ export default {
       if(request) {
         return this.$router.push(`/request-details/${ project._id }`);
       }
-      this.$router.push(`/project-details/${ project._id }`);
+      this.$router.push(`/projects/open-projects/details/${ project._id }`);
     },
     async getManagers() {
       const managers = await this.$http.get("/pm-manage/all-managers?groupFilters=Project%20Managers,Sales");
@@ -86,13 +93,22 @@ export default {
       this.$emit("bottomScrolled", { filters: this.filters });
     },
     refreshProjects() {
-      this.setClientsRequests({filters: this.filters});
+      this.$emit('filterProjects', this.filters);
+    },
+    setStatuses(name) {
+      if(name === 'open-projects') {
+        this.statuses = ["All", "Approved", "Cancelled", "Cancelled Halfway", "In progress", "Rejected", "Ready for Delivery"]
+      } else if(name === 'quote-projects') {
+        this.statuses = ["All", "Draft", "Quote sent", "Cost Quote"]
+      } else {
+        this.statuses = ["Closed"]
+      }
     },
   },
   computed: {
     ...mapGetters({
       allProjects: "getAllProjects",
-      allRequests: "getClientsRequests",
+      allRequests: "getAllRequests",
       allCustomers: "getClients",
     }),
     filters() {
@@ -110,7 +126,7 @@ export default {
       }
     },
     tableData() {
-      return this.allRequests
+      return this.projectsType === 'requests' ? [...this.allRequests] : [...this.allProjects];
     },
     projectManagers() {
       return this.managers.filter(item => item.group.name === 'Project Managers')
@@ -119,14 +135,17 @@ export default {
       return this.managers.filter(item => item.group.name === 'Sales')
     }
   },
-  created() {
-    this.getManagers();
+  async created() {
+    await this.getManagers();
+    await this.setProjects()
   },
   mounted() {
-    this.setClientsRequests({});
+    if(this.projectsType === "requests") {
+      this.statusFilter = "Requested";
+    }
+    this.setStatuses(this.$route.name);
   },
   components: {
-    RequestFilters,
     ProjectsTable,
     RequestsTable,
     ProjectInfo,

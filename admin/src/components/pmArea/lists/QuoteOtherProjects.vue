@@ -12,13 +12,14 @@
       .other-projects__table
         OtherProjectTable(
           :allProjects="allProjects"
+          @onRowClicked="onRowClicked"
           @bottomScrolled="bottomScrolled"
         )
 </template>
 
 <script>
-	import OtherProjectTable from './otherProjects/OtherProjectTable';
-	import OtherProjectFilter from './otherProjects/OtherProjectFilter';
+	import OtherProjectTable from '../otherProjects/OtherProjectTable';
+	import OtherProjectFilter from '../otherProjects/OtherProjectFilter';
 	import { mapActions } from 'vuex';
 
 	export default {
@@ -41,6 +42,9 @@
 		},
 		methods: {
 			...mapActions(['alertToggle']),
+      onRowClicked(id) {
+			  this.$router.push(`/projects/xtrf/quote-other-projects/details/${ id }`);
+      },
 			refreshProjects(projects) {
 				this.allProjects = projects;
 			},

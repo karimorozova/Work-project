@@ -266,7 +266,8 @@ export default {
             if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
                 return
             }
-            this.$router.push(`/clients/details/${this.clients[index]._id}`);
+          let clientId = this.clients[index]._id
+          this.$emit('showClientDetails', {id: clientId} )
         },
         stopPropagation() {
             return

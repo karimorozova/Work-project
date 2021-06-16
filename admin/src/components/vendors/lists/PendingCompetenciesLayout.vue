@@ -78,7 +78,7 @@
 
             template(slot="link" slot-scope="{ row }")
               .pendingCompetencies__icon
-                a(:href="'/vendors/details/' + row.link" target="_blank")
+                a(:href="'/vendors/all/details/' + row.link" target="_blank")
                   i.fas.fa-external-link-alt
 
 </template>
@@ -86,8 +86,8 @@
 <script>
 	import DataTable from "../../DataTable"
 	import { mapGetters, mapActions } from "vuex"
-	import PendingCompetenciesFilter from "./PendingCompetenciesFilter"
-	import CandidateForm from "./CandidateForm"
+	import PendingCompetenciesFilter from "../pending-competencies/PendingCompetenciesFilter"
+	import CandidateForm from "../pending-competencies/CandidateForm"
 	import WYSIWYG from "../WYSIWYG"
 
 

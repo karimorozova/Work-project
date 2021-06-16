@@ -37,23 +37,25 @@ import ClientInfo from '@/components/clients/ClientInfo'
 import ClientDetails from '@/components/clients/ClientDetails'
 
 //CLIENT TABLE
-import Allclients from '@/components/clients/Allclients'
-import ActiveClients from '@/components/clients/ActiveClients'
-import InactiveClients from '@/components/clients/InactiveClients'
-import PotentialClients from '@/components/clients/PotentialClients'
+import Allclients from '@/components/clients/lists/Allclients'
+import ActiveClients from '@/components/clients/lists/ActiveClients'
+import InactiveClients from '@/components/clients/lists/InactiveClients'
+import PotentialClients from '@/components/clients/lists/PotentialClients'
 //------------------------------------------------------------CLIENT------------------------------------------------------------
 import Vendordetails from '@/components/vendors/Vendordetails'
-import AllVendorsTable from '@/components/vendors/AllVendorsTable'
-import ActiveVendors from '@/components/vendors/ActiveVendors'
-import PotentialVendors from '@/components/vendors/PotentialVendors'
-import InactiveVendors from '@/components/vendors/InactiveVendors'
+import AllVendorsTable from '@/components/vendors/lists/AllVendorsTable'
+import ActiveVendors from '@/components/vendors/lists/ActiveVendors'
+import PotentialVendors from '@/components/vendors/lists/PotentialVendors'
+import InactiveVendors from '@/components/vendors/lists/InactiveVendors'
 import NewVendor from '@/components/vendors/NewVendor'
 import Accountinfo from '@/components/account/Accountinfo'
-import Projects from '@/components/pmArea/Projects'
-import Requests from '@/components/pmArea/Requests'
-import ClosedProjects from '@/components/pmArea/ClosedProjects'
-import QuoteProjects from '@/components/pmArea/QuoteProjects'
-import OtherProjects from '@/components/pmArea/OtherProjects'
+import Projects from '@/components/pmArea/lists/Projects'
+import Requests from '@/components/pmArea/lists/Requests'
+import ClosedProjects from '@/components/pmArea/lists/ClosedProjects'
+import QuoteProjects from '@/components/pmArea/lists/QuoteProjects'
+import OpenOtherProjects from '@/components/pmArea/lists/OpenOtherProjects'
+import ClosedOtherProjects from '@/components/pmArea/lists/ClosedOtherProjects'
+import QuoteOtherProjects from '@/components/pmArea/lists/QuoteOtherProjects'
 import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
 import ZohoCode from '@/components/ZohoCode'
@@ -61,12 +63,12 @@ import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
-import VendorsCandidatesTests from '@/components/vendors/VendorsCandidatesTests'
+import VendorsCandidatesTests from '@/components/vendors/lists/VendorsCandidatesTests'
 import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
-import { default as PendingCompetenciesLayout } from "../components/vendors/pending-competencies/Layout"
+import PendingCompetenciesLayout from "../components/vendors/lists/PendingCompetenciesLayout"
 import { store } from '../vuex/store'
 import TableClientApiSetting from "../components/Table/TableClientApiSetting"
 import Navbar from "../components/Navbar"
@@ -225,7 +227,7 @@ const router = new Router({
                     children: [
                         {
                             path: 'all',
-                            name: 'all-vendors',
+                            name: '',
                             props: true,
                             component: clearRouterView,
                             children: [
@@ -237,45 +239,45 @@ const router = new Router({
                                 },
                                 {
                                     path: 'details/:id',
-                                    name: 'vendor-details',
+                                    name: 'all-vendor-details',
                                     component: Vendordetails
                                 },
                             ]
                         },
                         {
                             path: 'active',
-                            name: 'active-vendors',
+                            name: '',
                             props: true,
                             component: clearRouterView,
                             children: [
                                 {
                                     path: '',
-                                    name: 'all-vendors',
+                                    name: 'active-vendors',
                                     props: true,
                                     component: ActiveVendors,
                                 },
                                 {
                                     path: 'details/:id',
-                                    name: 'vendor-details',
+                                    name: 'active-vendor-details',
                                     component: Vendordetails
                                 },
                             ]
                         },
                         {
                             path: 'inactive',
-                            name: 'inactive-vendors',
+                            name: '',
                             props: true,
                             component: clearRouterView,
                             children: [
                                 {
                                     path: '',
-                                    name: 'all-vendors',
+                                    name: 'inactive-vendors',
                                     props: true,
                                     component: InactiveVendors,
                                 },
                                 {
                                     path: 'details/:id',
-                                    name: 'vendor-details',
+                                    name: 'inactive-vendor-details',
                                     component: Vendordetails
                                 },
                             ]
@@ -287,13 +289,13 @@ const router = new Router({
                             children: [
                                 {
                                     path: 'potential',
-                                    name: 'potential-vendors',
+                                    name: '',
                                     props: true,
                                     component: clearRouterView,
                                     children: [
                                         {
                                             path: '',
-                                            name: 'all-vendors',
+                                            name: 'potential-vendors',
                                             props: true,
                                             component: PotentialVendors,
                                         },
@@ -329,16 +331,16 @@ const router = new Router({
                                 },
                                 {
                                     path: 'details/:id',
-                                    name: 'vendor-details',
+                                    name: 'report-details',
                                     component: Vendordetails
                                 },
                             ]
                         },
-                        {
-                            path: 'details/:id',
-                            name: 'vendor-details',
-                            component: Vendordetails
-                        },
+                        // {
+                        //     path: 'details/:id',
+                        //     name: 'vendor-details',
+                        //     component: Vendordetails
+                        // },
                         {
                             path: 'new-vendor',
                             name: 'new-vendor',
@@ -358,19 +360,19 @@ const router = new Router({
                     children: [
                         {
                             path: 'all',
-                            name: 'all-clients',
+                            name: '',
                             component: clearRouterView,
                             props: true,
                             children: [
                                 {
                                     path: '',
-                                    name: 'client-info',
+                                    name: 'all-clients',
                                     component: Allclients,
                                     props: true
                                 },
                                 {
                                     path: 'details/:id',
-                                    name: '',
+                                    name: 'all-clients-details',
                                     component: ClientInfo,
                                     props: true,
                                 }
@@ -378,48 +380,90 @@ const router = new Router({
                         },
                         {
                             path: 'active',
-                            name: 'active-clients',
-                            props: true,
-                            component: ActiveClients
-                        },
-                        {
-                            path: 'inactive',
-                            name: 'inactive-clients',
-                            props: true,
-                            component: InactiveClients
-                        },
-                        {
-                            path: 'potential',
-                            name: 'potential-clients',
-                            props: true,
-                            component: PotentialClients
-                        },
-                        {
-                            path: 'details/:id',
                             name: '',
-                            component: ClientDetails,
                             props: true,
+                            component: clearRouterView,
                             children: [
                                 {
                                     path: '',
-                                    name: 'client-info',
+                                    name: 'active-clients',
+                                    component: ActiveClients,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'active-clients-details',
                                     component: ClientInfo,
-                                    props: true
-                                },
-                                {
-                                    path: 'new-contact',
-                                    name: 'new-contact',
-                                    component: NewContactDetails,
-                                    props: true
-                                },
-                                {
-                                    path: 'contact/:index',
-                                    name: 'contact',
-                                    component: ContactDetails,
-                                    props: true
+                                    props: true,
                                 }
                             ]
                         },
+                        {
+                            path: 'inactive',
+                            name: '',
+                            props: true,
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'inactive-clients',
+                                    component: InactiveClients,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'inactive-clients-details',
+                                    component: ClientInfo,
+                                    props: true,
+                                }
+                            ]
+                        },
+                        {
+                            path: 'potential',
+                            name: '',
+                            props: true,
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'potential-clients',
+                                    component: PotentialClients,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'potential-clients-details',
+                                    component: ClientInfo,
+                                    props: true,
+                                }
+                            ]
+                        },
+                        // {
+                        //     path: 'details/:id',
+                        //     name: '',
+                        //     component: ClientDetails,
+                        //     props: true,
+                        //     children: [
+                        //         {
+                        //             path: '',
+                        //             name: 'client-info',
+                        //             component: ClientInfo,
+                        //             props: true
+                        //         },
+                        //         {
+                        //             path: 'new-contact',
+                        //             name: 'new-contact',
+                        //             component: NewContactDetails,
+                        //             props: true
+                        //         },
+                        //         {
+                        //             path: 'contact/:index',
+                        //             name: 'contact',
+                        //             component: ContactDetails,
+                        //             props: true
+                        //         }
+                        //     ]
+                        // },
                         {
                             path: 'new-client',
                             name: '',
@@ -455,20 +499,81 @@ const router = new Router({
                     children: [
                         {
                             path: 'open-projects',
-                            name: 'open-projects',
-                            component: Projects,
-                            props: true
+                            name: '',
+                            component: clearRouterView,
+                            props: true,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'open-projects',
+                                    component: Projects,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'open-project-details',
+                                    component: ProjectInfo,
+                                    props: true,
+                                }
+                            ]
+                        },
+                        {
+                            path: 'quote-projects',
+                            name: '',
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'quote-projects',
+                                    component: QuoteProjects,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'quote-projects-details',
+                                    component: ProjectInfo,
+                                    props: true,
+                                }
+                            ]
                         },
                         {
                             path: 'requests',
-                            name: 'requests',
-                            component: Requests,
-                            props: true
+                            name: '',
+                            component: clearRouterView,
+                            props: true,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'requests',
+                                    component: Requests,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'requests-projects-details',
+                                    component: ProjectInfo,
+                                    props: true,
+                                }
+                            ]
                         },
                         {
                             path: 'closed-projects',
-                            name: 'closed-projects',
-                            component: ClosedProjects
+                            name: '',
+                            component: clearRouterView,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'closed-projects',
+                                    component: ClosedProjects,
+                                    props: true
+                                },
+                                {
+                                    path: 'details/:id',
+                                    name: 'closed-projects-details',
+                                    component: ProjectInfo,
+                                    props: true,
+                                }
+                            ]
                         },
                         {
                             path: 'xtrf',
@@ -478,36 +583,73 @@ const router = new Router({
                             children: [
                                 {
                                     path: 'open-other-projects',
-                                    name: 'open-other-projects',
-                                    component: OtherProjects
+                                    name: '',
+                                    component: clearRouterView,
+                                    children: [
+                                        {
+                                            path: '',
+                                            name: 'open-other-projects',
+                                            component: OpenOtherProjects,
+                                            props: true
+                                        },
+                                        {
+                                            path: 'details/:id',
+                                            name: 'open-other-projects-details',
+                                            component: OtherProjectInfo,
+                                            props: true,
+                                        }
+                                    ]
                                 },
                                 {
                                     path: 'closed-other-projects',
-                                    name: 'closed-other-projects',
-                                    component: OtherProjects
+                                    name: '',
+                                    component: clearRouterView,
+                                    children: [
+                                        {
+                                            path: '',
+                                            name: 'closed-other-projects',
+                                            component: ClosedOtherProjects,
+                                            props: true
+                                        },
+                                        {
+                                            path: 'details/:id',
+                                            name: 'closed-other-projects-details',
+                                            component: OtherProjectInfo,
+                                            props: true,
+                                        }
+                                    ]
                                 },
                                 {
                                     path: 'quote-other-projects',
-                                    name: 'quote-other-projects',
-                                    component: OtherProjects
+                                    name: '',
+                                    component: clearRouterView,
+                                    children: [
+                                        {
+                                            path: '',
+                                            name: 'quote-other-projects',
+                                            component: QuoteOtherProjects,
+                                            props: true
+                                        },
+                                        {
+                                            path: 'details/:id',
+                                            name: 'quote-other-projects-details',
+                                            component: OtherProjectInfo,
+                                            props: true,
+                                        }
+                                    ]
                                 },
-                                {
-                                    path: 'details/:id',
-                                    name: 'details',
-                                    component: OtherProjectInfo
-                                },
+                                // {
+                                //     path: 'details/:id',
+                                //     name: 'details',
+                                //     component: OtherProjectInfo
+                                // },
                             ]
                         },
-                        {
-                            path: 'quote-projects',
-                            name: 'quote-projects',
-                            component: QuoteProjects
-                        },
-                        {
-                            path: 'details/:id',
-                            name: 'details',
-                            component: ProjectInfo
-                        },
+                        // {
+                        //     path: 'details/:id',
+                        //     name: 'details',
+                        //     component: ProjectInfo
+                        // },
 
                     ]
                 },

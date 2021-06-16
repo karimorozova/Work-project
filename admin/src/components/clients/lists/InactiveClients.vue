@@ -32,19 +32,13 @@
 </template>
 
 <script>
-import ClientsTable from "./ClientsTable";
-import ClientIndustrySelect from '../clients/ClientIndustrySelect';
-import MultiClientIndustrySelect from '../clients/MultiClientIndustrySelect';
-import ClientLeadsourceSelect from '../clients/ClientLeadsourceSelect';
+import ClientsTable from "../ClientsTable";
+import ClientIndustrySelect from '../../clients/ClientIndustrySelect';
+import MultiClientIndustrySelect from '../../clients/MultiClientIndustrySelect';
+import ClientLeadsourceSelect from '../../clients/ClientLeadsourceSelect';
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    props: {
-        statusFilter: {
-            type: String,
-            default: "All"
-        }
-    },
     data() {
         return {
           nameFilter: "",
@@ -56,7 +50,8 @@ export default {
           isDataRemain: true,
           lastId: "",
           typingTimer: "",
-          doneTypingInterval: 800
+          doneTypingInterval: 800,
+          statusFilter: 'Inactive'
         }
     },
     methods: {
@@ -96,11 +91,7 @@ export default {
             this.$emit('clientCancel');
         },
         showClientDetails({id}) {
-            const client = this.allClients.find(item => item._id === id);
-            let str = JSON.stringify(client);
-            const currentClient = JSON.parse(str);
-            this.storeCurrentClient(currentClient);
-            this.$router.push(`/clients/details/${id}`);
+            this.$router.push(`/clients/inactive/details/${id}`);
         },
         addClient() {
             this.$router.push('/clients/new-client');

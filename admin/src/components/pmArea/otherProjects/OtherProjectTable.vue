@@ -195,7 +195,8 @@
 				}
 			},
 			async onRowClicked({ index }) {
-				this.$router.push(`/projects/xtrf/details/${ this.allProjects[index]._id }`);
+        const id = this.allProjects[index]._id
+        this.$emit('onRowClicked', id)
 			},
 			formateDate: time => moment(time).format("DD-MM-YYYY"),
 			projectLangs(row) {

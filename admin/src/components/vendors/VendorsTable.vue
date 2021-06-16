@@ -293,7 +293,7 @@
 					return
 				}
 				const vendor = this.vendors[index];
-				this.$router.push(`/vendors/all/details/${ vendor._id }`);
+				this.$emit('goToVendor', vendor._id)
 			}
 		},
 		computed: {

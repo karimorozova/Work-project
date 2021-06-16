@@ -35,11 +35,11 @@
 </template>
 
 <script>
-	import VendorsTable from "./VendorsTable";
-	import VendorFilters from "./VendorFilters";
+	import VendorsTable from "../VendorsTable";
+	import VendorFilters from "../VendorFilters";
 	import { mapActions, mapGetters } from "vuex";
-	import VendorsTablePotential from "./VendorsTablePotential"
-	import VendorFiltersPotential from "./VendorFiltersPotential"
+	import VendorsTablePotential from "../VendorsTablePotential"
+	import VendorFiltersPotential from "../VendorFiltersPotential"
 
 	export default {
 		data() {
@@ -178,7 +178,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors.scss";
 
   .potential {
     width: 1200px;

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Allclients from "./Allclients";
+import Allclients from "./lists/Allclients";
 
 export default {
     components: {

@@ -162,14 +162,14 @@
 <script>
 	import { mapGetters, mapActions } from "vuex";
 	import moment from "moment";
-	import Add from "../Add";
-	import Button from "../Button";
-	import SelectSingle from "../SelectSingle";
-	import SelectMulti from "../SelectMulti";
-	import Datatable from "../DataTable";
+	import Add from "../../Add";
+	import Button from "../../Button";
+	import SelectSingle from "../../SelectSingle";
+	import SelectMulti from "../../SelectMulti";
+	import Datatable from "../../DataTable";
 	import scrollDrop from "@/mixins/scrollDrop";
-	import ValidationErrors from "../ValidationErrors";
-	import ApproveModal from "../ApproveModal";
+	import ValidationErrors from "../../ValidationErrors";
+	import ApproveModal from "../../ApproveModal";
 
 export default {
 		mixins: [scrollDrop],
@@ -241,7 +241,7 @@ export default {
 					},
 				],
 				icons: {
-					delete: { icon: require("../../assets/images/Other/delete-icon-qa-form.png") },
+					delete: { icon: require("../../../assets/images/Other/delete-icon-qa-form.png") },
 				},
 				vendorTests: [],
 				currentActive: -1,
@@ -569,7 +569,7 @@ export default {
 	};
 </script>
 <style lang="scss" scoped>
-  @import "../../assets/styles/settingsTable.scss";
+  @import "../../../assets/styles/settingsTable.scss";
 
   a{
     color: #d15f45;
@@ -638,7 +638,7 @@ export default {
         width: 48px;
         height: 31px;
         position: relative;
-        background: url("../../assets/images/upload-red-icon.png");
+        background: url("../../../assets/images/upload-red-icon.png");
         background-position: center;
         background-repeat: no-repeat;
       }
@@ -659,7 +659,7 @@ export default {
         width: 48px;
         height: 31px;
         position: relative;
-        background: url("../../assets/images/upload-red-icon-disabled.png");
+        background: url("../../../assets/images/upload-red-icon-disabled.png");
         background-position: center;
         background-repeat: no-repeat;
       }

@@ -914,6 +914,7 @@
 
     &__layout {
       display: flex;
+      margin: 40px;
     }
 
     &__notes {
