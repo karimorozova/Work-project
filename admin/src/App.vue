@@ -40,10 +40,23 @@
 
   input:disabled,
   textarea:disabled {
-    background-color: #eee!important;
+    background-color: #eee !important;
   }
 
-  ::-webkit-file-upload-button { cursor:pointer; }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+
+  ::-webkit-file-upload-button {
+    cursor: pointer;
+  }
 
   .b-log-in,
   .b-log-out {
@@ -65,41 +78,41 @@
     opacity: 0;
   }
 
-  ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-  }
+  /*::-webkit-scrollbar {*/
+  /*  width: 12px;*/
+  /*  height: 12px;*/
+  /*}*/
 
-  ::-webkit-scrollbar-track {
-    background: rgba(103, 87, 62, 0.1);
-  }
+  /*::-webkit-scrollbar-track {*/
+  /*  background: rgba(103, 87, 62, 0.1);*/
+  /*}*/
 
-  ::-webkit-scrollbar-thumb:vertical {
-    background-color: rgba(103, 87, 62, 0.3);
-    border-left: 2px solid transparent;
-    border-right: 2px solid transparent;
-    background-clip: content-box;
-    border-radius: 4px;
-    min-height: 25px;
+  /*::-webkit-scrollbar-thumb:vertical {*/
+  /*  background-color: rgba(103, 87, 62, 0.3);*/
+  /*  border-left: 2px solid transparent;*/
+  /*  border-right: 2px solid transparent;*/
+  /*  background-clip: content-box;*/
+  /*  border-radius: 4px;*/
+  /*  min-height: 25px;*/
 
-    &:hover {
-      background-color: #938676;
-      background-clip: content-box;
-    }
-  }
+  /*  &:hover {*/
+  /*    background-color: #938676;*/
+  /*    background-clip: content-box;*/
+  /*  }*/
+  /*}*/
 
-  ::-webkit-scrollbar-thumb:horizontal {
-    background-color: rgba(103, 87, 62, 0.3);
-    border-top: 2px solid transparent;
-    border-bottom: 2px solid transparent;
-    background-clip: content-box;
-    border-radius: 4px;
+  /*::-webkit-scrollbar-thumb:horizontal {*/
+  /*  background-color: rgba(103, 87, 62, 0.3);*/
+  /*  border-top: 2px solid transparent;*/
+  /*  border-bottom: 2px solid transparent;*/
+  /*  background-clip: content-box;*/
+  /*  border-radius: 4px;*/
 
-    &:hover {
-      background-color: #938676;
-      background-clip: content-box;
-    }
-  }
+  /*  &:hover {*/
+  /*    background-color: #938676;*/
+  /*    background-clip: content-box;*/
+  /*  }*/
+  /*}*/
 
   @font-face {
     font-family: 'Myriad300';
@@ -128,9 +141,5 @@
     font-style: normal;
     font-weight: normal;
     src: url('./assets/fonts/MYRIADPRO-BOLD.woff') format('woff');
-  }
-
-  #app {
-
   }
 </style>

@@ -1,5 +1,15 @@
 <template lang="pug">
   .price
+    .modal(v-if="isUpdateModal")
+      SetPriceModal(
+        @close="closeUpdateModal"
+        @setPrice="setPrice"
+        :i="i"
+        :length="length"
+      )
+    .button(v-if="dataArray.some(i => !!i.isCheck)")
+      Button(value="Update Selected" @clicked="openUpdateModal")
+
     StepFilter(
       :step="stepFilter"
       :unit="unitFilter"
@@ -25,7 +35,8 @@
 
       template(slot="check" slot-scope="{ row, index }")
         .price__data(v-if="isEdit")
-          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+          | {{row.isCheck}}
+          CheckBox(:isChecked="!!row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="step" slot-scope="{ row, index }")
         .price__data {{ row.step.title }}
@@ -80,6 +91,8 @@
 	import StepFilter from "./StepFilter"
 	import { mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
+	import Button from "../../Button"
+	import SetPriceModal from "./SetPriceModal"
 
 	export default {
 		props: {
@@ -170,8 +183,9 @@
 				stepFilter: "",
 				unitFilter: "",
 				sizeFilter: "",
-
-				isDataRemain: true
+				isDataRemain: true,
+				i: 0,
+				length: 0
 			}
 		},
 		created() {
@@ -182,6 +196,23 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			async setPrice(price) {
+				this.length = this.dataArray.filter(i => !!i.isCheck).length
+				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
+					this.i = index + 1
+					row.euroBasicPrice = price
+					await this.manageSavePrice(row)
+				}
+				this.closeUpdateModal()
+			},
+			openUpdateModal() {
+				this.isUpdateModal = true
+			},
+			closeUpdateModal() {
+				this.isUpdateModal = false
+				this.toggleAll(false)
+				this.i = this.length = 0
+			},
 			toggleCheck(index, val) {
 				this.dataArray[index].isCheck = val
 			},
@@ -216,7 +247,7 @@
 						...filters,
 						countFilter: count
 					})
-					this.dataArray = result.data
+					this.dataArray = result.data.map(i => ({ ...i, isCheck: false }))
 				} catch (err) {
 					this.alertToggle({
 						message: "Error on getting Steps",
@@ -227,6 +258,31 @@
 			},
 			refreshResultTable() {
 				this.$emit('refreshResultTable')
+			},
+			async manageSavePrice({ _id, step, unit, size, multiplier, euroMinPrice }) {
+				try {
+					const result = await this.$http.post("/pricelists/step-multipliers-update/" + this.priceId, {
+						stepMultiplier: {
+							_id,
+							step,
+							unit,
+							size,
+							multiplier: parseFloat(multiplier).toFixed(0),
+							usdMinPrice: euroMinPrice * this.currency.USD,
+							euroMinPrice,
+							gbpMinPrice: euroMinPrice * this.currency.GBP
+						}
+					})
+					this.dataArray.splice(idx(this.dataArray, _id), 1, { ...result.data, isCheck: false })
+
+					function idx(arr, id) {
+						return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+					}
+
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
+				}
 			},
 			async manageSaveClick(index) {
 				const { _id, step, unit, size, multiplier, euroMinPrice } = this.dataArray[index]
@@ -272,7 +328,7 @@
 		},
 		computed: {
 			isAllSelected() {
-				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+				return this.dataArray && this.dataArray.length && this.dataArray.every(i => !!i.isCheck)
 			},
 			allFilters() {
 				let result = {
@@ -288,6 +344,8 @@
 			}
 		},
 		components: {
+			SetPriceModal,
+			Button,
 			CheckBox,
 			DataTable,
 			StepFilter
@@ -300,12 +358,14 @@
   .price {
     background-color: #fff;
 
-    input {
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
     }
 
     label {

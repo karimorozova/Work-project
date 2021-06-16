@@ -44,11 +44,11 @@
     &__button {
       transition: .2s ease-out;
       text-align: center;
-      border: 2px solid #d15f45;
+      border: 2px solid $red;
       min-width: 120px;
       padding: 0 24px 0 24px;
       height: 32px;
-      color: #d15f45;
+      color: $red;
       font-size: 14px;
       border-radius: 4px;
       background-color: white;
@@ -81,19 +81,19 @@
       color: $white;
       font-size: 14px;
       border-radius: 4px;
-      background-color: $orange;
+      background-color: $red;
       border: none;
-      transition: .1s ease;
+      transition: .2s ease-out;
       outline: none;
       letter-spacing: 0.2px;
 
       &:hover {
         cursor: pointer;
-        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+        background-color: black!important;
       }
 
       &:active {
-        transform: scale(.98);
+        transform: scale(.97);
       }
     }
 
@@ -139,7 +139,7 @@
       color: $white;
       font-size: 14px;
       border-radius: 4px;
-      background-color: $orange!important;
+      background-color: $orange !important;
       border: none;
       transition: .1s ease;
       outline: none;
@@ -161,6 +161,7 @@
       width: 200px;
     }
   }
+
   .width-140 {
     .action-button__button {
       width: 140px;

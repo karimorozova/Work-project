@@ -1,5 +1,14 @@
 <template lang="pug">
   .price
+    .modal(v-if="isUpdateModal")
+      SetPriceModal(
+        @close="closeUpdateModal"
+        @setPrice="setPrice"
+        :i="i"
+        :length="length"
+      )
+    .button(v-if="dataArray.some(i => !!i.isCheck)")
+      Button(value="Update Selected" @clicked="openUpdateModal")
     LangFilter(
       :source="sourceFilter"
       :target="targetFilter"
@@ -18,13 +27,13 @@
       @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+        //.price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
+          //CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
         .price-title(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
-        .price__data(v-if="isEdit")
-          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+        .price__data(v-if="isEdit && row.hasOwnProperty('isCheck')")
+          CheckBox(:isChecked="!!row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="sourceLang" slot-scope="{ row, index }")
         .price__data {{ row.sourceLanguage.lang }}
@@ -60,6 +69,8 @@
 	import LangFilter from "./LangFilter"
 	import { mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
+	import Button from "../../Button"
+	import SetPriceModal from "./SetPriceModal"
 
 	export default {
 		props: {
@@ -128,7 +139,10 @@
 				typeFilter: "",
 				sourceFilter: "",
 				targetFilter: "",
-				isDataRemain: true
+				isDataRemain: true,
+				isUpdateModal: false,
+				i: 0,
+				length: 0
 			}
 		},
 		created() {
@@ -139,6 +153,23 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			async setPrice(price) {
+				this.length = this.dataArray.filter(i => !!i.isCheck).length
+				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
+					this.i = index + 1
+					row.euroBasicPrice = price
+					await this.manageSavePrice(row)
+				}
+				this.closeUpdateModal()
+			},
+			openUpdateModal() {
+				this.isUpdateModal = true
+			},
+			closeUpdateModal() {
+				this.isUpdateModal = false
+				this.toggleAll(false)
+				this.i = this.length = 0
+			},
 			toggleCheck(index, val) {
 				this.dataArray[index].isCheck = val
 			},
@@ -179,6 +210,29 @@
 			},
 			refreshResultTable() {
 				this.$emit('refreshResultTable')
+			},
+			async manageSavePrice({ _id, type, sourceLanguage, targetLanguage, euroBasicPrice }) {
+				try {
+					const result = await this.$http.post("/pricelists/basic-prices-update/" + this.priceId, {
+						basicPrice: {
+							_id,
+							type,
+							sourceLanguage,
+							targetLanguage,
+							usdBasicPrice: euroBasicPrice * this.currency.USD,
+							euroBasicPrice,
+							gbpBasicPrice: euroBasicPrice * this.currency.GBP
+						}
+					})
+					this.dataArray.splice(idx(this.dataArray, _id), 1, { ...result.data, isCheck: false })
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
+				}
+
+				function idx(arr, id) {
+					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				}
 			},
 			async manageSaveClick(index) {
 				const { _id, type, sourceLanguage, targetLanguage, euroBasicPrice } = this.dataArray[index]
@@ -223,7 +277,7 @@
 		},
 		computed: {
 			isAllSelected() {
-				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+				return this.dataArray && this.dataArray.length && this.dataArray.every(i => !!i.isCheck)
 			},
 			allFilters() {
 				let result = {
@@ -239,6 +293,8 @@
 			}
 		},
 		components: {
+			SetPriceModal,
+			Button,
 			CheckBox,
 			DataTable,
 			LangFilter
@@ -252,12 +308,14 @@
     background-color: #fff;
     box-shadow: none;
 
-    input {
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
     }
 
     label {
