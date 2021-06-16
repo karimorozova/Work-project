@@ -63,8 +63,8 @@ const updateBasicPriceValue = async ({ USD, GBP }) => {
 		for (let { basicPricesTable, _id } of priceLists) {
 			let updatedBasicPrices = []
 			for (let { euroBasicPrice, usdBasicPrice, gbpBasicPrice, _id: basicPriceId, type, sourceLanguage, targetLanguage } of basicPricesTable) {
-				usdBasicPrice = euroBasicPrice * Number(USD)
-				gbpBasicPrice = euroBasicPrice * Number(GBP)
+				usdBasicPrice = +(euroBasicPrice * Number(USD)).toFixed(4)
+				gbpBasicPrice = +(euroBasicPrice * Number(GBP)).toFixed(4)
 				updatedBasicPrices.push({
 					euroBasicPrice,
 					usdBasicPrice,

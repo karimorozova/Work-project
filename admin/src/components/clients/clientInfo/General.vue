@@ -342,7 +342,7 @@
       outline: none;
       width: 200px;
       height: 32px;
-      transition: .1s ease;
+      transition: .1s ease-out;
 
       &:focus{
         border: 1px solid #938877;

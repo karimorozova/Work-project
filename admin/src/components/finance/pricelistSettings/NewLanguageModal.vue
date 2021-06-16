@@ -8,13 +8,16 @@
           label(:for="'language-row' + (index + 1)")
         .language__pairs {{ item.source.lang }} >> {{ item.target.lang }}
     .language__buttons
-      .button(@click="save") Confirm
-      .button(@click="close") Cancel
+      Button(value="Confirm"  @clicked="save")
+      Button(value="Cancel" @clicked="close")
 
 </template>
 
 <script>
+	import Button from "../../Button"
+
 	export default {
+		components: { Button },
 		props: {
 			languagesArr: {
 				type: Array
@@ -34,15 +37,15 @@
 			},
 			approveLanguagesPairs(index) {
 				const position = this.approveArray
-						.findIndex(item => JSON.stringify(item) === JSON.stringify(this.languagesArr[index]));
+						.findIndex(item => JSON.stringify(item) === JSON.stringify(this.languagesArr[index]))
 
-				if(position !== -1) {
-					this.approveArray.splice(position, 1);
+				if (position !== -1) {
+					this.approveArray.splice(position, 1)
 				} else {
-					this.approveArray.push(this.languagesArr[index]);
+					this.approveArray.push(this.languagesArr[index])
 				}
 			}
-		},
+		}
 
 	}
 </script>
@@ -51,8 +54,8 @@
 
   .language {
     background: #fff;
-    box-shadow: 0 0 10px rgba(103, 87, 62, 0.7);
-    width: 360px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    width: 350px;
     padding: 20px;
 
     &__pairs {
@@ -65,30 +68,16 @@
     }
 
     &__title {
-      font-size: 22px;
-      border-bottom: 1px solid #68573e;
+      font-size: 21px;
+      font-family: Myriad600;
       margin-bottom: 20px;
     }
 
     &__buttons {
       margin-top: 20px;
       display: flex;
-      justify-content: space-between;
+      justify-content: space-evenly;
     }
-  }
-
-  .button {
-    height: 31px;
-    color: #fff;
-    font-size: 14px;
-    border-radius: 4px;
-    box-shadow: 0 3px 5px rgba(103, 87, 62, .5);
-    background-color: #d15f45;
-    border: 1px solid #d15f45;
-    cursor: pointer;
-    outline: none;
-    padding: 0 50px;
-    line-height: 31px;
   }
 
   .checkbox {

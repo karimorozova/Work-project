@@ -67,21 +67,22 @@ const updateStepMultipliers = async (stepToUpdate, priceListId) => {
 		console.log(err)
 		console.log('Error in updateStepMultipliers')
 	}
+
 	function fixedPrice4() {
 		stepToUpdate.usdMinPrice = +parseFloat(stepToUpdate.usdMinPrice).toFixed(4)
-		stepToUpdate.euroMinPrice = +parseFloat(stepToUpdate.euroMinPrice ).toFixed(4)
+		stepToUpdate.euroMinPrice = +parseFloat(stepToUpdate.euroMinPrice).toFixed(4)
 		stepToUpdate.gbpMinPrice = +parseFloat(stepToUpdate.gbpMinPrice).toFixed(4)
 	}
 }
 
 const updateStepPriceValue = async ({ USD, GBP }) => {
 	try {
-		const pricelists = await Pricelist.find()
-		for (let { stepMultipliersTable, _id } of pricelists) {
+		const priceLists = await Pricelist.find()
+		for (let { stepMultipliersTable, _id } of priceLists) {
 			let updatedStepPrices = []
 			for (let { euroMinPrice, usdMinPrice, gbpMinPrice, _id: stepMultipliersId, step, unit, size } of stepMultipliersTable) {
-				usdMinPrice = euroMinPrice * Number(USD)
-				gbpMinPrice = euroMinPrice * Number(GBP)
+				usdMinPrice = +(euroMinPrice * Number(USD)).toFixed(4)
+				gbpMinPrice = +(euroMinPrice * Number(GBP)).toFixed(4)
 				updatedStepPrices.push({
 					euroMinPrice,
 					usdMinPrice,

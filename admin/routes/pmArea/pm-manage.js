@@ -1137,6 +1137,8 @@ router.post('/add-new-langs', async (req, res) => {
 	try {
 		await pushNewLangs(pricelistId, langArr)
 		const updatedPricelist = await Pricelist.findOne({ _id: pricelistId })
+				.populate('newLangPairs.source', [ 'lang' ])
+				.populate('newLangPairs.target', [ 'lang' ])
 		res.send(updatedPricelist.newLangPairs)
 	} catch (err) {
 		console.log(err)

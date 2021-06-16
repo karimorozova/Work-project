@@ -6,11 +6,11 @@
         @savePairs="savePairs"
         @closePairs="closeModal"
       )
-    .title
-      .title__title(v-if="this.pricelists") {{ this.pricelists.find((i) => i._id.toString() === priceId.toString()).name }}
+    .title(v-if="this.pricelists")
+      .title__title {{ this.pricelists.find((i) => i._id.toString() === priceId.toString()).name }}
       .buttons
-        .title__return(v-if="newLanguagesPairs.length")
-          .update-btn(@click="openModal") Update Languages pairs
+        .title__return(v-if="newLanguagesPairs.length" style="margin-right: 10px")
+          Button(value="Update Languages pairs", @clicked="openModal")
         .title__return
           Button(value="Back", @clicked="goBack")
 
@@ -121,6 +121,7 @@
 				this.selectedTab = this.tabs.find((item, index) => index === i)
 			},
 			async savePairs(dataArr) {
+				if (!dataArr.length) return
 				try {
 					const result = await this.$http.post('/pm-manage/add-new-langs', {
 						langArr: dataArr,
@@ -129,19 +130,12 @@
 					this.newLanguagesPairs = result.data
 					this.getAllData()
 					this.refreshResultTable()
-					this.alertToggle({
-						message: "New Languages Pairs saved",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "New Languages Pairs saved", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on saving Languages Pairs.",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on saving Languages Pairs.", isShow: true, type: "error" })
+				} finally {
+					this.closeModal()
 				}
-				this.languageModal = false
 			},
 			closeModal() {
 				this.languageModal = false
@@ -154,11 +148,7 @@
 					const result = await this.$http.get(`/pm-manage/pricelist-new-langs/${ this.$route.params.id }`)
 					this.newLanguagesPairs = result.data
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting new Languages Pairs.",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting new Languages Pairs.", isShow: true, type: "error" })
 				}
 			},
 			async getPricelists() {
@@ -166,11 +156,7 @@
 					const result = await this.$http.get("/prices/pricelists")
 					this.pricelists = result.body
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting pricelists.",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting pricelists.", isShow: true, type: "error" })
 				}
 			},
 			async getDefaultLanguages() {
@@ -180,11 +166,7 @@
 					this.languages = formatLanguages.map((item) => item.lang)
 					this.languages.unshift("All")
 				} catch (err) {
-					this.alertToggle({
-						message: "Cannot get Languages",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Cannot get Languages", isShow: true, type: "error" })
 				}
 			},
 			goBack() {
@@ -197,11 +179,7 @@
 					this.steps = formatSteps.map((item) => item.title)
 					this.steps.unshift("All")
 				} catch (err) {
-					this.alertToggle({
-						message: "Cannot get Steps",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Cannot get Steps", isShow: true, type: "error" })
 				}
 			},
 			async getDefaultUnits() {
@@ -213,11 +191,7 @@
 					this.sizes = [ ...new Set(formatUnits.map((item) => item.sizes).flat()) ]
 					this.sizes.unshift("All")
 				} catch (err) {
-					this.alertToggle({
-						message: "Cannot get Units",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Cannot get Units", isShow: true, type: "error" })
 				}
 			},
 			async getDefaultIndustries() {
@@ -227,11 +201,7 @@
 					this.industries = formatIndustries.map((item) => item.name)
 					this.industries.unshift("All")
 				} catch (err) {
-					this.alertToggle({
-						message: "Cannot get Industries",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Cannot get Industries", isShow: true, type: "error" })
 				}
 			},
 			refreshResultTable() {
@@ -280,10 +250,17 @@
 	}
 </script>
 <style lang="scss" scoped>
+  .layout {
+    position: relative;
+    width: 1000px;
+  }
+
   .new__languages {
     position: absolute;
     z-index: 9999;
-    transform: translate(120%, 100%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .title {
@@ -300,35 +277,12 @@
     }
   }
 
-  .update-btn {
-    min-width: 120px;
-    padding: 0 24px 0 24px;
-    height: 32px;
-    color: white;
-    font-size: 14px;
-    border-radius: 4px;
-    background-color: #d15f45;
-    border: none;
-    transition: .1s ease;
-    outline: none;
-    letter-spacing: 0.2px;
-    margin-right: 20px;
-    line-height: 32px;
-
-    &:hover {
-      cursor: pointer;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-    }
-
-    &:active {
-      transform: scale(.98);
-    }
-  }
-
   .priceLayout {
     width: 1000px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     position: relative;
+    background: white;
+    border-radius: 4px;
 
     &__editIcons {
       display: flex;

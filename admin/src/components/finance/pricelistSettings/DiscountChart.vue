@@ -93,12 +93,6 @@
       width: 80%;
       background: inherit;
       outline: none;
-
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
     }
 
     &__percent {
