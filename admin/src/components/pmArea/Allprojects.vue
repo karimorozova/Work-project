@@ -52,6 +52,8 @@
 				deadlineFilter: "",
 				managers: [],
 				statuses: [],
+        projectFilter: "",
+        idFilter: "",
 			}
 		},
 		methods: {
@@ -113,7 +115,9 @@
 					startFilter: this.startFilter,
 					deadlineFilter: this.deadlineFilter,
 					sourceFilter: this.sourceFilter,
-					targetFilter: this.targetFilter
+					targetFilter: this.targetFilter,
+          projectFilter: this.projectFilter,
+          idFilter: this.idFilter,
 				}
 			},
 			tableData() {

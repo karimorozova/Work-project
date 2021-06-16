@@ -16,6 +16,16 @@ function getFilterdProjectsQuery(filters) {
 	if(filters.lastDate) {
 		query.startDate = { $lt: new Date(filters.lastDate) };
 	}
+
+	if(filters.idFilter) {
+		const filter = filters.idFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		query.projectId = { "$regex": new RegExp(filter, 'i') };
+	}
+	if(filters.projectFilter) {
+		const filter = filters.projectFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		query.projectName = { "$regex": new RegExp(filter, 'i') };
+	}
+
 	if(filters.startFilter) {
 		query.startDate = filters.lastDate ? { $lt: new Date(filters.lastDate), $gte: new Date(filters.startFilter) } : { $gte: new Date(filters.startFilter) };
 	}
