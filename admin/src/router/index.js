@@ -5,7 +5,6 @@ import PasswordRestore from '@/components/PasswordRestore'
 import DashboardSettings from '@/components/sliders/DashboardSettings'
 import Settings from '@/components/sliders/Settings'
 import VendorsSettings from '@/components/sliders/VendorsSettings'
-import LanguagesSettings from '@/components/sliders/LanguagesSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
 import clientRequestInfo from '@/components/pmArea/clientRequests/clientRequestInfo'
@@ -347,11 +346,6 @@ const router = new Router({
                             component: NewVendor
                         },
                     ]
-                },
-                {
-                    path: 'languages',
-                    name: 'languages',
-                    component: LanguagesSettings
                 },
                 {
                     path: 'clients',
