@@ -37,11 +37,9 @@
         .price__icons
           .altered(v-if="row.altered")
             .tooltip
-              span(v-if="index <= 1")
-                span#myTooltip.tooltiptext-bottom {{ row.notification }}
-              span(v-else)
-                span#myTooltip.tooltiptext {{ row.notification }}
-              img.price__icons-info(:style="{ cursor: 'help' }", src="../../../assets/images/red-info-icon.png")
+              span#myTooltip.tooltiptext {{ row.notification }}
+              .price__icons-info
+                i.fas.fa-info-circle
           span(v-if="row.altered")
             .price__icons-link(@click="getRowPrice(index)")
               i.fa.fa-link(aria-hidden='true')
@@ -241,41 +239,27 @@
     }
 
     &__icons {
-      padding-top: 2px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
       align-items: center;
+      gap: 7px;
 
       &-info {
-        margin-top: 1px;
-        margin-right: 3px;
+        cursor: help;
+        color: $red;
+        font-size: 16px;
       }
 
       &-link {
         cursor: pointer;
         font-size: 16px;
-        margin-top: 5px;
-        margin-right: 4px;
       }
 
       &-link-opacity {
         cursor: default;
         font-size: 16px;
-        margin-top: 4px;
         opacity: 0.5;
-        margin-right: 4px;
       }
-    }
-
-    &__icon {
-      cursor: pointer;
-      opacity: 0.5;
-      margin-right: 2px;
-      font-size: 16px;
-    }
-
-    &_opacity {
-      opacity: 1;
     }
   }
 
@@ -283,74 +267,35 @@
     position: relative;
     display: flex;
 
-    .tooltiptext-bottom {
-      font-size: 14px;
-      visibility: hidden;
-      width: 140px;
-      background-color: #66563d;
-      color: #fff;
-      text-align: center;
-      border-radius: 4px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: -55px;
-      left: 50%;
-      margin-left: -75px;
-      opacity: 0;
-      transition: opacity 0.3s;
-
-      &::after {
-        content: "";
-        position: absolute;
-        top: -10px;
-        left: 50%;
-        margin-left: -5px;
-        transform: rotate(180deg);
-        border-width: 5px;
-        border-style: solid;
-        border-color: #66563d transparent transparent;
-      }
-    }
-
     .tooltiptext {
       font-size: 14px;
-      visibility: hidden;
-      width: 140px;
-      background-color: #66563d;
+      width: max-content;
+      background-color: $red;
       color: #fff;
       text-align: center;
       border-radius: 4px;
-      padding: 5px;
+      right: 30px;
+      bottom: -3px;
+      padding: 6px;
       position: absolute;
       z-index: 1;
-      bottom: 30px;
-      left: 50%;
-      margin-left: -75px;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity .3s;
 
       &::after {
         content: "";
         position: absolute;
-        top: 100%;
-        left: 50%;
-        margin-left: -5px;
+        top: 38%;
+        right: -10px;
+        transform: rotate(270deg);
         border-width: 5px;
         border-style: solid;
-        border-color: #66563d transparent transparent transparent;
+        border-color: $red transparent transparent;
       }
     }
 
     &:hover {
       .tooltiptext {
-        visibility: visible;
-        opacity: 1;
-      }
-    }
-
-    &:hover {
-      .tooltiptext-bottom {
         visibility: visible;
         opacity: 1;
       }

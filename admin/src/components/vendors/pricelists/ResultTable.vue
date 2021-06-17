@@ -370,11 +370,6 @@
       justify-content: flex-end;
       align-items: center;
 
-      &-info {
-        margin-top: 1px;
-        margin-right: 3px;
-      }
-
       &-link {
         cursor: pointer;
         font-size: 16px;
