@@ -81,7 +81,7 @@
 				this.setCurrentProject(project);
 				const request = this.allRequests.find(item => item._id === project._id);
 				if(request) {
-					return this.$router.push(`/request-details/${ project._id }`);
+					return this.$router.push(`/projects/requests/details/${ project._id }`);
 				}
 				this.$router.push(`/projects/closed-projects/details/${ project._id }`);
 			},

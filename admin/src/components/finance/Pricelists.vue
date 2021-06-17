@@ -87,7 +87,7 @@
 		},
 		methods: {
 			showPriceSettings(id) {
-				this.$router.push(`/settings/pricelist/${ id }`);
+				this.$router.push(`/settings/pricelists/${ id }`);
 			},
 			isDeletePricelist() {
 				this.isDeleting = true;

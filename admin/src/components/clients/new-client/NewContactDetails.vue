@@ -226,7 +226,7 @@
 		},
 		created() {
 			if (!this.currentClient._id && this.$route.params.id) {
-				this.$router.push(`/clients/details/${ this.$route.params.id }`)
+				this.$router.push(`/clients/all/details/${ this.$route.params.id }`)
 			}
 		}
 	}
@@ -238,6 +238,7 @@
   .contact-wrap {
     position: relative;
     width: 700px;
+    margin: 40px;
 
     label {
       margin-bottom: 0;

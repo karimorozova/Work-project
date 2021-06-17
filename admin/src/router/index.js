@@ -204,7 +204,7 @@ const router = new Router({
                             component: IndustryLqa,
                         },
                         {
-                            path: 'pricelist/:id',
+                            path: 'pricelists/:id',
                             name: 'pricelist',
                             component: PricelistSettingsLayout
                         },
@@ -438,32 +438,32 @@ const router = new Router({
                                 }
                             ]
                         },
-                        // {
-                        //     path: 'details/:id',
-                        //     name: '',
-                        //     component: ClientDetails,
-                        //     props: true,
-                        //     children: [
-                        //         {
-                        //             path: '',
-                        //             name: 'client-info',
-                        //             component: ClientInfo,
-                        //             props: true
-                        //         },
-                        //         {
-                        //             path: 'new-contact',
-                        //             name: 'new-contact',
-                        //             component: NewContactDetails,
-                        //             props: true
-                        //         },
-                        //         {
-                        //             path: 'contact/:index',
-                        //             name: 'contact',
-                        //             component: ContactDetails,
-                        //             props: true
-                        //         }
-                        //     ]
-                        // },
+                        {
+                            path: 'details/:id',
+                            name: '',
+                            component: ClientDetails,
+                            props: true,
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'client-info',
+                                    component: ClientInfo,
+                                    props: true
+                                },
+                                {
+                                    path: 'new-contact',
+                                    name: 'new-contact',
+                                    component: NewContactDetails,
+                                    props: true
+                                },
+                                {
+                                    path: 'contact/:index',
+                                    name: 'contact',
+                                    component: ContactDetails,
+                                    props: true
+                                }
+                            ]
+                        },
                         {
                             path: 'new-client',
                             name: '',
