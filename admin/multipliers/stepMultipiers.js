@@ -59,7 +59,6 @@ const updateStepMultipliers = async (stepToUpdate, priceListId) => {
 		const stepToUpdateIndex = stepMultipliersTable.findIndex(step => step._id.toString() === stepToUpdate._id)
 		stepToUpdate.altered = true
 		fixedPrice4()
-		console.log(stepToUpdate)
 		stepMultipliersTable.splice(stepToUpdateIndex, 1, stepToUpdate)
 		await postNotifications(priceListId, stepToUpdate, tableKeys.stepMultipliersTable)
 		await Pricelist.updateOne({ _id: priceListId }, { stepMultipliersTable })

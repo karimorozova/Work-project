@@ -7,8 +7,9 @@
         :i="i"
         :length="length"
       )
-    .button(v-if="dataArray.some(i => !!i.isCheck)")
+    .button(v-if="dataArray.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
+
     LangFilter(
       :source="sourceFilter"
       :target="targetFilter"
@@ -27,8 +28,8 @@
       @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        //.price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
-          //CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit && dataArray.length")
+          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
         .price-title(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
@@ -277,7 +278,7 @@
 		},
 		computed: {
 			isAllSelected() {
-				return this.dataArray && this.dataArray.length && this.dataArray.every(i => !!i.isCheck)
+				return (this.dataArray && this.dataArray.length) && this.dataArray.every(i => !!i.isCheck)
 			},
 			allFilters() {
 				let result = {

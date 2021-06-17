@@ -7,7 +7,7 @@
         :i="i"
         :length="length"
       )
-    .button(v-if="dataArray.some(i => !!i.isCheck)")
+    .button(v-if="dataArray.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
 
     StepFilter(
@@ -29,13 +29,12 @@
       @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
+        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit && dataArray.length")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
         .price-title(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
         .price__data(v-if="isEdit")
-          | {{row.isCheck}}
           CheckBox(:isChecked="!!row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="step" slot-scope="{ row, index }")
@@ -185,7 +184,8 @@
 				sizeFilter: "",
 				isDataRemain: true,
 				i: 0,
-				length: 0
+				length: 0,
+				isUpdateModal: false
 			}
 		},
 		created() {
@@ -200,7 +200,7 @@
 				this.length = this.dataArray.filter(i => !!i.isCheck).length
 				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
 					this.i = index + 1
-					row.euroBasicPrice = price
+					row.euroMinPrice = price
 					await this.manageSavePrice(row)
 				}
 				this.closeUpdateModal()
@@ -229,7 +229,7 @@
 						countFilter: this.dataArray.length
 					})
 					this.dataArray.push(...result.data.map(i => ({ ...i, isCheck: false })))
-					this.isDataRemain = result.body.length === 25
+					this.isDataRemain = result.data.length === 25
 				}
 			},
 			async setRowValue(index) {
@@ -274,14 +274,13 @@
 						}
 					})
 					this.dataArray.splice(idx(this.dataArray, _id), 1, { ...result.data, isCheck: false })
-
-					function idx(arr, id) {
-						return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
-					}
-
 					this.refreshResultTable()
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
+				}
+
+				function idx(arr, id) {
+					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
 				}
 			},
 			async manageSaveClick(index) {

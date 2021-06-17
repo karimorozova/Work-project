@@ -53,7 +53,6 @@
     -moz-appearance: textfield;
   }
 
-
   ::-webkit-file-upload-button {
     cursor: pointer;
   }

@@ -1,5 +1,16 @@
 <template lang="pug">
   .price
+    .modal(v-if="isUpdateModal")
+      SetPriceModal(
+        @close="closeUpdateModal"
+        @setPrice="setPrice"
+        :i="i"
+        :length="length"
+        :isPercent="true"
+      )
+    .button(v-if="dataArray.some(it => !!it.isCheck)")
+      Button(value="Update Selected" @clicked="openUpdateModal")
+
     DataTable(
       :fields="fields"
       :tableData="dataArray"
@@ -10,7 +21,7 @@
     )
 
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
+        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit && dataArray.length")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
         .price-title(v-else) {{ field.label }}
 
@@ -33,6 +44,8 @@
 	import DataTable from "../../DataTable"
 	import { mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
+	import Button from "../../Button"
+	import SetPriceModal from "./SetPriceModal"
 
 	export default {
 		props: {
@@ -75,7 +88,10 @@
 				errors: [],
 				isDeleting: false,
 				deleteIndex: -1,
-				currentActive: -1
+				currentActive: -1,
+				i: 0,
+				length: 0,
+				isUpdateModal: false
 			}
 		},
 		created() {
@@ -85,6 +101,23 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			async setPrice(price) {
+				this.length = this.dataArray.filter(i => !!i.isCheck).length
+				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
+					this.i = index + 1
+					row.multiplier = price
+					await this.manageSavePrice(row)
+				}
+				this.closeUpdateModal()
+			},
+			openUpdateModal() {
+				this.isUpdateModal = true
+			},
+			closeUpdateModal() {
+				this.isUpdateModal = false
+				this.toggleAll(false)
+				this.i = this.length = 0
+			},
 			toggleCheck(index, val) {
 				this.dataArray[index].isCheck = val
 			},
@@ -114,6 +147,25 @@
 			refreshResultTable() {
 				this.$emit('refreshResultTable')
 			},
+			async manageSavePrice({ _id, industry, multiplier }) {
+				try {
+					const result = await this.$http.post("/pricelists/industry-multipliers/" + this.priceId, {
+						industryMultiplier: {
+							_id,
+							industry,
+							multiplier: parseFloat(multiplier).toFixed(0)
+						}
+					})
+					this.dataArray.splice(idx(this.dataArray, _id), 1, { ...result.data, isCheck: false })
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting Industry", isShow: true, type: "error" })
+				}
+
+				function idx(arr, id) {
+					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				}
+			},
 			async manageSaveClick(index) {
 				const { _id, industry, multiplier } = this.dataArray[index]
 				try {
@@ -133,10 +185,12 @@
 		},
 		computed: {
 			isAllSelected() {
-				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+				return (this.dataArray && this.dataArray.length) && this.dataArray.every(i => i.isCheck)
 			}
 		},
 		components: {
+			SetPriceModal,
+			Button,
 			CheckBox,
 			DataTable
 		}

@@ -6,11 +6,12 @@
       .modal__close(@click="close")
         i.fas.fa-times
       .modal__input
-        input(type="number" placeholder="0.000" v-model="price" ref="input" @click="selectAll()")
-        .euro &euro;
+        input(type="number" :placeholder="isPercent ? '0' : '0.000'" v-model="price" ref="input" @click="selectAll()")
+        .euro
+          span(v-if="!isPercent") &euro;
+          span(v-else) %
       .modal__button
         Button(value="Confirm" @clicked="setPrice")
-
 
 </template>
 
@@ -19,6 +20,10 @@
 
 	export default {
 		props: {
+			isPercent: {
+				type: Boolean,
+				default: false
+			},
 			i: {
 				type: Number
 			},

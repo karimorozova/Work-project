@@ -68,15 +68,15 @@ const PricelistSchema = new mongoose.Schema({
 		},
 		euroMinPrice: {
 			type: Number,
-			default: 1,
+			default: 0,
 		},
 		usdMinPrice: {
 			type: Number,
-			default: 1,
+			default: 0,
 		},
 		gbpMinPrice: {
 			type: Number,
-			default: 1,
+			default: 0,
 		},
 		defaultSize: {
 			type: Boolean,
