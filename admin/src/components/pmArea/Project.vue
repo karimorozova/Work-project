@@ -313,7 +313,7 @@
 				this.$refs.billingDate.showCalendar()
 			},
 			goToClientInfo() {
-				const route = this.$router.resolve({ path: `/clients/details/${ this.project.customer._id }` })
+				const route = this.$router.resolve({ path: `/clients/all/details/${ this.project.customer._id }` })
 				window.open(route.href, "_blank")
 			},
 			async getCustomers() {

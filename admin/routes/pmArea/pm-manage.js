@@ -449,7 +449,7 @@ router.put('/project-date', async (req, res) => {
 	}
 })
 
-router.get('/project-details', async (req, res) => {
+router.get('/projects/all/details', async (req, res) => {
 	const { projectId } = req.query
 	try {
 		const message = await getMessage(projectId, 'details')
@@ -460,7 +460,7 @@ router.get('/project-details', async (req, res) => {
 	}
 })
 
-router.post('/project-details', async (req, res) => {
+router.post('/projects/all/details', async (req, res) => {
 	const { id, message } = req.body
 	try {
 		const project = await getProject({ '_id': id })

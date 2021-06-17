@@ -134,7 +134,7 @@ export default {
             this.$refs.deadline.showCalendar();
         },
         goToClientInfo() {
-            const route = this.$router.resolve({path: `/clients/details/${this.request.customer._id}`});
+            const route = this.$router.resolve({path: `/clients/all/details/${this.request.customer._id}`});
             window.open(route.href, "_blank");
         },
         async approveDeadline() {

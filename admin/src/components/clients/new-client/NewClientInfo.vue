@@ -332,7 +332,7 @@
           const newClient = { ...result.data.client }
           await this.addNewClient(newClient)
           this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
-          await this.$router.push(`/clients/details/${ newClient._id }`)
+          await this.$router.push(`/clients/all/details/${ newClient._id }`)
         } catch (err) {
           this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
         }
@@ -359,7 +359,7 @@
 					const newClient = { ...result.data.client }
 					await this.addNewClient(newClient)
 					this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
-					await this.$router.push(`/clients/details/${ newClient._id }`)
+					await this.$router.push(`/clients/all/details/${ newClient._id }`)
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
 				}
@@ -408,6 +408,7 @@
 
   .client-layout {
     display: flex;
+    margin: 40px;
   }
 
   .new-client-subinfo {
