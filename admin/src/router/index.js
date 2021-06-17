@@ -138,6 +138,7 @@ const router = new Router({
 
                     ]
                 },
+                
                 {
                     path: 'settings',
                     name: 'settings',
