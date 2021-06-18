@@ -10,9 +10,10 @@
           @notApprove="setDefaults",
           @close="setDefaults"
         )
-      SettingsTable(
+      GeneralTable(
         :fields="fields"
         :tableData="vuexPricelists"
+        :isFilterShow="false"
       )
         template(slot="headerName" slot-scope="{ field }")
           .pricelists__head-title {{ field.label }}
@@ -49,7 +50,6 @@
 
 <script>
 	import ApproveModal from "../ApproveModal";
-	import SettingsTable from "../Table/SettingsTable";
 	import Add from "../Add";
 	import CheckBox from "../CheckBox";
 	import Toggler from "../Toggler";
@@ -57,6 +57,7 @@
 	import NewPricelist from "./pricelists/NewPricelist";
 	import { mapGetters, mapActions } from "vuex";
 	import crudIcons from "@/mixins/crudIcons";
+  import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [crudIcons],
@@ -64,11 +65,42 @@
 			return {
 				pricelists: [],
 				fields: [
-					{ label: "Name", headerKey: "headerName", key: "name", width: "35%", padding: "0" },
-					{ label: "Default Vendor", headerKey: "headerVendorDefault", key: "vendorDefault", width: "25%", padding: "0" },
-					{ label: "Active", headerKey: "headerActive", key: "active", width: "15%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "25%", padding: "0" },
-				],
+					{
+					  label: "Name",
+            headerKey: "headerName",
+            key: "name",
+            dataKey: "name",
+            style: {"width": "35%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
+          },
+					{
+					  label: "Default Vendor",
+            headerKey: "headerVendorDefault",
+            key: "vendorDefault",
+            dataKey: "vendorDefault",
+            style: {"width": "25%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
+          },
+					{
+					  label: "Active",
+            headerKey: "headerActive",
+            key: "active",
+            dataKey: "active",
+            style: {"width": "15%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
+          },
+					{
+					  label: "",
+            headerKey: "headerIcons",
+            key: "icons",
+            style: {"width": "25%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',}
+					}
+        ],
 				icons: {
 					save: { icon: require("../../assets/images/Other/save-icon-qa-form.png") },
 					edit: { icon: require("../../assets/images/Other/edit-icon-qa.png") },
@@ -271,7 +303,7 @@
 			})
 		},
 		components: {
-			SettingsTable,
+      GeneralTable,
 			Add,
 			Toggler,
 			CheckBox,

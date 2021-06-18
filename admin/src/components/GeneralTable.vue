@@ -16,29 +16,29 @@
         @notApprove="notApprove"
         @close="closeModal"
       )
-    span(@click="showFilters = !showFilters") 'show filter'
+    span(v-if="isFilterShow" @click="showFilters = !showFilters") 'show filter'
     table
       thead
-        tr
-          th(v-for="header in headers" :style="header.style")
+        tr(:class="{'compensate-scroll': tableData.length >= elementToScroll}")
+          th(v-for="header in fields" :style="header.style")
             .th__header
-              slot( :name="header.slotHeaderName" :field="header")
-              .th__sort-icon(v-if="header.sortInfo.isSort")
+              slot( :name="header.headerKey" :field="header")
+              .th__sort-icon(v-if="header.sortInfo && header.sortInfo.isSort")
                 .th__sort-test(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'")
-                  i.fas.fa-caret-down(v-if="header.sortInfo.order === 'asc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.key, sortField: header.slotDataName, order: 'desc'})")
-                  i.fas.fa-caret-up(v-else-if="header.sortInfo.order === 'desc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.key, sortField: header.slotDataName, order: 'asc'})")
-                i.fas.fa-times-circle(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"  @click.stop="removeSortKey({sortInfo: header.sortInfo, key: header.key, sortField: header.slotDataName, order: 'asc'})")
-                i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo: header.sortInfo, key: header.key, sortField: header.slotDataName, order: 'asc'})")
-            .th__filter(v-if="header.filterInfo.isFilter && showFilters")
-              input(:ref='header.slotDataName' @keyup="(e) => setFilter({filterInfo: header.filterInfo, value: e.target.value, key: header.key, filterField: header.slotDataName})")
-              i.fas.fa-times-circle.th__filter-close(v-if="header.filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo: header.filterInfo , filterField: header.slotDataName})")
+                  i.fas.fa-caret-down(v-if="header.sortInfo.order === 'asc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'desc'})")
+                  i.fas.fa-caret-up(v-else-if="header.sortInfo.order === 'desc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
+                i.fas.fa-times-circle(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"  @click.stop="removeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
+                i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
+            .th__filter(v-if="header.filterInfo && header.filterInfo.isFilter && showFilters")
+              input(:ref='header.key' @keyup="(e) => setFilter({filterInfo: header.filterInfo, value: e.target.value, key: header.dataKey, filterField: header.key})")
+              i.fas.fa-times-circle.th__filter-close(v-if="header.filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo: header.filterInfo , filterField: header.key})")
 
-      tbody
+      tbody(:class="{'scroll': tableData.length >= elementToScroll}" @scroll="handleBodyScroll")
         tr.data(
               v-for="(row, index) of tableData"
         )
-          td(v-for="field of headers" :style="field.style")
-            slot(:name="field.slotDataName" :row="row" :index="index")
+          td(v-for="field of fields" :style="field.style")
+            slot(:name="field.key" :row="row" :index="index")
 
 </template>
 
@@ -48,7 +48,7 @@ import ValidationErrors from './ValidationErrors'
 	export default {
 	  props: {
 	    //Array of header Info
-      headers: {
+      fields: {
         type: Array,
       },
       //Array of data
@@ -59,11 +59,16 @@ import ValidationErrors from './ValidationErrors'
       areErrors: {
         type: Boolean,
         default: false
+      },
+      isFilterShow: {
+        type: Boolean,
+        default: true
       }
     },
 	  data() {
 	    return {
-        showFilters: false
+        showFilters: false,
+        elementToScroll: 15,
       }
     },
     methods: {
@@ -96,7 +101,14 @@ import ValidationErrors from './ValidationErrors'
       removeFilter(field) {
         this.$refs[field.filterField][0].value = ''
         this.$emit('removeFilter', field)
-      }
+      },
+
+      handleBodyScroll(e) {
+        const element = e.target;
+        if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
+          this.$emit("bottomScrolled");
+        }
+      },
     },
     components: {
       ValidationErrors,
@@ -142,6 +154,13 @@ import ValidationErrors from './ValidationErrors'
         color: #36304a;
       }
      }
+  }
+  .scroll {
+    overflow-y: scroll;
+  }
+
+  .compensate-scroll {
+    padding-right: 17px;
   }
   table {
     border-collapse: collapse;
@@ -203,7 +222,6 @@ import ValidationErrors from './ValidationErrors'
   tbody {
     max-height: 600px;
     display: block;
-    overflow-x: auto;
   }
 
   tbody tr:nth-child(even) {

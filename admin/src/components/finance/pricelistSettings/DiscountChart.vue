@@ -1,9 +1,10 @@
 <template lang="pug">
   .pricelistDiscountChart
     .pricelistDiscountChart__table
-      DataTable(
+      GeneralTable(
         :fields="fields",
         :tableData="tableData",
+        :isFilterShow="false",
         bodyRowClass="rates-matrix-row",
         :bodyClass="['rates-matrix-body', 'tbody_visible-overflow']",
         tableheadRowClass="tbody_visible-overflow",
@@ -25,8 +26,8 @@
 </template>
 
 <script>
-	import DataTable from "../../DataTable"
 	import { mapActions } from "vuex"
+  import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -44,8 +45,18 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Translation match", headerKey: "headerText", key: "text", width: "85%" },
-					{ label: "Value %", headerKey: "headerRate", key: "rate", width: "15%" }
+					{
+					  label: "Translation match",
+            headerKey: "headerText",
+            key: "text",
+            style: {"width": "85%"}
+          },
+					{
+					  label: "Value %",
+            headerKey: "headerRate",
+            key: "rate",
+            style: {"width": "15%"}
+					}
 				],
 				currentDiscountChart: null
 			}
@@ -68,7 +79,7 @@
 			}
 		},
 		components: {
-			DataTable
+      GeneralTable,
 		},
 		computed: {
 			tableData() {

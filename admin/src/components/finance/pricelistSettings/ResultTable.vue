@@ -13,7 +13,7 @@
       :industries="industries"
       @setFilter="setFilter"
     )
-    DataTable(
+    GeneralTable(
       :fields="fields"
       :tableData="dataArray"
       :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 10}]"
@@ -65,9 +65,9 @@
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
-	import DataTable from "../../DataTable"
 	import ResultFilter from "./ResultFilter"
 	import { mapActions } from "vuex"
+  import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -97,57 +97,49 @@
 						label: "Source Language",
 						headerKey: "headerLanguageSource",
 						key: "sourceLang",
-						width: "15%",
-						padding: "0"
+            style: {"width": "15%"}
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerLanguageTarget",
 						key: "targetLang",
-						width: "15%",
-						padding: "0"
+            style: {"width": "15%"}
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "15%",
-						padding: "0"
+            style: {"width": "15%"}
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "15%",
-						padding: "0"
+            style: {"width": "15%"}
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "16%",
-						padding: "0"
+            style: {"width": "16%"}
 					},
 					{
 						label: "EUR",
 						headerKey: "headerPriceEUR",
 						key: "eur",
-						width: "8%",
-						padding: "0"
+            style: {"width": "8%"}
 					},
 					{
 						label: "USD",
 						headerKey: "headerPriceUSD",
 						key: "usd",
-						width: "8%",
-						padding: "0"
+            style: {"width": "8%"}
 					},
 					{
 						label: "GBP",
 						headerKey: "headerPriceGBP",
 						key: "gbp",
-						width: "8%",
-						padding: "0"
+            style: {"width": "8%"}
 					}
 				],
 
@@ -219,7 +211,7 @@
 			}
 		},
 		components: {
-			DataTable,
+      GeneralTable,
 			ResultFilter
 		}
 	}

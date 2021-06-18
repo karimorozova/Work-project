@@ -19,9 +19,10 @@
       :sizes="sizes"
       @setFilter="setFilter"
     )
-    DataTable(
+    GeneralTable(
       :fields="fields"
       :tableData="dataArray"
+      :isFilterShow="false"
       :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
       :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
@@ -86,12 +87,12 @@
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
-	import DataTable from "../../DataTable"
 	import StepFilter from "./StepFilter"
 	import { mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
 	import Button from "../../Button"
 	import SetPriceModal from "./SetPriceModal"
+  import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -122,57 +123,49 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-						width: "4%",
-						padding: 0
+            style: {"width": "4%"}
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "23%",
-						padding: "0"
+            style: {"width": "23%"}
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "23%",
-						padding: "0"
+            style: {"width": "23%"}
 					},
 					{
 						label: "Size",
 						headerKey: "headerSize",
 						key: "size",
-						width: "10%",
-						padding: "0"
+            style: {"width": "10%"}
 					},
 					{
 						label: "Multiplier %",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-						width: "10%",
-						padding: "0"
+            style: {"width": "10%"}
 					},
 					{
 						label: "Fix EUR",
 						headerKey: "headerMinPriceEUR",
 						key: "eur",
-						width: "10%",
-						padding: "0"
+            style: {"width": "10%"}
 					},
 					{
 						label: "Fix USD",
 						headerKey: "headerMinPriceUSD",
 						key: "usd",
-						width: "10%",
-						padding: "0"
+            style: {"width": "10%"}
 					},
 					{
 						label: "Fix GBP",
 						headerKey: "headerMinPriceGBP",
 						key: "gbp",
-						width: "10%",
-						padding: "0"
+            style: {"width": "10%"}
 					}
 				],
 				dataArray: [],
@@ -343,10 +336,10 @@
 			}
 		},
 		components: {
+      GeneralTable,
 			SetPriceModal,
 			Button,
 			CheckBox,
-			DataTable,
 			StepFilter
 		}
 	}

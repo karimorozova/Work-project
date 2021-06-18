@@ -104,9 +104,10 @@
         )
 
     .languages__table
-      SettingsTable(
+      GeneralTable(
         :fields="fields"
         :tableData="languages"
+        :isFilterShow="false"
         :errors="errors"
         :areErrors="areErrors"
         @closeErrors="closeErrors"
@@ -223,7 +224,6 @@
 
 </template>
 <script>
-	import SettingsTable from "./SettingsTable"
 	import { mapActions, mapGetters } from "vuex"
 	import ClickOutside from "vue-click-outside"
 	import crudIcons from "@/mixins/crudIcons"
@@ -238,15 +238,15 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Icon", headerKey: "headerIcon", key: "icon", width: "10%", padding: "0" },
-					{ label: "Name", headerKey: "headerName", key: "name", width: "16%", padding: "0" },
-					{ label: "Group", headerKey: "headerGroup", key: "group", width: "16%", padding: "0" },
-					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "10%", padding: "0" },
-					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", width: "10%", padding: "0" },
-					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", width: "10%", padding: "0" },
-					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", width: "10%", padding: "0" },
-					{ label: "Active", headerKey: "headerActive", key: "active", width: "6%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0" }
+					{ label: "Icon", headerKey: "headerIcon", key: "icon", style: {"width": "10%"} },
+					{ label: "Name", headerKey: "headerName", key: "name",  style: {"width": "16%"} },
+					{ label: "Group", headerKey: "headerGroup", key: "group", style: {"width": "16%"}},
+					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", style: {"width": "10%"} },
+					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", style: {"width": "10%"} },
+					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", style: {"width": "10%"}},
+					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", style: {"width": "10%"} },
+					{ label: "Active", headerKey: "headerActive", key: "active", style: {"width": "6%"} },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: {"width": "12%"} }
 				],
 				languages: [],
 				currentActive: -1,
@@ -542,7 +542,6 @@
 			Button,
 			SelectSingle,
 			Add,
-			SettingsTable,
 			GeneralTable
 		},
 		directives: {

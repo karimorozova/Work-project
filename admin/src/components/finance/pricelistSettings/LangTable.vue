@@ -18,9 +18,10 @@
       :targets="languages"
       @setFilter="setFilter"
     )
-    DataTable(
+    GeneralTable(
       :fields="fields"
       :tableData="dataArray"
+      :isFilterShow="false"
       :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
       :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
@@ -66,12 +67,12 @@
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
 <script>
-	import DataTable from "../../DataTable"
 	import LangFilter from "./LangFilter"
 	import { mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
 	import Button from "../../Button"
 	import SetPriceModal from "./SetPriceModal"
+  import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -96,43 +97,49 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-						width: "4%",
-						padding: 0
+            style: {"width": "4%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
 					},
 					{
 						label: "Source Lang",
 						headerKey: "headerSourceLang",
-						key: "sourceLang",
-						width: "27%",
-						padding: "0"
+            key: "sourceLang",
+            style: {"width": "27%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
 					},
 					{
 						label: "Target Lang",
 						headerKey: "headerTargetLang",
-						key: "targetLang",
-						width: "27%",
-						padding: "0"
+            key: "targetLang",
+            style: {"width": "27%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
 					},
 					{
 						label: "EUR",
 						headerKey: "headerBasicPriceEUR",
-						key: "eur",
-						width: "14%",
-						padding: "0"
+            key: "eur",
+            style: {"width": "14%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
 					},
 					{
 						label: "USD",
 						headerKey: "headerBasicPriceUSD",
-						key: "usd",
-						width: "14%",
-						padding: "0"
+            key: "usd",
+            style: {"width": "14%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
 					},
 					{
 						label: "GBP",
 						headerKey: "headerBasicPriceGBP",
-						key: "gbp",
-						width: "14%",
-						padding: "0"
+            key: "gbp",
+            style: {"width": "14%"},
+            filterInfo:{isFilter: false, isFilterSet: false},
+            sortInfo: { isSort: false, isArray: false, order: 'default',},
 					}
 				],
 				dataArray: [],
@@ -294,10 +301,10 @@
 			}
 		},
 		components: {
+      GeneralTable,
 			SetPriceModal,
 			Button,
 			CheckBox,
-			DataTable,
 			LangFilter
 		}
 	}

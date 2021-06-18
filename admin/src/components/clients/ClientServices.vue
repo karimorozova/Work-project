@@ -1,9 +1,10 @@
 <template lang="pug">
   .clientService
     .clientService__table
-      general-table(
-        :headers="fields",
+      GeneralTable(
+        :fields="fields",
         :tableData="finalData",
+        :isFilterShow="false",
         :errors="errors",
         :areErrors="areErrors",
         :isApproveModal="isDeleting",
@@ -19,7 +20,7 @@
         @setFilter="setFilter"
         @removeFilter="removeFilter"
       )
-        template(v-for="field in fields", :slot="field.slotHeaderName", slot-scope="{ field }")
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .clientService__head-title {{ field.label }}
 
         template(slot="sourceLanguage", slot-scope="{ row, index }")
@@ -159,36 +160,36 @@
 				fields: [
 					{
 						label: "Source Language",
-            slotHeaderName: "headerSource",
-            slotDataName: "sourceLanguage",
-            key: 'lang',
+            headerKey: "headerSource",
+            key: "sourceLanguage",
+            dataKey: 'lang',
             filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: false, order: 'default',},
             style: {"width": "20%"},
           },
 					{
 						label: "Target Languages",
-						slotHeaderName: "headerTarget",
-            slotDataName: "targetLanguages",
-            key: 'lang',
+						headerKey: "headerTarget",
+            key: "targetLanguages",
+            dataKey: 'lang',
             filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: true, order: 'default',},
             style: {"width": "20%"},
           },
 					{
 						label: "Services",
-            slotHeaderName: "headerService",
-            slotDataName: "services",
-            key: 'title',
+            headerKey: "headerService",
+            key: "services",
+            dataKey: 'title',
             filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: true,  order: 'default',},
             style: {"width": "20%"},
           },
 					{
 						label: "Industries",
-            slotHeaderName: "headerIndustry",
-						slotDataName: "industries",
-            key: 'name',
+            headerKey: "headerIndustry",
+						key: "industries",
+            dataKey: 'name',
             filterInfo:{isFilter: true, isFilterSet: false},
             sortInfo: { isSort: true, isArray: true, order: 'default',},
             style: {"width": "20%"},
@@ -196,9 +197,9 @@
 
 					{
 						label: "",
-            slotHeaderName: "headerIcons",
-						slotDataName: "icons",
-            key: 'name',
+            headerKey: "headerIcons",
+						key: "icons",
+            dataKey: 'name',
             filterInfo:{isFilter: false, isFilterSet: false},
             sortInfo: { isSort: false, isArray: false, order: 'default',},
             style: {"width": "20%"}

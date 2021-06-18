@@ -11,9 +11,10 @@
     .button(v-if="dataArray.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
 
-    DataTable(
+    GeneralTable(
       :fields="fields"
       :tableData="dataArray"
+      :isFilterShow="false"
       :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 3}]"
       :tableheadRowClass="dataArray.length < 3 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
@@ -41,11 +42,11 @@
 
 </template>
 <script>
-	import DataTable from "../../DataTable"
 	import { mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
 	import Button from "../../Button"
 	import SetPriceModal from "./SetPriceModal"
+  import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -64,22 +65,19 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-						width: "4%",
-						padding: 0
+            style: {"width": "4%"}
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "81%",
-						padding: "0"
+            style: {"width": "81%"}
 					},
 					{
 						label: "Multiplier %",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-						width: "15%",
-						padding: "0"
+            style: {"width": "15%"}
 					}
 				],
 				dataArray: [],
@@ -189,10 +187,10 @@
 			}
 		},
 		components: {
+      GeneralTable,
 			SetPriceModal,
 			Button,
 			CheckBox,
-			DataTable
 		}
 	}
 </script>
