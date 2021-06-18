@@ -57,13 +57,13 @@ import ClosedOtherProjects from '@/components/pmArea/lists/ClosedOtherProjects'
 import QuoteOtherProjects from '@/components/pmArea/lists/QuoteOtherProjects'
 import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
-import ZohoCode from '@/components/ZohoCode'
+// import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
 import VendorsCandidatesTests from '@/components/vendors/lists/VendorsCandidatesTests'
-import Xtrf from '@/components/reports/Xtrf'
+// import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
@@ -78,11 +78,11 @@ Vue.use(Router)
 const router = new Router({
     mode: 'history',
     routes: [
-        {
-            path: '/xtrf',
-            name: 'xtrf',
-            component: Xtrf
-        },
+        // {
+        //     path: '/xtrf',
+        //     name: 'xtrf',
+        //     component: Xtrf
+        // },
         {
             path: '/login',
             name: 'login',
@@ -108,11 +108,11 @@ const router = new Router({
                 }
             },
             children: [
-                {
-                    path: '/zoho-code',
-                    name: 'zoho',
-                    component: ZohoCode
-                },
+                // {
+                //     path: '/zoho-code',
+                //     name: 'zoho',
+                //     component: ZohoCode
+                // },
                 {
                     path: '/account/settings',
                     name: 'account-info',

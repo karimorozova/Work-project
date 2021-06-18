@@ -893,6 +893,8 @@
       height: 270px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
+      background: white;
+      border-radius: 4px;
 
     }
 
@@ -901,6 +903,8 @@
       margin-left: 40px;
       width: 390px;
       height: 270px;
+      background: white;
+      border-radius: 4px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
   }
@@ -918,6 +922,8 @@
     }
 
     &__notes {
+      background: white;
+      border-radius: 4px;
       box-sizing: border-box;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
@@ -944,6 +950,8 @@
     }
 
     &__rates {
+      background: white;
+      border-radius: 4px;
       padding: 0;
       padding: 20px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;

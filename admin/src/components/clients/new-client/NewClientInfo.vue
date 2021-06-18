@@ -417,13 +417,19 @@
       width: 390px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
+      background: white;
+      border-radius: 4px;
     }
 
     &__date {
       margin-top: 40px;
       width: 390px;
       height: 270px;
+      background: white;
+      border-radius: 4px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      background: white;
+      border-radius: 4px;
     }
   }
 
@@ -435,6 +441,8 @@
       padding: 20px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       box-sizing: border-box;
+      background: white;
+      border-radius: 4px;
     }
 
     &_error-shadow {

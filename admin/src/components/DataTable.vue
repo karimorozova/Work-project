@@ -305,7 +305,6 @@ export default {
   font-size: 14px;
   padding: 0 0 0 5px;
   height: 32px;
-  line-height: 32px;
   border-bottom: 1px solid $cell-border;
   border-left: 1px solid $cell-border;
   border-right: none;

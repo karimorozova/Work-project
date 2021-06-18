@@ -46,7 +46,7 @@ export default {
       this.getFinanceData()
     },
     async getFinanceData() {
-      const result = await this.$http.post('/dashboard/finance-view', { startDate: this.startDate, endDate: this.endDate })
+      const result = await this.$http.post('/dashboard-api/finance-view', { startDate: this.startDate, endDate: this.endDate })
       const { marginInfo, clientsInfo } = result.body
       this.tableMarginInfo = [ marginInfo ]
       this.tableClientReceivablesInfo = clientsInfo
