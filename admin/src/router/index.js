@@ -72,660 +72,502 @@ import { store } from '../vuex/store'
 import TableClientApiSetting from "../components/Table/TableClientApiSetting"
 import Navbar from "../components/Navbar"
 import clearRouterView from "../components/clearRouterView"
+import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
 
 Vue.use(Router)
 
 const router = new Router({
-    mode: 'history',
-    routes: [
-        // {
-        //     path: '/xtrf',
-        //     name: 'xtrf',
-        //     component: Xtrf
-        // },
-        {
-            path: '/login',
-            name: 'login',
-            component: Login
-        },
-        {
-            path: '/forgot',
-            name: 'forgot',
-            component: PasswordRestore
-        },
-        {
-            path: '/',
-            name: 'main',
-            redirect: '/dashboard/overall-view',
-            component: Navbar,
-            props: true,
-            beforeEnter: (to, from, next) => {
-                const token = localStorage.getItem("token");
-                if (token) {
-                    next()
-                } else {
-                    next('/login')
-                }
-            },
-            children: [
-                // {
-                //     path: '/zoho-code',
-                //     name: 'zoho',
-                //     component: ZohoCode
-                // },
-                {
-                    path: '/account/settings',
-                    name: 'account-info',
-                    component: Accountinfo
-                },
-                {
-                    path: 'dashboard',
-                    name: '',
-                    component: DashboardSettings,
-                    children: [
-                        {
-                            path: 'overall-view',
-                            name: 'overall-view',
-                            component: OverallView,
-                        },
-                        {
-                            path: 'sales-perfomance',
-                            name: 'sales-perfomance',
-                            component: SalesPerformance,
-                        }
+	mode: 'history',
+	routes: [
+		// {
+		//     path: '/xtrf',
+		//     name: 'xtrf',
+		//     component: Xtrf
+		// },
+		{
+			path: '/login',
+			name: 'login',
+			component: Login
+		},
+		{
+			path: '/forgot',
+			name: 'forgot',
+			component: PasswordRestore
+		},
+		{
+			path: '/',
+			name: 'main',
+			redirect: '/dashboard/overall-view',
+			component: Navbar,
+			props: true,
+			beforeEnter: (to, from, next) => {
+				const token = localStorage.getItem("token")
+				if (token) {
+					next()
+				} else {
+					next('/login')
+				}
+			},
+			children: [
+				// {
+				//     path: '/zoho-code',
+				//     name: 'zoho',
+				//     component: ZohoCode
+				// },
+				{
+					path: '/account/settings',
+					name: 'account-info',
+					component: Accountinfo
+				},
+				{
+					path: 'dashboard',
+					name: '',
+					component: DashboardSettings,
+					children: [
+						{
+							path: 'overall-view',
+							name: 'overall-view',
+							component: OverallView
+						},
+						{
+							path: 'sales-perfomance',
+							name: 'sales-perfomance',
+							component: SalesPerformance
+						}
 
-                    ]
-                },
-                {
-                    path: 'settings',
-                    name: 'settings',
-                    component: Settings,
-                    props: true,
-                    children: [
-                        {
-                            path: 'discounts',
-                            name: 'discounts',
-                            component: TableDiscounts
-                        },
-                        {
-                            path: 'api-customers',
-                            name: 'api-customers',
-                            component: TableClientApiSetting
-                        },
-                        {
-                            path: 'leadsources',
-                            name: 'leadsources',
-                            component: TableLeadsources
-                        },
-                        {
-                            path: 'groups',
-                            name: 'groups',
-                            component: TableGroups
-                        },
-                        {
-                            path: 'langs',
-                            name: 'langs',
-                            component: TableLanguages
-                        },
-                        {
-                            path: 'services',
-                            name: 'services',
-                            component: TableServices
-                        },
-                        {
-                            path: 'industries',
-                            name: 'industries',
-                            component: TableIndustries
-                        },
-                        {
-                            path: 'pricelists',
-                            name: 'pricelists',
-                            component: Pricelists
-                        },
-                        {
-                            path: 'instructions',
-                            name: 'instructions',
-                            component: Instructions
-                        },
-                        {
-                            path: 'cancel-reasons',
-                            name: 'cancel-reasons',
-                            component: CancelReasons
-                        },
-                        {
-                            path: 'tiers-lqas',
-                            name: 'tiers-lqas',
-                            component: TierLqas
-                        },
-                        {
-                            path: 'industry-lqas',
-                            name: 'industry-lqas',
-                            component: IndustryLqa,
-                        },
-                        {
-                            path: 'pricelists/:id',
-                            name: 'pricelist',
-                            component: PricelistSettingsLayout
-                        },
-                        {
-                            path: 'users',
-                            name: 'users',
-                            component: Users
-                        },
-                        {
-                            path: 'units',
-                            name: 'units',
-                            component: TableUnits
-                        },
-                    ]
-                },
-                {
-                    path: 'vendors',
-                    name: '',
-                    component: VendorsSettings,
-                    children: [
-                        {
-                            path: 'all',
-                            name: '',
-                            props: true,
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'all-vendors',
-                                    props: true,
-                                    component: AllVendorsTable,
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'all-vendor-details',
-                                    component: Vendordetails
-                                },
-                            ]
-                        },
-                        {
-                            path: 'active',
-                            name: '',
-                            props: true,
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'active-vendors',
-                                    props: true,
-                                    component: ActiveVendors,
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'active-vendor-details',
-                                    component: Vendordetails
-                                },
-                            ]
-                        },
-                        {
-                            path: 'inactive',
-                            name: '',
-                            props: true,
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'inactive-vendors',
-                                    props: true,
-                                    component: InactiveVendors,
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'inactive-vendor-details',
-                                    component: Vendordetails
-                                },
-                            ]
-                        },
-                        {
-                            path: 'candidates',
-                            name: '',
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: 'potential',
-                                    name: '',
-                                    props: true,
-                                    component: clearRouterView,
-                                    children: [
-                                        {
-                                            path: '',
-                                            name: 'potential-vendors',
-                                            props: true,
-                                            component: PotentialVendors,
-                                        },
-                                        {
-                                            path: 'details/:id',
-                                            name: 'vendor-details',
-                                            component: Vendordetails
-                                        },
-                                    ]
-                                },
-                                {
-                                    path: 'tests',
-                                    name: 'tests-vendors',
-                                    props: true,
-                                    component: VendorsCandidatesTests
-                                },
-                                // {
-                                //     path: 'details/:id',
-                                //     name: 'vendor-details',
-                                //     component: Vendordetails
-                                // },
-                            ]
-                        },
-                        {
-                            path: 'report',
-                            name: '',
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: 'pending-competencies-vendors',
-                                    name: 'pending-competencies-vendors',
-                                    component: PendingCompetenciesLayout
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'report-details',
-                                    component: Vendordetails
-                                },
-                            ]
-                        },
-                        // {
-                        //     path: 'details/:id',
-                        //     name: 'vendor-details',
-                        //     component: Vendordetails
-                        // },
-                        {
-                            path: 'new-vendor',
-                            name: 'new-vendor',
-                            component: NewVendor
-                        },
-                    ]
-                },
-                {
-                    path: 'clients',
-                    name: '',
-                    component: clearRouterView,
-                    children: [
-                        {
-                            path: 'all',
-                            name: '',
-                            component: clearRouterView,
-                            props: true,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'all-clients',
-                                    component: Allclients,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'all-clients-details',
-                                    component: ClientInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'active',
-                            name: '',
-                            props: true,
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'active-clients',
-                                    component: ActiveClients,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'active-clients-details',
-                                    component: ClientInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'inactive',
-                            name: '',
-                            props: true,
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'inactive-clients',
-                                    component: InactiveClients,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'inactive-clients-details',
-                                    component: ClientInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'potential',
-                            name: '',
-                            props: true,
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'potential-clients',
-                                    component: PotentialClients,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'potential-clients-details',
-                                    component: ClientInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'details/:id',
-                            name: '',
-                            component: ClientDetails,
-                            props: true,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'client-info',
-                                    component: ClientInfo,
-                                    props: true
-                                },
-                                {
-                                    path: 'new-contact',
-                                    name: 'new-contact',
-                                    component: NewContactDetails,
-                                    props: true
-                                },
-                                {
-                                    path: 'contact/:index',
-                                    name: 'contact',
-                                    component: ContactDetails,
-                                    props: true
-                                }
-                            ]
-                        },
-                        {
-                            path: 'new-client',
-                            name: '',
-                            component: NewClient,
-                            props: true,
-                            children: [
-                                {
-                                    path: '',
-                                    name: '_info',
-                                    component: NewClientInfo,
-                                    props: true
-                                },
-                                {
-                                    path: 'new_contact',
-                                    name: 'new_contact',
-                                    component: NewContactDetails,
-                                    props: true
-                                },
-                                {
-                                    path: '_contact/:index',
-                                    name: '_contact',
-                                    component: ContactDetails,
-                                    props: true
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    path: 'projects',
-                    name: 'projects',
-                    component: PmArea,
-                    children: [
-                        {
-                            path: 'open-projects',
-                            name: '',
-                            component: clearRouterView,
-                            props: true,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'open-projects',
-                                    component: Projects,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'open-project-details',
-                                    component: ProjectInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'quote-projects',
-                            name: '',
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'quote-projects',
-                                    component: QuoteProjects,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'quote-projects-details',
-                                    component: ProjectInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'requests',
-                            name: '',
-                            component: clearRouterView,
-                            props: true,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'requests',
-                                    component: Requests,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'requests-projects-details',
-                                    component: ProjectInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'closed-projects',
-                            name: '',
-                            component: clearRouterView,
-                            children: [
-                                {
-                                    path: '',
-                                    name: 'closed-projects',
-                                    component: ClosedProjects,
-                                    props: true
-                                },
-                                {
-                                    path: 'details/:id',
-                                    name: 'closed-projects-details',
-                                    component: ProjectInfo,
-                                    props: true,
-                                }
-                            ]
-                        },
-                        {
-                            path: 'xtrf',
-                            name: '',
-                            component: clearRouterView,
-                            props: true,
-                            children: [
-                                {
-                                    path: 'open-other-projects',
-                                    name: '',
-                                    component: clearRouterView,
-                                    children: [
-                                        {
-                                            path: '',
-                                            name: 'open-other-projects',
-                                            component: OpenOtherProjects,
-                                            props: true
-                                        },
-                                        {
-                                            path: 'details/:id',
-                                            name: 'open-other-projects-details',
-                                            component: OtherProjectInfo,
-                                            props: true,
-                                        }
-                                    ]
-                                },
-                                {
-                                    path: 'closed-other-projects',
-                                    name: '',
-                                    component: clearRouterView,
-                                    children: [
-                                        {
-                                            path: '',
-                                            name: 'closed-other-projects',
-                                            component: ClosedOtherProjects,
-                                            props: true
-                                        },
-                                        {
-                                            path: 'details/:id',
-                                            name: 'closed-other-projects-details',
-                                            component: OtherProjectInfo,
-                                            props: true,
-                                        }
-                                    ]
-                                },
-                                {
-                                    path: 'quote-other-projects',
-                                    name: '',
-                                    component: clearRouterView,
-                                    children: [
-                                        {
-                                            path: '',
-                                            name: 'quote-other-projects',
-                                            component: QuoteOtherProjects,
-                                            props: true
-                                        },
-                                        {
-                                            path: 'details/:id',
-                                            name: 'quote-other-projects-details',
-                                            component: OtherProjectInfo,
-                                            props: true,
-                                        }
-                                    ]
-                                },
-                                // {
-                                //     path: 'details/:id',
-                                //     name: 'details',
-                                //     component: OtherProjectInfo
-                                // },
-                            ]
-                        },
-                        // {
-                        //     path: 'details/:id',
-                        //     name: 'details',
-                        //     component: ProjectInfo
-                        // },
+					]
+				},
+				{
+					path: 'settings',
+					name: 'settings',
+					component: Settings,
+					props: true,
+					children: [
+						{
+							path: 'discounts',
+							name: 'discounts',
+							component: TableDiscounts
+						},
+						{
+							path: 'api-customers',
+							name: 'api-customers',
+							component: TableClientApiSetting
+						},
+						{
+							path: 'leadsources',
+							name: 'leadsources',
+							component: TableLeadsources
+						},
+						{
+							path: 'groups',
+							name: 'groups',
+							component: TableGroups
+						},
+						{
+							path: 'languages',
+							name: 'languages',
+							component: TableLanguages
+						},
+						{
+							path: 'services',
+							name: 'services',
+							component: TableServices
+						},
+						{
+							path: 'industries',
+							name: 'industries',
+							component: TableIndustries
+						},
+						{
+							path: 'pricelists',
+							name: 'pricelists',
+							component: Pricelists
+						},
+						{
+							path: 'pricelists/:id',
+							name: 'pricelist',
+							component: PricelistSettingsLayout
+						},
+						{
+							path: 'instructions',
+							name: 'instructions',
+							component: Instructions
+						},
+						{
+							path: 'cancel-reasons',
+							name: 'cancel-reasons',
+							component: CancelReasons
+						},
+						{
+							path: 'tiers-lqas',
+							name: 'tiers-lqas',
+							component: TierLqas
+						},
+						{
+							path: 'industry-lqas',
+							name: 'industry-lqas',
+							component: IndustryLqa
+						},
+						{
+							path: 'users',
+							name: 'users',
+							component: Users
+						},
+						{
+							path: 'units',
+							name: 'units',
+							component: TableUnits
+						}
+					]
+				},
+				{
+					path: 'vendors',
+					name: '',
+					component: clearRouterView,
+					children: [
 
-                    ]
-                },
+						{
+							path: 'all',
+							name: 'all-vendors',
+							props: true,
+							component: AllVendorsTable
+						},
+						{
+							path: 'all/details/:id',
+							name: 'all-vendor-details',
+							component: Vendordetails
+						},
+						{
+							path: 'active',
+							name: 'active-vendors',
+							props: true,
+							component: ActiveVendors
+						},
+						{
+							path: 'active/details/:id',
+							name: 'active-vendor-details',
+							component: Vendordetails
+						},
+						{
+							path: 'inactive',
+							name: 'inactive-vendors',
+							props: true,
+							component: InactiveVendors
+						},
+						{
+							path: 'inactive/details/:id',
+							name: 'inactive-vendor-details',
+							component: Vendordetails
+						},
+						{
+							path: 'candidates/potential',
+							name: 'potential-vendors',
+							props: true,
+							component: PotentialVendors
+						},
+						{
+							path: 'candidates/potential/details/:id',
+							name: 'vendor-details',
+							component: Vendordetails
+						},
+						{
+							path: 'candidates/tests',
+							name: 'tests-vendors',
+							props: true,
+							component: VendorsCandidatesTests
+						},
+						{
+							path: 'report/pending-competencies-vendors',
+							name: 'pending-competencies-vendors',
+							component: PendingCompetenciesLayout
+						},
+						{
+							path: 'new-vendor',
+							name: 'new-vendor',
+							component: NewVendor
+						}
 
-                // {
-                //     path: 'request-details/:id',
-                //     name: 'request-details',
-                //     component: RequestInfo
-                // },
-                {
-                    path: 'request-details/:id',
-                    name: 'request-details',
-                    component: clientRequestInfo
-                },
+					]
+				},
+				{
+					path: 'clients',
+					name: '',
+					component: clearRouterView,
+					children: [
 
-                {
-                    path: 'create-project',
-                    name: 'create-project',
-                    component: CreateProject
-                },
-                {
-                    path: 'finance',
-                    name: 'finance',
-                    component: FinanceSettings
-                },
-                {
-                    path: 'reports',
-                    name: 'reports',
-                    component: ReportsSettings,
-                    children: [
-                        {
-                            path: 'lang-pair-tier',
-                            name: 'lang-pair-tier',
-                            component: TierReport,
-                            props: true
-                        },
-                        {
-                            path: 'lqa',
-                            name: 'lqa',
-                            component: LqaReport,
-                            props: true
-                        },
-                        {
-                            path: 'upcoming-lqa',
-                            name: 'upcoming-lqa',
-                            component: LqaVendors
-                        },
-                        {
-                            path: 'benchmark',
-                            name: 'benchmark',
-                            component: BenchmarkReport
-                        },
-                        {
-                            path: 'pending-competencies',
-                            name: 'pending-competencies',
-                            component: PendingCompetenciesLayout
-                        }
-                    ]
-                }
-            ]
-        },
-    ]
+						{
+							path: 'all',
+							name: 'all-clients',
+							component: Allclients,
+							props: true
+						},
+						{
+							path: 'all/details/:id',
+							name: '',
+							component: clearRouterView,
+							props: true,
+							children: [
+								{ path: '', name: 'all-client-info', component: ClientInfo, props: true },
+								{ path: 'new-contact', name: 'all-new-contact', component: NewContactDetails, props: true },
+								{ path: 'contact/:index', name: 'all-contact', component: ContactDetails, props: true }
+							]
+						},
+						{
+							path: 'active',
+							name: 'active-clients',
+							component: ActiveClients,
+							props: true
+						},
+						{
+							path: 'active/details/:id',
+							name: '',
+							component: clearRouterView,
+							props: true,
+							children: [
+								{ path: '', name: 'active-client-info', component: ClientInfo, props: true },
+								{ path: 'new-contact', name: 'active-new-contact', component: NewContactDetails, props: true },
+								{ path: 'contact/:index', name: 'active-contact', component: ContactDetails, props: true }
+							]
+						},
+						{
+							path: 'inactive',
+							name: 'inactive-clients',
+							component: InactiveClients,
+							props: true
+						},
+						{
+							path: 'inactive/details/:id',
+							name: '',
+							component: clearRouterView,
+							props: true,
+							children: [
+								{ path: '', name: 'inactive-client-info', component: ClientInfo, props: true },
+								{ path: 'new-contact', name: 'inactive-new-contact', component: NewContactDetails, props: true },
+								{ path: 'contact/:index', name: 'inactive-contact', component: ContactDetails, props: true }
+							]
+						},
+						{
+							path: 'potential',
+							name: 'potential-clients',
+							component: PotentialClients,
+							props: true
+						},
+						{
+							path: 'potential/details/:id',
+							name: '',
+							component: clearRouterView,
+							props: true,
+							children: [
+								{ path: '', name: 'potential-client-info', component: ClientInfo, props: true },
+								{ path: 'new-contact', name: 'potential-new-contact', component: NewContactDetails, props: true },
+								{ path: 'contact/:index', name: 'potential-contact', component: ContactDetails, props: true }
+							]
+						},
+						// {
+						// 	path: 'details/:id',
+						// 	name: '',
+						// 	component: ClientDetails,
+						// 	props: true,
+						//
+						// },
+						{
+							path: 'new-client',
+							name: '',
+							component: NewClient,
+							props: true,
+							children: [
+								{
+									path: '',
+									name: '_info',
+									component: NewClientInfo,
+									props: true
+								},
+								{
+									path: 'new_contact',
+									name: 'new_contact',
+									component: NewContactDetails,
+									props: true
+								},
+								{
+									path: '_contact/:index',
+									name: '_contact',
+									component: ContactDetails,
+									props: true
+								}
+							]
+						}
+					]
+				},
+
+				{
+					path: 'projects',
+					name: 'projects',
+					component: PmArea,
+					children: [
+						{
+							path: 'open-projects',
+							name: 'open-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'open-projects/details/:id',
+							name: 'open-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'quote-projects',
+							name: 'quote-projects',
+							component: QuoteProjects,
+							props: true
+						},
+						{
+							path: 'quote-projects/details/:id',
+							name: 'quote-projects-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'requests',
+							name: 'requests',
+							component: Requests,
+							props: true
+						},
+						{
+							path: 'requests/details/:id',
+							name: 'requests-projects-details',
+							component: RequestInfo,
+							props: true
+						},
+						{
+							path: 'closed-projects',
+							name: 'closed-projects',
+							component: ClosedProjects,
+							props: true
+						},
+						{
+							path: 'closed-projects/details/:id',
+							name: 'closed-projects-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'xtrf',
+							name: '',
+							component: clearRouterView,
+							props: true,
+							children: [
+								{
+									path: 'open-other-projects',
+									name: 'open-other-projects',
+									component: OpenOtherProjects,
+									props: true
+								},
+								{
+									path: 'open-other-projects/details/:id',
+									name: 'open-other-projects-details',
+									component: OtherProjectInfo,
+									props: true
+								},
+								{
+
+									path: 'closed-other-projects',
+									name: 'closed-other-projects',
+									component: ClosedOtherProjects,
+									props: true
+								},
+								{
+									path: 'closed-other-projects/details/:id',
+									name: 'closed-other-projects-details',
+									component: OtherProjectInfo,
+									props: true
+								},
+								{
+									path: 'quote-other-projects',
+									name: 'quote-other-projects',
+									component: QuoteOtherProjects,
+									props: true
+								},
+								{
+									path: 'quote-other-projects/details/:id',
+									name: 'quote-other-projects-details',
+									component: OtherProjectInfo,
+									props: true
+								}
+
+							]
+						}
+
+					]
+				},
+				{
+					path: 'create-project',
+					name: 'create-project',
+					component: CreateProject
+				},
+				{
+					path: 'finance',
+					name: 'finance',
+					component: FinanceSettings
+				},
+				{
+					path: 'reports',
+					name: 'reports',
+					component: ReportsSettings,
+					children: [
+						{
+							path: 'lang-pair-tier',
+							name: 'lang-pair-tier',
+							component: TierReport,
+							props: true
+						},
+						{
+							path: 'lqa',
+							name: 'lqa',
+							component: LqaReport,
+							props: true
+						},
+						{
+							path: 'upcoming-lqa',
+							name: 'upcoming-lqa',
+							component: LqaVendors
+						},
+						{
+							path: 'benchmark',
+							name: 'benchmark',
+							component: BenchmarkReport
+						},
+						{
+							path: 'pending-competencies',
+							name: 'pending-competencies',
+							component: PendingCompetenciesLayout
+						}
+					]
+				}
+			]
+		}
+	]
 })
 
 router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem("token");
-    if (to.path === '/forgot') {
-        next();
-    } else if (!token && to.path !== '/login') {
-        next('/login');
-    } else if (token) {
-        const date = Date.now();
-        const expiryTime = new Date(JSON.parse(token).timestamp);
-        if (date > expiryTime && to.path !== '/login') {
-            store.dispatch("logout");
-            next('/login')
-        } else {
-            next()
-        }
-    } else {
-        next();
-    }
+	const token = localStorage.getItem("token")
+	if (to.path === '/forgot') {
+		next()
+	} else if (!token && to.path !== '/login') {
+		next('/login')
+	} else if (token) {
+		const date = Date.now()
+		const expiryTime = new Date(JSON.parse(token).timestamp)
+		if (date > expiryTime && to.path !== '/login') {
+			store.dispatch("logout")
+			next('/login')
+		} else {
+			next()
+		}
+	} else {
+		next()
+	}
 })
 
-export default router;
+export default router

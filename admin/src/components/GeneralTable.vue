@@ -183,7 +183,8 @@ import ValidationErrors from './ValidationErrors'
 
   table thead {
     height: 40px;
-    background: #36304a;
+    //background: #d1ccc4;
+    background: #e0ddd8;
   }
 
   table tbody tr:last-child {
@@ -195,7 +196,7 @@ import ValidationErrors from './ValidationErrors'
   /*}*/
 
   table thead th {
-    color: #fff;
+    //color: $text;
     font-weight: unset;
   }
 

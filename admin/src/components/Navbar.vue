@@ -93,7 +93,12 @@
 										name: 'Competencies Queue'
 									}
 								]
-							}
+							},
+              {
+                type: 'link',
+                name: 'Add Vendor',
+                path: '/vendors/new-vendor'
+              },
 
 						]
 					},
@@ -123,7 +128,12 @@
 								type: 'link',
 								name: 'Potential',
 								path: '/clients/potential'
-							}
+							},
+              {
+                type: 'link',
+                name: 'Add Client',
+                path: '/clients/new-client'
+              },
 						]
 					},
 					{
@@ -175,7 +185,12 @@
 										name: 'Closed Projects'
 									}
 								]
-							}
+							},
+              {
+                type: 'link',
+                name: 'Add Project',
+                path: '/clients/create-project'
+              },
 						]
 					},
 					{
@@ -210,6 +225,7 @@
 								name: 'Vendor Cost Benchmark',
 								path: '/reports/benchmark'
 							},
+
 							{
 								type: 'link',
 								name: 'Competencies Queue',
@@ -227,7 +243,7 @@
 							{
 								type: 'link',
 								name: 'Languages',
-								path: '/settings/langs'
+								path: '/settings/languages'
 							},
 							{
 								type: 'link',
@@ -372,6 +388,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import "../assets/scss/colors";
   .wrapper {
     display: flex;
   }
@@ -383,7 +400,7 @@
     bottom: 0;
     width: 265px;
     padding: 10px;
-    background-color: #463b2a;
+    background-color: $navbar;
     box-sizing: border-box;
   }
 

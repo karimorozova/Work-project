@@ -451,10 +451,12 @@
 				this.storeClientPropertyOverallDataBilling({ prop, value })
 			},
 			contactDetails({ contactIndex }) {
-				this.$router.push({ name: "contact", params: { index: contactIndex } })
+        const name = this.$route.name.split('-').shift()
+				this.$router.push({ name: `${name}-contact`, params: { index: contactIndex } })
 			},
 			addNewContact(data) {
-				this.$router.push({ name: "new-contact" })
+        const name = this.$route.name.split('-').shift()
+        this.$router.push({ name: `${name}-new-contact` })
 			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false
