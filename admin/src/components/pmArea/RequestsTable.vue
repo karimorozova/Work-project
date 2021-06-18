@@ -28,8 +28,6 @@
         span.requests-table__label {{ field.label }}
       template(slot="headerAccountManager" slot-scope="{ field }")
         span.requests-table__label {{ field.label }}
-      //template(slot="headerEdit" slot-scope="{ field }")
-      //    span.requests-table__label
 
       template(slot="projectId" slot-scope="{ row }")
         span {{ getId(row) }}
@@ -51,9 +49,6 @@
         span(v-if="row.projectManager") {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
       template(slot="accountManager" slot-scope="{ row }")
         span(v-if="row.accountManager") {{ row.accountManager.firstName }} {{ row.accountManager.lastName }}
-      //template(slot="edit" slot-scope="{ row }" style="{'z-index': 100}")
-        span.requests-table__icon(@click.stop="edit")
-          img.requests-table__edit(src="../../assets/images/edit-icon-qa.png")
 </template>
 
 <script>
@@ -77,8 +72,7 @@
 					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%" },
 					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "11%" },
-					{ label: "Account Manager", headerKey: "headerAccountManager", key: "accountManager", width: "11%" },
-					// {label: "Edit", headerKey: "headerEdit", key: "edit", width: "5%"},
+					{ label: "Account Manager", headerKey: "headerAccountManager", key: "accountManager", width: "11%" }
 				]
 			}
 		},

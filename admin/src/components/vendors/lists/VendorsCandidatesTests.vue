@@ -160,19 +160,19 @@
         i.fa.fa-times(aria-hidden="true", @click="closeAddData")
 </template>
 <script>
-	import { mapGetters, mapActions } from "vuex";
-	import moment from "moment";
-	import Add from "../../Add";
-	import Button from "../../Button";
-	import SelectSingle from "../../SelectSingle";
-	import SelectMulti from "../../SelectMulti";
-	import Datatable from "../../DataTable";
-	import scrollDrop from "@/mixins/scrollDrop";
-	import ValidationErrors from "../../ValidationErrors";
-	import ApproveModal from "../../ApproveModal";
+	import { mapGetters, mapActions } from "vuex"
+	import moment from "moment"
+	import Add from "../../Add"
+	import Button from "../../Button"
+	import SelectSingle from "../../SelectSingle"
+	import SelectMulti from "../../SelectMulti"
+	import Datatable from "../../DataTable"
+	import scrollDrop from "@/mixins/scrollDrop"
+	import ValidationErrors from "../../ValidationErrors"
+	import ApproveModal from "../../ApproveModal"
 
-export default {
-		mixins: [scrollDrop],
+	export default {
+		mixins: [ scrollDrop ],
 		data() {
 			return {
 				fields: [
@@ -181,67 +181,67 @@ export default {
 						headerKey: "headerEvaluatioName",
 						key: "evaluationName",
 						width: "14%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Evaluation Type",
 						headerKey: "headerEvaluationType",
 						key: "evaluationType",
 						width: "10%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Source",
 						headerKey: "headerSource",
 						key: "source",
 						width: "12%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Targets",
 						headerKey: "headerTarget",
 						key: "targets",
 						width: "12%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Industries",
 						headerKey: "headerIndustry",
 						key: "industry",
 						width: "12%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Steps",
 						headerKey: "headerStep",
 						key: "step",
 						width: "12%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "File Name",
 						headerKey: "headerFile",
 						key: "file",
 						width: "15%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "Uploaded",
 						headerKey: "headerUploaded",
 						key: "uploaded",
 						width: "8%",
-						padding: "0",
+						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
 						width: "5%",
-						padding: "0",
-					},
+						padding: "0"
+					}
 				],
 				icons: {
-					delete: { icon: require("../../../assets/images/Other/delete-icon-qa-form.png") },
+					delete: { icon: require("../../../assets/images/Other/delete-icon-qa-form.png") }
 				},
 				vendorTests: [],
 				currentActive: -1,
@@ -266,101 +266,97 @@ export default {
 				deleteIndex: -1,
 				isTableDropMenu: true,
 				domain: "http://localhost:3001",
-				isPopup: false,
-			};
+				isPopup: false
+			}
 		},
 		methods: {
-			...mapActions(["saveLangTest", "removeLangTest", "alertToggle"]),
+			...mapActions([ "saveLangTest", "removeLangTest", "alertToggle" ]),
 			setEvaluationType(type) {
-				this.currentEvaluationType = type;
+				this.currentEvaluationType = type
 			},
 			setLanguageType(type) {
-				this.currentLanguageType = type;
-				this.currentSource = "";
-				this.currentTargets = [];
+				this.currentLanguageType = type
+				this.currentSource = ""
+				this.currentTargets = []
 			},
 			async makeAction(index, key) {
-				if(key === "delete") this.manageDeleteClick(index);
+				if (key === "delete") this.manageDeleteClick(index)
 			},
 			togglePopup(action) {
-				this.isPopup = action;
+				this.isPopup = action
 			},
 			addData() {
-				this.currentIndex = -1;
-				this.togglePopup(true);
+				this.currentIndex = -1
+				this.togglePopup(true)
 			},
 			closeAddData() {
-				this.togglePopup(false);
-				this.setDefaults();
-				this.getTests();
+				this.togglePopup(false)
+				this.setDefaults()
+				this.getTests()
 			},
 			async saveTest() {
-				this.errors = [];
-				if(!this.currentSource) this.errors.push("Source should not be empty!");
-				if(this.selectedTargets.length === 0) this.errors.push("Target should not be empty!");
-				if(!this.currentIndustries.length) this.errors.push("Industries should not be empty!");
-				if(!this.currentSteps.length) this.errors.push("Steps should not be empty!");
-				if(!this.currentEvaluationType) this.errors.push("Evaluation type should not be empty");
-				if(!this.currentLanguageType) this.errors.push("Language type should not be empty");
-				if(!this.currentEvaluationName) this.errors.push("Evaluation name should not be empty");
-				if(this.currentIndex === -1 && this.currentEvaluationType === "Test") {
-					if(!this.currentFile) this.errors.push("File should not be empty!");
+				this.errors = []
+				if (!this.currentSource) this.errors.push("Source should not be empty!")
+				if (this.selectedTargets.length === 0) this.errors.push("Target should not be empty!")
+				if (!this.currentIndustries.length) this.errors.push("Industries should not be empty!")
+				if (!this.currentSteps.length) this.errors.push("Steps should not be empty!")
+				if (!this.currentEvaluationType) this.errors.push("Evaluation type should not be empty")
+				if (!this.currentLanguageType) this.errors.push("Language type should not be empty")
+				if (!this.currentEvaluationName) this.errors.push("Evaluation name should not be empty")
+				if (this.currentIndex === -1 && this.currentEvaluationType === "Test") {
+					if (!this.currentFile) this.errors.push("File should not be empty!")
 				}
-				if(this.isTestSame()) this.errors.push("Such a test already exists");
-				if(this.isSameTestName()) this.errors.push("This evaluation name already exists");
-				if(this.errors.length) {
-					this.areErrors = true;
-					return;
+				if (this.isTestSame()) this.errors.push("Such a test already exists")
+				if (this.isSameTestName()) this.errors.push("This evaluation name already exists")
+				if (this.errors.length) {
+					this.areErrors = true
+					return
 				}
-				await this.sendSaveTest();
+				await this.sendSaveTest()
 			},
 			isSameTestName() {
 				const allVendorsTests = this.vendorTests.filter((test) =>
 						this.currentIndex >= 0 ? test._id !== this.vendorTests[this.currentIndex]._id : true
-				);
-				return allVendorsTests.map((test) => test.evaluationName).includes(this.currentEvaluationName);
+				)
+				return allVendorsTests.map((test) => test.evaluationName).includes(this.currentEvaluationName)
 			},
 			searchSame(type) {
-				let result = false;
-				const allVendorsTests = this.currentIndex !== -1 ? this.vendorTests.filter((test) => test._id !== this.vendorTests[this.currentIndex]._id) : this.vendorTests;
+				let result = false
+				const allVendorsTests = this.currentIndex !== -1 ? this.vendorTests.filter((test) => test._id !== this.vendorTests[this.currentIndex]._id) : this.vendorTests
 
 				for (const element of allVendorsTests) {
-					const source = element.source.lang === this.currentSource.lang;
-					const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets;
+					const source = element.source.lang === this.currentSource.lang
+					const currentTargetForSearch = this.currentTargets[0].lang === "All" ? this.sources : this.currentTargets
 					const target = element.targets.find((target) =>
 							currentTargetForSearch.some((currentTarget) => target.lang === currentTarget.lang)
-					);
+					)
 					const industry = element.industries.find((industry) =>
 							this.currentIndustries.some((currentIndustry) => industry.name === currentIndustry.name)
-					);
+					)
 					const step = element.steps.find((steps) =>
 							this.currentSteps.some((currentStep) => steps.title === currentStep.title)
-					);
+					)
 					result =
 							source &&
 							Object.keys(target !== undefined ? target : {}).length > 0 &&
 							Object.keys(industry !== undefined ? industry : {}).length > 0 &&
-							Object.keys(step !== undefined ? step : {}).length > 0;
+							Object.keys(step !== undefined ? step : {}).length > 0
 
-					if(result) {
-						break;
+					if (result) {
+						break
 					}
 				}
-				return result;
+				return result
 			},
 
 			isTestSame() {
-				return this.searchSame();
-				// if (this.currentEvaluationType === "Test") {
-				// } else {
-				//   return this.searchSame("Sample");
-				// }
+				return this.searchSame()
 			},
 			async sendSaveTest() {
 				const targets =
 						this.currentTargets[0].lang === "All"
 								? this.targets.filter((item) => item.lang !== "All")
-								: this.currentTargets;
+								: this.currentTargets
 				let testData = {
 					evaluationName: this.currentEvaluationName,
 					evaluationType: this.currentEvaluationType,
@@ -372,190 +368,190 @@ export default {
 					index: this.currentIndex >= 0 ? this.currentIndex : "",
 					oldPath: this.currentIndex >= 0 ? this.vendorTests[this.currentIndex].path : "",
 					fileName: this.currentIndex >= 0 ? this.vendorTests[this.currentIndex].fileName : "",
-					_id: this.currentIndex >= 0 ? this.vendorTests[this.currentIndex]._id : "",
-				};
+					_id: this.currentIndex >= 0 ? this.vendorTests[this.currentIndex]._id : ""
+				}
 				try {
-					await this.saveLangTest({ testData, file: this.currentFile });
-					await this.getTests();
+					await this.saveLangTest({ testData, file: this.currentFile })
+					await this.getTests()
 				} catch (err) {
 				} finally {
-					this.setDefaults();
+					this.setDefaults()
 				}
 			},
 			editData({ index }) {
-				this.currentFile = "";
-				this.currentSource = this.vendorTests[index].source;
-				this.currentIndustries = this.vendorTests[index].industries;
-				this.currentSteps = this.vendorTests[index].steps;
-				this.currentTargets = this.vendorTests[index].targets;
-				this.currentEvaluationType = this.vendorTests[index].evaluationType;
-				this.currentLanguageType = this.vendorTests[index].languageType;
-				this.currentEvaluationName = this.vendorTests[index].evaluationName;
-				this.currentIndex = index;
-				this.togglePopup(true);
+				this.currentFile = ""
+				this.currentSource = this.vendorTests[index].source
+				this.currentIndustries = this.vendorTests[index].industries
+				this.currentSteps = this.vendorTests[index].steps
+				this.currentTargets = this.vendorTests[index].targets
+				this.currentEvaluationType = this.vendorTests[index].evaluationType
+				this.currentLanguageType = this.vendorTests[index].languageType
+				this.currentEvaluationName = this.vendorTests[index].evaluationName
+				this.currentIndex = index
+				this.togglePopup(true)
 			},
 			getFormattedDate(date) {
-				if(!date) return "";
-				return moment(date).format("DD-MM-YYYY");
+				if (!date) return ""
+				return moment(date).format("DD-MM-YYYY")
 			},
 			uploadDocument(e) {
-				this.currentFile = this.$refs.file.files[0];
+				this.currentFile = this.$refs.file.files[0]
 			},
 			setDefaults() {
-				this.isDeleting = false;
-				this.isPopup = false;
-				this.currentFile = "";
-				this.currentSource = "";
-				this.currentIndustries = [];
-				this.currentSteps = [];
-				this.currentTargets = [];
-				this.currentEvaluationType = "";
-				this.currentLanguageType = "";
-				this.currentEvaluationName = "";
-				this.currentIndex = "";
+				this.isDeleting = false
+				this.isPopup = false
+				this.currentFile = ""
+				this.currentSource = ""
+				this.currentIndustries = []
+				this.currentSteps = []
+				this.currentTargets = []
+				this.currentEvaluationType = ""
+				this.currentLanguageType = ""
+				this.currentEvaluationName = ""
+				this.currentIndex = ""
 			},
 			async manageDeleteClick(index) {
-				this.togglePopup(false);
-				this.deleteIndex = index;
-				this.isDeleting = true;
+				this.togglePopup(false)
+				this.deleteIndex = index
+				this.isDeleting = true
 			},
 			async deveteVendorsTest() {
-				const { _id, path } = this.vendorTests[this.deleteIndex];
+				const { _id, path } = this.vendorTests[this.deleteIndex]
 				try {
-					await this.removeLangTest({ _id, path });
-					await this.getTests();
+					await this.removeLangTest({ _id, path })
+					await this.getTests()
 				} catch (err) {
 				} finally {
-					this.setDefaults();
-					this.isDeleting = false;
+					this.setDefaults()
+					this.isDeleting = false
 				}
 			},
 			closeErrors() {
-				this.areErrors = false;
+				this.areErrors = false
 			},
 			setIndustries({ option }) {
-				const position = this.currentIndustries.map((item) => item.name).indexOf(option);
-				if(position !== -1) {
-					this.currentIndustries.splice(position, 1);
+				const position = this.currentIndustries.map((item) => item.name).indexOf(option)
+				if (position !== -1) {
+					this.currentIndustries.splice(position, 1)
 				} else {
-					const industry = this.industries.find((item) => item.name === option);
-					this.currentIndustries.push(industry);
+					const industry = this.industries.find((item) => item.name === option)
+					this.currentIndustries.push(industry)
 				}
 			},
 			setSteps({ option }) {
-				const position = this.currentSteps.map((item) => item.title).indexOf(option);
-				if(position !== -1) {
-					this.currentSteps.splice(position, 1);
+				const position = this.currentSteps.map((item) => item.title).indexOf(option)
+				if (position !== -1) {
+					this.currentSteps.splice(position, 1)
 				} else {
-					const service = this.steps.find((item) => item.title === option);
-					this.currentSteps.push(service);
+					const service = this.steps.find((item) => item.title === option)
+					this.currentSteps.push(service)
 				}
 			},
 			setSource({ option }) {
-				this.currentSource = this.sources.find((item) => item.lang === option);
+				this.currentSource = this.sources.find((item) => item.lang === option)
 			},
 			setTargets({ option }) {
-				if(this.currentLanguageType === "Mono") {
-					const lang = this.targets.find((item) => item.lang === option);
-					this.currentTargets = [lang];
-					this.currentSource = lang;
+				if (this.currentLanguageType === "Mono") {
+					const lang = this.targets.find((item) => item.lang === option)
+					this.currentTargets = [ lang ]
+					this.currentSource = lang
 				} else {
-					const position = this.selectedTargets.indexOf(option);
-					this.currentTargets = this.currentTargets.filter((item) => item.lang !== "All");
-					if(position !== -1) {
-						this.currentTargets.splice(position, 1);
+					const position = this.selectedTargets.indexOf(option)
+					this.currentTargets = this.currentTargets.filter((item) => item.lang !== "All")
+					if (position !== -1) {
+						this.currentTargets.splice(position, 1)
 					} else {
-						const lang = this.targets.find((item) => item.lang === option);
-						this.currentTargets.push(lang);
+						const lang = this.targets.find((item) => item.lang === option)
+						this.currentTargets.push(lang)
 					}
-					if(option === "All" || !this.selectedTargets.length) {
-						this.currentTargets = [{ lang: "All" }];
+					if (option === "All" || !this.selectedTargets.length) {
+						this.currentTargets = [ { lang: "All" } ]
 					}
 				}
 			},
 			presentArrays(Arr, key) {
-				if(!Arr.length) return "";
-				return Arr.reduce((acc, cur) => acc + `${ cur[key] }; `, "");
+				if (!Arr.length) return ""
+				return Arr.reduce((acc, cur) => acc + `${ cur[key] }; `, "")
 			},
 			presentSource(source) {
-				return source ? source.lang : "NA";
+				return source ? source.lang : "NA"
 			},
 			presentTargets(targets) {
-				if(!targets.length) return "";
-				if(targets.length === this.targets.filter((item) => item.lang !== "All").length) return "All";
-				return targets.reduce((acc, cur) => acc + `${ cur.lang }; `, "");
+				if (!targets.length) return ""
+				if (targets.length === this.targets.filter((item) => item.lang !== "All").length) return "All"
+				return targets.reduce((acc, cur) => acc + `${ cur.lang }; `, "")
 			},
 			async getTests() {
 				try {
-					const result = await this.$http.get("/vendorsapi/lang-tests");
-					this.vendorTests = result.body;
+					const result = await this.$http.get("/vendorsapi/lang-tests")
+					this.vendorTests = result.body
 				} catch (err) {
-					this.alertToggle({ message: "Error on getting tests", isShow: true });
+					this.alertToggle({ message: "Error on getting tests", isShow: true })
 				}
 			},
 			async getLangs() {
 				try {
-					const result = await this.$http.get("/api/languages");
-					this.sources = Array.from(result.body);
-					this.targets = Array.from(result.body);
-					this.targets.unshift({ lang: "All" });
+					const result = await this.$http.get("/api/languages")
+					this.sources = Array.from(result.body)
+					this.targets = Array.from(result.body)
+					this.targets.unshift({ lang: "All" })
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async getSteps() {
 				try {
-					const result = await this.$http.get("/api/steps");
-					this.steps = result.body;
+					const result = await this.$http.get("/api/steps")
+					this.steps = result.body
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async getIndustries() {
 				try {
-					const result = await this.$http.get("/api/industries");
-					this.industries = result.body;
+					const result = await this.$http.get("/api/industries")
+					this.industries = result.body
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
-			},
+			}
 		},
 		computed: {
 			sourceData() {
-				return this.sources.map((item) => item.lang);
+				return this.sources.map((item) => item.lang)
 			},
 			targetData() {
-				if(this.currentLanguageType === "Mono") {
-					const firstElement = this.targets.shift();
-					return this.targets.map((item) => item.lang);
+				if (this.currentLanguageType === "Mono") {
+					const firstElement = this.targets.shift()
+					return this.targets.map((item) => item.lang)
 				} else {
-					const isAll = this.targets.find((item) => item.lang == "All");
-					if(isAll) {
-						return this.targets.map((item) => item.lang);
+					const isAll = this.targets.find((item) => item.lang == "All")
+					if (isAll) {
+						return this.targets.map((item) => item.lang)
 					} else {
-						this.targets.unshift({ lang: "All" });
-						return this.targets.map((item) => item.lang);
+						this.targets.unshift({ lang: "All" })
+						return this.targets.map((item) => item.lang)
 					}
 				}
 			},
 			industryData() {
-				return this.industries.map((item) => item.name);
+				return this.industries.map((item) => item.name)
 			},
 			stepsData() {
-				return this.steps.map((item) => item.title);
+				return this.steps.map((item) => item.title)
 			},
 			selectedTargets() {
-				return this.currentTargets.length ? this.currentTargets.map((item) => item.lang) : [];
-			},
+				return this.currentTargets.length ? this.currentTargets.map((item) => item.lang) : []
+			}
 		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__;
+			this.domain = __WEBPACK__API_URL__
 		},
 		created() {
-			this.getTests();
-			this.getLangs();
-			this.getSteps();
-			this.getIndustries();
+			this.getTests()
+			this.getLangs()
+			this.getSteps()
+			this.getIndustries()
 		},
 		components: {
 			SelectSingle,
@@ -564,21 +560,26 @@ export default {
 			Add,
 			Button,
 			ValidationErrors,
-			ApproveModal,
-		},
-	};
+			ApproveModal
+		}
+	}
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/styles/settingsTable.scss";
 
-  a{
+  a {
     color: #d15f45;
   }
+
   .vendorTests {
-    @extend %setting-table;
-    width: 1160px;
+    width: 1200px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     position: relative !important;
+    margin: 40px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 20px;
+    background: white;
 
     &__approve {
       position: absolute;
@@ -587,19 +588,16 @@ export default {
     }
 
     &__data {
-      @extend %table-data;
       overflow-x: hidden;
       display: grid;
     }
 
     &__icons {
-      @extend %table-icons;
       height: 30px;
       justify-content: center;
     }
 
     &__icon {
-      @extend %table-icon;
       opacity: 1;
       margin: 0;
     }

@@ -55,9 +55,9 @@
 </template>
 
 <script>
-	import DataTable from "@/components/DataTable";
-	import { mapActions } from "vuex";
-	import TierReportsFilter from "./TierReportsFilter";
+	import DataTable from "@/components/DataTable"
+	import { mapActions } from "vuex"
+	import TierReportsFilter from "./TierReportsFilter"
 
 	export default {
 		data() {
@@ -78,92 +78,92 @@
 				sourceFilter: "English [grouped]",
 				activeIndex: -1,
 				allSources: [],
-				allTargets: [],
+				allTargets: []
 
 			}
 		},
 		methods: {
-			...mapActions(['alertToggle']),
+			...mapActions([ 'alertToggle' ]),
 			async updateReports() {
-				await this.updateReportsCollections();
-				await this.getReport();
+				await this.updateReportsCollections()
+				await this.getReport()
 			},
 			async updateReportsCollections() {
 				try {
-					await this.$http.get('/reportsapi/rewrite-xtrf-tier-report');
+					await this.$http.get('/reportsapi/rewrite-xtrf-tier-report')
 				} catch (err) {
 					this.alertToggle({ message: "Error on update tier reports", isShow: true, type: "error" })
 				}
 			},
 			async getReport() {
-				this.activeIndex = -1;
+				this.activeIndex = -1
 				try {
-					const result = await this.$http.post("/reportsapi/xtrf-tier-report", { filters: this.filters });
-					const { filteredReports, structuredReports } = result.data;
-					this.reportData = filteredReports;
-					if(structuredReports) {
-						this.allSources = [...new Set(structuredReports.map(i => i.source))];
-						this.allSources.unshift('All');
-						this.allTargets = [...new Set(structuredReports.map(i => i.target))];
-						this.allTargets.unshift('All');
+					const result = await this.$http.post("/reportsapi/xtrf-tier-report", { filters: this.filters })
+					const { filteredReports, structuredReports } = result.data
+					this.reportData = filteredReports
+					if (structuredReports) {
+						this.allSources = [ ...new Set(structuredReports.map(i => i.source)) ]
+						this.allSources.unshift('All')
+						this.allTargets = [ ...new Set(structuredReports.map(i => i.target)) ]
+						this.allTargets.unshift('All')
 					}
 				} catch (err) {
-					this.alertToggle({ message: "Error on getting tier report", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on getting tier report", isShow: true, type: "error" })
 				}
 			},
 			sortData(tierProp, prop) {
-				this.activeIndex = -1;
-				this[prop] = !this[prop];
+				this.activeIndex = -1
+				this[prop] = !this[prop]
 
-				const residualArr = this.reportData.filter(item => !item.hasOwnProperty(tierProp));
-				if(this[prop]) {
+				const residualArr = this.reportData.filter(item => !item.hasOwnProperty(tierProp))
+				if (this[prop]) {
 					this.reportData = this.reportData.filter(item => item.hasOwnProperty(tierProp))
-              .sort((a, b) => a[tierProp]['tier'] - b[tierProp]['tier']);
-          this.reportData.push(...residualArr);
+							.sort((a, b) => a[tierProp]['tier'] - b[tierProp]['tier'])
+					this.reportData.push(...residualArr)
 
 				} else {
 					this.reportData = this.reportData.filter(item => item.hasOwnProperty(tierProp))
-              .sort((a, b) => b[tierProp]['tier'] - a[tierProp]['tier'])
-					this.reportData.unshift(...residualArr);
+							.sort((a, b) => b[tierProp]['tier'] - a[tierProp]['tier'])
+					this.reportData.unshift(...residualArr)
 				}
 			},
 			async setTierFilter({ value }) {
-				this.tierFilter = value;
-				await this.getReport();
+				this.tierFilter = value
+				await this.getReport()
 			},
 			async setSourceFilter({ option }) {
-				this.sourceFilter = option;
-				await this.getReport();
+				this.sourceFilter = option
+				await this.getReport()
 			},
 			async setTargetFilter({ option }) {
-				this.targetFilter = option;
-				await this.getReport();
+				this.targetFilter = option
+				await this.getReport()
 			},
 			showInfo({ index }) {
-				this.activeIndex = this.activeIndex === index ? -1 : index;
+				this.activeIndex = this.activeIndex === index ? -1 : index
 			}
 		},
 		computed: {
 			filters() {
-				let result = {};
-				if(this.targetFilter !== 'All') {
-					result.targetFilter = this.targetFilter;
+				let result = {}
+				if (this.targetFilter !== 'All') {
+					result.targetFilter = this.targetFilter
 				}
-				if(this.sourceFilter !== 'All') {
-					result.sourceFilter = this.sourceFilter;
+				if (this.sourceFilter !== 'All') {
+					result.sourceFilter = this.sourceFilter
 				}
-				if(this.tierFilter !== 'All') {
-					result.tierFilter = +this.tierFilter;
+				if (this.tierFilter !== 'All') {
+					result.tierFilter = +this.tierFilter
 				}
-				return result;
+				return result
 			}
 		},
 		components: {
 			TierReportsFilter,
-			DataTable,
+			DataTable
 		},
 		mounted() {
-			this.getReport();
+			this.getReport()
 		}
 	}
 </script>
@@ -174,9 +174,14 @@
   .tier {
 
     &__body {
-      width: 1160px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      position: relative;
+      width: 1200px;
+      margin: 40px;
+      background: white;
       padding: 20px;
+      box-sizing: border-box;
+      border-radius: 4px;
     }
 
     &__filters {

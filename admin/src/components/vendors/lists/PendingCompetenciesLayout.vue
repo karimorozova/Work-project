@@ -98,7 +98,7 @@
 				isForm: false,
 				isWYSIWYG: false,
 				pendingCompetenceForReject: {},
-        message: '',
+				message: '',
 				filters: {
 					sourceFilter: [ "All" ],
 					targetFilter: [ "All" ],
@@ -126,25 +126,25 @@
 				alertToggle: "alertToggle",
 				storeCurrentVendor: "storeCurrentVendor"
 			}),
-			async deletePC(pendingCompetence){
-				try{
+			async deletePC(pendingCompetence) {
+				try {
 					const result = await this.$http.post('/vendorsapi/delete-pending-competence', {
 						vendorId: pendingCompetence.link,
-						pendingCompetence,
+						pendingCompetence
 					})
 					await this.storeCurrentVendor(result.data)
 					this.getVendorsPendingCompetencies(this.filters)
-        }catch (e) {
+				} catch (e) {
 					this.alertToggle({ message: "Error on deleting pending competence", isShow: true, type: "error" })
-				}finally {
+				} finally {
 					this.closeForm()
 				}
-      },
+			},
 			async getRejectMessage() {
 				try {
 					const result = await this.$http.post('/vendorsapi/get-reject-pc-message', {
 						pendingCompetence: this.pendingCompetenceForReject,
-            vendorId: this.pendingCompetenceForReject.link
+						vendorId: this.pendingCompetenceForReject.link
 					})
 					this.message = result.data
 				} catch (err) {
@@ -172,7 +172,7 @@
 					const result = await this.$http.post('/vendorsapi/reject-pending-competence', {
 						vendorId: this.pendingCompetenceForReject.link,
 						pendingCompetence: this.pendingCompetenceForReject,
-						template,
+						template
 					})
 					await this.storeCurrentVendor(result.data)
 					this.getVendorsPendingCompetencies(this.filters)
@@ -188,7 +188,7 @@
 				try {
 					const result = await this.$http.post('/vendorsapi/approve-pending-competence', {
 						vendorId: pendingCompetence.link,
-						pendingCompetence,
+						pendingCompetence
 					})
 					await this.storeCurrentVendor(result.data)
 					this.getVendorsPendingCompetencies(this.filters)
@@ -249,13 +249,16 @@
 <style lang="scss" scoped>
   .pendingCompetencies {
     position: relative;
-    width: 100%;
+    width: 1200px;
+    margin: 40px;
+    background: white;
 
     &__body {
-      width: 1100px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       padding: 20px;
       position: relative;
+      box-sizing: border-box;
+      border-radius: 4px;
     }
 
     &__data {

@@ -67,8 +67,6 @@
         span {{ row.deadline.split('T')[0].split('-').reverse().join('-') }}
       template(slot="projectManager" slot-scope="{ row }")
         span {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
-      //template(slot="projectDelivery" slot-scope="{ row, index }")
-        div.size-16(v-html="deliveryStatistic(index)")
       template(slot="projectTest" slot-scope="{ row, index }")
         .checkbox(@click.stop="")
           input(type="checkbox" class="test" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
@@ -102,7 +100,6 @@
 					{ label: "Start date", headerKey: "headerStartDate", key: "startDate", width: "7%" },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "7%" },
 					{ label: "Project Manager", headerKey: "headerProjectManager", key: "projectManager", width: "14%" },
-					// { label: "Del", headerKey: "headerDelivery", key: "projectDelivery", width: "4%" },
 					{ label: "Test", headerKey: "headerTest", key: "projectTest", width: "4%" }
 				]
 			}
@@ -120,18 +117,12 @@
 					value: event.target.checked
 				})
 			},
-			// deliveryStatistic(index) {
-			// 	let { tasks } = this.allProjects[index]
-			// 	tasks = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
-			// 	const { length: deliveryLength } = tasks.filter(({ status }) => status === 'Delivered')
-			// 	return deliveryLength === tasks.length && tasks.length ? '<i class="fa fa-check" aria-hidden="true"></i>' : (deliveryLength && deliveryLength < tasks.length) ? `${ deliveryLength } / ${ tasks.length }` : ''
-			// },
 			toFixedFinalCost(num) {
 				return num && num.toFixed(2)
 			},
 			async setProjectProp({ projectId, prop, value }) {
 				try {
-					const result = await this.$http.put("/pm-manage/project-prop", { projectId, prop, value })
+					await this.$http.put("/pm-manage/project-prop", { projectId, prop, value })
 					this.alertToggle({ message: "Project type changed", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server Error / Cannot update status Project", isShow: true, type: "error" })

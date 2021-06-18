@@ -91,7 +91,7 @@
 		},
 		computed: {
 			extendedPersons() {
-				let result = [...this.persons]
+				let result = [ ...this.persons ]
 				if (this.isAdditionalShow) {
 					this.isExtended ? result.push("Hide all") : result.push("Show all")
 				}

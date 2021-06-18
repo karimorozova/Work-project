@@ -17,31 +17,31 @@ import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
 import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
-
-//------------------------------------------------------------CLIENT------------------------------------------------------------
-//NEW CLIENT
 import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
 import NewContactDetails from '@/components/clients/new-client/NewContactDetails'
 import NewClient from '@/components/clients/new-client/NewClient'
-
-//CLIENT
 import ContactDetails from '@/components/clients/ContactDetails'
 import ClientInfo from '@/components/clients/ClientInfo'
-import ClientDetails from '@/components/clients/ClientDetails'
-
-//CLIENT TABLE
-import Allclients from '@/components/clients/lists/Allclients'
-import ActiveClients from '@/components/clients/lists/ActiveClients'
-import InactiveClients from '@/components/clients/lists/InactiveClients'
-import PotentialClients from '@/components/clients/lists/PotentialClients'
-//------------------------------------------------------------CLIENT------------------------------------------------------------
-import Vendordetails from '@/components/vendors/Vendordetails'
-import AllVendorsTable from '@/components/vendors/lists/AllVendorsTable'
-import ActiveVendors from '@/components/vendors/lists/ActiveVendors'
-import PotentialVendors from '@/components/vendors/lists/PotentialVendors'
-import InactiveVendors from '@/components/vendors/lists/InactiveVendors'
 import NewVendor from '@/components/vendors/NewVendor'
 import Accountinfo from '@/components/account/Accountinfo'
+import CreateProject from '@/components/pmArea/CreateProject'
+// import ZohoCode from '@/components/ZohoCode'
+import TierReport from '@/components/reports/langPair/TierReport'
+import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
+import LqaReport from '@/components/reports/lqa/LqaReport'
+import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
+// import Xtrf from '@/components/reports/Xtrf'
+import OverallView from '@/components/dashboard/OverallView'
+import SalesPerformance from '@/components/dashboard/SalesPerformance'
+import IndustryLqa from '@/components/Table/IndustryLqa'
+import { store } from '../vuex/store'
+import TableClientApiSetting from "../components/Table/TableClientApiSetting"
+import Navbar from "../components/Navbar"
+import clearRouterView from "../components/clearRouterView"
+import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
+
+
+// LIST ================================================================================================
 import Projects from '@/components/pmArea/lists/Projects'
 import Requests from '@/components/pmArea/lists/Requests'
 import ClosedProjects from '@/components/pmArea/lists/ClosedProjects'
@@ -49,23 +49,21 @@ import QuoteProjects from '@/components/pmArea/lists/QuoteProjects'
 import OpenOtherProjects from '@/components/pmArea/lists/OpenOtherProjects'
 import ClosedOtherProjects from '@/components/pmArea/lists/ClosedOtherProjects'
 import QuoteOtherProjects from '@/components/pmArea/lists/QuoteOtherProjects'
-import CreateProject from '@/components/pmArea/CreateProject'
-// import ZohoCode from '@/components/ZohoCode'
-import TierReport from '@/components/reports/langPair/TierReport'
-import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
-import LqaReport from '@/components/reports/lqa/LqaReport'
-import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
-import VendorsCandidatesTests from '@/components/vendors/lists/VendorsCandidatesTests'
-// import Xtrf from '@/components/reports/Xtrf'
-import OverallView from '@/components/dashboard/OverallView'
-import SalesPerformance from '@/components/dashboard/SalesPerformance'
-import IndustryLqa from '@/components/Table/IndustryLqa'
+
+import Allclients from '@/components/clients/lists/Allclients'
+import ActiveClients from '@/components/clients/lists/ActiveClients'
+import InactiveClients from '@/components/clients/lists/InactiveClients'
+import PotentialClients from '@/components/clients/lists/PotentialClients'
+
 import PendingCompetenciesLayout from "../components/vendors/lists/PendingCompetenciesLayout"
-import { store } from '../vuex/store'
-import TableClientApiSetting from "../components/Table/TableClientApiSetting"
-import Navbar from "../components/Navbar"
-import clearRouterView from "../components/clearRouterView"
-import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
+import VendorsCandidatesTests from '@/components/vendors/lists/VendorsCandidatesTests'
+import Vendordetails from '@/components/vendors/Vendordetails'
+import AllVendorsTable from '@/components/vendors/lists/AllVendorsTable'
+import ActiveVendors from '@/components/vendors/lists/ActiveVendors'
+import PotentialVendors from '@/components/vendors/lists/PotentialVendors'
+import InactiveVendors from '@/components/vendors/lists/InactiveVendors'
+// =====================================================================================================
+
 
 Vue.use(Router)
 
@@ -356,13 +354,6 @@ const router = new Router({
 								{ path: 'contact/:index', name: 'potential-contact', component: ContactDetails, props: true }
 							]
 						},
-						// {
-						// 	path: 'details/:id',
-						// 	name: '',
-						// 	component: ClientDetails,
-						// 	props: true,
-						//
-						// },
 						{
 							path: 'new-client',
 							name: '',
@@ -490,14 +481,13 @@ const router = new Router({
 								}
 
 							]
+						},
+						{
+							path: 'create-project',
+							name: 'create-project',
+							component: CreateProject
 						}
-
 					]
-				},
-				{
-					path: 'create-project',
-					name: 'create-project',
-					component: CreateProject
 				},
 				{
 					path: 'finance',

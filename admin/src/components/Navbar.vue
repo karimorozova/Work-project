@@ -1,6 +1,8 @@
 <template lang="pug">
   .wrapper
     .navbar
+      .navbar__logo
+        img(src="../assets/images/logo_white.png")
       Menu(:elements="test" :path='path')
     .content
       router-view
@@ -94,11 +96,11 @@
 									}
 								]
 							},
-              {
-                type: 'link',
-                name: 'Add Vendor',
-                path: '/vendors/new-vendor'
-              },
+							{
+								type: 'link',
+								name: 'Add Vendor',
+								path: '/vendors/new-vendor'
+							}
 
 						]
 					},
@@ -129,11 +131,11 @@
 								name: 'Potential',
 								path: '/clients/potential'
 							},
-              {
-                type: 'link',
-                name: 'Add Client',
-                path: '/clients/new-client'
-              },
+							{
+								type: 'link',
+								name: 'Add Client',
+								path: '/clients/new-client'
+							}
 						]
 					},
 					{
@@ -177,7 +179,7 @@
 									{
 										type: 'link',
 										path: '/projects/xtrf/quote-other-projects?status=Quote',
-										name: 'Open Projects'
+										name: 'Quotes Projects'
 									},
 									{
 										type: 'link',
@@ -186,11 +188,11 @@
 									}
 								]
 							},
-              {
-                type: 'link',
-                name: 'Add Project',
-                path: '/clients/create-project'
-              },
+							{
+								type: 'link',
+								name: 'Add Project',
+								path: '/projects/create-project'
+							}
 						]
 					},
 					{
@@ -366,8 +368,6 @@
 			userName() {
 				return `${ this.user.firstName } ${ this.user.lastName } test`
 			}
-
-
 		},
 		created() {
 			this.getCurrentUserGroup()
@@ -387,8 +387,9 @@
 	}
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
   @import "../assets/scss/colors";
+
   .wrapper {
     display: flex;
   }
@@ -402,6 +403,15 @@
     padding: 10px;
     background-color: $navbar;
     box-sizing: border-box;
+
+    &__logo {
+      width: 200px;
+      margin: 0 auto;
+
+      img {
+        width: 100%;
+      }
+    }
   }
 
   .content {
