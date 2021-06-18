@@ -398,13 +398,13 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 265px;
+    width: 250px;
     padding: 10px;
     background-color: $navbar;
     box-sizing: border-box;
   }
 
   .content {
-    margin-left: 265px;
+    margin-left: 250px;
   }
 </style>

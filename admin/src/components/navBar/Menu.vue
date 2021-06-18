@@ -84,12 +84,12 @@ export default {
   background-color: indianred;
 }
 .menu {
-  font-size: 18px;
-  font-family: 'Myriad600', sans-serif;
+  font-size: 14px;
+  /*font-family: 'Myriad600', sans-serif;*/
   text-transform: uppercase;
-  color: #cccccc;
+  color: #fcfcfc;
   &__items {
-    margin: 5px 0;
+    /*margin: 5px 0;*/
   }
   .link {
     text-decoration: none;

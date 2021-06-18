@@ -2,16 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
-import DashboardSettings from '@/components/sliders/DashboardSettings'
-import Settings from '@/components/sliders/Settings'
-import VendorsSettings from '@/components/sliders/VendorsSettings'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
-import clientRequestInfo from '@/components/pmArea/clientRequests/clientRequestInfo'
-import FinanceSettings from '@/components/sliders/FinanceSettings'
 import Pricelists from '@/components/finance/Pricelists'
 import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayout'
-import ReportsSettings from '@/components/sliders/ReportsSettings'
 import TableLeadsources from '@/components/Table/TableLeadsources'
 import TableDiscounts from '@/components/Table/TableDiscounts'
 import TableGroups from '@/components/Table/TableGroups'
@@ -55,7 +49,6 @@ import QuoteProjects from '@/components/pmArea/lists/QuoteProjects'
 import OpenOtherProjects from '@/components/pmArea/lists/OpenOtherProjects'
 import ClosedOtherProjects from '@/components/pmArea/lists/ClosedOtherProjects'
 import QuoteOtherProjects from '@/components/pmArea/lists/QuoteOtherProjects'
-import PmArea from '@/components/sliders/PmArea'
 import CreateProject from '@/components/pmArea/CreateProject'
 // import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
@@ -122,7 +115,7 @@ const router = new Router({
 				{
 					path: 'dashboard',
 					name: '',
-					component: DashboardSettings,
+					component: clearRouterView,
 					children: [
 						{
 							path: 'overall-view',
@@ -140,7 +133,7 @@ const router = new Router({
 				{
 					path: 'settings',
 					name: 'settings',
-					component: Settings,
+					component: clearRouterView,
 					props: true,
 					children: [
 						{
@@ -402,7 +395,7 @@ const router = new Router({
 				{
 					path: 'projects',
 					name: 'projects',
-					component: PmArea,
+					component: clearRouterView,
 					children: [
 						{
 							path: 'open-projects',
@@ -509,12 +502,12 @@ const router = new Router({
 				{
 					path: 'finance',
 					name: 'finance',
-					component: FinanceSettings
+					component: clearRouterView
 				},
 				{
 					path: 'reports',
 					name: 'reports',
-					component: ReportsSettings,
+					component: clearRouterView,
 					children: [
 						{
 							path: 'lang-pair-tier',
