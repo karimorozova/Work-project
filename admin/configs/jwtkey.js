@@ -1,3 +1,3 @@
-const secretKey = 'cTzEx8';
+const secretKey = 'WHZm9i';
 
 module.exports = secretKey;

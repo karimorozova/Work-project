@@ -89,11 +89,14 @@ export default {
 <style lang="scss" scoped>
 .priceFilter {
   display: flex;
+  padding: 10px 0;
+  border: 2px solid #e0ddd8;
 
   &__drop-menu {
     position: relative;
     width: 160px;
     height: 30px;
+    margin-left: 25px;
   }
 }
 </style>

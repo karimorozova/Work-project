@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import jwt from 'jsonwebtoken'
+import secretKey from '../../configs/jwtkey'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
@@ -91,14 +93,14 @@ const router = new Router({
 			redirect: '/dashboard/overall-view',
 			component: Navbar,
 			props: true,
-			beforeEnter: (to, from, next) => {
-				const token = localStorage.getItem("token")
-				if (token) {
-					next()
-				} else {
-					next('/login')
-				}
-			},
+			// beforeEnter: (to, from, next) => {
+			// 	const token = localStorage.getItem("token")
+			// 	if (token) {
+			// 		next()
+			// 	} else {
+			// 		next('/login')
+			// 	}
+			// },
 			children: [
 				// {
 				//     path: '/zoho-code',
@@ -534,22 +536,31 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-	const token = localStorage.getItem("token")
-	if (to.path === '/forgot') {
-		next()
-	} else if (!token && to.path !== '/login') {
-		next('/login')
-	} else if (token) {
-		const date = Date.now()
-		const expiryTime = new Date(JSON.parse(token).timestamp)
-		if (date > expiryTime && to.path !== '/login') {
-			store.dispatch("logout")
-			next('/login')
+	try{
+		const token = localStorage.getItem("token")
+		if (!token && to.path !== '/login') {
+				next('/login')
+		}
+
+		const test = token ? jwt.verify(JSON.parse(token).value, secretKey) : false
+
+		if (to.path === '/forgot') {
+			next()
+		}  else if (test) {
+			const date = Date.now()
+			const expiryTime = new Date(JSON.parse(token).timestamp)
+			if (date > expiryTime && to.path !== '/login') {
+				store.dispatch("logout")
+				next('/login')
+			} else {
+				next()
+			}
 		} else {
 			next()
 		}
-	} else {
-		next()
+	} catch (e) {
+		localStorage.removeItem("token")
+		next('/login')
 	}
 })
 

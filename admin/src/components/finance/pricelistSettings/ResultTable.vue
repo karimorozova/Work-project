@@ -16,6 +16,7 @@
     GeneralTable(
       :fields="fields"
       :tableData="dataArray"
+      :isFilterShow="false"
       :bodyClass="['setting-table-body', {'tbody_visible-overflow': dataArray.length < 10}]"
       :tableheadRowClass="dataArray.length < 10 ? 'tbody_visible-overflow' : ''"
       bodyRowClass="settings-table-row"
