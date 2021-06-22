@@ -58,7 +58,7 @@
         )
         .lang-table(v-if="selectedTab === 'Basic Price'")
           LangTable(
-            :rates="currentVendor.rates.basicPricesTable.map(i => ({...i, isCheck: false}))",
+            :rates="currentVendor.rates.basicPricesTable",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
@@ -66,7 +66,7 @@
           )
         .step-table(v-if="selectedTab === 'Steps / Units'")
           StepTable(
-            :rates="currentVendor.rates.stepMultipliersTable.map(i => ({...i, isCheck: false}))",
+            :rates="currentVendor.rates.stepMultipliersTable",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
@@ -74,7 +74,7 @@
           )
         .industry-table(v-if="selectedTab === 'Industries'")
           IndustryTable(
-            :rates="currentVendor.rates.industryMultipliersTable.map(i => ({...i, isCheck: false}))",
+            :rates="currentVendor.rates.industryMultipliersTable",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
@@ -82,7 +82,7 @@
           )
         .result-table(v-if="selectedTab === 'Overall Prices'")
           ResultTable(
-            :rates="currentVendor.rates.pricelistTable.map(i => ({...i, isCheck: false}))"
+            :rates="currentVendor.rates.pricelistTable"
             :vendorId="currentVendor._id",
             :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
             :steps="steps.map((i) => i.title)",
@@ -269,6 +269,17 @@
 				updateVendorGeneralData: "updateVendorGeneralData",
 				updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
+			toggleCheck({ index, val, prop }) {
+				const row = this.currentClient.rates[prop][index]
+				row.isCheck = val
+				this.currentClient.rates[prop].splice(index, 1, row)
+			},
+			toggleAll({ val, prop }) {
+				this.currentClient.rates[prop] = this.currentClient.rates[prop].reduce((acc, cur) => {
+					acc.push({ ...cur, isCheck: val })
+					return acc
+				}, [])
+			},
 			crudActions(actionType) {
 				this.paramsIsEdit = actionType !== 'cancel'
 				this.isEdit = this.paramsIsEdit
@@ -668,7 +679,7 @@
     position: relative;
     width: 100%;
     display: flex;
-    margin-bottom: 50px;
+    margin: 40px;
   }
 
   .vendor-subinfo {

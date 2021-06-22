@@ -401,7 +401,8 @@
     bottom: 0;
     width: 250px;
     padding: 10px;
-    background-color: $navbar;
+/*    background-color: $navbar;*/
+    background-color: #fff;
     box-sizing: border-box;
 
     &__logo {

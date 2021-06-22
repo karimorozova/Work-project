@@ -402,6 +402,7 @@
     display: flex;
 
     .tooltiptext {
+      visibility: hidden;
       font-size: 14px;
       width: max-content;
       background-color: $red;

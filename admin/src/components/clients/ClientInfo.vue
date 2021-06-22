@@ -109,30 +109,36 @@
             )
             .lang-table(v-if="selectedTab === 'Basic Price'")
               LangTable(
-                :rates="currentClient.rates.basicPricesTable.map(i => ({...i, isCheck: false}))"
+                :dataArray="currentClient.rates.basicPricesTable"
                 :clientId="currentClient._id"
                 @refreshResultTable="refreshResultTable"
                 :isEdit="isEdit"
+                @toggleCheck="toggleCheck"
+                @toggleAll="toggleAll"
               )
             .step-table(v-if="selectedTab === 'Steps / Units'")
               StepTable(
-                :rates="currentClient.rates.stepMultipliersTable.map(i => ({...i, isCheck: false}))"
+                :dataArray="currentClient.rates.stepMultipliersTable"
                 :clientId="currentClient._id"
                 @refreshResultTable="refreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
                 :isEdit="isEdit"
+                @toggleCheck="toggleCheck"
+                @toggleAll="toggleAll"
               )
             .industry-table(v-if="selectedTab === 'Industries'")
               IndustryTable(
-                :rates="currentClient.rates.industryMultipliersTable.map(i => ({...i, isCheck: false}))"
+                :dataArray="currentClient.rates.industryMultipliersTable"
                 :clientId="currentClient._id"
                 @refreshResultTable="refreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
                 :isEdit="isEdit"
+                @toggleCheck="toggleCheck"
+                @toggleAll="toggleAll"
               )
             .result-table(v-if="selectedTab === 'Overall Prices'")
               ResultTable(
-                :rates="currentClient.rates.pricelistTable.map(i => ({...i, isCheck: false}))"
+                :dataArray="currentClient.rates.pricelistTable"
                 :clientId="currentClient._id"
                 :languages="languages"
                 :steps="steps"
@@ -141,6 +147,8 @@
                 :isRefreshResultTable="isRefreshResultTable"
                 :refresh="isRefreshAfterServiceUpdate"
                 :isEdit="isEdit"
+                @toggleCheck="toggleCheck"
+                @toggleAll="toggleAll"
               )
             .chart(v-if="selectedTab === 'Discount Chart'")
               DiscountChart(
@@ -304,6 +312,23 @@
 			}
 		},
 		methods: {
+
+			toggleCheck({ row, val, prop }) {
+				const index = getIndex(this.currentClient.rates[prop], row._id)
+				const obj = this.currentClient.rates[prop][index]
+				obj.isCheck = val
+				this.currentClient.rates[prop].splice(index, 1, obj)
+
+				function getIndex(arr, id) {
+					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				}
+			},
+			toggleAll({ val, prop }) {
+				this.currentClient.rates[prop] = this.currentClient.rates[prop].reduce((acc, cur) => {
+					acc.push({ ...cur, isCheck: val })
+					return acc
+				}, [])
+			},
 			crudActions(actionType) {
 				this.paramsIsEdit = actionType !== 'cancel'
 				this.isEdit = this.paramsIsEdit
@@ -451,12 +476,12 @@
 				this.storeClientPropertyOverallDataBilling({ prop, value })
 			},
 			contactDetails({ contactIndex }) {
-        const name = this.$route.name.split('-').shift()
-				this.$router.push({ name: `${name}-contact`, params: { index: contactIndex } })
+				const name = this.$route.name.split('-').shift()
+				this.$router.push({ name: `${ name }-contact`, params: { index: contactIndex } })
 			},
 			addNewContact(data) {
-        const name = this.$route.name.split('-').shift()
-        this.$router.push({ name: `${name}-new-contact` })
+				const name = this.$route.name.split('-').shift()
+				this.$router.push({ name: `${ name }-new-contact` })
 			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false
@@ -730,6 +755,13 @@
 					})
 				}
 			}
+			// mutateRatesFields() {
+			// 	const { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } } = this.currentClient
+			// 	this.currentClient.rates.basicPricesTable = basicPricesTable.map(i => ({ ...i, isCheck: false }))
+			// 	this.currentClient.rates.stepMultipliersTable = stepMultipliersTable.map(i => ({ ...i, isCheck: false }))
+			// 	this.currentClient.rates.industryMultipliersTable = industryMultipliersTable.map(i => ({ ...i, isCheck: false }))
+			// 	this.currentClient.rates.pricelistTable = pricelistTable.map(i => ({ ...i, isCheck: false }))
+			// }
 		},
 		computed: {
 			...mapGetters({
@@ -813,6 +845,9 @@
 				}
 			})
 		},
+		// mounted() {
+		// 	this.mutateRatesFields()
+		// },
 		beforeDestroy() {
 			this.storeCurrentClient({})
 		},

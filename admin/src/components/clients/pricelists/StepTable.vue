@@ -1,5 +1,16 @@
 <template lang="pug">
   .price
+    .modal(v-if="isUpdateModal")
+      SetPriceModal(
+        @close="closeUpdateModal"
+        @setPrice="setPrice"
+        :i="i"
+        :length="length"
+        :isPercent="true"
+      )
+    .button(v-if="dataArray.some(it => !!it.isCheck)")
+      Button(value="Update Selected" @clicked="openUpdateModal")
+
     DataTable(
       :fields="fields",
       :tableData="dataArray",
@@ -15,7 +26,7 @@
 
       template(slot="check" slot-scope="{ row, index }")
         .price__data(v-if="isEdit")
-          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(row, true)" @uncheck="toggleCheck(row, false)")
 
       template(slot="step", slot-scope="{ row, index }")
         .price__data {{ row.step.title }}
@@ -31,7 +42,7 @@
           span#multiplier {{ row.multiplier }}
           label(for="multiplier") &#37;
         .price__editing-data(v-else)
-          input.price__data-input(type="number", @change="setRowValue(index)" v-model="dataArray[index].multiplier")
+          input.price__data-input(type="number", @change="setRowValue(row)" v-model="dataArray[index].multiplier")
 
       template(slot="icons", slot-scope="{ row, index }")
         .price__icons
@@ -53,10 +64,12 @@
 	import DataTable from "../../DataTable"
 	import { mapGetters, mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
+	import SetPriceModal from "../../finance/pricelistSettings/SetPriceModal"
+	import Button from "../../Button"
 
 	export default {
 		props: {
-			rates: {
+			dataArray: {
 				type: Array
 			},
 			clientId: {
@@ -114,8 +127,10 @@
 						padding: "0"
 					}
 				],
-				dataArray: JSON.parse(JSON.stringify(this.rates)),
-				isDataRemain: true
+				isDataRemain: true,
+				isUpdateModal: false,
+				i: 0,
+				length: 0
 			}
 		},
 		methods: {
@@ -123,14 +138,31 @@
 				alertToggle: "alertToggle",
 				setUpClientRatesProp: "setUpClientRatesProp"
 			}),
-			toggleCheck(index, val) {
-				this.dataArray[index].isCheck = val
+			getIndex(id) {
+				return this.dataArray.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+			},
+			async setPrice(price) {
+				this.length = this.dataArray.filter(i => !!i.isCheck).length
+				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
+					this.i = index + 1
+					row.multiplier = price
+					await this.manageSavePrice(row)
+				}
+				this.closeUpdateModal()
+			},
+			openUpdateModal() {
+				this.isUpdateModal = true
+			},
+			closeUpdateModal() {
+				this.isUpdateModal = false
+				this.toggleAll(false)
+				this.i = this.length = 0
+			},
+			toggleCheck(row, val) {
+				this.$emit('toggleCheck', { row, val, prop: 'stepMultipliersTable' })
 			},
 			toggleAll(val) {
-				this.dataArray = this.dataArray.reduce((acc, cur) => {
-					acc.push({ ...cur, isCheck: val })
-					return acc
-				}, [])
+				this.$emit('toggleAll', { val, prop: 'stepMultipliersTable' })
 			},
 			async getRowPrice(index) {
 				try {
@@ -145,20 +177,39 @@
 					this.alertToggle({ message: "Impossible update price", isShow: true, type: "error" })
 				}
 			},
-			async setRowValue(index) {
-				await this.checkErrors(index)
+			async setRowValue(row) {
+				await this.checkErrors(row)
 			},
-
-			async checkErrors(index) {
+			async checkErrors(row) {
 				if (!this.isEdit) return
-				if (this.dataArray[index].multiplier === "") this.dataArray[index].multiplier = 100
-				await this.manageSaveClick(index)
+				if (this.dataArray[this.getIndex(row._id)].multiplier === "") this.dataArray[this.getIndex(row._id)].multiplier = 100
+				await this.manageSaveClick(row)
 			},
 			refreshResultTable() {
 				this.$emit("refreshResultTable")
 			},
-			async manageSaveClick(index) {
-				const { _id, step, unit, size, multiplier } = this.dataArray[index]
+			async manageSavePrice({ _id, step, unit, size, multiplier }) {
+				try {
+					await this.$http.post("/clientsapi/rates/" + this.clientId, {
+						itemIdentifier: "Step Multipliers Table",
+						updatedItem: {
+							_id,
+							step,
+							unit,
+							size,
+							multiplier: parseFloat(multiplier).toFixed(0),
+							altered: true
+						}
+					})
+					const updatedData = await this.$http.get("/clientsapi/rates/" + this.clientId)
+					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'stepMultipliersTable', value: updatedData.data.stepMultipliersTable })
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Error on saving Steps", isShow: true, type: "error" })
+				}
+			},
+			async manageSaveClick(row) {
+				const { _id, step, unit, size, multiplier } = this.dataArray[this.getIndex(row._id)]
 				try {
 					await this.$http.post("/clientsapi/rates/" + this.clientId, {
 						itemIdentifier: "Step Multipliers Table",
@@ -184,10 +235,12 @@
 				currentClient: "getCurrentClient"
 			}),
 			isAllSelected() {
-				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+				return (this.dataArray && this.dataArray.length) && this.dataArray.every(i => i.isCheck)
 			}
 		},
 		components: {
+			Button,
+			SetPriceModal,
 			CheckBox,
 			DataTable
 		}
@@ -269,6 +322,7 @@
     display: flex;
 
     .tooltiptext {
+      visibility: hidden;
       font-size: 14px;
       width: max-content;
       background-color: $red;
