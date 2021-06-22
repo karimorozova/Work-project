@@ -1,5 +1,15 @@
 <template lang="pug">
   .price
+    .modal(v-if="isUpdateModal")
+      SetPriceModal(
+        @close="closeUpdateModal"
+        @setPrice="setPrice"
+        :i="i"
+        :length="length"
+      )
+    .button(v-if="dataArray.some(it => !!it.isCheck)")
+      Button(value="Update Selected" @clicked="openUpdateModal")
+
     ResultFilter(
       :source="sourceFilter",
       :target="targetFilter",
@@ -76,6 +86,8 @@
 	import ResultFilter from "./ResultFilter"
 	import { mapActions, mapGetters } from "vuex"
 	import CheckBox from "../../CheckBox"
+	import SetPriceModal from "../../finance/pricelistSettings/SetPriceModal"
+	import Button from "../../Button"
 
 	export default {
 		props: {
@@ -104,7 +116,7 @@
 				type: Boolean,
 				default: false
 			},
-			rates: {
+			dataArray: {
 				type: Array
 			}
 		},
@@ -168,15 +180,15 @@
 						padding: "0"
 					}
 				],
-
 				sourceFilter: "",
 				targetFilter: "",
 				stepFilter: "",
 				unitFilter: "",
 				industryFilter: "",
 				isDataRemain: true,
-				dataArray: JSON.parse(JSON.stringify(this.rates))
-
+				isUpdateModal: false,
+				i: 0,
+				length: 0
 			}
 		},
 		methods: {
@@ -184,19 +196,31 @@
 				alertToggle: "alertToggle",
 				updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
-			toggleCheck({ _id }, val) {
-				const index = idx(this.dataArray, _id)
-				this.dataArray[index].isCheck = val
-
-				function idx(arr, id) {
-					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+			getIndex(id) {
+				return this.dataArray.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+			},
+			async setPrice(price) {
+				this.length = this.dataArray.filter(i => !!i.isCheck).length
+				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
+					this.i = index + 1
+					row.price = price
+					await this.manageSavePrice(row)
 				}
+				this.closeUpdateModal()
+			},
+			openUpdateModal() {
+				this.isUpdateModal = true
+			},
+			closeUpdateModal() {
+				this.isUpdateModal = false
+				this.toggleAll(false)
+				this.i = this.length = 0
+			},
+			toggleCheck(row, val) {
+				this.$emit('toggleCheck', { row, val, prop: 'pricelistTable' })
 			},
 			toggleAll(val) {
-				this.dataArray = this.dataArray.reduce((acc, cur) => {
-					acc.push({ ...cur, isCheck: val })
-					return acc
-				}, [])
+				this.$emit('toggleAll', { val, prop: 'pricelistTable' })
 			},
 			async getRowPrice(index, row) {
 				try {
@@ -217,6 +241,19 @@
 				if (row.price === "") row.price = 1
 				await this.manageSaveClick(row)
 			},
+			async manageSavePrice({ _id, price }) {
+				try {
+					await this.$http.post("/vendorsapi/rates/change-pricelist/" + this.$route.params.id, {
+						_id,
+						price: parseFloat(price).toFixed(4),
+						altered: true,
+						notification: "Price disconnected from function"
+					})
+					this.updateVendorRatesByKey({ key: 'pricelistTable' })
+				} catch (err) {
+					this.alertToggle({ message: "Error on saving Result pricelist", isShow: true, type: "error" })
+				}
+			},
 			async manageSaveClick(row) {
 				const { _id, price } = row
 				try {
@@ -236,12 +273,7 @@
 				this[prop] = option
 			},
 			getAllConcatUniqueValues(key, mapKey) {
-				return [ "All" ].concat(
-						this.getUniqueValues(
-								this.currentVendor.rates.pricelistTable.map((item) => item[key]),
-								mapKey
-						)
-				)
+				return [ "All" ].concat(this.getUniqueValues(this.currentVendor.rates.pricelistTable.map((item) => item[key]), mapKey))
 			},
 			getUniqueValues(arr, key) {
 				return [ ...new Set(arr.map((item) => item[key])) ]
@@ -252,7 +284,7 @@
 				currentVendor: "getCurrentVendor"
 			}),
 			isAllSelected() {
-				return this.dataArray && this.dataArray.length && this.dataArray.every(i => i.isCheck)
+				return (this.dataArray && this.dataArray.length) && this.dataArray.every(i => i.isCheck)
 			},
 			dataForSourceFilter() {
 				if (this.currentVendor.rates.pricelistTable.length) {
@@ -305,6 +337,8 @@
 			}
 		},
 		components: {
+			Button,
+			SetPriceModal,
 			CheckBox,
 			DataTable,
 			ResultFilter

@@ -47,7 +47,7 @@
               .price__icons-info
                 i.fas.fa-info-circle
           span(v-if="row.altered")
-            .price__icons-link(@click="getRowPrice(index)")
+            .price__icons-link(@click="getRowPrice(row)")
               i.fa.fa-link(aria-hidden='true')
           span(v-else)
             .price__icons-link-opacity
@@ -144,11 +144,11 @@
 			toggleAll(val) {
 				this.$emit('toggleAll', { val, prop: 'industryMultipliersTable' })
 			},
-			async getRowPrice(index) {
+			async getRowPrice(row) {
 				try {
 					await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
 						tableKey: "Industry Multipliers Table",
-						row: this.dataArray[index]
+						row: this.dataArray[this.getIndex(row._id)]
 					})
 					const result = await this.$http.post(`/clientsapi/client-rate-by-key`, { id: this.clientId, key: 'industryMultipliersTable' })
 					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'industryMultipliersTable', value: result.data })

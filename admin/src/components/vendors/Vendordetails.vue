@@ -58,31 +58,37 @@
         )
         .lang-table(v-if="selectedTab === 'Basic Price'")
           LangTable(
-            :rates="currentVendor.rates.basicPricesTable",
+            :dataArray="currentVendor.rates.basicPricesTable",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
             :isEdit="isEdit"
+            @toggleCheck="toggleCheck"
+            @toggleAll="toggleAll"
           )
         .step-table(v-if="selectedTab === 'Steps / Units'")
           StepTable(
-            :rates="currentVendor.rates.stepMultipliersTable",
+            :dataArray="currentVendor.rates.stepMultipliersTable",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
             :isEdit="isEdit"
+            @toggleCheck="toggleCheck"
+            @toggleAll="toggleAll"
           )
         .industry-table(v-if="selectedTab === 'Industries'")
           IndustryTable(
-            :rates="currentVendor.rates.industryMultipliersTable",
+            :dataArray="currentVendor.rates.industryMultipliersTable",
             :vendorId="currentVendor._id",
             :vendor="currentVendor"
             @refreshResultTable="refreshResultTable",
             :isEdit="isEdit"
+            @toggleCheck="toggleCheck"
+            @toggleAll="toggleAll"
           )
         .result-table(v-if="selectedTab === 'Overall Prices'")
           ResultTable(
-            :rates="currentVendor.rates.pricelistTable"
+            :dataArray="currentVendor.rates.pricelistTable"
             :vendorId="currentVendor._id",
             :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
             :steps="steps.map((i) => i.title)",
@@ -91,6 +97,8 @@
             :isRefreshResultTable="isRefreshResultTable",
             :refresh="isRefreshAfterServiceUpdate"
             :isEdit="isEdit"
+            @toggleCheck="toggleCheck"
+            @toggleAll="toggleAll"
           )
         .chart(v-if="selectedTab === 'Discount Chart'")
           FinanceMatrixWithReset(
@@ -269,13 +277,18 @@
 				updateVendorGeneralData: "updateVendorGeneralData",
 				updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
-			toggleCheck({ index, val, prop }) {
-				const row = this.currentClient.rates[prop][index]
-				row.isCheck = val
-				this.currentClient.rates[prop].splice(index, 1, row)
+			toggleCheck({ row, val, prop }) {
+				const index = getIndex(this.currentVendor.rates[prop], row._id)
+				const obj = this.currentVendor.rates[prop][index]
+				obj.isCheck = val
+				this.currentVendor.rates[prop].splice(index, 1, obj)
+
+				function getIndex(arr, id) {
+					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				}
 			},
 			toggleAll({ val, prop }) {
-				this.currentClient.rates[prop] = this.currentClient.rates[prop].reduce((acc, cur) => {
+				this.currentVendor.rates[prop] = this.currentVendor.rates[prop].reduce((acc, cur) => {
 					acc.push({ ...cur, isCheck: val })
 					return acc
 				}, [])
