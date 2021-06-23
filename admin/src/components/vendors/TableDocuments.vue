@@ -1,9 +1,10 @@
 <template lang="pug">
   .documents
     .documents__table
-      SettingsTable(
+      GeneralTable(
         :fields="fields"
         :tableData="documentsData"
+        :isFilterShow="false"
         :errors="errors"
         :areErrors="areErrors"
         :isApproveModal="isDeleting"
@@ -54,6 +55,7 @@
 	import Add from "../Add"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import crudIcons from "@/mixins/crudIcons"
+  import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ scrollDrop, crudIcons ],
@@ -73,22 +75,19 @@
 						label: "File Name",
 						headerKey: "headerFileName",
 						key: "fileName",
-						width: "64%",
-						padding: "0"
+            style: { width: "64%" },
 					},
 					{
 						label: "Category",
 						headerKey: "headerCategory",
 						key: "category",
-						width: "18%",
-						padding: "0"
+            style: { width: "18%" },
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "18%",
-						padding: "0"
+            style: { width: "18%" },
 					}
 				],
 				categories: [ "NDA", "Contract", "Resume" ],
@@ -294,6 +293,7 @@
 			}
 		},
 		components: {
+      GeneralTable,
 			SettingsTable,
 			SelectSingle,
 			Add

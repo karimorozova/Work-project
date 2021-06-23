@@ -1,8 +1,9 @@
 <template lang="pug">
   .experience
-    SettingsTable(
+    GeneralTable(
       :fields="fields"
       :tableData="professionalExperienceData"
+      :isFilterShow="false"
       :errors="errors"
       :areErrors="areErrors"
       :isApproveModal="isDeleting"
@@ -72,6 +73,7 @@
 	import moment from "moment"
 	import ClickOutside from "vue-click-outside"
 	import { mapGetters, mapActions } from "vuex"
+  import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons ],
@@ -90,36 +92,32 @@
 						label: "Duration",
 						headerKey: "headerDuration",
 						key: "duration",
-						width: "21.5%",
-						padding: "0"
+            style: { width: "21.5%", },
+
 					},
 					{
 						label: "Occupation / Title",
 						headerKey: "headerOccupation",
 						key: "occupation",
-						width: "21.5%",
-						padding: "0"
+            style: { width: "21.5%", },
 					},
 					{
 						label: "Company",
 						headerKey: "headerCompany",
 						key: "company",
-						width: "21.5%",
-						padding: "0"
+            style: { width: "21.5%", },
 					},
 					{
 						label: "Notes",
 						headerKey: "headerNotes",
 						key: "notes",
-						width: "21.5%",
-						padding: "0"
+            style: { width: "21.5%", },
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "14%",
-						padding: "0"
+            style: { width: "14%", },
 					}
 				],
 
@@ -300,6 +298,7 @@
 			}
 		},
 		components: {
+      GeneralTable,
 			Datepicker,
 			Button,
 			SettingsTable,

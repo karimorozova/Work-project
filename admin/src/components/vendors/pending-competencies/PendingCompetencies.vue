@@ -12,11 +12,9 @@
       @deletePC="deletePC"
     )
     .competencies__table
-      SettingsTable(
+      GeneralTable(
         :fields="fields"
         :tableData="pendingCompetenciesData"
-        :tbodyStyle="{'max-height': '256px'}",
-        :rowCount="10"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
@@ -52,6 +50,7 @@
 	import SettingsTable from "../../Table/SettingsTable"
 	import CandidateForm from "./CandidateForm"
 	import WYSIWYG from "../WYSIWYG"
+  import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -67,43 +66,37 @@
 						label: "Source Language",
 						headerKey: "headerSource",
 						key: "source",
-						width: "21%",
-						padding: "0"
+            style: { width: '21%' }
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
 						key: "targets",
-						width: "21%",
-						padding: "0"
+            style: { width: '21%' }
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "21%",
-						padding: "0"
+            style: { width: '21%' }
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "21%",
-						padding: "0"
+            style: { width: '21%' }
 					},
 					{
 						label: "",
 						headerKey: "headerAlertIcons",
 						key: "alertIcon",
-						width: "8%",
-						padding: "0"
+            style: { width: '8%' }
 					},
 					{
 						label: "",
 						headerKey: "headerModal",
 						key: "modal",
-						width: "8%",
-						padding: "0"
+            style: { width: '8%' }
 					}
 				],
 				isForm: false,
@@ -201,6 +194,7 @@
 			}
 		},
 		components: {
+      GeneralTable,
 			WYSIWYG,
 			CandidateForm,
 			SettingsTable

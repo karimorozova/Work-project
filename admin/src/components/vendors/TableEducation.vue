@@ -1,6 +1,6 @@
 <template lang="pug">
   .education
-    SettingsTable(
+    GeneralTable(
       :fields="fields"
       :tableData="educationData"
       :errors="errors"
@@ -84,6 +84,7 @@
 	import moment from "moment"
 	import ClickOutside from "vue-click-outside"
 	import { mapGetters, mapActions } from "vuex"
+  import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons ],
@@ -102,53 +103,46 @@
 						label: "Duration",
 						headerKey: "headerDuration",
 						key: "duration",
-						width: "18%",
-						padding: "0"
+            style: { width: "18%" },
 					},
 					{
 						label: "Institute / School",
 						headerKey: "headerEducation",
 						key: "education",
-						width: "13%",
-						padding: "0"
+            style: { width: "13%" },
 					},
 					{
 						label: "Major / Department",
 						headerKey: "headerDepartment",
 						key: "department",
-						width: "16%",
-						padding: "0"
+            style: { width: "18%" },
 					},
 					{
 						label: "Degree",
 						headerKey: "headerDegree",
 						key: "degree",
-						width: "13%",
-						padding: "0"
+            style: { width: "13%" },
 					},
 
 					{
 						label: "Grade",
 						headerKey: "headerGrade",
 						key: "grade",
-						width: "6%",
-						padding: "0"
+            style: { width: "6%" },
 					},
 
 					{
 						label: "Document",
 						headerKey: "headerDocument",
 						key: "document",
-						width: "20%",
-						padding: "0"
+            style: { width: "18%" },
 					},
 
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "14%",
-						padding: "0"
+            style: { width: "14%" },
 					}
 				],
 
@@ -343,6 +337,7 @@
 			}
 		},
 		components: {
+      GeneralTable,
 			Datepicker,
 			Button,
 			SettingsTable,

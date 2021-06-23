@@ -8,7 +8,7 @@
       .assessment__industry(v-for="(industryData, industryIndex) in assessment.industries")
         .assessment__industry-title {{ industryData.industry.name }}
         .assessment__table
-          SettingsTable(
+          GeneralTable(
             :fields="fields",
             :tableData="industryData.steps",
             :errors="errors",
@@ -52,6 +52,7 @@
 	import SettingsTable from "../Table/SettingsTable"
 	import VendorLqa from "../vendors/VendorLqa"
 	import { mapGetters, mapActions } from "vuex"
+  import GeneralTable from "../GeneralTable"
 
 	export default {
 		props: {
@@ -70,36 +71,31 @@
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "20%",
-						padding: "0"
+            style: { width: "20%" },
 					},
 					{
 						label: "TQI",
 						headerKey: "headerTQI",
 						key: "tqi",
-						width: "20%",
-						padding: "0"
+            style: { width: "20%" },
 					},
 					{
 						label: "LQA 1",
 						headerKey: "headerLQA1",
 						key: "lqa1",
-						width: "20%",
-						padding: "0"
+            style: { width: "20%" },
 					},
 					{
 						label: "LQA 2",
 						headerKey: "headerLQA2",
 						key: "lqa2",
-						width: "20%",
-						padding: "0"
+            style: { width: "20%" },
 					},
 					{
 						label: "LQA 3",
 						headerKey: "headerLQA3",
 						key: "lqa3",
-						width: "20%",
-						padding: "0"
+            style: { width: "20%" },
 					}
 				],
 				gradeNextLvl: 50,
@@ -221,6 +217,7 @@
 			})
 		},
 		components: {
+      GeneralTable,
 			SettingsTable,
 			VendorLqa
 		},

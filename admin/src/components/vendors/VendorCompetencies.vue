@@ -1,26 +1,29 @@
 <template lang="pug">
   .competencies
     .competencies__table
-      SettingsTable(
+      GeneralTable(
         :fields="fields",
-        :tableData="competenciesData",
+        :tableData="finalData",
         :errors="errors",
         :areErrors="areErrors",
-        :isApproveModal="isDeleting",
-        :tbodyStyle="{'max-height': '256px'}",
-        :rowCount="9",
         @closeErrors="closeErrors",
         @approve="deleteCompetencies",
         @notApprove="setDefaults",
         @closeModal="setDefaults"
+
+        @addSortKey="addSortKey"
+        @changeSortKey="changeSortKey"
+        @removeSortKey="removeSortKey"
+        @setFilter="setFilter"
+        @removeFilter="removeFilter"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
 
-        template(slot="source", slot-scope="{ row, index }")
+        template(slot="sourceLanguage", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
           .competencies__drop-menu(v-else)
-            SelectSingle(
+            NewSelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -29,10 +32,10 @@
               @chooseOption="setSource"
             )
 
-        template(slot="targets", slot-scope="{ row, index }")
+        template(slot="targetLanguage", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
           .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
+            NewSelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -54,7 +57,7 @@
         template(slot="industry", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.industry.name }}
           .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
+            NewSelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -76,7 +79,7 @@
         template(slot="step", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.step.title }}
           .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
+            NewSelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -110,12 +113,13 @@
 <script>
 	import { mapGetters, mapActions } from "vuex";
 	import Add from "../Add";
-	import SelectSingle from "../SelectSingle";
+	import NewSelectSingle from "../NewSelectSingle";
 	import SelectMulti from "../SelectMulti";
 	import SettingsTable from "../Table/SettingsTable";
 	import crudIcons from "@/mixins/crudIcons";
 	import scrollEnd from "../../mixins/scrollEnd";
 	import checkCombinations from "../../mixins/combinationsChecker";
+  import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [crudIcons, scrollEnd, checkCombinations],
@@ -142,39 +146,54 @@
 					{
 						label: "Source Language",
 						headerKey: "headerSource",
-						key: "source",
-						width: "21%",
-						padding: "0",
+						key: "sourceLanguage",
+						dataKey: "lang",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, isArray: false, order: 'default',},
+            style: { width: '21%' }
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
-						key: "targets",
-						width: "21%",
-						padding: "0",
+						key: "targetLanguage",
+						dataKey: "lang",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, isArray: false, order: 'default',},
+            style: { width: '21%' }
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "21%",
-						padding: "0",
+						dataKey: "name",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, isArray: false, order: 'default',},
+            style: { width: '21%' }
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "21%",
-						padding: "0",
+						dataKey: "title",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, isArray: false, order: 'default',},
+            style: { width: '21%' }
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "16%",
-						padding: "0",
+            style: { width: '16%' }
 					},
 				],
+        sortKeys: [],
+        filtersData: {
+          sourceLanguage: {value: '' , key: ''},
+          targetLanguages: {value: '' , key: ''},
+          services: {value: '' , key: ''},
+          industries: {value: '' , key: ''}
+        },
+        sortedData: [],
 
 				// competenciesData: [],
 				currentSource: "",
@@ -198,6 +217,53 @@
 				storeCurrentVendor: "storeCurrentVendor",
 				updateVendorProp: "updateVendorProp",
 			}),
+
+      addSortKey({ sortInfo, key, sortField, order }) {
+        sortInfo.order = order
+        this.sortKeys.push({sortField, key, sortInfo})
+        this.setDefaults()
+      },
+      changeSortKey({ sortInfo, order }) {
+        sortInfo.order = order
+        this.sortKeys = [...this.sortKeys]
+        this.setDefaults()
+      },
+      removeSortKey({ sortInfo, sortField}) {
+        sortInfo.order = 'default'
+        this.sortKeys = this.sortKeys.filter((sortKey) => sortKey.sortField !== sortField)
+        this.setDefaults()
+      },
+      setFilter({value, key, filterField, filterInfo}) {
+        filterInfo.isFilterSet = value !== ''
+        this.filtersData = { ...this.filtersData, [filterField] :{value, key}}
+        this.setDefaults()
+      },
+      removeFilter({ filterInfo, filterField}) {
+        filterInfo.isFilterSet = false
+        this.filtersData = { ...this.filtersData, [filterField] :{value: '', key: ''}}
+        this.setDefaults()
+
+      },
+      sortData({ sortInfo, key, sortField }) {
+        this.sortedData.sort((a,b) => {
+          let first = !sortInfo.isArray ? a[sortField][key] : a[sortField][0][key]
+          let second = !sortInfo.isArray ? b[sortField][key] : b[sortField][0][key]
+          if(sortInfo.order === 'asc') [first, second] = [second, first]
+          if (first > second) {
+            return 1;
+          }
+          if (first < second) {
+            return -1;
+          }
+          return 0;
+        })
+      },
+      filterData({ filterKey, value, fieldName }) {
+        this.sortedData = this.sortedData.filter((data) => {
+          const dataReadyForSearch = !Array.isArray(data[filterKey]) ? data[filterKey][fieldName].toLowerCase() : data[filterKey].map(elem => elem[fieldName]).join(' ').toLowerCase()
+          return dataReadyForSearch.includes(value.toLowerCase())
+        })
+      },
 
 			presentArrays(Arr, key) {
 				if(!Arr.length) return "";
@@ -459,6 +525,22 @@
 			// ...mapGetters({
 			// 	currentVendor: "getCurrentVendor",
 			// }),
+      finalData() {
+        this.sortedData = JSON.parse( JSON.stringify( this.competenciesData))
+
+        for (let filterKey in this.filtersData) {
+          if (this.filtersData[filterKey].value.length < 1) continue
+          this.filterData({filterKey, value: this.filtersData[filterKey].value, fieldName: this.filtersData[filterKey].key })
+        }
+
+        let sortKeys = [...this.sortKeys].reverse()
+
+        for(let sortKey of sortKeys ) {
+          this.sortData(sortKey)
+        }
+
+        return this.sortedData
+      },
 			sourceData() {
 				return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b));
 			},
@@ -473,7 +555,8 @@
 			 // ?  : this.getVendorInfo();
 		},
 		components: {
-			SelectSingle,
+      GeneralTable,
+			NewSelectSingle,
 			SettingsTable,
 			SelectMulti,
 			Add,
