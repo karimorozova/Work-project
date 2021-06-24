@@ -14,15 +14,21 @@
     .competencies__table
       GeneralTable(
         :fields="fields"
-        :tableData="pendingCompetenciesData"
+        :tableData="finalData"
+
+        @addSortKey="addSortKey"
+        @changeSortKey="changeSortKey"
+        @removeSortKey="removeSortKey"
+        @setFilter="setFilter"
+        @removeFilter="removeFilter"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
 
-        template(slot="source", slot-scope="{ row, index }")
+        template(slot="sourceLanguage", slot-scope="{ row, index }")
           .competencies__data {{ row.sourceLanguage.lang }}
 
-        template(slot="targets", slot-scope="{ row, index }")
+        template(slot="targetLanguage", slot-scope="{ row, index }")
           .competencies__data {{ row.targetLanguage.lang }}
 
         template(slot="industry", slot-scope="{ row, index }")
@@ -51,8 +57,10 @@
 	import CandidateForm from "./CandidateForm"
 	import WYSIWYG from "../WYSIWYG"
   import GeneralTable from "../../GeneralTable"
+  import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 
 	export default {
+	  mixins: [ tableSortAndFilter ],
 		props: {
 			pendingCompetenciesData: {
 				type: Array,
@@ -65,25 +73,37 @@
 					{
 						label: "Source Language",
 						headerKey: "headerSource",
-						key: "source",
+						key: "sourceLanguage",
+						dataKey: "lang",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
-						key: "targets",
+						key: "targetLanguage",
+            dataKey: "lang",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
+            dataKey: "name",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
+            dataKey: "title",
+            filterInfo:{isFilter: true, isFilterSet: false},
+            sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
@@ -193,6 +213,11 @@
 				this.isForm = false
 			}
 		},
+    computed: {
+      rawData() {
+        return JSON.parse( JSON.stringify( this.pendingCompetenciesData))
+      },
+    },
 		components: {
       GeneralTable,
 			WYSIWYG,

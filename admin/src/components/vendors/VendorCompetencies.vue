@@ -117,12 +117,13 @@
 	import SelectMulti from "../SelectMulti";
 	import SettingsTable from "../Table/SettingsTable";
 	import crudIcons from "@/mixins/crudIcons";
+	import tableSortAndFilter from "@/mixins/tableSortAndFilter";
 	import scrollEnd from "../../mixins/scrollEnd";
 	import checkCombinations from "../../mixins/combinationsChecker";
   import GeneralTable from "../GeneralTable"
 
 	export default {
-		mixins: [crudIcons, scrollEnd, checkCombinations],
+		mixins: [crudIcons, scrollEnd, checkCombinations, tableSortAndFilter],
 		props: {
 			vendorIndustries: {
 				type: Array,
@@ -186,14 +187,6 @@
             style: { width: '16%' }
 					},
 				],
-        sortKeys: [],
-        filtersData: {
-          sourceLanguage: {value: '' , key: ''},
-          targetLanguages: {value: '' , key: ''},
-          services: {value: '' , key: ''},
-          industries: {value: '' , key: ''}
-        },
-        sortedData: [],
 
 				// competenciesData: [],
 				currentSource: "",
@@ -217,53 +210,6 @@
 				storeCurrentVendor: "storeCurrentVendor",
 				updateVendorProp: "updateVendorProp",
 			}),
-
-      addSortKey({ sortInfo, key, sortField, order }) {
-        sortInfo.order = order
-        this.sortKeys.push({sortField, key, sortInfo})
-        this.setDefaults()
-      },
-      changeSortKey({ sortInfo, order }) {
-        sortInfo.order = order
-        this.sortKeys = [...this.sortKeys]
-        this.setDefaults()
-      },
-      removeSortKey({ sortInfo, sortField}) {
-        sortInfo.order = 'default'
-        this.sortKeys = this.sortKeys.filter((sortKey) => sortKey.sortField !== sortField)
-        this.setDefaults()
-      },
-      setFilter({value, key, filterField, filterInfo}) {
-        filterInfo.isFilterSet = value !== ''
-        this.filtersData = { ...this.filtersData, [filterField] :{value, key}}
-        this.setDefaults()
-      },
-      removeFilter({ filterInfo, filterField}) {
-        filterInfo.isFilterSet = false
-        this.filtersData = { ...this.filtersData, [filterField] :{value: '', key: ''}}
-        this.setDefaults()
-
-      },
-      sortData({ sortInfo, key, sortField }) {
-        this.sortedData.sort((a,b) => {
-          let first = !sortInfo.isArray ? a[sortField][key] : a[sortField][0][key]
-          let second = !sortInfo.isArray ? b[sortField][key] : b[sortField][0][key]
-          if(sortInfo.order === 'asc') [first, second] = [second, first]
-          if (first > second) {
-            return 1;
-          }
-          if (first < second) {
-            return -1;
-          }
-          return 0;
-        })
-      },
-      filterData({ filterKey, value, fieldName }) {
-        this.sortedData = this.sortedData.filter((data) => {
-          const dataReadyForSearch = !Array.isArray(data[filterKey]) ? data[filterKey][fieldName].toLowerCase() : data[filterKey].map(elem => elem[fieldName]).join(' ').toLowerCase()
-          return dataReadyForSearch.includes(value.toLowerCase())
-        })
-      },
 
 			presentArrays(Arr, key) {
 				if(!Arr.length) return "";
@@ -525,23 +471,10 @@
 			// ...mapGetters({
 			// 	currentVendor: "getCurrentVendor",
 			// }),
-      finalData() {
-        this.sortedData = JSON.parse( JSON.stringify( this.competenciesData))
-
-        for (let filterKey in this.filtersData) {
-          if (this.filtersData[filterKey].value.length < 1) continue
-          this.filterData({filterKey, value: this.filtersData[filterKey].value, fieldName: this.filtersData[filterKey].key })
-        }
-
-        let sortKeys = [...this.sortKeys].reverse()
-
-        for(let sortKey of sortKeys ) {
-          this.sortData(sortKey)
-        }
-
-        return this.sortedData
+      rawData() {
+        return this.competenciesData;
       },
-			sourceData() {
+      sourceData() {
 				return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b));
 			},
 			filteredSteps() {
