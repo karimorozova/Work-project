@@ -9,8 +9,20 @@ const {
   getPricelistCombinations,
   addNewMultiplier,
   updateMultiplier,
-  updatePriceMultiplier
+  updatePriceMultiplier,
+  setHideAndShowOption
 } = require('../../multipliers');
+
+router.post('/hide-and-show-vendor-clients-rates/', async (req, res) => {
+  const { entityId, entityType, tableName, tableRow } = req.body;
+  try {
+    const entity = await setHideAndShowOption({ entityId, entityType, tableName, tableRow })
+    res.send(entity.rates);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error on updating hide/show option');
+  }
+})
 
 router.post('/step-multipliers/:id', async (req, res) => {
   const { id } = req.params;

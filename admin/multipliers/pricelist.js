@@ -1,16 +1,42 @@
-const { Pricelist, Step, Units, Languages, Industries, CurrencyRatio } = require('../models');
+const { Pricelist, Step, Units, Languages, Industries, CurrencyRatio, Vendors, Clients } = require('../models');
 const { getFilteredBasicPrices } = require('./basicPrice');
 const { getFilteredStepMultiplier } = require('./stepMultipiers');
 const lodash = require('lodash');
-const getPercentage = (number, percentage) => number * (percentage / 100);
-const { differenceOperationType } = require('../enums/differenceOperationType');
 
-/**
- *
- * @param {ObjectId} priceListId
- * @param {Object} filters
- * @returns {Array} returns filtered array
- */
+const getPercentage = (number, percentage) => number * (percentage / 100);
+const multiplyPrices = (basicPrice, firstPercentMultiplier, size, secondPercentMultiplier) =>
+    +(getPercentage(basicPrice, firstPercentMultiplier) * Number(size) * (secondPercentMultiplier / 100)).toFixed(4)
+
+const { differenceOperationType } = require('../enums/differenceOperationType');
+const { getVendor } = require('../vendors/getVendors')
+const { getClient } = require('../clients/getClients')
+
+
+const setHideAndShowOption = async ({ entityId, entityType, tableName, tableRow }) => {
+  const { _id, isActive, step, unit, size } = tableRow
+  const query = { "_id": entityId }
+
+  const { rates } = entityType === 'Vendor' ?
+      await Vendors.findOne(query, { rates: 1 }) :
+      await Clients.findOne(query, { rates: 1 })
+
+  const tableIndex = rates[tableName].findIndex(i => `${i._id}` === `${_id}`)
+  rates[tableName][tableIndex].isActive = isActive
+
+  rates.pricelistTable.forEach((item, index) => {
+    if(`${item.step}` === `${step._id}` && `${item.unit}` === `${unit._id}` && `${item.size}` === `${size}`) rates.pricelistTable[index].isActive = isActive
+  })
+
+  entityType === 'Vendor' ?
+      await Vendors.updateOne(query, { rates }) :
+     await Clients.updateOne(query, { rates })
+
+  return entityType === 'Vendor' ?
+      await getVendor(query) :
+      await getClient(query)
+}
+
+
 const getPricelistCombinations = async (priceListId, filters) => {
   const { countFilter, industryFilter } = filters;
   const getAllIndustries = await Industries.find({isActive: true});
@@ -48,13 +74,6 @@ const getPricelistCombinations = async (priceListId, filters) => {
   return groupedPriceLists.splice(countFilter, 25);
 };
 
-const multiplyPrices = (basicPrice, firstPercentMultiplier, size, secondPercentMultiplier) => (
-  +(
-    getPercentage(basicPrice, firstPercentMultiplier) *
-    Number(size) *
-    (secondPercentMultiplier / 100)
-  ).toFixed(4)
-);
 
 const groupPriceList = (arr, allIndustries) => {
   let result = [];
@@ -170,12 +189,7 @@ const groupPriceList = (arr, allIndustries) => {
   return result;
 };
 
-/**
- *
- * @param {String} key
- * @param {ObjectId} newMultiplierId
- * @returns nothing - just updates needed pricelist table
- */
+
 const addNewMultiplier = async (key, newMultiplierId) => {
   try {
     const pricelists = await Pricelist.find();
@@ -216,12 +230,7 @@ const addNewMultiplier = async (key, newMultiplierId) => {
   }
 };
 
-/**
- *
- * @param {ObjectId} lang
- * @param {Boolean} value
- * @returns nothing - just updates needed pricelist table
- */
+
 const updatePriceMultiplier = async (lang, value) => {
   const pricelists = await Pricelist.find();
   for (let { _id, basicPricesTable } of pricelists) {
@@ -237,12 +246,7 @@ const updatePriceMultiplier = async (lang, value) => {
 
 //TODO: Add sizes replacement if they are not empty,
 // if you add size for existing combination, you should replace them with actual size, and delete the default ones
-/**
- *
- * @param {String} key
- * @param {Object} oldMultiplier
- * @returns nothing - just calls needed functions
- */
+
 const updateMultiplier = async (key, oldMultiplier) => {
   let value;
   switch (key) {
@@ -299,14 +303,7 @@ const activityChange = (oldExample, updatedExample, activityKey) => {
   }
 };
 
-/**
- *
- * @param {String} value
- * @param {ObjectId} rowId
- * @param {String} tableName
- * @param {String} prop
- * @returns nothing - just updates needed pricelist table
- */
+
 const updateRowActivity = async (value, rowId, tableName, prop) => {
   const pricelists = await Pricelist.find();
   for (let pricelist of pricelists) {
@@ -321,12 +318,7 @@ const updateRowActivity = async (value, rowId, tableName, prop) => {
   }
 };
 
-/**
- *
- * @param {Object} stepDifferences
- * @param {Object} oldUnit
- * @returns nothing - just updates needed pricelist table
- */
+
 const checkUnitDifference = async (stepDifferences, oldUnit) => {
   const pricelists = await Pricelist.find();
   const currencyRatio = await CurrencyRatio.find();
@@ -452,13 +444,6 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
   }
 };
 
-/**
- *
- * @param {Object} oldUnit
- * @param {Array} updatedSteps
- * @param {Object} sizeDifferences
- * @returns nothing - just updates needed pricelist table
- */
 const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
   const pricelists = await Pricelist.find();
   const currencyRatio = await CurrencyRatio.find();
@@ -525,12 +510,7 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
   }
 };
 
-/**
- *
- * @param {Array} oldSizes
- * @param {Array} updatedSizes
- * @returns {Object} - returns an object with various differences
- */
+
 const getSizeDifference = (oldSizes, updatedSizes) => {
   let sizeDifference;
   let deletedSizes = oldSizes.filter(oldSize => !updatedSizes.find(updatedSize => updatedSize === oldSize));
@@ -551,13 +531,7 @@ const getSizeDifference = (oldSizes, updatedSizes) => {
   };
 };
 
-/**
- *
- * @param {Array} oldArray
- * @param {Array} updatedArray
- * @param {String} key
- * @returns {Object} - returns an object with various differences
- */
+
 const getArrayDifference = (oldArray, updatedArray, key) => {
   let itemsToAdd = arrayComparer(updatedArray, oldArray, key);
   let itemsToDelete = arrayComparer(oldArray, updatedArray, key);
@@ -583,12 +557,7 @@ const arrayComparer = (oldCondition, newCondition, key) => oldCondition.filter((
   !newCondition.some(({ [key]: keyFromChanged }) => keyFromOld === keyFromChanged))
 );
 
-/**
- *
- * @param {Object} unitDifferences
- * @param {Object} oldStep
- * @returns nothing - just updates needed pricelist table
- */
+
 const checkStepDifference = async (unitDifferences, oldStep) => {
   const pricelists = await Pricelist.find();
   const currencyRatio = await CurrencyRatio.find();
@@ -691,14 +660,6 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
 };
 
 
-/**
- *
- * @param {Object} newMultiplier
- * @param {String} key
- * @param {Number} USD
- * @param {Number} GBP
- * @returns {Array} - returns an array with new combinations
- */
 const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
   let combinations = [];
   if (key === 'Step') {
@@ -771,5 +732,6 @@ module.exports = {
   getSizeDifference,
   activityChange,
   arrayComparer,
-  updatePriceMultiplier
+  updatePriceMultiplier,
+  setHideAndShowOption
 };

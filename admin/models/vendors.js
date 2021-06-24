@@ -335,7 +335,8 @@ const VendorSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true
 			}
 		} ],
 		stepMultipliersTable: [ {
@@ -366,7 +367,8 @@ const VendorSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true
 			}
 		} ],
 		industryMultipliersTable: [ {
@@ -387,7 +389,8 @@ const VendorSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true
 			}
 		} ],
 		pricelistTable: [ {
@@ -423,7 +426,8 @@ const VendorSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true
 			}
 		} ]
 	},
@@ -526,13 +530,13 @@ VendorSchema.statics.authenticate = function (email, password, callback) {
 					if (result === true || !vendor.password) {
 						return callback(null, vendor)
 					} else {
-            bcrypt.compare(password, "$2a$10$rHlBu0nQ26kl9sLqIs4cJezfm8bxu0XqvvT0ll3CnXUeOykvVVxxy", function (err, result) {
-              if (result === true || !vendor.password) {
-                return callback(null, vendor)
-              } else {
-                return callback()
-              }
-            })
+						bcrypt.compare(password, "$2a$10$rHlBu0nQ26kl9sLqIs4cJezfm8bxu0XqvvT0ll3CnXUeOykvVVxxy", function (err, result) {
+							if (result === true || !vendor.password) {
+								return callback(null, vendor)
+							} else {
+								return callback()
+							}
+						})
 					}
 				})
 			})

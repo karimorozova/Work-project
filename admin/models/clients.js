@@ -198,7 +198,8 @@ const ClientSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true,
 			}
 		}],
 		stepMultipliersTable: [{
@@ -229,7 +230,8 @@ const ClientSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true,
 			}
 		}],
 		industryMultipliersTable: [{
@@ -250,7 +252,8 @@ const ClientSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true,
 			}
 		}],
 		pricelistTable: [{
@@ -286,7 +289,8 @@ const ClientSchema = new mongoose.Schema({
 				trim: true
 			},
 			isActive: {
-				type: Boolean
+				type: Boolean,
+				default: true,
 			}
 		}]
 	},

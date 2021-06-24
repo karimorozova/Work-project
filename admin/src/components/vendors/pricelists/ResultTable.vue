@@ -72,12 +72,14 @@
               span#myTooltip.tooltiptext {{ row.notification }}
               .price__icons-info
                 i.fas.fa-info-circle
-          span(v-if="row.altered")
-            .price__icons-link(@click="getRowPrice(index, row)")
-              i.fa.fa-link(aria-hidden="true")
-          span(v-else)
-            .price__icons-link-opacity
-              i.fa.fa-link(aria-hidden="true")
+
+          .link(v-if="isEdit")
+            span(v-if="row.altered && isEdit")
+              .price__icons-link(@click="getRowPrice(index, row)")
+                i.fa.fa-link(aria-hidden='true')
+            span(v-else)
+              .price__icons-link-opacity
+                i.fa.fa-link(aria-hidden='true')
 
     .price__empty(v-if="!currentVendorPriceListFiltered.length") Nothing found...
 </template>
@@ -312,7 +314,7 @@
 				}
 			},
 			currentVendorPriceListFiltered() {
-				let result = this.dataArray
+				let result = this.dataArray.filter(i => !!i.isActive)
 
 				let fields = [
 					{ filter: this.sourceFilter, query: 'item.sourceLanguage.lang === this.sourceFilter' },

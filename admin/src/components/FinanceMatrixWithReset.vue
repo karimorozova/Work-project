@@ -35,12 +35,13 @@
                 .finance-matrix__icons-info
                   i.fas.fa-info-circle
 
-            span(v-if="row.altered")
-            .icons-link(@click="getDefaultValues(row.key)")
-              i.fa.fa-link(aria-hidden='true')
-            span(v-else)
-              .icons-link-opacity
-                i.fa.fa-link(aria-hidden='true')
+            .link(v-if="isEdit")
+              span(v-if="row.altered")
+                .icons-link(@click="getDefaultValues(row.key)")
+                  i.fa.fa-link(aria-hidden='true')
+              span(v-else)
+                .icons-link-opacity
+                  i.fa.fa-link(aria-hidden='true')
 
 </template>
 
@@ -101,6 +102,12 @@
       cursor: pointer;
       font-size: 16px;
     }
+
+    &-link-opacity {
+      cursor: default;
+      font-size: 16px;
+      opacity: 0.5;
+    }
   }
 
   .finance-matrix {
@@ -114,13 +121,6 @@
         cursor: help;
         color: $red;
         font-size: 16px;
-      }
-
-
-      &-link-opacity {
-        cursor: default;
-        font-size: 16px;
-        opacity: 0.5;
       }
     }
 

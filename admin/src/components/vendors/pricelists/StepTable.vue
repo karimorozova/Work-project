@@ -13,7 +13,7 @@
 
     DataTable(
       :fields="fields",
-      :tableData="dataArray",
+      :tableData="tableData",
       :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 6 }]",
       :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 6 }]",
       bodyRowClass="client-pricelist-table-row",
@@ -25,38 +25,47 @@
         .price-title(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
-        .price__data(v-if="isEdit")
+        .price__data(v-if="isEdit && row.isActive")
           CheckBox(:isChecked="row.isCheck" @check="toggleCheck(row, true)" @uncheck="toggleCheck(row, false)")
 
       template(slot="step", slot-scope="{ row, index }")
-        .price__data {{ row.step.title }}
+        .price__data(:class="{'opacity-05': !row.isActive}") {{ row.step.title }}
 
       template(slot="unit", slot-scope="{ row, index }")
-        .price__data {{ row.unit.type }}
+        .price__data(:class="{'opacity-05': !row.isActive}") {{ row.unit.type }}
 
       template(slot="size", slot-scope="{ row, index }")
-        .price__data {{ row.size }}
+        .price__data(:class="{'opacity-05': !row.isActive}") {{ row.size }}
 
       template(slot="multiplier", slot-scope="{ row, index }")
+        .price__editing-data(v-if="isEdit && row.isActive")
+          input.price__data-input(type="number" @change="setRowValue(row)" v-model="dataArray[index].multiplier")
+        .price__data(v-if="isEdit && !row.isActive")
+          span(:class="{'opacity-05': !row.isActive}") {{ row.multiplier }}
         .price__data(v-if="!isEdit")
           span#multiplier {{ row.multiplier }}
           label(for="multiplier") &#37;
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" @change="setRowValue(row)" v-model="dataArray[index].multiplier")
 
       template(slot="icons", slot-scope="{ row, index }")
         .price__icons
-          .altered(v-if="row.altered")
+          .altered(v-if="row.altered && row.isActive")
             .tooltip
               span#myTooltip.tooltiptext {{ row.notification }}
               .price__icons-info
                 i.fas.fa-info-circle
-          span(v-if="row.altered")
-            .price__icons-link(@click="getRowPrice(row)")
-              i.fa.fa-link(aria-hidden="true")
-          span(v-else)
-            .price__icons-link-opacity
-              i.fa.fa-link(aria-hidden="true")
+          .link(v-if="isEdit && row.isActive")
+            span(v-if="row.altered && isEdit")
+              .price__icons-link(@click="getRowPrice(row)")
+                i.fa.fa-link(aria-hidden="true")
+            span(v-else)
+              .price__icons-link-opacity
+                i.fa.fa-link(aria-hidden="true")
+          .toggle(v-if="isEdit")
+            Toggler(
+              :isDisabled="false"
+              :isActive="row.isActive"
+              @toggle="toggleActive(row)"
+            )
 
     .price__empty(v-if="!dataArray.length") Nothing found...
 </template>
@@ -66,6 +75,7 @@
 	import CheckBox from "../../CheckBox"
 	import SetPriceModal from "../../finance/pricelistSettings/SetPriceModal"
 	import Button from "../../Button"
+	import Toggler from "../../Toggler"
 
 	export default {
 		props: {
@@ -143,6 +153,22 @@
 				alertToggle: "alertToggle",
 				storeCurrentVendor: "storeCurrentVendor"
 			}),
+			async toggleActive(row) {
+				row.isActive = !row.isActive
+				try {
+					const rates = await this.$http.post('/pricelists/hide-and-show-vendor-clients-rates', {
+						entityId: this.$route.params.id,
+						entityType: 'Vendor',
+						tableName: 'stepMultipliersTable',
+						tableRow: row
+					})
+					this.vendor.rates = rates.data
+					await this.storeCurrentVendor(this.vendor)
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Impossible to hide", isShow: true, type: "error" })
+				}
+			},
 			getIndex(id) {
 				return this.dataArray.findIndex(({ _id }) => `${ _id }` === `${ id }`)
 			},
@@ -240,11 +266,16 @@
 			}
 		},
 		computed: {
+			tableData() {
+				if (this.isEdit) return this.dataArray
+				return this.dataArray.filter(i => !!i.isActive)
+			},
 			isAllSelected() {
-				return (this.dataArray && this.dataArray.length) && this.dataArray.every(i => i.isCheck)
+				return (this.dataArray && this.dataArray.length) && this.dataArray.filter(i => !!i.isActive).every(i => i.isCheck)
 			}
 		},
 		components: {
+			Toggler,
 			Button,
 			SetPriceModal,
 			CheckBox,
@@ -371,5 +402,9 @@
         opacity: 1;
       }
     }
+  }
+
+  .opacity-05 {
+    opacity: 0.5;
   }
 </style>

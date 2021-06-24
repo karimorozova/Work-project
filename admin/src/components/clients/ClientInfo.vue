@@ -92,16 +92,13 @@
           .client-info__rates
             .rates__icons
               .rates__icon
-                img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+                img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit'), setNewStepCombination()")
                 img.rates__icons-opacity05(v-else :src="icons.edit.icon")
               .rates__icon
                 img.rates__icons-opacity1(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
                 img.rates__icons-opacity05(v-else :src="icons.cancel.icon")
 
-            PullButton(:style="'margin: 0 0 20px;'" @refreshResultTable="refreshResultTable")
-            RatesParameters(
-              :isEdit="isEdit"
-            )
+            RatesParameters(:isEdit="isEdit")
             Tabs(
               :tabs="tabs"
               :selectedTab="selectedTab"
@@ -219,7 +216,6 @@
 	import AllActivitiesModal from "./activity/AllActivitiesModal"
 	import AllActivitiesFullScrean from "./activity/AllActivitiesFullScrean"
 	import RadioButton from "../RadioButton"
-	import PullButton from "./pricelists/PullButton"
 	import Tabs from "../Tabs"
 
 	export default {
@@ -312,7 +308,15 @@
 			}
 		},
 		methods: {
-
+			async setNewStepCombination() {
+				try {
+					const updatedClient = await this.$http.post('/clientsapi/updated-retest-from-settings', { clientId: this.$route.params.id })
+					this.setUpClientProp({ _id: this.$route.params.id, key: 'rates', value: updatedClient.data.rates })
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Rates not Updated!", isShow: true, type: "error" })
+				}
+			},
 			toggleCheck({ row, val, prop }) {
 				const index = getIndex(this.currentClient.rates[prop], row._id)
 				const obj = this.currentClient.rates[prop][index]
@@ -325,7 +329,7 @@
 			},
 			toggleAll({ val, prop }) {
 				this.currentClient.rates[prop] = this.currentClient.rates[prop].reduce((acc, cur) => {
-					acc.push({ ...cur, isCheck: val })
+					cur.isActive ? acc.push({ ...cur, isCheck: val }) : acc.push({ ...cur, isCheck: false })
 					return acc
 				}, [])
 			},
@@ -808,7 +812,6 @@
 		},
 		components: {
 			Tabs,
-			PullButton,
 			AllActivitiesFullScrean,
 			AllActivitiesModal,
 			Sidebar,
@@ -870,7 +873,7 @@
   .rates {
     &__icons {
       display: flex;
-      position: absolute;
+      /*position: absolute;*/
       right: 20px;
       top: 20px;
       gap: 7px;

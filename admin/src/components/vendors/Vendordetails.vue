@@ -45,12 +45,12 @@
       .vendor-info__rates
         .rates__icons
           .rates__icon
-            img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+            img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit'), setNewStepCombination()")
             img.rates__icons-opacity05(v-else :src="icons.edit.icon")
           .rates__icon
             img.rates__icons-opacity1(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
             img.rates__icons-opacity05(v-else :src="icons.cancel.icon")
-        PullButton(:style="'margin: 0 0 20px;'" @refreshResultTable="refreshResultTable")
+
         Tabs(
           :tabs="tabs"
           :selectedTab="selectedTab"
@@ -209,7 +209,6 @@
 	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
 	import VendorMainInfo from "./VendorGeneralInfo"
 	import SaveCancelPopUp from "../SaveCancelPopUp"
-	import PullButton from "./pricelists/PullButton"
 	import Tabs from "../Tabs"
 
 	export default {
@@ -277,6 +276,15 @@
 				updateVendorGeneralData: "updateVendorGeneralData",
 				updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
+			async setNewStepCombination() {
+				try {
+					const updatedVendor = await this.$http.post('/vendorsapi/updated-retest-from-settings', { vendorId: this.$route.params.id })
+					await this.storeCurrentVendor(updatedVendor.data)
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Rates not Updated!", isShow: true, type: "error" })
+				}
+			},
 			toggleCheck({ row, val, prop }) {
 				const index = getIndex(this.currentVendor.rates[prop], row._id)
 				const obj = this.currentVendor.rates[prop][index]
@@ -289,7 +297,7 @@
 			},
 			toggleAll({ val, prop }) {
 				this.currentVendor.rates[prop] = this.currentVendor.rates[prop].reduce((acc, cur) => {
-					acc.push({ ...cur, isCheck: val })
+					cur.isActive ? acc.push({ ...cur, isCheck: val }) : acc.push({ ...cur, isCheck: false })
 					return acc
 				}, [])
 			},
@@ -564,7 +572,6 @@
 		},
 		components: {
 			Tabs,
-			PullButton,
 			SaveCancelPopUp,
 			VendorMainInfo,
 			PendingCompetencies,

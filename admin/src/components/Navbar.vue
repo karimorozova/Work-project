@@ -2,8 +2,8 @@
   .wrapper
     .navbar
       .navbar__logo
-        img(src="../assets/images/logo_white.png")
-      Menu(:elements="test" :path='path')
+        img(src="../assets/images/latest-version/navbar-logo.svg")
+      Menu(:elements="elements" :path='path')
     .content
       router-view
 </template>
@@ -18,11 +18,11 @@
 		data() {
 			return {
 				isSidebar: false,
-				test: [
-					{
-						name: 'title',
-						type: 'title'
-					},
+				elements: [
+					// {
+					// 	name: 'title',
+					// 	type: 'title'
+					// },
 					{
 						type: 'group',
 						name: 'dashboard',
@@ -400,14 +400,13 @@
     top: 0;
     bottom: 0;
     width: 250px;
-    padding: 10px;
-/*    background-color: $navbar;*/
+    /*    background-color: $navbar;*/
     background-color: #fff;
     box-sizing: border-box;
 
     &__logo {
-      width: 200px;
       margin: 0 auto;
+      padding: 10px;
 
       img {
         width: 100%;
