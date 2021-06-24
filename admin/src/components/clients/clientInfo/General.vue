@@ -69,11 +69,6 @@
       .block-item
         label.block-item__label.block-item_relative Aliases:
         .block-item__drop
-          //SelectMultiBlocks(
-            //:options="clientAliases"
-            //:selectedOptions="currentClient.hasOwnProperty('aliases') ? currentClient.aliases : currentClientAliases"
-            //@chooseOptions="setAlias"
-          //)
           SelectMulti(
             placeholder="Select"
             :hasSearch="true"
@@ -93,7 +88,6 @@
 	import SelectMulti from "../../SelectMulti"
 
 	import { mapGetters, mapActions } from "vuex"
-	import SelectMultiBlocks from "../../SelectMultiBlocks"
 
 	export default {
 		mixins: [ scrollDrop ],
@@ -101,9 +95,9 @@
 			isSaveClicked: {
 				type: Boolean
 			},
-      isIndividual: {
+			isIndividual: {
 				type: Boolean,
-        default: true
+				default: true
 			},
 			languages: {
 				type: Array
@@ -266,7 +260,6 @@
 			}
 		},
 		components: {
-			SelectMultiBlocks,
 			Asterisk,
 			ClientStatusSelect,
 			AMSelect,
@@ -320,8 +313,8 @@
 
     &__drop {
       position: relative;
-      width: 200px;
-      height: 28px;
+      width: 210px;
+      height: 32px;
     }
 
     &_high-index {
@@ -334,23 +327,19 @@
 
     input {
       font-size: 14px;
-      color: #66563d;
-      border: 1px solid #c1bbb1;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
       box-sizing: border-box;
-      padding: 0 8px;
+      padding: 0 7px;
       outline: none;
-      width: 200px;
+      width: 210px;
       height: 32px;
       transition: .1s ease-out;
 
-      &:focus{
-        border: 1px solid #938877;
+      &:focus {
+        border: 1px solid $border-focus;
       }
-    }
-
-    ::-webkit-input-placeholder {
-      opacity: 0.5;
     }
   }
 

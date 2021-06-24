@@ -131,253 +131,258 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex";
-import SelectMulti from "../SelectMulti"
-import SelectSingle from "../SelectSingle"
-import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect"
-import TimezoneSelect from "../clients/TimezoneSelect";
-import NativeLanguageSelect from "./NativeLanguageSelect";
-import Asterisk from "../Asterisk";
+	import { mapActions, mapGetters } from "vuex"
+	import SelectMulti from "../SelectMulti"
+	import SelectSingle from "../SelectSingle"
+	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect"
+	import TimezoneSelect from "../clients/TimezoneSelect"
+	import NativeLanguageSelect from "./NativeLanguageSelect"
+	import Asterisk from "../Asterisk"
 
-export default {
-  data() {
-    return {
-      errors: [],
-      aliases: [],
-      genders: [ "Male", "Female", "Other" ],
-      currentVendorAliases: [],
-      timezone: '',
-      native: '',
-      gender: '',
-    }
-  },
-  methods: {
-    ...mapActions({
-      updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
-    }),
-    chosenInd(e){
-      let curentVentorIndusties = [...this.currentVendor.industries]
+	export default {
+		data() {
+			return {
+				errors: [],
+				aliases: [],
+				genders: [ "Male", "Female", "Other" ],
+				currentVendorAliases: [],
+				timezone: '',
+				native: '',
+				gender: ''
+			}
+		},
+		methods: {
+			...mapActions({
+				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData"
+			}),
+			chosenInd(e) {
+				let curentVentorIndusties = [ ...this.currentVendor.industries ]
 
-      const position = curentVentorIndusties.findIndex(item => item._id === e.industry._id);
-      if(position !== -1) {
-        curentVentorIndusties.splice(position, 1)
-      } else {
-        curentVentorIndusties.push( e.industry)
-      }
-      this.updateCurrentVendorGeneralData({key: 'industries', value: curentVentorIndusties})
-    },
-    setAlias(e){
-      let curentVentorAliases = [...this.currentVendor.aliases]
+				const position = curentVentorIndusties.findIndex(item => item._id === e.industry._id)
+				if (position !== -1) {
+					curentVentorIndusties.splice(position, 1)
+				} else {
+					curentVentorIndusties.push(e.industry)
+				}
+				this.updateCurrentVendorGeneralData({ key: 'industries', value: curentVentorIndusties })
+			},
+			setAlias(e) {
+				let curentVentorAliases = [ ...this.currentVendor.aliases ]
 
-      const position = curentVentorAliases.findIndex(item => item === e.option);
-      if(position !== -1) {
-        curentVentorAliases.splice(position, 1)
-      } else {
-        curentVentorAliases.push( e.option)
-      }
-      this.updateCurrentVendorGeneralData({key: 'aliases', value: curentVentorAliases})
-    },
-    previewPhoto(e,name) {
-      this.updateCurrentVendorGeneralData({key: name, value: e.target.value})
-    },
-    updateVendorProp(value, key) {
-      this.updateCurrentVendorGeneralData({key, value })
-    },
-    async getAliases() {
-      try {
-        const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
-        this.aliases = result.body
-      } catch (err) {
-        this.alertToggle({
-          message: "Error in Aliases",
-          isShow: true,
-          type: "error"
-        })
-      }
-    }
-  },
-  computed: {
-    ...mapGetters({
-      currentVendor: "getCurrentVendorGeneralData",
-    }),
-    vendorAliases() {
-      if (this.aliases) {
-        return this.aliases
-      }
-    },
-    selectedIndNames() {
-      let result = []
-      if (this.currentVendor.industries && this.currentVendor.industries.length) {
-        for (let ind of this.currentVendor.industries) {
-          result.push(ind.name)
-        }
-      }
-      return result
-    },
-  },
-  components: {
-    SelectSingle,
-    SelectMulti,
-    MultiVendorIndustrySelect,
-    TimezoneSelect,
-    NativeLanguageSelect,
-    Asterisk
-},
-  created() {
-    this.getAliases()
-  }
-}
+				const position = curentVentorAliases.findIndex(item => item === e.option)
+				if (position !== -1) {
+					curentVentorAliases.splice(position, 1)
+				} else {
+					curentVentorAliases.push(e.option)
+				}
+				this.updateCurrentVendorGeneralData({ key: 'aliases', value: curentVentorAliases })
+			},
+			previewPhoto(e, name) {
+				this.updateCurrentVendorGeneralData({ key: name, value: e.target.value })
+			},
+			updateVendorProp(value, key) {
+				this.updateCurrentVendorGeneralData({ key, value })
+			},
+			async getAliases() {
+				try {
+					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
+					this.aliases = result.body
+				} catch (err) {
+					this.alertToggle({
+						message: "Error in Aliases",
+						isShow: true,
+						type: "error"
+					})
+				}
+			}
+		},
+		computed: {
+			...mapGetters({
+				currentVendor: "getCurrentVendorGeneralData"
+			}),
+			vendorAliases() {
+				if (this.aliases) {
+					return this.aliases
+				}
+			},
+			selectedIndNames() {
+				let result = []
+				if (this.currentVendor.industries && this.currentVendor.industries.length) {
+					for (let ind of this.currentVendor.industries) {
+						result.push(ind.name)
+					}
+				}
+				return result
+			}
+		},
+		components: {
+			SelectSingle,
+			SelectMulti,
+			MultiVendorIndustrySelect,
+			TimezoneSelect,
+			NativeLanguageSelect,
+			Asterisk
+		},
+		created() {
+			this.getAliases()
+		}
+	}
 </script>
 
 <style scoped lang="scss">
-@import "../../assets/scss/colors.scss";
+  @import "../../assets/scss/colors.scss";
 
-.gen-info {
-  box-sizing: border-box;
-  padding: 20px;
-  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-}
+  .gen-info {
+    box-sizing: border-box;
+    padding: 20px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    border-radius: 4px;
+  }
 
-.gen-info {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
+  .gen-info {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
 
-  &__block {
-    width: 35%;
+    &__block {
+      width: 35%;
 
-    &:first-child {
-      width: 22%;
-      text-align: center;
+      &:first-child {
+        width: 22%;
+        text-align: center;
+      }
     }
   }
-}
 
-.block-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  .block-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 
-  &__label {
-    margin-bottom: 0;
+    &__label {
+      margin-bottom: 0;
+    }
+
+    &_relative {
+      position: relative;
+    }
+
+    &__drop-menu {
+      position: relative;
+      width: 200px;
+      height: 28px;
+      box-sizing: border-box;
+    }
+
+    &_high-index {
+      z-index: 10;
+    }
+
+    &_medium-index {
+      z-index: 8;
+    }
+
+    label {
+      margin-bottom: 0;
+    }
+
+    &__input-filed {
+      font-size: 14px;
+      color: #66563d;
+      border: 1px solid #c1bbb1;
+      border-radius: 4px;
+      padding: 0 5px;
+      outline: none;
+      width: 200px;
+      height: 30px;
+      box-sizing: border-box;
+    }
+
+    ::-webkit-input-placeholder {
+      opacity: 0.5;
+    }
+
+    &_error-shadow {
+      box-shadow: 0 0 5px red;
+      border-radius: 4px;
+    }
   }
 
-  &_relative {
-    position: relative;
-  }
-
-  &__drop-menu {
-    position: relative;
-    width: 200px;
-    height: 28px;
-    box-sizing: border-box;
-  }
-
-  &_high-index {
-    z-index: 10;
-  }
-
-  &_medium-index {
-    z-index: 8;
-  }
-
-  label {
-    margin-bottom: 0;
-  }
-
-  &__input-filed {
-    font-size: 14px;
-    color: #66563d;
+  .photo-wrap {
+    width: 195px;
+    height: 160px;
     border: 1px solid #c1bbb1;
-    border-radius: 4px;
-    padding: 0 5px;
-    outline: none;
-    width: 200px;
-    height: 30px;
-    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .photo-image {
+      max-width: 100%;
+      max-height: 100%;
+    }
   }
 
-  ::-webkit-input-placeholder {
-    opacity: 0.5;
-  }
-
-  &_error-shadow {
-    box-shadow: 0 0 5px red;
-    border-radius: 4px;
-  }
-}
-
-.photo-wrap {
-  width: 195px;
-  height: 160px;
-  border: 1px solid #c1bbb1;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .photo-image {
-    max-width: 100%;
-    max-height: 100%;
-  }
-}
-
-.photo-file {
-  position: absolute;
-  top: -25px;
-  left: -100px;
-  height: 180px;
-  background-color: transparent;
-  outline: none;
-  border: none;
-  z-index: 5;
-  cursor: pointer;
-}
-
-.photo-text {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-
-  &__message {
-    font-size: 18px;
-    opacity: 0.5;
-    width: 50%;
-    text-align: center;
-  }
-
-  &__error-message {
+  .photo-file {
     position: absolute;
-    bottom: 30%;
-    z-index: 10;
-    background-color: $white;
-    padding: 3px;
-    box-sizing: border-box;
-    color: $orange;
+    top: -25px;
+    left: -100px;
+    height: 180px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    z-index: 5;
+    cursor: pointer;
   }
-}
-.photo-extensions,
-.photo-size {
-  display: block;
-  font-size: 12px;
-  margin-top: 10px;
-}
-.edited {
-  opacity: .6;
-}
-.actionsButton {
-  display: flex;
-  position: absolute;
-  right: 10px;
-  top: -30px;
-}
-.actionsButton__icon {
-  padding: 0 5px;
-}
+
+  .photo-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    &__message {
+      font-size: 18px;
+      opacity: 0.5;
+      width: 50%;
+      text-align: center;
+    }
+
+    &__error-message {
+      position: absolute;
+      bottom: 30%;
+      z-index: 10;
+      background-color: $white;
+      padding: 3px;
+      box-sizing: border-box;
+      color: $orange;
+    }
+  }
+
+  .photo-extensions,
+  .photo-size {
+    display: block;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .edited {
+    opacity: .5;
+  }
+
+  .actionsButton {
+    display: flex;
+    position: absolute;
+    right: 10px;
+    top: -30px;
+  }
+
+  .actionsButton__icon {
+    padding: 0 5px;
+  }
 
 </style>

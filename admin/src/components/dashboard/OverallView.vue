@@ -28,7 +28,7 @@ export default {
 <style lang="scss" scoped>
 .overallView {
   width: 1000px;
-  margin: 40px;
+  margin: 50px;
   display: flex;
 
   &__spaceLine {

@@ -250,7 +250,7 @@
   .pendingCompetencies {
     position: relative;
     width: 1200px;
-    margin: 40px;
+    margin: 50px;
     background: white;
 
     &__body {

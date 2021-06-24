@@ -699,7 +699,7 @@
     position: relative;
     width: 100%;
     display: flex;
-    margin: 40px;
+    margin: 50px;
   }
 
   .vendor-subinfo {
@@ -814,17 +814,17 @@
       margin-bottom: 0;
     }
 
-    &__input-filed {
-      font-size: 14px;
-      color: #66563d;
-      border: 1px solid #c1bbb1;
-      border-radius: 4px;
-      padding: 0 5px;
-      outline: none;
-      width: 200px;
-      height: 30px;
-      box-sizing: border-box;
-    }
+    /*&__input-filed {*/
+    /*  font-size: 14px;*/
+    /*  color: #66563d;*/
+    /*  border: 1px solid #c1bbb1;*/
+    /*  border-radius: 4px;*/
+    /*  padding: 0 5px;*/
+    /*  outline: none;*/
+    /*  width: 200px;*/
+    /*  height: 30px;*/
+    /*  box-sizing: border-box;*/
+    /*}*/
 
     ::-webkit-input-placeholder {
       opacity: 0.5;

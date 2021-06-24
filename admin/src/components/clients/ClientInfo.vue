@@ -958,7 +958,7 @@
 
     &__layout {
       display: flex;
-      margin: 40px;
+      margin: 50px;
     }
 
     &__notes {

@@ -31,16 +31,22 @@
 </script>
 
 <style lang='scss'>
+  @import "assets/scss/colors";
+
   body {
     font-family: Myriad400;
-    color: #66563d;
+    color: $text;
     font-size: 14px;
-    background: #FCFCFC;
+    background: $body;
   }
 
-  input:disabled,
-  textarea:disabled {
-    background-color: #eee !important;
+  /*input:disabled,*/
+  /*textarea:disabled {*/
+  /*  background-color: #eee !important;*/
+  /*}*/
+
+  input::-webkit-input-placeholder {
+    opacity: 0.5;
   }
 
   input::-webkit-outer-spin-button,
@@ -53,7 +59,7 @@
     -moz-appearance: textfield;
   }
 
-  ::-webkit-file-upload-button {
+  input::-webkit-file-upload-button {
     cursor: pointer;
   }
 
@@ -133,7 +139,6 @@
     font-weight: normal;
     src: url('./assets/fonts/MYRIADPRO-SEMIBOLD.woff') format('woff');
   }
-
 
   @font-face {
     font-family: 'Myriad900';

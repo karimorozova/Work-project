@@ -265,7 +265,7 @@ export default {
 
 .activities {
   width: 1000px;
-  margin: 40px;
+  margin: 50px;
   &__title {
     font-size: 22px;
     font-weight: bold;
