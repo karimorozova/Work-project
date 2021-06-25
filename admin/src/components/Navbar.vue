@@ -152,6 +152,10 @@
 								path: '/projects/open-projects'
 							},
 							{
+								name: 'Quote Projects',
+								type: 'title'
+							},
+							{
 								type: 'link',
 								name: 'Quote Sent',
 								path: '/projects/quote-projects'
