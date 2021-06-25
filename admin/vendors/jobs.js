@@ -254,10 +254,9 @@ function setRejectedStatus({ steps, jobId }) {
 }
 
 async function setTaskStatusAndSave({ project, jobId, steps, status }) {
-
 	const { tasks } = project
 	const { taskId } = steps.find(item => item._id.toString() === jobId)
-	const currSteps = steps.filter(item => item.taskId === taskId)
+	const currSteps = steps.filter(item => item.taskId === taskId).filter(item => item.status === 'Cancelled' || item.status === 'Cancelled Halfway')
 
 	const updatedTasks = tasks.map(item => {
 		if (item.taskId === taskId) {
