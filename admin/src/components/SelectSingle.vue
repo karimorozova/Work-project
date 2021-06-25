@@ -1,7 +1,7 @@
 <template lang="pug">
   .drop-select(
     v-click-outside="outOptions"
-    :class="[{'z-index': isDropped, 'drop-select-active': isDropped, 'table-drop-menu-no-shadow': isTableDropMenuNoShadow, 'table-drop-menu': isTableDropMenu, 'disabled': isDisabled}, customClass]"
+    :class="[{'z-index': isDropped, 'table-drop-menu-no-shadow': isTableDropMenuNoShadow, 'table-drop-menu': isTableDropMenu, 'disabled': isDisabled}, customClass]"
     :style="positionStyle"
   )
 
@@ -163,9 +163,6 @@
     }
   }
 
-  .drop-select-active {
-    border: 1px solid $border-focus;
-  }
 
   .drop-select {
     position: absolute;

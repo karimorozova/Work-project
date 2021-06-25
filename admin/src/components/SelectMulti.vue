@@ -1,7 +1,7 @@
 <template lang="pug">
   .drop-select(
     v-click-outside="outOptions"
-    :class="[{'z-index': isDropped, 'drop-select-active': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]"
+    :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]"
   )
     .select(@click="toggleOptions")
       span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
@@ -134,10 +134,6 @@
   .fa-check-square-o,
   .fa-square-o {
     padding-right: 5px;
-  }
-
-  .drop-select-active {
-    border: 1px solid $border-focus;
   }
 
   .drop-select {

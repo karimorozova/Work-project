@@ -1,21 +1,21 @@
 <template lang="pug">
   .menu
-    .menu__item(v-for="element in elements")
+    .item(v-for="element in elements")
 
-      .item__title(v-if="isTitle(element)") {{element.name}}
+      .title(v-if="isTitle(element)") {{element.name}}
 
-      .item__group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
-        .item__group-open(v-if="element.isOpen")
+      .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
+        .group__open(v-if="element.isOpen")
           div {{element.name}}
           i.fas.fa-chevron-down
-        .item__group-close(v-if="!element.isOpen")
+        .group__close(v-if="!element.isOpen")
           div {{element.name}}
           i.fas.fa-chevron-right
 
       Menu(v-if="isGroup(element) && openSubMenu(element)" :elements="element.children" :path='path' @closeGroup="closeGroup")
 
-      .item__link(v-if="isLink(element)")
-        router-link(:to="{ path: element.path}") {{element.name}}
+      router-link(v-if="isLink(element)" :to="{ path: element.path}" id="link") {{element.name}}
+        i.fas.fa-circle
 
 </template>
 
@@ -79,85 +79,77 @@
 				path.shift()
 				this.openCurrentPath(this.elements, path)
 			}
-		},
-		watch: {}
+		}
 	}
 </script>
 
 <style scoped lang="scss">
 
-  %hoverItem {
-    background-color: #222;
-    cursor: pointer;
-    color: white;
+  a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
   }
 
-  .item {
-    &__group {
-      &-open {
+  %flexBetween {
+    display: flex;
+    justify-content: space-between;
+  }
 
+  .menu {
+    color: wheat;
+    margin-left: 12px;
+  }
+
+  .group {
+    cursor: pointer;
+
+    &__open {
+      @extend %flexBetween;
+      padding: 6px;
+      color: white;
+
+      &:hover {
+        color: green;
       }
+    }
 
-      &-close {
+    &__close {
+      @extend %flexBetween;
+      padding: 6px;
 
+      &:hover {
+        color: green;
       }
     }
   }
 
-  /*  .menu {
-      font-size: 14px;
-      text-transform: uppercase;
-      !*color: #fcfcfc;*!
-      color: wheat;
+  #link {
+    padding: 6px;
+    width: -webkit-fill-available;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    align-items: center;
 
-      &__items {
-        !*margin: 5px 0;*!
-      }
-
-      .link {
-        text-decoration: none;
-        color: wheat;
-        padding: 10px;
-        display: block;
-
-        &:hover {
-          @extend %hoverItem;
-        }
-      }
-
-      !*.title {*!
-      !*  color: #cccccc;*!
-      !*}*!
-    }*/
-
-  /*  .group {
-      cursor: pointer;
-      color: #ebbb46;
-
-      &__text {
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
-
-        &:hover {
-          @extend %hoverItem;
-        }
-      }
-
-      &__textOpen {
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
-        color: white;
-        background-color: #222;
-        cursor: pointer;
-      }
-    }*/
-
-  .link.router-link-active,
-  .link.router-link-exact-active {
-    background-color: #222;
-    color: white !important;
+    &:hover {
+      color: green;
+    }
   }
+
+  #link.router-link-active,
+  #link.router-link-exact-active {
+    color: white !important;
+
+    &:hover {
+      color: green;
+    }
+  }
+
+  .fa-circle {
+    font-size: 4px;
+    margin-right: 6px;
+  }
+
 
 </style>

@@ -3,7 +3,8 @@
     .navbar
       .navbar__logo
         img(src="../assets/images/latest-version/navbar-logo.svg")
-      Menu(:elements="elements" :path='path')
+      .navbar__menu
+        Menu(:elements="elements" :path='path')
     .content
       router-view
 </template>
@@ -25,7 +26,7 @@
 					// },
 					{
 						type: 'group',
-						name: 'dashboard',
+						name: 'Dashboard',
 						path: 'dashboard',
 						isOpen: false,
 						parent: true,
@@ -66,7 +67,7 @@
 							},
 							{
 								type: 'group',
-								name: 'CANDIDATES',
+								name: 'Candidates',
 								path: 'candidates',
 								isOpen: false,
 								children: [
@@ -86,7 +87,7 @@
 							{
 								type: 'group',
 								path: 'report',
-								name: 'REPORTS',
+								name: 'Reports',
 								isOpen: false,
 								children: [
 									{
@@ -140,7 +141,7 @@
 					},
 					{
 						type: 'group',
-						name: 'PROJECTS',
+						name: 'Projects',
 						path: 'projects',
 						isOpen: false,
 						parent: true,
@@ -168,7 +169,7 @@
 							{
 								type: 'group',
 								path: 'xtrf',
-								name: 'XTRF',
+								name: 'Other Projects (XTRF)',
 								isOpen: false,
 								children: [
 									{
@@ -197,7 +198,7 @@
 					},
 					{
 						type: 'link',
-						name: 'FINANCE',
+						name: 'Finance',
 						path: '/finance'
 					},
 					{
@@ -254,7 +255,7 @@
 							},
 							{
 								type: 'link',
-								name: 'Services',
+								name: 'Services / Steps',
 								path: '/settings/services'
 							},
 							{
@@ -269,7 +270,7 @@
 							},
 							{
 								type: 'link',
-								name: 'Discounts/Surcharges',
+								name: 'Discounts / Surcharges',
 								path: '/settings/discounts'
 							},
 							{
@@ -403,6 +404,10 @@
     /*    background-color: $navbar;*/
     background-color: #333;
     box-sizing: border-box;
+
+    &__menu {
+      /*margin-right: 12px;*/
+    }
 
     &__logo {
       margin: 0 auto;
