@@ -89,7 +89,7 @@
 
       &:hover {
         cursor: pointer;
-        background-color: $text !important;
+        background-color: $orange !important;
       }
 
       &:active {

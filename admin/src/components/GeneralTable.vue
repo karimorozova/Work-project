@@ -1,5 +1,5 @@
 <template lang="pug">
-  .go
+  .generalTable
     .th__modals
       ValidationErrors(
         v-if="areErrors"
@@ -22,102 +22,104 @@
         tr(:class="{'compensate-scroll': tableData.length >= elementToScroll}")
           th(v-for="header in fields" :style="header.style")
             .th__header
-              slot( :name="header.headerKey" :field="header")
+              slot(:name="header.headerKey" :field="header")
               .th__sort-icon(v-if="header.sortInfo && header.sortInfo.isSort")
                 .th__sort-test(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'")
                   i.fas.fa-caret-down(v-if="header.sortInfo.order === 'asc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'desc'})")
                   i.fas.fa-caret-up(v-else-if="header.sortInfo.order === 'desc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
                 i.fas.fa-times-circle(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"  @click.stop="removeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
                 i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
+
             .th__filter(v-if="header.filterInfo && header.filterInfo.isFilter && showFilters")
               input(:ref='header.key' @keyup="(e) => setFilter({filterInfo: header.filterInfo, value: e.target.value, key: header.dataKey, filterField: header.key})")
               i.fas.fa-times-circle.th__filter-close(v-if="header.filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo: header.filterInfo , filterField: header.key})")
 
       tbody(:class="{'scroll': tableData.length >= elementToScroll}" @scroll="handleBodyScroll")
-        tr.data(
-              v-for="(row, index) of tableData"
-        )
+        tr.data(v-for="(row, index) of tableData")
           td(v-for="field of fields" :style="field.style")
             slot(:name="field.key" :row="row" :index="index")
 
 </template>
 
 <script>
-import ApproveModal from './ApproveModal'
-import ValidationErrors from './ValidationErrors'
+	import ApproveModal from './ApproveModal'
+	import ValidationErrors from './ValidationErrors'
+
 	export default {
-	  props: {
-	    //Array of header Info
-      fields: {
-        type: Array,
-      },
-      //Array of data
-      tableData: {
-        type: Array,
-      },
+		props: {
+			//Array of header Info
+			fields: {
+				type: Array
+			},
+			//Array of data
+			tableData: {
+				type: Array
+			},
 
-      areErrors: {
-        type: Boolean,
-        default: false
-      },
-      isFilterShow: {
-        type: Boolean,
-        default: true
-      }
-    },
-	  data() {
-	    return {
-        showFilters: false,
-        elementToScroll: 15,
-      }
-    },
-    methods: {
-      closeErrors() {
-        this.$emit('closeErrors')
-      },
-      approve() {
-        this.$emit('approve')
-      },
-      notApprove() {
-        this.$emit('notApprove')
-      },
-      closeModal() {
-        this.$emit('closeModal')
-      },
+			areErrors: {
+				type: Boolean,
+				default: false
+			},
+			isFilterShow: {
+				type: Boolean,
+				default: true
+			}
+		},
+		data() {
+			return {
+				showFilters: false,
+				elementToScroll: 15
+			}
+		},
+		methods: {
+			closeErrors() {
+				this.$emit('closeErrors')
+			},
+			approve() {
+				this.$emit('approve')
+			},
+			notApprove() {
+				this.$emit('notApprove')
+			},
+			closeModal() {
+				this.$emit('closeModal')
+			},
 
-      addSortKey(field) {
-        this.$emit('addSortKey', field)
-      },
-      changeSortKey(field) {
-        this.$emit('changeSortKey', field)
-      },
-      removeSortKey(field) {
-        this.$emit('removeSortKey', field)
-      },
+			addSortKey(field) {
+				this.$emit('addSortKey', field)
+			},
+			changeSortKey(field) {
+				this.$emit('changeSortKey', field)
+			},
+			removeSortKey(field) {
+				this.$emit('removeSortKey', field)
+			},
 
-      setFilter(field) {
-        this.$emit('setFilter', field)
-      },
-      removeFilter(field) {
-        this.$refs[field.filterField][0].value = ''
-        this.$emit('removeFilter', field)
-      },
+			setFilter(field) {
+				this.$emit('setFilter', field)
+			},
+			removeFilter(field) {
+				this.$refs[field.filterField][0].value = ''
+				this.$emit('removeFilter', field)
+			},
 
-      handleBodyScroll(e) {
-        const element = e.target;
-        if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
-          this.$emit("bottomScrolled");
-        }
-      },
-    },
-    components: {
-      ValidationErrors,
-      ApproveModal
-    }
-  }
+			handleBodyScroll(e) {
+				const element = e.target
+				if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
+					this.$emit("bottomScrolled")
+				}
+			}
+		},
+		components: {
+			ValidationErrors,
+			ApproveModal
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
+  @import "../assets/scss/colors";
+
   .th {
     &__modals {
       position: absolute;
@@ -126,17 +128,20 @@ import ValidationErrors from './ValidationErrors'
       left: 50%;
       transform: translate(-50%);
     }
+
     &__sort-icon {
       display: flex;
       width: 25px;
       justify-content: space-between;
     }
+
     &__header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       height: 40px;
     }
+
     &__filter {
       //height: 31px;
       input {
@@ -153,8 +158,9 @@ import ValidationErrors from './ValidationErrors'
         z-index: 50;
         color: #36304a;
       }
-     }
+    }
   }
+
   .scroll {
     overflow-y: scroll;
   }
@@ -162,6 +168,7 @@ import ValidationErrors from './ValidationErrors'
   .compensate-scroll {
     padding-right: 17px;
   }
+
   table {
     border-collapse: collapse;
     background: white;
@@ -177,7 +184,7 @@ import ValidationErrors from './ValidationErrors'
     padding: 0 6px;
   }
 
-  th{
+  th {
     //display: flex;
     //align-items: center;
     min-height: 40px;
@@ -203,7 +210,7 @@ import ValidationErrors from './ValidationErrors'
   table thead {
     height: 40px;
     //background: #d1ccc4;
-    background: #e0ddd8;
+    background: $light-border;
   }
 
   table tbody tr:last-child {
@@ -222,10 +229,11 @@ import ValidationErrors from './ValidationErrors'
   tbody {
     max-height: 600px;
     display: block;
+    border: 1px solid $list-hover;
   }
 
   tbody tr:nth-child(even) {
-    background-color: #f5f5f5;
+    background-color: $list-hover;
   }
 
   tbody tr {
@@ -234,7 +242,7 @@ import ValidationErrors from './ValidationErrors'
   }
 
   tbody tr:hover {
-    background-color: #f5f5f5;
+    background-color: $list-hover;
     cursor: default;
   }
 
