@@ -27,19 +27,19 @@
 					{
 						type: 'group',
 						name: 'Dashboard',
-						path: 'dashboard',
+						path: 'pangea-dashboard',
 						isOpen: false,
 						parent: true,
 						children: [
 							{
 								type: 'link',
 								name: 'Overall View',
-								path: '/dashboard/overall-view'
+								path: '/pangea-dashboard/overall-view'
 							},
 							{
 								type: 'link',
 								name: 'Sales Performance',
-								path: '/dashboard/sales-perfomance'
+								path: '/pangea-dashboard/sales-perfomance'
 							}
 						]
 					},

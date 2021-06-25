@@ -231,22 +231,22 @@
 	import scrollEnd from "../../mixins/scrollEnd"
 	import SelectSingle from "../SelectSingle"
 	import Button from "../Button"
-  import GeneralTable from "../GeneralTable"
+	import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons, scrollEnd ],
 		data() {
 			return {
 				fields: [
-					{ label: "Icon", headerKey: "headerIcon", key: "icon", style: {"width": "10%"} },
-					{ label: "Name", headerKey: "headerName", key: "name",  style: {"width": "16%"} },
-					{ label: "Group", headerKey: "headerGroup", key: "group", style: {"width": "16%"}},
-					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", style: {"width": "10%"} },
-					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", style: {"width": "10%"} },
-					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", style: {"width": "10%"}},
-					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", style: {"width": "10%"} },
-					{ label: "Active", headerKey: "headerActive", key: "active", style: {"width": "6%"} },
-					{ label: "", headerKey: "headerIcons", key: "icons", style: {"width": "12%"} }
+					{ label: "Icon", headerKey: "headerIcon", key: "icon", style: { "width": "10%" } },
+					{ label: "Name", headerKey: "headerName", key: "name", style: { "width": "16%" } },
+					{ label: "Group", headerKey: "headerGroup", key: "group", style: { "width": "16%" } },
+					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", style: { "width": "10%" } },
+					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", style: { "width": "10%" } },
+					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", style: { "width": "10%" } },
+					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", style: { "width": "10%" } },
+					{ label: "Active", headerKey: "headerActive", key: "active", style: { "width": "6%" } },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: { "width": "12%" } }
 				],
 				languages: [],
 				currentActive: -1,
@@ -554,12 +554,14 @@
 </script>
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
-  @import "../../assets/styles/settingsTable";
   @import "../../assets/scss/checkbox";
 
   .languages {
-    @extend %setting-table;
     width: 1040px;
+    margin: 50px;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
 
     &__settingSpliter {
       width: 1px;
@@ -647,16 +649,14 @@
     }
 
     &__data {
-      @extend %table-data;
       position: relative;
     }
 
     &__icons {
-      @extend %table-icons;
+      display: flex;
     }
 
     &__icon {
-      @extend %table-icon;
       margin-right: 4px;
       margin-left: 4px;
     }

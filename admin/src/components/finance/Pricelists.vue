@@ -49,58 +49,58 @@
 </template>
 
 <script>
-	import ApproveModal from "../ApproveModal";
-	import Add from "../Add";
-	import CheckBox from "../CheckBox";
-	import Toggler from "../Toggler";
-	import ValidationErrors from "../ValidationErrors";
-	import NewPricelist from "./pricelists/NewPricelist";
-	import { mapGetters, mapActions } from "vuex";
-	import crudIcons from "@/mixins/crudIcons";
-  import GeneralTable from "../GeneralTable"
+	import ApproveModal from "../ApproveModal"
+	import Add from "../Add"
+	import CheckBox from "../CheckBox"
+	import Toggler from "../Toggler"
+	import ValidationErrors from "../ValidationErrors"
+	import NewPricelist from "./pricelists/NewPricelist"
+	import { mapGetters, mapActions } from "vuex"
+	import crudIcons from "@/mixins/crudIcons"
+	import GeneralTable from "../GeneralTable"
 
 	export default {
-		mixins: [crudIcons],
+		mixins: [ crudIcons ],
 		data() {
 			return {
 				pricelists: [],
 				fields: [
 					{
-					  label: "Name",
-            headerKey: "headerName",
-            key: "name",
-            dataKey: "name",
-            style: {"width": "35%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
-          },
+						label: "Name",
+						headerKey: "headerName",
+						key: "name",
+						dataKey: "name",
+						style: { "width": "35%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
+					},
 					{
-					  label: "Default Vendor",
-            headerKey: "headerVendorDefault",
-            key: "vendorDefault",
-            dataKey: "vendorDefault",
-            style: {"width": "25%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
-          },
+						label: "Default Vendor",
+						headerKey: "headerVendorDefault",
+						key: "vendorDefault",
+						dataKey: "vendorDefault",
+						style: { "width": "25%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
+					},
 					{
-					  label: "Active",
-            headerKey: "headerActive",
-            key: "active",
-            dataKey: "active",
-            style: {"width": "15%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
-          },
+						label: "Active",
+						headerKey: "headerActive",
+						key: "active",
+						dataKey: "active",
+						style: { "width": "15%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
+					},
 					{
-					  label: "",
-            headerKey: "headerIcons",
-            key: "icons",
-            style: {"width": "25%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',}
+						label: "",
+						headerKey: "headerIcons",
+						key: "icons",
+						style: { "width": "25%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
 					}
-        ],
+				],
 				icons: {
 					save: { icon: require("../../assets/images/Other/save-icon-qa-form.png") },
 					edit: { icon: require("../../assets/images/Other/edit-icon-qa.png") },
@@ -114,52 +114,52 @@
 				isErrorExist: false,
 				errors: [],
 				isDeleting: false,
-				deleteIndex: -1,
+				deleteIndex: -1
 			}
 		},
 		methods: {
 			showPriceSettings(id) {
-				this.$router.push(`/settings/pricelists/${ id }`);
+				this.$router.push(`/settings/pricelists/${ id }`)
 			},
 			isDeletePricelist() {
-				this.isDeleting = true;
+				this.isDeleting = true
 			},
 			async makeAction(index, key) {
-				if(this.currentActive !== -1 && this.currentActive !== index) {
+				if (this.currentActive !== -1 && this.currentActive !== index) {
 					return
 				}
-				if(key === "edit") {
-					this.currentActive = index;
-					this.currentName = this.pricelists[index].name;
+				if (key === "edit") {
+					this.currentActive = index
+					this.currentName = this.pricelists[index].name
 				}
-				if(key === "save") {
-					await this.checkErrors(index);
+				if (key === "save") {
+					await this.checkErrors(index)
 				}
-				if(key === "copy") {
-					await this.addPriceCopy(index);
+				if (key === "copy") {
+					await this.addPriceCopy(index)
 				}
-				if(key === "cancel") {
+				if (key === "cancel") {
 					await this.cancelEdition(index)
 				}
-				if(key === "delete") {
+				if (key === "delete") {
 					this.deleteIndex = index
-					await this.isDeletePricelist();
+					await this.isDeletePricelist()
 				}
 			},
 			isNameUnique(index) {
 				const duplicateIndex = this.pricelists.findIndex((item, ind) => {
-					return (ind !== index && this.currentName === item.name);
+					return (ind !== index && this.currentName === item.name)
 				})
-				return duplicateIndex === -1;
+				return duplicateIndex === -1
 			},
 			async checkErrors(index) {
-				if(this.currentActive === -1) return;
-				this.errors = [];
-				if(!this.currentName || !this.isNameUnique(index)) this.errors.push("The name should be unique and not empty.");
-				if(this.errors.length) {
-					return this.isErrorExist = true;
+				if (this.currentActive === -1) return
+				this.errors = []
+				if (!this.currentName || !this.isNameUnique(index)) this.errors.push("The name should be unique and not empty.")
+				if (this.errors.length) {
+					return this.isErrorExist = true
 				}
-				await this.savePricelist(index);
+				await this.savePricelist(index)
 			},
 			async savePricelist(index) {
 				const pricelist = {
@@ -167,16 +167,16 @@
 					name: this.currentName
 				}
 				try {
-					await this.$http.post("/prices/pricelist", { pricelist });
-					await this.getPricelists();
-					this.setDefaults();
-					this.alertToggle({ message: "Pricelist saved.", isShow: true, type: "success" });
+					await this.$http.post("/prices/pricelist", { pricelist })
+					await this.getPricelists()
+					this.setDefaults()
+					this.alertToggle({ message: "Pricelist saved.", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Error on saving pricelist.", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on saving pricelist.", isShow: true, type: "error" })
 				}
 			},
 			async addPriceCopy(index) {
-				const name = this.setCopyPriceName(index);
+				const name = this.setCopyPriceName(index)
 				const pricelist = {
 					name,
 					copyName: this.pricelists[index].name,
@@ -184,109 +184,109 @@
 					isActive: false,
 					basicPricesTable: this.pricelists[index].basicPricesTable,
 					industryMultipliersTable: this.pricelists[index].industryMultipliersTable,
-					stepMultipliersTable: this.pricelists[index].stepMultipliersTable,
+					stepMultipliersTable: this.pricelists[index].stepMultipliersTable
 				}
 				try {
-					await this.$http.post("/prices/new-pricelist", { pricelist });
-					await this.getPricelists();
-					this.alertToggle({ message: "Pricelist saved.", isShow: true, type: "success" });
+					await this.$http.post("/prices/new-pricelist", { pricelist })
+					await this.getPricelists()
+					this.alertToggle({ message: "Pricelist saved.", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Error on copying pricelist.", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on copying pricelist.", isShow: true, type: "error" })
 				}
 			},
 			setCopyPriceName(index) {
-				const name = this.pricelists[index].name;
+				const name = this.pricelists[index].name
 				const priceCopies = this.pricelists.filter((item, ind) => {
-					return ind !== index && item.name.indexOf(`${ name }-copy`) !== -1;
-				});
-				const copyQuantity = priceCopies.length ? priceCopies.length : "";
-				return `${ name }-copy${ copyQuantity }`;
+					return ind !== index && item.name.indexOf(`${ name }-copy`) !== -1
+				})
+				const copyQuantity = priceCopies.length ? priceCopies.length : ""
+				return `${ name }-copy${ copyQuantity }`
 			},
 			async deletePricelist() {
-				this.errors = [];
-				const index = this.deleteIndex;
-				const id = this.pricelists[index]._id;
-				if(!id) return this.pricelists.slice(index, 1);
+				this.errors = []
+				const index = this.deleteIndex
+				const id = this.pricelists[index]._id
+				if (!id) return this.pricelists.slice(index, 1)
 
-				const { isVendorDefault } = this.pricelists[index];
+				const { isVendorDefault } = this.pricelists[index]
 
-				if(!this.pricelists.filter(i => i.isActive).length) {
+				if (!this.pricelists.filter(i => i.isActive).length) {
 					this.errors.push('Cannot be deleted, no last active Pricelist')
-				} else if(this.pricelists[index].isActive === true && this.pricelists.filter(i => i.isActive).length <= 1) {
+				} else if (this.pricelists[index].isActive === true && this.pricelists.filter(i => i.isActive).length <= 1) {
 					this.errors.push('Cannot be deleted, no last active Pricelist')
 				}
 
-				if(this.errors.length) {
-					return this.isErrorExist = true;
+				if (this.errors.length) {
+					return this.isErrorExist = true
 				}
 				const result = await this.$http.delete(`/prices/pricelist/${ id }`, {
 					body: { isVendorDefault }
-				});
-				if(result.data === 'Not deleted') {
+				})
+				if (result.data === 'Not deleted') {
 					this.errors.push('This Pricelist assigned in client and cannot be deleted')
-					return this.isErrorExist = true;
+					return this.isErrorExist = true
 				} else {
-					this.isDeleting = false;
-					this.alertToggle({ message: "Pricelist deleted", isShow: true, type: "success" });
-					await this.getPricelists();
+					this.isDeleting = false
+					this.alertToggle({ message: "Pricelist deleted", isShow: true, type: "success" })
+					await this.getPricelists()
 				}
 			},
 			async setDefaultPricelist(e, index, prop) {
-				if(this.pricelists[index][prop]) return;
-				const newDefaultPriceId = this.pricelists[index]._id;
-				const currentDefaultPrice = this.pricelists.find(item => item[prop]);
-				const exDefaultPriceId = currentDefaultPrice._id;
+				if (this.pricelists[index][prop]) return
+				const newDefaultPriceId = this.pricelists[index]._id
+				const currentDefaultPrice = this.pricelists.find(item => item[prop])
+				const exDefaultPriceId = currentDefaultPrice._id
 				try {
 					await this.$http.post("/prices/set-default", {
 						newDefaultPriceId, exDefaultPriceId, prop
-					});
-					await this.getPricelists();
-					this.alertToggle({ message: "Changes saved", isShow: true, type: "success" });
+					})
+					await this.getPricelists()
+					this.alertToggle({ message: "Changes saved", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Error: Cannot set the default pricelist", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error: Cannot set the default pricelist", isShow: true, type: "error" })
 				}
 			},
 			async toggleActive(index) {
-				const isActive = !this.pricelists[index].isActive;
+				const isActive = !this.pricelists[index].isActive
 				try {
-					await this.$http.post("/prices/activeness", { id: this.pricelists[index]._id, isActive });
-					await this.getPricelists();
+					await this.$http.post("/prices/activeness", { id: this.pricelists[index]._id, isActive })
+					await this.getPricelists()
 				} catch (err) {
-					this.alertToggle({ message: "Error: Cannot toggle the property", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error: Cannot toggle the property", isShow: true, type: "error" })
 				}
 			},
 			async refreshPricelists() {
-				await this.getPricelists();
-				this.cancelNewPricelist();
+				await this.getPricelists()
+				this.cancelNewPricelist()
 			},
 			closeErrors() {
-				this.isErrorExist = false;
+				this.isErrorExist = false
 			},
 			cancelNewPricelist() {
-				this.isNewPricelist = false;
+				this.isNewPricelist = false
 			},
 			cancelEdition(index) {
-				if(!this.pricelists[index]._id) {
-					this.pricelists.splice(index, 1);
+				if (!this.pricelists[index]._id) {
+					this.pricelists.splice(index, 1)
 				}
-				this.setDefaults();
+				this.setDefaults()
 			},
 			setDefaults() {
-				this.isDeleting = false;
-				this.deleteIndex = -1;
-				this.currentActive = -1;
-				this.currentName = "";
+				this.isDeleting = false
+				this.deleteIndex = -1
+				this.currentActive = -1
+				this.currentName = ""
 			},
 			addPricelist() {
-				this.isNewPricelist = true;
+				this.isNewPricelist = true
 			},
 			async getPricelists() {
 				try {
-					const result = await this.$http.get("/prices/pricelists");
-					this.pricelists = result.body;
-					await this.storePricelists(result.body);
+					const result = await this.$http.get("/prices/pricelists")
+					this.pricelists = result.body
+					await this.storePricelists(result.body)
 				} catch (err) {
-					this.alertToggle({ message: "Error on getting pricelists.", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on getting pricelists.", isShow: true, type: "error" })
 				}
 			},
 			...mapActions([
@@ -303,7 +303,7 @@
 			})
 		},
 		components: {
-      GeneralTable,
+			GeneralTable,
 			Add,
 			Toggler,
 			CheckBox,
@@ -312,7 +312,7 @@
 			ApproveModal
 		},
 		created() {
-			this.getPricelists();
+			this.getPricelists()
 		}
 	}
 </script>
@@ -323,6 +323,7 @@
 
   .pricelists {
     position: relative;
+    margin: 50px;
 
     &__approve {
       position: absolute;
@@ -332,6 +333,7 @@
     &__table {
       @extend %setting-table;
       width: 800px;
+      border-radius: 4px;
     }
 
     &__data {
@@ -340,13 +342,6 @@
 
     &_pointer {
       cursor: pointer;
-
-      &:hover {
-        .pricelists__rates-link {
-          transition: all 0.3s;
-          text-shadow: 0 0 5px $brown-shadow;
-        }
-      }
     }
 
     &__editing-data {

@@ -127,11 +127,11 @@
 
   .title {
     font-family: 'Myriad300';
-    margin-top: 12px;
+    margin-top: 10px;
     margin-bottom: 2px;
     color: lightgrey;
     letter-spacing: 0.5px;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .element:hover {

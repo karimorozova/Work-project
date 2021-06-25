@@ -53,20 +53,20 @@
 </template>
 
 <script>
-	import SettingsTable from "./SettingsTable";
-	import Add from "../Add";
-	import { mapActions } from "vuex";
-	import crudIcons from "@/mixins/crudIcons";
+	import SettingsTable from "./SettingsTable"
+	import Add from "../Add"
+	import { mapActions } from "vuex"
+	import crudIcons from "@/mixins/crudIcons"
 
 	export default {
-		mixins: [crudIcons],
+		mixins: [ crudIcons ],
 		data() {
 			return {
 				fields: [
 					{ label: "Name", headerKey: "headerName", key: "name", width: "50%", padding: "0" },
 					{ label: "Value", headerKey: "headerValue", key: "value", width: "14%", padding: "0" },
 					{ label: "Active", headerKey: "headerActive", key: "active", width: "14%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "22%", padding: "0" },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "22%", padding: "0" }
 				],
 				discounts: [],
 				currentName: "",
@@ -80,66 +80,66 @@
 		},
 		methods: {
 			toggleActive(index) {
-				if(this.currentActive !== index) return;
-				this.discounts[index].isActive = !this.discounts[index].isActive;
+				if (this.currentActive !== index) return
+				this.discounts[index].isActive = !this.discounts[index].isActive
 			},
 			async makeAction(index, key) {
-				if(this.currentActive !== -1 && this.currentActive !== index) {
-					return this.isEditing();
+				if (this.currentActive !== -1 && this.currentActive !== index) {
+					return this.isEditing()
 				}
-				if(key === "save") {
-					await this.checkErrors(index);
+				if (key === "save") {
+					await this.checkErrors(index)
 				}
-				if(key === "edit") {
-					this.setEditionData(index);
+				if (key === "edit") {
+					this.setEditionData(index)
 				}
-				if(key === "cancel") {
-					if(this.currentActive === -1) return;
-					this.cancel();
-					await this.getDiscounts();
+				if (key === "cancel") {
+					if (this.currentActive === -1) return
+					this.cancel()
+					await this.getDiscounts()
 				}
-				if(key === "delete") {
-					if(!this.discounts[index]._id) {
-						this.discounts.splice(index, 1);
-						return this.cancel();
+				if (key === "delete") {
+					if (!this.discounts[index]._id) {
+						this.discounts.splice(index, 1)
+						return this.cancel()
 					}
-					this.deleteIndex = index;
-					this.isDeleting = true;
+					this.deleteIndex = index
+					this.isDeleting = true
 				}
 			},
 			setEditionData(index) {
-				this.currentActive = index;
-				this.currentName = this.discounts[index].name;
-				this.currentValue = +this.discounts[index].value;
+				this.currentActive = index
+				this.currentName = this.discounts[index].name
+				this.currentValue = +this.discounts[index].value
 			},
 			async checkErrors(index) {
-				if(this.currentActive === -1) return;
-				this.errors = [];
-				if(!this.currentName) this.errors.push("Name should not be empty!");
-				if(!this.currentValue) this.errors.push("Value should not be empty!");
-				if(this.errors.length) {
-					this.areErrors = true;
+				if (this.currentActive === -1) return
+				this.errors = []
+				if (!this.currentName) this.errors.push("Name should not be empty!")
+				if (!this.currentValue) this.errors.push("Value should not be empty!")
+				if (this.errors.length) {
+					this.areErrors = true
 					return
 				}
-				await this.saveChanges(index);
-				this.cancel();
+				await this.saveChanges(index)
+				this.cancel()
 			},
 			closeErrors() {
-				this.areErrors = false;
+				this.areErrors = false
 			},
 			async saveChanges(index) {
-				const id = this.discounts[index]._id;
+				const id = this.discounts[index]._id
 				const data = {
 					name: this.currentName,
 					value: this.currentValue,
-					isActive: this.discounts[index].isActive,
-				};
+					isActive: this.discounts[index].isActive
+				}
 				try {
-					!id ? await this.createNew(data) : await this.updateIndustry(id, data);
-					await this.getDiscounts();
-					this.alertToggle({ message: "Saved", isShow: true, type: "success" });
+					!id ? await this.createNew(data) : await this.updateIndustry(id, data)
+					await this.getDiscounts()
+					this.alertToggle({ message: "Saved", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Error on saving discount", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on saving discount", isShow: true, type: "error" })
 				}
 			},
 			async createNew(newData) {
@@ -148,7 +148,7 @@
 						newDiscountObj: newData
 					})
 				} catch (err) {
-					this.alertToggle({ message: "Error on saving discount", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on saving discount", isShow: true, type: "error" })
 				}
 			},
 			async updateIndustry(id, newData) {
@@ -158,52 +158,52 @@
 						values: newData
 					})
 				} catch (err) {
-					this.alertToggle({ message: "Error on saving discount", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on saving discount", isShow: true, type: "error" })
 				}
 			},
 			async deleteIndustry() {
 				try {
 					await this.$http.post('/pm-manage/delete-discount', {
 						_id: this.discounts[this.deleteIndex]._id
-					});
-					this.discounts.splice(this.deleteIndex, 1);
-					this.alertToggle({ message: "Discount removed", isShow: true, type: "success" });
+					})
+					this.discounts.splice(this.deleteIndex, 1)
+					this.alertToggle({ message: "Discount removed", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Error on removing Discount", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on removing Discount", isShow: true, type: "error" })
 				}
-				this.cancel();
+				this.cancel()
 			},
 			cancel() {
-				this.currentActive = -1;
-				this.currentName = '';
-				this.currentValue = null;
-				this.isDeleting = false;
+				this.currentActive = -1
+				this.currentName = ''
+				this.currentValue = null
+				this.isDeleting = false
 			},
 			addData() {
-				if(this.currentActive !== -1) return this.isEditing();
+				if (this.currentActive !== -1) return this.isEditing()
 				this.discounts.push({
 					name: "",
 					value: "",
-					isActive: true,
-				});
-				this.setEditionData(this.discounts.length - 1);
-				this.$nextTick(() => this.scrollToEnd());
+					isActive: true
+				})
+				this.setEditionData(this.discounts.length - 1)
+				this.$nextTick(() => this.scrollToEnd())
 			},
 			async getDiscounts() {
 				try {
-					const result = await this.$http.get("/pm-manage/discounts");
-					this.discounts = result.data;
+					const result = await this.$http.get("/pm-manage/discounts")
+					this.discounts = result.data
 				} catch (err) {
-					this.alertToggle({ message: "Error on getting Discounts", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on getting Discounts", isShow: true, type: "error" })
 				}
 			},
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
 			scrollToEnd() {
-				const element = this.$el.querySelector('.table__tbody');
+				const element = this.$el.querySelector('.table__tbody')
 				element.scrollTop = element.scrollHeight
-			},
+			}
 		},
 		computed: {},
 		components: {
@@ -211,7 +211,7 @@
 			Add
 		},
 		mounted() {
-			this.getDiscounts();
+			this.getDiscounts()
 		}
 	}
 </script>
@@ -230,7 +230,9 @@
 
   .discounts {
     @extend %setting-table;
-    width: 650px;
+    width: 700px;
+    border-radius: 4px;
+    margin: 50px;
 
     &__data {
       @extend %table-data;

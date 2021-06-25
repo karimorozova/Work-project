@@ -90,7 +90,7 @@ const router = new Router({
 		{
 			path: '/',
 			name: 'main',
-			redirect: '/dashboard/overall-view',
+			redirect: '/pangea-dashboard/overall-view',
 			component: Navbar,
 			props: true,
 			// beforeEnter: (to, from, next) => {
@@ -113,7 +113,7 @@ const router = new Router({
 					component: Accountinfo
 				},
 				{
-					path: 'dashboard',
+					path: 'pangea-dashboard',
 					name: '',
 					component: clearRouterView,
 					children: [
