@@ -187,13 +187,13 @@
   th {
     //display: flex;
     //align-items: center;
-    min-height: 40px;
+    /*min-height: 40px;*/
     //justify-content: space-between;
     //flex-shrink: 1;
   }
 
   td {
-    padding: 0 6px 0 6px;
+    /*padding: 0 6px 0 6px;*/
     min-height: 40px;
     display: grid;
     max-height: 60px;
@@ -217,12 +217,8 @@
     border: 0;
   }
 
-  /*table td, table th {*/
-  /*  text-align: left;*/
-  /*}*/
 
   table thead th {
-    //color: $text;
     font-weight: unset;
   }
 

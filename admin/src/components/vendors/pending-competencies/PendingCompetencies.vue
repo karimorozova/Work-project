@@ -12,28 +12,19 @@
       @deletePC="deletePC"
     )
     .competencies__table
-      //GeneralTable(
-      //  :fields="fields"
-      //  :tableData="finalData"
-      //
-      //  @addSortKey="addSortKey"
-      //  @changeSortKey="changeSortKey"
-      //  @removeSortKey="removeSortKey"
-      //  @setFilter="setFilter"
-      //  @removeFilter="removeFilter"
-      //)
-      GeneralTable(
+      SettingsTable(
         :fields="fields"
         :tableData="pendingCompetenciesData"
-        :isFilterShow="false"
+        :tbodyStyle="{'max-height': '256px'}",
+        :rowCount="10"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
 
-        template(slot="sourceLanguage", slot-scope="{ row, index }")
+        template(slot="source", slot-scope="{ row, index }")
           .competencies__data {{ row.sourceLanguage.lang }}
 
-        template(slot="targetLanguage", slot-scope="{ row, index }")
+        template(slot="targets", slot-scope="{ row, index }")
           .competencies__data {{ row.targetLanguage.lang }}
 
         template(slot="industry", slot-scope="{ row, index }")
@@ -61,11 +52,8 @@
 	import SettingsTable from "../../Table/SettingsTable"
 	import CandidateForm from "./CandidateForm"
 	import WYSIWYG from "../WYSIWYG"
-  import GeneralTable from "../../GeneralTable"
-  // import tableSortAndFilter from "@/mixins/tableSortAndFilter";
 
 	export default {
-	  // mixins: [ tableSortAndFilter ],
 		props: {
 			pendingCompetenciesData: {
 				type: Array,
@@ -78,50 +66,44 @@
 					{
 						label: "Source Language",
 						headerKey: "headerSource",
-						key: "sourceLanguage",
-						dataKey: "lang",
-            // filterInfo:{isFilter: true, isFilterSet: false},
-            // sortInfo: { isSort: true, order: 'default',},
-            style: { width: '21%' }
+						key: "source",
+						width: "21%",
+						padding: "0"
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
-						key: "targetLanguage",
-            dataKey: "lang",
-            // filterInfo:{isFilter: true, isFilterSet: false},
-            // sortInfo: { isSort: true, order: 'default',},
-            style: { width: '21%' }
+						key: "targets",
+						width: "21%",
+						padding: "0"
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-            dataKey: "name",
-            // filterInfo:{isFilter: true, isFilterSet: false},
-            // sortInfo: { isSort: true, order: 'default',},
-            style: { width: '21%' }
+						width: "21%",
+						padding: "0"
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-            dataKey: "title",
-            // filterInfo:{isFilter: true, isFilterSet: false},
-            // sortInfo: { isSort: true, order: 'default',},
-            style: { width: '21%' }
+						width: "21%",
+						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerAlertIcons",
 						key: "alertIcon",
-            style: { width: '8%' }
+						width: "8%",
+						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerModal",
 						key: "modal",
-            style: { width: '8%' }
+						width: "8%",
+						padding: "0"
 					}
 				],
 				isForm: false,
@@ -153,7 +135,7 @@
 				try {
 					const result = await this.$http.post('/vendorsapi/get-reject-pc-message', {
 						pendingCompetence: this.pendingCompetenceForReject,
-            vendorId: this.$route.params.id
+						vendorId: this.$route.params.id
 					})
 					this.message = result.data
 				} catch (err) {
@@ -218,13 +200,7 @@
 				this.isForm = false
 			}
 		},
-    computed: {
-      // rawData() {
-      //   return JSON.parse( JSON.stringify( this.pendingCompetenciesData))
-      // },
-    },
 		components: {
-      GeneralTable,
 			WYSIWYG,
 			CandidateForm,
 			SettingsTable

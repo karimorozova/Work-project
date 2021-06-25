@@ -253,6 +253,8 @@
   .layout {
     position: relative;
     width: 1000px;
+    margin: 50px;
+    border-radius: 4px;
   }
 
   .new__languages {

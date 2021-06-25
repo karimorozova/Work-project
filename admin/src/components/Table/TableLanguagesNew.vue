@@ -104,10 +104,9 @@
         )
 
     .languages__table
-      GeneralTable(
+      SettingsTable(
         :fields="fields"
         :tableData="languages"
-        :isFilterShow="false"
         :errors="errors"
         :areErrors="areErrors"
         @closeErrors="closeErrors"
@@ -224,6 +223,7 @@
 
 </template>
 <script>
+	import SettingsTable from "./SettingsTable"
 	import { mapActions, mapGetters } from "vuex"
 	import ClickOutside from "vue-click-outside"
 	import crudIcons from "@/mixins/crudIcons"
@@ -238,15 +238,15 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Icon", headerKey: "headerIcon", key: "icon", style: { "width": "10%" } },
-					{ label: "Name", headerKey: "headerName", key: "name", style: { "width": "16%" } },
-					{ label: "Group", headerKey: "headerGroup", key: "group", style: { "width": "16%" } },
-					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", style: { "width": "10%" } },
-					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", style: { "width": "10%" } },
-					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", style: { "width": "10%" } },
-					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", style: { "width": "10%" } },
-					{ label: "Active", headerKey: "headerActive", key: "active", style: { "width": "6%" } },
-					{ label: "", headerKey: "headerIcons", key: "icons", style: { "width": "12%" } }
+					{ label: "Icon", headerKey: "headerIcon", key: "icon", width: "10%", padding: "0" },
+					{ label: "Name", headerKey: "headerName", key: "name", width: "16%", padding: "0" },
+					{ label: "Group", headerKey: "headerGroup", key: "group", width: "16%", padding: "0" },
+					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "10%", padding: "0" },
+					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", width: "10%", padding: "0" },
+					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", width: "10%", padding: "0" },
+					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", width: "10%", padding: "0" },
+					{ label: "Active", headerKey: "headerActive", key: "active", width: "6%", padding: "0" },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0" }
 				],
 				languages: [],
 				currentActive: -1,
@@ -542,6 +542,7 @@
 			Button,
 			SelectSingle,
 			Add,
+			SettingsTable,
 			GeneralTable
 		},
 		directives: {
@@ -562,6 +563,7 @@
     padding: 20px;
     border-radius: 4px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    margin: 50px;
 
     &__settingSpliter {
       width: 1px;
@@ -573,15 +575,18 @@
       display: flex;
       flex-direction: column;
       width: 200px;
+      width: 191px;
       position: relative;
     }
 
     &__settingScheme {
       width: 200px;
+      width: 191px;
     }
 
     &__settingBody {
       width: 200px;
+      width: 191px;
     }
 
     &__settingRow {
@@ -599,6 +604,7 @@
       background: white;
       padding: 20px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
       z-index: 999;
       top: 50%;
       left: 50%;
@@ -649,19 +655,23 @@
     }
 
     &__data {
+      @extend %table-data;
       position: relative;
     }
 
     &__icons {
       display: flex;
+      @extend %table-icons;
     }
 
     &__icon {
+      @extend %table-icon;
       margin-right: 4px;
       margin-left: 4px;
     }
 
     &__checkbox {
+      height: 22px;
       cursor: pointer;
       opacity: 0.5;
     }

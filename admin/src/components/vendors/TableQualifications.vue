@@ -26,22 +26,17 @@
       )
 
     .qualifications__table
-      GeneralTable(
+      SettingsTable(
         :fields="fields",
-        :tableData="finalData",
+        :tableData="qualificationData",
         :errors="errors",
         :areErrors="areErrors",
         :isApproveModal="isDeleting",
         @closeErrors="closeErrors",
+        :tbodyStyle="{'max-height': '256px'}",
         @approve="deleteData",
         @notApprove="setDefaults",
         @closeModal="setDefaults"
-
-        @addSortKey="addSortKey"
-        @changeSortKey="changeSortKey"
-        @removeSortKey="removeSortKey"
-        @setFilter="setFilter"
-        @removeFilter="removeFilter"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .qualifications__head-title {{ field.label }}
@@ -50,9 +45,9 @@
           .qualifications__data {{ row.source.lang }}
         template(slot="target", slot-scope="{ row, index }")
           .qualifications__data {{ row.target.lang }}
-        template(slot="industries", slot-scope="{ row, index }")
+        template(slot="industry", slot-scope="{ row, index }")
           .qualifications__data {{ presentArrays(row.industries, 'name') }}
-        template(slot="steps", slot-scope="{ row, index }")
+        template(slot="step", slot-scope="{ row, index }")
           .qualifications__data {{ presentArrays(row.steps, 'title') }}
 
         template(slot="status", slot-scope="{ row, index }")
@@ -101,13 +96,11 @@
 	import SelectSingle from "../SelectSingle"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import crudIcons from "@/mixins/crudIcons"
-	import tableSortAndFilter from "@/mixins/tableSortAndFilter"
 	import VendorLqa from "./VendorLqa"
 	import ApproveModal from "../ApproveModal"
-  import GeneralTable from "../GeneralTable"
 
 	export default {
-		mixins: [ scrollDrop, crudIcons, tableSortAndFilter ],
+		mixins: [ scrollDrop, crudIcons ],
 		props: {
 			qualificationData: {
 				type: Array,
@@ -132,68 +125,59 @@
 						label: "Source",
 						headerKey: "headerSource",
 						key: "source",
-						dataKey: "lang",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: "14%" },
+						width: "14%",
+						padding: "0"
 					},
 					{
 						label: "Target",
 						headerKey: "headerTarget",
 						key: "target",
-						dataKey: "lang",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: "14%" },
+						width: "14%",
+						padding: "0"
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
-						key: "industries",
-						dataKey: "name",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, order: 'default',},
-            style: { width: "14%" },
+						key: "industry",
+						width: "14%",
+						padding: "0"
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
-						key: "steps",
-						dataKey: "title",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            // sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: "14%" },
+						key: "step",
+						width: "14%",
+						padding: "0"
 					},
 					{
 						label: "Test Status",
 						headerKey: "headerStatus",
 						key: "status",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: "14%" },
+						width: "14%",
+						padding: "0"
 					},
 					{
 						label: "Progress",
 						headerKey: "headerProgress",
 						key: "progress",
-            style: { width: "14%" },
+						width: "14%",
+						padding: "0"
 					},
 					{
 						label: "TQI",
 						headerKey: "headerTQI",
 						key: "tqi",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: "4%" },
+						width: "4%",
+						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-            style: { width: "13%" },
+						width: "13%",
+						padding: "0"
 					}
 				],
-
 				lqaData: {
 					isTqi: true
 				},
@@ -240,10 +224,7 @@
 				storeAssessment: "storeCurrentVendorAssessment",
 				storeCurrentVendor: "storeCurrentVendor"
 			}),
-
-
-
-      presentArrays(Arr, key) {
+			presentArrays(Arr, key) {
 				if (!Arr.length) return ""
 				return Arr.reduce((acc, cur) => acc + `${ cur[key] }; `, "")
 			},
@@ -383,7 +364,7 @@
 				this.isSendMessage = false
 				this.sendNotPassedTest()
 			},
-      saveNotPassedTest({ vendorData }) {
+			saveNotPassedTest({ vendorData }) {
 				this.isSendMessageModalNotPassed = true
 				this.vendorData = vendorData
 				this.closeFormNotPassed()
@@ -416,7 +397,7 @@
 				this.isSendMessage = false
 				this.sendVendorLqa()
 			},
-      saveVendorLqa({ vendorData }) {
+			saveVendorLqa({ vendorData }) {
 				this.isSendMessageModalPassed = true
 				this.vendorData = vendorData
 				this.closeForm()
@@ -591,28 +572,23 @@
 			}
 		},
 		// watch: {
-			// async refresh() {
-			// 	if (this.refresh) {
-			// 		try {
-			// 			const id = this.$route.params.id
-			// 			const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
-			// 			await this.storeCurrentVendor(vendor.body)
-			// 		} catch (err) {
-			// 		} finally {
-			// 			this.$emit("refreshQualifications")
-			// 		}
-			// 	}
-			// }
+		// async refresh() {
+		// 	if (this.refresh) {
+		// 		try {
+		// 			const id = this.$route.params.id
+		// 			const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+		// 			await this.storeCurrentVendor(vendor.body)
+		// 		} catch (err) {
+		// 		} finally {
+		// 			this.$emit("refreshQualifications")
+		// 		}
+		// 	}
+		// }
 		// },
 		computed: {
 			...mapGetters({
 				currentVendorQualifications: "getCurrentVendorQualifications"
 			}),
-
-      rawData() {
-        return JSON.parse( JSON.stringify( this.qualificationData))
-      },
-
 			TestWorkflowStatusesSample() {
 				let result = []
 				switch (this.qualificationData[this.currentActive].status) {
@@ -665,7 +641,6 @@
 			}
 		},
 		components: {
-      GeneralTable,
 			ApproveModal,
 			WYSIWYG,
 			SettingsTable,

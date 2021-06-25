@@ -1,33 +1,35 @@
 <template lang="pug">
   .competencies
     .competencies__table
-      GeneralTable(
+      SettingsTable(
         :fields="fields",
-        :tableData="finalData",
+        :tableData="competenciesData",
         :errors="errors",
         :areErrors="areErrors",
+        :isApproveModal="isDeleting",
+        :tbodyStyle="{'max-height': '256px'}",
+        :rowCount="9",
         @closeErrors="closeErrors",
         @approve="deleteCompetencies",
         @notApprove="setDefaults",
         @closeModal="setDefaults"
-
-        @addSortKey="addSortKey"
-        @changeSortKey="changeSortKey"
-        @removeSortKey="removeSortKey"
-        @setFilter="setFilter"
-        @removeFilter="removeFilter"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
 
-        template(slot="sourceLanguage", slot-scope="{ row, index }")
+        template(slot="source", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
           .competencies__drop-menu(v-else)
             SelectSingle(
+              :isTableDropMenu="isTableDropMenu",
+              placeholder="Select",
+              :hasSearch="true",
+              :selectedOption="currentSource.lang",
+              :options="sourceData | firstEnglishLanguage",
               @chooseOption="setSource"
             )
 
-        template(slot="targetLanguage", slot-scope="{ row, index }")
+        template(slot="targets", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
           .competencies__drop-menu(v-if="currentActive == index && !newRow")
             SelectSingle(
@@ -112,13 +114,11 @@
 	import SelectMulti from "../SelectMulti";
 	import SettingsTable from "../Table/SettingsTable";
 	import crudIcons from "@/mixins/crudIcons";
-	import tableSortAndFilter from "@/mixins/tableSortAndFilter";
 	import scrollEnd from "../../mixins/scrollEnd";
 	import checkCombinations from "../../mixins/combinationsChecker";
-  import GeneralTable from "../GeneralTable"
 
 	export default {
-		mixins: [crudIcons, scrollEnd, checkCombinations, tableSortAndFilter],
+		mixins: [crudIcons, scrollEnd, checkCombinations],
 		props: {
 			vendorIndustries: {
 				type: Array,
@@ -134,7 +134,7 @@
 			},
 			competenciesData:{
 				type: Array,
-      }
+			}
 		},
 		data() {
 			return {
@@ -142,44 +142,37 @@
 					{
 						label: "Source Language",
 						headerKey: "headerSource",
-						key: "sourceLanguage",
-						dataKey: "lang",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: '21%' }
+						key: "source",
+						width: "21%",
+						padding: "0",
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
-						key: "targetLanguage",
-						dataKey: "lang",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: '21%' }
+						key: "targets",
+						width: "21%",
+						padding: "0",
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						dataKey: "name",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: '21%' }
+						width: "21%",
+						padding: "0",
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						dataKey: "title",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: { width: '21%' }
+						width: "21%",
+						padding: "0",
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-            style: { width: '16%' }
+						width: "16%",
+						padding: "0",
 					},
 				],
 
@@ -271,18 +264,17 @@
 
 			setEditingData(index) {
 				this.currentActive = index;
-				this.currentId = this.finalData[index]._id;
-				this.currentSource = this.finalData[index].sourceLanguage;
-				this.currentTargets = this.finalData[index].targetLanguage;
-				this.currentIndustries = this.finalData[index].industry;
-				this.currentSteps = this.finalData[index].step;
+				this.currentId = this.competenciesData[index]._id;
+				this.currentSource = this.competenciesData[index].sourceLanguage;
+				this.currentTargets = this.competenciesData[index].targetLanguage;
+				this.currentIndustries = this.competenciesData[index].industry;
+				this.currentSteps = this.competenciesData[index].step;
 			},
 
 			manageCancelEdition(index) {
-				!this.finalData[index]._id && this.finalData.splice(index, 1);
+				!this.competenciesData[index]._id && this.competenciesData.splice(index, 1);
 				this.setDefaults();
 				this.isDeleting = false;
-				if (this.newRow) this.competenciesData.pop()
 				this.newRow = false;
 			},
 
@@ -299,10 +291,10 @@
 				if(this.currentActive === -1) return;
 				const countOfFields = {first: 5, second: 5, third: 5}
 				this.errors = [];
-        if(this.newRow) {
-          if(!this.checkCombinations(this.currentTargets.length, this.currentIndustries.length, this.currentSteps.length, countOfFields))
-            this.errors.push(`Max selected fields: \n Targets = ${countOfFields.first} | Industries = ${countOfFields.second} | Steps = ${countOfFields.third} `)
-          if(!this.currentSource) this.errors.push("Source should not be empty!");
+				if(this.newRow) {
+					if(!this.checkCombinations(this.currentTargets.length, this.currentIndustries.length, this.currentSteps.length, countOfFields))
+						this.errors.push(`Max selected fields: \n Targets = ${countOfFields.first} | Industries = ${countOfFields.second} | Steps = ${countOfFields.third} `)
+					if(!this.currentSource) this.errors.push("Source should not be empty!");
 					if(!this.currentTargets.length) this.errors.push("Targets should not be empty!");
 					if(!this.currentIndustries.length) this.errors.push("Industries should not be empty!");
 					if(!this.currentSteps.length) this.errors.push("Steps should not be empty!");
@@ -332,7 +324,7 @@
 			},
 			async manageSaveClick(index) {
 				try {
-					const id = this.finalData[index]._id;
+					const id = this.competenciesData[index]._id;
 					const currentData = {
 						_id: id,
 						sourceLanguage: this.currentSource,
@@ -344,16 +336,16 @@
 						vendorId: this.$route.params.id,
 						currentData,
 					});
-          await this.storeCurrentVendor(result.data)
+					await this.storeCurrentVendor(result.data)
 					// await this.updateVendorProp({ id: this.$route.params.id , key: 'competencies', value: result.data.competencies })
 
-					this.finalData.length && this.$emit("updateRates", true)
+					this.competenciesData.length && this.$emit("updateRates", true)
 
 					// this.updateVendorProp({ prop: "competencies", value: result.data.competencies })
 
-          // this.finalData = result.data.competencies;
-          // this.finalData.length && this.$emit("updateQualifications");
-          //
+					// this.competenciesData = result.data.competencies;
+					// this.competenciesData.length && this.$emit("updateQualifications");
+					//
 
 					// if (result.data.pendingCompetencies.length) {
 					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
@@ -390,9 +382,9 @@
 				}
 			},
 			async manageDeleteClick(index) {
-				if(!this.finalData[index]._id) {
+				if(!this.competenciesData[index]._id) {
 					this.newRow = false;
-					this.finalData.splice(index, 1);
+					this.competenciesData.splice(index, 1);
 					this.setDefaults();
 					return;
 				}
@@ -406,14 +398,14 @@
 
 			async deleteCompetencies() {
 				try {
-					let currentData = this.finalData[this.deleteIndex];
+					let currentData = this.competenciesData[this.deleteIndex];
 					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
 					await this.storeCurrentVendor(result.data)
 					// if (result.data.pendingCompetencies.length) {
 					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
 					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data.pendingCompetencies })
 					// }
-					// this.finalData.splice(this.deleteIndex, 1);
+					// this.competenciesData.splice(this.deleteIndex, 1);
 					this.$emit("updateRates", true);
 					this.closeModal();
 					this.alertToggle({
@@ -441,7 +433,7 @@
 					step: [],
 					industry: [],
 				});
-				this.setEditingData(this.finalData.length - 1);
+				this.setEditingData(this.competenciesData.length - 1);
 				this.$nextTick(() => {
 					this.scrollToEnd();
 				});
@@ -452,31 +444,22 @@
 			},
 
 			setSource({ option }) {
-        let selectInfo = {
-          placeholder:"Select",
-          hasSearch:"true",
-          selectedOption:"currentSource.lang",
-          options:"sourceData | firstEnglishLanguage",
-        }
-				// this.currentSource = this.languages.find((item) => item.lang === option);
+				this.currentSource = this.languages.find((item) => item.lang === option);
 			},
 			// async getVendorInfo() {
 			// 	console.log('1')
 			// 	const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
-			// 	this.finalData = vendor.data.competencies;
+			// 	this.competenciesData = vendor.data.competencies;
 			// },
 			// getVendorInfoByState(){
-			// 	this.finalData = this.currentVendor.competencies
-      // }
+			// 	this.competenciesData = this.currentVendor.competencies
+			// }
 		},
 		computed: {
 			// ...mapGetters({
 			// 	currentVendor: "getCurrentVendor",
 			// }),
-      rawData() {
-        return this.competenciesData;
-      },
-      sourceData() {
+			sourceData() {
 				return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b));
 			},
 			filteredSteps() {
@@ -485,13 +468,12 @@
 		},
 		created() {
 			// if(this.currentVendor._id){
-			// 	this.finalData = this.currentVendor.competencies
-      // }
-			 // ?  : this.getVendorInfo();
+			// 	this.competenciesData = this.currentVendor.competencies
+			// }
+			// ?  : this.getVendorInfo();
 		},
 		components: {
-      SelectSingle,
-      GeneralTable,
+			SelectSingle,
 			SettingsTable,
 			SelectMulti,
 			Add,
@@ -501,13 +483,7 @@
 
 <style lang="scss" scoped>
   @import "../../assets/styles/settingsTable.scss";
-  .modal {
-    position: absolute;
-    z-index: 10;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%);
-  }
+
   .competencies {
     &__data {
       @extend %table-data;
@@ -534,6 +510,8 @@
     }
 
     &__drop-menu {
+      position: relative;
+      box-shadow: inset 0 0 7px $brown-shadow;
     }
 
     &_opacity {

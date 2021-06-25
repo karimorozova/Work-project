@@ -1,10 +1,9 @@
 <template lang="pug">
   .clientService
     .clientService__table
-      GeneralTable(
+      SettingsTable(
         :fields="fields",
-        :tableData="finalData",
-        :isFilterShow="false",
+        :tableData="clientServices",
         :errors="errors",
         :areErrors="areErrors",
         :isApproveModal="isDeleting",
@@ -14,19 +13,14 @@
         @approve="deleteService",
         @notApprove="setDefaults",
         @closeModal="setDefaults"
-        @addSortKey="addSortKey"
-        @changeSortKey="changeSortKey"
-        @removeSortKey="removeSortKey"
-        @setFilter="setFilter"
-        @removeFilter="removeFilter"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .clientService__head-title {{ field.label }}
 
-        template(slot="sourceLanguage", slot-scope="{ row, index }")
+        template(slot="source", slot-scope="{ row, index }")
           .clientService__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
           .clientService__drop-menu(v-else)
-            NewSelectSingle(
+            SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -36,10 +30,10 @@
               @scrollDrop="scrollDrop"
             )
 
-        template(slot="targetLanguages", slot-scope="{ row, index }")
+        template(slot="targets", slot-scope="{ row, index }")
           .clientService__data(v-if="currentActive !== index") {{ row.targetLanguages[0].lang }}
           .clientService__drop-menu(v-if="currentActive == index && !newRow")
-            NewSelectSingle(
+            SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -58,10 +52,10 @@
               :allOptionsButtons="true"
             )
 
-        template(slot="services", slot-scope="{ row, index }")
+        template(slot="service", slot-scope="{ row, index }")
           .clientService__data(v-if="currentActive !== index") {{ row.services[0].title }}
           .clientService__drop-menu(v-if="currentActive == index && !newRow")
-            NewSelectSingle(
+            SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -81,10 +75,10 @@
               :allOptionsButtons="true"
             )
 
-        template(slot="industries", slot-scope="{ row, index }")
+        template(slot="industry", slot-scope="{ row, index }")
           .clientService__data(v-if="currentActive !== index") {{ row.industries[0].name }}
           .clientService__drop-menu(v-if="currentActive == index && !newRow")
-            NewSelectSingle(
+            SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -108,7 +102,7 @@
             img.clientService__icon(
               v-for="(icon, key) in icons",
               :src="icon.icon",
-              @click="makeAction(index, key, row._id)",
+              @click="makeAction(index, key)",
               :class="{ clientService_opacity: isActive(key, index) }"
             )
 
@@ -118,14 +112,13 @@
 <script>
 	import { mapGetters, mapActions } from "vuex"
 	import Add from "../Add"
-	import NewSelectSingle from "../NewSelectSingle"
+	import SelectSingle from "../SelectSingle"
 	import SelectMulti from "../SelectMulti"
 	import SettingsTable from "../Table/SettingsTable"
 	import crudIcons from "@/mixins/crudIcons"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import scrollEnd from "../../mixins/scrollEnd"
 	import checkCombinations from "../../mixins/combinationsChecker"
-  import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ scrollDrop, crudIcons, scrollEnd, checkCombinations ],
@@ -153,69 +146,50 @@
 			},
 			industries: {
 				type: Array
-			},
+			}
 		},
 		data() {
 			return {
 				fields: [
 					{
 						label: "Source Language",
-            headerKey: "headerSource",
-            key: "sourceLanguage",
-            dataKey: 'lang',
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: false, order: 'default',},
-            style: {"width": "20%"},
-          },
+						headerKey: "headerSource",
+						key: "source",
+						width: "20%",
+						padding: "0"
+					},
 					{
 						label: "Target Languages",
 						headerKey: "headerTarget",
-            key: "targetLanguages",
-            dataKey: 'lang',
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: true, order: 'default',},
-            style: {"width": "20%"},
-          },
+						key: "targets",
+						width: "20%",
+						padding: "0"
+					},
 					{
 						label: "Services",
-            headerKey: "headerService",
-            key: "services",
-            dataKey: 'title',
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: true,  order: 'default',},
-            style: {"width": "20%"},
-          },
+						headerKey: "headerService",
+						key: "service",
+						width: "20%",
+						padding: "0"
+					},
 					{
 						label: "Industries",
-            headerKey: "headerIndustry",
-						key: "industries",
-            dataKey: 'name',
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, isArray: true, order: 'default',},
-            style: {"width": "20%"},
-          },
+						headerKey: "headerIndustry",
+						key: "industry",
+						width: "20%",
+						padding: "0"
+					},
 
 					{
 						label: "",
-            headerKey: "headerIcons",
+						headerKey: "headerIcons",
 						key: "icons",
-            dataKey: 'name',
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
-            style: {"width": "20%"}
-          }
+						width: "20%",
+						padding: "0"
+					}
 				],
-        sortKeys: [],
-        filtersData: {
-          sourceLanguage: {value: '' , key: ''},
-          targetLanguages: {value: '' , key: ''},
-          services: {value: '' , key: ''},
-          industries: {value: '' , key: ''}
-        },
-        sortedData: [],
 
-
-        currentSource: "",
+				currentSource: "",
 				currentTargets: [],
 				currentIndustries: [],
 				currentServices: [],
@@ -236,54 +210,6 @@
 				storeCurrentClient: "storeCurrentClient",
 				setUpClientProp: "setUpClientProp"
 			}),
-      addSortKey({ sortInfo, key, sortField, order }) {
-        sortInfo.order = order
-        this.sortKeys.push({sortField, key, sortInfo})
-        this.setDefaults()
-      },
-      changeSortKey({ sortInfo, order }) {
-        sortInfo.order = order
-        this.sortKeys = [...this.sortKeys]
-        this.setDefaults()
-      },
-      removeSortKey({ sortInfo, sortField}) {
-        sortInfo.order = 'default'
-        this.sortKeys = this.sortKeys.filter((sortKey) => sortKey.sortField !== sortField)
-        this.setDefaults()
-      },
-      setFilter({value, key, filterField, filterInfo}) {
-        filterInfo.isFilterSet = true
-        this.filtersData[filterField] = {value, key}
-        this.setDefaults()
-      },
-      removeFilter({ filterInfo, filterField}) {
-        filterInfo.isFilterSet = false
-        this.filtersData[filterField] = {value: '', key: ''}
-        this.setDefaults()
-
-      },
-      sortData({ sortInfo, key, sortField }) {
-        this.sortedData.sort((a,b) => {
-          let first = !sortInfo.isArray ? a[sortField][key] : a[sortField][0][key]
-          let second = !sortInfo.isArray ? b[sortField][key] : b[sortField][0][key]
-          if(sortInfo.order === 'asc') [first, second] = [second, first]
-          if (first > second) {
-            return 1;
-          }
-          if (first < second) {
-            return -1;
-          }
-          return 0;
-        })
-      },
-      filterData({ filterKey, value, fieldName }) {
-        this.sortedData = this.sortedData.filter((data) => {
-          // const regex = new RegExp(`${value}`,'gi')
-          const dataReadyForSearch = !Array.isArray(data[filterKey]) ? data[filterKey][fieldName].toLowerCase() : data[filterKey].map(elem => elem[fieldName]).join(' ').toLowerCase()
-          // return regex.test(dataReadyForSearch)
-          return dataReadyForSearch.includes(value.toLowerCase())
-        })
-      },
 
 			presentArrays(Arr, key) {
 				if (!Arr.length) return ""
@@ -329,7 +255,7 @@
 				this.currentServices = [ this.services.find((item) => item.title === option) ]
 			},
 
-			async makeAction(index, key, _id) {
+			async makeAction(index, key) {
 				if (this.currentActive !== -1 && this.currentActive !== index) {
 					return this.isEditing()
 				}
@@ -350,15 +276,15 @@
 
 			setEditingData(index) {
 				this.currentActive = index
-				this.currentId = this.sortedData[index]._id
-				this.currentSource = this.sortedData[index].sourceLanguage
-				this.currentTargets = this.sortedData[index].targetLanguages
-				this.currentIndustries = this.sortedData[index].industries
-				this.currentServices = this.sortedData[index].services
+				this.currentId = this.clientServices[index]._id
+				this.currentSource = this.clientServices[index].sourceLanguage
+				this.currentTargets = this.clientServices[index].targetLanguages
+				this.currentIndustries = this.clientServices[index].industries
+				this.currentServices = this.clientServices[index].services
 			},
 
 			manageCancelEdition(index) {
-				!this.sortedData[index]._id && this.sortedData.splice(index, 1)
+				!this.clientServices[index]._id && this.clientServices.splice(index, 1)
 				this.setDefaults()
 				this.isDeleting = false
 				this.newRow = false
@@ -380,7 +306,7 @@
 				this.errors = []
 
 				if (!this.newRow) {
-					const arraysOfTheSame = this.sortedData
+					const arraysOfTheSame = this.clientServices
 							.filter((item, index) => index !== currentIndex)
 							.filter((item) =>
 									item.sourceLanguage.lang === this.currentSource.lang &&
@@ -407,8 +333,8 @@
 
 				if (this.currentActive === -1) return
 				try {
-					const id = this.sortedData[index]._id
-					const oldData = this.sortedData[index]
+					const id = this.clientServices[index]._id
+					const oldData = this.clientServices[index]
 					const currentData = {
 						_id: id,
 						sourceLanguage: this.currentSource,
@@ -426,7 +352,7 @@
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'rates', value: result.data.rates })
 
 					// this.clientServices = result.data.services;
-					this.sortedData.length && this.$emit("updateRates", true)
+					this.clientServices.length && this.$emit("updateRates", true)
 
 					await this.$http.post('/pm-manage/check-pricelist-langs', {
 						pricelistId: this.defaultPriceList,
@@ -447,9 +373,9 @@
 			},
 
 			async manageDeleteClick(index) {
-				if (!this.sortedData[index]._id) {
+				if (!this.clientServices[index]._id) {
 					this.newRow = false
-					this.sortedData.splice(index, 1)
+					this.clientServices.splice(index, 1)
 					this.setDefaults()
 					return
 				}
@@ -463,13 +389,13 @@
 
 			async deleteService() {
 				try {
-					let currentData = this.sortedData[this.deleteIndex]
+					let currentData = this.clientServices[this.deleteIndex]
 					const result = await this.$http.delete(`/clientsapi/services/${ this.$route.params.id }/${ currentData._id }`)
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'services', value: result.data.services })
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'rates', value: result.data.rates })
 
 					this.$emit("updateRates", true)
-					this.sortedData.splice(this.deleteIndex, 1)
+					this.clientServices.splice(this.deleteIndex, 1)
 					this.closeModal()
 					this.alertToggle({ message: "Services are deleted", isShow: true, type: "success" })
 				} catch (err) {
@@ -482,13 +408,13 @@
 					return this.isEditing()
 				}
 				this.newRow = true
-				this.sortedData.push({
+				this.clientServices.push({
 					sourceLanguage: "",
 					targetLanguages: [],
 					services: [],
 					industries: []
 				})
-				this.setEditingData(this.sortedData.length - 1)
+				this.setEditingData(this.clientServices.length - 1)
 				this.$nextTick(() => {
 					this.scrollToEnd()
 				})
@@ -501,36 +427,29 @@
 			setSource({ option }) {
 				this.currentSource = this.languages.find((item) => item.lang === option)
 			}
+
+			// async getClientInfo() {
+			//   if (!this.currentClient._id) {
+			//     const client = await this.$http.get(`/clientsapi/client?id=${this.$route.params.id}`);
+			//     this.clientServices = client.body.services;
+			//     this.defaultPriceList = client.body.defaultPricelist;
+			//   } else {
+			//     this.clientServices = this.currentClient.services;
+			//     this.defaultPriceList = this.currentClient.defaultPricelist;
+			//
+			//   }
+			// },
 		},
-    watch: {
-    },
 		computed: {
 			...mapGetters({
 				currentClient: "getCurrentClient"
-			}),
-      finalData() {
-        this.sortedData = JSON.parse( JSON.stringify( this.clientServices))
-
-        for (let filterKey in this.filtersData) {
-          if (this.filtersData[filterKey].value.length < 1) continue
-          this.filterData({filterKey, value: this.filtersData[filterKey].value, fieldName: this.filtersData[filterKey].key })
-        }
-
-        let sortKeys = [...this.sortKeys].reverse()
-
-        for(let sortKey of sortKeys ) {
-          this.sortData(sortKey)
-        }
-
-        return this.sortedData
-      }
+			})
 		},
 		created() {
 			// this.getClientInfo();
 		},
 		components: {
-      GeneralTable,
-			NewSelectSingle,
+			SelectSingle,
 			SettingsTable,
 			SelectMulti,
 			Add
@@ -568,7 +487,7 @@
 
     &__drop-menu {
       position: relative;
-      height: 100%;
+      box-shadow: inset 0 0 7px $brown-shadow;
     }
 
     &_opacity {
