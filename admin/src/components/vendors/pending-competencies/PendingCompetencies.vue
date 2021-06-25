@@ -12,15 +12,20 @@
       @deletePC="deletePC"
     )
     .competencies__table
+      //GeneralTable(
+      //  :fields="fields"
+      //  :tableData="finalData"
+      //
+      //  @addSortKey="addSortKey"
+      //  @changeSortKey="changeSortKey"
+      //  @removeSortKey="removeSortKey"
+      //  @setFilter="setFilter"
+      //  @removeFilter="removeFilter"
+      //)
       GeneralTable(
         :fields="fields"
-        :tableData="finalData"
-
-        @addSortKey="addSortKey"
-        @changeSortKey="changeSortKey"
-        @removeSortKey="removeSortKey"
-        @setFilter="setFilter"
-        @removeFilter="removeFilter"
+        :tableData="pendingCompetenciesData"
+        :isFilterShow="false"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
@@ -57,10 +62,10 @@
 	import CandidateForm from "./CandidateForm"
 	import WYSIWYG from "../WYSIWYG"
   import GeneralTable from "../../GeneralTable"
-  import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
+  // import tableSortAndFilter from "@/mixins/tableSortAndFilter";
 
 	export default {
-	  mixins: [ tableSortAndFilter ],
+	  // mixins: [ tableSortAndFilter ],
 		props: {
 			pendingCompetenciesData: {
 				type: Array,
@@ -75,8 +80,8 @@
 						headerKey: "headerSource",
 						key: "sourceLanguage",
 						dataKey: "lang",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, order: 'default',},
+            // filterInfo:{isFilter: true, isFilterSet: false},
+            // sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
@@ -84,8 +89,8 @@
 						headerKey: "headerTarget",
 						key: "targetLanguage",
             dataKey: "lang",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, order: 'default',},
+            // filterInfo:{isFilter: true, isFilterSet: false},
+            // sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
@@ -93,8 +98,8 @@
 						headerKey: "headerIndustry",
 						key: "industry",
             dataKey: "name",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, order: 'default',},
+            // filterInfo:{isFilter: true, isFilterSet: false},
+            // sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
@@ -102,8 +107,8 @@
 						headerKey: "headerStep",
 						key: "step",
             dataKey: "title",
-            filterInfo:{isFilter: true, isFilterSet: false},
-            sortInfo: { isSort: true, order: 'default',},
+            // filterInfo:{isFilter: true, isFilterSet: false},
+            // sortInfo: { isSort: true, order: 'default',},
             style: { width: '21%' }
 					},
 					{
@@ -214,9 +219,9 @@
 			}
 		},
     computed: {
-      rawData() {
-        return JSON.parse( JSON.stringify( this.pendingCompetenciesData))
-      },
+      // rawData() {
+      //   return JSON.parse( JSON.stringify( this.pendingCompetenciesData))
+      // },
     },
 		components: {
       GeneralTable,

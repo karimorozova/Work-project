@@ -75,7 +75,7 @@ export default {
 	},
 	computed: {
 		finalData() {
-			this.sortedData = this.rawData
+			this.sortedData = JSON.parse(JSON.stringify(this.rawData))
 
 			for (let filterKey in this.filtersData) {
 				if (this.filtersData[filterKey].value.length < 1) continue

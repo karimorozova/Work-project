@@ -23,19 +23,14 @@
         template(slot="sourceLanguage", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
           .competencies__drop-menu(v-else)
-            NewSelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentSource.lang",
-              :options="sourceData | firstEnglishLanguage",
+            SelectSingle(
               @chooseOption="setSource"
             )
 
         template(slot="targetLanguage", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
           .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            NewSelectSingle(
+            SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -57,7 +52,7 @@
         template(slot="industry", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.industry.name }}
           .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            NewSelectSingle(
+            SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -79,7 +74,7 @@
         template(slot="step", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.step.title }}
           .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            NewSelectSingle(
+            SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
               :hasSearch="true",
@@ -113,7 +108,7 @@
 <script>
 	import { mapGetters, mapActions } from "vuex";
 	import Add from "../Add";
-	import NewSelectSingle from "../NewSelectSingle";
+	import SelectSingle from "../SelectSingle";
 	import SelectMulti from "../SelectMulti";
 	import SettingsTable from "../Table/SettingsTable";
 	import crudIcons from "@/mixins/crudIcons";
@@ -276,17 +271,18 @@
 
 			setEditingData(index) {
 				this.currentActive = index;
-				this.currentId = this.competenciesData[index]._id;
-				this.currentSource = this.competenciesData[index].sourceLanguage;
-				this.currentTargets = this.competenciesData[index].targetLanguage;
-				this.currentIndustries = this.competenciesData[index].industry;
-				this.currentSteps = this.competenciesData[index].step;
+				this.currentId = this.finalData[index]._id;
+				this.currentSource = this.finalData[index].sourceLanguage;
+				this.currentTargets = this.finalData[index].targetLanguage;
+				this.currentIndustries = this.finalData[index].industry;
+				this.currentSteps = this.finalData[index].step;
 			},
 
 			manageCancelEdition(index) {
-				!this.competenciesData[index]._id && this.competenciesData.splice(index, 1);
+				!this.finalData[index]._id && this.finalData.splice(index, 1);
 				this.setDefaults();
 				this.isDeleting = false;
+				if (this.newRow) this.competenciesData.pop()
 				this.newRow = false;
 			},
 
@@ -336,7 +332,7 @@
 			},
 			async manageSaveClick(index) {
 				try {
-					const id = this.competenciesData[index]._id;
+					const id = this.finalData[index]._id;
 					const currentData = {
 						_id: id,
 						sourceLanguage: this.currentSource,
@@ -351,12 +347,12 @@
           await this.storeCurrentVendor(result.data)
 					// await this.updateVendorProp({ id: this.$route.params.id , key: 'competencies', value: result.data.competencies })
 
-					this.competenciesData.length && this.$emit("updateRates", true)
+					this.finalData.length && this.$emit("updateRates", true)
 
 					// this.updateVendorProp({ prop: "competencies", value: result.data.competencies })
 
-          // this.competenciesData = result.data.competencies;
-          // this.competenciesData.length && this.$emit("updateQualifications");
+          // this.finalData = result.data.competencies;
+          // this.finalData.length && this.$emit("updateQualifications");
           //
 
 					// if (result.data.pendingCompetencies.length) {
@@ -394,9 +390,9 @@
 				}
 			},
 			async manageDeleteClick(index) {
-				if(!this.competenciesData[index]._id) {
+				if(!this.finalData[index]._id) {
 					this.newRow = false;
-					this.competenciesData.splice(index, 1);
+					this.finalData.splice(index, 1);
 					this.setDefaults();
 					return;
 				}
@@ -410,14 +406,14 @@
 
 			async deleteCompetencies() {
 				try {
-					let currentData = this.competenciesData[this.deleteIndex];
+					let currentData = this.finalData[this.deleteIndex];
 					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`);
 					await this.storeCurrentVendor(result.data)
 					// if (result.data.pendingCompetencies.length) {
 					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
 					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data.pendingCompetencies })
 					// }
-					// this.competenciesData.splice(this.deleteIndex, 1);
+					// this.finalData.splice(this.deleteIndex, 1);
 					this.$emit("updateRates", true);
 					this.closeModal();
 					this.alertToggle({
@@ -445,7 +441,7 @@
 					step: [],
 					industry: [],
 				});
-				this.setEditingData(this.competenciesData.length - 1);
+				this.setEditingData(this.finalData.length - 1);
 				this.$nextTick(() => {
 					this.scrollToEnd();
 				});
@@ -456,15 +452,21 @@
 			},
 
 			setSource({ option }) {
-				this.currentSource = this.languages.find((item) => item.lang === option);
+        let selectInfo = {
+          placeholder:"Select",
+          hasSearch:"true",
+          selectedOption:"currentSource.lang",
+          options:"sourceData | firstEnglishLanguage",
+        }
+				// this.currentSource = this.languages.find((item) => item.lang === option);
 			},
 			// async getVendorInfo() {
 			// 	console.log('1')
 			// 	const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
-			// 	this.competenciesData = vendor.data.competencies;
+			// 	this.finalData = vendor.data.competencies;
 			// },
 			// getVendorInfoByState(){
-			// 	this.competenciesData = this.currentVendor.competencies
+			// 	this.finalData = this.currentVendor.competencies
       // }
 		},
 		computed: {
@@ -483,13 +485,13 @@
 		},
 		created() {
 			// if(this.currentVendor._id){
-			// 	this.competenciesData = this.currentVendor.competencies
+			// 	this.finalData = this.currentVendor.competencies
       // }
 			 // ?  : this.getVendorInfo();
 		},
 		components: {
+      SelectSingle,
       GeneralTable,
-			NewSelectSingle,
 			SettingsTable,
 			SelectMulti,
 			Add,
@@ -499,7 +501,13 @@
 
 <style lang="scss" scoped>
   @import "../../assets/styles/settingsTable.scss";
-
+  .modal {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%);
+  }
   .competencies {
     &__data {
       @extend %table-data;
@@ -526,8 +534,6 @@
     }
 
     &__drop-menu {
-      position: relative;
-      box-shadow: inset 0 0 7px $brown-shadow;
     }
 
     &_opacity {
