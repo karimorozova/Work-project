@@ -254,7 +254,6 @@ function setRejectedStatus({ steps, jobId }) {
 }
 
 async function setTaskStatusAndSave({ project, jobId, steps, status }) {
-
 	const { tasks } = project
 	const { taskId } = steps.find(item => item._id.toString() === jobId)
 	const currSteps = steps.filter(item => item.taskId === taskId)
