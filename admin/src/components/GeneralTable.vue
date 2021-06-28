@@ -8,7 +8,7 @@
         @closeErrors="closeErrors"
       )
       ApproveModal(
-        v-if="areErrors"
+        v-if="isApproveModal"
         text="Are you sure?"
         approveValue="Yes"
         notApproveValue="Cancel"
@@ -60,6 +60,14 @@
 				type: Boolean,
 				default: false
 			},
+      errors: {
+				type: Array,
+				default: false
+			},
+      isApproveModal: {
+			  type: Boolean,
+        default: false
+      },
 			isFilterShow: {
 				type: Boolean,
 				default: true
