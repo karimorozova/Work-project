@@ -5,7 +5,7 @@
                 .selected
                     .industry-tooltip(v-for="item in selectedInd")
                         img(:src="item.icon")
-            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ") 
+            template(v-if="!selectedInd.length || selectedInd[0].name == 'All' ")
                 span.selected.no-industry Options
             .arrow-button(@click="showInds")
                 img(src="../../assets/images/open-close-arrow-brown.png" :class="{reverseIcon: droppedInd}")
@@ -60,7 +60,7 @@ export default {
                 const result = await this.$http.get('/api/industries')
                 this.industries = result.data.filter(item => item.active);
             } catch(err) {
-                this.errors.push(err)             
+                this.errors.push(err)
             }
         },
         outClick() {
@@ -84,7 +84,7 @@ export default {
 
 .select {
     width: 100%;
-    height: 28px;
+    height: 30px;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
@@ -102,7 +102,7 @@ export default {
         width: 80%;
         padding: 0 5px;
         font-size: 14px;
-        max-height: 28px;
+        max-height: 30px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
@@ -114,7 +114,7 @@ export default {
         }
         .industry-tooltip {
             width: 40px;
-            max-height: 28px;
+            max-height: 30px;
             display: flex;
             img {
                 max-width: 21px;
@@ -156,8 +156,8 @@ export default {
     }
 }
 .drop-select {
-    position: absolute;    
-    border: 1px solid $main-color;
+    position: absolute;
+    border: 1px solid $light-brown;
     border-radius: 4px;
     width: 100%;
     overflow-x: hidden;
@@ -207,7 +207,7 @@ export default {
 .checkbox {
     width: 13px;
     height: 13px;
-    border: 1px solid $main-color;
+    border: 1px solid #c1bbb1;
     margin-right: 3px;
     .checked {
         width: 100%;
@@ -217,7 +217,7 @@ export default {
             content: '';
             position: absolute;
             width: 5px;
-            border: 1px solid $main-color;
+            border: 1px solid #c1bbb1;
             top: 6px;
             left: 1px;
             transform: rotate(45deg);
@@ -226,7 +226,7 @@ export default {
             content: '';
             position: absolute;
             width: 6px;
-            border: 1px solid $main-color;
+            border: 1px solid #c1bbb1;
             top: 5px;
             left: 3px;
             transform: rotate(-58deg);

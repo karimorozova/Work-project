@@ -214,7 +214,7 @@
       color: $main-color;
       padding: 0 5px;
       box-sizing: border-box;
-      border: 1px solid $main-color;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       outline: none;
       transition: all 0.2s;

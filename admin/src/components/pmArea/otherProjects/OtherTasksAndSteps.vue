@@ -80,7 +80,7 @@
       left: 0;
       right: 0;
       width: 300px;
-      border: 1px solid $main-color;
+      border: 1px solid #c1bbb1;
       box-shadow: 0 0 10px #66563d9d;
     }
 

@@ -474,7 +474,7 @@
       width: 459px;
       border-radius: 4px;
       color: #68573E;
-      border: 1px solid #68573E;
+      border: 1px solid #c1bbb1;
       outline: none;
 
       &:focus {
@@ -500,7 +500,7 @@
     }
 
     &__link {
-      border-bottom: 1px solid #68573E;
+      border-bottom: 1px solid #c1bbb1;
       cursor: pointer;
     }
 
@@ -510,8 +510,8 @@
 
     &__input-text {
       width: 179px;
-      height: 28px;
-      border: 1px solid #68573E;
+      height: 30px;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       padding: 0 5px;
       color: #68573E;
@@ -524,8 +524,8 @@
 
     &__input-text2 {
       width: 179px;
-      height: 28px;
-      border: 1px solid #68573E;
+      height: 30px;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       padding: 0 5px;
       color: #68573E;
@@ -544,7 +544,7 @@
       width: 100%;
       margin-top: 4px;
       border-radius: 4px;
-      border: 1px solid #68573E;
+      border: 1px solid #c1bbb1;
       padding: 5px;
       color: #68573E;
       resize: none;

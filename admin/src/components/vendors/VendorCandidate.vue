@@ -34,6 +34,8 @@
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     padding: 20px;
     margin-right: 40px;
+    border-radius: 4px;
+
 
     &__title {
       font-size: 21px;

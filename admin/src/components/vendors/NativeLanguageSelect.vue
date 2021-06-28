@@ -99,7 +99,7 @@ export default {
 
 .select {
     width: 100%;
-    height: 28px;
+    height: 30px;
     display: flex;
     justify-content: space-between;
     .vendors-table__drop-menu & {
@@ -154,7 +154,7 @@ export default {
 }
 .drop-select {
     position: absolute;
-    border: 1px solid $main-color;
+    border: 1px solid $light-brown;
     border-radius: 4px;
     width: 100%;
     overflow: hidden;

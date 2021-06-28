@@ -175,7 +175,7 @@ export default {
     height: 32px;
     padding: 0 5px;
     outline: none;
-    border: 1px solid $main-color;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     margin-left: 5px;
   }

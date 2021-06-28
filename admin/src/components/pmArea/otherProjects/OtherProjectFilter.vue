@@ -271,7 +271,7 @@
       width: 154px;
       height: 30px;
       outline: none;
-      border: 1px solid #68573e;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       color: #68573e;
       transition: all 0.2s;

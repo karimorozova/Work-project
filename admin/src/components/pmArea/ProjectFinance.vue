@@ -333,7 +333,7 @@
       width: 33%;
       display: flex;
       justify-content: center;
-      border-left: 1px solid #66563d;
+      border-left: 1px solid #c1bbb1;
       padding: 6px 3px;
 
       &:first-child {

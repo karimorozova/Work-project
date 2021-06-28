@@ -888,7 +888,7 @@ export default {
   &__item {
     width: 100%;
     border-radius: 4px;
-    border: 1px solid #68573e;
+    border: 1px solid #c1bbb1;
     box-sizing: border-box;
     background-color: #fff;
     font-size: 12px;

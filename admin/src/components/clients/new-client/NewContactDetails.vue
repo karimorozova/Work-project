@@ -238,7 +238,9 @@
   .contact-wrap {
     position: relative;
     width: 700px;
-    margin: 40px;
+    margin: 50px;
+    border-radius: 4px;
+    background-color: white;
 
     label {
       margin-bottom: 0;
@@ -315,6 +317,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        border-radius: 4px;
+
 
         .photo-image {
           max-height: 100%;

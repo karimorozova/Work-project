@@ -700,7 +700,7 @@
       text-align: center;
       padding: 5px;
       width: 130px;
-      border: 1px solid $main-color;
+      border: 1px solid #c1bbb1;
       margin: 5px;
       cursor: pointer;
     }

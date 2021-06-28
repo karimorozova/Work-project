@@ -314,7 +314,7 @@ export default {
         padding-left: 70px;
         padding-top: 30px;
         margin-left: 10px;
-        border-top:1px solid #66563d;
+        border-top:1px solid #c1bbb1;
     }
     &__close {
         position: relative;

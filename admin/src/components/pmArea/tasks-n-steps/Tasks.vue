@@ -753,7 +753,7 @@
 
     &__item {
       border-radius: 4px;
-      border: 1px solid #68573e;
+      border: 1px solid #c1bbb1;
       box-sizing: border-box;
       background-color: #fff;
       font-size: 12px;
@@ -892,8 +892,8 @@
 
     &__drop-menu {
       position: relative;
-      width: 200px;
-      height: 28px;
+      width: 210px;
+      height: 30px;
     }
 
     &__delivery-image {

@@ -91,7 +91,7 @@ export default {
         height: 30px;
     }
     .selected {
-        border-right: 1px solid $main-color;
+        border-right: 1px solid $light-border;
         width: 80%;
         padding: 0 5px;
         font-size: 14px;
@@ -141,7 +141,7 @@ export default {
     width: 100%;
     position: absolute;
     border-radius: 4px;
-    border: 1px solid $main-color;
+    border: 1px solid #c1bbb1;
     overflow: hidden;
     z-index: 6;
     box-sizing: border-box;

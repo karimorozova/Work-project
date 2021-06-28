@@ -148,9 +148,9 @@ export default {
     display: flex;
     justify-content: space-between;
     overflow: hidden;
-    height: 28px;
+    height: 30px;
     .all-projects__filters & {
-        height: 28px;
+        height: 30px;
     }
     .selected {
         border-right: 1px solid #bfb09d;
@@ -334,7 +334,7 @@ export default {
 
 .vendors-filter {
     .select {
-        height: 28px;
+        height: 30px;
     }
 }
 

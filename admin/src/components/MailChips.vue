@@ -154,8 +154,8 @@
   }
 
   .mailBox {
-    border-top: 1px solid #66563d;
-    border-bottom: 1px solid #66563d;
+    border-top: 1px solid #c1bbb1;
+    border-bottom: 1px solid #c1bbb1;
     display: flex;
     color: #66563d;
 

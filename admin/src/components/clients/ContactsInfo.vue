@@ -262,7 +262,7 @@
     outline: none;
     position: relative;
 
-    &__fontIcon{
+    &__fontIcon {
       font-size: 16px;
       margin-top: 5px;
       cursor: pointer;

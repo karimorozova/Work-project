@@ -714,10 +714,12 @@
       width: 350px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
+      border-radius: 4px;
     }
 
     &__action {
       margin-top: 40px;
+      border-radius: 4px;
       width: 390px;
       margin-left: 40px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
@@ -734,6 +736,8 @@
       padding: 20px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       position: relative;
+      border-radius: 4px;
+
     }
 
     &__notes-block {
@@ -757,6 +761,7 @@
       position: relative;
       box-sizing: border-box;
       padding: 20px;
+      border-radius: 4px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
   }
@@ -803,7 +808,7 @@
     &__drop-menu {
       position: relative;
       width: 200px;
-      height: 28px;
+      height: 30px;
       box-sizing: border-box;
     }
 
@@ -950,6 +955,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 4px;
 
     .photo-image {
       max-width: 100%;
@@ -960,7 +966,7 @@
   .photo-file {
     position: absolute;
     top: -25px;
-    left: -100px;
+    left: 0px;
     height: 180px;
     background-color: transparent;
     outline: none;

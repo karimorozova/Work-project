@@ -110,7 +110,7 @@ export default {
 .drop-select {
     position: absolute;
     border-radius: 4px;
-    border: 1px solid $main-color;
+    border: 1px solid #c1bbb1;
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;

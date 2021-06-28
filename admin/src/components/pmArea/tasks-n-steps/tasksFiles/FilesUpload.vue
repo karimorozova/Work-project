@@ -101,7 +101,7 @@
     }
 
     &_bordered {
-      border: 1px solid $main-color;
+      border: 1px solid #c1bbb1;
     }
   }
 

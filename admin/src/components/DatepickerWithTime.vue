@@ -1243,7 +1243,7 @@
 
   .datepicker-custom-project-info {
     border-radius: 4px;
-    border: 1px solid #68573E;
+    border: 1px solid #c1bbb1;
     height: 30px;
     color: #68573E;
     padding-left: 5px;
@@ -1252,7 +1252,7 @@
   }
   .datepicker-custom-compliance {
     border-radius: 4px;
-    border: 1px solid #68573E;
+    border: 1px solid #c1bbb1;
     height: 30px;
     color: #68573E;
     padding-left: 5px;
@@ -1262,7 +1262,7 @@
 
   .datepicker-custom {
     border-radius: 4px;
-    border: 1px solid #68573E;
+    border: 1px solid #c1bbb1;
     height: 30px;
     color: #68573E;
     padding-left: 5px;
@@ -1271,7 +1271,7 @@
 
   .datepicker-custom-client {
     border-radius: 4px;
-    border: 1px solid #68573E;
+    border: 1px solid #c1bbb1;
     height: 30px;
     color: #68573E;
     outline: none;
@@ -1304,7 +1304,7 @@
 
   .filters .datepicker-custom-filter {
     border-radius: 4px;
-    border: 1px solid #68573E;
+    border: 1px solid #c1bbb1;
     width: 200px;
     height: 30px;
     color: #68573E;
@@ -1314,7 +1314,7 @@
 
   .datepicker-height-30 {
     border-radius: 4px;
-    border: 1px solid #68573E;
+    border: 1px solid #c1bbb1;
     height: 30px;
     color: #68573E;
     padding-left: 5px;

@@ -107,7 +107,7 @@
       justify-content: flex-start;
       position: relative;
       width: 190px;
-      height: 28px;
+      height: 30px;
     }
 
   }

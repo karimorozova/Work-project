@@ -1,18 +1,17 @@
 <template lang="pug">
   .menu
-    .elements(v-for="element in elements")
+    .elements(v-for="(element, index) in elements" :key="index")
 
       .title(v-if="isTitle(element)" :style="elementPadding") {{element.name}}
 
       .element(:style="elementPadding")
-        .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
 
+        .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
           .group__open(v-if="element.isOpen")
             .group__open-image
               img(:src="require(`../../assets/images/navbar-icons/testicon.png`)")
               div {{element.name}}
             i.fas.fa-chevron-down
-
           .group__close(v-if="!element.isOpen")
             .group__close-image
               img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
@@ -34,7 +33,9 @@
 </template>
 
 <script>
+
 	export default {
+
 		name: "Menu",
 		props: {
 			elements: {
@@ -104,7 +105,6 @@
 </script>
 
 <style scoped lang="scss">
-
   img {
     margin-right: 5px;
   }

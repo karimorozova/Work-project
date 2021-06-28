@@ -295,7 +295,7 @@
       width: 200px;
       height: 30px !important;
       padding-left: 5px;
-      border: 1px solid $main-color;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       outline: none;
       font-size: 14px;

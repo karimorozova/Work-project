@@ -501,7 +501,7 @@ export default {
 
 .checkbox {
   display: flex;
-  height: 28px;
+  height: 30px;
 
   input[type="checkbox"] {
     opacity: 0;

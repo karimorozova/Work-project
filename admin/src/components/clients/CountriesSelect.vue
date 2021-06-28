@@ -125,7 +125,7 @@ export default {
 
 .select {
     width: 100%;
-    height: 28px;
+    height: 30px;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
@@ -134,7 +134,7 @@ export default {
         width: 91%;
         padding: 0 5px;
         font-size: 14px;
-        max-height: 28px;
+        max-height: 30px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;

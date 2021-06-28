@@ -243,7 +243,7 @@
   .select {
     border-radius: 4px;
     width: 100%;
-    height: 28px;
+    height: 30px;
     display: flex;
     justify-content: space-between;
     cursor: pointer;
@@ -328,31 +328,5 @@
     }
   }
 
-  /*.height-32 {*/
-  /*  .select {*/
-  /*    height: 32px;*/
-  /*  }*/
-
-  /*  .drop {*/
-  /*    max-height: 160px;*/
-  /*  }*/
-  /*}*/
-
-  /*.table-drop-menu {*/
-  /*  border: none;*/
-  /*  border-radius: 0;*/
-  /*  height: 100%;*/
-  /*  overflow: visible;*/
-
-  /*  .drop {*/
-  /*    border: 1px solid #BFB09D;*/
-  /*  }*/
-
-  /*  .select {*/
-  /*    height: 31px;*/
-  /*    border-radius: 0px;*/
-  /*    box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);*/
-  /*  }*/
-  /*}*/
 
 </style>

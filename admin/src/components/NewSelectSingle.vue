@@ -174,7 +174,7 @@ export default {
     overflow-y: auto;
     overflow-x: hidden;
     background-color: #FFF;
-    border-top: 1px solid #66563d;
+    border-top: 1px solid #c1bbb1;
     box-sizing: border-box;
     z-index: 10;
 

@@ -112,7 +112,7 @@
       &__input {
         width: 133px;
         height: 28px;
-        border: 1px solid #68573E;
+        border: 1px solid #c1bbb1;
         border-radius: 4px;
         padding: 0 5px;
         color: #68573E;

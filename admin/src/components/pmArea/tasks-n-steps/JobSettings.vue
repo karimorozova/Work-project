@@ -286,7 +286,7 @@
       color: $main-color;
       width: 200px;
       outline: none;
-      border: 1px solid $main-color;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       box-sizing: border-box;
       transition: all 0.2s;

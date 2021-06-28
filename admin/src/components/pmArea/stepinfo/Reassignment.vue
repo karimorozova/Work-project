@@ -245,7 +245,7 @@
       margin: 5px 5px 0 0;
       padding: 0 5px;
       box-sizing: border-box;
-      border: 1px solid $main-color;
+      border: 1px solid #c1bbb1;
       outline: none;
       color: $main-color;
       transition: all 0.2s;

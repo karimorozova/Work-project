@@ -622,7 +622,7 @@
       width: 200px;
       margin-top: 5px;
       border-radius: 4px;
-      border: 1px solid #68573e;
+      border: 1px solid #c1bbb1;
       padding: 5px;
       color: #68573e;
       resize: none;

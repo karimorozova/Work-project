@@ -95,7 +95,7 @@ export default {
     border: 1px solid $cell-border;
     border-radius: 4px;
     width: 200px;
-    height: 28px;
+    height: 30px;
     box-sizing: border-box;
     color: $main-color;
     &:focus {

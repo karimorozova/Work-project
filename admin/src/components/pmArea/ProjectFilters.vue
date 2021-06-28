@@ -264,7 +264,7 @@
       width: 179px;
       height: 28px;
       outline: none;
-      border: 1px solid #68573E;
+      border: 1px solid #c1bbb1;
       border-radius: 4px;
       color: #68573E;
       transition: all 0.2s;
@@ -303,7 +303,7 @@
     width: 200px;
     height: 30px !important;
     padding-left: 5px;
-    border: 1px solid $main-color;
+    border: 1px solid #c1bbb1;
     border-radius: 4px;
     outline: none;
     font-size: 14px;
@@ -381,7 +381,7 @@
   //    width: 154px;
   //    height: 30px;
   //    outline: none;
-  //    border: 1px solid #68573E;
+  //    border: 1px solid #c1bbb1;
   //    border-radius: 4px;
   //    color: #68573E;
   //    transition: all 0.2s;

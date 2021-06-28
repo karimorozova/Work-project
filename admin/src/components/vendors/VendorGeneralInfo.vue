@@ -237,6 +237,7 @@
     padding: 20px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     border-radius: 4px;
+    background-color: white;
   }
 
   .gen-info {
@@ -270,8 +271,8 @@
 
     &__drop-menu {
       position: relative;
-      width: 200px;
-      height: 28px;
+      width: 210px;
+      height: 30px;
       box-sizing: border-box;
     }
 
@@ -289,14 +290,19 @@
 
     &__input-filed {
       font-size: 14px;
-      color: #66563d;
-      border: 1px solid #c1bbb1;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
-      padding: 0 5px;
-      outline: none;
-      width: 200px;
-      height: 30px;
       box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 210px;
+      height: 32px;
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
     }
 
     ::-webkit-input-placeholder {
@@ -319,6 +325,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 4px;
 
     .photo-image {
       max-width: 100%;
@@ -329,7 +336,7 @@
   .photo-file {
     position: absolute;
     top: -25px;
-    left: -100px;
+    left: 0px;
     height: 180px;
     background-color: transparent;
     outline: none;
