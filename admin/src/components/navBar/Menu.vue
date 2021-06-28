@@ -135,7 +135,7 @@
   }
 
   .element {
-    transition: .1s linear;
+    transition: .2s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
   .element:hover {
