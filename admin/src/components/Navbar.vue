@@ -405,6 +405,7 @@
     top: 0;
     bottom: 0;
     width: 250px;
+    z-index: 99999;
     /*    background-color: $navbar;*/
     background-color: #333;
     box-sizing: border-box;

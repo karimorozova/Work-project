@@ -10,19 +10,19 @@
     .button(v-if="dataArray.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
 
-    ResultFilter(
-      :source="sourceFilter",
-      :target="targetFilter",
-      :step="stepFilter",
-      :unit="unitFilter",
-      :industry="industryFilter",
-      :targets="dataForTargetFilter"
-      :sources="dataForSourceFilter"
-      :steps="dataForStepFilter"
-      :units="dataForUnitFilter"
-      :industries="dataForIndustryFilter"
-      @setFilter="setFilter"
-    )
+    //ResultFilter(
+    //  :source="sourceFilter",
+    //  :target="targetFilter",
+    //  :step="stepFilter",
+    //  :unit="unitFilter",
+    //  :industry="industryFilter",
+    //  :targets="dataForTargetFilter"
+    //  :sources="dataForSourceFilter"
+    //  :steps="dataForStepFilter"
+    //  :units="dataForUnitFilter"
+    //  :industries="dataForIndustryFilter"
+    //  @setFilter="setFilter"
+    //)
     DataTable(
       :fields="fields",
       :tableData="currentVendorPriceListFiltered",
@@ -136,14 +136,14 @@
 						label: "Source Language",
 						headerKey: "headerLanguageSource",
 						key: "sourceLang",
-						width: "14%",
+						width: "15%",
 						padding: "0"
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerLanguageTarget",
 						key: "targetLang",
-						width: "14%",
+						width: "15%",
 						padding: "0"
 					},
 					{
@@ -178,7 +178,7 @@
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "13%",
+						width: "11%",
 						padding: "0"
 					}
 				],
@@ -350,6 +350,12 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
+  .button {
+    position: absolute;
+    right: 20px;
+    margin-top: -40px;
+  }
+
   .price {
     background-color: #fff;
     padding: 0;
@@ -403,6 +409,7 @@
       justify-content: center;
       align-items: center;
       gap: 7px;
+      height: 30px;
 
       &-info {
         cursor: help;

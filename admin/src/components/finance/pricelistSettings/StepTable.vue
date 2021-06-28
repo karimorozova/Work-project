@@ -10,15 +10,17 @@
     .button(v-if="dataArray.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
 
-    StepFilter(
-      :step="stepFilter"
-      :unit="unitFilter"
-      :size="sizeFilter"
-      :steps="steps"
-      :units="units"
-      :sizes="sizes"
-      @setFilter="setFilter"
-    )
+    .price__filter
+      StepFilter(
+        :step="stepFilter"
+        :unit="unitFilter"
+        :size="sizeFilter"
+        :steps="steps"
+        :units="units"
+        :sizes="sizes"
+        @setFilter="setFilter"
+      )
+
     GeneralTable(
       :fields="fields"
       :tableData="dataArray"
@@ -65,23 +67,23 @@
           input.price__data-input(type="number"  @change="setRowValue(index)"  v-model="dataArray[index].euroMinPrice")
 
       template(slot="usd" slot-scope="{ row, index }")
-        .price__data(v-if="!isEdit")
+        .price__data
           span(v-if="!row.usdMinPrice")
             span n/a
           span(v-else)
             span(id="usd") {{row.usdMinPrice}}
             label(for="usd") &#36;
-        .price__data(v-else)
+        //.price__data(v-else)
           input.price__data-input(type="number" :value="dataArray[index].usdMinPrice" disabled)
 
       template(slot="gbp" slot-scope="{ row, index }")
-        .price__data(v-if="!isEdit")
+        .price__data
           span(v-if="!row.gbpMinPrice")
             span n/a
           span(v-else)
             span(id="gbp") {{row.gbpMinPrice}}
             label(for="gbp") &pound;
-        .price__data(v-else)
+        //.price__data(v-else)
           input.price__data-input(type="number" :value="dataArray[index].gbpMinPrice" disabled)
 
     .price__empty(v-if="!dataArray.length") Nothing found...
@@ -92,7 +94,7 @@
 	import CheckBox from "../../CheckBox"
 	import Button from "../../Button"
 	import SetPriceModal from "./SetPriceModal"
-  import GeneralTable from "../../GeneralTable"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -123,49 +125,49 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-            style: {"width": "4%"}
+						style: { "width": "4%" }
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-            style: {"width": "23%"}
+						style: { "width": "23%" }
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-            style: {"width": "23%"}
+						style: { "width": "23%" }
 					},
 					{
 						label: "Size",
 						headerKey: "headerSize",
 						key: "size",
-            style: {"width": "10%"}
+						style: { "width": "10%" }
 					},
 					{
 						label: "Multiplier %",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-            style: {"width": "10%"}
+						style: { "width": "10%" }
 					},
 					{
 						label: "Fix EUR",
 						headerKey: "headerMinPriceEUR",
 						key: "eur",
-            style: {"width": "10%"}
+						style: { "width": "10%" }
 					},
 					{
 						label: "Fix USD",
 						headerKey: "headerMinPriceUSD",
 						key: "usd",
-            style: {"width": "10%"}
+						style: { "width": "10%" }
 					},
 					{
 						label: "Fix GBP",
 						headerKey: "headerMinPriceGBP",
 						key: "gbp",
-            style: {"width": "10%"}
+						style: { "width": "10%" }
 					}
 				],
 				dataArray: [],
@@ -336,7 +338,7 @@
 			}
 		},
 		components: {
-      GeneralTable,
+			GeneralTable,
 			SetPriceModal,
 			Button,
 			CheckBox,
@@ -345,7 +347,14 @@
 	}
 </script>
 <style lang="scss" scoped>
+  @import "../../../assets/scss/generalTable";
   @import "../../../assets/scss/colors.scss";
+
+  .button {
+    position: absolute;
+    right: 20px;
+    top: 110px;
+  }
 
   .price {
     background-color: #fff;
@@ -364,27 +373,8 @@
       margin-left: 3px;
     }
 
-    &__data,
-    &__editing-data {
-      height: 31px;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    &__editing-data {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
     &__data-input {
-      width: 100%;
-      border: none;
-      outline: none;
-      color: $main-color;
-      padding: 0 2px;
-      background-color: transparent;
+      @extend %editing-input;
     }
 
     &__icons {

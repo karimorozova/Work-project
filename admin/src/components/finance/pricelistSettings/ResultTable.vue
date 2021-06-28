@@ -1,18 +1,20 @@
 <template lang="pug">
   .price
-    ResultFilter(
-      :source="sourceFilter"
-      :target="targetFilter"
-      :step="stepFilter"
-      :unit="unitFilter"
-      :industry="industryFilter"
-      :targets="languages"
-      :sources="languages"
-      :steps="steps"
-      :units="units"
-      :industries="industries"
-      @setFilter="setFilter"
-    )
+    .price__filter
+      ResultFilter(
+        :source="sourceFilter"
+        :target="targetFilter"
+        :step="stepFilter"
+        :unit="unitFilter"
+        :industry="industryFilter"
+        :targets="languages"
+        :sources="languages"
+        :steps="steps"
+        :units="units"
+        :industries="industries"
+        @setFilter="setFilter"
+      )
+
     GeneralTable(
       :fields="fields"
       :tableData="dataArray"
@@ -68,7 +70,7 @@
 <script>
 	import ResultFilter from "./ResultFilter"
 	import { mapActions } from "vuex"
-  import GeneralTable from "../../GeneralTable"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -98,49 +100,49 @@
 						label: "Source Language",
 						headerKey: "headerLanguageSource",
 						key: "sourceLang",
-            style: {"width": "15%"}
+						style: { "width": "15%" }
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerLanguageTarget",
 						key: "targetLang",
-            style: {"width": "15%"}
+						style: { "width": "15%" }
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-            style: {"width": "15%"}
+						style: { "width": "15%" }
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-            style: {"width": "15%"}
+						style: { "width": "15%" }
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-            style: {"width": "16%"}
+						style: { "width": "16%" }
 					},
 					{
 						label: "EUR",
 						headerKey: "headerPriceEUR",
 						key: "eur",
-            style: {"width": "8%"}
+						style: { "width": "8%" }
 					},
 					{
 						label: "USD",
 						headerKey: "headerPriceUSD",
 						key: "usd",
-            style: {"width": "8%"}
+						style: { "width": "8%" }
 					},
 					{
 						label: "GBP",
 						headerKey: "headerPriceGBP",
 						key: "gbp",
-            style: {"width": "8%"}
+						style: { "width": "8%" }
 					}
 				],
 
@@ -212,7 +214,7 @@
 			}
 		},
 		components: {
-      GeneralTable,
+			GeneralTable,
 			ResultFilter
 		}
 	}
@@ -235,29 +237,6 @@
 
     label {
       margin-left: 3px;
-    }
-
-    &__data,
-    &__editing-data {
-      height: 31px;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    &__editing-data {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
-    &__data-input {
-      width: 100%;
-      border: none;
-      outline: none;
-      color: $main-color;
-      padding: 0 2px;
-      background-color: transparent;
     }
 
     &__icons {

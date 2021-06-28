@@ -252,7 +252,7 @@
 <style lang="scss" scoped>
   .layout {
     position: relative;
-    width: 1000px;
+    width: 1120px;
     margin: 50px;
     border-radius: 4px;
   }
@@ -270,17 +270,16 @@
     justify-content: space-between;
     padding-bottom: 20px;
     align-items: flex-end;
-    max-width: 1000px;
 
     &__title {
       display: flex;
       align-items: flex-end;
-      font-size: 22px;
+      font-size: 21px;
+      font-family: 'Myriad600';
     }
   }
 
   .priceLayout {
-    width: 1000px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     position: relative;
     background: white;
@@ -308,6 +307,7 @@
 
     &__allTabs {
       padding: 20px;
+      margin-top: 50px;
     }
   }
 

@@ -30,7 +30,6 @@
 
       SaveCancelPopUp(v-if="detectedForSave" text=""  @accept="checkForErrors" @cancel="cancel")
 
-
       .client-info__layoutActivities(v-if="fullActivityModal")
 
         .title-with-action
@@ -240,7 +239,7 @@
 					edit: { icon: require("../../assets/images/latest-version/edit.png") },
 					cancel: { icon: require("../../assets/images/cancel-icon.png") }
 				},
-				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Overall Prices', 'Discount Chart' ],
+				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
 				selectedTab: 'Overall Prices',
 				clientTask: {},
 				clientNote: {},
@@ -336,6 +335,11 @@
 			crudActions(actionType) {
 				this.paramsIsEdit = actionType !== 'cancel'
 				this.isEdit = this.paramsIsEdit
+
+				this.toggleAll({ val: false, prop: 'basicPricesTable' })
+				this.toggleAll({ val: false, prop: 'stepMultipliersTable' })
+				this.toggleAll({ val: false, prop: 'industryMultipliersTable' })
+				this.toggleAll({ val: false, prop: 'pricelistTable' })
 			},
 			setTab({ index: i }) {
 				this.selectedTab = this.tabs.find((item, index) => index === i)
@@ -873,12 +877,13 @@
   .rates {
     &__icons {
       display: flex;
-      /*position: absolute;*/
       right: 20px;
       top: 20px;
       gap: 7px;
       height: 20px;
       align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 20px;
 
       &-opacity1 {
         opacity: 1;

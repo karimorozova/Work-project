@@ -60,14 +60,14 @@
 				type: Boolean,
 				default: false
 			},
-      errors: {
+			errors: {
 				type: Array,
 				default: false
 			},
-      isApproveModal: {
-			  type: Boolean,
-        default: false
-      },
+			isApproveModal: {
+				type: Boolean,
+				default: false
+			},
 			isFilterShow: {
 				type: Boolean,
 				default: true
@@ -193,23 +193,31 @@
   }
 
   th {
-    //display: flex;
-    //align-items: center;
-    /*min-height: 40px;*/
-    //justify-content: space-between;
-    //flex-shrink: 1;
+    border-left: 1px solid $list-hover;
+    display: grid;
+    align-items: center;
+
+    &:first-child {
+      border-left: none;
+    }
   }
 
   td {
-    /*padding: 0 6px 0 6px;*/
-    min-height: 40px;
-    display: grid;
-    max-height: 60px;
+    height: 40px;
     overflow-y: auto;
-    align-items: center;
     letter-spacing: -0.1px;
+    border-left: 1px solid $light-border;
+    display: grid;
+    align-items: center;
 
+    &:first-child {
+      border-left: none;
+    }
   }
+
+  /*td:last-child {*/
+  /*  margin-bottom: 0px;*/
+  /*}*/
 
   tr {
     display: flex;
@@ -234,6 +242,8 @@
     max-height: 600px;
     display: block;
     border: 1px solid $list-hover;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
   }
 
   tbody tr:nth-child(even) {

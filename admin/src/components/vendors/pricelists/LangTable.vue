@@ -100,14 +100,14 @@
 						label: "Source",
 						headerKey: "headerSourceLang",
 						key: "sourceLang",
-						width: "36%",
+						width: "35%",
 						padding: "0"
 					},
 					{
 						label: "Target",
 						headerKey: "headerTargetLang",
 						key: "targetLang",
-						width: "36%",
+						width: "35%",
 						padding: "0"
 					},
 					{
@@ -121,7 +121,7 @@
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "9%",
+						width: "11%",
 						padding: "0"
 					}
 				],
@@ -251,6 +251,12 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
+  .button {
+    position: absolute;
+    right: 20px;
+    margin-top: -40px;
+  }
+
   .price {
     background-color: #fff;
     padding: 0;
@@ -304,6 +310,7 @@
       justify-content: center;
       align-items: center;
       gap: 7px;
+      height: 30px;
 
       &-info {
         cursor: help;

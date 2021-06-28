@@ -1,0 +1,19 @@
+@import "colors";
+
+%editing-input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  height: 32px;
+  width: 100%;
+  transition: .1s ease-out;
+  background: white;
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}

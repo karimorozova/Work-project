@@ -46,7 +46,8 @@
 	import CheckBox from "../../CheckBox"
 	import Button from "../../Button"
 	import SetPriceModal from "./SetPriceModal"
-  import GeneralTable from "../../GeneralTable"
+	import GeneralTable from "../../GeneralTable"
+
 
 	export default {
 		props: {
@@ -65,19 +66,19 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-            style: {"width": "4%"}
+						style: { "width": "4%" }
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-            style: {"width": "81%"}
+						style: { "width": "81%" }
 					},
 					{
 						label: "Multiplier %",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-            style: {"width": "15%"}
+						style: { "width": "15%" }
 					}
 				],
 				dataArray: [],
@@ -187,15 +188,22 @@
 			}
 		},
 		components: {
-      GeneralTable,
+			GeneralTable,
 			SetPriceModal,
 			Button,
-			CheckBox,
+			CheckBox
 		}
 	}
 </script>
 <style lang="scss" scoped>
+  @import "../../../assets/scss/generalTable";
   @import "../../../assets/scss/colors.scss";
+
+  .button {
+    position: absolute;
+    right: 20px;
+    top: 110px;
+  }
 
   .price {
     background-color: #fff;
@@ -215,27 +223,8 @@
       margin-left: 3px;
     }
 
-    &__data,
-    &__editing-data {
-      height: 31px;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    &__editing-data {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
     &__data-input {
-      width: 100%;
-      border: none;
-      outline: none;
-      color: $main-color;
-      padding: 0 2px;
-      background-color: transparent;
+      @extend %editing-input;
     }
 
     &__icons {

@@ -221,7 +221,7 @@
 				},
 				paramsIsEdit: false,
 				isEdit: false,
-				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Overall Prices', 'Discount Chart' ],
+				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
 				selectedTab: 'Overall Prices',
 				aliases: [],
 				currentVendorAliases: [],
@@ -305,6 +305,10 @@
 				this.paramsIsEdit = actionType !== 'cancel'
 				this.isEdit = this.paramsIsEdit
 
+				this.toggleAll({ val: false, prop: 'basicPricesTable' })
+				this.toggleAll({ val: false, prop: 'stepMultipliersTable' })
+				this.toggleAll({ val: false, prop: 'industryMultipliersTable' })
+				this.toggleAll({ val: false, prop: 'pricelistTable' })
 			},
 			setTab({ index: i }) {
 				this.selectedTab = this.tabs.find((item, index) => index === i)
@@ -637,12 +641,13 @@
   .rates {
     &__icons {
       display: flex;
-      position: absolute;
       right: 20px;
       top: 20px;
       gap: 7px;
       height: 20px;
       align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 20px;
 
       &-opacity1 {
         opacity: 1;

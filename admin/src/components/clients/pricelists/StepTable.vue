@@ -118,7 +118,7 @@
 						label: "Size",
 						headerKey: "headerSize",
 						key: "size",
-						width: "10%",
+						width: "9%",
 						padding: "0"
 					},
 					{
@@ -132,7 +132,7 @@
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "10%",
+						width: "11%",
 						padding: "0"
 					}
 				],
@@ -278,6 +278,12 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
+  .button {
+    position: absolute;
+    right: 20px;
+    margin-top: -40px;
+  }
+
   .price {
     background-color: #fff;
     box-shadow: none;
@@ -326,6 +332,7 @@
       justify-content: center;
       align-items: center;
       gap: 7px;
+      height: 30px;
 
       &-info {
         cursor: help;

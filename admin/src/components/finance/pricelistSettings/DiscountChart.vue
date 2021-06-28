@@ -27,7 +27,7 @@
 
 <script>
 	import { mapActions } from "vuex"
-  import GeneralTable from "../../GeneralTable"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -46,16 +46,16 @@
 			return {
 				fields: [
 					{
-					  label: "Translation match",
-            headerKey: "headerText",
-            key: "text",
-            style: {"width": "85%"}
-          },
+						label: "Translation match",
+						headerKey: "headerText",
+						key: "text",
+						style: { "width": "85%" }
+					},
 					{
-					  label: "Value %",
-            headerKey: "headerRate",
-            key: "rate",
-            style: {"width": "15%"}
+						label: "Value %",
+						headerKey: "headerRate",
+						key: "rate",
+						style: { "width": "15%" }
 					}
 				],
 				currentDiscountChart: null
@@ -79,7 +79,7 @@
 			}
 		},
 		components: {
-      GeneralTable,
+			GeneralTable
 		},
 		computed: {
 			tableData() {
@@ -96,23 +96,16 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+  @import "../../../assets/scss/generalTable";
 
   .pricelistDiscountChart {
     &__rate {
-      color: #66563d;
-      border: none;
-      width: 80%;
-      background: inherit;
-      outline: none;
+      @extend %editing-input;
     }
 
     &__percent {
       margin-left: 3px;
     }
   }
-  .table{
-    &__dataEdit{
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-  }
+
 </style>

@@ -117,7 +117,7 @@
     color: $text;
     height: 30px;
     border-radius: 4px;
-    width: 45px;
+    width: 55px;
     border: 1px solid $border;
     padding: 0 8px;
     transition: .1s ease-out;

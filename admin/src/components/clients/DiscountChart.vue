@@ -63,9 +63,9 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Translation match", headerKey: "headerText", key: "text", width: "46%" },
-					{ label: "Value %", headerKey: "headerRate", key: "rate", width: "46%" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "8%" }
+					{ label: "Translation match", headerKey: "headerText", key: "text", width: "78%" },
+					{ label: "Value %", headerKey: "headerRate", key: "rate", width: "11%" },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "11%" }
 				]
 			}
 		},
@@ -119,6 +119,7 @@
       justify-content: center;
       align-items: center;
       gap: 7px;
+      height: 30px;
 
       &-info {
         cursor: help;

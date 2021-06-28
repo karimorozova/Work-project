@@ -9,13 +9,13 @@
 
           .group__open(v-if="element.isOpen")
             .group__open-image
-              img(src="../../assets/images/navbar-icons/Dashboard.png")
+              img(:src="require(`../../assets/images/navbar-icons/testicon.png`)")
               div {{element.name}}
             i.fas.fa-chevron-down
 
           .group__close(v-if="!element.isOpen")
             .group__close-image
-              img(src="../../assets/images/navbar-icons/Dashboard.png")
+              img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
               div {{element.name}}
             i.fas.fa-chevron-right
 
@@ -132,6 +132,10 @@
     color: lightgrey;
     letter-spacing: 0.5px;
     font-size: 12px;
+  }
+
+  .element {
+    transition: .1s linear;
   }
 
   .element:hover {

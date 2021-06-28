@@ -10,14 +10,16 @@
     .button(v-if="dataArray.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
 
-    LangFilter(
-      :source="sourceFilter"
-      :target="targetFilter"
-      :form="typeFilter"
-      :sources="languages"
-      :targets="languages"
-      @setFilter="setFilter"
-    )
+    .price__filter
+      LangFilter(
+        :source="sourceFilter"
+        :target="targetFilter"
+        :form="typeFilter"
+        :sources="languages"
+        :targets="languages"
+        @setFilter="setFilter"
+      )
+
     GeneralTable(
       :fields="fields"
       :tableData="dataArray"
@@ -51,17 +53,17 @@
           input.price__data-input(type="number" @change="setRowValue(index)" v-model="dataArray[index].euroBasicPrice")
 
       template(slot="usd" slot-scope="{ row, index }")
-        .price__data(v-if="!isEdit")
+        .price__data
           span(id="usd") {{row.usdBasicPrice}}
           label(for="usd") &#36;
-        .price__data(v-else)
+        //.price__data(v-else)
           input.price__data-input(type="number" :value="dataArray[index].usdBasicPrice" disabled)
 
       template(slot="gbp" slot-scope="{ row, index }")
-        .price__data(v-if="!isEdit")
+        .price__data
           span(id="gbp") {{row.gbpBasicPrice}}
           label(for="gbp") &pound;
-        .price__data(v-else)
+        //.price__data(v-else)
           input.price__data-input(type="number" :value="dataArray[index].gbpBasicPrice" disabled)
 
     .price__empty(v-if="!dataArray.length") Nothing found...
@@ -72,7 +74,7 @@
 	import CheckBox from "../../CheckBox"
 	import Button from "../../Button"
 	import SetPriceModal from "./SetPriceModal"
-  import GeneralTable from "../../GeneralTable"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -97,49 +99,49 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-            style: {"width": "4%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
+						style: { "width": "4%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
 					},
 					{
 						label: "Source Lang",
 						headerKey: "headerSourceLang",
-            key: "sourceLang",
-            style: {"width": "27%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
+						key: "sourceLang",
+						style: { "width": "27%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
 					},
 					{
 						label: "Target Lang",
 						headerKey: "headerTargetLang",
-            key: "targetLang",
-            style: {"width": "27%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
+						key: "targetLang",
+						style: { "width": "27%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
 					},
 					{
 						label: "EUR",
 						headerKey: "headerBasicPriceEUR",
-            key: "eur",
-            style: {"width": "14%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
+						key: "eur",
+						style: { "width": "14%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
 					},
 					{
 						label: "USD",
 						headerKey: "headerBasicPriceUSD",
-            key: "usd",
-            style: {"width": "14%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
+						key: "usd",
+						style: { "width": "14%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
 					},
 					{
 						label: "GBP",
 						headerKey: "headerBasicPriceGBP",
-            key: "gbp",
-            style: {"width": "14%"},
-            filterInfo:{isFilter: false, isFilterSet: false},
-            sortInfo: { isSort: false, isArray: false, order: 'default',},
+						key: "gbp",
+						style: { "width": "14%" },
+						filterInfo: { isFilter: false, isFilterSet: false },
+						sortInfo: { isSort: false, isArray: false, order: 'default' }
 					}
 				],
 				dataArray: [],
@@ -301,7 +303,7 @@
 			}
 		},
 		components: {
-      GeneralTable,
+			GeneralTable,
 			SetPriceModal,
 			Button,
 			CheckBox,
@@ -310,7 +312,14 @@
 	}
 </script>
 <style lang="scss" scoped>
+  @import "../../../assets/scss/generalTable";
   @import "../../../assets/scss/colors.scss";
+
+  .button {
+    position: absolute;
+    right: 20px;
+    top: 110px;
+  }
 
   .price {
     background-color: #fff;
@@ -330,27 +339,8 @@
       margin-left: 3px;
     }
 
-    &__data,
-    &__editing-data {
-      height: 31px;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    &__editing-data {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
     &__data-input {
-      width: 100%;
-      border: none;
-      outline: none;
-      color: $main-color;
-      padding: 0 2px;
-      background-color: transparent;
+      @extend %editing-input;
     }
 
     &__icons {
