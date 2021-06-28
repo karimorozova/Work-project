@@ -556,6 +556,7 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
   @import "../../assets/scss/checkbox";
+  @import "../../assets/styles/settingsTable";
 
   .languages {
     width: 1040px;
