@@ -37,7 +37,7 @@ export default {
             this.project = project;
             this.project.customer = customer;
             this.setCurrentProject(this.project);
-            this.$router.push(`/projects/quote-projects/details/${project._id}`);
+            this.$router.push(`/pangea-projects/quote-projects/details/${project._id}`);
         }
     },
     components: {

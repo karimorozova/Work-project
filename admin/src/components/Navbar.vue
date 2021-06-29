@@ -46,24 +46,24 @@
 					{
 						type: 'group',
 						name: 'Vendors',
-						path: 'vendors',
+						path: 'pangea-vendors',
 						isOpen: false,
 						parent: true,
 						children: [
 							{
 								type: 'link',
 								name: 'All',
-								path: '/vendors/all'
+								path: '/pangea-vendors/all'
 							},
 							{
 								type: 'link',
 								name: 'Active',
-								path: '/vendors/active'
+								path: '/pangea-vendors/active'
 							},
 							{
 								type: 'link',
 								name: 'Inactive',
-								path: '/vendors/inactive'
+								path: '/pangea-vendors/inactive'
 							},
 							{
 								type: 'group',
@@ -73,12 +73,12 @@
 								children: [
 									{
 										type: 'link',
-										path: '/vendors/candidates/potential',
+										path: '/pangea-vendors/candidates/potential',
 										name: 'Potential'
 									},
 									{
 										type: 'link',
-										path: '/vendors/candidates/tests',
+										path: '/pangea-vendors/candidates/tests',
 										name: 'Tests'
 									}
 								]
@@ -92,7 +92,7 @@
 								children: [
 									{
 										type: 'link',
-										path: '/vendors/report/pending-competencies-vendors',
+										path: '/pangea-vendors/report/pending-competencies-vendors',
 										name: 'Competencies Queue'
 									}
 								]
@@ -100,7 +100,7 @@
 							{
 								type: 'link',
 								name: 'Add Vendor',
-								path: '/vendors/new-vendor'
+								path: '/pangea-vendors/new-vendor'
 							}
 
 						]
@@ -108,48 +108,48 @@
 					{
 						type: 'group',
 						name: 'Clients',
-						path: 'clients',
+						path: 'pangea-clients',
 						isOpen: false,
 						parent: true,
 						children: [
 							{
 								type: 'link',
 								name: 'All',
-								path: '/clients/all'
+								path: '/pangea-clients/all'
 							},
 							{
 								type: 'link',
 								name: 'Active',
-								path: '/clients/active'
+								path: '/pangea-clients/active'
 							},
 							{
 								type: 'link',
 								name: 'Inactive',
-								path: '/clients/inactive'
+								path: '/pangea-clients/inactive'
 							},
 							{
 								type: 'link',
 								name: 'Potential',
-								path: '/clients/potential'
+								path: '/pangea-clients/potential'
 							},
 							{
 								type: 'link',
 								name: 'Add Client',
-								path: '/clients/new-client'
+								path: '/pangea-clients/new-client'
 							}
 						]
 					},
 					{
 						type: 'group',
 						name: 'Projects',
-						path: 'projects',
+						path: 'pangea-projects',
 						isOpen: false,
 						parent: true,
 						children: [
 							{
 								type: 'link',
 								name: 'Open Projects',
-								path: '/projects/open-projects'
+								path: '/pangea-projects/open-projects'
 							},
 							{
 								name: 'Quote Projects',
@@ -158,17 +158,17 @@
 							{
 								type: 'link',
 								name: 'Quote Sent',
-								path: '/projects/quote-projects'
+								path: '/pangea-projects/quote-projects'
 							},
 							{
 								type: 'link',
 								name: 'Incoming Requests',
-								path: '/projects/requests'
+								path: '/pangea-projects/requests'
 							},
 							{
 								type: 'link',
 								name: 'Closed Projects',
-								path: '/projects/closed-projects'
+								path: '/pangea-projects/closed-projects'
 							},
 							{
 								type: 'group',
@@ -178,17 +178,17 @@
 								children: [
 									{
 										type: 'link',
-										path: '/projects/xtrf/open-other-projects?status=In-progress',
+										path: '/pangea-projects/xtrf/open-other-projects?status=In-progress',
 										name: 'Open Projects'
 									},
 									{
 										type: 'link',
-										path: '/projects/xtrf/quote-other-projects?status=Quote',
+										path: '/pangea-projects/xtrf/quote-other-projects?status=Quote',
 										name: 'Quotes Projects'
 									},
 									{
 										type: 'link',
-										path: '/projects/xtrf/closed-other-projects?status=Closed',
+										path: '/pangea-projects/xtrf/closed-other-projects?status=Closed',
 										name: 'Closed Projects'
 									}
 								]
@@ -196,147 +196,156 @@
 							{
 								type: 'link',
 								name: 'Add Project',
-								path: '/projects/create-project'
+								path: '/pangea-projects/create-project'
 							}
 						]
 					},
 					{
-						type: 'link',
+						type: 'group',
 						name: 'Finance',
-						path: '/finance'
+						path: 'pangea-finance',
+						isOpen: false,
+						parent: true,
+						children: [
+							{
+								type: 'link',
+								name: 'Finance',
+								path: '/pangea-finance/finance'
+							}
+						]
 					},
 					{
 						type: 'group',
 						name: 'Reports',
-						path: 'reports',
+						path: 'pangea-reports',
 						isOpen: false,
 						parent: true,
 						children: [
 							{
 								type: 'link',
 								name: 'Language Tier',
-								path: '/reports/lang-pair-tier'
+								path: '/pangea-reports/lang-pair-tier'
 							},
 							{
 								type: 'link',
 								name: 'LQA Status',
-								path: '/reports/lqa'
+								path: '/pangea-reports/lqa'
 							},
 							{
 								type: 'link',
 								name: 'Upcoming LQAs',
-								path: '/reports/upcoming-lqa'
+								path: '/pangea-reports/upcoming-lqa'
 							},
 							{
 								type: 'link',
 								name: 'Vendor Cost Benchmark',
-								path: '/reports/benchmark'
+								path: '/pangea-reports/benchmark'
 							},
 
 							{
 								type: 'link',
 								name: 'Competencies Queue',
-								path: '/reports/pending-competencies'
+								path: '/pangea-reports/pending-competencies'
 							}
 						]
 					},
 					{
 						type: 'group',
 						name: 'Settings',
-						path: 'settings',
+						path: 'pangea-settings',
 						isOpen: false,
 						parent: true,
 						children: [
 							{
 								type: 'link',
 								name: 'Languages',
-								path: '/settings/languages'
+								path: '/pangea-settings/languages'
 							},
 							{
 								type: 'link',
 								name: 'Industries',
-								path: '/settings/industries'
+								path: '/pangea-settings/industries'
 							},
 							{
 								type: 'link',
 								name: 'Services / Steps',
-								path: '/settings/services'
+								path: '/pangea-settings/services'
 							},
 							{
 								type: 'link',
 								name: 'Units',
-								path: '/settings/units'
+								path: '/pangea-settings/units'
 							},
 							{
 								type: 'link',
 								name: 'Pricelists',
-								path: '/settings/pricelists'
+								path: '/pangea-settings/pricelists'
 							},
 							{
 								type: 'link',
 								name: 'Discounts / Surcharges',
-								path: '/settings/discounts'
+								path: '/pangea-settings/discounts'
 							},
 							{
 								type: 'link',
 								name: 'Cancellation Reasons',
-								path: '/settings/cancel-reasons'
+								path: '/pangea-settings/cancel-reasons'
 							},
 							{
 								type: 'link',
 								name: 'Instructions',
-								path: '/settings/instructions'
+								path: '/pangea-settings/instructions'
 							},
 							{
 								type: 'link',
 								name: 'LQA',
-								path: '/settings/tiers-lqas'
+								path: '/pangea-settings/tiers-lqas'
 							},
 							{
 								type: 'link',
 								name: 'Industry Tiers',
-								path: '/settings/industry-lqas'
+								path: '/pangea-settings/industry-lqas'
 							},
 							{
 								type: 'link',
 								name: 'Lead Sources',
-								path: '/settings/leadsources'
+								path: '/pangea-settings/leadsources'
 							},
 							{
 								type: 'link',
 								name: 'Clients Api',
-								path: '/settings/api-customers'
+								path: '/pangea-settings/api-customers'
 							},
 							{
 								type: 'link',
 								name: 'Users',
-								path: '/settings/users'
+								path: '/pangea-settings/users'
 							},
 							{
 								type: 'link',
 								name: 'Groups',
-								path: '/settings/groups'
-							}
-						]
-					},
-					{
-						type: 'group',
-						path: 'account',
-						name: 'My Account',
-						isOpen: false,
-						children: [
-							{
-								type: 'link',
-								path: '/account/settings',
-								name: 'Settings'
-							},
-							{
-								type: 'link',
-								path: '/projects/xtrf/closed-other-projects?status=Closed',
-								name: 'logout'
+								path: '/pangea-settings/groups'
 							}
 						]
 					}
+					// {
+					// 	type: 'group',
+					// 	path: 'account',
+					// 	name: 'My Account',
+					// 	isOpen: false,
+					// 	children: [
+					// 		{
+					// 			type: 'link',
+					// 			path: '/account/settings',
+					// 			name: 'Settings'
+					// 		},
+					// 		{
+					// 			type: 'link',
+					// 			path: '/projects/xtrf/closed-other-projects?status=Closed',
+					// 			name: 'logout'
+					// 		}
+					// 	]
+					// }
 				]
 			}
 		},

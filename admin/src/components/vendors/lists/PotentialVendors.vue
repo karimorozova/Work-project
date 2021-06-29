@@ -86,7 +86,7 @@
 				}
 			},
 			addVendor() {
-				this.$router.push("/vendors/new-vendor")
+				this.$router.push("/pangea-vendors/new-vendor")
 			},
 			async setFilter({ option }, prop) {
 				this[prop] = option

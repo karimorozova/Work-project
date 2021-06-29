@@ -42,7 +42,7 @@
 		methods: {
 			...mapActions([ 'alertToggle' ]),
 			onRowClicked(id) {
-				this.$router.push(`/projects/xtrf/open-other-projects/details/${ id }`)
+				this.$router.push(`/pangea-projects/xtrf/open-other-projects/details/${ id }`)
 			},
 			refreshProjects(projects) {
 				this.allProjects = projects

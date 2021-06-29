@@ -235,7 +235,7 @@
 				try {
 					await this.saveNewVendor(sendData)
 					this.alertToggle({ message: "New Vendor saved", isShow: true, type: "success" })
-					this.$router.push(`/vendors/all/details/${ this.currentVendor._id }`)
+					this.$router.push(`/pangea-vendors/all/details/${ this.currentVendor._id }`)
 				} catch (err) {
 					this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
 				}

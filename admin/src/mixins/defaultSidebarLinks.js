@@ -1,25 +1,26 @@
-export default {
-    methods: {
-        toggleLink({index}) {
-            this.currentIndex = index;
-            const { routeName } = this.sidebarLinks[index];
-            this.$router.push({name: routeName});
-        },
-        setDefaultActiveLink() {
-            const { name } = this.$route;
-            this.currentIndex = this.sidebarLinks.findIndex(item => item.routeName === name);
-        },
-        goToRoute() {
-            if(this.currentIndex !== -1) {
-                this.$router.push({name: this.sidebarLinks[this.currentIndex].routeName});
-            }    
-        }
-    },
-    mounted() {
-        this.setDefaultActiveLink();
-        this.goToRoute();
-    },
-    updated() {
-        this.setDefaultActiveLink();
-    }
-}
+// TODO: refactoring old side bar
+// export default {
+//     methods: {
+//         toggleLink({index}) {
+//             this.currentIndex = index;
+//             const { routeName } = this.sidebarLinks[index];
+//             this.$router.push({name: routeName});
+//         },
+//         setDefaultActiveLink() {
+//             const { name } = this.$route;
+//             this.currentIndex = this.sidebarLinks.findIndex(item => item.routeName === name);
+//         },
+//         goToRoute() {
+//             if(this.currentIndex !== -1) {
+//                 this.$router.push({name: this.sidebarLinks[this.currentIndex].routeName});
+//             }
+//         }
+//     },
+//     mounted() {
+//         this.setDefaultActiveLink();
+//         this.goToRoute();
+//     },
+//     updated() {
+//         this.setDefaultActiveLink();
+//     }
+// }

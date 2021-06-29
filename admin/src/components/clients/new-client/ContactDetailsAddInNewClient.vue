@@ -226,7 +226,7 @@
 		},
 		created() {
 			if (!this.currentClient._id && this.$route.params.id) {
-				this.$router.push(`/clients/all/details/${ this.$route.params.id }`)
+				this.$router.push(`/pangea-clients/all/details/${ this.$route.params.id }`)
 			}
 		}
 	}

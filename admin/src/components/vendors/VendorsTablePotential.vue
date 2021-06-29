@@ -316,8 +316,8 @@
 					return
 				}
 				const vendor = this.vendors[index];
-        window.open(`/vendors/candidates/potential/details/${ vendor._id }`, "_blank");
-        // this.$router.push(`/vendors/details/${ vendor._id }`);
+        window.open(`/pangea-vendors/candidates/potential/details/${ vendor._id }`, "_blank");
+        // this.$router.push(`/pangea-vendors/details/${ vendor._id }`);
 			}
 		},
 		computed: {

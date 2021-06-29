@@ -69,7 +69,7 @@
 		},
 		methods: {
 			goToClientInfo(id) {
-				const route = this.$router.resolve({ path: `/clients/all/details/${ id }` })
+				const route = this.$router.resolve({ path: `/pangea-clients/all/details/${ id }` })
 				window.open(route.href, "_blank")
 			},
 			async toggleLock(action) {

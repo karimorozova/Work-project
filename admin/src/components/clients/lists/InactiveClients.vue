@@ -90,10 +90,10 @@
 				this.$emit('clientCancel')
 			},
 			showClientDetails({ id }) {
-				this.$router.push(`/clients/inactive/details/${ id }`)
+				this.$router.push(`/pangea-clients/inactive/details/${ id }`)
 			},
 			addClient() {
-				this.$router.push('/clients/new-client')
+				this.$router.push('/pangea-clients/new-client')
 			},
 			filterByName(e) {
 				const { value } = e.target

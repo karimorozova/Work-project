@@ -43,7 +43,7 @@
 		methods: {
 			...mapActions([ "setFilteredVendors", "alertToggle" ]),
 			goToVendorPage(vendorId) {
-				this.$router.push(`/vendors/inactive/details/${ vendorId }`)
+				this.$router.push(`/pangea-vendors/inactive/details/${ vendorId }`)
 			},
 			async setSourceFilter(data) {
 				this.sourceLang = data

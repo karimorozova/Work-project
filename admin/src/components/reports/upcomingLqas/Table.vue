@@ -53,7 +53,7 @@ export default {
     },
     methods: {
 	    routeToVendor(vendorId){
-		    const route = this.$router.resolve({ path: `/vendors/all/details/${ vendorId }` });
+		    const route = this.$router.resolve({ path: `/pangea-vendors/all/details/${ vendorId }` });
 		    window.open(route.href, "_blank");
 	    },
         presentWordcount(words) {

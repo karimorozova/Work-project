@@ -671,7 +671,7 @@
 					const result = await this.$http.delete(`/clientsapi/deleteclient/${ id }`)
 					await this.removeClient(id)
 					this.alertToggle({ message: "Client has been removed", isShow: true, type: "success" })
-					await this.$router.push("/clients")
+					await this.$router.push("/pangea-clients/all")
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error on deleting the Client", isShow: true, type: "error" })
 				}

@@ -79,7 +79,7 @@
 				alertToggle: "alertToggle"
 			}),
 			addVendor() {
-				this.$router.push("/vendors/new-vendor")
+				this.$router.push("/pangea-vendors/new-vendor")
 			},
 			setSourceFilter({ option }) {
 				this.$emit('setSourceFilter', option)

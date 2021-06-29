@@ -77,7 +77,7 @@
 			},
 
 			goToVendorPage(vendorId) {
-				this.$router.push(`/vendors/all/details/${ vendorId }`)
+				this.$router.push(`/pangea-vendors/all/details/${ vendorId }`)
 			},
 
 			async setFilter({ option }, prop) {

@@ -109,14 +109,14 @@ const router = new Router({
 				//     name: 'zoho',
 				//     component: ZohoCode
 				// },
-				{
-					path: '/account/settings',
-					name: 'account-info',
-					component: Accountinfo
-				},
+				// {
+				// 	path: '/account/settings',
+				// 	name: 'account-info',
+				// 	component: Accountinfo
+				// },
 				{
 					path: 'pangea-dashboard',
-					name: '',
+					name: 'pangea-dashboard',
 					component: clearRouterView,
 					children: [
 						{
@@ -133,8 +133,8 @@ const router = new Router({
 					]
 				},
 				{
-					path: 'settings',
-					name: 'settings',
+					path: 'pangea-settings',
+					name: 'pangea-settings',
 					component: clearRouterView,
 					props: true,
 					children: [
@@ -216,8 +216,8 @@ const router = new Router({
 					]
 				},
 				{
-					path: 'vendors',
-					name: '',
+					path: 'pangea-vendors',
+					name: 'pangea-vendors',
 					component: clearRouterView,
 					children: [
 
@@ -285,8 +285,8 @@ const router = new Router({
 					]
 				},
 				{
-					path: 'clients',
-					name: '',
+					path: 'pangea-clients',
+					name: 'pangea-clients',
 					component: clearRouterView,
 					children: [
 						{
@@ -359,7 +359,7 @@ const router = new Router({
 						},
 						{
 							path: 'new-client',
-							name: '',
+							name: 'new-client',
 							component: NewClient,
 							props: true,
 							children: [
@@ -385,10 +385,9 @@ const router = new Router({
 						}
 					]
 				},
-
 				{
-					path: 'projects',
-					name: 'projects',
+					path: 'pangea-projects',
+					name: 'pangea-projects',
 					component: clearRouterView,
 					children: [
 						{
@@ -441,7 +440,7 @@ const router = new Router({
 						},
 						{
 							path: 'xtrf',
-							name: '',
+							name: 'xtrf',
 							component: clearRouterView,
 							props: true,
 							children: [
@@ -493,13 +492,21 @@ const router = new Router({
 					]
 				},
 				{
-					path: 'finance',
-					name: 'finance',
-					component: clearRouterView
+					path: 'pangea-finance',
+					name: 'pangea-finance',
+					component: clearRouterView,
+					props: true,
+					children: [
+						{
+							path: 'finance',
+							name: 'finance',
+							component: clearRouterView
+						}
+					]
 				},
 				{
-					path: 'reports',
-					name: 'reports',
+					path: 'pangea-reports',
+					name: 'pangea-reports',
 					component: clearRouterView,
 					children: [
 						{

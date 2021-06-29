@@ -78,7 +78,7 @@
 
             template(slot="link" slot-scope="{ row }")
               .pendingCompetencies__icon
-                a(:href="'/vendors/all/details/' + row.link" target="_blank")
+                a(:href="'/pangea-vendors/all/details/' + row.link" target="_blank")
                   i.fas.fa-external-link-alt
 
 </template>

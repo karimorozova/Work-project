@@ -87,7 +87,7 @@
 		},
 		methods: {
 			showPriceSettings(id) {
-				this.$router.push(`/settings/pricelists/${ id }`)
+				this.$router.push(`/pangea-settings/pricelists/${ id }`)
 			},
 			isDeletePricelist() {
 				this.isDeleting = true

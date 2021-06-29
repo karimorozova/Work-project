@@ -81,9 +81,9 @@
 				this.setCurrentProject(project)
 				const request = this.allRequests.find(item => item._id === project._id)
 				if (request) {
-					return this.$router.push(`/projects/requests/details/${ project._id }`)
+					return this.$router.push(`/pangea-projects/requests/details/${ project._id }`)
 				}
-				this.$router.push(`/projects/closed-projects/details/${ project._id }`)
+				this.$router.push(`/pangea-projects/closed-projects/details/${ project._id }`)
 			},
 			async getManagers() {
 				const managers = await this.$http.get("/pm-manage/all-managers?groupFilters=Project%20Managers,Sales")
