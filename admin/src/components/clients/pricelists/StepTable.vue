@@ -104,28 +104,28 @@
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "28%",
+						width: "31.5%",
 						padding: "0"
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "28%",
+						width: "31.5%",
 						padding: "0"
 					},
 					{
 						label: "Size",
 						headerKey: "headerSize",
 						key: "size",
-						width: "9%",
+						width: "11%",
 						padding: "0"
 					},
 					{
 						label: "%",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-						width: "10%",
+						width: "11%",
 						padding: "0"
 					},
 					{
