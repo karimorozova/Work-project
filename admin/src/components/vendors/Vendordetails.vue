@@ -200,7 +200,6 @@
 	import ValidationErrors from "../ValidationErrors"
 	import SelectSingle from "../SelectSingle"
 	import Asterisk from "../Asterisk"
-	import Addseverallangs from "../finance/Addseverallangs"
 	import AvailablePairs from "../finance/pricelists/AvailablePairs"
 	import photoPreview from "@/mixins/photoPreview"
 	import ApproveModal from "../ApproveModal"
@@ -595,7 +594,6 @@
 			TimezoneSelect,
 			ValidationErrors,
 			Asterisk,
-			Addseverallangs,
 			AvailablePairs,
 			SelectSingle,
 			ckeditor: CKEditor.component,

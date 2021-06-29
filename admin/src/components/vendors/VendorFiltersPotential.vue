@@ -52,7 +52,6 @@
 
 <script>
 	import VendorIndustrySelect from "./VendorIndustrySelect"
-	import LanguagesSelect from "@/components/LanguagesSelect"
 	import SelectSingle from "@/components/SelectSingle"
 	import { mapActions } from "vuex"
 	import Datepicker from "../Datepicker"
@@ -175,7 +174,6 @@
 		components: {
 			Button,
 			VendorIndustrySelect,
-			LanguagesSelect,
 			SelectSingle,
 			Datepicker
 		},

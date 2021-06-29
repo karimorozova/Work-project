@@ -13,7 +13,6 @@
 </template>
 
 <script>
-	import LanguagesSelect from "@/components/LanguagesSelect"
 	import SelectSingle from "@/components/SelectSingle"
 	import { mapGetters, mapActions } from "vuex"
 	import taskData from "@/mixins/taskData"
@@ -61,7 +60,6 @@
 			}
 		},
 		components: {
-			LanguagesSelect,
 			SelectSingle
 		}
 	}

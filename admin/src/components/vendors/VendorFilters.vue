@@ -41,7 +41,6 @@
 
 <script>
 	import VendorIndustrySelect from "./VendorIndustrySelect"
-	import LanguagesSelect from "@/components/LanguagesSelect"
 	import SelectSingle from "@/components/SelectSingle"
 	import { mapActions, mapGetters } from "vuex"
 	import Button from "../Button"
@@ -109,7 +108,6 @@
 		components: {
 			Button,
 			VendorIndustrySelect,
-			LanguagesSelect,
 			SelectSingle
 		}
 	}

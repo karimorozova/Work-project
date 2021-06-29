@@ -15,11 +15,11 @@
             Datepicker(@selected="setStart" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-30" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
           img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="startOpen")
         .filters-other__item
-          LabelValue(label="Target Langs")
-            .filters-other__drop-menu.filters-other_medium-menu
-              LanguagesSelect(
-                :selectedLangs="targetLangs"
-                @chosenLang="({lang}) => addLang({lang}, 'targetFilter')")
+          //LabelValue(label="Target Langs")
+            //.filters-other__drop-menu.filters-other_medium-menu
+              //LanguagesSelect(
+                //:selectedLangs="targetLangs"
+                //@chosenLang="({lang}) => addLang({lang}, 'targetFilter')")
 
       .filters-other__col
         .filters-other__date
@@ -27,11 +27,11 @@
             Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-30" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
           img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="deadlineOpen")
         .filters-other__item
-          LabelValue(label="Source Langs")
-            .filters-other__drop-menu.filters-other_medium-menu
-              LanguagesSelect(
-                :selectedLangs="sourceLangs"
-                @chosenLang="({lang}) => addLang({lang}, 'sourceFilter')")
+          //LabelValue(label="Source Langs")
+            //.filters-other__drop-menu.filters-other_medium-menu
+              //LanguagesSelect(
+                //:selectedLangs="sourceLangs"
+                //@chosenLang="({lang}) => addLang({lang}, 'sourceFilter')")
 
       .filters-other__col
         .filters-other__item
@@ -49,7 +49,6 @@
 </template>
 
 <script>
-	import LanguagesSelect from "../../LanguagesSelect"
 	import Datepicker from "../../Datepicker"
 	import LabelValue from "../LabelValue"
 	import moment from "moment"
@@ -174,7 +173,6 @@
 		},
 		components: {
 			Button,
-			LanguagesSelect,
 			Datepicker,
 			LabelValue
 		}

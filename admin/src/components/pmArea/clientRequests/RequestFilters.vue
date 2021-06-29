@@ -42,22 +42,22 @@
         input.filters__text-input(type="text" :value="clientName" @keyup="filterByName")
       .filters__item
         //LabelValue(label="Source Langs")
-        label.filters__filter-title Source Langs:
+        //label.filters__filter-title Source Langs:
 
-        .filters__drop-menu.filters_medium-menu
-          LanguagesSelect(
-            :selectedLangs="sourceLangs.map(({symbol}) => symbol)"
-            @chosenLang="(lang) => addLang(lang, 'sourceFilter')"
-          )
+        //.filters__drop-menu.filters_medium-menu
+          //LanguagesSelect(
+            //:selectedLangs="sourceLangs.map(({symbol}) => symbol)"
+            //@chosenLang="(lang) => addLang(lang, 'sourceFilter')"
+          //)
       .filters__item.filters_flex-end
         //LabelValue(label="Target Langs")
 
-        label.filters__filter-title Target Langs:
-        .filters__drop-menu.filters_medium-menu
-          LanguagesSelect(
-            :selectedLangs="targetLangs.map(({symbol}) => symbol)"
-            @chosenLang="(lang) => addLang(lang, 'targetFilter')"
-          )
+        //label.filters__filter-title Target Langs:
+        //.filters__drop-menu.filters_medium-menu
+          //LanguagesSelect(
+            //:selectedLangs="targetLangs.map(({symbol}) => symbol)"
+            //@chosenLang="(lang) => addLang(lang, 'targetFilter')"
+          //)
 
     .filters__row
       .filters__date
@@ -84,7 +84,6 @@
 <script>
 	import SelectSingle from "../../SelectSingle"
 	import SelectMulti from "../../SelectMulti"
-	import LanguagesSelect from "../../LanguagesSelect"
 	import Datepicker from "../../Datepicker"
 	import LabelValue from "../LabelValue"
 	import moment from "moment"
@@ -197,7 +196,6 @@
       DatepickerWithTime,
 			SelectSingle,
 			SelectMulti,
-			LanguagesSelect,
 			Datepicker,
 			LabelValue
 		}
