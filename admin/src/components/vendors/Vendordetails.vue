@@ -196,7 +196,6 @@
 	import VendorStatusSelect from "./VendorStatusSelect"
 	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect"
 	import NativeLanguageSelect from "./NativeLanguageSelect"
-	import TimezoneSelect from "../clients/TimezoneSelect"
 	import ValidationErrors from "../ValidationErrors"
 	import SelectSingle from "../SelectSingle"
 	import Asterisk from "../Asterisk"
@@ -591,7 +590,6 @@
 			VendorStatusSelect,
 			MultiVendorIndustrySelect,
 			NativeLanguageSelect,
-			TimezoneSelect,
 			ValidationErrors,
 			Asterisk,
 			AvailablePairs,
