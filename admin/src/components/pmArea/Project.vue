@@ -94,7 +94,7 @@
         .project__number
           .input-title
             .input-title__text Client Project Number:
-            span.require *
+            span.require
           input.project__input-text(type="text" :disabled="isProjectFinished" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
@@ -447,6 +447,10 @@
       padding: 20px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
       position: relative;
+      background: white;
+      border-radius: 4px;
+      background: white;
+      border-radius: 4px;
     }
 
     &__info-row {
@@ -509,7 +513,7 @@
     }
 
     &__input-text {
-      width: 179px;
+      width: 189px;
       height: 30px;
       border: 1px solid #c1bbb1;
       border-radius: 4px;
@@ -523,7 +527,7 @@
     }
 
     &__input-text2 {
-      width: 179px;
+      width: 189px;
       height: 30px;
       border: 1px solid #c1bbb1;
       border-radius: 4px;
@@ -614,7 +618,7 @@
           display: inline-block;
           height: 16px;
           width: 16px;
-          border: 1px solid;
+          border: 1px solid #c1bbb1;
           left: 0px;
           top: 3px;
         }

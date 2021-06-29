@@ -860,7 +860,7 @@
 		},
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
-				if (from.name === 'contact' || from.name === 'new-contact') {
+				if (from.name && from.name.includes('contact')) {
 					vm.getClientInfoWithoutOverallData()
 				} else {
 					vm.getClientInfo()

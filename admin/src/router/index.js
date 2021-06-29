@@ -20,9 +20,7 @@ import CancelReasons from '@/components/Table/CancelReasons'
 import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
 import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
-import NewContactDetails from '@/components/clients/new-client/NewContactDetails'
 import NewClient from '@/components/clients/new-client/NewClient'
-import ContactDetails from '@/components/clients/ContactDetails'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewVendor from '@/components/vendors/NewVendor'
 import Accountinfo from '@/components/account/Accountinfo'
@@ -64,6 +62,10 @@ import AllVendorsTable from '@/components/vendors/lists/AllVendorsTable'
 import ActiveVendors from '@/components/vendors/lists/ActiveVendors'
 import PotentialVendors from '@/components/vendors/lists/PotentialVendors'
 import InactiveVendors from '@/components/vendors/lists/InactiveVendors'
+import ContactDetailsAddInNewClient from "../components/clients/new-client/ContactDetailsAddInNewClient"
+import ContactDetailsInNewClient from "../components/clients/new-client/ContactDetailsInNewClient"
+import ContactDetailsAddExistingClient from "../components/clients/ContactDetailsAddExistingClient"
+import ContactDetailsExistingClient from "../components/clients/ContactDetailsExistingClient"
 // =====================================================================================================
 
 
@@ -287,7 +289,6 @@ const router = new Router({
 					name: '',
 					component: clearRouterView,
 					children: [
-
 						{
 							path: 'all',
 							name: 'all-clients',
@@ -301,8 +302,8 @@ const router = new Router({
 							props: true,
 							children: [
 								{ path: '', name: 'all-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'all-new-contact', component: NewContactDetails, props: true },
-								{ path: 'contact/:index', name: 'all-contact', component: ContactDetails, props: true }
+								{ path: 'new-contact', name: 'all-new-contact', component: ContactDetailsAddExistingClient, props: true },
+								{ path: 'contact/:index', name: 'all-contact', component: ContactDetailsExistingClient, props: true }
 							]
 						},
 						{
@@ -318,8 +319,8 @@ const router = new Router({
 							props: true,
 							children: [
 								{ path: '', name: 'active-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'active-new-contact', component: NewContactDetails, props: true },
-								{ path: 'contact/:index', name: 'active-contact', component: ContactDetails, props: true }
+								{ path: 'new-contact', name: 'active-new-contact', component: ContactDetailsAddExistingClient, props: true },
+								{ path: 'contact/:index', name: 'active-contact', component: ContactDetailsExistingClient, props: true }
 							]
 						},
 						{
@@ -335,8 +336,8 @@ const router = new Router({
 							props: true,
 							children: [
 								{ path: '', name: 'inactive-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'inactive-new-contact', component: NewContactDetails, props: true },
-								{ path: 'contact/:index', name: 'inactive-contact', component: ContactDetails, props: true }
+								{ path: 'new-contact', name: 'inactive-new-contact', component: ContactDetailsAddExistingClient, props: true },
+								{ path: 'contact/:index', name: 'inactive-contact', component: ContactDetailsExistingClient, props: true }
 							]
 						},
 						{
@@ -352,8 +353,8 @@ const router = new Router({
 							props: true,
 							children: [
 								{ path: '', name: 'potential-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'potential-new-contact', component: NewContactDetails, props: true },
-								{ path: 'contact/:index', name: 'potential-contact', component: ContactDetails, props: true }
+								{ path: 'new-contact', name: 'potential-new-contact', component: ContactDetailsAddExistingClient, props: true },
+								{ path: 'contact/:index', name: 'potential-contact', component: ContactDetailsExistingClient, props: true }
 							]
 						},
 						{
@@ -371,13 +372,13 @@ const router = new Router({
 								{
 									path: 'new_contact',
 									name: 'new_contact',
-									component: NewContactDetails,
+									component: ContactDetailsAddInNewClient,
 									props: true
 								},
 								{
 									path: '_contact/:index',
 									name: '_contact',
-									component: ContactDetails,
+									component: ContactDetailsInNewClient,
 									props: true
 								}
 							]
@@ -536,17 +537,17 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-	try{
+	try {
 		const token = localStorage.getItem("token")
 		if (!token && to.path !== '/login') {
-				next('/login')
+			next('/login')
 		}
 
 		const test = token ? jwt.verify(JSON.parse(token).value, secretKey) : false
 
 		if (to.path === '/forgot') {
 			next()
-		}  else if (test) {
+		} else if (test) {
 			const date = Date.now()
 			const expiryTime = new Date(JSON.parse(token).timestamp)
 			if (date > expiryTime && to.path !== '/login') {

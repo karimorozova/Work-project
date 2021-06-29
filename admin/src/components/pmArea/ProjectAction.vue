@@ -595,6 +595,8 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    background: white;
+    border-radius: 4px;
 
     &__dropBody{
       position: relative;

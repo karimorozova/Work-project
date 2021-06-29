@@ -6,7 +6,7 @@
       .buttons
         input.button(type="button" value="Continue" @click="checkForErrors")
         input.button(type="button" value="Cancel" @click="cancel")
-        //input.button(type="button" value="Delete" @click="deleteContact")
+
     .details
       .details__item
         .photo-wrap(v-if="!contact.photo")
@@ -74,7 +74,7 @@
     .delete-approve(v-if="approveShow")
       p Are you sure you want to delete?
       input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
-      input.button(type="button" value="Delete" @click="approveDelete")
+      input.button(type="button" value="Delete")
     ValidationErrors(v-if="areErrorsExist"
       :errors="errors"
       @closeErrors="closeErrorsBlock"
@@ -88,42 +88,46 @@
 	import ClickOutside from "vue-click-outside"
 	import CountriesSelect from './CountriesSelect'
 	import TimezoneSelect from './TimezoneSelect'
-	import { mapGetters } from 'vuex'
+	import { mapActions, mapGetters } from 'vuex'
 	import photoPreview from '@/mixins/photoPreview'
 
 	export default {
 		mixins: [ photoPreview ],
-		props: {
-			index: {
-				type: [ Number, String ]
-			},
-			newClient: {
-				type: Object
-			},
-			isNewClient: {
-				type: Boolean,
-				default: false
-			}
-		},
 		data() {
 			return {
-				countries: [],
-				timezones: [],
+				contact: {
+					firstName: "",
+					surname: "",
+					email: "",
+					password: "",
+					gender: "",
+					position: "",
+					phone: "",
+					photo: "",
+					whatsApp: "",
+					skype: "",
+					linkedIn: "",
+					country: "",
+					timeZone: "",
+					notes: "",
+					leadContact: false
+				},
 				imageExist: false,
+				areErrorsExist: false,
+				genderDropped: false,
 				approveShow: false,
 				photoFile: [],
-				contact: {},
-				areErrorsExist: false,
 				errors: [],
 				isSaveClicked: false,
 				genders: [ "Male", "Female" ],
 				fromRoute: "",
-				oldEmail: "",
 				isFileError: false
 			}
 		},
 		methods: {
-
+			...mapActions({
+				storeClientContactOverAll: "storeClientContactOverAll"
+			}),
 			openGenders() {
 				this.genderDropped = !this.genderDropped
 			},
@@ -142,9 +146,6 @@
 			deleteContact() {
 				this.approveShow = true
 			},
-			approveDelete() {
-				this.$emit('approveDelete', { index: this.index })
-			},
 			chosenCountry(data) {
 				this.countrySelected = data
 				this.contact.country = data
@@ -152,13 +153,6 @@
 			chosenZone(data) {
 				this.timezoneSelected = data
 				this.contact.timezone = data
-			},
-			checkInNewCLient() {
-				const { contacts } = this.newClient
-				const sameEmail = contacts.find((item, index) => {
-					return this.index !== index && item.email === this.contact.email
-				})
-				if (sameEmail) this.errors.push("The email you entered is already used.")
 			},
 			setPhone(e) {
 				const { value } = e.target
@@ -169,17 +163,12 @@
 				this.$refs.phone.value = this.contact.phone
 			},
 			async checkEmailUniquenes() {
-				if (this.oldEmail === this.contact.email) return
-				if (this.isNewClient) {
-					return checkInNewCLient()
-				}
 				try {
 					const result = await this.$http.get(`/clientsapi/unique-email?email=${ this.contact.email }`)
 					if (result.body === "exist") {
 						this.errors.push("The email you entered is already used in our system.")
 					}
 				} catch (err) {
-
 				}
 			},
 			async checkForErrors() {
@@ -193,24 +182,23 @@
 				if (this.contact.email && emailValidReg.test(this.contact.email)) {
 					await this.checkEmailUniquenes()
 				}
+				if (/^\s+$/.exec(this.contact.firstName) || /^\s+$/.exec(this.contact.firstName)) {
+					this.errors.push("Please, enter valid contact's first name or e-mail address.")
+				}
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					this.isSaveClicked = true
 					return
 				}
-				this.contactUpdate()
+				this.contactSave()
 			},
-			contactUpdate() {
-				this.$emit('contactUpdate', { file: this.photoFile[0], index: this.index || this.$route.params.index, contact: this.contact })
+			useContactSave({ file, contact }) {
+				// this.photoFile.push(file)
+				this.storeClientContactOverAll(contact)
+				this.$router.go(-1)
 			},
-			getContact() {
-				const index = this.index || this.$route.params.index
-				if (!this.isNewClient) {
-					this.contact = { ...this.currentClient.contacts[index] }
-				} else {
-					this.contact = { ...this.newClient.contacts[index] }
-				}
-				this.oldEmail = this.contact.email
+			contactSave() {
+				this.useContactSave({ contact: this.contact, file: this.photoFile[0] })
 			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false
@@ -218,7 +206,7 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "currentClientOverallData"
+				currentClient: "getCurrentClient"
 			}),
 			isEmailValid() {
 				if (this.isSaveClicked) {
@@ -227,9 +215,6 @@
 				}
 				return true
 			}
-		},
-		mounted() {
-			this.getContact()
 		},
 		components: {
 			CountriesSelect,
@@ -245,19 +230,22 @@
 			next(vm => {
 				vm.fromRoute = from.path
 			})
+		},
+		created() {
+			if (!this.currentClient._id && this.$route.params.id) {
+				this.$router.push(`/clients/all/details/${ this.$route.params.id }`)
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+  @import "../../assets/scss/colors";
 
   .contact-wrap {
     position: relative;
     width: 700px;
     margin: 50px;
-    border-radius: 4px;
-    background-color: white;
 
     label {
       margin-bottom: 0;
@@ -268,7 +256,6 @@
       justify-content: space-between;
       align-items: center;
       padding-bottom: 20px;
-
     }
 
     &_error-shadow {
@@ -309,6 +296,8 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
+    border-radius: 4px;
+    background: white;
 
     &__item {
       display: flex;
@@ -337,9 +326,10 @@
         align-items: center;
         border-radius: 4px;
 
+
         .photo-image {
-          max-width: 100%;
           max-height: 100%;
+          max-width: 100%;
         }
       }
     }

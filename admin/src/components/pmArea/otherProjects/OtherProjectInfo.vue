@@ -1,5 +1,5 @@
 <template lang="pug">
-  .project-inf
+  .project-info
     .project-info__all-info
       OtherProjectDetails(
         :project="project"
@@ -132,6 +132,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    margin: 50px;
 
     &__title {
       padding: 20px 0 0 40px;

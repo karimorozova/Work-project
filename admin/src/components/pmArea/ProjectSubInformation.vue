@@ -396,6 +396,8 @@ export default {
   align-items: flex-start;
   min-width: 400px;
   width: 400px;
+  background: white;
+  border-radius: 4px;
 
   &__row {
     width: 100%;
@@ -537,7 +539,7 @@ export default {
       display: inline-block;
       height: 16px;
       width: 16px;
-      border: 1px solid;
+      border: 1px solid #c1bbb1;
       left: 0px;
       top: 3px;
     }

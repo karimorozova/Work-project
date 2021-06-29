@@ -526,7 +526,7 @@
         display: inline-block;
         height: 16px;
         width: 16px;
-        border: 1px solid;
+        border: 1px solid #c1bbb1;
         left: 0px;
         top: 3px;
       }

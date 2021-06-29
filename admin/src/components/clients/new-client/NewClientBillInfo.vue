@@ -138,7 +138,7 @@
 				})
 			},
 			isSameInformation() {
-				if (this.client.officialCompanyName ) {
+				if (this.client.officialCompanyName) {
 					this.isSame = this.client.billingInfo.officialCompanyName === this.client.officialCompanyName
 				}
 			}
@@ -185,7 +185,7 @@
     textarea {
       color: rgba(103, 87, 62, 0.5);
       height: 71px;
-      width: 185px;
+      width: 300px;
       border: 1px solid #c1bbb1;
       border-radius: 4px;
       outline: none;
@@ -201,7 +201,7 @@
     }
 
     &__dueDate {
-      width: 190px;
+      width: 210px;
       display: flex;
 
       .dueDate-date {
@@ -212,8 +212,8 @@
 
     &__drop {
       position: relative;
-      width: 200px;
-      height: 28px;
+      width: 210px;
+      height: 30px;
     }
 
     &__item {
@@ -243,8 +243,8 @@
         border-radius: 4px;
         padding: 0 5px;
         outline: none;
-        width: 200px;
-        height: 30px;
+        width: 210px;
+        height: 32px;
         box-sizing: border-box;
       }
     }
@@ -269,8 +269,8 @@
 
   .checkbox {
     display: flex;
-    height: 28px;
-    width: 200px;
+    height: 30px;
+    width: 210px;
 
     input[type="checkbox"] {
       opacity: 0;
@@ -305,7 +305,7 @@
         display: inline-block;
         height: 16px;
         width: 16px;
-        border: 1px solid;
+        border: 1px solid #c1bbb1;
         left: 0px;
         top: 3px;
       }
@@ -326,11 +326,11 @@
   }
 
   #dueDate {
-    width: 200px;
+    width: 210px;
   }
 
   #vatId {
-    width: 162px;
+    width: 172px;
   }
 
   #same-checkbox {

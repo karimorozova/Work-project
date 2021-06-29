@@ -264,6 +264,8 @@
     margin-top: 40px;
     padding: 20px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    background: white;
+    border-radius: 4px;
 
     &__titleFinance{
       font-size: 21px;
@@ -418,7 +420,7 @@
         display: inline-block;
         height: 16px;
         width: 16px;
-        border: 1px solid;
+        border: 1px solid #c1bbb1;
         left: 0px;
         top: 3px;
         background: white;

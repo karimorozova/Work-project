@@ -86,8 +86,8 @@
 	import Asterisk from "../../Asterisk"
 	import SelectSingle from "../../SelectSingle"
 	import ClickOutside from "vue-click-outside"
-	import CountriesSelect from '../CountriesSelect'
-	import TimezoneSelect from '../TimezoneSelect'
+	import CountriesSelect from './../CountriesSelect'
+	import TimezoneSelect from './../TimezoneSelect'
 	import { mapGetters } from 'vuex'
 	import photoPreview from '@/mixins/photoPreview'
 
@@ -239,8 +239,6 @@
     position: relative;
     width: 700px;
     margin: 50px;
-    border-radius: 4px;
-    background-color: white;
 
     label {
       margin-bottom: 0;
@@ -291,6 +289,8 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
+    border-radius: 4px;
+    background: white;
 
     &__item {
       display: flex;
