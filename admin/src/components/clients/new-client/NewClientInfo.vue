@@ -178,9 +178,8 @@
 					if (!lead) this.setLeadContact({ index: 0 })
 				}
 			},
-			setLeadSource({ leadSource }) {
-
-				this.client.leadSource = leadSource
+			setLeadSource({ option }) {
+				this.client.leadSource = option
 			},
 			setBillInfo({ prop, value }) {
 				this.client.billingInfo[prop] = value

@@ -4,9 +4,11 @@
       label.block-item__label Status:
         span.require *
       .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !client.status}")
-        ClientStatusSelect(
-          :selectedStatus="clientStatus"
-          @chosenStatus="setStatus"
+        SelectSingle(
+          :options="['Active', 'Inactive', 'Potential']",
+          placeholder="Status",
+          :selectedOption="clientStatus",
+          @chooseOption="setStatus"
         )
     .block-item
       label.block-item__label Test:
@@ -17,7 +19,12 @@
       label.block-item__label Account Manager:
         span.require *
       .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.accountManager}")
-        AMSelect(:selectedManager="client.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
+        SelectSingle(
+          :options="users.filter(i => i.group.name === 'Account Managers').map(i => `${i.firstName} ${i.lastName}`)",
+          placeholder="Select",
+          :selectedOption="getFullName(client.accountManager)",
+          @chooseOption="(data) => setManager(data, 'accountManager')"
+        )
     //.block-item
       label.block-item__label Sales Manager:
         span.require *
@@ -27,12 +34,17 @@
       label.block-item__label Project Manager:
         span.require *
       .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.projectManager}")
-        AMSelect(:selectedManager="client.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
+        SelectSingle(
+          :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
+          placeholder="Select",
+          :selectedOption="getFullName(client.projectManager)",
+          @chooseOption="(data) => setManager(data, 'projectManager')"
+        )
 </template>
 
 <script>
-	import ClientStatusSelect from "../ClientStatusSelect"
-	import AMSelect from "../AMSelect"
+	import SelectSingle from "../../SelectSingle"
+	import { mapGetters } from "vuex"
 
 	export default {
 		props: {
@@ -47,17 +59,23 @@
 			return {}
 		},
 		methods: {
-			setManager({ manager }, prop) {
-				this.client[prop] = manager
+			setManager({ option }, prop) {
+				this.client[prop] = this.users.find(i => `${ i.firstName } ${ i.lastName }` === option)
 			},
 			setTest() {
 				this.client.isTest = event.target.checked
 			},
-			setStatus({ status }) {
-				this.client.status = status
+			setStatus({ option }) {
+				this.client.status = option
+			},
+			getFullName(manager) {
+				return `${ manager.firstName || "" } ${ manager.lastName || "" }`
 			}
 		},
 		computed: {
+			...mapGetters({
+				users: "getUsers"
+			}),
 			clientStatus() {
 				if (!this.client.status) {
 					this.client.status = 'Potential'
@@ -66,8 +84,7 @@
 			}
 		},
 		components: {
-			ClientStatusSelect,
-			AMSelect
+			SelectSingle
 		}
 	}
 </script>

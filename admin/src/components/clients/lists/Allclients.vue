@@ -11,9 +11,9 @@
             .clients-filters__drop-menu
               ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
           .clients-filters__item
-            label Lead Source:
-            .clients-filters__drop-menu
-              ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="leadSourceFilter" @chosenLeadsource="chosenLeadsource")
+            //label Lead Source:
+            //.clients-filters__drop-menu
+              //ClientLeadsourceSelect(:isAllExist="isAllLeadExist" :selectedLeadsource="leadSourceFilter" @chosenLeadsource="chosenLeadsource")
           .clients-filters__item
           .clients-filters__itemButton
             input.add-button(type="submit" value="Add client" @click="addClient")
@@ -34,7 +34,6 @@
 	import ClientsTable from "../ClientsTable"
 	import ClientIndustrySelect from '../../clients/ClientIndustrySelect'
 	import MultiClientIndustrySelect from '../../clients/MultiClientIndustrySelect'
-	import ClientLeadsourceSelect from '../../clients/ClientLeadsourceSelect'
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
@@ -141,7 +140,6 @@
 			ClientsTable,
 			ClientIndustrySelect,
 			MultiClientIndustrySelect,
-			ClientLeadsourceSelect
 		},
 		created() {
 			this.getCustomers()

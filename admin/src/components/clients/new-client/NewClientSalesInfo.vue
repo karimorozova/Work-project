@@ -4,7 +4,12 @@
       label.lead-info__label.lead-info_relative Lead Source:
         Asterisk(:customStyle="{top: '-4px'}")
       .lead-info__menu(:class="{'sales-info_error-shadow': !client.leadSource && isEmpty}")
-        ClientLeadsourceSelect(:selectedLeadsource="client.leadSource" @chosenLeadsource="chosenLeadsource")
+        SelectSingle(
+          :options="leadsources",
+          placeholder="Select",
+          :selectedOption="client.leadSource",
+          @chooseOption="chosenLeadsource"
+        )
     .lead-info
       label.lead-info__label.lead-info_relative Lead Generator:
       .lead-info__menu
@@ -18,7 +23,6 @@
 </template>
 
 <script>
-	import ClientLeadsourceSelect from '../ClientLeadsourceSelect'
 	import SelectSingle from '../../SelectSingle'
 	import Asterisk from "../../Asterisk"
 	import { mapGetters, mapActions } from "vuex"
@@ -34,20 +38,32 @@
 		},
 		data() {
 			return {
-				leadGeneration: ''
+				leadGeneration: '',
+				leadsources: []
 			}
 		},
 		methods: {
 			...mapActions({
 				storeClientProperty: "storeClientProperty"
 			}),
-			chosenLeadsource({ leadSource }) {
-				this.$emit("setLeadSource", { leadSource })
+			chosenLeadsource({ option }) {
+				this.$emit("setLeadSource", { option })
 			},
 			setGenerator({ option }) {
 				this.leadGeneration = option
 				this.storeClientProperty({ prop: "leadGeneration", value: this.leadGeneration })
+			},
+			async getSources() {
+				try {
+					const result = await this.$http.get('/api/leadsources')
+					this.leadsources = result.data.map(item => item.source)
+				} catch (err) {
+					console.log(err)
+				}
 			}
+		},
+		created() {
+			this.getSources()
 		},
 		computed: {
 			...mapGetters({
@@ -55,7 +71,6 @@
 			})
 		},
 		components: {
-			ClientLeadsourceSelect,
 			Asterisk,
 			SelectSingle
 		}

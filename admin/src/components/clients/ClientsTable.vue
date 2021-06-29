@@ -27,14 +27,14 @@
                 input.clients-table__input(type="text" v-model="currentName" @click.stop="stopPropagation")
             .clients-table__data-cell(v-else) {{ row.name }}
         template(slot="status" slot-scope="{ row, index }")
-            .clients-table__drop-menu(v-if="currentEditingIndex === index")
-                ClientStatusSelect(
-                    :isAllExist="isAllStatusExist"
-                    :selectedStatus="selectedStatus"
-                    @chosenStatus="setStatus"
-                    @scrollDrop="scrollDrop"
-                )
-            .clients-table__data-cell(v-else) {{ row.status }}
+            //.clients-table__drop-menu(v-if="currentEditingIndex === index")
+                //ClientStatusSelect(
+                  //  :isAllExist="isAllStatusExist"
+                    //:selectedStatus="selectedStatus"
+                    //@chosenStatus="setStatus"
+                    //@scrollDrop="scrollDrop"
+                //)
+            .clients-table__data-cell {{ row.status }}
         template(slot="industry" slot-scope="{ row, index }")
             .clients-table__drop-menu(v-if="currentEditingIndex === index")
                 MultiClientIndustrySelect(
@@ -51,14 +51,14 @@
                 input.clients-table__input(type="text" v-model="currentWebsite" @click.stop="stopPropagation")
             .clients-table__data-cell(v-else) {{ row.website }}
         template(slot="lead" slot-scope="{ row, index }")
-            .clients-table__drop-menu(v-if="currentEditingIndex === index")
-                ClientLeadsourceSelect(
-                    :isAllExist="isAllLeadExist"
-                    :selectedLeadsource="selectedLeadsource"
-                    @chosenLeadsource="setLeadsource"
-                    @scrollDrop="scrollDrop"
-                )
-            .clients-table__data-cell(v-else) {{ row.leadSource }}
+            //.clients-table__drop-menu(v-if="currentEditingIndex === index")
+                //ClientLeadsourceSelect(
+                    //:isAllExist="isAllLeadExist"
+                    //:selectedLeadsource="selectedLeadsource"
+                   // @chosenLeadsource="setLeadsource"
+                    //@scrollDrop="scrollDrop"
+                //)
+            .clients-table__data-cell {{ row.leadSource }}
         template(slot="test" slot-scope="{ row, index }")
             .checkbox(@click.stop="")
                 input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
@@ -78,8 +78,6 @@
 
 <script>
 import DataTable from "../DataTable";
-import ClientStatusSelect from "./ClientStatusSelect";
-import ClientLeadsourceSelect from "./ClientLeadsourceSelect";
 import MultiClientIndustrySelect from "./MultiClientIndustrySelect";
 import Button from "../Button";
 import scrollDrop from "@/mixins/scrollDrop";
@@ -293,8 +291,6 @@ export default {
     },
     components: {
         DataTable,
-        ClientStatusSelect,
-        ClientLeadsourceSelect,
         MultiClientIndustrySelect,
         Button
     }

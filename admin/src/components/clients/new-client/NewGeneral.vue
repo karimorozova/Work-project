@@ -69,9 +69,7 @@
 
 <script>
 import Asterisk from "@/components/Asterisk";
-import ClientStatusSelect from "../ClientStatusSelect";
 import MultiClientIndustrySelect from "../MultiClientIndustrySelect";
-import AMSelect from "../AMSelect";
 import scrollDrop from "@/mixins/scrollDrop";
 import SelectSingle from "../../SelectSingle";
 import SelectMulti from "../../SelectMulti";
@@ -192,8 +190,6 @@ export default {
   },
   components: {
     Asterisk,
-    ClientStatusSelect,
-    AMSelect,
     MultiClientIndustrySelect,
     SelectSingle,
     SelectMulti

@@ -6,7 +6,12 @@
         label.block-item__label Status:
           span.require *
         .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.status}")
-          ClientStatusSelect(:selectedStatus="currentClientOverallData.status" @chosenStatus="setStatus")
+          SelectSingle(
+            :options="['Active', 'Inactive', 'Potential']",
+            placeholder="Status",
+            :selectedOption="currentClientOverallData.status",
+            @chooseOption="setStatus"
+          )
       .block-item
         label.block-item__label Test:
         .block-item__check-item.checkbox
@@ -16,7 +21,12 @@
         label.block-item__label Account Manager:
           span.require *
         .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
-          AMSelect(:selectedManager="currentClientOverallData.accountManager" @chosenManager="(manager) => setManager(manager, 'accountManager')"  group="Account Managers")
+          SelectSingle(
+            :options="users.filter(i => i.group.name === 'Account Managers').map(i => `${i.firstName} ${i.lastName}`)",
+            placeholder="Select",
+            :selectedOption="getFullName(currentClientOverallData.accountManager)",
+            @chooseOption="(data) => setManager(data, 'accountManager')"
+          )
       //.block-item
         label.block-item__label Sales Manager:
           span.require *
@@ -26,13 +36,17 @@
         label.block-item__label Project Manager:
           span.require *
         .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
-          AMSelect(:selectedManager="currentClientOverallData.projectManager" @chosenManager="(manager) => setManager(manager, 'projectManager')"  group="Project Managers")
+          SelectSingle(
+            :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
+            placeholder="Select",
+            :selectedOption="getFullName(currentClientOverallData.projectManager)",
+            @chooseOption="(data) => setManager(data, 'projectManager')"
+          )
 </template>
 
 <script>
-	import ClientStatusSelect from "../ClientStatusSelect"
 	import { mapGetters, mapActions } from "vuex"
-	import AMSelect from "../AMSelect"
+	import SelectSingle from "../../SelectSingle"
 
 	export default {
 		props: {
@@ -63,22 +77,25 @@
 					})
 				}
 			},
-			setStatus({ status }) {
-				this.storeClientPropertyOverallData({ prop: "status", value: status })
+			setStatus({ option }) {
+				this.storeClientPropertyOverallData({ prop: "status", value: option })
 			},
-			setManager({ manager }, prop) {
-				this.storeClientPropertyOverallData({ prop, value: manager })
+			setManager({ option }, prop) {
+				this.storeClientPropertyOverallData({ prop, value: this.users.find(i => `${ i.firstName } ${ i.lastName }` === option) })
+			},
+			getFullName(manager) {
+				return `${ manager.firstName || "" } ${ manager.lastName || "" }`
 			}
 		},
 		computed: {
 			...mapGetters({
 				currentClient: "getCurrentClient",
-				currentClientOverallData: "currentClientOverallData"
+				currentClientOverallData: "currentClientOverallData",
+				users: "getUsers"
 			})
 		},
 		components: {
-			ClientStatusSelect,
-			AMSelect
+			SelectSingle
 		}
 	}
 </script>

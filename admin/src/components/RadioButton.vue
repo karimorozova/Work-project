@@ -6,58 +6,63 @@
 </template>
 
 <script>
-export default {
-  props: {
-    selected: {
-      type: String,
-      default: true
-    },
-    name: {
-      type: String,
-      default: ""
-    }
-  },
-  methods: {
-    toggle() {
-      this.$emit('toggleRadio', {value: this.name})
-    }
-  },
-  computed: {
-    isSelected() {
-      return this.name === this.selected
-    },
-  }
-}
+	export default {
+		props: {
+			selected: {
+				type: String,
+				default: true
+			},
+			name: {
+				type: String,
+				default: ""
+			}
+		},
+		methods: {
+			toggle() {
+				this.$emit('toggleRadio', { value: this.name })
+			}
+		},
+		computed: {
+			isSelected() {
+				return this.name === this.selected
+			}
+		}
+	}
 </script>
 
 <style scoped lang="scss">
 
-.radio {
-  &__text{
-    margin-left: 5px;
-    cursor: pointer;
+  .radio {
+    &__text {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    &__wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    &__buttom {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid #c1bbb1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    &__inside-circle {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    &_checked {
+      background-color: #66563d;
+    }
   }
-  &__wrapper{
-    display: flex;
-  }
-  &__buttom{
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 1px solid #c1bbb1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-  &__inside-circle {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-  &_checked {
-    background-color: #66563d;
-  }
-}
 
 </style>

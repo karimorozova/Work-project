@@ -477,8 +477,8 @@
 			cancelApprove() {
 				this.isApproveModal = false
 			},
-			setLeadSource({ leadSource }) {
-				this.storeClientPropertyOverallData({ prop: "leadSource", value: leadSource })
+			setLeadSource({ option }) {
+				this.storeClientPropertyOverallData({ prop: "leadSource", value: option })
 			},
 			changeBillingProp({ prop, value }) {
 				this.storeClientPropertyOverallDataBilling({ prop, value })

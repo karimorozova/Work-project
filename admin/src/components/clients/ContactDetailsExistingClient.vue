@@ -63,11 +63,23 @@
       .details__item
         label Country:
         .details__drop-menu
-          CountriesSelect(:countrySelected="contact.country" @chosenCountry="chosenCountry")
+          SelectSingle(
+            :hasSearch="true"
+            :options="countries",
+            placeholder="Country",
+            :selectedOption="contact.country",
+            @chooseOption="chosenCountry"
+          )
       .details__item
         label Time Zone:
         .details__drop-menu
-          TimezoneSelect(:timezoneSelected="contact.timezone" @chosenZone="chosenZone")
+          SelectSingle(
+            :hasSearch="true"
+            :options="timezones.map(item => item.zone)",
+            placeholder="Timezone",
+            :selectedOption="contact.timezone",
+            @chooseOption="chosenZone"
+          )
       .details__item
         label Notes:
         textarea.non-personal(type="text" placeholder="Type" v-model="contact.notes")
@@ -85,8 +97,6 @@
 	import ValidationErrors from "../ValidationErrors"
 	import Asterisk from "../Asterisk"
 	import SelectSingle from "../SelectSingle"
-	import CountriesSelect from './CountriesSelect'
-	import TimezoneSelect from './TimezoneSelect'
 	import { mapActions, mapGetters } from 'vuex'
 	import photoPreview from '@/mixins/photoPreview'
 
@@ -146,13 +156,11 @@
 			// approveDelete() {
 			// 	this.$emit('approveDelete', { index: this.index })
 			// },
-			chosenCountry(data) {
-				this.countrySelected = data
-				this.contact.country = data
+			chosenCountry({ option }) {
+				this.contact.country = option
 			},
-			chosenZone(data) {
-				this.timezoneSelected = data
-				this.contact.timezone = data
+			chosenZone({ option }) {
+				this.contact.timezone = option
 			},
 			checkInNewCLient() {
 				const { contacts } = this.newClient
@@ -219,7 +227,23 @@
 			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false
-			}
+			},
+			async getTimezones() {
+				try {
+					const result = await this.$http.get('/api/timezones')
+					this.timezones = result.data
+				} catch (err) {
+					console.log(err)
+				}
+			},
+			async getCountries() {
+				try {
+					const result = await this.$http.get('/api/countries');
+					this.countries = result.data;
+				} catch(err) {
+					console.log(err)
+				}
+			},
 		},
 		computed: {
 			...mapGetters({
@@ -236,9 +260,11 @@
 		mounted() {
 			this.getContact()
 		},
+		created() {
+			this.getTimezones()
+      this.getCountries()
+		},
 		components: {
-			CountriesSelect,
-			TimezoneSelect,
 			ValidationErrors,
 			Asterisk,
 			SelectSingle
