@@ -81,7 +81,6 @@
 <script>
 	import DataTable from "../DataTable";
 	import VendorStatusSelect from "./VendorStatusSelect";
-	import VendorLeadsourceSelect from "./VendorLeadsourceSelect";
 	import NativeLanguageSelect from "./NativeLanguageSelect";
 	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 	import Button from "../Button";
@@ -311,7 +310,6 @@
 		},
 		components: {
 			DataTable,
-			VendorLeadsourceSelect,
 			VendorStatusSelect,
 			MultiVendorIndustrySelect,
 			NativeLanguageSelect,

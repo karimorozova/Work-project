@@ -56,7 +56,10 @@
       .block-item
         label.block-item__label.block-item_relative Native Language:
         .block-item__drop-menu.block-item_medium-index
-          NativeLanguageSelect(:selectedLang="currentVendor.native", @chosenLang="(e) => updateVendorProp(e.lang, 'native')")
+          NativeLanguageSelect(
+            :selectedLang="currentVendor.native",
+            @chosenLang="(e) => updateVendorProp(e.lang, 'native')"
+          )
       .block-item.no-margin
         label Gender:
         .block-item__drop-menu

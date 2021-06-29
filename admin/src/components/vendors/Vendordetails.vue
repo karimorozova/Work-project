@@ -194,7 +194,6 @@
 	import TableAssessment from "./TableAssessment"
 	import ClickOutside from "vue-click-outside"
 	import VendorStatusSelect from "./VendorStatusSelect"
-	import VendorLeadsourceSelect from "./VendorLeadsourceSelect"
 	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect"
 	import NativeLanguageSelect from "./NativeLanguageSelect"
 	import TimezoneSelect from "../clients/TimezoneSelect"
@@ -590,7 +589,6 @@
 			TableDocuments,
 			TableEducation,
 			TableProfessionalExperience,
-			VendorLeadsourceSelect,
 			VendorStatusSelect,
 			MultiVendorIndustrySelect,
 			NativeLanguageSelect,

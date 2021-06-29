@@ -40,7 +40,10 @@
           .block-item
             label.block-item__label Native Language:
             .block-item__drop-menu.block-item_medium-index
-              NativeLanguageSelect(:selectedLang="vendor.native" @chosenLang="setNative")
+              NativeLanguageSelect(
+                :selectedLang="vendor.native"
+                @chosenLang="setNative"
+              )
           .block-item.no-margin
             label Gender:
             .block-item__drop-menu
@@ -111,7 +114,6 @@
 <script>
 	import ClickOutside from "vue-click-outside"
 	import VendorStatusSelect from "./VendorStatusSelect"
-	import VendorLeadsourceSelect from "./VendorLeadsourceSelect"
 	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect"
 	import NativeLanguageSelect from "./NativeLanguageSelect"
 	import ValidationErrors from "../ValidationErrors"
@@ -297,7 +299,6 @@
 			}
 		},
 		components: {
-			VendorLeadsourceSelect,
 			VendorStatusSelect,
 			MultiVendorIndustrySelect,
 			NativeLanguageSelect,
