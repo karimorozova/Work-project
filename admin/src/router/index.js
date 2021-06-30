@@ -545,25 +545,19 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
 	const date = Date.now()
+	const token = localStorage.getItem("token")
 
 	try {
-		const token = localStorage.getItem("token")
 		if (to.path === '/login' || to.path === '/forgot') return next()
 		if (!!token) {
 			const jwtObj = jwt.verify(JSON.parse(token).value, secretKey)
-
 			if (jwtObj) {
-				if (date > new Date(JSON.parse(jwtObj).timestamp)) {
-					exit()
-				}
+				if (date > new Date(jwtObj.timestamp)) exit()
 				return next()
 			}
 		}
-
 		next('/login')
-
 	} catch (e) {
-		console.log(e, 'CACTCJ')
 		exit()
 	}
 
