@@ -19,7 +19,14 @@
         label.block-item__label.block-item_relative Industry:
           Asterisk(:customStyle="asteriskStyle")
         .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
-          MultiClientIndustrySelect(:selectedInd="currentClient.industries" :filteredIndustries="selectedIndNames" @chosenInd="setIndustries")
+          SelectMulti(
+            :hasSearch="true"
+            :allOptionsButtons="true"
+            placeholder="Select"
+            :selectedOptions="currentClient.industries.length ? currentClient.industries.map(i => i.name) : []"
+            :options="getAllIndustries.map(i => i.name)"
+            @chooseOptions="setIndustries"
+          )
     .general-info__block
       .block-item(v-if="!isIndividual")
         label.block-item__label.block-item_relative Time Zone:
@@ -80,7 +87,6 @@
 
 <script>
 	import Asterisk from "@/components/Asterisk"
-	import MultiClientIndustrySelect from "../MultiClientIndustrySelect"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import SelectSingle from "../../SelectSingle"
 	import SelectMulti from "../../SelectMulti"
@@ -125,14 +131,12 @@
 			makeStringLanguage(langArray) {
 				return langArray.map(item => item.lang)
 			},
-			setIndustries({ industry }) {
+			setIndustries({ option }) {
 				let industries = [ ...this.currentClient.industries ]
-				const position = industries.findIndex(item => item._id === industry._id)
-				if (position !== -1) {
-					industries.splice(position, 1)
-				} else {
-					industries.push(industry)
-				}
+				const position = industries.findIndex(item => item.name === option)
+				if (position !== -1) industries.splice(position, 1)
+				else industries.push(this.getAllIndustries.find(item => item.name === option))
+
 				this.storeClientPropertyOverallData({ prop: "industries", value: industries })
 			},
 			setLanguage({ option }) {
@@ -222,7 +226,8 @@
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "currentClientOverallData"
+				currentClient: "currentClientOverallData",
+				getAllIndustries: "getAllIndustries"
 			}),
 			clientAliases() {
 				if (this.allClientAliases) {
@@ -259,7 +264,6 @@
 		},
 		components: {
 			Asterisk,
-			MultiClientIndustrySelect,
 			SelectSingle,
 			SelectMulti
 		}

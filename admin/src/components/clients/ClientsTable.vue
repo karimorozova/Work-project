@@ -36,15 +36,15 @@
                 //)
             .clients-table__data-cell {{ row.status }}
         template(slot="industry" slot-scope="{ row, index }")
-            .clients-table__drop-menu(v-if="currentEditingIndex === index")
-                MultiClientIndustrySelect(
-                  :selectedInd="selectedIndustry"
-                  :filteredIndustries="selectedIndNames"
-                  :parentInd="index"
-                  @chosenInd="setIndustry"
-                  @scrollDrop="scrollDrop"
-                )
-            .clients-table__data-cell(v-else)
+            //.clients-table__drop-menu(v-if="currentEditingIndex === index")
+                //MultiClientIndustrySelect(
+                  //:selectedInd="selectedIndustry"
+                  //:filteredIndustries="selectedIndNames"
+                  //:parentInd="index"
+                  //@chosenInd="setIndustry"
+                  //@scrollDrop="scrollDrop"
+                //)
+            .clients-table__data-cell
                 img.clients-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
         template(slot="web" slot-scope="{ row, index }")
             .clients-table__active-cell(v-if="currentEditingIndex === index")
@@ -78,7 +78,6 @@
 
 <script>
 import DataTable from "../DataTable";
-import MultiClientIndustrySelect from "./MultiClientIndustrySelect";
 import Button from "../Button";
 import scrollDrop from "@/mixins/scrollDrop";
 import { mapGetters, mapActions } from 'vuex';
@@ -291,7 +290,6 @@ export default {
     },
     components: {
         DataTable,
-        MultiClientIndustrySelect,
         Button
     }
 }

@@ -7,9 +7,9 @@
             label Name:
             input.clients-filters__input-field(type="text" placeholder="Company Name" v-model="nameFilter" @keyup="filterByName")
           .clients-filters__item
-            label Industry:
-            .clients-filters__drop-menu
-              ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
+            //label Industry:
+            //.clients-filters__drop-menu
+              //ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
           .clients-filters__item
             //label Lead Source:
             //.clients-filters__drop-menu
@@ -32,8 +32,6 @@
 
 <script>
 	import ClientsTable from "../ClientsTable"
-	import ClientIndustrySelect from '../../clients/ClientIndustrySelect'
-	import MultiClientIndustrySelect from '../../clients/MultiClientIndustrySelect'
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
@@ -138,8 +136,6 @@
 		},
 		components: {
 			ClientsTable,
-			ClientIndustrySelect,
-			MultiClientIndustrySelect,
 		},
 		created() {
 			this.getCustomers()

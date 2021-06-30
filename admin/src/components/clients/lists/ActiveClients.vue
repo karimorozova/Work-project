@@ -7,9 +7,9 @@
             label Name:
             input.clients-filters__input-field(type="text" placeholder="Company Name" v-model="nameFilter" @keyup="filterByName")
           .clients-filters__item
-            label Industry:
-            .clients-filters__drop-menu
-              ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
+            //label Industry:
+            //.clients-filters__drop-menu
+              //ClientIndustrySelect(:isAllExist="isAllIndustyFilter" :selectedInd="[industryFilter]" @chosenInd="chosenInd")
           .clients-filters__item
             //label Lead Source:
             //.clients-filters__drop-menu
@@ -32,8 +32,6 @@
 
 <script>
 	import ClientsTable from "../ClientsTable"
-	import ClientIndustrySelect from '../../clients/ClientIndustrySelect'
-	import MultiClientIndustrySelect from '../../clients/MultiClientIndustrySelect'
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
@@ -61,8 +59,8 @@
 				if (this.isDataRemain) {
 					const result = await this.$http.post('/all-clients', { filters: this.filters })
 					this.setAllCustomers([ ...this.allClients, ...result.body ])
-					this.isDataRemain = result.body.length === 25
-					this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : ""
+					this.isDataRemain = result.data.length === 25
+					this.lastId = result.data && result.body.length ? result.body[result.body.length - 1]._id : ""
 				}
 			},
 			async update({ status }) {
@@ -138,8 +136,6 @@
 		},
 		components: {
 			ClientsTable,
-			ClientIndustrySelect,
-			MultiClientIndustrySelect,
 		},
 		created() {
 			this.getCustomers()

@@ -20,8 +20,8 @@
         span.require *
       .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.accountManager}")
         SelectSingle(
+          :placeholder="'Select'",
           :options="users.filter(i => i.group.name === 'Account Managers').map(i => `${i.firstName} ${i.lastName}`)",
-          placeholder="Select",
           :selectedOption="getFullName(client.accountManager)",
           @chooseOption="(data) => setManager(data, 'accountManager')"
         )
@@ -35,8 +35,8 @@
         span.require *
       .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.projectManager}")
         SelectSingle(
+          :placeholder="'Select'",
           :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
-          placeholder="Select",
           :selectedOption="getFullName(client.projectManager)",
           @chooseOption="(data) => setManager(data, 'projectManager')"
         )

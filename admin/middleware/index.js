@@ -102,7 +102,7 @@ const middleware = {
 	},
 
 	checkRoutes(req, res, next) {
-		if (req.originalUrl.includes('pangea-')) {
+		if (req.originalUrl.includes('pangea-') || '/login' || '/forgot') {
 			res.sendFile(path.resolve('./dist/index.html'))
 			return
 		}
