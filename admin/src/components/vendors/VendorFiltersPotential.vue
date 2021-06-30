@@ -8,7 +8,13 @@
       .v-filters__item
         label.v-filters__filter-title Industry:
         .v-filters__drop-menu
-          VendorIndustrySelect(:isAllExist="isAllForIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenIndustry")
+          SelectSingle(
+            :hasSearch="true"
+            placeholder="Select"
+            :selectedOption="industryFilter.name"
+            :options="['All', ...getAllIndustries.map(({name, _id}) => ({name, _id}))]"
+            @chooseOption="setIndustries"
+          )
 
       .v-filters__itemPicker
         label.v-filters__filter-title Date range:
@@ -51,12 +57,12 @@
 </template>
 
 <script>
-	import VendorIndustrySelect from "./VendorIndustrySelect"
 	import SelectSingle from "@/components/SelectSingle"
-	import { mapActions } from "vuex"
+  import { mapActions, mapGetters } from "vuex"
 	import Datepicker from "../Datepicker"
 	import Button from "../Button"
   import moment from "moment"
+  import SelectMulti from "../SelectMulti"
 
 	export default {
 		props: {
@@ -162,18 +168,24 @@
       hasPendingClicked() {
 			  this.hasPending = !this.hasPending
 			  this.$emit('setIsPendingFilter', {hasPending: this.hasPending})
-      }
+      },
+      setIndustries({ option }) {
+        this.$emit("setIndustryFilter", { option: option })
+      },
 		},
 		computed: {
+      ...mapGetters({
+        getAllIndustries: "getAllIndustries",
+      }),
 			stepNames() {
 				let result = this.steps.map(item => item.title)
 				result.unshift("All")
 				return result
-			}
+			},
 		},
 		components: {
+      SelectMulti,
 			Button,
-			VendorIndustrySelect,
 			SelectSingle,
 			Datepicker
 		},

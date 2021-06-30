@@ -31,7 +31,13 @@
       .v-filters__item
         label.v-filters__filter-title Industry:
         .v-filters__drop-menu
-          VendorIndustrySelect(:isAllExist="isAllForIndustryExist" :selectedInd="industryFilter" @chosenInd="chosenIndustry")
+          SelectSingle(
+            :hasSearch="true"
+            placeholder="Select"
+            :selectedOption="industryFilter.name"
+            :options="['All', ...getAllIndustries.map(({name, _id}) => ({name, _id}))]"
+            @chooseOption="setIndustries"
+          )
 
       .v-filters__itemButton
         Button(value="Add vendor" @clicked="addVendor" :class="['width-140']")
@@ -40,135 +46,139 @@
 </template>
 
 <script>
-	import VendorIndustrySelect from "./VendorIndustrySelect"
-	import SelectSingle from "@/components/SelectSingle"
-	import { mapActions, mapGetters } from "vuex"
-	import Button from "../Button"
+import SelectSingle from "@/components/SelectSingle"
+import { mapActions, mapGetters } from "vuex"
+import Button from "../Button"
+import SelectMulti from "../SelectMulti"
 
-	export default {
-		props: {
-			statusFilter: {
-				type: String
-			},
-			industryFilter: {
-				type: [ Object, String ]
-			},
-			sourceLang: {
-				type: String
-			},
-			targetLang: {
-				type: String
-			},
-			statuses: {
-				type: Array,
-				default: () => []
-			}
-		},
-		data() {
-			return {
-				nameFilter: "",
-				isAllForIndustryExist: true,
-				steps: [],
-				typingTimer: "",
-				doneTypingInterval: 800
-			}
-		},
-		methods: {
-			...mapActions({
-				alertToggle: "alertToggle"
-			}),
-			addVendor() {
-				this.$router.push("/pangea-vendors/new-vendor")
-			},
-			setSourceFilter({ option }) {
-				this.$emit('setSourceFilter', option)
-			},
-			setTargetFilter({ option }) {
-				this.$emit('setTargetFilter', option)
-			},
-			chosenIndustry({ industry }) {
-				this.$emit("setIndustryFilter", { option: industry })
-			},
-			filterByName(e) {
-				const { value } = e.target
-				clearTimeout(this.typingTimer)
-				this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval)
-				const vm = this
+export default {
+  props: {
+    statusFilter: {
+      type: String
+    },
+    industryFilter: {
+      type: [ Object, String ]
+    },
+    sourceLang: {
+      type: String
+    },
+    targetLang: {
+      type: String
+    },
+    statuses: {
+      type: Array,
+      default: () => []
+    }
+  },
+  data() {
+    return {
+      nameFilter: "",
+      isAllForIndustryExist: true,
+      steps: [],
+      typingTimer: "",
+      doneTypingInterval: 800
+    }
+  },
+  methods: {
+    ...mapActions({
+      alertToggle: "alertToggle"
+    }),
+    addVendor() {
+      this.$router.push("/pangea-vendors/new-vendor")
+    },
+    setSourceFilter({ option }) {
+      this.$emit('setSourceFilter', option)
+    },
+    setTargetFilter({ option }) {
+      this.$emit('setTargetFilter', option)
+    },
+    chosenIndustry({ industry }) {
+      this.$emit("setIndustryFilter", { option: industry })
+    },
+    filterByName(e) {
+      const { value } = e.target
+      clearTimeout(this.typingTimer)
+      this.typingTimer = setTimeout(doneTyping, this.doneTypingInterval)
+      const vm = this
 
-				function doneTyping() {
-					vm.$emit("setNameFilter", { option: value })
-				}
-			}
-		},
-		computed: {
-			...mapGetters({
-				allLanguages: "getAllLanguages"
-			})
-		},
-		components: {
-			Button,
-			VendorIndustrySelect,
-			SelectSingle
-		}
-	}
+      function doneTyping() {
+        vm.$emit("setNameFilter", { option: value })
+      }
+    },
+    setIndustries({ option }) {
+      this.$emit("setIndustryFilter", { option: option })
+    }
+  },
+  computed: {
+    ...mapGetters({
+      allLanguages: "getAllLanguages",
+      getAllIndustries: "getAllIndustries"
+    })
+  },
+  components: {
+    SelectMulti,
+    Button,
+    SelectSingle
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+@import "../../assets/scss/colors.scss";
 
-  .v-filters {
-    width: 100%;
+.v-filters {
+  width: 100%;
+  display: flex;
+
+  &__row {
     display: flex;
+    margin-bottom: 20px;
+    height: 50px;
+    align-items: flex-end;
+  }
 
-    &__row{
-      display: flex;
-      margin-bottom: 20px;
-      height: 50px;
-      align-items: flex-end;
-    }
+  &__filter-title {
+    margin-bottom: 3px;
+  }
 
-    &__filter-title {
-      margin-bottom: 3px;
-    }
+  &__itemButton {
+    position: relative;
+    display: grid;
+    align-items: end;
+    width: 232px;
+    justify-content: end;
+  }
 
-    &__itemButton{
-      position: relative;
-      display: grid;
-      align-items: end;
-      width: 232px;
-      justify-content: end;
-    }
+  &__item {
+    position: relative;
+    display: grid;
+    align-items: end;
+    width: 232px;
 
-    &__item {
-      position: relative;
-      display: grid;
-      align-items: end;
-      width: 232px;
-
-      ::-webkit-input-placeholder {
-        opacity: 0.5;
-      }
-    }
-
-    &__input-field {
-      box-sizing: border-box;
-      color: $main-color;
-      width: 200px;
-      height: 30px !important;
-      padding-left: 5px;
-      border: 1px solid #c1bbb1;
-      border-radius: 4px;
-      outline: none;
-      font-size: 14px;
-    }
-
-    &__drop-menu {
-      position: relative;
-      width: 200px;
-      height: 30px;
-      box-sizing: border-box;
-      z-index: 10;
+    ::-webkit-input-placeholder {
+      opacity: 0.5;
     }
   }
+
+  &__input-field {
+    box-sizing: border-box;
+    color: $main-color;
+    width: 200px;
+    height: 30px !important;
+    padding-left: 5px;
+    border: 1px solid #c1bbb1;
+    border-radius: 4px;
+    outline: none;
+    font-size: 14px;
+  }
+
+  &__drop-menu {
+    position: relative;
+    width: 200px;
+    height: 30px;
+    box-sizing: border-box;
+    z-index: 10;
+  }
+}
 
 </style>

@@ -16,12 +16,10 @@
         .vendors-table__data {{ getFullName(row) }}
       template(slot="status" slot-scope="{ row, index }")
         .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          VendorStatusSelect(
-            isAllExist="no"
-            :selectedStatus="selectedStatus"
-            :parentInd="index"
-            @chosenStatus="setStatus"
-            @scrollDrop="scrollDrop"
+          SelectSingle(
+            :options="statuses"
+            :selectedOption="selectedStatus"
+            @chooseOption="setStatus"
           )
         .vendors-table__no-drop.vendors-table__status(v-else) {{ row.status }}
 
@@ -33,21 +31,29 @@
 
       template(slot="native" slot-scope="{ row, index }")
         .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          NativeLanguageSelect(
-            :selectedLang="selectedNative"
-            :parentIndex="index"
-            @chosenLang="setNative"
-            @scrollDrop="scrollDrop"
+          SelectSingle(
+            :selectedOption="selectedNative && selectedNative.lang",
+            :options="filteredLanguages.map(({lang}) => lang)",
+            :hasSearch="true"
+            @chooseOption="setNative"
           )
         .vendors-table__no-drop.vendors-table__native(v-if="row.native && currentEditingIndex !== index") {{ row.native.lang }}
       template(slot="industry" slot-scope="{ row, index }")
         .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          MultiVendorIndustrySelect(
-            :selectedInd="industrySelected"
-            :filteredIndustries="selectedIndNames"
-            :parentInd="index"
-            @chosenInd="setIndustry"
-            @scrollDrop="scrollDrop"
+          //MultiVendorIndustrySelect(
+          //  :selectedInd="industrySelected"
+          //  :filteredIndustries="selectedIndNames"
+          //  :parentInd="index"
+          //  @chosenInd="setIndustry"
+          //  @scrollDrop="scrollDrop"
+          //)
+          SelectMulti(
+            :hasSearch="true"
+            :allOptionsButtons="true"
+            placeholder="Select"
+            :selectedOptions="industrySelected.length ? industrySelected.map(i => i.name) : []"
+            :options="getAllIndustries.map(i => i.name)"
+            @chooseOptions="setIndustries"
           )
         .vendors-table__no-drop.vendors-table__industry.vendors-table_flex-wrap(v-else)
           img.vendors-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
@@ -80,12 +86,11 @@
 
 <script>
 	import DataTable from "../DataTable";
-	import VendorStatusSelect from "./VendorStatusSelect";
-	import NativeLanguageSelect from "./NativeLanguageSelect";
-	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
 	import Button from "../Button";
 	import scrollDrop from "@/mixins/scrollDrop";
 	import { mapGetters, mapActions } from "vuex";
+  import SelectSingle from "../SelectSingle"
+  import SelectMulti from "../SelectMulti"
 
 	export default {
 		mixins: [scrollDrop],
@@ -115,8 +120,10 @@
 				selectedNative: {},
 				selectedStatus: "",
 				isErrorShow: false,
-				isDeleteMessageShow: false
-			}
+				isDeleteMessageShow: false,
+        searchLang: '',
+        statuses: ["Active", "Inactive", "Potential"],
+      }
 		},
 		methods: {
 			...mapActions({
@@ -275,18 +282,27 @@
 			setStatus({ option }) {
 				this.selectedStatus = option
 			},
-			setNative({ lang }) {
-				this.selectedNative = lang;
+			setNative(value) {
+        const {_id, lang} = this.filteredLanguages.find(({lang}) => lang === value.option)
+				this.selectedNative = {_id, lang};
 			},
-			setIndustry({ industry, index }) {
-				const position = this.industrySelected.findIndex(item => {
-					return item._id === industry._id
-				})
-				if(position !== -1) {
-					return this.industrySelected.splice(position, 1);
-				}
-				this.industrySelected.push(industry);
-			},
+			// setIndustry({ industry, index }) {
+			// 	const position = this.industrySelected.findIndex(item => {
+			// 		return item._id === industry._id
+			// 	})
+			// 	if(position !== -1) {
+			// 		return this.industrySelected.splice(position, 1);
+			// 	}
+			// 	this.industrySelected.push(industry);
+			// },
+      setIndustries({ option }) {
+        let industries = [ ...this.industrySelected ]
+        const position = industries.findIndex(item => item.name === option)
+        if (position !== -1) industries.splice(position, 1)
+        else industries.push(this.getAllIndustries.find(item => item.name === option))
+        this.industrySelected = industries
+        // this.updateCurrentVendorGeneralData({ key: "industries", value: industries })
+      },
 			onRowClicked({ index }) {
 				if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
 					return
@@ -298,8 +314,21 @@
 		computed: {
 			...mapGetters({
 				vendors: "getFilteredVendors",
-				getAllLanguages: "getAllLanguages"
-			}),
+				getAllLanguages: "getAllLanguages",
+        getAllIndustries: "getAllIndustries",
+      }),
+      filteredLanguages() {
+        let result = this.getAllLanguages;
+        if(this.addAll) {
+          result.unshift({lang: "All", symbol: "All"})
+        }
+        result = result.filter(item => {
+          if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
+            return item
+          }
+        })
+        return result;
+      },
 			selectedIndNames() {
 				let result = [];
 				for (let ind of this.industrySelected) {
@@ -309,10 +338,9 @@
 			}
 		},
 		components: {
+      SelectMulti,
+      SelectSingle,
 			DataTable,
-			VendorStatusSelect,
-			MultiVendorIndustrySelect,
-			NativeLanguageSelect,
 			Button
 		}
 	}

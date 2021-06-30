@@ -15,15 +15,15 @@
       template(slot="vendorName" slot-scope="{ row }")
         .vendors-table__data {{ getFullName(row) }}
       template(slot="status" slot-scope="{ row, index }")
-        .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          VendorStatusSelect(
-            isAllExist="no"
-            :selectedStatus="selectedStatus"
-            :parentInd="index"
-            @chosenStatus="setStatus"
-            @scrollDrop="scrollDrop"
-          )
-        .vendors-table__no-drop.vendors-table__status(v-else) {{ row.status }}
+        //.vendors-table__drop-menu(v-if="currentEditingIndex === index")
+        //  VendorStatusSelect(
+        //    isAllExist="no"
+        //    :selectedStatus="selectedStatus"
+        //    :parentInd="index"
+        //    @chosenStatus="setStatus"
+        //    @scrollDrop="scrollDrop"
+        //  )
+        .vendors-table__no-drop.vendors-table__status {{ row.status }}
 
       template(slot="potentialLang" slot-scope="{ row }")
         .vendors-table__combinations(v-html="formateLanguagesPairs(getPendingLanguagePair(row)) ")
@@ -35,32 +35,32 @@
         .vendors-table__combinations(v-html="formateLanguagesPairs(getLanguagePairs(row).monoLanguagesPairs)")
 
       template(slot="native" slot-scope="{ row, index }")
-        .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          NativeLanguageSelect(
-            :selectedLang="selectedNative"
-            :parentIndex="index"
-            @chosenLang="setNative"
-            @scrollDrop="scrollDrop"
-          )
-        .vendors-table__no-drop.vendors-table__native(v-if="row.native && currentEditingIndex !== index") {{ row.native.lang }}
+        //.vendors-table__drop-menu(v-if="currentEditingIndex === index")
+        //  NativeLanguageSelect(
+        //    :selectedLang="selectedNative"
+        //    :parentIndex="index"
+        //    @chosenLang="setNative"
+        //    @scrollDrop="scrollDrop"
+        //  )
+        .vendors-table__no-drop.vendors-table__native {{ row.native.lang }}
       template(slot="industry" slot-scope="{ row, index }")
-        .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          MultiVendorIndustrySelect(
-            :selectedInd="industrySelected"
-            :filteredIndustries="selectedIndNames"
-            :parentInd="index"
-            @chosenInd="setIndustry"
-            @scrollDrop="scrollDrop"
-          )
-        .vendors-table__no-drop.vendors-table__industry.vendors-table_flex-wrap(v-else)
+        //.vendors-table__drop-menu(v-if="currentEditingIndex === index")
+        //  MultiVendorIndustrySelect(
+        //    :selectedInd="industrySelected"
+        //    :filteredIndustries="selectedIndNames"
+        //    :parentInd="index"
+        //    @chosenInd="setIndustry"
+        //    @scrollDrop="scrollDrop"
+        //  )
+        .vendors-table__no-drop.vendors-table__industry.vendors-table_flex-wrap
           img.vendors-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
 
       template(slot="createdAt" slot-scope="{ row, index }")
         .vendors-table__data {{ row.date }}
 
       template(slot="test" slot-scope="{ row, index }")
-        .checkbox(@click.stop="")
-          input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="" disabled)
+        .checkbox()
+          input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"   disabled)
           label(:for="'test' + (index + 1)")
       template(slot="icons" slot-scope="{ row, index }")
         span.vendors-table__icons
@@ -76,467 +76,461 @@
 </template>
 
 <script>
-	import DataTable from "../DataTable";
-	import VendorStatusSelect from "./VendorStatusSelect";
-	import NativeLanguageSelect from "./NativeLanguageSelect";
-	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect";
-	import Button from "../Button";
-	import scrollDrop from "@/mixins/scrollDrop";
-	import { mapGetters, mapActions } from "vuex";
+import DataTable from "../DataTable"
+import Button from "../Button"
+import scrollDrop from "@/mixins/scrollDrop"
+import { mapGetters, mapActions } from "vuex"
 
-	export default {
-		mixins: [scrollDrop],
-		props: {
-			nameFilter: {
-				type: String
-			},
-			statusFilter: {
-				type: String
-			},
-			industryFilter: {
-				type: [String, Object],
-				default: ""
-			},
-			sourceFilter: {
-				type: Array,
-				default: () => []
-			},
-			targetFilter: {
-				type: Array,
-				default: () => []
-			},
-			stepFilter: {
-				type: Object
-			}
-		},
-		data() {
-			return {
-				fields: [
-					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "15%", padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "8%", padding: "0" },
-					{ label: "Pending Pair", headerKey: "headerPotentialLang", key: "potentialLang", width: "12%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "12%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "10%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Native Language", headerKey: "headerNative", key: "native", width: "12%", padding: "0" },
-					{ label: "Industry", headerKey: "headerIndustry", key: "industry", width: "12%", padding: "0" },
-					{ label: "Created At", headerKey: "headerCreated", key: "createdAt", width: "12%", padding: "0",},
-					{ label: "Test", headerKey: "headerTest", key: "test", width: "3%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "4%", padding: "3px" },
-				],
-				icons: {
-					save: { icon: require('../../assets/images/Other/save-icon-qa-form.png') },
-					edit: { icon: require('../../assets/images/Other/edit-icon-qa.png') },
-					cancel: { icon: require('../../assets/images/cancel-icon.png') },
-					delete: { icon: require('../../assets/images/Other/delete-icon-qa-form.png') }
-				},
-				currentEditingIndex: -1,
-				deletingVendorIndex: -1,
-				currentBasicRate: "",
-				currentTqi: "",
-				industrySelected: [],
-				selectedNative: {},
-				selectedStatus: "",
-				isErrorShow: false,
-				isDeleteMessageShow: false
-			}
-		},
-		methods: {
-			...mapActions({
-				alertToggle: "alertToggle",
-				updateVendorProp: "updateVendorProp",
-				storeVendors: "vendorsSetting",
-				updateCurrentVendor: "updateCurrentVendor",
-				storeCurrentVendor: "storeCurrentVendor",
-				updateIndustry: "updateIndustry",
-				deleteCurrentVendor: "deleteCurrentVendor",
-				updateVendorStatus: "updateVendorStatus"
-			}),
-			async setTest(vendorId) {
-				const vendor = {
-					id: vendorId,
-					isTest: event.target.checked
-				}
-				try {
-					await this.updateVendorStatus(vendor);
-					this.alertToggle({ message: "Vendor status updated", isShow: true, type: "success" });
-				} catch (err) {
-					this.alertToggle({
-						message: "Server error / Cannot update Vendor status",
-						isShow: true,
-						type: "error"
-					});
-				}
-			},
-			bottomScrolled() {
-				this.$emit("bottomScrolled");
-			},
-			isScrollDrop(drop, elem) {
-				return drop && elem.clientHeight >= 600;
-			},
-			getFullName(vendor) {
-				return vendor.firstName + " " + vendor.surname;
-			},
-			formateLanguagesPairs(arr) {
-				return arr.reduce((acc, curr) => acc + curr + '<br>', '')
-			},
-			getLanguagePairs(vendor) {
-				const isId = vendor.competencies.length && vendor.competencies[0].sourceLanguage.hasOwnProperty('_id');
-				return {
-					duoLanguagesPairs: returnLangPairs('duo', this.getAllLanguages),
-					monoLanguagesPairs: returnLangPairs('mono', this.getAllLanguages)
-				};
-
-				function returnLangPairs(condition, allLanguages) {
-					return [...new Set(
-							vendor.competencies
-									.map(({ sourceLanguage, targetLanguage }) => {
-										return isId ? { sourceLanguage: sourceLanguage._id, targetLanguage: targetLanguage._id } : { sourceLanguage, targetLanguage }
-									})
-									.filter(({ sourceLanguage, targetLanguage }) => condition === 'duo' ? sourceLanguage !== targetLanguage : sourceLanguage === targetLanguage)
-									.map(({ sourceLanguage, targetLanguage }) => {
-										return condition === 'duo' ? `${ findSymbolOrLang(sourceLanguage, condition, allLanguages) } >> ${ findSymbolOrLang(targetLanguage, condition, allLanguages) }` :
-												`${ findSymbolOrLang(sourceLanguage, condition, allLanguages) }`
-									})
-					)];
-
-					function findSymbolOrLang(_idItem, condition, allLanguages) {
-						const { symbol, lang } = allLanguages.find(({ _id }) => _id.toString() === _idItem.toString());
-						return condition === 'duo' ? symbol : lang;
-					}
-				}
-			},
-      getPendingLanguagePair(vendor) {
-			  if(!vendor && !vendor.pendingCompetencies && !vendor.competencies[0].sourceLanguage ) return []
-        return [...new Set(vendor.pendingCompetencies.map(({sourceLanguage, targetLanguage})=> (`${sourceLanguage.symbol} >> ${targetLanguage.symbol}`)))]
+export default {
+  mixins: [ scrollDrop ],
+  props: {
+    nameFilter: {
+      type: String
+    },
+    statusFilter: {
+      type: String
+    },
+    industryFilter: {
+      type: [ String, Object ],
+      default: ""
+    },
+    sourceFilter: {
+      type: Array,
+      default: () => []
+    },
+    targetFilter: {
+      type: Array,
+      default: () => []
+    },
+    stepFilter: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      fields: [
+        { label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "15%", padding: "0" },
+        { label: "Status", headerKey: "headerStatus", key: "status", width: "8%", padding: "0" },
+        { label: "Pending Pair", headerKey: "headerPotentialLang", key: "potentialLang", width: "12%", cellClass: "vendors-table_scroll-y" },
+        { label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "12%", cellClass: "vendors-table_scroll-y" },
+        { label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "10%", cellClass: "vendors-table_scroll-y" },
+        { label: "Native Language", headerKey: "headerNative", key: "native", width: "12%", padding: "0" },
+        { label: "Industry", headerKey: "headerIndustry", key: "industry", width: "12%", padding: "0" },
+        { label: "Created At", headerKey: "headerCreated", key: "createdAt", width: "12%", padding: "0" },
+        { label: "Test", headerKey: "headerTest", key: "test", width: "3%", padding: "0" },
+        { label: "", headerKey: "headerIcons", key: "icons", width: "4%", padding: "3px" }
+      ],
+      icons: {
+        save: { icon: require('../../assets/images/Other/save-icon-qa-form.png') },
+        edit: { icon: require('../../assets/images/Other/edit-icon-qa.png') },
+        cancel: { icon: require('../../assets/images/cancel-icon.png') },
+        delete: { icon: require('../../assets/images/Other/delete-icon-qa-form.png') }
       },
-			isIconClass(index, key) {
-				if(this.currentEditingIndex !== index) {
-					return key === 'save' || key === 'cancel';
-				}
-				if(this.currentEditingIndex === index) {
-					return key === 'edit'
-				}
-			},
-			closeErrorMessage() {
-				this.isErrorShow = false;
-			},
-			setCurrentEditionValues(index) {
-				this.currentEditingIndex = index;
-				this.currentBasicRate = this.vendors[index].basicRate;
-				this.currentTqi = this.vendors[index].tqi;
-				this.industrySelected = Array.from(this.vendors[index].industries);
-				this.selectedStatus = this.vendors[index].status;
-				this.selectedNative = this.vendors[index].native;
-			},
-			setCurrentDefaults() {
-				this.currentEditingIndex = -1;
-				this.currentBasicRate = "";
-				this.currentTqi = "";
-				this.industrySelected = [];
-				this.selectedStatus = "";
-				this.selectedNative = {};
-				const tbody = document.querySelector('.table__tbody');
-				tbody.style.minHeight = this.currentTableHeight + 'px';
-			},
-			async updateVendor(index) {
-				let sendData = new FormData();
-				const updatingVendor = {
-					...this.vendors[index],
-					basicRate: this.currentBasicRate,
-					tqi: this.currentTqi,
-					industries: this.industrySelected,
-					status: this.selectedStatus,
-					native: this.selectedNative
-				}
-				sendData.append('vendor', JSON.stringify(updatingVendor));
-				try {
-					await this.updateCurrentVendor(sendData);
-					this.alertToggle({ message: "Vendor info updated", isShow: true, type: "success" });
-					this.$emit("update", { status: this.selectedStatus });
-				} catch (err) {
-					this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
-				}
-			},
-			async makeAction(index, key) {
-				if(this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
-					return this.isErrorShow = true;
-				}
-				if(key === 'edit') {
-					this.setCurrentEditionValues(index);
-				}
-				if(key === 'save') {
-					await this.updateVendor(index);
-					this.setCurrentDefaults();
-				}
-				if(key === 'cancel') {
-					this.setCurrentDefaults();
-				}
-				if(key === 'delete') {
-					this.deletingVendorIndex = index;
-					this.isDeleteMessageShow = true;
-				}
-			},
-			async approveDelete() {
-				this.isDeleteMessageShow = false;
-				this.currentEditingIndex = -1;
-				const vendor = this.vendors[this.deletingVendorIndex];
-				try {
-					const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ vendor._id }`);
-					if(isAssigned.body) {
-						return this.alertToggle({ message: "The vendor was assigned to a step and cannot be deleted.", isShow: true, type: "error" });
-					}
-					await this.deleteCurrentVendor({ id: vendor._id });
-					this.alertToggle({ message: "Vendor removed", isShow: true, type: "success" });
-				} catch (err) {
-					this.alertToggle({ message: "Server error / Cannot delete the Vendor", isShow: true, type: "error" });
-				}
-			},
-			cancelDelete() {
-				this.deletingVendorIndex = -1;
-				this.isDeleteMessageShow = false;
-			},
-			setStatus({ option }) {
-				this.selectedStatus = option
-			},
-			setNative({ lang }) {
-				this.selectedNative = lang;
-			},
-			setIndustry({ industry, index }) {
-				const position = this.industrySelected.findIndex(item => {
-					return item._id === industry._id
-				})
-				if(position !== -1) {
-					return this.industrySelected.splice(position, 1);
-				}
-				this.industrySelected.push(industry);
-			},
-			onRowClicked({ index }) {
-				if(this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
-					return
-				}
-				const vendor = this.vendors[index];
-        window.open(`/pangea-vendors/candidates/potential/details/${ vendor._id }`, "_blank");
-        // this.$router.push(`/pangea-vendors/details/${ vendor._id }`);
-			}
-		},
-		computed: {
-			...mapGetters({
-				vendors: "getFilteredVendors",
-				getAllLanguages: "getAllLanguages"
-			}),
-			selectedIndNames() {
-				let result = [];
-				for (let ind of this.industrySelected) {
-					result.push(ind.name);
-				}
-				return result;
-			},
-      manageIcons() {
-        return { delete: this.icons.delete }
-      },
-		},
-		components: {
-			DataTable,
-			VendorStatusSelect,
-			MultiVendorIndustrySelect,
-			NativeLanguageSelect,
-			Button
-		}
-	}
+      currentEditingIndex: -1,
+      deletingVendorIndex: -1,
+      currentBasicRate: "",
+      currentTqi: "",
+      industrySelected: [],
+      selectedNative: {},
+      selectedStatus: "",
+      isErrorShow: false,
+      isDeleteMessageShow: false
+    }
+  },
+  methods: {
+    ...mapActions({
+      alertToggle: "alertToggle",
+      updateVendorProp: "updateVendorProp",
+      storeVendors: "vendorsSetting",
+      updateCurrentVendor: "updateCurrentVendor",
+      storeCurrentVendor: "storeCurrentVendor",
+      updateIndustry: "updateIndustry",
+      deleteCurrentVendor: "deleteCurrentVendor",
+      updateVendorStatus: "updateVendorStatus"
+    }),
+    async setTest(vendorId) {
+      const vendor = {
+        id: vendorId,
+        isTest: event.target.checked
+      }
+      try {
+        await this.updateVendorStatus(vendor)
+        this.alertToggle({ message: "Vendor status updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({
+          message: "Server error / Cannot update Vendor status",
+          isShow: true,
+          type: "error"
+        })
+      }
+    },
+    bottomScrolled() {
+      this.$emit("bottomScrolled")
+    },
+    isScrollDrop(drop, elem) {
+      return drop && elem.clientHeight >= 600
+    },
+    getFullName(vendor) {
+      return vendor.firstName + " " + vendor.surname
+    },
+    formateLanguagesPairs(arr) {
+      return arr.reduce((acc, curr) => acc + curr + '<br>', '')
+    },
+    getLanguagePairs(vendor) {
+      const isId = vendor.competencies.length && vendor.competencies[0].sourceLanguage.hasOwnProperty('_id')
+      return {
+        duoLanguagesPairs: returnLangPairs('duo', this.getAllLanguages),
+        monoLanguagesPairs: returnLangPairs('mono', this.getAllLanguages)
+      }
+
+      function returnLangPairs(condition, allLanguages) {
+        return [ ...new Set(
+            vendor.competencies
+                .map(({ sourceLanguage, targetLanguage }) => {
+                  return isId ? { sourceLanguage: sourceLanguage._id, targetLanguage: targetLanguage._id } : { sourceLanguage, targetLanguage }
+                })
+                .filter(({ sourceLanguage, targetLanguage }) => condition === 'duo' ? sourceLanguage !== targetLanguage : sourceLanguage === targetLanguage)
+                .map(({ sourceLanguage, targetLanguage }) => {
+                  return condition === 'duo' ? `${ findSymbolOrLang(sourceLanguage, condition, allLanguages) } >> ${ findSymbolOrLang(targetLanguage, condition, allLanguages) }` :
+                      `${ findSymbolOrLang(sourceLanguage, condition, allLanguages) }`
+                })
+        ) ]
+
+        function findSymbolOrLang(_idItem, condition, allLanguages) {
+          const { symbol, lang } = allLanguages.find(({ _id }) => _id.toString() === _idItem.toString())
+          return condition === 'duo' ? symbol : lang
+        }
+      }
+    },
+    getPendingLanguagePair(vendor) {
+      if (!vendor && !vendor.pendingCompetencies && !vendor.competencies[0].sourceLanguage) return []
+      return [ ...new Set(vendor.pendingCompetencies.map(({ sourceLanguage, targetLanguage }) => (`${ sourceLanguage.symbol } >> ${ targetLanguage.symbol }`))) ]
+    },
+    isIconClass(index, key) {
+      if (this.currentEditingIndex !== index) {
+        return key === 'save' || key === 'cancel'
+      }
+      if (this.currentEditingIndex === index) {
+        return key === 'edit'
+      }
+    },
+    closeErrorMessage() {
+      this.isErrorShow = false
+    },
+    setCurrentEditionValues(index) {
+      this.currentEditingIndex = index
+      this.currentBasicRate = this.vendors[index].basicRate
+      this.currentTqi = this.vendors[index].tqi
+      this.industrySelected = Array.from(this.vendors[index].industries)
+      this.selectedStatus = this.vendors[index].status
+      this.selectedNative = this.vendors[index].native
+    },
+    setCurrentDefaults() {
+      this.currentEditingIndex = -1
+      this.currentBasicRate = ""
+      this.currentTqi = ""
+      this.industrySelected = []
+      this.selectedStatus = ""
+      this.selectedNative = {}
+      const tbody = document.querySelector('.table__tbody')
+      tbody.style.minHeight = this.currentTableHeight + 'px'
+    },
+    async updateVendor(index) {
+      let sendData = new FormData()
+      const updatingVendor = {
+        ...this.vendors[index],
+        basicRate: this.currentBasicRate,
+        tqi: this.currentTqi,
+        industries: this.industrySelected,
+        status: this.selectedStatus,
+        native: this.selectedNative
+      }
+      sendData.append('vendor', JSON.stringify(updatingVendor))
+      try {
+        await this.updateCurrentVendor(sendData)
+        this.alertToggle({ message: "Vendor info updated", isShow: true, type: "success" })
+        this.$emit("update", { status: this.selectedStatus })
+      } catch (err) {
+        this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
+      }
+    },
+    async makeAction(index, key) {
+      if (this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
+        return this.isErrorShow = true
+      }
+      if (key === 'edit') {
+        this.setCurrentEditionValues(index)
+      }
+      if (key === 'save') {
+        await this.updateVendor(index)
+        this.setCurrentDefaults()
+      }
+      if (key === 'cancel') {
+        this.setCurrentDefaults()
+      }
+      if (key === 'delete') {
+        this.deletingVendorIndex = index
+        this.isDeleteMessageShow = true
+      }
+    },
+    async approveDelete() {
+      this.isDeleteMessageShow = false
+      this.currentEditingIndex = -1
+      const vendor = this.vendors[this.deletingVendorIndex]
+      try {
+        const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ vendor._id }`)
+        if (isAssigned.body) {
+          return this.alertToggle({ message: "The vendor was assigned to a step and cannot be deleted.", isShow: true, type: "error" })
+        }
+        await this.deleteCurrentVendor({ id: vendor._id })
+        this.alertToggle({ message: "Vendor removed", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Server error / Cannot delete the Vendor", isShow: true, type: "error" })
+      }
+    },
+    cancelDelete() {
+      this.deletingVendorIndex = -1
+      this.isDeleteMessageShow = false
+    },
+    setStatus({ option }) {
+      this.selectedStatus = option
+    },
+    // setNative({ lang }) {
+    // 	this.selectedNative = lang;
+    // },
+    // setIndustry({ industry, index }) {
+    // 	const position = this.industrySelected.findIndex(item => {
+    // 		return item._id === industry._id
+    // 	})
+    // 	if(position !== -1) {
+    // 		return this.industrySelected.splice(position, 1);
+    // 	}
+    // 	this.industrySelected.push(industry);
+    // },
+    onRowClicked({ index }) {
+      if (this.currentEditingIndex === index || this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
+        return
+      }
+      const vendor = this.vendors[index]
+      window.open(`/pangea-vendors/candidates/potential/details/${ vendor._id }`, "_blank")
+      // this.$router.push(`/pangea-vendors/details/${ vendor._id }`);
+    }
+  },
+  computed: {
+    ...mapGetters({
+      vendors: "getFilteredVendors",
+      getAllLanguages: "getAllLanguages"
+    }),
+    selectedIndNames() {
+      let result = []
+      for (let ind of this.industrySelected) {
+        result.push(ind.name)
+      }
+      return result
+    },
+    manageIcons() {
+      return { delete: this.icons.delete }
+    }
+  },
+  components: {
+    DataTable,
+    Button
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+@import "../../assets/scss/colors.scss";
 
-  .vendors-table {
+.vendors-table {
+  position: relative;
+
+  &__combinations {
+    padding: 8px 5px;
+  }
+
+  &__industry-icon {
+    width: 21px;
+    height: 21px;
+    margin-right: 5px;
+  }
+
+  &__industry {
+    padding: 5px;
+  }
+
+  &__status,
+  &__native,
+  &__data {
+    margin: 6px 5px;
+    padding: 2px 0;
+  }
+
+  &__no-drop, &__data {
+    display: flex;
+    align-items: center;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  &__icons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  &__icon {
+    cursor: pointer;
+  }
+
+  &_opacity {
+    opacity: 0.5;
+  }
+
+  &__drop-menu {
     position: relative;
+  }
 
-    &__combinations {
-      padding: 8px 5px;
+  &__active {
+    /*padding: 5px;*/
+    box-shadow: inset 0 0 5px $brown-shadow;
+  }
+
+  &__input {
+    border: none;
+    outline: none;
+    color: $main-color;
+    padding: 2px;
+    background-color: transparent;
+  }
+
+  &__error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: transparent;
+    padding: 0 15px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__error-message {
+    position: relative;
+    width: 300px;
+    padding: 0 20px;
+    border: 1px solid $orange;
+    box-shadow: 0 0 5px $orange;
+    background-color: $white;
+    font-weight: bolder;
+    font-size: 14px;
+  }
+
+  &__close {
+    position: absolute;
+    font-size: 24px;
+    font-weight: 700;
+    top: -2px;
+    right: 5px;
+    transform: rotate(45deg);
+    cursor: pointer;
+  }
+
+  &__delete-approve {
+    position: absolute;
+    width: 332px;
+    height: 270px;
+    top: 10%;
+    left: 50%;
+    margin-left: -166px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    background-color: $white;
+    z-index: 20;
+
+    p {
+      font-size: 21px;
+      width: 50%;
+      text-align: center;
     }
 
-    &__industry-icon {
-      width: 21px;
-      height: 21px;
-      margin-right: 5px;
+    .approve-block {
+      margin-bottom: 15px;
     }
+  }
 
-    &__industry {
-      padding: 5px;
-    }
+  &__button {
+    margin-bottom: 5px;
+  }
 
-    &__status,
-    &__native,
-    &__data {
-      margin: 6px 5px;
-      padding: 2px 0;
-    }
+  &_flex-wrap {
+    flex-wrap: wrap;
+  }
 
-    &__no-drop, &__data {
-      display: flex;
-      align-items: center;
-      overflow-y: auto;
-      box-sizing: border-box;
-    }
+  .checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 3px;
 
-    &__icons {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
+    input[type="checkbox"] {
+      display: none;
 
-    &__icon {
-      cursor: pointer;
-    }
-
-    &_opacity {
-      opacity: 0.5;
-    }
-
-    &__drop-menu {
-      position: relative;
-    }
-
-    &__active {
-      /*padding: 5px;*/
-      box-shadow: inset 0 0 5px $brown-shadow;
-    }
-
-    &__input {
-      border: none;
-      outline: none;
-      color: $main-color;
-      padding: 2px;
-      background-color: transparent;
-    }
-
-    &__error {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      background: transparent;
-      padding: 0 15px;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    &__error-message {
-      position: relative;
-      width: 300px;
-      padding: 0 20px;
-      border: 1px solid $orange;
-      box-shadow: 0 0 5px $orange;
-      background-color: $white;
-      font-weight: bolder;
-      font-size: 14px;
-    }
-
-    &__close {
-      position: absolute;
-      font-size: 24px;
-      font-weight: 700;
-      top: -2px;
-      right: 5px;
-      transform: rotate(45deg);
-      cursor: pointer;
-    }
-
-    &__delete-approve {
-      position: absolute;
-      width: 332px;
-      height: 270px;
-      top: 10%;
-      left: 50%;
-      margin-left: -166px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-      background-color: $white;
-      z-index: 20;
-
-      p {
-        font-size: 21px;
-        width: 50%;
-        text-align: center;
+      + {
+        label {
+          &::after {
+            content: none;
+          }
+        }
       }
 
-      .approve-block {
-        margin-bottom: 15px;
-      }
-    }
-
-    &__button {
-      margin-bottom: 5px;
-    }
-
-    &_flex-wrap {
-      flex-wrap: wrap;
-    }
-
-    .checkbox {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: 3px;
-
-      input[type="checkbox"] {
-        display: none;
-
+      &:checked {
         + {
           label {
             &::after {
-              content: none;
+              content: "";
             }
           }
-        }
-
-        &:checked {
-          + {
-            label {
-              &::after {
-                content: "";
-              }
-            }
-          }
-        }
-      }
-
-      label {
-        position: relative;
-        display: inline-block;
-        padding-left: 19px;
-        padding-top: 7px;
-
-        &::before {
-          position: absolute;
-          content: "";
-          display: inline-block;
-          height: 16px;
-          width: 16px;
-          border: 1px solid #c1bbb1;
-          left: 0px;
-          top: 3px;
-        }
-
-        &::after {
-          position: absolute;
-          content: "";
-          display: inline-block;
-          height: 5px;
-          width: 9px;
-          border-left: 2px solid;
-          border-bottom: 2px solid;
-          transform: rotate(-45deg);
-          left: 4px;
-          top: 7px;
         }
       }
     }
+
+    label {
+      position: relative;
+      display: inline-block;
+      padding-left: 19px;
+      padding-top: 7px;
+
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid #c1bbb1;
+        left: 0px;
+        top: 3px;
+      }
+
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+      }
+    }
   }
+}
 </style>

@@ -52,13 +52,22 @@
       .block-item
         label Time Zone:
         .block-item__drop-menu.block-item_high-index
-          TimezoneSelect(:timezoneSelected=" currentVendor.timezone", @chosenZone="(e) => updateVendorProp(e, 'timezone')")
+          SelectSingle(
+            :hasSearch="true"
+            :options="timezones.map(item => item.zone)",
+            placeholder="Timezone",
+            :selectedOption="currentVendor.timezone",
+            @chooseOption="updateVendorTimeZone"
+          )
       .block-item
         label.block-item__label.block-item_relative Native Language:
         .block-item__drop-menu.block-item_medium-index
-          NativeLanguageSelect(
-            :selectedLang="currentVendor.native",
-            @chosenLang="(e) => updateVendorProp(e.lang, 'native')"
+          SelectSingle(
+            :selectedOption="currentVendor.native.lang",
+            :options="filteredLanguages.map(({lang}) => lang)",
+            placeholder="Native Language"
+            :hasSearch="true"
+            @chooseOption="updateVendorNative"
           )
       .block-item.no-margin
         label Gender:
@@ -116,10 +125,13 @@
         .block-item__drop-menu(
           :class="{ 'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length }"
         )
-          MultiVendorIndustrySelect(
-            :selectedInd="currentVendor.industries || []",
-            :filteredIndustries="selectedIndNames",
-            @chosenInd="chosenInd"
+          SelectMulti(
+            :hasSearch="true"
+            :allOptionsButtons="true"
+            placeholder="Select"
+            :selectedOptions="currentVendor.industries.length ? currentVendor.industries.map(i => i.name) : []"
+            :options="getAllIndustries.map(i => i.name)"
+            @chooseOptions="setIndustries"
           )
       .block-item.no-margin
         label Aliases:
@@ -137,9 +149,6 @@
 	import { mapActions, mapGetters } from "vuex"
 	import SelectMulti from "../SelectMulti"
 	import SelectSingle from "../SelectSingle"
-	import MultiVendorIndustrySelect from "./MultiVendorIndustrySelect"
-	import TimezoneSelect from "../clients/TimezoneSelect"
-	import NativeLanguageSelect from "./NativeLanguageSelect"
 	import Asterisk from "../Asterisk"
 
 	export default {
@@ -151,24 +160,26 @@
 				currentVendorAliases: [],
 				timezone: '',
 				native: '',
-				gender: ''
+				gender: '',
+        searchLang: '',
+        timezones: [],
 			}
 		},
 		methods: {
 			...mapActions({
 				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData"
 			}),
-			chosenInd(e) {
-				let curentVentorIndusties = [ ...this.currentVendor.industries ]
-
-				const position = curentVentorIndusties.findIndex(item => item._id === e.industry._id)
-				if (position !== -1) {
-					curentVentorIndusties.splice(position, 1)
-				} else {
-					curentVentorIndusties.push(e.industry)
-				}
-				this.updateCurrentVendorGeneralData({ key: 'industries', value: curentVentorIndusties })
-			},
+			// chosenInd(e) {
+			// 	let curentVentorIndusties = [ ...this.currentVendor.industries ]
+      //
+			// 	const position = curentVentorIndusties.findIndex(item => item._id === e.industry._id)
+			// 	if (position !== -1) {
+			// 		curentVentorIndusties.splice(position, 1)
+			// 	} else {
+			// 		curentVentorIndusties.push(e.industry)
+			// 	}
+			// 	this.updateCurrentVendorGeneralData({ key: 'industries', value: curentVentorIndusties })
+			// },
 			setAlias(e) {
 				let curentVentorAliases = [ ...this.currentVendor.aliases ]
 
@@ -183,9 +194,31 @@
 			previewPhoto(e, name) {
 				this.updateCurrentVendorGeneralData({ key: name, value: e.target.value })
 			},
+      updateVendorNative(value) {
+        const {_id, lang} = this.filteredLanguages.find(({lang}) => lang === value.option)
+        this.updateCurrentVendorGeneralData({ key: 'native', value: {_id, lang} })
+      },
+      updateVendorTimeZone({option}) {
+        this.updateCurrentVendorGeneralData({ key: 'timezone', value: option })
+      },
+      setIndustries({ option }) {
+        let industries = [ ...this.currentVendor.industries ]
+        const position = industries.findIndex(item => item.name === option)
+        if (position !== -1) industries.splice(position, 1)
+        else industries.push(this.getAllIndustries.find(item => item.name === option))
+        this.updateCurrentVendorGeneralData({ key: "industries", value: industries })
+      },
 			updateVendorProp(value, key) {
 				this.updateCurrentVendorGeneralData({ key, value })
 			},
+      async getTimezones() {
+        try {
+          const result = await this.$http.get('/api/timezones')
+          this.timezones = result.data
+        } catch (err) {
+          console.log(err)
+        }
+      },
 			async getAliases() {
 				try {
 					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
@@ -201,8 +234,22 @@
 		},
 		computed: {
 			...mapGetters({
-				currentVendor: "getCurrentVendorGeneralData"
-			}),
+				currentVendor: "getCurrentVendorGeneralData",
+        getAllIndustries: "getAllIndustries",
+        languages: "getAllLanguages",
+      }),
+      filteredLanguages() {
+        let result = this.languages;
+        if(this.addAll) {
+          result.unshift({lang: "All", symbol: "All"})
+        }
+        result = result.filter(item => {
+          if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
+            return item
+          }
+        })
+        return result;
+      },
 			vendorAliases() {
 				if (this.aliases) {
 					return this.aliases
@@ -221,12 +268,10 @@
 		components: {
 			SelectSingle,
 			SelectMulti,
-			MultiVendorIndustrySelect,
-			TimezoneSelect,
-			NativeLanguageSelect,
 			Asterisk
 		},
 		created() {
+      this.getTimezones()
 			this.getAliases()
 		}
 	}

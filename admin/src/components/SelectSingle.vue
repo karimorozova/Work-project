@@ -185,7 +185,7 @@
       &__search {
         background: $body;
         box-sizing: border-box;
-        width: -webkit-fill-available;
+        width: 100%;
         padding: 0 7px;
         outline: none;
         border: none;
