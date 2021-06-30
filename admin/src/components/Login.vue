@@ -63,14 +63,14 @@
 					this.alertToggle({ message: err.body, isShow: true, type: "error" })
 				}
 			},
-			async logout() {
-				try {
-					await this.loggingOut()
-					this.$router.push("/login")
-				} catch (err) {
-					this.alertToggle({ message: "Cannot log out", isShow: true, type: "error" })
-				}
-			},
+			// async logout() {
+			// 	try {
+			// 		await this.loggingOut()
+			// 		this.$router.push("/login")
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: "Cannot log out", isShow: true, type: "error" })
+			// 	}
+			// },
       async singInGoogle() {
         try {
           const googleUser = await this.$gAuth.signIn();
@@ -110,7 +110,7 @@
 			...mapActions({
 				alertToggle: "alertToggle",
 				loggingIn: "login",
-				loggingOut: "logout"
+				// loggingOut: "logout"
 			})
 		},
     created() {

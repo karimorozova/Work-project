@@ -49,6 +49,6 @@ export default {
 <style lang="scss" scoped>
 .create-project {
     width: 100%;
-    margin: 40px;
+    margin: 50px;
 }
 </style>

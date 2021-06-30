@@ -544,31 +544,32 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+	const date = Date.now()
+
 	try {
 		const token = localStorage.getItem("token")
-		if (!token && to.path !== '/login') {
-			next('/login')
-		}
+		if (to.path === '/login' || to.path === '/forgot') return next()
+		if (!!token) {
+			const jwtObj = jwt.verify(JSON.parse(token).value, secretKey)
 
-		const test = token ? jwt.verify(JSON.parse(token).value, secretKey) : false
-
-		if (to.path === '/forgot') {
-			next()
-		} else if (test) {
-			const date = Date.now()
-			const expiryTime = new Date(JSON.parse(token).timestamp)
-			if (date > expiryTime && to.path !== '/login') {
-				store.dispatch("logout")
-				next('/login')
-			} else {
-				next()
+			if (jwtObj) {
+				if (date > new Date(JSON.parse(jwtObj).timestamp)) {
+					exit()
+				}
+				return next()
 			}
-		} else {
-			next()
 		}
-	} catch (e) {
-		localStorage.removeItem("token")
+
 		next('/login')
+
+	} catch (e) {
+		console.log(e, 'CACTCJ')
+		exit()
+	}
+
+	function exit() {
+		localStorage.removeItem("token")
+		return next('/login')
 	}
 })
 

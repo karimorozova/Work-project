@@ -1,8 +1,7 @@
 <template lang="pug">
   .filters
     .filters__row
-      .filters__item(v-if="projectsType !== 'requests'")
-        //LabelValue(label="Status")
+      .filters__item
         label.filters__filter-title Status:
         .filters__drop-menu.filters__input
           SelectSingle(
@@ -13,19 +12,7 @@
             :projectsType="projectsType"
           )
 
-      .filters__item(v-else)
-        //LabelValue(label="Sales Manager")
-        label.filters__filter-title Sales Manager:
-        .filters__drop-menu.filters_short-menu
-          SelectSingle(
-            :selectedOption="salesFilter"
-            :options="salesNames"
-            placeholder="Name"
-            @chooseOption="(e) => setValue(e, 'salesFilter')"
-          )
-
       .filters__item
-        //LabelValue(:label="projectsType === 'requests' ? 'Assigned To' : 'Project Manager'")
         label.filters__filter-title {{ projectsType === 'requests' ? 'Assigned To' : 'Project Manager' }}:
         .filters__drop-menu(:class="projectsType === 'requests' ? 'filters_medium-menu' : 'filters_short-menu'")
           SelectSingle(
@@ -36,11 +23,24 @@
           )
 
       .filters__item
-        //LabelValue(label="Client Name")
-
         label.filters__filter-title Client Name:
         input.filters__text-input(type="text" :value="clientName" @keyup="filterByName")
-      .filters__item
+
+      .filters__date
+        label.filters__filter-title Start Date and Time:
+        datepicker-with-time(@selected="setStart" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
+        span.calendar-wrapper( @click="startOpen")
+          i.calendar.far.fa-calendar-alt
+        //img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
+
+      .filters__date
+        label.filters__filter-title Deadline:
+        datepicker-with-time(@selected="setDeadline" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
+        span.calendar-wrapper(@click="deadlineOpen")
+          i.calendar.far.fa-calendar-alt
+        //img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
+
+      //.filters__item
         //LabelValue(label="Source Langs")
         //label.filters__filter-title Source Langs:
 
@@ -49,7 +49,7 @@
             //:selectedLangs="sourceLangs.map(({symbol}) => symbol)"
             //@chosenLang="(lang) => addLang(lang, 'sourceFilter')"
           //)
-      .filters__item.filters_flex-end
+      //.filters__item.filters_flex-end
         //LabelValue(label="Target Langs")
 
         //label.filters__filter-title Target Langs:
@@ -59,24 +59,7 @@
             //@chosenLang="(lang) => addLang(lang, 'targetFilter')"
           //)
 
-    .filters__row
-      .filters__date
-        //LabelValue(label="Start Date and Time")
-        label.filters__filter-title Start Date and Time:
-
-        datepicker-with-time(@selected="setStart" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
-        span.calendar-wrapper( @click="startOpen")
-          i.calendar.far.fa-calendar-alt
-        //img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
-
-      .filters__date
-        //LabelValue(label="Deadline")
-        label.filters__filter-title Deadline:
-
-        datepicker-with-time(@selected="setDeadline" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
-        span.calendar-wrapper(@click="deadlineOpen")
-          i.calendar.far.fa-calendar-alt
-        //img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
+    //.filters__row
       //.filters__itemLeft
         .filters__itemLeft-button(@click="refreshProjects")
 </template>

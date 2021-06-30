@@ -171,7 +171,7 @@ router.post('/login', (req, res, next) => {
 				return next(err)
 			} else {
 				try {
-					const token = await jwt.sign({ user }, secretKey, { expiresIn: '2h' })
+					const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
 					req.session.userId = user._id
 					res.statusCode = 200
 					const loggedUser = Object.keys(user).reduce((init, cur) => {

@@ -242,11 +242,11 @@ export const login = ({ commit, state }, payload) => {
     });
 };
 
-export const logout = ({ commit }) => {
-    localStorage.removeItem("token");
-}
+// export const logout = ({ commit }) => {
+//     localStorage.removeItem("token");
+// }
 
-export const setUser = async ({commit, state}) => {
+export const setUser = async ({commit, state, dispatch}) => {
     commit('startRequest')
     try {
         const key = JSON.parse(localStorage.getItem("token"));

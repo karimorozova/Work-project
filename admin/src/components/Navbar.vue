@@ -5,15 +5,17 @@
         img(src="../assets/images/latest-version/navbar-logo.svg")
       .navbar__menu
         Menu(:elements="elements" :path='path')
+
     .content
+      Header
       router-view
+
 </template>
 
 <script>
-
 	import Menu from './navBar/Menu'
 	import { mapActions, mapGetters } from "vuex"
-	import { setAllServices, setAllUnits, setAllUsers, setIndustries, setLanguages, setSteps } from "../vuex/general/actions"
+	import Header from "./navBar/Header"
 
 	export default {
 		data() {
@@ -395,6 +397,7 @@
 			this.setSteps()
 		},
 		components: {
+			Header,
 			Menu
 		}
 
@@ -413,9 +416,8 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 250px;
+    width: 260px;
     z-index: 99999;
-    /*    background-color: $navbar;*/
     background-color: #333;
     box-sizing: border-box;
 
@@ -425,7 +427,7 @@
 
     &__logo {
       margin: 0 auto;
-      padding: 10px;
+      padding: 15px;
 
       img {
         width: 100%;
@@ -434,6 +436,7 @@
   }
 
   .content {
-    margin-left: 250px;
+    margin-left: 260px;
+    width: -webkit-fill-available;
   }
 </style>
