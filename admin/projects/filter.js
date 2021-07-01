@@ -1,17 +1,18 @@
 const ObjectId = require('mongodb').ObjectID;
 
 function getFilterdProjectsQuery(filters) {
+	// let status;
+	// if(filters.projectType === 'Open') {
+	// 	status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Closed", "Draft", "Quote sent", "Cost Quote"] } : filters.statusFilter;
+	// } else if(filters.projectType === 'Quote') {
+	// 	status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Approved", "Ready for Delivery", "Cancelled", "Closed", "Cancelled", "Cancelled Halfway", "In progress", "Rejected"] } : filters.statusFilter;
+	// } else if(filters.projectType === 'Closed') {
+	// 	status = !filters.statusFilter || filters.statusFilter === 'All' ? "Closed" : filters.statusFilter;
+	// }
 
-	let status;
-	if(filters.projectType === 'Open') {
-		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Closed", "Draft", "Quote sent", "Cost Quote"] } : filters.statusFilter;
-	} else if(filters.projectType === 'Quote') {
-		status = !filters.statusFilter || filters.statusFilter === 'All' ? { $nin: ["Approved", "Ready for Delivery", "Cancelled", "Closed", "Cancelled", "Cancelled Halfway", "In progress", "Rejected"] } : filters.statusFilter;
-	} else if(filters.projectType === 'Closed') {
-		status = !filters.statusFilter || filters.statusFilter === 'All' ? "Closed" : filters.statusFilter;
-	}
+	let query = {};
 
-	let query = { status };
+	query["status"] = filters.statusFilter
 
 	if(filters.lastDate) {
 		query.startDate = { $lt: new Date(filters.lastDate) };

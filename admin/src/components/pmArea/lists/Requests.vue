@@ -5,7 +5,6 @@
         :clientName="clientFilter"
         :sourceLangs="sourceFilter"
         :targetLangs="targetFilter"
-        :status="statusFilter"
         :pmFilter="pmFilter"
         :salesFilter="salesFilter"
         :projectManagers="projectManagers"
@@ -13,12 +12,10 @@
         @addLangFilter="addLangFilter"
         @removeLangFilter="removeLangFilter"
         @setFilter="setFilter"
-        @refreshProjects="refreshProjects"
-        :statuses="statuses"
       )
     .all-requests__table
       RequestsTable(
-        :allProjects="tableData"
+        :allProjects="allRequests"
         @selectProject="selectProject"
         @bottomScrolled="bottomScrolled"
       )
@@ -27,10 +24,7 @@
 <script>
 	import ProjectsTable from "../ProjectsTable"
 	import RequestsTable from "../RequestsTable"
-	import ProjectInfo from "../ProjectInfo"
-	import ProjectFilters from "../ProjectFilters"
-	import { mapGetters, mapActions } from 'vuex'
-	import { setClientsRequests } from "../../../vuex/clientsRequests/actions"
+	import { mapGetters } from 'vuex'
 	import RequestFilters from "../clientRequests/RequestFilters"
 
 	export default {
@@ -40,57 +34,66 @@
 				clientFilter: "",
 				sourceFilter: [],
 				targetFilter: [],
-				statusFilter: "All",
+				statusFilter: "",
 				pmFilter: "All",
 				salesFilter: "All",
 				startFilter: "",
 				deadlineFilter: "",
 				managers: [],
-				statuses: [ "All", "Client Request", "Request Approved" ]
+				allRequests: [],
+				lastDate: new Date(),
+				isDataRemain: true
 			}
 		},
 		methods: {
-			...mapActions([ "setCurrentProject", "setClientsRequests" ]),
 			setFilter({ option, prop }) {
 				this[prop] = option
 				this.refreshProjects()
-				// this.setClientsRequests({filters: this.filters});
-				// this.$emit('filterProjects', this.filters);
 			},
 			removeLangFilter({ from, position }) {
 				this[from].splice(position, 1)
 				this.refreshProjects()
-				// this.setClientsRequests({filters: this.filters});
-				// this.$emit('filterProjects', this.filters);
 			},
 			addLangFilter({ to, lang }) {
 				this[to].push(lang)
 				this.refreshProjects()
-				// this.setClientsRequests({filters: this.filters});
 			},
 			selectProject({ project }) {
-				this.setCurrentProject(project)
-				const request = this.allRequests.find(item => item._id === project._id)
-				if (request) {
-					return this.$router.push(`/pangea-projects/requests/details/${ project._id }`)
+				if (project.status === 'Closed') {
+					alert('Closed requests don\'t have a layout yet.')
+					return
 				}
-				this.$router.push(`/pangea-projects/requests/details/${ project._id }`)
+				this.$router.push(`${ this.$route.path }/details/${ project._id }`)
+				// this.$router.push(`/pangea-projects/requests/details/${ project._id }`)
 			},
 			async getManagers() {
 				const managers = await this.$http.get("/pm-manage/all-managers?groupFilters=Project%20Managers,Sales")
 				this.managers = managers.body
 			},
-			bottomScrolled() {
-				this.$emit("bottomScrolled", { filters: this.filters })
+			async bottomScrolled() {
+				if (this.isDataRemain) {
+					const result = await this.$http.post(`/clients-requests/all`, { ...this.filters, lastDate: this.lastDate })
+					console.log(result.data)
+					this.allRequests.push(...result.data)
+					this.isDataRemain = result.data.length === 25
+					this.lastDate = result.data && result.data.length ? result.data[result.data.length - 1].startDate : ""
+				}
 			},
-			refreshProjects() {
-				this.setClientsRequests({ filters: this.filters })
+			async getData(filters) {
+				this.lastDate = new Date()
+				this.lastDate.setDate(this.lastDate.getDate() + 1)
+				this.isDataRemain = true
+				try {
+					const result = await this.$http.post(`/clients-requests/all`, { ...filters, lastDate: this.lastDate })
+					this.allRequests = result.data
+					this.lastDate = result.data && result.data.length ? result.data[result.data.length - 1].startDate : ""
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting data", isShow: true, type: "error" })
+				}
 			}
 		},
 		computed: {
 			...mapGetters({
-				allProjects: "getAllProjects",
-				allRequests: "getClientsRequests",
 				allCustomers: "getClients"
 			}),
 			filters() {
@@ -107,9 +110,6 @@
 					targetFilter: this.targetFilter
 				}
 			},
-			tableData() {
-				return this.allRequests
-			},
 			projectManagers() {
 				return this.managers.filter(item => item.group.name === 'Project Managers')
 			},
@@ -117,18 +117,21 @@
 				return this.managers.filter(item => item.group.name === 'Sales')
 			}
 		},
+		beforeRouteEnter(to, from, next) {
+			next((vm) => {
+				let { status } = to.params
+				if (status.includes('_')) status = status.replace('_', ' ')
+				vm.statusFilter = status
+				vm.getData(vm.filters)
+			})
+		},
 		created() {
 			this.getManagers()
-		},
-		mounted() {
-			this.setClientsRequests({})
 		},
 		components: {
 			RequestFilters,
 			ProjectsTable,
-			RequestsTable,
-			ProjectInfo,
-			ProjectFilters
+			RequestsTable
 		}
 	}
 </script>

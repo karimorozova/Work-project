@@ -23,7 +23,7 @@ import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
 import NewClient from '@/components/clients/new-client/NewClient'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewVendor from '@/components/vendors/NewVendor'
-import Accountinfo from '@/components/account/Accountinfo'
+import AccountInfo from '@/components/account/AccountInfo'
 import CreateProject from '@/components/pmArea/CreateProject'
 // import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
@@ -44,8 +44,6 @@ import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
 // LIST ================================================================================================
 import Projects from '@/components/pmArea/lists/Projects'
 import Requests from '@/components/pmArea/lists/Requests'
-import ClosedProjects from '@/components/pmArea/lists/ClosedProjects'
-import QuoteProjects from '@/components/pmArea/lists/QuoteProjects'
 import OpenOtherProjects from '@/components/pmArea/lists/OpenOtherProjects'
 import ClosedOtherProjects from '@/components/pmArea/lists/ClosedOtherProjects'
 import QuoteOtherProjects from '@/components/pmArea/lists/QuoteOtherProjects'
@@ -109,11 +107,11 @@ const router = new Router({
 				//     name: 'zoho',
 				//     component: ZohoCode
 				// },
-				// {
-				// 	path: '/account/settings',
-				// 	name: 'account-info',
-				// 	component: Accountinfo
-				// },
+				{
+					path: 'pangea-account',
+					name: 'pangea-account',
+					component: AccountInfo
+				},
 				{
 					path: 'pangea-dashboard',
 					name: 'pangea-dashboard',
@@ -391,52 +389,156 @@ const router = new Router({
 					component: clearRouterView,
 					children: [
 						{
-							path: 'open-projects',
-							name: 'open-projects',
+							path: 'draft-projects/:status',
+							name: 'draft-projects',
 							component: Projects,
 							props: true
 						},
 						{
-							path: 'open-projects/details/:id',
-							name: 'open-project-details',
+							path: 'draft-projects/:status/details/:id',
+							name: 'draft-project-details',
 							component: ProjectInfo,
 							props: true
 						},
 						{
-							path: 'quote-projects',
-							name: 'quote-projects',
-							component: QuoteProjects,
+							path: 'cost-quote-projects/:status',
+							name: 'cost-quote-projects',
+							component: Projects,
 							props: true
 						},
 						{
-							path: 'quote-projects/details/:id',
-							name: 'quote-projects-details',
+							path: 'cost-quote-projects/:status/details/:id',
+							name: 'cost-quote-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'quote-sent-projects/:status',
+							name: 'quote-sent-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'quote-sent-projects/:status/details/:id',
+							name: 'quote-sent-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'in-progress-projects/:status',
+							name: 'in-progress-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'in-progress-projects/:status/details/:id',
+							name: 'in-progress-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'approved-projects/:status',
+							name: 'approved-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'approved-projects/:status/details/:id',
+							name: 'approved-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'rejected-projects/:status',
+							name: 'rejected-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'rejected-projects/:status/details/:id',
+							name: 'rejected-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'closed-projects/:status',
+							name: 'closed-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'closed-projects/:status/details/:id',
+							name: 'closed-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'cancelled-projects/:status',
+							name: 'cancelled-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'cancelled-projects/:status/details/:id',
+							name: 'cancelled-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
+							path: 'cancelled-halfway-projects/:status',
+							name: 'cancelled-halfway-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'cancelled-halfway-projects/:status/details/:id',
+							name: 'cancelled-halfway-project-details',
 							component: ProjectInfo,
 							props: true
 						},
 						{
 							path: 'requests',
 							name: 'requests',
-							component: Requests,
-							props: true
-						},
-						{
-							path: 'requests/details/:id',
-							name: 'requests-projects-details',
-							component: RequestInfo,
-							props: true
-						},
-						{
-							path: 'closed-projects',
-							name: 'closed-projects',
-							component: ClosedProjects,
-							props: true
-						},
-						{
-							path: 'closed-projects/details/:id',
-							name: 'closed-projects-details',
-							component: ProjectInfo,
-							props: true
+							component: clearRouterView,
+							props: true,
+							children: [
+								{
+									path: 'am-requests/:status',
+									name: 'am-requests',
+									component: Requests,
+									props: true
+								},
+								{
+									path: 'am-requests/:status/details/:id',
+									name: 'am-requests-details',
+									component: RequestInfo,
+									props: true
+								},
+								{
+									path: 'pm-requests/:status',
+									name: 'pm-requests',
+									component: Requests,
+									props: true
+								},
+								{
+									path: 'pm-requests/:status/details/:id',
+									name: 'pm-requests-details',
+									component: RequestInfo,
+									props: true
+								},
+								{
+									path: 'closed-requests/:status',
+									name: 'closed-requests',
+									component: Requests,
+									props: true
+								},
+								{
+									path: 'closed-requests/:status/details/:id',
+									name: 'closed-requests-details',
+									component: RequestInfo,
+									props: true
+								}
+							]
 						},
 						{
 							path: 'xtrf',
@@ -457,7 +559,6 @@ const router = new Router({
 									props: true
 								},
 								{
-
 									path: 'closed-other-projects',
 									name: 'closed-other-projects',
 									component: ClosedOtherProjects,
@@ -481,7 +582,6 @@ const router = new Router({
 									component: OtherProjectInfo,
 									props: true
 								}
-
 							]
 						},
 						{

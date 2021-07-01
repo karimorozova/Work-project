@@ -1,16 +1,16 @@
 <template lang="pug">
   .filters
     .filters__row
-      .filters__item
-        label.filters__filter-title Status:
-        .filters__drop-menu.filters__input
-          SelectSingle(
-            :selectedOption="status"
-            :options="statuses"
-            placeholder="Select"
-            @chooseOption="(e) => setValue(e, 'statusFilter')"
-            :projectsType="projectsType"
-          )
+      //.filters__item
+        //label.filters__filter-title Status:
+        //.filters__drop-menu.filters__input
+          //SelectSingle(
+            //:selectedOption="status"
+            //:options="statuses"
+            //placeholder="Select"
+            //@chooseOption="(e) => setValue(e, 'statusFilter')"
+            //:projectsType="projectsType"
+         //)
 
       .filters__item
         label.filters__filter-title {{ projectsType === 'requests' ? 'Assigned To' : 'Project Manager' }}:
@@ -75,7 +75,6 @@
 
 	export default {
 		props: {
-			status: { type: String },
 			pmFilter: { type: String },
 			salesFilter: { type: String },
 			clientName: { type: String },
@@ -84,7 +83,6 @@
 			projectManagers: { type: Array },
 			salesManagers: { type: Array },
 			projectsType: { type: String },
-			statuses: { type: Array }
 		},
 		data() {
 			return {

@@ -7,38 +7,48 @@
         .header__button
           Button(value="Add Project" @clicked="gotoRequestPage")
 
-        .header__user(@click="toggleMenu")
-          .user__image
-            img(src='../../assets/images/signin-background.jpg')
-          .user__name
-            span Maksym Knyazev
-          .user__chevron
-            i.fas.fa-chevron-down(v-if="isDropBox")
-            i.fas.fa-chevron-right(v-if="!isDropBox")
+        div(v-click-outside="clickOutside")
+          .header__user(@click="toggleMenu")
+            .user__image
+              img(v-if="!user.photo" src='../../assets/images/signin-background.jpg')
+              img(v-else :src="user.photo")
 
-        .header__dropbox(v-if="isDropBox")
-          .dropbox__item(@click="useDropBoxListMethod('My Account')")
-            .dropbox__item-icon
-              i.fas.fa-user-circle
-            .dropbox__item-text My Account
-          .dropbox__item(@click="useDropBoxListMethod('Logout')")
-            .dropbox__item-icon
-              i.fas.fa-power-off
-            .dropbox__item-text Logout
+            .user__name {{ user.firstName || '' }} {{ user.lastName || '' }}
+            .user__chevron
+              i.fas.fa-chevron-down(v-if="isDropBox")
+              i.fas.fa-chevron-right(v-if="!isDropBox")
+
+          .header__dropbox(v-if="isDropBox")
+            .dropbox__item(@click="useDropBoxListMethod('My Account')")
+              .dropbox__item-icon
+                i.fas.fa-user-circle
+              .dropbox__item-text My Account
+            .dropbox__item(@click="useDropBoxListMethod('Logout')")
+              .dropbox__item-icon
+                i.fas.fa-power-off
+              .dropbox__item-text Logout
 
 </template>
 
 <script>
 	import Button from "../Button"
+	import { mapGetters } from "vuex"
+	import ClickOutside from "vue-click-outside"
 
 	export default {
 		components: { Button },
+		directives: {
+			ClickOutside
+		},
 		data() {
 			return {
 				isDropBox: false
 			}
 		},
 		methods: {
+			clickOutside() {
+				this.isDropBox = false
+			},
 			gotoRequestPage() {
 				this.$router.push({ name: 'create-project' })
 			},
@@ -48,28 +58,34 @@
 			useDropBoxListMethod(key) {
 				switch (key) {
 					case 'My Account' :
-						this.$router.push('/account-info')
+						this.$router.push({ name: 'pangea-account' })
 						break
 					case 'Logout' :
 						this.signOut()
 						break
 				}
+				this.clickOutside()
 			},
 			async signOut() {
 				try {
-					localStorage.removeItem("token");
+					localStorage.removeItem("token")
 					this.$router.push('/login')
 				} catch (err) {
 					console.log(err, 'in signOut()')
 				}
 			}
+		},
+		computed: {
+			...mapGetters({
+				user: "getUser"
+			})
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
   .block {
-    width: -webkit-fill-available;
+    width: 100%;
 
     &__header {
       height: 50px;
@@ -107,11 +123,15 @@
 
     &__dropbox {
       position: absolute;
-      background: #f4f2f1;
+      background: white;
       right: 0;
       top: 50px;
       width: 200px;
       z-index: 5555;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+
     }
   }
 

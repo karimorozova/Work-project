@@ -7,20 +7,28 @@
       .element(:style="elementPadding")
 
         .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
-          .group__open(v-if="element.isOpen")
-            .group__open-image
-              img(:src="require(`../../assets/images/navbar-icons/testicon.png`)")
+          span(v-if="element.hasOwnProperty('parent')")
+            .group__open(v-if="element.isOpen")
+              .group__open-image
+                img(:src="require(`../../assets/images/navbar-icons/testicon.png`)")
+                div {{element.name}}
+              i.fas.fa-chevron-down
+            .group__close(v-if="!element.isOpen")
+              .group__close-image
+                img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
+                div {{element.name}}
+              i.fas.fa-chevron-right
+          span(v-else)
+            .group__open(v-if="element.isOpen")
               div {{element.name}}
-            i.fas.fa-chevron-down
-          .group__close(v-if="!element.isOpen")
-            .group__close-image
-              img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
+              i.fas.fa-chevron-down
+            .group__close(v-if="!element.isOpen")
               div {{element.name}}
-            i.fas.fa-chevron-right
+              i.fas.fa-chevron-right
 
       .element(:style="elementPadding")
         router-link(v-if="isLink(element)" :to="{ path: element.path}" id="link") {{element.name}}
-          i.fas.fa-circle
+          //i.fas.fa-circle
 
       Menu(
         v-if="isGroup(element) && openSubMenu(element)"
@@ -53,10 +61,13 @@
 		},
 		data() {
 			return {
-				elementPadding: { 'padding-left': 14 * this.menuIterator + 'px' }
+				elementPadding: { 'padding-left': 18 * this.menuIterator + 'px' }
 			}
 		},
 		methods: {
+			// generateRouteTo(){
+			//
+			// },
 			isGroup: ({ type }) => type === 'group',
 			isLink: ({ type }) => type === 'link',
 			isTitle: ({ type }) => type === 'title',
@@ -130,8 +141,8 @@
     margin-top: 10px;
     margin-bottom: 2px;
     color: lightgrey;
-    letter-spacing: 0.5px;
-    font-size: 12px;
+    letter-spacing: 0.6px;
+    font-size: 11px;
   }
 
   .element {
@@ -144,12 +155,12 @@
 
   .group {
     cursor: pointer;
-    font-family: 'Myriad600';
+    /*font-family: 'Myriad600';*/
     font-size: 14px;
 
     &__open {
       @extend %flexBetween;
-      padding: 8px 14px 8px 0;
+      padding: 10px 18px 10px 0;
       color: white;
 
       &-image {
@@ -160,7 +171,7 @@
 
     &__close {
       @extend %flexBetween;
-      padding: 8px 14px 8px 0;
+      padding: 10px 18px 10px 0;
 
       &-image {
         display: flex;
@@ -170,7 +181,7 @@
   }
 
   #link {
-    padding: 8px 14px 8px 0;
+    padding: 10px 18px 10px 0;
     width: -webkit-fill-available;
     display: flex;
     flex-direction: row-reverse;
@@ -181,13 +192,6 @@
   #link.router-link-active,
   #link.router-link-exact-active {
     color: white !important;
-  }
-
-  .fa-circle {
-    font-size: 4px;
-    margin-right: 5px;
-    width: 16px;
-    text-align: center;
   }
 
   .fa-chevron-right,

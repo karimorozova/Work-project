@@ -149,28 +149,89 @@
 						parent: true,
 						children: [
 							{
-								type: 'link',
-								name: 'Open Projects',
-								path: '/pangea-projects/open-projects'
-							},
-							{
-								name: 'Quote Projects',
+								name: 'Quotes',
 								type: 'title'
 							},
 							{
 								type: 'link',
+								name: 'Draft',
+								path: '/pangea-projects/draft-projects/Draft'
+							},
+							{
+								type: 'link',
+								name: 'Cost Quote',
+								path: '/pangea-projects/cost-quote-projects/Cost_Quote'
+							},
+							{
+								type: 'link',
 								name: 'Quote Sent',
-								path: '/pangea-projects/quote-projects'
+								path: '/pangea-projects/quote-sent-projects/Quote_sent'
+							},
+							{
+								name: 'In Progress',
+								type: 'title'
 							},
 							{
 								type: 'link',
+								name: 'In Progress',
+								path: '/pangea-projects/in-progress-projects/In_progress'
+							},
+							{
+								type: 'link',
+								name: 'Approved',
+								path: '/pangea-projects/approved-projects/Approved'
+							},
+							{
+								type: 'link',
+								name: 'Rejected',
+								path: '/pangea-projects/rejected-projects/Rejected'
+							},
+							{
+								name: 'Closed',
+								type: 'title'
+							},
+							{
+								type: 'link',
+								name: 'Closed',
+								path: '/pangea-projects/closed-projects/Closed'
+							},
+							{
+								type: 'link',
+								name: 'Cancelled',
+								path: '/pangea-projects/cancelled-projects/Cancelled'
+							},
+							{
+								type: 'link',
+								name: 'Cancelled Halfway',
+								path: '/pangea-projects/cancelled-halfway-projects/Cancelled_Halfway'
+							},
+							// {
+							// 	type: 'link',
+							// 	name: 'Incoming Requests',
+							// 	path: '/pangea-projects/requests'
+							// },
+							{
+								type: 'group',
+								path: 'requests',
 								name: 'Incoming Requests',
-								path: '/pangea-projects/requests'
-							},
-							{
-								type: 'link',
-								name: 'Closed Projects',
-								path: '/pangea-projects/closed-projects'
+								isOpen: false,
+								children: [
+									{
+										type: 'link',
+										name: 'Client Requests',
+										path: '/pangea-projects/requests/pm-requests/Client_Request'
+									},
+									{
+										type: 'link',
+										name: 'Approved Requests',
+										path: '/pangea-projects/requests/am-requests/Request_Approved'
+									},
+									{
+										type: 'link',
+										name: 'Closed Requests',
+										path: '/pangea-projects/requests/closed-requests/Closed'
+									}
+								]
 							},
 							{
 								type: 'group',
@@ -330,24 +391,6 @@
 							}
 						]
 					}
-					// {
-					// 	type: 'group',
-					// 	path: 'account',
-					// 	name: 'My Account',
-					// 	isOpen: false,
-					// 	children: [
-					// 		{
-					// 			type: 'link',
-					// 			path: '/account/settings',
-					// 			name: 'Settings'
-					// 		},
-					// 		{
-					// 			type: 'link',
-					// 			path: '/projects/xtrf/closed-other-projects?status=Closed',
-					// 			name: 'logout'
-					// 		}
-					// 	]
-					// }
 				]
 			}
 		},
@@ -416,7 +459,7 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 260px;
+    width: 270px;
     z-index: 99999;
     background-color: #333;
     box-sizing: border-box;
@@ -436,7 +479,7 @@
   }
 
   .content {
-    margin-left: 260px;
+    margin-left: 270px;
     width: -webkit-fill-available;
   }
 </style>

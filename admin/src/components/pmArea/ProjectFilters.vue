@@ -9,26 +9,26 @@
         label.filters__filter-title Project Name:
         input.filters__text-input(type="text" :value="clientName" @keyup="filterByProjectName")
 
-      .filters__item(v-if="projectsType !== 'requests'")
-        label.filters__filter-title Status:
-        .filters__drop-menu.filters__input
-          SelectSingle(
-            :selectedOption="status"
-            :options="statuses"
-            placeholder="Select"
-            @chooseOption="(e) => setValue(e, 'statusFilter')"
-            :projectsType="projectsType"
-          )
+      //.filters__item
+        //label.filters__filter-title Status:
+        //.filters__drop-menu.filters__input
+          //SelectSingle(
+            //:selectedOption="status"
+            //:options="statuses"
+            //placeholder="Select"
+            //@chooseOption="(e) => setValue(e, 'statusFilter')"
+            //:projectsType="projectsType"
+          //)
 
-      .filters__item(v-else)
-        label.filters__filter-title Sales Manager:
-        .filters__drop-menu.filters_short-menu
-          SelectSingle(
-            :selectedOption="salesFilter"
-            :options="salesNames"
-            placeholder="Name"
-            @chooseOption="(e) => setValue(e, 'salesFilter')"
-          )
+      //.filters__item(v-else)
+        //label.filters__filter-title Sales Manager:
+        //.filters__drop-menu.filters_short-menu
+         // SelectSingle(
+            //:selectedOption="salesFilter"
+            //:options="salesNames"
+            //placeholder="Name"
+            //@chooseOption="(e) => setValue(e, 'salesFilter')"
+          //)
 
       .filters__item
         label.filters__filter-title {{ projectsType === 'requests' ? 'Assigned To' : 'Project Manager' }}:
@@ -91,7 +91,6 @@
 
 	export default {
 		props: {
-			status: { type: String },
 			pmFilter: { type: String },
 			salesFilter: { type: String },
 			clientName: { type: String },
@@ -100,7 +99,6 @@
 			projectManagers: { type: Array },
 			salesManagers: { type: Array },
 			projectsType: { type: String },
-			statuses: { type: Array }
 		},
 		data() {
 			return {
@@ -207,9 +205,9 @@
 			}
 		},
 		mounted() {
-			if (this.projectsType === 'requests') {
-				this.statuses = [ "Requested" ]
-			}
+			// if (this.projectsType === 'requests') {
+			// 	this.statuses = [ "Requested" ]
+			// }
 		},
 		components: {
       DatepickerWithTime,

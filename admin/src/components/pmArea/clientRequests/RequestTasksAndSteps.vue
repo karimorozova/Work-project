@@ -160,7 +160,7 @@
 			async convertIntoProject() {
 				try {
 					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
-					const route = this.$router.resolve({ path: `/pangea-projects/all/details/${ projectId.data }` })
+					const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
 					window.open(route.href, "_self");
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })

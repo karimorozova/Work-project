@@ -42,6 +42,7 @@ function getRequestsQuery (filters) {
 	}
 	return query;
 }
+
 async function getClientsRequests(filters) {
 	const query = getRequestsQuery(filters);
 	try {
@@ -61,6 +62,7 @@ async function getClientsRequests(filters) {
 			},
 			{$unwind: "$customer"}
 		]).sort({startDate: -1}).limit(25)
+
 		return await ClientRequest.populate(requests, [
       "requestForm.sourceLanguage",
       "requestForm.targetLanguages",

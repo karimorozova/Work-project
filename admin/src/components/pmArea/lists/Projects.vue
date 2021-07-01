@@ -5,7 +5,6 @@
         :clientName="clientFilter"
         :sourceLangs="sourceFilter"
         :targetLangs="targetFilter"
-        :status="statusFilter"
         :pmFilter="pmFilter"
         :salesFilter="salesFilter"
         :projectManagers="projectManagers"
@@ -15,19 +14,17 @@
         @setFilter="setFilter"
         :projectsType="projectsType"
         @refreshProjects="refreshProjects"
-        :statuses="statuses"
       )
     .all-projects__table
       ProjectsTable(
         v-if="projectsType !== 'requests'"
-        :allProjects="tableData"
+        :allProjects="allProjects"
         @selectProject="selectProject"
         @bottomScrolled="bottomScrolled"
       )
 </template>
 
 <script>
-	import projectsAndRequsets from '@/mixins/projectsAndRequests'
 	import moment from "moment"
 	import ProjectsTable from "../ProjectsTable"
 	import RequestsTable from "../RequestsTable"
@@ -36,7 +33,6 @@
 	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
-		mixins: [ projectsAndRequsets ],
 		props: {
 			projectsType: {
 				type: String
@@ -47,24 +43,26 @@
 				clientFilter: "",
 				sourceFilter: [],
 				targetFilter: [],
-				statusFilter: "All",
+				statusFilter: "",
 				pmFilter: "All",
 				salesFilter: "All",
 				startFilter: "",
 				deadlineFilter: "",
 				managers: [],
-				statuses: [],
+				// statuses: [],
 				isDataRemain: true,
 				lastDate: new Date(),
 				endpoint: "allprojects",
-				prop: "projects"
+				prop: "projects",
+				allProjects: []
 			}
 		},
 		methods: {
-			...mapActions([ "setCurrentProject", "setAllProjects", "alertToggle" ]),
-			async setProjects(filters) {
-				await this.getData(filters)
-			},
+			...mapActions([
+				"setCurrentProject",
+				// "setAllProjects",
+				"alertToggle"
+			]),
 			setFilter({ option, prop }) {
 				this[prop] = option
 				this.$emit('filterProjects', this.filters)
@@ -79,36 +77,50 @@
 			},
 			selectProject({ project }) {
 				this.setCurrentProject(project)
-				const request = this.allRequests.find(item => item._id === project._id)
-				if (request) {
-					return this.$router.push(`/pangea-projects/requests/details/${ project._id }`)
-				}
-				this.$router.push(`/pangea-projects/open-projects/details/${ project._id }`)
+				this.$router.push(`${ this.$route.path }/details/${ project._id }`)
 			},
 			async getManagers() {
 				const managers = await this.$http.get("/pm-manage/all-managers?groupFilters=Project%20Managers,Sales")
-				this.managers = managers.body
-			},
-			bottomScrolled() {
-				this.$emit("bottomScrolled", { filters: this.filters })
+				this.managers = managers.data
 			},
 			refreshProjects() {
 				this.$emit('filterProjects', this.filters)
 			},
-			setStatuses(name) {
-				if (name === 'open-projects') {
-					this.statuses = [ "All", "Approved", "Cancelled", "Cancelled Halfway", "In progress", "Rejected", "Ready for Delivery" ]
-				} else if (name === 'quote-projects') {
-					this.statuses = [ "All", "Draft", "Quote sent", "Cost Quote" ]
-				} else {
-					this.statuses = [ "Closed" ]
+			async getData(filters) {
+				this.lastDate = new Date()
+				this.lastDate.setDate(this.lastDate.getDate() + 1)
+				this.isDataRemain = true
+				try {
+					const result = await this.$http.post(`/pm-manage/${ this.endpoint }`, {
+						...filters,
+						lastDate: this.lastDate
+					})
+					this.allProjects = result.data
+					// this.setAllProjects([ ...result.data ])
+					this.lastDate = result.data && result.data.length ? result.data[result.data.length - 1].startDate : ""
+					// this.scrollBodyToTop()
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting data", isShow: true, type: "error" })
+				}
+			},
+			scrollBodyToTop() {
+				let tbody = document.querySelector(".all-projects")
+				tbody.scrollTop = 0
+			},
+			async bottomScrolled() {
+				if (this.isDataRemain) {
+					const result = await this.$http.post(`/pm-manage/${ this.endpoint }`, { ...this.filters, lastDate: this.lastDate })
+					this.allProjects.push(...result.data)
+					this.isDataRemain = result.data.length === 25
+					this.lastDate = result.data && result.data.length ? result.data[result.data.length - 1].startDate : ""
 				}
 			}
 		},
 		computed: {
 			...mapGetters({
-				allProjects: "getAllProjects",
-				allRequests: "getAllRequests",
+				// TODO: ref this getters
+				// allProjects: "getAllProjects",
+				// allRequests: "getAllRequests",
 				allCustomers: "getClients"
 			}),
 			filters() {
@@ -125,9 +137,6 @@
 					targetFilter: this.targetFilter
 				}
 			},
-			tableData() {
-				return this.projectsType === 'requests' ? [ ...this.allRequests ] : [ ...this.allProjects ]
-			},
 			projectManagers() {
 				return this.managers.filter(item => item.group.name === 'Project Managers')
 			},
@@ -135,15 +144,16 @@
 				return this.managers.filter(item => item.group.name === 'Sales')
 			}
 		},
+		beforeRouteEnter(to, from, next) {
+			next((vm) => {
+				let { status } = to.params
+				if (status.includes('_')) status = status.replace('_', ' ')
+				vm.statusFilter = status
+				vm.getData(vm.filters)
+			})
+		},
 		async created() {
 			await this.getManagers()
-			await this.setProjects()
-		},
-		mounted() {
-			if (this.projectsType === "requests") {
-				this.statusFilter = "Requested"
-			}
-			this.setStatuses(this.$route.name)
 		},
 		components: {
 			ProjectsTable,
