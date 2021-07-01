@@ -48,15 +48,15 @@
 		methods: {
 			setFilter({ option, prop }) {
 				this[prop] = option
-				this.refreshProjects()
+				// this.refreshProjects()
 			},
 			removeLangFilter({ from, position }) {
 				this[from].splice(position, 1)
-				this.refreshProjects()
+				// this.refreshProjects()
 			},
 			addLangFilter({ to, lang }) {
 				this[to].push(lang)
-				this.refreshProjects()
+				// this.refreshProjects()
 			},
 			selectProject({ project }) {
 				if (project.status === 'Closed') {

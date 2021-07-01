@@ -465,7 +465,13 @@
     box-sizing: border-box;
 
     &__menu {
-      /*margin-right: 12px;*/
+      height: calc(100vh - 140px);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    ::-webkit-scrollbar {
+      width: 0px;
     }
 
     &__logo {
@@ -480,6 +486,6 @@
 
   .content {
     margin-left: 270px;
-    width: -webkit-fill-available;
+    width: 100%;
   }
 </style>
