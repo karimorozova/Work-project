@@ -28,14 +28,14 @@
 
       .filters__date
         label.filters__filter-title Start Date and Time:
-        datepicker-with-time(@selected="setStart" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
+        DatepickerWithTime(@selected="setStart" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
         span.calendar-wrapper( @click="startOpen")
           i.calendar.far.fa-calendar-alt
         //img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
 
       .filters__date
         label.filters__filter-title Deadline:
-        datepicker-with-time(@selected="setDeadline" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
+        DatepickerWithTime(@selected="setDeadline" :isTime="false" :highlighted="highlighted" monday-first=true inputClass="datepicker-custom-filter" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
         span.calendar-wrapper(@click="deadlineOpen")
           i.calendar.far.fa-calendar-alt
         //img.filters__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
@@ -71,7 +71,7 @@
 	import LabelValue from "../LabelValue"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
-  import DatepickerWithTime from "../../DatepickerWithTime";
+	import DatepickerWithTime from "../../DatepickerWithTime"
 
 	export default {
 		props: {
@@ -82,7 +82,7 @@
 			targetLangs: { type: Array },
 			projectManagers: { type: Array },
 			salesManagers: { type: Array },
-			projectsType: { type: String },
+			projectsType: { type: String }
 		},
 		data() {
 			return {
@@ -124,7 +124,7 @@
 			},
 			addLang({ lang }, goal) {
 				const prop = goal === 'sourceFilter' ? 'sourceLangs' : 'targetLangs'
-				const position = this[prop].findIndex(({symbol}) => symbol === lang.symbol)
+				const position = this[prop].findIndex(({ symbol }) => symbol === lang.symbol)
 				if (position !== -1) {
 					this.$emit('removeLangFilter', { from: goal, position })
 				} else {
@@ -174,7 +174,7 @@
 			}
 		},
 		components: {
-      DatepickerWithTime,
+			DatepickerWithTime,
 			SelectSingle,
 			SelectMulti,
 			Datepicker,
@@ -185,174 +185,101 @@
 
 
 <style lang="scss" scoped>
-@import "../../../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors.scss";
 
-.filters {
-  width: 100%;
-  //display: flex;
+  .filters {
+    width: 100%;
 
-  &__row{
-    display: flex;
-    margin-bottom: 20px;
-    height: 50px;
-    align-items: flex-end;
-  }
+    &__row {
+      display: flex;
+      margin-bottom: 20px;
+      height: 50px;
+      align-items: flex-end;
+    }
 
-  &__input {
-    width: 200px;
-  }
+    &__input {
+      width: 200px;
+    }
 
-  &__date {
-    position: relative;
-    width: 232px;
-  }
+    &__date {
+      position: relative;
+      width: 250px;
+    }
 
     &__text-input {
-      padding: 0 5px;
-      width: 179px;
-      height: 28px;
-      outline: none;
-      border: 1px solid #c1bbb1;
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
-      color: #68573E;
-      transition: all 0.2s;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
       &:focus {
-        box-shadow: 0 0 3px #68573E;
+        border: 1px solid $border-focus;
       }
     }
 
-  &__filter-title {
-    margin-bottom: 3px;
-  }
-
-  &__itemButton{
-    position: relative;
-    display: grid;
-    align-items: end;
-    width: 232px;
-    justify-content: end;
-  }
-
-  &__item {
-    position: relative;
-    display: grid;
-    align-items: end;
-    width: 232px;
-
-    ::-webkit-input-placeholder {
-      opacity: 0.5;
+    &__filter-title {
+      margin-bottom: 3px;
     }
-  }
 
-  &__input-field {
-    box-sizing: border-box;
-    color: $main-color;
-    width: 200px;
-    height: 30px !important;
-    padding-left: 5px;
-    border: 1px solid #c1bbb1;
-    border-radius: 4px;
-    outline: none;
-    font-size: 14px;
-  }
+    &__itemButton {
+      position: relative;
+      display: grid;
+      align-items: end;
+      width: 250px;
+      justify-content: end;
+    }
 
-  &__drop-menu {
-    position: relative;
-    width: 200px;
-    height: 30px;
-    box-sizing: border-box;
-    z-index: 10;
-  }
+    &__item {
+      position: relative;
+      display: grid;
+      align-items: end;
+      width: 250px;
 
-  .calendar {
-    cursor: pointer;
-  }
+      ::-webkit-input-placeholder {
+        opacity: 0.5;
+      }
+    }
 
-  .calendar-wrapper {
-    position: absolute;
-    right: 50px;
-    bottom: 5px;
-    font-size: 18px;
-  }
-}
+    &__input-field {
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
-  //.filters {
-  //  display: flex;
-  //  width: 100%;
-  //  justify-content: space-between;
-  //  margin-bottom: 20px;
-  //
-  //  &__itemLeft {
-  //    display: flex;
-  //    justify-content: flex-end;
-  //
-  //    &-button {
-  //      background-image: url('../../assets/images/refresh-icon.png');
-  //      width: 24px;
-  //      height: 20px;
-  //      cursor: pointer;
-  //    }
-  //  }
-  //
-  //  &__itemCenter {
-  //    display: flex;
-  //    justify-content: space-between;
-  //
-  //
-  //  }
-  //
-  //  &__row {
-  //    display: flex;
-  //    flex-direction: column;
-  //    justify-content: space-between;
-  //    width: 24%;
-  //    height: 80px;
-  //  }
-  //
-  //  &__drop-menu {
-  //    position: relative;
-  //    width: 166px;
-  //    height: 30px;
-  //  }
-  //
-  //  &_medium-menu {
-  //    width: 166px;
-  //  }
-  //
-  //  &_short-menu {
-  //    width: 166px;
-  //  }
-  //
-  //  &__text-input {
-  //    padding: 0 5px;
-  //    width: 154px;
-  //    height: 30px;
-  //    outline: none;
-  //    border: 1px solid #c1bbb1;
-  //    border-radius: 4px;
-  //    color: #68573E;
-  //    transition: all 0.2s;
-  //
-  //    &:focus {
-  //      box-shadow: 0 0 3px #68573E;
-  //    }
-  //  }
-  //
-  //  &__date {
-  //    position: relative;
-  //  }
-  //
-  //  &__calendar-icon {
-  //    position: absolute;
-  //    top: 5px;
-  //    right: 5px;
-  //    width: 18px;
-  //    cursor: pointer;
-  //  }
-  //}
+      &:focus {
+        border: 1px solid $border-focus;
+      }
+    }
 
-  .left {
+    &__drop-menu {
+      position: relative;
+      width: 220px;
+      height: 32px;
+      box-sizing: border-box;
+      z-index: 10;
+    }
 
+    .calendar {
+      cursor: pointer;
+    }
+
+    .calendar-wrapper {
+      position: absolute;
+      right: 50px;
+      bottom: 5px;
+      font-size: 18px;
+    }
   }
 </style>

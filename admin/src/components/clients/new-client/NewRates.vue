@@ -110,7 +110,7 @@
       }
 
       &__input {
-        width: 190px;
+        width: 220px;
         position: relative;
         margin-top: -6px;
       }

@@ -174,7 +174,7 @@
     box-sizing: border-box;
 
     .drop {
-      max-height: 250px;
+      max-height: 320px;
       overflow-y: auto;
       overflow-x: hidden;
       background-color: #FFF;
@@ -226,9 +226,6 @@
         max-height: 170px;
       }
 
-      .filters & {
-        max-height: 220px;
-      }
 
       .inner-component & {
         max-height: 135px;
@@ -338,53 +335,4 @@
       height: 32px;
     }
   }
-
-
-  /*.table-drop-menu {*/
-  /*  border: none;*/
-  /*  border-radius: 0;*/
-  /*  height: 100%;*/
-  /*  overflow: visible;*/
-
-  /*  .drop {*/
-  /*    border: 1px solid #BFB09D;*/
-  /*  }*/
-
-  /*  .select {*/
-  /*    height: 31px;*/
-  /*    box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);*/
-  /*  }*/
-  /*}*/
-
-  /*.table-drop-menu-no-shadow {*/
-  /*  border: none;*/
-  /*  border-radius: 0;*/
-  /*  height: 100%;*/
-  /*  overflow: visible;*/
-
-  /*  .drop {*/
-  /*    border: 1px solid #BFB09D;*/
-  /*  }*/
-
-  /*  .select {*/
-  /*    height: 31px;*/
-  /*  }*/
-  /*}*/
-
-  /*.disabled {*/
-  /*  background-color: #eee;*/
-  /*}*/
-
-  /*.rates-table {*/
-  /*  .select {*/
-  /*    height: 34px;*/
-  /*  }*/
-  /*}*/
-
-  /*.height-32 {*/
-  /*  .select {*/
-  /*    height: 32px;*/
-  /*  }*/
-  /*}*/
-
 </style>

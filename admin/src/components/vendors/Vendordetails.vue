@@ -660,7 +660,7 @@ export default {
   }
 
   &__check-item {
-    width: 190px;
+    width: 220px;
   }
 
   &__last {
@@ -682,7 +682,7 @@ export default {
 
   &__drop {
     position: relative;
-    width: 190px;
+    width: 220px;
   }
 }
 
@@ -797,7 +797,7 @@ export default {
 
   &__drop-menu {
     position: relative;
-    width: 200px;
+    width: 220px;
     height: 30px;
     box-sizing: border-box;
   }
@@ -821,7 +821,7 @@ export default {
   /*  border-radius: 4px;*/
   /*  padding: 0 5px;*/
   /*  outline: none;*/
-  /*  width: 200px;*/
+  /*  width: 220px;*/
   /*  height: 30px;*/
   /*  box-sizing: border-box;*/
   /*}*/

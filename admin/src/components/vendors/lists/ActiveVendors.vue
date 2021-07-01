@@ -132,7 +132,7 @@
 
   .active-vendors {
     position: relative;
-    width: 1200px;
+    width: 1220px;
     margin: 50px;
     background: white;
 

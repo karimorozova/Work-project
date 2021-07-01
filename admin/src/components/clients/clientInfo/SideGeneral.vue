@@ -144,7 +144,7 @@
 
       &__drop {
         position: relative;
-        width: 190px;
+        width: 220px;
         height: 30px;
       }
     }

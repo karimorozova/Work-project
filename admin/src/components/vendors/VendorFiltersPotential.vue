@@ -302,7 +302,7 @@
     &__input-field {
       box-sizing: border-box;
       color: $main-color;
-      width: 200px;
+      width: 220px;
       height: 30px !important;
       padding-left: 5px;
       border: 1px solid #c1bbb1;
@@ -313,7 +313,7 @@
 
     &__drop-menu {
       position: relative;
-      width: 200px;
+      width: 220px;
       height: 30px;
       box-sizing: border-box;
       z-index: 10;

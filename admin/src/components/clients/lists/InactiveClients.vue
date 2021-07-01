@@ -147,6 +147,7 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../assets/scss/colors";
 
   .inactive-clients {
     position: relative;
@@ -192,14 +193,20 @@
     }
 
     &__input-field {
-      width: 200px;
-      height: 30px;
-      padding-left: 5px;
-      border: 1px solid #c1bbb1;
-      color: #66563d;
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
-      outline: none;
       box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
     }
 
     &__itemButton {

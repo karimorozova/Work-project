@@ -117,7 +117,7 @@
       display: flex;
       justify-content: flex-start;
       position: relative;
-      width: 190px;
+      width: 220px;
       height: 28px;
     }
   }

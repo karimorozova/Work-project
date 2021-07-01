@@ -231,7 +231,7 @@
     height: 30px;
 
     &__check-item {
-      width: 190px;
+      width: 220px;
     }
 
     &__label {

@@ -146,7 +146,7 @@
     box-sizing: border-box;
 
     .drop {
-      max-height: 250px;
+      max-height: 320px;
       overflow-y: auto;
       overflow-x: hidden;
       background-color: #FFF;

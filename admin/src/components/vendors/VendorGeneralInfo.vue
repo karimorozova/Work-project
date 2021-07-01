@@ -15,7 +15,7 @@
     .gen-info__block
       .block-item
         label.block-item__label.block-item_relative First Name:
-          Asterisk(:customStyle="asteriskStyle")
+          span.require *
         input.block-item__input-filed(
           :class="{ 'block-item_error-shadow': errors.includes('Please, enter valid first name.') && isSaveClicked }",
           type="text",
@@ -33,7 +33,7 @@
         )
       .block-item
         label.block-item__label.block-item_relative Email:
-          Asterisk(:customStyle="asteriskStyle")
+          span.require *
         input.block-item__input-filed(
           type="text",
           placeholder="Email",
@@ -149,7 +149,6 @@
 	import { mapActions, mapGetters } from "vuex"
 	import SelectMulti from "../SelectMulti"
 	import SelectSingle from "../SelectSingle"
-	import Asterisk from "../Asterisk"
 
 	export default {
 		data() {
@@ -161,64 +160,50 @@
 				timezone: '',
 				native: '',
 				gender: '',
-        searchLang: '',
-        timezones: [],
+				searchLang: '',
+				timezones: []
 			}
 		},
 		methods: {
 			...mapActions({
 				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData"
 			}),
-			// chosenInd(e) {
-			// 	let curentVentorIndusties = [ ...this.currentVendor.industries ]
-      //
-			// 	const position = curentVentorIndusties.findIndex(item => item._id === e.industry._id)
-			// 	if (position !== -1) {
-			// 		curentVentorIndusties.splice(position, 1)
-			// 	} else {
-			// 		curentVentorIndusties.push(e.industry)
-			// 	}
-			// 	this.updateCurrentVendorGeneralData({ key: 'industries', value: curentVentorIndusties })
-			// },
 			setAlias(e) {
-				let curentVentorAliases = [ ...this.currentVendor.aliases ]
+				let currVendorAliases = [ ...this.currentVendor.aliases ]
+				const position = currVendorAliases.findIndex(item => item === e.option)
+				if (position !== -1) currVendorAliases.splice(position, 1)
+				else currVendorAliases.push(e.option)
 
-				const position = curentVentorAliases.findIndex(item => item === e.option)
-				if (position !== -1) {
-					curentVentorAliases.splice(position, 1)
-				} else {
-					curentVentorAliases.push(e.option)
-				}
-				this.updateCurrentVendorGeneralData({ key: 'aliases', value: curentVentorAliases })
+				this.updateCurrentVendorGeneralData({ key: 'aliases', value: currVendorAliases })
 			},
 			previewPhoto(e, name) {
 				this.updateCurrentVendorGeneralData({ key: name, value: e.target.value })
 			},
-      updateVendorNative(value) {
-        const {_id, lang} = this.filteredLanguages.find(({lang}) => lang === value.option)
-        this.updateCurrentVendorGeneralData({ key: 'native', value: {_id, lang} })
-      },
-      updateVendorTimeZone({option}) {
-        this.updateCurrentVendorGeneralData({ key: 'timezone', value: option })
-      },
-      setIndustries({ option }) {
-        let industries = [ ...this.currentVendor.industries ]
-        const position = industries.findIndex(item => item.name === option)
-        if (position !== -1) industries.splice(position, 1)
-        else industries.push(this.getAllIndustries.find(item => item.name === option))
-        this.updateCurrentVendorGeneralData({ key: "industries", value: industries })
-      },
+			updateVendorNative(value) {
+				const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
+				this.updateCurrentVendorGeneralData({ key: 'native', value: { _id, lang } })
+			},
+			updateVendorTimeZone({ option }) {
+				this.updateCurrentVendorGeneralData({ key: 'timezone', value: option })
+			},
+			setIndustries({ option }) {
+				let industries = [ ...this.currentVendor.industries ]
+				const position = industries.findIndex(item => item.name === option)
+				if (position !== -1) industries.splice(position, 1)
+				else industries.push(this.getAllIndustries.find(item => item.name === option))
+				this.updateCurrentVendorGeneralData({ key: "industries", value: industries })
+			},
 			updateVendorProp(value, key) {
 				this.updateCurrentVendorGeneralData({ key, value })
 			},
-      async getTimezones() {
-        try {
-          const result = await this.$http.get('/api/timezones')
-          this.timezones = result.data
-        } catch (err) {
-          console.log(err)
-        }
-      },
+			async getTimezones() {
+				try {
+					const result = await this.$http.get('/api/timezones')
+					this.timezones = result.data
+				} catch (err) {
+					console.log(err)
+				}
+			},
 			async getAliases() {
 				try {
 					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
@@ -235,21 +220,21 @@
 		computed: {
 			...mapGetters({
 				currentVendor: "getCurrentVendorGeneralData",
-        getAllIndustries: "getAllIndustries",
-        languages: "getAllLanguages",
-      }),
-      filteredLanguages() {
-        let result = this.languages;
-        if(this.addAll) {
-          result.unshift({lang: "All", symbol: "All"})
-        }
-        result = result.filter(item => {
-          if(item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
-            return item
-          }
-        })
-        return result;
-      },
+				getAllIndustries: "getAllIndustries",
+				languages: "getAllLanguages"
+			}),
+			filteredLanguages() {
+				let result = this.languages
+				if (this.addAll) {
+					result.unshift({ lang: "All", symbol: "All" })
+				}
+				result = result.filter(item => {
+					if (item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
+						return item
+					}
+				})
+				return result
+			},
 			vendorAliases() {
 				if (this.aliases) {
 					return this.aliases
@@ -267,11 +252,10 @@
 		},
 		components: {
 			SelectSingle,
-			SelectMulti,
-			Asterisk
+			SelectMulti
 		},
 		created() {
-      this.getTimezones()
+			this.getTimezones()
 			this.getAliases()
 		}
 	}
@@ -279,6 +263,10 @@
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors.scss";
+
+  .require {
+    color: $red;
+  }
 
   .gen-info {
     box-sizing: border-box;
@@ -297,7 +285,7 @@
       width: 35%;
 
       &:first-child {
-        width: 22%;
+        width: 20%;
         text-align: center;
       }
     }
@@ -319,8 +307,8 @@
 
     &__drop-menu {
       position: relative;
-      width: 210px;
-      height: 30px;
+      width: 220px;
+      height: 32px;
       box-sizing: border-box;
     }
 
@@ -344,7 +332,7 @@
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;
-      width: 210px;
+      width: 220px;
       height: 32px;
       transition: .1s ease-out;
 

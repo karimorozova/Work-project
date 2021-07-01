@@ -386,7 +386,7 @@ export default {
   }
 
   &__check-item {
-    width: 190px;
+    width: 220px;
   }
 
   &__last {
@@ -408,7 +408,7 @@ export default {
 
   &__drop {
     position: relative;
-    width: 190px;
+    width: 220px;
   }
 }
 
@@ -476,7 +476,7 @@ export default {
   margin-bottom: 20px;
 
   &__check-item {
-    width: 190px;
+    width: 220px;
   }
 
   &__label {
