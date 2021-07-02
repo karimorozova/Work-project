@@ -539,7 +539,7 @@ export default {
       display: inline-block;
       height: 16px;
       width: 16px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       left: 0px;
       top: 3px;
     }
@@ -561,7 +561,7 @@ export default {
 .icon{
   display: flex;
   justify-content: center;
-  color: #66563d;
+  color: $text;
   margin-left: 12px;
   font-size: 16px;
   transition: .2s ease;

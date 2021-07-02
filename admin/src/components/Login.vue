@@ -223,7 +223,7 @@
       height: 40px;
       width: 100%;
       font-size: 18px;
-      color: #66563d;
+      color: $text;
       padding-left: 10px;
       padding-right: 10px;
       border-radius: 4px;
@@ -254,7 +254,7 @@
 
       &-label {
         font-size: 16px;
-        color: #66563d;
+        color: $text;
         margin-bottom: 0;
         margin-left: 6px;
       }

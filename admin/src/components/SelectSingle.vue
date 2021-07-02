@@ -215,27 +215,28 @@
       }
 
       .active {
-        background-color: $light-border;
+        opacity: 0.5;
+        /*background-color: $light-border;*/
       }
 
-      .test-options & {
-        max-height: 60px;
-      }
+      /*.test-options & {*/
+      /*  max-height: 60px;*/
+      /*}*/
 
-      .project-info__tasks & {
-        max-height: 170px;
-      }
+      /*.project-info__tasks & {*/
+      /*  max-height: 170px;*/
+      /*}*/
 
 
-      .inner-component & {
-        max-height: 135px;
-        border: 1px solid #BFB09D;
-        border-top: none;
-      }
+      /*.inner-component & {*/
+      /*  max-height: 135px;*/
+      /*  border: 1px solid #BFB09D;*/
+      /*  border-top: none;*/
+      /*}*/
 
-      .services__drop-menu & {
-        border: 1px solid #BFB09D;
-      }
+      /*.services__drop-menu & {*/
+      /*  border: 1px solid #BFB09D;*/
+      /*}*/
     }
 
     .filters &, .project-finance__drop-menu & {
@@ -296,16 +297,16 @@
         transform: rotate(180deg);
       }
 
-      .inner-component & {
-        background-color: white;
-        box-shadow: inset -1px 0 5px #bfb09d;
-        border-left: 1px solid #bfb09d;
-        width: 17%;
-      }
+      /*      .inner-component & {
+              background-color: white;
+              box-shadow: inset -1px 0 5px #bfb09d;
+              border-left: 1px solid #bfb09d;
+              width: 17%;
+            }*/
 
       .block-item__drop-menu & {
         width: 20%;
-        border-left: 1px solid #bfb09d;
+        border-left: 1px solid $light-border
       }
     }
 
@@ -326,13 +327,13 @@
       }
     }
 
-    .services__drop-menu & {
-      height: 32px;
-      box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);
-    }
+    /*.services__drop-menu & {*/
+    /*  height: 32px;*/
+    /*  box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);*/
+    /*}*/
 
-    .add-several__drop-menu & {
-      height: 32px;
-    }
+    /*.add-several__drop-menu & {*/
+    /*  height: 32px;*/
+    /*}*/
   }
 </style>

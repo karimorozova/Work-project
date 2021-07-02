@@ -100,6 +100,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../assets/scss/colors";
+
   .selectBox {
     margin: 10px 30px;
     color: #66563d;
@@ -115,9 +117,9 @@
     }
 
     &__body {
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       border-radius: 4px;
-      box-shadow: 0 10px 6px -6px #333;
+/*      box-shadow: 0 10px 6px -6px #333;*/
       max-height: 260px;
       overflow-y: auto;
     }
@@ -137,7 +139,7 @@
       &-icon {
         height: 25px;
         width: 25px;
-        background: #66563d;
+        background: $text;
         color: white;
         border-radius: 50%;
         text-align: center;
@@ -154,10 +156,9 @@
   }
 
   .mailBox {
-    border-top: 1px solid #c1bbb1;
-    border-bottom: 1px solid #c1bbb1;
+    border-top: 1px solid $border;
+    border-bottom: 1px solid $border;
     display: flex;
-    color: #66563d;
 
 
     &__to {
@@ -182,12 +183,6 @@
         height: 50px;
         outline: none;
         border: none;
-        color: #66563d;
-        font-size: 14px;
-      }
-
-      input::placeholder {
-        color: #D6CDC8;
         font-size: 14px;
       }
     }
@@ -195,7 +190,7 @@
     &__chips {
       padding: 5px 12px;
       margin-left: 10px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       border-radius: 4px;
       min-height: 10px;
       margin-top: 10px;
@@ -208,7 +203,6 @@
         &__mail {
           font-size: 14px;
           line-height: 18px;
-          color: #D6CDC8;
         }
 
         &__close {

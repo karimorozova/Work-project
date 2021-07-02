@@ -753,7 +753,7 @@
 
     &__item {
       border-radius: 4px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       box-sizing: border-box;
       background-color: #fff;
       font-size: 12px;

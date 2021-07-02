@@ -130,9 +130,7 @@
 </script>
 
 <style lang="scss" scoped>
-  input:disabled {
-    background-color: #F2EFEB;
-  }
+  @import "../../../assets/scss/colors";
 
   .project {
     margin-right: 40px;
@@ -172,7 +170,7 @@
       margin-bottom: 40px;
 
       ::-webkit-input-placeholder {
-        color: #68573E;
+        color: $text;
         opacity: 0.47;
       }
     }
@@ -183,13 +181,10 @@
       height: 44px;
       width: 40%;
       border-radius: 4px;
-      color: #68573E;
-      border: 1px solid #c1bbb1;
+      color: $text;
+      border: 1px solid $border;
       outline: none;
 
-      &:focus {
-        box-shadow: 0 0 5px #68573E;
-      }
     }
 
     &__date {
@@ -216,29 +211,25 @@
     }
 
     &__link {
-      border-bottom: 1px solid #c1bbb1;
+      border-bottom: 1px solid $border;
       cursor: pointer;
     }
 
     &__input-text {
       width: 158px;
       height: 28px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       border-radius: 4px;
       padding: 0 5px;
-      color: #68573E;
+      color: $text;
       font-size: 14px;
       outline: none;
-
-      &:focus {
-        box-shadow: 0 0 5px #68573E;
-      }
     }
 
     &__input-text2 {
       width: 133px;
       height: 28px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       border-radius: 4px;
       padding: 0 5px;
       color: #68573E;
@@ -246,9 +237,6 @@
       outline: none;
       padding-right: 30px;
 
-      &:focus {
-        box-shadow: 0 0 5px #68573E;
-      }
     }
 
     &__textarea {
@@ -259,16 +247,13 @@
       width: 100%;
       margin-top: 10px;
       border-radius: 4px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       padding: 5px;
-      color: #68573E;
+      color: $text;
       resize: none;
       outline: none;
       box-sizing: border-box;
 
-      &:focus {
-        box-shadow: 0 0 5px #68573E;
-      }
     }
 
     &__calendar-icon {
@@ -329,7 +314,7 @@
           display: inline-block;
           height: 16px;
           width: 16px;
-          border: 1px solid #c1bbb1;
+          border: 1px solid $border;
           left: 0px;
           top: 3px;
         }
@@ -352,13 +337,8 @@
 
   .fa {
     font-size: 20px;
-    color: #938676;
     transition: ease 0.2s;
     cursor: pointer;
-  }
-
-  .fa:hover {
-    color: #66563d;
   }
 
   .tooltip {
@@ -369,7 +349,7 @@
       font-size: 14px;
       visibility: hidden;
       width: 140px;
-      background-color: #66563d;
+      background-color: $red;
       color: #fff;
       text-align: center;
       border-radius: 4px;
@@ -390,7 +370,7 @@
         margin-left: -5px;
         border-width: 5px;
         border-style: solid;
-        border-color: #66563d transparent transparent transparent;
+        border-color: $red transparent transparent transparent;
       }
     }
 

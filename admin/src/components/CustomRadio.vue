@@ -26,7 +26,7 @@ export default {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid #c1bbb1;
+    border: 1px solid $border;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -37,7 +37,7 @@ export default {
         border-radius: 50%;
     }
     &_checked {
-        background-color: $main-color;
+        background-color: $text;
     }
 }
 

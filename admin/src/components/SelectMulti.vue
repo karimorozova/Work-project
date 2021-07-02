@@ -306,24 +306,27 @@
       height: 100%;
       position: relative;
 
-      &::before {
-        content: "";
-        position: absolute;
-        width: 6px;
-        border: 1px solid $text;
-        top: 7px;
-        left: 0px;
-        transform: rotate(45deg);
-      }
+      /*      &::before {
+              content: "";
+              position: absolute;
+              width: 6px;
+              border: 1px solid $text;
+              top: 7px;
+              left: 0px;
+              transform: rotate(45deg);
+            }*/
 
       &::after {
         content: "";
         position: absolute;
+        display: inline-block;
+        height: 5px;
         width: 8px;
-        border: 1px solid $text;
-        top: 6px;
-        left: 4px;
-        transform: rotate(-58deg);
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        left: 2px;
+        top: 2px;
+        transform: rotate(-45deg);
       }
     }
   }

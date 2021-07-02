@@ -156,6 +156,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../assets/scss/colors";
+
   .projects-table {
     &__label {
       width: 100%;
@@ -217,7 +219,7 @@
           display: inline-block;
           height: 16px;
           width: 16px;
-          border: 1px solid #c1bbb1;
+          border: 1px solid $border;
           left: 0px;
           top: 3px;
         }
