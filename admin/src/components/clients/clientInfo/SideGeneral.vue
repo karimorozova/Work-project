@@ -5,7 +5,7 @@
       .block-item
         label.block-item__label Status:
           span.require *
-        .block-item__drop.block-item_maxhigh-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.status}")
+        .block-item__drop.index-10(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.status}")
           SelectSingle(
             :options="['Active', 'Inactive', 'Potential']",
             placeholder="Status",
@@ -20,7 +20,7 @@
       .block-item
         label.block-item__label Account Manager:
           span.require *
-        .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
+        .block-item__dropindex-9(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
           SelectSingle(
             :options="users.filter(i => i.group.name === 'Account Managers').map(i => `${i.firstName} ${i.lastName}`)",
             placeholder="Select",
@@ -35,7 +35,7 @@
       .block-item
         label.block-item__label Project Manager:
           span.require *
-        .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
+        .block-item__dropindex-8(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
           SelectSingle(
             :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
             placeholder="Select",
@@ -113,6 +113,18 @@
     margin-bottom: 5px;
   }
 
+  .index-10 {
+    z-index: 10;
+  }
+
+  .index-9 {
+    z-index: 9;
+  }
+
+  .index-8 {
+    z-index: 8;
+  }
+
   .general-info {
 
     .block-item {
@@ -122,30 +134,18 @@
       position: relative;
 
       &__last {
-        height: 30px;
-      }
-
-      /*&_maxhigh-index {*/
-      /*  z-index: 12;*/
-      /*}*/
-
-      &_high-index {
-        z-index: 10;
-      }
-
-      &_medium-index {
-        z-index: 8;
+        height: 32px;
       }
 
       &__label {
-        width: 160px;
+        width: 130px;
         padding-top: 6px;
       }
 
       &__drop {
         position: relative;
         width: 220px;
-        height: 30px;
+        height: 32px;
       }
     }
 

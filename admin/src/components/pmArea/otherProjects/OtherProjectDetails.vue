@@ -205,12 +205,12 @@
 
     &__drop-menu {
       position: relative;
-      height: 28px;
-      width: 200px;
+      height: 32px;
+      width: 220px;
     }
 
     &__client-link {
-      width: 200px;
+      width: 220px;
       display: flex;
       justify-content: flex-start;
     }

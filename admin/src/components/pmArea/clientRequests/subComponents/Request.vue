@@ -22,7 +22,9 @@
             ref="start"
             :disabledPicker="disabledPicker && isProjectFinished || !canUpdateRequest"
           )
-          img.project__calendar-icon(src="../../../../assets/images/calendar.png" @click="startOpen")
+          .project__calendar-icon( @click="startOpen")
+            i.far.fa-calendar-alt
+
         .project__date
           .input-title
             .input-title__text Deadline:
@@ -38,7 +40,9 @@
             :disabled="disabled"
             ref="deadline"
           )
-          img.project__calendar-icon(src="../../../../assets/images/calendar.png" @click="deadlineOpen")
+          .project__calendar-icon( @click="deadlineOpen")
+            i.far.fa-calendar-alt
+
         .project__date
           .input-title
             .input-title__text Billing Date:
@@ -53,7 +57,8 @@
             :disabledPicker="isBilling || isProjectFinished || !canUpdateRequest"
             :disabled="disabled"
           )
-          img.project__calendar-icon(src="../../../../assets/images/calendar.png" @click="billingOpen")
+          .project__calendar-icon( @click="billingOpen")
+            i.far.fa-calendar-alt
 
         .project__same.checkbox
           input(type="checkbox" id="same" :disabled="isProjectFinished || !canUpdateRequest" :checked="isBilling" @change="setSameDate")
@@ -240,15 +245,15 @@
 				this.areErrorsExist = false
 			},
 			checkProjectName() {
-        const regex = /^([^\d\W]|[A-z])[\w \.]*$/
+				const regex = /^([^\d\W]|[A-z])[\w \.]*$/
 				return regex.test(this.project.projectName)
 			},
 			async checkForErrors() {
 				this.errors = []
-        if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())){
-          this.errors.push("Please, enter valid Project name.")
-          this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
-        }
+				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
+					this.errors.push("Please, enter valid Project name.")
+					this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
+				}
 				if (!this.project.startDate) this.errors.push("Please, set the start date.")
 				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
 				if (!this.project.customer.name) this.errors.push("Please, select a Client.")
@@ -338,11 +343,11 @@
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
 			},
-      canUpdateRequest() {
-        return this.user.group.name === "Administrators"
-            ||  this.user.group.name === "Developers"
-            ||  this.project.projectManager._id === this.user._id
-      }
+			canUpdateRequest() {
+				return this.user.group.name === "Administrators"
+						|| this.user.group.name === "Developers"
+						|| this.project.projectManager._id === this.user._id
+			}
 		},
 		components: {
 			DatepickerWithTime,
@@ -360,6 +365,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../../assets/scss/colors";
+
   .input-title {
     display: flex;
 
@@ -373,7 +380,7 @@
   }
 
   .hide-elem {
-    width: 155px;
+    width: 170px;
   }
 
   .project {
@@ -439,16 +446,19 @@
     }
 
     &__name {
-      font-size: 21px;
+      font-size: 20px;
       padding: 0 5px;
-      height: 38px;
-      width: 459px;
+      height: 42px;
+      width: 488px;
       border-radius: 4px;
       color: #68573E;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       outline: none;
+      color: $text;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
@@ -457,12 +467,12 @@
     }
 
     &__client, &__industry, &__number {
-      width: 200px;
+      width: 220px;
     }
 
     &__drop-menu {
       position: relative;
-      height: 30px;
+      height: 32px;
     }
 
     &__client-link {
@@ -480,30 +490,36 @@
     }
 
     &__input-text {
-      width: 179px;
-      height: 28px;
-      border: 1px solid #c1bbb1;
-      border-radius: 4px;
-      padding: 0 5px;
-      color: #68573E;
       font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
       outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
     &__input-text2 {
-      width: 179px;
-      height: 28px;
-      border: 1px solid #c1bbb1;
-      border-radius: 4px;
-      padding: 0 5px;
-      color: #68573E;
       font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
       outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
@@ -515,14 +531,16 @@
       width: 100%;
       margin-top: 4px;
       border-radius: 4px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       padding: 5px;
-      color: #68573E;
+      color: $text;
       resize: none;
       outline: none;
       box-sizing: border-box;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
@@ -532,6 +550,7 @@
       right: 5px;
       width: 18px;
       cursor: pointer;
+      font-size: 18px;
     }
 
     &__button {
@@ -609,10 +628,6 @@
   #same,
   #test {
     width: 0;
-  }
-
-  input:disabled {
-    background-color: #f4f2f1;
   }
 
 </style>

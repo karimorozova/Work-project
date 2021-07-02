@@ -158,6 +158,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../assets/scss/colors";
+
   .same-info {
     &__row {
       height: 55px;
@@ -180,28 +182,26 @@
   }
 
   .names-info {
-    width: 40%;
+    width: 41%;
 
     textarea {
-      color: rgba(103, 87, 62, 0.5);
-      height: 71px;
-      width: 300px;
-      border: 1px solid #c1bbb1;
+      color: $text;
+      height: 70px;
+      width: 310px;
+      border: 1px solid $border;
       border-radius: 4px;
       outline: none;
       resize: none;
+      transition: .1s ease-out;
+      padding: 5px;
 
       &:focus {
-        color: #66563d;
-      }
-
-      &::-webkit-input-placeholder {
-        opacity: 0.5;
+        border: 1px solid $border-focus;
       }
     }
 
     &__dueDate {
-      width: 210px;
+      width: 220px;
       display: flex;
 
       .dueDate-date {
@@ -212,8 +212,8 @@
 
     &__drop {
       position: relative;
-      width: 210px;
-      height: 30px;
+      width: 220px;
+      height: 32px;
     }
 
     &__item {
@@ -238,14 +238,20 @@
       }
 
       input {
-        color: #66563d;
-        border: 1px solid #c1bbb1;
+        font-size: 14px;
+        color: $text;
+        border: 1px solid $border;
         border-radius: 4px;
-        padding: 0 5px;
-        outline: none;
-        width: 210px;
-        height: 32px;
         box-sizing: border-box;
+        padding: 0 7px;
+        outline: none;
+        width: 220px;
+        height: 32px;
+        transition: .1s ease-out;
+
+        &:focus {
+          border: 1px solid $border-focus;
+        }
       }
     }
 
@@ -269,8 +275,8 @@
 
   .checkbox {
     display: flex;
-    height: 30px;
-    width: 210px;
+    height: 32px;
+    width: 220px;
 
     input[type="checkbox"] {
       opacity: 0;
@@ -326,11 +332,11 @@
   }
 
   #dueDate {
-    width: 210px;
+    width: 220px;
   }
 
   #vatId {
-    width: 172px;
+    width: 192px;
   }
 
   #same-checkbox {
@@ -348,7 +354,7 @@
 
   .vat-fields {
     display: flex;
-    width: 200px;
+    width: 220px;
     height: 30px;
   }
 

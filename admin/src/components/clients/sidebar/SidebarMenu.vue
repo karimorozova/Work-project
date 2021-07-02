@@ -161,7 +161,7 @@
       position: fixed;
       width: 400px;
       right: 0;
-      top: 5vh;
+      top: 50;
       height: 95vh;
       z-index: 9;
       border-left: 2px solid #E8E8E8;

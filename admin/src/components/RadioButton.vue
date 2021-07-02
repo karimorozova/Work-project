@@ -31,6 +31,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import "../assets/scss/colors";
 
   .radio {
     &__text {
@@ -47,7 +48,7 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -61,7 +62,7 @@
     }
 
     &_checked {
-      background-color: #66563d;
+      background-color: $red;
     }
   }
 

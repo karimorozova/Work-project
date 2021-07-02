@@ -279,7 +279,7 @@
     justify-content: space-between;
 
     &__block {
-      width: 39%;
+      width: 41%;
       padding-bottom: 1px;
     }
 
@@ -297,7 +297,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    height: 30px;
+    height: 32px;
 
     &__check-item {
       width: 220px;
@@ -313,7 +313,7 @@
 
     &__drop {
       position: relative;
-      width: 210px;
+      width: 220px;
       height: 32px;
     }
 
@@ -333,7 +333,7 @@
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;
-      width: 210px;
+      width: 220px;
       height: 32px;
       transition: .1s ease-out;
 

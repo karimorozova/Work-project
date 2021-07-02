@@ -128,599 +128,599 @@
 </template>
 
 <script>
-import ClickOutside from "vue-click-outside"
-import ValidationErrors from "../ValidationErrors"
-import SelectSingle from "../SelectSingle"
-import Asterisk from "../Asterisk"
-import { mapGetters, mapActions } from "vuex"
-import photoPreview from "@/mixins/photoPreview"
-import SelectMulti from "../SelectMulti"
+	import ClickOutside from "vue-click-outside"
+	import ValidationErrors from "../ValidationErrors"
+	import SelectSingle from "../SelectSingle"
+	import Asterisk from "../Asterisk"
+	import { mapGetters, mapActions } from "vuex"
+	import photoPreview from "@/mixins/photoPreview"
+	import SelectMulti from "../SelectMulti"
 
-export default {
-  mixins: [ photoPreview ],
-  data() {
-    return {
-      areErrorsExist: false,
-      isSaveClicked: false,
-      vendorShow: true,
-      imageExist: false,
-      timezones: [],
-      approveShow: false,
-      photoFile: [],
-      genders: [ "Male", "Female", "Other" ],
-      asteriskStyle: { top: "0px" },
-      errors: [],
-      vendor: {
-        basicRate: "",
-        companyName: "",
-        email: "",
-        firstName: "",
-        surname: "",
-        gender: "",
-        linkedin: "",
-        native: null,
-        phone: "",
-        photo: "",
-        skype: "",
-        status: "",
-        timezone: "",
-        tqi: "",
-        website: "",
-        whatsapp: "",
-        languageCombinations: [],
-        languagePairs: [],
-        industries: [],
-        test: false,
-        position: [],
-        isTest: false,
-        professionalLevel: "",
-        isCreatedByManager: true
-      },
-      isFileError: false,
-      onlySpaces: /^\s+$/,
-      searchLang: '',
-      statuses: [ "Active", "Inactive", "Potential" ]
-    }
-  },
-  methods: {
-    setTest() {
-      this.vendor.isTest = event.target.checked
-    },
-    closeErrors() {
-      this.areErrorsExist = false
-    },
-    checkEmail() {
-      const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-      return (
-          !this.vendor.email ||
-          !emailValidRegex.test(this.vendor.email.toLowerCase())
-      )
-    },
-    setPhone(e) {
-      const { value } = e.target
-      const regex = /^[0-9]+$/
-      const characters = value.split("").filter(item => regex.test(item))
-      const clearedValue = characters.join("")
-      this.vendor.phone =
-          clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue
-      this.$refs.phone.value = this.vendor.phone
-    },
-    async checkUniqueEmailInVendors() {
-      let isExists = false
-      try {
-        const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.vendor.email }`)
-        isExists = !!result.data
-      } catch (err) {
-        this.alertToggle({
-          message: "Error on email uniqueness checking",
-          isShow: true,
-          type: "error"
-        })
-      }
-      return isExists
-    },
-    async checkForErrors() {
-      const textReg = /^[-\sa-zA-Z]+$/
-      this.errors = []
-      if (!this.vendor.firstName || !textReg.test(this.vendor.firstName))
-        this.errors.push("Please, enter valid first name.")
-      if (this.onlySpaces.exec(this.vendor.firstName)) {
-        this.errors.push("Please, enter valid first name.")
-      }
-      if (this.vendor.surname && !textReg.test(this.vendor.surname))
-        this.errors.push("Please, enter valid surname.")
-      if (!this.vendor.industries.length)
-        this.errors.push("Please, choose at least one industry.")
-      if (!this.vendor.status) this.errors.push("Please, choose status.")
-      if (this.checkEmail()) {
-        this.errors.push("Please provide a valid email.")
-      }
-      if (await this.checkUniqueEmailInVendors()) {
-        this.errors.push("The email you've entered is already used in our system!")
-      }
-      if (this.errors.length) {
-        this.areErrorsExist = true
-        this.isSaveClicked = true
-        return
-      }
-      await this.saveVendor()
-    },
-    async saveVendor() {
-      let sendData = new FormData()
-      sendData.append("vendor", JSON.stringify(this.vendor))
-      sendData.append("photo", this.photoFile[0])
-      try {
-        await this.saveNewVendor(sendData)
-        this.alertToggle({ message: "New Vendor saved", isShow: true, type: "success" })
-        this.$router.push(`/pangea-vendors/all/details/${ this.currentVendor._id }`)
-      } catch (err) {
-        this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
-      }
-    },
-    updateProp(e, prop) {
-      const value = e.target.value
-      this.vendor[prop] = value
-    },
-    updateGender({ option }) {
-      this.vendor.gender = option
-    },
-    setTimezone({ option }) {
-      this.vendor.timezone = option
-    },
-    setNative(value) {
-      const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
-      this.vendor.native = { _id, lang }
-    },
-    setIndustries({ option }) {
-      let industries = this.vendor.industries
-      const position = industries.findIndex(item => item.name === option)
-      if (position !== -1) industries.splice(position, 1)
-      else industries.push(this.getAllIndustries.find(item => item.name === option))
-    },
-    async getTimezones() {
-      try {
-        const result = await this.$http.get('/api/timezones')
-        this.timezones = result.data
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    chooseProfessionalLevel({ option }) {
-      this.vendor.professionalLevel = option
-    },
-    chosenStatus(value) {
-      this.vendor.status = value.option
-    },
-    cancel() {
-      this.$router.go(-1)
-    },
-    chosenInd({ industry }) {
-      const index = this.vendor.industries.findIndex(
-          item => item._id === industry._id
-      )
-      if (index !== -1) {
-        return this.vendor.industries.splice(index, 1)
-      }
-      this.vendor.industries.push(industry)
-    },
-    ...mapActions({
-      alertToggle: "alertToggle",
-      saveNewVendor: "saveNewVendor"
-    })
-  },
-  computed: {
-    ...mapGetters({
-      currentVendor: "getCurrentVendor",
-      languages: "getAllLanguages",
-      getAllIndustries: "getAllIndustries"
-    }),
-    filteredLanguages() {
-      let result = this.languages
-      if (this.addAll) {
-        result.unshift({ lang: "All", symbol: "All" })
-      }
-      result = result.filter(item => {
-        if (item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
-          return item
-        }
-      })
-      return result
-    },
-    vendorStatus() {
-      if (!this.vendor.status) {
-        this.vendor.status = 'Potential'
-      }
-      return this.vendor.status
-    },
-    selectedIndNames() {
-      let result = []
-      if (this.vendor.industries.length) {
-        for (let ind of this.vendor.industries) {
-          result.push(ind.name)
-        }
-      }
-      return result
-    }
-  },
-  created() {
-    this.getTimezones()
-  },
-  components: {
-    SelectMulti,
-    ValidationErrors,
-    SelectSingle,
-    Asterisk
-  },
-  directives: {
-    ClickOutside
-  }
-}
+	export default {
+		mixins: [ photoPreview ],
+		data() {
+			return {
+				areErrorsExist: false,
+				isSaveClicked: false,
+				vendorShow: true,
+				imageExist: false,
+				timezones: [],
+				approveShow: false,
+				photoFile: [],
+				genders: [ "Male", "Female", "Other" ],
+				asteriskStyle: { top: "0px" },
+				errors: [],
+				vendor: {
+					basicRate: "",
+					companyName: "",
+					email: "",
+					firstName: "",
+					surname: "",
+					gender: "",
+					linkedin: "",
+					native: null,
+					phone: "",
+					photo: "",
+					skype: "",
+					status: "",
+					timezone: "",
+					tqi: "",
+					website: "",
+					whatsapp: "",
+					languageCombinations: [],
+					languagePairs: [],
+					industries: [],
+					test: false,
+					position: [],
+					isTest: false,
+					professionalLevel: "",
+					isCreatedByManager: true
+				},
+				isFileError: false,
+				onlySpaces: /^\s+$/,
+				searchLang: '',
+				statuses: [ "Active", "Inactive", "Potential" ]
+			}
+		},
+		methods: {
+			setTest() {
+				this.vendor.isTest = event.target.checked
+			},
+			closeErrors() {
+				this.areErrorsExist = false
+			},
+			checkEmail() {
+				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+				return (
+						!this.vendor.email ||
+						!emailValidRegex.test(this.vendor.email.toLowerCase())
+				)
+			},
+			setPhone(e) {
+				const { value } = e.target
+				const regex = /^[0-9]+$/
+				const characters = value.split("").filter(item => regex.test(item))
+				const clearedValue = characters.join("")
+				this.vendor.phone =
+						clearedValue.length > 19 ? clearedValue.slice(0, 19) : clearedValue
+				this.$refs.phone.value = this.vendor.phone
+			},
+			async checkUniqueEmailInVendors() {
+				let isExists = false
+				try {
+					const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.vendor.email }`)
+					isExists = !!result.data
+				} catch (err) {
+					this.alertToggle({
+						message: "Error on email uniqueness checking",
+						isShow: true,
+						type: "error"
+					})
+				}
+				return isExists
+			},
+			async checkForErrors() {
+				const textReg = /^[-\sa-zA-Z]+$/
+				this.errors = []
+				if (!this.vendor.firstName || !textReg.test(this.vendor.firstName))
+					this.errors.push("Please, enter valid first name.")
+				if (this.onlySpaces.exec(this.vendor.firstName)) {
+					this.errors.push("Please, enter valid first name.")
+				}
+				if (this.vendor.surname && !textReg.test(this.vendor.surname))
+					this.errors.push("Please, enter valid surname.")
+				if (!this.vendor.industries.length)
+					this.errors.push("Please, choose at least one industry.")
+				if (!this.vendor.status) this.errors.push("Please, choose status.")
+				if (this.checkEmail()) {
+					this.errors.push("Please provide a valid email.")
+				}
+				if (await this.checkUniqueEmailInVendors()) {
+					this.errors.push("The email you've entered is already used in our system!")
+				}
+				if (this.errors.length) {
+					this.areErrorsExist = true
+					this.isSaveClicked = true
+					return
+				}
+				await this.saveVendor()
+			},
+			async saveVendor() {
+				let sendData = new FormData()
+				sendData.append("vendor", JSON.stringify(this.vendor))
+				sendData.append("photo", this.photoFile[0])
+				try {
+					await this.saveNewVendor(sendData)
+					this.alertToggle({ message: "New Vendor saved", isShow: true, type: "success" })
+					this.$router.push(`/pangea-vendors/all/details/${ this.currentVendor._id }`)
+				} catch (err) {
+					this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
+				}
+			},
+			updateProp(e, prop) {
+				const value = e.target.value
+				this.vendor[prop] = value
+			},
+			updateGender({ option }) {
+				this.vendor.gender = option
+			},
+			setTimezone({ option }) {
+				this.vendor.timezone = option
+			},
+			setNative(value) {
+				const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
+				this.vendor.native = { _id, lang }
+			},
+			setIndustries({ option }) {
+				let industries = this.vendor.industries
+				const position = industries.findIndex(item => item.name === option)
+				if (position !== -1) industries.splice(position, 1)
+				else industries.push(this.getAllIndustries.find(item => item.name === option))
+			},
+			async getTimezones() {
+				try {
+					const result = await this.$http.get('/api/timezones')
+					this.timezones = result.data
+				} catch (err) {
+					console.log(err)
+				}
+			},
+			chooseProfessionalLevel({ option }) {
+				this.vendor.professionalLevel = option
+			},
+			chosenStatus(value) {
+				this.vendor.status = value.option
+			},
+			cancel() {
+				this.$router.go(-1)
+			},
+			chosenInd({ industry }) {
+				const index = this.vendor.industries.findIndex(
+						item => item._id === industry._id
+				)
+				if (index !== -1) {
+					return this.vendor.industries.splice(index, 1)
+				}
+				this.vendor.industries.push(industry)
+			},
+			...mapActions({
+				alertToggle: "alertToggle",
+				saveNewVendor: "saveNewVendor"
+			})
+		},
+		computed: {
+			...mapGetters({
+				currentVendor: "getCurrentVendor",
+				languages: "getAllLanguages",
+				getAllIndustries: "getAllIndustries"
+			}),
+			filteredLanguages() {
+				let result = this.languages
+				if (this.addAll) {
+					result.unshift({ lang: "All", symbol: "All" })
+				}
+				result = result.filter(item => {
+					if (item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) != -1) {
+						return item
+					}
+				})
+				return result
+			},
+			vendorStatus() {
+				if (!this.vendor.status) {
+					this.vendor.status = 'Potential'
+				}
+				return this.vendor.status
+			},
+			selectedIndNames() {
+				let result = []
+				if (this.vendor.industries.length) {
+					for (let ind of this.vendor.industries) {
+						result.push(ind.name)
+					}
+				}
+				return result
+			}
+		},
+		created() {
+			this.getTimezones()
+		},
+		components: {
+			SelectMulti,
+			ValidationErrors,
+			SelectSingle,
+			Asterisk
+		},
+		directives: {
+			ClickOutside
+		}
+	}
 </script>
 
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss";
+  @import "../../assets/scss/colors.scss";
 
-.vendor-wrap {
-  display: flex;
-}
-
-.vendor-subinfo {
-  &__general {
-    padding: 20px;
-    margin-top: 145px;
-    width: 350px;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-    margin-left: 40px;
-    background: white;
-    border-radius: 4px;
-  }
-}
-
-.block-item-subinfo {
-  display: flex;
-  height: 50px;
-
-  &__error-shadow {
-    height: 30px;
+  .vendor-wrap {
+    display: flex;
   }
 
-  &__check-item {
-    width: 220px;
-  }
-
-  &__last {
-    height: 30px;
-  }
-
-  &_maxhigh-index {
-    z-index: 12;
-  }
-
-  &_high-index {
-    z-index: 10;
-  }
-
-  &__label {
-    width: 160px;
-    padding-top: 6px;
-  }
-
-  &__drop {
-    position: relative;
-    width: 220px;
-  }
-}
-
-.block-item-subinfo:last-child {
-  height: 30px;
-}
-
-.vendor-wrap {
-  position: relative;
-  width: 100%;
-  display: flex;
-  min-height: 94vh;
-}
-
-.vendor-info {
-  box-sizing: border-box;
-  width: 1000px;
-  margin: 50px 0 50px 50px;
-}
-
-.title {
-  font-size: 21px;
-  padding: 30px 0 10px;
-  width: 1000px;
-}
-
-.gen-info,
-.rates {
-  box-sizing: border-box;
-  padding: 20px;
-  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-  width: 1000px;
-  border-radius: 4px;
-  background-color: white;
-}
-
-.gen-info {
-  display: flex;
-  justify-content: space-between;
-
-  &__block {
-    width: 35%;
-
-    &:first-child {
-      width: 22%;
-      text-align: center;
+  .vendor-subinfo {
+    &__general {
+      padding: 20px;
+      margin-top: 145px;
+      width: 350px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      margin-left: 40px;
+      background: white;
+      border-radius: 4px;
     }
   }
-}
 
-.rates {
-  padding: 10px;
-}
+  .block-item-subinfo {
+    display: flex;
+    height: 50px;
 
-.require {
-  font-size: 14px;
-  color: red;
-  margin-left: 2px;
-}
+    &__error-shadow {
+      height: 32px;
+    }
 
-.block-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+    &__check-item {
+      width: 220px;
+    }
 
-  &__check-item {
-    width: 220px;
+    &__last {
+      height: 32px;
+    }
+
+    &_maxhigh-index {
+      z-index: 12;
+    }
+
+    &_high-index {
+      z-index: 10;
+    }
+
+    &__label {
+      width: 130px;
+      padding-top: 6px;
+    }
+
+    &__drop {
+      position: relative;
+      width: 220px;
+    }
   }
 
-  &__label {
-    margin-bottom: 0;
-  }
-
-  &_relative {
-    position: relative;
-  }
-
-  &__drop-menu {
-    position: relative;
-    width: 210px;
-    height: 30px;
-    box-sizing: border-box;
-  }
-
-  &_high-index {
-    z-index: 10;
-  }
-
-  &_medium-index {
-    z-index: 8;
-  }
-
-  label {
-    margin-bottom: 0;
-  }
-
-  input {
-    font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    width: 210px;
+  .block-item-subinfo:last-child {
     height: 32px;
-    transition: .1s ease-out;
+  }
 
-    &:focus {
-      border: 1px solid $border-focus;
+  .vendor-wrap {
+    position: relative;
+    width: 100%;
+    display: flex;
+    min-height: 94vh;
+  }
+
+  .vendor-info {
+    box-sizing: border-box;
+    width: 1000px;
+    margin: 50px 0 50px 50px;
+  }
+
+  .title {
+    font-size: 21px;
+    padding: 30px 0 10px;
+    width: 1000px;
+  }
+
+  .gen-info,
+  .rates {
+    box-sizing: border-box;
+    padding: 20px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    width: 1000px;
+    border-radius: 4px;
+    background-color: white;
+  }
+
+  .gen-info {
+    display: flex;
+    justify-content: space-between;
+
+    &__block {
+      width: 35%;
+
+      &:first-child {
+        width: 22%;
+        text-align: center;
+      }
     }
   }
 
-  ::-webkit-input-placeholder {
-    opacity: 0.5;
+  .rates {
+    padding: 10px;
   }
 
-  &_error-shadow {
-    box-shadow: 0 0 5px red;
-    border-radius: 4px;
-    height: 31px;
+  .require {
+    font-size: 14px;
+    color: red;
+    margin-left: 2px;
   }
-}
 
-#test {
-  width: 0;
-}
+  .block-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 
-.checkbox {
-  display: flex;
-  height: 28px;
+    &__check-item {
+      width: 220px;
+    }
 
-  input[type="checkbox"] {
-    opacity: 0;
+    &__label {
+      margin-bottom: 0;
+    }
 
-    + {
-      label {
-        &::after {
-          content: none;
-        }
+    &_relative {
+      position: relative;
+    }
+
+    &__drop-menu {
+      position: relative;
+      width: 220px;
+      height: 32px;
+      box-sizing: border-box;
+    }
+
+    &_high-index {
+      z-index: 10;
+    }
+
+    &_medium-index {
+      z-index: 8;
+    }
+
+    label {
+      margin-bottom: 0;
+    }
+
+    input {
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
-    &:checked {
+    ::-webkit-input-placeholder {
+      opacity: 0.5;
+    }
+
+    &_error-shadow {
+      box-shadow: 0 0 5px red;
+      border-radius: 4px;
+      height: 32px;
+    }
+  }
+
+  #test {
+    width: 0;
+  }
+
+  .checkbox {
+    display: flex;
+    height: 28px;
+
+    input[type="checkbox"] {
+      opacity: 0;
+
       + {
         label {
           &::after {
-            content: "";
+            content: none;
+          }
+        }
+      }
+
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
           }
         }
       }
     }
+
+    label {
+      position: relative;
+      display: inline-block;
+      padding-left: 22px;
+      padding-top: 4px;
+
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid #c1bbb1;
+        left: 0px;
+        top: 3px;
+      }
+
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+      }
+    }
   }
 
-  label {
+  .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: 10px;
+    width: 1000px;
+  }
+
+  .button {
+    min-width: 120px;
+    padding: 0 24px 0 24px;
+    margin: 0 10px;
+    height: 32px;
+    color: $white;
+    font-size: 14px;
+    border-radius: 4px;
+    background-color: $orange;
+    border: none;
+    transition: .1s ease;
+    outline: none;
+    letter-spacing: 0.2px;
+
+    &:hover {
+      cursor: pointer;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    }
+
+    &:active {
+      transform: scale(.98);
+    }
+
+    .delete-approve & {
+      margin-left: 0;
+    }
+  }
+
+  .photo-wrap {
+    width: 195px;
+    height: 160px;
+    border: 1px solid #c1bbb1;
     position: relative;
-    display: inline-block;
-    padding-left: 22px;
-    padding-top: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
 
-    &::before {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid #c1bbb1;
-      left: 0px;
-      top: 3px;
-    }
-
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
+    .photo-image {
+      max-width: 100%;
+      max-height: 100%;
     }
   }
-}
 
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-left: 10px;
-  width: 1000px;
-}
-
-.button {
-  min-width: 120px;
-  padding: 0 24px 0 24px;
-  margin: 0 10px;
-  height: 32px;
-  color: $white;
-  font-size: 14px;
-  border-radius: 4px;
-  background-color: $orange;
-  border: none;
-  transition: .1s ease;
-  outline: none;
-  letter-spacing: 0.2px;
-
-  &:hover {
-    cursor: pointer;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-  }
-
-  &:active {
-    transform: scale(.98);
-  }
-
-  .delete-approve & {
-    margin-left: 0;
-  }
-}
-
-.photo-wrap {
-  width: 195px;
-  height: 160px;
-  border: 1px solid #c1bbb1;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 4px;
-
-  .photo-image {
-    max-width: 100%;
-    max-height: 100%;
-  }
-}
-
-.photo-file {
-  position: absolute;
-  top: -25px;
-  left: 0px;
-  height: 180px;
-  background-color: transparent;
-  outline: none;
-  border: none;
-  z-index: 5;
-  cursor: pointer;
-}
-
-.photo-text {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-
-  &__message {
-    font-size: 18px;
-    opacity: 0.5;
-    width: 50%;
-    text-align: center;
-  }
-
-  &__error-message {
+  .photo-file {
     position: absolute;
-    bottom: 30%;
-    z-index: 10;
-    background-color: $white;
-    padding: 3px;
-    box-sizing: border-box;
-    color: $orange;
-  }
-}
-
-.photo-extensions,
-.photo-size {
-  display: block;
-  font-size: 12px;
-  margin-top: 10px;
-}
-
-.delete-approve {
-  position: absolute;
-  width: 332px;
-  height: 270px;
-  top: 10%;
-  left: 50%;
-  margin-left: -166px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-  background-color: #fff;
-  z-index: 20;
-
-  p {
-    font-size: 21px;
-    width: 50%;
-    text-align: center;
+    top: -25px;
+    left: 0px;
+    height: 180px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    z-index: 5;
+    cursor: pointer;
   }
 
-  .approve-block {
-    margin-bottom: 15px;
-  }
-}
+  .photo-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
 
-.no-margin {
-  margin-bottom: 0;
-}
+    &__message {
+      font-size: 18px;
+      opacity: 0.5;
+      width: 50%;
+      text-align: center;
+    }
+
+    &__error-message {
+      position: absolute;
+      bottom: 30%;
+      z-index: 10;
+      background-color: $white;
+      padding: 3px;
+      box-sizing: border-box;
+      color: $orange;
+    }
+  }
+
+  .photo-extensions,
+  .photo-size {
+    display: block;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .delete-approve {
+    position: absolute;
+    width: 332px;
+    height: 270px;
+    top: 10%;
+    left: 50%;
+    margin-left: -166px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    background-color: #fff;
+    z-index: 20;
+
+    p {
+      font-size: 21px;
+      width: 50%;
+      text-align: center;
+    }
+
+    .approve-block {
+      margin-bottom: 15px;
+    }
+  }
+
+  .no-margin {
+    margin-bottom: 0;
+  }
 </style>

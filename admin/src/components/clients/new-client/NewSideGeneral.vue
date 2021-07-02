@@ -125,13 +125,14 @@
       }
 
       &__label {
-        width: 160px;
+        width: 130px;
         padding-top: 6px;
       }
 
       &__drop {
         position: relative;
         width: 220px;
+        height: 32px;
       }
     }
 

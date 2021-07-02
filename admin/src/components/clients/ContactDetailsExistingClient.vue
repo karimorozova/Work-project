@@ -375,7 +375,7 @@
     &__drop-menu {
       position: relative;
       width: 470px;
-      height: 28px;
+      height: 32px;
     }
 
     &_no-space {
@@ -449,7 +449,7 @@
     &__drop-menu {
       position: relative;
       width: 240px;
-      height: 28px;
+      height: 32px;
     }
   }
 

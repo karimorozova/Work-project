@@ -204,7 +204,7 @@
   .setting {
     &__drop {
       position: relative;
-      width: 200px;
+      width: 220px;
       height: 30px;
     }
 
@@ -231,7 +231,7 @@
         box-sizing: border-box;
         padding: 0 5px;
         outline: none;
-        width: 200px;
+        width: 220px;
         height: 30px;
       }
     }

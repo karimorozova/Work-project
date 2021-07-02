@@ -313,7 +313,7 @@
 
     .calendar-wrapper {
       position: absolute;
-      right: 50px;
+      right: 38px;
       bottom: 5px;
       font-size: 18px;
     }

@@ -5,32 +5,33 @@
       .block-item__time
         .block-item__time-input
           Datepicker(
-            monday-first=true
+            :value="currentClientOverallData.otherInfo.hasOwnProperty('firstContactDate') ? currentClientOverallData.otherInfo.firstContactDate : firstContactDate"
             ref="firstContactDate"
-            inputClass="datepicker-custom-client"
+            @selected="setDate"
+            monday-first=true
+            inputClass="datepicker-custom-project-info"
             calendarClass="calendar-custom"
             :format="customFormatter"
-            @selected="setDate"
-            :value="currentClientOverallData.otherInfo.hasOwnProperty('firstContactDate') ? currentClientOverallData.otherInfo.firstContactDate : firstContactDate"
           )
-      img.icon(src="../../assets/images/calendar.png" @click="openCalendar")
+      .icon(@click="openCalendar")
+        i.far.fa-calendar-alt
 
     .block-item
-      .block-item__label Client First Quote Date:
+      .block-item__label First Quote Date:
       .block-item__time {{ currentClient.otherInfo.firstQuoteDate || emptyField }}
     .block-item
-      .block-item__label Client Last Quote Date:
+      .block-item__label Last Quote Date:
       .block-item__time {{ currentClient.otherInfo.lastQuoteDate || emptyField }}
     .block-item
-      .block-item__label Client First Project Date:
+      .block-item__label First Project Date:
       .block-item__time {{ currentClient.otherInfo.firstProjectDate || emptyField }}
     .block-item
-      .block-item__label Client Last Project Date:
+      .block-item__label Last Project Date:
       .block-item__time {{ currentClient.otherInfo.lastProjectDate || emptyField }}
 
 </template>
 <script>
-	import Datepicker from "../Datepicker"
+	import Datepicker from "../DatepickerWithTime"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
 
@@ -88,26 +89,20 @@
       height: 50px;
 
       &__last {
-        height: 30px;
+        height: 32px;
       }
 
       &__label {
-        width: 179px;
+        width: 130px;
       }
 
-      &__time {
-        position: relative;
-        width: 171px;
-
-        &-input {
-          margin-top: -6px;
-        }
-      }
     }
 
     .icon {
+      font-size: 18px;
       position: absolute;
       right: 5px;
+      top: 6px;
       width: 20px;
       cursor: pointer;
     }

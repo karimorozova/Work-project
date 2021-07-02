@@ -80,9 +80,9 @@
 
     &__drop-menu {
       position: relative;
-      width: 200px;
+      width: 220px;
       margin-top: 3px;
-      height: 30px;
+      height: 32px;
 
     }
 

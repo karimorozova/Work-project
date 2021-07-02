@@ -186,8 +186,8 @@
 
     &__drop-menu {
       position: relative;
-      width: 200px;
-      height: 28px;
+      width: 220px;
+      height: 32px;
     }
 
     &__delivery-image {

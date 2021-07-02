@@ -220,8 +220,8 @@
 
     &__drop-menu {
       position: relative;
-      width: 200px;
-      height: 30px;
+      width: 220px;
+      height: 32px;
     }
   }
 

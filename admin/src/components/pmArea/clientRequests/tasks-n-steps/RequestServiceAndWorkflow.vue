@@ -348,7 +348,7 @@
 
     &__drop-menu {
       position: relative;
-      width: 200px;
+      width: 220px;
       height: 50px;
     }
 

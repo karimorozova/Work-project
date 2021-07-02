@@ -228,10 +228,10 @@
 				const statuses = [ "Closed", "Cancelled" ]
 				return statuses.indexOf(this.currentProject.status) !== -1
 			},
-      isProjectFinished(){
+			isProjectFinished() {
 				const { status } = this.currentProject
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-      },
+			}
 		},
 		components: {
 			TasksData,
@@ -321,7 +321,8 @@
     transform: translateY(10px);
     opacity: 0;
   }
-  .no-box-shadow{
+
+  .no-box-shadow {
     box-shadow: none;
   }
 

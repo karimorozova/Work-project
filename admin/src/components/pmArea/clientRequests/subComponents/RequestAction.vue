@@ -166,8 +166,8 @@
     }
 
     &__drop-menu {
-      width: 200px;
-      height: 28px;
+      width: 220px;
+      height: 32px;
       position: relative;
       margin-bottom: 20px;
     }

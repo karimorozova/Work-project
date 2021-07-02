@@ -256,9 +256,9 @@
 			})
 		},
 		created() {
-			if (!this.currentClient._id && this.$route.params.id) {
-				this.$router.push(`/pangea-clients/all/details/${ this.$route.params.id }`)
-			}
+			// if (!this.currentClient._id && this.$route.params.id) {
+			// 	this.$router.push(`/pangea-clients/all/details/${ this.$route.params.id }`)
+			// }
 			this.getTimezones()
       this.getCountries()
 		}
@@ -363,7 +363,7 @@
     &__drop-menu {
       position: relative;
       width: 470px;
-      height: 28px;
+      height: 32px;
     }
 
     &_no-space {
@@ -437,7 +437,7 @@
     &__drop-menu {
       position: relative;
       width: 240px;
-      height: 28px;
+      height: 32px;
     }
   }
 

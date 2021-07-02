@@ -50,19 +50,19 @@
           input(type="checkbox" id="hasPending"  :checked="hasPending"  @click.stop="hasPendingClicked")
           label(for="hasPending")
 
-      .v-filters__itemButton
-        Button(value="Add vendor" @clicked="addVendor" :class="['width-140']")
+      //.v-filters__itemButton
+        //Button(value="Add vendor" @clicked="addVendor" :class="['width-140']")
 
 
 </template>
 
 <script>
 	import SelectSingle from "@/components/SelectSingle"
-  import { mapActions, mapGetters } from "vuex"
+	import { mapActions, mapGetters } from "vuex"
 	import Datepicker from "../Datepicker"
 	import Button from "../Button"
-  import moment from "moment"
-  import SelectMulti from "../SelectMulti"
+	import moment from "moment"
+	import SelectMulti from "../SelectMulti"
 
 	export default {
 		props: {
@@ -99,29 +99,29 @@
 				fromDate: new Date(),
 				toDate: new Date(),
 				dateRange: "",
-        hasPending: true,
+				hasPending: true
 			}
 		},
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
-			clearDateRange(){
+			clearDateRange() {
 				this.dateRange = ''
 				this.$emit('setDateRange', null)
 				this.closePickers()
 			},
-      setDateRange(){
-	      this.dateRange = moment(this.fromDate).format("DD-MM-YYYY") + " / " + moment(this.toDate).format("DD-MM-YYYY")
-				this.$emit('setDateRange', {from: this.fromDate, to: this.toDate})
-	      this.closePickers()
-      },
+			setDateRange() {
+				this.dateRange = moment(this.fromDate).format("DD-MM-YYYY") + " / " + moment(this.toDate).format("DD-MM-YYYY")
+				this.$emit('setDateRange', { from: this.fromDate, to: this.toDate })
+				this.closePickers()
+			},
 			openPickers() {
 				this.isDatepickers = true
 			},
-      closePickers(){
-	      this.isDatepickers = false
-      },
+			closePickers() {
+				this.isDatepickers = false
+			},
 			setDate(e, prop) {
 				this[prop] = new Date(e)
 			},
@@ -165,26 +165,26 @@
 					vm.$emit("setNameFilter", { option: value })
 				}
 			},
-      hasPendingClicked() {
-			  this.hasPending = !this.hasPending
-			  this.$emit('setIsPendingFilter', {hasPending: this.hasPending})
-      },
-      setIndustries({ option }) {
-        this.$emit("setIndustryFilter", { option: option })
-      },
+			hasPendingClicked() {
+				this.hasPending = !this.hasPending
+				this.$emit('setIsPendingFilter', { hasPending: this.hasPending })
+			},
+			setIndustries({ option }) {
+				this.$emit("setIndustryFilter", { option: option })
+			}
 		},
 		computed: {
-      ...mapGetters({
-        getAllIndustries: "getAllIndustries",
-      }),
+			...mapGetters({
+				getAllIndustries: "getAllIndustries"
+			}),
 			stepNames() {
 				let result = this.steps.map(item => item.title)
 				result.unshift("All")
 				return result
-			},
+			}
 		},
 		components: {
-      SelectMulti,
+			SelectMulti,
 			Button,
 			SelectSingle,
 			Datepicker
@@ -224,27 +224,28 @@
     width: 100%;
     display: flex;
 
-    &__row{
+    &__row {
       display: flex;
       margin-bottom: 20px;
       height: 50px;
       align-items: flex-end;
     }
 
-    &__itemButton{
+    &__itemButton {
       position: relative;
       display: grid;
       align-items: end;
-      width: 232px;
+      width: 250px;
       justify-content: end;
     }
 
-    &__itemPicker{
+    &__itemPicker {
       position: relative;
       display: grid;
-      width: 232px;
+      width: 250px;
     }
-    &__calendar{
+
+    &__calendar {
       height: 20px;
       width: 20px;
       cursor: pointer;
@@ -267,7 +268,7 @@
       justify-content: space-between;
     }
 
-    &__buttonItem{
+    &__buttonItem {
       margin-left: 20px;
     }
 
@@ -286,35 +287,41 @@
     &__item {
       position: relative;
       display: grid;
-      width: 232px;
+      width: 250px;
 
       ::-webkit-input-placeholder {
         opacity: 0.5;
       }
     }
-    &__bodyCalendar{
+
+    &__bodyCalendar {
       position: absolute;
       bottom: 2px;
-      left: 166px;
+      left: 192px;
       cursor: pointer;
     }
 
     &__input-field {
-      box-sizing: border-box;
-      color: $main-color;
-      width: 220px;
-      height: 30px !important;
-      padding-left: 5px;
-      border: 1px solid #c1bbb1;
-      border-radius: 4px;
-      outline: none;
       font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
     }
 
     &__drop-menu {
       position: relative;
       width: 220px;
-      height: 30px;
+      height: 32px;
       box-sizing: border-box;
       z-index: 10;
     }
@@ -376,11 +383,13 @@
         }
       }
     }
+
     .margin-top-4 {
       margin-top: 4px;
     }
   }
-  #hasPending{
+
+  #hasPending {
     width: 0
   }
 

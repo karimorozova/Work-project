@@ -267,10 +267,10 @@
     &__drop-menu {
       position: relative;
       border-radius: 4px;
-      height: 30px;
+      height: 32px;
       background: #fff;
       margin-top: 3px;
-      width: 200px;
+      width: 220px;
     }
 
     &__input {

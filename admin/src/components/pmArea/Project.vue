@@ -25,7 +25,8 @@
             ref="start"
             :disabledPicker="disabledPicker && isProjectFinished"
           )
-          img.project__calendar-icon(src="../../assets/images/calendar.png" @click="startOpen")
+          .project__calendar-icon( @click="startOpen")
+            i.far.fa-calendar-alt
         .project__date
           .input-title
             .input-title__text Deadline:
@@ -41,7 +42,9 @@
             :disabled="disabled"
             ref="deadline"
           )
-          img.project__calendar-icon(src="../../assets/images/calendar.png" @click="deadlineOpen")
+          .project__calendar-icon(@click="deadlineOpen")
+            i.far.fa-calendar-alt
+
         .project__date
           .input-title
             .input-title__text Billing Date:
@@ -56,7 +59,8 @@
             :disabledPicker="isBilling || isProjectFinished"
             :disabled="disabled"
           )
-          img.project__calendar-icon(src="../../assets/images/calendar.png" @click="billingOpen")
+          .project__calendar-icon(@click="billingOpen")
+            i.far.fa-calendar-alt
 
         .project__same.checkbox
           input(type="checkbox" id="same" :disabled="isProjectFinished" :checked="isBilling" @change="setSameDate")
@@ -165,20 +169,20 @@
 				"setProjectDate",
 				"setCurrentProject"
 			]),
-      async updateBrief(e) {
-        const { value } = e.target
-        if (!this.project._id) {
-          return this.$emit('setValue', { prop: 'brief', option: value })
-        }
-        await this.setProjectProp({ prop: 'brief', value })
-      },
-      async updateNotes(e) {
-        const { value } = e.target
-        if (!this.project._id) {
-          return this.$emit('setValue', { prop: 'notes', option: value })
-        }
-        await this.setProjectProp({ prop: 'notes', value })
-      },
+			async updateBrief(e) {
+				const { value } = e.target
+				if (!this.project._id) {
+					return this.$emit('setValue', { prop: 'brief', option: value })
+				}
+				await this.setProjectProp({ prop: 'brief', value })
+			},
+			async updateNotes(e) {
+				const { value } = e.target
+				if (!this.project._id) {
+					return this.$emit('setValue', { prop: 'notes', option: value })
+				}
+				await this.setProjectProp({ prop: 'notes', value })
+			},
 			async changeProjectName(projectName) {
 				this.errors = []
 				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
@@ -262,12 +266,12 @@
 				return regex.test(this.project.projectName)
 			},
 			async checkForErrors() {
-        this.errors = []
-        if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())){
-          // this.errors.push("Please, enter valid Project name.")
-          this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
-        }
-        if (!this.project.startDate) this.errors.push("Please, set the start date.")
+				this.errors = []
+				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
+					// this.errors.push("Please, enter valid Project name.")
+					this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
+				}
+				if (!this.project.startDate) this.errors.push("Please, set the start date.")
 				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
 				if (!this.project.customer.name) this.errors.push("Please, select a Client.")
 				if (!this.selectedIndustry) this.errors.push("Please, choose an industry.")
@@ -372,10 +376,10 @@
 			disabledPicker() {
 				return !!(this.project._id && this.project.tasks && this.project.tasks.length)
 			},
-			isProjectFinished(){
+			isProjectFinished() {
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			},
+			}
 		},
 		components: {
 			DatepickerWithTime,
@@ -396,28 +400,33 @@
 </script>
 
 <style lang="scss" scoped>
-  .input-title{
+  @import '../../assets/scss/colors';
+
+  .input-title {
     display: flex;
-    &__text{
+
+    &__text {
       margin-bottom: 4px;
     }
-    .require{
+
+    .require {
       color: red;
     }
   }
+
   .project {
     display: flex;
     flex-direction: column;
 
-    &__nameDisabled{
+    &__nameDisabled {
       display: flex;
       font-family: Myriad600;
       align-items: center;
       cursor: default;
-      font-size: 21px;
-      height: 38px;
-      width: 459px;
-      color: #68573e;
+      font-size: 20px;
+      height: 42px;
+      width: 488px;
+      color: $text;
       border: 1px solid white;
     }
 
@@ -472,16 +481,19 @@
     }
 
     &__name {
-      font-size: 21px;
+      font-size: 20px;
       padding: 0 5px;
-      height: 38px;
-      width: 459px;
+      height: 42px;
+      width: 488px;
       border-radius: 4px;
       color: #68573E;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       outline: none;
+      color: $text;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
@@ -490,12 +502,12 @@
     }
 
     &__client, &__industry, &__number {
-      width: 200px;
+      width: 220px;
     }
 
     &__drop-menu {
       position: relative;
-      height: 30px;
+      height: 32px;
     }
 
     &__client-link {
@@ -513,30 +525,36 @@
     }
 
     &__input-text {
-      width: 189px;
-      height: 30px;
-      border: 1px solid #c1bbb1;
-      border-radius: 4px;
-      padding: 0 5px;
-      color: #68573E;
       font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
       outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
     &__input-text2 {
-      width: 189px;
-      height: 30px;
-      border: 1px solid #c1bbb1;
-      border-radius: 4px;
-      padding: 0 5px;
-      color: #68573E;
       font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
       outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
@@ -548,14 +566,16 @@
       width: 100%;
       margin-top: 4px;
       border-radius: 4px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       padding: 5px;
-      color: #68573E;
+      color: $text;
       resize: none;
       outline: none;
       box-sizing: border-box;
+      transition: .1s ease-out;
 
       &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
@@ -565,6 +585,7 @@
       right: 5px;
       width: 18px;
       cursor: pointer;
+      font-size: 18px;
     }
 
     &__button {
@@ -640,11 +661,8 @@
   }
 
   #same,
-  #test{
+  #test {
     width: 0;
-  }
-  input:disabled {
-    background-color: #f4f2f1;
   }
 
 </style>

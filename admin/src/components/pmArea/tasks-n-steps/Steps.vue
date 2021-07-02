@@ -612,8 +612,8 @@
 
     &__drop-menu {
       position: relative;
-      width: 210px;
-      height: 30px;
+      width: 220px;
+      height: 32px;
     }
 
     &__info {

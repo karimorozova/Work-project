@@ -70,7 +70,7 @@
 	import Datepicker from "../../Datepicker"
 	import LabelValue from "../LabelValue"
 	import moment from "moment"
-	import { mapGetters, mapActions } from "vuex"
+	import { mapGetters } from "vuex"
 	import DatepickerWithTime from "../../DatepickerWithTime"
 
 	export default {
@@ -277,7 +277,7 @@
 
     .calendar-wrapper {
       position: absolute;
-      right: 50px;
+      right: 38px;
       bottom: 5px;
       font-size: 18px;
     }

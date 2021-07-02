@@ -66,7 +66,7 @@
             :tableheadRowClass="currentClientRequest.clientContacts.length < 10 ? 'tbody_visible-overflow' : ''"
             :headCellClass="'padding-with-check-box'"
             :tableheadClass="'hideHead'"
-            )
+          )
             div(slot="name" slot-scope="{ row, index }")
               .contacts__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
               .contacts__dataDrop(v-else)
@@ -74,7 +74,7 @@
                   :isTableDropMenu="true"
                   :options="availableContacts"
                   @chooseOption="setContact"
-              )
+                )
 
             .contacts__dataIcon(slot="icon" slot-scope="{ row, index }")
               span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
@@ -334,7 +334,7 @@
 				sourceFiles: [],
 				refFiles: [],
 				currentTemplate: '',
-        selected: '',
+				selected: ''
 			}
 		},
 		methods: {
@@ -343,41 +343,41 @@
 				setCurrentClientRequest: "setCurrentClientRequest",
 				alertToggle: "alertToggle"
 			}),
-      copyId() {
-        let id = document.getElementById('id')
-        let elementText = id.textContent
-        navigator.clipboard.writeText(elementText)
-        try {
-          document.execCommand('copy')
-          this.alertToggle({
-            message: "Text copied successfully",
-            isShow: true,
-            type: "success"
-          })
-        } catch (err) {
-          this.alertToggle({
-            message: "Text not copied",
-            isShow: true,
-            type: "error"
-          })
-        }
-      },
-      setCurrentAm() {
-        if (this.isAmSet()) return
-          this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": this.user._id } })
-      },
-      canUpdateRequest() {
-        if(!this.currentClientRequest.accountManager) return false
+			copyId() {
+				let id = document.getElementById('id')
+				let elementText = id.textContent
+				navigator.clipboard.writeText(elementText)
+				try {
+					document.execCommand('copy')
+					this.alertToggle({
+						message: "Text copied successfully",
+						isShow: true,
+						type: "success"
+					})
+				} catch (err) {
+					this.alertToggle({
+						message: "Text not copied",
+						isShow: true,
+						type: "error"
+					})
+				}
+			},
+			setCurrentAm() {
+				if (this.isAmSet()) return
+				this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": this.user._id } })
+			},
+			canUpdateRequest() {
+				if (!this.currentClientRequest.accountManager) return false
 
-			  const group = this.user.group.name
-			  const isAdmin = group === "Administrators" || group === "Developers"
-			  const currentAm = group === "Account Managers" && this.currentClientRequest.accountManager._id === this.user._id
+				const group = this.user.group.name
+				const isAdmin = group === "Administrators" || group === "Developers"
+				const currentAm = group === "Account Managers" && this.currentClientRequest.accountManager._id === this.user._id
 
-        return isAdmin || currentAm
-      },
+				return isAdmin || currentAm
+			},
 			approveRequest() {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
 					this.alertToggle({ message: "Project approved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -396,8 +396,8 @@
 				this.deleteFilePath = null
 			},
 			async deleteFile() {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					const updatedProject = await this.$http.post("/clients-requests/remove-form-file", {
 						path: this.deleteFilePath,
 						projectId: this.currentClientRequest._id,
@@ -413,11 +413,11 @@
 				}
 			},
 			changeProjectName(key, value) {
-        if (!this.canUpdateRequest()) return
-        const regex = /^([^\d\W]|[A-z])[\w \.]*$/
+				if (!this.canUpdateRequest()) return
+				const regex = /^([^\d\W]|[A-z])[\w \.]*$/
 				if (!regex.test(value) || !value) {
 					this.alertToggle({ message: "Project name not saved!", isShow: true, type: "error" })
-          // this.currentClientRequest.projectName = value.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
+					// this.currentClientRequest.projectName = value.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
 					return
 				}
 				try {
@@ -428,8 +428,8 @@
 				}
 			},
 			changeBrief(data) {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': data } })
 					this.alertToggle({ message: "Project brief saved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -437,8 +437,8 @@
 				}
 			},
 			changeNotes(data) {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'notes': data } })
 					this.alertToggle({ message: "Project notes saved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -446,8 +446,8 @@
 				}
 			},
 			async makeAction(index, key) {
-        if (!this.canUpdateRequest()) return
-        if (this.currentActive !== -1 && this.currentActive !== index) {
+				if (!this.canUpdateRequest()) return
+				if (this.currentActive !== -1 && this.currentActive !== index) {
 					return this.isEditing()
 				}
 				switch (key) {
@@ -463,8 +463,8 @@
 				}
 			},
 			setEditingData(index) {
-        if (!this.canUpdateRequest()) return
-        if (this.currentClientRequest.checkedForm.isCheckComplianceTemplate) return
+				if (!this.canUpdateRequest()) return
+				if (this.currentClientRequest.checkedForm.isCheckComplianceTemplate) return
 				this.currentActive = index
 				this.currentTemplate = this.currentClientRequest.requestForm.complianceOptions
 			},
@@ -472,12 +472,12 @@
 				this.currentActive = -1
 			},
 			setTemplate({ option }) {
-        if (!this.canUpdateRequest()) return
-        this.currentTemplate = this.complianceTemplates.find(({ title }) => title === option)
+				if (!this.canUpdateRequest()) return
+				this.currentTemplate = this.complianceTemplates.find(({ title }) => title === option)
 			},
 			saveTemplate(index) {
-        if (!this.canUpdateRequest()) return
-        if (this.currentActive === -1 || this.currentActive !== index) return
+				if (!this.canUpdateRequest()) return
+				if (this.currentActive === -1 || this.currentActive !== index) return
 				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "requestForm.complianceOptions": this.currentTemplate } })
 					this.alertToggle({ message: "Project template saved!", isShow: true, type: "success" })
@@ -489,8 +489,8 @@
 				}
 			},
 			setPM({ option }) {
-        if (!this.canUpdateRequest()) return
-        const pm = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
+				if (!this.canUpdateRequest()) return
+				const pm = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
 				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "projectManager": pm } })
 					this.alertToggle({ message: "Project managers added!", isShow: true, type: "success" })
@@ -498,23 +498,23 @@
 					this.alertToggle({ message: "Project managers not added!", isShow: true, type: "error" })
 				}
 			},
-      isAmSet() {
-			  return this.currentClientRequest.accountManager !== null
-      },
-      isAm() {
-			  return this.user.group.name === 'Account Managers'
-      },
-      approveChangeAM({ option }) {
-        this.selected = option
-      },
-      setDefault() {
-			  this.selected = ''
-      },
+			isAmSet() {
+				return this.currentClientRequest.accountManager !== null
+			},
+			isAm() {
+				return this.user.group.name === 'Account Managers'
+			},
+			approveChangeAM({ option }) {
+				this.selected = option
+			},
+			setDefault() {
+				this.selected = ''
+			},
 			setAM() {
-        if (!this.canUpdateRequest()) return
-        const am = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === this.selected)
-        this.selected = ''
-        try {
+				if (!this.canUpdateRequest()) return
+				const am = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === this.selected)
+				this.selected = ''
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": am } })
 					this.alertToggle({ message: "Account managers added!", isShow: true, type: "success" })
 				} catch (err) {
@@ -522,8 +522,8 @@
 				}
 			},
 			async removeContact(row) {
-        if (!this.canUpdateRequest()) return
-        if (this.currentClientRequest.clientContacts.length === 1) {
+				if (!this.canUpdateRequest()) return
+				if (this.currentClientRequest.clientContacts.length === 1) {
 					this.alertToggle({ message: 'One contact should remain', isShow: true, type: "error" })
 					return
 				}
@@ -536,8 +536,8 @@
 				}
 			},
 			async setContact({ option }) {
-        if (!this.canUpdateRequest()) return
-        const contact = this.currentClientRequest.customer.contacts.find(item => `${ item.firstName } ${ item.surname }` === option)
+				if (!this.canUpdateRequest()) return
+				const contact = this.currentClientRequest.customer.contacts.find(item => `${ item.firstName } ${ item.surname }` === option)
 				try {
 					const updatedProject = await this.$http.post('/clients-requests/manage-client-contact', { projectId: this.currentClientRequest._id, contact, action: 'Add' })
 					this.setCurrentClientRequest(updatedProject.data)
@@ -547,12 +547,12 @@
 				}
 			},
 			addContact() {
-        if (!this.canUpdateRequest()) return
-        this.currentClientRequest.clientContacts.push({})
+				if (!this.canUpdateRequest()) return
+				this.currentClientRequest.clientContacts.push({})
 			},
 			checkTemplate(data) {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckComplianceTemplate": data } })
 					this.alertToggle({ message: "Template checked!", isShow: true, type: "success" })
 				} catch (err) {
@@ -570,7 +570,7 @@
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			checkProjectName(data) {
-			  if (!this.canUpdateRequest()) return
+				if (!this.canUpdateRequest()) return
 				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckProjectName": data } })
 					this.alertToggle({ message: "Project checked!", isShow: true, type: "success" })
@@ -579,8 +579,8 @@
 				}
 			},
 			checkBrief(data) {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckBrief": data } })
 					this.alertToggle({ message: "Project brief checked!", isShow: true, type: "success" })
 				} catch (err) {
@@ -588,8 +588,8 @@
 				}
 			},
 			async checkFile(data, { path, type }) {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					const updatedProject = await this.$http.post("/clients-requests/check-form-file", { projectId: this.currentClientRequest._id, path, check: data, type })
 					this.setCurrentClientRequest(updatedProject.data)
 					this.restructuredFiles(updatedProject.data)
@@ -601,8 +601,8 @@
 				}
 			},
 			checkProjectDeadline(data) {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckDeadline": data } })
 					this.alertToggle({ message: "Project deadline checked!", isShow: true, type: "success" })
 				} catch (err) {
@@ -610,8 +610,8 @@
 				}
 			},
 			async updateProjectDate(data) {
-        if (!this.canUpdateRequest()) return
-        try {
+				if (!this.canUpdateRequest()) return
+				try {
 					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'deadline': data } })
 					this.alertToggle({ message: "Project deadline saved!", isShow: true, type: "success" })
 				} catch (err) {
@@ -619,34 +619,34 @@
 				}
 			},
 			restructuredFiles(project) {
-        // if (!this.canUpdateRequest()) return
-        const { requestForm: { sourceFiles, refFiles } } = project
+				// if (!this.canUpdateRequest()) return
+				const { requestForm: { sourceFiles, refFiles } } = project
 				this.files = [
 					...sourceFiles.map(i => ({ ...i, type: 'Source' })),
 					...refFiles.map(i => ({ ...i, type: 'Reference' }))
 				]
 			},
 			deadlineOpen() {
-        if (!this.canUpdateRequest()) return
-        this.$refs.deadline.showCalendar()
+				if (!this.canUpdateRequest()) return
+				this.$refs.deadline.showCalendar()
 			},
 			clearInputFiles(str) {
-        if (!this.canUpdateRequest()) return
-        let inputFiles = document.querySelectorAll(str)
+				if (!this.canUpdateRequest()) return
+				let inputFiles = document.querySelectorAll(str)
 				for (let elem of inputFiles) {
 					elem.value = ''
 				}
 			},
 			async uploadSourceFiles({ files }) {
-        if (!this.canUpdateRequest()) return
-        const filteredFiles = Array.from(files).filter(item => {
+				if (!this.canUpdateRequest()) return
+				const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
-          if(this.currentClientRequest.requestForm.service.title === 'Compliance'){
-	          return size / 1000000 <= 50
-          }else{
-	          return size / 1000000 <= 2
-          }
+					if (this.currentClientRequest.requestForm.service.title === 'Compliance') {
+						return size / 1000000 <= 50
+					} else {
+						return size / 1000000 <= 2
+					}
 					// return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
 				})
 
@@ -672,8 +672,8 @@
 				}
 			},
 			async uploadRefFiles({ files }) {
-        if (!this.canUpdateRequest()) return
-        const filteredFiles = Array.from(files).filter(item => {
+				if (!this.canUpdateRequest()) return
+				const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
 					//return size / 1000000 <= 50 && this.forbiddenExtensions.indexOf(extension) === -1
@@ -684,7 +684,7 @@
 				formData.append("type", 'Reference')
 				formData.append("projectId", this.currentClientRequest._id)
 
-				if (filteredFiles.length){
+				if (filteredFiles.length) {
 					for (let file of filteredFiles) formData.append('refFiles', file)
 				} else {
 					return
@@ -722,8 +722,8 @@
 				document.addEventListener('click', this.outsideClickListener)
 			},
 			replaceDescription(str) {
-        if (!this.canUpdateRequest()) return
-        return str.split(/<\/li>/).join('').split(/<li>/).filter(i => !!i).reduce((acc, curr) => {
+				if (!this.canUpdateRequest()) return
+				return str.split(/<\/li>/).join('').split(/<li>/).filter(i => !!i).reduce((acc, curr) => {
 					acc = acc + curr + '; '
 					return acc
 				}, '')
@@ -749,12 +749,12 @@
 					if (name === 'Project Managers') return `${ firstName } ${ lastName }`
 				}).filter(i => !!i)
 			},
-      accountManagers() {
-        return this.users.map(item => {
-          const { group: { name }, firstName, lastName } = item
-          if (name === 'Account Managers') return `${ firstName } ${ lastName }`
-        }).filter(i => !!i)
-      },
+			accountManagers() {
+				return this.users.map(item => {
+					const { group: { name }, firstName, lastName } = item
+					if (name === 'Account Managers') return `${ firstName } ${ lastName }`
+				}).filter(i => !!i)
+			},
 			manageIcons() {
 				const { delete: del, ...result } = this.icons
 				return result
@@ -783,14 +783,15 @@
 			Check,
 			DatepickerWithTime
 		},
-    created() {
-		  // this.currentClientRequest = this.
-    }
-  }
+		created() {
+			// this.currentClientRequest = this.
+		}
+	}
 </script>
 
 <style scoped lang="scss">
   @import "../../../assets/styles/settingsTable";
+  @import "../../../assets/scss/colors";
 
   .formLayout {
     padding: 40px;
@@ -934,7 +935,8 @@
 
     &__assignedPm {
       position: relative;
-      width: 240px;
+      width: 220px;
+      height: 32px;
     }
 
     &__icons {
@@ -955,11 +957,12 @@
       justify-content: space-between;
       align-items: center;
 
-      &-title{
+      &-title {
         font-size: 21px;
         font-family: 'Myriad600';
       }
-      &-icons{
+
+      &-icons {
         display: flex;
       }
     }
@@ -1124,23 +1127,34 @@
   textarea {
     width: 100%;
     border-radius: 4px;
-    border: 1px solid #c1bbb1;
+    border: 1px solid $border;
     padding: 5px;
-    color: #68573E;
+    color: $text;
     resize: none;
     outline: none;
     box-sizing: border-box;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   input {
-    color: #66563d;
-    border: 1px solid #c1bbb1;
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    padding: 0 5px;
-    outline: none;
-    width: 240px;
-    height: 30px;
     box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   #checkProject,

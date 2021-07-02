@@ -3,26 +3,26 @@
     div(:class="{'input-group' : bootstrapStyling}")
       <!-- Calendar Button -->
       span(v-if="calendarButton" class="vdp-datepicker__calendar-button" :class="{'input-group-addon' : bootstrapStyling}" @click="showCalendar"
-            v-bind:style="{'cursor:not-allowed;' : disabledPicker}")
+        v-bind:style="{'cursor:not-allowed;' : disabledPicker}")
         i.calendarButtonIcon {{ calendarButtonIconContent }}
           span(v-if="!calendarButtonIcon") &hellip;
       <!-- Input -->
       input(
-          :type="inline ? 'hidden' : 'text'"
-          :class="[inputClass,inputClass2]"
-          :name="name"
-          :ref="refName"
-          @click="showCalendarReadonly"
-          @change="setDateManually"
-          :id="id"
-          :value="formattedValue"
-          :open-date="openDate"
-          :placeholder="placeholder"
-          :clear-button="clearButton"
-          :disabled="disabledPicker"
-          :required="required"
-          :readonly="isReadonly"
-          )
+        :type="inline ? 'hidden' : 'text'"
+        :class="[inputClass,inputClass2]"
+        :name="name"
+        :ref="refName"
+        @click="showCalendarReadonly"
+        @change="setDateManually"
+        :id="id"
+        :value="formattedValue"
+        :open-date="openDate"
+        :placeholder="placeholder"
+        :clear-button="clearButton"
+        :disabled="disabledPicker"
+        :required="required"
+        :readonly="isReadonly"
+      )
       <!-- Clear Button -->
       span(v-if="clearButton && selectedDate" class="vdp-datepicker__clear-button" :class="{'input-group-addon' : bootstrapStyling}" @click="clearDate()")
         i.clearButtonIcon
@@ -34,28 +34,28 @@
       div(:class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showDayView" v-bind:style="calendarStyle")
         header
           span(
-              @click="isRtl ? nextMonth() : previousMonth()"
-              class="prev"
-              v-bind:class="{ 'disabled' : isRtl ? nextMonthDisabled(pageTimestamp) : previousMonthDisabled(pageTimestamp) }"
-              ) &lt;
+            @click="isRtl ? nextMonth() : previousMonth()"
+            class="prev"
+            v-bind:class="{ 'disabled' : isRtl ? nextMonthDisabled(pageTimestamp) : previousMonthDisabled(pageTimestamp) }"
+          ) &lt;
           span(
-              @click="showMonthCalendar"
-              :class="allowedToShowView('month') ? 'up' : ''"
-              ) {{ isYmd ? currYear : currMonthName }} {{ isYmd ? currMonthName : currYear }}
+            @click="showMonthCalendar"
+            :class="allowedToShowView('month') ? 'up' : ''"
+          ) {{ isYmd ? currYear : currMonthName }} {{ isYmd ? currMonthName : currYear }}
           span(
-              @click="isRtl ? previousMonth() : nextMonth()"
-              class="next"
-              v-bind:class="{ 'disabled' : isRtl ? previousMonthDisabled(pageTimestamp) : nextMonthDisabled(pageTimestamp) }"
-              ) &gt;
+            @click="isRtl ? previousMonth() : nextMonth()"
+            class="next"
+            v-bind:class="{ 'disabled' : isRtl ? previousMonthDisabled(pageTimestamp) : nextMonthDisabled(pageTimestamp) }"
+          ) &gt;
         .custom-fonts( :class="isRtl ? 'flex-rtl' : ''")
           span.cell.day-header( v-for="d in daysOfWeek" :key="d.timestamp") {{ d }}
           span.cell.day(
-                v-for="day in days"
-                :key="day.timestamp"
-                track-by="timestamp"
-                v-bind:class="dayClasses(day)"
-                @click="setDay(day)"
-                ) {{ day.date }}
+            v-for="day in days"
+            :key="day.timestamp"
+            track-by="timestamp"
+            v-bind:class="dayClasses(day)"
+            @click="setDay(day)"
+          ) {{ day.date }}
 
         .time-select(v-if="isTime")
           .change-time.hour
@@ -91,21 +91,21 @@
       div( :class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showMonthView" v-bind:style="calendarStyle")
         header
           span.prev(
-              @click="previousYear"
-              v-bind:class="{ 'disabled' : previousYearDisabled(pageTimestamp) }"
-              ) &lt;
+            @click="previousYear"
+            v-bind:class="{ 'disabled' : previousYearDisabled(pageTimestamp) }"
+          ) &lt;
           span( @click="showYearCalendar" :class="allowedToShowView('year') ? 'up' : ''") {{ getPageYear() }}
           span.next(
-              @click="nextYear"
-              v-bind:class="{ 'disabled' : nextYearDisabled(pageTimestamp) }"
-              ) &gt;
+            @click="nextYear"
+            v-bind:class="{ 'disabled' : nextYearDisabled(pageTimestamp) }"
+          ) &gt;
         span.cell.month(
-              v-for="month in months"
-              :key="month.timestamp"
-              track-by="timestamp"
-              v-bind:class="{ 'selected': month.isSelected, 'disabled': month.isDisabled }"
-              @click.stop="selectMonth(month)"
-              ) {{ month.month }}
+          v-for="month in months"
+          :key="month.timestamp"
+          track-by="timestamp"
+          v-bind:class="{ 'selected': month.isSelected, 'disabled': month.isDisabled }"
+          @click.stop="selectMonth(month)"
+        ) {{ month.month }}
 
 
     <!-- Year View -->
@@ -113,32 +113,32 @@
       div( :class="[calendarClass, 'vdp-datepicker__calendar']" v-show="showYearView" v-bind:style="calendarStyle")
         header
           span.prev(
-              @click="previousDecade"
-              v-bind:class="{ 'disabled' : previousDecadeDisabled(pageTimestamp) }"
-              ) &lt;
+            @click="previousDecade"
+            v-bind:class="{ 'disabled' : previousDecadeDisabled(pageTimestamp) }"
+          ) &lt;
           span {{ getPageDecade() }}
           span.next(
-              @click="nextDecade"
-              v-bind:class="{ 'disabled' : nextMonthDisabled(pageTimestamp) }"
-              ) &gt;
+            @click="nextDecade"
+            v-bind:class="{ 'disabled' : nextMonthDisabled(pageTimestamp) }"
+          ) &gt;
         span.cell.year(
-            v-for="year in years"
-            :key="year.timestamp"
-            track-by="timestamp"
-            v-bind:class="{ 'selected': year.isSelected, 'disabled': year.isDisabled }"
-            @click.stop="selectYear(year)"
-            ) {{ year.year }}
+          v-for="year in years"
+          :key="year.timestamp"
+          track-by="timestamp"
+          v-bind:class="{ 'selected': year.isSelected, 'disabled': year.isDisabled }"
+          @click.stop="selectYear(year)"
+        ) {{ year.year }}
 </template>
 
 <script>
 	import DateUtils from '../../utils/DateUtils.js'
 	import DateLanguages from '../../utils/DateLanguages.js'
 	import moment from 'moment'
-  import Button from "./Button";
+	import Button from "./Button"
 
 	export default {
-    components: {Button},
-    props: {
+		components: { Button },
+		props: {
 			value: {
 				validator: function (val) {
 					return val === null || val instanceof Date || typeof val === 'string' || typeof val === 'number'
@@ -148,7 +148,7 @@
 			refName: String,
 			id: String,
 			format: {
-				type: [String, Function],
+				type: [ String, Function ],
 				default: 'dd MMM yyyy'
 			},
 			language: {
@@ -169,10 +169,10 @@
 				type: Boolean,
 				default: true
 			},
-			calendarClass: [String, Object],
-			inputClass: [String, Object],
-			inputClass2: [String, Object],
-			wrapperClass: [String, Object],
+			calendarClass: [ String, Object ],
+			inputClass: [ String, Object ],
+			inputClass2: [ String, Object ],
+			wrapperClass: [ String, Object ],
 			mondayFirst: Boolean,
 			clearButton: Boolean,
 			clearButtonIcon: String,
@@ -190,7 +190,7 @@
 				type: String,
 				default: 'year'
 			},
-      isTime: { type: Boolean, default: true },
+			isTime: { type: Boolean, default: true }
 		},
 		data() {
 			const startDate = this.openDate ? new Date(this.openDate) : new Date()
@@ -217,9 +217,9 @@
          * Positioning
          */
 				calendarHeight: 0,
-        day: '',
-        hours: moment().hour(),
-        minutes: moment().minute()
+				day: '',
+				hours: moment().hour(),
+				minutes: moment().minute()
 			}
 		},
 		watch: {
@@ -232,22 +232,22 @@
 			initialView() {
 				this.setInitialView()
 			},
-      hours(value) {
-        const hours = parseInt((value+'').replace(/[^-\d]/g, '')) || 0
-			  if (hours > 23) {
-			    this.hours = 23
-          return
-        }
-			  this.hours = hours < 0 ? '0': hours
-      },
-      minutes(value) {
-        const minutes = parseInt((value+'').replace(/[^-\d]/g, '')) || 0
-        if (minutes > 59) {
-          this.minutes = 59
-          return
-        }
-        this.minutes = minutes < 0 ? '0': minutes
-      }
+			hours(value) {
+				const hours = parseInt((value + '').replace(/[^-\d]/g, '')) || 0
+				if (hours > 23) {
+					this.hours = 23
+					return
+				}
+				this.hours = hours < 0 ? '0' : hours
+			},
+			minutes(value) {
+				const minutes = parseInt((value + '').replace(/[^-\d]/g, '')) || 0
+				if (minutes > 59) {
+					this.minutes = 59
+					return
+				}
+				this.minutes = minutes < 0 ? '0' : minutes
+			}
 		},
 		computed: {
 			computedInitialView() {
@@ -457,7 +457,7 @@
 				const value = e.target.value
 				const dateParts = value.split(", ")
 				const dateString = dateParts[0].split("-").reverse().join("-") + "T" + dateParts[1]
-				const newDate = moment(dateString).set({hour: this.hours, minute: this.minutes}).format()
+				const newDate = moment(dateString).set({ hour: this.hours, minute: this.minutes }).format()
 				if (isNaN(newDate.getTime())) {
 					return this.$emit("invalidDate", { message: "Please set valid date" })
 				}
@@ -485,7 +485,7 @@
 				}
 			},
 			allowedToShowView(view) {
-				const views = ['day', 'month', 'year']
+				const views = [ 'day', 'month', 'year' ]
 				const minimumViewIndex = views.indexOf(this.minimumView)
 				const maximumViewIndex = views.indexOf(this.maximumView)
 				const viewIndex = views.indexOf(view)
@@ -538,20 +538,20 @@
 			 */
 			selectDate() {
 				if (this.day.isDisabled) {
-          this.$emit('selectedDisabled', this.day)
+					this.$emit('selectedDisabled', this.day)
 					return false
 				}
-				this.setDate(moment(this.day.timestamp).set({hour: this.hours, minute: this.minutes}).format())
+				this.setDate(moment(this.day.timestamp).set({ hour: this.hours, minute: this.minutes }).format())
 				if (!this.isInline) {
 					this.close(true)
 				}
 				this.day = ''
 			},
-      setDay(day) {
-			  if (!day.isDisabled) {
-          this.day = day
-        }
-      },
+			setDay(day) {
+				if (!day.isDisabled) {
+					this.day = day
+				}
+			},
 			/**
 			 * @param {Object} month
 			 */
@@ -954,7 +954,7 @@
 					'selected': day.isToday,
 					'disabled': day.isDisabled,
 					'highlighted': day.isHighlighted,
-					'today': (day.isSelected && !this.day )|| day === this.day,
+					'today': (day.isSelected && !this.day) || day === this.day,
 					'beforeToday': day.isBeforeToday,
 					'weekend': day.isWeekend,
 					'sat': day.isSaturday,
@@ -972,39 +972,39 @@
 					this.setInitialView()
 				}
 			},
-      checkHours(hours) {
-        hours = parseInt((hours+'').replace(/[^-\d]/g, ''))
-        if(hours >= 24 ) {
-			    this.hours = 0
-          return
-        }
-			  if(hours < 0 ) {
-			    this.hours = 23
-          return
-        }
-			  this.hours = hours
-      },
-      checkMinutes(minutes) {
-        minutes = parseInt((minutes+'').replace(/[^-\d]/g, ''))
-			  if (minutes > 59) {
-			    this.checkHours((+this.hours+1))
-          this.minutes = 0
-          return
-        }
-			  if (minutes < 0) {
-          this.checkHours((+this.hours-1))
-          this.minutes = 59
-          return
-        }
-			  this.minutes = minutes
+			checkHours(hours) {
+				hours = parseInt((hours + '').replace(/[^-\d]/g, ''))
+				if (hours >= 24) {
+					this.hours = 0
+					return
+				}
+				if (hours < 0) {
+					this.hours = 23
+					return
+				}
+				this.hours = hours
+			},
+			checkMinutes(minutes) {
+				minutes = parseInt((minutes + '').replace(/[^-\d]/g, ''))
+				if (minutes > 59) {
+					this.checkHours((+this.hours + 1))
+					this.minutes = 0
+					return
+				}
+				if (minutes < 0) {
+					this.checkHours((+this.hours - 1))
+					this.minutes = 59
+					return
+				}
+				this.minutes = minutes
 
-      },
-      selectAllText(e) {
-			  e.target.select()
-      },
-      twoDigit(digit) {
-			  return digit < 10 ? '0'+digit : digit
-      }
+			},
+			selectAllText(e) {
+				e.target.select()
+			},
+			twoDigit(digit) {
+				return digit < 10 ? '0' + digit : digit
+			}
 		},
 		mounted() {
 			this.init()
@@ -1162,7 +1162,7 @@
   /*  background: #4bd;*/
   /*}*/
 
-  .vdp-datepicker__calendar .cell.highlighted{
+  .vdp-datepicker__calendar .cell.highlighted {
     /*background: #daeded;*/
   }
 
@@ -1244,45 +1244,75 @@
   }
 
   .datepicker-custom-project-info {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #c1bbb1;
-    height: 30px;
-    color: #68573E;
-    padding-left: 5px;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
-    width: 200px;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
+
   .datepicker-custom-compliance {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #c1bbb1;
-    height: 30px;
-    color: #68573E;
-    padding-left: 5px;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
-    width: 240px;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .datepicker-custom {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #c1bbb1;
-    height: 30px;
-    color: #68573E;
-    padding-left: 5px;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .datepicker-custom-client {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #c1bbb1;
-    height: 30px;
-    color: #68573E;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
-    padding-left: 5px;
-    width: 100%;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .datepicker-custom-mod {
-    width: 200px;
+    width: 220px;
   }
 
   .steps__custom-input {
@@ -1322,13 +1352,20 @@
   }
 
   .datepicker-height-30 {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #c1bbb1;
-    height: 30px;
-    color: #68573E;
-    padding-left: 5px;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
-    width: 166px;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .calendar-custom {

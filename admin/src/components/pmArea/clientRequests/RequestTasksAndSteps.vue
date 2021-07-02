@@ -94,15 +94,12 @@
 
 <script>
 	import RequestTasksData from "./tasks-n-steps/RequestTasksData"
-	// import Tasks from "./tasks-n-steps/Tasks"
-	// import Steps from "./tasks-n-steps/Steps"
 	import { mapGetters, mapActions } from 'vuex'
 	import ValidationErrors from "../../ValidationErrors"
 	import Tabs from "../../Tabs"
 	import DataTable from "../../DataTable"
 	import moment from 'moment'
 	import Button from "../../Button"
-	import { getUser } from "../../../vuex/general/getters"
 
 	export default {
 		props: {
@@ -161,7 +158,7 @@
 				try {
 					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
 					const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
-					window.open(route.href, "_self");
+					window.open(route.href, "_self")
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
 				}

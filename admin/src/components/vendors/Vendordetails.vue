@@ -177,859 +177,859 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
-import FinanceMatrixWithReset from "../FinanceMatrixWithReset"
-import VendorCompetencies from "./VendorCompetencies"
-import ResultTable from "./pricelists/ResultTable"
-import IndustryTable from "./pricelists/IndustryTable"
-import StepTable from "./pricelists/StepTable"
-import LangTable from "./pricelists/LangTable"
-import CKEditor from "ckeditor4-vue"
-import WYSIWYG from "./WYSIWYG"
-import VendorAction from "./VendorAction"
-import VendorCandidate from "./VendorCandidate"
-import TableQualifications from "./TableQualifications"
-import TableProfessionalExperience from "./TableProfessionalExperience"
-import TableEducation from "./TableEducation"
-import TableDocuments from "./TableDocuments"
-import TableAssessment from "./TableAssessment"
-import ClickOutside from "vue-click-outside"
-import ValidationErrors from "../ValidationErrors"
-import SelectSingle from "../SelectSingle"
-import Asterisk from "../Asterisk"
-import AvailablePairs from "../finance/pricelists/AvailablePairs"
-import photoPreview from "@/mixins/photoPreview"
-import ApproveModal from "../ApproveModal"
-import SelectMulti from "../SelectMulti"
-import PendingCompetencies from "./pending-competencies/PendingCompetencies"
-import VendorMainInfo from "./VendorGeneralInfo"
-import SaveCancelPopUp from "../SaveCancelPopUp"
-import Tabs from "../Tabs"
+	import { mapGetters, mapActions } from "vuex"
+	import FinanceMatrixWithReset from "../FinanceMatrixWithReset"
+	import VendorCompetencies from "./VendorCompetencies"
+	import ResultTable from "./pricelists/ResultTable"
+	import IndustryTable from "./pricelists/IndustryTable"
+	import StepTable from "./pricelists/StepTable"
+	import LangTable from "./pricelists/LangTable"
+	import CKEditor from "ckeditor4-vue"
+	import WYSIWYG from "./WYSIWYG"
+	import VendorAction from "./VendorAction"
+	import VendorCandidate from "./VendorCandidate"
+	import TableQualifications from "./TableQualifications"
+	import TableProfessionalExperience from "./TableProfessionalExperience"
+	import TableEducation from "./TableEducation"
+	import TableDocuments from "./TableDocuments"
+	import TableAssessment from "./TableAssessment"
+	import ClickOutside from "vue-click-outside"
+	import ValidationErrors from "../ValidationErrors"
+	import SelectSingle from "../SelectSingle"
+	import Asterisk from "../Asterisk"
+	import AvailablePairs from "../finance/pricelists/AvailablePairs"
+	import photoPreview from "@/mixins/photoPreview"
+	import ApproveModal from "../ApproveModal"
+	import SelectMulti from "../SelectMulti"
+	import PendingCompetencies from "./pending-competencies/PendingCompetencies"
+	import VendorMainInfo from "./VendorGeneralInfo"
+	import SaveCancelPopUp from "../SaveCancelPopUp"
+	import Tabs from "../Tabs"
 
-export default {
-  mixins: [ photoPreview ],
-  data() {
-    return {
-      icons: {
-        edit: { icon: require("../../assets/images/latest-version/edit.png") },
-        cancel: { icon: require("../../assets/images/cancel-icon.png") }
-      },
-      statuses: [ "Active", "Inactive", "Potential" ],
-      paramsIsEdit: false,
-      isEdit: false,
-      tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
-      selectedTab: 'Overall Prices',
-      aliases: [],
-      currentVendorAliases: [],
-      memoqAction: "",
-      approveMemoqVendorAction: false,
-      isRefreshAfterServiceUpdate: false,
-      isRefreshResultTable: false,
-      vendorId: "",
-      areErrorsExist: false,
-      isSaveClicked: false,
-      vendorShow: true,
-      imageExist: false,
-      isApproveModal: false,
-      asteriskStyle: { top: "0px" },
-      photoFile: [],
-      genders: [ "Male", "Female", "Other" ],
-      errors: [],
-      langPairs: [],
-      addSeveralPriceId: "",
-      oldEmail: "",
-      isFileError: false,
-      isEditAndSend: false,
-      editorConfig: {
-        allowedContent: true,
-        uiColor: "#F4F0EE",
-        resize_minHeight: "130",
-        height: 167
-      },
-      templatesWysiwyg: [
-        {
-          title: "tempate",
-          message: "<p>test message</p>"
-        }
-      ]
-    }
-  },
-  methods: {
-    ...mapActions({
-      alertToggle: "alertToggle",
-      updateVendorProp: "updateVendorProp",
-      updateWithOutSocketVendorProp: "updateWithOutSocketVendorProp",
-      updateCurrentVendor: "updateCurrentVendor",
-      deleteCurrentVendor: "deleteCurrentVendor",
-      storeCurrentVendor: "storeCurrentVendor",
-      updateIndustry: "updateIndustry",
-      getDuoCombinations: "getVendorDuoCombinations",
-      updateVendorStatus: "updateVendorStatus",
-      setVendorsMatrixData: "setVendorsMatrixData",
-      setDefaultValuesMatrixData: "setDefaultValuesMatrixData",
-      initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
-      updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
-      updateVendorGeneralData: "updateVendorGeneralData",
-      updateVendorRatesByKey: 'updateVendorRatesFromServer'
-    }),
-    async setNewStepCombination() {
-      try {
-        const updatedVendor = await this.$http.post('/vendorsapi/updated-retest-from-settings', { vendorId: this.$route.params.id })
-        await this.storeCurrentVendor(updatedVendor.data)
-        this.refreshResultTable()
-      } catch (err) {
-        this.alertToggle({ message: "Rates not Updated!", isShow: true, type: "error" })
-      }
-    },
-    toggleCheck({ row, val, prop }) {
-      const index = getIndex(this.currentVendor.rates[prop], row._id)
-      const obj = this.currentVendor.rates[prop][index]
-      obj.isCheck = val
-      this.currentVendor.rates[prop].splice(index, 1, obj)
+	export default {
+		mixins: [ photoPreview ],
+		data() {
+			return {
+				icons: {
+					edit: { icon: require("../../assets/images/latest-version/edit.png") },
+					cancel: { icon: require("../../assets/images/cancel-icon.png") }
+				},
+				statuses: [ "Active", "Inactive", "Potential" ],
+				paramsIsEdit: false,
+				isEdit: false,
+				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
+				selectedTab: 'Overall Prices',
+				aliases: [],
+				currentVendorAliases: [],
+				memoqAction: "",
+				approveMemoqVendorAction: false,
+				isRefreshAfterServiceUpdate: false,
+				isRefreshResultTable: false,
+				vendorId: "",
+				areErrorsExist: false,
+				isSaveClicked: false,
+				vendorShow: true,
+				imageExist: false,
+				isApproveModal: false,
+				asteriskStyle: { top: "0px" },
+				photoFile: [],
+				genders: [ "Male", "Female", "Other" ],
+				errors: [],
+				langPairs: [],
+				addSeveralPriceId: "",
+				oldEmail: "",
+				isFileError: false,
+				isEditAndSend: false,
+				editorConfig: {
+					allowedContent: true,
+					uiColor: "#F4F0EE",
+					resize_minHeight: "130",
+					height: 167
+				},
+				templatesWysiwyg: [
+					{
+						title: "tempate",
+						message: "<p>test message</p>"
+					}
+				]
+			}
+		},
+		methods: {
+			...mapActions({
+				alertToggle: "alertToggle",
+				updateVendorProp: "updateVendorProp",
+				updateWithOutSocketVendorProp: "updateWithOutSocketVendorProp",
+				updateCurrentVendor: "updateCurrentVendor",
+				deleteCurrentVendor: "deleteCurrentVendor",
+				storeCurrentVendor: "storeCurrentVendor",
+				updateIndustry: "updateIndustry",
+				getDuoCombinations: "getVendorDuoCombinations",
+				updateVendorStatus: "updateVendorStatus",
+				setVendorsMatrixData: "setVendorsMatrixData",
+				setDefaultValuesMatrixData: "setDefaultValuesMatrixData",
+				initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
+				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
+				updateVendorGeneralData: "updateVendorGeneralData",
+				updateVendorRatesByKey: 'updateVendorRatesFromServer'
+			}),
+			async setNewStepCombination() {
+				try {
+					const updatedVendor = await this.$http.post('/vendorsapi/updated-retest-from-settings', { vendorId: this.$route.params.id })
+					await this.storeCurrentVendor(updatedVendor.data)
+					this.refreshResultTable()
+				} catch (err) {
+					this.alertToggle({ message: "Rates not Updated!", isShow: true, type: "error" })
+				}
+			},
+			toggleCheck({ row, val, prop }) {
+				const index = getIndex(this.currentVendor.rates[prop], row._id)
+				const obj = this.currentVendor.rates[prop][index]
+				obj.isCheck = val
+				this.currentVendor.rates[prop].splice(index, 1, obj)
 
-      function getIndex(arr, id) {
-        return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
-      }
-    },
-    toggleAll({ val, prop }) {
-      this.currentVendor.rates[prop] = this.currentVendor.rates[prop].reduce((acc, cur) => {
-        cur.isActive ? acc.push({ ...cur, isCheck: val }) : acc.push({ ...cur, isCheck: false })
-        return acc
-      }, [])
-    },
-    crudActions(actionType) {
-      this.paramsIsEdit = actionType !== 'cancel'
-      this.isEdit = this.paramsIsEdit
+				function getIndex(arr, id) {
+					return arr.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				}
+			},
+			toggleAll({ val, prop }) {
+				this.currentVendor.rates[prop] = this.currentVendor.rates[prop].reduce((acc, cur) => {
+					cur.isActive ? acc.push({ ...cur, isCheck: val }) : acc.push({ ...cur, isCheck: false })
+					return acc
+				}, [])
+			},
+			crudActions(actionType) {
+				this.paramsIsEdit = actionType !== 'cancel'
+				this.isEdit = this.paramsIsEdit
 
-      this.toggleAll({ val: false, prop: 'basicPricesTable' })
-      this.toggleAll({ val: false, prop: 'stepMultipliersTable' })
-      this.toggleAll({ val: false, prop: 'industryMultipliersTable' })
-      this.toggleAll({ val: false, prop: 'pricelistTable' })
-    },
-    setTab({ index: i }) {
-      this.selectedTab = this.tabs.find((item, index) => index === i)
-    },
-    setAlias({ option }) {
-      if (this.currentVendor.hasOwnProperty('aliases')) {
-        if (this.currentVendor.aliases.length) {
-          this.currentVendorAliases = this.currentVendor.aliases
-        }
-      }
-      const position = this.currentVendorAliases.indexOf(option)
+				this.toggleAll({ val: false, prop: 'basicPricesTable' })
+				this.toggleAll({ val: false, prop: 'stepMultipliersTable' })
+				this.toggleAll({ val: false, prop: 'industryMultipliersTable' })
+				this.toggleAll({ val: false, prop: 'pricelistTable' })
+			},
+			setTab({ index: i }) {
+				this.selectedTab = this.tabs.find((item, index) => index === i)
+			},
+			setAlias({ option }) {
+				if (this.currentVendor.hasOwnProperty('aliases')) {
+					if (this.currentVendor.aliases.length) {
+						this.currentVendorAliases = this.currentVendor.aliases
+					}
+				}
+				const position = this.currentVendorAliases.indexOf(option)
 
-      if (position !== -1) {
-        this.currentVendorAliases.splice(position, 1)
-        this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases })
-      } else {
-        this.currentVendorAliases.push(option)
-        this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases })
-      }
-    },
-    async approveModal() {
-      await this.memoqVendorAction(this.memoqAction)
-      this.approveMemoqVendorAction = false
-      this.memoqAction = ''
-    },
-    openMemoqModal(action) {
-      this.memoqAction = action
-      this.approveMemoqVendorAction = !!action
-    },
-    async memoqVendorAction(action) {
-      if (action === 'Saved') {
-        await this.sendVendorToMemoq(`/vendorsapi/create-memoq-vendor/${ this.currentVendor._id }`, action)
-      } else {
-        await this.sendVendorToMemoq(`/vendorsapi/delete-memoq-vendor/${ this.currentVendor._id }`, action)
-      }
-    },
-    async sendVendorToMemoq(link, action) {
-      try {
-        await this.$http.get(link)
-        this.alertToggle({ message: `Vendor in Memoq are ${ action }`, isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Error on action with Memoq & Vendor", isShow: true, type: "error" })
-      }
-    },
-    async setMatrixData({ value, key }) {
-      try {
-        await this.setVendorsMatrixData({ value, key })
-        this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
-      }
-    },
-    async getDefaultValuesDC(key) {
-      try {
-        await this.setDefaultValuesMatrixData({ key })
-        this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
-      }
-    },
-    refreshResultTable() {
-      this.updateVendorRatesByKey({ key: 'pricelistTable' })
-    },
-    updateRates(action) {
-      this.isRefreshAfterServiceUpdate = action
-      setTimeout(() => {
-        this.isRefreshAfterServiceUpdate = !action
-      }, 1000)
-    },
-    async setTest(event) {
-      const vendor = {
-        id: this.currentVendor._id,
-        isTest: event.target.checked
-      }
-      try {
-        await this.updateVendorStatus(vendor)
-        this.alertToggle({ message: "Vendor status updated", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Server error / Cannot update Vendor status", isShow: true, type: "error" })
-      }
-    },
-    closePreview() {
-      this.isEditAndSend = false
-    },
-    openPreview() {
-      this.isEditAndSend = true
-    },
-    async openVendor() {
-      const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendorId })
-      const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
-      const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
-      document.cookie = `vendor=${ data }; path=/; domain=${ domain }`
-      window.open(redirectTo, '_blank')
-    },
-    async sendQuote(message) {
-      try {
-        await this.$http.post(`/vendorsapi/send-email`, {
-          message,
-          vendorId: this.vendorId
-        })
-        this.alertToggle({ message: 'Message sent!' })
-      } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: 'error' })
-      }
-      this.closePreview()
-    },
-    closeLangPairs() {
-      this.isAvailablePairs = false
-    },
-    deleteVendor() {
-      this.isApproveModal = true
-    },
-    cancelApprove() {
-      this.isApproveModal = false
-    },
-    closeErrors() {
-      this.areErrorsExist = false
-    },
-    validateEmail() {
-      const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-      return !this.getVendorUpdatedData.email || !emailValidRegex.test(this.getVendorUpdatedData.email.toLowerCase())
-    },
-    async checkEmail() {
-      if (this.validateEmail()) {
-        return this.errors.push("Please provide a valid email.")
-      }
-      if (this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
-        try {
-          const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.currentVendor.email }`)
-          const isUnique = !result.data
-          if (!isUnique) {
-            this.errors.push("The email you've entered is already used in our system!")
-          }
-        } catch (err) {
-          this.alertToggle({
-            message: "Error on email uniqueness checking",
-            isShow: true,
-            type: "error"
-          })
-        }
-      }
-    },
-    async checkForErrors() {
-      const textReg = /^[-\sa-zA-Z]+$/
-      try {
-        this.errors = []
-        if (!this.getVendorUpdatedData.firstName || !textReg.test(this.getVendorUpdatedData.firstName))
-          this.errors.push("Please, enter valid first name.")
-        if (/^\s+$/.exec(this.getVendorUpdatedData.firstName)) {
-          this.errors.push("Please, enter valid first name.")
-        }
-        if (this.getVendorUpdatedData.surname && !textReg.test(this.getVendorUpdatedData.surname))
-          this.errors.push("Please, enter valid surname.")
-        if (!this.getVendorUpdatedData.industries.length) this.errors.push("Please, choose at least one industry.")
-        if (!this.getVendorUpdatedData.status) this.errors.push("Please, choose status.")
-        await this.checkEmail()
-        if (this.errors.length) {
-          this.areErrorsExist = true
-          this.isSaveClicked = true
-          return
-        }
-        await this.updateVendor()
-      } catch (err) {
-      }
-    },
-    async updateVendor() {
-      let sendData = new FormData()
-      sendData.append("vendor", JSON.stringify({ ...this.getVendorUpdatedData, _id: this.$route.params.id }))
-      sendData.append("photo", this.photoFile[0])
-      try {
-        await this.updateCurrentVendor(sendData)
-        this.initCurrentVendorGeneralData(this.currentVendor)
-        this.oldEmail = this.getVendorUpdatedData.email
-        this.$socket.emit('updatedVendorData', { id: this.$route.params.id })
-        // this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, data: this.getVendorUpdatedData})
-        this.alertToggle({
-          message: "Vendor info updated",
-          isShow: true,
-          type: "success"
-        })
-      } catch (err) {
-        this.alertToggle({
-          message: "Server error / Cannot update Vendor info",
-          isShow: true,
-          type: "error"
-        })
-      } finally {
-        this.closeErrors()
-      }
-    },
-    updateProfessionalLevel({ option }) {
-      this.updateCurrentVendorGeneralData({ key: "professionalLevel", value: option })
-    },
-    chosenStatus({ option }) {
-      this.updateCurrentVendorGeneralData({ key: "status", value: option })
-    },
-    cancel() {
-      this.initCurrentVendorGeneralData(this.currentVendor)
-    },
-    async approveVendorDelete() {
-      this.isApproveModal = false
-      if (!this.currentVendor._id) {
-        return this.cancel()
-      }
-      try {
-        const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ this.currentVendor._id }`)
-        if (isAssigned.body) {
-          return this.alertToggle({ message: "The vendor was assigned to a step and cannot be deleted.", isShow: true, type: "error" })
-        }
-        await this.deleteCurrentVendor({ id: this.currentVendor._id })
-        this.alertToggle({ message: "Vendor removed", isShow: true, type: "success" })
-        this.$router.go(-1)
-      } catch (err) {
-        this.alertToggle({ message: "Server error / Cannot delete the Vendor", isShow: true, type: "error" })
-      }
-    },
-    async getVendor() {
-      this.vendorId = this.$route.params.id
-      const id = this.$route.params.id
-      try {
-        const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
-        await this.storeCurrentVendor(vendor.data)
-        this.initCurrentVendorGeneralData(vendor.data)
-        this.oldEmail = this.currentVendor.email
-      } catch (err) {
-        this.alertToggle({ message: "Error on getting Vendor's info", isShow: true, type: "error" })
-      }
-    }
-  },
-  computed: {
-    ...mapGetters({
-      currentVendor: "getCurrentVendor",
-      languages: "getAllLanguages",
-      steps: "getAllSteps",
-      services: "getAllServices",
-      units: "getAllUnits",
-      industries: "getAllIndustries",
-      getVendorUpdatedData: "getCurrentVendorGeneralData"
-    }),
-    vendorAliases() {
-      if (this.aliases) {
-        return this.aliases
-      }
-    },
-    isChangedVendorGeneralInfo() {
-      if (this.currentVendor.hasOwnProperty('firstName')) {
-        let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender', 'status', 'professionalLevel', 'notes' ]
-        for (let key of keys) {
-          if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
-            return true
-          }
-        }
-      }
-    },
-    selectedIndNames() {
-      let result = []
-      if (this.currentVendor.industries && this.currentVendor.industries.length) {
-        for (let ind of this.currentVendor.industries) result.push(ind.name)
-      }
-      return result
-    },
-    optionProfessionalLevel() {
-      return this.getVendorUpdatedData.hasOwnProperty("professionalLevel") ? this.getVendorUpdatedData.professionalLevel : ""
-    }
-  },
-  components: {
-    Tabs,
-    SaveCancelPopUp,
-    VendorMainInfo,
-    PendingCompetencies,
-    SelectMulti,
-    ApproveModal,
-    VendorCompetencies,
-    WYSIWYG,
-    VendorCandidate,
-    VendorAction,
-    TableQualifications,
-    TableAssessment,
-    TableDocuments,
-    TableEducation,
-    TableProfessionalExperience,
-    ValidationErrors,
-    Asterisk,
-    AvailablePairs,
-    SelectSingle,
-    ckeditor: CKEditor.component,
-    LangTable,
-    StepTable,
-    IndustryTable,
-    ResultTable,
-    FinanceMatrixWithReset
-  },
-  directives: {
-    ClickOutside
-  },
-  created() {
-    this.getVendor()
+				if (position !== -1) {
+					this.currentVendorAliases.splice(position, 1)
+					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases })
+				} else {
+					this.currentVendorAliases.push(option)
+					this.updateVendorProp({ prop: "aliases", value: this.currentVendorAliases })
+				}
+			},
+			async approveModal() {
+				await this.memoqVendorAction(this.memoqAction)
+				this.approveMemoqVendorAction = false
+				this.memoqAction = ''
+			},
+			openMemoqModal(action) {
+				this.memoqAction = action
+				this.approveMemoqVendorAction = !!action
+			},
+			async memoqVendorAction(action) {
+				if (action === 'Saved') {
+					await this.sendVendorToMemoq(`/vendorsapi/create-memoq-vendor/${ this.currentVendor._id }`, action)
+				} else {
+					await this.sendVendorToMemoq(`/vendorsapi/delete-memoq-vendor/${ this.currentVendor._id }`, action)
+				}
+			},
+			async sendVendorToMemoq(link, action) {
+				try {
+					await this.$http.get(link)
+					this.alertToggle({ message: `Vendor in Memoq are ${ action }`, isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on action with Memoq & Vendor", isShow: true, type: "error" })
+				}
+			},
+			async setMatrixData({ value, key }) {
+				try {
+					await this.setVendorsMatrixData({ value, key })
+					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
+				}
+			},
+			async getDefaultValuesDC(key) {
+				try {
+					await this.setDefaultValuesMatrixData({ key })
+					this.alertToggle({ message: "Matrix data updated", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on setting matrix data", isShow: true, type: "error" })
+				}
+			},
+			refreshResultTable() {
+				this.updateVendorRatesByKey({ key: 'pricelistTable' })
+			},
+			updateRates(action) {
+				this.isRefreshAfterServiceUpdate = action
+				setTimeout(() => {
+					this.isRefreshAfterServiceUpdate = !action
+				}, 1000)
+			},
+			async setTest(event) {
+				const vendor = {
+					id: this.currentVendor._id,
+					isTest: event.target.checked
+				}
+				try {
+					await this.updateVendorStatus(vendor)
+					this.alertToggle({ message: "Vendor status updated", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Server error / Cannot update Vendor status", isShow: true, type: "error" })
+				}
+			},
+			closePreview() {
+				this.isEditAndSend = false
+			},
+			openPreview() {
+				this.isEditAndSend = true
+			},
+			async openVendor() {
+				const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendorId })
+				const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
+				const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
+				document.cookie = `vendor=${ data }; path=/; domain=${ domain }`
+				window.open(redirectTo, '_blank')
+			},
+			async sendQuote(message) {
+				try {
+					await this.$http.post(`/vendorsapi/send-email`, {
+						message,
+						vendorId: this.vendorId
+					})
+					this.alertToggle({ message: 'Message sent!' })
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: 'error' })
+				}
+				this.closePreview()
+			},
+			closeLangPairs() {
+				this.isAvailablePairs = false
+			},
+			deleteVendor() {
+				this.isApproveModal = true
+			},
+			cancelApprove() {
+				this.isApproveModal = false
+			},
+			closeErrors() {
+				this.areErrorsExist = false
+			},
+			validateEmail() {
+				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+				return !this.getVendorUpdatedData.email || !emailValidRegex.test(this.getVendorUpdatedData.email.toLowerCase())
+			},
+			async checkEmail() {
+				if (this.validateEmail()) {
+					return this.errors.push("Please provide a valid email.")
+				}
+				if (this.oldEmail.toLowerCase() !== this.currentVendor.email.toLowerCase()) {
+					try {
+						const result = await this.$http.get(`/vendors/application/unique-email?email=${ this.currentVendor.email }`)
+						const isUnique = !result.data
+						if (!isUnique) {
+							this.errors.push("The email you've entered is already used in our system!")
+						}
+					} catch (err) {
+						this.alertToggle({
+							message: "Error on email uniqueness checking",
+							isShow: true,
+							type: "error"
+						})
+					}
+				}
+			},
+			async checkForErrors() {
+				const textReg = /^[-\sa-zA-Z]+$/
+				try {
+					this.errors = []
+					if (!this.getVendorUpdatedData.firstName || !textReg.test(this.getVendorUpdatedData.firstName))
+						this.errors.push("Please, enter valid first name.")
+					if (/^\s+$/.exec(this.getVendorUpdatedData.firstName)) {
+						this.errors.push("Please, enter valid first name.")
+					}
+					if (this.getVendorUpdatedData.surname && !textReg.test(this.getVendorUpdatedData.surname))
+						this.errors.push("Please, enter valid surname.")
+					if (!this.getVendorUpdatedData.industries.length) this.errors.push("Please, choose at least one industry.")
+					if (!this.getVendorUpdatedData.status) this.errors.push("Please, choose status.")
+					await this.checkEmail()
+					if (this.errors.length) {
+						this.areErrorsExist = true
+						this.isSaveClicked = true
+						return
+					}
+					await this.updateVendor()
+				} catch (err) {
+				}
+			},
+			async updateVendor() {
+				let sendData = new FormData()
+				sendData.append("vendor", JSON.stringify({ ...this.getVendorUpdatedData, _id: this.$route.params.id }))
+				sendData.append("photo", this.photoFile[0])
+				try {
+					await this.updateCurrentVendor(sendData)
+					this.initCurrentVendorGeneralData(this.currentVendor)
+					this.oldEmail = this.getVendorUpdatedData.email
+					this.$socket.emit('updatedVendorData', { id: this.$route.params.id })
+					// this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, data: this.getVendorUpdatedData})
+					this.alertToggle({
+						message: "Vendor info updated",
+						isShow: true,
+						type: "success"
+					})
+				} catch (err) {
+					this.alertToggle({
+						message: "Server error / Cannot update Vendor info",
+						isShow: true,
+						type: "error"
+					})
+				} finally {
+					this.closeErrors()
+				}
+			},
+			updateProfessionalLevel({ option }) {
+				this.updateCurrentVendorGeneralData({ key: "professionalLevel", value: option })
+			},
+			chosenStatus({ option }) {
+				this.updateCurrentVendorGeneralData({ key: "status", value: option })
+			},
+			cancel() {
+				this.initCurrentVendorGeneralData(this.currentVendor)
+			},
+			async approveVendorDelete() {
+				this.isApproveModal = false
+				if (!this.currentVendor._id) {
+					return this.cancel()
+				}
+				try {
+					const isAssigned = await this.$http.get(`/vendorsapi/any-step?id=${ this.currentVendor._id }`)
+					if (isAssigned.body) {
+						return this.alertToggle({ message: "The vendor was assigned to a step and cannot be deleted.", isShow: true, type: "error" })
+					}
+					await this.deleteCurrentVendor({ id: this.currentVendor._id })
+					this.alertToggle({ message: "Vendor removed", isShow: true, type: "success" })
+					this.$router.go(-1)
+				} catch (err) {
+					this.alertToggle({ message: "Server error / Cannot delete the Vendor", isShow: true, type: "error" })
+				}
+			},
+			async getVendor() {
+				this.vendorId = this.$route.params.id
+				const id = this.$route.params.id
+				try {
+					const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ id }`)
+					await this.storeCurrentVendor(vendor.data)
+					this.initCurrentVendorGeneralData(vendor.data)
+					this.oldEmail = this.currentVendor.email
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting Vendor's info", isShow: true, type: "error" })
+				}
+			}
+		},
+		computed: {
+			...mapGetters({
+				currentVendor: "getCurrentVendor",
+				languages: "getAllLanguages",
+				steps: "getAllSteps",
+				services: "getAllServices",
+				units: "getAllUnits",
+				industries: "getAllIndustries",
+				getVendorUpdatedData: "getCurrentVendorGeneralData"
+			}),
+			vendorAliases() {
+				if (this.aliases) {
+					return this.aliases
+				}
+			},
+			isChangedVendorGeneralInfo() {
+				if (this.currentVendor.hasOwnProperty('firstName')) {
+					let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender', 'status', 'professionalLevel', 'notes' ]
+					for (let key of keys) {
+						if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
+							return true
+						}
+					}
+				}
+			},
+			selectedIndNames() {
+				let result = []
+				if (this.currentVendor.industries && this.currentVendor.industries.length) {
+					for (let ind of this.currentVendor.industries) result.push(ind.name)
+				}
+				return result
+			},
+			optionProfessionalLevel() {
+				return this.getVendorUpdatedData.hasOwnProperty("professionalLevel") ? this.getVendorUpdatedData.professionalLevel : ""
+			}
+		},
+		components: {
+			Tabs,
+			SaveCancelPopUp,
+			VendorMainInfo,
+			PendingCompetencies,
+			SelectMulti,
+			ApproveModal,
+			VendorCompetencies,
+			WYSIWYG,
+			VendorCandidate,
+			VendorAction,
+			TableQualifications,
+			TableAssessment,
+			TableDocuments,
+			TableEducation,
+			TableProfessionalExperience,
+			ValidationErrors,
+			Asterisk,
+			AvailablePairs,
+			SelectSingle,
+			ckeditor: CKEditor.component,
+			LangTable,
+			StepTable,
+			IndustryTable,
+			ResultTable,
+			FinanceMatrixWithReset
+		},
+		directives: {
+			ClickOutside
+		},
+		created() {
+			this.getVendor()
 
-    this.$socket.on('setFreshVendorData', ({ id }) => {
-      if (id.toString() === this.$route.params.id.toString()) {
-        this.getVendor()
-      }
-    })
+			this.$socket.on('setFreshVendorData', ({ id }) => {
+				if (id.toString() === this.$route.params.id.toString()) {
+					this.getVendor()
+				}
+			})
 
-    this.$socket.on('socketUpdateVendorProp', ({ id, key, value }) => {
-      if (this.$route.params.id === id) {
-        this.updateWithOutSocketVendorProp({ key, value })
-      }
-    })
-  },
-  mounted() {
-    this.oldEmail = this.currentVendor.email
-  },
-  beforeDestroy() {
-    this.storeCurrentVendor({})
-  }
-}
+			this.$socket.on('socketUpdateVendorProp', ({ id, key, value }) => {
+				if (this.$route.params.id === id) {
+					this.updateWithOutSocketVendorProp({ key, value })
+				}
+			})
+		},
+		mounted() {
+			this.oldEmail = this.currentVendor.email
+		},
+		beforeDestroy() {
+			this.storeCurrentVendor({})
+		}
+	}
 </script>
 
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors.scss";
+  @import "../../assets/scss/colors.scss";
 
-.rates {
-  &__icons {
-    display: flex;
-    right: 20px;
-    top: 20px;
-    gap: 7px;
-    height: 20px;
-    align-items: center;
-    justify-content: flex-end;
-    margin-bottom: 20px;
+  .rates {
+    &__icons {
+      display: flex;
+      right: 20px;
+      top: 20px;
+      gap: 7px;
+      height: 20px;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 20px;
 
-    &-opacity1 {
-      opacity: 1;
-      cursor: pointer;
-    }
+      &-opacity1 {
+        opacity: 1;
+        cursor: pointer;
+      }
 
-    &-opacity05 {
-      opacity: 0.4;
-      cursor: default;
-    }
-  }
-}
-
-.block-item-subinfo {
-  display: flex;
-  height: 50px;
-
-  &__error-shadow {
-    height: 30px;
-  }
-
-  &__check-item {
-    width: 220px;
-  }
-
-  &__last {
-    height: 30px;
-  }
-
-  &_maxhigh-index {
-    z-index: 12;
-  }
-
-  &_high-index {
-    z-index: 10;
-  }
-
-  &__label {
-    width: 160px;
-    padding-top: 6px;
-  }
-
-  &__drop {
-    position: relative;
-    width: 220px;
-  }
-}
-
-.block-item-subinfo:last-child {
-  height: 30px;
-}
-
-.vendor-wrap {
-  position: relative;
-  width: 100%;
-  display: flex;
-  margin: 50px;
-}
-
-.vendor-subinfo {
-  &__general {
-    padding: 20px;
-    margin-top: 66px;
-    width: 350px;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-    margin-left: 40px;
-    border-radius: 4px;
-  }
-
-  &__action {
-    margin-top: 40px;
-    border-radius: 4px;
-    width: 390px;
-    margin-left: 40px;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-  }
-}
-
-.vendor-info {
-  position: relative;
-  width: 1000px;
-  min-width: 1000px;
-
-  &__competencies {
-    box-sizing: border-box;
-    padding: 20px;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-    position: relative;
-    border-radius: 4px;
-
-  }
-
-  &__notes-block {
-    display: flex;
-  }
-
-  &__editor {
-    width: 100%;
-  }
-
-  &__preview {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-  }
-
-  &__rates {
-    position: relative;
-    box-sizing: border-box;
-    padding: 20px;
-    border-radius: 4px;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-  }
-}
-
-.title {
-  font-size: 21px;
-  padding: 30px 0 10px;
-}
-
-.gen-info {
-  box-sizing: border-box;
-  padding: 20px;
-  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-}
-
-.gen-info {
-  display: flex;
-  justify-content: space-between;
-
-  &__block {
-    width: 35%;
-
-    &:first-child {
-      width: 22%;
-      text-align: center;
-    }
-  }
-}
-
-.block-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  &__label {
-    margin-bottom: 0;
-  }
-
-  &_relative {
-    position: relative;
-  }
-
-  &__drop-menu {
-    position: relative;
-    width: 220px;
-    height: 30px;
-    box-sizing: border-box;
-  }
-
-  &_high-index {
-    z-index: 10;
-  }
-
-  &_medium-index {
-    z-index: 8;
-  }
-
-  label {
-    margin-bottom: 0;
-  }
-
-  /*&__input-filed {*/
-  /*  font-size: 14px;*/
-  /*  color: #66563d;*/
-  /*  border: 1px solid #c1bbb1;*/
-  /*  border-radius: 4px;*/
-  /*  padding: 0 5px;*/
-  /*  outline: none;*/
-  /*  width: 220px;*/
-  /*  height: 30px;*/
-  /*  box-sizing: border-box;*/
-  /*}*/
-
-  ::-webkit-input-placeholder {
-    opacity: 0.5;
-  }
-
-  &_error-shadow {
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-    border-radius: 4px;
-  }
-}
-
-#test {
-  width: 0;
-}
-
-.checkbox {
-  display: flex;
-  height: 28px;
-
-  input[type="checkbox"] {
-    opacity: 0;
-
-    + {
-      label {
-        &::after {
-          content: none;
-        }
+      &-opacity05 {
+        opacity: 0.4;
+        cursor: default;
       }
     }
+  }
 
-    &:checked {
+  .block-item-subinfo {
+    display: flex;
+    height: 50px;
+
+    &__error-shadow {
+      height: 32;
+    }
+
+    &__check-item {
+      width: 220px;
+    }
+
+    &__last {
+      height: 32px;
+    }
+
+    &_maxhigh-index {
+      z-index: 12;
+    }
+
+    &_high-index {
+      z-index: 10;
+    }
+
+    &__label {
+      width: 130px;
+      padding-top: 6px;
+    }
+
+    &__drop {
+      position: relative;
+      width: 220px;
+    }
+  }
+
+  .block-item-subinfo:last-child {
+    height: 32px;
+  }
+
+  .vendor-wrap {
+    position: relative;
+    width: 100%;
+    display: flex;
+    margin: 50px;
+  }
+
+  .vendor-subinfo {
+    &__general {
+      padding: 20px;
+      margin-top: 66px;
+      width: 350px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      margin-left: 40px;
+      border-radius: 4px;
+    }
+
+    &__action {
+      margin-top: 40px;
+      border-radius: 4px;
+      width: 390px;
+      margin-left: 40px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    }
+  }
+
+  .vendor-info {
+    position: relative;
+    width: 1000px;
+    min-width: 1000px;
+
+    &__competencies {
+      box-sizing: border-box;
+      padding: 20px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      position: relative;
+      border-radius: 4px;
+
+    }
+
+    &__notes-block {
+      display: flex;
+    }
+
+    &__editor {
+      width: 100%;
+    }
+
+    &__preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    &__rates {
+      position: relative;
+      box-sizing: border-box;
+      padding: 20px;
+      border-radius: 4px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    }
+  }
+
+  .title {
+    font-size: 21px;
+    padding: 30px 0 10px;
+  }
+
+  .gen-info {
+    box-sizing: border-box;
+    padding: 20px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+  }
+
+  .gen-info {
+    display: flex;
+    justify-content: space-between;
+
+    &__block {
+      width: 35%;
+
+      &:first-child {
+        width: 22%;
+        text-align: center;
+      }
+    }
+  }
+
+  .block-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    &__label {
+      margin-bottom: 0;
+    }
+
+    &_relative {
+      position: relative;
+    }
+
+    &__drop-menu {
+      position: relative;
+      width: 220px;
+      height: 32px;
+      box-sizing: border-box;
+    }
+
+    &_high-index {
+      z-index: 10;
+    }
+
+    &_medium-index {
+      z-index: 8;
+    }
+
+    label {
+      margin-bottom: 0;
+    }
+
+    /*&__input-filed {*/
+    /*  font-size: 14px;*/
+    /*  color: #66563d;*/
+    /*  border: 1px solid #c1bbb1;*/
+    /*  border-radius: 4px;*/
+    /*  padding: 0 5px;*/
+    /*  outline: none;*/
+    /*  width: 220px;*/
+    /*  height: 30px;*/
+    /*  box-sizing: border-box;*/
+    /*}*/
+
+    ::-webkit-input-placeholder {
+      opacity: 0.5;
+    }
+
+    &_error-shadow {
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      border-radius: 4px;
+    }
+  }
+
+  #test {
+    width: 0;
+  }
+
+  .checkbox {
+    display: flex;
+    height: 28px;
+
+    input[type="checkbox"] {
+      opacity: 0;
+
       + {
         label {
           &::after {
-            content: "";
+            content: none;
+          }
+        }
+      }
+
+      &:checked {
+        + {
+          label {
+            &::after {
+              content: "";
+            }
           }
         }
       }
     }
-  }
 
-  label {
-    position: relative;
-    display: inline-block;
-    padding-left: 22px;
-    padding-top: 4px;
-
-    &::before {
-      position: absolute;
-      content: "";
+    label {
+      position: relative;
       display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid #c1bbb1;
-      left: 0px;
-      top: 3px;
+      padding-left: 22px;
+      padding-top: 4px;
+
+      &::before {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        border: 1px solid #c1bbb1;
+        left: 0px;
+        top: 3px;
+      }
+
+      &::after {
+        position: absolute;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        width: 9px;
+        border-left: 2px solid;
+        border-bottom: 2px solid;
+        transform: rotate(-45deg);
+        left: 4px;
+        top: 7px;
+      }
     }
-
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
-    }
-  }
-}
-
-.buttons {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding-right: 10px;
-  box-sizing: border-box;
-  width: 1020px;
-}
-
-.button {
-  min-width: 120px;
-  padding: 0 24px 0 24px;
-  margin: 0 10px;
-  height: 32px;
-  color: $white;
-  font-size: 14px;
-  border-radius: 4px;
-  background-color: $orange;
-  border: none;
-  transition: .1s ease;
-  outline: none;
-  letter-spacing: 0.2px;
-
-  &:hover {
-    cursor: pointer;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
   }
 
-  &:active {
-    transform: scale(.98);
-  }
-
-  .delete-approve & {
-    margin-left: 0;
-  }
-}
-
-.photo-wrap {
-  width: 195px;
-  height: 160px;
-  border: 1px solid #c1bbb1;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 4px;
-
-  .photo-image {
-    max-width: 100%;
-    max-height: 100%;
-  }
-}
-
-.photo-file {
-  position: absolute;
-  top: -25px;
-  left: 0px;
-  height: 180px;
-  background-color: transparent;
-  outline: none;
-  border: none;
-  z-index: 5;
-  cursor: pointer;
-}
-
-.photo-text {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-
-  &__message {
-    font-size: 18px;
-    opacity: 0.5;
-    width: 50%;
-    text-align: center;
-  }
-
-  &__error-message {
-    position: absolute;
-    bottom: 30%;
-    z-index: 10;
-    background-color: $white;
-    padding: 3px;
+  .buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 10px;
     box-sizing: border-box;
-    color: $orange;
-  }
-}
-
-.photo-extensions,
-.photo-size {
-  display: block;
-  font-size: 12px;
-  margin-top: 10px;
-}
-
-.require {
-  font-size: 14px;
-  color: red;
-  margin-left: 2px;
-}
-
-.delete-approve {
-  position: absolute;
-  width: 332px;
-  height: 270px;
-  top: 10%;
-  left: 50%;
-  margin-left: -166px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-  background-color: #fff;
-  z-index: 20;
-
-  p {
-    font-size: 21px;
-    width: 50%;
-    text-align: center;
+    width: 1020px;
   }
 
-  .approve-block {
-    margin-bottom: 15px;
-  }
-}
+  .button {
+    min-width: 120px;
+    padding: 0 24px 0 24px;
+    margin: 0 10px;
+    height: 32px;
+    color: $white;
+    font-size: 14px;
+    border-radius: 4px;
+    background-color: $orange;
+    border: none;
+    transition: .1s ease;
+    outline: none;
+    letter-spacing: 0.2px;
 
-.no-margin {
-  margin-bottom: 0;
-}
+    &:hover {
+      cursor: pointer;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    }
+
+    &:active {
+      transform: scale(.98);
+    }
+
+    .delete-approve & {
+      margin-left: 0;
+    }
+  }
+
+  .photo-wrap {
+    width: 195px;
+    height: 160px;
+    border: 1px solid #c1bbb1;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+
+    .photo-image {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+
+  .photo-file {
+    position: absolute;
+    top: -25px;
+    left: 0px;
+    height: 180px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    z-index: 5;
+    cursor: pointer;
+  }
+
+  .photo-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    &__message {
+      font-size: 18px;
+      opacity: 0.5;
+      width: 50%;
+      text-align: center;
+    }
+
+    &__error-message {
+      position: absolute;
+      bottom: 30%;
+      z-index: 10;
+      background-color: $white;
+      padding: 3px;
+      box-sizing: border-box;
+      color: $orange;
+    }
+  }
+
+  .photo-extensions,
+  .photo-size {
+    display: block;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .require {
+    font-size: 14px;
+    color: red;
+    margin-left: 2px;
+  }
+
+  .delete-approve {
+    position: absolute;
+    width: 332px;
+    height: 270px;
+    top: 10%;
+    left: 50%;
+    margin-left: -166px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    background-color: #fff;
+    z-index: 20;
+
+    p {
+      font-size: 21px;
+      width: 50%;
+      text-align: center;
+    }
+
+    .approve-block {
+      margin-bottom: 15px;
+    }
+  }
+
+  .no-margin {
+    margin-bottom: 0;
+  }
 </style>
