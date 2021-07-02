@@ -94,8 +94,8 @@ export default {
     padding-top: 4px;
     border: 1px solid $cell-border;
     border-radius: 4px;
-    width: 200px;
-    height: 30px;
+    width: 220px;
+    height: 32px;
     box-sizing: border-box;
     color: $main-color;
     &:focus {

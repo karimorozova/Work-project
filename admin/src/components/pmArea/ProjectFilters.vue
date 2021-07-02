@@ -234,7 +234,7 @@
     }
 
     &__input {
-      width: 200px;
+      width: 220px;
     }
 
     &__date {

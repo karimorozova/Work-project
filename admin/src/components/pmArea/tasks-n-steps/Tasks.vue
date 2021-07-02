@@ -1006,7 +1006,7 @@
     &__select {
       position: relative;
       height: 32px;
-      width: 200px;
+      width: 220px;
     }
 
   }

@@ -543,10 +543,10 @@ export default {
 
 .deliverablesActions{
   position: relative;
-  width: 200px;
+  width: 220px;
 
   &__drop-menu{
-    height: 30px;
+    height: 32px;
   }
 
   &__title{
@@ -633,7 +633,7 @@ export default {
   &__select {
     position: relative;
     height: 32px;
-    width: 200px;
+    width: 220px;
   }
 
   &-table {
@@ -661,7 +661,7 @@ export default {
 
     &__action {
       position: relative;
-      width: 200px;
+      width: 220px;
       height: 30px;
       align-self: flex-end;
       margin-bottom: 20px;

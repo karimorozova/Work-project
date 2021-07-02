@@ -52,6 +52,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../../../assets/scss/colors';
+
   .modal {
     z-index: 8;
     position: absolute;
@@ -102,18 +104,18 @@
 
   input {
     font-size: 14px;
-    color: #66563d;
-    border: 1px solid #c1bbb1;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
     box-sizing: border-box;
-    padding: 0 8px;
+    padding: 0 7px;
     outline: none;
-    width: 200px;
+    width: 220px;
     height: 32px;
     transition: .1s ease-out;
 
     &:focus {
-      border: 1px solid #938877;
+      border: 1px solid $border-focus;
     }
   }
 

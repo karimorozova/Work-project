@@ -158,7 +158,7 @@
 
   .width-191 {
     .action-button__button {
-      width: 200px;
+      width: 220px;
     }
   }
 

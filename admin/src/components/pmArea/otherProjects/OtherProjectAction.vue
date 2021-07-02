@@ -105,8 +105,8 @@
 
       &__menu {
         position: relative;
-        width: 190px;
-        height: 30px;
+        width: 220px;
+        height: 32px;
       }
 
       &__input {

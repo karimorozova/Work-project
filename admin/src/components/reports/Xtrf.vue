@@ -102,7 +102,7 @@
 <style lang="scss" scoped>
 
   .xtrf {
-    width: 200px;
+    width: 220px;
     padding: 40px;
 
     &__upload {

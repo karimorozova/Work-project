@@ -575,19 +575,16 @@
     &__settingDrop {
       display: flex;
       flex-direction: column;
-      width: 200px;
-      width: 191px;
+      width: 220px;
       position: relative;
     }
 
     &__settingScheme {
-      width: 200px;
-      width: 191px;
+      width: 220px;
     }
 
     &__settingBody {
-      width: 200px;
-      width: 191px;
+      width: 220px;
     }
 
     &__settingRow {

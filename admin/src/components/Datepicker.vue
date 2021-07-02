@@ -1178,7 +1178,7 @@ input:disabled {
 }
 
 .datepicker-custom-mod {
-  width: 200px;
+  width: 220px;
 }
 
 .steps__custom-input {
@@ -1190,7 +1190,7 @@ input:disabled {
 }
 
 .steps__calendar-custom {
-  width: 200px;
+  width: 220px;
   right: -6px;
   top: 24px;
 }

@@ -226,8 +226,8 @@
 
     &__drop {
       position: relative;
-      height: 28px;
-      width: 200px;
+      height: 32px;
+      width: 220px;
     }
 
     &__check {

@@ -154,7 +154,7 @@
 
     &__project-template {
       position: relative;
-      width: 200px;
+      width: 220px;
       margin-bottom: 60px;
     }
 

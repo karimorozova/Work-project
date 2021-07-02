@@ -134,18 +134,18 @@ export default {
     &__text {
         box-sizing: border-box;
         color: $main-color;
-        width: 200px;
-        height: 30px;
+        width: 220px;
+        height: 32px;
         padding: 0 5px;
         outline: none;
-        border: 1px solid #c1bbb1;
+        border: 1px solid $border;
         border-radius: 4px;
         margin-left: 5px;
     }
     &__drop {
         position: relative;
-        height: 30px;
-        width: 200px;
+        height: 32px;
+        width: 220px;
         margin-left: 8px;
     }
     &_no-space {

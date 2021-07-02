@@ -411,7 +411,7 @@ export default {
     }
 
     &__data {
-      width: 190px;
+      width: 220px;
       position: relative;
     }
   }

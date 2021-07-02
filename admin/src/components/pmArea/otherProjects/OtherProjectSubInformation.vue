@@ -385,7 +385,7 @@
       }
 
       &__data {
-        width: 190px;
+        width: 220px;
         position: relative;
       }
 

@@ -14,34 +14,48 @@
       .tasks-langs__title-target Target Language(s):
         span.asterisk *
       .select-lang-wrapper
-        .target__from
-          span.target__search-value(v-model="langSearchValue", v-if="isSearching && langSearchValue") {{ langSearchValue }}
-          Languages(
-            tabIndex="0",
-            :languages="targetAll",
-            :langSearchValue="langSearchValue",
-            @forceMove="forceMoveFromAll",
-            @searching="isSearching = true",
-            @searchValue="(e) => searchValue(e, 'targetAll')",
-            @slice="slice",
-            @sortBySearch="(e) => sortBySearch(e, 'targetAll')",
-            @clearSearch="(e) => clearSearch(e, 'targetAll')"
-          )
-        .target__arrows
-          Arrows(
-            @forward="(e) => moveTargets(e, 'targetAll', 'targetChosen')",
-            @back="(e) => moveTargets(e, 'targetChosen', 'targetAll')"
-          )
-        .target__to
-          Languages(tabIndex="1", :languages="targetChosen", @forceMove="forceMoveFromChosen")
+        ListManagement(
+          :list="targetAll.map(i=> i.lang)"
+          @moveItem="moveFromAll"
+        )
+        ListManagementButtons(
+          @moveAll="moveAll"
+          @removeAll="removeAll"
+        )
+        ListManagement(
+          :list="targetChosen.map(i=> i.lang)"
+          @moveItem="moveFromChosen"
+        )
+        //.target__from
+        //  span.target__search-value(v-model="langSearchValue", v-if="isSearching && langSearchValue") {{ langSearchValue }}
+        //  Languages(
+        //    tabIndex="0",
+        //    :languages="targetAll",
+        //    :langSearchValue="langSearchValue",
+        //    @forceMove="forceMoveFromAll",
+        //    @searching="isSearching = true",
+        //    @searchValue="(e) => searchValue(e, 'targetAll')",
+        //    @slice="slice",
+        //    @sortBySearch="(e) => sortBySearch(e, 'targetAll')",
+        //    @clearSearch="(e) => clearSearch(e, 'targetAll')"
+        //  )
+        //.target__arrows
+        //  Arrows(
+        //    @forward="(e) => moveTargets(e, 'targetAll', 'targetChosen')",
+        //    @back="(e) => moveTargets(e, 'targetChosen', 'targetAll')"
+        //  )
+        //.target__to
+        //  Languages(tabIndex="1", :languages="targetChosen", @forceMove="forceMoveFromChosen")
 </template>
 
 <script>
 	import SelectSingle from "../../../SelectSingle"
-	import Languages from "@/components/finance/langs/Languages"
-	import Arrows from "@/components/finance/langs/Arrows"
+	// import Languages from "@/components/finance/langs/Languages"
+	// import Arrows from "@/components/finance/langs/Arrows"
 	import { mapGetters, mapActions } from "vuex"
 	import TasksLanguages from "../../../../mixins/TasksLanguages"
+	import ListManagement from "../../../ListManagement"
+	import ListManagementButtons from "../../../ListManagementButtons"
 
 	export default {
 		mixins: [ TasksLanguages ],
@@ -59,8 +73,6 @@
 		},
 		data() {
 			return {
-				wordsRates: [],
-				hoursRates: [],
 				targetAll: [],
 				targetChosen: [],
 				languagePairs: [],
@@ -69,6 +81,27 @@
 			}
 		},
 		methods: {
+			moveFromAll(index) {
+				const lang = this.targetAll.splice(index, 1)
+				this.targetChosen.push(lang[0])
+				this.emitTargets()
+				this.sortLanguages("targetChosen")
+			},
+			moveFromChosen(index) {
+				const lang = this.targetChosen.splice(index, 1)
+				this.targetAll.push(lang[0])
+				this.emitTargets()
+				this.sortLanguages("targetAll")
+			},
+			moveAll() {
+				this.setPossibleTargets()
+				this.targetChosen = this.targetAll
+				this.targetAll = []
+			},
+			removeAll() {
+				this.setPossibleTargets()
+				this.targetChosen = []
+			},
 			...mapActions({
 				storeProject: "setCurrentProject",
 				setDataValue: "setTasksDataValueRequest"
@@ -107,27 +140,27 @@
 			emitTargets() {
 				this.$emit("setTargets", { targets: this.targetChosen })
 			},
-			forceMoveFromAll({ index }) {
-				const lang = this.targetAll.splice(index, 1)
-				this.targetChosen.push(lang[0])
-				this.emitTargets()
-				this.sortLanguages("targetChosen")
-			},
-			forceMoveFromChosen({ index }) {
-				const lang = this.targetChosen.splice(index, 1)
-				this.targetAll.push(lang[0])
-				this.emitTargets()
-				this.sortLanguages("targetAll")
-			},
-			moveTargets(e, from, to) {
-				const checked = this[from].filter((item) => item.check)
-				this[from] = this[from].filter((item) => !item.check)
-				this[to].push(...checked)
-				this.sortLanguages(from)
-				this.sortLanguages(to)
-				this.clearChecks(to)
-				this.emitTargets()
-			},
+			// forceMoveFromAll({ index }) {
+			// 	const lang = this.targetAll.splice(index, 1)
+			// 	this.targetChosen.push(lang[0])
+			// 	this.emitTargets()
+			// 	this.sortLanguages("targetChosen")
+			// },
+			// forceMoveFromChosen({ index }) {
+			// 	const lang = this.targetChosen.splice(index, 1)
+			// 	this.targetAll.push(lang[0])
+			// 	this.emitTargets()
+			// 	this.sortLanguages("targetAll")
+			// },
+			// moveTargets(e, from, to) {
+			// 	const checked = this[from].filter((item) => item.check)
+			// 	this[from] = this[from].filter((item) => !item.check)
+			// 	this[to].push(...checked)
+			// 	this.sortLanguages(from)
+			// 	this.sortLanguages(to)
+			// 	this.clearChecks(to)
+			// 	this.emitTargets()
+			// },
 			searchValue({ value }, prop) {
 				this.langSearchValue += value.toLowerCase()
 				this[prop].filter(item => item.lang.toLowerCase().indexOf(this.langSearchValue) !== -1)
@@ -158,7 +191,7 @@
 				this.targetAll = this.currentProject.requestForm.targetLanguages.filter(item => !targets.map(item => item.lang).includes(item.lang))
 				this.targetChosen.push(...targets)
 				this.$emit("setTargets", { targets: this.targetChosen })
-        this.$emit("endOfSettingTaskData")
+				this.$emit("endOfSettingTaskData")
 			},
 			runPossibleTargets() {
 				this.setPossibleTargets()
@@ -188,8 +221,10 @@
 			}
 		},
 		components: {
-			Languages,
-			Arrows,
+			ListManagementButtons,
+			ListManagement,
+			// Languages,
+			// Arrows,
 			SelectSingle
 		}
 	}

@@ -80,8 +80,8 @@
 
     &__menu {
       position: relative;
-      height: 30px;
-      width: 200px;
+      height: 32px;
+      width: 220px;
       margin: 20px 0;
     }
 

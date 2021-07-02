@@ -600,8 +600,8 @@
 
     &__dropBody{
       position: relative;
-      width: 200px;
-      height: 30px;
+      width: 220px;
+      height: 32px;
       margin-bottom: 20px;
     }
 
@@ -621,12 +621,12 @@
     }
 
     &__text-input {
-      width: 200px;
+      width: 220px;
       margin-top: 5px;
       border-radius: 4px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       padding: 5px;
-      color: #68573e;
+      color: $text;
       resize: none;
       outline: none;
       box-sizing: border-box;
@@ -732,12 +732,12 @@
 
       &__menu {
         position: relative;
-        width: 190px;
-        height: 30px;
+        width: 220px;
+        height: 32px;
       }
       &__menuTitle{
-        width: 190px;
-        height: 30px;
+        width: 220px;
+        height: 32px;
         display: flex;
         align-items: center;
       }

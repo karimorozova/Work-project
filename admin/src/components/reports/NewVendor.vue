@@ -201,17 +201,17 @@ export default {
     }
     &__drop {
         position: relative;
-        width: 200px;
-        height: 30px;
+        width: 220px;
+        height: 32px;
     }
     &__text {
-        width: 200px;
-        height: 30px;
+        width: 220px;
+        height: 32px;
         box-sizing: border-box;
         padding: 0 5px;
         color: $main-color;
         outline: none;
-        border: 1px solid #c1bbb1;
+        border: 1px solid $border;
         border-radius: 4px;
     }
     &__error-message {

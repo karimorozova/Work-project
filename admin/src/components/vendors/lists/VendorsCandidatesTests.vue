@@ -713,7 +713,7 @@
 
       &__drop {
         position: relative;
-        width: 190px;
+        width: 220px;
 
         &-title {
           padding: 5px 0;

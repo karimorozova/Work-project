@@ -209,18 +209,19 @@
     }
 
     &__text {
-      width: 200px;
-      height: 30px;
-      color: $main-color;
-      padding: 0 5px;
-      box-sizing: border-box;
-      border: 1px solid #c1bbb1;
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
       outline: none;
-      transition: all 0.2s;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
       &:focus {
-        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+        border: 1px solid $border-focus;
       }
     }
 

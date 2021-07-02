@@ -185,21 +185,26 @@
     }
 
     &__text {
-      box-sizing: border-box;
-      color: $main-color;
-      width: 200px;
-      height: 30px;
-      padding: 0 5px;
-      outline: none;
-      border: 1px solid #c1bbb1;
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
-      margin-left: 5px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
     }
 
     &__drop {
       position: relative;
-      height: 30px;
-      width: 200px;
+      height: 32px;
+      width: 220px;
       margin-left: 8px;
     }
 

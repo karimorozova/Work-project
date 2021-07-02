@@ -249,7 +249,7 @@
       &-item {
         display: flex;
         flex-direction: column;
-        width: 200px;
+        width: 220px;
       }
 
       &-title {
@@ -269,7 +269,7 @@
 
     &__main {
       display: flex;
-      width: 200px;
+      width: 220px;
       flex-direction: column;
     }
 
@@ -283,20 +283,20 @@
     }
 
     &__input {
-      color: $main-color;
-      width: 200px;
-      outline: none;
-      border: 1px solid #c1bbb1;
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
       box-sizing: border-box;
-      transition: all 0.2s;
-      height: 30px;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
       margin-top: 3px;
 
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+      &:focus {
+        border: 1px solid $border-focus;
       }
     }
 
