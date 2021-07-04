@@ -458,8 +458,6 @@
       position: relative;
       background: white;
       border-radius: 4px;
-      background: white;
-      border-radius: 4px;
     }
 
     &__info-row {

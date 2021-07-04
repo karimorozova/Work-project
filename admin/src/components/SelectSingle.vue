@@ -215,7 +215,7 @@
       }
 
       .active {
-        opacity: 0.5;
+        color: $border;
         /*background-color: $light-border;*/
       }
 

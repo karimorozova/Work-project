@@ -1,68 +1,68 @@
 <template lang="pug">
-  .steps-date
-    .steps-date-wrapperTitle
-      .steps-date__header
-        .steps-date__title Step {{ stepCounter }} - {{setSteps[0].steps[stepCounter-1].step.title}}
-
-    .steps-date-wrapper
-      .steps-date__picker
-        .steps-date__input-wrapper
-          .steps-date__label Start date:
-            span.steps-date__label-red *
-          .steps-date__datepicker-wrapper
-            .steps-date__input
-              Datepicker(
-                ref="start"
-                :isReadonly="isReadonly"
-                :value="start"
-                :format="customFormatter"
-                monday-first=true
-                :disabled="disabledStart"
-                :highlighted="highlighted"
-                inputClass="datepicker-custom"
-                inputClass2="datepicker-custom-mod"
-                calendarClass="calendar-custom"
-                @selected="(e) => setDate(e, 'start')"
-                @invalidDate="invalidDateWarn"
-              )
-            img.steps-date__image(src="../../../assets/images/calendar.png" @click="showStartCalendar")
-
-      .steps-date__picker
-        .steps-date__input-wrapper
-          .steps-date__label Deadline:
-            span.steps-date__label-red *
-          .steps-date__datepicker-wrapper
-            .steps-date__input
-              Datepicker(
-                ref="deadline"
-                :isReadonly="isReadonly"
-                :value="deadline"
-                :format="customFormatter"
-                monday-first=true
-                :disabled="disabledDeadline"
-                :highlighted="highlighted"
-                inputClass="datepicker-custom"
-                inputClass2="datepicker-custom-mod"
-                calendarClass="calendar-custom"
-                @selected="(e) => setDate(e, 'deadline')"
-                @invalidDate="invalidDateWarn"
-              )
-            img.steps-date__image(src="../../../assets/images/calendar.png" @click="showDeadlineCalendar")
-
-    .steps-date-wrapper
-      .steps-date__picker
-        .steps-date__input-wrapper
-          .steps-date__label Unit:
-            span.steps-date__label-red *
-          .steps-date__datepicker-wrapper
-            .steps-date__input(v-if="tasksData.stepsAndUnits[stepCounter-1]")
-              .steps-date__drop-menu
-                SelectSingle(
-                  :selectedOption="tasksData.stepsAndUnits[stepCounter-1].unit"
-                  :options="optionUnits"
-                  placeholder="Select"
-                  @chooseOption="setUnit"
+  .content
+    .content__title Step {{ stepCounter }}: {{setSteps[0].steps[stepCounter-1].step.title}}
+    .steps-date
+      .steps-date-wrapper
+        .steps-date__picker
+          .steps-date__input-wrapper
+            .steps-date__label Start date:
+              span.steps-date__label-red *
+            .steps-date__datepicker-wrapper
+              .steps-date__input
+                Datepicker(
+                  ref="start"
+                  :isReadonly="isReadonly"
+                  :value="start"
+                  :format="customFormatter"
+                  monday-first=true
+                  :disabled="disabledStart"
+                  :highlighted="highlighted"
+                  inputClass="datepicker-custom"
+                  inputClass2="datepicker-custom-mod"
+                  calendarClass="calendar-custom"
+                  @selected="(e) => setDate(e, 'start')"
+                  @invalidDate="invalidDateWarn"
                 )
+              .steps-date__image(@click="showStartCalendar")
+                i.far.fa-calendar-alt
+
+        .steps-date__picker
+          .steps-date__input-wrapper
+            .steps-date__label Deadline:
+              span.steps-date__label-red *
+            .steps-date__datepicker-wrapper
+              .steps-date__input
+                Datepicker(
+                  ref="deadline"
+                  :isReadonly="isReadonly"
+                  :value="deadline"
+                  :format="customFormatter"
+                  monday-first=true
+                  :disabled="disabledDeadline"
+                  :highlighted="highlighted"
+                  inputClass="datepicker-custom"
+                  inputClass2="datepicker-custom-mod"
+                  calendarClass="calendar-custom"
+                  @selected="(e) => setDate(e, 'deadline')"
+                  @invalidDate="invalidDateWarn"
+                )
+              .steps-date__image(@click="showDeadlineCalendar")
+                i.far.fa-calendar-alt
+
+      .steps-date-wrapper
+        .steps-date__picker
+          .steps-date__input-wrapper
+            .steps-date__label Unit:
+              span.steps-date__label-red *
+            .steps-date__datepicker-wrapper
+              .steps-date__input(v-if="tasksData.stepsAndUnits[stepCounter-1]")
+                .steps-date__drop-menu
+                  SelectSingle(
+                    :selectedOption="tasksData.stepsAndUnits[stepCounter-1].unit"
+                    :options="optionUnits"
+                    placeholder="Select"
+                    @chooseOption="setUnit"
+                  )
 </template>
 
 <script>
@@ -112,7 +112,7 @@
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
-				isReadonly: false,
+				isReadonly: true,
 				// originallyUnits: null,
 				services: null,
 				currentUnit: '',
@@ -233,14 +233,20 @@
 
 <style lang="scss" scoped>
   @import '../../../assets/scss/colors.scss';
-
+  .content{
+    &__title {
+      font-size: 16px;
+      font-family: 'Myriad600';
+      padding: 30px 10px 10px;
+    }
+  }
   .steps-date {
-    background-color: $active-background;
-    border: 1px solid #938676;
-    margin-top: 40px;
+    background-color: $table-list;
+    border-bottom: 1px solid $border;
+    border-top: 1px solid $border;
     position: relative;
-    border-radius: 4px;
-    padding: 10px 15px 5px;
+    padding: 15px 10px 8px;
+
 
     &__input {
       margin-top: 3px;
@@ -305,6 +311,7 @@
       top: 9px;
       right: 5px;
       width: 18px;
+      font-size: 18px;
       cursor: pointer;
     }
   }

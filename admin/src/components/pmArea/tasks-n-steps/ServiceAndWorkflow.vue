@@ -296,14 +296,16 @@
     position: relative;
 
     &__title {
-      font-size: 18px;
-      margin-bottom: 20px;
+      font-size: 16px;
+      font-family: 'Myriad600';
+      padding: 30px 10px 10px;
     }
 
     &__wrapper {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 0 9px;
     }
 
     &__drop-menu {

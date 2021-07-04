@@ -1,9 +1,8 @@
 <template lang="pug">
   .managment
     .search
-      .search__button
-        span(@click="toggleShowBox")
-          i.fas.fa-filter
+      .search__button(@click="toggleShowBox")
+        i.fas.fa-filter
     .list
       .list__input(v-if="isSearchBox")
         input(type="text" v-model="searchValue" :placeholder="'🔎︎  Search'" ref="search")
@@ -58,36 +57,44 @@
   .search {
     display: flex;
     justify-content: flex-end;
+    position: relative;
 
     &__button {
       background: $border;
       border-radius: 4px;
-      height: 22px;
+      height: 24px;
       width: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: $text;
-      font-size: 13px;
+      color: white;
+      font-size: 12px;
+      position: absolute;
+      top: -28px;
       cursor: pointer;
-      margin-bottom: 4px;
+      transition: .2s ease-out;
     }
   }
 
   .list {
-    width: 220px;
+    width: 200px;
     box-sizing: border-box;
     border: 1px solid $border;
     border-radius: 4px;
-    height: 220px;
+    height: 257px;
     overflow-y: auto;
 
     &__item {
-      font-size: 14px;
       cursor: pointer;
+      padding: 0 7px;
+      height: 31px;
+      border-bottom: 1px solid #ededed;
+      display: flex;
+      align-items: center;
+      transition: .2s cubic-bezier(0.22, 0.61, 0.36, 1);
 
       &:hover {
-        background-color: red;
+        background-color: $list-hover;
       }
 
       user-select: none;
@@ -117,5 +124,9 @@
       color: $text;
       border-bottom: 1px solid $border;
     }
+  }
+
+  i{
+    margin-top: 1px;
   }
 </style>

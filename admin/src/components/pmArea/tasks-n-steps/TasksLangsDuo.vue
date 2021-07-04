@@ -236,17 +236,16 @@
   }
 
   .tasks-langs {
+    padding: 0 10px;
     &__title {
       &-source {
         margin-bottom: 3px;
         position: relative;
-        width: 145px;
       }
 
       &-target {
         margin-bottom: 3px;
         position: relative;
-        width: 160px;
       }
     }
   }

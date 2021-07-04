@@ -1,19 +1,60 @@
 <template lang="pug">
   .hours-steps
     .hours-steps__step
-      .hours-steps__block(v-if="currentJob.unit !== 'Packages' &&  currentJob.unit !== 'CAT Wordcount'")
-        .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
-        .hours-steps__packages
-          .hours-steps__packages-item
-            .hours-steps__packages-title {{currentJob.unit}}:
-              input.hours-steps__input(
-                type="number" min="1" max="1000"
-                :value="currentJob.hours ? currentJob.hours : null"
-                @change="(e) => setHours(e, currentJob.step)"
-              )
-          .hours-steps__packages-item
+
+      .content(v-if="currentJob.unit !== 'Packages' &&  currentJob.unit !== 'CAT Wordcount'")
+        .content__title {{currentJob.step}} Job Setting
+        .hours-steps__block
+          .hours-steps__packages
             .hours-steps__packages-item
-              .hours-steps__sub-title {{ currentJob.step === 'Compliance' ? 'Compliance Template' : 'Size' }}:
+              .hours-steps__packages-title {{currentJob.unit}}:
+                span.hours-steps__label-red *
+                input.hours-steps__input(
+                  type="number" min="1" max="1000"
+                  :value="currentJob.hours ? currentJob.hours : null"
+                  @change="(e) => setHours(e, currentJob.step)"
+                )
+            .hours-steps__packages-item
+              .hours-steps__packages-item
+                .hours-steps__sub-title {{ currentJob.step === 'Compliance' ? 'Compliance Template' : 'Size' }}:
+                  span.hours-steps__label-red *
+                .hours-steps__drop-menu
+                  SelectSingle(
+                    placeholder="Select"
+                    :options="getSizes"
+                    :selectedOption="currentJobSize"
+                    @chooseOption="setSize"
+                  )
+
+      .content(v-if="currentJob.unit === 'CAT Wordcount'")
+        .content__title {{currentJob.step}} Job Setting
+        .hours-steps__block
+          .hours-steps__main(v-if="tasksData.stepsAndUnits")
+            .hours-steps__label Template:
+              span.hours-steps__label-red *
+            .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
+              SelectSingle(
+                :selectedOption="selectedTemplate"
+                :options="allTemplates"
+                placeholder="Template"
+                @chooseOption="setTemplate"
+              )
+
+      .content(v-if="currentJob.unit === 'Packages'")
+        .content__title {{currentJob.step}} Job Setting
+        .hours-steps__block
+          .hours-steps__packages
+            .hours-steps__packages-item
+              .hours-steps__packages-title Quantity:
+                span.hours-steps__label-red *
+                input.hours-steps__input(
+                  type="number" min="1" max="1000"
+                  :value="currentJob.quantity ? currentJob.quantity : null"
+                  @change="(e) => setQuantity(e, currentJob.step)"
+                )
+            .hours-steps__packages-item
+              .hours-steps__sub-title Size:
+                span.hours-steps__label-red *
               .hours-steps__drop-menu
                 SelectSingle(
                   placeholder="Select"
@@ -21,39 +62,6 @@
                   :selectedOption="currentJobSize"
                   @chooseOption="setSize"
                 )
-
-      .hours-steps__block(v-if="currentJob.unit === 'CAT Wordcount'")
-        .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
-        .hours-steps__main(v-if="tasksData.stepsAndUnits")
-          .hours-steps__label Template:
-            span.hours-steps__label-red *
-          .hours-steps__drop-menu(v-if="tasksData.stepsAndUnits[currentJob.stepCounter - 1]")
-            SelectSingle(
-              :selectedOption="selectedTemplate"
-              :options="allTemplates"
-              placeholder="Template"
-              @chooseOption="setTemplate"
-            )
-
-      .hours-steps__block(v-if="currentJob.unit === 'Packages'")
-        .hours-steps__title Step {{currentJob.stepCounter}} - {{currentJob.step}}
-        .hours-steps__packages
-          .hours-steps__packages-item
-            .hours-steps__packages-title Quantity:
-              input.hours-steps__input(
-                type="number" min="1" max="1000"
-                :value="currentJob.quantity ? currentJob.quantity : null"
-                @change="(e) => setQuantity(e, currentJob.step)"
-              )
-          .hours-steps__packages-item
-            .hours-steps__sub-title Size:
-            .hours-steps__drop-menu
-              SelectSingle(
-                placeholder="Select"
-                :options="getSizes"
-                :selectedOption="currentJobSize"
-                @chooseOption="setSize"
-              )
 
 </template>
 
@@ -209,18 +217,23 @@
 
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors.scss";
-
+  .content{
+    &__title {
+      font-size: 16px;
+      font-family: 'Myriad600';
+      padding: 30px 10px 10px;
+    }
+  }
   .hours-steps {
     &__block {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 40px;
-      border: 1px solid #938676;
+      border-bottom: 1px solid $border;
+      border-top: 1px solid $border;
       box-sizing: border-box;
-      background-color: $active-background;
-      border-radius: 4px;
-      padding: 10px 15px 15px;
+      background-color: $table-list;
+      padding: 15px 10px 18px;
     }
 
     &__label {
@@ -240,7 +253,7 @@
       &-item {
         display: flex;
         flex-direction: column;
-        width: 200px;
+        width: 220px;
       }
 
       &-title {

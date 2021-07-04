@@ -1,13 +1,11 @@
 <template lang="pug">
   .buttons
     .buttons__button(@click="moveAll")
-      .text All
       .icon
         i.fas.fa-angle-double-right
     .buttons__button(@click="removeAll")
       .icon
         i.fas.fa-angle-double-left
-      .text All
 </template>
 
 <script>
@@ -35,14 +33,15 @@
 
     &__button {
       display: flex;
-      padding: 8px;
       border-radius: 4px;
-      color: white;
-      gap: 3px;
       align-items: center;
-      font-family: 'Myriad600';
       background-color: $red;
       color: white;
+      font-size: 13px;
+      height: 24px;
+      width: 32px;
+      justify-content: center;
+      transition: .2s ease-out;
 
       &:hover {
         cursor: pointer;

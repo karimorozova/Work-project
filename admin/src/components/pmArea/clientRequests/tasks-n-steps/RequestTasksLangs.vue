@@ -69,6 +69,7 @@
   @import "../../../../assets/scss/colors.scss";
 
   .tasks-langs {
+    padding: 0 10px;
 
     &__title {
       position: relative;

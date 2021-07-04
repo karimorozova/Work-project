@@ -15,7 +15,7 @@
         )
 
       .tasks-data__item
-        .tasks-data__item-title Job Settings
+        .tasks-data__item-title Language Setting
         .tasks-data__langs
           span(v-if="isMonoService")
             RequestTasksLangs(
@@ -343,15 +343,19 @@
   .tasks-data {
     position: relative;
 
+    &__files{
+      padding: 0 10px 20px;
+    }
+
     &__filesOptions {
       margin-top: 20px;
-      border: 2px solid #938676;
-      padding: 20px 15px;
+      border: 2px solid $border;
       border-radius: 4px;
 
       &-title {
-        font-size: 18px;
-        margin-bottom: 20px;
+        font-size: 16px;
+        font-family: Myriad600;
+        padding: 25px 10px 10px;
       }
     }
 
@@ -373,16 +377,16 @@
     }
 
     &__item {
-      padding: 20px 15px;
-      width: 49%;
-      border: 2px solid #938676;
+      width: 470px;
+      border: 2px solid $border;
       border-radius: 4px;
       box-sizing: border-box;
-      border-radius: 4px;
+      padding-bottom: 25px;
 
       &-title {
-        font-size: 18px;
-        margin-bottom: 20px;
+        font-size: 16px;
+        font-family: Myriad600;
+        padding: 25px 9px 10px;
       }
     }
 
