@@ -12,10 +12,7 @@ import { mapActions } from "vuex"
 export default {
   data() {
     return {
-      isDisable: {
-        type: Boolean,
-        default: false
-      }
+      isDisable: false
     }
   },
   methods: {
