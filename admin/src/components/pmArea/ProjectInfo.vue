@@ -19,6 +19,7 @@
       Deliverables(v-if="isStageDelivery")
 
     .project-info__rigthSide
+      ImportProjectToXtrf(v-if="canSendToXtrf")
       ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
       .project-info__action
         ProjectAction(
@@ -34,7 +35,8 @@
 </template>
 
 <script>
-	const ValidationErrors = () => import("../ValidationErrors");
+	import ImportProjectToXtrf from "./ImportProjectToXtrf"
+  const ValidationErrors = () => import("../ValidationErrors");
 	import Project from "./Project";
 	import ProjectAction from "./ProjectAction";
 	import ProjectFinance from "./ProjectFinance";
@@ -222,6 +224,9 @@
 				originallyServices: "getAllServices",
 				originallyUnits: "getAllUnits",
 			}),
+      canSendToXtrf() {
+        return this.currentProject.status === 'Closed' && !this.currentProject.isSendToXtrf && this.currentProject.steps.length && this.currentProject.steps.every(({serviceStep}) => serviceStep.title === 'Compliance')
+      },
 			isStageDelivery(){
         return this.currentProject.tasks.some(({status}) => status === 'Completed' || status === 'Pending Approval [DR1]')
       },
@@ -231,6 +236,7 @@
 			}
 		},
 		components: {
+      ImportProjectToXtrf,
 			ValidationErrors,
 			Project,
 			ProjectAction,

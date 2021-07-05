@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { Projects } = require('../models')
 const { getProject, updateProjectStatus, updateWithApprovedTasks } = require('../projects')
+const { createXtrfProjectWithFinance } = require("../projects/xtrfApi")
 const { emitter } = require('../events')
 const { getProjectManageToken } = require("../middleware")
 const { notifyManagerProjectStarts } = require('../utils')
@@ -178,6 +179,11 @@ router.get('/step-decision', getProjectManageToken, async (req, res) => {
 		console.log(err)
 		res.send(generateTemplateForDefaultMessage('Sorry. Acception failed! Try again later.'))
 	}
+})
+
+router.get('/createXtrfProjectWithFinance/:vendorId', async (req, res) => {
+	const { vendorId } = req.params;
+	res.send(await createXtrfProjectWithFinance(vendorId))
 })
 
 module.exports = router
