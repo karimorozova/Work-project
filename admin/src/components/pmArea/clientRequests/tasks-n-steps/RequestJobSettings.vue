@@ -229,8 +229,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      border-bottom: 1px solid $border;
-      border-top: 1px solid $border;
+      border-bottom: 2px solid $light-border;
+      border-top: 2px solid $light-border;
       box-sizing: border-box;
       background-color: $table-list;
       padding: 15px 10px 18px;

@@ -5,10 +5,10 @@
         img(src="../assets/images/latest-version/navbar-logo.svg")
       .navbar__menu
         Menu(:elements="elements" :path='path')
-
     .content
       Header
       router-view
+
 
 </template>
 
@@ -204,6 +204,9 @@
 								type: 'link',
 								name: 'Cancelled Halfway',
 								path: '/pangea-projects/cancelled-halfway-projects/Cancelled_Halfway'
+							},
+							{
+								type: 'row'
 							},
 							// {
 							// 	type: 'link',
@@ -461,8 +464,12 @@
     bottom: 0;
     width: 270px;
     z-index: 99999;
-    background-color: #333;
     box-sizing: border-box;
+    background: white;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+
+    /*  background: $body;
+        border-right: 1px solid $dark-border;*/
 
     &__menu {
       height: calc(100vh - 140px);
@@ -485,7 +492,8 @@
   }
 
   .content {
-    margin-left: 270px;
     width: 100%;
+    min-width: fit-content;
+    margin-left: 270px;
   }
 </style>

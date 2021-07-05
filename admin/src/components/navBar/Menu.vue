@@ -2,15 +2,20 @@
   .menu
     .elements(v-for="(element, index) in elements" :key="index")
 
-      .title(v-if="isTitle(element)" :style="elementPadding") {{element.name}}
+      .row(v-if="isRow(element)")
+
+      .title(v-if="isTitle(element)")
+        .title__row
+        .title__text {{element.name}}
 
       .element(:style="elementPadding")
 
         .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
+
           span(v-if="element.hasOwnProperty('parent')")
             .group__open(v-if="element.isOpen")
               .group__open-image
-                img(:src="require(`../../assets/images/navbar-icons/testicon.png`)")
+                img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-down
             .group__close(v-if="!element.isOpen")
@@ -18,6 +23,7 @@
                 img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-right
+
           span(v-else)
             .group__open(v-if="element.isOpen")
               div {{element.name}}
@@ -61,7 +67,7 @@
 		},
 		data() {
 			return {
-				elementPadding: { 'padding-left': 18 * this.menuIterator + 'px' }
+				elementPadding: { 'padding-left': 20 * this.menuIterator + 'px' }
 			}
 		},
 		methods: {
@@ -71,6 +77,7 @@
 			isGroup: ({ type }) => type === 'group',
 			isLink: ({ type }) => type === 'link',
 			isTitle: ({ type }) => type === 'title',
+			isRow: ({ type }) => type === 'row',
 
 			toggleGroup(element) {
 				if (element.parent && !element.isOpen) this.closeChild(this.elements)
@@ -116,8 +123,10 @@
 </script>
 
 <style scoped lang="scss">
+  @import "../../assets/scss/colors";
+
   img {
-    margin-right: 5px;
+    margin-right: 3px;
   }
 
   a {
@@ -132,36 +141,58 @@
     align-items: center;
   }
 
+  %row {
+    border-bottom: 1px solid #e2e2e2;
+    margin-top: 10px;
+  }
+
   .menu {
-    color: wheat;
+    color: $text;
+    margin: 10px 0;
+  }
+
+  .row {
+    @extend %row
   }
 
   .title {
-    font-family: 'Myriad300';
-    margin-top: 10px;
-    margin-bottom: 2px;
-    color: lightgrey;
-    letter-spacing: 0.6px;
-    font-size: 11px;
+    &__row {
+      @extend %row
+    }
+
+    &__text {
+      color: $border;
+      font-size: 12px;
+      margin-left: 10px;
+      margin-top: 5px;
+      position: absolute;
+      display: flex;
+      justify-content: flex-end;
+      width: 250px;
+      font-family: 'Myriad300';
+    }
+  }
+
+  .elements {
+    position: relative;
   }
 
   .element {
-    transition: .2s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition: 0.1s cubic-bezier(0.12, 0, 0.39, 0);
   }
 
   .element:hover {
-    background: #222;
+    background: $list-hover;
   }
 
   .group {
     cursor: pointer;
-    /*font-family: 'Myriad600';*/
+    font-family: 'Myriad600';
     font-size: 14px;
 
     &__open {
       @extend %flexBetween;
-      padding: 10px 18px 10px 0;
-      color: white;
+      padding: 10px 12px 10px 0;
 
       &-image {
         display: flex;
@@ -171,7 +202,7 @@
 
     &__close {
       @extend %flexBetween;
-      padding: 10px 18px 10px 0;
+      padding: 10px 12px 10px 0;
 
       &-image {
         display: flex;
@@ -181,17 +212,18 @@
   }
 
   #link {
-    padding: 10px 18px 10px 0;
+    padding: 10px 0px;
     width: -webkit-fill-available;
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
     align-items: center;
+    font-family: 'Myriad600';
   }
 
   #link.router-link-active,
   #link.router-link-exact-active {
-    color: white !important;
+    color: $green !important;
   }
 
   .fa-chevron-right,

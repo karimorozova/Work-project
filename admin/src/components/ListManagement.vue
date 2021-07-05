@@ -10,7 +10,7 @@
           span(@click="clearFilter")
             i.fas.fa-times-circle
 
-      .list__item(v-for="(item, index) in filteredList" @click="moveItem(index)") {{ item }}
+      .list__item(v-for="(item, index) in filteredList" @click="moveItem(item)") {{ item }}
 
 </template>
 
@@ -29,8 +29,9 @@
 			}
 		},
 		methods: {
-			moveItem(index) {
-				this.$emit('moveItem', index)
+			moveItem(item) {
+				const _idx = this.list.findIndex(it => it === item)
+				this.$emit('moveItem', _idx)
 			},
 			toggleShowBox() {
 				this.isSearchBox = !this.isSearchBox
@@ -91,7 +92,7 @@
       border-bottom: 1px solid #ededed;
       display: flex;
       align-items: center;
-      transition: .2s cubic-bezier(0.22, 0.61, 0.36, 1);
+      transition: 0.1s cubic-bezier(0.12, 0, 0.39, 0);
 
       &:hover {
         background-color: $list-hover;
@@ -114,7 +115,7 @@
     }
 
     input {
-      background: $body;
+      background: $table-list;
       box-sizing: border-box;
       width: 100%;
       padding: 0 7px;

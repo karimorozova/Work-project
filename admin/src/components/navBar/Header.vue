@@ -9,14 +9,10 @@
 
         div(v-click-outside="clickOutside")
           .header__user(@click="toggleMenu")
+            .user__name {{ user.firstName || '' }} {{ user.lastName || '' }}
             .user__image
               img(v-if="!user.photo" src='../../assets/images/signin-background.jpg')
               img(v-else :src="user.photo")
-
-            .user__name {{ user.firstName || '' }} {{ user.lastName || '' }}
-            .user__chevron
-              i.fas.fa-chevron-down(v-if="isDropBox")
-              i.fas.fa-chevron-right(v-if="!isDropBox")
 
           .header__dropbox(v-if="isDropBox")
             .dropbox__item(@click="useDropBoxListMethod('My Account')")
@@ -84,15 +80,21 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../assets/scss/colors";
+
   .block {
     width: 100%;
 
     &__header {
       height: 50px;
-      background-color: lightgrey;
       display: flex;
       justify-content: space-between;
       padding: 0 50px;
+      background: $table-list;
+      border-bottom: 2px solid $light-border;
+      /*      border-bottom: 1px solid $dark-border;
+            background: $body;*/
+
 
       &-right {
         display: flex;
@@ -110,7 +112,7 @@
 
   .header {
     &__button {
-      margin-left: 30px;
+      margin-left: 40px;
     }
 
     &__user {
@@ -125,13 +127,11 @@
       position: absolute;
       background: white;
       right: 0;
-      top: 50px;
+      top: 60px;
       width: 200px;
       z-index: 5555;
-      border-bottom-left-radius: 4px;
-      border-bottom-right-radius: 4px;
+      border-radius: 4px;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-
     }
   }
 
@@ -140,7 +140,6 @@
       height: 32px;
       width: 32px;
       border-radius: 32px;
-      margin-right: 7px;
 
       img {
         width: 100%;
@@ -151,22 +150,17 @@
     }
 
     &__name {
-      margin-right: 15px;
+      margin-right: 10px;
       font-family: 'Myriad600';
     }
 
-    &__chevron {
-      font-size: 14px;
-      margin-top: 3px;
-      width: 15px;
-    }
   }
 
   .dropbox {
     &__item {
       display: flex;
       padding: 10px 14px;
-      transition: .2s cubic-bezier(0.22, 0.61, 0.36, 1);
+      transition: 0.1s cubic-bezier(0.12, 0, 0.39, 0);
       align-items: center;
 
       &-icon {
@@ -176,7 +170,7 @@
 
       &:hover {
         cursor: pointer;
-        background: red;
+        background: $list-hover;
       }
     }
   }

@@ -49,20 +49,21 @@
 		props: {
 			//Array of header Info
 			fields: {
-				type: Array
+				type: Array,
+				default: () => []
 			},
 			//Array of data
 			tableData: {
-				type: Array
+				type: Array,
+				default: () => []
 			},
-
 			areErrors: {
 				type: Boolean,
 				default: false
 			},
 			errors: {
 				type: Array,
-				default: false
+				default: () => []
 			},
 			isApproveModal: {
 				type: Boolean,
@@ -70,7 +71,7 @@
 			},
 			isFilterShow: {
 				type: Boolean,
-				default: true
+				default: false
 			}
 		},
 		data() {
@@ -193,7 +194,7 @@
   }
 
   th {
-    border-left: 1px solid $list-hover;
+    border-left: 1px solid red;
     display: grid;
     align-items: center;
 
@@ -206,7 +207,7 @@
     height: 40px;
     overflow-y: auto;
     letter-spacing: -0.1px;
-    border-left: 1px solid $light-border;
+    border-left: 1px solid yellow;
     display: grid;
     align-items: center;
 
@@ -241,7 +242,7 @@
   tbody {
     max-height: 600px;
     display: block;
-    border: 1px solid $list-hover;
+    border: 1px solid blue;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
   }

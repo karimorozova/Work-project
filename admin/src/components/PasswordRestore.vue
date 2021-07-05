@@ -74,6 +74,8 @@
       padding: 40px;
       box-sizing: border-box;
       background-color: $white;
+      border-radius: 4px;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 
     &__data {

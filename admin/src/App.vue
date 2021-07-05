@@ -33,17 +33,31 @@
 <style lang='scss'>
   @import "assets/scss/colors";
 
+  /** {*/
+  /*  scrollbar-width: thin;*/
+  /*}*/
+  /* Works on Chrome, Edge, and Safari */
+  /**::-webkit-scrollbar {*/
+  /*  width: 8px;*/
+  /*}*/
+
+  /**::-webkit-scrollbar-track {*/
+  /*  background: orange;*/
+  /*}*/
+
+  /**::-webkit-scrollbar-thumb {*/
+  /*  background-color: blue;*/
+  /*  border-radius: 20px;*/
+  /*  border: 3px solid orange;*/
+  /*}*/
+
   body {
     font-family: Myriad400;
     color: $text;
     font-size: 14px;
     background: $body;
+    scrollbar-width: thin;
   }
-
-  /*input:disabled,*/
-  /*textarea:disabled {*/
-  /*  background-color: #eee !important;*/
-  /*}*/
 
   input::-webkit-input-placeholder {
     opacity: 0.5;
@@ -82,42 +96,6 @@
     transform: translateX(20px);
     opacity: 0;
   }
-
-  /*::-webkit-scrollbar {*/
-  /*  width: 12px;*/
-  /*  height: 12px;*/
-  /*}*/
-
-  /*::-webkit-scrollbar-track {*/
-  /*  background: rgba(103, 87, 62, 0.1);*/
-  /*}*/
-
-  /*::-webkit-scrollbar-thumb:vertical {*/
-  /*  background-color: rgba(103, 87, 62, 0.3);*/
-  /*  border-left: 2px solid transparent;*/
-  /*  border-right: 2px solid transparent;*/
-  /*  background-clip: content-box;*/
-  /*  border-radius: 4px;*/
-  /*  min-height: 25px;*/
-
-  /*  &:hover {*/
-  /*    background-color: #938676;*/
-  /*    background-clip: content-box;*/
-  /*  }*/
-  /*}*/
-
-  /*::-webkit-scrollbar-thumb:horizontal {*/
-  /*  background-color: rgba(103, 87, 62, 0.3);*/
-  /*  border-top: 2px solid transparent;*/
-  /*  border-bottom: 2px solid transparent;*/
-  /*  background-clip: content-box;*/
-  /*  border-radius: 4px;*/
-
-  /*  &:hover {*/
-  /*    background-color: #938676;*/
-  /*    background-clip: content-box;*/
-  /*  }*/
-  /*}*/
 
   @font-face {
     font-family: 'Myriad300';

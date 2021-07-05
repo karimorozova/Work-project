@@ -183,7 +183,7 @@
       z-index: 10;
 
       &__search {
-        background: $body;
+        background: $table-list;
         box-sizing: border-box;
         width: 100%;
         padding: 0 7px;

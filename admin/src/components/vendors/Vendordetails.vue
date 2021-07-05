@@ -692,7 +692,6 @@
 
   .vendor-wrap {
     position: relative;
-    width: 100%;
     display: flex;
     margin: 50px;
   }

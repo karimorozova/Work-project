@@ -207,8 +207,8 @@
   }
   .steps-date {
     background-color: $table-list;
-    border-bottom: 1px solid $border;
-    border-top: 1px solid $border;
+    border-bottom: 2px solid $light-border;
+    border-top: 2px solid $light-border;
     position: relative;
     padding: 15px 10px 8px;
 
