@@ -24,7 +24,6 @@ const csvToJsonXtrf = () => {
 		const [ val, key ] = Object.values(data)
 		a[key] = val
 	}).on('end', () => {
-		console.log(vendorPriceProfileIdPath)
 		writeFileSync(vendorPriceProfileIdPath, JSON.stringify(a))
 	})
 }
@@ -41,11 +40,10 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 		let vendorPriceProfileId = JSON.parse(await readFileSync(vendorPriceProfileIdPath))
 
 		let vendors = JSON.parse(await readFileSync('./static/xtrf/Vendors.json'))
-		// let vendors = {}
 
 		const allLanguages = await sendRequest('get', 'dictionaries/language/active')
 
-		const { projectId, projectName, customer, steps } = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer')
+		const { projectId, projectName, customer, steps, accountManager } = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer').populate("accountManager")
 		const { stepsInfo, stepsSource, stepsTarget, noFoundVendors } = getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors)
 
 		// const allServices = await sendRequest('get', 'services/all')
@@ -55,7 +53,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 		const allCustomer = await sendRequest('get', 'customers')
 		const customers = findInXtrf(allCustomer, "name", customer.name)
 		if (!customers) {
-			return {isSuccess: false, message: 'Client was not find'}
+			return { isSuccess: false, message: 'Client was not find' }
 		}
 
 		const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
@@ -67,13 +65,14 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 		// IS test true
 		await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: true })
 
-		console.log(xtrfProjectInfo.data.projectId)
+		// Set AM
+		try {
+			if (accountManager.firstName && accountManager.lastName) {
+				await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
+			}
+		}catch (e) {
+		}
 
-		// for(let stepSource of  stepsSource) {
-		// 	await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/sourceLanguage`, {
-		// 		sourceLanguageId: stepSource
-		// 	})
-		// }
 
 		await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/sourceLanguage`, {
 			sourceLanguageId: stepsSource.pop()
@@ -85,12 +84,17 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 
 		await setProjectFinance(xtrfProjectInfo.data.projectId, stepsInfo)
 
-		await Projects.updateOne({ _id: vendorId }, { isSendToXtrf: true })
+		await Projects.updateOne(
+				{ _id: vendorId },
+				{
+					isSendToXtrf: true,
+					xtrfLink: `https://pangea.s.xtrf.eu/xtrf/faces/projectAssistant/projects/project.seam?assistedProjectId=${ xtrfProjectInfo.data.projectId }#/project`
+				}
+		)
 
-		return {isSuccess: true, message: "id: " + xtrfProjectInfo.data.projectId, noFoundVendors }
+		return { isSuccess: true, message: "id: " + xtrfProjectInfo.data.projectId, noFoundVendors }
 	} catch (e) {
-		console.log(e)
-		return {isSuccess: false, message: e.message}
+		return { isSuccess: false, message: e.message }
 	}
 
 }
@@ -112,7 +116,7 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors) {
 		}
 
 		if (stepsInfo.hasOwnProperty(sourceLang + ">>" + targetLang)) {
-			const currentStepInfo =  stepsInfo[sourceLang + ">>" + targetLang]
+			const currentStepInfo = stepsInfo[sourceLang + ">>" + targetLang]
 			currentStepInfo.payables = currentStepInfo.payables + finance.Price.payables
 			currentStepInfo.receivables = currentStepInfo.receivables + finance.Price.receivables
 		} else {
@@ -133,41 +137,41 @@ async function setProjectFinance(xtrfProjectId, stepsInfo) {
 	const xtrfProjectJobs = await sendRequest('get', `v2/projects/${ xtrfProjectId }/jobs`)
 	for (let { id, languages } of xtrfProjectJobs.data) {
 		const { sourceLanguage, targetLanguage, payables, receivables, vendor } = stepsInfo[languages[0].sourceLanguageId + ">>" + languages[0].targetLanguageId]
-			const baseData = {
-				"type": "SIMPLE",
-				"languageCombination": {
-					sourceLanguageId: sourceLanguage,
-					targetLanguageId: targetLanguage
-				},
-				"calculationUnitId": 11,
-				"ignoreMinimumCharge": false,
-				"description": "payable"
-			}
+		const baseData = {
+			"type": "SIMPLE",
+			"languageCombination": {
+				sourceLanguageId: sourceLanguage,
+				targetLanguageId: targetLanguage
+			},
+			"calculationUnitId": 11,
+			"ignoreMinimumCharge": false,
+			"description": "payable"
+		}
 
-			const payablesData = {
-				...baseData,
-				"jobId": id,
-				"rate": payables,
-				"quantity": 1,
-			}
-			const receivablesData = {
-				...baseData,
-				"jobTypeId": 1,
-				"rate": receivables,
-				"quantity": 1
-			}
-			try {
+		const payablesData = {
+			...baseData,
+			"jobId": id,
+			"rate": payables,
+			"quantity": 1
+		}
+		const receivablesData = {
+			...baseData,
+			"jobTypeId": 1,
+			"rate": receivables,
+			"quantity": 1
+		}
+		try {
 
 			if (!!vendor) {
 				await sendRequest('put', `v2/jobs/${ id }/vendor`, { vendorPriceProfileId: vendor })
 			}
 
-				await sendRequest('post', `v2/projects/${ xtrfProjectId }/finance/receivables`, receivablesData)
+			await sendRequest('post', `v2/projects/${ xtrfProjectId }/finance/receivables`, receivablesData)
 
-				await sendRequest('post', `v2/projects/${ xtrfProjectId }/finance/payables`, payablesData)
+			await sendRequest('post', `v2/projects/${ xtrfProjectId }/finance/payables`, payablesData)
 
-			} catch (e) {
-			}
+		} catch (e) {
+		}
 
 
 	}

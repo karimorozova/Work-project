@@ -19,7 +19,7 @@
       Deliverables(v-if="isStageDelivery")
 
     .project-info__rigthSide
-      ImportProjectToXtrf(v-if="canSendToXtrf")
+      ImportProjectToXtrf(v-if="canSendToXtrf" :project="currentProject" @refreshProject="refreshProject")
       ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
       .project-info__action
         ProjectAction(
@@ -225,7 +225,7 @@
 				originallyUnits: "getAllUnits",
 			}),
       canSendToXtrf() {
-        return this.currentProject.status === 'Closed' && !this.currentProject.isSendToXtrf && this.currentProject.steps.length && this.currentProject.steps.every(({serviceStep}) => serviceStep.title === 'Compliance')
+        return this.currentProject.status === 'Closed' && this.currentProject.steps.length && this.currentProject.steps.every(({serviceStep}) => serviceStep.title === 'Compliance')
       },
 			isStageDelivery(){
         return this.currentProject.tasks.some(({status}) => status === 'Completed' || status === 'Pending Approval [DR1]')

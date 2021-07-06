@@ -1,7 +1,11 @@
 <template lang="pug">
   .projectToXtrf
-    Button(value="Import to XTRF" @clicked="sendTo" :isDisabled="isDisable")
-    span If a step has the same language pair, they will be grouped. Accounts payable and receivable will be added.
+    .projectToXtrf__buttons
+      Button(v-if="!project.isSendToXtrf && !project.xtrfLink" value="Send to XTRF" @clicked="sendTo" :isDisabled="isDisable")
+      a(v-else target="_blank" :href="project.xtrfLink")
+        Button(value="Go to project")
+    .projectToXtrf__info
+      span If a step has the same language pair, they will be grouped. Accounts payable and receivable will be added.
 </template>
 
 <script>
@@ -10,6 +14,11 @@ import axios from "axios"
 import { mapActions } from "vuex"
 
 export default {
+  props: {
+    project: {
+      type: Object
+    }
+  },
   data() {
     return {
       isDisable: false
@@ -29,10 +38,11 @@ export default {
               console.log(data)
               const notFoundVendorsMessage = data.noFoundVendors.length ? ", but we can not find some vendors: " + data.noFoundVendors.join(", ") : ''
                   this.alertToggle({
-                message: "Import success" + notFoundVendorsMessage,
+                message: "Send success" + notFoundVendorsMessage,
                 isShow: true,
                 type: "success"
               })
+              this.$emit('refreshProject')
             } else {
               this.alertToggle({
                 message: data.message,
@@ -59,12 +69,18 @@ export default {
   border-radius: 4px;
   margin-bottom: 40px;
 
-  span {
+
+  &__info {
     margin-top: 10px;
     margin-bottom: 2px;
     letter-spacing: .6px;
     font-size: 11px;
     opacity: .5;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
   }
 }
 </style>
