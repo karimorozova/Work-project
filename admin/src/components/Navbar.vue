@@ -149,6 +149,11 @@
 						parent: true,
 						children: [
 							{
+								type: 'link',
+								name: 'All',
+								path: '/pangea-projects/all-projects/All'
+							},
+							{
 								name: 'Quotes',
 								type: 'title'
 							},
@@ -483,7 +488,8 @@
 
     &__logo {
       margin: 0 auto;
-      padding: 15px;
+      padding: 20px 0 10px 0;
+      width: 200px;
 
       img {
         width: 100%;

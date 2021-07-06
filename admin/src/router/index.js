@@ -389,6 +389,18 @@ const router = new Router({
 					component: clearRouterView,
 					children: [
 						{
+							path: 'all-projects/:status',
+							name: 'all-projects',
+							component: Projects,
+							props: true
+						},
+						{
+							path: 'all-projects/:status/details/:id',
+							name: 'all-project-details',
+							component: ProjectInfo,
+							props: true
+						},
+						{
 							path: 'draft-projects/:status',
 							name: 'draft-projects',
 							component: Projects,

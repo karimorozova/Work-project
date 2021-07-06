@@ -56,7 +56,7 @@
 		},
 		methods: {
 			gotToVendorInfo(id) {
-				window.open(`/vendors/candidates/details/${ id }`, '_blank');
+				window.open(`/pangea-vendors/all/details/${ id }`, '_blank');
 			},
 			async sendEmail() {
 				// try {

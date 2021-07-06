@@ -1,5 +1,6 @@
 <template lang="pug">
   .generalTable
+
     .th__modals
       ValidationErrors(
         v-if="areErrors"
@@ -16,28 +17,74 @@
         @notApprove="notApprove"
         @close="closeModal"
       )
-    span(v-if="isFilterShow" @click="showFilters = !showFilters") 'show filter'
+
+    span(
+      v-if="isFilterShow"
+      @click="showFilters = !showFilters"
+    ) 'show filter'
+
     table
       thead
-        tr(:class="{'compensate-scroll': tableData.length >= elementToScroll}")
-          th(v-for="header in fields" :style="header.style")
+        .hideScrollBlock(v-if="tableData.length >= elementToScroll")
+        tr(
+          :class="{'scroll': tableData.length >= elementToScroll}"
+        )
+          th(
+            v-for="header in fields"
+            :style="header.style"
+          )
             .th__header
-              slot(:name="header.headerKey" :field="header")
-              .th__sort-icon(v-if="header.sortInfo && header.sortInfo.isSort")
-                .th__sort-test(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'")
-                  i.fas.fa-caret-down(v-if="header.sortInfo.order === 'asc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'desc'})")
-                  i.fas.fa-caret-up(v-else-if="header.sortInfo.order === 'desc'"  @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
-                i.fas.fa-times-circle(v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"  @click.stop="removeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
+              slot(
+                :name="header.headerKey"
+                :field="header"
+              )
+              .th__sort-icon(
+                v-if="header.sortInfo && header.sortInfo.isSort"
+              )
+                .th__sort-test(
+                  v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"
+                )
+                  i.fas.fa-caret-down(
+                    v-if="header.sortInfo.order === 'asc'"
+                    @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'desc'})"
+                  )
+                  i.fas.fa-caret-up(
+                    v-else-if="header.sortInfo.order === 'desc'"
+                    @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})"
+                  )
+                i.fas.fa-times-circle(
+                  v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"
+                  @click.stop="removeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})"
+                )
                 i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
 
-            .th__filter(v-if="header.filterInfo && header.filterInfo.isFilter && showFilters")
-              input(:ref='header.key' @keyup="(e) => setFilter({filterInfo: header.filterInfo, value: e.target.value, key: header.dataKey, filterField: header.key})")
-              i.fas.fa-times-circle.th__filter-close(v-if="header.filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo: header.filterInfo , filterField: header.key})")
+            .th__filter(
+              v-if="header.filterInfo && header.filterInfo.isFilter && showFilters"
+            )
+              input(
+                :ref='header.key'
+                @keyup="(e) => setFilter({filterInfo: header.filterInfo, value: e.target.value, key: header.dataKey, filterField: header.key})"
+              )
+              i.fas.fa-times-circle.th__filter-close(
+                v-if="header.filterInfo.isFilterSet"
+                @click.stop="removeFilter({ filterInfo: header.filterInfo , filterField: header.key})"
+              )
 
-      tbody(:class="{'scroll': tableData.length >= elementToScroll}" @scroll="handleBodyScroll")
-        tr.data(v-for="(row, index) of tableData")
-          td(v-for="field of fields" :style="field.style")
-            slot(:name="field.key" :row="row" :index="index")
+      tbody(
+        :class="{'scroll': tableData.length >= elementToScroll}"
+        @scroll="handleBodyScroll"
+      )
+        tr.data(
+          v-for="(row, index) of tableData"
+        )
+          td(
+            v-for="field of fields" :style="field.style"
+          )
+            slot(
+              :name="field.key"
+              :row="row"
+              :index="index"
+            )
 
 </template>
 
@@ -47,12 +94,10 @@
 
 	export default {
 		props: {
-			//Array of header Info
 			fields: {
 				type: Array,
 				default: () => []
 			},
-			//Array of data
 			tableData: {
 				type: Array,
 				default: () => []
@@ -174,15 +219,13 @@
     overflow-y: scroll;
   }
 
-  .compensate-scroll {
-    padding-right: 17px;
-  }
 
   table {
     border-collapse: collapse;
     background: white;
     width: 100%;
     position: relative;
+    border: 1px solid $border;
   }
 
   table * {
@@ -190,11 +233,11 @@
   }
 
   table td, table th {
-    padding: 0 6px;
+    padding: 0 7px;
   }
 
   th {
-    border-left: 1px solid red;
+    border-left: 1px solid $border;
     display: grid;
     align-items: center;
 
@@ -207,7 +250,7 @@
     height: 40px;
     overflow-y: auto;
     letter-spacing: -0.1px;
-    border-left: 1px solid yellow;
+    border-left: 1px solid $light-border;
     display: grid;
     align-items: center;
 
@@ -216,39 +259,32 @@
     }
   }
 
-  /*td:last-child {*/
-  /*  margin-bottom: 0px;*/
-  /*}*/
-
   tr {
     display: flex;
   }
 
   table thead {
     height: 40px;
-    //background: #d1ccc4;
-    background: $light-border;
+    position: relative;
+    border-bottom: 1px solid $border;
   }
 
   table tbody tr:last-child {
     border: 0;
   }
 
-
   table thead th {
     font-weight: unset;
+    font-family: 'Myriad600';
   }
 
   tbody {
     max-height: 600px;
     display: block;
-    border: 1px solid blue;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
   }
 
   tbody tr:nth-child(even) {
-    background-color: $list-hover;
+    background-color: $table-list;
   }
 
   tbody tr {
@@ -257,8 +293,17 @@
   }
 
   tbody tr:hover {
-    background-color: $list-hover;
+    background-color: $table-list-hover;
     cursor: default;
+  }
+
+  .hideScrollBlock {
+    height: 40px;
+    width: 20px;
+    background: white;
+    position: absolute;
+    right: 1px;
+    z-index: 55;
   }
 
 </style>

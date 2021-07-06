@@ -84,7 +84,7 @@
 	import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 	export default {
-		mixins: [currencyIconDetected],
+		mixins: [ currencyIconDetected ],
 		props: {},
 		data() {
 			return {
@@ -94,7 +94,7 @@
 				},
 				isFinanceShow: true,
 				paramsIsEdit: false,
-				checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.4)' }
+				checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.5)' }
 			}
 		},
 		methods: {
@@ -192,10 +192,10 @@
 					margin: ((1 - (Price.payables / basePrice)) * 100).toFixed(2)
 				}
 			},
-			isProjectFinished(){
+			isProjectFinished() {
 				const { status } = this.currentProject
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			},
+			}
 		},
 		components: {
 			Discounts
@@ -225,11 +225,12 @@
 
   .minPrice {
     display: flex;
-    padding: 5px 5px 2px 5px;
-    background: #f4f2f1;
-    border: 2px solid #938676;
+    padding: 7px;
+    background: $table-list;
+    border: 1px solid $border;
     flex-direction: column;
     margin-bottom: 20px;
+    border-radius: 4px;
 
     .minPrice-item-check {
       min-height: 30px;
@@ -243,8 +244,8 @@
     }
 
     .minPrice-item {
-      width: 250px;
-      min-height: 30px;
+      width: 240px;
+      min-height: 32px;
       display: flex;
       align-items: center;
 
@@ -253,7 +254,7 @@
       }
 
       &__title {
-        width: 150px;
+        width: 120px;
       }
     }
   }
@@ -267,13 +268,14 @@
     background: white;
     border-radius: 4px;
 
-    &__titleFinance{
+    &__titleFinance {
       font-size: 21px;
       font-family: Myriad600;
     }
-    &__header{
+
+    &__header {
       margin-bottom: 20px;
-      border-bottom: 1px solid #c5bfb5;
+      border-bottom: 1px solid $border;
       width: 100%;
       padding-bottom: 5px;
       display: flex;
@@ -295,7 +297,7 @@
 
     &__total {
       padding-top: 20px;
-      border-top: 1px solid #C5BFB5;
+      border-top: 1px solid $border;
       display: flex;
       font-family: Myriad900;
       margin-top: 10px;
@@ -325,7 +327,7 @@
 
     &__dashboard {
       display: flex;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       border-radius: 4px;
       align-items: center;
       margin-bottom: 20px;
@@ -335,7 +337,7 @@
       width: 33%;
       display: flex;
       justify-content: center;
-      border-left: 1px solid #c1bbb1;
+      border-left: 1px solid $border;
       padding: 6px 3px;
 
       &:first-child {
@@ -420,7 +422,7 @@
         display: inline-block;
         height: 16px;
         width: 16px;
-        border: 1px solid #c1bbb1;
+        border: 1px solid $border;
         left: 0px;
         top: 3px;
         background: white;
@@ -442,11 +444,20 @@
   }
 
   input {
-    color: #66563d;
-    height: 22px;
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    width: 70px;
-    border: 1px solid #c1bbb1;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 80px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   input {

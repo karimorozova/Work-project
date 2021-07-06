@@ -28,6 +28,8 @@
 	}
 </script>
 <style lang="scss" scoped>
+  @import '../../assets/scss/colors';
+
   .candidate {
     width: 300px;
     background: #fff;
@@ -39,7 +41,7 @@
 
     &__title {
       font-size: 21px;
-      border-bottom: 1px solid #c5bfb5;
+      border-bottom: 1px solid $border;
       padding-bottom: 5px;
     }
 

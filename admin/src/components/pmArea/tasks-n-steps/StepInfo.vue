@@ -1,7 +1,7 @@
 <template lang="pug">
   .step-info
     span.step-info__close(@click="closeInfo") +
-    .step-info__block.size Step ID - {{ step.stepId }}
+    .step-info__block.size Step Id: {{ step.stepId }}
     .step-info__block
       Vendor(
         :index="index"
@@ -124,11 +124,12 @@
 			Files
 		}
 	}
+	1
 </script>
 
 <style lang="scss" scoped>
   .step-info {
-    padding: 20px;
+    padding: 21px;
     position: relative;
 
     &__block {
@@ -147,6 +148,7 @@
   }
 
   .size {
-    font-size: 20px;
+    font-size: 21px;
+    font-family: 'Myriad600';
   }
 </style>

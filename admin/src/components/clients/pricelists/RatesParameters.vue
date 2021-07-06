@@ -2,12 +2,17 @@
   .ratesParams
     .pricelist-infoBlock
       .rates
+
         .rates-item
           .rates-item__title Pricelist:
           .rates-item__input(v-if="currentClient.defaultPricelist") {{currentClient.defaultPricelist.name}}
+            .link(@click="goToPricelist(currentClient.defaultPricelist)")
+              i.fas.fa-external-link-alt
+
         .rates-item
           .rates-item__title Currency:
           .rates-item__input {{currentClient.currency}}
+
         .rates-item
           .rates-item__title Min Price:
           .rates-item__input
@@ -15,6 +20,7 @@
               input(v-if="isEdit" type="number" ref="minPrice" :value="currentClient.minPrice" @change="updateMinPrice")
               span(v-else) {{ currentClient.minPrice }}
               span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
+
         //.rates-item
           .rates-item__title Ignore Min Price:
           .rates-item__input
@@ -46,11 +52,14 @@
 					edit: { icon: require("../../../assets/images/Other/edit-icon-qa.png") },
 					cancel: { icon: require("../../../assets/images/cancel-icon.png") }
 				},
-				ignoreMinPrice: false,
+				ignoreMinPrice: false
 			}
 		},
 		methods: {
 			...mapActions([ 'setUpClientProp', 'alertToggle' ]),
+			goToPricelist({ _id }) {
+				window.open(`/pangea-settings/pricelists/${ _id }`, '_blank')
+			},
 			async updateMinPrice() {
 				try {
 					await this.$http.put('/clientsapi/set-min-price', {
@@ -104,6 +113,12 @@
 	}
 </script>
 <style lang="scss" scoped>
+  @import '../../../assets/scss/colors';
+
+  .link {
+    cursor: pointer;
+  }
+
   .ratesParams {
     display: flex;
     justify-content: space-between;
@@ -129,25 +144,31 @@
   }
 
   .opacity {
-    opacity: .4;
+    opacity: .5;
     cursor: default;
   }
 
   .rates {
     display: flex;
     padding: 10px;
-    background: #f4f2f1;
-    border: 2px solid #938676;
+    background: $table-list;
+    border: 1px solid $border;
     flex-direction: column;
+    border-radius: 4px;
 
     .rates-item {
-      width: 231px;
-      min-height: 30px;
+      min-height: 32px;
       display: flex;
       align-items: center;
 
       &__title {
-        width: 90px;
+        width: 100px;
+      }
+
+      &__input {
+        width: 120px;
+        display: flex;
+        justify-content: space-between;
       }
     }
   }
@@ -215,11 +236,20 @@
 
 
   input {
-    color: #66563d;
-    height: 22px;
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    width: 70px;
-    border: 1px solid #c1bbb1;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 80px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   input {

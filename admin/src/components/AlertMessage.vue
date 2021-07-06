@@ -1,10 +1,11 @@
 <template lang="pug">
   .alert-message
-    .alet-message__icon(v-if="type === 'error'")
-      i.icon.fa.fa-exclamation(aria-hidden='true')
-    .alet-message__icon(v-else)
+    .alert-message__success(v-if="type !== 'error'")
       i.icon.fa.fa-check(aria-hidden='true')
-    .alert-message__text(:class="[type === 'error' ? 'alert-message_error' : 'alert-message_success']") {{ text }}
+      .alert-message__text {{ text }}
+    .alert-message__error(v-else)
+      i.icon.fa.fa-exclamation(aria-hidden='true')
+      .alert-message__text {{ text }}
 </template>
 
 <script>
@@ -21,41 +22,37 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../assets/scss/colors.scss';
+  @import '../assets/scss/colors';
+
+  %messageBox {
+    border-radius: 4px;
+    padding: 15px 25px;
+    display: flex;
+  }
 
   .alert-message {
-    display: flex;
-    align-items: center;
     position: fixed;
-    z-index: 100;
-    right: 20px;
-    top: 80px;
-    max-width: 250px;
-    padding: 30px 40px;
+    z-index: 70000;
+    right: 50px;
+    top: 70px;
+    background: white;
+    border-radius: 4px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-    background-color: $white;
+    min-width: 160px;
 
-    &_error {
-      position: relative;
-      color: $orange;
-    }
-
-    &_success {
-      position: relative;
+    &__success {
       color: $green-approve;
+      @extend %messageBox;
     }
-  }
 
-  .fa-exclamation {
-    color: $orange;
-  }
-
-  .fa-check {
-    color: $green-approve;
+    &__error {
+      color: $red;
+      @extend %messageBox;
+    }
   }
 
   .icon {
-    font-size: 18px;
+    font-size: 15px;
     margin-right: 10px;
   }
 </style>

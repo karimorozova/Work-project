@@ -398,6 +398,7 @@ export default {
   width: 400px;
   background: white;
   border-radius: 4px;
+  background: white;
 
   &__row {
     width: 100%;
@@ -418,7 +419,7 @@ export default {
 
   &__project {
     margin-bottom: 20px;
-    border-bottom: 1px solid #c5bfb5;
+    border-bottom: 1px solid $border;
     width: 100%;
     padding-bottom: 5px;
     display: flex;

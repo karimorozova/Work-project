@@ -56,8 +56,10 @@
   @import "../../../../assets/scss/colors";
 
   .step-finance {
-    box-shadow: 0 0 5px $brown-shadow;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     padding: 20px;
+    border-radius: 4px;
+
 
     &__main {
       display: flex;

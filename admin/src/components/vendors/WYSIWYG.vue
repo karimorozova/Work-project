@@ -48,7 +48,7 @@
 						this.message,
 				editorConfig: {
 					allowedContent: true,
-					uiColor: "#F2EFEB",
+					uiColor: "#f7f7f7",
 					height: 350,
 				}
 			};

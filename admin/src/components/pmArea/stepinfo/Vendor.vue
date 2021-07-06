@@ -1,8 +1,8 @@
 <template lang="pug">
   .step-vendor
-    .step-vendor__title Vendor:
-    .step-vendor__info
-      .step-vendor__drop-menu(v-if="isVendorSelect")
+    .step-vendor__vendor
+      .step-vendor__title Vendor:
+      .step-vendor__drop(v-if="isVendorSelect")
         PersonSelect(
           :selectedPerson="currentVendorName(vendor)"
           :persons="extendedVendors(index)"
@@ -13,27 +13,32 @@
           @scrollDrop="personSelectDrop(step)"
           @removeVendorFromStep="removeVendorFromStep"
         )
+      .step-vendor__current-vendor(v-else)
+        input(type="text" :value="currentVendorName(vendor)" :disabled="true")
 
-      .step-vendor__current-vendor(v-else) {{ currentVendorName(vendor) }}
-        span.step-vendor__no-vendor(v-if="!vendor") No Vendor
-      .step-vendor__contacts
-        .step-vendor__icon(@click="gotToVendorInfo")
+    .step-vendor__links(v-if="!!vendor")
+      .link
+        .link__title Go to current vendor page:
+        .link__icon(@click="gotToVendorInfo")
           i.fas.fa-external-link-alt
-        .step-vendor__icon(@click="sendEmail")
-          i.fa.fa-envelope
-        //.step-vendor__icon
-        //  i.fab.fa-slack-hash
-        .step-vendor__icon(@click="goToVendor")
+      .link
+        .link__title Enter to vendor.portal like vendor:
+        .link__icon(@click="goToVendor")
           i.fas.fa-sign-in-alt
-    .step-vendor__options(v-if="isVendorSelect")
-      .step-vendor__check
-        CustomRadio(:isChecked="isAfterRejectCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterRejectCheck')")
-        .step-vendor__text Send next vendor after rejection
-      .step-vendor__check
-        CustomRadio(:isChecked="isAfterTimeCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterTimeCheck')")
-        .step-vendor__text Send next vendor after
-        .step-vendor__time(:class="{'step-vendor_gap': isTimeDouble}")
-          input.step-vendor__time-select(type="number" v-model="nextSendTime" min="1" max="24")
+      //.link
+      //  .link__title Send email message to vendor:
+      //  .link__icon(@click="sendEmail")
+      //    i.fa.fa-envelope
+
+    //.step-vendor__options(v-if="isVendorSelect")
+      //.step-vendor__check
+        //CustomRadio(:isChecked="isAfterRejectCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterRejectCheck')")
+        //.step-vendor__text Send next vendor after rejection
+      //.step-vendor__check
+        //CustomRadio(:isChecked="isAfterTimeCheck" @toggleRadio="(e) => toggleRadio(e,'isAfterTimeCheck')")
+        //.step-vendor__text Send next vendor after
+        //.step-vendor__time(:class="{'step-vendor_gap': isTimeDouble}")
+          //input.step-vendor__time-select(type="number" v-model="nextSendTime" min="1" max="24")
 </template>
 
 <script>
@@ -44,10 +49,10 @@
 	import stepVendor from "@/mixins/stepVendor"
 
 	export default {
-		mixins: [stepVendor],
+		mixins: [ stepVendor ],
 		props: {
 			vendor: {
-				type: [Object, String]
+				type: [ Object, String ]
 			},
 			step: {
 				type: Object
@@ -75,7 +80,7 @@
 						projectId: this.currentProject._id,
 						stepId: this.currentStepIdForRemoveVendor
 					})
-					this.setCurrentProject(project.data);
+					this.setCurrentProject(project.data)
 					this.alertToggle({ message: "Vendor removed from Step.", isShow: true, type: 'success' })
 				} catch (err) {
 					this.alertToggle({ message: "Error can't remove Vendor from Step", isShow: true, type: 'success' })
@@ -103,24 +108,24 @@
 				this.isAllShow = isAll
 			},
 			async sendEmail() {
-				try {
-					if (!this.step.vendor) return
-					await this.$http.post("/vendorsapi/step-email", { projectId: this.currentProject._id, step: this.step })
-					this.alertToggle({ message: "Email has been sent", isShow: true, type: "success" })
-				} catch (err) {
-					this.alertToggle({ message: "Internal server error / Cannot send email to vendor", isShow: true, type: "error" })
-				}
+				// try {
+				// 	if (!this.step.vendor) return
+				// 	await this.$http.post("/vendorsapi/step-email", { projectId: this.currentProject._id, step: this.step })
+				// 	this.alertToggle({ message: "Email has been sent", isShow: true, type: "success" })
+				// } catch (err) {
+				// 	this.alertToggle({ message: "Internal server error / Cannot send email to vendor", isShow: true, type: "error" })
+				// }
 			},
 			gotToVendorInfo() {
-				window.open(`/vendors/candidates/details/${ this.vendor._id }`, '_blank')
+				window.open(`/pangea-vendors/all/details/${ this.vendor._id }`, '_blank')
 			},
-      async goToVendor() {
-        const { data } = await this.$http.post("/service-login/vendor", {vendorId: this.vendor._id})
-        const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
-        const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
-        document.cookie = `vendor=${data}; path=/; domain=${domain}`
-        window.open(redirectTo, '_blank')
-      },
+			async goToVendor() {
+				const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendor._id })
+				const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
+				const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
+				document.cookie = `vendor=${ data }; path=/; domain=${ domain }`
+				window.open(redirectTo, '_blank')
+			},
 			...mapActions({
 				alertToggle: "alertToggle",
 				setStepVendor: "setStepVendor",
@@ -137,7 +142,7 @@
 				return this.nextSendTime.length === 2
 			},
 			isVendorSelect() {
-				const statuses = ['Started', 'Cancelled', 'Cancelled Halfway', 'Completed']
+				const statuses = [ 'Started', 'Cancelled', 'Cancelled Halfway', 'Completed' ]
 				return statuses.indexOf(this.step.status) === -1
 			}
 		},
@@ -152,103 +157,67 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
-  .step-vendor {
-    box-shadow: 0 0 5px $brown-shadow;
-    padding: 20px;
+  .link {
+    display: flex;
+    height: 32px;
+    align-items: center;
 
     &__title {
-      margin-bottom: 15px;
-      font-size: 18px;
+      width: 220px;
     }
 
-    &__info {
+    &__icon {
+      cursor: pointer;
+    }
+  }
+
+  .step-vendor {
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    padding: 20px;
+    border-radius: 4px;
+
+    &__links {
+      margin: 20px 0;
+      border-left: 3px solid $border;
+      padding: 0 10px;
+    }
+
+    &__vendor {
       display: flex;
-      align-items: flex-end;
-      margin-bottom: 40px;
+      height: 32px;
+      align-items: center;
+      gap: 15px;
     }
 
-    &__drop-menu {
+    &__drop {
       position: relative;
       width: 220px;
       height: 32px;
     }
 
-    &__no-vendor {
-      opacity: 0.7;
+    &__title {
+      font-size: 18px;
     }
 
-    &__contacts {
-      max-height: 28px;
-      display: flex;
-    }
-
-    &__icon {
-      margin-left: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 28px;
-
-      i {
-        font-size: 18px;
-        cursor: pointer;
-      }
-
-      .fa-slack {
-        border: 1px solid $light-brown;
-        border-radius: 4px;
-      }
-    }
-
-    &__options {
-      display: flex;
-      width: 80%;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    &__check {
-      display: flex;
-      align-items: center;
-      width: 50%;
-    }
-
-    &__text {
-      margin-left: 10px;
-      display: flex;
-    }
-
-    &__time {
-      position: relative;
-
-      &:after {
-        content: "h";
-        position: absolute;
-        top: 3px;
-        left: 27px;
-      }
-    }
-
-    &_gap {
-      &:after {
-        left: 34px
-      }
-    }
-
-    &__time-select {
-      margin-left: 10px;
+    input {
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
       border-radius: 4px;
-      border: 1px solid $light-brown;
-      overflow: hidden;
-      color: $main-color;
+      box-sizing: border-box;
+      padding: 0 7px;
       outline: none;
-      padding-left: 5px;
-      padding-top: 2px;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
 
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        opacity: 1;
+      &:focus {
+        border: 1px solid $border-focus;
       }
+    }
+
+    i {
+      font-size: 16px;
     }
   }
 </style>

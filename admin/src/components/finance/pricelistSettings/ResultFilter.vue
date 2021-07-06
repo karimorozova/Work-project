@@ -95,7 +95,7 @@
 
     &__drop-menu {
       position: relative;
-      width: 220px;
+      width: 200px;
       height: 32px;
       margin-right: 20px;
     }

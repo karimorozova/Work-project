@@ -240,7 +240,7 @@
   .minPrice {
     display: flex;
     padding: 16px 30px;
-    background: #F2EFEB;
+    background: #f7f7f7;
     border: 2px solid #938676;
     flex-direction: column;
     margin-right: 40px;
@@ -261,7 +261,7 @@
     box-sizing: border-box;
     min-width: 1000px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-    margin: 40px;
+    margin-top: 40px;
 
     &_reverse {
       transform: rotate(180deg);

@@ -120,16 +120,15 @@
 
   .select {
     width: 100%;
-    height: 31px;
+    height: 30px;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
 
     .selected {
       width: 80%;
-      padding: 0 5px;
+      padding: 0 7px;
       font-size: 14px;
-      max-height: 30px;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
@@ -144,7 +143,7 @@
     .steps__vendor-menu & {
       border: none;
       border-radius: 0;
-      height: 31px;
+      height: 32px;
     }
 
     .no-select {
@@ -156,7 +155,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      border-left: 1px solid $brown-border;
+      border-left: 1px solid $light-border;
       cursor: pointer;
 
       img {
@@ -169,7 +168,7 @@
 
       .steps__vendor-menu & {
         padding-top: 3px;
-        border-left: 1px solid $light-brown;
+        border-left: 1px solid $light-border;
       }
     }
   }
@@ -181,59 +180,47 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid $border;
+
 
     .drop {
-      font-size: 14px;
-      width: 100%;
-      border: 1px solid #938676;
-      max-height: 186px;
+      max-height: 320px;
       overflow-y: auto;
       overflow-x: hidden;
-      flex-direction: column;
-      background-color: $white;
+      background-color: #FFF;
+      border-top: 1px solid $border;
       box-sizing: border-box;
       z-index: 10;
 
       &__item {
-        align-items: center;
-        padding: 5px;
-        border-bottom: 1px solid #938676;
+        padding: 0 7px;
+        height: 31px;
+        border-bottom: 1px solid $light-border;
         cursor: pointer;
         font-size: 14px;
-        transition: ease 0.3s;
+        transition: .1s ease-out;
+        display: flex;
+        align-items: center;
+        color: $text;
 
         &:last-child {
           border: none;
         }
 
         &:hover {
-          background-color: $active-background;
+          background-color: $list-hover;
         }
       }
 
       .chosen {
-        background-color: $active-background;
-      }
-
-      .project-details__drop-menu &, .step-vendor & {
-        border: none;
-        border-top: 1px solid $brown-border;
+        color: $border;
       }
 
       &__last-item {
         font-style: italic;
       }
     }
-
-    .project-details__drop-menu &, .step-vendor & {
-      border: 1px solid $brown-border;
-      border-radius: 4px;
-    }
-  }
-
-  .bordered {
-    border: 1px solid $brown-border;
-    border-radius: 4px;
   }
 
   .arrow-20 {

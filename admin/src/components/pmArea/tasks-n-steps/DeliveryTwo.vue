@@ -484,7 +484,7 @@
 
   .dr1Comment {
     &__title {
-      border-bottom: 1px solid #c5bfb5;
+      border-bottom: 1px solid $border;
       font-family: Myriad600;
       width: 80%;
       margin-bottom: 12px;
@@ -520,9 +520,10 @@
     background-color: $white;
     position: relative;
     width: 1000px;
+    border-radius: 4px;
 
     &__checkSubTitle {
-      border-bottom: 1px solid #c5bfb5;
+      border-bottom: 1px solid $border;
       font-family: Myriad600;
       width: 80%;
       margin-bottom: 12px;
@@ -585,7 +586,7 @@
       display: flex;
       padding: 6px 0;
       &:nth-child(even){
-        background-color: #f4f2f1;
+        background-color: $table-list;
       }
     }
 
@@ -703,17 +704,15 @@
       bottom: 45px;
       width: 140px;
       height: 30px;
-      border-radius: 7px;
+      border-radius: 4px;
       font-size: 14px;
       background-color: #fff;
-      color: #938676;
       outline: none;
-      border: none;
-      transition: 0.2s ease-out;
+      transition: .2s ease-out;
       text-align: center;
       line-height: 30px;
-      letter-spacing: 0.2px;
-      border: 2px solid #938676;
+      letter-spacing: .2px;
+      border: 1px solid $border;
 
       &:active {
         transform: scale(.98);
@@ -721,7 +720,7 @@
 
       &:hover {
         cursor: pointer;
-        background: #f2efeb;
+        border: 1px solid $border-focus;
       }
     }
     &__button-email {
@@ -748,7 +747,7 @@
 
       &:hover {
         cursor: pointer;
-        background: #f2efeb;
+        background: #f7f7f7;
       }
     }
   }

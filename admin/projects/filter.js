@@ -9,10 +9,11 @@ function getFilterdProjectsQuery(filters) {
 	// } else if(filters.projectType === 'Closed') {
 	// 	status = !filters.statusFilter || filters.statusFilter === 'All' ? "Closed" : filters.statusFilter;
 	// }
-
 	let query = {};
 
-	query["status"] = filters.statusFilter
+	if(filters.statusFilter !== 'All'){
+		query["status"] = filters.statusFilter
+	}
 
 	if(filters.lastDate) {
 		query.startDate = { $lt: new Date(filters.lastDate) };

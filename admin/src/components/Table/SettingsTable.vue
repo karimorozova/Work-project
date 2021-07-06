@@ -110,7 +110,7 @@
 
       .table__thead-row {
         background-color: $thead-background;
-        color: $white;
+        color: white;
       }
     }
 
@@ -163,6 +163,8 @@
     }
 
     &__tbody-row{
+      background-color: white;
+
       &:nth-of-type(odd) {
         .table__tbody-cell {
           background-color: $table-row-zebra-background;

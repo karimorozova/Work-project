@@ -372,6 +372,8 @@
     margin-bottom: 40px;
     min-width: 390px;
     width: 390px;
+    background: white;
+    border-radius: 4px;
 
     &__row {
       width: 100%;

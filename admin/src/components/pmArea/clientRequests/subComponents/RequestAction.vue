@@ -119,6 +119,8 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    border-radius: 4px;
+    background: white;
 
     &__dropBody{
       position: relative;
@@ -146,9 +148,9 @@
       width: 200px;
       margin-top: 5px;
       border-radius: 4px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       padding: 5px;
-      color: #68573e;
+      color: $text;
       resize: none;
       outline: none;
       box-sizing: border-box;
@@ -158,7 +160,7 @@
     &__title {
       font-size: 21px;
       font-family: Myriad600;
-      border-bottom: 1px solid #C5BFB5;
+      border-bottom: 1px solid $border;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;

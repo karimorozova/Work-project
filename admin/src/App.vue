@@ -7,7 +7,7 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex"
+	import { mapGetters } from "vuex"
 	import Loading from "./components/Loading"
 	import AlertMessage from "./components/AlertMessage"
 
@@ -85,11 +85,11 @@
   }
 
   .slide-fade-enter-active {
-    transition: all .5s ease;
+    transition: all .3s ease;
   }
 
   .slide-fade-leave-active {
-    transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
   }
 
   .slide-fade-enter, .slide-fade-leave-to {

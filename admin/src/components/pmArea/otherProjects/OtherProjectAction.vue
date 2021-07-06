@@ -87,6 +87,8 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    border-radius: 4px;
+    background: white;
 
     .drops {
       width: 100%;

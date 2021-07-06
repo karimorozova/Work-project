@@ -34,14 +34,14 @@
 			user: { type: Object },
 			dr1Manager: { type: Object },
 			dr2Manager: { type: Object },
-      deliveryTask: { type: Object },
+			deliveryTask: { type: Object }
 		},
 		data() {
 			return {
 				managers: [],
 				fields: [
 					{ label: "Delivery Review 1", headerKey: "headerDr1", key: "dr1", width: "50%", padding: 0 },
-					{ label: "Delivery Review 2", headerKey: "headerDr2", key: "dr2", width: "50%", padding: 0 },
+					{ label: "Delivery Review 2", headerKey: "headerDr2", key: "dr2", width: "50%", padding: 0 }
 				]
 			}
 		},
@@ -65,13 +65,13 @@
 			isAdmin() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
 			},
-      canUpdateDr1() {
-        return this.isAdmin || this.user._id.toString() === this.dr1Manager._id.toString()
-      },
-      canUpdateDr1Manager() {
-        if (this.isAdmin) return true
-        return !this.deliveryTask.instructions.some(({isChecked, isNotRelevant}) => isChecked || isNotRelevant ) && this.user._id.toString() === this.dr1Manager._id.toString()
-      },
+			canUpdateDr1() {
+				return this.isAdmin || this.user._id.toString() === this.dr1Manager._id.toString()
+			},
+			canUpdateDr1Manager() {
+				if (this.isAdmin) return true
+				return !this.deliveryTask.instructions.some(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant) && this.user._id.toString() === this.dr1Manager._id.toString()
+			}
 		},
 		components: {
 			SelectSingle,
@@ -79,27 +79,31 @@
 		},
 		created() {
 			this.getManagers()
-		},
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
-  .dropsManagers{
+  .dropsManagers {
     margin-bottom: 20px;
-    background: #f2efeb;
-    border: 2px solid #938676;
+    background: $table-list;
+    border: 1px solid $border;
     padding: 20px;
-    &__body{
+    border-radius: 4px;
+
+    &__body {
       display: flex;
       justify-content: space-around;
-      &-item{
+
+      &-item {
         display: flex;
         height: 30px;
         align-items: center;
       }
-      &-title{
+
+      &-title {
         margin-right: 15px;
       }
     }

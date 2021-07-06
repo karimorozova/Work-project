@@ -35,7 +35,7 @@ export default {
 
   &__title {
     font-size: 21px;
-    border-bottom: 1px solid #c5bfb5;
+    border-bottom: 1px solid $border;
     padding-bottom: 5px;
   }
 

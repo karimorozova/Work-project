@@ -1,6 +1,6 @@
 <template lang="pug">
   .radio__wrapper
-    .radio__buttom(@click.stop="toggle")
+    .radio__button(@click.stop="toggle")
       .radio__inside-circle(:class="{'radio_checked': isSelected}")
     .radio__text(@click.stop="toggle") {{ name }}
 </template>
@@ -44,7 +44,7 @@
       align-items: center;
     }
 
-    &__buttom {
+    &__button {
       width: 16px;
       height: 16px;
       border-radius: 50%;
@@ -53,6 +53,7 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      background-color: white;
     }
 
     &__inside-circle {
@@ -62,7 +63,7 @@
     }
 
     &_checked {
-      background-color: $red;
+      background-color: $dark-border;
     }
   }
 

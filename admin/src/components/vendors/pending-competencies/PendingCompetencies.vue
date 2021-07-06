@@ -118,16 +118,16 @@
 				alertToggle: "alertToggle",
 				storeCurrentVendor: "storeCurrentVendor"
 			}),
-			async deletePC(pendingCompetence){
-				try{
+			async deletePC(pendingCompetence) {
+				try {
 					const result = await this.$http.post('/vendorsapi/delete-pending-competence', {
 						vendorId: this.$route.params.id,
-						pendingCompetence,
+						pendingCompetence
 					})
 					await this.storeCurrentVendor(result.data)
-				}catch (e) {
+				} catch (e) {
 					this.alertToggle({ message: "Error on deleting pending competence", isShow: true, type: "error" })
-				}finally {
+				} finally {
 					this.closeForm()
 				}
 			},
@@ -163,7 +163,7 @@
 					const result = await this.$http.post('/vendorsapi/reject-pending-competence', {
 						vendorId: this.$route.params.id,
 						pendingCompetence: this.pendingCompetenceForReject,
-						template,
+						template
 					})
 					await this.storeCurrentVendor(result.data)
 					this.alertToggle({ message: "Pending Competence Rejected", isShow: true, type: "success" })

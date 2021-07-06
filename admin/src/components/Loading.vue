@@ -10,6 +10,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../assets/scss/colors';
+
   .loading {
     position: absolute;
     top: 0;
@@ -28,28 +30,28 @@
       top: 0;
       left: 50%;
       margin-left: -125px;
-      padding: 30px 0;
+      padding: 20px 0;
       width: 250px;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #FFF;
+      background-color: white;
       box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
     }
 
     &__text {
-      color: #68573E;
+      color: $text;
       font-size: 16px;
       margin-right: 20px;
     }
 
     &__spinner {
-      border: 7px solid #e0dcd8;
-      border-top: 7px solid #68573E;
+      border: 6px solid $light-border;
+      border-top: 6px solid $dark-border;
       border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      animation: spin 1.2s linear infinite;
+      width: 15px;
+      height: 15px;
+      animation: spin 1s linear infinite;
     }
   }
 

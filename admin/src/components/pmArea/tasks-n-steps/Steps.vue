@@ -56,7 +56,7 @@
             CheckBox(:isChecked="row.check" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
         template(slot="info" slot-scope="{row, index}")
           .steps__info-icon(@click="showStepDetails(index)")
-            i.fas.fa-info-circle
+            img(src="../../../assets/images/latest-version/view-details.png")
         template(slot="name" slot-scope="{ row }")
           span.steps__step-data.steps_no-padding {{ row.name }}
         template(slot="language" slot-scope="{ row }")
@@ -83,30 +83,30 @@
 
         template(slot="start" slot-scope="{ row, index }")
           .steps__step-date
-             Datepicker(
-               @selected="(e) => changeDate(e, 'start', index)"
-               v-model="row.start"
-               inputClass="steps__custom-input"
-               calendarClass="steps__calendar-custom"
-               :format="customFormatter"
-               monday-first=true
-               :disabledPicker="isDatePickDisabled"
-               :highlighted="highlighted"
-               @scrollDrop="scrollDrop")
+            Datepicker(
+              @selected="(e) => changeDate(e, 'start', index)"
+              v-model="row.start"
+              inputClass="steps__custom-input"
+              calendarClass="steps__calendar-custom"
+              :format="customFormatter"
+              monday-first=true
+              :disabledPicker="isDatePickDisabled"
+              :highlighted="highlighted"
+              @scrollDrop="scrollDrop")
 
         template(slot="deadline" slot-scope="{ row, index }")
           .steps__step-date
-             Datepicker(
-               @selected="(e) => changeDate(e, 'deadline', index)"
-               v-model="row.deadline"
-               inputClass="steps__custom-input"
-               calendarClass="steps__calendar-custom"
-               :format="customFormatter"
-               monday-first=true
-               :disabled="disabled"
-               :disabledPicker="isDatePickDisabled"
-               :highlighted="highlighted"
-               @scrollDrop="scrollDrop")
+            Datepicker(
+              @selected="(e) => changeDate(e, 'deadline', index)"
+              v-model="row.deadline"
+              inputClass="steps__custom-input"
+              calendarClass="steps__calendar-custom"
+              :format="customFormatter"
+              monday-first=true
+              :disabled="disabled"
+              :disabledPicker="isDatePickDisabled"
+              :highlighted="highlighted"
+              @scrollDrop="scrollDrop")
 
         template(slot="progress" slot-scope="{ row, index }")
           .steps__step-progress
@@ -182,7 +182,7 @@
 	import SelectSingle from "../../SelectSingle"
 
 	const ValidationErrors = () => import("../../ValidationErrors")
-  import Datepicker from "../../DatepickerWithTime"
+	import Datepicker from "../../DatepickerWithTime"
 	import moment from "moment"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import stepVendor from "@/mixins/stepVendor"
@@ -192,7 +192,7 @@
 	import ProgressLineStep from "../../ProgressLineStep"
 
 	export default {
-		mixins: [scrollDrop, stepVendor, currencyIconDetected],
+		mixins: [ scrollDrop, stepVendor, currencyIconDetected ],
 		props: {
 			allSteps: {
 				type: Array
@@ -210,28 +210,28 @@
 		data() {
 			return {
 				highlighted: {
-					days: [6, 0]
+					days: [ 6, 0 ]
 				},
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
-				tabs: ['Tasks', 'Steps'],
+				tabs: [ 'Tasks', 'Steps' ],
 				fields: [
 					{ label: "Check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0 },
-					{ label: "", headerKey: "headerInfo", key: "info", width: "3%", padding: 0, style: {'border-left': 0} },
+					{ label: "", headerKey: "headerInfo", key: "info", width: "3%", padding: 0, style: { 'border-left': 0 } },
 					{ label: "Step", headerKey: "headerName", key: "name", width: "10%", padding: 0 },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0  },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0 },
 					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "13%", padding: 0 },
-					{ label: "Start", headerKey: "headerStart", key: "start", width: "8%", padding: 0  },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "8%", padding: 0  },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%", padding: 0  },
+					{ label: "Start", headerKey: "headerStart", key: "start", width: "8%", padding: 0 },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "8%", padding: 0 },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%", padding: 0 },
 					{ label: "Status", headerKey: "headerStatus", key: "status", width: "9%", padding: 0 },
-					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%", padding: 0  },
-					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%", padding: 0  },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%", padding: 0  }
+					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%", padding: 0 },
+					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%", padding: 0 },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%", padding: 0 }
 				],
 				selectedVendors: [],
-				actions: ["Mark as accept/reject", "Request confirmation"],
+				actions: [ "Mark as accept/reject", "Request confirmation" ],
 				modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
 				isApproveActionShow: false,
 				activeIndex: -1,
@@ -319,7 +319,7 @@
 				this.isAllShow = isAll
 			},
 			isVendorSelect(status) {
-				const validStatuses = ['Started', 'Cancelled', 'Cancelled Halfway', 'Completed']
+				const validStatuses = [ 'Started', 'Cancelled', 'Cancelled Halfway', 'Completed' ]
 				return validStatuses.indexOf(status) === -1
 			},
 			showTab({ index }) {
@@ -364,7 +364,7 @@
 				} else if (!relatedStep.vendor || relatedStep.vendor.toString() !== person._id.toString()) {
 					this.$emit("setVendor", { vendor: person, index })
 				} else {
-					this.showErrors(['This vendor has already been assigned to a related step'])
+					this.showErrors([ 'This vendor has already been assigned to a related step' ])
 				}
 			},
 			async setAction({ option }) {
@@ -424,7 +424,7 @@
 						await this.setStepsStatus({ status, steps: withPayables })
 					}
 					if (withPayables.length < assignedSteps.length) {
-						this.showErrors([`One or more steps could not be ${ selectedStatus.toLowerCase() } as payables are missing`])
+						this.showErrors([ `One or more steps could not be ${ selectedStatus.toLowerCase() } as payables are missing` ])
 					}
 				} catch (err) {
 				}
@@ -468,7 +468,7 @@
 				if (!filteredSteps.length) return
 				const zeroPayablesStep = filteredSteps.find(item => !item.finance.Price.payables)
 				if (!!zeroPayablesStep) {
-					return this.showErrors(["There are steps with no payables!"])
+					return this.showErrors([ "There are steps with no payables!" ])
 				}
 				try {
 					const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: filteredSteps, projectId: this.currentProject._id })
@@ -530,7 +530,7 @@
 					result.push("ReOpen")
 				}
 				if (!result.length) {
-					result = ["No action available"]
+					result = [ "No action available" ]
 				}
 				return result
 			},
@@ -539,13 +539,13 @@
 				return !unchecked
 			},
 			isDatePickDisabled() {
-				const statuses = ["Closed", "Rejected", "Cancelled", "Cancelled Halfway"]
+				const statuses = [ "Closed", "Rejected", "Cancelled", "Cancelled Halfway" ]
 				return statuses.indexOf(this.currentProject.status) !== -1
 			},
-			isProjectFinished(){
+			isProjectFinished() {
 				const { status } = this.currentProject
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			},
+			}
 		},
 		components: {
 			ProgressLineStep,
@@ -571,27 +571,28 @@
     display: flex;
     flex-direction: column;
 
-    &__step-check{
+    &__step-check {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 31px;
     }
 
-    &__step-data{
+    &__step-data {
       height: 31px;
       display: flex;
       align-items: center;
       padding: 0 5px;
     }
 
-    &__step-date{
+    &__step-date {
       height: 31px;
       display: flex;
       align-items: center;
       padding: 0 2px;
     }
-    &__step-progress{
+
+    &__step-progress {
       padding: 0 4px;
       display: flex;
       height: 30px;
@@ -628,17 +629,18 @@
     }
 
     &__info-icon {
-      font-size: 18px;
       display: flex;
-      height: 30px;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      height: 30px;
 
       i {
         color: $main-color;
         opacity: 0.8;
         transition: all 0.2s;
         cursor: pointer;
+
         &:hover {
           opacity: 1;
         }

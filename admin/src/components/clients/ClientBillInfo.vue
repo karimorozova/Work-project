@@ -171,7 +171,7 @@
 
     &__block {
       display: flex;
-      border-bottom: 1px solid #c5bfb5;
+      border-bottom: 1px solid $border;
       padding-bottom: 10px;
 
       &-title {

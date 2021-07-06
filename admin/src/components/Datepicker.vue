@@ -925,7 +925,7 @@ export default {
 
 <style lang="scss" scoped>
 input:disabled {
-  background-color: #F2EFEB;
+  background-color: #f7f7f7;
 }
 
 .vdp-datepicker__calendar div .cell {

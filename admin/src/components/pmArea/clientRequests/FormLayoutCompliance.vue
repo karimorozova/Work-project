@@ -814,9 +814,10 @@
       padding: 20px;
       width: 400px;
       box-sizing: border-box;
-      //height: fit-content;
       margin-left: 40px;
       margin-bottom: 40px;
+      border-radius: 4px;
+      background: white;
     }
   }
 
@@ -827,6 +828,8 @@
     max-width: 1000px;
     box-sizing: border-box;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    border-radius: 4px;
+    background: white;
 
     &__project-icons {
       color: #66563d;
@@ -950,7 +953,7 @@
 
     &__project {
       margin-bottom: 20px;
-      border-bottom: 1px solid #c5bfb5;
+      border-bottom: 1px solid $border;
       width: 100%;
       padding-bottom: 5px;
       display: flex;

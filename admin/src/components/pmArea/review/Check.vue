@@ -35,7 +35,7 @@
     align-items: center;
 
     &__icon {
-      color: $light-brown;
+      color: $border;
       font-size: 16px;
       cursor: pointer;
       transition: ease 0.1s;

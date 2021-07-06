@@ -1015,10 +1015,6 @@
 <style lang="scss" scoped>
   @import '../assets/scss/colors.scss';
 
-  /*input:disabled {*/
-  /*  background-color: #f4f2f1;*/
-  /*}*/
-
   .vdp-datepicker__calendar div .cell {
     font-size: 16px;
   }

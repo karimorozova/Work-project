@@ -1,6 +1,11 @@
 <template lang="pug">
   .tabs
-    .tabs__option(v-for="(tab, index) in tabs" @click="setTab(index)" :class="{'tabs_active': tab === selectedTab}") {{ tab }}
+    .tabs__option(
+      v-for="(tab, index) in tabs"
+      @click="setTab(index)"
+      :class="{'tabs_active': tab === selectedTab}"
+    ) {{ tab }}
+
 </template>
 
 <script>
@@ -22,27 +27,39 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../assets/scss/colors.scss";
+  @import "../assets/scss/colors";
 
   .tabs {
     display: flex;
 
     &__option {
-      padding: 5px 7px;
-      min-width: 110px;
-      font-size: 14px;
-      border: 1px solid #938676;
-      border-bottom: none;
-      border-top-right-radius: 10px;
-      background-color: #f2efeb;
       cursor: pointer;
-      opacity: 0.6;
-      z-index: 0;
+      border-left: none;
+      border-top: 1px solid $border;
+      border-right: 1px solid $border;
+      min-width: 120px;
+      border-bottom: none;
+      background-color: $table-list-hover;
+      padding: 0px 7px;
+      height: 31px;
+      display: flex;
+      align-items: center;
+      color: #3d3d3d80;
+
+      &:first-child {
+        border-left: 1px solid $border !important;
+        border-top-left-radius: 4px;
+      }
+
+      &:last-child {
+        border-left: 1px solid $border !important;
+        border-top-right-radius: 4px;
+      }
     }
 
     &_active {
       background-color: $white;
-      opacity: 1;
+      color: $text;
     }
   }
 </style>

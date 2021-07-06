@@ -15,12 +15,12 @@
           span(v-if="element.hasOwnProperty('parent')")
             .group__open(v-if="element.isOpen")
               .group__open-image
-                img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
+                img(:src="require(`../../assets/images/navbar-icons/test-icon.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-down
             .group__close(v-if="!element.isOpen")
               .group__close-image
-                img(:src="require(`../../assets/images/navbar-icons/testicon-close.png`)")
+                img(:src="require(`../../assets/images/navbar-icons/test-icon.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-right
 
@@ -143,12 +143,12 @@
 
   %row {
     border-bottom: 1px solid #e2e2e2;
-    margin-top: 10px;
+    margin-top: 9px;
   }
 
   .menu {
     color: $text;
-    margin: 10px 0;
+    margin: 9px 0;
   }
 
   .row {
@@ -163,7 +163,7 @@
     &__text {
       color: $border;
       font-size: 12px;
-      margin-left: 10px;
+      margin-left: 9px;
       margin-top: 5px;
       position: absolute;
       display: flex;
@@ -188,11 +188,11 @@
   .group {
     cursor: pointer;
     font-family: 'Myriad600';
-    font-size: 14px;
+    font-size: 15px;
 
     &__open {
       @extend %flexBetween;
-      padding: 10px 12px 10px 0;
+      padding: 9px 12px 9px 0;
 
       &-image {
         display: flex;
@@ -202,7 +202,7 @@
 
     &__close {
       @extend %flexBetween;
-      padding: 10px 12px 10px 0;
+      padding: 9px 12px 9px 0;
 
       &-image {
         display: flex;
@@ -212,13 +212,14 @@
   }
 
   #link {
-    padding: 10px 0px;
+    padding: 9px 0px;
     width: -webkit-fill-available;
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
     align-items: center;
     font-family: 'Myriad600';
+    font-size: 15px;
   }
 
   #link.router-link-active,

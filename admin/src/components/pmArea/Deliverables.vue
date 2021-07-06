@@ -557,8 +557,8 @@ export default {
 .content{
   &__DR2 {
     position: absolute;
-    top: 505px;
-    left: 40px;
+    top: 475px;
+    left: 0px;
     bottom: 0;
     z-index: 50;
     box-sizing: border-box;
@@ -567,6 +567,7 @@ export default {
     justify-content: center;
     height: fit-content;
     padding-bottom: 150px;
+    border-radius: 4px;
   }
 }
 

@@ -83,18 +83,14 @@
   @import "../../assets/scss/colors";
 
   .block {
-    width: 100%;
 
     &__header {
       height: 50px;
       display: flex;
       justify-content: space-between;
       padding: 0 50px;
-      background: $table-list;
-      border-bottom: 2px solid $light-border;
-      /*      border-bottom: 1px solid $dark-border;
-            background: $body;*/
-
+      background: white;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
 
       &-right {
         display: flex;

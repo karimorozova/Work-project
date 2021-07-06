@@ -26,7 +26,7 @@
   .progress-line {
     width: 100%;
     height: 14px;
-    border: 1px solid #938676;
+    border: 1px solid $border;
     position: relative;
     box-sizing: border-box;
 
@@ -53,10 +53,13 @@
     }
 
     &__value {
-      background-color: $white;
-      color: $main-color;
+      background-color: white;
       font-size: 14px;
-      padding: 0 3px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      width: 50px;
+      text-align: center;
+      margin-top: -3px;
     }
   }
 

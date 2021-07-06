@@ -10,15 +10,15 @@
 	export default {
 		props: {
 			progress: {
-				type: [Number, String]
+				type: [ Number, String ]
 			},
 			lastProgress: {
-				type: [Number, String]
+				type: [ Number, String ]
 			}
 		},
 		computed: {
 			currentProgress() {
-				return !isNaN(this.progress) ? this.progress : 0;
+				return !isNaN(this.progress) ? this.progress : 0
 			}
 		}
 	}
@@ -30,7 +30,7 @@
   .progress-line {
     width: 100%;
     height: 14px;
-    border: 1px solid $brown-border;
+    border: 1px solid $border;
     position: relative;
     box-sizing: border-box;
     display: flex;
@@ -64,10 +64,13 @@
     }
 
     &__value {
-      background-color: $white;
-      color: $main-color;
+      background-color: white;
       font-size: 14px;
-      padding: 0 3px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      width: 50px;
+      text-align: center;
+      margin-top: -3px;
     }
   }
 
