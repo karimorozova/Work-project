@@ -60,7 +60,6 @@
 	import SelectSingle from "../../../SelectSingle"
 	import RequestStepsDefaultDateModified from "./RequestStepsDefaultDateModified"
 	import { mapGetters, mapActions } from "vuex"
-	// import setDefaultTasksService from "@/mixins/setDefaultTasksService"
 	// import TasksLanguages from "../../../../mixins/TasksLanguages"
 
 	export default {

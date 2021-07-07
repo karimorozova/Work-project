@@ -124,53 +124,35 @@
 					}
 				}
 				if (this.selectedWorkflow.id === 2890) {
-					this.setDataValue({ prop: "stepsDates", value: [this.stepsDates[0]] })
+					this.setDataValue({ prop: "stepsDates", value: [ this.stepsDates[0] ] })
 				} else {
 					this.setDataValue({ prop: "stepsDates", value: this.stepsDates })
 				}
 			},
 			setDefaultStepsAndUnits(option) {
-				let defaultStepsAndUnits
-				const currentSteps = this.services.find(item => item.title === this.service)
+				let defaultStepsAndUnits = null
+				const service = this.services.find(item => item.title === this.service)
+				const { steps } = service
+				console.log('service', service)
 
 				if (option === "2 Steps") {
-					let firstUnit = returnUnit(0, this.originallySteps)
-					let secondUnit = returnUnit(1, this.originallySteps)
+					let unit1 = returnUnit(0, this.originallySteps)
+
 					if (this.service === "Translation") {
-						const unitsObjects = this.originallyUnits.filter(item => {
-							return currentSteps.steps[0].step.calculationUnit.some(item2 => {
-								return item._id.toString() === item2.toString()
-							})
-						})
+						const unitsObjects = this.originallyUnits.filter(item => steps[0].step.calculationUnit.some(item2 => item._id.toString() === item2.toString()))
 						const firstUnitCAT = unitsObjects.find(item => item.type === "CAT Wordcount")
-						if (firstUnitCAT.hasOwnProperty('type')) {
-							firstUnit = firstUnitCAT.type
-						}
+						if (firstUnitCAT.hasOwnProperty('type')) unit1 = firstUnitCAT.type
 					}
+
 					defaultStepsAndUnits = [
-						{
-							step: currentSteps.steps[0].step.title,
-							unit: firstUnit,
-							stepCounter: 1,
-							size: null
-						},
-						{
-							step: currentSteps.steps[1].step.title,
-							unit: secondUnit,
-							stepCounter: 2,
-							size: null
-						}
+						{ step: steps[0].step.title, unit: unit1, stepCounter: 1, size: null },
+						{ step: steps[1].step.title, unit: returnUnit(1, this.originallySteps), stepCounter: 2, size: null }
 					]
+
 					this.stepsAndUnits = defaultStepsAndUnits
 				} else {
-					let firstUnit = returnUnit(0, this.originallySteps)
 					defaultStepsAndUnits = [
-						{
-							step: currentSteps.steps[0].step.title,
-							unit: firstUnit,
-							stepCounter: 1,
-							size: null
-						}
+						{ step: steps[0].step.title, unit: returnUnit(0, this.originallySteps), stepCounter: 1, size: null }
 					]
 					this.stepsAndUnitsMono = defaultStepsAndUnits
 				}
@@ -178,8 +160,11 @@
 				this.setDataValue({ prop: "stepsAndUnits", value: defaultStepsAndUnits })
 
 				function returnUnit(index, array) {
-					return array.find((item) => item.title === currentSteps.steps[index].step.title
-					).calculationUnit[0].type
+					const { step: { title } } = steps[index]
+					console.log('steps[index].step.title', title)
+          const allStepUnits = array.find((item) => item.title === title)
+					console.log('YTRO')
+					return allStepUnits.calculationUnit[0].type
 				}
 			},
 			setDefaultTemplate() {
@@ -198,13 +183,20 @@
 
 			setService({ option }) {
 				const service = this.services.find((item) => item.title === option)
-				this.service = service.title
 				if (!service.steps.length) return this.showError()
+
+				const { steps, title } = service
+				this.service = title
+
+				let countStepsInService = steps.length === 2 && (this.isActiveStepInRates(steps[0].step._id) && this.isActiveStepInRates(steps[1].step._id))
+						? "2 Steps"
+						: "1 Step"
+
 				this.setDataValue({ prop: "service", value: service })
-				const countStepsInService = service.steps.length === 1 ? "1 Step" : "2 Steps"
 				this.setWorkflow({ option: countStepsInService })
 				this.setDefaultLanguages(service)
 			},
+
 			setWorkflow({ option }) {
 				const workflowSteps = this.workflowSteps.find((item) => item.name === option)
 				this.workFlowOption = workflowSteps.name
@@ -270,10 +262,13 @@
 			},
 			workflowStepsNames() {
 				let result = this.workflowSteps.map((item) => item.name)
-				if (this.tasksData.service && this.tasksData.service.steps.length < 2) {
+				const { steps } = this.tasksData.service
+				if (this.tasksData.service && steps.length === 2 && this.isActiveStepInRates(steps[0].step._id) && this.isActiveStepInRates(steps[1].step._id)) {
+					return result
+				} else {
 					result.pop()
+					return result
 				}
-				return result
 			},
 			allServices() {
 				if (this.services.length) {
@@ -347,7 +342,8 @@
   .fade-leave-to {
     opacity: 0;
   }
-  .label-red{
+
+  .label-red {
     color: red;
     font-size: 14px;
   }

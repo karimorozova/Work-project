@@ -126,7 +126,7 @@
   @import "../../assets/scss/colors";
 
   img {
-    margin-right: 3px;
+    margin-right: 4px;
   }
 
   a {

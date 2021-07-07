@@ -102,7 +102,7 @@
 			},
 			originallySteps: {
 				type: Array
-			},
+			}
 		},
 		data() {
 			return {
@@ -113,7 +113,6 @@
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
 				isReadonly: true,
-				// originallyUnits: null,
 				services: null,
 				currentUnit: '',
 				steps: null
@@ -133,32 +132,6 @@
 				this.currentUnit = this.originallyUnits.find(item => item.type === option)
 				this.sendUnit()
 			},
-			// async getUnits(){
-			//   try {
-			//     const result = await this.$http.get("/api/originallyUnits");
-			//     this.originallyUnits = result.body.filter(item => item.active);
-			//   } catch (err) {
-			//     this.alertToggle({
-			//       message: "Erorr on getting Units",
-			//       isShow: true,
-			//       type: "error"
-			//     });
-			//   }
-			// },
-			// async getServiceSteps() {
-			// 	try {
-			// 		const services = await this.$http.get("/api/services")
-			// 		const steps = await this.$http.get("/api/steps")
-			// 		this.services = services.body
-			// 		this.steps = steps.body
-			// 	} catch (err) {
-			// 		this.alertToggle({
-			// 			message: "Erorr on getting Services or Steps",
-			// 			isShow: true,
-			// 			type: "error"
-			// 		})
-			// 	}
-			// },
 			customFormatter(date) {
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
@@ -181,13 +154,6 @@
 			invalidDateWarn({ message }) {
 				console.log(message)
 			}
-		},
-		created() {
-			// this.getServiceSteps()
-		},
-		mounted() {
-			// this.getServiceSteps();
-			// this.getUnits();
 		},
 		computed: {
 			setSteps() {
@@ -233,13 +199,15 @@
 
 <style lang="scss" scoped>
   @import '../../../assets/scss/colors.scss';
-  .content{
+
+  .content {
     &__title {
       font-size: 16px;
       font-family: 'Myriad600';
       padding: 30px 10px 10px;
     }
   }
+
   .steps-date {
     background-color: $table-list;
     border-bottom: 2px solid $light-border;
