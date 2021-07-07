@@ -339,8 +339,9 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
                 deleteSize = true;
                 for (let i = 0; i < sizes.length; i += 1) {
                   stepToReplace = {
-                    usdMinPrice: USD,
-                    gbpMinPrice: GBP,
+                    euroMinPrice: 0,
+                    usdMinPrice: 0,
+                    gbpMinPrice: 0,
                     step: stepId,
                     unit: unitId,
                     size: sizes[i],
@@ -349,8 +350,9 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
                 }
               } else {
                 stepToReplace = {
-                  usdMinPrice: USD,
-                  gbpMinPrice: GBP,
+                  euroMinPrice: 0,
+                  usdMinPrice: 0,
+                  gbpMinPrice: 0,
                   step: stepId,
                   unit: unitId,
                   size: 1,
@@ -403,9 +405,9 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
             }
             if (!sameCombination) {
               newMultiplierCombinations.push({
-                euroMinPrice: 1,
-                usdMinPrice: USD,
-                gbpMinPrice: GBP,
+                euroMinPrice: 0,
+                usdMinPrice: 0,
+                gbpMinPrice: 0,
                 step: _id,
                 unit: neededUnit,
                 size,
@@ -420,9 +422,9 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
           }
           if (!sameCombination) {
             newMultiplierCombinations.push({
-              euroMinPrice: 1,
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
+              euroMinPrice: 0,
+              usdMinPrice: 0,
+              gbpMinPrice: 0,
               step: _id,
               unit: neededUnit,
               size: 1,
@@ -459,9 +461,9 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
               `${item.step} ${item.unit} ${item.defaultSize}` !== `${item.step} ${item.unit} ${true}`
             ));
             stepMultipliersTable.push({
-              euroMinPrice: 1,
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
+              euroMinPrice: 0,
+              usdMinPrice: 0,
+              gbpMinPrice: 0,
               step: step._id,
               unit: oldUnit._id,
               size,
@@ -496,9 +498,9 @@ const checkSizeDifference = async (oldUnit, updatedSteps, sizeDifferences) => {
           }
           for (let size of newSizes) {
             stepMultipliersTable.push({
-              euroMinPrice: 1,
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
+              euroMinPrice: 0,
+              usdMinPrice: 0,
+              gbpMinPrice: 0,
               step: step._id,
               unit: oldUnit._id,
               size,
@@ -574,8 +576,9 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
             deleteSize = true;
             for (let i = 0; i < sizes.length; i += 1) {
               unitToReplace = {
-                usdMinPrice: USD,
-                gbpMinPrice: GBP,
+                euroMinPrice: 0,
+                usdMinPrice: 0,
+                gbpMinPrice: 0,
                 step: oldStep._id,
                 unit: _id,
                 size: sizes[i],
@@ -584,8 +587,9 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
             }
           } else {
             unitToReplace = {
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
+              euroMinPrice: 0,
+              usdMinPrice: 0,
+              gbpMinPrice: 0,
               step: oldStep._id,
               unit: _id,
               size: 1,
@@ -626,9 +630,9 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
           deleteSize = true;
           sizes.forEach(size => {
             newMultiplierCombinations.push({
-              euroMinPrice: 1,
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
+              euroMinPrice: 0,
+              usdMinPrice: 0,
+              gbpMinPrice: 0,
               step: oldStep._id,
               unit: unitId,
               size,
@@ -636,9 +640,9 @@ const checkStepDifference = async (unitDifferences, oldStep) => {
           });
         } else {
           newMultiplierCombinations.push({
-            euroMinPrice: 1,
-            usdMinPrice: USD,
-            gbpMinPrice: GBP,
+            euroMinPrice: 0,
+            usdMinPrice: 0,
+            gbpMinPrice: 0,
             step: oldStep._id,
             unit: unitId,
             size: 1,
@@ -670,9 +674,9 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
         if (sizes.length) {
           sizes.forEach(size => {
             combinations.push({
-              euroMinPrice: 1,
-              usdMinPrice: USD,
-              gbpMinPrice: GBP,
+              euroMinPrice: 0,
+              usdMinPrice: 0,
+              gbpMinPrice: 0,
               step: _id,
               unit: unitId,
               size,
@@ -680,9 +684,9 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
           });
         } else {
           combinations.push({
-            euroMinPrice: 1,
-            usdMinPrice: USD,
-            gbpMinPrice: GBP,
+            euroMinPrice: 0,
+            usdMinPrice: 0,
+            gbpMinPrice: 0,
             step: _id,
             unit: unitId,
             size: 1
@@ -697,9 +701,9 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
       sizes.forEach(size => {
         steps.forEach(step => {
           combinations.push({
-            euroMinPrice: 1,
-            usdMinPrice: USD,
-            gbpMinPrice: GBP,
+            euroMinPrice: 0,
+            usdMinPrice: 0,
+            gbpMinPrice: 0,
             step: step._id,
             unit: _id,
             size,
@@ -709,9 +713,9 @@ const getMultiplierCombinations = async (newMultiplier, key, { USD, GBP }) => {
     } else {
       steps.forEach(step => {
         combinations.push({
-          euroMinPrice: 1,
-          usdMinPrice: USD,
-          gbpMinPrice: GBP,
+          euroMinPrice: 0,
+          usdMinPrice: 0,
+          gbpMinPrice: 0,
           step: step._id,
           unit: _id,
           size: 1
