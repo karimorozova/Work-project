@@ -115,13 +115,20 @@
 				// return !this.job.memoqProjectId ? +this.job.progress : this.getMemoqFilesProgress(file.fileName);
 			},
 			getMemoqFilesProgress(fileName) {
+				console.log('fileName', fileName)
+				console.log('this.job', this.job)
 				if (this.job.status !== 'Completed') {
+					console.log('tyt1')
 					const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName)
+					console.log('docId', docId)
+					console.log('this.job.progress[docId]', this.job.progress[docId])
 					const value = (100 * this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2)
 					return +value
 				} else if (this.job.status === 'Completed') {
+					console.log('tyt2')
 					return 100
 				} else {
+					console.log('tyt3')
 					this.job.progress
 				}
 			},
