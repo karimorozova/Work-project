@@ -2,7 +2,7 @@ const { Projects } = require('../models/')
 const axios = require("axios")
 const request = require('request')
 
-const { existsSync, writeFileSync, readFileSync, createReadStream } = require('fs')
+const {  writeFileSync, readFileSync, createReadStream } = require('fs')
 const csv = require('csv-parser')
 
 const apiDomain = "https://pangea.s.xtrf.eu/home-api/"
@@ -28,11 +28,20 @@ const csvToJsonXtrf = () => {
 	})
 }
 
+const errorMessages = {
+	cannotCreateVendors: "Sorry! But we can not find some vendors: ",
+	cannotFindClient: "Sorry! We can not find client",
+	cannotFindServices: "Sorry! We can not find services",
+	cannotFindLanguage: "Sorry! We can not find language pair",
+	cannotSendProject: "Sorry! We can not send the project to XTRF"
+}
+
 const createXtrfProjectWithFinance = async (vendorId) => {
 	try {
 		// csvToJsonXtrf()
-		//
+
 		// getAllVendors()
+
 		// if (!existsSync(vendorPriceProfileIdPath)) {
 		// 	await csvToJsonXtrf()
 		// }
@@ -43,23 +52,34 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 
 		const allLanguages = await sendRequest('get', 'dictionaries/language/active')
 
-		const { projectId, projectName, customer, steps, accountManager } = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer').populate("accountManager")
+		const {
+			projectId,
+			projectName,
+			customer,
+			steps,
+			tasks,
+			accountManager
+		} = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer').populate("accountManager")
 		const { stepsInfo, stepsSource, stepsTarget, noFoundVendors } = getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors)
 
-		// const allServices = await sendRequest('get', 'services/all')
-		// const service = findInXtrf(allServices, "name", "Translation")
-		const service = { id: 79 }
+
+		const services = { Translation: 80, Compliance: 79 }
+		const currentServices = Array.from(new Set(tasks.map(({ service }) => service.title).filter((servicesTitle) => Object.keys(services).includes(servicesTitle)))).pop()
+		const service = currentServices ? services[currentServices] : false
+		if (!services) {
+			return { isSuccess: false, message: errorMessages['cannotFindServices'] }
+		}
 
 		const allCustomer = await sendRequest('get', 'customers')
 		const customers = findInXtrf(allCustomer, "name", customer.name)
 		if (!customers) {
-			return { isSuccess: false, message: 'Client was not find' }
+			return { isSuccess: false, message: errorMessages['cannotFindClient'] }
 		}
 
 		const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
-			name: `Test step in Api proj| ${ projectId }: ${ projectName }`,
+			name: `Api| ${ projectId }: ${ projectName }`,
 			clientId: customers.id,
-			serviceId: service.id
+			serviceId: service
 		})
 
 		// IS test true
@@ -70,7 +90,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			if (accountManager.firstName && accountManager.lastName) {
 				await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
 			}
-		}catch (e) {
+		} catch (e) {
 		}
 
 
@@ -82,7 +102,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			targetLanguageIds: stepsTarget
 		})
 
-		await setProjectFinance(xtrfProjectInfo.data.projectId, stepsInfo)
+		await setProjectFinance(xtrfProjectInfo.data.projectId, stepsInfo, currentServices)
 
 		await Projects.updateOne(
 				{ _id: vendorId },
@@ -104,7 +124,7 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors) {
 	let stepsSource = new Set()
 	let stepsTarget = new Set()
 	let noFoundVendors = new Set()
-	for (let { sourceLanguage, targetLanguage, finance, vendor, _id } of steps) {
+	for (let { sourceLanguage, targetLanguage, finance, vendor, serviceStep, _id } of steps) {
 		const sourceLang = findLanguageId(allLanguages, "symbol", sourceLanguage) ? findLanguageId(allLanguages, "symbol", sourceLanguage).id : ''
 		const targetLang = findLanguageId(allLanguages, "symbol", targetLanguage) ? findLanguageId(allLanguages, "symbol", targetLanguage).id : ''
 		const vendorId = vendor ? vendors[vendor.firstName + " " + vendor.surname] : ''
@@ -115,65 +135,90 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors) {
 			noFoundVendors.add(vendor.firstName + " " + vendor.surname)
 		}
 
+		const subInfo =  {
+			payables: finance.Price.payables,
+			vendor: vendorId ? vendorPriceProfileId[vendorId] : false,
+			memoqAssignmentRole: serviceStep.memoqAssignmentRole != null ?  serviceStep.memoqAssignmentRole+1 : 1
+		}
+		const stepInfo = {
+			receivables: finance.Price.receivables,
+			subInfo: [subInfo]
+		}
 		if (stepsInfo.hasOwnProperty(sourceLang + ">>" + targetLang)) {
-			const currentStepInfo = stepsInfo[sourceLang + ">>" + targetLang]
-			currentStepInfo.payables = currentStepInfo.payables + finance.Price.payables
-			currentStepInfo.receivables = currentStepInfo.receivables + finance.Price.receivables
+			stepsInfo[sourceLang + ">>" + targetLang].subInfo.push(subInfo)
+			stepsInfo[sourceLang + ">>" + targetLang].receivables +=  finance.Price.receivables
 		} else {
-			stepsInfo[sourceLang + ">>" + targetLang] = {
-				receivables: finance.Price.receivables,
-				payables: finance.Price.payables,
-				sourceLanguage: sourceLang,
-				targetLanguage: targetLang,
-				vendor: vendorId ? vendorPriceProfileId[vendorId] : false
-			}
+			stepsInfo[sourceLang + ">>" + targetLang] = stepInfo
 		}
 
 	}
+
 	return { stepsInfo, stepsSource: Array.from(stepsSource), stepsTarget: Array.from(stepsTarget), noFoundVendors: Array.from(noFoundVendors) }
 }
 
-async function setProjectFinance(xtrfProjectId, stepsInfo) {
+async function setProjectFinance(xtrfProjectId, stepsInfo, currentServices) {
 	const xtrfProjectJobs = await sendRequest('get', `v2/projects/${ xtrfProjectId }/jobs`)
-	for (let { id, languages } of xtrfProjectJobs.data) {
-		const { sourceLanguage, targetLanguage, payables, receivables, vendor } = stepsInfo[languages[0].sourceLanguageId + ">>" + languages[0].targetLanguageId]
+	let tasks = {}
+	xtrfProjectJobs.data.forEach((elem) => {
+
+		const {languages} = elem
+		const langPair = languages[0].sourceLanguageId + ">>" + languages[0].targetLanguageId
+
+		if(tasks.hasOwnProperty(langPair)) {
+			tasks[langPair].push(elem)
+		}else  {
+			tasks[langPair] = [elem]
+		}
+
+	})
+
+	for (let langPair in tasks) {
+		const task = tasks[langPair]
+
+		const { receivables, subInfo} =  stepsInfo[langPair]
+
+		const sourceLanguageId = task[0].languages[0].sourceLanguageId
+		const targetLanguageId = task[0].languages[0].targetLanguageId
+
 		const baseData = {
 			"type": "SIMPLE",
 			"languageCombination": {
-				sourceLanguageId: sourceLanguage,
-				targetLanguageId: targetLanguage
+				sourceLanguageId: sourceLanguageId,
+				targetLanguageId: targetLanguageId
 			},
-			"calculationUnitId": 11,
+			"calculationUnitId":  currentServices === "Translation" ? 1 : 11,
 			"ignoreMinimumCharge": false,
 			"description": "payable"
 		}
 
-		const payablesData = {
-			...baseData,
-			"jobId": id,
-			"rate": payables,
-			"quantity": 1
-		}
 		const receivablesData = {
 			...baseData,
-			"jobTypeId": 1,
+			"jobTypeId": currentServices === "Translation" ? 4 : 67,
 			"rate": receivables,
 			"quantity": 1
 		}
-		try {
+
+		for await (let { id, stepNumber } of task) {
+			const {payables, vendor} = subInfo.find((step ) => step.memoqAssignmentRole === stepNumber)
+
+			const payablesData = {
+				...baseData,
+				"jobId": id,
+				"rate": payables,
+				"quantity": 1
+			}
 
 			if (!!vendor) {
 				await sendRequest('put', `v2/jobs/${ id }/vendor`, { vendorPriceProfileId: vendor })
 			}
 
-			await sendRequest('post', `v2/projects/${ xtrfProjectId }/finance/receivables`, receivablesData)
-
 			await sendRequest('post', `v2/projects/${ xtrfProjectId }/finance/payables`, payablesData)
 
-		} catch (e) {
 		}
 
 
+
+		await sendRequest('post', `v2/projects/${ xtrfProjectId }/finance/receivables`, receivablesData)
 	}
 }
 
@@ -188,13 +233,13 @@ async function getAllVendors() {
 	await writeFileSync('./static/xtrf/Vendors.json', JSON.stringify(allVendors))
 }
 
-function findInXtrf(response, field, value, fieldName) {
+function findInXtrf(response, field, value) {
 	if (!value) return false
 	const found = response.data.filter((elem) => elem[field].toLowerCase() === value.toLowerCase())
 	return Array.isArray(found) ? found[0] : found
 }
 
-function findLanguageId(response, field, value, fieldName) {
+function findLanguageId(response, field, value) {
 	if (!value) return false
 	const found = response.data.filter((elem) => elem[field].toLowerCase().includes(value.toLowerCase()))
 	return Array.isArray(found) ? found[0] : found
