@@ -139,6 +139,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    letter-spacing: 0.1px;
   }
 
   %row {
@@ -161,7 +162,7 @@
     }
 
     &__text {
-      color: $border;
+      color: #c1c1c1;
       font-size: 12px;
       margin-left: 9px;
       margin-top: 5px;
@@ -170,6 +171,7 @@
       justify-content: flex-end;
       width: 250px;
       font-family: 'Myriad300';
+      letter-spacing: 0.4px;
     }
   }
 
@@ -220,6 +222,7 @@
     align-items: center;
     font-family: 'Myriad600';
     font-size: 15px;
+    letter-spacing: 0.1px;
   }
 
   #link.router-link-active,

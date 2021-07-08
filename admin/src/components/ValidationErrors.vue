@@ -41,16 +41,17 @@
   .validationCustom {
 
     .validation {
-
       &__errors {
         position: fixed;
-        width: 320px;
+        width: 300px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
         box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-        background-color: #fff;
+        background-color: white;
+        border-radius: 4px;
+        border-top: 3px solid $red;
       }
 
       &__errors-title {
@@ -62,14 +63,14 @@
       }
 
       &__messages {
-        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         background-color: white;
         padding: 20px;
-        border: 2px solid $orange;
+        border-radius: 4px;
       }
 
       &__error {
-        font-size: 15px;
+        font-size: 14px;
+        padding: 1px 0;
       }
 
       &__close {
@@ -102,13 +103,15 @@
 
       &__errors {
         position: absolute;
-        width: 320px;
+        width: 300px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
         box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-        background-color: #fff;
+        background-color: white;
+        border-radius: 4px;
+        border-top: 3px solid $red;
       }
 
       &__errors-title {
@@ -120,14 +123,14 @@
       }
 
       &__messages {
-        box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
         background-color: white;
         padding: 20px;
-        border: 2px solid $orange;
+        border-radius: 4px;
       }
 
       &__error {
-        font-size: 15px;
+        font-size: 14px;
+        padding: 1px 0;
       }
 
       &__close {

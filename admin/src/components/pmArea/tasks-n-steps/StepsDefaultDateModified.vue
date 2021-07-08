@@ -70,7 +70,7 @@
 	import SelectSingle from "@/components/SelectSingle"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import moment from "moment"
-	import { mapActions } from "vuex"
+	import { mapActions, mapGetters } from "vuex"
 
 	export default {
 		mixins: [ scrollDrop ],
@@ -156,15 +156,28 @@
 			}
 		},
 		computed: {
+			...mapGetters({
+				currentProject: "getCurrentProject"
+			}),
+
 			setSteps() {
 				if (this.originallyServices) {
 					return this.originallyServices.filter(item => item.title == this.service)
 				}
 			},
 			optionUnits() {
-				const currentStep = this.setSteps[0].steps[this.stepCounter - 1].step.title
-				return this.originallySteps.filter(item => item.title == currentStep)[0]
-						.calculationUnit.map(item => item.type)
+				if (this.currentProject) {
+
+					const { customer: { rates: { stepMultipliersTable } } } = this.currentProject
+					const { title: currentStepTitle } = this.setSteps[0].steps[this.stepCounter - 1].step
+					const { calculationUnit: calculationUnits, _id: stepId } = this.originallySteps.find(item => item.title === currentStepTitle)
+
+					const stepRates = stepMultipliersTable.filter(item => item.step === stepId)
+
+					let listOfUnits = []
+					for (let unit of calculationUnits) if (stepRates.filter(item => item.unit === unit._id).some(item => item.isActive)) listOfUnits.push(unit.type)
+					return listOfUnits
+				}
 			},
 			disabledStart() {
 				let result = {

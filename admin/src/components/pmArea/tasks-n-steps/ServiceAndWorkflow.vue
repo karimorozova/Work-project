@@ -130,6 +130,7 @@
 				}
 			},
 			setDefaultStepsAndUnits(option) {
+				const { customer: { rates: { stepMultipliersTable } } } = this.currentProject
 				let defaultStepsAndUnits = null
 				const service = this.services.find(item => item.title === this.service)
 				const { steps } = service
@@ -162,9 +163,11 @@
 				function returnUnit(index, array) {
 					const { step: { title } } = steps[index]
 					console.log('steps[index].step.title', title)
-          const allStepUnits = array.find((item) => item.title === title)
-					console.log('YTRO')
-					return allStepUnits.calculationUnit[0].type
+					const { calculationUnit: calculationUnits, _id: stepId } = array.find((item) => item.title === title)
+					const stepRates = stepMultipliersTable.filter(item => item.step === stepId)
+					for (let unit of calculationUnits) {
+						if (stepRates.filter(item => item.unit === unit._id).some(item => item.isActive)) return unit.type
+					}
 				}
 			},
 			setDefaultTemplate() {
@@ -222,31 +225,23 @@
 			},
 			pushStepAndUnit(data) {
 				if (this.selectedWorkflow.id === 2890) {
-					if (!this.stepsAndUnitsMono.length) {
-						this.stepsAndUnitsMono.push(data)
-					}
-					this.stepsAndUnitsMono.forEach((element, index) => {
-						element.step === data.step
-								? (this.stepsAndUnitsMono[index].unit = data.unit)
-								: false
-					})
-					this.setDataValue({
-						prop: "stepsAndUnits",
-						value: this.stepsAndUnitsMono
-					})
+					if (!this.stepsAndUnitsMono.length) this.stepsAndUnitsMono.push(data)
+
+					this.stepsAndUnitsMono.forEach((element, index) => element.step === data.step
+							? (this.stepsAndUnitsMono[index].unit = data.unit)
+							: false)
+
+					this.setDataValue({ prop: "stepsAndUnits", value: this.stepsAndUnitsMono })
 				}
+
 				if (this.selectedWorkflow.id === 2917) {
-					if (!this.stepsAndUnits.length) {
-						this.stepsAndUnits.push(data)
-					}
+					if (!this.stepsAndUnits.length) this.stepsAndUnits.push(data)
+
 					this.stepsAndUnits.forEach((element, index, array) => {
-						if (element.step === data.step) {
-							this.stepsAndUnits[index].unit = data.unit
-						}
-						if (array.map((element) => element.step).indexOf(data.step) === -1) {
-							this.stepsAndUnits.push(data)
-						}
+						if (element.step === data.step) this.stepsAndUnits[index].unit = data.unit
+						if (array.map((element) => element.step).indexOf(data.step) === -1) this.stepsAndUnits.push(data)
 					})
+
 					this.setDataValue({ prop: "stepsAndUnits", value: this.stepsAndUnits })
 				}
 			}

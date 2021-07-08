@@ -43,6 +43,7 @@
                 :currentIndex="index"
                 :templates="templates"
                 :originallyUnits="originallyUnits"
+                :originallySteps="originallySteps"
               )
 
           .tasks-data__service-steps(v-else)
@@ -54,6 +55,7 @@
                 :currentIndex="index"
                 :templates="templates"
                 :originallyUnits="originallyUnits"
+                :originallySteps="originallySteps"
               )
 
     .tasks-data__filesOptions(v-if="originallySteps && originallyServices && originallyUnits && templates.length")

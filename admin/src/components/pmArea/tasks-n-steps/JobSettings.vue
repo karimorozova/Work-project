@@ -6,6 +6,7 @@
         .content__title {{currentJob.step}} Job Setting
         .hours-steps__block
           .hours-steps__packages
+
             .hours-steps__packages-item
               .hours-steps__packages-title {{currentJob.unit}}:
                 span.hours-steps__label-red *
@@ -14,6 +15,7 @@
                   :value="currentJob.hours ? currentJob.hours : null"
                   @change="(e) => setHours(e, currentJob.step)"
                 )
+
             .hours-steps__packages-item
               .hours-steps__packages-item
                 .hours-steps__sub-title {{ currentJob.step === 'Compliance' ? 'Compliance Template:' : 'Size:' }}
@@ -29,6 +31,7 @@
       .content(v-if="currentJob.unit === 'CAT Wordcount'")
         .content__title {{currentJob.step}} Job Setting
         .hours-steps__block
+
           .hours-steps__main(v-if="tasksData.stepsAndUnits")
             .hours-steps__label Template:
               span.hours-steps__label-red *
@@ -44,6 +47,7 @@
         .content__title {{currentJob.step}} Job Setting
         .hours-steps__block
           .hours-steps__packages
+
             .hours-steps__packages-item
               .hours-steps__packages-title Quantity:
                 span.hours-steps__label-red *
@@ -52,6 +56,7 @@
                   :value="currentJob.quantity ? currentJob.quantity : null"
                   @change="(e) => setQuantity(e, currentJob.step)"
                 )
+
             .hours-steps__packages-item
               .hours-steps__sub-title Size:
                 span.hours-steps__label-red *
@@ -85,29 +90,22 @@
 			},
 			originallyUnits: {
 				type: Array
+			},
+			originallySteps: {
+				type: Array
 			}
 		},
 		data() {
 			return {
-				// templates: [],
 				selectedSizes: ""
-				// selectedTemplate: "",
-				// units: null,
 			}
 		},
 		methods: {
-			// async getUnits() {
-			// 	try {
-			// 		const result = await this.$http.get('/api/units');
-			// 		this.originallyUnits = result.data;
-			// 	} catch (err) {
-			// 		this.alertToggle({message: "Error on getting units", isShow: true, type: "error"});
-			// 	}
-			// },
 			...mapActions({
 				setDataValue: "setTasksDataValue",
 				alertToggle: "alertToggle"
 			}),
+
 			setQuantity(e, step) {
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits
 				oldStepsAndUnits[this.currentIndex].quantity = e.target.value
@@ -120,6 +118,7 @@
 				}
 				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits })
 			},
+
 			setHours(e, step) {
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits
 				oldStepsAndUnits[this.currentIndex].hours = e.target.value
@@ -132,9 +131,9 @@
 				}
 				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits })
 			},
+
 			setTemplate({ option }) {
 				const value = this.templates.find(item => item.name === option)
-				// this.selectedTemplate = value;
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits
 				oldStepsAndUnits[this.currentIndex].template = value
 				oldStepsAndUnits[this.currentIndex].size = null
@@ -147,6 +146,7 @@
 				}
 				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits })
 			},
+
 			setSize({ option }) {
 				let oldStepsAndUnits = this.tasksData.stepsAndUnits
 				oldStepsAndUnits[this.currentIndex].size = option
@@ -160,29 +160,11 @@
 				}
 				this.setDataValue({ prop: "stepsAndUnits", value: oldStepsAndUnits })
 			}
-			// async getMemoqTemplates() {
-			// 	try {
-			// 		const result = await this.$http.get("/memoqapi/templates");
-			// 		this.templates = result.data || [];
-			// 	} catch (err) {
-			// 		this.alertToggle({message: "Error on getting templates", isShow: true, type: "error"});
-			// 	}
-			// },
-			// setStartedTempalte() {
-			// 	if (this.currentJob.unit === "CAT Wordcount") {
-			// 		const template = this.templates.find(i => true)
-			// 		this.setTemplate({option: template.name})
-			// 	}
-			// },
 		},
-		// async created() {
-		// await this.getMemoqTemplates();
-		// this.setStartedTempalte();
-		// await this.getUnits();
-		// },
 		computed: {
 			...mapGetters({
-				tasksData: "getTasksData"
+				tasksData: "getTasksData",
+				currentProject: "getCurrentProject"
 			}),
 			selectedTemplate() {
 				if (this.tasksData) {
@@ -194,13 +176,25 @@
 				}
 			},
 			getSizes() {
-				if (this.originallyUnits.length) {
-					if (this.currentJob.unit !== 'CAT Wordcount') {
-						let sizes = this.originallyUnits.filter(item => item.type === this.currentJob.unit)[0].sizes
-						if (!sizes.length) {
-							sizes = [ "1" ]
+				if (this.currentProject) {
+					if (this.originallyUnits && this.originallySteps) {
+						if (this.currentJob.unit !== 'CAT Wordcount') {
+
+							const { customer: { rates: { stepMultipliersTable } } } = this.currentProject
+							const { unit: unitString, step: stepString } = this.currentJob
+
+							const unit = this.originallyUnits.find(item => item.type === unitString)
+							const step = this.originallySteps.find(item => item.title === stepString)
+							const unitRates = stepMultipliersTable.filter(item => item.unit === unit._id && item.step === step._id)
+
+							let sizes = []
+							for (let size of unit.sizes) {
+								const { isActive } = unitRates.find(item => `${ item.size }` === size)
+								if (isActive) sizes.push(size)
+							}
+
+							return sizes
 						}
-						return sizes
 					}
 				}
 			},
@@ -226,13 +220,15 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  .content{
+
+  .content {
     &__title {
       font-size: 16px;
       font-family: 'Myriad600';
       padding: 30px 10px 10px;
     }
   }
+
   .hours-steps {
     &__block {
       display: flex;
