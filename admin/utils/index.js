@@ -1,5 +1,6 @@
 const {
   sendEmail,
+  sendFlexibleEmail,
   clientQuoteEmail,
   managerNotifyMail
 } = require("./mailTemplate");
@@ -25,6 +26,7 @@ const { archiveFile } = require("./archiving");
 
 module.exports = {
   sendEmail,
+  sendFlexibleEmail,
   clientQuoteEmail,
   upload,
   moveFile,

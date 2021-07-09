@@ -1,7 +1,7 @@
 <template lang="pug">
   .text-input
     .text-input__label {{ label }}:
-    input.text-input__input(:type="type" :name="name"  @change="setValue")
+    input.text-input__input(:type="type" :name="name"  @change="setValue" :value="value")
     span.text-input__example(v-if="example") {{ example }}
 
 </template>
@@ -21,6 +21,10 @@
 			type:{
 				type: String,
         default: 'text'
+      },
+			value:{
+				type: [String, Number],
+        default: ''
       }
 		},
 		methods: {

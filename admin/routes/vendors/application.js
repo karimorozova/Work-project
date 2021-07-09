@@ -4,11 +4,11 @@ const { Vendors } = require("../../models");
 const { manageNewApplication } = require("../../vendors");
 
 router.post("/send-form", upload.any(), async (req, res) => {
-    let person = {...req.body};
+    let {infoForMail, ...person} = {...req.body};
     const cvFiles = req.files.filter(item => item.fieldname === "cvFile");
     const coverLetterFiles = req.files.filter(item => item.fieldname === "coverLetterFile");
     try {
-        await manageNewApplication({person, cvFiles, coverLetterFiles});
+        await manageNewApplication({person, cvFiles, coverLetterFiles, infoForMail: JSON.parse(infoForMail)});
         res.send("Sent");
     } catch(err) {
         console.log(err);

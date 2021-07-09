@@ -45,6 +45,29 @@
                 )
 
           p.application__step-title Professional Information
+            .application__row-flex
+              .application__col50
+                .available__title.application__mb-10 Source Language:
+                .application__software
+                  SelectSingle(
+                    :selectedOption="selectedSourceLanguage.lang"
+                    :options="languages.map(item => item.lang)"
+                    @chooseOption="setSourceLanguage"
+                  )
+
+              .application__col50
+                .available__title.application__mb-10 Target Language:
+                .application__software
+                  SelectMulti(
+                    :isTableDropMenu="true"
+                    placeholder="Select"
+                    :hasSearch="false"
+                    :options="languages.map(item => item.lang)"
+                    :selectedOptions="selectedTargetsLanguages.map(item => item.lang)"
+                    :allOptionsButtons="true"
+                    @chooseOptions="setTargetLanguage"
+                  )
+
           .application__row-flex
             .application__col50
               .available__title.application__mb-10 Industries:
@@ -59,6 +82,33 @@
                   @chooseOptions="chooseIndustries"
                 )
             .application__col50
+              .available__title.application__mb-10 Step:
+              .application__software
+                SelectSingle(
+                  :selectedOption="selectedStep.title"
+                  :options="steps.map(({title})=> title)"
+                  @chooseOption="setStep"
+                )
+
+          .application__row-flex
+            .application__col50
+                TextInput.application__mb-10(
+                  label="Rates"
+                  name="selectedRate"
+                  :value="selectedRate"
+                  @setValue="setRate"
+                )
+            .application__col50
+              .application__availability.application__mb-10
+                .available__title Availability:
+                SelectSingle(
+                  :selectedOption="availability"
+                  :options="availabilityOptions"
+                  @chooseOption="chooseOption"
+                )
+
+          .application__row-flex
+            .application__col50
               .application__mb-10
                 p Do you work with CAT tools?
                 .application__radio-group
@@ -72,16 +122,6 @@
                       input#opt2.hidden(type='radio' v-model="secondInfo.CAT" :value="false")
                       span.label
                       | No
-
-          .application__row-flex
-            .application__col50
-              .application__availability.application__mb-10
-                .available__title Availability:
-                SelectSingle(
-                  :selectedOption="availability"
-                  :options="availabilityOptions"
-                  @chooseOption="chooseOption"
-                )
             .application__col50
               div(v-if="secondInfo.CAT === true")
                 .available__title.application__mb-10 Previous software experience:
@@ -176,14 +216,43 @@
 				softwaresOptions: [ "XTM", "MemoQ", "Trados" ],
 				secondInfo: { CAT: false },
 				industries: [],
-        selectedIndustries: []
+        selectedIndustries: [],
+        languages: [],
+        selectedSourceLanguage: '',
+        selectedTargetsLanguages: [],
+        showStep: [ 'Translation', 'Copywriting' ],
+        steps: [],
+        selectedStep: {},
+        selectedRate: (0).toFixed(4),
+
 			}
 		},
 		methods: {
 			setInfoValue({ property, value }) {
 				this.person[property] = value
 			},
+      hasErrorPendingInfo() {
+			  this.errors = []
+			  if(this.selectedSourceLanguage === "") {
+			    this.errors.push('Please select the Source Language')
+        }
+			  if(!this.selectedTargetsLanguages.length) {
+			    this.errors.push('Please select the Target Language')
+        }
+			  if(this.selectedRate <= 0) {
+			    this.errors.push('Please select the Rate')
+        }
+			  if(!this.selectedStep.hasOwnProperty('title')) {
+			    this.errors.push('Please select the Step')
+        }
+        return !!this.errors.length
+      },
 			async submitForm({ confirmed }) {
+        if (this.hasErrorPendingInfo()) {
+          this.errorsExist = true
+          return
+        }
+
 				this.person.confirmed = confirmed
 
 				const sendData = new FormData()
@@ -199,6 +268,32 @@
 
 				}
 
+				let pendingCompetencies = []
+				for(let targetLanguage of this.selectedTargetsLanguages) {
+				  for(let industry of this.selectedIndustries) {
+            pendingCompetencies.push({
+              description: {
+                industry: 'Api',
+                targetLanguage: 'Api'
+              },
+              sourceLanguage: this.selectedSourceLanguage,
+              targetLanguage: targetLanguage,
+              industry: industry,
+              step: this.selectedStep,
+              rate: this.selectedRate,
+            })
+          }
+        }
+
+				const infoForMail = {
+				  sourceLanguage: this.selectedSourceLanguage,
+          targetLanguages: this.selectedTargetsLanguages,
+          step: this.selectedStep,
+          rate: this.selectedRate,
+        }
+
+        sendData.append("pendingCompetencies",  JSON.stringify(pendingCompetencies))
+        sendData.append("infoForMail",  JSON.stringify(infoForMail))
 				for (let key in this.person) {
 					if (typeof this.person[key] === "string") {
 						sendData.append(key, this.person[key])
@@ -214,6 +309,31 @@
 					this.alertToggle({ message: "Error on submitting the form", isShow: true, type: "error" })
 				}
 			},
+      setRate({  value }) {
+        this.selectedRate = value
+      },
+      setStep({option}) {
+			  const step = this.steps.find(({title}) => title === option)
+        this.selectedStep = step
+      },
+      setSourceLanguage ({ option }) {
+			  const lang = this.languages.find(({lang}) => lang === option)
+        this.selectedSourceLanguage = lang
+      },
+      setTargetLanguage ({option}){
+        const position = this.selectedTargetsLanguages.findIndex( ({lang}) => lang === option)
+        if (position !== -1) {
+          this.selectedTargetsLanguages.splice(position, 1)
+        } else {
+          if (this.selectedTargetsLanguages.length >= 5) {
+            this.errors.push('You can select only 5 Target languages')
+            this.errorsExist = true
+            return
+          }
+          const lang = this.languages.find(({ lang }) => lang === option)
+          this.selectedTargetsLanguages.push(lang)
+        }
+      },
 			formValidationFail({ errors }) {
 				this.errors = errors
 				return this.errorsExist = this.errors.length ? true : false
@@ -247,6 +367,11 @@
 				if (position !== -1) {
 					this.selectedIndustries.splice(position, 1)
 				} else {
+          if (this.selectedIndustries.length >= 5) {
+            this.errors.push('You can select only 5 industries')
+            this.errorsExist = true
+            return
+          }
 					const industry = this.industries.find(item => item.name === option)
 					this.selectedIndustries.push(industry)
 				}
@@ -268,9 +393,33 @@
 				} catch (err) {
 				}
 			},
+			async getAllLanguages() {
+				try {
+					let result = await this.$axios.$get("/api/languages")
+					this.languages = result
+				} catch (err) {
+				}
+			},
+			async getAllSteps() {
+				try {
+					let result = await this.$axios.$get("/api/steps")
+					this.steps = result.filter((step) => this.showStep.includes(step.title))
+
+				} catch (err) {
+				}
+			},
+    },
+    watch: {
+      selectedRate(value) {
+        const regex = /[^0-9\.,]/g
+        value = parseFloat(value.replace(regex, '').replace(',', '.')) || 0
+        this.selectedRate = (+value).toFixed(4)
+      },
     },
     created(){
       this.getAllIndustries()
+      this.getAllLanguages()
+      this.getAllSteps()
     },
 		components: {
 			Header,
