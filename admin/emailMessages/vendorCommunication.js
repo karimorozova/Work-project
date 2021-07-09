@@ -4,12 +4,13 @@ const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 
-function applicationMessage (obj) {
+function applicationMessage (obj, infoForMail) {
 	let cvFiles = ""
 	let industries = obj.industries.reduce((acc, curr) => {
 		acc = `${acc} ${curr.name};`
 		return acc;
 	},'')
+	const langPair = infoForMail.targetLanguages.map(({lang}) => infoForMail.sourceLanguage.lang + " >> " + lang)
 	let coverLetterFiles = ""
 	if (obj.cvFiles.length) {
 		cvFiles = obj.cvFiles.reduce((acc, cur, index) => {
@@ -27,15 +28,21 @@ function applicationMessage (obj) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
                 </header>
                 <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row" style="color:#66563E;">New application request</span></p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;color:#66563E;"> Name: </b> ${obj.firstName} </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;color:#66563E;"> Surname: </b> ${obj.surname} </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Email: </b> <span>${ obj.email }</span> </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Phone: </b> <span>${ obj.phone }</span> </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Mother tongue: </b> <span>${ obj.lang }</span> </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Industries: </b> <span>${ industries }</span> </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Availability: </b> <span>${ obj.availability }</span> </p>
-                    <p style="font-weight: 400;"><b style="margin-right: 6px;"> Software experience: </b> <span>${ obj.softwares }</span> </p>
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span style="color:#66563E;">Hello Recruitment Team,</span></p>
+                    <p style="font-size: 14px; font-weight: 400;"><span id="client-name-row" style="color:#66563E;">A new applicant has submitted a form.</span></p>
+                    <p style="font-size: 14px; font-weight: 400;"><span id="client-name-row" style="color:#66563E;">Here is the initial information:</span></p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;color:#66563E;"> Name: </b> ${obj.firstName} </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;color:#66563E;"> Surname: </b> ${obj.surname} </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Email: </b> <span>${ obj.email }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Phone Number: </b> <span>${ obj.phone }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Mother tongue: </b> <span>${ obj.lang }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;margin-bottom: 0;"><b style="margin-right: 6px;"> Language Pair: </b></p>
+                    <p style="font-weight: 400; color:#66563e; margin-left: 20px;margin-top: 0;"> <span>${ langPair.join(', <br>') }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Industries: </b> <span>${ industries }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Position: </b> <span>${ infoForMail.step.title }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Rate: </b> <span>${ infoForMail.rate }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Availability: </b> <span>${ obj.availability }</span> </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Software experience: </b> <span>${ obj.softwares }</span> </p>
                 </div>
                 <footer>
                     <hr size="15" color="#66563E">
@@ -54,27 +61,23 @@ function vendorRegistration(obj) {
                       Thank you for your interest in working with Pangea.
                       We are always on the lookout for talent, yet only the best of the best get to join us.
                       Submitting your information tells us you may be our next superstar.
-                      It all starts with completing your profile. Here is what you need to do:
 										</p>
-										<p style="font-weight: 400;color:#66563E;">Enter our system and complete your competencies:</p>
-										<p style="font-weight: 400;color:#66563E;">language pair and industry</p>
+										<p style="font-weight: 400;color:#66563E;">
+                      If you wish to change any of the information you have submitted, 
+                      you can access the candidate platform and adjust your profile. 
+                      Here is what you need to do:
+										</p>
 										<p style="font-weight: 400;color:#66563E;">1. Go to: <a href="https://vendor.pangea.global/login" style="color: #D15F46;">Vendor Portal</a></p>
 										<p style="font-weight: 400;color:#66563E;">2. Log in to the system with the following details:</p>
                     <p style="font-weight: 400;color:#66563E;margin-left: 10px;">• username: <b>${ obj.email.replace(/@/g, '<span>@</span>').replace(/\./g, '<span>.</span>') }</b> </p>
                     <p style="font-weight: 400;color:#66563E;margin-left: 10px;">• password: <b>${ obj.pass }</b> </p>
 										<p style="font-weight: 400;color:#66563E;">
-                      3. Once in, you will be required to provide additional information that will allow us
-                      to get a clearer idea of your industry expertise and language proficiency.
-                      Please fill in the form, as required.
+                      <b>What's the next step?</b>
                     </p>
                     <p style="font-weight: 400;color:#66563E;">
-                      We normally allow all candidates a period of 21 days to complete their profile.
-                      Should you not manage to complete this step within the given time frame,
-                      contact us and we will extend the deadline. In the lapse of time,
-                      should you fail to notify us to request an extension, your profile will be automatically deleted.
-                      If you wish to join Pangea at a later stage, you will have to repeat the process.
+                      One of our recruiters will <b>review</b> your application and <b>send you a short test in one or more of your selected language pairs for the specified industry(ies)</b>.
                     </p>
-                    <p style="font-weight: 400;color:#66563E;">Many thanks,</p>
+                    <p style="font-weight: 400;color:#66563E;">Kind regards,</p>
                     <p style="font-weight: 400;color:#66563E;">Pangea HR team</p>
                 </div>
                 <footer>

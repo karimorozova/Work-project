@@ -1,15 +1,17 @@
 const { Vendors, Languages } = require("../models");
-const { moveFile, sendEmail } = require("../utils");
+const { moveFile, sendEmail, sendFlexibleEmail } = require("../utils");
 const { applicationMessage,vendorRegistration } = require("../emailMessages/vendorCommunication");
 const fs = require("fs");
 const passwordGen = require("generate-password")
 const { getVendorAfterUpdate } = require('../vendors/getVendors')
 const bcrypt = require('bcryptjs');
 
-async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
+async function manageNewApplication({person, cvFiles, coverLetterFiles, infoForMail}) {
     const softData = JSON.parse(person['parsing-softwares'])
+    const pendingCompetencies = JSON.parse(person['pendingCompetencies'])
+    const industries = JSON.parse(person['parsing-industries'])
     try {
-        let vendor = await Vendors.create({...person, softData , status: "Potential"});
+        let vendor = await Vendors.create({...person,industries, pendingCompetencies, softData , status: "Potential"});
         vendor.documents = await setDocuments(cvFiles, 'Resume', vendor.id);
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');
         const mailPassword = passwordGen.generate({ length: 8, numbers: true })
@@ -17,18 +19,19 @@ async function manageNewApplication({person, cvFiles, coverLetterFiles}) {
         const updatedVendor = await getVendorAfterUpdate({_id: vendor._id}, vendor)
 
         const parsedPersonData = getParsedData(person);
-        await sendEmailToManager(parsedPersonData, updatedVendor)
-        await sendEmailToVendor(updatedVendor, mailPassword)
+        await sendEmailToManager("translation@pangea.global","career@pangea.global",  parsedPersonData, updatedVendor, infoForMail)
+        await sendEmailToVendor("career@pangea.global", updatedVendor, mailPassword)
     } catch(err) {
         console.log(err);
         console.log("Error in manageNewApplication");
     }
 }
 
-async function sendEmailToManager(personData, vendor) {
+async function sendEmailToManager(from, to, personData, vendor, infoForMail) {
     let emailData = {...personData};
     try {
-        emailData.to = "career@pangea.global";
+        emailData.to = to;
+        emailData.from = from;
         emailData.subject = `Application from ${emailData.firstName} ${emailData.surname}`;
 
         emailData.cvFiles = vendor.documents
@@ -39,21 +42,22 @@ async function sendEmailToManager(personData, vendor) {
         emailData.attachments = getFilesAttachments([...emailData.cvFiles, ...emailData.coverLetterFiles]);
         emailData.phone = vendor.phone
 
-        const message = applicationMessage(emailData);
-        await sendEmail(emailData, message);
+        const message = applicationMessage(emailData, infoForMail);
+        await sendFlexibleEmail(emailData, message);
     } catch(err) {
         console.log(err);
         console.log("Error in sendEmailToManager");
     }
 }
 
-async function sendEmailToVendor(vendor, pass) {
+async function sendEmailToVendor(from, vendor, pass) {
     const emailData = {firstName: vendor.firstName, surname: vendor.surname, email: vendor.email, textEmail: vendor.email , pass}
     try {
         emailData.to = emailData.email;
+        emailData.from = from;
         emailData.subject = `Application from ${emailData.firstName} ${emailData.surname}`;
         const message = vendorRegistration(emailData);
-        await sendEmail(emailData, message);
+        await sendFlexibleEmail(emailData, message);
     } catch(err) {
         console.log(err);
         console.log("Error in sendEmailToManager");

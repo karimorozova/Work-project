@@ -71,6 +71,39 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 	})
 }
 
+const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
+	return new Promise((res, rej) => {
+		let mailOptions = {
+			from: mailSettings.from, // sender address
+			to: `${ mailSettings.to }`, // pm@pangea.global list of receivers
+			subject: `${ mailSettings.subject }`, // Subject line
+			text: "plain text", // plain text body
+			html: "<b>" + msg + "</b>" // html body
+		}
+		mailOptions.attachments = mailSettings.attachments || []
+		if (!withoutImage) {
+			if(!mailOptions.attachments.map(item => item.filename).includes('logo.png')){
+				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
+			}
+		}
+		mailTransporter.sendMail(mailOptions, (error, info) => {
+			mailTransporter.close()
+			if (error) {
+				console.log(error)
+				rej(error)
+			}
+			if (info) {
+				console.log('sendEmail', 'Message sent: %s', info.messageId)
+				res(info.messageId)
+				mailOptions = {}
+			} else {
+				console.log('Error in sendEmail')
+				rej("no message sent")
+			}
+		})
+	})
+}
+
 const sendEmailCandidates = function (obj, msg, withoutImage = false) {
 	return new Promise((res, rej) => {
 		let mailOptions = {
@@ -188,4 +221,4 @@ const managerNotifyMail = function (obj, msg, subject) {
 	})
 }
 
-module.exports = { sendEmail, clientQuoteEmail, managerNotifyMail, clientQuoteToEmails, sendEmailFromUser, sendEmailCandidates }
+module.exports = { sendEmail, sendFlexibleEmail, clientQuoteEmail, managerNotifyMail, clientQuoteToEmails, sendEmailFromUser, sendEmailCandidates }
