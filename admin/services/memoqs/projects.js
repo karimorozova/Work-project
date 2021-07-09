@@ -279,6 +279,38 @@ async function setMemoqDocsAssignments(projectId, docsInfo) {
 	}
 }
 
+async function setMemoqDocsDeadline(memoqProjectId, documentGuid, deadline, memoqAssignmentRole, guid) {
+	const xml = `${ xmlHeader }
+	            <soapenv:Body>
+	                <ns:SetProjectTranslationDocumentUserAssignments>
+	                    <ns:serverProjectGuid>${ memoqProjectId }</ns:serverProjectGuid>
+							          <ns:assignments>
+													<ns:ServerProjectTranslationDocumentUserAssignments>
+										           <ns:DocumentGuid>${documentGuid}</ns:DocumentGuid>
+										           <ns:UserRoleAssignments>
+											           <ns:TranslationDocumentUserRoleAssignment>
+											               <ns:DeadLine>${deadline}</ns:DeadLine>
+											               <ns:DocumentAssignmentRole>${memoqAssignmentRole}</ns:DocumentAssignmentRole>
+											               <ns:UserGuid>${guid}</ns:UserGuid>
+											           </ns:TranslationDocumentUserRoleAssignment>
+										           </ns:UserRoleAssignments>
+										        </ns:ServerProjectTranslationDocumentUserAssignments>
+							         </ns:assignments>
+	                </ns:SetProjectTranslationDocumentUserAssignments>
+	            </soapenv:Body>
+            </soapenv:Envelope>`;
+	const headers = headerWithoutAction('SetProjectTranslationDocumentUserAssignments');
+	try {
+		const { response } = await soapRequest({ url, headers, xml });
+		const result = parser.toJson(response.body, { object: true, sanitize: true, trim: true })["s:Envelope"]["s:Body"];
+		return !result["s:Fault"];
+	} catch (err) {
+		console.log("Error in setMemoqDocsDeadline");
+		console.log(err);
+		throw new Error(err.message);
+	}
+}
+
 function getDocRoleAssignments(obj) {
 	const roles = obj.users ? getRoles(obj.users) : "";
 	return `<ns:ServerProjectTranslationDocumentUserAssignments>
@@ -796,5 +828,6 @@ module.exports = {
 	assignMemoqTranslators,
 	setMemoqDocumentWorkFlowStatus,
 	assignedDefaultTranslator,
-	documentsWithMetrics
+	documentsWithMetrics,
+	setMemoqDocsDeadline
 }

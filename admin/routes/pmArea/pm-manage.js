@@ -65,7 +65,8 @@ const {
 	updateRequestTasks,
 	createProjectFromRequest,
 	autoCreatingTaskInProject,
-	saveCertificateTODR1Files
+	saveCertificateTODR1Files,
+	setStepDeadlineProjectAndMemoq
 } = require('../../projects')
 
 const {
@@ -104,7 +105,7 @@ const {
 	// removeRequestFiles,
 	// sendNotificationToManager,
 	// removeClientRequest
-		getClientRequestById
+	getClientRequestById
 } = require('../../clientRequests')
 
 const {
@@ -220,6 +221,21 @@ router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), 
 	}
 })
 
+router.post('/update-steps-dates', async (req, res) => {
+	try {
+		const { projectId, steps, step, stepId, type, prop } = req.body
+		const updatedProject = await updateProject({ '_id': projectId }, { steps })
+
+		if (prop === 'deadline' && type === 'CAT Wordcount' && !!step.vendor && step.status === 'Started') {
+			await setStepDeadlineProjectAndMemoq({ projectId, stepId })
+		}
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on update-step-deadline-by-index')
+	}
+})
+
 router.post('/convert-request-into-project', async (req, res) => {
 	try {
 		const { projectId: requestId } = req.body
@@ -257,7 +273,7 @@ router.post('/remove-request-file', async (req, res) => {
 		fs.unlink(`./dist${ path }`, (err) => {
 			if (err) throw(err)
 		})
-		const updatedProject =  await getClientRequestById(_id)
+		const updatedProject = await getClientRequestById(_id)
 		res.send(updatedProject)
 
 	} catch (err) {
@@ -278,9 +294,9 @@ router.post('/update-request-tasks', upload.fields([ { name: 'sourceFiles' }, { 
 	}
 })
 
-router.delete('/delete-request-tasks/:id/:projectId', async (req,res) => {
-	const { id: taskId, projectId } = req.params;
-	try{
+router.delete('/delete-request-tasks/:id/:projectId', async (req, res) => {
+	const { id: taskId, projectId } = req.params
+	try {
 		await ClientRequest.updateOne({ "_id": projectId }, { $pull: { "tasksAndSteps": { "taskId": taskId } } })
 		const updatedProject = await getClientRequestById(projectId)
 		res.send(updatedProject)
@@ -871,9 +887,9 @@ router.post('/delete-request-files', async (req, res) => {
 })
 // TODO: refactoring client request
 router.post('/delete-project', async (req, res) => {
-	const { projectId} = req.body
+	const { projectId } = req.body
 	try {
-		await Projects.remove({_id: projectId})
+		await Projects.remove({ _id: projectId })
 		res.send('')
 	} catch (err) {
 		console.log(err)

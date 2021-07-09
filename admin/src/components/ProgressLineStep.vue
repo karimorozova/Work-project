@@ -34,6 +34,7 @@
     position: relative;
     box-sizing: border-box;
     display: flex;
+    border-radius: 4px;
 
     &__tooltip {
       position: absolute;

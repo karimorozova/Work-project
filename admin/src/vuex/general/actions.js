@@ -14,7 +14,7 @@ export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', p
 export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload);
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload);
 export const setProjectProp = ({ commit }, payload) => commit('storeProjectProp', payload);
-export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
+// export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload);
 
@@ -116,19 +116,19 @@ export const setStepVendor = async ({ commit, dispatch, state }, payload) => {
     }
 }
 
-export const updateCurrentProject = async ({ commit, dispatch, state }, payload) => {
-    commit('startRequest')
-    try {
-        const updatedProject = await Vue.http.post('/pm-manage/update-project', {...payload});
-        const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
-        state.projects[index] = updatedProject.data;
-        await commit('storeCurrentProject', updatedProject.data);
-    } catch(err) {
-        dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
-    } finally {
-        commit('endRequest');
-    }
-}
+// export const updateCurrentProject = async ({ commit, dispatch, state }, payload) => {
+//     commit('startRequest')
+//     try {
+//         const updatedProject = await Vue.http.post('/pm-manage/update-project', {...payload});
+//         const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
+//         state.projects[index] = updatedProject.data;
+//         await commit('storeCurrentProject', updatedProject.data);
+//     } catch(err) {
+//         dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+//     } finally {
+//         commit('endRequest');
+//     }
+// }
 
 export const updateMatrix = async ({ commit }, payload) => {
     commit('startRequest')

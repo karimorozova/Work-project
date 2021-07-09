@@ -16,16 +16,12 @@
           selectedTab="Steps"
           @setTab="showTab"
         )
-      DataTable(
+
+      GeneralTable(
         :fields="fields"
         :tableData="allSteps"
-        :activeIndex="activeIndex"
-        :bodyClass="['steps-table-body', {'tbody_visible-overflow': allSteps.length < 10}]"
-        :tableheadRowClass="allSteps.length < 10 ? 'tbody_visible-overflow' : ''"
-        bodyCellClass="steps-table-cell"
-        bodyRowClass="steps-table-row"
-        :headCellClass="'padding-with-check-box'"
       )
+
         template(slot="headerCheck" slot-scope="{ field }")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
 
@@ -77,14 +73,15 @@
 
           span.steps_no-padding(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
             .steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")
-              img.steps__replace-icon(src="../../../assets/images/replace_person.png" @click="showReassignment(index)")
+              .steps__replace-icon(@click="showReassignment(index)")
+                i.fas.fa-exchange-alt
               .steps__tooltip Reassign Vendor
             span.steps__step-no-select(v-if="!row.vendor") No Vendor
 
         template(slot="start" slot-scope="{ row, index }")
           .steps__step-date
             Datepicker(
-              @selected="(e) => changeDate(e, 'start', index)"
+              @selected="(e) => changeDate(e, 'start', row.stepId)"
               v-model="row.start"
               inputClass="steps__custom-input"
               calendarClass="steps__calendar-custom"
@@ -92,12 +89,13 @@
               monday-first=true
               :disabledPicker="isDatePickDisabled"
               :highlighted="highlighted"
-              @scrollDrop="scrollDrop")
+              @scrollDrop="scrollDrop"
+            )
 
         template(slot="deadline" slot-scope="{ row, index }")
           .steps__step-date
             Datepicker(
-              @selected="(e) => changeDate(e, 'deadline', index)"
+              @selected="(e) => changeDate(e, 'deadline', row.stepId)"
               v-model="row.deadline"
               inputClass="steps__custom-input"
               calendarClass="steps__calendar-custom"
@@ -106,7 +104,8 @@
               :disabled="disabled"
               :disabledPicker="isDatePickDisabled"
               :highlighted="highlighted"
-              @scrollDrop="scrollDrop")
+              @scrollDrop="scrollDrop"
+            )
 
         template(slot="progress" slot-scope="{ row, index }")
           .steps__step-progress
@@ -161,8 +160,10 @@
         :notApproveValue="modalTexts.notApprove"
         @approve="approveAction"
         @notApprove="notApproveAction"
-        @close="closeApproveModal")
-    ValidationErrors(v-if="areErrorsExist"
+        @close="closeApproveModal"
+      )
+    ValidationErrors(
+      v-if="areErrorsExist"
       :errors="errors"
       :isAbsolute="true"
       @closeErrors="closeErrors"
@@ -190,6 +191,7 @@
 
 	import { mapGetters, mapActions } from 'vuex'
 	import ProgressLineStep from "../../ProgressLineStep"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		mixins: [ scrollDrop, stepVendor, currencyIconDetected ],
@@ -217,18 +219,18 @@
 				},
 				tabs: [ 'Tasks', 'Steps' ],
 				fields: [
-					{ label: "Check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0 },
-					{ label: "", headerKey: "headerInfo", key: "info", width: "3%", padding: 0, style: { 'border-left': 0 } },
-					{ label: "Step", headerKey: "headerName", key: "name", width: "10%", padding: 0 },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0 },
-					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", width: "13%", padding: 0 },
-					{ label: "Start", headerKey: "headerStart", key: "start", width: "8%", padding: 0 },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "8%", padding: 0 },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%", padding: 0 },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "9%", padding: 0 },
-					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%", padding: 0 },
-					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "9%", padding: 0 },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%", padding: 0 }
+					{ label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "2%" } },
+					{ label: "", headerKey: "headerInfo", key: "info", style: { "width": "2%" } },
+					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "4%" } },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", style: { "width": "4%" } },
+					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", style: { "width": "16%" } },
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "4%" } },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "5%" } },
+					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "4%" } },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "4%" } },
+					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "5%" } },
+					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "5%" } },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "5%" } }
 				],
 				selectedVendors: [],
 				actions: [ "Mark as accept/reject", "Request confirmation" ],
@@ -309,11 +311,8 @@
 				}
 				return step.finance.Price[prop] === 0 ? true : step.finance.Price[prop]
 			},
-			isScrollDrop(drop, elem) {
-				return drop && elem.clientHeight >= 320
-			},
 			customFormatter(date) {
-				return moment(date).format('DD-MM-YYYY')
+				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			toggleVendors({ isAll }) {
 				this.isAllShow = isAll
@@ -501,8 +500,8 @@
 				const surname = vendor && (vendor.surname && vendor.surname !== "undefined") ? vendor.surname : ""
 				return vendor ? vendor.firstName + ' ' + surname : ""
 			},
-			changeDate(e, prop, index) {
-				this.$emit('setDate', { date: new Date(e), prop, index })
+			changeDate(e, prop, stepId) {
+				this.$emit('setDate', { date: new Date(e), prop, stepId })
 			},
 			...mapActions([
 				"alertToggle",
@@ -548,6 +547,7 @@
 			}
 		},
 		components: {
+			GeneralTable,
 			ProgressLineStep,
 			DataTable,
 			ProgressLine,
@@ -579,24 +579,24 @@
     }
 
     &__step-data {
-      height: 31px;
-      display: flex;
-      align-items: center;
-      padding: 0 5px;
+      /*height: 31px;*/
+      /*display: flex;*/
+      /*align-items: center;*/
+      /*padding: 0 5px;*/
     }
 
     &__step-date {
-      height: 31px;
-      display: flex;
-      align-items: center;
-      padding: 0 2px;
+      /*height: 31px;*/
+      /*display: flex;*/
+      /*align-items: center;*/
+      /*padding: 0 2px;*/
     }
 
     &__step-progress {
-      padding: 0 4px;
-      display: flex;
-      height: 30px;
-      align-items: center;
+      /*padding: 0 4px;*/
+      /*display: flex;*/
+      /*height: 30px;*/
+      /*align-items: center;*/
     }
 
     &__table {
@@ -619,7 +619,7 @@
 
     &__info {
       position: absolute;
-      top: -300px;
+      top: -150px;
       left: 10%;
       width: 80%;
       z-index: 50;
@@ -633,18 +633,6 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      height: 30px;
-
-      i {
-        color: $main-color;
-        opacity: 0.8;
-        transition: all 0.2s;
-        cursor: pointer;
-
-        &:hover {
-          opacity: 1;
-        }
-      }
     }
 
     &__vendor-replace {
@@ -668,15 +656,15 @@
 
     &__tooltip {
       text-align: center;
-      width: 110px;
+      width: 120px;
       position: absolute;
-      right: 25px;
-      top: 0;
+      right: 27px;
+      top: -4px;
       display: none;
-      background-color: $white;
-      color: $orange;
+      background-color: $text;
+      color: white;
       box-sizing: border-box;
-      padding: 3px;
+      padding: 4px;
       border-radius: 4px;
     }
 
@@ -691,7 +679,7 @@
     &__vendor-menu {
       position: relative;
       width: 100%;
-      height: 29px;
+      height: 32px;
     }
 
     &__reassignment {

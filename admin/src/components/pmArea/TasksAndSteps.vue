@@ -109,8 +109,8 @@
 			setVendor({ vendor, index }) {
 				this.$emit("setVendor", { vendor, index })
 			},
-			setDate({ date, prop, index }) {
-				this.$emit("setDate", { date, prop, index })
+			setDate({ date, prop, stepId }) {
+				this.$emit("setDate", { date, prop, stepId })
 			},
 			async refreshMetricsIfStepsWereNotCreated() {
 				let ifNeedRefreshMetrics = false

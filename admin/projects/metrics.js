@@ -7,12 +7,7 @@ const { getProjectAnalysis } = require('../services/memoqs/projects');
 const { setTaskFinance, getProjectFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
-/**
- *
- * @param {ObjectId} projectId
- * @param {Array} tasks
- * @returns {Object} - returns an updated project
- */
+
 async function updateProjectMetrics(projectId, tasks) {
 	try {
 		const project = await getProject({ "_id": projectId });
@@ -77,13 +72,6 @@ async function updateProjectMetrics(projectId, tasks) {
 	}
 }
 
-/**
- *
- * @param {Object} task
- * @param {Object} matrix
- * @param {Object} analysis
- * @returns {Object} - returns object with metrics and total words
- */
 function getTaskMetrics({ task, matrix, analysis }) {
 	const { AnalysisResultForLang } = analysis;
 	let targetMetrics = AnalysisResultForLang;
@@ -100,11 +88,6 @@ function getTaskMetrics({ task, matrix, analysis }) {
 	return { ...taskMetrics, totalWords: metrics.All };
 }
 
-/**
- *
- * @param {Object} metrics
- * @returns {Object} - returns updated metrics
- */
 function getFilledMemoqMetrics(metrics) {
 	const { Hit50_74, Hit101, Hit100, NoMatch, Repetition, Hit75_84, Hit85_94, XTranslated, Hit95_99 } = metrics;
 	return {
@@ -120,11 +103,7 @@ function getFilledMemoqMetrics(metrics) {
 	};
 }
 
-/**
- *
- * @param {Object} project
- * @returns {Object} - returns calculated project's tasks and steps
- */
+
 async function getProjectWithUpdatedFinance(project) {
 	let projectToUpdate = { ...project._doc, id: project.id };
 	let { tasks, steps } = projectToUpdate;
@@ -149,15 +128,7 @@ async function getProjectWithUpdatedFinance(project) {
 	}
 }
 
-/**
- *
- * @param task
- * @param industry
- * @param customer
- * @param discounts
- * @param projectId
- * @returns {Promise<[]>}
- */
+
 async function getTaskSteps(task, industry, customer, discounts, projectId) {
 	let { sourceLanguage, targetLanguage, metrics, service, stepsAndUnits } = task;
 
@@ -208,7 +179,6 @@ async function getTaskSteps(task, industry, customer, discounts, projectId) {
 			defaultStepPrice,
 			vendorRate,
 			totalWords: quantity,
-			// check: false,
 			vendorsClickedOffer: [],
 			isVendorRead: false,
 			service,
@@ -231,12 +201,7 @@ async function getTaskSteps(task, industry, customer, discounts, projectId) {
 	return newSteps;
 }
 
-/**
- *
- * @param {String} symbol
- * @param {Array} docs
- * @returns {Object} - returns step's progress
- */
+
 function setStepsProgress(symbol, docs) {
 	const prop = symbol === 'translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount';
 	const totalProgress = docs.reduce((acc, cur) => {
@@ -255,13 +220,7 @@ function setStepsProgress(symbol, docs) {
 	return { ...stepProgress, ...totalProgress };
 }
 
-/**
- *
- * @param {String} type
- * @param {Object} metrics
- * @param {Object} stepAndUnit
- * @returns {Number} - returns correct amount of quantity
- */
+
 const getWordcountStepQuantity = (type, metrics, stepAndUnit) => {
 	let quantity = metrics.totalWords;
 	switch (type) {

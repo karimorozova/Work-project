@@ -29,6 +29,7 @@
     border: 1px solid $border;
     position: relative;
     box-sizing: border-box;
+    border-radius: 4px;
 
     &__tooltip {
       position: absolute;

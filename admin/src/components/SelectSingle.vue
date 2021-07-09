@@ -219,24 +219,6 @@
         /*background-color: $light-border;*/
       }
 
-      /*.test-options & {*/
-      /*  max-height: 60px;*/
-      /*}*/
-
-      /*.project-info__tasks & {*/
-      /*  max-height: 170px;*/
-      /*}*/
-
-
-      /*.inner-component & {*/
-      /*  max-height: 135px;*/
-      /*  border: 1px solid #BFB09D;*/
-      /*  border-top: none;*/
-      /*}*/
-
-      /*.services__drop-menu & {*/
-      /*  border: 1px solid #BFB09D;*/
-      /*}*/
     }
 
     .filters &, .project-finance__drop-menu & {

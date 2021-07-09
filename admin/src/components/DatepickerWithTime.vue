@@ -1036,13 +1036,8 @@
     position: absolute;
     z-index: 100;
     background: #fff;
-    border: 1px solid #eee;
-  }
-
-  @media (max-width: 350px) {
-    .vdp-datepicker__calendar {
-      left: -25px;
-    }
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    border-radius: 4px;
   }
 
   .vdp-datepicker__calendar header {
@@ -1108,7 +1103,7 @@
   .vdp-datepicker__calendar header .prev:not(.disabled):hover,
   .vdp-datepicker__calendar header .next:not(.disabled):hover,
   .vdp-datepicker__calendar header .up:not(.disabled):hover {
-    background: #eee;
+    background: $light-border;
   }
 
   .vdp-datepicker__calendar .disabled {
@@ -1169,7 +1164,7 @@
   }
 
   .vdp-datepicker__calendar .cell.beforeToday {
-    color: #c5bfb5;
+    color: $border;
   }
 
   .vdp-datepicker__calendar .cell.highlighted.disabled {
@@ -1210,7 +1205,7 @@
   }
 
   .vdp-datepicker__calendar .cell.notCurrentMonth {
-    color: #c5bfb566;
+    color: $border;
   }
 
 
@@ -1312,17 +1307,19 @@
   }
 
   .steps__custom-input {
-    color: #68573E;
+    color: $text;
     border: none;
     width: 100%;
     background-color: transparent;
     cursor: pointer;
+    margin: 0;
     outline: 0;
+    padding: 0;
   }
 
   .steps__calendar-custom {
     right: -6px;
-    top: 24px;
+    top: 26px;
   }
 
   .filters .datepicker-custom {

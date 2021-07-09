@@ -72,7 +72,7 @@ export default {
       'setStepVendor',
       'setStepDate',
       'updateProgress',
-      'updateCurrentProject',
+      // 'updateCurrentProject',
       'sendClientQuote',
       'sendProjectDetails',
       'storeCurrentClient'
@@ -87,12 +87,25 @@ export default {
       } catch (err) {
       }
     },
-    async setDate({ date, prop, index }) {
+    async setDate({ date, prop, stepId }) {
       try {
-        await this.setStepDate({ value: date, prop, index })
-        await this.updateCurrentProject({ ...this.currentProject, id: this.currentProject._id })
-        await this.getMetrics()
+	      let { steps, _id } = this.currentProject;
+	      const _idx = steps.findIndex(item => item.stepId === stepId)
+
+	      steps[_idx][prop] = date;
+	      if(prop === 'deadline' && _idx + 1 < steps.length && steps[_idx].taskId === steps[_idx + 1].taskId){
+		      steps[_idx + 1].start = date;
+        }
+
+	      const { type } = this.originallyUnits
+            .find(item => item._id.toString() === steps[_idx].serviceStep.unit)
+
+        if(steps[_idx].status !== 'Completed' && steps[_idx].status !== 'Cancelled' && steps[_idx].status !== 'Cancelled Halfway'){
+	        const updatedProject = await this.$http.post('/pm-manage/update-steps-dates', { projectId: _id, steps, step: steps[_idx], stepId, type, prop })
+	        await this.setCurrentProject(updatedProject.data)
+        }
       } catch (err) {
+	      this.alertToggle({ message: 'Error on Set Step Deadline', isShow: true, type: "error" })
       }
     },
     async setStatus({ option }) {
@@ -103,53 +116,45 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: "error" })
       }
     },
+
     wordsCalculation(metrics) {
-      const repetitions = Object.keys(metrics).filter(item => item !== "totalWords")
+      const repetitions = Object.keys(metrics)
+          .filter(item => item !== "totalWords")
           .reduce((prev, cur) => {
             return prev + metrics[cur].value
           }, 0)
+
       const receivables = metrics.totalWords - metrics.nonTranslatable
       const payables = receivables - repetitions
       return { receivables, payables }
     },
-    async updateProjectProgress() {
-      const projectId = this.currentProject._id
-      const nonWordcountTasks = this.currentProject.tasks.filter(item => item.service.calculationUnit !== 'Words')
-      const wordcountTasks = this.currentProject.tasks.filter(item => item.service.calculationUnit === 'Words')
-      try {
-        if (nonWordcountTasks.length) {
-          await this.updateProgress({ projectId, isCatTool: false })
-        }
-        if (wordcountTasks.length) {
-          await this.updateProgress({ projectId, isCatTool: true })
-        }
-        this.alertToggle({ message: "Metrics are updated.", isShow: true, type: "success" })
-      } catch (err) {
-      }
-    },
+
+	  async updateProjectProgress() {
+		  const wordcountTasks = this.currentProject.tasks.filter(item => item.stepsAndUnits.map(i => i.unit).includes('CAT Wordcount') )
+		  try {
+			  wordcountTasks.length
+					  ? await this.updateProgress({ projectId: this.currentProject._id, isCatTool: true })
+					  : await this.updateProgress({ projectId: this.currentProject._id, isCatTool: false })
+
+			  this.alertToggle({ message: "Project are updated.", isShow: true, type: "success" })
+		  } catch (err) {
+			  this.alertToggle({ message: "Project are updated.", isShow: true, type: "success" })
+		  }
+	  },
+
     async getMetrics() {
       try {
-        if (this.currentProject.isMetricsExist) {
-          return await this.updateProjectProgress()
-        }
-        const result = await this.$http.post('/memoqapi/metrics', {
-          projectId: this.currentProject._id
-        })
+        if (this.currentProject.isMetricsExist) return await this.updateProjectProgress()
+
+        await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id })
+
         const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`)
         await this.setCurrentProject(updatedProject.body)
+
         this.alertToggle({ message: "Metrics are received.", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Internal server error. Cannot get metrics.", isShow: true, type: "error" })
       }
-    },
-    getStepsDates({ task, key }) {
-      let startDate = task.start
-      let deadline = task.deadline
-      if (task.stepsDates.length) {
-        startDate = key === 'translate1' ? task.stepsDates[0].start : task.stepsDates[1].start
-        deadline = key === 'translate1' ? task.stepsDates[0].deadline : task.stepsDates[1].deadline
-      }
-      return { startDate, deadline }
     },
     async getVendorsForProject() {
       try {

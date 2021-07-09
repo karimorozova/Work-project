@@ -248,7 +248,6 @@
 
   td {
     height: 40px;
-    overflow-y: auto;
     letter-spacing: -0.1px;
     border-left: 1px solid $light-border;
     display: grid;

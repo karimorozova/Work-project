@@ -29,7 +29,8 @@ const {
 	checkProjectHasMemoqStep,
 	assignProjectManagers,
 	updateProjectStatusForClientPortalProject,
-	regainWorkFlowStatusByStepId
+	regainWorkFlowStatusByStepId,
+	setStepDeadlineProjectAndMemoq
 } = require('./updates')
 
 const {
@@ -102,6 +103,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	setStepDeadlineProjectAndMemoq,
 	saveCertificateTODR1Files,
 	autoCreatingTaskInProject,
 	createProjectFromRequest,

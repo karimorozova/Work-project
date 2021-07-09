@@ -1,30 +1,30 @@
 const { Projects, User, MemoqProject, Units, Vendors } = require('../models');
-const { getProject, updateProject } = require('./getProjects');
+const { getProject, updateProject, getProjectAfterUpdate } = require('./getProjects');
+
 const {
 	stepCancelNotifyVendor,
 	notifyVendorStepStart
 } = require('./emails');
+
 const { notifyManagerProjectStarts } = require('../utils');
 const { pmMail } = require('../utils/mailtopm');
+
 const {
 	getUpdatedProjectFinanceToZero,
 	getProjectFinancePrice
 } = require('./porjectFinance');
+
 const {
 	getProjectTranslationDocs,
 	getProjectUsers,
 	setMemoqProjectUsers,
-	assignMemoqTranslators
+	assignMemoqTranslators,
+	setMemoqDocsDeadline,
 } = require('../services/memoqs/projects');
+
 const { downloadMemoqFile } = require('../services/memoqs/files');
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users');
 
-/**
- *
- * @param {Object} project
- * @param {Boolean} isCatTool
- * @returns {Object} - returns updated project
- */
 async function updateProjectProgress(project, isCatTool) {
 	let { steps, tasks } = project;
 	try {
@@ -47,12 +47,6 @@ async function updateProjectProgress(project, isCatTool) {
 	}
 }
 
-/**
- *
- * @param {Array} tasks
- * @param {Object} project
- * @returns {Object} - returns updated project
- */
 async function getProjectAfterCancelTasks(tasks, project) {
 	try {
 
@@ -68,12 +62,6 @@ async function getProjectAfterCancelTasks(tasks, project) {
 	}
 }
 
-/**
- *
- * @param {Array} tasks
- * @param {Object} project
- * @returns {Object} - returns changed tasks, steps and identifier
- */
 async function cancelTasks(tasks, project) {
 	let projectTasks = [...project.tasks];
 	let projectSteps = [...project.steps];
@@ -100,12 +88,6 @@ async function cancelTasks(tasks, project) {
 	}
 }
 
-/**
- *
- * @param {Object} stepIdentify
- * @param {Array} steps
- * @returns {Array} - returns updated steps array
- */
 function cancelSteps({ stepIdentify, steps }) {
 	return steps.map(item => {
 		if(stepIdentify.indexOf(item.stepId) !== -1) {
@@ -133,14 +115,6 @@ function cancelSteps({ stepIdentify, steps }) {
 	});
 }
 
-/**
- *
- * @param {Array} tasksIds
- * @param {Array} projectTasks
- * @param {Array} changedSteps
- * @param {String} projectId
- * @returns {Array} - returns array of updated tasks
- */
 async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projectId }) {
 	const unchangingStatuses = ['Ready for Delivery', 'Pending Approval [DR1]', 'Pending Approval [DR2]', 'Delivered'];
 	let tasks = [...projectTasks];
@@ -174,13 +148,6 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
 	}
 }
 
-/**
- *
- * @param {Object} task
- * @param {String} projectId
- * @param {String} stepName
- * @returns {Array} - returns array of target files
- */
 async function getTaskTargetFiles({ task, projectId, stepName }) {
 	let targetFiles = [];
 	const { memoqDocs, memoqProjectId } = task;
@@ -203,11 +170,6 @@ async function getTaskTargetFiles({ task, projectId, stepName }) {
 	}
 }
 
-/**
- *
- * @param {ObjectId} stepId
- * @returns nothing - just updated needed project with tasks
- */
 async function downloadCompletedFiles(stepId) {
 	try {
 		let { id, steps, tasks } = await getProject({ "steps._id": stepId });
@@ -226,12 +188,6 @@ async function downloadCompletedFiles(stepId) {
 	}
 }
 
-/**
- *
- * @param {Array} changedSteps
- * @param {Object} task
- * @returns {{ receivables: number, payables: number }, {halfReceivables: number, halfPayables: number}}
- */
 function getTaskNewFinance(changedSteps, task) {
 	const { priceValues } = updateTaskNewFinance(changedSteps, task);
 	const { finance } = task;
@@ -243,12 +199,6 @@ function getTaskNewFinance(changedSteps, task) {
 	return { ...finance, Price };
 }
 
-/**
- *
- * @param {Array} changedSteps
- * @param {Object} task
- * @returns {{priceValues: {receivables: number, payables: number}}}
- */
 function updateTaskNewFinance(changedSteps, task) {
 	let priceValues = { receivables: 0, payables: 0 };
 	const taskSteps = changedSteps.filter(item => item.taskId === task.taskId);
@@ -264,12 +214,6 @@ function updateTaskNewFinance(changedSteps, task) {
 	return { priceValues };
 }
 
-/**
- *
- * @param {Array} steps
- * @param {ObjectId} taskId
- * @returns {String}
- */
 function getTaskStatusAfterCancel(steps, taskId) {
 	const taskSteps = steps.filter(item => item.taskId === taskId).map(step => step.status);
 	const cancelledSteps = taskSteps.filter(item => item === "Cancelled");
@@ -286,14 +230,6 @@ function getTaskStatusAfterCancel(steps, taskId) {
 	}
 }
 
-/**
- *
- * @param {Array} projectSteps
- * @param {Array} tasks
- * @param {String} status
- * @param {Array} stepIdentify
- * @returns {Array} returns updated project steps array
- */
 function updateStepsStatuses({ projectSteps, tasks, status, stepIdentify }) {
 	return projectSteps.map(item => {
 		if(stepIdentify.indexOf(item.id) !== -1) {
@@ -307,13 +243,7 @@ function updateStepsStatuses({ projectSteps, tasks, status, stepIdentify }) {
 	});
 }
 
-/**
- *
- * @param {Array} tasks
- * @param {Array} projectSteps
- * @param {Object} step
- * @returns {Boolean}
- */
+
 function isPrevStep({ tasks, projectSteps, step }) {
 	const stepTask = tasks.find(item => item.taskId === step.taskId);
 	const sameSteps = projectSteps.filter(item => {
@@ -325,11 +255,6 @@ function isPrevStep({ tasks, projectSteps, step }) {
 	return sameSteps.length && stage1.step.title !== step.serviceStep.title;
 }
 
-/**
- *
- * @param {ObjectId} step
- * @returns {Object}
- */
 function getStepNewFinance(step) {
 	const { progress, finance } = step;
 	const { Wordcount, Price } = finance;
@@ -340,12 +265,6 @@ function getStepNewFinance(step) {
 	return { Wordcount, Price };
 }
 
-/**
- *
- * @param {Object} project
- * @param {Boolean} ifChangePreviousStatus
- * @returns {Object} - returns an updated project
- */
 async function reOpenProject(project, ifChangePreviousStatus = true) {
 	let { steps, tasks } = project;
 
@@ -369,13 +288,6 @@ async function reOpenProject(project, ifChangePreviousStatus = true) {
 	}
 }
 
-
-/**
- *
- * @param {ObjectId} projectId
- * @param {String} action
- * @returns {Object} - returns an updated project
- */
 async function updateProjectStatusForClientPortalProject(projectId, action) {
 	const project = await getProject({ "_id": projectId });
 
@@ -398,13 +310,6 @@ async function updateProjectStatusForClientPortalProject(projectId, action) {
 	);
 }
 
-/**
- *
- * @param {ObjectId} id
- * @param {String} status
- * @param {String} reason
- * @returns {Object} - returns an updated project
- */
 async function updateProjectStatus(id, status, reason) {
 	try {
 		const project = await getProject({ "_id": id });
@@ -458,13 +363,6 @@ async function updateProjectStatus(id, status, reason) {
 //   return notFullyCancelledTask ? "Cancelled Halfway" : status;
 // }
 
-/**
- *
- * @param {Object} project
- * @param {String} status
- * @param {String} reason
- * @returns {Object} - returns an updated project
- */
 async function setNewProjectDetails(project, status, reason) {
 	try {
 		if(status === "Started" || status === "Approved") {
@@ -483,12 +381,7 @@ async function setNewProjectDetails(project, status, reason) {
 	}
 }
 
-/**
- *
- * @param {Object} project
- * @param {String} status
- * @returns {Object} - returns an updated project
- */
+
 async function getApprovedProject(project, status) {
 	const taskIds = project.tasks.map(item => item.taskId);
 	const { tasks, steps } = updateWithApprovedTasks({ taskIds, project });
@@ -524,12 +417,7 @@ async function getApprovedProject(project, status) {
 	}
 }
 
-/**
- *
- * @param {Array} taskIds
- * @param {Object} project
- * @returns {{steps: {Array}, tasks: {Array}}}
- */
+
 function updateWithApprovedTasks({ taskIds, project }) {
 	const tasks = project.tasks.map(task => {
 		if((task.status === 'Created' || task.status === 'Quote sent') && taskIds.indexOf(task.taskId) !== -1) {
@@ -547,12 +435,6 @@ function updateWithApprovedTasks({ taskIds, project }) {
 	return { tasks, steps };
 }
 
-/**
- *
- * @param {Object} stepTask
- * @param {Object} step
- * @returns {string}
- */
 function getApprovedStepStatus(stepTask, step) {
 	const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1');
 	if(stage1.step.title === step.serviceStep.title) {
@@ -562,25 +444,12 @@ function getApprovedStepStatus(stepTask, step) {
 }
 
 
-/**
- *
- * @param {Array} steps
- * @param {String} status
- * @param {Object} project
- * @returns {Array}
- */
 function setStepsStatus({ steps, status, project }) {
 	const { steps: projectSteps, tasks } = project;
 	const stepIdentify = steps.map(item => item._id);
 	return updateStepsStatuses({ projectSteps, tasks, status, stepIdentify });
 }
 
-/**
- *
- * @param {Object} task
- * @param {Array} steps
- * @returns {Array} - returns updated steps array
- */
 function updateStepsProgress(task, steps) {
 	return steps.map(item => {
 		if(task.taskId === item.taskId) {
@@ -590,12 +459,7 @@ function updateStepsProgress(task, steps) {
 	});
 }
 
-/**
- *
- * @param {Array} steps
- * @param {Object} task
- * @returns {Array} - returns updated steps array
- */
+
 function updateWordcountStepsProgress({ steps, task }) {
 	const { memoqDocs: docs } = task;
 	return steps.map(item => {
@@ -606,12 +470,7 @@ function updateWordcountStepsProgress({ steps, task }) {
 	});
 }
 
-/**
- *
- * @param {String} title
- * @param {Array} docs
- * @returns {{stepProgress: {Object}, totalProgress: {Array}}}
- */
+
 function setStepsProgress(title, docs) {
 	const prop = title === 'Translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount';
 	const totalProgress = docs.reduce((acc, cur) => {
@@ -711,12 +570,6 @@ async function getAfterReopenSteps(steps, project) {
 	}
 }
 
-/**
- *
- * @param {Array} steps
- * @param {Array} tasks
- * @returns {Array} - returns updated tasks array
- */
 function getTasksAfterReopen({ steps, tasks }) {
 	let updatedTasks = [...tasks];
 	for (let step of steps) {
@@ -728,12 +581,7 @@ function getTasksAfterReopen({ steps, tasks }) {
 	return updatedTasks;
 }
 
-/**
- *
- * @param {Object} query
- * @param {Object} update
- * @returns {Object} - returns an updated memoq project
- */
+
 async function updateOtherProject(query, update) {
 	return await MemoqProject.findOneAndUpdate(query, update, { new: false });
 }
@@ -776,12 +624,7 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	}
 };
 
-/**
- *
- * @param {ObjectId} manager
- * @param {ObjectId} memoqProjectId
- * @returns nothing - but updates memoq project's users by xml request
- */
+
 const assignProjectManagers = async ({ manager, memoqProjectId }) => {
 	const users = await getMemoqUsers();
 	const projectManagers = [];
@@ -790,12 +633,6 @@ const assignProjectManagers = async ({ manager, memoqProjectId }) => {
 	await setMemoqProjectUsers(memoqProjectId, projectManagers);
 };
 
-/**
- *
- * @param {Array} memoqUsers
- * @param {Object} manager
- * @returns {Object}
- */
 const checkAndCreateManager = async (memoqUsers, manager) => {
 	const memoqManager = memoqUsers.find(user => user.email === manager.email);
 	if(memoqManager) {
@@ -816,11 +653,6 @@ const checkAndCreateManager = async (memoqUsers, manager) => {
 	}
 };
 
-/**
- *
- * @param {ObjectId} projectId
- * @returns {Array} - returns array with unique steps or empty array
- */
 const checkProjectHasMemoqStep = async (projectId) => {
 	let { steps } = await Projects.findOne({ _id: projectId });
 	if(steps.length) {
@@ -858,6 +690,21 @@ const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 	return { workFlowStatus, memoqProjectId, memoqDocIds }
 }
 
+const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
+	let { steps } = await Projects.findOne({ '_id': projectId })
+	const { memoqProjectId, memoqDocIds, deadline, serviceStep: { memoqAssignmentRole }, vendor: vendorId } = steps.find(item => item.stepId === stepId)
+	const { email } = await Vendors.findOne({ "_id": vendorId })
+
+	const users = await getMemoqUsers();
+	const user = users.find(item => item.email === email)
+
+	if(user.id){
+		for await (let documentGuid of memoqDocIds) {
+			await setMemoqDocsDeadline(memoqProjectId, documentGuid, deadline, memoqAssignmentRole, user.id)
+		}
+	}
+}
+
 module.exports = {
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
@@ -873,5 +720,6 @@ module.exports = {
 	assignProjectManagers,
 	checkProjectHasMemoqStep,
 	updateProjectStatusForClientPortalProject,
-	regainWorkFlowStatusByStepId
+	regainWorkFlowStatusByStepId,
+	setStepDeadlineProjectAndMemoq
 };
