@@ -1,7 +1,7 @@
 <template lang="pug">
   .text-input
     .text-input__label {{ label }}:
-    input.text-input__input(:type="type" :name="name"  @change="setValue" :value="value")
+    input.text-input__input(:type="type" :name="name"  @input="setValue" @click="selectAll")
     span.text-input__example(v-if="example") {{ example }}
 
 </template>
@@ -22,15 +22,18 @@
 				type: String,
         default: 'text'
       },
-			value:{
-				type: [String, Number],
-        default: ''
+      selectWhenClicked: {
+			  type: Boolean,
+        default: false
       }
 		},
 		methods: {
 			setValue({ target: { value, name } }) {
 				this.$emit("setValue", { property: name, value: value })
-			}
+			},
+      selectAll(e) {
+        if (this.selectWhenClicked) e.target.select()
+      }
 		}
 	}
 </script>

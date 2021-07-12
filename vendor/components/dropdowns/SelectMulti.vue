@@ -6,8 +6,10 @@
         span.selected.no-choice(v-if="!selectedOptions.length") Select
         .arrow-button
           img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
+
+      input.search(v-if="isDropped && hasSearch" v-model="search" placeholder="Search")
       .drop(v-if="isDropped")
-        .drop__item(v-for="(option, index) in options" @click="chooseOptions(index)")
+        .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOptions(index)")
           .checkbox
             .checkbox__check(:class="{checked: activeClass(option)}")
           span {{ option }}
@@ -38,11 +40,16 @@
 			},
 			customClass: {
 				type: String
-			}
+			},
+      hasSearch: {
+			  type: Boolean,
+        default: false
+      }
 		},
 		data() {
 			return {
-				isDropped: false
+				isDropped: false,
+        search: '',
 			}
 		},
 		methods: {
@@ -53,7 +60,7 @@
 				this.isDropped = !this.isDropped
 			},
 			chooseOptions(index) {
-				this.$emit("chooseOptions", { option: this.options[index] })
+				this.$emit("chooseOptions", { option: this.filteredOptions[index] })
 			},
 			activeClass(elem) {
 				return (this.selectedOptions.indexOf(elem) != -1 ||
@@ -62,6 +69,15 @@
 						this.otherSoftwareChoice.indexOf(elem) != -1)
 			}
 		},
+    computed: {
+		  filteredOptions() {
+        return this.options.filter(item => {
+          if (item.toLowerCase().includes(this.search.toLowerCase())) {
+            return item
+          }
+        })
+      }
+    },
 		directives: {
 			ClickOutside
 		}
@@ -72,6 +88,16 @@
   .drop__wrapper {
     position: relative;
     height: 42px;
+  }
+  .search {
+    z-index: 50;
+    width: 100%;
+    padding: 10px;
+    color: #67573E;
+    outline: none;
+    box-shadow: inset 0 0 7px #C4BEB6;
+    border: 1px solid #c3c5c5;
+    box-sizing: border-box;
   }
 
   .drop-select {
@@ -85,7 +111,7 @@
 
     .drop {
       width: 100%;
-      max-height: 188px;
+      max-height: 320px;
       overflow-y: auto;
       overflow-x: hidden;
       flex-direction: column;

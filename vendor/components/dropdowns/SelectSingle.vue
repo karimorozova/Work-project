@@ -6,8 +6,9 @@
         span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
         .arrow-button
           img(src="../../assets/images/arrow_open.png" :class="{'reverse-icon': isDropped}")
+      input.search(v-if="isDropped && hasSearch" v-model="search" placeholder="Search")
       .drop(v-if="isDropped")
-        .drop__item(v-for="(option, index) in options" @click="chooseOption(index)" :class="{active: activeClass(option)}")
+        .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
           span {{ option }}
 </template>
 
@@ -28,11 +29,16 @@
 			placeholder: {
 				type: String,
 				default: 'Select'
-			}
+			},
+      hasSearch: {
+        type: Boolean,
+        default: false
+      }
 		},
 		data() {
 			return {
-				isDropped: false
+				isDropped: false,
+        search: "",
 			}
 		},
 		methods: {
@@ -43,16 +49,25 @@
 				this.isDropped = !this.isDropped
 			},
 			chooseOption(index) {
-				this.$emit("chooseOption", { option: this.options[index] })
+				this.$emit("chooseOption", { option: this.filteredOptions[index] })
 				this.outOptions()
 			},
 			activeClass(elem) {
 				if (this.selectedOption == elem && elem != "Yes") return true
 				if (elem == "Yes" && this.selectedOption &&
-						this.options.indexOf(this.selectedOption) === -1) return true
+						this.filteredOptions.indexOf(this.selectedOption) === -1) return true
 				return false
 			}
 		},
+    computed: {
+      filteredOptions() {
+        return this.options.filter(item => {
+          if (item.toLowerCase().includes(this.search.toLowerCase())) {
+            return item
+          }
+        })
+      },
+    },
 		directives: {
 			ClickOutside
 		}
@@ -67,6 +82,17 @@
     &__label {
       font-size: 14px;
     }
+  }
+
+  .search {
+    z-index: 50;
+    width: 100%;
+    padding: 10px;
+    color: #67573E;
+    outline: none;
+    box-shadow: inset 0 0 7px #C4BEB6;
+    border: 1px solid #c3c5c5;
+    box-sizing: border-box;
   }
 
   .drop-relative {
@@ -86,7 +112,7 @@
 
     .drop {
       width: 100%;
-      max-height: 188px;
+      max-height: 320px;
       overflow-y: auto;
       overflow-x: hidden;
       display: flex;

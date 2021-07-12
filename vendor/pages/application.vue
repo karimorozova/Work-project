@@ -52,6 +52,7 @@
                   SelectSingle(
                     :selectedOption="selectedSourceLanguage.lang"
                     :options="languages.map(item => item.lang)"
+                    :hasSearch="true"
                     @chooseOption="setSourceLanguage"
                   )
 
@@ -61,7 +62,7 @@
                   SelectMulti(
                     :isTableDropMenu="true"
                     placeholder="Select"
-                    :hasSearch="false"
+                    :hasSearch="true"
                     :options="languages.map(item => item.lang)"
                     :selectedOptions="selectedTargetsLanguages.map(item => item.lang)"
                     :allOptionsButtons="true"
@@ -75,7 +76,7 @@
                 SelectMulti(
                   :isTableDropMenu="true"
                   placeholder="Select"
-                  :hasSearch="false"
+                  :hasSearch="true"
                   :options="industries.map(item => item.name)"
                   :selectedOptions="selectedIndustries.map(item => item.name)"
                   :allOptionsButtons="true"
@@ -93,9 +94,9 @@
           .application__row-flex
             .application__col50
                 TextInput.application__mb-10(
-                  label="Rates"
+                  :label="`Rate (${selectedRate})`"
                   name="selectedRate"
-                  :value="selectedRate"
+                  :selectWhenClicked="true"
                   @setValue="setRate"
                 )
             .application__col50
@@ -272,7 +273,7 @@
 				for(let targetLanguage of this.selectedTargetsLanguages) {
 				  for(let industry of this.selectedIndustries) {
             pendingCompetencies.push({
-              description: {
+              descriptions: {
                 industry: 'Api',
                 targetLanguage: 'Api'
               },
@@ -309,7 +310,7 @@
 					this.alertToggle({ message: "Error on submitting the form", isShow: true, type: "error" })
 				}
 			},
-      setRate({  value }) {
+       setRate({  value }) {
         this.selectedRate = value
       },
       setStep({option}) {
@@ -326,7 +327,7 @@
           this.selectedTargetsLanguages.splice(position, 1)
         } else {
           if (this.selectedTargetsLanguages.length >= 5) {
-            this.errors.push('You can select only 5 Target languages')
+            this.errors = ['You can select only 5 Target languages']
             this.errorsExist = true
             return
           }
@@ -368,7 +369,7 @@
 					this.selectedIndustries.splice(position, 1)
 				} else {
           if (this.selectedIndustries.length >= 5) {
-            this.errors.push('You can select only 5 industries')
+            this.errors = ['You can select only 5 industries']
             this.errorsExist = true
             return
           }
@@ -385,18 +386,19 @@
 			async getAllIndustries() {
 				try {
 					let result = await this.$axios.$get("/api/industries")
-					result.sort((a, b) => {
-						if (a.lang < b.lang) return -1
-						if (a.lang > b.lang) return 1
-					})
+					result.sort((a, b) =>a.name.localeCompare(b.name))
 					this.industries = result
 				} catch (err) {
 				}
 			},
+      removeEnglishLang(languages) {
+        return languages.filter(({lang}) => lang.search("English") === -1 || lang === "English (United Kingdom)" )
+      },
 			async getAllLanguages() {
 				try {
 					let result = await this.$axios.$get("/api/languages")
-					this.languages = result
+          result.sort((a, b) =>a.lang.localeCompare(b.lang))
+					this.languages = this.removeEnglishLang(result)
 				} catch (err) {
 				}
 			},
@@ -412,6 +414,8 @@
     watch: {
       selectedRate(value) {
         const regex = /[^0-9\.,]/g
+        console.log(value)
+        console.log(value,value.replace(regex, ''))
         value = parseFloat(value.replace(regex, '').replace(',', '.')) || 0
         this.selectedRate = (+value).toFixed(4)
       },
