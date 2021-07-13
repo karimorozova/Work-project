@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { upload, sendEmail } = require('../utils');
-const { User, MemoqProject, Vendors } = require('../models');
+const { User, MemoqProject, Vendors, Projects} = require('../models');
 const { downloadCompletedFiles } = require('../projects');
 
 const {
@@ -95,6 +95,10 @@ router.get('/templates', async (req, res) => {
 
 router.post('/memoq-project', upload.fields([{ name: 'sourceFiles' }, { name: 'refFiles' }]), async (req, res) => {
 	let tasksInfo = { ...req.body };
+	tasksInfo.nativeProjectName = tasksInfo.nativeProjectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim()
+	if(!tasksInfo.nativeProjectName.trim().length) tasksInfo.nativeProjectName = "Png"
+	if(Number.isInteger(+tasksInfo.nativeProjectName.charAt(0)))  tasksInfo.nativeProjectName = 'Png ' + tasksInfo.nativeProjectName
+	tasksInfo.projectName = `${tasksInfo.internalProjectId} - ${tasksInfo.nativeProjectName}`
 	try {
 		if(tasksInfo.isRequest) {
 			tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
@@ -118,6 +122,7 @@ router.post('/memoq-project', upload.fields([{ name: 'sourceFiles' }, { name: 'r
 			manager: tasksInfo.projectManager,
 			memoqProjectId: tasksInfo.memoqProjectId
 		});
+		await Projects.updateOne({_id: tasksInfo.projectId}, {projectName: tasksInfo.nativeProjectName})
 		res.send({ tasksInfo });
 	} catch (err) {
 		console.log(err);

@@ -185,8 +185,8 @@
 			},
 			async changeProjectName(projectName) {
 				this.errors = []
-				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
-				// if (!this.project.projectName || (this.project.projectName )) this.errors.push("Please, enter valid Project name.")
+				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+				if (!this.project.projectName) this.errors.push("Please, enter valid Project name.")
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					return
@@ -267,9 +267,10 @@
 			},
 			async checkForErrors() {
 				this.errors = []
-				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
-					// this.errors.push("Please, enter valid Project name.")
-					this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
+				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
+				if (!this.project.projectName ) {
+					this.errors.push("Please, enter valid Project name.")
+					// this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
 				}
 				if (!this.project.startDate) this.errors.push("Please, set the start date.")
 				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")

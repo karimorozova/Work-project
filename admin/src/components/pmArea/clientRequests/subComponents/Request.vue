@@ -177,7 +177,8 @@
 			]),
 			async changeProjectName(projectName) {
 				this.errors = []
-				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+				if (!this.project.projectName ) this.errors.push("Please, enter valid Project name.")
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					return
@@ -245,12 +246,13 @@
 				this.areErrorsExist = false
 			},
 			checkProjectName() {
-				const regex = /^([^\d\W]|[A-z])[\w \.]*$/
-				return regex.test(this.project.projectName)
+				// const regex = /^([^\d\W]|[A-z])[\w \.]*$/
+				// return regex.test(this.project.projectName)
 			},
 			async checkForErrors() {
 				this.errors = []
-				if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
+				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
+				if (!this.project.projectName ) {
 					this.errors.push("Please, enter valid Project name.")
 					this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
 				}
