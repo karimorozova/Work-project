@@ -24,7 +24,7 @@
 
         template(slot="headerCheck" slot-scope="{ field }")
           .table__header
-            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
+            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(true)" @uncheck="(e)=>toggleAll(false)" customClass="tasks-n-steps")
         template(slot="headerInfo" slot-scope="{ field }")
           .table__header {{ field.label }}
         template(slot="headerName" slot-scope="{ field }")
@@ -164,6 +164,21 @@
         @notApprove="notApproveAction"
         @close="closeApproveModal"
       )
+    .steps__change-deadline(v-if="deadlineModal")
+      .steps__change-deadline-close(@click="closeErrorsDeadline") &#215;
+      Datepicker(
+        @selected="(e) => setMassDeadline(e)"
+        :inline="true",
+        calendarClass="steps__calendar-custom"
+        :format="customFormatter"
+        monday-first=true
+        :disabled="disabled"
+        :disabledPicker="isDatePickDisabled"
+        :highlighted="highlighted"
+        @scrollDrop="scrollDrop"
+      )
+
+
     ValidationErrors(
       v-if="areErrorsExist"
       :errors="errors"
@@ -194,6 +209,7 @@
 	import { mapGetters, mapActions } from 'vuex'
 	import ProgressLineStep from "../../ProgressLineStep"
 	import GeneralTable from "../../GeneralTable"
+	import Button from "../../Button"
 
 	export default {
 		mixins: [ scrollDrop, stepVendor, currencyIconDetected ],
@@ -246,7 +262,9 @@
 				isReassignment: false,
 				reassignStep: {},
 				areErrorsExist: false,
-				currentStepIdForRemoveVendor: null
+				currentStepIdForRemoveVendor: null,
+				deadlineModal: false,
+				dateNow: new Date()
 			}
 		},
 		methods: {
@@ -263,10 +281,6 @@
 				}
 			},
 			getStepPair(step) {
-				// if (step.packageSize) {
-				// 	return `${ step.targetLanguage } / ${ step.packageSize }`
-				// }
-				// return `${ step.sourceLanguage } <span><i class="fas fa-angle-double-right"></i></span> ${ step.targetLanguage }`
 				return `${ step.sourceLanguage } <span>&#8811;</span> ${ step.targetLanguage }`
 			},
 			personSelectDrop(step) {
@@ -283,7 +297,7 @@
 			//     return finance.Price.receivables;
 			// },
 			progress(prog) {
-				return prog.totalWordCount ? ((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : prog
+				return prog.hasOwnProperty('totalWordCount') ? +((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : +prog
 			},
 			lastProgress(step, index) {
 				if (step.stepId.includes('R')) {
@@ -369,11 +383,32 @@
 				}
 			},
 			async setAction({ option }) {
-				if (option !== "No action available") {
-					this.selectedAction = option
-					this.setModalTexts(option)
-					this.isApproveActionShow = true
+				this.selectedAction = option
+
+				switch (option) {
+					case "Mark as accept/reject":
+					case "Request confirmation":
+					case "ReOpen":
+						this.setModalTexts(option)
+						this.isApproveActionShow = true
+						break
+					case "Change Deadline" :
+						this.deadlineModal = true
+						break
 				}
+			},
+			setMassDeadline(e) {
+				const checkedSteps = this.currentProject.steps.filter(item => item.check)
+        try{
+	        for(let step of checkedSteps) this.$emit('setDate', { date: new Date(e), prop: 'deadline', stepId: step.stepId })
+        }finally {
+          this.closeErrorsDeadline()
+        }
+			},
+			closeErrorsDeadline() {
+				this.deadlineModal = false
+				this.selectedAction = ''
+        this.toggleAll(false)
 			},
 			setModalTexts(option) {
 				this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
@@ -392,6 +427,7 @@
 			getCheckedSteps() {
 				return this.allSteps.filter(item => item.check)
 			},
+
 			async approveAction() {
 				const checkedSteps = this.getCheckedSteps()
 				!checkedSteps.length ? this.closeApproveModal() : await this.doStepApproveAction(checkedSteps)
@@ -404,13 +440,12 @@
 							break
 						case "Mark as accept/reject":
 							const assignedSteps = checkedSteps.filter(item => item.vendor)
-							if (assignedSteps.length) {
-								await this.decideOnSteps(assignedSteps, "Accepted")
-							}
+							if (assignedSteps.length) await this.decideOnSteps(assignedSteps, "Accepted")
 							break
 						case "ReOpen":
 							const steps = checkedSteps.filter(item => item.status === "Completed")
 							await this.reopenSteps(steps)
+							break
 					}
 				} catch (err) {
 				} finally {
@@ -439,9 +474,7 @@
 			},
 			async notApproveAction() {
 				const checkedSteps = this.getCheckedSteps()
-				if (!checkedSteps.length) {
-					return this.closeApproveModal()
-				}
+				if (!checkedSteps.length) return this.closeApproveModal()
 				try {
 					switch (this.modalTexts.notApprove) {
 						case "No":
@@ -491,7 +524,7 @@
 				this.allSteps[index].check = val
 				this.setProjectProp({ value: this.allSteps, prop: 'steps' })
 			},
-			toggleAll(e, val) {
+			toggleAll(val) {
 				const steps = this.allSteps.reduce((acc, cur) => {
 					acc.push({ ...cur, check: val })
 					return acc
@@ -504,6 +537,10 @@
 			},
 			changeDate(e, prop, stepId) {
 				this.$emit('setDate', { date: new Date(e), prop, stepId })
+			},
+			isEvery(stepStatus) {
+				const checkedSteps = this.currentProject.steps.filter(item => item.check)
+				if (checkedSteps.length) return checkedSteps.every(({ status }) => status === stepStatus)
 			},
 			...mapActions([
 				"alertToggle",
@@ -522,32 +559,46 @@
 			}),
 			stepActions() {
 				if (this.currentProject) {
-					const checkedSteps = this.currentProject.steps.filter(item => item.check)
-					if (checkedSteps.length) {
+					const checkedSteps = this.currentProject.steps.filter(item => item.check).map(item => item.status)
+					const availableStatusForChangeDeadline = [ 'Created', 'Ready to Start', 'Request Sent', 'Waiting to Start', 'In progress', 'Started' ]
+					const indexesForAvailableStatuses = checkedSteps.map(item => availableStatusForChangeDeadline.indexOf(item))
 
-
+					if (this.isEvery('Created')) {
+						return [ "Mark as accept/reject", "Request confirmation", "Change Deadline" ]
+					} else if (this.isEvery('Completed')) {
+						return [ "ReOpen" ]
+					} else if (indexesForAvailableStatuses.length && !indexesForAvailableStatuses.includes(-1)) {
+						return [ "Change Deadline" ]
 					}
-					// console.log(checkedSteps)
-					// if(checkedSteps.length){
-					//   console.log(checkedSteps)
+
+					// const startAvailableOption = [ "Mark as accept/reject", "Request confirmation" ]
+					// const startAvailableStatuses = [ "Created", 'Rejected', 'Approved' ]
+
+					// if (checkedSteps.length) {
+					//
+					//   if(checkedSteps.every(({status}) => status === 'Created' || status === 'Rejected' )){
+					//     return ["Mark as accept/reject", "Request confirmation"]
+					//   }else if(checkedSteps.every(({status}) => status === 'Completed' )){
+					//     return ["ReOpen"]
+					//   }
 					// }
+
+					// let result = [ "Mark as accept/reject", "Request confirmation" ]
+					// const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created")
+					// const completedStep = this.allSteps.find(item => item.status === "Completed")
+					// if (!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
+					// 	result = []
+					// }
+					// if (completedStep && result.indexOf("ReOpen") === -1) {
+					// 	result.push("ReOpen")
+					// }
+					// if (!result.length) {
+					// 	result = [ "No action available" ]
+					// }
+					// return result
+
+					// return []
 				}
-
-				// let result = [ "Mark as accept/reject", "Request confirmation" ]
-				// const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created")
-				// const completedStep = this.allSteps.find(item => item.status === "Completed")
-				// if (!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
-				// 	result = []
-				// }
-				// if (completedStep && result.indexOf("ReOpen") === -1) {
-				// 	result.push("ReOpen")
-				// }
-				// if (!result.length) {
-				// 	result = [ "No action available" ]
-				// }
-				// return result
-
-				return []
 			},
 			isAllSelected() {
 				const unchecked = this.currentProject.steps.find(item => !item.check)
@@ -563,6 +614,7 @@
 			}
 		},
 		components: {
+			Button,
 			GeneralTable,
 			ProgressLineStep,
 			DataTable,
@@ -586,7 +638,7 @@
   .table {
     &__data {
       padding: 0 5px;
-      word-break: break-all;
+      word-break: break-word;
     }
 
     &__header {
@@ -600,8 +652,12 @@
       width: 100%;
       margin: 0 5px;
     }
-    &__vendor{
+
+    &__vendor {
       display: flex;
+      justify-content: space-between;
+      padding: 0 5px;
+      width: 100%;
     }
   }
 
@@ -616,33 +672,13 @@
       height: 31px;
     }
 
-    &__step-data {
-      /*height: 31px;*/
-      /*display: flex;*/
-      /*align-items: center;*/
-      /*padding: 0 5px;*/
-    }
-
-    &__step-date {
-      /*height: 31px;*/
-      /*display: flex;*/
-      /*align-items: center;*/
-      /*padding: 0 2px;*/
-    }
-
-    &__step-progress {
-      /*padding: 0 4px;*/
-      /*display: flex;*/
-      /*height: 30px;*/
-      /*align-items: center;*/
-    }
-
     &__table {
       position: relative;
     }
 
     &__action {
       align-self: flex-end;
+      z-index: 5;
     }
 
     &__title {
@@ -729,11 +765,48 @@
       right: 0;
     }
 
+    &__change-deadline {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      background-color: #fff;
+      border-radius: 4px;
+      padding: 30px 0 0 0;
+      width: 280px;
+
+      &-close {
+        position: absolute;
+        top: 5px;
+        right: 7px;
+        font-size: 22px;
+        cursor: pointer;
+        height: 22px;
+        width: 22px;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        font-family: Myriad900;
+        opacity: 0.8;
+        transition: ease 0.2s;
+
+        &:hover {
+          opacity: 1
+        }
+      }
+    }
+
     &__approve-action {
       position: absolute;
-      right: 0;
-      z-index: 50;
-      background-color: $white;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      background-color: #fff;
+      border-radius: 4px;
     }
 
     &__step-status {

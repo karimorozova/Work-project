@@ -239,13 +239,15 @@ function returnNewDeliveryId(projectId, singleLang, multiLang) {
 
 const removeDR2 = async ({ projectId, taskId, path, sourceLanguage: source, targetLanguage: target }) => {
 	const allLang = await Languages.find()
-	const { tasksDR2: { singleLang } } = await Projects.findOne({ _id: projectId })
+	let { tasksDR2: { singleLang } } = await Projects.findOne({ _id: projectId })
+
 	const idx = singleLang
 			.findIndex(({ sourceLanguage, targetLanguage }) => `${ sourceLanguage }-${ targetLanguage }` === `${ langId(source) }-${ langId(target) }`)
 
 	const { files: notFilteredFiles } = singleLang[idx]
+
 	singleLang[idx].files = notFilteredFiles
-			.filter(file => file.path !== path && file.taskId !== taskId)
+			.filter(file => file.path.toString() !== path.toString())
 
 	if (!singleLang[idx].files.length) singleLang.splice(idx, 1)
 

@@ -13,14 +13,14 @@
         .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
 
           span(v-if="element.hasOwnProperty('parent')")
-            .group__open(v-if="element.isOpen")
+            .group__open(style="margin-left: -4px;" v-if="element.isOpen")
               .group__open-image
-                img(:src="require(`../../assets/images/navbar-icons/test-icon.png`)")
+                img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-down
-            .group__close(v-if="!element.isOpen")
+            .group__close(style="margin-left: -4px;" v-if="!element.isOpen")
               .group__close-image
-                img(:src="require(`../../assets/images/navbar-icons/test-icon.png`)")
+                img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-right
 
@@ -71,9 +71,6 @@
 			}
 		},
 		methods: {
-			// generateRouteTo(){
-			//
-			// },
 			isGroup: ({ type }) => type === 'group',
 			isLink: ({ type }) => type === 'link',
 			isTitle: ({ type }) => type === 'title',
@@ -126,7 +123,7 @@
   @import "../../assets/scss/colors";
 
   img {
-    margin-right: 4px;
+    margin-right: 8px;
   }
 
   a {

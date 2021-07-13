@@ -1,20 +1,22 @@
 <template lang="pug">
   .all-projects
+
     .all-projects__filters
       ProjectFilters(
+        :idFilter="idFilter"
         :clientName="clientFilter"
+        :projectName="projectFilter"
         :sourceLangs="sourceFilter"
         :targetLangs="targetFilter"
         :pmFilter="pmFilter"
         :salesFilter="salesFilter"
         :projectManagers="projectManagers"
         :salesManagers="salesManagers"
-        @addLangFilter="addLangFilter"
-        @removeLangFilter="removeLangFilter"
         @setFilter="setFilter"
         :projectsType="projectsType"
         @refreshProjects="refreshProjects"
       )
+
     .all-projects__table
       ProjectsTable(
         v-if="projectsType !== 'requests'"
@@ -25,7 +27,6 @@
 </template>
 
 <script>
-	import moment from "moment"
 	import ProjectsTable from "../ProjectsTable"
 	import RequestsTable from "../RequestsTable"
 	import ProjectInfo from "../ProjectInfo"
@@ -41,6 +42,8 @@
 		data() {
 			return {
 				clientFilter: "",
+				projectFilter: "",
+				idFilter: "",
 				sourceFilter: [],
 				targetFilter: [],
 				statusFilter: "",
@@ -65,16 +68,17 @@
 			]),
 			setFilter({ option, prop }) {
 				this[prop] = option
-				this.$emit('filterProjects', this.filters)
+				console.log({ option, prop })
+				this.getData(this.filters)
 			},
-			removeLangFilter({ from, position }) {
-				this[from].splice(position, 1)
-				this.$emit('filterProjects', this.filters)
-			},
-			addLangFilter({ to, lang }) {
-				this[to].push(lang.symbol)
-				this.$emit('filterProjects', this.filters)
-			},
+			// removeLangFilter({ from, position }) {
+			// 	this[from].splice(position, 1)
+			// 	this.$emit('filterProjects', this.filters)
+			// },
+			// addLangFilter({ to, lang }) {
+			// 	this[to].push(lang.symbol)
+			// 	this.$emit('filterProjects', this.filters)
+			// },
 			selectProject({ project }) {
 				this.setCurrentProject(project)
 				this.$router.push(`${ this.$route.path }/details/${ project._id }`)
@@ -134,7 +138,9 @@
 					startFilter: this.startFilter,
 					deadlineFilter: this.deadlineFilter,
 					sourceFilter: this.sourceFilter,
-					targetFilter: this.targetFilter
+					targetFilter: this.targetFilter,
+					projectFilter: this.projectFilter,
+					idFilter: this.idFilter,
 				}
 			},
 			projectManagers() {

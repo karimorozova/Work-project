@@ -101,7 +101,14 @@ export default {
             .find(item => item._id.toString() === steps[_idx].serviceStep.unit)
 
         if(steps[_idx].status !== 'Completed' && steps[_idx].status !== 'Cancelled' && steps[_idx].status !== 'Cancelled Halfway'){
-	        const updatedProject = await this.$http.post('/pm-manage/update-steps-dates', { projectId: _id, steps, step: steps[_idx], stepId, type, prop })
+
+        	const finalSteps = steps.reduce((acc, curr) => {
+        		delete curr.check
+            acc.push(curr)
+        		return acc
+          }, [])
+
+	        const updatedProject = await this.$http.post('/pm-manage/update-steps-dates', { projectId: _id, steps: finalSteps, step: finalSteps[_idx], stepId, type, prop })
 	        await this.setCurrentProject(updatedProject.data)
         }
       } catch (err) {

@@ -23,6 +23,7 @@ function getFilterdProjectsQuery(filters) {
 		const filter = filters.idFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		query.projectId = { "$regex": new RegExp(filter, 'i') };
 	}
+
 	if(filters.projectFilter) {
 		const filter = filters.projectFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		query.projectName = { "$regex": new RegExp(filter, 'i') };

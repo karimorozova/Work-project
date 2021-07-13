@@ -3,11 +3,11 @@
     .filters__row
       .filters__item
         label.filters__filter-title Project Id:
-        input.filters__text-input(type="text" id="clientId" @keyup="filterById")
+        input.filters__text-input(type="text" id="idFilter" @keyup="filterById")
 
       .filters__item
         label.filters__filter-title Project Name:
-        input.filters__text-input(type="text" :value="clientName" @keyup="filterByProjectName")
+        input.filters__text-input(type="text" :value="projectName" @keyup="filterByProjectName")
 
       //.filters__item
         //label.filters__filter-title Status:
@@ -91,9 +91,11 @@
 
 	export default {
 		props: {
+			idFilter: { type: String },
 			pmFilter: { type: String },
 			salesFilter: { type: String },
 			clientName: { type: String },
+			projectName: { type: String },
 			sourceLangs: { type: Array },
 			targetLangs: { type: Array },
 			projectManagers: { type: Array },

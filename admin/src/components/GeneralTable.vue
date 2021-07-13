@@ -301,7 +301,7 @@
     background: white;
     position: absolute;
     right: 1px;
-    z-index: 55;
+    z-index: 1;
   }
 
 </style>
