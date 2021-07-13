@@ -77,7 +77,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 		}
 
 		const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
-			name: `Api| ${ projectId }: ${ projectName }`,
+			name: `${ projectId }: ${ projectName }`,
 			clientId: customers.id,
 			serviceId: service
 		})

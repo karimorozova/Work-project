@@ -19,13 +19,17 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	const tasksInfo = obj.selectedTasks.length ?
 			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
 			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps)
+
 	const tasksInfoArr = obj.selectedTasks.length ?
 			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true) :
 			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true)
+
 	const taskInfoSubTotal = tasksInfoArr.reduce((acc, curr) => acc + curr.cost, 0)
+
 	const taskInfoWithoutDiscountsArr = obj.selectedTasks.length ?
 			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps, true, true) :
 			getTasksInfo(obj, fromMinimumCharge, activeTasks, obj.steps, allUnits, allSettingsSteps, true, true)
+
 	const taskInfoWithoutDiscounts = taskInfoWithoutDiscountsArr.reduce((acc, curr) => acc + curr.cost, 0)
 	const token = jwt.sign({ id: obj.id }, secretKey, { expiresIn: '21d' })
 
@@ -69,10 +73,10 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	                            style="color:#66563E; width: 100%; border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 	                            <tr>
 	                                <td class="main_weight600"
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
 	                                    Name:</td>
 	                                <td
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
 	                                    ${ obj.projectName }</td>
 	                            </tr>
 	                            <tr>
@@ -85,10 +89,10 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	                            </tr>
 	                            <tr>
 	                                <td class="main_weight600"
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
 	                                    Industry:</td>
 	                                <td
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
 	                                    ${ obj.industry.name }</td>
 	                            </tr>
 	                            <tr>
@@ -150,7 +154,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
                     <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;">
                         By clicking on one of the link below, you can accept or reject our offer.<br>
                         <span class="main_line15-red"
-                            style="background-color:#F4F0EE;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;">
+                            style="background-color:#f7f7f7;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;">
                             Clicking "I accept" will also approve and accept our <a
                                 href="https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf" class="link"
                                 style="color:#D15F46;">terms and conditions</a>
@@ -215,10 +219,10 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
 	                            style="color:#66563E; width: 100%; border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 	                            <tr>
 	                                <td class="main_weight600"
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
 	                                    Name:</td>
 	                                <td
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
 	                                    ${ obj.projectName }</td>
 	                            </tr>
 	                            <tr>
@@ -231,10 +235,10 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
 	                            </tr>
 	                            <tr>
 	                                <td class="main_weight600"
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;font-weight:600;">
 	                                    Industry:</td>
 	                                <td
-	                                    style="border:none;background: #F4F0EE; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
+	                                    style="border:none;background: #f7f7f7; padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;min-width:200px;">
 	                                    ${ obj.industry.name }</td>
 	                            </tr>
 	                            <tr>
@@ -297,7 +301,7 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
                     	This is a Cost Quote and provides only estimation.
 										</p>
                     <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;">
-                        <span class="main_line15-red" style="background-color:#F4F0EE;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;">
+                        <span class="main_line15-red" style="background-color:#f7f7f7;padding-top:2px;padding-bottom:2px;padding-right:0;padding-left:0;">
                             Should anything change in the files or instructions, so will the deadline and charges.
                         </span>
                     </p>
@@ -433,10 +437,10 @@ function generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDisc
 <td style="border:none;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;"> ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ TMDiscount.toFixed(2) }</td>` : `<td style="display: none;"></td><td style="display: none;"></td>`
 	return !fromMinimumCharge ? `<tr>
             <td class="main_weight600"
-                style="border:none;background: #F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+                style="border:none;background: #f7f7f7;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
                 Sub-total:</td>
             <td
-                style="border:none;background: #F4F0EE;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
+                style="border:none;background: #f7f7f7;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
                 ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ taskInfoSubTotal.toFixed(2) }</td>
         </tr>
         <tr>
@@ -457,7 +461,7 @@ function discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInf
 	const startIndex = TMDiscount > 0 ? 2 : 1
 	return obj.discounts.length && !fromMinimumCharge ?
 			obj.discounts.reduce((acc, curr, index) => {
-				let color = (index + startIndex) % 2 ? '#fff' : '#F4F0EE'
+				let color = (index + startIndex) % 2 ? '#fff' : '#f7f7f7'
 				acc += `<tr><td class="main_weight600"
 				style="border:none;background: ${ color };padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
 						${ curr.name }</td>
@@ -495,26 +499,28 @@ function getTasksInfo(obj, fromMinimumCharge, tasks, steps, allUnits, allSetting
 		for (let curStep of taskSteps) {
 			const { type } = allUnits.find(({ _id }) => _id.toString() === curStep.serviceStep.unit.toString())
 			const { title } = allSettingsSteps.find(({ _id }) => _id.toString() === curStep.serviceStep.step.toString())
+
 			if (type === 'CAT Wordcount') {
 				cost = sumForTMDiscounts ? curStep.finance.Wordcount.receivables * curStep.clientRate.value : curStep.totalWords * curStep.clientRate.value
 				totalQuantity = curStep.totalWords
 			} else {
 				if (type === 'Packages') {
 					totalQuantity = curStep.quantity
+					cost = +(totalQuantity * curStep.clientRate.value).toFixed(4)
 				} else {
 					totalQuantity = curStep.hours
+					cost = +(totalQuantity * curStep.clientRate.value).toFixed(4)
 				}
-				cost = curStep.defaultStepPrice
 			}
 			acc.push({
 				task: curTask.service.title,
 				langPair: `${ langPair }`,
 				jobType: title,
-				unitPrice: curStep.clientRate.value.toFixed(4),
+				unitPrice: +curStep.clientRate.value.toFixed(4),
 				unit: type,
 				quantity: totalQuantity,
 				cost,
-				color: (index + 2) % 2 ? '#fff' : '#F4F0EE'
+				color: (index + 2) % 2 ? '#fff' : '#f7f7f7'
 			})
 		}
 		return [ ...acc ]
@@ -523,6 +529,7 @@ function getTasksInfo(obj, fromMinimumCharge, tasks, steps, allUnits, allSetting
 	for (let info of tasksInfo) {
 		result += getTaskCode(obj, fromMinimumCharge, info)
 	}
+
 	return onlyInformation ? tasksInfo : result
 }
 
@@ -616,7 +623,7 @@ function notifyLanguagePairIsReady(obj) {
                 <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ am }</p>
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
                     <p style="font-weight: 400;">
                     		The translation for ${ obj.languagePair } from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready.
                     </p>
@@ -647,7 +654,7 @@ function notifyMultilingualIsReady(obj) {
                 <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ am }</p>
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
                     <p style="font-weight: 400;">
                     	The translation in project ${ obj.project.projectId } - ${ obj.project.projectName } in the following languages is ready in one multilingual file. 
                     	<ul style="font-weight: 400;">
@@ -689,7 +696,7 @@ function notifyAssignmentIsReady(obj) {
                 <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ am }</p>
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
      	    					<p style="font-weight: 400;">
                        ${ content }
                     </p>
@@ -713,7 +720,7 @@ function getDeliveryMessage(obj) {
                     <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                         <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                             This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
-                        <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
+                        <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
                         <p style="font-weight: 400;">
                         	I'm pleased to inform you that the task(s) of ${obj.langPair} from project ${ obj.projectId } - ${ obj.projectName } has been completed and is ready for review.
                         </p>
@@ -865,7 +872,7 @@ function projectDeliveryMessage(obj) {
                 <div class="main" style="padding-top:40px;padding-right:40px;padding-left:40px;" >
                     <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
                         This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
                     <p style="font-weight: 400;">
                     		I'm pleased to inform you the following languages tasks from  project: ${ obj.projectId } - ${ obj.projectName } have been completed and is ready for review.
                     </p>

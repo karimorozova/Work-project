@@ -117,21 +117,21 @@
             span {{ row.status | stepsAndTasksStatusFilter }}
 
         template(slot="receivables" slot-scope="{ row }")
-          .table__data
+          .table__finance
             span(v-if="isShowValue(row, 'receivables')")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
               span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
               span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          .table__data
+          .table__finance
             span(v-if="isShowValue(row, 'payables')")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
               span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
               span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
         template(slot="margin" slot-scope="{ row }")
-          .table__data
+          .table__finance
             span(v-if="marginCalc(row)")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="marginCalc(row)") {{ marginCalc(row) }}
@@ -240,15 +240,15 @@
 					{ label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
 					{ label: "", headerKey: "headerInfo", key: "info", style: { "width": "3%", "border-left": "none" } },
 					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "9%" } },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
+					{ label: "Langs", headerKey: "headerLanguage", key: "language", style: { "width": "6%" } },
 					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", style: { "width": "16%" } },
 					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "8%" } },
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "7%" } },
-					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "12%" } },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "12%" } },
-					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "6%" } },
-					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "6%" } },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "6%" } }
+					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "13%" } },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "13%" } },
+					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "7%" } },
+					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "7%" } },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "7%" } }
 				],
 				selectedVendors: [],
 				modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
@@ -281,7 +281,7 @@
 				}
 			},
 			getStepPair(step) {
-				return `${ step.sourceLanguage } <span>&#8811;</span> ${ step.targetLanguage }`
+				return `<div style="margin-bottom: -2px;">${ step.sourceLanguage }</div><div>${ step.targetLanguage }</div>`
 			},
 			personSelectDrop(step) {
 				const { stepId, vendor } = step
@@ -658,6 +658,9 @@
       justify-content: space-between;
       padding: 0 5px;
       width: 100%;
+    }
+    &__finance{
+      padding: 0 3px 0 5px;
     }
   }
 

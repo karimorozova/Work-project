@@ -44,10 +44,8 @@
 
         .project-finance__content-settingBlock
           div
+
             .minPrice
-              .minPrice-item
-                .minPrice-item__title Receivables Rates:
-                .minPrice-item__input {{ getStartedReceivables }}
               .minPrice-item__forIgnore
                 .minPrice-item
                   .minPrice-item__title Minimum Charge:
@@ -63,6 +61,13 @@
                       input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
                       label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
                       label(v-else for="ignoreMinPrice")
+
+              .initialReceivables
+                .initialReceivables__title Initial Receivables
+                  span.internal-info (internal information)
+                  span :
+                .initialReceivables__value {{ getStartedReceivables }}
+                  span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
 
           .discounts
             Discounts(
@@ -221,6 +226,23 @@
   .opacity {
     opacity: .4;
     cursor: default;
+  }
+
+  .initialReceivables {
+    display: flex;
+
+    .internal-info {
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    &__title {
+
+    }
+
+    &__value {
+      margin-left: 23px;
+    }
   }
 
   .minPrice {
