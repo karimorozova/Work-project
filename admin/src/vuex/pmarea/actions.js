@@ -193,7 +193,13 @@ export const reopenSteps = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
 	try {
 		if(payload.length) {
-			const updatedProject = await Vue.http.post("/pm-manage/steps-reopen", { steps: payload });
+			const steps = payload.reduce((acc, curr) => {
+				delete curr.check
+				acc.push(curr)
+				return acc
+			}, [])
+
+			const updatedProject = await Vue.http.post("/pm-manage/steps-reopen", { steps });
 			await dispatch('setCurrentProject', updatedProject.data);
 		}
 		dispatch('alertToggle', { message: "Steps reopened", isShow: true, type: "success" });

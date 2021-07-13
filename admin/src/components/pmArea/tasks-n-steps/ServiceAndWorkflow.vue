@@ -162,7 +162,6 @@
 
 				function returnUnit(index, array) {
 					const { step: { title } } = steps[index]
-					console.log('steps[index].step.title', title)
 					const { calculationUnit: calculationUnits, _id: stepId } = array.find((item) => item.title === title)
 					const stepRates = stepMultipliersTable.filter(item => item.step === stepId)
 					for (let unit of calculationUnits) {

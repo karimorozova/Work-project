@@ -4,7 +4,7 @@
       template(v-if="selectedPerson")
         span.selected {{ selectedPerson }}
       template(v-if="!selectedPerson")
-        span.selected.no-select Select
+        span.selected.no-select Select Vendor
       .arrow-button(@click="togglePersons")
         i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")
     .drop(v-if="isDropped")

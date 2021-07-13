@@ -23,43 +23,44 @@
       )
 
         template(slot="headerCheck" slot-scope="{ field }")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
-
+          .table__header
+            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
         template(slot="headerInfo" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerName" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerLanguage" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerVendor" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerStart" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerDeadline" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerProgress" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerStatus" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerReceivables" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerPayables" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerMargin" slot-scope="{ field }")
-          span.steps__label {{ field.label }}
+          .table__header {{ field.label }}
+
         template(slot="check" slot-scope="{ row, index }")
-          .steps__step-check
+          .table__data
             CheckBox(:isChecked="row.check" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
         template(slot="info" slot-scope="{row, index}")
-          .steps__info-icon(@click="showStepDetails(index)")
+          .table__data(style="cursor: pointer;" @click="showStepDetails(index)")
             img(src="../../../assets/images/latest-version/view-details.png")
         template(slot="name" slot-scope="{ row }")
-          span.steps__step-data.steps_no-padding {{ row.name }}
+          .table__data {{ row.name }}
         template(slot="language" slot-scope="{ row }")
-          span.steps__step-data {{ getStepPair(row) }}
+          .table__data(v-html="getStepPair(row)")
 
         template(slot="vendor" slot-scope="{ row, index }")
-          .steps__vendor-menu(v-if="isVendorSelect(row.status)")
+          .table__drop(v-if="isVendorSelect(row.status)")
             PersonSelect(
               :persons="extendedVendors(index)"
               :selectedPerson="vendorName(row.vendor)"
@@ -71,7 +72,7 @@
               @removeVendorFromStep="removeVendorFromStep"
             )
 
-          span.steps_no-padding(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
+          .table__vendor(v-if="!isVendorSelect(row.status)") {{ vendorName(row.vendor) }}
             .steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")
               .steps__replace-icon(@click="showReassignment(index)")
                 i.fas.fa-exchange-alt
@@ -79,7 +80,7 @@
             span.steps__step-no-select(v-if="!row.vendor") No Vendor
 
         template(slot="start" slot-scope="{ row, index }")
-          .steps__step-date
+          .table__data
             Datepicker(
               @selected="(e) => changeDate(e, 'start', row.stepId)"
               v-model="row.start"
@@ -93,7 +94,7 @@
             )
 
         template(slot="deadline" slot-scope="{ row, index }")
-          .steps__step-date
+          .table__data
             Datepicker(
               @selected="(e) => changeDate(e, 'deadline', row.stepId)"
               v-model="row.deadline"
@@ -108,28 +109,29 @@
             )
 
         template(slot="progress" slot-scope="{ row, index }")
-          .steps__step-progress
+          .table__data(style="width: 100%")
             ProgressLineStep(:progress="progress(row.progress)" :lastProgress="lastProgress(row, index)")
+
         template(slot="status" slot-scope="{ row }")
-          .steps__step-data
+          .table__data
             span {{ row.status | stepsAndTasksStatusFilter }}
 
         template(slot="receivables" slot-scope="{ row }")
-          .steps__step-data
+          .table__data
             span(v-if="isShowValue(row, 'receivables')")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
               span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
               span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          .steps__step-data
+          .table__data
             span(v-if="isShowValue(row, 'payables')")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
               span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
               span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
         template(slot="margin" slot-scope="{ row }")
-          .steps__step-data
+          .table__data
             span(v-if="marginCalc(row)")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="marginCalc(row)") {{ marginCalc(row) }}
@@ -219,21 +221,20 @@
 				},
 				tabs: [ 'Tasks', 'Steps' ],
 				fields: [
-					{ label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "2%" } },
-					{ label: "", headerKey: "headerInfo", key: "info", style: { "width": "2%" } },
-					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "4%" } },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", style: { "width": "4%" } },
+					{ label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
+					{ label: "", headerKey: "headerInfo", key: "info", style: { "width": "3%", "border-left": "none" } },
+					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "9%" } },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
 					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", style: { "width": "16%" } },
-					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "4%" } },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "5%" } },
-					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "4%" } },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "4%" } },
-					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "5%" } },
-					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "5%" } },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "5%" } }
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "8%" } },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "7%" } },
+					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "12%" } },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "12%" } },
+					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "6%" } },
+					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "6%" } },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "6%" } }
 				],
 				selectedVendors: [],
-				actions: [ "Mark as accept/reject", "Request confirmation" ],
 				modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
 				isApproveActionShow: false,
 				activeIndex: -1,
@@ -262,10 +263,11 @@
 				}
 			},
 			getStepPair(step) {
-				if (step.packageSize) {
-					return `${ step.targetLanguage } / ${ step.packageSize }`
-				}
-				return `${ step.sourceLanguage } >> ${ step.targetLanguage }`
+				// if (step.packageSize) {
+				// 	return `${ step.targetLanguage } / ${ step.packageSize }`
+				// }
+				// return `${ step.sourceLanguage } <span><i class="fas fa-angle-double-right"></i></span> ${ step.targetLanguage }`
+				return `${ step.sourceLanguage } <span>&#8811;</span> ${ step.targetLanguage }`
 			},
 			personSelectDrop(step) {
 				const { stepId, vendor } = step
@@ -519,19 +521,33 @@
 				userGroup: "getUserGroup"
 			}),
 			stepActions() {
-				let result = this.actions
-				const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created")
-				const completedStep = this.allSteps.find(item => item.status === "Completed")
-				if (!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
-					result = []
+				if (this.currentProject) {
+					const checkedSteps = this.currentProject.steps.filter(item => item.check)
+					if (checkedSteps.length) {
+
+
+					}
+					// console.log(checkedSteps)
+					// if(checkedSteps.length){
+					//   console.log(checkedSteps)
+					// }
 				}
-				if (completedStep && result.indexOf("ReOpen") === -1) {
-					result.push("ReOpen")
-				}
-				if (!result.length) {
-					result = [ "No action available" ]
-				}
-				return result
+
+				// let result = [ "Mark as accept/reject", "Request confirmation" ]
+				// const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created")
+				// const completedStep = this.allSteps.find(item => item.status === "Completed")
+				// if (!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
+				// 	result = []
+				// }
+				// if (completedStep && result.indexOf("ReOpen") === -1) {
+				// 	result.push("ReOpen")
+				// }
+				// if (!result.length) {
+				// 	result = [ "No action available" ]
+				// }
+				// return result
+
+				return []
 			},
 			isAllSelected() {
 				const unchecked = this.currentProject.steps.find(item => !item.check)
@@ -566,6 +582,28 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .table {
+    &__data {
+      padding: 0 5px;
+      word-break: break-all;
+    }
+
+    &__header {
+      padding: 0 5px;
+      word-break: break-all;
+    }
+
+    &__drop {
+      position: relative;
+      height: 32px;
+      width: 100%;
+      margin: 0 5px;
+    }
+    &__vendor{
+      display: flex;
+    }
+  }
 
   .steps {
     display: flex;
@@ -699,22 +737,19 @@
     }
 
     &__step-status {
-      padding-left: 5px;
-      max-height: 30px;
+      max-height: 32px;
       overflow-y: auto;
     }
 
     &_no-padding {
       height: 100%;
       width: 100%;
-      max-height: 30px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-left: 5px;
-      overflow-y: auto;
       overflow-y: hidden;
+      overflow-x: hidden;
     }
   }
 
@@ -728,6 +763,11 @@
 
   .fa-info-circle {
     font-size: 16px;
+  }
+
+  .overHidden {
+    overflow-y: hidden;
+    overflow-x: hidden;
   }
 
 </style>

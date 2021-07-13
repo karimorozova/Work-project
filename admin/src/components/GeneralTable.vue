@@ -174,7 +174,7 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors";
 
-  .th {
+/*  .th {
     &__modals {
       position: absolute;
       z-index: 10;
@@ -213,7 +213,7 @@
         color: #36304a;
       }
     }
-  }
+  }*/
 
   .scroll {
     overflow-y: scroll;
@@ -232,14 +232,15 @@
     position: relative;
   }
 
-  table td, table th {
-    padding: 0 7px;
-  }
-
   th {
     border-left: 1px solid $border;
-    display: grid;
+    height: 40px;
+    display: flex;
     align-items: center;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    padding: 0;
 
     &:first-child {
       border-left: none;
@@ -247,11 +248,15 @@
   }
 
   td {
-    height: 40px;
-    letter-spacing: -0.1px;
     border-left: 1px solid $light-border;
-    display: grid;
+    height: 40px;
+    display: flex;
     align-items: center;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    letter-spacing: -0.1px;
+    padding: 0;
 
     &:first-child {
       border-left: none;
@@ -263,13 +268,7 @@
   }
 
   table thead {
-    height: 40px;
-    position: relative;
     border-bottom: 1px solid $border;
-  }
-
-  table tbody tr:last-child {
-    border: 0;
   }
 
   table thead th {
