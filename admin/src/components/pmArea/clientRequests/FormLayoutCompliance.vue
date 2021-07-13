@@ -414,8 +414,9 @@
 			},
 			changeProjectName(key, value) {
 				if (!this.canUpdateRequest()) return
-				const regex = /^([^\d\W]|[A-z])[\w \.]*$/
-				if (!regex.test(value) || !value) {
+				// const regex = /^([^\d\W]|[A-z])[\w \.]*$/
+				// if (!regex.test(value) || !value) {
+				if (!value) {
 					this.alertToggle({ message: "Project name not saved!", isShow: true, type: "error" })
 					// this.currentClientRequest.projectName = value.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
 					return

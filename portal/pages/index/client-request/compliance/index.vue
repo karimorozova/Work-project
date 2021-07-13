@@ -293,10 +293,7 @@ export default {
         startOption: this.startOption
       }
     },
-    checkProjectName() {
-      const regex = /^[A-Za-z][A-Za-z0-9\-\_ ]+((([A-Za-z0-9])+([\-\_])?)* *)*$/
-      return regex.test(this.currentProjectName)
-    },
+
     closeErrors() {
 
       this.showError = false
@@ -305,7 +302,7 @@ export default {
     checkError() {
       this.closeErrors()
 
-      if (!this.currentProjectName || (this.currentProjectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
+      if (!this.currentProjectName) this.errors.push("Please, enter valid Project name.")
       if (new Set(this.files.map(({ name }) => name)).size !== this.files.length) this.errors.push("Please, do not select the same files.")
 
       if (this.errors.length > 0) {
