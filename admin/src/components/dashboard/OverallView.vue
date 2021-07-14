@@ -1,11 +1,12 @@
 <template lang="pug">
   .overallView
-    .overallView__col
+    h3 only for AM PM ADMIN
+    //.overallView__col
       .col__title Today
       ProjectFinanceStats
-    .overallView__spaceLine
+    //.overallView__spaceLine
       .overallView__spaceLine-line
-    .overallView__col
+    //.overallView__col
       .col__title Month
       ProjectFinanceStats(:startDateSet="startDateMonth")
 
@@ -26,48 +27,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.overallView {
-  width: 1000px;
-  margin: 50px;
-  display: flex;
-
-  &__spaceLine {
-    width: 100px;
-    display: flex;
-    margin-top: 75px;
-    justify-content: center;
-
-    &-line {
-      width: 1px;
-      height: auto;
-      background: #dbd3c9;
-    }
-  }
-
-  &__col {
-    width: 450px;
-  }
-
-  .col {
-    &__title {
-      text-align: center;
-      font-size: 22px;
-      font-family: Myriad600;
-    }
-
-    &__table {
-      margin-top: 50px;
-      padding: 10px 20px;
-    }
-
-    &__chart {
-      margin-top: 50px;
-    }
-  }
-
-  .shadow {
+  .overallView{
+    padding: 20px;
     box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    box-sizing: border-box;
+    width: 1400px;
+    margin: 50px;
   }
-
-}
 </style>

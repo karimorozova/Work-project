@@ -63,7 +63,7 @@
         label.block-item__label.block-item_relative Native Language:
         .block-item__drop-menu.block-item_medium-index
           SelectSingle(
-            :selectedOption="currentVendor.native.lang",
+            :selectedOption="currentVendor.native != null ? currentVendor.native.lang : ''",
             :options="filteredLanguages.map(({lang}) => lang)",
             placeholder="Native Language"
             :hasSearch="true"
