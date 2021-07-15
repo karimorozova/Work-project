@@ -63,7 +63,7 @@
           )
 
 
-    .review-table__upload.review-table_no-back
+    //.review-table__upload.review-table_no-back
       input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing")
       Add
 </template>
@@ -80,7 +80,6 @@
 
 	export default {
 		props: {
-			task: { type: Object },
 			files: { type: Array }
 		},
 		data() {
@@ -131,6 +130,7 @@
 					for (let file of checked) {
 						this.createLinkAndDownload(file.path)
 					}
+					this.toggleAll(null, false)
 				}
 				if (option === 'Approve') {
 					this.$emit('approveFiles', { checked })

@@ -9,10 +9,6 @@
         @close="closeModal"
         @notApprove="closeModal"
       )
-
-    //.review-table__actions
-      //.review-table__action(v-if="task.service.title === 'Compliance'")
-        Button(value="Add Certificate" @clicked="generateCertificate")
     .review-table__action
       SelectSingle(
         placeholder="Select action"
@@ -20,14 +16,11 @@
         :selectedOption="selectedAction"
         @chooseOption="makeActions"
       )
-    DataTable(
+    GeneralTable(
       :fields="fields"
       :tableData="files"
-      :bodyClass="['review-body', {'tbody_visible-overflow': files.length < 12}]"
-      :tableheadRowClass="files.length < 12 ? 'tbody_visible-overflow' : ''"
-      :headCellClass="'padding-with-check-box'"
     )
-      .review-table__header.review-table__check-cell(slot="headerCheck" slot-scope="{ field }")
+      .review-table__header(slot="headerCheck" slot-scope="{ field }")
         CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
       .review-table__header(slot="headerName" slot-scope="{ field }") {{ field.label }}
       .review-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
@@ -36,14 +29,14 @@
       .review-table__header(slot="headerDR2" slot-scope="{ field }") {{ field.label }}
       .review-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
-      .review-table__data.review-table__check-cell(slot="check" slot-scope="{ row, index }")
+      .review-table__data(slot="check" slot-scope="{ row, index }")
         CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
-      .review-table__dataFilename(slot="name" slot-scope="{ row }")
+      .review-table__data(slot="name" slot-scope="{ row }")
         span.review-table__file-name {{ row.fileName }}
 
       .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
-      .review-table__dataTasks(slot="task" slot-scope="{ row }")
+      .review-table__data(slot="task" slot-scope="{ row }")
         span(v-if="type ==='multi'") {{ getTasksIds(row.taskId) }}
         span(v-if="type ==='single'") {{ row.taskId.substring(row.taskId.length - 3)  }}
       .review-table__data(slot="dr1" slot-scope="{ row }")
@@ -56,7 +49,8 @@
             i.far.fa-comment(v-if="getTimeAndComment(row).getComment().length")
 
           span {{ getManagerName(row.dr1Manager) }}
-      .review-table__dataDrop(slot="dr2" slot-scope="{ row }")
+
+      .review-table__data-drop(slot="dr2" slot-scope="{ row }")
         .drops__menu(v-if="canChangeDR2Manager(row) || user.group.name === 'Project Managers' || getManagerName(row.dr1Manager) === getManagerName(user._id)")
           SelectSingle(
             :isTableDropMenuNoShadow="true"
@@ -85,6 +79,7 @@
     .review-table__upload.review-table_no-back(v-if="type === 'single' && canAddDR2Manager ")
       input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing")
       Add
+
 </template>
 
 <script>
@@ -93,97 +88,95 @@
 	import CheckBox from "@/components/CheckBox"
 	import Add from "@/components/Add"
 	import { mapActions, mapGetters } from "vuex"
-  import moment from "moment"
+	import moment from "moment"
 	import ApproveModal from "../../ApproveModal"
 	import Button from "../../Button"
-  import reviewManagers from "../../../mixins/reviewManagers";
+	import reviewManagers from "../../../mixins/reviewManagers"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
-	  mixins: [reviewManagers],
+		mixins: [ reviewManagers ],
 		props: {
 			task: { type: Object },
 			files: { type: Array },
-      type: {type: String },
-      user: { type: Object },
-      users: { type: Array },
+			type: { type: String },
+			user: { type: Object },
+			users: { type: Array }
 		},
 		data() {
 			return {
 				fields: [
-					{ label: "", headerKey: "headerCheck", key: "check", width: "4%", padding: 0 },
-					{ label: "File Name", headerKey: "headerName", key: "name", width: "21%", padding: 0 },
-					{ label: "Task ID", headerKey: "headerTask", key: "task", width: "8%", padding: 0 },
-          { label: "Language pair", headerKey: "headerPair", key: "pair", width: "14%", padding: 0 },
-          { label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", width: "19%", padding: 0 },
-          { label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", width: "19%", padding: 0},
-          { label: "Action", headerKey: "headerAction", key: "action", width: "15%", padding: 0 }
+					{ label: "", headerKey: "headerCheck", key: "check", style: { width: "4%" } },
+					{ label: "File Name", headerKey: "headerName", key: "name", style: { width: "21%" } },
+					{ label: "Task ID", headerKey: "headerTask", key: "task", style: { width: "8%" } },
+					{ label: "Language pair", headerKey: "headerPair", key: "pair", style: { width: "14%" } },
+					{ label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", style: { width: "19%" } },
+					{ label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", style: { width: "19%" } },
+					{ label: "Action", headerKey: "headerAction", key: "action", style: { width: "15%" } }
 				],
 				icons: {
 					download: { src: require("../../../assets/images/latest-version/download-file.png") },
 					upload: { src: require("../../../assets/images/latest-version/upload-file.png") },
 					delete: { src: require("../../../assets/images/latest-version/delete-icon.png") },
-					lock: { src: require("../../../assets/images/lock.png") },
+					lock: { src: require("../../../assets/images/latest-version/lock.png") }
 				},
 				selectedAction: "",
 				actions: [ "Approve", "Download" ],
 				deleteIndex: null,
 				approveModalShow: false,
-        managers: [],
+				managers: []
 			}
 		},
 		methods: {
-      getTasksIds(str){
-       return  str.split(',').reduce((acc, curr) => {
-          acc = acc + curr.substring(curr.length - 3) + '; '
-          return acc
-        }, '')
-      },
-      getTimeAndComment(row){
-        if(this.type === 'multi'){
-          const { taskId } = row
-          const tasksIds = taskId.split(',')
-          const comments = tasksIds.reduce((acc, curr) => {
-            const taskId = curr.substring(curr.length - 3)
-            const { comment } = this.currentProject.tasksDR1.find(item => item.taskId === curr.trim())
-            if(comment){
-              acc = acc + `<div><p>${ taskId }:</p> ${comment}</div>`
-            }
-            return acc
-          },'')
-          return {
-            getComment: () => comments,
-          }
-        }else{
-          const { taskId } = row
-          const { timestamp, comment} = this.currentProject.tasksDR1.find(item => item.taskId === taskId)
-          return {
-            getComment: () => comment,
-            getTime: () => moment(timestamp).format('DD-MM-YYYY, HH:mm')
-          }
-        }
-      },
-      setManager({ option }, file) {
-        const managerIndex = this.managersNames.indexOf(option)
-        this.$emit("assignManager", {
-          manager: this.managers[managerIndex],
-          type: this.type,
-          file
-        })
-      },
-      getManagerName(id){
-        const { firstName, lastName } =  this.users.find(({_id}) => `${_id}` === `${id}`)
-        return `${firstName} ${lastName}`
-      },
+			getTasksIds(str) {
+				return str.split(',').reduce((acc, curr) => {
+					acc = acc + curr.substring(curr.length - 3) + '; '
+					return acc
+				}, '')
+			},
+			getTimeAndComment(row) {
+				if (this.type === 'multi') {
+					const { taskId } = row
+					const tasksIds = taskId.split(',')
+					const comments = tasksIds.reduce((acc, curr) => {
+						const taskId = curr.substring(curr.length - 3)
+						const { comment } = this.currentProject.tasksDR1.find(item => item.taskId === curr.trim())
+						if (comment) {
+							acc = acc + `<div><p>${ taskId }:</p> ${ comment }</div>`
+						}
+						return acc
+					}, '')
+					return {
+						getComment: () => comments
+					}
+				} else {
+					const { taskId } = row
+					const { timestamp, comment } = this.currentProject.tasksDR1.find(item => item.taskId === taskId)
+					return {
+						getComment: () => comment,
+						getTime: () => moment(timestamp).format('DD-MM-YYYY, HH:mm')
+					}
+				}
+			},
+			setManager({ option }, file) {
+				const managerIndex = this.managersNames.indexOf(option)
+				this.$emit("assignManager", {
+					manager: this.managers[managerIndex],
+					type: this.type,
+					file
+				})
+			},
+			getManagerName(id) {
+				const { firstName, lastName } = this.users.find(({ _id }) => `${ _id }` === `${ id }`)
+				return `${ firstName } ${ lastName }`
+			},
 			approveFile(index) {
 				this.$emit('approveFile', { index })
 			},
-      rollback(task){
-        this.$emit('rollback', task)
-      },
-			// generateCertificate() {
-			// 	this.$emit('generateCertificate')
-			// },
-			 makeOneAction(index, key) {
+			rollback(task) {
+				this.$emit('rollback', task)
+			},
+			makeOneAction(index, key) {
 				const file = this.files[index]
 				if (file.isFileApproved) return
 				if (key === 'download') {
@@ -197,8 +190,8 @@
 			},
 			async makeActions({ option }) {
 				const checked = this.files.filter(item => {
-         return  item.isChecked
-        })
+					return item.isChecked
+				})
 				if (!checked.length) return
 				if (option === 'Download') {
 					for (let file of checked) {
@@ -240,40 +233,34 @@
 				if (this.isReviewing) return
 				this.$emit("checkFile", { index, bool })
 			},
-      canChangeDR2Manager({dr2Manager}) {
-        return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || dr2Manager.toString() === this.user._id.toString()
-      },
+			canChangeDR2Manager({ dr2Manager }) {
+				return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || dr2Manager.toString() === this.user._id.toString()
+			}
 
 
 		},
 		computed: {
-			// allIcons() {
-			// 	let result = this.icons
-			// 	if (this.files.length > 1) {
-			// 		result = {
-			// 			...result,
-			// 			delete: { src: require("../../../assets/images/latest-version/delete-icon.png") }
-			// 		}
-			// 	}
-			// 	return result
-			// },
-      ...mapGetters({
-        currentProject: 'getCurrentProject',
-      }),
-      canAddDR2Manager() {
-        return this.user.group.name === "Administrators"
-          || this.user.group.name === "Developers"
-          || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
-          || this.user._id === this.currentProject.accountManager._id
-      },
-			isAllChecked() {
-				return !this.files.find(item => !item.isChecked)
+			...mapGetters({
+				currentProject: 'getCurrentProject'
+			}),
+			canAddDR2Manager() {
+				return this.user.group.name === "Administrators"
+						|| this.user.group.name === "Developers"
+						|| this.files.map(({ dr2Manager }) => dr2Manager).includes(this.user._id.toString())
+						|| this.user._id === this.currentProject.accountManager._id
 			},
+			isAllChecked() {
+				if (this.files.length) {
+					return !this.files.find(item => !item.isChecked)
+				}
+				return false
+			}
 		},
-    created() {
-      this.getManagers()
-    },
+		created() {
+			this.getManagers()
+		},
 		components: {
+			GeneralTable,
 			Button,
 			ApproveModal,
 			DataTable,
@@ -287,13 +274,14 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
-  .drops{
+  .drops {
     &__menu {
       position: relative;
-      height: 30px;
+      height: 32px;
       width: 100%;
     }
   }
+
   .review-table {
     width: 100%;
     box-sizing: border-box;
@@ -321,27 +309,20 @@
       align-self: flex-end;
       margin-bottom: 20px;
     }
-    &__dataFilename,
-    &__dataTasks{
-      box-sizing: border-box;
-      display: grid;
-      align-items: center;
-      height: 30px;
-      padding: 6px 5px;
-      overflow-y: auto;
-      overflow-x: hidden;
+
+    &__header {
+      padding: 0 7px;
     }
 
     &__data {
-      box-sizing: border-box;
-      display: grid;
-      align-items: center;
-      height: 30px;
-      padding: 6px 5px;
-      //overflow-y: auto;
-      //overflow-x: hidden;
+      padding: 0 7px;
 
-      &-manager{
+      &-drop {
+        width: 100%;
+        margin: 0 7px;
+      }
+
+      &-manager {
         display: flex;
       }
     }
@@ -372,6 +353,7 @@
       transition: ease 0.1s;
       margin-right: 10px;
     }
+
     &__rollback-icon {
       font-size: 16px;
       cursor: pointer;

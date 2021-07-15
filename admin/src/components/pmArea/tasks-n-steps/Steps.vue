@@ -21,11 +21,12 @@
         :fields="fields"
         :tableData="allSteps"
       )
-
         template(slot="headerCheck" slot-scope="{ field }")
           .table__header
             CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(true)" @uncheck="(e)=>toggleAll(false)" customClass="tasks-n-steps")
         template(slot="headerInfo" slot-scope="{ field }")
+          .table__header {{ field.label }}
+        template(slot="headerId" slot-scope="{ field }")
           .table__header {{ field.label }}
         template(slot="headerName" slot-scope="{ field }")
           .table__header {{ field.label }}
@@ -54,6 +55,8 @@
         template(slot="info" slot-scope="{row, index}")
           .table__data(style="cursor: pointer;" @click="showStepDetails(index)")
             img(src="../../../assets/images/latest-version/view-details.png")
+        template(slot="id" slot-scope="{ row }")
+          .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
         template(slot="name" slot-scope="{ row }")
           .table__data {{ row.name }}
         template(slot="language" slot-scope="{ row }")
@@ -239,13 +242,14 @@
 				fields: [
 					{ label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
 					{ label: "", headerKey: "headerInfo", key: "info", style: { "width": "3%", "border-left": "none" } },
-					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "9%" } },
+					{ label: "Id", headerKey: "headerId", key: "id", style: { "width": "4%" } },
+					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "10%" } },
 					{ label: "Langs", headerKey: "headerLanguage", key: "language", style: { "width": "6%" } },
 					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", style: { "width": "16%" } },
 					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "8%" } },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "7%" } },
-					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "13%" } },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "13%" } },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "8%" } },
+					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
 					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "7%" } },
 					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "7%" } },
 					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "7%" } }
@@ -328,7 +332,7 @@
 				return step.finance.Price[prop] === 0 ? true : step.finance.Price[prop]
 			},
 			customFormatter(date) {
-				return moment(date).format('DD-MM-YYYY, HH:mm')
+				return moment(date).format('MMM D, HH:mm')
 			},
 			toggleVendors({ isAll }) {
 				this.isAllShow = isAll

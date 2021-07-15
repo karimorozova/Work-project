@@ -87,81 +87,78 @@
           selectedTab="Tasks"
           @setTab="showTab"
         )
-      DataTable(
+
+      GeneralTable(
         :fields="fields"
         :tableData="allTasks"
-        bodyRowClass="steps-table-row"
-        :bodyClass="['steps-table-body', {'tbody_visible-overflow': allTasks.length < 10}]"
-        :tableheadRowClass="allTasks.length < 10 ? 'tbody_visible-overflow' : ''"
-        @onRowClicked="onRowClicked"
-        :bodyCellClass="'steps-cell'"
-        :headCellClass="'padding-with-check-box'"
       )
         template(slot="headerCheck" slot-scope="{ field }")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
+          .table__header
+            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
         template(slot="headerTaskId" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
+        template(slot="headerService" slot-scope="{ field }")
+          .table__header {{ field.label }}
         template(slot="headerLanguage" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerStart" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerDeadline" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerProgress" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerStatus" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerReceivables" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerPayables" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerMargin" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerDelivery" slot-scope="{ field }")
-          span.tasks__label {{ field.label }}
+          .table__header {{ field.label }}
+
         template(slot="check" slot-scope="{ row, index }")
-          .tasks__task-check
+          .table__data
             CheckBox(:isChecked="row.isChecked" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
         template(slot="taskId" slot-scope="{ row }")
-          span.tasks__task-data {{ row.taskId }}
+          .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
+        template(slot="service" slot-scope="{ row }")
+          .table__data {{ row.service.title }}
         template(slot="language" slot-scope="{ row }")
-          span.tasks__task-data {{ getPair(row) }}
+          .table__data(v-html="getPair(row)")
         template(slot="start" slot-scope="{ row }")
-          span.tasks__task-data {{ formatDate(row.start) }}
+          .table__data {{ formatDate(row).start }}
         template(slot="deadline" slot-scope="{ row }")
-          span.tasks__task-data {{ formatDate(row.deadline) }}
+          .table__data {{ formatDate(row).deadline }}
         template(slot="progress" slot-scope="{ row, index }")
-          .tasks__task-progress
+          .table__data(style="width: 100%")
             ProgressLine(:progress="progress(row, index)")
         template(slot="status" slot-scope="{ row }")
-          .tasks__task-data {{ row.status | stepsAndTasksStatusFilter }}
-            //.tasks__timestamp(v-if="row.isDelivered && row.status === 'Delivered'")
-              img.tasks__time-icon(src="../../../assets/images/time_icon.png")
-              .tasks__time-data {{ getDeliveredTime(row.deliveredTime) }}
+          .table__data {{ row.status | stepsAndTasksStatusFilter }}
 
         template(slot="receivables" slot-scope="{ row }")
-          .tasks__task-data
+          .table__finance
             span(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
             span(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          .tasks__task-data
+          .table__finance
             span(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
             span(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
         template(slot="margin" slot-scope="{ row }")
-          .tasks__task-data
+          .table__finance
             span(v-if="marginCalc(row.finance.Price)")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
 
         template(slot="delivery" slot-scope="{ row }")
-          .tasks__task-data
-            //img.tasks__delivery-image(v-if="row.status === 'Ready for Delivery' || row.status === 'Delivered'" src="../../../assets/images/download-big-b.png" @click="downloadFiles(row)")
+          .table__data
             img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
 
     .tasks__approve-action(v-if="isApproveActionShow")
@@ -176,6 +173,16 @@
         @returnData="getApproveModalData"
 
       )
+
+    .tasks__review(v-if="isDeliveryReviewMulti && reviewTasksMulti.length")
+      DeliveryOneMulti(
+        @close="closeMultiReview"
+        :user="user"
+        :users="users"
+        :project="currentProject"
+        :allTasks="currentProject.tasks"
+        :deliveryTasks="currentProject.tasksDR1.filter(item => reviewTasksMulti.includes(item.taskId))"
+      )
     .tasks__review(v-if="isDeliveryReview")
       DeliveryOne(
         :project="currentProject"
@@ -184,9 +191,7 @@
         :task="reviewTask"
         :deliveryTask="currentProject.tasksDR1.find(({taskId}) => taskId === reviewTask.taskId)"
         @close="closeReview"
-        @updateTasks="updateReviewTask"
       )
-      //DeliveryReview(:project="currentProject" :user="user" @close="closeReview" :task="reviewTask" @updateTasks="updateReviewTask")
 </template>
 
 <script>
@@ -205,9 +210,11 @@
 	import ApproveModalPayment from "../../ApproveModalPayment"
 	import FilesUpload from "./tasksFiles/FilesUpload"
 	import Button from "../../Button"
-  import DeliveryOne from "./DeliveryOne";
+	import DeliveryOne from "./DeliveryOne"
 
-  import reviewManagers from "@/mixins/reviewManagers"
+	import reviewManagers from "@/mixins/reviewManagers"
+	import GeneralTable from "../../GeneralTable"
+	import DeliveryOneMulti from "./DeliveryOneMulti"
 
 	export default {
 		mixins: [ currencyIconDetected, reviewManagers ],
@@ -228,17 +235,18 @@
 		data() {
 			return {
 				fields: [
-					{ label: "check", headerKey: "headerCheck", key: "check", width: "3%", padding: 0 },
-					{ label: "Task ID", headerKey: "headerTaskId", key: "taskId", width: "16%", padding: 0 },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "12%", padding: 0 },
-					{ label: "Start", headerKey: "headerStart", key: "start", width: "9%", padding: 0 },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "9%", padding: 0 },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "8%", padding: 0 },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "13%", padding: 0 },
-					{ label: "Receivables", headerKey: "headerReceivables", key: "receivables", width: "9%", padding: 0 },
-					{ label: "Payables", headerKey: "headerPayables", key: "payables", width: "8%", padding: 0 },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", width: "8%", padding: 0 },
-					{ label: "Delivery", headerKey: "headerDelivery", key: "delivery", width: "5%", cellClass: "tasks_centered", padding: 0 }
+					{ label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
+					{ label: "Id", headerKey: "headerTaskId", key: "taskId", style: { "width": "4%" } },
+					{ label: "Service", headerKey: "headerService", key: "service", style: { "width": "11%" } },
+					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "12%" } },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "10%" } },
+					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
+					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
+					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "8%" } },
+					{ label: "", headerKey: "headerDelivery", key: "delivery", style: { "width": "4%" } }
 				],
 				selectedAction: "",
 				fileUploadStatus: [ "Created", "Started", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval" ],
@@ -260,35 +268,38 @@
 				refFilesForDelete: [],
 				removeFile: null,
 				manageApprovalModal: false,
-        changeManagerModal: false,
-        managers: [],
-        selectedManager: null
+				changeManagerModal: false,
+				managers: [],
+				selectedManager: null,
+				reviewTasksMulti: [],
+				isDeliveryReviewMulti: false
+
 			}
 		},
 		methods: {
 			closeManageApprovalModal() {
 				this.manageApprovalModal = false
 			},
-      async changeManager() {
-        try {
-          const result = await this.$http.post('/delivery/change-managers', {
-            projectId: this.currentProject._id,
-            checkedTasksId: this.currentProject.tasks.filter(item => item.isChecked).map(({taskId}) => taskId),
-            manager: this.selectedManager,
-          })
+			async changeManager() {
+				try {
+					const result = await this.$http.post('/delivery/change-managers', {
+						projectId: this.currentProject._id,
+						checkedTasksId: this.currentProject.tasks.filter(item => item.isChecked).map(({ taskId }) => taskId),
+						manager: this.selectedManager
+					})
 
-          await this.storeProject(result.body)
-          this.closeManagerModal()
-          this.selectedAction = ""
-          this.selectedManager = null
-        } catch (err) {
-          this.alertToggle({ message: err.message, isShow: true, type: "error" })
-        }
-      },
-      closeManagerModal() {
-        this.changeManagerModal = false
-        this.selectedAction = ""
-      },
+					await this.storeProject(result.body)
+					this.closeManagerModal()
+					this.selectedAction = ""
+					this.selectedManager = null
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
+				}
+			},
+			closeManagerModal() {
+				this.changeManagerModal = false
+				this.selectedAction = ""
+			},
 			async removeRefFile() {
 				const { taskId: checkedTasksId } = this.currentProject.tasks.find(item => item.isChecked)
 				try {
@@ -381,16 +392,7 @@
 				this.isEditAndSendQuote = true
 			},
 			getPair(task) {
-				if (task.packageSize) {
-					return `${ task.targetLanguage } / ${ task.packageSize }`
-				}
-				return `${ task.sourceLanguage } >> ${ task.targetLanguage }`
-			},
-			getDeliveredTime(date) {
-				return date ? moment(date).format("YYYY-MM-DD, HH:mm Z") : ""
-			},
-			onRowClicked({ index }) {
-				this.$emit("onRowClicked", { index: index })
+				return `<span>${ task.sourceLanguage }</span><span> &#8811; </span><span>${ task.targetLanguage }</span>`
 			},
 			async getSendQuoteMessage() {
 				try {
@@ -408,36 +410,41 @@
 			},
 			async setAction({ option }) {
 				this.selectedAction = option
-				if (option === 'Delivery Review [1]' || option === 'Delivery Review [2]') {
-					this.reviewForDelivery(...this.currentProject.tasks.filter(item => item.isChecked))
-					this.isDeliveryReview = true
-				} else if (option === 'Send a Quote') {
-					await this.getSendQuoteMessage()
-				} else if (option === 'Manage DR1 manager') {
-					await this.manageDR1()
-				} else if (option === 'Cancel' || option === 'Deliver') {
-					this.setModalTexts(option)
-					this.isApproveActionShow = true
-				} else if (option === 'Upload reference files') {
-					this.openFileModal = true
-				} else if (option === 'Manage reference files') {
-					const { tasks } = this.currentProject
-					const checkedTasks = tasks.filter(item => item.isChecked)
-					this.refFilesForDelete = checkedTasks[0].refFiles
-					this.manageFileModal = true
+
+				switch (option) {
+					case 'Manage DR1 instructions':
+						this.reviewTasksMulti = this.currentProject.tasks.filter(item => item.isChecked).map(item => item.taskId)
+						this.isDeliveryReviewMulti = true
+						this.setShowTasksAndDeliverables(false)
+						break
+					case 'Send a Quote':
+						await this.getSendQuoteMessage()
+						break
+					case 'Manage DR1 manager':
+						await this.manageDR1()
+						break
+					case 'Cancel':
+						this.setModalTexts(option)
+						this.isApproveActionShow = true
+						break
+					case 'Upload reference files':
+						this.openFileModal = true
+						break
+					case 'Manage reference files':
+						const { tasks } = this.currentProject
+						const checkedTasks = tasks.filter(item => item.isChecked)
+						this.refFilesForDelete = checkedTasks[0].refFiles
+						this.manageFileModal = true
+						break
 				}
 			},
-      async manageDR1() {
-			  this.changeManagerModal = true
-
-      },
-      setManager({ option }) {
-        const managerIndex = this.managersNames.indexOf(option)
-        this.selectedManager = this.managers[managerIndex]
-        // this.$emit("assignManager", {
-        //   manager: this.managers[managerIndex]
-        // })
-      },
+			async manageDR1() {
+				this.changeManagerModal = true
+			},
+			setManager({ option }) {
+				const managerIndex = this.managersNames.indexOf(option)
+				this.selectedManager = this.managers[managerIndex]
+			},
 			reviewForDelivery(task) {
 				this.reviewTask = task
 				this.isDeliveryReview = true
@@ -450,10 +457,6 @@
 				})
 				this.storeProject({ ...this.currentProject, tasks: unchecked })
 			},
-			updateReviewTask({ tasksIds }) {
-        console.log('UPDATE TASK')
-				// this.reviewTask = this.allTasks.filter(item => tasksIds.indexOf(item.taskId) !== -1)
-			},
 			setModalTexts(option) {
 				this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
 			},
@@ -462,17 +465,17 @@
 				if (!checkedTasks.length) {
 					return this.closeApproveModal()
 				}
-				await this.doTasksApproveaction(checkedTasks)
+				await this.doTasksApproveAction(checkedTasks)
 			},
-			async doTasksApproveaction(checkedTasks) {
+			async doTasksApproveAction(checkedTasks) {
 				try {
 					switch (this.selectedAction) {
 						case 'Cancel':
 							await this.cancelTasks(checkedTasks)
 							break
-						// case 'Deliver':
-						// 	await this.deliverTasks({ tasks: checkedTasks, user: this.user })
-						// 	break
+							// case 'Deliver':
+							// 	await this.deliverTasks({ tasks: checkedTasks, user: this.user })
+							// 	break
 					}
 				} catch (err) {
 					this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
@@ -560,8 +563,32 @@
 						: this.$emit('showTab', { tab: this.tabs[index] })
 
 			},
-			formatDate(date) {
-				return date.split('T')[0].split('-').reverse().join('-')
+			formatDate({ taskId }) {
+				let dates = {
+					start: '',
+					deadline: ''
+				}
+				const currentSteps = this.currentProject.steps
+						.filter(item => item.taskId === taskId)
+						.filter(item => item.status !== 'Cancelled' && item.status !== 'Cancelled Halfway')
+
+				if (currentSteps.length === 2) {
+					const [ first, second ] = currentSteps
+					dates.start = date(first.start)
+					dates.deadline = date(second.deadline)
+				}
+
+				if (currentSteps.length === 1) {
+					const { start, deadline } = currentSteps[0]
+					dates.start = date(start)
+					dates.deadline = date(deadline)
+				}
+
+				function date(date) {
+					return moment(date).format('MMM D, HH:mm')
+				}
+
+				return dates
 			},
 			marginCalc(finance) {
 				if (finance.halfReceivables >= 0) {
@@ -623,20 +650,12 @@
 				this.selectedAction = ""
 				this.setShowTasksAndDeliverables(true)
 			},
-			async downloadFiles(task) {
-				try {
-					let href = task.deliverables
-					if (!href) {
-						const result = await this.$http.get(`/pm-manage/deliverables?taskId=${ task.taskId }`)
-						href = result.data.link
-					}
-					let link = document.createElement('a')
-					link.href = __WEBPACK__API_URL__ + href
-					link.target = "_blank"
-					link.click()
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" })
-				}
+			closeMultiReview(e) {
+				this.reviewTasksMulti = []
+				this.isDeliveryReviewMulti = false
+				this.selectedAction = ""
+				this.setShowTasksAndDeliverables(true)
+        this.toggleAll(e, false)
 			},
 			isEvery(taskStatus) {
 				return this.currentProject.tasks
@@ -655,11 +674,11 @@
 			...mapGetters({
 				currentProject: 'getCurrentProject',
 				user: 'getUser',
-        users: 'getUsers'
+				users: 'getUsers'
 			}),
-      selectedDr1Manager() {
-        return this.selectedManager ? `${ this.selectedManager.firstName } ${ this.selectedManager.lastName }` : ""
-      },
+			selectedDr1Manager() {
+				return this.selectedManager ? `${ this.selectedManager.firstName } ${ this.selectedManager.lastName }` : ""
+			},
 			projectClientContacts() {
 				return this.currentProject.clientContacts.map(({ email }) => email)
 			},
@@ -668,6 +687,7 @@
 				const checkedTasks = tasks.filter(item => item.isChecked)
 				if (checkedTasks.length) {
 					if (this.isEvery('Created')) {
+
 						if (status !== "Draft" && status !== "Cost Quote" && status !== "Rejected") {
 							return [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
 						} else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length === 1) {
@@ -675,20 +695,17 @@
 						} else {
 							return [ 'Cancel' ]
 						}
-					} else if (this.isEvery("Ready for Delivery")) return [ 'Deliver' ]
 
-          else if (this.isEvery("Pending Approval [DR1]")) {
-            let elements = []
+					} else if (this.isEvery("Pending Approval [DR1]")) {
 
-            if(checkedTasks.length === 1) elements.push('Delivery Review [1]' )
+						let elements = []
+						const [ first ] = checkedTasks
+						const isSameService = checkedTasks.every(({ service }) => service.title === first.service.title)
+						if (isSameService) elements.push('Manage DR1 instructions')
+						if (this.canChangeDR1Manager) elements.push('Manage DR1 manager')
+						return elements
 
-            if(this.canChangeDR1Manager) elements.push('Manage DR1 manager' )
-
-            return elements
-          }
-
-					else if (this.isEvery('Pending Approval [DR2]') && checkedTasks.length === 1) return [ 'Delivery Review [2]' ]
-					else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {
+					} else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {
 						return [ 'Upload reference files', 'Cancel' ]
 					} else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length === 1) {
 						return [ 'Manage reference files', 'Upload reference files', 'Cancel' ]
@@ -700,29 +717,30 @@
 				return !unchecked
 			},
 			canChangeDR1Manager() {
-        const checkedIds = this.currentProject.tasks
-          .filter(item => item.isChecked)
-          .map(({ taskId }) => taskId)
+				const checkedIds = this.currentProject.tasks
+						.filter(item => item.isChecked)
+						.map(({ taskId }) => taskId)
 
-        const { _id, group: { name } } = this.user
+				const { _id, group: { name } } = this.user
 
-        return name === 'Administrators'
-          || name === 'Developers'
-          || this.currentProject.tasksDR1.filter(({taskId}) => checkedIds.includes(taskId)).every(({dr1Manager}) => {
-            console.log({dr1Manager, _id})
-            return dr1Manager === _id
-          })
-      },
-			isProjectFinished(){
+				return name === 'Administrators'
+						|| name === 'Developers'
+						|| this.currentProject.tasksDR1.filter(({ taskId }) => checkedIds.includes(taskId)).every(({ dr1Manager }) => {
+							return dr1Manager === _id
+						})
+			},
+			isProjectFinished() {
 				const { status } = this.currentProject
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-			},
+			}
 		},
-    created() {
-      this.getManagers()
-    },
-    components: {
-      DeliveryOne,
+		created() {
+			this.getManagers()
+		},
+		components: {
+			DeliveryOneMulti,
+			GeneralTable,
+			DeliveryOne,
 			Button,
 			FilesUpload,
 			ApproveModalPayment,
@@ -740,6 +758,22 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .table {
+    &__data {
+      padding: 0 5px;
+      word-break: break-word;
+    }
+
+    &__header {
+      padding: 0 5px;
+      word-break: break-all;
+    }
+
+    &__finance {
+      padding: 0 3px 0 5px;
+    }
+  }
 
   .file-list {
     &__items {
@@ -965,7 +999,7 @@
       z-index: 500;
     }
 
-    &__titleModal{
+    &__titleModal {
       font-size: 21px;
       margin-bottom: 20px;
       text-align: center;
@@ -993,12 +1027,12 @@
     }
 
 
-    &__itemsContacts{
+    &__itemsContacts {
       display: flex;
       justify-content: center;
     }
 
-    &__selectTitle{
+    &__selectTitle {
       margin-bottom: 4px;
     }
 

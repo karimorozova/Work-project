@@ -1,7 +1,7 @@
 <template lang="pug">
   .add-button(@click="click")
-    span.add-button__sign
-      span +
+    .add-button__icon
+      i.fas.fa-plus
 </template>
 
 <script>
@@ -15,32 +15,27 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../assets/scss/colors';
 
   .add-button {
-    border: 2px solid #938676;
-    border-radius: 50%;
     width: 25px;
     height: 25px;
+    border: 1px solid $border;
+    border-radius: 4px;
+    cursor: pointer;
+    /*transition: .1s cubic-bezier(.12,0,.39,0);*/
+    margin-top: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0.7;
-    transition: ease 0.2s;
-    cursor: pointer;
-
-    &__sign {
-      margin-top: -6px;
-      height: 25px;
-      width: 25px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
+    /*    &:hover{
+          background: $table-list;
+        }*/
+    &__icon {
+      font-size: 16px;
+      color: $border;
     }
-  }
 
-  .add-button:hover {
-    opacity: 1;
   }
 
 </style>

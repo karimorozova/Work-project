@@ -17,20 +17,21 @@
               .group__open-image
                 img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
-              i.fas.fa-chevron-down
+              i.fas.fa-chevron-right
             .group__close(style="margin-left: -4px;" v-if="!element.isOpen")
               .group__close-image
                 img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
-              i.fas.fa-chevron-right
+              i.fas.fa-chevron-down
 
           span(v-else)
             .group__open(v-if="element.isOpen")
               div {{element.name}}
-              i.fas.fa-chevron-down
+              i.fas.fa-chevron-right
+
             .group__close(v-if="!element.isOpen")
               div {{element.name}}
-              i.fas.fa-chevron-right
+              i.fas.fa-chevron-down
 
       .element(:style="elementPadding")
         router-link(v-if="isLink(element)" :to="{ path: element.path}" id="link") {{element.name}}
@@ -67,7 +68,7 @@
 		},
 		data() {
 			return {
-				elementPadding: { 'padding-left': 20 * this.menuIterator + 'px' }
+				elementPadding: { 'padding-left': 22 * this.menuIterator + 'px' }
 			}
 		},
 		methods: {
@@ -217,7 +218,7 @@
     flex-direction: row-reverse;
     justify-content: flex-end;
     align-items: center;
-    font-family: 'Myriad600';
+    font-family: 'Myriad400';
     font-size: 15px;
     letter-spacing: 0.1px;
   }

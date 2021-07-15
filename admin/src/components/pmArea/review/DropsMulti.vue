@@ -2,7 +2,7 @@
   .dropsManagers
     .dropsManagers__body
       .dropsManagers__body-item
-        .dropsManagers__body-title Delivery Review 1 Manager:
+        .dropsManagers__body-title Multi DR1 Manager:
         .drops__name(v-if="!canUpdateDr1Manager") {{ `${ dr1Manager.firstName } ${ dr1Manager.lastName }` }}
         .drops__menu(v-else)
           SelectSingle(
@@ -11,7 +11,7 @@
             @chooseOption="(e) => setManager(e, 'dr1Manager')"
           )
       .dropsManagers__body-item
-        .dropsManagers__body-title Delivery Review 2 Manager:
+        .dropsManagers__body-title Multi DR2 Manager:
         .drops__name(v-if="!canUpdateDr1") {{ dr2Manager.firstName + ' ' + dr2Manager.lastName }}
         .drops__menu(v-else)
           SelectSingle(
@@ -34,7 +34,7 @@
 			user: { type: Object },
 			dr1Manager: { type: Object },
 			dr2Manager: { type: Object },
-			deliveryTask: { type: Object }
+			instructions: { type: Array }
 		},
 		data() {
 			return {
@@ -70,7 +70,7 @@
 			},
 			canUpdateDr1Manager() {
 				if (this.isAdmin) return true
-				return !this.deliveryTask.instructions.some(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant) && this.user._id.toString() === this.dr1Manager._id.toString()
+				return !this.instructions.some(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant) && this.user._id.toString() === this.dr1Manager._id.toString()
 			}
 		},
 		components: {

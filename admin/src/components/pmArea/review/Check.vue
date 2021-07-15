@@ -1,5 +1,5 @@
 <template lang="pug">
-  .check-line
+  .check-line(:class="{'cursorDisable': isDisabled}")
     i.check-line__icon.fa.fa-check-circle(@click="toggleApproval" :class="{'check-line_green': isApproved}")
 </template>
 
@@ -14,10 +14,16 @@
 			},
 			type: {
 				type: String
+			},
+			isDisabled: {
+				type: Boolean,
+				default: false
 			}
 		},
 		methods: {
 			toggleApproval() {
+				if (this.isDisabled) return
+
 				this.$emit('toggleApproval', {
 					type: this.type,
 					instruction: this.instruction
@@ -30,14 +36,18 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
+  .cursorDisable {
+    cursor: default !important;
+  }
+
   .check-line {
     display: flex;
     align-items: center;
+    cursor: pointer;
 
     &__icon {
       color: $border;
       font-size: 16px;
-      cursor: pointer;
       transition: ease 0.1s;
     }
 

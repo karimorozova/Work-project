@@ -4,18 +4,9 @@
 
     .review__modal(v-if="isModalRollback")
       RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBackApprove")
-    //
+
     .review__title Delivery Review 2
-    span.relative
-      //.review__forbidden(v-if="isReviewing")
-      //DropsDR2(:project="project":user="user" :dr1Manager="users.find(({_id}) => `${_id}` === `${deliveryData.dr1Manager}`)" :dr2Manager="users.find(({_id}) => `${_id}` === `${deliveryData.dr2Manager}`)" @assignManager="assignManager" @setContacts="setContacts")
-
-    span.relative
-      //.review_left-align {{ checklistTile }} Checklist
-      //.review__forbidden(v-if="isReviewing")
-
     .review__check
-      //.review__forbidden(v-if="isReviewing")
       .review__headers
         .review__headers-item Check
         .review__headers-item Not Relevant
@@ -32,6 +23,7 @@
               :instruction="instruction"
               :isApproved="instruction.isChecked"
               :type="'isChecked'"
+              :isDisabled="!!requestCounter.length"
             )
           .review__check-itemCheck
             Check(
@@ -39,6 +31,7 @@
               :instruction="instruction"
               :isApproved="instruction.isNotRelevant"
               :type="'isNotRelevant'"
+              :isDisabled="!!requestCounter.length"
             )
       .review__checkTitle
         .review__checkSubTitle(:class="{marginTop: true}") Comments
@@ -46,18 +39,8 @@
           ckeditor(v-model="deliveryData.comment" :config="editorConfig")
           .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save Comment &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
-    //
-    //  .review__dr1Comment(:class="{marginTop: true}" v-if="dr === 2 && !!previousComment")
-    //    .dr1Comment__title DR1 Comment
-    //    .dr1Comment__textarea
-    //      .dr1Comment__textareaText(v-html="previousComment")
-    //
-    //  span.relative
-    //    .split-line
-    //    .review__forbidden(v-if="isReviewing")
-    //
+
     .review__table
-      //.review__forbidden(v-if="isReviewing")
       TableDR2(
         :type="type"
         :task="task"
@@ -74,16 +57,7 @@
         @assignManager="assignManager"
       )
 
-
-
     .review__options
-      //.review__options-check(v-if="isAllChecked")
-        //CheckBox(
-        //  :isChecked="areOptions"
-        //  customClass="review-options"
-        //  @check="(e) => toggleOptions(e, true)"
-        //  @uncheck="(e) => toggleOptions(e, false)"
-        //)
       .review__group
         OptionsDR2(
           v-if="allChecked"
@@ -100,21 +74,13 @@
             span Do you want to external comment? &nbsp;&nbsp;
           .review__notes(v-if="isComment")
             ckeditor(v-model="comment" :config="editorConfig")
-            //.notes__button-email(v-if="canAddDR2Manager" @click="sendComment") Save &nbsp;
-              i.fa.fa-paper-plane(aria-hidden='true')
 
         .review__contacts(v-if="(isDeliver || isNotify) && allChecked") Contacts:
           SelectMulti(
             :options="contactsNames"
             :selectedOptions="selectedContacts"
             @chooseOptions="setContacts")
-      //  (v-if="dr1Manager && dr2Manager && getUser")
-      //    .review__button(v-if="!isDr1")
-      //      .review__forbidden(v-if="dr1Manager._id !== getUser._id && dr2Manager._id !== getUser._id && getUser.name === 'Administrators'")
-      //      Button(
-      //        value="Rollback"
-      //        @clicked="popupRollback"
-      //      )
+
       .review__buttons
         .review__button(v-if="allChecked")
           Button(
@@ -124,21 +90,16 @@
 </template>
 
 <script>
-	// import Drops from "../review/Drops"
-	// import Table from "../review/Table"
-	// import _ from "lodash"
-  // import DropsDR2 from "../review/DropsDR2";
-  // const CheckBox = () => import("@/components/CheckBox")
 	import CKEditor from "ckeditor4-vue"
 	import { mapGetters, mapActions } from "vuex"
 	import Check from "../review/Check"
 	import editorConfig from "../../../mixins/editorConfig"
-  import TableDR2 from "../review/TableDR2";
-  import OptionsDR2 from "../review/OptionsDR2";
-  import Button from "../../Button";
-  import RollbackModal from "../review/RollbackModal";
-  import SelectMulti from "../../SelectMulti";
-  import CheckBox from "../../CheckBox";
+	import TableDR2 from "../review/TableDR2"
+	import OptionsDR2 from "../review/OptionsDR2"
+	import Button from "../../Button"
+	import RollbackModal from "../review/RollbackModal"
+	import SelectMulti from "../../SelectMulti"
+	import CheckBox from "../../CheckBox"
 
 	export default {
 		mixins: [ editorConfig ],
@@ -147,70 +108,48 @@
 			users: { type: Array },
 			project: { type: Object },
 			id: { type: String },
-      type: {type: String }
+			type: { type: String }
 		},
 		data() {
 			return {
-        files: [],
-				// editorData: "",
-				// areFilesChecked: false,
-				// areFilesConverted: false,
-				// areOptions: true,
+				files: [],
 				isDeliver: false,
 				isNotify: false,
 				isReadyForDelivery: true,
-        isModalRollback: false,
+				isModalRollback: false,
 				rollbackManager: null,
-        taskIdRollback: null,
-        selectedContacts: [],
-        comment: "",
-        isComment: false,
-        // contacts: [],
-				// isAssign: true,
-				// isDr1: true,
-				// files: [],
-				// dr1Manager: null,
-				// dr2Manager: null,
-				// contacts: [],
-				// timestamp: "",
-				// instructions: [],
-				// isReviewing: false,
-				// isModal: false,
-				// previousComment: ''
+				taskIdRollback: null,
+				selectedContacts: [],
+				comment: "",
+				isComment: false
 			}
 		},
-		beforeDestroy(){
+		beforeDestroy() {
 			this.setShowTasksAndDeliverables(true)
 		},
 		methods: {
 			...mapActions([
 				"approveInstructionDR2",
 				"approveDeliveryFileDR2",
-        "approveReady",
-        "approveNotify",
-        "approveDeliver",
-        // "changeReviewManagerDR2",
-        "alertToggle",
-        "setCurrentProject",
+				"approveReady",
+				"approveNotify",
+				"approveDeliver",
+				"alertToggle",
+				"setCurrentProject",
 				"setShowTasksAndDeliverables"
-				// "rollBackReview",
-				// "approveDeliveryFile",
-				// "uploadTarget",
-				// "approveWithOption",
-				// "assignDr2",
 			]),
-      toggleCommentEmail() {
-        this.isComment = !this.isComment
-      },
+			toggleCommentEmail() {
+				this.isComment = !this.isComment
+			},
 			async sendComment() {
 				try {
 					const updatedProject = await this.$http.post('/delivery/delivery-comments-dr2', {
-            projectId: this.project._id,
-            entityId: this.deliveryData._id,
-            type: this.type,
+						projectId: this.project._id,
+						entityId: this.deliveryData._id,
+						type: this.type,
 						comment: this.deliveryData.comment
 					})
-          await this.setCurrentProject(updatedProject.data);
+					await this.setCurrentProject(updatedProject.data)
 					this.alertToggle({ message: "Comment updated!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Comment not updated!", isShow: true, type: "error" })
@@ -226,256 +165,257 @@
 					this.isNotify = true
 					this.isReadyForDelivery = false
 				} else if (prop === 'isDeliver') {
-          this.isDeliver = true
-          this.isNotify = false
-          this.isReadyForDelivery = false
+					this.isDeliver = true
+					this.isNotify = false
+					this.isReadyForDelivery = false
 				} else if (prop === 'isReadyForDelivery') {
-          this.isDeliver = false
-          this.isNotify = false
-          this.isReadyForDelivery = true
+					this.isDeliver = false
+					this.isNotify = false
+					this.isReadyForDelivery = true
 				}
 			},
 			async toggleList({ type, instruction }) {
-        if(!this.canAddDR2Manager) return
-        const types = [ 'isChecked', 'isNotRelevant' ]
-        const anotherType = types.filter(item => item !== type)
-        instruction[type] = !instruction[type]
-        instruction[anotherType] = !instruction[type]
-        await this.approveInstructionDR2({
-          projectId: this.project._id,
-          entityId: this.deliveryData._id,
-          instruction,
-          type: this.type
-        })
+				if (!this.canAddDR2Manager) return
+				const types = [ 'isChecked', 'isNotRelevant' ]
+				const anotherType = types.filter(item => item !== type)
+				instruction[type] = !instruction[type]
+				instruction[anotherType] = !instruction[type]
+				await this.approveInstructionDR2({
+					projectId: this.project._id,
+					entityId: this.deliveryData._id,
+					instruction,
+					type: this.type
+				})
 			},
-			// // toggleOptions() {
-			// // 	this.isAssign = this.isDr1
-			// // 	this.isDeliver = !this.isDr1
-			// // 	this.isNotify = false
-			// // },
+
 			checkAllFiles({ bool }) {
 				this.files = this.files.map(item => {
-          // if (bool && item.dr2Manager !== this.user._id) return { ...item, isChecked: false }
 					return { ...item, isChecked: bool }
 				})
 			},
 			checkFile({ index, bool }) {
 				this.files[index].isChecked = bool
 			},
-			// popupRollback() {
-			// 	this.isModal = true
-			// },
-      async updatedFiles(updatedProject){
-        const { tasksDR2 } = updatedProject.data
-        if(this.type === 'single'){
-          const {files} = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
-          this.files = files.map(item => ({ ...item, isChecked: false }))
-        }else{
-          const { file, tasks } = tasksDR2.multiLang.find(item => `${item._id}` === `${this.id}`)
-          this.files = [{ ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false}]
-        }
-      },
-      async removeFile(file){
-        try{
-          const updatedProject = await this.$http.post("/delivery/remove-dr2-file", {
-            ...file,
-            projectId: this.project._id,
-            type: this.type,
-            entityId: this.id
-          });
-          await this.setCurrentProject(updatedProject.data);
-          await this.updatedFiles(updatedProject)
-          this.alertToggle({ message: "File removed!", isShow: true, type: "success" })
-        }catch (err){
-          this.alertToggle({ message: "Error on remove DR1 Files", isShow: true, type: "error" })
-        }
-      },
-			async uploadFile({ file, index }) {
-        const { path } = index !== undefined ? this.files[index] : { path: "" }
-        const fileData = new FormData()
-        fileData.append("targetFile", file)
-        fileData.append("projectId", this.project._id)
-        fileData.append("path", path)
-        fileData.append("entityId", this.deliveryData._id)
-        fileData.append("type", this.type)
-        fileData.append("user", this.user._id)
-        fileData.append("dr1Manager", this.project.projectManager._id)
-        try {
-            const updatedProject = await this.$http.post("/delivery/target-dr2", fileData)
-            await this.setCurrentProject(updatedProject.data);
-            await this.updatedFiles(updatedProject)
-        } catch (err) {
-        }
+			async updatedFiles(updatedProject) {
+				const { tasksDR2 } = updatedProject.data
+				if (this.type === 'single') {
+					const { files } = tasksDR2.singleLang.find(item => `${ item._id }` === `${ this.id }`)
+					this.files = files.map(item => ({ ...item, isChecked: false }))
+				} else {
+					const { file, tasks } = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
+					this.files = [ { ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false } ]
+				}
 			},
-      async approveFile({ index }) {
-        this.files[index].isFileApproved = !this.files[index].isFileApproved
-        const { isFileApproved, path } = this.files[index]
-        try {
-	        const updatedProject = await this.$http.post("/delivery/approve-files-dr2", { type: this.type, entityId: this.id, projectId: this.project._id, isFileApproved, paths: [path] });
-	        await this.setCurrentProject(updatedProject.data);
-        } catch (err) {
-	        this.alertToggle({ message: "Err in approveFile!", isShow: true, type: "error" })
-        }
-      },
-      async approveFiles({ checked }) {
-        const paths = checked.map(item => item.path)
-        try{
-	        const updatedProject = await this.$http.post("/delivery/approve-files-dr2", { type: this.type, entityId: this.id, projectId: this.project._id, isFileApproved: true, paths })
-	        await this.setCurrentProject(updatedProject.data);
-	        await this.updatedFiles(updatedProject)
-        }catch (err) {
-	        this.alertToggle({ message: "Err in approveFiles!", isShow: true, type: "error" })
-        }
-      },
-      listOfContactsForDeliver(){
-        return this.selectedContacts
-          .map(item => this.project.clientContacts.find(({firstName, surname}) => `${firstName} ${surname}` === item))
-          .map(item => ({email: item.email, firstName: `${item.firstName} ${item.surname}`}))
-      },
+			async removeFile(file) {
+				try {
+					const updatedProject = await this.$http.post("/delivery/remove-dr2-file", {
+						...file,
+						projectId: this.project._id,
+						type: this.type,
+						entityId: this.id
+					})
+					await this.setCurrentProject(updatedProject.data)
+					await this.updatedFiles(updatedProject)
+					this.alertToggle({ message: "File removed!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on remove DR1 Files", isShow: true, type: "error" })
+				}
+			},
+			async uploadFile({ file, index }) {
+				const { path } = index !== undefined ? this.files[index] : { path: "" }
+				const fileData = new FormData()
+				fileData.append("targetFile", file)
+				fileData.append("projectId", this.project._id)
+				fileData.append("path", path)
+				fileData.append("entityId", this.deliveryData._id)
+				fileData.append("type", this.type)
+				fileData.append("user", this.user._id)
+				fileData.append("dr1Manager", this.project.projectManager._id)
+				try {
+					const updatedProject = await this.$http.post("/delivery/target-dr2", fileData)
+					await this.setCurrentProject(updatedProject.data)
+					await this.updatedFiles(updatedProject)
+				} catch (err) {
+				}
+			},
+			async approveFile({ index }) {
+				this.files[index].isFileApproved = !this.files[index].isFileApproved
+				const { isFileApproved, path } = this.files[index]
+				try {
+					const updatedProject = await this.$http.post("/delivery/approve-files-dr2", {
+						type: this.type,
+						entityId: this.id,
+						projectId: this.project._id,
+						isFileApproved,
+						paths: [ path ]
+					})
+					await this.setCurrentProject(updatedProject.data)
+				} catch (err) {
+					this.alertToggle({ message: "Err in approveFile!", isShow: true, type: "error" })
+				}
+			},
+			async approveFiles({ checked }) {
+				const paths = checked.map(item => item.path)
+				try {
+					const updatedProject = await this.$http.post("/delivery/approve-files-dr2", {
+						type: this.type,
+						entityId: this.id,
+						projectId: this.project._id,
+						isFileApproved: true,
+						paths
+					})
+					await this.setCurrentProject(updatedProject.data)
+					await this.updatedFiles(updatedProject)
+				} catch (err) {
+					this.alertToggle({ message: "Err in approveFiles!", isShow: true, type: "error" })
+				}
+			},
+			listOfContactsForDeliver() {
+				return this.selectedContacts
+						.map(item => this.project.clientContacts.find(({ firstName, surname }) => `${ firstName } ${ surname }` === item))
+						.map(item => ({ email: item.email, firstName: `${ item.firstName } ${ item.surname }` }))
+			},
 			async approve() {
-        switch (true) {
-          case this.isReadyForDelivery:
-            await this.approveReady({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type })
-            this.$emit("close")
-            break
-          case this.isDeliver:
-            await this.approveDeliver({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, user: this.user, contacts: this.listOfContactsForDeliver(), comment: this.comment })
-            this.$emit("close")
-            break
-          case this.isNotify:
-            await this.approveNotify({projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.listOfContactsForDeliver() })
-            this.$emit("close")
-            break
-        }
+				switch (true) {
+					case this.isReadyForDelivery:
+						await this.approveReady({ projectId: this.project._id, entityId: this.deliveryData._id, type: this.type })
+						this.$emit("close")
+						break
+					case this.isDeliver:
+						await this.approveDeliver({
+							projectId: this.project._id,
+							entityId: this.deliveryData._id,
+							type: this.type,
+							user: this.user,
+							contacts: this.listOfContactsForDeliver(),
+							comment: this.comment
+						})
+						this.$emit("close")
+						break
+					case this.isNotify:
+						await this.approveNotify({ projectId: this.project._id, entityId: this.deliveryData._id, type: this.type, contacts: this.listOfContactsForDeliver() })
+						this.$emit("close")
+						break
+				}
 			},
 			async assignManager({ manager, type, file }) {
-        if(manager._id === file.dr2Manager) return
-        try{
-          const updatedProject = await this.$http.post("/delivery/change-manager-dr2", {
-            projectId: this.project._id,
-            manager,
-            type,
-            file,
-            entityId: this.deliveryData._id,
-          });
-          await this.setCurrentProject(updatedProject.data);
-          await this.updatedFiles(updatedProject)
-          this.alertToggle({ message: "Manager changed!", isShow: true, type: "success" })
-        }catch (err){
-          this.alertToggle({ message: "Err in assignManager!", isShow: true, type: "error" })
-        }
+				if (manager._id === file.dr2Manager) return
+				try {
+					const updatedProject = await this.$http.post("/delivery/change-manager-dr2", {
+						projectId: this.project._id,
+						manager,
+						type,
+						file,
+						entityId: this.deliveryData._id
+					})
+					await this.setCurrentProject(updatedProject.data)
+					await this.updatedFiles(updatedProject)
+					this.alertToggle({ message: "Manager changed!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Err in assignManager!", isShow: true, type: "error" })
+				}
 			},
-      rollback(task){
-        this.isModalRollback = true
-        const { tasksDR1 } = this.project
-        const { dr1Manager } = tasksDR1.find(({ taskId }) => taskId === task)
-        this.rollbackManager = this.users.find(({ _id }) => `${ _id }` === `${ dr1Manager }`)
-        this.taskIdRollback = task
-      },
-      setRollbackManager({ manager }) {
-        this.rollbackManager = manager
-      },
-      closeRollback() {
-        this.isModalRollback = false
-        this.rollbackManager = null
-        this.taskIdRollback = null
-      },
+			rollback(task) {
+				this.isModalRollback = true
+				const { tasksDR1 } = this.project
+				const { dr1Manager } = tasksDR1.find(({ taskId }) => taskId === task)
+				this.rollbackManager = this.users.find(({ _id }) => `${ _id }` === `${ dr1Manager }`)
+				this.taskIdRollback = task
+			},
+			setRollbackManager({ manager }) {
+				this.rollbackManager = manager
+			},
+			closeRollback() {
+				this.isModalRollback = false
+				this.rollbackManager = null
+				this.taskIdRollback = null
+			},
 			async rollBackApprove() {
 				const rollback = {
-          entityId: this.deliveryData._id,
-				  projectId: this.project._id,
-          taskId: this.taskIdRollback,
-          manager: this.rollbackManager
+					entityId: this.deliveryData._id,
+					projectId: this.project._id,
+					taskId: this.taskIdRollback,
+					manager: this.rollbackManager
 				}
-				try{
-          const updatedProject = await this.$http.post("/delivery/rollback-review", { ...rollback })
-          await this.setCurrentProject(updatedProject.data);
-          await this.updatedFiles(updatedProject)
-        }catch (err){
-          this.alertToggle({ message: "Err in rollback!", isShow: true, type: "error" })
-        }
+				try {
+					const updatedProject = await this.$http.post("/delivery/rollback-review", { ...rollback })
+					await this.setCurrentProject(updatedProject.data)
+					await this.updatedFiles(updatedProject)
+				} catch (err) {
+					this.alertToggle({ message: "Err in rollback!", isShow: true, type: "error" })
+				}
 				this.closeRollback()
 			},
-      setContacts({ option }) {
-        const position = this.selectedContacts.indexOf(option)
-        if(position === -1){
-          this.selectedContacts.push(option)
-        }else{
-          if(this.selectedContacts.length > 1){
-            this.selectedContacts.splice(position, 1)
-          }
-        }
-      },
-      setDefaultContact() {
-        this.selectedContacts = []
-        const { firstName, surname } = this.project.clientContacts[0]
-        this.selectedContacts.push(`${firstName} ${surname}`)
-      },
+			setContacts({ option }) {
+				const position = this.selectedContacts.indexOf(option)
+				if (position === -1) {
+					this.selectedContacts.push(option)
+				} else {
+					if (this.selectedContacts.length > 1) {
+						this.selectedContacts.splice(position, 1)
+					}
+				}
+			},
+			setDefaultContact() {
+				this.selectedContacts = []
+				const { firstName, surname } = this.project.clientContacts[0]
+				this.selectedContacts.push(`${ firstName } ${ surname }`)
+			}
 		},
 		computed: {
-      contactsNames() {
-        return this.project.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
-      },
-		  deliveryData(){
-        const { tasksDR2 } = this.project
-		    if(this.type === 'single'){
-		      const deliveryData = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
-          console.log('deliveryDataS',deliveryData)
-          return deliveryData
-        }else{
-          const deliveryData = tasksDR2.multiLang.find(item => `${item._id}` === `${this.id}`)
-          console.log('deliveryDataM',deliveryData)
-          return deliveryData
-        }
-      },
+			...mapGetters({
+				requestCounter: 'getRequestCounter'
+			}),
+			contactsNames() {
+				return this.project.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
+			},
+			deliveryData() {
+				const { tasksDR2 } = this.project
+				if (this.type === 'single') {
+					const deliveryData = tasksDR2.singleLang.find(item => `${ item._id }` === `${ this.id }`)
+					console.log('deliveryDataS', deliveryData)
+					return deliveryData
+				} else {
+					const deliveryData = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
+					console.log('deliveryDataM', deliveryData)
+					return deliveryData
+				}
+			},
 			groupedInstructions() {
 				return _.groupBy(this.deliveryData.instructions, 'title')
 			},
-			// isAllChecked() {
-			// 	// this.toggleOptions()
-			// 	const uncheckedFiles = this.files.filter(item => !item.isFileApproved)
-			// 	const uncheckedInstructions = this.instructions.filter(item => !item.isChecked && !item.isNotRelevant)
-			// 	return !uncheckedInstructions.length && !uncheckedFiles.length
-			// },
-			// dr() {
-			// 	return this.task.status === "Pending Approval [DR1]" ? 1 : 2
-			// },
-			// checklistTile() {
-			// 	return this.task.status === "Pending Approval [DR1]" ? "DR1" : "DR2"
-			// },
 			isAdmin() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
 			},
-      canAddDR2Manager() {
-        return this.isAdmin || this.files.map(({dr2Manager})=> dr2Manager).includes(this.user._id.toString())
-      },
-      allChecked() {
-        return this.deliveryData.instructions.every(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant )
-          && this.files.every(({isFileApproved}) => isFileApproved) && this.files.length > 0
-      },
-
+			canAddDR2Manager() {
+				return this.isAdmin || this.files.map(({ dr2Manager }) => dr2Manager).includes(this.user._id.toString())
+			},
+			allChecked() {
+				return this.deliveryData.instructions.every(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant)
+						&& this.files.every(({ isFileApproved }) => isFileApproved) && this.files.length > 0
+			}
 		},
-    components: {
-      CheckBox,
-      SelectMulti,
-      RollbackModal,
-      Button,
-      OptionsDR2,
-      TableDR2,
+		components: {
+			CheckBox,
+			SelectMulti,
+			RollbackModal,
+			Button,
+			OptionsDR2,
+			TableDR2,
 			Check,
 			ckeditor: CKEditor.component
 		},
-    mounted() {
-      const { tasksDR2 } = this.project
-		  if(this.type === 'single'){
-        const {files} = tasksDR2.singleLang.find(item => `${item._id}` === `${this.id}`)
-        this.files = files.map(item => ({ ...item, isChecked: false }))
-      }else{
-        const { file, tasks } = tasksDR2.multiLang.find(item => `${item._id}` === `${this.id}`)
-        this.files = [{ ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false}]
-      }
-      this.setDefaultContact()
-    }
+		mounted() {
+			const { tasksDR2 } = this.project
+			if (this.type === 'single') {
+				const { files } = tasksDR2.singleLang.find(item => `${ item._id }` === `${ this.id }`)
+				this.files = files.map(item => ({ ...item, isChecked: false }))
+			} else {
+				const { file, tasks } = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
+				this.files = [ { ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false } ]
+			}
+			this.setDefaultContact()
+		}
 	}
 </script>
 
@@ -578,14 +518,15 @@
       position: relative;
     }
 
-    &__table{
+    &__table {
       margin-top: 20px;
     }
 
     &__check-item {
       display: flex;
       padding: 6px 0;
-      &:nth-child(even){
+
+      &:nth-child(even) {
         background-color: $table-list;
       }
     }
@@ -664,12 +605,14 @@
       background-color: rgba(0, 0, 0, 0.2);
       cursor: not-allowed;
     }
+
     &__contacts {
       position: relative;
       width: 200px;
       height: 50px;
       margin-top: 20px;
     }
+
     &__group {
       display: flex;
       margin-top: 10px;
@@ -723,6 +666,7 @@
         border: 1px solid $border-focus;
       }
     }
+
     &__button-email {
       position: absolute;
       right: 3%;
@@ -751,6 +695,7 @@
       }
     }
   }
+
   .max-with-400 {
     max-width: 400px;
   }
