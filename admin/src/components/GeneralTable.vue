@@ -18,73 +18,40 @@
         @close="closeModal"
       )
 
-    span(
-      v-if="isFilterShow"
-      @click="showFilters = !showFilters"
-    ) 'show filter'
+    .filter(v-if="isFilterShow" @click="showFilters = !showFilters")
+      span(v-if="!showFilters")
+        i.fas.fa-filter
+      span(v-if="showFilters")
+        i.fas.fa-times-circle
 
     table
+
       thead
         .hideScrollBlock(v-if="tableData.length >= elementToScroll")
-        tr(
-          :class="{'scroll': tableData.length >= elementToScroll}"
-        )
-          th(
-            v-for="header in fields"
-            :style="header.style"
-          )
-            .th__header
-              slot(
-                :name="header.headerKey"
-                :field="header"
-              )
-              .th__sort-icon(
-                v-if="header.sortInfo && header.sortInfo.isSort"
-              )
-                .th__sort-test(
-                  v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"
-                )
-                  i.fas.fa-caret-down(
-                    v-if="header.sortInfo.order === 'asc'"
-                    @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'desc'})"
-                  )
-                  i.fas.fa-caret-up(
-                    v-else-if="header.sortInfo.order === 'desc'"
-                    @click.stop="changeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})"
-                  )
-                i.fas.fa-times-circle(
-                  v-if="header.sortInfo.order === 'asc' || header.sortInfo.order === 'desc'"
-                  @click.stop="removeSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})"
-                )
-                i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo: header.sortInfo, key: header.dataKey, sortField: header.key, order: 'asc'})")
 
-            .th__filter(
-              v-if="header.filterInfo && header.filterInfo.isFilter && showFilters"
-            )
-              input(
-                :ref='header.key'
-                @keyup="(e) => setFilter({filterInfo: header.filterInfo, value: e.target.value, key: header.dataKey, filterField: header.key})"
-              )
-              i.fas.fa-times-circle.th__filter-close(
-                v-if="header.filterInfo.isFilterSet"
-                @click.stop="removeFilter({ filterInfo: header.filterInfo , filterField: header.key})"
-              )
+        tr(:class="{'scroll': tableData.length >= elementToScroll}")
 
-      tbody(
-        :class="{'scroll': tableData.length >= elementToScroll}"
-        @scroll="handleBodyScroll"
-      )
-        tr.data(
-          v-for="(row, index) of tableData"
-        )
-          td(
-            v-for="field of fields" :style="field.style"
-          )
-            slot(
-              :name="field.key"
-              :row="row"
-              :index="index"
-            )
+          th(v-for="{ headerKey, style, sortInfo, dataKey, key, filterInfo, ...rest } in fields" :style="style")
+
+            .th__titleAndSort
+              slot(:name="headerKey" :field="{ headerKey, sortInfo, style, dataKey, key, filterInfo, ...rest }")
+
+              .th__sortIcons(v-if="sortInfo && sortInfo.isSort")
+
+                i.fas.fa-times-circle(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'" @click.stop="removeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
+                span(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'")
+                  i.fas.fa-caret-down(v-if="sortInfo.order === 'asc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'desc'})")
+                  i.fas.fa-caret-up(v-else-if="sortInfo.order === 'desc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
+                i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
+
+            .th__filter(v-if="filterInfo && filterInfo.isFilter && showFilters")
+              input(:ref='key' @keyup="(e) => setFilter({filterInfo, value: e.target.value, key: dataKey, filterField: key})")
+              i.fas.fa-backspace.th__filter-close(v-if="filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo, filterField: key})")
+
+      tbody(:class="{'scroll': tableData.length >= elementToScroll}" @scroll="handleBodyScroll")
+        tr.data(v-for="(row, index) of tableData")
+          td(v-for="field of fields" :style="field.style")
+            slot(:name="field.key" :row="row" :index="index" )
 
 </template>
 
@@ -174,22 +141,88 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors";
 
- .th {
-    &__modals {
-      position: absolute;
-      z-index: 10;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%);
-    }
+  .filter {
+    border: 1px solid $border;
+    border-radius: 4px;
+    height: 30px;
+    width: 30px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: .2s ease-out;
+    justify-content: center;
 
-    &__sort-icon {
+    &:hover {
+      .fa-filter {
+        color: $text !important;
+      }
+    }
+  }
+
+  %iconsStyle {
+    transition: .2s ease-out;
+    color: $dark-border;
+    cursor: pointer;
+
+    &:hover {
+      color: $text;
+    }
+  }
+
+  .fa-filter {
+    font-size: 11px;
+    color: $dark-border;
+  }
+
+  .fa-backspace {
+    font-size: 16px;
+    @extend %iconsStyle;
+  }
+
+  .fa-sort {
+    font-size: 16px;
+    @extend %iconsStyle;
+  }
+
+  .fa-times-circle {
+    font-size: 15px;
+    @extend %iconsStyle;
+  }
+
+  .fa-caret-up,
+  .fa-caret-down {
+    font-size: 18px;
+    @extend %iconsStyle;
+  }
+
+  input {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    height: 32px;
+    transition: .1s ease-out;
+    width: 100%;
+    font-family: 'Myriad400';
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .th {
+    &__sortIcons {
+      gap: 6px;
       display: flex;
-      width: 25px;
-      justify-content: space-between;
+      margin-right: 8px;
+      align-items: center;
     }
 
-    &__header {
+    &__titleAndSort {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -197,26 +230,15 @@
     }
 
     &__filter {
-      //height: 31px;
-      input {
-        width: 100%;
-        margin-bottom: 10px;
-        box-sizing: border-box;
-        padding-right: 20px;
-      }
+      padding: 0px 8px 8px 8px;
+      position: relative;
 
       &-close {
         position: absolute;
-        top: 4px;
-        right: 4px;
-        z-index: 50;
-        color: #36304a;
+        right: 14px;
+        top: 8px;
       }
     }
-  }
-
-  .scroll {
-    overflow-y: scroll;
   }
 
 
@@ -234,11 +256,6 @@
 
   th {
     border-left: 1px solid $border;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    justify-content: flex-start;
     box-sizing: border-box;
     padding: 0;
 
@@ -304,4 +321,7 @@
     z-index: 1;
   }
 
+  .scroll {
+    overflow-y: scroll;
+  }
 </style>
