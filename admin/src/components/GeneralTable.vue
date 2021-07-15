@@ -174,7 +174,7 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors";
 
-/*  .th {
+ .th {
     &__modals {
       position: absolute;
       z-index: 10;
@@ -213,7 +213,7 @@
         color: #36304a;
       }
     }
-  }*/
+  }
 
   .scroll {
     overflow-y: scroll;
