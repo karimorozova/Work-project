@@ -237,12 +237,15 @@ export default {
       originallyServices: "getAllServices",
       originallyUnits: "getAllUnits"
     }),
-    //TODO изменить  step на task ===========================
+
     canSendToXtrf() {
-      return this.currentProject.status === 'Closed'
-          && this.currentProject.steps.length
-          && (this.currentProject.tasks.every(({ service }) => service.title === 'Compliance')
-          || this.currentProject.tasks.every(({ service }) => service.title === 'Translation' ))
+      const {status, steps, tasks} = this.currentProject
+
+      const closedCheck = status === 'Closed'
+          && steps.length
+          && (tasks.every(({ service }) => service.title === 'Compliance')
+              || tasks.every(({ service }) => service.title === 'Translation' ))
+      return closedCheck || status === 'In progress' || status === 'Approved'
     },
     isStageDelivery() {
       return this.currentProject.tasks.some(({ status }) => status === 'Completed' || status === 'Pending Approval [DR1]')
