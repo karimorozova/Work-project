@@ -157,7 +157,7 @@
     border-radius: 4px;
     height: 30px;
     width: 30px;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     display: flex;
     align-items: center;
     cursor: pointer;
