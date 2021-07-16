@@ -9,7 +9,7 @@ async function getProjectsForDashboard() {
 	// 			},
 	// }
 	const STATUSES = ["Close", "Cancelled", "Cancelled Halfway"]
-	const filters = {status: {$ne: {$in: STATUSES}}}
+	const filters = {status: {$ne: {$in: STATUSES}}, isTest: false}
 	return await getProjects(filters)
 }
 
