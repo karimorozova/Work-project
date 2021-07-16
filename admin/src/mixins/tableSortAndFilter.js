@@ -10,28 +10,25 @@ export default {
 		addSortKey({ sortInfo, key, sortField, order }) {
 			sortInfo.order = order
 			this.sortKeys.push({ sortField, key, sortInfo })
-			// this.setDefaults()
 		},
 		changeSortKey({ sortInfo, order }) {
 			sortInfo.order = order
 			this.sortKeys = [ ...this.sortKeys ]
-			// this.setDefaults()
 		},
 		removeSortKey({ sortInfo, sortField }) {
 			sortInfo.order = 'default'
 			this.sortKeys = this.sortKeys.filter((sortKey) => sortKey.sortField !== sortField)
-			// this.setDefaults()
 		},
 		setFilter({ value, key, filterField, filterInfo }) {
 			filterInfo.isFilterSet = value !== ''
 			this.filtersData = { ...this.filtersData, [filterField]: { value, key } }
-			// this.setDefaults()
 		},
 		removeFilter({ filterInfo, filterField }) {
 			filterInfo.isFilterSet = false
 			this.filtersData = { ...this.filtersData, [filterField]: { value: '', key: '' } }
-			// this.setDefaults()
-
+		},
+		clearAllFilters() {
+			this.filtersData = {}
 		},
 
 		setDefaults(){
@@ -46,7 +43,6 @@ export default {
 
 				let first = key ? rawFirst[key] : rawFirst
 				let second = key ? rawSecond[key] : rawSecond
-				console.log({first, second})
 				if (sortInfo.order === 'asc') [ first, second ] = [ second, first ]
 				if (first > second) {
 					return 1
@@ -84,7 +80,6 @@ export default {
 			}
 
 			let sortKeys = [...this.sortKeys].reverse()
-			console.log(sortKeys)
 			for(let sortKey of sortKeys ) {
 				this.sortData(sortKey)
 			}

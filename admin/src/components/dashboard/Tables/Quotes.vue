@@ -1,12 +1,22 @@
 <template lang="pug">
   GeneralTable(
     :fields="fields"
-    :tableData="projects"
+    :tableData="finalData"
+    :isFilterShow="true"
+    :isBodyShort="true"
+
+    @addSortKey="addSortKey"
+    @changeSortKey="changeSortKey"
+    @removeSortKey="removeSortKey"
+    @setFilter="setFilter"
+    @removeFilter="removeFilter"
+
+    @clearAllFilters="clearAllFilters"
   )
     template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
       .day-today__header {{ field.label }}
 
-    template(slot="id" slot-scope="{ row, index }")
+    template(slot="projectId" slot-scope="{ row, index }")
       .day-today__data
         span {{row.projectId}}
 
@@ -15,7 +25,7 @@
 
     template(slot="projectName" slot-scope="{ row, index }")
       .day-today__data {{row.projectName}}
-    template(slot="client" slot-scope="{ row, index }")
+    template(slot="customer" slot-scope="{ row, index }")
       .day-today__data
         span {{ row.customer.name }}
         router-link(class="link-to" :to="{path: `/pangea-clients/all/details/${row.customer._id}`}" target="_blank")
@@ -27,21 +37,15 @@
     template(slot="assigned" slot-scope="{ row, index }")
       //.day-today__data {{ row.projectManager.firstName }}
       .day-today__data ...coming soon
-
-    //template(slot="multiplier" slot-scope="{ row, index }")
-      .price__data(v-if="!isEdit")
-        span(id="multiplier") {{ row.multiplier }}
-        label(for="multiplier") &#37;
-      .price__editing-data(v-else)
-        input.price__data-input(type="number" @change="setRowValue(index)" v-model="dataArray[index].multiplier")
-
 </template>
 
 <script>
 import GeneralTable from '../../GeneralTable'
 import moment from "moment"
+import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 
 export default {
+  mixins: [tableSortAndFilter],
   name: "DueToday.vue",
   props: {
     projects: {
@@ -55,32 +59,43 @@ export default {
         {
           label: "ID",
           headerKey: "headerID",
-          key: "id",
-          style: { "width": "16%" }
+          key: "projectId",
+          sortInfo: {isSort: true, order: 'default'},
+          filterInfo: {isFilter: true},
+          style: { "width": "18%" }
         },
         {
           label: "Project Name",
           headerKey: "headerProjectName",
           key: "projectName",
+          sortInfo: {isSort: true, order: 'default'},
+          filterInfo: {isFilter: true},
           style: { "width": "20%" }
         },
         {
           label: "Client",
           headerKey: "headerClient",
-          key: "client",
+          key: "customer",
+          dataKey: "name",
+          sortInfo: {isSort: true, order: 'default'},
+          filterInfo: {isFilter: true},
           style: { "width": "16%" }
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
+          sortInfo: {isSort: true, order: 'default'},
+          filterInfo: {isFilter: true},
           style: { "width": "16%" }
         },
         {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
-          style: { "width": "16%" }
+          sortInfo: {isSort: true, order: 'default'},
+          filterInfo: {isFilter: true},
+          style: { "width": "14%" }
         },
         {
           label: "Assigned",
@@ -90,6 +105,11 @@ export default {
         }
       ]
     }
+  },
+  computed: {
+    rawData() {
+      return this.projects
+    },
   },
   methods: {
     customFormatter(date) {

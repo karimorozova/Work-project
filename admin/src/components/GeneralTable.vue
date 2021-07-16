@@ -18,7 +18,7 @@
         @close="closeModal"
       )
 
-    .filter(v-if="isFilterShow" @click="showFilters = !showFilters")
+    .filter(v-if="isFilterShow" @click="showFilter")
       span(v-if="!showFilters")
         i.fas.fa-filter
       span(v-if="showFilters")
@@ -48,7 +48,7 @@
               input(:ref='key' @keyup="(e) => setFilter({filterInfo, value: e.target.value, key: dataKey, filterField: key})")
               i.fas.fa-backspace.th__filter-close(v-if="filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo, filterField: key})")
 
-      tbody(:class="{'scroll': tableData.length >= elementToScroll}" @scroll="handleBodyScroll")
+      tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" @scroll="handleBodyScroll")
         tr.data(v-for="(row, index) of tableData")
           td(v-for="field of fields" :style="field.style")
             slot(:name="field.key" :row="row" :index="index" )
@@ -84,7 +84,11 @@
 			isFilterShow: {
 				type: Boolean,
 				default: false
-			}
+			},
+      isBodyShort: {
+			  type: Boolean,
+        default: false
+      }
 		},
 		data() {
 			return {
@@ -116,6 +120,12 @@
 				this.$emit('removeSortKey', field)
 			},
 
+      showFilter() {
+        this.showFilters = !this.showFilters
+        if (!this.showFilters) {
+          this.$emit('clearAllFilters')
+        }
+      },
 			setFilter(field) {
 				this.$emit('setFilter', field)
 			},
@@ -141,6 +151,7 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors";
 
+
   .filter {
     border: 1px solid $border;
     border-radius: 4px;
@@ -152,6 +163,7 @@
     cursor: pointer;
     transition: .2s ease-out;
     justify-content: center;
+    float: right;
 
     &:hover {
       .fa-filter {
@@ -323,5 +335,8 @@
 
   .scroll {
     overflow-y: scroll;
+  }
+  .shortBody {
+    max-height: 240px;
   }
 </style>

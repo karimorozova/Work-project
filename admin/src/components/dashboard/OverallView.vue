@@ -1,9 +1,14 @@
 <template lang="pug">
   .overallView
     .row
-      DueToday(class="test" :projects="dueToday")
-      StartedToday(class="test" :projects="startedToday")
-      Quotes(class="test" :projects ="quotes")
+      .col
+        DueToday( :projects="dueToday")
+
+      .col
+        StartedToday( :projects="startedToday")
+    .row
+      .col
+        Quotes( :projects ="quotes")
     //.overallView__col
       .col__title Today
       ProjectFinanceStats
@@ -87,19 +92,22 @@ export default {
 </script>
 <style lang="scss" scoped>
 .overallView {
-  padding: 20px;
-  box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
-  box-sizing: border-box;
   width: 1550px;
   margin: 50px;
 
   .row {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 50px;
   }
-  .test {
-    flex: 1 1 auto;
-    margin: 0 5px;
+  .col {
+    width: 750px;
+    padding: 10px 20px 20px;
+    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 4px;
+    align-self: baseline;
   }
 }
 </style>
