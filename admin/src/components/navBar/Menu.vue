@@ -13,12 +13,12 @@
         .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
 
           span(v-if="element.hasOwnProperty('parent')")
-            .group__open(style="margin-left: -4px;" v-if="element.isOpen")
+            .group__open(style="margin-left: -6px;" v-if="element.isOpen")
               .group__open-image
                 img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-right
-            .group__close(style="margin-left: -4px;" v-if="!element.isOpen")
+            .group__close(style="margin-left: -6px;" v-if="!element.isOpen")
               .group__close-image
                 img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
@@ -68,7 +68,7 @@
 		},
 		data() {
 			return {
-				elementPadding: { 'padding-left': 22 * this.menuIterator + 'px' }
+				elementPadding: { 'padding-left': 24 * this.menuIterator + 'px' }
 			}
 		},
 		methods: {
@@ -124,7 +124,7 @@
   @import "../../assets/scss/colors";
 
   img {
-    margin-right: 8px;
+    margin-right: 10px;
   }
 
   a {
@@ -137,7 +137,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    letter-spacing: 0.1px;
+    /*letter-spacing: 0.1px;*/
   }
 
   %row {
@@ -147,7 +147,7 @@
 
   .menu {
     color: $text;
-    margin: 9px 0;
+    margin: 5px 0 10px 0;
   }
 
   .row {
@@ -187,8 +187,8 @@
 
   .group {
     cursor: pointer;
-    font-family: 'Myriad600';
     font-size: 15px;
+    font-family: 'Myriad600';
 
     &__open {
       @extend %flexBetween;
@@ -220,7 +220,7 @@
     align-items: center;
     font-family: 'Myriad400';
     font-size: 15px;
-    letter-spacing: 0.1px;
+    /*letter-spacing: 0.1px;*/
   }
 
   #link.router-link-active,

@@ -569,7 +569,9 @@
 
 					if (this.isEvery('Created')) {
 						return [ "Mark as accept/reject", "Request confirmation", "Change Deadline" ]
-					} else if (this.isEvery('Completed')) {
+					} else if (this.isEvery('Request Sent')) {
+						return [ "Mark as accept/reject", "Change Deadline" ]
+          } else if (this.isEvery('Completed')) {
 						return [ "ReOpen" ]
 					} else if (indexesForAvailableStatuses.length && !indexesForAvailableStatuses.includes(-1)) {
 						return [ "Change Deadline" ]

@@ -109,6 +109,7 @@
       background-color: white;
       border-radius: 4px;
       position: relative;
+      align-self: baseline;
     }
   }
 </style>

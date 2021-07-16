@@ -19,7 +19,11 @@
       Deliverables(v-if="isStageDelivery")
 
     .project-info__rigthSide
-      ImportProjectToXtrf(v-if="canSendToXtrf" :project="currentProject" @refreshProject="refreshProject")
+      ImportProjectToXtrf(
+        v-if="canSendToXtrf"
+        :project="currentProject"
+        @refreshProject="refreshProject"
+      )
       ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
       .project-info__action
         ProjectAction(
@@ -239,13 +243,15 @@ export default {
     }),
 
     canSendToXtrf() {
-      const {status, steps, tasks} = this.currentProject
+      const {status, tasks} = this.currentProject
 
-      const closedCheck = status === 'Closed'
-          && steps.length
-          && (tasks.every(({ service }) => service.title === 'Compliance')
-              || tasks.every(({ service }) => service.title === 'Translation' ))
-      return closedCheck || status === 'In progress' || status === 'Approved'
+      const closedCheck = tasks.length && (
+      		tasks.every(({ service }) => service.title === 'Compliance') ||
+		      tasks.every(({ service }) => service.title === 'Translation')
+		      // tasks.every(({ service }) => service.title === 'Copywriting')
+      )
+
+      return  closedCheck && ( status === 'Closed' || status === 'In progress' || status === 'Approved' )
     },
     isStageDelivery() {
       return this.currentProject.tasks.some(({ status }) => status === 'Completed' || status === 'Pending Approval [DR1]')
