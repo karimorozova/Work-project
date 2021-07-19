@@ -22,7 +22,6 @@
 </template>
 
 <script>
-	import ProjectsTable from "../ProjectsTable"
 	import RequestsTable from "../RequestsTable"
 	import { mapGetters } from 'vuex'
 	import RequestFilters from "../clientRequests/RequestFilters"
@@ -130,7 +129,6 @@
 		},
 		components: {
 			RequestFilters,
-			ProjectsTable,
 			RequestsTable
 		}
 	}
