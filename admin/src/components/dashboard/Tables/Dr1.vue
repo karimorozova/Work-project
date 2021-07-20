@@ -1,6 +1,6 @@
 <template lang="pug">
   .component
-    .component__title Pending Quotes
+    .component__title DR1
     .component__content
       GeneralTable(
         :fields="fields"
@@ -34,9 +34,8 @@
         template(slot="deadline" slot-scope="{ row, index }")
           .table__data {{ customFormatter(row.deadline) }}
 
-        template(slot="status" slot-scope="{ row, index }")
-          .table__data {{ row.status }}
-
+        template(slot="delivery" slot-scope="{ row, index }")
+          .table__data soon...
         template(slot="assigned" slot-scope="{ row, index }")
           //.table__data {{ row.projectManager.firstName }}
           .table__data soon...
@@ -94,9 +93,9 @@
 						style: { "width": "16%" }
 					},
 					{
-						label: "Status",
-						headerKey: "headerStatus",
-						key: "status",
+						label: "Delivery",
+						headerKey: "headerDelivery",
+						key: "delivery",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
 						style: { "width": "16%" }

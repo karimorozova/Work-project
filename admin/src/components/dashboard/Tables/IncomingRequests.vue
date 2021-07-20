@@ -1,6 +1,6 @@
 <template lang="pug">
   .component
-    .component__title Pending Quotes
+    .component__title Incoming Requests
     .component__content
       GeneralTable(
         :fields="fields"
@@ -20,7 +20,7 @@
 
         template(slot="projectId" slot-scope="{ row, index }")
           .table__data
-            router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}" target="_blank")
+            router-link(class="link-to" :to="{path: `/pangea-projects/requests/pm-requests/Client_Request/details/${row._id}`}" target="_blank")
               span {{row.projectId}}
 
         template(slot="projectName" slot-scope="{ row, index }")
@@ -33,9 +33,6 @@
 
         template(slot="deadline" slot-scope="{ row, index }")
           .table__data {{ customFormatter(row.deadline) }}
-
-        template(slot="status" slot-scope="{ row, index }")
-          .table__data {{ row.status }}
 
         template(slot="assigned" slot-scope="{ row, index }")
           //.table__data {{ row.projectManager.firstName }}
@@ -91,14 +88,6 @@
 						key: "deadline",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: false },
-						style: { "width": "16%" }
-					},
-					{
-						label: "Status",
-						headerKey: "headerStatus",
-						key: "status",
-						sortInfo: { isSort: true, order: 'default' },
-						filterInfo: { isFilter: true },
 						style: { "width": "16%" }
 					},
 					{

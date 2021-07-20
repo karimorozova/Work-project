@@ -90,7 +90,7 @@
 						headerKey: "headerDeadline",
 						key: "deadline",
 						sortInfo: { isSort: true, order: 'default' },
-						filterInfo: { isFilter: true },
+						filterInfo: { isFilter: false },
 						style: { "width": "16%" }
 					},
 					{

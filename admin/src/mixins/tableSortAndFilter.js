@@ -44,6 +44,9 @@ export default {
 				let first = key ? rawFirst[key] : rawFirst
 				let second = key ? rawSecond[key] : rawSecond
 				if (sortInfo.order === 'asc') [ first, second ] = [ second, first ]
+				if(typeof first === 'string' && typeof second === 'string'){
+					return first.localeCompare(second)
+				}
 				if (first > second) {
 					return 1
 				}
@@ -72,6 +75,7 @@ export default {
 	},
 	computed: {
 		finalData() {
+			if (!this.rawData) return []
 			this.sortedData = JSON.parse(JSON.stringify(this.rawData))
 
 			for (let filterKey in this.filtersData) {

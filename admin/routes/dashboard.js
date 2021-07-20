@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { getProjectsFinanceInfo }  = require('../dashboard/overallView/projectFinance')
 const { getProjectsForDashboard }  = require('../dashboard/pmAmOrAdmin')
+const { getClientsRequestsForDashboard }  = require('../dashboard/incomingRequests')
 
 
 router.post("/finance-view", async (req, res) => {
@@ -13,9 +14,19 @@ router.post("/finance-view", async (req, res) => {
       res.status(500).send('Something wrong on Finance getting');
     }
 });
-router.get("/due-today", async (req, res) => {
+
+router.get("/all-projects", async (req, res) => {
   try {
     const result = await getProjectsForDashboard()
+    res.send(result)
+    } catch(err) {
+      console.log(err);
+      res.status(500).send('Something wrong on Finance getting');
+    }
+});
+router.get("/all-client-requests", async (req, res) => {
+  try {
+    const result = await getClientsRequestsForDashboard()
     res.send(result)
     } catch(err) {
       console.log(err);

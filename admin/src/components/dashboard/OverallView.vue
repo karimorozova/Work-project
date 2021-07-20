@@ -1,5 +1,15 @@
 <template lang="pug">
   .overallView
+    .row(v-if="isPm || isAdmin")
+      .col
+        IncomingRequests( :projects="incomingRequests")
+      .col
+        Dr1( :projects="dr1")
+    .row(v-else-if="isAm || isAdmin")
+      .col
+        AcceptedRequest( :projects="acceptedRequest")
+      .col
+        Dr2( :projects ="dr2")
     .row
       .col
         DueToday( :projects="dueToday")
@@ -8,6 +18,7 @@
     .row
       .col
         Quotes( :projects ="quotes")
+
 
     //.overallView__col
       .col__title Today
@@ -25,12 +36,17 @@
 	import DueToday from "./Tables/DueToday"
 	import StartedToday from "./Tables/StartedToday"
 	import Quotes from "./Tables/Quotes"
+	import IncomingRequests from "./Tables/IncomingRequests"
+	import AcceptedRequest from "./Tables/AcceptedRequest"
+	import Dr1 from "./Tables/Dr1"
+	import Dr2 from "./Tables/Dr2"
 	import { mapGetters } from "vuex"
 
 	export default {
 		data() {
 			return {
 				projects: [],
+        clientRequest: [],
 				startDateMonth: moment({ hour: 0, minute: 0, second: 0 }).subtract(30, 'days').toDate()
 			}
 		},
@@ -39,16 +55,61 @@
 			...mapGetters({
 				user: 'getUser'
 			}),
+      incomingRequests() {
+        if (!this.user.hasOwnProperty('group')) return []
+        const clientRequest = this.clientRequest.filter(({status}) => status === "Client Request" )
+        if (this.isAdmin) return clientRequest.filter(({ accountManager, projectManager })=> projectManager !== null || accountManager !== null)
+
+        if (this.isPm)
+          return clientRequest.filter(({ accountManager, projectManager }) => {
+            return projectManager === this.user._id || (projectManager === null && accountManager === null)
+          })
+      },
+      acceptedRequest() {
+        if (!this.user.hasOwnProperty('group')) return []
+        const clientRequest = this.clientRequest.filter(({status}) => status === "Request Approved" )
+        if (this.isAdmin) return clientRequest.filter(({ accountManager, projectManager })=> projectManager !== null || accountManager !== null)
+
+        if (this.isAm)
+          return clientRequest.filter(({ accountManager }) => {
+            return accountManager === this.user._id
+          })
+      },
+      dr1() {
+        if (!this.user.hasOwnProperty('group')) return []
+        if (this.isAdmin) return this.projects.filter(item => {
+          return item.hasOwnProperty('tasksDR1') && item.tasksDR1.length
+        })
+        if (this.isPm){
+          return this.projects.filter( project => {
+            return project.hasOwnProperty('tasksDR1') && project.tasksDR1.some(task => task.dr1Manager === this.user._id)
+          })
+
+        }
+      },
+      dr2() {
+        if (!this.user.hasOwnProperty('group')) return []
+        if (this.isAdmin) return this.projects.filter(item => {
+          return item.hasOwnProperty('tasksDR2')
+              && (item.tasksDR2.singleLang.length || item.tasksDR2.multiLang.length)
+        })
+        if (this.isAm){
+          return this.projects.filter( project => {
+            return project.hasOwnProperty('tasksDR2')
+                &&  ((project.tasksDR2.singleLang.length ? project.tasksDR2.singleLang.some(singleLang => singleLang.files.some(({dr2Manager}) => dr2Manager === this.user._id)) :false)
+                || (project.tasksDR2.multiLang.length ? project.tasksDR2.multiLang.some( multiLang  => multiLang.files.some(({dr2Manager}) => dr2Manager === this.user._id)) :false))
+          })
+        }
+      },
 			filteredForPmAmOrAdmin() {
 				if (!this.user.hasOwnProperty('group')) return []
-				const userGroup = this.user.group.name
-				if (userGroup === 'Administrators' || userGroup === "Developers") return this.projects
-				if (userGroup === 'Account Managers')
+				if (this.isAdmin) return this.projects
+				if (this.isAm)
 					return this.projects.filter(({ accountManager }) => {
 						return accountManager._id === this.user._id
 					})
 
-				if (userGroup === "Project Managers")
+				if (this.isPm)
 					return this.projects.filter(({ projectManager }) => {
 						return projectManager._id === this.user._id
 					})
@@ -75,18 +136,35 @@
 						})
 						: []
 			},
-			currentDate() {
-
-			}
+      isAdmin() {
+        if (!this.user.hasOwnProperty('group')) return false
+        const userGroup = this.user.group.name
+        return userGroup === 'Administrators' || userGroup === 'Developers'
+      },
+      isPm() {
+        if (!this.user.hasOwnProperty('group')) return false
+        const userGroup = this.user.group.name
+        return userGroup === 'Project Managers'
+      },
+      isAm() {
+        if (!this.user.hasOwnProperty('group')) return false
+        const userGroup = this.user.group.name
+        return userGroup === 'Account Managers'
+      }
 		},
 		async created() {
-			this.projects = (await this.$http.get('/dashboard-api/due-today')).data
+			this.projects = (await this.$http.get('/dashboard-api/all-projects')).data
+			this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
 		},
 		components: {
 			DueToday,
 			StartedToday,
 			Quotes,
-			ProjectFinanceStats
+      IncomingRequests,
+      AcceptedRequest,
+      ProjectFinanceStats,
+      Dr1,
+      Dr2,
 		}
 	}
 </script>

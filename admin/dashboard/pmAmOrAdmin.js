@@ -8,8 +8,8 @@ async function getProjectsForDashboard() {
 	// 				$lte: new Date(moment().set({ hour: 23, minute: 59, second: 59 }).toString())
 	// 			},
 	// }
-	const STATUSES = ["Close", "Cancelled", "Cancelled Halfway"]
-	const filters = {status: {$ne: {$in: STATUSES}}, isTest: false}
+	const STATUSES = ["Closed", "Cancelled", "Cancelled Halfway"]
+	const filters = {status: {$not: {$in: STATUSES}}, isTest: false}
 	return await getProjects(filters)
 }
 
@@ -58,7 +58,6 @@ async function getProjects(filters) {
 				"customer.targetLanguages",
 				"customer.country",
 
-				"tasksDR2",
 				"genBrief",
 				"roi",
 				"minimumCharge",
@@ -83,7 +82,6 @@ async function getProjects(filters) {
 				"billingDate",
 				"dateFormatted",
 				"discounts",
-				"tasksDR1",
 				"tasksDeliverables",
 			]
 		},
