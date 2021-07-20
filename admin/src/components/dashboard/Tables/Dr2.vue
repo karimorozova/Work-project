@@ -97,7 +97,7 @@
 						headerKey: "headerDelivery",
 						key: "delivery",
 						sortInfo: { isSort: true, order: 'default' },
-						filterInfo: { isFilter: true },
+						filterInfo: { isFilter: false },
 						style: { "width": "16%" }
 					},
 					{

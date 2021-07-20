@@ -5,7 +5,7 @@
         IncomingRequests( :projects="incomingRequests")
       .col
         Dr1( :projects="dr1")
-    .row(v-else-if="isAm || isAdmin")
+    .row(v-if="isAm || isAdmin")
       .col
         AcceptedRequest( :projects="acceptedRequest")
       .col
