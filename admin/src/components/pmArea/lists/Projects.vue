@@ -1,6 +1,13 @@
 <template lang="pug">
   .all-projects
+    ProjectSettingsSidebar(
+      v-if="!!user.layoutsSettings"
+      :filters="filtersSetting"
+      :fields="fieldsSetting"
+      :userInfo="user.layoutsSettings.project"
 
+      @updateFiltersAndFields="updateFiltersAndFields"
+    )
     ProjectsLayoutTable(
       :list="allProjects"
       @bottomScrolled="bottomScrolled"
@@ -11,6 +18,7 @@
 	import { mapGetters, mapActions } from 'vuex'
 	import ProjectsLayoutTable from "./ProjectsLayoutTable"
 	import ProjectsLayoutFilter from "./ProjectsLayoutFilter"
+  import ProjectSettingsSidebar from "./ProjectSettingsSidebar"
 
 	export default {
 		props: {
@@ -46,11 +54,134 @@
 					'deadline',
 					'sourceLanguages',
 					'targetLanguages'
-				]
+				],
+        filtersSetting: [
+          {
+            id: "projectId",
+            name: "Project Id",
+            order: 1,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectName",
+            name: "Project Name",
+            order: 2,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "clientName",
+            name: "Client Name",
+            order: 3,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "startDate",
+            name: "Start Date",
+            order: 4,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "deadline",
+            name: "Deadline",
+            order: 5,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectManager",
+            name: "Project Manager",
+            order: 6,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "accountManger",
+            name: "Account Manger",
+            order: 7,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "sourceLanguages",
+            name: "Source Languages",
+            order: 8,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "targetLanguages",
+            name: "Target Languages",
+            order: 9,
+            fixed: false,
+            isCheck: false,
+          },
+        ],
+        fieldsSetting: [
+          {
+            id: "projectId",
+            name: "Project Id",
+            order: 1,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectName",
+            name: "Project Name",
+            order: 2,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "clientName",
+            name: "Client Name",
+            order: 3,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "startDate",
+            name: "Start Date",
+            order: 4,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "deadline",
+            name: "Deadline",
+            order: 5,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectManager",
+            name: "Project Manager",
+            order: 6,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "accountManger",
+            name: "Account Manger",
+            order: 7,
+            fixed: false,
+            isCheck: false,
+          },
+        ],
 			}
 		},
 		methods: {
-			...mapActions([ "alertToggle" ]),
+			...mapActions([
+        "alertToggle",
+        "setUser",
+      ]),
+      async updateFiltersAndFields(data) {
+        await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, {data})
+        await this.setUser()
+      },
 			async getData() {
 				this.lastDate = new Date()
 				this.lastDate.setDate(this.lastDate.getDate() + 1)
@@ -83,6 +214,9 @@
 			}
 		},
 		computed: {
+      ...mapGetters({
+        user: "getUser"
+      }),
 			filters() {
 				const filters = { status: this.status }
 				for (let variable of this.dataVariables) filters[variable] = this[variable]
@@ -109,6 +243,7 @@
 		},
 
 		components: {
+      ProjectSettingsSidebar,
 			ProjectsLayoutFilter,
 			ProjectsLayoutTable
 		}
