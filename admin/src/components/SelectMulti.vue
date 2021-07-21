@@ -1,15 +1,29 @@
 <template lang="pug">
   .drop-select(
     v-click-outside="outOptions"
-    :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu}, customClass]"
+    :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu, 'disableOverFlow': isSelectedWithIcon}, customClass]"
   )
-    .select(@click="toggleOptions")
-      span.selected(v-if="selectedOptions.length") {{ selectedOptions.join('; ') }}
+    .select
+
+      .selectedWithIcon(v-if="selectedOptions.length && isSelectedWithIcon")
+        span {{ selectedOptions.length }} Selected...
+        .tooltip
+          .tooltipData(v-html="selectedOptions.join('<br>')")
+          i.fas.fa-info-circle
+
+      .selected(v-if="selectedOptions.length && !isSelectedWithIcon") {{ selectedOptions.join(', ') }}
+
       span.selected.no-choice(v-if="!selectedOptions.length") {{ placeholder }}
-      .arrow-button
+
+      .arrow-button(@click="toggleOptions")
         i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")
 
     .drop(v-if="isDropped")
+      .remove-option(v-if="isRemoveOption && selectedOptions.length" @click="removeOption")
+        span.remove__icon
+          i.fa.fa-ban(aria-hidden='true')
+          span.remove__text &nbsp; Clear Selected
+
       .drop__buttonRow(v-if="allOptionsButtons")
         .buttonRow__button(@click="setOrUnsetAllOptions('set')")
           i.fa.fa-check-square-o(aria-hidden='true')
@@ -18,7 +32,9 @@
           i.fa.fa-square-o(aria-hidden='true')
           span Clear All
 
-      input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" :placeholder="'🔎︎  Search'" ref="search")
+      .drop__searchBlock
+        input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" :placeholder="'🔎︎  Search'" ref="search")
+
       .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOptions(index)")
         .checkbox
           .checkbox__check(:class="{checked: activeClass(option)}")
@@ -55,6 +71,14 @@
 			allOptionsButtons: {
 				type: Boolean,
 				default: false
+			},
+			isSelectedWithIcon: {
+				type: Boolean,
+				default: false
+			},
+			isRemoveOption: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -64,6 +88,10 @@
 			}
 		},
 		methods: {
+			removeOption() {
+				this.$emit("removeOption")
+				this.outOptions()
+			},
 			showOption(opt) {
 				return (typeof opt === "string") ? opt : opt.name
 			},
@@ -126,6 +154,59 @@
 <style lang="scss" scoped>
   @import '../assets/scss/colors.scss';
 
+  .disableOverFlow {
+    overflow: unset !important;
+  }
+
+  .fa-ban {
+    color: $red !important;
+    font-size: 13px !important;
+  }
+
+  .remove-option {
+    padding: 0 7px;
+    height: 31px;
+    border-bottom: 1px solid $light-border;
+    cursor: pointer;
+    font-size: 14px;
+    transition: .1s ease-out;
+    display: flex;
+    align-items: center;
+    color: $text;
+
+    &:hover {
+      background-color: $list-hover;
+    }
+  }
+
+  .remove {
+    &__icon {
+      margin-right: 6px;
+      color: $red;
+    }
+  }
+
+  .selectedWithIcon {
+    width: 80%;
+    padding: 3px 7px;
+    font-size: 14px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .fa-info-circle {
+    font-size: 16px;
+    cursor: help;
+    transition: .2s ease-out;
+    color: $dark-border;
+
+    &:hover {
+      color: $text;
+    }
+  }
+
   i {
     font-size: 20px;
     color: $border;
@@ -146,7 +227,7 @@
     box-sizing: border-box;
 
     .drop {
-      max-height: 320px;
+      max-height: 375px;
       overflow-y: auto;
       overflow-x: hidden;
       background-color: #FFF;
@@ -203,15 +284,24 @@
       }
 
       &__search {
-        background: $table-list;
         box-sizing: border-box;
-        width: 100%;
+        width: 94%;
         padding: 0 7px;
         outline: none;
-        border: none;
         height: 32px;
         color: $text;
-        border-bottom: 1px solid $border;
+        border: 1px solid $border;
+        border-radius: 4px;
+        margin: 11px 3%;
+        transition: .1s ease-out;
+
+        &:focus {
+          border: 1px solid $border-focus;
+        }
+      }
+
+      &__searchBlock {
+        border-bottom: 1px solid $light-border;
       }
 
       .domain__options & {
@@ -246,11 +336,10 @@
     height: 30px;
     display: flex;
     justify-content: space-between;
-    cursor: pointer;
 
     .selected {
       width: 80%;
-      padding: 3px 5px;
+      padding: 3px 7px;
       font-size: 14px;
       max-height: 40px;
       display: flex;
@@ -265,7 +354,7 @@
     }
 
     .no-choice {
-      opacity: 0.5;
+      opacity: 0.45;
     }
 
     .arrow-button {
@@ -306,16 +395,6 @@
       height: 100%;
       position: relative;
 
-      /*      &::before {
-              content: "";
-              position: absolute;
-              width: 6px;
-              border: 1px solid $text;
-              top: 7px;
-              left: 0px;
-              transform: rotate(45deg);
-            }*/
-
       &::after {
         content: "";
         position: absolute;
@@ -331,5 +410,43 @@
     }
   }
 
+
+  .tooltip {
+    position: relative;
+    display: flex;
+
+    .tooltipData {
+      visibility: hidden;
+      font-size: 14px;
+      width: max-content;
+      background: white;
+      border-radius: 4px;
+      right: 25px;
+      padding: 7px 7px 5px 7px;
+      position: absolute;
+      z-index: 555;
+      opacity: 0;
+      transition: opacity .3s;
+      border: 1px solid $text;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        right: -12px;
+        transform: rotate(270deg);
+        border-width: 6px;
+        border-style: solid;
+        border-color: $text transparent transparent;
+      }
+    }
+
+    &:hover {
+      .tooltipData {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  }
 
 </style>

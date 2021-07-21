@@ -216,6 +216,7 @@
   tbody {
     max-height: 600px;
     display: block;
+    color: $table;
   }
 
   tbody tr:nth-child(even) {

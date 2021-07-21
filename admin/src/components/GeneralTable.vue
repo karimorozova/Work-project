@@ -217,9 +217,9 @@
     padding: 0 7px;
     outline: none;
     height: 32px;
-    transition: .1s ease-out;
     width: 100%;
     font-family: 'Myriad400';
+    transition: .1s ease-out;
 
     &:focus {
       border: 1px solid $border-focus;
@@ -308,6 +308,7 @@
   tbody {
     max-height: 600px;
     display: block;
+    color: $table;
   }
 
   tbody tr:nth-child(even) {

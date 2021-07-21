@@ -60,7 +60,7 @@
   }
 
   input::-webkit-input-placeholder {
-    opacity: 0.5;
+    opacity: 0.45;
   }
 
   input::-webkit-outer-spin-button,

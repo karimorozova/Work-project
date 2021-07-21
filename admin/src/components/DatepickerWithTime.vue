@@ -1,6 +1,6 @@
 <template lang="pug">
   .vdp-datepicker(:class="[wrapperClass, isRtl ? 'rtl' : '']")
-    div(:class="{'input-group' : bootstrapStyling}")
+    div(style="position: relative;" :class="{'input-group' : bootstrapStyling}")
       <!-- Calendar Button -->
       span(v-if="calendarButton" class="vdp-datepicker__calendar-button" :class="{'input-group-addon' : bootstrapStyling}" @click="showCalendar"
         v-bind:style="{'cursor:not-allowed;' : disabledPicker}")
@@ -23,6 +23,10 @@
         :required="required"
         :readonly="isReadonly"
       )
+      <!-- Clear Icon -->
+      span.clear-icon(v-if="isClearIcon && selectedDate" @click="removeSelectedDate()")
+        i.fas.fa-backspace
+
       <!-- Clear Button -->
       span(v-if="clearButton && selectedDate" class="vdp-datepicker__clear-button" :class="{'input-group-addon' : bootstrapStyling}" @click="clearDate()")
         i.clearButtonIcon
@@ -83,7 +87,8 @@
               class="next"
             )
               i.fa.fa-chevron-down
-        Button.select-date(value="select" @clicked="selectDate()")
+
+        Button.select-date(value="Set date" @clicked="selectDate()")
 
 
     <!-- Month View -->
@@ -190,7 +195,11 @@
 				type: String,
 				default: 'year'
 			},
-			isTime: { type: Boolean, default: true }
+			isTime: { type: Boolean, default: true },
+			isClearIcon: {
+				type: Boolean,
+				default: false
+			}
 		},
 		data() {
 			const startDate = this.openDate ? new Date(this.openDate) : new Date()
@@ -388,6 +397,10 @@
 			/**
 			 * Close all calendar layers
 			 */
+			removeSelectedDate(){
+				this.selectedDate = null
+        this.$emit('removeSelectedDate')
+      },
 			close(full) {
 				this.showDayView = this.showMonthView = this.showYearView = false
 				if (!this.isInline) {
@@ -1015,6 +1028,21 @@
 <style lang="scss" scoped>
   @import '../assets/scss/colors.scss';
 
+
+  .fa-backspace {
+    font-size: 16px;
+    transition: .2s ease-out;
+    color: $dark-border;
+    cursor: pointer;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+
+    &:hover {
+      color: $text;
+    }
+  }
+
   .vdp-datepicker__calendar div .cell {
     font-size: 16px;
   }
@@ -1344,6 +1372,24 @@
     }
   }
 
+  .datepicker-custom-filter {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+    cursor: pointer;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
   .datepicker-height-30 {
     font-size: 14px;
     color: $text;
@@ -1451,8 +1497,7 @@
   }
 
   ::-webkit-input-placeholder {
-    opacity: 0.5;
-    color: #66563d;
+    opacity: 0.45;
   }
 
   .prev,

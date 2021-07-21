@@ -12,15 +12,17 @@
         i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")
 
     .drop(v-if="isDropped")
-      input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" :placeholder="'🔎︎  Search'" ref="search" :disabled="isDisabled")
+      .remove-option(v-if="isRemoveOption && ( Object.keys(selectedOption).length )" @click="removeOption")
+        span.remove__icon
+          i.fa.fa-ban(aria-hidden='true')
+          span.remove__text &nbsp; Clear Selected
+
+      .drop__searchBlock
+        input.drop__search(v-if="hasSearch" type="text" @input="(e) => search(e)" :placeholder="'🔎︎  Search'" ref="search" :disabled="isDisabled")
 
       .drop__item(v-for="(option, index) in filteredOptions" @click="chooseOption(index)" :class="{active: activeClass(option)}")
         span {{ showOption(option) }}
 
-      .drop__item(v-if="isRemoveOption" @click="removeOption")
-        span.remove__icon
-          i.fa.fa-ban(aria-hidden='true')
-          span.remove__text &nbsp; Remove Option
 
 </template>
 
@@ -52,9 +54,6 @@
 			isTableDropMenuNoShadow: {
 				type: Boolean,
 				default: false
-			},
-			projectsType: {
-				type: String
 			},
 			customClass: {
 				type: String
@@ -156,13 +155,33 @@
     color: $border;
   }
 
-  .remove {
-    &__icon {
-      margin-right: 5px;
-      color: #d15f45;
+  .fa-ban {
+    color: $red !important;
+    font-size: 13px !important;
+  }
+
+  .remove-option {
+    padding: 0 7px;
+    height: 31px;
+    border-bottom: 1px solid $light-border;
+    cursor: pointer;
+    font-size: 14px;
+    transition: .1s ease-out;
+    display: flex;
+    align-items: center;
+    color: $text;
+
+    &:hover {
+      background-color: $list-hover;
     }
   }
 
+  .remove {
+    &__icon {
+      margin-right: 6px;
+      color: $red;
+    }
+  }
 
   .drop-select {
     position: absolute;
@@ -174,7 +193,7 @@
     box-sizing: border-box;
 
     .drop {
-      max-height: 320px;
+      max-height: 375px;
       overflow-y: auto;
       overflow-x: hidden;
       background-color: #FFF;
@@ -183,15 +202,24 @@
       z-index: 10;
 
       &__search {
-        background: $table-list;
         box-sizing: border-box;
-        width: 100%;
+        width: 94%;
         padding: 0 7px;
         outline: none;
-        border: none;
         height: 32px;
         color: $text;
-        border-bottom: 1px solid $border;
+        border: 1px solid $border;
+        border-radius: 4px;
+        margin: 11px 3%;
+        transition: .1s ease-out;
+
+        &:focus {
+          border: 1px solid $border-focus;
+        }
+      }
+
+      &__searchBlock {
+        border-bottom: 1px solid $light-border;
       }
 
       &__item {
@@ -216,7 +244,6 @@
 
       .active {
         color: $border;
-        /*background-color: $light-border;*/
       }
 
     }
@@ -263,7 +290,7 @@
     }
 
     .no-choice {
-      opacity: 0.5;
+      opacity: 0.45;
     }
 
     .arrow-button {
@@ -278,13 +305,6 @@
       .reverse-icon {
         transform: rotate(180deg);
       }
-
-      /*      .inner-component & {
-              background-color: white;
-              box-shadow: inset -1px 0 5px #bfb09d;
-              border-left: 1px solid #bfb09d;
-              width: 17%;
-            }*/
 
       .block-item__drop-menu & {
         width: 20%;
@@ -308,14 +328,5 @@
         padding: 2px 5px;
       }
     }
-
-    /*.services__drop-menu & {*/
-    /*  height: 32px;*/
-    /*  box-shadow: inset 0 0 7px rgba(104, 87, 62, 0.5);*/
-    /*}*/
-
-    /*.add-several__drop-menu & {*/
-    /*  height: 32px;*/
-    /*}*/
   }
 </style>
