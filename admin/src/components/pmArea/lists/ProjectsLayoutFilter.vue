@@ -289,7 +289,7 @@
 
   label {
     display: block;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
     font-family: 'Myriad600';
   }
 

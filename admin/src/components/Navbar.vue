@@ -432,9 +432,6 @@
 				params.shift()
 				return params
 			},
-			userName() {
-				return `${ this.user.firstName } ${ this.user.lastName } test`
-			}
 		},
 		created() {
 			this.getCurrentUserGroup()

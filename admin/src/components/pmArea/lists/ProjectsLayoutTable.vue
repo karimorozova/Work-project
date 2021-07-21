@@ -25,7 +25,7 @@
           .table__data {{row.customer.name}}
 
         template(slot="languages" slot-scope="{ row, index }")
-          .table__data {{ projectLanguages(row.tasks) }}
+          .table__data(v-html="projectLanguages(row.tasks)")
 
         template(slot="startDate" slot-scope="{ row, index }")
           .table__data {{ customFormatter(row.startDate) }}
@@ -47,6 +47,7 @@
 	import ProjectsLayoutFilter from "./ProjectsLayoutFilter"
 	import { mapGetters } from "vuex"
 	import moment from "moment"
+	import _ from "lodash"
 
 	export default {
 		props: {
@@ -111,7 +112,17 @@
 		},
 		methods: {
 			projectLanguages(tasks) {
-				console.log(tasks)
+				if (!tasks.length) return '-'
+				const taskLanguages = tasks.map(({ sourceLanguage, targetLanguage }) => ({ sourceLanguage, targetLanguage }))
+				let groupedLanguages = Object.entries(_.groupBy(taskLanguages, 'sourceLanguage'))
+				groupedLanguages = groupedLanguages.map(item => {
+					return { sourceLanguage: item[0], targetLanguages: [...new Set(item[1].map(({ targetLanguage }) => targetLanguage))].join(', ') }
+				})
+				groupedLanguages = groupedLanguages.reduce((acc, curr) => {
+					acc = acc + `${curr.sourceLanguage} &#8811; ${curr.targetLanguages } <br>`
+					return acc
+        }, '')
+        return groupedLanguages
 			},
 			customFormatter(date) {
 				return moment(date).format('MMM D, HH:mm')

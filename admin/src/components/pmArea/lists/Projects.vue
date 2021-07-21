@@ -5,30 +5,6 @@
       :list="allProjects"
       @bottomScrolled="bottomScrolled"
     )
-
-    //.all-projects__filters
-    //  ProjectFilters(
-    //    :idFilter="idFilter"
-    //    :clientName="clientFilter"
-    //    :projectName="projectFilter"
-    //    :sourceLangs="sourceFilter"
-    //    :targetLangs="targetFilter"
-    //    :pmFilter="pmFilter"
-    //    :salesFilter="salesFilter"
-    //    :projectManagers="projectManagers"
-    //    :salesManagers="salesManagers"
-    //    @setFilter="setFilter"
-    //    :projectsType="projectsType"
-    //    @refreshProjects="refreshProjects"
-    //  )
-    //
-    //.all-projects__table
-    //  ProjectsTable(
-    //    v-if="projectsType !== 'requests'"
-    //    :allProjects="allProjects"
-    //    @selectProject="selectProject"
-    //    @bottomScrolled="bottomScrolled"
-    //  )
 </template>
 
 <script>
