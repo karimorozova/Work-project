@@ -1270,4 +1270,17 @@ router.get('/vendors-for-project', async (req, res) => {
 		res.status(500).send('Error on vendors-for-project!')
 	}
 })
+
+router.post('/update-filters-and-fields/:userId', async (req, res) => {
+	const { userId } = req.params
+	const { data } = req.body
+	try {
+		await  User.updateOne({_id: userId}, {$set: {layoutsSettings:{ project: data}}})
+		res.send("done!")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on update project filters')
+	}
+})
+
 module.exports = router

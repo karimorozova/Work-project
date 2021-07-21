@@ -94,14 +94,9 @@ router.get('/users-full', requiresLogin, async (req, res, next) => {
 router.get('/user', requiresLogin, async (req, res, next) => {
 	try {
 		const key = req.query["key"]
-		const result = jwt.verify(key, secretKey)
-		const loggedUser = Object.keys(result.user).reduce((init, cur) => {
-			if (cur !== "__v" && cur !== "password") {
-				init[cur] = result.user[cur]
-			}
-			return { ...init }
-		}, {})
-		res.send({ ...loggedUser })
+		const userFromJWT = jwt.verify(key, secretKey)
+		const result = await User.findOne({_id: userFromJWT.user._id}, {password: 0})
+		res.send(result)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting User from DB")

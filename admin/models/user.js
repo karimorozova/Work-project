@@ -49,18 +49,18 @@ const UserSchema = new mongoose.Schema({
 		default: "",
 		trim: true
 	},
-	// layoutsSettings: {
-	// 	vendor: {
-	// 		filters: {
-	// 			type: Array,
-	// 			default: ['name']
-	// 		},
-	// 		fields: {
-	// 			type: Array,
-	// 			default: [ 'name' ]
-	// 		}
-	// 	}
-	// }
+	layoutsSettings: {
+		project: {
+			filters: {
+				type: Array,
+				default: ['projectId', 'projectName', 'clientName', 'startDate', 'deadline', 'projectManager', 'accountManger', 'sourceLanguages', 'targetLanguages']
+			},
+			fields: {
+				type: Array,
+				default: [ 'projectId', 'projectName', 'clientName', 'startDate', 'deadline', 'projectManager', 'accountManger' ]
+			}
+		}
+	}
 
 }, { minimize: false })
 

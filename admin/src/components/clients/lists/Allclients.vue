@@ -1,5 +1,13 @@
 <template lang="pug">
   .all-clients
+    ProjectSettingsSidebar(
+      v-if="!!user.layoutsSettings"
+      :filters="filtersSetting"
+      :fields="fieldsSetting"
+      :userInfo="user.layoutsSettings.project"
+
+      @updateFiltersAndFields="updateFiltersAndFields"
+    )
     .all-clients__table
       .clients-filters
         .clients-filters__row
@@ -33,6 +41,8 @@
 <script>
 	import ClientsTable from "../ClientsTable"
 	import { mapGetters, mapActions } from "vuex"
+  import ProjectSettingsSidebar from "../../pmArea/lists/ProjectSettingsSidebar"
+  import { setUserFromDb } from "../../../vuex/general/actions"
 
 	export default {
 		data() {
@@ -47,10 +57,130 @@
 				lastId: "",
 				typingTimer: "",
 				doneTypingInterval: 800,
-				statusFilter: 'All'
+				statusFilter: 'All',
+        filtersSetting: [
+          {
+            id: "projectId",
+            name: "Project Id",
+            order: 1,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectName",
+            name: "Project Name",
+            order: 2,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "clientName",
+            name: "Client Name",
+            order: 3,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "startDate",
+            name: "Start Date",
+            order: 4,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "deadline",
+            name: "Deadline",
+            order: 5,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectManager",
+            name: "Project Manager",
+            order: 6,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "accountManger",
+            name: "Account Manger",
+            order: 7,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "sourceLanguages",
+            name: "Source Languages",
+            order: 8,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "targetLanguages",
+            name: "Target Languages",
+            order: 9,
+            fixed: false,
+            isCheck: false,
+          },
+        ],
+        fieldsSetting: [
+          {
+            id: "projectId",
+            name: "Project Id",
+            order: 1,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectName",
+            name: "Project Name",
+            order: 2,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "clientName",
+            name: "Client Name",
+            order: 3,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "startDate",
+            name: "Start Date",
+            order: 4,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "deadline",
+            name: "Deadline",
+            order: 5,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "projectManager",
+            name: "Project Manager",
+            order: 6,
+            fixed: false,
+            isCheck: false,
+          },
+          {
+            id: "accountManger",
+            name: "Account Manger",
+            order: 7,
+            fixed: false,
+            isCheck: false,
+          },
+        ],
 			}
 		},
 		methods: {
+      async updateFiltersAndFields(data) {
+        await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, {data})
+        await this.setUser()
+      },
 			scrollBodyToTop() {
 				let tbody = document.querySelector(".clients__table")
 				tbody.scrollTop = 0
@@ -115,6 +245,7 @@
 				await this.getCustomers()
 			},
 			...mapActions([
+        "setUser",
 				"alertToggle",
 				"setAllCustomers",
 				"storeCurrentClient"
@@ -122,7 +253,8 @@
 		},
 		computed: {
 			...mapGetters({
-				allClients: "getClients"
+				allClients: "getClients",
+        user: "getUser"
 			}),
 			filters() {
 				return {
@@ -135,6 +267,7 @@
 			}
 		},
 		components: {
+      ProjectSettingsSidebar,
 			ClientsTable,
 		},
 		created() {
