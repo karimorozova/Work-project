@@ -701,7 +701,7 @@
       padding: 20px;
       margin-top: 66px;
       width: 350px;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
       border-radius: 4px;
       background-color: white;
@@ -712,7 +712,7 @@
       border-radius: 4px;
       width: 390px;
       margin-left: 40px;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       background-color: white;
     }
   }
@@ -725,7 +725,7 @@
     &__competencies {
       box-sizing: border-box;
       padding: 20px;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       position: relative;
       border-radius: 4px;
       background-color: white;
@@ -754,7 +754,7 @@
       box-sizing: border-box;
       padding: 20px;
       border-radius: 4px;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       background: white;
     }
   }
@@ -767,7 +767,7 @@
   .gen-info {
     box-sizing: border-box;
     padding: 20px;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
   }
 
   .gen-info {
@@ -822,7 +822,7 @@
     }
 
     &_error-shadow {
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       border-radius: 4px;
     }
   }
@@ -914,7 +914,7 @@
 
     &:hover {
       cursor: pointer;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     }
 
     &:active {
@@ -1005,7 +1005,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     background-color: #fff;
     z-index: 20;
 

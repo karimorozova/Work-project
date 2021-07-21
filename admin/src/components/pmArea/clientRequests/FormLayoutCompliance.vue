@@ -802,7 +802,7 @@
   .side {
     &__contacts,
     &__pm {
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       padding: 20px;
       width: 240px;
       height: fit-content;
@@ -811,7 +811,7 @@
     }
 
     &__info {
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       padding: 20px;
       width: 400px;
       box-sizing: border-box;
@@ -828,7 +828,7 @@
     min-width: 1000px;
     max-width: 1000px;
     box-sizing: border-box;
-    box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     border-radius: 4px;
     background: white;
 
@@ -1001,7 +1001,7 @@
 
     &__main {
       padding: 30px 20px 20px 20px;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       position: absolute;
       z-index: 9999;
       background: white;

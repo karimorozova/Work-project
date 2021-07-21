@@ -867,7 +867,7 @@
       padding: 20px 40px;
       background: white;
       position: absolute;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -982,7 +982,7 @@
       padding: 3px;
       border-radius: 4px;
       margin-left: 22px;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       opacity: 0;
       z-index: -2;
       transition: all 0.2s;
@@ -992,7 +992,7 @@
       padding: 20px;
       background: white;
       position: absolute;
-      box-shadow: rgba(81, 68, 48, 0.3) 0px 1px 2px 0px, rgba(81, 68, 48, 0.15) 0px 1px 3px 1px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
