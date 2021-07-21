@@ -1,48 +1,69 @@
 const ObjectId = require('mongodb').ObjectID
 
-function getFilterdProjectsQuery(filters) {
+function getFilterdProjectsQuery(filters, allLanguages) {
+
 	const reg = /[.*+?^${}()|[\]\\]/g
 	let query = {}
 
-	if (filters.statusFilter !== 'All') {
-		query["status"] = filters.statusFilter
+	console.log(filters)
+
+	const {
+		status,
+		projectId,
+		projectName,
+		lastDate,
+		clientName,
+		projectManager,
+		accountManager,
+		startDate,
+		deadline,
+		sourceLanguages,
+		targetLanguages
+	} = filters
+
+	if (status !== 'All') query["status"] = status
+
+	if (projectId) {
+		const filter = projectId.replace(reg, '\\$&')
+		query['projectId'] = { "$regex": new RegExp(filter, 'i') }
 	}
 
-	if (filters.projectIdFilter) {
-		const filter = filters.projectIdFilter.replace(reg, '\\$&')
-		query.projectId = { "$regex": new RegExp(filter, 'i') }
+	if (projectName) {
+		const filter = projectName.replace(reg, '\\$&')
+		query['projectName'] = { "$regex": new RegExp(filter, 'i') }
 	}
 
-	if (filters.projectNameFilter) {
-		const filter = filters.projectNameFilter.replace(reg, '\\$&')
-		query.projectName = { "$regex": new RegExp(filter, 'i') }
+	if (lastDate) {
+		query['startDate'] = { $lt: new Date(lastDate) }
 	}
 
-	// if(filters.lastDate) {
-	// 	query.startDate = { $lt: new Date(filters.lastDate) };
-	// }
+	if (clientName) {
+		query["customer.name"] = { "$regex": new RegExp(`${ clientName }`, 'i') }
+	}
 
+	if (projectManager) {
+		query["projectManager"] = ObjectId(projectManager)
+	}
 
-	//
-	// if(filters.startFilter) {
-	// 	query.startDate = filters.lastDate ? { $lt: new Date(filters.lastDate), $gte: new Date(filters.startFilter) } : { $gte: new Date(filters.startFilter) };
-	// }
-	// if(filters.deadlineFilter) {
-	// 	query.deadline = { $lte: new Date(filters.deadlineFilter) };
-	// }
-	// if(filters.clientFilter) {
-	// 	query["customer.name"] = { "$regex": new RegExp(`${ filters.clientFilter }`, 'i') };
-	// }
-	// if(filters.sourceFilter && filters.sourceFilter.length) {
-	// 	query["tasks.sourceLanguage"] = { $in: filters.sourceFilter };
-	// }
-	// if(filters.targetFilter && filters.targetFilter.length) {
-	// 	query["tasks.targetLanguage"] = { $in: filters.targetFilter };
-	// }
-	// if(filters.pmIds) {
-	// 	const managerFilter = filters.pmIds.map(item => ObjectId(item._id));
-	// 	query.projectManager = { $in: managerFilter };
-	// }
+	if (accountManager) {
+		query["accountManager"] = ObjectId(accountManager)
+	}
+
+	if (startDate) {
+		query["startDate"] = { $gte: new Date(`${ startDate }T00:00:00.000Z`), $lt: new Date(`${ startDate }T24:00:00.000Z`) }
+	}
+
+	if (deadline) {
+		query["deadline"] = { $gte: new Date(`${ deadline }T00:00:00.000Z`), $lt: new Date(`${ deadline }T24:00:00.000Z`) }
+	}
+
+	if (sourceLanguages) {
+		query["tasks.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+	if (targetLanguages) {
+		query["tasks.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+
 	return query
 }
 

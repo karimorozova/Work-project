@@ -3,42 +3,266 @@
 
     .filter__item
       label Project Id:
-      input(type="text" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
+      .filter__input
+        input(type="text" placeholder="Value" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
+        .clear-icon(v-if="projectIdValue.length" @click="removeSelectedInputs('projectId')")
+          i.fas.fa-backspace
 
     .filter__item
       label Project Name:
-      input(type="text" :value="projectNameValue" @change="projectNameSetFilter" @keyup.13="projectNameSetFilter")
+      .filter__input
+        input(type="text" placeholder="Value" :value="projectNameValue" @change="projectNameSetFilter" @keyup.13="projectNameSetFilter")
+        .clear-icon(v-if="projectNameValue.length" @click="removeSelectedInputs('projectName')")
+          i.fas.fa-backspace
+
+    .filter__item
+      label Client Name:
+      .filter__input
+        input(type="text" placeholder="Value" :value="clientNameValue" @change="clientNameSetFilter" @keyup.13="clientNameSetFilter")
+        .clear-icon(v-if="clientNameValue.length" @click="removeSelectedInputs('clientName')")
+          i.fas.fa-backspace
+
+    .filter__item
+      label Project Manager:
+      SelectSingle(
+        :hasSearch="true"
+        :selectedOption="selectedPM"
+        :options="allPMs"
+        placeholder="Option"
+        @chooseOption="setPM"
+        :isRemoveOption="true"
+        @removeOption="removePM"
+      )
+
+    .filter__item
+      label Account Manager:
+      SelectSingle(
+        :hasSearch="true"
+        :selectedOption="selectedAM"
+        :options="allAMs"
+        placeholder="Option"
+        @chooseOption="setAM"
+        :isRemoveOption="true"
+        @removeOption="removeAM"
+      )
+
+    .filter__item
+      label Start Date:
+      DatepickerWithTime(
+        :value="startDateValue"
+        @selected="setStartDate"
+        placeholder="Date"
+        :isTime="false"
+        :highlighted="highlighted"
+        :monday-first="true"
+        inputClass="datepicker-custom-filter"
+        calendarClass="calendar-custom"
+        :format="customFormatter"
+        :isClearIcon="true"
+        @removeSelectedDate="removeStartDate"
+      )
+
+    .filter__item
+      label Deadline:
+      DatepickerWithTime(
+        :value="deadlineValue"
+        @selected="setDeadline"
+        placeholder="Date"
+        :isTime="false"
+        :highlighted="highlighted"
+        :monday-first="true"
+        inputClass="datepicker-custom-filter"
+        calendarClass="calendar-custom"
+        :format="customFormatter"
+        :isClearIcon="true"
+        @removeSelectedDate="removeDeadline"
+      )
+
+    .filter__item
+      label Source Languages:
+      SelectMulti(
+        :selectedOptions="selectedSourceLanguages"
+        :options="mappedLanguages | firstEnglishLanguage"
+        :hasSearch="true"
+        placeholder="Options"
+        @chooseOptions="chooseSourceLanguages"
+        :isSelectedWithIcon="true"
+        :isRemoveOption="true"
+        @removeOption="removeSourceLanguages"
+      )
+
+    .filter__item
+      label Target Languages:
+      SelectMulti(
+        :selectedOptions="selectedTargetLanguages"
+        :options="mappedLanguages"
+        :hasSearch="true"
+        placeholder="Options"
+        @chooseOptions="chooseTargetLanguages"
+        :isSelectedWithIcon="true"
+        :isRemoveOption="true"
+        @removeOption="removeTargetLanguages"
+      )
 
 </template>
 
 <script>
+	import SelectSingle from "../../SelectSingle"
+	import { mapGetters } from "vuex"
+	import DatepickerWithTime from "../../DatepickerWithTime"
+	import moment from "moment"
+	import SelectMulti from "../../SelectMulti"
+
 	export default {
-		props: {
-			// projectIdFilter: { type: String }
-		},
+		components: { SelectMulti, DatepickerWithTime, SelectSingle },
+		props: {},
 		data() {
-			return {}
+			return {
+				disabled: {
+					to: moment().add(-1, 'day').endOf('day').toDate()
+				},
+				highlighted: {
+					days: [ 6, 0 ]
+				}
+			}
 		},
 		methods: {
+			removeSelectedInputs(prop) {
+				this.replaceRoute(prop, '')
+			},
+			removeSourceLanguages() {
+				this.replaceRoute('sourceLanguages', '')
+			},
+			removeTargetLanguages() {
+				this.replaceRoute('targetLanguages', '')
+			},
+			getLanguageIdByLang(option) {
+				const { _id } = this.languages.find(({ lang }) => lang === option)
+				return _id
+			},
+			chooseSourceLanguages({ option }) {
+				if (!this.$route.query.sourceLanguages) {
+					this.replaceRoute('sourceLanguages', this.getLanguageIdByLang(option))
+					return
+				}
+				let _ids = this.$route.query.sourceLanguages.split(',')
+				if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
+				else _ids.push(this.getLanguageIdByLang(option))
+				this.replaceRoute('sourceLanguages', _ids.join(','))
+			},
+			chooseTargetLanguages({ option }) {
+				if (!this.$route.query.targetLanguages) {
+					this.replaceRoute('targetLanguages', this.getLanguageIdByLang(option))
+					return
+				}
+				let _ids = this.$route.query.targetLanguages.split(',')
+				if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
+				else _ids.push(this.getLanguageIdByLang(option))
+				this.replaceRoute('targetLanguages', _ids.join(','))
+			},
+			customFormatter(date) {
+				return moment(date).format('MMMM D')
+			},
+			replaceRoute(key, value) {
+				let query = this.$route.query
+				delete query[key]
+				this.$router.replace({ path: this.$route.path, query: { ...query, [key]: value } })
+			},
 			projectIdSetFilter(e) {
 				const { value } = e.target
-				let query = this.$route.query
-				delete query.projectId
-				this.$router.replace({ path: this.$route.path, query: { ...query, projectId: value } })
+				this.replaceRoute('projectId', value)
 			},
 			projectNameSetFilter(e) {
 				const { value } = e.target
-				let query = this.$route.query
-				delete query.projectName
-				this.$router.replace({ path: this.$route.path, query: { ...query, projectName: value } })
+				this.replaceRoute('projectName', value)
+			},
+			clientNameSetFilter(e) {
+				const { value } = e.target
+				this.replaceRoute('clientName', value)
+			},
+			setPM({ option }) {
+				const { _id } = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
+				this.replaceRoute('projectManager', _id)
+			},
+			setAM({ option }) {
+				const { _id } = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
+				this.replaceRoute('accountManager', _id)
+			},
+			removePM() {
+				this.replaceRoute('projectManager', '')
+			},
+			removeAM() {
+				this.replaceRoute('accountManager', '')
+			},
+			setStartDate(data) {
+				this.replaceRoute('startDate', moment(data).format('YYYY-MM-DD'))
+			},
+			removeStartDate() {
+				this.replaceRoute('startDate', '')
+			},
+			setDeadline(data) {
+				this.replaceRoute('deadline', moment(data).format('YYYY-MM-DD'))
+			},
+			removeDeadline() {
+				this.replaceRoute('deadline', '')
 			}
 		},
 		computed: {
+			...mapGetters({
+				users: "getUsers",
+				languages: "getAllLanguages"
+			}),
+			mappedLanguages() {
+				return this.languages.map(({ lang }) => lang)
+			},
 			projectIdValue() {
 				return this.$route.query.projectId || ''
 			},
 			projectNameValue() {
 				return this.$route.query.projectName || ''
+			},
+			clientNameValue() {
+				return this.$route.query.clientName || ''
+			},
+			selectedPM() {
+				if (this.$route.query.projectManager && this.users.length) {
+					const { firstName, lastName } = this.users.find(({ _id }) => `${ _id }` === `${ this.$route.query.projectManager }`)
+					return `${ firstName } ${ lastName }`
+				}
+				return ''
+			},
+			selectedAM() {
+				if (this.$route.query.accountManager && this.users.length) {
+					const { firstName, lastName } = this.users.find(({ _id }) => `${ _id }` === `${ this.$route.query.accountManager }`)
+					return `${ firstName } ${ lastName }`
+				}
+				return ''
+			},
+			allPMs() {
+				return this.users
+						.filter(({ group }) => group.name === 'Project Managers')
+						.map(({ firstName, lastName }) => `${ firstName } ${ lastName }`)
+			},
+			allAMs() {
+				return this.users
+						.filter(({ group }) => group.name === 'Account Managers')
+						.map(({ firstName, lastName }) => `${ firstName } ${ lastName }`)
+			},
+			startDateValue() {
+				return this.$route.query.startDate || ''
+			},
+			deadlineValue() {
+				return this.$route.query.deadline || ''
+			},
+			selectedSourceLanguages() {
+				return this.$route.query.sourceLanguages
+						? this.$route.query.sourceLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
+						: []
+			},
+			selectedTargetLanguages() {
+				return this.$route.query.targetLanguages
+						? this.$route.query.targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
+						: []
 			}
 		}
 	}
@@ -52,8 +276,14 @@
     flex-wrap: wrap;
 
     &__item {
+      position: relative;
       margin-bottom: 15px;
       margin-right: 30px;
+      width: 220px;
+    }
+
+    &__input {
+      position: relative;
     }
   }
 
@@ -78,6 +308,20 @@
 
     &:focus {
       border: 1px solid $border-focus;
+    }
+  }
+
+  .fa-backspace {
+    font-size: 16px;
+    transition: .2s ease-out;
+    color: $dark-border;
+    cursor: pointer;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+
+    &:hover {
+      color: $text;
     }
   }
 
