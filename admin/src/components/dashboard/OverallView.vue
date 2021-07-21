@@ -2,12 +2,12 @@
   .overallView
     .row(v-if="isPm || isAdmin")
       .col
-        IncomingRequests( :projects="incomingRequests")
+        AcceptedRequest( :projects="acceptedRequest")
       .col
         Dr1( :projects="dr1")
     .row(v-if="isAm || isAdmin")
       .col
-        AcceptedRequest( :projects="acceptedRequest")
+        IncomingRequests( :projects="incomingRequests")
       .col
         Dr2( :projects ="dr2")
     .row
@@ -58,9 +58,9 @@
       incomingRequests() {
         if (!this.user.hasOwnProperty('group')) return []
         const clientRequest = this.clientRequest.filter(({status}) => status === "Client Request" )
-        if (this.isAdmin) return clientRequest.filter(({ accountManager, projectManager })=> projectManager !== null || accountManager !== null)
+        if (this.isAdmin) return clientRequest
 
-        if (this.isPm)
+        if (this.isAm)
           return clientRequest.filter(({ accountManager, projectManager }) => {
             return projectManager === this.user._id || (projectManager === null && accountManager === null)
           })
@@ -68,9 +68,8 @@
       acceptedRequest() {
         if (!this.user.hasOwnProperty('group')) return []
         const clientRequest = this.clientRequest.filter(({status}) => status === "Request Approved" )
-        if (this.isAdmin) return clientRequest.filter(({ accountManager, projectManager })=> projectManager !== null || accountManager !== null)
-
-        if (this.isAm)
+        if (this.isAdmin) return clientRequest
+        if (this.isPm)
           return clientRequest.filter(({ accountManager }) => {
             return accountManager === this.user._id
           })
@@ -170,7 +169,7 @@
 </script>
 <style lang="scss" scoped>
   .overallView {
-    width: 1550px;
+    width: 1530px;
     margin: 50px;
 
     .row {
