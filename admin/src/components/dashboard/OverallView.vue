@@ -46,7 +46,7 @@
 		data() {
 			return {
 				projects: [],
-        clientRequest: [],
+				clientRequest: [],
 				startDateMonth: moment({ hour: 0, minute: 0, second: 0 }).subtract(30, 'days').toDate()
 			}
 		},
@@ -55,51 +55,49 @@
 			...mapGetters({
 				user: 'getUser'
 			}),
-      incomingRequests() {
-        if (!this.user.hasOwnProperty('group')) return []
-        const clientRequest = this.clientRequest.filter(({status}) => status === "Client Request" )
-        if (this.isAdmin) return clientRequest
+			incomingRequests() {
+				if (!this.user.hasOwnProperty('group')) return []
+				const clientRequest = this.clientRequest.filter(({ status }) => status === "Client Request")
+				if (this.isAdmin) return clientRequest
+				if (this.isAm) return clientRequest.filter(({ accountManager }) => accountManager === this.user._id || accountManager === null)
+			},
+			acceptedRequest() {
+				if (!this.user.hasOwnProperty('group')) return []
+				const clientRequest = this.clientRequest.filter(({ status }) => status === "Request Approved")
+				if (this.isAdmin) return clientRequest
+				if (this.isPm)
+					return clientRequest.filter(({ projectManager }) => {
+						return projectManager === this.user._id
+					})
+			},
+			dr1() {
+				if (!this.user.hasOwnProperty('group')) return []
+				if (this.isAdmin) return this.projects.filter(item => {
+					return item.tasks.some(({ status }) => status === 'Pending Approval [DR1]')
+				})
+				if (this.isPm) {
+					return this.projects.filter(item => {
+						const DR1Tasks = item.tasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(item => item.taskId)
+						return item.tasksDR1.some(({ dr1Manager, taskId }) => dr1Manager === this.user._id && DR1Tasks.includes(taskId))
+					})
+				}
+			},
+			dr2() {
+				if (!this.user.hasOwnProperty('group')) return []
+				if (this.isAdmin) return this.projects.filter(item => {
+					return item.hasOwnProperty('tasksDR2')
+							&& (item.tasksDR2.singleLang.filter(item => item.status !== 'Delivered').length || item.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').length)
+				})
 
-        if (this.isAm)
-          return clientRequest.filter(({ accountManager, projectManager }) => {
-            return projectManager === this.user._id || (projectManager === null && accountManager === null)
-          })
-      },
-      acceptedRequest() {
-        if (!this.user.hasOwnProperty('group')) return []
-        const clientRequest = this.clientRequest.filter(({status}) => status === "Request Approved" )
-        if (this.isAdmin) return clientRequest
-        if (this.isPm)
-          return clientRequest.filter(({ accountManager }) => {
-            return accountManager === this.user._id
-          })
-      },
-      dr1() {
-        if (!this.user.hasOwnProperty('group')) return []
-        if (this.isAdmin) return this.projects.filter(item => {
-          return item.hasOwnProperty('tasksDR1') && item.tasksDR1.length
-        })
-        if (this.isPm){
-          return this.projects.filter( project => {
-            return project.hasOwnProperty('tasksDR1') && project.tasksDR1.some(task => task.dr1Manager === this.user._id)
-          })
-
-        }
-      },
-      dr2() {
-        if (!this.user.hasOwnProperty('group')) return []
-        if (this.isAdmin) return this.projects.filter(item => {
-          return item.hasOwnProperty('tasksDR2')
-              && (item.tasksDR2.singleLang.length || item.tasksDR2.multiLang.length)
-        })
-        if (this.isAm){
-          return this.projects.filter( project => {
-            return project.hasOwnProperty('tasksDR2')
-                &&  ((project.tasksDR2.singleLang.length ? project.tasksDR2.singleLang.some(singleLang => singleLang.files.some(({dr2Manager}) => dr2Manager === this.user._id)) :false)
-                || (project.tasksDR2.multiLang.length ? project.tasksDR2.multiLang.some( multiLang  => multiLang.files.some(({dr2Manager}) => dr2Manager === this.user._id)) :false))
-          })
-        }
-      },
+				if (this.isAm) {
+					return this.projects.filter(project => {
+						return project.hasOwnProperty('tasksDR2')
+								&& ((project.tasksDR2.singleLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.singleLang.filter(item => item.status !== 'Delivered').some(singleLang => singleLang.files.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
+										|| (project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').some(multiLang => multiLang.files.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
+								)
+					})
+				}
+			},
 			filteredForPmAmOrAdmin() {
 				if (!this.user.hasOwnProperty('group')) return []
 				if (this.isAdmin) return this.projects
@@ -135,21 +133,21 @@
 						})
 						: []
 			},
-      isAdmin() {
-        if (!this.user.hasOwnProperty('group')) return false
-        const userGroup = this.user.group.name
-        return userGroup === 'Administrators' || userGroup === 'Developers'
-      },
-      isPm() {
-        if (!this.user.hasOwnProperty('group')) return false
-        const userGroup = this.user.group.name
-        return userGroup === 'Project Managers'
-      },
-      isAm() {
-        if (!this.user.hasOwnProperty('group')) return false
-        const userGroup = this.user.group.name
-        return userGroup === 'Account Managers'
-      }
+			isAdmin() {
+				if (!this.user.hasOwnProperty('group')) return false
+				const userGroup = this.user.group.name
+				return userGroup === 'Administrators' || userGroup === 'Developers'
+			},
+			isPm() {
+				if (!this.user.hasOwnProperty('group')) return false
+				const userGroup = this.user.group.name
+				return userGroup === 'Project Managers'
+			},
+			isAm() {
+				if (!this.user.hasOwnProperty('group')) return false
+				const userGroup = this.user.group.name
+				return userGroup === 'Account Managers'
+			}
 		},
 		async created() {
 			this.projects = (await this.$http.get('/dashboard-api/all-projects')).data
@@ -159,11 +157,11 @@
 			DueToday,
 			StartedToday,
 			Quotes,
-      IncomingRequests,
-      AcceptedRequest,
-      ProjectFinanceStats,
-      Dr1,
-      Dr2,
+			IncomingRequests,
+			AcceptedRequest,
+			ProjectFinanceStats,
+			Dr1,
+			Dr2
 		}
 	}
 </script>

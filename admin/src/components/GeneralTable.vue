@@ -93,7 +93,7 @@
 		data() {
 			return {
 				showFilters: false,
-				elementToScroll: this.isBodyShort ? 6 : 15
+				elementToScroll: this.isBodyShort ? 7 : 15
 			}
 		},
 		methods: {
