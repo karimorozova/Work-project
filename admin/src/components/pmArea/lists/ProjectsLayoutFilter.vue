@@ -104,6 +104,30 @@
         @removeOption="removeTargetLanguages"
       )
 
+    .filter__item
+      label Industry:
+      SelectSingle(
+        :hasSearch="true"
+        :selectedOption="selectedIndustry"
+        :options="allIndustries"
+        placeholder="Option"
+        @chooseOption="setIndustry"
+        :isRemoveOption="true"
+        @removeOption="removeIndustry"
+      )
+
+    .filter__item
+      label Services:
+      SelectMulti(
+        :selectedOptions="selectedServices"
+        :options="allServices"
+        :hasSearch="true"
+        placeholder="Options"
+        @chooseOptions="setServices"
+        :isSelectedWithIcon="true"
+        :isRemoveOption="true"
+        @removeOption="removeService"
+      )
 </template>
 
 <script>
@@ -135,6 +159,12 @@
 			},
 			removeTargetLanguages() {
 				this.replaceRoute('targetLanguages', '')
+			},
+      removeService() {
+				this.replaceRoute('services', '')
+			},
+      removeIndustry() {
+				this.replaceRoute('industry', '')
 			},
 			getLanguageIdByLang(option) {
 				const { _id } = this.languages.find(({ lang }) => lang === option)
@@ -188,6 +218,27 @@
 				const { _id } = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
 				this.replaceRoute('accountManager', _id)
 			},
+      setIndustry({ option }) {
+        const { _id } = this.industries.find(({ name }) => name === option)
+        this.replaceRoute('industry', _id)
+      },
+      getServicesIdByTitle(option) {
+        const { _id } = this.services.find(({ title }) => title === option)
+        return _id
+      },
+      setServices({ option }) {
+				// const { _id } = this.allServices.find(({ title }) => title === option)
+				// this.replaceRoute('services', _id)
+
+        if (!this.$route.query.services) {
+          this.replaceRoute('services', this.getServicesIdByTitle(option))
+          return
+        }
+        let _ids = this.$route.query.services.split(',')
+        if (_ids.includes(this.getServicesIdByTitle(option))) _ids = _ids.filter(_id => _id !== this.getServicesIdByTitle(option))
+        else _ids.push(this.getServicesIdByTitle(option))
+        this.replaceRoute('services', _ids.join(','))
+			},
 			removePM() {
 				this.replaceRoute('projectManager', '')
 			},
@@ -210,7 +261,9 @@
 		computed: {
 			...mapGetters({
 				users: "getUsers",
-				languages: "getAllLanguages"
+				languages: "getAllLanguages",
+        services: "getAllServices",
+        industries: "getAllIndustries",
 			}),
 			mappedLanguages() {
 				return this.languages.map(({ lang }) => lang)
@@ -248,6 +301,12 @@
 						.filter(({ group }) => group.name === 'Account Managers')
 						.map(({ firstName, lastName }) => `${ firstName } ${ lastName }`)
 			},
+      allIndustries() {
+				return this.industries.map(({name}) => name)
+			},
+      allServices() {
+				return this.services.map(({title}) => title)
+			},
 			startDateValue() {
 				return this.$route.query.startDate || ''
 			},
@@ -263,7 +322,19 @@
 				return this.$route.query.targetLanguages
 						? this.$route.query.targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
 						: []
-			}
+			},
+      selectedIndustry() {
+        if (this.$route.query.industry) {
+          const {name } = this.industries.find(({ _id }) => `${ _id }` === `${ this.$route.query.industry }`)
+          return name
+        }
+        return ''
+      },
+      selectedServices() {
+				return this.$route.query.services
+						? this.$route.query.services.split(',').map(_id => this.services.find(service => _id === service._id).title)
+						: []
+			},
 		}
 	}
 </script>

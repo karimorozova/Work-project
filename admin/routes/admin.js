@@ -95,7 +95,7 @@ router.get('/user', requiresLogin, async (req, res, next) => {
 	try {
 		const key = req.query["key"]
 		const userFromJWT = jwt.verify(key, secretKey)
-		const result = await User.findOne({_id: userFromJWT.user._id}, {password: 0})
+		const result = await User.findOne({_id: userFromJWT.user._id}, {password: 0}).populate("group")
 		res.send(result)
 	} catch (err) {
 		console.log(err)

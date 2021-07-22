@@ -39,6 +39,15 @@
         template(slot="accountManager" slot-scope="{ row, index }")
           .table__data {{ row.accountManager.firstName }} {{ row.accountManager.lastName }}
 
+        template(slot="industry" slot-scope="{ row, index }")
+          .table__data {{ row.industry.name }}
+
+        template(slot="services" slot-scope="{ row, index }")
+          .table__data {{ servicesToString(row.tasks) }}
+
+        template(slot="isTest" slot-scope="{ row, index }")
+          .table__data {{ row.isTest }}
+
 
 </template>
 
@@ -106,7 +115,27 @@
 						headerKey: "headerAccountManager",
 						key: "accountManager",
 						style: { "width": "170px" }
-					}
+					},
+					{
+						label: "Industry",
+						headerKey: "headerIndustry",
+						key: "industry",
+            dataKey: 'name',
+            sortInfo: { isSort: true, order: 'default' },
+						style: { "width": "170px" }
+					},
+					{
+						label: "Services",
+						headerKey: "headerServices",
+						key: "services",
+						style: { "width": "170px" }
+					},
+					{
+						label: "Is Test",
+						headerKey: "headerTest",
+						key: "isTest",
+						style: { "width": "100px" }
+					},
 				]
 			}
 		},
@@ -129,7 +158,11 @@
 			},
 			bottomScrolled() {
 				this.$emit("bottomScrolled")
-			}
+			},
+      servicesToString(tasks) {
+			  const services = new Set(tasks.map(({service}) => service.title))
+        return Array.from(services).join(", ") || '-'
+      }
 		},
 		computed: {
 			...mapGetters({

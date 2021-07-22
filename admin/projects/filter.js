@@ -1,6 +1,6 @@
 const ObjectId = require('mongodb').ObjectID
 
-function getFilterdProjectsQuery(filters, allLanguages) {
+function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 
 	const reg = /[.*+?^${}()|[\]\\]/g
 	let query = {}
@@ -18,7 +18,9 @@ function getFilterdProjectsQuery(filters, allLanguages) {
 		startDate,
 		deadline,
 		sourceLanguages,
-		targetLanguages
+		targetLanguages,
+		industry,
+		services,
 	} = filters
 
 	if (status !== 'All') query["status"] = status
@@ -64,6 +66,13 @@ function getFilterdProjectsQuery(filters, allLanguages) {
 		query["tasks.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
 	}
 
+	if (industry) {
+		query["industry"] = ObjectId(industry)
+	}
+
+	if (services) {
+		query["tasks.service.title"] = { $in: services.split(',').map(item => allServices.find(({ _id }) => _id.toString() === item.toString()).title) }
+	}
 	return query
 }
 

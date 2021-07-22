@@ -1,4 +1,4 @@
-const { Projects, Clients, Languages } = require('../models/')
+const { Projects, Clients, Languages, Services } = require('../models/')
 const { getFilterdProjectsQuery } = require('./filter')
 
 async function getProjects(obj) {
@@ -46,7 +46,8 @@ async function getProjectAfterUpdate(query, update) {
 
 async function getFilteredProjects(filters) {
 	const allLanguages = await Languages.find()
-	const query = getFilterdProjectsQuery(filters, allLanguages)
+	const allServices = await Services.find()
+	const query = getFilterdProjectsQuery(filters, allLanguages, allServices)
 
 	const projects = await Projects.aggregate([
 		{

@@ -43,6 +43,8 @@
 				deadline: '',
 				sourceLanguages: '',
 				targetLanguages: '',
+				industry: '',
+				services: '',
 
 				dataVariables: [
 					'projectId',
@@ -53,7 +55,9 @@
 					'startDate',
 					'deadline',
 					'sourceLanguages',
-					'targetLanguages'
+					'targetLanguages',
+          'industry',
+          'services'
 				],
         filtersSetting: [
           {
