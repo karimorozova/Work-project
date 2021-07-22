@@ -1,133 +1,142 @@
 <template lang="pug">
-  .filter
+  .filter(v-if="Object.keys(user).length")
+    template(v-for="filter in user.layoutsSettings.project.filters")
+      .filter__item(v-if="filter === 'projectId'")
+        label Project Id:
+        .filter__input
+          input(type="text" placeholder="Value" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
+          .clear-icon(v-if="projectIdValue.length" @click="removeSelectedInputs('projectId')")
+            i.fas.fa-backspace
 
-    .filter__item
-      label Project Id:
-      .filter__input
-        input(type="text" placeholder="Value" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
-        .clear-icon(v-if="projectIdValue.length" @click="removeSelectedInputs('projectId')")
-          i.fas.fa-backspace
+      .filter__item(v-if="filter === 'projectName'")
+        label Project Name:
+        .filter__input
+          input(type="text" placeholder="Value" :value="projectNameValue" @change="projectNameSetFilter" @keyup.13="projectNameSetFilter")
+          .clear-icon(v-if="projectNameValue.length" @click="removeSelectedInputs('projectName')")
+            i.fas.fa-backspace
 
-    .filter__item
-      label Project Name:
-      .filter__input
-        input(type="text" placeholder="Value" :value="projectNameValue" @change="projectNameSetFilter" @keyup.13="projectNameSetFilter")
-        .clear-icon(v-if="projectNameValue.length" @click="removeSelectedInputs('projectName')")
-          i.fas.fa-backspace
+      .filter__item(v-if="filter === 'clientName'")
+        label Client Name:
+        .filter__input
+          input(type="text" placeholder="Value" :value="clientNameValue" @change="clientNameSetFilter" @keyup.13="clientNameSetFilter")
+          .clear-icon(v-if="clientNameValue.length" @click="removeSelectedInputs('clientName')")
+            i.fas.fa-backspace
 
-    .filter__item
-      label Client Name:
-      .filter__input
-        input(type="text" placeholder="Value" :value="clientNameValue" @change="clientNameSetFilter" @keyup.13="clientNameSetFilter")
-        .clear-icon(v-if="clientNameValue.length" @click="removeSelectedInputs('clientName')")
-          i.fas.fa-backspace
+      .filter__item(v-if="filter === 'projectManager'")
+        label Project Manager:
+        .filter__input
+          SelectSingle(
+            :hasSearch="true"
+            :selectedOption="selectedPM"
+            :options="allPMs"
+            placeholder="Option"
+            @chooseOption="setPM"
+            :isRemoveOption="true"
+            @removeOption="removePM"
+          )
 
-    .filter__item
-      label Project Manager:
-      SelectSingle(
-        :hasSearch="true"
-        :selectedOption="selectedPM"
-        :options="allPMs"
-        placeholder="Option"
-        @chooseOption="setPM"
-        :isRemoveOption="true"
-        @removeOption="removePM"
-      )
+      .filter__item(v-if="filter === 'accountManger'")
+        label Account Manager:
+        .filter__input
+          SelectSingle(
+            :hasSearch="true"
+            :selectedOption="selectedAM"
+            :options="allAMs"
+            placeholder="Option"
+            @chooseOption="setAM"
+            :isRemoveOption="true"
+            @removeOption="removeAM"
+          )
 
-    .filter__item
-      label Account Manager:
-      SelectSingle(
-        :hasSearch="true"
-        :selectedOption="selectedAM"
-        :options="allAMs"
-        placeholder="Option"
-        @chooseOption="setAM"
-        :isRemoveOption="true"
-        @removeOption="removeAM"
-      )
+      .filter__item(v-if="filter === 'startDate'")
+        label Start Date:
+        .filter__input
+          DatepickerWithTime(
+            :value="startDateValue"
+            @selected="setStartDate"
+            placeholder="Date"
+            :isTime="false"
+            :highlighted="highlighted"
+            :monday-first="true"
+            inputClass="datepicker-custom-filter"
+            calendarClass="calendar-custom"
+            :format="customFormatter"
+            :isClearIcon="true"
+            @removeSelectedDate="removeStartDate"
+          )
 
-    .filter__item
-      label Start Date:
-      DatepickerWithTime(
-        :value="startDateValue"
-        @selected="setStartDate"
-        placeholder="Date"
-        :isTime="false"
-        :highlighted="highlighted"
-        :monday-first="true"
-        inputClass="datepicker-custom-filter"
-        calendarClass="calendar-custom"
-        :format="customFormatter"
-        :isClearIcon="true"
-        @removeSelectedDate="removeStartDate"
-      )
+      .filter__item(v-if="filter === 'deadline'")
+        label Deadline:
+        .filter__input
+          DatepickerWithTime(
+            :value="deadlineValue"
+            @selected="setDeadline"
+            placeholder="Date"
+            :isTime="false"
+            :highlighted="highlighted"
+            :monday-first="true"
+            inputClass="datepicker-custom-filter"
+            calendarClass="calendar-custom"
+            :format="customFormatter"
+            :isClearIcon="true"
+            @removeSelectedDate="removeDeadline"
+          )
 
-    .filter__item
-      label Deadline:
-      DatepickerWithTime(
-        :value="deadlineValue"
-        @selected="setDeadline"
-        placeholder="Date"
-        :isTime="false"
-        :highlighted="highlighted"
-        :monday-first="true"
-        inputClass="datepicker-custom-filter"
-        calendarClass="calendar-custom"
-        :format="customFormatter"
-        :isClearIcon="true"
-        @removeSelectedDate="removeDeadline"
-      )
+      .filter__item(v-if="filter === 'sourceLanguages'")
+        label Source Languages:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedSourceLanguages"
+            :options="mappedLanguages | firstEnglishLanguage"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="chooseSourceLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeSourceLanguages"
+          )
 
-    .filter__item
-      label Source Languages:
-      SelectMulti(
-        :selectedOptions="selectedSourceLanguages"
-        :options="mappedLanguages | firstEnglishLanguage"
-        :hasSearch="true"
-        placeholder="Options"
-        @chooseOptions="chooseSourceLanguages"
-        :isSelectedWithIcon="true"
-        :isRemoveOption="true"
-        @removeOption="removeSourceLanguages"
-      )
+      .filter__item(v-if="filter === 'targetLanguages'")
+        label Target Languages:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedTargetLanguages"
+            :options="mappedLanguages"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="chooseTargetLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeTargetLanguages"
+          )
 
-    .filter__item
-      label Target Languages:
-      SelectMulti(
-        :selectedOptions="selectedTargetLanguages"
-        :options="mappedLanguages"
-        :hasSearch="true"
-        placeholder="Options"
-        @chooseOptions="chooseTargetLanguages"
-        :isSelectedWithIcon="true"
-        :isRemoveOption="true"
-        @removeOption="removeTargetLanguages"
-      )
+      .filter__item(v-if="filter === 'industry'")
+        label Industry:
+        .filter__input
+          SelectSingle(
+            :hasSearch="true"
+            :selectedOption="selectedIndustry"
+            :options="allIndustries"
+            placeholder="Option"
+            @chooseOption="setIndustry"
+            :isRemoveOption="true"
+            @removeOption="removeIndustry"
+          )
 
-    .filter__item
-      label Industry:
-      SelectSingle(
-        :hasSearch="true"
-        :selectedOption="selectedIndustry"
-        :options="allIndustries"
-        placeholder="Option"
-        @chooseOption="setIndustry"
-        :isRemoveOption="true"
-        @removeOption="removeIndustry"
-      )
+      .filter__item(v-if="filter === 'services'")
+        label Services:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedServices"
+            :options="allServices"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setServices"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeService"
+          )
 
-    .filter__item
-      label Services:
-      SelectMulti(
-        :selectedOptions="selectedServices"
-        :options="allServices"
-        :hasSearch="true"
-        placeholder="Options"
-        @chooseOptions="setServices"
-        :isSelectedWithIcon="true"
-        :isRemoveOption="true"
-        @removeOption="removeService"
-      )
 </template>
 
 <script>
@@ -261,6 +270,7 @@
 		computed: {
 			...mapGetters({
 				users: "getUsers",
+        user: "getUser",
 				languages: "getAllLanguages",
         services: "getAllServices",
         industries: "getAllIndustries",
@@ -349,12 +359,13 @@
     &__item {
       position: relative;
       margin-bottom: 15px;
-      margin-right: 30px;
+      margin-right: 25px;
       width: 220px;
     }
 
     &__input {
       position: relative;
+      height: 32px;
     }
   }
 

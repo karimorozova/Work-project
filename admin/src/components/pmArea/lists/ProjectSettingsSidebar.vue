@@ -1,8 +1,9 @@
 <template lang="pug">
   .sidebarSettings
     .sidebarSettings__mainIcon(@click="toggleSettings")
-      img(src="../../../assets/images/left-menu-close.png" v-if="!isShowSettings")
-      img(src="../../../assets/images/left-menu-open.png" v-else)
+      i.fas.fa-cogs
+      //img(src="../../../assets/images/left-menu-close.png" v-if="!isShowSettings")
+      //img(src="../../../assets/images/left-menu-open.png" v-else)
 
     transition(name='slide')
       .sidebarSettings__body(v-if="isShowSettings")
@@ -109,12 +110,16 @@
   }
 
   .sortable-chosen {
-    background: $light-border;;
+    background: $light-border;
   }
 
   .filters {
     max-height: 75vh;
     overflow: auto;
+  }
+
+  .fa-cogs {
+    color: $dark-border;
   }
 
   i {
@@ -146,7 +151,7 @@
     &__close {
       display: flex;
       justify-content: flex-end;
-      margin: 10px 0;
+      margin: 12px 0 10px 0;
     }
 
     &__body {
@@ -162,7 +167,21 @@
     }
 
     &__mainIcon {
-      display: inline-block;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background: #fff;
+      border: 1px solid $border;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 5px;
+      transition: .2s ease-out;
+
+      &:hover {
+        .fa-cogs {
+          color: $text;
+        }
+      }
     }
 
     .draggable__element {

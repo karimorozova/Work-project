@@ -123,6 +123,20 @@
             fixed: false,
             isCheck: false,
           },
+	        {
+		        id: "industry",
+		        name: "Industry",
+		        order: 10,
+		        fixed: false,
+		        isCheck: false,
+	        },
+	        {
+		        id: "services",
+		        name: "Services",
+		        order: 11,
+		        fixed: false,
+		        isCheck: false,
+	        },
         ],
         fieldsSetting: [
           {
@@ -168,7 +182,7 @@
             isCheck: false,
           },
           {
-            id: "accountManger",
+            id: "accountManager",
             name: "Account Manger",
             order: 7,
             fixed: false,
@@ -259,6 +273,7 @@
   .all-projects {
     width: 1530px;
     margin: 50px 50px 0 50px;
+    position: relative;
   }
 
 </style>

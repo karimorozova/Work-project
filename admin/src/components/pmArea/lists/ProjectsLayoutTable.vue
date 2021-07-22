@@ -6,7 +6,7 @@
 
     .table__result
       LayoutsTable(
-        :fields="fields"
+        :fields="filteredFields"
         :tableData="list"
         @bottomScrolled="bottomScrolled"
       )
@@ -120,8 +120,8 @@
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-            dataKey: 'name',
-            sortInfo: { isSort: true, order: 'default' },
+						dataKey: 'name',
+						// sortInfo: { isSort: true, order: 'default' },
 						style: { "width": "170px" }
 					},
 					{
@@ -135,7 +135,7 @@
 						headerKey: "headerTest",
 						key: "isTest",
 						style: { "width": "100px" }
-					},
+					}
 				]
 			}
 		},
@@ -145,13 +145,13 @@
 				const taskLanguages = tasks.map(({ sourceLanguage, targetLanguage }) => ({ sourceLanguage, targetLanguage }))
 				let groupedLanguages = Object.entries(_.groupBy(taskLanguages, 'sourceLanguage'))
 				groupedLanguages = groupedLanguages.map(item => {
-					return { sourceLanguage: item[0], targetLanguages: [...new Set(item[1].map(({ targetLanguage }) => targetLanguage))].join(', ') }
+					return { sourceLanguage: item[0], targetLanguages: [ ...new Set(item[1].map(({ targetLanguage }) => targetLanguage)) ].join(', ') }
 				})
 				groupedLanguages = groupedLanguages.reduce((acc, curr) => {
-					acc = acc + `${curr.sourceLanguage} &#8811; ${curr.targetLanguages } <br>`
+					acc = acc + `${ curr.sourceLanguage } &#8811; ${ curr.targetLanguages } <br>`
 					return acc
-        }, '')
-        return groupedLanguages
+				}, '')
+				return groupedLanguages
 			},
 			customFormatter(date) {
 				return moment(date).format('MMM D, HH:mm')
@@ -159,15 +159,27 @@
 			bottomScrolled() {
 				this.$emit("bottomScrolled")
 			},
-      servicesToString(tasks) {
-			  const services = new Set(tasks.map(({service}) => service.title))
-        return Array.from(services).join(", ") || '-'
-      }
+			servicesToString(tasks) {
+				const services = new Set(tasks.map(({ service }) => service.title))
+				return Array.from(services).join(", ") || '-'
+			}
 		},
 		computed: {
 			...mapGetters({
-				users: "getUsers"
-			})
+				users: "getUsers",
+				user: "getUser"
+			}),
+			filteredFields() {
+				if (Object.keys(this.user).length) {
+					let filteredFields = []
+					const { layoutsSettings: { project: { fields } } } = this.user
+					fields.forEach(field => {
+						const _idx = this.fields.findIndex(({ key }) => key === field)
+						if (_idx !== -1) filteredFields.push(this.fields[_idx])
+					})
+					return filteredFields
+				}
+			}
 		},
 		components: { ProjectsLayoutFilter, LayoutsTable }
 	}
@@ -178,13 +190,17 @@
 
   .table {
     background: white;
-    padding: 20px;
+    padding: 15px 20px;
     box-sizing: border-box;
     border-radius: 4px;
     box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
 
     &__header {
       padding: 0 0 0 7px;
+    }
+
+    &__result {
+      margin-top: 15px;
     }
 
     &__data {

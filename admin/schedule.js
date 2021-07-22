@@ -20,7 +20,7 @@ const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmar
 // sendPreventDeleteNotActiveVendor()
 
 
-schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"))
+// schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"))
 
 // schedule.scheduleJob('30 8,13,18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"))
 // schedule.scheduleJob('40 8,13,18 * * *', async () => await scheduleJobBody(updateStatusesForOtherProjects(), "Save project statuses from Gmail API"))
