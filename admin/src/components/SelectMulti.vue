@@ -7,9 +7,12 @@
 
       .selectedWithIcon(v-if="selectedOptions.length && isSelectedWithIcon")
         span {{ selectedOptions.length }} Selected...
-        .tooltip
-          .tooltipData(v-html="selectedOptions.join('<br>')")
-          i.fas.fa-info-circle
+        .controlOptions
+          .tooltip
+            .tooltipData(v-html="selectedOptions.join('<br>')")
+            i.fas.fa-info-circle
+          .remove__icon(v-if="isRemoveOption && selectedOptions.length" @click="removeOption")
+            i(class="fas fa-backspace" aria-hidden='true')
 
       .selected(v-if="selectedOptions.length && !isSelectedWithIcon") {{ selectedOptions.join(', ') }}
 
@@ -19,7 +22,7 @@
         i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")
 
     .drop(v-if="isDropped")
-      .remove-option(v-if="isRemoveOption && selectedOptions.length" @click="removeOption")
+      //.remove-option(v-if="isRemoveOption && selectedOptions.length" @click="removeOption")
         span.remove__icon
           i.fa.fa-ban(aria-hidden='true')
           span.remove__text &nbsp; Clear Selected
@@ -158,31 +161,26 @@
     overflow: unset !important;
   }
 
-  .fa-ban {
-    color: $red !important;
-    font-size: 13px !important;
-  }
-
-  .remove-option {
-    padding: 0 7px;
-    height: 31px;
-    border-bottom: 1px solid $light-border;
-    cursor: pointer;
-    font-size: 14px;
-    transition: .1s ease-out;
+  .controlOptions {
     display: flex;
     align-items: center;
-    color: $text;
-
-    &:hover {
-      background-color: $list-hover;
-    }
   }
 
-  .remove {
-    &__icon {
-      margin-right: 6px;
-      color: $red;
+  .remove__icon i {
+    color: inherit;
+    font-size: inherit;
+  }
+
+  .remove__icon {
+    margin-left: 7px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: .1s ease-out;
+    display: flex;
+    color: $dark-border;
+
+    &:hover {
+      color: $text;
     }
   }
 
