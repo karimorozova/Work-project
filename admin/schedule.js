@@ -11,31 +11,6 @@ const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles')
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmarkCost } = require('./reports')
 
 
-async function setVendorRates() {
-	const all = await Vendors.find()
-	for await (let i of all) {
-		const { rates } = await Vendors.findOne({ email: i.email }, { rates: 1 })
-		await Vendors.updateOne({ email: i.email }, { rates })
-	}
-	console.log('F1')
-}
-
-async function setClientsRates(){
-	const all = await Clients.find()
-	for await (let i of all) {
-		const { rates } = await Clients.findOne({ email: i.email }, { rates: 1 })
-		await Clients.updateOne({ email: i.email }, { rates })
-	}
-	console.log('F2')
-}
-
-
-
-// setVendorRates()
-// setClientsRates()
-
-
-
 // downloadMemoqFile({memoqProjectId:'1443ab32-fa74-eb11-90ed-82bb18d08256', docId:'4c077bd7-e5e7-46a5-9e4e-2953ab86e913', path:'./dist/max.xlsx'} )
 // saveOtherProjectStatuses()
 // downloadFromMemoqProjectsData();
@@ -47,8 +22,8 @@ async function setClientsRates(){
 
 schedule.scheduleJob('0 */3 * * *', async () => await scheduleJobBody(downloadFromMemoqProjectsData(), "Download new memoq projects"))
 
-schedule.scheduleJob('30 8,13,18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"))
-schedule.scheduleJob('40 8,13,18 * * *', async () => await scheduleJobBody(updateStatusesForOtherProjects(), "Save project statuses from Gmail API"))
+// schedule.scheduleJob('30 8,13,18 * * *', async () => await scheduleJobBody(saveOtherProjectStatuses(), "Save project statuses from Gmail API"))
+// schedule.scheduleJob('40 8,13,18 * * *', async () => await scheduleJobBody(updateStatusesForOtherProjects(), "Save project statuses from Gmail API"))
 
 schedule.scheduleJob('40 0 * * *', async () => await scheduleJobBody(UpdateLQAFromProject(), "Updating LQA reports from projects data"))
 schedule.scheduleJob('30 0 * * *', async () => await scheduleJobBody(newLQAStatusFromXTRFProjects(), "Updating LQA reports from MemoqProjects data"))

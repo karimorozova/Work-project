@@ -161,10 +161,10 @@
       position: fixed;
       width: 400px;
       right: 0;
-      top: 50;
-      height: 95vh;
+      top: 0;
+      height: 100vh;
       z-index: 9;
-      border-left: 2px solid #E8E8E8;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     }
   }
 

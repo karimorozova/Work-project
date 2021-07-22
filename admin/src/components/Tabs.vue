@@ -52,7 +52,7 @@
       }
 
       &:last-child {
-        border-left: 1px solid $border !important;
+/*        border-left: 1px solid $border !important;*/
         border-top-right-radius: 4px;
       }
     }
