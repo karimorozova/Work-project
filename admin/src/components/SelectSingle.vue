@@ -6,13 +6,17 @@
   )
 
     .select
-      span.selected(v-if="selectedOption") {{ selectedOption }}
-      span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
+      .content
+        span.selected(v-if="selectedOption") {{ selectedOption }}
+        span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
+
+        .remove__icon(v-if="isRemoveOption && ( Object.keys(selectedOption).length )" @click="removeOption")
+          i(class="fas fa-backspace" aria-hidden='true')
       .arrow-button(@click="toggleOptions")
         i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")
 
     .drop(v-if="isDropped")
-      .remove-option(v-if="isRemoveOption && ( Object.keys(selectedOption).length )" @click="removeOption")
+      //.remove-option(v-if="isRemoveOption && ( Object.keys(selectedOption).length )" @click="removeOption")
         span.remove__icon
           i.fa.fa-ban(aria-hidden='true')
           span.remove__text &nbsp; Clear Selected
@@ -154,32 +158,26 @@
     font-size: 20px;
     color: $border;
   }
-
-  .fa-ban {
-    color: $red !important;
-    font-size: 13px !important;
+  .content {
+    display: flex;
+    justify-content: space-between;
+  }
+  .remove__icon i {
+    color: inherit;
+    font-size: inherit;
   }
 
-  .remove-option {
-    padding: 0 7px;
-    height: 31px;
-    border-bottom: 1px solid $light-border;
+  .remove__icon {
+    margin: 0 7px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     transition: .1s ease-out;
     display: flex;
     align-items: center;
-    color: $text;
+    color: $dark-border;
 
     &:hover {
-      background-color: $list-hover;
-    }
-  }
-
-  .remove {
-    &__icon {
-      margin-right: 6px;
-      color: $red;
+      color: $text;
     }
   }
 
