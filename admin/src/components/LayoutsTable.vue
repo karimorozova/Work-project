@@ -151,7 +151,7 @@
   }
 
   table td:first-child {
-    box-shadow: inset -1px 0 0 $border;
+    box-shadow: inset -1px 0 0 $light-border;
   }
 
   table tr th:first-child, table td:first-child {
@@ -183,7 +183,10 @@
     padding: 0;
   }
 
-  table td,
+  table td{
+
+    box-shadow: inset -1px 0 0 $light-border;
+  }
   table th {
     box-shadow: inset -1px 0 0 $border;
   }
