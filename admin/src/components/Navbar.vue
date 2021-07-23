@@ -410,7 +410,8 @@
 				setLanguages: "setLanguages",
 				setAllUsers: "setAllUsers",
 				setIndustries: "setIndustries",
-				setSteps: "setSteps"
+				setSteps: "setSteps",
+        setVendorsForOption: 'setVendorsForOption'
 			}),
 			async getCurrentUserGroup() {
 				try {
@@ -443,6 +444,7 @@
 			this.setAllUsers()
 			this.setIndustries()
 			this.setSteps()
+			this.setVendorsForOption()
 		},
 		components: {
 			Header,

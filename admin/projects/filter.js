@@ -5,8 +5,6 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 	const reg = /[.*+?^${}()|[\]\\]/g
 	let query = {}
 
-	console.log(filters)
-
 	const {
 		status,
 		projectId,
@@ -21,6 +19,10 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 		targetLanguages,
 		industry,
 		services,
+		isTest,
+		projectCurrency,
+		paymentProfile,
+		vendors,
 	} = filters
 
 	if (status !== 'All') query["status"] = status
@@ -72,6 +74,23 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 
 	if (services) {
 		query["tasks.service.title"] = { $in: services.split(',').map(item => allServices.find(({ _id }) => _id.toString() === item.toString()).title) }
+	}
+
+	if (vendors) {
+		query["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+	}
+
+	if (isTest) {
+		query["isTest"] = isTest === "Yes"
+	}
+
+	if (projectCurrency) {
+		query["projectCurrency"] = projectCurrency
+	}
+
+	if (paymentProfile) {
+		console.log(paymentProfile)
+		query["paymentProfile"] = paymentProfile
 	}
 	return query
 }

@@ -1270,6 +1270,15 @@ router.get('/vendors-for-project', async (req, res) => {
 		res.status(500).send('Error on vendors-for-project!')
 	}
 })
+router.get('/vendors-for-options', async (req, res) => {
+	try {
+		const result = await Vendors.find({ status: "Active" }, { "firstName": 1, "surname": 1 })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendors-for-project!')
+	}
+})
 
 router.post('/update-filters-and-fields/:userId', async (req, res) => {
 	const { userId } = req.params

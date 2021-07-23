@@ -8,6 +8,8 @@
 
       @updateFiltersAndFields="updateFiltersAndFields"
     )
+    .clear-filter(@click="clearFilters")
+      i(class="fas fa-broom")
     ProjectsLayoutTable(
       :list="allProjects"
       @bottomScrolled="bottomScrolled"
@@ -45,6 +47,10 @@
 				targetLanguages: '',
 				industry: '',
 				services: '',
+				isTest: '',
+				projectCurrency: '',
+        paymentProfile: '',
+        vendors: '',
 
 				dataVariables: [
 					'projectId',
@@ -57,7 +63,11 @@
 					'sourceLanguages',
 					'targetLanguages',
           'industry',
-          'services'
+          'services',
+          'isTest',
+          'projectCurrency',
+          'paymentProfile',
+          'vendors',
 				],
         filtersSetting: [
           {
@@ -137,6 +147,34 @@
 		        fixed: false,
 		        isCheck: false,
 	        },
+	        {
+		        id: "isTest",
+		        name: "Test",
+		        order: 12,
+		        fixed: false,
+		        isCheck: false,
+	        },
+	        {
+		        id: "projectCurrency",
+		        name: "Currency",
+		        order: 13,
+		        fixed: false,
+		        isCheck: false,
+	        },
+	        {
+		        id: "paymentProfile",
+		        name: "Payment Profile",
+		        order: 14,
+		        fixed: false,
+		        isCheck: false,
+	        },
+	        {
+		        id: "vendors",
+		        name: "Vendors",
+		        order: 15,
+		        fixed: false,
+		        isCheck: false,
+	        },
         ],
         fieldsSetting: [
           {
@@ -196,6 +234,11 @@
         "alertToggle",
         "setUser",
       ]),
+      clearFilters() {
+			  this.$router.replace({'query': null}).catch((err)=> err)
+        this.defaultSetter()
+        this.getData()
+      },
       async updateFiltersAndFields(data) {
         await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, {data})
         await this.setUser()
@@ -269,11 +312,40 @@
 </script>
 
 <style lang="scss" scoped>
+ @import "../../../assets/scss/colors";
 
   .all-projects {
     width: 1530px;
     margin: 50px 50px 0 50px;
     position: relative;
+  }
+  .clear-filter{
+    position: absolute;
+    right: 10px;
+    top: 48px;
+    background: #fff;
+    border: 1px solid $border;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 5px;
+    transition: .2s ease-out;
+
+    & i {
+      color: #919191;
+      height: 20px;
+      width: 20px;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-pack: center;
+      justify-content: center;
+      -ms-flex-align: center;
+      align-items: center;
+    }
+    &:hover {
+      & i {
+        color: $text;
+      }
+    }
   }
 
 </style>

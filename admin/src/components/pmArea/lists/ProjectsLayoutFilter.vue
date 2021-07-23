@@ -137,6 +137,57 @@
             @removeOption="removeService"
           )
 
+      .filter__item(v-if="filter === 'vendors'")
+        label Vendors:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedVendors"
+            :options="allVendors"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setVendors"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeVendors"
+          )
+
+      .filter__item(v-if="filter === 'isTest'")
+        label Test:
+        .filter__input
+          SelectSingle(
+            :selectedOption="selectedIsTest"
+            :options="booleanOptions"
+            placeholder="Option"
+            @chooseOption="setIsTest"
+            :isRemoveOption="true"
+            @removeOption="removeIsTest"
+          )
+
+      .filter__item(v-if="filter === 'projectCurrency'")
+        label Currency:
+        .filter__input
+          SelectSingle(
+            :selectedOption="selectedProjectCurrency"
+            :options="allCurrency"
+            placeholder="Option"
+            @chooseOption="setProjectCurrency"
+            :isRemoveOption="true"
+            @removeOption="removeProjectCurrency"
+          )
+
+      .filter__item(v-if="filter === 'paymentProfile'")
+        label Payment Profile:
+        .filter__input
+          SelectSingle(
+            :selectedOption="selectedPaymentProfile"
+            :options="allPaymentProfile"
+            placeholder="Option"
+            @chooseOption="setPaymentProfile"
+            :isRemoveOption="true"
+            @removeOption="removePaymentProfile"
+          )
+
+
 </template>
 
 <script>
@@ -151,6 +202,9 @@
 		props: {},
 		data() {
 			return {
+        booleanOptions: ['Yes', 'No'],
+        allCurrency: ['EUR','USD'],
+        allPaymentProfile: ['PPP', 'Pre-Payment', 'Monthly', '50%/50%'],
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
@@ -160,6 +214,15 @@
 			}
 		},
 		methods: {
+      removePaymentProfile() {
+        this.replaceRoute('paymentProfile', '')
+      },
+      removeIsTest() {
+        this.replaceRoute('isTest', '')
+      },
+      removeProjectCurrency() {
+        this.replaceRoute('projectCurrency', '')
+      },
 			removeSelectedInputs(prop) {
 				this.replaceRoute(prop, '')
 			},
@@ -171,6 +234,9 @@
 			},
       removeService() {
 				this.replaceRoute('services', '')
+			},
+      removeVendors() {
+				this.replaceRoute('vendors', '')
 			},
       removeIndustry() {
 				this.replaceRoute('industry', '')
@@ -236,9 +302,6 @@
         return _id
       },
       setServices({ option }) {
-				// const { _id } = this.allServices.find(({ title }) => title === option)
-				// this.replaceRoute('services', _id)
-
         if (!this.$route.query.services) {
           this.replaceRoute('services', this.getServicesIdByTitle(option))
           return
@@ -248,6 +311,29 @@
         else _ids.push(this.getServicesIdByTitle(option))
         this.replaceRoute('services', _ids.join(','))
 			},
+      getVendorsIdByFullName(option) {
+        const { _id } = this.vendors.find(({ firstName, surname }) => `${firstName} ${surname}` === option)
+        return _id
+      },
+      setVendors({ option }) {
+        if (!this.$route.query.vendors) {
+          this.replaceRoute('vendors', this.getVendorsIdByFullName(option))
+          return
+        }
+        let _ids = this.$route.query.vendors.split(',')
+        if (_ids.includes(this.getVendorsIdByFullName(option))) _ids = _ids.filter(_id => _id !== this.getVendorsIdByFullName(option))
+        else _ids.push(this.getVendorsIdByFullName(option))
+        this.replaceRoute('vendors', _ids.join(','))
+			},
+      setPaymentProfile({option}) {
+        this.replaceRoute('paymentProfile', option)
+      },
+      setIsTest({option}) {
+        this.replaceRoute('isTest', option)
+      },
+      setProjectCurrency({option}) {
+        this.replaceRoute('projectCurrency', option)
+      },
 			removePM() {
 				this.replaceRoute('projectManager', '')
 			},
@@ -274,6 +360,7 @@
 				languages: "getAllLanguages",
         services: "getAllServices",
         industries: "getAllIndustries",
+        vendors: "getAllVendorsForOptions",
 			}),
 			mappedLanguages() {
 				return this.languages.map(({ lang }) => lang)
@@ -284,6 +371,15 @@
 			projectNameValue() {
 				return this.$route.query.projectName || ''
 			},
+      selectedPaymentProfile() {
+			  return this.$route.query.paymentProfile || ''
+      },
+      selectedIsTest() {
+			  return this.$route.query.isTest || ''
+      },
+      selectedProjectCurrency() {
+			  return this.$route.query.projectCurrency || ''
+      },
 			clientNameValue() {
 				return this.$route.query.clientName || ''
 			},
@@ -313,6 +409,9 @@
 			},
       allIndustries() {
 				return this.industries.map(({name}) => name)
+			},
+      allVendors() {
+				return this.vendors.map(({firstName, surname}) => `${firstName} ${surname}`)
 			},
       allServices() {
 				return this.services.map(({title}) => title)
@@ -344,6 +443,15 @@
 				return this.$route.query.services
 						? this.$route.query.services.split(',').map(_id => this.services.find(service => _id === service._id).title)
 						: []
+			},
+      selectedVendors() {
+        return this.$route.query.vendors
+          ? this.$route.query.vendors.split(',').map(_id => {
+            const vendor = this.vendors.find(vendor => _id === vendor._id)
+            return vendor ? `${vendor.firstName} ${vendor.surname}` : ''
+          })
+          : []
+
 			},
 		}
 	}

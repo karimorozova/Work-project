@@ -64,6 +64,9 @@ export const mutations = {
     storeCurrentProject(state, payload) {
         state.currentProject = payload
     },
+    storeVendorsForOptions(state, payload) {
+        state.vendorsForOptions = payload
+    },
     storeProjectProp(state, payload) {
         const {prop, value} = payload;
         state.currentProject = {...state.currentProject, [prop]: value}
