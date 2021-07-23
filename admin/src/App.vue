@@ -1,5 +1,6 @@
 <template lang='pug'>
   #app
+    title {{ title }}
     Loading(v-if="!!requestCounter")
     transition(name="slide-fade")
       AlertMessage(v-if="isAlert" :text="alertMessage" :type="alertType")
@@ -13,6 +14,20 @@
 
 	export default {
 		name: 'app',
+		data() {
+			return {
+				title: ''
+			}
+		},
+		methods: {
+			goFirstToUpperCase(str) {
+				return str[0].toUpperCase() + str.slice(1)
+			},
+			setTitle(re) {
+				if (re) this.title = `pangea - ${ this.goFirstToUpperCase(re[1]) }`
+				else this.title = 'pangea'
+			}
+		},
 		computed: {
 			...mapGetters({
 				isLoggedIn: 'isLoggedIn',
@@ -22,6 +37,16 @@
 				alertMessage: 'alertMessage',
 				requestCounter: 'getRequestCounter'
 			})
+		},
+		mounted() {
+			const re = /pangea-(\w+)/.exec(this.$route.fullPath)
+			this.setTitle(re)
+		},
+		watch: {
+			$route(to) {
+				const re = /pangea-(\w+)/.exec(to.fullPath)
+				this.setTitle(re)
+			}
 		},
 		components: {
 			Loading,
