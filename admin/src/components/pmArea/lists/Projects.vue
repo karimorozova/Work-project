@@ -51,6 +51,7 @@
 				projectCurrency: '',
 				paymentProfile: '',
 				vendors: '',
+				tasksStatuses: '',
 
 				dataVariables: [
 					'projectId',
@@ -67,7 +68,8 @@
 					'isTest',
 					'projectCurrency',
 					'paymentProfile',
-					'vendors'
+					'vendors',
+					'tasksStatuses'
 				],
 				filtersSetting: [
 					{
@@ -157,6 +159,12 @@
 					{
 						id: "vendors",
 						name: "Vendors",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "tasksStatuses",
+						name: "Tasks Statuses",
 						fixed: false,
 						isCheck: false
 					}
@@ -299,6 +307,12 @@
 					{
 						id: "vendors",
 						name: "Vendors",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "tasksStatuses",
+						name: "Tasks Statuses",
 						fixed: false,
 						isCheck: false
 					}

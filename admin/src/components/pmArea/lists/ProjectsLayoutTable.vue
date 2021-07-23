@@ -107,6 +107,9 @@
         template(slot="vendors" slot-scope="{ row, index }")
           .table__data soon...
 
+        template(slot="tasksStatuses" slot-scope="{ row, index }")
+          .table__data {{ tasksToString(row.tasks) }}
+
 
 </template>
 
@@ -271,6 +274,12 @@
 						headerKey: "vendorsHeader",
 						key: "vendors",
 						style: { "width": "140px" }
+					},
+					{
+						label: "Tasks Statuses",
+						headerKey: "tasksStatusesHeader",
+						key: "tasksStatuses",
+						style: { "width": "160px" }
 					}
 				]
 			}
@@ -374,6 +383,10 @@
 			servicesToString(tasks) {
 				const services = new Set(tasks.map(({ service }) => service.title))
 				return Array.from(services).join(", ") || '-'
+			},
+			tasksToString(tasks) {
+				const statuses = new Set(tasks.map(({ status }) => status))
+				return Array.from(statuses).join(", ") || '-'
 			}
 		},
 		computed: {
