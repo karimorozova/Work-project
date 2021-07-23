@@ -2,8 +2,6 @@
   .sidebarSettings
     .sidebarSettings__mainIcon(@click="toggleSettings")
       i.fas.fa-cogs
-      //img(src="../../../assets/images/left-menu-close.png" v-if="!isShowSettings")
-      //img(src="../../../assets/images/left-menu-open.png" v-else)
 
     transition(name='slide')
       .sidebarSettings__body(v-if="isShowSettings")
@@ -16,7 +14,7 @@
 
         .filters(v-if="selectedTab === 'Filters'")
           draggable(v-model="baseFilters" handle=".handle")
-            .draggable__element( v-for="element in baseFilters" :key="element.id")
+            .draggable__element( v-for="element in baseFilters" :key="element.id" :class="{'opacity05': !element.isCheck}")
               .draggable__element-title
                 CheckBox(:isChecked="!!element.isCheck" @check="baseFiltersCheck(element.id, true)" @uncheck="baseFiltersCheck(element.id, false)")
                 span {{element.name}}
@@ -25,7 +23,7 @@
 
         .fields(v-else)
           draggable(v-model="baseFields" handle=".handle")
-            .draggable__element( v-for="element in baseFields" :key="element.id")
+            .draggable__element( v-for="element in baseFields" :key="element.id" :class="{'opacity05': !element.isCheck}")
               .draggable__element-title
                 CheckBox(:isChecked="!!element.isCheck" @check="baseFieldsCheck(element.id, true)" @uncheck="baseFieldsCheck(element.id, false)")
                 span {{element.name}}
@@ -115,7 +113,7 @@
 
   .filters,
   .fields {
-    max-height: 75vh;
+    max-height: 76vh;
     overflow: auto;
   }
 
@@ -163,7 +161,7 @@
       background-color: white;
       padding: 50px 20px 20px 20px;
       background: white;
-      z-index: 10;
+      z-index: 25;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     }
 
@@ -177,6 +175,7 @@
       cursor: pointer;
       padding: 5px;
       transition: .2s ease-out;
+      z-index: 20;
 
       &:hover {
         .fa-cogs {
@@ -211,6 +210,10 @@
         align-items: center;
       }
     }
+  }
+
+  .opacity05 {
+    opacity: 0.5;
   }
 
   .slide-enter-active,

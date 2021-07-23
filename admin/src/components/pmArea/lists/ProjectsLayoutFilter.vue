@@ -137,6 +137,20 @@
             @removeOption="removeService"
           )
 
+      .filter__item(v-if="filter === 'tasksStatuses'")
+        label Tasks Statuses:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedTasksStatuses"
+            :options="allTasksStatuses"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setTasksStatus"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeTasksStatus"
+          )
+
       .filter__item(v-if="filter === 'vendors'")
         label Vendors:
         .filter__input
@@ -186,8 +200,6 @@
             :isRemoveOption="true"
             @removeOption="removePaymentProfile"
           )
-
-
 </template>
 
 <script>
@@ -205,6 +217,7 @@
 				booleanOptions: [ 'Yes', 'No' ],
 				allCurrency: [ 'EUR', 'USD', 'GBP' ],
 				allPaymentProfile: [ 'PPP', 'Pre-Payment', 'Monthly', '50%/50%' ],
+				allTasksStatuses: ['Created', "Quote Sent", "Approved", "Rejected", "In progress", "Pending Approval [DR1]", "Completed", "Cancelled",  "Cancelled Halfway" ],
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
@@ -214,6 +227,9 @@
 			}
 		},
 		methods: {
+			removeTasksStatus(){
+				this.replaceRoute('tasksStatuses', '')
+      },
 			removePaymentProfile() {
 				this.replaceRoute('paymentProfile', '')
 			},
@@ -310,6 +326,16 @@
 				if (_ids.includes(this.getServicesIdByTitle(option))) _ids = _ids.filter(_id => _id !== this.getServicesIdByTitle(option))
 				else _ids.push(this.getServicesIdByTitle(option))
 				this.replaceRoute('services', _ids.join(','))
+			},
+			setTasksStatus({ option }){
+				if (!this.$route.query.tasksStatuses) {
+					this.replaceRoute('tasksStatuses', option)
+					return
+				}
+				let statuses = this.$route.query.tasksStatuses.split(',')
+				if (statuses.includes(option)) statuses = statuses.filter(status => status !== option)
+				else statuses.push(option)
+				this.replaceRoute('tasksStatuses', statuses.join(','))
 			},
 			getVendorsIdByFullName(option) {
 				const { _id } = this.vendors.find(({ firstName, surname }) => `${ firstName } ${ surname }` === option)
@@ -442,6 +468,11 @@
 			selectedServices() {
 				return this.$route.query.services
 						? this.$route.query.services.split(',').map(_id => this.services.find(service => _id === service._id).title)
+						: []
+			},
+			selectedTasksStatuses() {
+				return this.$route.query.tasksStatuses
+						? this.$route.query.tasksStatuses.split(',')
 						: []
 			},
 			selectedVendors() {

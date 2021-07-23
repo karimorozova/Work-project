@@ -23,7 +23,9 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 		projectCurrency,
 		paymentProfile,
 		vendors,
+		tasksStatuses
 	} = filters
+
 
 	if (status !== 'All') query["status"] = status
 
@@ -78,6 +80,13 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 
 	if (vendors) {
 		query["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+	}
+
+	if (tasksStatuses) {
+		const tasksStatusesArr = tasksStatuses.split(',')
+		if(tasksStatusesArr.includes('In progress') && !tasksStatusesArr.includes('Started')) tasksStatusesArr.push('Started')
+		console.log(tasksStatusesArr)
+		query["tasks.status"] = { $in: tasksStatusesArr }
 	}
 
 	if (isTest) {

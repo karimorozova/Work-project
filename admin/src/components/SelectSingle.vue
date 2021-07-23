@@ -260,7 +260,7 @@
   }
 
   .z-index {
-    z-index: 1;
+    z-index: 13;
   }
 
   .select {

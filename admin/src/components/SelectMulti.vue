@@ -325,7 +325,7 @@
   }
 
   .z-index {
-    z-index: 1;
+    z-index: 13;
   }
 
   .select {
@@ -385,7 +385,7 @@
   .checkbox {
     min-width: 14px;
     height: 14px;
-    border: 1px solid $border;
+    border: 1px solid $text;
     margin-right: 6px;
 
     .checked {
