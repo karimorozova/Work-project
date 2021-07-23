@@ -53,11 +53,37 @@ const UserSchema = new mongoose.Schema({
 		project: {
 			filters: {
 				type: Array,
-				default: ['projectId', 'projectName', 'clientName', 'startDate', 'deadline', 'projectManager', 'accountManger', 'sourceLanguages', 'targetLanguages']
+				default: [
+					"projectId",
+					"startDate",
+					"sourceLanguages",
+					"projectManager",
+					"clientName",
+					"tasksStatuses",
+					"projectName",
+					"deadline",
+					"targetLanguages",
+					"accountManger",
+					"industry",
+					"isTest"
+				]
 			},
 			fields: {
 				type: Array,
-				default: [ 'projectId', 'projectName', 'clientName', 'startDate', 'deadline', 'projectManager', 'accountManger' ]
+				default: [
+					"projectId",
+					"projectName",
+					"clientName",
+					"status",
+					"progress",
+					"languages",
+					"startDate",
+					"deadline",
+					"isTest",
+					"payables",
+					"receivables",
+					"margin"
+				]
 			}
 		}
 	}
