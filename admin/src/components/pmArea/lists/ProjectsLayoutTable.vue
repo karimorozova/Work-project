@@ -418,7 +418,7 @@
     }
 
     &__data {
-      padding: 0 7px;
+      //padding: 0 7px;
       width: 100%;
     }
   }
