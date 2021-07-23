@@ -113,7 +113,8 @@
     background: $light-border;
   }
 
-  .filters {
+  .filters,
+  .fields {
     max-height: 75vh;
     overflow: auto;
   }

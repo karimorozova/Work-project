@@ -202,9 +202,9 @@
 		props: {},
 		data() {
 			return {
-        booleanOptions: ['Yes', 'No'],
-        allCurrency: ['EUR','USD'],
-        allPaymentProfile: ['PPP', 'Pre-Payment', 'Monthly', '50%/50%'],
+				booleanOptions: [ 'Yes', 'No' ],
+				allCurrency: [ 'EUR', 'USD', 'GBP' ],
+				allPaymentProfile: [ 'PPP', 'Pre-Payment', 'Monthly', '50%/50%' ],
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
@@ -214,15 +214,15 @@
 			}
 		},
 		methods: {
-      removePaymentProfile() {
-        this.replaceRoute('paymentProfile', '')
-      },
-      removeIsTest() {
-        this.replaceRoute('isTest', '')
-      },
-      removeProjectCurrency() {
-        this.replaceRoute('projectCurrency', '')
-      },
+			removePaymentProfile() {
+				this.replaceRoute('paymentProfile', '')
+			},
+			removeIsTest() {
+				this.replaceRoute('isTest', '')
+			},
+			removeProjectCurrency() {
+				this.replaceRoute('projectCurrency', '')
+			},
 			removeSelectedInputs(prop) {
 				this.replaceRoute(prop, '')
 			},
@@ -232,13 +232,13 @@
 			removeTargetLanguages() {
 				this.replaceRoute('targetLanguages', '')
 			},
-      removeService() {
+			removeService() {
 				this.replaceRoute('services', '')
 			},
-      removeVendors() {
+			removeVendors() {
 				this.replaceRoute('vendors', '')
 			},
-      removeIndustry() {
+			removeIndustry() {
 				this.replaceRoute('industry', '')
 			},
 			getLanguageIdByLang(option) {
@@ -293,47 +293,47 @@
 				const { _id } = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
 				this.replaceRoute('accountManager', _id)
 			},
-      setIndustry({ option }) {
-        const { _id } = this.industries.find(({ name }) => name === option)
-        this.replaceRoute('industry', _id)
-      },
-      getServicesIdByTitle(option) {
-        const { _id } = this.services.find(({ title }) => title === option)
-        return _id
-      },
-      setServices({ option }) {
-        if (!this.$route.query.services) {
-          this.replaceRoute('services', this.getServicesIdByTitle(option))
-          return
-        }
-        let _ids = this.$route.query.services.split(',')
-        if (_ids.includes(this.getServicesIdByTitle(option))) _ids = _ids.filter(_id => _id !== this.getServicesIdByTitle(option))
-        else _ids.push(this.getServicesIdByTitle(option))
-        this.replaceRoute('services', _ids.join(','))
+			setIndustry({ option }) {
+				const { _id } = this.industries.find(({ name }) => name === option)
+				this.replaceRoute('industry', _id)
 			},
-      getVendorsIdByFullName(option) {
-        const { _id } = this.vendors.find(({ firstName, surname }) => `${firstName} ${surname}` === option)
-        return _id
-      },
-      setVendors({ option }) {
-        if (!this.$route.query.vendors) {
-          this.replaceRoute('vendors', this.getVendorsIdByFullName(option))
-          return
-        }
-        let _ids = this.$route.query.vendors.split(',')
-        if (_ids.includes(this.getVendorsIdByFullName(option))) _ids = _ids.filter(_id => _id !== this.getVendorsIdByFullName(option))
-        else _ids.push(this.getVendorsIdByFullName(option))
-        this.replaceRoute('vendors', _ids.join(','))
+			getServicesIdByTitle(option) {
+				const { _id } = this.services.find(({ title }) => title === option)
+				return _id
 			},
-      setPaymentProfile({option}) {
-        this.replaceRoute('paymentProfile', option)
-      },
-      setIsTest({option}) {
-        this.replaceRoute('isTest', option)
-      },
-      setProjectCurrency({option}) {
-        this.replaceRoute('projectCurrency', option)
-      },
+			setServices({ option }) {
+				if (!this.$route.query.services) {
+					this.replaceRoute('services', this.getServicesIdByTitle(option))
+					return
+				}
+				let _ids = this.$route.query.services.split(',')
+				if (_ids.includes(this.getServicesIdByTitle(option))) _ids = _ids.filter(_id => _id !== this.getServicesIdByTitle(option))
+				else _ids.push(this.getServicesIdByTitle(option))
+				this.replaceRoute('services', _ids.join(','))
+			},
+			getVendorsIdByFullName(option) {
+				const { _id } = this.vendors.find(({ firstName, surname }) => `${ firstName } ${ surname }` === option)
+				return _id
+			},
+			setVendors({ option }) {
+				if (!this.$route.query.vendors) {
+					this.replaceRoute('vendors', this.getVendorsIdByFullName(option))
+					return
+				}
+				let _ids = this.$route.query.vendors.split(',')
+				if (_ids.includes(this.getVendorsIdByFullName(option))) _ids = _ids.filter(_id => _id !== this.getVendorsIdByFullName(option))
+				else _ids.push(this.getVendorsIdByFullName(option))
+				this.replaceRoute('vendors', _ids.join(','))
+			},
+			setPaymentProfile({ option }) {
+				this.replaceRoute('paymentProfile', option)
+			},
+			setIsTest({ option }) {
+				this.replaceRoute('isTest', option)
+			},
+			setProjectCurrency({ option }) {
+				this.replaceRoute('projectCurrency', option)
+			},
 			removePM() {
 				this.replaceRoute('projectManager', '')
 			},
@@ -356,11 +356,11 @@
 		computed: {
 			...mapGetters({
 				users: "getUsers",
-        user: "getUser",
+				user: "getUser",
 				languages: "getAllLanguages",
-        services: "getAllServices",
-        industries: "getAllIndustries",
-        vendors: "getAllVendorsForOptions",
+				services: "getAllServices",
+				industries: "getAllIndustries",
+				vendors: "getAllVendorsForOptions"
 			}),
 			mappedLanguages() {
 				return this.languages.map(({ lang }) => lang)
@@ -371,15 +371,15 @@
 			projectNameValue() {
 				return this.$route.query.projectName || ''
 			},
-      selectedPaymentProfile() {
-			  return this.$route.query.paymentProfile || ''
-      },
-      selectedIsTest() {
-			  return this.$route.query.isTest || ''
-      },
-      selectedProjectCurrency() {
-			  return this.$route.query.projectCurrency || ''
-      },
+			selectedPaymentProfile() {
+				return this.$route.query.paymentProfile || ''
+			},
+			selectedIsTest() {
+				return this.$route.query.isTest || ''
+			},
+			selectedProjectCurrency() {
+				return this.$route.query.projectCurrency || ''
+			},
 			clientNameValue() {
 				return this.$route.query.clientName || ''
 			},
@@ -407,14 +407,14 @@
 						.filter(({ group }) => group.name === 'Account Managers')
 						.map(({ firstName, lastName }) => `${ firstName } ${ lastName }`)
 			},
-      allIndustries() {
-				return this.industries.map(({name}) => name)
+			allIndustries() {
+				return this.industries.map(({ name }) => name)
 			},
-      allVendors() {
-				return this.vendors.map(({firstName, surname}) => `${firstName} ${surname}`)
+			allVendors() {
+				return this.vendors.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
 			},
-      allServices() {
-				return this.services.map(({title}) => title)
+			allServices() {
+				return this.services.map(({ title }) => title)
 			},
 			startDateValue() {
 				return this.$route.query.startDate || ''
@@ -432,27 +432,27 @@
 						? this.$route.query.targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
 						: []
 			},
-      selectedIndustry() {
-        if (this.$route.query.industry) {
-          const {name } = this.industries.find(({ _id }) => `${ _id }` === `${ this.$route.query.industry }`)
-          return name
-        }
-        return ''
-      },
-      selectedServices() {
+			selectedIndustry() {
+				if (this.$route.query.industry) {
+					const { name } = this.industries.find(({ _id }) => `${ _id }` === `${ this.$route.query.industry }`)
+					return name
+				}
+				return ''
+			},
+			selectedServices() {
 				return this.$route.query.services
 						? this.$route.query.services.split(',').map(_id => this.services.find(service => _id === service._id).title)
 						: []
 			},
-      selectedVendors() {
-        return this.$route.query.vendors
-          ? this.$route.query.vendors.split(',').map(_id => {
-            const vendor = this.vendors.find(vendor => _id === vendor._id)
-            return vendor ? `${vendor.firstName} ${vendor.surname}` : ''
-          })
-          : []
+			selectedVendors() {
+				return this.$route.query.vendors
+						? this.$route.query.vendors.split(',').map(_id => {
+							const vendor = this.vendors.find(vendor => _id === vendor._id)
+							return vendor ? `${ vendor.firstName } ${ vendor.surname }` : ''
+						})
+						: []
 
-			},
+			}
 		}
 	}
 </script>

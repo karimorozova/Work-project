@@ -3,7 +3,7 @@
     ProjectSettingsSidebar(
       v-if="!!user.layoutsSettings"
       :filters="filtersSetting"
-      :fields="fieldsSetting"
+      :fields="filteredPositionByUserSetting.fields"
       :userInfo="user.layoutsSettings.project"
 
       @updateFiltersAndFields="updateFiltersAndFields"
@@ -20,7 +20,7 @@
 	import { mapGetters, mapActions } from 'vuex'
 	import ProjectsLayoutTable from "./ProjectsLayoutTable"
 	import ProjectsLayoutFilter from "./ProjectsLayoutFilter"
-  import ProjectSettingsSidebar from "./ProjectSettingsSidebar"
+	import ProjectSettingsSidebar from "./ProjectSettingsSidebar"
 
 	export default {
 		props: {
@@ -49,8 +49,8 @@
 				services: '',
 				isTest: '',
 				projectCurrency: '',
-        paymentProfile: '',
-        vendors: '',
+				paymentProfile: '',
+				vendors: '',
 
 				dataVariables: [
 					'projectId',
@@ -62,187 +62,263 @@
 					'deadline',
 					'sourceLanguages',
 					'targetLanguages',
-          'industry',
-          'services',
-          'isTest',
-          'projectCurrency',
-          'paymentProfile',
-          'vendors',
+					'industry',
+					'services',
+					'isTest',
+					'projectCurrency',
+					'paymentProfile',
+					'vendors'
 				],
-        filtersSetting: [
-          {
-            id: "projectId",
-            name: "Project Id",
-            order: 1,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "projectName",
-            name: "Project Name",
-            order: 2,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "clientName",
-            name: "Client Name",
-            order: 3,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "startDate",
-            name: "Start Date",
-            order: 4,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "deadline",
-            name: "Deadline",
-            order: 5,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "projectManager",
-            name: "Project Manager",
-            order: 6,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "accountManger",
-            name: "Account Manger",
-            order: 7,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "sourceLanguages",
-            name: "Source Languages",
-            order: 8,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "targetLanguages",
-            name: "Target Languages",
-            order: 9,
-            fixed: false,
-            isCheck: false,
-          },
-	        {
-		        id: "industry",
-		        name: "Industry",
-		        order: 10,
-		        fixed: false,
-		        isCheck: false,
-	        },
-	        {
-		        id: "services",
-		        name: "Services",
-		        order: 11,
-		        fixed: false,
-		        isCheck: false,
-	        },
-	        {
-		        id: "isTest",
-		        name: "Test",
-		        order: 12,
-		        fixed: false,
-		        isCheck: false,
-	        },
-	        {
-		        id: "projectCurrency",
-		        name: "Currency",
-		        order: 13,
-		        fixed: false,
-		        isCheck: false,
-	        },
-	        {
-		        id: "paymentProfile",
-		        name: "Payment Profile",
-		        order: 14,
-		        fixed: false,
-		        isCheck: false,
-	        },
-	        {
-		        id: "vendors",
-		        name: "Vendors",
-		        order: 15,
-		        fixed: false,
-		        isCheck: false,
-	        },
-        ],
-        fieldsSetting: [
-          {
-            id: "projectId",
-            name: "Project Id",
-            order: 1,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "projectName",
-            name: "Project Name",
-            order: 2,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "clientName",
-            name: "Client Name",
-            order: 3,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "startDate",
-            name: "Start Date",
-            order: 4,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "deadline",
-            name: "Deadline",
-            order: 5,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "projectManager",
-            name: "Project Manager",
-            order: 6,
-            fixed: false,
-            isCheck: false,
-          },
-          {
-            id: "accountManager",
-            name: "Account Manger",
-            order: 7,
-            fixed: false,
-            isCheck: false,
-          },
-        ],
+				filtersSetting: [
+					{
+						id: "projectId",
+						name: "Project Id",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "projectName",
+						name: "Project Name",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "clientName",
+						name: "Client Name",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "startDate",
+						name: "Start Date",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "deadline",
+						name: "Deadline",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "projectManager",
+						name: "Project Manager",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "accountManger",
+						name: "Account Manger",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "sourceLanguages",
+						name: "Source Languages",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "targetLanguages",
+						name: "Target Languages",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "industry",
+						name: "Industry",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "services",
+						name: "Services",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "isTest",
+						name: "Test",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "projectCurrency",
+						name: "Currency",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "paymentProfile",
+						name: "Payment Profile",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "vendors",
+						name: "Vendors",
+						fixed: false,
+						isCheck: false
+					}
+				],
+				fieldsSetting: [
+					{
+						id: "projectId",
+						name: "Project Id",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "projectName",
+						name: "Project Name",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "clientName",
+						name: "Client Name",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "startDate",
+						name: "Start Date",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "deadline",
+						name: "Deadline",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "languages",
+						name: "Languages",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "projectManager",
+						name: "Project Manager",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "accountManager",
+						name: "Account Manger",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "industry",
+						name: "Industry",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "services",
+						name: "Services",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "isTest",
+						name: "Test",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "payables",
+						name: "Payables",
+						fixed: false,
+						isCheck: false
+					}, {
+						id: "receivables",
+						name: "Receivables",
+						fixed: false,
+						isCheck: false
+					}, {
+						id: "margin",
+						name: "Margin",
+						fixed: false,
+						isCheck: false
+					}, {
+						id: "marginPercentage",
+						name: "Margin %",
+						fixed: false,
+						isCheck: false
+					}, {
+						id: "roi",
+						name: "Roi",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "projectCurrency",
+						name: "Currency",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "status",
+						name: "Status",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "paymentProfile",
+						name: "Payment Profile",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "xtrf",
+						name: "In XTRF",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "progress",
+						name: "Progress",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "discounts",
+						name: "Discounts",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "urgent",
+						name: "Urgent",
+						fixed: false,
+						isCheck: false
+					},
+					{
+						id: "vendors",
+						name: "Vendors",
+						fixed: false,
+						isCheck: false
+					}
+				]
 			}
 		},
 		methods: {
 			...mapActions([
-        "alertToggle",
-        "setUser",
-      ]),
-      clearFilters() {
-			  this.$router.replace({'query': null}).catch((err)=> err)
-        this.defaultSetter()
-        this.getData()
-      },
-      async updateFiltersAndFields(data) {
-        await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, {data})
-        await this.setUser()
-      },
+				"alertToggle",
+				"setUser"
+			]),
+			clearFilters() {
+				this.$router.replace({ 'query': null }).catch((err) => err)
+				this.defaultSetter()
+				this.getData()
+			},
+			async updateFiltersAndFields(data) {
+				await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, { data })
+				await this.setUser()
+			},
 			async getData() {
 				this.lastDate = new Date()
 				this.lastDate.setDate(this.lastDate.getDate() + 1)
@@ -275,9 +351,41 @@
 			}
 		},
 		computed: {
-      ...mapGetters({
-        user: "getUser"
-      }),
+			...mapGetters({
+				user: "getUser"
+			}),
+			filteredPositionByUserSetting() {
+				const obj = {
+					fields: [],
+					filters: []
+				}
+				if (Object.keys(this.user).length) {
+					const { layoutsSettings: { project: { fields, filters } } } = this.user
+
+					if (fields.length) {
+						fields.forEach(filed => {
+							const _idx = this.fieldsSetting.findIndex(({ id }) => id === filed)
+							if (_idx !== -1) obj.fields.push(this.fieldsSetting[_idx])
+						})
+						const rest = this.fieldsSetting.filter(({ id }) => !obj.fields.map(item => item.id).includes(id))
+						obj.fields.push(...rest)
+					} else {
+						obj.fields.push(...this.fieldsSetting)
+					}
+
+					if (filters.length) {
+						filters.forEach(filter => {
+							const _idx = this.filtersSetting.findIndex(({ id }) => id === filter)
+							if (_idx !== -1) obj.filters.push(this.filtersSetting[_idx])
+						})
+						const rest = this.filtersSetting.filter(({ id }) => !obj.filters.map(item => item.id).includes(id))
+						obj.filters.push(...rest)
+					} else {
+						obj.filters.push(...this.filtersSetting)
+					}
+				}
+				return obj
+			},
 			filters() {
 				const filters = { status: this.status }
 				for (let variable of this.dataVariables) filters[variable] = this[variable]
@@ -304,7 +412,7 @@
 		},
 
 		components: {
-      ProjectSettingsSidebar,
+			ProjectSettingsSidebar,
 			ProjectsLayoutFilter,
 			ProjectsLayoutTable
 		}
@@ -312,14 +420,15 @@
 </script>
 
 <style lang="scss" scoped>
- @import "../../../assets/scss/colors";
+  @import "../../../assets/scss/colors";
 
   .all-projects {
     width: 1530px;
     margin: 50px 50px 0 50px;
     position: relative;
   }
-  .clear-filter{
+
+  .clear-filter {
     position: absolute;
     right: 10px;
     top: 48px;
@@ -341,6 +450,7 @@
       -ms-flex-align: center;
       align-items: center;
     }
+
     &:hover {
       & i {
         color: $text;

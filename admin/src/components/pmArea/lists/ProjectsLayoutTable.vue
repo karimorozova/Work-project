@@ -6,7 +6,7 @@
 
     .table__result
       LayoutsTable(
-        :fields="fields"
+        :fields="filteredFields"
         :tableData="list"
         @bottomScrolled="bottomScrolled"
       )
@@ -140,7 +140,7 @@
 						style: { "width": "170px" }
 					},
 					{
-						label: "Cleint Name",
+						label: "Client Name",
 						headerKey: "headerClientName",
 						key: "clientName",
 						style: { "width": "170px" }
@@ -237,7 +237,7 @@
 						style: { "width": "120px" }
 					},
 					{
-						label: "Payment Profile",
+						label: "PP",
 						headerKey: "paymentProfileHeader",
 						key: "paymentProfile",
 						style: { "width": "140px" }
@@ -357,10 +357,10 @@
 				const taskLanguages = tasks.map(({ sourceLanguage, targetLanguage }) => ({ sourceLanguage, targetLanguage }))
 				let groupedLanguages = Object.entries(_.groupBy(taskLanguages, 'sourceLanguage'))
 				groupedLanguages = groupedLanguages.map(item => {
-					return { sourceLanguage: item[0], targetLanguages: [ ...new Set(item[1].map(({ targetLanguage }) => targetLanguage)) ].join(', ') }
+					return { sourceLanguage: item[0], targetLanguages: [ ...new Set(item[1].map(({ targetLanguage }) => targetLanguage)) ].join(';&ensp;') }
 				})
 				groupedLanguages = groupedLanguages.reduce((acc, curr) => {
-					acc = acc + `${ curr.sourceLanguage } &#8811; ${ curr.targetLanguages } <br>`
+					acc = acc + `${ curr.sourceLanguage } <span style="font-size: 12px;color: #919191;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ${ curr.targetLanguages } <br>`
 					return acc
 				}, '')
 				return groupedLanguages
@@ -418,7 +418,6 @@
     }
 
     &__data {
-      //padding: 0 7px;
       width: 100%;
     }
   }

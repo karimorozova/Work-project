@@ -14,29 +14,22 @@
 
     table
       thead
-        tr(:class="{'scroll': tableData.length >= elementToScroll}")
-
+        tr
           th(v-for="{ headerKey, style, sortInfo, dataKey, key, filterInfo, ...rest } in fields" :style="style")
-
             .th__titleAndSort(:style="style")
               slot(:name="headerKey" :field="{ headerKey, sortInfo, style, dataKey, key, filterInfo, ...rest }")
-
               .th__sortIcons(v-if="sortInfo && sortInfo.isSort")
-
                 i.fas.fa-times-circle(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'" @click.stop="removeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
                 span(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'")
                   i.fas.fa-caret-down(v-if="sortInfo.order === 'asc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'desc'})")
                   i.fas.fa-caret-up(v-else-if="sortInfo.order === 'desc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
                 i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
 
-            //.th__filter(v-if="filterInfo && filterInfo.isFilter && showFilters")
-              // input(:ref='key' @keyup="(e) => setFilter({filterInfo, value: e.target.value, key: dataKey, filterField: key})")
-              // i.fas.fa-backspace.th__filter-close(v-if="filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo, filterField: key})")
-
-      tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" )
+      tbody
         tr(v-for="(row, index) of tableData")
           td(v-for="{ key } of fields")
-            slot(:name="key" :row="row" :index="index" )
+            .td__data
+              slot(:name="key" :row="row" :index="index" )
 
 </template>
 
@@ -82,20 +75,6 @@
 			removeSortKey(field) {
 				this.$emit('removeSortKey', field)
 			},
-
-			// showFilter() {
-			//   this.showFilters = !this.showFilters
-			//   if (!this.showFilters) {
-			//     this.$emit('clearAllFilters')
-			//   }
-			// },
-			// setFilter(field) {
-			// 	this.$emit('setFilter', field)
-			// },
-			// removeFilter(field) {
-			// 	this.$refs[field.filterField][0].value = ''
-			// 	this.$emit('removeFilter', field)
-			// },
 			bottomScrolled(e) {
 				const element = e.target
 				if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
@@ -160,23 +139,33 @@
     }
   }
 
-  //table tr th:first-child{
-  //
-  //  box-shadow: inset -1px 0 0 $border;
-  //}
-  table td:first-child{
+  .td {
+    &__data {
+      min-height: 40px;
+      padding: 7px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+  }
+
+  table td:first-child {
     box-shadow: inset -1px 0 0 $border;
   }
-  table tr th:first-child, table td:first-child{
+
+  table tr th:first-child, table td:first-child {
     position: sticky;
     left: 0;
     z-index: 10;
     background: #fff;
   }
-  table tr th:first-child{
+
+  table tr th:first-child {
     z-index: 11;
   }
-  table tr th{
+
+  table tr th {
     position: sticky;
     top: 0;
     z-index: 9;
@@ -184,47 +173,24 @@
     box-shadow: inset -1px -1px 0 $border;
   }
 
-
   table {
     border-collapse: collapse;
     background: white;
   }
 
-
   th {
-    //border-right: 1px solid $border;
     box-sizing: border-box;
     padding: 0;
-
-    &:last-child {
-      //border-right: none;
-    }
   }
 
   table td,
-  table th{
+  table th {
     box-shadow: inset -1px 0 0 $border;
-    //position:sticky;
-    //border-right: 1px solid $border;
-    //border-collapse:collapse;
   }
 
   td {
-    //border-right: 1px solid $border;
-    align-items: center;
-    box-sizing: border-box;
-    justify-content: flex-start;
     box-sizing: border-box;
     letter-spacing: -0.1px;
-    padding: 12px 7px;
-
-    &:last-child {
-      //border-right: none;
-    }
-  }
-
-  table thead {
-    //border-bottom: 1px solid $border;
   }
 
   table thead th {
@@ -237,7 +203,7 @@
   }
 
   tbody tr:nth-child(even),
-  tbody tr:nth-child(2n) td:first-child{
+  tbody tr:nth-child(2n) td:first-child {
     background-color: $table-list;
   }
 
@@ -251,16 +217,16 @@
     cursor: default;
   }
 
-  .hideScrollBlock {
-    height: 40px;
-    width: 20px;
-    background: white;
-    position: absolute;
-    right: 1px;
-    z-index: 1;
-  }
+  /*.hideScrollBlock {*/
+  /*  height: 40px;*/
+  /*  width: 20px;*/
+  /*  background: white;*/
+  /*  position: absolute;*/
+  /*  right: 1px;*/
+  /*  z-index: 1;*/
+  /*}*/
 
-  .scroll {
-    overflow-y: scroll;
-  }
+  /*.scroll {*/
+  /*  overflow-y: scroll;*/
+  /*}*/
 </style>
