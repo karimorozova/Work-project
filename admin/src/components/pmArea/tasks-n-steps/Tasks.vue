@@ -412,7 +412,7 @@
 				this.selectedAction = option
 
 				switch (option) {
-					case 'Manage DR1 instructions':
+					case 'Complete DR1':
 						this.reviewTasksMulti = this.currentProject.tasks.filter(item => item.isChecked).map(item => item.taskId)
 						this.isDeliveryReviewMulti = true
 						this.setShowTasksAndDeliverables(false)
@@ -420,7 +420,7 @@
 					case 'Send a Quote':
 						await this.getSendQuoteMessage()
 						break
-					case 'Manage DR1 manager':
+					case 'Reassign DR1':
 						await this.manageDR1()
 						break
 					case 'Cancel':
@@ -701,8 +701,8 @@
 						let elements = []
 						const [ first ] = checkedTasks
 						const isSameService = checkedTasks.every(({ service }) => service.title === first.service.title)
-						if (isSameService) elements.push('Manage DR1 instructions')
-						if (this.canChangeDR1Manager) elements.push('Manage DR1 manager')
+						if (isSameService) elements.push('Complete DR1')
+						if (this.canChangeDR1Manager) elements.push('Reassign DR1')
 						return elements
 
 					} else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {

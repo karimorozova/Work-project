@@ -96,12 +96,9 @@ async function getFilteredProjects(filters) {
 
 				"tasksDR2",
 				"genBrief",
-				"roi",
 				"minimumCharge",
 				"crossRate",
-				"isUrgent",
 				"clientContacts",
-				"paymentProfile",
 				"clientProjectNumber",
 				"totalCost",
 				"isMetricsExist",
@@ -118,7 +115,6 @@ async function getFilteredProjects(filters) {
 				"template",
 				"billingDate",
 				"dateFormatted",
-				"discounts",
 				"tasksDR1",
 				"tasksDeliverables"
 			]

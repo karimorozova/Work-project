@@ -161,6 +161,7 @@
   .content {
     display: flex;
     justify-content: space-between;
+    width: 100%;
   }
   .remove__icon i {
     color: inherit;
