@@ -19,7 +19,9 @@
               span {{row.projectId}}
 
         template(slot="projectName" slot-scope="{ row, index }")
-          .table__data {{row.projectName}}
+          .table__data
+            router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+              span {{row.projectName}}
 
         template(slot="clientName" slot-scope="{ row, index }")
           .table__data {{row.customer.name}}
@@ -134,7 +136,7 @@
 						label: "Project Id",
 						headerKey: "headerID",
 						key: "projectId",
-						style: { "width": "150px" }
+						style: { "width": "135px" }
 					},
 					{
 						label: "Project Name",
@@ -146,37 +148,37 @@
 						label: "Client Name",
 						headerKey: "headerClientName",
 						key: "clientName",
-						style: { "width": "170px" }
+						style: { "width": "150px" }
 					},
 					{
 						label: "Languages",
 						headerKey: "headerLanguages",
 						key: "languages",
-						style: { "width": "200px" }
+						style: { "width": "150px" }
 					},
 					{
 						label: "Start Date",
 						headerKey: "headerStartDate",
 						key: "startDate",
-						style: { "width": "120px" }
+						style: { "width": "110px" }
 					},
 					{
 						label: "Deadline",
 						headerKey: "headerDeadline",
 						key: "deadline",
-						style: { "width": "120px" }
+						style: { "width": "110px" }
 					},
 					{
 						label: "Project Manager",
 						headerKey: "headerProjectManager",
 						key: "projectManager",
-						style: { "width": "180px" }
+						style: { "width": "160px" }
 					},
 					{
 						label: "Account Manager",
 						headerKey: "headerAccountManager",
 						key: "accountManager",
-						style: { "width": "180px" }
+						style: { "width": "160px" }
 					},
 					{
 						label: "Industry",
@@ -195,43 +197,43 @@
 						label: "Test",
 						headerKey: "headerTest",
 						key: "isTest",
-						style: { "width": "100px" }
+						style: { "width": "60px" }
 					},
 					{
 						label: "Payables",
 						headerKey: "payablesHeader",
 						key: "payables",
-						style: { "width": "100px" }
+						style: { "width": "90px" }
 					},
 					{
 						label: "Receivables",
 						headerKey: "receivablesHeader",
 						key: "receivables",
-						style: { "width": "100px" }
+						style: { "width": "90px" }
 					},
 					{
 						label: "Margin",
 						headerKey: "marginHeader",
 						key: "margin",
-						style: { "width": "100px" }
+						style: { "width": "90px" }
 					},
 					{
 						label: "Margin %",
 						headerKey: "marginPercentageHeader",
 						key: "marginPercentage",
-						style: { "width": "100px" }
+						style: { "width": "90px" }
 					},
 					{
 						label: "Roi",
 						headerKey: "roiHeader",
 						key: "roi",
-						style: { "width": "100px" }
+						style: { "width": "90px" }
 					},
 					{
 						label: "Currency",
 						headerKey: "projectCurrencyHeader",
 						key: "projectCurrency",
-						style: { "width": "100px" }
+						style: { "width": "90px" }
 					},
 					{
 						label: "Status",
@@ -261,13 +263,13 @@
 						label: "Discounts",
 						headerKey: "discountsHeader",
 						key: "discounts",
-						style: { "width": "120px" }
+						style: { "width": "90px" }
 					},
 					{
 						label: "Urgent",
 						headerKey: "urgentHeader",
 						key: "urgent",
-						style: { "width": "100px" }
+						style: { "width": "60px" }
 					},
 					{
 						label: "Vendors",
@@ -385,7 +387,7 @@
 				return Array.from(services).join(", ") || '-'
 			},
 			tasksToString(tasks) {
-				const statuses = new Set(tasks.map(({ status }) => status))
+				const statuses = new Set(tasks.map(({ status }) => status === "Started" ? "In progress" : status))
 				return Array.from(statuses).join(", ") || '-'
 			}
 		},

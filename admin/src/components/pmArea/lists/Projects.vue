@@ -2,7 +2,7 @@
   .all-projects
     ProjectSettingsSidebar(
       v-if="!!user.layoutsSettings"
-      :filters="filtersSetting"
+      :filters="filteredPositionByUserSetting.filters"
       :fields="filteredPositionByUserSetting.fields"
       :userInfo="user.layoutsSettings.project"
 
