@@ -15,7 +15,7 @@
     table
       thead
         tr
-          th(v-for="{ headerKey, style, sortInfo, dataKey, key, filterInfo, ...rest } in fields" :style="style")
+          th(v-for="{ headerKey, style, sortInfo, dataKey, key, filterInfo, ...rest } in fields")
             .th__titleAndSort(:style="style")
               slot(:name="headerKey" :field="{ headerKey, sortInfo, style, dataKey, key, filterInfo, ...rest }")
               .th__sortIcons(v-if="sortInfo && sortInfo.isSort")
