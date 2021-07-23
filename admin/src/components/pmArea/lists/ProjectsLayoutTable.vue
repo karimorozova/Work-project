@@ -295,6 +295,7 @@
 				}, '') + `<span style="margin-left: 4px; color: #919191;">%</span>`
 			},
 			progress(project) {
+				console.log(project.projectId)
 				let progresses = []
 				const isObject = (key) => typeof key === "object"
 				const calculatePercentage = (step) => (+step.progress.wordsDone / +step.progress.totalWordCount) * 100
@@ -307,7 +308,7 @@
 						.map(({ title }) => title)
 
 				const tasks = project.tasks
-						.filter(({ status }) => status !== 'Cancelled')
+						.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
 				tasks.forEach(task => {
 					let taskSteps = project.steps
@@ -319,7 +320,7 @@
 					if (CATServices.includes(task.service.title)) {
 						if (taskSteps.length === 2) {
 							if (isObject(taskSteps[1].progress) && isObject(taskSteps[0].progress)) progresses.push((calculatePercentage(taskSteps[0]) + calculatePercentage(taskSteps[1])) / 2)
-						} else if (taskSteps.length === 1) progress.push(calculatePercentage(taskSteps[0]))
+						} else if (taskSteps.length === 1) progresses.push(calculatePercentage(taskSteps[0]))
 					} else {
 						progresses.push(taskSteps.reduce((init, cur) => init + cur.progress / taskSteps.length, 0))
 					}
