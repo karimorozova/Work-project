@@ -10,6 +10,7 @@
     "dev": "API_URL='http://localhost:3001' node build/dev-server.js",
     "start": "node build/dev-server.js",
     "watch": "cross-env API_URL='http://localhost:3001' node build/watch.js",
+    "debug": "cross-env API_URL='http://localhost:3001' node build/debugger.js",
     "test:unit": "jest"
   },
   "dependencies": {
