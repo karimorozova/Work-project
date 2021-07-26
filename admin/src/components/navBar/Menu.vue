@@ -160,16 +160,16 @@
     }
 
     &__text {
-      color: #c1c1c1;
-      font-size: 12px;
-      margin-left: 9px;
+      color: #ccc;
+      font-size: 11px;
+      margin-left: 13px;
       margin-top: 5px;
       position: absolute;
       display: flex;
       justify-content: flex-end;
       width: 250px;
-      font-family: 'Myriad300';
-      letter-spacing: 0.4px;
+      font-family: Myriad300;
+      letter-spacing: .7px;
     }
   }
 

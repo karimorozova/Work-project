@@ -441,11 +441,15 @@
 				}
 			},
 			isAdmin() {
-				return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
+				if (Object.keys(this.user).length) {
+					return this.user.group.name === "Administrators" || this.user.group.name === "Developers"
+				}
 			},
 			canUpdateDR1() {
-				return this.isAdmin
-						|| this.user._id.toString() === this.dr1Manager.toString()
+				if (Object.keys(this.user).length && Object.keys(this.dr1Manager).length) {
+					return this.isAdmin
+							|| this.user._id.toString() === this.dr1Manager._id.toString()
+				}
 			}
 		},
 		components: {
