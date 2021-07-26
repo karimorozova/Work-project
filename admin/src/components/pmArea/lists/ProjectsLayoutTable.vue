@@ -295,7 +295,6 @@
 				}, '') + `<span style="margin-left: 4px; color: #919191;">%</span>`
 			},
 			progress(project) {
-				console.log(project.projectId)
 				let progresses = []
 				const isObject = (key) => typeof key === "object"
 				const calculatePercentage = (step) => (+step.progress.wordsDone / +step.progress.totalWordCount) * 100
