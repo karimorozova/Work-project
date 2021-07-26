@@ -154,6 +154,7 @@ router.post("/assign-translator", checkVendor, async (req, res) => {
 	const { token, stepId, projectId, stepAction } = req.body
 	try {
 		const { vendorId } = jwt.verify(token, secretKey)
+
 		await assignMemoqTranslator(vendorId, stepId, projectId)
 
 		const {memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)

@@ -92,6 +92,7 @@
 			setDeliverables({ files }) {
 				this.targetFiles = files
 			},
+      // #Complete
 			async completeJob() {
 				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
 				this.closeModal()

@@ -601,6 +601,7 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	} else {
 		assignedSteps.push(neededStep);
 	}
+	assignedSteps = assignedSteps.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
 	let projectUsers = [];
 	const currentProjectUsers = await getProjectUsers(memoqProjectId);
