@@ -226,7 +226,7 @@ router.post('/update-steps-dates', async (req, res) => {
 		const { projectId, steps, step, stepId, type, prop } = req.body
 		const updatedProject = await updateProject({ '_id': projectId }, { steps })
 
-		if (prop === 'deadline' && type === 'CAT Wordcount' && !!step.vendor && step.status === 'Started') {
+		if (prop === 'deadline' && type === 'CAT Wordcount' && !!step.vendor && (step.status === 'Started' || step.status === 'In progress')) {
 			await setStepDeadlineProjectAndMemoq({ projectId, stepId })
 		}
 		res.send(updatedProject)
