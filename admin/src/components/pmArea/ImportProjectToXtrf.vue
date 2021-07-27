@@ -10,6 +10,7 @@
 
     .projectToXtrf__info
       span If a step has the same language pair, they will be grouped. Accounts payable and receivable will be added.
+      .dont-close-text If the project is not closed, click the button again.
 </template>
 
 <script>
@@ -95,6 +96,9 @@
       letter-spacing: .6px;
       font-size: 11px;
       opacity: .5;
+      .dont-close-text {
+        margin: 5px 0 0 0;
+      }
     }
 
     a {

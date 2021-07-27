@@ -246,9 +246,10 @@ export default {
       const {status, tasks} = this.currentProject
 
       const closedCheck = tasks.length && (
-      		tasks.every(({ service }) => service.title === 'Compliance') ||
-		      tasks.every(({ service }) => service.title === 'Translation')
-		      // tasks.every(({ service }) => service.title === 'Copywriting')
+      		tasks.every(({ service }) => service.title === 'Compliance')
+		      || tasks.every(({ service }) => service.title === 'Translation')
+		      || (tasks.every(({ service }) => service.title === 'Copywriting') && tasks.length === 1)
+		      || (tasks.every(({ service }) => service.title === 'Newsletter' || service.title === "SMS") && tasks.length === 2)
       )
 
       return  closedCheck && ( status === 'Closed' || status === 'In progress' || status === 'Approved' )
