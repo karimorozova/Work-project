@@ -351,6 +351,16 @@
 					else return 'Not transferred yet'
 				}
 
+				if (tasks.length && tasks.every(({ service }) => service.title === 'Copywriting')) {
+					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					else return 'Not transferred yet'
+				}
+
+				if (tasks.every(({ service }) => service.title === 'Newsletter' || service.title === "SMS") && tasks.length === 2) {
+					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					else return 'Not transferred yet'
+				}
+
 				return 'No possibility to transfer'
 			},
 			currency(currency) {

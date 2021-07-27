@@ -105,6 +105,7 @@
 		},
 		methods: {
 			approveFile(index, { isFilePushedDR2 }) {
+				if (!!this.requestCounter) return
 				if (isFilePushedDR2) return
 				this.$emit('approveFile', { index })
 			},
