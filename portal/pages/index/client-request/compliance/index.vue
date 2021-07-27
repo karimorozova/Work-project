@@ -142,7 +142,7 @@
             @check="(e) => setQuoteDecision('Start')"
           )
         .form__submit
-          Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm")
+          Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm || isRequestSend")
 
       div(v-if="!isSent")
         .content__order
@@ -208,6 +208,7 @@ import error from "../../../../../vendor/layouts/error"
 export default {
   data() {
     return {
+      isRequestSend: false,
       currentDeadline: '',
       currentProjectName: '',
       currentSourceLang: {},
@@ -312,6 +313,7 @@ export default {
       }
     },
     async addService() {
+      this.isRequestSend = true
       let formData = new FormData()
       formData.append('deadline', this.currentDeadline)
       formData.append('projectName', this.currentProjectName)
@@ -329,8 +331,9 @@ export default {
       try {
         await this.$axios.post('/portal/compliance-service', formData)
         this.isSent = true
+        this.isRequestSend = false
       } catch (err) {
-
+        this.isRequestSend = false
       }
     },
     removeContact(index) {

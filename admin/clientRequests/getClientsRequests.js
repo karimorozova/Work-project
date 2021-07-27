@@ -120,10 +120,19 @@ async function updateClientRequestProps(id, key, value) {
 	}
 }
 
+async function removeClientRequestById(id) {
+	try {
+		await ClientRequest.deleteOne({_id: id})
+	} catch(err) {
+		console.log(err);
+		console.log("Error on getting filtered client requests");
+	}
+}
 
 
 module.exports = {
 	getClientsRequests,
 	getClientRequestById,
   getClientRequestAfterUpdate,
+	removeClientRequestById,
 }

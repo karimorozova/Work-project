@@ -186,6 +186,16 @@
 
     .side
       .side__info
+        .approve__delete
+          ApproveModal(
+            v-if="deleteCurrentRequest"
+            text="Do you want to delete Request?"
+            approveValue="Yes"
+            notApproveValue="Cancel"
+            @approve="deleteRequest"
+            @notApprove="doNotDelete"
+            @close="doNotDelete"
+          )
         .form__project
           .form__project-title
             span(id="id") {{ currentClientRequest.projectId }}
@@ -212,6 +222,7 @@
           .order__subTitle Target:
           .order__value {{ currentClientRequest.requestForm.targetLanguages[0].lang }}
         Button(customClass="middle" @clicked="setCurrentAm" :isDisabled="isAmSet() || !isAm()" value="Get This Project")
+        Button(customClass="middle" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
 
 
       //.side__contacts
@@ -334,7 +345,8 @@
 				sourceFiles: [],
 				refFiles: [],
 				currentTemplate: '',
-				selected: ''
+				selected: '',
+        deleteCurrentRequest: false,
 			}
 		},
 		methods: {
@@ -343,6 +355,17 @@
 				setCurrentClientRequest: "setCurrentClientRequest",
 				alertToggle: "alertToggle"
 			}),
+      isDeleteRequest() {
+        this.deleteCurrentRequest = true
+      },
+      async deleteRequest() {
+        const { id } = this.$route.params
+        await this.$http.post(`/clients-requests/${id}/delete`)
+        this.$router.go(-1)
+      },
+      doNotDelete() {
+        this.deleteCurrentRequest = false
+      },
 			copyId() {
 				let id = document.getElementById('id')
 				let elementText = id.textContent
@@ -794,6 +817,18 @@
   @import "../../../assets/styles/settingsTable";
   @import "../../../assets/scss/colors";
 
+  .button-m-top {
+    margin-top: 20px;
+  }
+  .approve__delete {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 15;
+
+  }
+
   .formLayout {
     padding: 40px;
     display: flex;
@@ -811,6 +846,7 @@
     }
 
     &__info {
+      position: relative;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       padding: 20px;
       width: 400px;

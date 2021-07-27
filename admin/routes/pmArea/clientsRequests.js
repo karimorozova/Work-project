@@ -9,7 +9,8 @@ const {
 	checkRequestedFiles,
 	manageClientContacts,
 	removeContactClientRequest,
-	sendMailToClient
+	sendMailToClient,
+	removeClientRequestById,
 } = require("../../clientRequests")
 
 const { pmAssignInRequest } = require('../../emailMessages/internalCommunication')
@@ -145,9 +146,9 @@ router.post('/:id/update-client-contact', async (req, res) => {
 
 
 router.post('/:id/delete', async (req, res) => {
-	const filters = { ...req.body }
+	const { id } = req.params
 	try {
-		const requests = await getClientRequestById(filters)
+		const requests = await removeClientRequestById(id)
 		res.send(requests)
 	} catch (err) {
 		console.log(err)

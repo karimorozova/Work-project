@@ -25,12 +25,26 @@
         @notApprove="closeModal"
       )
 
+    .approve-action(v-if="deleteCurrentRequest")
+      ApproveModal(
+        v-if="deleteCurrentRequest"
+        text="Are you sure you want to change Project Manager?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="deleteRequest"
+        @close="doNotDelete"
+        @notApprove="doNotDelete"
+      )
+
+    Button(customClass="middle" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
+
 </template>
 
 <script>
 	import SelectSingle from '../../../SelectSingle';
 	import { mapGetters, mapActions } from 'vuex';
 	import ApproveModal from '../../../ApproveModal';
+  import Button from "../../../Button"
 
 	export default {
 		props: {
@@ -40,6 +54,7 @@
 		},
 		data() {
 			return {
+        deleteCurrentRequest:false,
         approveChangePM: false,
         selectedPM: {},
 				managers: [],
@@ -49,8 +64,19 @@
 			...mapActions({
         updateClientsRequestsProps: 'updateClientsRequestsProps',
 			}),
+      isDeleteRequest() {
+        this.deleteCurrentRequest = true
+      },
+      async deleteRequest() {
+        const { id } = this.$route.params
+        await this.$http.post(`/clients-requests/${id}/delete`)
+        this.$router.go(-1)
+      },
+      doNotDelete() {
+        this.deleteCurrentRequest = false
+      },
 			closeModal() {
-				this.approveChangeAM = false;
+				this.approveChangePM = false;
 			},
 			async showModalPM({ option }) {
 				const manager = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option);
@@ -98,6 +124,7 @@
 			},
 		},
 		components: {
+      Button,
 			ApproveModal,
 			SelectSingle,
 		},
@@ -109,6 +136,10 @@
 
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors.scss";
+
+  .button-m-top {
+    margin-top: 10px;
+  }
 
   .project-action {
     padding: 20px;
