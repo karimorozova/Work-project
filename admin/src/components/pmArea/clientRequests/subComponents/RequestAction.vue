@@ -70,7 +70,11 @@
       async deleteRequest() {
         const { id } = this.$route.params
         await this.$http.post(`/clients-requests/${id}/delete`)
-        this.$router.go(-1)
+        if(window.history.length > 2) {
+          this.$router.go(-1)
+        }else {
+          this.$router.push('/pangea-dashboard/overall-view')
+        }
       },
       doNotDelete() {
         this.deleteCurrentRequest = false
