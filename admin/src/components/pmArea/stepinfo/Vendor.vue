@@ -18,13 +18,14 @@
 
     .step-vendor__links(v-if="!!vendor")
       .link
-        .link__title Go to current vendor page:
+        .link__title Vendor Page:
         .link__icon(@click="gotToVendorInfo")
           i.fas.fa-external-link-alt
       .link
-        .link__title Enter to vendor.portal like vendor:
+        .link__title Vendor Portal:
         .link__icon(@click="goToVendor")
-          i.fas.fa-sign-in-alt
+          i.fas.fa-external-link-alt
+
       //.link
       //  .link__title Send email message to vendor:
       //  .link__icon(@click="sendEmail")
@@ -163,11 +164,17 @@
     align-items: center;
 
     &__title {
-      width: 220px;
+      width: 100px;
     }
 
     &__icon {
+      transition: .2s ease-out;
+      color: $dark-border;
       cursor: pointer;
+
+      &:hover {
+        color: $text;
+      }
     }
   }
 

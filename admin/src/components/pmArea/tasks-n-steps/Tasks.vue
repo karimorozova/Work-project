@@ -603,8 +603,11 @@
 						.filter(({ steps }) => steps.some(({ step: { calculationUnit } }) => calculationUnit.includes(catId)))
 						.map(({ title }) => title)
 
-				let taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId)
+				let taskSteps = this.currentProject.steps
+            .filter(item => item.taskId === task.taskId)
+
 				taskSteps = taskSteps.filter(item => !item.stepId.includes('Cancelled'))
+
 				if (CATServices.includes(task.service.title)) {
 					const [ firstStep, secondStep ] = taskSteps
 					if (taskSteps.length === 2) {

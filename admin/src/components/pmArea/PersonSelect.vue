@@ -126,7 +126,7 @@
     overflow: hidden;
 
     .selected {
-      width: 80%;
+      width: 100%;
       padding: 0 7px;
       font-size: 14px;
       display: flex;
@@ -157,6 +157,7 @@
       align-items: center;
       border-left: 1px solid $light-border;
       cursor: pointer;
+      color: $border;
 
       img {
         padding-right: 2px;
@@ -217,129 +218,5 @@
       }
     }
   }
-
-
-  /*  .drop-select {
-      position: absolute;
-      width: 100%;
-      border: 1px solid $border;
-      border-radius: 4px;
-      overflow: hidden;
-      flex-direction: column;
-      box-sizing: border-box;
-
-      .drop {
-        max-height: 320px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        background-color: #FFF;
-        border-top: 1px solid $border;
-        box-sizing: border-box;
-        z-index: 10;
-
-        &__search {
-          background: $table-list;
-          box-sizing: border-box;
-          width: 100%;
-          padding: 0 7px;
-          outline: none;
-          border: none;
-          height: 32px;
-          color: $text;
-          border-bottom: 1px solid $border;
-        }
-
-        &__item {
-          padding: 0 7px;
-          height: 31px;
-          border-bottom: 1px solid $light-border;
-          cursor: pointer;
-          font-size: 14px;
-          transition: .1s ease-out;
-          display: flex;
-          align-items: center;
-          color: $text;
-
-          &:last-child {
-            border: none;
-          }
-
-          &:hover {
-            background-color: $list-hover;
-          }
-        }
-
-        .active {
-          color: $border;
-        }
-
-      }
-    }
-
-    .select {
-      width: 100%;
-      height: 30px;
-      display: flex;
-      justify-content: space-between;
-
-      .selected {
-        width: 80%;
-        padding: 0 7px;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        overflow: auto;
-        position: relative;
-
-        .inner-component & {
-          width: 83%;
-        }
-
-        .block-item__drop-menu & {
-          width: 80%;
-        }
-      }
-
-      .no-choice {
-        opacity: 0.5;
-      }
-
-      .arrow-button {
-        width: 20%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-left: 1px solid $light-border;
-        cursor: pointer;
-        transition: .1s ease-out;
-
-        .reverse-icon {
-          transform: rotate(180deg);
-        }
-
-        .block-item__drop-menu & {
-          width: 20%;
-          border-left: 1px solid $light-border
-        }
-      }
-
-      .no-border {
-        border-left: none;
-        cursor: default;
-        opacity: 0;
-      }
-
-      .inner-component & {
-        border: none;
-        border-radius: 0;
-        box-shadow: inset 0 0 8px rgba(191, 176, 157, 1);
-        height: 100%;
-
-        .selected {
-          padding: 2px 5px;
-        }
-      }
-    }*/
 
 </style>

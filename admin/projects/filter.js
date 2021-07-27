@@ -44,7 +44,8 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 	}
 
 	if (clientName) {
-		query["customer.name"] = { "$regex": new RegExp(`${ clientName }`, 'i') }
+		const filter = clientName.replace(reg, '\\$&')
+		query["customer.name"] = { "$regex": new RegExp(filter, 'i') }
 	}
 
 	if (projectManager) {
@@ -98,7 +99,6 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 	}
 
 	if (paymentProfile) {
-		console.log(paymentProfile)
 		query["paymentProfile"] = paymentProfile
 	}
 	return query

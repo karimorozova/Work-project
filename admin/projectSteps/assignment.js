@@ -32,7 +32,7 @@ async function reassignVendor(project, reassignData) {
 		const updatedStep = updateCurrentStep({ step: stepForUpdatedStep, isStart, isPay, progress, allUnits })
 
 		const updatedIndex = steps.findIndex(item => item.stepId === step.stepId)
-		updatedStep.stepId = updatedStep.stepId + '-Canceled'
+		updatedStep.stepId = updatedStep.stepId + '-Cancelled'
 
 		steps.splice(updatedIndex, 1, updatedStep, newStep)
 
