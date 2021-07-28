@@ -18,7 +18,7 @@ const {
 	getProject
 } = require("./getProjects")
 
-const { manageDeliveryFile } = require('./files')
+const { manageDeliveryFile, copyProjectFiles } = require('./files')
 
 const {
 	moveProjectFile
@@ -93,7 +93,7 @@ async function changeManagerDR2({ project, prevManager, manager, type, file, ent
 
 		if (type === 'multi') {
 			const idx = multiLang.findIndex(({ _id }) => `${ _id }` === `${ entityId }`)
-			const fileIdx = multiLang[idx].file.findIndex(({_id}) => `${ _id }` === `${ file._id }` )
+			const fileIdx = multiLang[idx].file.findIndex(({ _id }) => `${ _id }` === `${ file._id }`)
 			multiLang[idx].file[fileIdx] = { ...file, dr2Manager: manager, isFileApproved: false }
 			return await getProjectAfterUpdate({ "_id": project._id }, { "tasksDR2.multiLang": multiLang })
 		} else {
@@ -259,23 +259,42 @@ const removeDR2 = async ({ projectId, taskId, path, sourceLanguage: source, targ
 	}
 }
 
-async function addMultiLangDR2({ projectId, taskIds, refFiles }) {
+async function addMultiLangDR2({ projectId, taskIds, refFiles, filesFromVault }) {
 	const { projectId: strId, tasksDR2: { singleLang, multiLang: projectMultiLang }, projectManager, accountManager, tasksDR2 } = await Projects.findOne({ _id: projectId })
 
-	const file = (await storeFile(refFiles[0], projectId))[0]
+	let files = []
+	if (refFiles) {
+		for await (let file of Array.from(refFiles)) {
+			const path = await storeFile(file, projectId)
+			files.push({
+				fileName: path.split('/').pop(),
+				path,
+				isFileApproved: false,
+				dr1Manager: projectManager,
+				dr2Manager: accountManager
+			})
+		}
+	}
+
+	if (filesFromVault.length) {
+		for (let file of filesFromVault) {
+			const path = copyProjectFiles({ _id: projectId }, file)
+			files.push({
+				fileName: path.split('/').pop(),
+				path,
+				isFileApproved: false,
+				dr1Manager: projectManager,
+				dr2Manager: accountManager
+			})
+		}
+	}
 
 	let multiLang = {
 		deliveryInternalId: returnNewDeliveryId(strId, singleLang, projectMultiLang),
 		tasks: taskIds,
 		instructions: dr2Instructions,
 		status: 'Pending Approval [DR2]',
-		file: {
-			fileName: file.split('/').pop(),
-			path: file,
-			isFileApproved: false,
-			dr1Manager: projectManager,
-			dr2Manager: accountManager
-		}
+		file: files
 	}
 
 	await sendNotificationToDR2(projectId, taskIds, accountManager)
@@ -285,13 +304,11 @@ async function addMultiLangDR2({ projectId, taskIds, refFiles }) {
 	async function storeFile(file, projectId) {
 		try {
 			const additionFileInfo = `${ Math.floor(Math.random() * 1000000) }`
-			let storedFiles = []
 			if (file) {
 				const newPath = `/projectFiles/${ projectId }/${ additionFileInfo }-${ file.filename.replace(/['"]/g, '_').replace(/\s+/, '_') }`
 				await moveProjectFile(file, `./dist${ newPath }`)
-				storedFiles.push(newPath)
+				return newPath
 			}
-			return storedFiles
 		} catch (err) {
 			console.log(err)
 			console.log("Error in storeFiles")
@@ -406,7 +423,7 @@ const targetFileDR2 = async (fileData, files) => {
 					},
 					{ arrayFilters: [ { 'i._id': entityId }, { 'j.path': path } ] }
 			)
-		}else  {
+		} else {
 			for (let i = 0; i < files.length; i++) {
 				const newPath = await manageDeliveryFile({ fileData, file: files[i] })
 				const fileName = newPath.split("/").pop()
@@ -420,7 +437,7 @@ const targetFileDR2 = async (fileData, files) => {
 			}
 			await Projects.updateOne(
 					{ "_id": projectId, 'tasksDR2.multiLang._id': entityId },
-					{ $push: { "tasksDR2.multiLang.$[i].file": filesRedyToPush} },
+					{ $push: { "tasksDR2.multiLang.$[i].file": filesRedyToPush } },
 					{ arrayFilters: [ { 'i._id': entityId } ] }
 			)
 
@@ -518,7 +535,7 @@ const approveFilesDR2 = async ({ type, entityId, projectId, isFileApproved, path
 	} else {
 		await Projects.updateOne(
 				{ "_id": projectId, 'tasksDR2.multiLang._id': entityId, "tasksDR2.multiLang.file.path": { $in: paths } },
-				{  "tasksDR2.multiLang.$[i].file.$[j].isFileApproved": isFileApproved   },
+				{ "tasksDR2.multiLang.$[i].file.$[j].isFileApproved": isFileApproved },
 				{ arrayFilters: [ { 'i._id': entityId }, { 'j.path': { $in: paths } } ] }
 		)
 		// await Projects.updateOne(

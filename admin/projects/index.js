@@ -11,7 +11,8 @@ const {
 	createArchiveForDeliverableItem,
 	manageDeliveryFile,
 	getPdf,
-	generateAndSaveCertificate
+	generateAndSaveCertificate,
+	copyProjectFiles
 } = require('./files')
 
 const {
@@ -103,6 +104,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	copyProjectFiles,
 	setStepDeadlineProjectAndMemoq,
 	saveCertificateTODR1Files,
 	autoCreatingTaskInProject,

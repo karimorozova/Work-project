@@ -42,44 +42,75 @@
             Button(:value="'Deliver'" @clicked="deliverForOne")
           .tasks-files__tooltip One project client contact is selected by default
 
-      .deliverables__modal(v-if="deliverablesModal")
-        .deliverables__titleModal Upload Deliverables
-        span.deliverables__close-modal(@click="closeDeliverablesModal") &#215;
-        .deliverables__body
-          .deliverables_items
-            .deliverables__items
-              .deliverables__item
-                .deliverables__uploadItem
-                  .deliverables__selectTitle Upload File:
-                  .tasks-files__upload-file
-                    FilesUpload(
-                      :isMulti="false"
-                      buttonValue="Upload deliverables"
-                      inputClass="files-upload__multiLang"
-                      :files="refFiles"
-                      @uploadFiles="uploadRefFiles"
-                      @deleteFile="deleteFile()"
-                    )
 
-              div(style="z-index: 50")
-                .deliverables__selectTitle Assign to task:
-                .deliverables__select
-                  SelectMulti(
-                    placeholder="Select"
-                    :options="selectTaskInfo"
-                    :selectedOptions="selectedTasks"
-                    @chooseOptions="selectedTasksMethod"
+      .modal__tasks(v-if="assignTaskModal")
+        .modal__title Select a tasks
+        span.modal__close-modal(@click="closeTasksModal()") &#215;
+        .deliverables__select
+          SelectMulti(
+            placeholder="Select"
+            :options="selectTaskInfo"
+            :selectedOptions="selectedTasks"
+            @chooseOptions="selectedTasksMethod"
+          )
+        .modal__button
+          Button(value="Upload files" :isDisabled="!selectedTasks.length" @clicked="openDeliverablesModal")
+
+      .modal__vault(v-if="deliverablesModal")
+        span.modal__close-modal(@click="closeDeliverablesModal()") &#215;
+        .sections
+          .sections__files(v-if="refFiles.length || filesFromVault.filter(item => item.isCheck).length")
+            .sections__title Deliverable files
+            .file-list__items
+              .file-list__item(v-for="(file, index) in refFiles")
+                .file-list__name {{file.name}}
+                span.file-list__delete(@click="deleteFile(index)") &#x2715
+
+              .file-list__item(v-for="file in filesFromVault.filter(item => item.isCheck)")
+                .file-list__name {{file.fileName}}
+                span.file-list__delete(@click="deleteVaultFile(file.fileName)") &#x2715
+
+          .sections__upload
+            .sections__upload-buttons
+              .uploadButtons__uploadItem
+                .uploadButtons__title Upload files:
+                .uploadButtons__upload-file
+                  FilesUpload(
+                    :isMulti="true"
+                    buttonValue="Upload deliverables"
+                    inputClass="files-upload__multiLang"
+                    :files="refFiles"
+                    @uploadFiles="uploadRefFiles"
                   )
+              .uploadButtons__uploadItem
+                .uploadButtons__title Tasks vault:
+                .uploadButtons__vaultToggler(@click="toggleVault")
+                  i.fas.fa-cloud-download-alt(v-if="!isVaultShow")
+                  i.fas.fa-times-circle(v-if="isVaultShow")
 
-          .tasks-files__fileItem
-            .deliverable__wrapper
-              .file-list__items(v-for="(file) in refFiles")
-                .file-list__item
-                  .file-list__name {{file.name}}
-                  span.file-list__delete(@click="deleteFile()") &#x2715
-          .tasks-files__button
-            Button(:value="'Upload'" @clicked="uploadFiles" :isDisabled="!checkMultiReview")
-          .tasks-files__tooltip File can be <= 50Mb (otherwise it will not be loaded)
+            .sections__upload-table(v-if="isVaultShow")
+              GeneralTable(
+                :fields="fields2"
+                :tableData="filesFromVault"
+              )
+                .table__header(slot="headerCheck" slot-scope="{ field }")
+                  CheckBox(:isChecked="isAllCheckedVault" :isWhite="true" @check="(e)=>toggleAllCheckVault(e, true)" @uncheck="(e)=>toggleAllCheckVault(e, false)" customClass="tasks-n-steps")
+                .table__header(slot="headerFileName" slot-scope="{ field }") {{ field.label }}
+
+                .table__data(slot="check" slot-scope="{ row, index }")
+                  CheckBox(:isChecked="row.isCheck" @check="(e)=>toggleCheckVault(e, index, true)" @uncheck="(e)=>toggleCheckVault(e, index, false)" customClass="tasks-n-steps")
+
+                template(slot="fileName" slot-scope="{ row, index }")
+                  .table__data {{ row.fileName }}
+
+
+        .modal__attention(v-if="!refFiles.length && !filesFromVault.filter(item => item.isCheck).length") Creating deliverable will be for the selected tasks: {{ selectedTasks.map((i) => i.substring(i.length - 3)).join(', ') }}
+        .modal__button
+          Button(
+            value="Complete"
+            :isDisabled="!refFiles.length && !filesFromVault.filter(item => item.isCheck).length"
+            @clicked="uploadFiles"
+          )
 
 
       .deliverables__header
@@ -133,7 +164,7 @@
             .table__icons(v-if="row.status !== 'Ready for Delivery'")
               img.table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
 
-      Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showModal")
+      Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showTasksModal")
 </template>
 
 <script>
@@ -166,9 +197,18 @@
 					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "17%" } },
 					{ label: "Delivery", headerKey: "headerAction", key: "action", style: { "width": "8%" } }
 				],
+				fields2: [
+					{ label: "", headerKey: "headerCheck", key: "check", style: { "width": "11%" } },
+					{ label: "File Name", headerKey: "headerFileName", key: "fileName", style: { "width": "89%" } }
+				],
+				assignTaskModal: false,
 				deliverablesModal: false,
-				refFilesForDelete: [],
+
+				isVaultShow: false,
+
 				refFiles: [],
+				filesFromVault: [],
+
 				selectedTasks: [],
 				isTableDropMenu: true,
 				isDR2Modal: false,
@@ -195,6 +235,20 @@
 				approveDeliverMany: "approveDeliverMany",
 				setShowTasksAndDeliverables: "setShowTasksAndDeliverables"
 			}),
+			toggleCheckVault(e, index, bool) {
+				const file = this.filesFromVault[index]
+				file.isCheck = bool
+				this.filesFromVault.splice(index, 1, file)
+			},
+			toggleAllCheckVault(e, bool) {
+				this.filesFromVault.forEach((elem, index) => {
+					elem.isCheck = bool
+					this.filesFromVault.splice(index, 1, elem)
+				})
+			},
+			toggleVault() {
+				this.isVaultShow = !this.isVaultShow
+			},
 			getDeliveryTimeAndPerson(row) {
 				const { deliveredAt, deliveredBy } = this.currentProject.tasksDeliverables.find(({ deliverablesId }) => deliverablesId === row._id)
 				const time = moment(deliveredAt).format('DD-MM-YYYY, HH:mm')
@@ -289,7 +343,7 @@
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				} finally {
-					this.closeDeliverablesModal()
+					// this.closeDeliverablesModal()
 				}
 			},
 			getIcons({ type, files, status }) {
@@ -342,24 +396,45 @@
 				const mySet = new Set(row.tasks.map((field) => field.substring(field.length - 3)))
 				return [ ...mySet ].join(', ')
 			},
-			showModal() {
+			showTasksModal() {
+				this.assignTaskModal = true
+			},
+			closeTasksModal() {
+				this.assignTaskModal = false
+				this.selectedTasks = []
+			},
+			openDeliverablesModal() {
+				this.filesFromVault = this.currentProject.tasksDR1
+						.filter(({ taskId }) => this.selectedTasks.includes(taskId))
+						.map(({ files }) => files)
+						.flat()
+						.map(item => ({ ...item, isCheck: false }))
+
+				this.assignTaskModal = false
 				this.deliverablesModal = true
 			},
 			closeDeliverablesModal() {
 				this.deliverablesModal = false
+				this.isVaultShow = false
+				this.selectedTasks = []
+				this.filesFromVault = []
+				this.refFiles = []
 			},
 			async uploadFiles() {
 				let filesData = new FormData()
 				filesData.append('projectId', this.currentProject._id)
 				filesData.append('taskIds', JSON.stringify(this.selectedTasks))
-				try {
-					filesData.append('refFiles', this.refFiles[0])
+				filesData.append('filesFromVault', JSON.stringify(this.filesFromVault.filter(i => i.isCheck)))
 
+				try {
+					if (this.refFiles.length) {
+						for (let file of this.refFiles) {
+							filesData.append('refFiles', file)
+						}
+					}
 					const result = await this.$http.post('/delivery/multi-file-dr2-push', filesData)
 					this.storeProject(result.data)
 
-					this.refFiles = []
-					this.selectedTasks = []
 					this.alertToggle({ message: "Files saved", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" })
@@ -370,22 +445,24 @@
 			uploadRefFiles({ files }) {
 				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 50)
 				if (filteredFiles.length) {
-					this.refFiles = [ files[0] ]
+					for (let file of files) {
+						const isExist = this.refFiles.find(item => item.name === file.name)
+						if (!isExist) this.refFiles.push(file)
+					}
 				}
-				if (!filteredFiles.length) {
-					this.clearInputFiles(".files-upload__multiLang")
-				}
+				if (!filteredFiles.length) this.clearInputFiles(".files-upload__multiLang")
 			},
-			deleteFile() {
-				this.refFiles = []
+			deleteFile(index) {
+				this.refFiles.splice(index, 1)
+			},
+			deleteVaultFile(fileName) {
+				const _idx = this.filesFromVault.findIndex(item => item.fileName === fileName)
+				if (_idx !== -1) this.filesFromVault[_idx].isCheck = false
 			},
 			selectedTasksMethod({ option }) {
 				const position = this.selectedTasks.indexOf(option)
-				if (position !== -1) {
-					this.selectedTasks.splice(position, 1)
-				} else {
-					this.selectedTasks.push(option)
-				}
+				if (position !== -1) this.selectedTasks.splice(position, 1)
+				else this.selectedTasks.push(option)
 			},
 			createLinkAndDownload(id) {
 				const deliverables = this.currentProject.tasksDeliverables.find(({ deliverablesId }) => deliverablesId === id)
@@ -438,6 +515,10 @@
 				users: 'getUsers',
 				user: 'getUser'
 			}),
+
+			isAllCheckedVault() {
+				return this.filesFromVault.length && this.filesFromVault.every(item => item.isCheck)
+			},
 			availableActionsOptions() {
 				const getArrayOfChecked = this.deliverables.filter(item => !!item.isChecked)
 
@@ -445,9 +526,9 @@
 					return [ 'Deliver' ]
 				}
 			},
-			checkMultiReview() {
-				return this.refFiles.length > 0 && this.selectedTasks.length > 0
-			},
+			// checkMultiReview() {
+			// 	return this.refFiles.length > 0 && this.selectedTasks.length > 0
+			// },
 			canUpdateDr2() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.currentProject.accountManager._id.toString() === this.user._id.toString()
 			},
@@ -455,9 +536,10 @@
 				return this.user.group.name === "Administrators" ||
 						this.user.group.name === "Developers" ||
 						this.currentProject.projectManager._id.toString() === this.user._id.toString() ||
+						this.currentProject.accountManager._id.toString() === this.user._id.toString() ||
+						this.currentProject.tasksDR1.map(({ dr2Manager }) => dr2Manager.toString()).includes(this.user._id.toString()) ||
 						this.currentProject.tasksDR1.map(({ dr1Manager }) => dr1Manager.toString()).includes(this.user._id.toString())
 			},
-
 			deliverables() {
 				if (!this.currentProject.hasOwnProperty('tasksDR2')) return []
 
@@ -484,7 +566,7 @@
 								status: item.status,
 								tasks: item.tasks,
 								pair: 'SOON...',
-								files: [ item.file ],
+								files: Array.isArray(item.file) ? item.file : [ item.file ],
 								isChecked: item.isChecked
 							}
 						}) : []
@@ -542,6 +624,135 @@
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
+
+
+  .sections {
+    display: flex;
+
+    &__title {
+      font-size: 16px;
+      font-family: 'Myriad600';
+      margin-bottom: 10px;
+      width: 271px;
+    }
+
+    &__files {
+      padding-right: 19px;
+      margin-right: 20px;
+      border-right: 1px solid $border;
+    }
+
+    &__upload {
+      &-buttons {
+        display: flex;
+        width: 300px;
+        justify-content: space-between;
+      }
+
+      &-table {
+        margin-top: 12px;
+      }
+    }
+  }
+
+  .uploadButtons {
+    &__title {
+      width: 80px;
+    }
+
+    &__uploadItem {
+      display: flex;
+      align-items: center;
+    }
+
+    &__vaultToggler {
+      position: relative;
+      width: 55px;
+      height: 32px;
+      color: #fff;
+      font-size: 15px;
+      border-radius: 4px;
+      background-color: $red;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        cursor: pointer;
+        box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      }
+
+      &:active {
+        transform: scale(.98);
+      }
+    }
+  }
+
+  .modal {
+
+    &__attention{
+      text-align: center;
+      opacity: 0.5;
+      margin-top: 20px;
+      margin-bottom: -10px;
+    }
+
+    &__button {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    &__title {
+      font-size: 21px;
+      font-family: "Myriad600";
+      margin-bottom: 10px;
+    }
+
+    &__title2 {
+      font-size: 21px;
+      font-family: "Myriad600";
+      margin-bottom: 15px;
+    }
+
+
+    &__tasks,
+    &__vault {
+      padding: 20px;
+      background: white;
+      position: absolute;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 500;
+    }
+
+    &__vault {
+      padding: 20px 35px 20px 20px;
+    }
+
+    &__close-modal {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+
+  }
 
   .table {
     &__header {
@@ -610,6 +821,7 @@
     position: relative;
     background: white;
     border-radius: 4px;
+    margin-bottom: 70px;
 
     &__header {
       display: flex;
@@ -900,39 +1112,41 @@
 
   .file-list {
     &__items {
-      position: relative;
+
     }
 
     &__name {
-      color: #68573e;
-      margin-right: 10px;
+      width: 240px;
     }
 
     &__item {
-      width: 100%;
       border-radius: 4px;
-      border: 1px solid #c1bbb1;
+      border: 1px solid $border;
       box-sizing: border-box;
       background-color: #fff;
-      font-size: 12px;
-      padding: 8px;
+      padding: 7px;
       margin: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: relative;
-      margin-top: 20px;
-      font-family: -webkit-pictograph;
+      font-family: 'Myriad300';
+      font-size: 14px;
+      word-break: break-all;
+      width: 281px;
+      margin-bottom: 5px;
     }
 
     &__delete {
       cursor: pointer;
-      transform: 0.2s ease;
+      transform: .2s ease;
       font-size: 14px;
+      height: 16px;
+      width: 16px;
+      cursor: pointer;
 
       &:hover {
         font-weight: bold;
-        cursor: pointer;
       }
     }
   }

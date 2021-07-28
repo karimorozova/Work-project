@@ -81,7 +81,7 @@ const createArchiveForDeliverableItem = async ({type, projectId, entityId, user,
 
     if (type === 'multi') {
         const { file } = tasksDR2.multiLang.find(({ _id }) => `${ _id }` === `${ entityId }`);
-        await archiveMultipleFiles({ outputPath: `./dist${outputPath}`, files: getParsedFiles([file]) });
+        await archiveMultipleFiles({ outputPath: `./dist${outputPath}`, files: getParsedFiles(file) });
         await setDeliveredStatus('multiLang')
 
     }
@@ -186,10 +186,23 @@ const generateAndSaveCertificate = async ({ project, task, deliveryTask }) => {
     // })
 }
 
+const copyProjectFiles = (project, originalFile) => {
+    const copiedName = originalFile.path.split("/").pop()
+    const additional = `${ Math.floor(Math.random() * 1000000) }-${ copiedName }`
+    const newPath = `./dist/projectFiles/${ project._id }/${ additional }`
+
+    fs.copyFile(`./dist/${ originalFile.path }`, newPath, (err) => {
+        if (err) throw err
+    })
+
+    return newPath
+}
+
 module.exports = {
     storeFiles,
     createArchiveForDeliverableItem,
     // getDeliverablesLink,
+    copyProjectFiles,
     manageDeliveryFile,
     getProjectDeliverables,
     getPdf,

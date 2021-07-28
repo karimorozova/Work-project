@@ -270,10 +270,10 @@ router.post('/file-dr2-pull', async (req, res) => {
 })
 
 router.post('/multi-file-dr2-push', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
-	const { projectId, taskIds, dr1Manager, dr2Manager } = req.body
+	const { projectId, taskIds, filesFromVault } = req.body
 	const { refFiles } = req.files
 	try {
-		const DR2 = await addMultiLangDR2({ projectId, taskIds: JSON.parse(taskIds), dr1Manager, dr2Manager, refFiles })
+		const DR2 = await addMultiLangDR2({ projectId, taskIds: JSON.parse(taskIds), refFiles, filesFromVault: JSON.parse(filesFromVault) })
 		res.send(DR2)
 	} catch (err) {
 		console.log(err)
