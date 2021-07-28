@@ -104,7 +104,7 @@
                   .table__data {{ row.fileName }}
 
 
-        .modal__attention(v-if="!refFiles.length && !filesFromVault.filter(item => item.isCheck).length") Creating deliverable will be for the selected tasks: {{ selectedTasks.map((i) => i.substring(i.length - 3)).join(', ') }}
+        .modal__attention(v-if="refFiles.length || filesFromVault.filter(item => item.isCheck).length") Creating deliverable will be for the selected tasks: {{ selectedTasks.map((i) => i.substring(i.length - 3)).join(', ') }}
         .modal__button
           Button(
             value="Complete"
@@ -144,9 +144,9 @@
             CheckBox(:isChecked="!!row.isChecked" @check="()=> toggle(row, true)" @uncheck="()=>toggle(row, false)" customClass="tasks-n-steps")
           .table__data(slot="ID" slot-scope="{ row }") {{ row.deliveryInternalId }}
           .table__data(slot="name" slot-scope="{ row }") soon name ...
-          .table__data(slot="pair" slot-scope="{ row }" v-html="row.pair")
+          .table__data-langs(slot="pair" slot-scope="{ row }" v-html="row.pair")
           .table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
-          .table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
+          .table__data-tasks(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
           .table__data(slot="status" slot-scope="{ row }")
             .table__data-status
               .tooltip(v-if="row.status === 'Delivered'")
@@ -191,10 +191,10 @@
 					{ label: "", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
 					{ label: "Id", headerKey: "headerID", key: "ID", style: { "width": "17%" } },
 					{ label: "Name", headerKey: "headerName", key: "name", style: { "width": "17%" } },
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "17%" } },
 					{ label: "Tasks Id", headerKey: "headerTask", key: "task", style: { "width": "15%" } },
 					{ label: "Languages", headerKey: "headerPair", key: "pair", style: { "width": "17%" } },
 					{ label: "Files", headerKey: "headerFile", key: "file", style: { "width": "6%" } },
-					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "17%" } },
 					{ label: "Delivery", headerKey: "headerAction", key: "action", style: { "width": "8%" } }
 				],
 				fields2: [
@@ -235,6 +235,19 @@
 				approveDeliverMany: "approveDeliverMany",
 				setShowTasksAndDeliverables: "setShowTasksAndDeliverables"
 			}),
+			projectLanguages(tasks) {
+				if (!tasks.length) return '-'
+				const taskLanguages = tasks.map(({ sourceLanguage, targetLanguage }) => ({ sourceLanguage, targetLanguage }))
+				let groupedLanguages = Object.entries(_.groupBy(taskLanguages, 'sourceLanguage'))
+				groupedLanguages = groupedLanguages.map(item => {
+					return { sourceLanguage: item[0], targetLanguages: [ ...new Set(item[1].map(({ targetLanguage }) => targetLanguage)) ].join(';&ensp;') }
+				})
+				groupedLanguages = groupedLanguages.reduce((acc, curr) => {
+					acc = acc + `${ curr.sourceLanguage } <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ${ curr.targetLanguages } <br>`
+					return acc
+				}, '')
+				return groupedLanguages
+			},
 			toggleCheckVault(e, index, bool) {
 				const file = this.filesFromVault[index]
 				file.isCheck = bool
@@ -392,6 +405,14 @@
 				const target = this.allLang.find(({ _id }) => row.targetLanguage.toString() === _id.toString())
 				return source[type] + ' <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ' + target[type]
 			},
+			getLangPairByTasks(tasks) {
+				const filteredTasks = this.currentProject.tasks.filter(item => tasks.includes(item.taskId))
+
+				return [ ...new Set(filteredTasks.reduce((acc, curr) => {
+					acc.push(curr.sourceLanguage + ' <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ' + curr.targetLanguage)
+					return acc
+				}, [])) ].join(', ')
+			},
 			getTasksId(row) {
 				const mySet = new Set(row.tasks.map((field) => field.substring(field.length - 3)))
 				return [ ...mySet ].join(', ')
@@ -526,9 +547,6 @@
 					return [ 'Deliver' ]
 				}
 			},
-			// checkMultiReview() {
-			// 	return this.refFiles.length > 0 && this.selectedTasks.length > 0
-			// },
 			canUpdateDr2() {
 				return this.user.group.name === "Administrators" || this.user.group.name === "Developers" || this.currentProject.accountManager._id.toString() === this.user._id.toString()
 			},
@@ -565,7 +583,7 @@
 								type: 'multi',
 								status: item.status,
 								tasks: item.tasks,
-								pair: 'SOON...',
+								pair: this.getLangPairByTasks(item.tasks),
 								files: Array.isArray(item.file) ? item.file : [ item.file ],
 								isChecked: item.isChecked
 							}
@@ -690,7 +708,7 @@
 
   .modal {
 
-    &__attention{
+    &__attention {
       text-align: center;
       opacity: 0.5;
       margin-top: 20px;
@@ -759,12 +777,25 @@
       padding: 0 0 0 6px;
     }
 
+    &__data-tasks,
+    &__data-langs {
+      padding: 0 6px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      overflow-y: hidden;
+    }
+
+    &__data-status {
+      display: flex;
+    }
+
     &__data {
       padding: 0 6px;
       width: 100%;
       display: flex;
       align-items: center;
-      /*justify-content: space-between;*/
     }
 
     &__icons {
@@ -885,10 +916,6 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-
-      &__data-status {
-        display: flex;
-      }
 
 
       &__approveModal {
@@ -1044,28 +1071,29 @@
       font-size: 14px;
       visibility: hidden;
       width: 220px;
-      background-color: #66563d;
-      color: #fff;
+      background-color: white;
+      color: $text;
       text-align: center;
       border-radius: 4px;
       padding: 5px;
       position: absolute;
       z-index: 1;
-      left: 38px;
+      left: 23px;
       opacity: 0;
       top: -5px;
+      border: 1px solid $text;
       transition: opacity .3s;
 
       &::after {
         content: "";
         position: absolute;
-        top: 8px;
+        top: 6px;
         left: 0;
-        margin-left: -10px;
+        margin-left: -12px;
         transform: rotate(90deg);
-        border-width: 5px;
+        border-width: 6px;
         border-style: solid;
-        border-color: #66563d transparent transparent;
+        border-color: $text transparent transparent;
       }
     }
 

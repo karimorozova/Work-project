@@ -22,7 +22,6 @@
         @assignManager="assignManager"
       )
 
-
     span.relative
     .review__wrapper
       .review__wrapper-hide(v-if="!canUpdateDR1")
@@ -60,9 +59,6 @@
             ckeditor(v-model="deliveryTask.comment" :config="editorConfig")
             .notes__button( @click="sendMessage") Save Comment &nbsp;
               i.fa.fa-paper-plane(aria-hidden='true')
-
-      .review__button-certificate(v-if="!isCertificateExistInTaskDeliverablesComplianceServiceOnly")
-        Button(value="Add Certificate" @clicked="generateCertificate")
 
       .review__table
         TableDR1(
@@ -142,20 +138,6 @@
 			},
 			closeApproveModal() {
 				this.isApproveModal = false
-			},
-			async generateCertificate() {
-				try {
-					const updatedProject = await this.$http.post('/pm-manage/generate-certificate', {
-						project: this.project,
-						task: this.task,
-						deliveryTask: this.deliveryTask
-					})
-					await this.setCurrentProject(updatedProject.data)
-					await this.updatedFiles(updatedProject)
-					this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
-				} catch (err) {
-					this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
-				}
 			},
 			async removeFile(file) {
 				if (!this.canUpdateDR1) return
@@ -312,17 +294,6 @@
 			}),
 			groupedInstructions() {
 				return _.groupBy(this.deliveryTask.instructions, 'title')
-			},
-			isCertificateExistInTaskDeliverablesComplianceServiceOnly() {
-				if (this.files.length) {
-					const filesNames = this.files.map(i => i.fileName)
-					for (let str of filesNames) {
-						if (str.indexOf('certificate') !== -1) return true
-					}
-				}
-				const { service: { title } } = this.task
-				return title !== 'Compliance';
-
 			},
 			canCompleteTask() {
 				return this.deliveryTask.instructions.every(({ isChecked, isNotRelevant }) => isChecked || isNotRelevant)

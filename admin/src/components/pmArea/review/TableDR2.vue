@@ -35,7 +35,6 @@
       .review-table__data(slot="name" slot-scope="{ row }")
         span.review-table__file-name {{ row.fileName }}
 
-      .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .review-table__data(slot="task" slot-scope="{ row }")
         span(v-if="type ==='multi'") {{ getTasksIds(row.taskId) }}
         span(v-if="type ==='single'") {{ row.taskId.substring(row.taskId.length - 3)  }}
@@ -109,11 +108,10 @@
 			return {
 				fields: [
 					{ label: "", headerKey: "headerCheck", key: "check", style: { width: "4%" } },
-					{ label: "File Name", headerKey: "headerName", key: "name", style: { width: "21%" } },
-					{ label: "Task ID", headerKey: "headerTask", key: "task", style: { width: "8%" } },
-					{ label: "Language pair", headerKey: "headerPair", key: "pair", style: { width: "14%" } },
-					{ label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", style: { width: "19%" } },
-					{ label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", style: { width: "19%" } },
+					{ label: "File Name", headerKey: "headerName", key: "name", style: { width: "23%" } },
+					{ label: "Task ID", headerKey: "headerTask", key: "task", style: { width: "14%" } },
+					{ label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", style: { width: "22%" } },
+					{ label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", style: { width: "22%" } },
 					{ label: "Action", headerKey: "headerAction", key: "action", style: { width: "15%" } }
 				],
 				icons: {

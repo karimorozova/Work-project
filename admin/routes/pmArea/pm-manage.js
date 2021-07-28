@@ -728,100 +728,19 @@ router.post('/close-project', async (req, res) => {
 		console.log(err)
 		res.status(500).send('Error on close project')
 	}
-	console.log(req.body)
 })
 
 router.post('/generate-certificate', async (req, res) => {
-	const { project, task, deliveryTask } = req.body
+	const { project, type, tasks, deliveryData } = req.body
 	try {
-		await generateAndSaveCertificate({ project, task, deliveryTask })
-		const updatedProject = await saveCertificateTODR1Files(project, deliveryTask)
+		await generateAndSaveCertificate({ project, tasks })
+		const updatedProject = await saveCertificateTODR1Files(project, type, deliveryData)
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on generate certificate')
 	}
 })
-
-// TODO: refactoring client request
-// router.post('/assign-dr2', async (req, res) => {
-// 	const { taskId, projectId, dr2Manager } = req.body
-// 	try {
-// 		await changeReviewStage({ taskId, projectId })
-// 		const updatedProject = await updateProject({
-// 			'_id': projectId,
-// 			'tasks.taskId': taskId
-// 		}, { 'tasks.$.status': 'Pending Approval [DR2]' })
-// 		await notifyReadyForDr2({ dr2Manager, project: updatedProject, taskId })
-// 		res.send(updatedProject)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on approving deliverable')
-// 	}
-// })
-
-// router.post('/delivery-data', async (req, res) => {
-// 	const { taskId, projectId } = req.body
-// 	try {
-// 		const projectDelivery = await Delivery.findOne(
-// 				{ projectId, 'tasks.taskId': taskId },
-// 				{ 'tasks.$': 1 })
-// 				.populate('tasks.dr1Manager')
-// 				.populate('tasks.dr2Manager')
-// 		const result = projectDelivery.tasks[0]
-// 		res.send(result)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on getting delivery data')
-// 	}
-// })
-
-// router.get('/deliverables', async (req, res) => {
-// console.log('route IN DEV for admin  => /deliverables')
-// const { taskId } = req.query
-// try {
-// 	const project = await getProject({ 'tasks.taskId': taskId })
-// 	const task = project.tasks.find(({ taskId: tId }) => tId === taskId)
-// 	const review = await Delivery.findOne({ projectId: project.id, 'tasks.taskId': taskId }, { 'tasks.$': 1 })
-// 	if (task.deliverables) {
-// 		res.send({ link: task.deliverables })
-// 	} else {
-// 		const link = await getDeliverablesLink({ taskId, projectId: project.id, taskFiles: review.tasks[0].files })
-// 		if (link) {
-// 			await Projects.updateOne({ 'tasks.taskId': taskId }, { 'tasks.$.deliverables': link })
-// 		}
-// 		res.send({ link })
-// 	}
-// } catch (err) {
-// 	console.log(err)
-// 	res.status(500).send('Error on downloading deliverables')
-// }
-// })
-
-// router.post('/deliver', async (req, res) => {
-// 	const { tasks, user } = req.body
-// 	try {
-// 		const updatedProject = await getAfterTasksDelivery(tasks, user)
-// 		if (updateProject.status === 'Delivered' || updateProject.status === 'Closed') {
-// 			await notifyProjectDelivery(updatedProject)
-// 		}
-// 		res.send(updatedProject)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on delivering tasks')
-// 	}
-// })
-
-// router.post('/project-delivery', async (req, res) => {
-// 	const { _id, message } = req.body
-// 	try {
-// 		const updatedProject = await getAfterProjectDelivery(_id, message)
-// 		res.send(updatedProject)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on delivering tasks')
-// 	}
-// })
 
 router.post('/step-finance', async (req, res) => {
 	const { step } = req.body
@@ -1014,17 +933,6 @@ router.post('/making-cancel-message', async (req, res) => {
 		res.status(500).send('Error on making project cancelled message')
 	}
 })
-// TODO: refactoring client request
-// router.post('/making-delivery-message', async (req, res) => {
-// 	const { accManager, contact } = getAccManagerAndContact(req.body)
-// 	try {
-// 		const message = await projectDeliveryMessage({ ...req.body, accManager, contact })
-// 		res.send({ message })
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on making delivery message')
-// 	}
-// })
 
 router.post('/making-tasks-cancel-message', async (req, res) => {
 	const { project, tasks, reason, isPay } = req.body

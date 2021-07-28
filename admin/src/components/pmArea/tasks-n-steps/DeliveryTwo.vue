@@ -40,6 +40,9 @@
           .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save Comment &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
 
+    .review__button-certificate(v-if="!isCertificateExist && isServiceForCertificate")
+      Button(value="Add Certificate" @clicked="generateCertificate")
+
     .review__table
       TableDR2(
         :type="type"
@@ -138,6 +141,25 @@
 				"setCurrentProject",
 				"setShowTasksAndDeliverables"
 			]),
+			async generateCertificate() {
+				const tasks = this.type === 'single'
+						? this.deliveryData.files.map(item => item.taskId)
+						: this.deliveryData.tasks
+
+				try {
+					const updatedProject = await this.$http.post('/pm-manage/generate-certificate', {
+						project: this.project,
+						type: this.type,
+						tasks,
+						deliveryData: this.deliveryData
+					})
+					await this.setCurrentProject(updatedProject.data)
+					await this.updatedFiles(updatedProject)
+					this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
+				}
+			},
 			toggleCommentEmail() {
 				this.isComment = !this.isComment
 			},
@@ -224,9 +246,9 @@
 			async uploadFile({ file, index }) {
 				const { path } = index !== undefined ? this.files[index] : { path: "" }
 				const fileData = new FormData()
-        for (var i = 0; i < file.length; i++) {
-          fileData.append("targetFile", file[i])
-        }
+				for (let i = 0; i < file.length; i++) {
+					fileData.append("targetFile", file[i])
+				}
 				fileData.append("projectId", this.project._id)
 				fileData.append("path", path)
 				fileData.append("entityId", this.deliveryData._id)
@@ -234,7 +256,6 @@
 				fileData.append("user", this.user._id)
 				fileData.append("dr1Manager", this.project.projectManager._id)
 				try {
-				  debugger
 					const updatedProject = await this.$http.post("/delivery/target-dr2", fileData)
 					await this.setCurrentProject(updatedProject.data)
 					await this.updatedFiles(updatedProject)
@@ -369,6 +390,26 @@
 			...mapGetters({
 				requestCounter: 'getRequestCounter'
 			}),
+			isServiceForCertificate(){
+				if(Object.keys(this.deliveryData).length && this.type && this.project){
+					let tasks = this.type === 'single'
+							? this.deliveryData.files.map(item => item.taskId)
+							: this.deliveryData.tasks
+          tasks = tasks.filter(item => item !== "Loaded in DR2")
+
+          const services = this.project.tasks.filter(item => tasks.includes( item.taskId)).map(item => item.service.title)
+					return services.length && services.every(item => item === 'Compliance' || item === 'Translation')
+        }
+      },
+			isCertificateExist() {
+				if (this.files.length) {
+					const filesNames = this.files.map(i => i.fileName)
+					for (let str of filesNames) {
+						if (str.indexOf('certificate') !== -1) return true
+					}
+				  return false
+				}
+			},
 			contactsNames() {
 				return this.project.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
 			},
@@ -376,11 +417,9 @@
 				const { tasksDR2 } = this.project
 				if (this.type === 'single') {
 					const deliveryData = tasksDR2.singleLang.find(item => `${ item._id }` === `${ this.id }`)
-					console.log('deliveryDataS', deliveryData)
 					return deliveryData
 				} else {
 					const deliveryData = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
-					console.log('deliveryDataM', deliveryData)
 					return deliveryData
 				}
 			},

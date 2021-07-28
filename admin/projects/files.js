@@ -159,9 +159,9 @@ async function getPdf(allUnits, allSettingsSteps, project, tasksIds = []) {
     }
 }
 
-const generateAndSaveCertificate = async ({ project, task, deliveryTask }) => {
+const generateAndSaveCertificate = async ({ project, tasks }) => {
     const allLanguages = await Languages.find()
-    const template = getCertificateTemplate({ project, task, deliveryTask, allLanguages })
+    const template = getCertificateTemplate({ project, allLanguages, tasks })
     const pdf = new Promise((resolve, reject) => {
         htmlToPdf.create(
             template,
