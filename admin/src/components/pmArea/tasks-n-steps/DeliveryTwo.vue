@@ -208,14 +208,12 @@
 			},
 			async removeFile(file) {
 				try {
-				  debugger
 					const updatedProject = await this.$http.post("/delivery/remove-dr2-file", {
 						...file,
 						projectId: this.project._id,
 						type: this.type,
 						entityId: this.id
 					})
-          debugger
 					await this.setCurrentProject(updatedProject.data)
 					await this.updatedFiles(updatedProject)
 					this.alertToggle({ message: "File removed!", isShow: true, type: "success" })

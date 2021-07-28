@@ -94,9 +94,12 @@ router.post('/remove-dr2-file', async (req, res) => {
 			)
 
 		}
-		fs.unlink(`./dist${ path }`, (err) => {
-			if (err) throw(err)
-		})
+
+		if(await fs.existsSync(`./dist${path}`)) {
+			fs.unlink(`./dist${ path }`, (err) => {
+				if (err) throw(err)
+			})
+		}
 		const updatedProject = await getProject({ "_id": projectId })
 		res.send(updatedProject)
 	} catch (err) {
@@ -192,9 +195,11 @@ router.post('/remove-dr-file', async (req, res) => {
 	const { taskId, path, projectId } = req.body
 	try {
 		await Projects.updateOne({ "_id": projectId, 'tasksDR1.files.path': path }, { $pull: { 'tasksDR1.$[i].files': { path } } }, { arrayFilters: [ { 'i.taskId': taskId } ] })
-		fs.unlink(`./dist${ path }`, (err) => {
-			if (err) throw(err)
-		})
+		if(await fs.existsSync(`./dist${path}`)) {
+			fs.unlink(`./dist${ path }`, (err) => {
+				if (err) throw(err)
+			})
+		}
 		const updatedProject = await getProject({ "_id": projectId })
 		res.send(updatedProject)
 	} catch (err) {

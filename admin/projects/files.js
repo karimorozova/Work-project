@@ -124,9 +124,12 @@ async function manageDeliveryFile({fileData, file}) {
         const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
         await moveFile(file, `./dist${newPath}`);
         if(!!path && path !== newPath) {
-            fs.unlink(`./dist${path}`, (err) => {
-                if(err) throw(err);
-            });
+            if(await fs.existsSync(`./dist${path}`)) {
+                fs.unlink(`./dist${path}`, (err) => {
+                    if(err) throw(err);
+                });
+            }
+
             return newPath;
         } else {
             return newPath;

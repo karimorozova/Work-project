@@ -403,7 +403,7 @@ const targetFileDR2 = async (fileData, files) => {
 			)
 		}
 	} else {
-		const { file } = project.tasksDR2.multiLang.find(({ _id }) => _id.toString() === entityId)
+		// const { file } = project.tasksDR2.multiLang.find(({ _id }) => _id.toString() === entityId)
 		let filesRedyToPush = []
 		if (!!path) {
 			const newPath = await manageDeliveryFile({ fileData, file: files[0] })
