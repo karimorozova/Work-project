@@ -218,7 +218,7 @@ const ProjectsSchema = new mongoose.Schema({
         type: Date,
         default: ""
       },
-      file: {
+      file: [{
         fileName: {
           type: String,
           default: "",
@@ -241,7 +241,7 @@ const ProjectsSchema = new mongoose.Schema({
           type: Schema.Types.ObjectId,
           ref: "User"
         },
-      }
+      }]
     }],
   },
   tasksDeliverables: [{

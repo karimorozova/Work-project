@@ -203,17 +203,19 @@
 					this.files = files.map(item => ({ ...item, isChecked: false }))
 				} else {
 					const { file, tasks } = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
-					this.files = [ { ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false } ]
+					this.files = file.map(files => ({ ...files, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false }))
 				}
 			},
 			async removeFile(file) {
 				try {
+				  debugger
 					const updatedProject = await this.$http.post("/delivery/remove-dr2-file", {
 						...file,
 						projectId: this.project._id,
 						type: this.type,
 						entityId: this.id
 					})
+          debugger
 					await this.setCurrentProject(updatedProject.data)
 					await this.updatedFiles(updatedProject)
 					this.alertToggle({ message: "File removed!", isShow: true, type: "success" })
@@ -224,7 +226,9 @@
 			async uploadFile({ file, index }) {
 				const { path } = index !== undefined ? this.files[index] : { path: "" }
 				const fileData = new FormData()
-				fileData.append("targetFile", file)
+        for (var i = 0; i < file.length; i++) {
+          fileData.append("targetFile", file[i])
+        }
 				fileData.append("projectId", this.project._id)
 				fileData.append("path", path)
 				fileData.append("entityId", this.deliveryData._id)
@@ -232,6 +236,7 @@
 				fileData.append("user", this.user._id)
 				fileData.append("dr1Manager", this.project.projectManager._id)
 				try {
+				  debugger
 					const updatedProject = await this.$http.post("/delivery/target-dr2", fileData)
 					await this.setCurrentProject(updatedProject.data)
 					await this.updatedFiles(updatedProject)
@@ -412,7 +417,7 @@
 				this.files = files.map(item => ({ ...item, isChecked: false }))
 			} else {
 				const { file, tasks } = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
-				this.files = [ { ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false } ]
+				this.files = file.map(files => ({ ...files, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false }))
 			}
 			this.setDefaultContact()
 		}

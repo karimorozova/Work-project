@@ -66,9 +66,11 @@
           img.review-table__icon(:src="icons.download.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'download')")
           .review-table__upload( :class="{'review-table_opacity-04': row.isFileApproved}")
             input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
-          span(v-if="type === 'single'")
+          //span(v-if="type === 'single'")
+          span
             img.review-table__icon(:src="icons.delete.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'delete')")
           i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
+          //span
           span(v-if="type === 'single'")
             i.review-table__rollback-icon.fas.fa-undo-alt(v-if="!row.isFileApproved && row.taskId !== 'Loaded in DR2'"  @click="rollback(row.taskId)")
 
@@ -76,8 +78,8 @@
           img.review-table__icon(:src="icons.lock.src" :class="{'review-table_opacity-04': row.isFileApproved}")
 
 
-    .review-table__upload.review-table_no-back(v-if="type === 'single' && canAddDR2Manager ")
-      input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing")
+    .review-table__upload.review-table_no-back(v-if=" canAddDR2Manager ")
+      input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing" :multiple="type !== 'single'")
       Add
 
 </template>
@@ -221,7 +223,7 @@
 				link.click()
 			},
 			uploadFile(e, index) {
-				const file = e.target.files[0]
+				const file = e.target.files
 				this.$emit('uploadFile', { file, index })
 				e.target.value = ""
 			},

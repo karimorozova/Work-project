@@ -70,7 +70,7 @@ router.post('/target-dr2', upload.fields([ { name: 'targetFile' } ]), async (req
 })
 
 router.post('/remove-dr2-file', async (req, res) => {
-	const { type, taskId, projectId, path, entityId } = req.body
+	const {  type, taskId, projectId, path, entityId } = req.body
 	try {
 		if (type === 'single') {
 			if (taskId !== 'Loaded in DR2') {
@@ -85,10 +85,18 @@ router.post('/remove-dr2-file', async (req, res) => {
 					{ $pull: { "tasksDR2.singleLang.$[i].files": { path } } },
 					{ arrayFilters: [ { 'i._id': entityId } ] }
 			)
-			fs.unlink(`./dist${ path }`, (err) => {
-				if (err) throw(err)
-			})
+
+		}else{
+			await Projects.updateOne(
+					{ "_id": projectId, 'tasksDR2.multiLang._id': entityId, "tasksDR2.multiLang.file.path": path },
+					{ $pull: { "tasksDR2.multiLang.$[i].file": { path } } },
+					{ arrayFilters: [ { 'i._id': entityId } ] }
+			)
+
 		}
+		fs.unlink(`./dist${ path }`, (err) => {
+			if (err) throw(err)
+		})
 		const updatedProject = await getProject({ "_id": projectId })
 		res.send(updatedProject)
 	} catch (err) {
