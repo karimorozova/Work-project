@@ -1,5 +1,5 @@
 <template lang="pug">
-  .layoutTable(@scroll="bottomScrolled" :style="{ 'max-height': maxHeight > 1200 ? 1200 : maxHeight + 'px' }")
+  .layoutTable(@scroll="bottomScrolled" :style="{ 'max-height': getUserHeight + 'px' }")
     .th__modals
       ApproveModal(
         v-if="isApproveModal"
@@ -34,13 +34,10 @@
 
 <script>
 	import ApproveModal from './ApproveModal'
+	import { mapGetters } from "vuex"
 
 	export default {
 		props: {
-			maxHeight: {
-				type: Number,
-        default: 554
-			},
 			fields: {
 				type: Array,
 				default: () => []
@@ -52,6 +49,11 @@
 			isApproveModal: {
 				type: Boolean,
 				default: false
+			}
+		},
+		data() {
+			return {
+				innerHeight: 0
 			}
 		},
 		methods: {
@@ -77,6 +79,21 @@
 				const element = e.target
 				if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
 					this.$emit("bottomScrolled")
+				}
+			}
+		},
+		mounted() {
+			this.innerHeight = window.innerHeight
+		},
+		computed: {
+			...mapGetters({
+				user: "getUser"
+			}),
+			getUserHeight() {
+				if (Object.keys(this.user).length) {
+					const { layoutsSettings: { project: { filters } } } = this.user
+					const height = Math.floor(this.innerHeight - (66 * Math.ceil(filters.length / 6)) - 185)
+					return height > 1200 ? 1200 : height
 				}
 			}
 		},
