@@ -340,11 +340,11 @@
 				return Math.ceil(progress) > 100 ? 100 : Math.ceil(progress)
 			},
 			inXtrf(project) {
-				const { tasks, isSendToXtrf, xtrfLink } = project
+				const { tasks, isSendToXtrf, xtrfLink, xtrfLinks } = project
 				if (!tasks.length) return '-'
 
 				if (tasks.length && tasks.every(({ service }) => service.title === 'Compliance')) {
-					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					if (isSendToXtrf && xtrfLinks && xtrfLinks.length ) return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
 					else return 'Not transferred yet'
 				}
 

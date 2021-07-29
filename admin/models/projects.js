@@ -448,6 +448,10 @@ const ProjectsSchema = new mongoose.Schema({
 		type: String,
 		default: ''
 	},
+	xtrfLinks: {
+		type: Array,
+		default: []
+	},
 	isTest: {
 		type: Boolean,
 		default: false

@@ -1,12 +1,17 @@
 <template lang="pug">
   .projectToXtrf
     .projectToXtrf__buttons
-      Button(v-if="!project.isSendToXtrf && !project.xtrfLink" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
+      Button(v-if="true" value="Send tasks to XTRF" @clicked="sendTo" :isDisabled="isDisable")
+      .xtrf-tasks(v-for="xtrfTask of project.xtrfLinks")
+        span {{ xtrfTask.taskId}}
+        a( target="_blank" :href="xtrfTask.link")
+          i(class="fas fa-link")
 
-      a(v-else target="_blank" :href="project.xtrfLink")
-        Button(value="Go to XTRF Project")
-      br
-      Button(v-if="project.xtrfLink" value="Update Fiance / Close Jobs & Project" @clicked="updateFinance")
+
+      //a( target="_blank" :href="project.xtrfLink || ''")
+        //Button(value="Go to XTRF Project")
+      //br
+      //Button(v-if="project.xtrfLink" value="Update Fiance / Close Jobs & Project" @clicked="updateFinance")
 
 
 
@@ -54,23 +59,24 @@
 			sendTo() {
 				this.isDisable = true
 				axios
-						.get('/pm-manage/createXtrfProjectWithFinance/' + this.$route.params.id)
+						.post('/pm-manage/createXtrfTasksWithFinance/' + this.$route.params.id)
 						.then((res) => res.data)
 						.then((data) => {
-							if (data.isSuccess) {
-								const notFoundVendorsMessage = data.noFoundVendors.length ? ", but we can not find some vendors: " + data.noFoundVendors.join(", ") : ''
+							if (!!data) {
+							// 	const notFoundVendorsMessage = data.noFoundVendors.length ? ", but we can not find some vendors: " + data.noFoundVendors.join(", ") : ''
 								this.alertToggle({
-									message: "Send success" + notFoundVendorsMessage,
+									// message: "Send success" + notFoundVendorsMessage,
+									message: "Send success",
 									isShow: true,
 									type: "success"
 								})
 								this.$emit('refreshProject')
 							} else {
-								this.alertToggle({
-									message: data.message,
-									isShow: true,
-									type: "error"
-								})
+								// this.alertToggle({
+								// 	message: data.message,
+								// 	isShow: true,
+								// 	type: "error"
+								// })
 							}
 						})
 						.finally(() => this.isDisable = false)
@@ -81,6 +87,17 @@
 </script>
 
 <style scoped lang="scss">
+  .xtrf-tasks {
+    margin: 10px 0;
+    span {
+      margin-right: 5px;
+
+    }
+    &__group {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
   .projectToXtrf {
     box-sizing: border-box;
     padding: 20px;

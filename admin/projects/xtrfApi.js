@@ -1,6 +1,6 @@
 const { Projects } = require('../models/')
 const axios = require("axios")
-const request = require('request')
+// const request = require('request')
 
 const { writeFileSync, readFileSync, createReadStream } = require('fs')
 const csv = require('csv-parser')
@@ -35,7 +35,6 @@ const errorMessages = {
 	cannotFindLanguage: "Sorry! We can not find language pair",
 	cannotSendProject: "Sorry! We can not send the project to XTRF"
 }
-// const services = { Translation: 80, Compliance: 79, Copywriting: 81, NewsletterSMS: 81 }
 const STEP_IDS = {
 	Translation: {
 		services: 80,
