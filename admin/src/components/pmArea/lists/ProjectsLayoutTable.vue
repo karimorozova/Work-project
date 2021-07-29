@@ -138,7 +138,7 @@
 						label: "Project Id",
 						headerKey: "headerID",
 						key: "projectId",
-						style: { "width": "135px" }
+						style: { "width": "140px" }
 					},
 					{
 						label: "Project Name",
