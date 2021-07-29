@@ -45,7 +45,7 @@
       transition: .2s ease-out;
       text-align: center;
       border: 2px solid $red;
-      min-width: 120px;
+      min-width: 110px;
       padding: 0 24px 0 24px;
       height: 32px;
       color: $red;
@@ -75,7 +75,7 @@
 
   .action-button {
     &__button {
-      min-width: 120px;
+      min-width: 110px;
       padding: 0 24px 0 24px;
       height: 32px;
       color: $white;
@@ -107,7 +107,7 @@
 
   .main-nav_button {
     .action-button__button {
-      min-width: 120px;
+      min-width: 110px;
       padding: 0 24px 0 24px;
       height: 32px;
       color: $white;
@@ -133,7 +133,7 @@
   .disabled {
     .action-button__button {
       opacity: 0.4;
-      min-width: 120px;
+      min-width: 110px;
       padding: 0 24px 0 24px;
       height: 32px;
       color: $white;

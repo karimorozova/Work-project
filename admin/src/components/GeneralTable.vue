@@ -1,23 +1,6 @@
 <template lang="pug">
   .generalTable
 
-    .th__modals
-      ValidationErrors(
-        v-if="areErrors"
-        :errors="errors"
-        :isAbsolute="isAbsolute"
-        @closeErrors="closeErrors"
-      )
-      ApproveModal(
-        v-if="isApproveModal"
-        text="Are you sure?"
-        approveValue="Yes"
-        notApproveValue="Cancel"
-        @approve="approve"
-        @notApprove="notApprove"
-        @close="closeModal"
-      )
-
     .filter(v-if="isFilterShow" @click="showFilter")
       span(v-if="!showFilters")
         i.fas.fa-filter
@@ -52,6 +35,24 @@
         tr.data(v-for="(row, index) of tableData")
           td(v-for="field of fields" :style="field.style")
             slot(:name="field.key" :row="row" :index="index" )
+
+
+    ValidationErrors(
+      v-if="areErrors"
+      :errors="errors"
+      :isAbsolute="true"
+      @closeErrors="closeErrors"
+    )
+    .approve(v-if="isApproveModal")
+      ApproveModal(
+        v-if="isApproveModal"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approve"
+        @notApprove="notApprove"
+        @close="closeModal"
+      )
 
 </template>
 
@@ -151,6 +152,18 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors";
 
+  .generalTable {
+    position: relative
+  }
+
+  .approve {
+    position: absolute;
+    z-index: 50;
+    background-color: transparent;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 
   .filter {
     border: 1px solid $border;

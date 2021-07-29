@@ -14,7 +14,6 @@
       .project-action__title-text Project Action
 
     .project-action__drop-menuSend
-      .project-details Project Details:
       .project-action__dropBody
         SelectSingle(
           :selectedOption="selectedAction"

@@ -36,8 +36,9 @@
     }
 
     &__icon {
-      font-size: 16px;
+      font-size: 15px;
       color: $dark-border;
+      margin-top: 1px;
     }
 
   }
