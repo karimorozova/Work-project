@@ -203,6 +203,7 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 		const instructions = service.title === 'Compliance' ? drInstructionsCompliance : dr2Instructions
 		singleLang.push({
 			deliveryInternalId: returnNewDeliveryId(strId, singleLang, multiLang),
+			deliveryName: strId,
 			status: 'Pending Approval [DR2]',
 			sourceLanguage: sourceLang._id,
 			targetLanguage: targetLang._id,
@@ -218,6 +219,18 @@ const sendNotificationToDR2 = async (projectId, taskIds, accountManager) => {
 	const messageToNew = managerDr1Assigned({ taskId: taskIds, project, manager: allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`) }, '2')
 	await managerNotifyMail(allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`), messageToNew, `The DR2 has been assigned to you: ${ project.projectId } (I009.1)`)
 }
+
+const changeNameLang = async ({projectId, deliveryId, deliveryName, type}) => {
+	const deliveryType = type === 'single' ? 'singleLang': 'multiLang'
+	await Projects.updateOne(
+			{ "_id": projectId, [`tasksDR2.${deliveryType}._id`]: deliveryId },
+			{ [`tasksDR2.${deliveryType}.$[i].deliveryName`]: deliveryName },
+			{ arrayFilters: [ { 'i._id': deliveryId } ] }
+	)
+	return await getProject({ _id: projectId })
+}
+
+
 
 function returnNewDeliveryId(projectId, singleLang, multiLang) {
 	if (!singleLang.length && !multiLang.length) return `${ projectId } D01`
@@ -291,6 +304,7 @@ async function addMultiLangDR2({ projectId, taskIds, refFiles, filesFromVault })
 
 	let multiLang = {
 		deliveryInternalId: returnNewDeliveryId(strId, singleLang, projectMultiLang),
+		deliveryName: strId,
 		tasks: taskIds,
 		instructions: dr2Instructions,
 		status: 'Pending Approval [DR2]',
@@ -585,20 +599,52 @@ const changeManagersDR1 = async ({ projectId, checkedTasksId, manager }) => {
 	return await getProject({ "_id": projectId })
 }
 
-const saveCertificateTODR1Files = async ({ _id }, { taskId }) => {
+const saveCertificateTODR1Files = async (project, type, deliveryData) => {
 	const additionFileInfo = `${ Math.floor(Math.random() * 1000000) }`
-	const newPath = `/projectFiles/${ _id }/${ additionFileInfo }-certificate.pdf`
+	const fileName = `${ additionFileInfo }-certificate.pdf`
+	const newPath = `/projectFiles/${ project._id }/${ fileName }`
 	try {
 		await moveFile({ path: './dist/uploads/certificatePdf.pdf' }, `./dist${ newPath }`)
-		await Projects.updateOne(
-				{ _id, 'tasksDR1.taskId': taskId },
-				{ $push: { 'tasksDR1.$.files': { isFileApproved: false, fileName: `${ additionFileInfo }-certificate.pdf`, path: newPath } } }
-		)
+
+		if (type === 'single') {
+			const allLanguages = await Languages.find()
+			const file = {
+				isFileApproved: false,
+				pair: `${ allLanguages.find(item => item._id.toString() === deliveryData.sourceLanguage).symbol } >> ${ allLanguages.find(item => item._id.toString() === deliveryData.targetLanguage).symbol }`,
+				fileName,
+				path: newPath,
+				taskId: 'Loaded in DR2',
+				dr1Manager: project.projectManager._id,
+				dr2Manager: project.accountManager._id
+			}
+
+			await Projects.updateOne(
+					{ "_id": project._id, 'tasksDR2.singleLang._id': deliveryData._id },
+					{ $push: { "tasksDR2.singleLang.$[i].files": file } },
+					{ arrayFilters: [ { 'i._id': deliveryData._id } ] }
+			)
+		}
+
+		if (type === 'multi') {
+			const file = {
+				fileName,
+				path: newPath,
+				isFileApproved: false,
+				dr1Manager: project.projectManager._id,
+				dr2Manager: project.accountManager._id
+			}
+
+			await Projects.updateOne(
+					{ "_id": project._id, 'tasksDR2.multiLang._id': deliveryData._id },
+					{ $push: { "tasksDR2.multiLang.$[i].file": file } },
+					{ arrayFilters: [ { 'i._id': deliveryData._id } ] }
+			)
+		}
 	} catch (err) {
 		console.log(err)
 		console.log("Error in saveCertificateTODR1Files")
 	}
-	return await getProject({ _id })
+	return await getProject({ _id: project._id })
 }
 
 module.exports = {
@@ -619,5 +665,6 @@ module.exports = {
 	changeManagerDR2,
 	changeManager,
 	rollbackReview,
-	targetFileDR2
+	targetFileDR2,
+	changeNameLang,
 }

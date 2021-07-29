@@ -40,9 +40,10 @@
           ckeditor(v-model="deliveryData.comment" :config="editorConfig")
           .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save Comment &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
-
-    .review__button-certificate(v-if="!isCertificateExist && isServiceForCertificate")
-      Button(value="Add Certificate" @clicked="generateCertificate")
+    .relative__wrapper(v-if="!isCertificateExist && isServiceForCertificate")
+      .review__button-certificate
+        input.field__name(type="text" placeholder="Delivery Name" :value="deliveryData.deliveryName" @change="setDeliveryName" @keyup.13="setDeliveryName")
+        Button(value="Add Certificate" @clicked="generateCertificate")
 
     .review__table
       TableDR2(
@@ -125,7 +126,7 @@
 				taskIdRollback: null,
 				selectedContacts: [],
 				comment: "",
-				isComment: false
+				isComment: false,
 			}
 		},
 		beforeDestroy() {
@@ -385,7 +386,15 @@
 				this.selectedContacts = []
 				const { firstName, surname } = this.project.clientContacts[0]
 				this.selectedContacts.push(`${ firstName } ${ surname }`)
-			}
+			},
+      async setDeliveryName(e) {
+        const { value } = e.target
+        const deliveryId = this.deliveryData._id
+        const projectId = this.project._id
+        const updatedProject =  await this.$http.post('/delivery/dr2-name-change', {projectId, deliveryId , deliveryName: value,type: this.type})
+        await this.setCurrentProject(updatedProject.data)
+
+      },
 		},
 		computed: {
 			...mapGetters({
@@ -464,6 +473,18 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+  .field__name{
+    font-size: 14px;
+    color: #3d3d3d;
+    border: 1px solid #bfbfbf;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+  }
 
   .dr1Comment {
     &__title {
@@ -504,6 +525,20 @@
     position: relative;
     width: 1000px;
     border-radius: 4px;
+    
+    &__button-certificate {
+      position: absolute;
+      display: flex;
+      top: 20px;
+      z-index: 5;
+
+      input {
+        margin-right: 15px;
+      }
+    }
+    .relative__wrapper {
+      position: relative;
+    }
 
     &__checkSubTitle {
       border-bottom: 1px solid $border;

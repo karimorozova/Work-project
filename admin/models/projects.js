@@ -141,6 +141,11 @@ const ProjectsSchema = new mongoose.Schema({
 		    default: '',
 		    trim: true
 	    },
+	    deliveryName: {
+		    type: String,
+		    trim: true,
+		    default: ''
+	    },
       status: {
         type: String,
         default: '',
@@ -200,6 +205,11 @@ const ProjectsSchema = new mongoose.Schema({
 		    type: String,
 		    default: '',
 		    trim: true
+	    },
+	    deliveryName: {
+	    	type: String,
+		    trim: true,
+		    default: ''
 	    },
       status: {
         type: String,

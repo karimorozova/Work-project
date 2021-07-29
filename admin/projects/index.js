@@ -97,6 +97,7 @@ const {
 	approveFilesDR2,
 	changeManagersDR1,
 	saveCertificateTODR1Files,
+	changeNameLang,
 } = require('./delivery')
 
 const {
@@ -173,6 +174,7 @@ module.exports = {
 	addDR2,
 	addMultiLangDR2,
 	removeMultiDR2,
+	changeNameLang,
 	// getClientsRequests,
 	// getClientRequestById,
 }

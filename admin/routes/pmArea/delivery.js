@@ -24,7 +24,8 @@ const {
 	targetFileDR1,
 	approveInstructionDR2,
 	approveFilesDR2,
-	changeManagersDR1
+	changeManagersDR1,
+	changeNameLang,
 } = require("../../projects")
 
 const {
@@ -274,6 +275,17 @@ router.post('/file-dr2-pull', async (req, res) => {
 	}
 })
 
+router.post('/dr2-name-change', async (req, res) => {
+	const { projectId, deliveryId, deliveryName, type } = req.body
+	try {
+		const project = await changeNameLang({ projectId, deliveryId, deliveryName, type })
+		res.send(project)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on multi-name-dr2-change')
+	}
+
+})
 router.post('/multi-file-dr2-push', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
 	const { projectId, taskIds, filesFromVault } = req.body
 	const { refFiles } = req.files
