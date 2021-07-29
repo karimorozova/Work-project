@@ -48,7 +48,7 @@ export default {
 			}
 		},
 		setDefaultService() {
-			console.log('project-1', this.currentProject)
+
 
 			const service = this.currentClientServices().find(i => i)
 			if (!service.steps.length) return this.showError()

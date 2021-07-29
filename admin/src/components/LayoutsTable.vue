@@ -1,6 +1,5 @@
 <template lang="pug">
-  .layoutTable(@scroll="bottomScrolled")
-
+  .layoutTable(@scroll="bottomScrolled" :style="{ 'max-height': maxHeight > 1200 ? 1200 : maxHeight + 'px' }")
     .th__modals
       ApproveModal(
         v-if="isApproveModal"
@@ -38,6 +37,10 @@
 
 	export default {
 		props: {
+			maxHeight: {
+				type: Number,
+        default: 554
+			},
 			fields: {
 				type: Array,
 				default: () => []
@@ -49,11 +52,6 @@
 			isApproveModal: {
 				type: Boolean,
 				default: false
-			}
-		},
-		data() {
-			return {
-				elementToScroll: 15
 			}
 		},
 		methods: {
@@ -93,7 +91,6 @@
 
   .layoutTable {
     overflow: auto;
-    max-height: 600px;
     border: 1px solid $border;
   }
 
@@ -183,10 +180,11 @@
     padding: 0;
   }
 
-  table td{
+  table td {
 
     box-shadow: inset -1px 0 0 $light-border;
   }
+
   table th {
     box-shadow: inset -1px 0 0 $border;
   }
@@ -219,17 +217,4 @@
     background-color: $table-list-hover !important;
     cursor: default;
   }
-
-  /*.hideScrollBlock {*/
-  /*  height: 40px;*/
-  /*  width: 20px;*/
-  /*  background: white;*/
-  /*  position: absolute;*/
-  /*  right: 1px;*/
-  /*  z-index: 1;*/
-  /*}*/
-
-  /*.scroll {*/
-  /*  overflow-y: scroll;*/
-  /*}*/
 </style>

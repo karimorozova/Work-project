@@ -88,7 +88,7 @@
     &__item {
       cursor: pointer;
       padding: 0 7px;
-      height: 31px;
+      height: 28px;
       border-bottom: 1px solid #ededed;
       display: flex;
       align-items: center;

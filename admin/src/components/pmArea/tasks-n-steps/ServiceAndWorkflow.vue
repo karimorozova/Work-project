@@ -134,7 +134,6 @@
 				let defaultStepsAndUnits = null
 				const service = this.services.find(item => item.title === this.service)
 				const { steps } = service
-				console.log('service', service)
 
 				if (option === "2 Steps") {
 					let unit1 = returnUnit(0, this.originallySteps)

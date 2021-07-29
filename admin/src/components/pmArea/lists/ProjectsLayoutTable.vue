@@ -1,13 +1,14 @@
 <template lang="pug">
   .table
 
-    .table__filters
+    .table__filters(ref="filter")
       ProjectsLayoutFilter
 
     .table__result
       LayoutsTable(
         :fields="filteredFields"
         :tableData="list"
+        :maxHeight="maxHeight"
         @bottomScrolled="bottomScrolled"
       )
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -131,6 +132,7 @@
 		},
 		data() {
 			return {
+				maxHeight: 0,
 				fields: [
 					{
 						label: "Project Id",
@@ -419,6 +421,13 @@
 					return filteredFields
 				}
 			}
+		},
+		mounted() {
+			setTimeout(() => {
+        if(this.$refs.filter.clientHeight){
+	        this.maxHeight = Math.floor(+window.innerHeight - +this.$refs.filter.clientHeight - 185)
+        }
+			}, 20)
 		},
 		components: { ProgressLine, ProjectsLayoutFilter, LayoutsTable }
 	}
