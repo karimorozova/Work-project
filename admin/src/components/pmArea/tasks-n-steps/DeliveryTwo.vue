@@ -6,6 +6,7 @@
       RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBackApprove")
 
     .review__title Delivery Review 2
+
     .review__check
       .review__headers
         .review__headers-item Check

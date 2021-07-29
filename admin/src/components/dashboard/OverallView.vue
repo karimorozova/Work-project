@@ -173,7 +173,7 @@
     .row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 50px;
+      margin-bottom: 35px;
     }
 
     .col {
