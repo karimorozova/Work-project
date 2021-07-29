@@ -146,7 +146,7 @@
   }
 
   a {
-    color: $table;
+    color: $text;
     text-decoration: none;
     transition: .2s ease-out;
 

@@ -260,10 +260,11 @@
         .buttonRow {
           &__button {
             width: 50%;
-            background: $light-border;
+            background: $table-list;
             color: $text;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
+            font-family: 'Myriad600';
             display: flex;
             justify-content: center;
             align-items: center;
@@ -271,7 +272,7 @@
             transition: .1s ease-out;
 
             &:hover {
-              background-color: $border;
+              background-color: $table-list-hover;
             }
           }
         }

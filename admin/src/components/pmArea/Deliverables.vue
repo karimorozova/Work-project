@@ -48,6 +48,7 @@
         span.modal__close-modal(@click="closeTasksModal()") &#215;
         .deliverables__select
           SelectMulti(
+            :allOptionsButtons="true"
             placeholder="Select"
             :options="selectTaskInfo"
             :selectedOptions="selectedTasks"
@@ -113,7 +114,7 @@
           )
 
 
-      .deliverables__header
+      .deliverables__header(v-if="isShowTasksAndDeliverables")
         .deliverables__title Deliverables
         .deliverablesActions(v-if="!isProjectFinished")
           .deliverablesActions__title Deliverables Action:
@@ -125,7 +126,7 @@
               @chooseOption="setAction"
             )
 
-      .table
+      .table(v-if="isShowTasksAndDeliverables")
         GeneralTable(
           :fields="fields"
           :tableData="deliverables"
@@ -164,7 +165,7 @@
             .table__icons(v-if="row.status !== 'Ready for Delivery'")
               img.table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
 
-      Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showTasksModal")
+      Add(v-if="canUploadDR1 && currentProject.status !== 'Closed' && isShowTasksAndDeliverables" @add="showTasksModal")
 </template>
 
 <script>

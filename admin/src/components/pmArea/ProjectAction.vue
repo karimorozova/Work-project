@@ -236,18 +236,6 @@
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
-			// async getDeliveryMessage() {
-			// 	try {
-			// 		const template = await this.$http.post(
-			// 				"/pm-manage/making-delivery-message",
-			// 				{ ...this.project }
-			// 		);
-			// 		this.previewMessage = template.body.message;
-			// 		this.openPreview();
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" });
-			// 	}
-			// },
 			async getSendCostQuoteMessage() {
 				try {
 					const template = await this.$http.get(`/pm-manage/quote-cost-message?projectId=${ this.project._id }`);
@@ -335,9 +323,6 @@
 							const updatedProject = await this.$http.post('/pm-manage/close-project', {projectId: this.project._id})
 							await this.storeProject(updatedProject.data)
 							break
-							// case "Deliver":
-							// 	await this.deliverProject(message);
-							// 	break;
 						case "Accept/Reject Quote":
 							await this.acceptQuote();
 							break;
@@ -451,16 +436,6 @@
 					this.alertToggle({ message: err.message, isShow: true, type: "error" });
 				}
 			},
-			// async deliverProject(message) {
-			// 	try {
-			// 		await this.deliverProjectToClient({
-			// 			id: this.project._id,
-			// 			message: message
-			// 		});
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" });
-			// 	}
-			// },
 			async setManager({ option }, prop) {
 				const manager = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option);
 				if(manager._id === this.project[prop]._id) return;
@@ -533,37 +508,43 @@
 			filteredActions() {
 				let result = this.actions;
 				const nonStartedStatuses = [
-					"Draft",
-					"Cost Quote",
-					"Quote sent",
-					"Requested",
-					"Cancelled"
-				];
+          "Draft",
+          "Cost Quote",
+          "Quote sent",
+          //"Requested",
+          "Cancelled"
+        ];
+
 				if(this.project.status === "Approved") {
-					result = ["Cancel", 'Delete'];
+					result = ["Cancel"];
 				}
+
 				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
-					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel", 'Delete'];
+					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel"];
 				}
+
 				if(this.project.status === 'Started' || this.project.status === 'In progress') {
 					const { tasks, tasksDR2 } = this.project
-					const isAllTasksCompleted =  tasks.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({status}) => status === 'Completed')
+					const isAllTasksCompleted = tasks.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({status}) => status === 'Completed')
 
-					if(isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)){
-						result = ["Close Project"];
-					}else{
-						result = ["Send Project Details", "Cancel"];
-					}
+					if(isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)) result = ["Close Project"];
+          else result = ["Send Project Details", "Cancel"];
 				}
+
 				if(this.project.status === 'Closed') {
 					result = ['ReOpen'];
 				}
+
 				if(this.project.status === 'Rejected') {
-					result = ['ReOpen', 'Cancel', 'Delete'];
+					result = ['ReOpen', 'Cancel'];
 				}
+
 				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-					result = ['ReOpen' , 'Delete'];
+					result = ['ReOpen'];
 				}
+
+				result.push('Delete')
+
 				return result;
 			},
 		},

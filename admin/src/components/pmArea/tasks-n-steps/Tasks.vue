@@ -764,17 +764,17 @@
 
   .table {
     &__data {
-      padding: 0 5px;
+      padding: 0 6px;
       word-break: break-word;
     }
 
     &__header {
-      padding: 0 5px;
+      padding: 0 6px;
       word-break: break-all;
     }
 
     &__finance {
-      padding: 0 3px 0 5px;
+      padding: 0 3px 0 6px;
     }
   }
 
@@ -784,7 +784,7 @@
     }
 
     &__name {
-      color: #68573e;
+      color: $text;
       margin-right: 10px;
     }
 

@@ -55,7 +55,7 @@
         template(slot="info" slot-scope="{row, index}")
           .table__data(style="cursor: pointer;" @click="showStepDetails(index)")
             img(src="../../../assets/images/latest-version/view-details.png")
-        template(slot="id" slot-scope="{ row }")
+        //template(slot="id" slot-scope="{ row }")
           .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
         template(slot="name" slot-scope="{ row }")
           .table__data {{ row.name }}
@@ -111,13 +111,14 @@
               @scrollDrop="scrollDrop"
             )
 
-        template(slot="progress" slot-scope="{ row, index }")
+        //template(slot="progress" slot-scope="{ row, index }")
           .table__data(style="width: 100%")
-            ProgressLineStep(:progress="progress(row.progress)" :lastProgress="lastProgress(row, index)")
 
         template(slot="status" slot-scope="{ row }")
-          .table__data
-            span {{ row.status | stepsAndTasksStatusFilter }}
+          .table__statusAndProgress
+            .status {{ row.status | stepsAndTasksStatusFilter }}
+            .progress
+              ProgressLineStep(:progress="progress(row.progress)" :lastProgress="lastProgress(row, index)")
 
         template(slot="receivables" slot-scope="{ row }")
           .table__finance
@@ -242,12 +243,12 @@
 				fields: [
 					{ label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
 					{ label: "", headerKey: "headerInfo", key: "info", style: { "width": "3%", "border-left": "none" } },
-					{ label: "Id", headerKey: "headerId", key: "id", style: { "width": "4%" } },
+					// { label: "Id", headerKey: "headerId", key: "id", style: { "width": "4%" } },
 					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "10%" } },
-					{ label: "Langs", headerKey: "headerLanguage", key: "language", style: { "width": "6%" } },
-					{ label: "Vendor name", headerKey: "headerVendor", key: "vendor", style: { "width": "16%" } },
-					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "8%" } },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "8%" } },
+					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
+					{ label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "18%" } },
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "12%" } },
+					// { label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "8%" } },
 					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
 					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "7%" } },
@@ -285,7 +286,7 @@
 				}
 			},
 			getStepPair(step) {
-				return `<div style="margin-bottom: -2px;">${ step.sourceLanguage }</div><div>${ step.targetLanguage }</div>`
+				return `<span>${ step.sourceLanguage }</span><span> &#8811; </span><span>${ step.targetLanguage }</span>`
 			},
 			personSelectDrop(step) {
 				const { stepId, vendor } = step
@@ -403,16 +404,16 @@
 			},
 			setMassDeadline(e) {
 				const checkedSteps = this.currentProject.steps.filter(item => item.check)
-        try{
-	        for(let step of checkedSteps) this.$emit('setDate', { date: new Date(e), prop: 'deadline', stepId: step.stepId })
-        }finally {
-          this.closeErrorsDeadline()
-        }
+				try {
+					for (let step of checkedSteps) this.$emit('setDate', { date: new Date(e), prop: 'deadline', stepId: step.stepId })
+				} finally {
+					this.closeErrorsDeadline()
+				}
 			},
 			closeErrorsDeadline() {
 				this.deadlineModal = false
 				this.selectedAction = ''
-        this.toggleAll(false)
+				this.toggleAll(false)
 			},
 			setModalTexts(option) {
 				this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
@@ -571,7 +572,7 @@
 						return [ "Mark as accept/reject", "Request confirmation", "Change Deadline" ]
 					} else if (this.isEvery('Request Sent')) {
 						return [ "Mark as accept/reject", "Change Deadline" ]
-          } else if (this.isEvery('Completed')) {
+					} else if (this.isEvery('Completed')) {
 						return [ "ReOpen" ]
 					} else if (indexesForAvailableStatuses.length && !indexesForAvailableStatuses.includes(-1)) {
 						return [ "Change Deadline" ]
@@ -643,12 +644,16 @@
 
   .table {
     &__data {
-      padding: 0 5px;
+      padding: 0 6px;
       word-break: break-word;
+    }
+    &__statusAndProgress{
+      width: 100%;
+      padding: 0 6px;
     }
 
     &__header {
-      padding: 0 5px;
+      padding: 0 6px;
       word-break: break-all;
     }
 
@@ -656,17 +661,19 @@
       position: relative;
       height: 32px;
       width: 100%;
-      margin: 0 5px;
+      margin: 0 6px;
     }
 
     &__vendor {
       display: flex;
       justify-content: space-between;
-      padding: 0 5px;
+      padding: 0 6px;
       width: 100%;
+      align-items: center;
     }
-    &__finance{
-      padding: 0 3px 0 5px;
+
+    &__finance {
+      padding: 0 3px 0 6px;
     }
   }
 

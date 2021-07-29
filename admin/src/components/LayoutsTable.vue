@@ -200,7 +200,7 @@
   }
 
   tbody {
-    color: $table;
+    color: $text;
   }
 
   tbody tr:nth-child(even),

@@ -44,7 +44,7 @@
       height: 31px;
       display: flex;
       align-items: center;
-      color: #3d3d3d80;
+      color: #33333380;
 
       &:first-child {
         border-left: 1px solid $border !important;

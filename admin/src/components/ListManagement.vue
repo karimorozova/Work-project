@@ -61,19 +61,24 @@
     position: relative;
 
     &__button {
-      background: $border;
+      background: white;
       border-radius: 4px;
       height: 24px;
       width: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: $border;
       font-size: 12px;
       position: absolute;
-      top: -28px;
+      top: -29px;
       cursor: pointer;
       transition: .2s ease-out;
+      border: 1px solid $border;
+
+      &:hover {
+        color: $text;
+      }
     }
   }
 
@@ -127,7 +132,7 @@
     }
   }
 
-  i{
+  i {
     margin-top: 1px;
   }
 </style>

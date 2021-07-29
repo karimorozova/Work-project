@@ -3,8 +3,14 @@
     transition(name="slide-fade")
       .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
         .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
+
     .tasks-steps__tasks-title Tasks and Steps
-      img.tasks-steps__arrow(v-if="!isProjectFinished" src="../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData && !isFinishedStatus}")
+
+      .tasks-steps__addTask(v-if="!isProjectFinished && !isTaskData" @click="toggleTaskData")
+        i.fas.fa-plus-circle
+      .tasks-steps__closeAddTask(v-if="!isProjectFinished && isTaskData" @click="toggleTaskData")
+        i.fas.fa-times-circle
+
     transition(name="slide-fade")
       TasksData(
         v-if="isTaskData && !isFinishedStatus && originallyLanguages.length && isShowTasksAndDeliverables"
@@ -85,14 +91,12 @@
 				this.currentProject.tasks = data
 			},
 			setDefaultIsTaskData() {
-				if (!this.currentProject.tasks || !this.currentProject.tasks.length) {
+				if (this.currentProject && !this.currentProject.tasks.length) {
 					this.isTaskData = true
 				}
 			},
 			toggleTaskData() {
-				if (this.currentProject.status !== 'Delivered') {
-					this.isTaskData = !this.isTaskData
-				}
+				this.isTaskData = !this.isTaskData
 			},
 			setValue({ option, prop }) {
 				this[prop] = option
@@ -264,19 +268,39 @@
     background: white;
     border-radius: 4px;
 
+    &__addTask,
+    &__closeAddTask {
+      font-size: 16px;
+      border: 1px solid $border;
+      border-radius: 4px;
+      height: 30px;
+      width: 30px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: .2s ease-out;
+      justify-content: center;
+      color: $dark-border;
+
+      &:hover {
+        color: $text;
+
+      }
+    }
+
     &__info {
       position: absolute;
       z-index: 1000;
-      color: $orange;
+      color: $text;
       background-color: $white;
       padding: 20px;
+      border-radius: 4px;
       top: 20%;
       margin-left: auto;
       margin-right: auto;
       left: 0;
       right: 0;
       width: 300px;
-      border: 1px solid #c1bbb1;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     }
 

@@ -85,15 +85,15 @@
 				type: Boolean,
 				default: false
 			},
-      isBodyShort: {
-			  type: Boolean,
-        default: false
-      }
+			isBodyShort: {
+				type: Boolean,
+				default: false
+			}
 		},
 		data() {
 			return {
 				showFilters: false,
-				elementToScroll: this.isBodyShort ? 7 : 15
+				elementToScroll: this.isBodyShort ? 7 : 13
 			}
 		},
 		methods: {
@@ -120,12 +120,12 @@
 				this.$emit('removeSortKey', field)
 			},
 
-      showFilter() {
-        this.showFilters = !this.showFilters
-        if (!this.showFilters) {
-          this.$emit('clearAllFilters')
-        }
-      },
+			showFilter() {
+				this.showFilters = !this.showFilters
+				if (!this.showFilters) {
+					this.$emit('clearAllFilters')
+				}
+			},
 			setFilter(field) {
 				this.$emit('setFilter', field)
 			},
@@ -306,9 +306,9 @@
   }
 
   tbody {
-    max-height: 600px;
+    max-height: 480px;
     display: block;
-    color: $table;
+    color: $text;
   }
 
   tbody tr:nth-child(even) {
@@ -337,6 +337,7 @@
   .scroll {
     overflow-y: scroll;
   }
+
   .shortBody {
     max-height: 240px;
   }
