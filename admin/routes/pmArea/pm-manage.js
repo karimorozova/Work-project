@@ -733,7 +733,7 @@ router.post('/close-project', async (req, res) => {
 router.post('/generate-certificate', async (req, res) => {
 	const { project, type, tasks, deliveryData } = req.body
 	try {
-		await generateAndSaveCertificate({ project, tasks })
+		await generateAndSaveCertificate({ project, tasks, deliveryData })
 		const updatedProject = await saveCertificateTODR1Files(project, type, deliveryData)
 		res.send(updatedProject)
 	} catch (err) {

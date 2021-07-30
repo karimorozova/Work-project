@@ -8,7 +8,7 @@ const logo = apiUrl + '/static/certificate-images/logo.png'
 const background = apiUrl + '/static/certificate-images/watermark.png'
 const stamp = apiUrl + '/static/certificate-images/stamp.png'
 
-module.exports.getCertificateTemplate = ({ project, allLanguages, tasks }) => {
+module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	const dateNow = new Date()
 	const projectTasks = project.tasks.filter(item => tasks.includes(item.taskId))
 	const languages = [ ...new Set(projectTasks.map(item => `${ getLang(item.sourceLanguage) } >> ${ getLang(item.targetLanguage) }`)) ]
@@ -31,7 +31,7 @@ module.exports.getCertificateTemplate = ({ project, allLanguages, tasks }) => {
 	         Certification of Translation
 	      </div>
 	      <div class="description" style="padding: 10px;border: 1px solid #333;font-size: 16px;text-align: center;margin: 20px 40px 60px 40px;line-height: 26px;">
-	               Translation of ${ project.projectId } - project.projectName  <br> 
+	               Translation of ${ deliveryData.deliveryName || project.projectId } - ${project.projectName}  <br> 
 	               from ${languages.join(', ')}
 	      </div>
 	      <div class="text" style="padding: 0 40px 40px;line-height: 22px;">
