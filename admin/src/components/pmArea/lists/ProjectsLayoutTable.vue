@@ -342,8 +342,12 @@
 				if (!tasks.length) return '-'
 
 				if (tasks.length && tasks.every(({ service }) => service.title === 'Compliance')) {
-					if (isSendToXtrf && xtrfLinks && xtrfLinks.length ) return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
-					else return 'Not transferred yet'
+					// if (isSendToXtrf && xtrfLinks && xtrfLinks.length ) return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
+					// else return 'Not transferred yet'
+
+          if(isSendToXtrf && xtrfLink) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+          else if (isSendToXtrf && xtrfLinks && xtrfLinks.length)  return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
+          else return 'Not transferred yet'
 				}
 
 				if (tasks.length && tasks.every(({ service }) => service.title === 'Translation')) {
