@@ -542,7 +542,7 @@
 					result = ['ReOpen'];
 				}
 
-				result.push('Delete')
+				if(!result.includes('Delete')) result.push('Delete')
 
 				return result;
 			},
