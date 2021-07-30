@@ -144,7 +144,7 @@
           .table__data(slot="check" slot-scope="{ index, row }")
             CheckBox(:isChecked="!!row.isChecked" @check="()=> toggle(row, true)" @uncheck="()=>toggle(row, false)" customClass="tasks-n-steps")
           .table__data(slot="ID" slot-scope="{ row }") {{ row.deliveryInternalId }}
-          .table__data(slot="name" slot-scope="{ row }") soon name ...
+          .table__data(slot="name" slot-scope="{ row }") {{ row.deliveryName }}
           .table__data-langs(slot="pair" slot-scope="{ row }" v-html="row.pair")
           .table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
           .table__data-tasks(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
@@ -566,6 +566,7 @@
 						this.currentProject.tasksDR2.singleLang.map(item => {
 							return {
 								_id: item._id,
+                deliveryName: item.deliveryName || this.currentProject.projectName,
 								deliveryInternalId: item.deliveryInternalId,
 								type: 'single',
 								status: item.status,
@@ -580,6 +581,7 @@
 						this.currentProject.tasksDR2.multiLang.map(item => {
 							return {
 								_id: item._id,
+                deliveryName: item.deliveryName || this.currentProject.projectName,
 								deliveryInternalId: item.deliveryInternalId,
 								type: 'multi',
 								status: item.status,

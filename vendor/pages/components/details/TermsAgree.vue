@@ -58,7 +58,7 @@
 					const { taskId, stepId } = this.job
 					const { steps } = this.project
 					let stepsCurrentByTask = steps.filter(item => item.taskId === taskId)
-					stepsCurrentByTask = stepsCurrentByTask.filter(item => !item.stepId.includes('Canceled'))
+					stepsCurrentByTask = stepsCurrentByTask.filter(item => item.status !== "Cancelled" && item.status !== "Cancelled Halfway")
 					const currentIndex = stepsCurrentByTask.findIndex(item => item.stepId === stepId)
 					if (statuses.indexOf(this.job.projectStatus) === -1 || this.job.status === 'Completed') {
 						return true
