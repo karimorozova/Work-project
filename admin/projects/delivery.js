@@ -165,7 +165,7 @@ const taskApproveReady = async ({ projectId, type, entityId }) => {
 
 async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 	const allLang = await Languages.find({})
-	const { projectId: strId, tasks, tasksDR2: { singleLang, multiLang } } = await Projects.findOne({ _id: projectId })
+	const { projectId: strId, projectName, tasks, tasksDR2: { singleLang, multiLang } } = await Projects.findOne({ _id: projectId })
 
 	const { sourceLanguage, targetLanguage, service } = tasks.find(({ taskId: tId }) => tId === taskId)
 	const sourceLang = allLang.find(({ symbol }) => sourceLanguage === symbol)
@@ -203,7 +203,7 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 		const instructions = service.title === 'Compliance' ? drInstructionsCompliance : dr2Instructions
 		singleLang.push({
 			deliveryInternalId: returnNewDeliveryId(strId, singleLang, multiLang),
-			deliveryName: strId,
+			deliveryName: projectName,
 			status: 'Pending Approval [DR2]',
 			sourceLanguage: sourceLang._id,
 			targetLanguage: targetLang._id,
@@ -273,7 +273,7 @@ const removeDR2 = async ({ projectId, taskId, path, sourceLanguage: source, targ
 }
 
 async function addMultiLangDR2({ projectId, taskIds, refFiles, filesFromVault }) {
-	const { projectId: strId, tasksDR2: { singleLang, multiLang: projectMultiLang }, projectManager, accountManager, tasksDR2 } = await Projects.findOne({ _id: projectId })
+	const { projectId: strId, projectName, tasksDR2: { singleLang, multiLang: projectMultiLang }, projectManager, accountManager, tasksDR2 } = await Projects.findOne({ _id: projectId })
 
 	let files = []
 	if (refFiles) {
@@ -304,7 +304,7 @@ async function addMultiLangDR2({ projectId, taskIds, refFiles, filesFromVault })
 
 	let multiLang = {
 		deliveryInternalId: returnNewDeliveryId(strId, singleLang, projectMultiLang),
-		deliveryName: strId,
+		deliveryName: projectName,
 		tasks: taskIds,
 		instructions: dr2Instructions,
 		status: 'Pending Approval [DR2]',
