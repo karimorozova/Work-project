@@ -6,7 +6,8 @@
         span {{ xtrfTask.taskId}}
         a( target="_blank" :href="xtrfTask.link")
           i(class="fas fa-link")
-
+        | &nbsp;&nbsp;
+        i(class="fas fa-sync-alt cursor-pointer" @click="updateFinance(xtrfTask.xtrfId, xtrfTask.taskId)")
 
       //a( target="_blank" :href="project.xtrfLink || ''")
         //Button(value="Go to XTRF Project")
@@ -40,9 +41,9 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
-			async updateFinance() {
+			async updateFinance(xtrfId, taskId) {
 				try {
-					await this.$http.get('/pm-manage/updateXtrfProject/' + this.$route.params.id)
+					await this.$http.post('/pm-manage/updateXtrfTasks/' + this.$route.params.id, {xtrfId, taskId})
 					this.alertToggle({
 						message: "Updated",
 						isShow: true,
@@ -97,6 +98,9 @@
       display: flex;
       justify-content: space-between;
     }
+  }
+  .cursor-pointer {
+    cursor: pointer;
   }
   .projectToXtrf {
     box-sizing: border-box;

@@ -1203,7 +1203,7 @@ router.post('/update-filters-and-fields/:userId', async (req, res) => {
 
 // XTRF API ==================================================================
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
-const { createSendAllTasksToXtrf } = require("../../projects/xtrfComplianceApi")
+const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
 
 router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
 	const { projectId } = req.params;
@@ -1220,6 +1220,13 @@ router.post('/createXtrfTasksWithFinance/:projectId', async (req, res) => {
 	const { projectId } = req.params;
 	await createSendAllTasksToXtrf(projectId)
 	res.send('test')
+})
+
+router.post('/updateXtrfTasks/:projectId', async (req, res) => {
+	const { projectId } = req.params;
+	const { xtrfId, taskId } = req.body
+	await updateTaskFianceXTRF(projectId, xtrfId, taskId )
+	res.send('Done!')
 })
 
 // XTRF API ==================================================================
