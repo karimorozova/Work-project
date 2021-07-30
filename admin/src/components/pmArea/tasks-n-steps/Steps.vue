@@ -114,7 +114,7 @@
         //template(slot="progress" slot-scope="{ row, index }")
           .table__data(style="width: 100%")
 
-        template(slot="status" slot-scope="{ row }")
+        template(slot="status" slot-scope="{ row, index }")
           .table__statusAndProgress
             .status {{ row.status | stepsAndTasksStatusFilter }}
             .progress
