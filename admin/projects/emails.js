@@ -16,11 +16,9 @@ const {
 const {
 	messageForClientSendQuote,
 	emailMessageForContact,
-	notifyLanguagePairIsReady,
 	getDeliveryMessage,
+	getNotifyDeliveryMessage,
 	messageForClientSendCostQuote,
-	notifyAssignmentIsReady,
-	notifyMultilingualIsReady,
 	projectDeliveryMessage
 } = require('../emailMessages/clientCommunication')
 
@@ -226,69 +224,59 @@ async function getPMnotificationMessage(project, task, user) {
 async function notifyClientDeliverablesReady({ project, contacts, type, entityId }) {
 	contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
 	const allLanguages = await Languages.find()
-	const allServices = await Services.find()
-	const { tasksDR2, tasks } = project
-	let tasksIds = []
+	let { tasksDR2, projectName, tasks: projectTasks } = project
+	const accManager = await User.findOne({ "_id": project.accountManager.id })
+
 
 	try {
 		if (type === 'single') {
-			tasksIds = [ ...new Set(tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`).files.map(item => item.taskId)) ]
-					.filter(item => item !== 'Loaded in DR2')
-
-			const tasksFromProject = tasks.filter(({ taskId }) => tasksIds.includes(taskId))
-			let units
-			let services
-			if (tasksFromProject.length) {
-				units = tasksFromProject.map(({ stepsAndUnits }) => stepsAndUnits.map(({ unit }) => unit))
-				services = [ ...new Set(tasksFromProject.map(({ service }) => service.title)) ]
-			}
-			const isCatUnitsOnly = flatten(units).every(item => item === 'CAT Wordcount')
-
-			const { deliveryInternalId, sourceLanguage, targetLanguage } = tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
+			const deliverableObj = tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
+			const { deliveryInternalId, sourceLanguage, targetLanguage } = deliverableObj
 			const { lang: source } = allLanguages.find(({ _id }) => `${ _id }` === `${ sourceLanguage }`)
 			const { lang: target } = allLanguages.find(({ _id }) => `${ _id }` === `${ targetLanguage }`)
+			const langPair = source === target ? target : `${ source } >> ${ target }`
 
-			if (tasksFromProject.length && isCatUnitsOnly) {
-				for (let contact of contacts) {
-					const message = notifyLanguagePairIsReady({
-						languagePair: `${ source } >> ${ target }`,
-						contact,
-						project
-					})
-					const subject = `Translation is Ready: ${ deliveryInternalId } - ${ source } >> ${ target } (C006.2)`
-					await sendEmail({ to: contact.email, subject }, message)
-				}
-			} else {
-				for (let contact of contacts) {
-					const message = notifyAssignmentIsReady({
-						source,
-						target,
-						allServices,
-						services,
-						contact,
-						project
-					})
-					const languages = source === target ? target : `${ source } >> ${ target }`
-					const subject = `Assignment is Ready: ${ deliveryInternalId } - ${ languages } (C006.22)`
-					await sendEmail({ to: contact.email, subject }, message)
-				}
+			const languagesAndServices = {
+				languages: [ langPair ]
+			}
+
+			for (let contact of contacts) {
+				const message = getNotifyDeliveryMessage({
+					deliveryName: deliverableObj.deliveryName || projectName,
+					languagesAndServices,
+					contact,
+					accManager,
+					projectId: project.projectId,
+					id: project._id
+				})
+				const subject = `DELIVERY Notification: ${ deliveryInternalId } - ${ deliverableObj.deliveryName || projectName } (C006.2)`
+				await sendEmail({ to: contact.email, subject }, message)
 			}
 		}
-
 		if (type === 'multi') {
-			const { tasks, deliveryInternalId } = tasksDR2.multiLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
-			tasksIds = [ ...new Set(tasks) ]
-			const tasksFromProject = tasks.filter(({ taskId }) => tasksIds.includes(taskId))
-			const languagesPairs = [ ...new Set(tasksFromProject.map(({ sourceLanguage, targetLanguage }) =>
-					`${ allLanguages.find(({ symbol }) => symbol === sourceLanguage).lang } >> ${ allLanguages.find(({ symbol }) => symbol === targetLanguage).lang }`
-			)) ]
+			const deliverableObj = tasksDR2.multiLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
+			const { deliveryInternalId, tasks } = deliverableObj
+			projectTasks = projectTasks.filter(item => tasks.includes(item.taskId))
+
+			const languagesAndServices = projectTasks.reduce((acc, curr) => {
+				const { lang: source } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.sourceLanguage }`)
+				const { lang: target } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.targetLanguage }`)
+				const langPair = source === target ? target : `${ source } >> ${ target }`
+				if (!acc.languages.includes(langPair)) acc.languages.push(langPair)
+				// if (!acc.services.includes(curr.service.title)) acc.services.push(curr.service.title)
+				return acc
+			}, { languages: [] })
+
 			for (let contact of contacts) {
-				const message = notifyMultilingualIsReady({
-					languagesPairs,
+				const message = getNotifyDeliveryMessage({
+					deliveryName: deliverableObj.deliveryName || projectName,
+					languagesAndServices,
 					contact,
-					project
+					accManager,
+					projectId: project.projectId,
+					id: project._id
 				})
-				const subject = `Translation is Ready: ${ deliveryInternalId } for multiple language (C006.21)`
+				const subject = `DELIVERY Notification: ${ deliveryInternalId } - ${ deliverableObj.deliveryName || projectName } (C006.2)`
 				await sendEmail({ to: contact.email, subject }, message)
 			}
 		}
@@ -317,22 +305,41 @@ async function sendClientManyDeliveries({ projectId, entitiesForDeliver, user, c
 	let attachmentsPaths = []
 	for (const { entityId, type } of entitiesForDeliver) {
 		let slug = ''
+
 		if (type === 'single') {
-			const { sourceLanguage, targetLanguage } = updatedProject.tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
+			const { sourceLanguage, targetLanguage, files } = updatedProject.tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
+			const tasks = [ ...new Set(files.map(item => item.taskId)) ]
+			const projectTasks = updatedProject.tasks.filter(item => tasks.includes(item.taskId))
 			const { lang: source } = allLanguages.find(({ _id }) => `${ _id }` === `${ sourceLanguage }`)
 			const { lang: target } = allLanguages.find(({ _id }) => `${ _id }` === `${ targetLanguage }`)
-			slug = source === target ? target : `${ source } >> ${ target }`
+			const languages = source === target ? target : `${ source } to ${ target }`
+			slug = projectTasks.reduce((acc, curr) => {
+				acc = acc + `"${ languages } - ${ curr.service.title }", `
+				return acc
+			}, '')
 		}
+
 		if (type === 'multi') {
-			slug = 'Multilingual'
+			const deliverableObj = updatedProject.tasksDR2.multiLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
+			const { tasks } = deliverableObj
+			const projectTasks = updatedProject.tasks.filter(item => tasks.includes(item.taskId))
+
+			slug = projectTasks.reduce((acc, curr) => {
+				const { lang: source } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.sourceLanguage }`)
+				const { lang: target } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.targetLanguage }`)
+				const languages = source === target ? target : `${ source } to ${ target }`
+				acc = acc + `"${ languages } - ${ curr.service.title }", `
+				return acc
+			}, '')
 		}
+
 		const { path } = updatedProject.tasksDeliverables.find(({ deliverablesId }) => `${ deliverablesId }` === `${ entityId }`)
-		const filename = `${ slug }-deliverables.zip`
+		const filename = `${ slug }deliverables.zip`
 		attachmentsPaths.push({ filename, path })
 	}
 
 	const accManager = await User.findOne({ "_id": updatedProject.accountManager.id })
-	const subject = `Delivery: ${ updatedProject.projectId } - ${ updatedProject.projectName } (ID C006.0)`
+	const subject = `DELIVERY: ${ updatedProject.projectId } - ${ updatedProject.projectName } (C006.0)`
 	for await (let contact of contacts) {
 		const finalAttachments = attachmentsPaths.map(item => ({ filename: item.filename, path: `./dist${ item.path }` }))
 
@@ -360,21 +367,23 @@ async function sendClientDeliveries({ projectId, type, entityId, user, contacts,
 		if (type === 'single') {
 			const deliverableObj = tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
 			const { deliveryInternalId, sourceLanguage, targetLanguage, files } = deliverableObj
-			const tasks = [ ...new Set(files.map(item => item.taskId)) ]
-			projectTasks = projectTasks.filter(item => tasks.includes(item.taskId))
 
-			const languagesAndServices = projectTasks.reduce((acc, curr) => {
-				if (!acc.services.includes(curr.service.title)) acc.services.push(curr.service.title)
-				return acc
-			}, { services: [] })
+			// const tasks = [ ...new Set(files.map(item => item.taskId)) ]
+			// projectTasks = projectTasks.filter(item => tasks.includes(item.taskId))
+			// const languagesAndServices = projectTasks.reduce((acc, curr) => {
+			// 	if (!acc.services.includes(curr.service.title)) acc.services.push(curr.service.title)
+			// 	return acc
+			// }, { services: [] })
 
 			const { lang: source } = allLanguages.find(({ _id }) => `${ _id }` === `${ sourceLanguage }`)
 			const { lang: target } = allLanguages.find(({ _id }) => `${ _id }` === `${ targetLanguage }`)
 			const langPair = source === target ? target : `${ source } >> ${ target }`
 
-			languagesAndServices.languages = [ langPair ]
+			const languagesAndServices = {
+				languages: [ langPair ]
+			}
 
-			const subject = `DELIVERY: ${ deliveryInternalId } - ${ deliverableObj.deliveryName || projectName }: ${ langPair } (C006.3)`
+			const subject = `DELIVERY: ${ deliveryInternalId } - ${ deliverableObj.deliveryName || projectName } (C006.3)`
 
 			for await (let contact of contacts) {
 				const finalAttachments = attachments.map(item => ({ filename: `${ item.filename }`, path: `./dist${ path }` }))
@@ -402,11 +411,11 @@ async function sendClientDeliveries({ projectId, type, entityId, user, contacts,
 				const { lang: target } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.targetLanguage }`)
 				const langPair = source === target ? target : `${ source } >> ${ target }`
 				if (!acc.languages.includes(langPair)) acc.languages.push(langPair)
-				if (!acc.services.includes(curr.service.title)) acc.services.push(curr.service.title)
+				// if (!acc.services.includes(curr.service.title)) acc.services.push(curr.service.title)
 				return acc
-			}, { languages: [], services: [] })
+			}, { languages: [] })
 
-			const subject = `DELIVERY: ${ deliveryInternalId } - ${ deliverableObj.deliveryName || projectName }: ${languagesAndServices.languages.join(", ")}  (C006.3)`
+			const subject = `DELIVERY: ${ deliveryInternalId } - ${ deliverableObj.deliveryName || projectName } (C006.3)`
 
 			for await (let contact of contacts) {
 				const finalAttachments = attachments.map(item => ({ filename: `${ item.filename }`, path: `./dist${ path }` }))
