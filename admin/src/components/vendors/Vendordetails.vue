@@ -451,12 +451,14 @@
 				const textReg = /^[-\sa-zA-Z]+$/
 				try {
 					this.errors = []
-					if (!this.getVendorUpdatedData.firstName || !textReg.test(this.getVendorUpdatedData.firstName))
+					// if (!this.getVendorUpdatedData.firstName || !textReg.test(this.getVendorUpdatedData.firstName))
+					if (!this.getVendorUpdatedData.firstName)
 						this.errors.push("Please, enter valid first name.")
 					if (/^\s+$/.exec(this.getVendorUpdatedData.firstName)) {
 						this.errors.push("Please, enter valid first name.")
 					}
-					if (this.getVendorUpdatedData.surname && !textReg.test(this.getVendorUpdatedData.surname))
+					// if (this.getVendorUpdatedData.surname && !textReg.test(this.getVendorUpdatedData.surname))
+					if (this.getVendorUpdatedData.surname)
 						this.errors.push("Please, enter valid surname.")
 					if (!this.getVendorUpdatedData.industries.length) this.errors.push("Please, choose at least one industry.")
 					if (!this.getVendorUpdatedData.status) this.errors.push("Please, choose status.")
