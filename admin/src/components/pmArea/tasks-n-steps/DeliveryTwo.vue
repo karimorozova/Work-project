@@ -73,18 +73,21 @@
           @toggleOption="toggleOption"
         )
 
+      .review__additionalOptions
+
         .review__email-comment(v-if="(isDeliver) && allChecked")
           .review__email-checkbox
             CheckBox(:isChecked="isComment" @check="toggleCommentEmail"  @uncheck="toggleCommentEmail")
-            span Do you want to external comment? &nbsp;&nbsp;
-          .review__notes(v-if="isComment")
-            ckeditor(v-model="comment" :config="editorConfig")
+            span Add external comment
 
         .review__contacts(v-if="(isDeliver || isNotify) && allChecked") Contacts:
           SelectMulti(
             :options="contactsNames"
             :selectedOptions="selectedContacts"
             @chooseOptions="setContacts")
+
+      .review__templateCommentRow(v-if="isComment")
+        ckeditor(v-model="comment" :config="editorConfig")
 
       .review__buttons
         .review__button(v-if="allChecked")
@@ -126,7 +129,7 @@
 				taskIdRollback: null,
 				selectedContacts: [],
 				comment: "",
-				isComment: false,
+				isComment: false
 			}
 		},
 		beforeDestroy() {
@@ -387,37 +390,37 @@
 				const { firstName, surname } = this.project.clientContacts[0]
 				this.selectedContacts.push(`${ firstName } ${ surname }`)
 			},
-      async setDeliveryName(e) {
-        const { value } = e.target
-        const deliveryId = this.deliveryData._id
-        const projectId = this.project._id
-        const updatedProject =  await this.$http.post('/delivery/dr2-name-change', {projectId, deliveryId , deliveryName: value,type: this.type})
-        await this.setCurrentProject(updatedProject.data)
+			async setDeliveryName(e) {
+				const { value } = e.target
+				const deliveryId = this.deliveryData._id
+				const projectId = this.project._id
+				const updatedProject = await this.$http.post('/delivery/dr2-name-change', { projectId, deliveryId, deliveryName: value, type: this.type })
+				await this.setCurrentProject(updatedProject.data)
 
-      },
+			}
 		},
 		computed: {
 			...mapGetters({
 				requestCounter: 'getRequestCounter'
 			}),
-			isServiceForCertificate(){
-				if(Object.keys(this.deliveryData).length && this.type && this.project){
+			isServiceForCertificate() {
+				if (Object.keys(this.deliveryData).length && this.type && this.project) {
 					let tasks = this.type === 'single'
 							? this.deliveryData.files.map(item => item.taskId)
 							: this.deliveryData.tasks
-          tasks = tasks.filter(item => item !== "Loaded in DR2")
+					tasks = tasks.filter(item => item !== "Loaded in DR2")
 
-          const services = this.project.tasks.filter(item => tasks.includes( item.taskId)).map(item => item.service.title)
+					const services = this.project.tasks.filter(item => tasks.includes(item.taskId)).map(item => item.service.title)
 					return services.length && services.every(item => item === 'Compliance' || item === 'Translation')
-        }
-      },
+				}
+			},
 			isCertificateExist() {
 				if (this.files.length) {
 					const filesNames = this.files.map(i => i.fileName)
 					for (let str of filesNames) {
 						if (str.indexOf('certificate') !== -1) return true
 					}
-				  return false
+					return false
 				}
 			},
 			contactsNames() {
@@ -473,7 +476,8 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  .field__name{
+
+  .field__name {
     font-size: 14px;
     color: #3d3d3d;
     border: 1px solid #bfbfbf;
@@ -525,7 +529,19 @@
     position: relative;
     width: 1000px;
     border-radius: 4px;
-    
+
+    &__templateCommentRow {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    &__additionalOptions {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 20px;
+    }
+
     &__button-certificate {
       position: absolute;
       display: flex;
@@ -536,6 +552,7 @@
         margin-right: 15px;
       }
     }
+
     .relative__wrapper {
       position: relative;
     }
@@ -550,18 +567,20 @@
 
     &__email-comment {
       position: relative;
-      margin-top: 20px;
+      height: 50px;
+      align-items: center;
+      display: flex;
+      margin-top: 6px;
     }
 
     &__email-checkbox {
       display: flex;
       font-size: 14px;
       justify-content: center;
-      margin-bottom: 10px;
 
       & span {
-        padding-left: 5px;
-
+        padding-left: 8px;
+        margin-top: 2px;
       }
 
     }
@@ -686,9 +705,8 @@
 
     &__contacts {
       position: relative;
-      width: 200px;
+      width: 220px;
       height: 50px;
-      margin-top: 20px;
     }
 
     &__group {
@@ -775,6 +793,6 @@
   }
 
   .max-with-400 {
-    max-width: 400px;
+    max-width: 440px;
   }
 </style>

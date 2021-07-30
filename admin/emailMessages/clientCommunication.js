@@ -48,7 +48,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 		const totalForSelected = obj.selectedTasks.reduce((acc, curr) => {
 			acc = curr.finance.Price.receivables
 			return acc
-		},0)
+		}, 0)
 		taskIdsString = taskIdsString.replace(/[' ']/g, '%')
 		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ totalForSelected.toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
 		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ totalForSelected.toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
@@ -643,7 +643,7 @@ function notifyLanguagePairIsReady(obj) {
 
 function notifyMultilingualIsReady(obj) {
 	const pairsContent = obj.languagesPairs.reduce((acc, curr) => {
-		acc = acc + `<li>${curr}</li>`
+		acc = acc + `<li>${ curr }</li>`
 		return acc
 	}, '')
 	const am = `${ obj.project.accountManager.firstName } ${ obj.project.accountManager.lastName }`
@@ -658,7 +658,7 @@ function notifyMultilingualIsReady(obj) {
                     <p style="font-weight: 400;">
                     	The translation in project ${ obj.project.projectId } - ${ obj.project.projectName } in the following languages is ready in one multilingual file. 
                     	<ul style="font-weight: 400;">
-                    		${pairsContent}
+                    		${ pairsContent }
 											</ul>
                     </p>
                     <p style="font-weight: 400;">
@@ -676,14 +676,14 @@ function notifyMultilingualIsReady(obj) {
 }
 
 function notifyAssignmentIsReady(obj) {
-	let content;
-	if(!!obj.services){
-		const [service] = obj.services
-		const {languageForm} = obj.allServices.find(({title}) => title === service)
+	let content
+	if (!!obj.services) {
+		const [ service ] = obj.services
+		const { languageForm } = obj.allServices.find(({ title }) => title === service)
 		const language = languageForm === 'Duo' ? `${ obj.source } >> ${ obj.target }` : obj.target
-		content = `Service ${obj.services.join(' ')} for ${language} from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready. 
+		content = `Service ${ obj.services.join(' ') } for ${ language } from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready. 
 		It will be delivered once all tasks have been completed.`
-	}else{
+	} else {
 		content = `Assignment from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready. 
 		It will be delivered once all tasks have been completed.`
 	}
@@ -722,14 +722,25 @@ function getDeliveryMessage(obj) {
                             This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
                         <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
                         <p style="font-weight: 400;">
-                        	I'm pleased to inform you that the task(s) of ${obj.langPair} from project ${ obj.projectId } - ${ obj.projectName } has been completed and is ready for review.
+                        	I'm pleased to inform you that the following delivery is completed and is ready for review:
                         </p>
                         <div style="font-weight: 400;">
-                        	${obj.comment}
+                        	${ obj.comment }
 												</div>
-                        <p style="font-weight: 400;">
-                            The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
-                        </p>
+												<ul>
+													<li>
+														<span style="font-weight: 400;"> Language pair:</span>
+														<strong>${ obj.languagesAndServices.languages.join(', ') }</strong>
+													</li>
+													<li>
+														<span style="font-weight: 400;">Service: </span>
+														<strong>${ obj.languagesAndServices.services.join(', ') }</strong>
+													</li>
+													<li>
+														<span style="font-weight: 400;"> Delivery information:</span>
+														<strong> ${ obj.projectId } - ${ obj.deliveryName } has been done</strong>
+													</li>
+												</ul>
                         <p style="font-weight: 400;">
                             In case of any questions, please do not hesitate to contact us :-)
                         </p>
@@ -864,7 +875,7 @@ function tasksMiddleCancelledMessage(obj) {
 
 //When Project Ready to Delivery
 function projectDeliveryMessage(obj) {
-  //DELIVER PROJECT CHANGE TEMPLATE #MAX
+	//DELIVER PROJECT CHANGE TEMPLATE #MAX
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -882,7 +893,7 @@ function projectDeliveryMessage(obj) {
                         and attached to this email in a zip format.
                     </p>
                      <div style="font-weight: 400;">
-                        	${obj.comment}
+                        	${ obj.comment }
 											</div>
                     <p style="font-weight: 400;">
                         In case of any questions, please do not hesitate to contact us :-)

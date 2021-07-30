@@ -292,6 +292,9 @@ export default {
     await this.getProject()
     await this.getVendorsForProject()
   },
+	beforeDestroy(){
+		this.setCurrentProject({})
+	},
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
       if (from.name === "client-info") {

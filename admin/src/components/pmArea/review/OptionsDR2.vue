@@ -24,38 +24,38 @@
   @import "../../../assets/scss/colors.scss";
 
   .border {
-    border-right: 2px solid #938676;
+    border-right: 1px solid $border;
   }
 
   .options {
     display: flex;
     align-items: center;
-    border: 2px solid #938676;
+    border: 1px solid $border;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 14px;
     overflow: hidden;
 
     &__item {
-      width: 120px;
-      padding: 6px 10px;
+      width: 140px;
+      padding: 7px 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: $main-color;
+      color: $text;
       // &:first-child {
       //     border-right: 1px solid $main-color;
       // }
     }
 
     &_bordered {
-      border-right: 2px solid #938676;
-      border-left: 2px solid #938676;
+      border-right: 1px solid $border;
+      border-left: 1px solid $border;
     }
 
     &_brown {
-      background-color: #938676;
+      background-color: $dark-border;
       color: $white;
 
       &:first-child {
