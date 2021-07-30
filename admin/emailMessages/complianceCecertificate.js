@@ -31,7 +31,7 @@ module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliver
 	         Certification of Translation
 	      </div>
 	      <div class="description" style="padding: 10px;border: 1px solid #333;font-size: 16px;text-align: center;margin: 20px 40px 60px 40px;line-height: 26px;">
-	               Translation of ${ deliveryData.deliveryName || project.projectId } - ${project.projectName}  <br> 
+	               Translation of ${ project.projectId } - ${ deliveryData.deliveryName || project.projectName}  <br> 
 	               from ${languages.join(', ')}
 	      </div>
 	      <div class="text" style="padding: 0 40px 40px;line-height: 22px;">
