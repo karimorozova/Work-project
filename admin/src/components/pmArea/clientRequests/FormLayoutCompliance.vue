@@ -221,8 +221,8 @@
         .order__row
           .order__subTitle Target:
           .order__value {{ currentClientRequest.requestForm.targetLanguages[0].lang }}
-        Button(customClass="middle" @clicked="setCurrentAm" :isDisabled="isAmSet() || !isAm()" value="Get This Project")
-        Button(customClass="middle" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
+        Button(customClass="middle" color="#999999" @clicked="setCurrentAm" :isDisabled="isAmSet() || !isAm()" value="Get This Project" :isFullWidth="true")
+        Button(customClass="middle" color="#999999" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request" :isFullWidth="true")
 
 
       //.side__contacts

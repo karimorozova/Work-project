@@ -1,12 +1,12 @@
 <template lang="pug">
   .projectToXtrf
     .projectToXtrf__buttons
-      Button(v-if="!project.isSendToXtrf && !project.xtrfLink" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
-
-      a(v-else target="_blank" :href="project.xtrfLink")
-        Button(value="Go to XTRF Project")
-      br
-      Button(v-if="project.xtrfLink" value="Update Fiance / Close Jobs & Project" @clicked="updateFinance")
+      Button.margin-bottom(v-if="!project.isSendToXtrf && !project.xtrfLink" color='#999999' value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable" :isFullWidth="true")
+      span {{ project.projectId}} : &nbsp;
+        a( target="_blank" :href="project.xtrfLink")
+          i(class="fas fa-link")
+        | &nbsp;&nbsp;
+        i(class="fas fa-sync-alt cursor-pointer" @click="updateFinance")
 
 
 
@@ -106,6 +106,9 @@
     a {
       text-decoration: none;
       color: inherit;
+    }
+    .margin-bottom {
+      margin-bottom: 10px;
     }
   }
 </style>

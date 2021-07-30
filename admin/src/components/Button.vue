@@ -1,10 +1,10 @@
 <template lang="pug">
   .buttons
     .button(v-if="outline")
-      .action-buttonOutline(:class="[customClass, {disabled: isDisabled}]")
+      .action-buttonOutline(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
         input.action-buttonOutline__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
     .button(v-else)
-      .action-button(:class="[customClass, {disabled: isDisabled}]")
+      .action-button(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
         input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
 </template>
 
@@ -27,7 +27,11 @@
 			color: {
 				type: String,
 				default: "#d15f45"
-			}
+			},
+      isFullWidth: {
+			  type: Boolean,
+        default: false
+      }
 		},
 		methods: {
 			clicked() {
@@ -132,14 +136,14 @@
 
   .disabled {
     .action-button__button {
-      opacity: 0.4;
+      opacity: 0.3;
       min-width: 110px;
       padding: 0 24px 0 24px;
       height: 32px;
       color: $white;
       font-size: 14px;
       border-radius: 4px;
-      background-color: $orange !important;
+      background-color: $orange;
       border: none;
       transition: .1s ease;
       outline: none;
@@ -170,6 +174,11 @@
 
   .middle {
     text-align: center;
+  }
+  .fullWidthButton{
+    input{
+      width: 100%;
+    }
   }
 
 </style>
