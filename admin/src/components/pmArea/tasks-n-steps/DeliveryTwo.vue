@@ -40,10 +40,17 @@
           ckeditor(v-model="deliveryData.comment" :config="editorConfig")
           .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save Comment &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
-    .relative__wrapper(v-if="!isCertificateExist && isServiceForCertificate")
-      .review__button-certificate
-        input.field__name(type="text" placeholder="Delivery Name" :value="deliveryData.deliveryName" @change="setDeliveryName" @keyup.13="setDeliveryName")
-        Button(value="Add Certificate" @clicked="generateCertificate")
+    .relative__wrapper
+      br(v-if="isCertificateExist && isServiceForCertificate")
+      .review__certificate
+        .inputs__group
+          .input__field
+            .input__title Delivery Name: {{isCertificateExist}} {{!isServiceForCertificate}}
+            input.field__name(type="text" placeholder="Delivery Name" :value="deliveryData.deliveryName" @change="setDeliveryName" @keyup.13="setDeliveryName" :disabled="isCertificateExist || !isServiceForCertificate")
+          .input__field
+            .input__title Add Certificate:
+            Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist || !isServiceForCertificate")
+        .certificate__info(v-if="isCertificateExist && isServiceForCertificate") For change Delivery Name you need to delete Certificate.
 
     .review__table
       TableDR2(
@@ -542,14 +549,23 @@
       margin-top: 20px;
     }
 
-    &__button-certificate {
+    &__certificate {
       position: absolute;
-      display: flex;
       top: 20px;
       z-index: 5;
+      background: #f7f7f7;
+      border: 1px solid #bfbfbf;
+      padding: 7px;
+      border-radius: 4px;
 
       input {
         margin-right: 15px;
+      }
+    }
+    .inputs{
+      &__group {
+        display: flex;
+        margin-bottom: 10px;
       }
     }
 
@@ -616,7 +632,7 @@
     }
 
     &__table {
-      margin-top: 20px;
+      margin-top: 65px;
     }
 
     &__check-item {
