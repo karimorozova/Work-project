@@ -40,17 +40,17 @@
           ckeditor(v-model="deliveryData.comment" :config="editorConfig")
           .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save Comment &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
-    .relative__wrapper
-      br(v-if="isCertificateExist && isServiceForCertificate")
+    .relative__wrapper(v-if="isServiceForCertificate")
+      br(v-if="isCertificateExist ")
       .review__certificate
         .inputs__group
           .input__field
-            .input__title Delivery Name: {{isCertificateExist}} {{!isServiceForCertificate}}
-            input.field__name(type="text" placeholder="Delivery Name" :value="deliveryData.deliveryName" @change="setDeliveryName" @keyup.13="setDeliveryName" :disabled="isCertificateExist || !isServiceForCertificate")
+            .input__title Delivery Name:
+            input.field__name(type="text" placeholder="Delivery Name" :value="deliveryData.deliveryName" @change="setDeliveryName" @keyup.13="setDeliveryName" :disabled="isCertificateExist")
           .input__field
             .input__title Add Certificate:
-            Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist || !isServiceForCertificate")
-        .certificate__info(v-if="isCertificateExist && isServiceForCertificate") For change Delivery Name you need to delete Certificate.
+            Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist ")
+        .certificate__info(v-if="isCertificateExist") For change Delivery Name you need to delete Certificate.
 
     .review__table
       TableDR2(
