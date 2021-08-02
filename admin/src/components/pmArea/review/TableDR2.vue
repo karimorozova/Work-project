@@ -32,7 +32,7 @@
       .review-table__data(slot="check" slot-scope="{ row, index }")
         CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
-      .review-table__data(slot="name" slot-scope="{ row }")
+      .review-table__data.review-table__scroled-data(slot="name" slot-scope="{ row }")
         span.review-table__file-name {{ row.fileName }}
 
       .review-table__data(slot="task" slot-scope="{ row }")
@@ -325,6 +325,9 @@
       &-manager {
         display: flex;
       }
+    }
+    &__scroled-data {
+      overflow-y: hidden;
     }
 
     &__check-cell {
