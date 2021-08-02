@@ -52,7 +52,7 @@
             Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist ")
         .certificate__info(v-if="isCertificateExist") For change Delivery Name you need to delete Certificate.
 
-    .review__table
+    .review__table(:class="{'margin-65': isServiceForCertificate}")
       TableDR2(
         :type="type"
         :task="task"
@@ -555,7 +555,7 @@
       z-index: 5;
       background: #f7f7f7;
       border: 1px solid #bfbfbf;
-      padding: 7px;
+      padding: 13px 12px 5px 12px;
       border-radius: 4px;
 
       input {
@@ -632,6 +632,9 @@
     }
 
     &__table {
+      margin-top: 20px;
+    }
+    .margin-65 {
       margin-top: 65px;
     }
 
