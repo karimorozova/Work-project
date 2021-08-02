@@ -1,7 +1,7 @@
 <template lang="pug">
   .generalTable
 
-    .filter(v-if="isFilterShow" @click="showFilter" :class="{'absoluteFilter': isFilterShow}")
+    .filter(v-if="isFilterShow" @click="showFilter" :class="{'absoluteFilter': isFilterAbsolute}")
       span(v-if="!showFilters")
         i.fas.fa-filter
       span(v-if="showFilters")
