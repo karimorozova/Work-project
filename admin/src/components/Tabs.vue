@@ -40,7 +40,7 @@
       min-width: 120px;
       border-bottom: none;
       background-color: $table-list;
-      padding: 1px 5px 0 8px;
+      padding: 1px 15px 0 8px;
       height: 31px;
       display: flex;
       align-items: center;

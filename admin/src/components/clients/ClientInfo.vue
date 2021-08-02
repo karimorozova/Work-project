@@ -90,12 +90,10 @@
           .title Rates
           .client-info__rates
             .rates__icons
-              .rates__icon
-                img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit'), setNewStepCombination()")
-                img.rates__icons-opacity05(v-else :src="icons.edit.icon")
-              .rates__icon
-                img.rates__icons-opacity1(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-                img.rates__icons-opacity05(v-else :src="icons.cancel.icon")
+              .rates__mainIcon(v-if="!paramsIsEdit" @click="crudActions('edit'), setNewStepCombination()")
+                i.fas.fa-pen#pen
+              .rates__mainIcon(v-if="paramsIsEdit" @click="crudActions('cancel')")
+                i.fas.fa-times-circle#close
 
             RatesParameters(:isEdit="isEdit")
             Tabs(
@@ -146,13 +144,18 @@
                 @toggleCheck="toggleCheck"
                 @toggleAll="toggleAll"
               )
-            .chart(v-if="selectedTab === 'Discount Chart'")
+            .chart(v-if="selectedTab === 'Discount & Surcharge / Discount Chart'")
               DiscountChart(
                 :entity="currentClient",
                 @getDefaultValues="getDefaultValuesDC"
                 @setMatrixData="setMatrixData"
                 :isEdit="isEdit"
               )
+              .discounts
+                Discounts(
+                  :paramsIsEdit="isEdit",
+                  :enum="'client'"
+                )
 
           .title Documents
           .client-info__documents
@@ -216,6 +219,7 @@
 	import AllActivitiesFullScrean from "./activity/AllActivitiesFullScrean"
 	import RadioButton from "../RadioButton"
 	import Tabs from "../Tabs"
+	import Discounts from "./pricelists/Discounts"
 
 	export default {
 		mixins: [ vatChecker ],
@@ -239,7 +243,7 @@
 					edit: { icon: require("../../assets/images/latest-version/edit.png") },
 					cancel: { icon: require("../../assets/images/cancel-icon.png") }
 				},
-				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
+				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount & Surcharge / Discount Chart', 'Overall Prices' ],
 				selectedTab: 'Overall Prices',
 				clientTask: {},
 				clientNote: {},
@@ -815,6 +819,7 @@
 
 		},
 		components: {
+			Discounts,
 			Tabs,
 			AllActivitiesFullScrean,
 			AllActivitiesModal,
@@ -874,29 +879,39 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
 
+  .discounts {
+    margin-top: 20px;
+  }
+
   .rates {
     &__icons {
       display: flex;
-      right: 20px;
-      top: 20px;
-      gap: 7px;
-      height: 20px;
-      align-items: center;
       justify-content: flex-end;
-      margin-bottom: 20px;
+      margin-bottom: 9px;
+    }
 
-      &-opacity1 {
-        opacity: 1;
-        cursor: pointer;
-      }
+    &__mainIcon {
+      background: #fff;
+      border: 1px solid $border;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: .2s ease-out;
+      z-index: 20;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $dark-border;
 
-      &-opacity05 {
-        opacity: 0.4;
-        cursor: default;
+      &:hover {
+        #pen,
+        #close {
+          color: $text;
+        }
       }
     }
   }
-
 
   .client-activity {
     &__addTask {

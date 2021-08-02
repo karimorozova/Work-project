@@ -20,7 +20,7 @@
       .block-item
         label.block-item__label Account Manager:
           span.require *
-        .block-item__dropindex-9(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
+        .block-item__drop.index-9(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
           SelectSingle(
             :options="users.filter(i => i.group.name === 'Account Managers').map(i => `${i.firstName} ${i.lastName}`)",
             placeholder="Select",
@@ -35,7 +35,7 @@
       .block-item
         label.block-item__label Project Manager:
           span.require *
-        .block-item__dropindex-8(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
+        .block-item__drop.index-8(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
           SelectSingle(
             :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
             placeholder="Select",

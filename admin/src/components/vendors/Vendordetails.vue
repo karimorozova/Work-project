@@ -46,7 +46,7 @@
         .rates__icons
           .rates__mainIcon(v-if="!paramsIsEdit" @click="crudActions('edit'), setNewStepCombination()")
             i.fas.fa-pen#pen
-          .rates__mainIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+          .rates__mainIcon(v-if="paramsIsEdit" @click="crudActions('cancel')")
             i.fas.fa-times-circle#close
 
 
@@ -660,27 +660,6 @@
         }
       }
     }
-
-    /*&__icons {*/
-    /*  display: flex;*/
-    /*  right: 20px;*/
-    /*  top: 20px;*/
-    /*  gap: 7px;*/
-    /*  height: 20px;*/
-    /*  align-items: center;*/
-    /*  justify-content: flex-end;*/
-    /*  margin-bottom: 20px;*/
-
-    /*  &-opacity1 {*/
-    /*    opacity: 1;*/
-    /*    cursor: pointer;*/
-    /*  }*/
-
-    /*  &-opacity05 {*/
-    /*    opacity: 0.4;*/
-    /*    cursor: default;*/
-    /*  }*/
-    /*}*/
   }
 
   .block-item-subinfo {
