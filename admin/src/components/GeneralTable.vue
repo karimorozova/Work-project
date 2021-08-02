@@ -1,11 +1,11 @@
 <template lang="pug">
   .generalTable
 
-    .filter(v-if="isFilterShow" @click="showFilter")
+    .filter(v-if="isFilterShow" @click="showFilter" :class="{'absoluteFilter': true}")
       span(v-if="!showFilters")
         i.fas.fa-filter
       span(v-if="showFilters")
-        i.fas.fa-times-circle
+        i.fas.fa-times-circle#filterClose
 
     table
 
@@ -86,6 +86,10 @@
 				type: Boolean,
 				default: false
 			},
+			isFilterAbsolute: {
+				type: Boolean,
+				default: false
+			},
 			isBodyShort: {
 				type: Boolean,
 				default: false
@@ -152,6 +156,12 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors";
 
+  .absoluteFilter {
+    position: absolute;
+    right: 0;
+    top: -37px;
+  }
+
   .generalTable {
     position: relative
   }
@@ -182,6 +192,10 @@
       .fa-filter {
         color: $text !important;
       }
+
+      #filterClose {
+        color: $text !important;
+      }
     }
   }
 
@@ -196,7 +210,7 @@
   }
 
   .fa-filter {
-    font-size: 11px;
+    font-size: 12px;
     color: $dark-border;
   }
 
@@ -339,7 +353,7 @@
   }
 
   .hideScrollBlock {
-    height: 40px;
+    height: 100%;
     width: 20px;
     background: white;
     position: absolute;

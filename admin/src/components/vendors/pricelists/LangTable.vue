@@ -7,67 +7,76 @@
         :i="i"
         :length="length"
       )
-    .button(v-if="dataArray.some(it => !!it.isCheck)")
+    .button(v-if="finalData.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
 
-    DataTable(
-      :fields="fields",
-      :tableData="dataArray",
-      :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 6 }]",
-      :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 6 }]",
-      bodyRowClass="client-pricelist-table-row",
-      bodyCellClass="client-pricelist-table-cell"
-    )
-      template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        .price-title(v-else) {{ field.label }}
+    .table
+      GeneralTable(
+        :fields="fields",
+        :tableData="finalData"
+        :isFilterShow="true"
+        :isFilterAbsolute="true"
 
-      template(slot="check" slot-scope="{ row, index }")
-        .price__data(v-if="isEdit")
-          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(row, true)" @uncheck="toggleCheck(row, false)")
+        @addSortKey="addSortKey"
+        @changeSortKey="changeSortKey"
+        @removeSortKey="removeSortKey"
+        @setFilter="setFilter"
+        @removeFilter="removeFilter"
+        @clearAllFilters="clearAllFilters"
+      )
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          .table__header(v-if="field.headerKey === 'headerCheck' && isEdit")
+            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+          .table__header(v-else) {{ field.label }}
 
-      template(slot="sourceLang", slot-scope="{ row, index }")
-        .price__data {{ row.sourceLanguage.lang }}
+        template(slot="check" slot-scope="{ row, index }")
+          .table__data(v-if="isEdit")
+            CheckBox(:isChecked="row.isCheck" @check="toggleCheck(row, true)" @uncheck="toggleCheck(row, false)")
 
-      template(slot="targetLang", slot-scope="{ row, index }")
-        .price__data {{ row.targetLanguage.lang }}
+        template(slot="sourceLanguage", slot-scope="{ row, index }")
+          .table__data {{ row.sourceLanguage.lang }}
 
-      template(slot="price", slot-scope="{ row, index }")
-        .price__data(v-if="!isEdit")
-          span#currencyType {{ row.basicPrice }}
-          label(for="currencyType" v-if="currentVendor.currency === 'EUR'" ) &euro;
-          label(for="currencyType" v-if="currentVendor.currency === 'USD'" ) &#36;
-          label(for="currencyType" v-if="currentVendor.currency === 'GBP'" ) &pound;
+        template(slot="targetLanguage", slot-scope="{ row, index }")
+          .table__data {{ row.targetLanguage.lang }}
 
-        .price__editing-data(v-else)
-          input.price__data-input(type="number" @change="setRowValue(row)"  v-model="dataArray[index].basicPrice")
+        template(slot="basicPrice", slot-scope="{ row, index }")
+          .table__data(v-if="!isEdit")
+            span#currencyType {{ row.basicPrice }}
+            label(for="currencyType" v-if="currentVendor.currency === 'EUR'" ) &euro;
+            label(for="currencyType" v-if="currentVendor.currency === 'USD'" ) &#36;
+            label(for="currencyType" v-if="currentVendor.currency === 'GBP'" ) &pound;
 
-      template(slot="icons", slot-scope="{ row, index }")
-        .price__icons
-          .altered(v-if="row.altered")
-            .tooltip
-              span#myTooltip.tooltiptext {{ row.notification }}
-              .price__icons-info
-                i.fas.fa-info-circle
-          .link(v-if="isEdit && row.isActive")
-            span(v-if="row.altered && isEdit")
-              .price__icons-link(@click="getRowPrice(row)")
-                i.fa.fa-link(aria-hidden="true")
-            span(v-else)
-              .price__icons-link-opacity
-                i.fa.fa-link(aria-hidden="true")
+          .table__data(v-else)
+            input(type="number" @change="setRowValue(row)" v-model="finalData[index].basicPrice")
 
-    .price__empty(v-if="!dataArray.length") Nothing found...
+        template(slot="icons", slot-scope="{ row, index }")
+          .table__icons
+            .altered(v-if="row.altered")
+              .tooltip
+                span#myTooltip.tooltiptext {{ row.notification }}
+                .table__icons-info
+                  i.fas.fa-info-circle
+            .link(v-if="isEdit && row.isActive")
+              span(v-if="row.altered && isEdit")
+                .table__icons-link(@click="getRowPrice(row)")
+                  i.fa.fa-link(aria-hidden="true")
+              span(v-else)
+                .table__icons-link-opacity
+                  i.fa.fa-link(aria-hidden="true")
+
+      .table__empty(v-if="!finalData.length") Nothing found...
 </template>
+
 <script>
-	import DataTable from "../../DataTable"
 	import { mapGetters, mapActions } from "vuex"
 	import CheckBox from "../../CheckBox"
 	import SetPriceModal from "../../finance/pricelistSettings/SetPriceModal"
 	import Button from "../../Button"
+	import GeneralTable from "../../GeneralTable"
+	import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 
 	export default {
+		mixins: [ tableSortAndFilter ],
 		props: {
 			dataArray: {
 				type: Array
@@ -93,36 +102,37 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-						width: "4%",
-						padding: 0
+						style: { width: "4%" }
 					},
 					{
 						label: "Source",
 						headerKey: "headerSourceLang",
-						key: "sourceLang",
-						width: "35%",
-						padding: "0"
+						key: "sourceLanguage",
+						dataKey: "lang",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "36%" }
 					},
 					{
 						label: "Target",
 						headerKey: "headerTargetLang",
-						key: "targetLang",
-						width: "35%",
-						padding: "0"
+						key: "targetLanguage",
+						dataKey: "lang",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "36%" }
 					},
 					{
-						label: "B.Price",
+						label: "Price",
 						headerKey: "headerBasicPriceEUR",
-						key: "price",
-						width: "15%",
-						padding: "0"
+						key: "basicPrice",
+						style: { width: "12%" }
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "11%",
-						padding: "0"
+						style: { width: "12%" }
 					}
 				],
 				currency: {},
@@ -138,11 +148,11 @@
 				storeCurrentVendor: "storeCurrentVendor"
 			}),
 			getIndex(id) {
-				return this.dataArray.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				return this.finalData.findIndex(({ _id }) => `${ _id }` === `${ id }`)
 			},
 			async setPrice(price) {
-				this.length = this.dataArray.filter(i => !!i.isCheck).length
-				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
+				this.length = this.finalData.filter(i => !!i.isCheck).length
+				for await (let [ index, row ] of this.finalData.filter(i => !!i.isCheck).entries()) {
 					this.i = index + 1
 					row.basicPrice = price
 					await this.manageSavePrice(row)
@@ -167,7 +177,7 @@
 				try {
 					await this.$http.post("/vendorsapi/rates/sync-cost/" + this.vendorId, {
 						tableKey: "Basic Price Table",
-						row: this.dataArray[this.getIndex(row._id)]
+						row: this.finalData[this.getIndex(row._id)]
 					})
 					const result = await this.$http.post(`/vendorsapi/vendor-rate-by-key`, { id: this.vendorId, key: 'basicPricesTable' })
 					this.vendor.rates.basicPricesTable = result.data
@@ -182,7 +192,7 @@
 			},
 			async checkErrors(row) {
 				if (!this.isEdit) return
-				if (this.dataArray[this.getIndex(row._id)].basicPrice === "") this.dataArray[this.getIndex(row._id)].basicPrice = 0.1
+				if (this.finalData[this.getIndex(row._id)].basicPrice === "") this.finalData[this.getIndex(row._id)].basicPrice = 0.1
 				await this.manageSaveClick(row)
 			},
 			refreshResultTable() {
@@ -210,7 +220,7 @@
 				}
 			},
 			async manageSaveClick(row) {
-				const { _id, type, sourceLanguage, targetLanguage, basicPrice } = this.dataArray[this.getIndex(row._id)]
+				const { _id, type, sourceLanguage, targetLanguage, basicPrice } = this.finalData[this.getIndex(row._id)]
 				try {
 					await this.$http.post("/vendorsapi/rates/" + this.vendorId, {
 						itemIdentifier: "Basic Price Table",
@@ -237,72 +247,32 @@
 				currentVendor: "getCurrentVendor"
 			}),
 			isAllSelected() {
-				return (this.dataArray && this.dataArray.length) && this.dataArray.every(i => i.isCheck)
+				return (this.finalData && this.finalData.length) && this.finalData.every(i => i.isCheck)
+			},
+			rawData() {
+				return this.dataArray
 			}
 		},
 		components: {
+			GeneralTable,
 			Button,
 			SetPriceModal,
-			CheckBox,
-			DataTable
+			CheckBox
 		}
 	}
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
-  .button {
-    position: absolute;
-    right: 20px;
-    margin-top: -40px;
-  }
-
-  .price {
-    background-color: #fff;
-    padding: 0;
-    box-shadow: none;
+  .table {
+    &__header,
+    &__data {
+      padding: 0 6px;
+    }
 
     &__empty {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    input[disabled] {
-      box-shadow: none;
-    }
-
-    input {
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-    }
-
-    label {
-      margin-left: 3px;
-    }
-
-    &__data,
-    &__editing-data {
-      height: 31px;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-    }
-
-    &__editing-data {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
-    &__data-input {
-      width: 100%;
-      border: none;
-      outline: none;
-      color: $main-color;
-      padding: 0 2px;
-      background-color: transparent;
+      opacity: 0.5;
+      margin-top: 10px;
     }
 
     &__icons {
@@ -310,7 +280,8 @@
       justify-content: center;
       align-items: center;
       gap: 7px;
-      height: 30px;
+      width: 100%;
+      height: 40px;
 
       &-info {
         cursor: help;
@@ -329,16 +300,16 @@
         opacity: 0.5;
       }
     }
+  }
 
-    &__icon {
-      cursor: pointer;
-      opacity: 0.5;
-      margin-right: 2px;
-    }
+  label {
+    margin-left: 3px;
+  }
 
-    &_opacity {
-      opacity: 1;
-    }
+  .button {
+    position: absolute;
+    left: 20px;
+    margin-top: -75px;
   }
 
   .tooltip {
@@ -349,27 +320,28 @@
       visibility: hidden;
       font-size: 14px;
       width: max-content;
-      background-color: $red;
-      color: #fff;
+      background-color: white;
+      color: $text;
       text-align: center;
       border-radius: 4px;
-      right: 30px;
-      bottom: -3px;
-      padding: 6px;
+      right: 28px;
+      bottom: -7px;
+      padding: 7px 12px;
       position: absolute;
       z-index: 1;
       opacity: 0;
       transition: opacity .3s;
+      border: 1px solid $border;
 
       &::after {
         content: "";
         position: absolute;
-        top: 38%;
-        right: -10px;
+        top: 30%;
+        right: -12px;
         transform: rotate(270deg);
-        border-width: 5px;
+        border-width: 6px;
         border-style: solid;
-        border-color: $red transparent transparent;
+        border-color: $border transparent transparent;
       }
     }
 

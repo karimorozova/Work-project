@@ -20,7 +20,7 @@
 		},
 		methods: {
 			setTab(index) {
-				this.$emit('setTab', { index })
+				this.$emit("setTab", { index })
 			}
 		}
 	}
@@ -39,12 +39,12 @@
       border-right: 1px solid $border;
       min-width: 120px;
       border-bottom: none;
-      background-color: $table-list-hover;
-      padding: 0px 7px;
+      background-color: $table-list;
+      padding: 1px 5px 0 8px;
       height: 31px;
       display: flex;
       align-items: center;
-      color: #33333380;
+      color: #33333370;
 
       &:first-child {
         border-left: 1px solid $border !important;
@@ -52,7 +52,6 @@
       }
 
       &:last-child {
-/*        border-left: 1px solid $border !important;*/
         border-top-right-radius: 4px;
       }
     }

@@ -44,12 +44,11 @@
       .title Rates
       .vendor-info__rates
         .rates__icons
-          .rates__icon
-            img.rates__icons-opacity1(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit'), setNewStepCombination()")
-            img.rates__icons-opacity05(v-else :src="icons.edit.icon")
-          .rates__icon
-            img.rates__icons-opacity1(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-            img.rates__icons-opacity05(v-else :src="icons.cancel.icon")
+          .rates__mainIcon(v-if="!paramsIsEdit" @click="crudActions('edit'), setNewStepCombination()")
+            i.fas.fa-pen#pen
+          .rates__mainIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+            i.fas.fa-times-circle#close
+
 
         Tabs(
           :tabs="tabs"
@@ -178,7 +177,6 @@
 
 <script>
 	import { mapGetters, mapActions } from "vuex"
-	import FinanceMatrixWithReset from "../FinanceMatrixWithReset"
 	import VendorCompetencies from "./VendorCompetencies"
 	import ResultTable from "./pricelists/ResultTable"
 	import IndustryTable from "./pricelists/IndustryTable"
@@ -205,6 +203,7 @@
 	import VendorMainInfo from "./VendorGeneralInfo"
 	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Tabs from "../Tabs"
+	import FinanceMatrixWithReset from "./pricelists/FinanceMatrixWithReset"
 
 	export default {
 		mixins: [ photoPreview ],
@@ -572,6 +571,7 @@
 			}
 		},
 		components: {
+			FinanceMatrixWithReset,
 			Tabs,
 			SaveCancelPopUp,
 			VendorMainInfo,
@@ -595,8 +595,7 @@
 			LangTable,
 			StepTable,
 			IndustryTable,
-			ResultTable,
-			FinanceMatrixWithReset
+			ResultTable
 		},
 		directives: {
 			ClickOutside
@@ -629,27 +628,59 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
 
+  #close {
+    font-size: 15px;
+  }
+
   .rates {
     &__icons {
       display: flex;
-      right: 20px;
-      top: 20px;
-      gap: 7px;
-      height: 20px;
-      align-items: center;
       justify-content: flex-end;
-      margin-bottom: 20px;
+      margin-bottom: 9px;
+    }
 
-      &-opacity1 {
-        opacity: 1;
-        cursor: pointer;
-      }
+    &__mainIcon {
+      background: #fff;
+      border: 1px solid $border;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: .2s ease-out;
+      z-index: 20;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $dark-border;
 
-      &-opacity05 {
-        opacity: 0.4;
-        cursor: default;
+      &:hover {
+        #pen,
+        #close {
+          color: $text;
+        }
       }
     }
+
+    /*&__icons {*/
+    /*  display: flex;*/
+    /*  right: 20px;*/
+    /*  top: 20px;*/
+    /*  gap: 7px;*/
+    /*  height: 20px;*/
+    /*  align-items: center;*/
+    /*  justify-content: flex-end;*/
+    /*  margin-bottom: 20px;*/
+
+    /*  &-opacity1 {*/
+    /*    opacity: 1;*/
+    /*    cursor: pointer;*/
+    /*  }*/
+
+    /*  &-opacity05 {*/
+    /*    opacity: 0.4;*/
+    /*    cursor: default;*/
+    /*  }*/
+    /*}*/
   }
 
   .block-item-subinfo {
