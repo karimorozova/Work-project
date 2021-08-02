@@ -1,6 +1,39 @@
 <template lang="pug">
   .competencies
+
+
     .competencies__table
+      .competencies__editing
+        .competencies__editing-item
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentSource.lang",
+            :options="sourceData | firstEnglishLanguage",
+            @chooseOption="setSource"
+          )
+        .competencies__editing-item(v-if="!newRow")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentTargets.lang",
+            :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
+            @chooseOption="setTarget"
+          )
+        .competencies__editing-item(v-if="newRow")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentTargets.map((i) => i.lang)",
+            :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
+            @chooseOptions="setTargets"
+            :allOptionsButtons="true"
+          )
+
+
       SettingsTable(
         :fields="fields",
         :tableData="competenciesData",
@@ -19,37 +52,11 @@
 
         template(slot="source", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
-          .competencies__drop-menu(v-else)
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentSource.lang",
-              :options="sourceData | firstEnglishLanguage",
-              @chooseOption="setSource"
-            )
+
 
         template(slot="targets", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
-          .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentTargets.lang",
-              :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
-              @chooseOption="setTarget"
-            )
-          .competencies__drop-menu(v-if="currentActive == index && newRow")
-            SelectMulti(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOptions="currentTargets.map((i) => i.lang)",
-              :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
-              @chooseOptions="setTargets"
-              :allOptionsButtons="true"
-            )
+
 
         template(slot="industry", slot-scope="{ row, index }")
           .competencies__data(v-if="currentActive !== index") {{ row.industry.name }}
@@ -176,7 +183,6 @@
 					}
 				],
 
-				// competenciesData: [],
 				currentSource: "",
 				currentTargets: [],
 				currentIndustries: [],
@@ -337,21 +343,7 @@
 						currentData
 					})
 					await this.storeCurrentVendor(result.data)
-					// await this.updateVendorProp({ id: this.$route.params.id , key: 'competencies', value: result.data.competencies })
-
 					this.competenciesData.length && this.$emit("updateRates", true)
-
-					// this.updateVendorProp({ prop: "competencies", value: result.data.competencies })
-
-					// this.competenciesData = result.data.competencies;
-					// this.competenciesData.length && this.$emit("updateQualifications");
-					//
-
-					// if (result.data.pendingCompetencies.length) {
-					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
-					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data })
-					// }
-
 					await this.$http.post('/pm-manage/check-pricelist-langs', {
 						pricelistId: null,
 						langPairs: this.getArrayLanguagesCombinations(this.currentSource, this.currentTargets)
@@ -401,11 +393,6 @@
 					let currentData = this.competenciesData[this.deleteIndex]
 					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`)
 					await this.storeCurrentVendor(result.data)
-					// if (result.data.pendingCompetencies.length) {
-					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
-					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data.pendingCompetencies })
-					// }
-					// this.competenciesData.splice(this.deleteIndex, 1);
 					this.$emit("updateRates", true)
 					this.closeModal()
 					this.alertToggle({
@@ -434,9 +421,6 @@
 					industry: []
 				})
 				this.setEditingData(this.competenciesData.length - 1)
-				this.$nextTick(() => {
-					this.scrollToEnd()
-				})
 			},
 
 			closeErrors() {
@@ -446,19 +430,8 @@
 			setSource({ option }) {
 				this.currentSource = this.languages.find((item) => item.lang === option)
 			}
-			// async getVendorInfo() {
-			// 	console.log('1')
-			// 	const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
-			// 	this.competenciesData = vendor.data.competencies;
-			// },
-			// getVendorInfoByState(){
-			// 	this.competenciesData = this.currentVendor.competencies
-			// }
 		},
 		computed: {
-			// ...mapGetters({
-			// 	currentVendor: "getCurrentVendor",
-			// }),
 			sourceData() {
 				return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))
 			},
@@ -467,10 +440,6 @@
 			}
 		},
 		created() {
-			// if(this.currentVendor._id){
-			// 	this.competenciesData = this.currentVendor.competencies
-			// }
-			// ?  : this.getVendorInfo();
 		},
 		components: {
 			SelectSingle,
@@ -485,6 +454,25 @@
   @import "../../assets/styles/settingsTable.scss";
 
   .competencies {
+
+    &__table {
+      position: relative;
+    }
+
+    &__editing {
+      position: absolute;
+      height: 40px;
+      background-color: forestgreen;
+      z-index: 5;
+      top: 40px;
+      left: 0;
+      display: flex;
+
+      &-item {
+        position: relative;
+        width: 150px;
+      }
+    }
 
     &__data {
       @extend %table-data;
