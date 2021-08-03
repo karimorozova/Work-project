@@ -17,7 +17,7 @@
       )
     .competencies__table
       .competencies__editing(v-if="currentActive >= 0" :class="{'move-bottom': toggleFilter}" :style='`width: ${widthWithoutScroll}px` ')
-        .competencies__editing-item(style="width: 21%")
+        .competencies__editing-item(style="width: 21%; background: white;")
           SelectSingle(
             :isTableDropMenu="isTableDropMenu",
             placeholder="Select",
@@ -26,7 +26,7 @@
             :options="sourceData | firstEnglishLanguage",
             @chooseOption="setSource"
           )
-        .competencies__editing-item(v-if="!newRow" style="width: 21%")
+        .competencies__editing-item(v-if="!newRow" style="width: 21%; background: white;")
           SelectSingle(
             :isTableDropMenu="isTableDropMenu",
             placeholder="Select",
@@ -35,7 +35,7 @@
             :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
             @chooseOption="setTarget"
           )
-        .competencies__editing-item(v-if="newRow" style="width: 21%")
+        .competencies__editing-item(v-if="newRow" style="width: 21%; background: white;")
           SelectMulti(
             :isTableDropMenu="isTableDropMenu",
             placeholder="Select",
@@ -45,7 +45,7 @@
             @chooseOptions="setTargets"
             :allOptionsButtons="true"
           )
-        .competencies__editing-item(v-if="!newRow" style="width: 21%")
+        .competencies__editing-item(v-if="!newRow" style="width: 21%; background: white;")
           SelectSingle(
             :isTableDropMenu="isTableDropMenu",
             placeholder="Select",
@@ -54,7 +54,7 @@
             :options="vendorIndustries",
             @chooseOption="setIndustry"
           )
-        .competencies__editing-item(v-if="newRow" style="width: 21%")
+        .competencies__editing-item(v-if="newRow" style="width: 21%; background: white;")
           SelectMulti(
             :isTableDropMenu="isTableDropMenu",
             placeholder="Select",
@@ -64,7 +64,7 @@
             @chooseOptions="setIndustries"
             :allOptionsButtons="true"
           )
-        .competencies__editing-item(v-if="!newRow" style="width: 21%")
+        .competencies__editing-item(v-if="!newRow" style="width: 21%; background: white;")
             SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
@@ -73,7 +73,7 @@
               :options="filteredSteps",
               @chooseOption="setStep"
             )
-        .competencies__editing-item(v-if=" newRow" style="width: 21%")
+        .competencies__editing-item(v-if=" newRow" style="width: 21%; background: white;")
           SelectMulti(
             :isTableDropMenu="isTableDropMenu",
             placeholder="Select",
@@ -144,7 +144,6 @@
 	import Add from "../Add"
 	import SelectSingle from "../SelectSingle"
 	import SelectMulti from "../SelectMulti"
-	// import SettingsTable from "../Table/SettingsTable"
 	import GeneralTable from "../GeneralTable"
 	import ValidationErrors from "../ValidationErrors"
 	import ApproveModal from "../ApproveModal"
@@ -580,6 +579,8 @@
       left: 0;
       right: 0;
       display: flex;
+      align-items: center;
+      margin-left: 1px;
 
       &.move-bottom{
         top:120px;
@@ -587,10 +588,8 @@
 
       &-item {
         position: relative;
-        width: 150px;
-        display: flex;
-        //align-items: center;
-        margin: 3px 0;
+        height: 32px;
+        margin: 0 2px;
       }
     }
 

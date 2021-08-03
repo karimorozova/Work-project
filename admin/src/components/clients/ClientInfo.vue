@@ -8,7 +8,6 @@
         @editActivityDetailsTask="editActivityDetailsTask"
         :isSaveClicked="isSaveClicked"
       )
-      //transition(name="modal")
       .client-activity__addTask(v-if="createTaskModal")
         AddTask(
           :clientTask="clientTask"
@@ -34,7 +33,6 @@
 
         .title-with-action
           span All Activities
-          //i.fas.fa-expand-arrows-alt(@click="closeModalFullSize")
 
         AllActivitiesFullScrean(
           @editActivityDetailsTask="editActivityDetailsTask"
