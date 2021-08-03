@@ -31,8 +31,8 @@
               input(:ref='key' @keyup="(e) => setFilter({filterInfo, value: e.target.value, key: dataKey, filterField: key})")
               i.fas.fa-backspace.th__filter-close(v-if="filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo, filterField: key})")
 
-      tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" @scroll="handleBodyScroll")
-        tr.data(v-for="(row, index) of tableData")
+      tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" ref="tableBody" @scroll="handleBodyScroll")
+        tr.data(v-for="(row, index) of tableData" :class="{'active': activeField === index}")
           td(v-for="field of fields" :style="field.style")
             slot(:name="field.key" :row="row" :index="index" )
 
@@ -93,7 +93,11 @@
 			isBodyShort: {
 				type: Boolean,
 				default: false
-			}
+			},
+      activeField: {
+			  type: Number,
+        default: -1
+      }
 		},
 		data() {
 			return {
@@ -127,6 +131,7 @@
 
 			showFilter() {
 				this.showFilters = !this.showFilters
+        this.$emit('toggleFilter', this.showFilters)
 				if (!this.showFilters) {
 					this.$emit('clearAllFilters')
 				}
@@ -160,6 +165,11 @@
     position: absolute;
     right: 0;
     top: -37px;
+  }
+  .data {
+     &.active {
+       opacity: 0.6;
+    }
   }
 
   .generalTable {

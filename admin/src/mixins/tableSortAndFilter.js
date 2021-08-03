@@ -31,11 +31,11 @@ export default {
 			this.filtersData = {}
 		},
 
-		setDefaults(){
-			this.sortKeys = []
-			this.filtersData = {}
-			this.sortedData = []
-		},
+		// setDefaults(){
+		// 	this.sortKeys = []
+		// 	this.filtersData = {}
+		// 	this.sortedData = []
+		// },
 		sortData({ sortInfo, key, sortField }) {
 			this.sortedData.sort((a, b) => {
 				const rawFirst = Array.isArray(a[sortField]) ? a[sortField][0] : a[sortField]
