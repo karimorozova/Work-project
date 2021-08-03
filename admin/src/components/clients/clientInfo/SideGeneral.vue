@@ -104,13 +104,16 @@
   @import "../../../assets/scss/colors.scss";
 
   .block-items {
-    padding: 10px;
-    border: 1px solid #e8e8e8;
+    padding: 20px;
+    border: 1px solid $border;
+    background: $table-list;
+    border-radius: 4px;
   }
 
   .title {
-    font-size: 18px;
-    margin-bottom: 5px;
+    font-size: 16px;
+    margin-bottom: 4px;
+    font-family: 'Myriad600';
   }
 
   .index-10 {
@@ -146,6 +149,7 @@
         position: relative;
         width: 220px;
         height: 32px;
+        background-color: white;
       }
     }
 
@@ -199,6 +203,7 @@
           border: 1px solid #c1bbb1;
           left: 0px;
           top: 3px;
+          background: white;
         }
 
         &::after {

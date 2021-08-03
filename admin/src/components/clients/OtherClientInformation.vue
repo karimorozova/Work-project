@@ -1,7 +1,7 @@
 <template lang="pug">
   .other-information
     .block-item
-      .block-item__label First Contact Date:
+      .block-item__label(style="margin-top: 8px;") First Contact Date:
       .block-item__time
         .block-item__time-input
           Datepicker(

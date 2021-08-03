@@ -63,13 +63,13 @@
 				currentClient: "getCurrentClient",
 				user: "getUser"
 			}),
-			isAdmin(){
+			isAdmin() {
 				return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
-      },
+			},
 			listOfActivity() {
 				let result = [
 					...this.currentClient.tasks
-					    .filter(item => item.status !== 'Completed')
+							.filter(item => item.status !== 'Completed')
 							.map(item => {
 								return { ...item, entity: 'task' }
 							})
@@ -81,6 +81,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../assets/scss/colors";
+
   .notActive {
     cursor: default !important;
     color: rgba(0, 0, 0, .1) !important;
@@ -88,12 +90,14 @@
 
   .openActivities {
     &__content {
-      max-height: 45vh;
+      max-height: 42vh;
       overflow-y: auto;
     }
 
     &__title {
-      font-size: 18px;
+      font-size: 16px;
+      font-family: 'Myriad600';
+      margin-bottom: 4px;
     }
 
     &__item {
@@ -106,13 +110,15 @@
     display: flex;
     align-items: center;
     padding: 10px;
-    border: 1px solid #E8E8E8;
-    margin-top: 5px;
-    transition: ease 0.2s;
+    border: 1px solid $border;
+    border-radius: 4px;
+    margin-top: 0px;
+    transition: .2s ease;
+    margin-bottom: 8px;
 
     &:hover {
       cursor: pointer;
-      background: rgba(153, 153, 153, .1);
+      background: $list-hover;
     }
 
     &__title {
@@ -155,6 +161,7 @@
       justify-content: center;
       align-items: center;
     }
+
     &__no-activity {
       font-size: 14px;
       padding-top: 5px;

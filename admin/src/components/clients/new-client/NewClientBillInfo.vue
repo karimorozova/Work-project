@@ -161,14 +161,10 @@
   @import "../../../assets/scss/colors";
 
   .same-info {
-    &__row {
-      height: 55px;
-    }
 
     &__block {
       display: flex;
-      border-bottom: 1px solid $border;
-      padding-bottom: 10px;
+      padding-bottom: 15px;
 
       &-title {
         margin-right: 5px;

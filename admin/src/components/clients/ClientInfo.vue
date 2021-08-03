@@ -46,128 +46,171 @@
           .client-info__radio
             RadioButton.radio(name="Company" :selected="currentClientOverallData.clientType" @toggleRadio="toggleRadio")
             RadioButton.radio(name="Individual" :selected="currentClientOverallData.clientType" @toggleRadio="toggleRadio")
-          .title General Information
-          .client-info__gen-info
-            General(
-              :isSaveClicked="isSaveClicked"
-              :isIndividual="isIndividual"
-              :languages="languages"
-              :timezones="timezones"
-              :allClientAliases="aliases"
-            )
 
-          .title Notes & Comments
-          .client-info__notes
-            ClientsNotes
-
-          .title(v-if="!isIndividual") Contact Details
-          .client-info__contacts-info(v-if="!isIndividual")
-            ContactsInfo(
-              :client="currentClientOverallData"
-              @contactDetails="contactDetails"
-              @saveContactUpdates="saveContactUpdates"
-              @setLeadContact="setLeadContact"
-              @newContact="addNewContact"
-              @approveDelete="approveContactDelete"
-            )
-
-          .title Services
-          .client-info__services
-            ClientServices(
-              :clientServices="currentClient.services"
-              :defaultPricelist="currentClient.defaultPricelist"
-              :languages="languages"
-              :sourceLanguagesClient="sourceLanguagesClientData"
-              :targetLanguagesClient="targetLanguagesClientData"
-              :industries="industries"
-              :services="services"
-              :clientIndustries="currentClient.industries.map(i => i.name)"
-              @updateRates="updateRates"
-            )
-
-          .title Rates
-          .client-info__rates
-            .rates__icons
-              .rates__mainIcon(v-if="!paramsIsEdit" @click="crudActions('edit'), setNewStepCombination()")
-                i.fas.fa-pen#pen
-              .rates__mainIcon(v-if="paramsIsEdit" @click="crudActions('cancel')")
-                i.fas.fa-times-circle#close
-
-            RatesParameters(:isEdit="isEdit")
-            Tabs(
-              :tabs="tabs"
-              :selectedTab="selectedTab"
-              @setTab="setTab"
-            )
-            .lang-table(v-if="selectedTab === 'Basic Price'")
-              LangTable(
-                :dataArray="currentClient.rates.basicPricesTable"
-                :clientId="currentClient._id"
-                @refreshResultTable="refreshResultTable"
-                :isEdit="isEdit"
-                @toggleCheck="toggleCheck"
-                @toggleAll="toggleAll"
-              )
-            .step-table(v-if="selectedTab === 'Steps / Units'")
-              StepTable(
-                :dataArray="currentClient.rates.stepMultipliersTable"
-                :clientId="currentClient._id"
-                @refreshResultTable="refreshResultTable"
-                :refresh="isRefreshAfterServiceUpdate"
-                :isEdit="isEdit"
-                @toggleCheck="toggleCheck"
-                @toggleAll="toggleAll"
-              )
-            .industry-table(v-if="selectedTab === 'Industries'")
-              IndustryTable(
-                :dataArray="currentClient.rates.industryMultipliersTable"
-                :clientId="currentClient._id"
-                @refreshResultTable="refreshResultTable"
-                :refresh="isRefreshAfterServiceUpdate"
-                :isEdit="isEdit"
-                @toggleCheck="toggleCheck"
-                @toggleAll="toggleAll"
-              )
-            .result-table(v-if="selectedTab === 'Overall Prices'")
-              ResultTable(
-                :dataArray="currentClient.rates.pricelistTable"
-                :clientId="currentClient._id"
+          .client-info__block
+            .block__data(style="border: none;")
+              General(
+                :isSaveClicked="isSaveClicked"
+                :isIndividual="isIndividual"
                 :languages="languages"
-                :steps="steps"
-                :units="units"
-                :industries="industries"
-                :isRefreshResultTable="isRefreshResultTable"
-                :refresh="isRefreshAfterServiceUpdate"
-                :isEdit="isEdit"
-                @toggleCheck="toggleCheck"
-                @toggleAll="toggleAll"
+                :timezones="timezones"
+                :allClientAliases="aliases"
               )
-            .chart(v-if="selectedTab === 'Discount & Surcharge / Discount Chart'")
-              DiscountChart(
-                :entity="currentClient",
-                @getDefaultValues="getDefaultValuesDC"
-                @setMatrixData="setMatrixData"
-                :isEdit="isEdit"
+
+          .client-info__block
+            .block__header(@click="toggleBlock('isRates')")
+              .title Rates
+              .icon(v-if="!isRates")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isRates")
+              .rates__icons
+                .rates__mainIcon(v-if="!paramsIsEdit" @click="crudActions('edit'), setNewStepCombination()")
+                  i.fas.fa-pen#pen
+                .rates__mainIcon(v-if="paramsIsEdit" @click="crudActions('cancel')")
+                  i.fas.fa-times-circle#close
+
+              RatesParameters(:isEdit="isEdit")
+              Tabs(
+                :tabs="tabs"
+                :selectedTab="selectedTab"
+                @setTab="setTab"
               )
-              .discounts
-                Discounts(
-                  :paramsIsEdit="isEdit",
-                  :enum="'client'"
+              .lang-table(v-if="selectedTab === 'Basic Price'")
+                LangTable(
+                  :dataArray="currentClient.rates.basicPricesTable"
+                  :clientId="currentClient._id"
+                  @refreshResultTable="refreshResultTable"
+                  :isEdit="isEdit"
+                  @toggleCheck="toggleCheck"
+                  @toggleAll="toggleAll"
                 )
+              .step-table(v-if="selectedTab === 'Steps / Units'")
+                StepTable(
+                  :dataArray="currentClient.rates.stepMultipliersTable"
+                  :clientId="currentClient._id"
+                  @refreshResultTable="refreshResultTable"
+                  :refresh="isRefreshAfterServiceUpdate"
+                  :isEdit="isEdit"
+                  @toggleCheck="toggleCheck"
+                  @toggleAll="toggleAll"
+                )
+              .industry-table(v-if="selectedTab === 'Industries'")
+                IndustryTable(
+                  :dataArray="currentClient.rates.industryMultipliersTable"
+                  :clientId="currentClient._id"
+                  @refreshResultTable="refreshResultTable"
+                  :refresh="isRefreshAfterServiceUpdate"
+                  :isEdit="isEdit"
+                  @toggleCheck="toggleCheck"
+                  @toggleAll="toggleAll"
+                )
+              .result-table(v-if="selectedTab === 'Overall Prices'")
+                ResultTable(
+                  :dataArray="currentClient.rates.pricelistTable"
+                  :clientId="currentClient._id"
+                  :languages="languages"
+                  :steps="steps"
+                  :units="units"
+                  :industries="industries"
+                  :isRefreshResultTable="isRefreshResultTable"
+                  :refresh="isRefreshAfterServiceUpdate"
+                  :isEdit="isEdit"
+                  @toggleCheck="toggleCheck"
+                  @toggleAll="toggleAll"
+                )
+              .chart(v-if="selectedTab === 'Discount & Surcharge / Discount Chart'")
+                DiscountChart(
+                  :entity="currentClient",
+                  @getDefaultValues="getDefaultValuesDC"
+                  @setMatrixData="setMatrixData"
+                  :isEdit="isEdit"
+                )
+                .discounts
+                  Discounts(
+                    :paramsIsEdit="isEdit",
+                    :enum="'client'"
+                  )
 
-          .title Documents
-          .client-info__documents
-            ClientDocuments(
-              :documentsData="currentClient.documents"
-            )
+          .client-info__block
+            .block__header(@click="toggleBlock('isServices')")
+              .title Services
+              .icon(v-if="!isServices")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isServices")
+              ClientServices(
+                :clientServices="currentClient.services"
+                :defaultPricelist="currentClient.defaultPricelist"
+                :languages="languages"
+                :sourceLanguagesClient="sourceLanguagesClientData"
+                :targetLanguagesClient="targetLanguagesClientData"
+                :industries="industries"
+                :services="services"
+                :clientIndustries="currentClient.industries.map(i => i.name)"
+                @updateRates="updateRates"
+              )
 
-          .title Sales Information
-          .client-info__sales
-            ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
+          .client-info__block(v-if="!isIndividual")
+            .block__header(@click="toggleBlock('isContactDetails')")
+              .title Contact Details
+              .icon(v-if="!isContactDetails")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isContactDetails")
+              ContactsInfo(
+                :client="currentClientOverallData"
+                @contactDetails="contactDetails"
+                @saveContactUpdates="saveContactUpdates"
+                @setLeadContact="setLeadContact"
+                @newContact="addNewContact"
+                @approveDelete="approveContactDelete"
+              )
 
-          .title(v-if="!isIndividual") Billing Information
-          .client-info__billing(v-if="!isIndividual")
-            ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+          .client-info__block
+            .block__header(@click="toggleBlock('isDocuments')")
+              .title Documents
+              .icon(v-if="!isDocuments")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isDocuments")
+              ClientDocuments(
+                :documentsData="currentClient.documents"
+              )
+
+          .client-info__block
+            .block__header(@click="toggleBlock('isSalesInformation')")
+              .title Sales Information
+              .icon(v-if="!isSalesInformation")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isSalesInformation")
+              ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
+
+          .client-info__block(v-if="!isIndividual")
+            .block__header(@click="toggleBlock('isBillingInformation')")
+              .title Billing Information
+              .icon(v-if="!isBillingInformation")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isBillingInformation")
+              ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+
+          .client-info__block
+            .block__header(@click="toggleBlock('isComments')")
+              .title Comments
+              .icon(v-if="!isComments")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isComments")
+              ClientsNotes
 
           .delete-approve(v-if="isApproveModal")
             p Are you sure you want to delete?
@@ -237,12 +280,20 @@
 		},
 		data() {
 			return {
+				isComments: false,
+				isContactDetails: false,
+				isServices: false,
+				isRates: false,
+				isDocuments: false,
+				isSalesInformation: false,
+				isBillingInformation: false,
+
 				icons: {
 					edit: { icon: require("../../assets/images/latest-version/edit.png") },
 					cancel: { icon: require("../../assets/images/cancel-icon.png") }
 				},
 				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount & Surcharge / Discount Chart', 'Overall Prices' ],
-				selectedTab: 'Overall Prices',
+				selectedTab: 'Basic Price',
 				clientTask: {},
 				clientNote: {},
 				aliases: [],
@@ -309,6 +360,9 @@
 			}
 		},
 		methods: {
+			toggleBlock(prop) {
+				this[prop] = !this[prop]
+			},
 			async setNewStepCombination() {
 				try {
 					const updatedClient = await this.$http.post('/clientsapi/updated-retest-from-settings', { clientId: this.$route.params.id })
@@ -957,7 +1011,7 @@
     }
 
     &__date {
-      margin-top: 80px;
+      margin-top: 40px;
       margin-left: 40px;
       width: 390px;
       height: 270px;
@@ -967,8 +1021,45 @@
     }
   }
 
+  .block {
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      cursor: pointer;
+      align-items: center;
+      transition: .2s ease;
+      align-items: center;
+      letter-spacing: 0.2px;
+
+      .title {
+        font-size: 15px;
+        font-family: Myriad600;
+      }
+
+      .icon {
+        font-size: 15px;
+        color: $text;
+      }
+    }
+
+    &__data {
+      padding: 20px 20px 20px;
+      border-top: 2px solid $light-border;
+    }
+  }
+
   .client-info {
     position: relative;
+
+    &__block {
+      box-sizing: border-box;
+      margin-bottom: 25px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      position: relative;
+      border-radius: 4px;
+      background-color: white;
+    }
 
     &__main-row {
       width: 1000px;
@@ -988,33 +1079,11 @@
 
     &__radio {
       display: flex;
+      margin-bottom: 20px;
 
       .radio {
-        margin-right: 10px;
+        margin-right: 20px;
       }
-    }
-
-    &__gen-info,
-    &__services,
-    &__contacts-info,
-    &__sales,
-    &__documents,
-    &__billing {
-      padding: 20px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-      box-sizing: border-box;
-      background: white;
-      border-radius: 4px;
-    }
-
-    &__rates {
-      background: white;
-      border-radius: 4px;
-      padding: 0;
-      padding: 20px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-      position: relative;
-      box-sizing: border-box;
     }
 
     &__documents {
@@ -1028,11 +1097,6 @@
     &_error-shadow {
       box-shadow: 0 0 5px $red;
     }
-  }
-
-  .title {
-    font-size: 21px;
-    padding: 30px 0 10px;
   }
 
   .title-with-action {
