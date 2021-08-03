@@ -16,7 +16,7 @@
         @closeErrors="closeErrors"
       )
     .competencies__table
-      .competencies__editing(v-if="currentActive >= 0" :class="{'move-bottom': toggleFilter}" :style='`width: ${widthWithoutScroll}px` ')
+      .competencies__editing(v-if="currentActive >= 0" :class="{'move-bottom': toggleFilter}" :style='`width: ${widthWithoutScroll}` ')
         .competencies__editing-item(style="width: 21%; background: white;")
           SelectSingle(
             :isTableDropMenu="isTableDropMenu",
@@ -523,7 +523,7 @@
 		},
 		computed: {
       widthWithoutScroll(){
-        return document.querySelector('.data').clientWidth+1
+        return document.querySelector('.data') ? document.querySelector('.data').clientWidth+1 +'px' : '100%'
       },
 		  saveCancelIcon() {
         const {cancel, save} = this.icons
