@@ -2,9 +2,10 @@
   .vendor-wrap
     SaveCancelPopUp(v-if="isChangedVendorGeneralInfo" text=""  @accept="checkForErrors" @cancel="cancel")
     .vendor-info(v-if="currentVendor._id")
-      .title General Information
-      .vendor-details(v-if="getVendorUpdatedData.industries")
-        VendorMainInfo
+
+      .vendor-info__block
+        .block__data(v-if="isGeneralInformation" style="border: none;")
+          VendorMainInfo
 
       .vendor-info__preview(v-if="isEditAndSend")
         WYSIWYG(
@@ -15,114 +16,173 @@
           @send="sendQuote"
         )
 
-      .title Pending Competencies
-      .vendor-info__competencies
-        PendingCompetencies(:pendingCompetenciesData="currentVendor.pendingCompetencies" @updateRates="updateRates")
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isRates')")
+          .title Rates
+          .icon(v-if="!isRates")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isRates")
+          .rates__icons
+            .rates__mainIcon(v-if="!paramsIsEdit" @click="crudActions('edit'), setNewStepCombination()")
+              i.fas.fa-pen#pen
+            .rates__mainIcon(v-if="paramsIsEdit" @click="crudActions('cancel')")
+              i.fas.fa-times-circle#close
 
-      .title Competencies
-      .vendor-info__competencies
-        VendorCompetencies(
-          :competenciesData="currentVendor.competencies"
-          :languages="languages",
-          :steps="steps",
-          :industries="industries",
-          :vendorIndustries="currentVendor.industries.map((i) => i.name)",
-          @updateRates="updateRates"
-        )
-
-      .title Qualifications
-      TableQualifications(
-        :qualificationData="currentVendor.qualifications",
-        :assessmentData="assessmentData",
-        :currentVendor="currentVendor",
-        @updateRates="updateRates"
-      )
-
-      .title Assessment
-      TableAssessment(:assessmentData="currentVendor.assessments", :currentVendor="currentVendor",)
-
-      .title Rates
-      .vendor-info__rates
-        .rates__icons
-          .rates__mainIcon(v-if="!paramsIsEdit" @click="crudActions('edit'), setNewStepCombination()")
-            i.fas.fa-pen#pen
-          .rates__mainIcon(v-if="paramsIsEdit" @click="crudActions('cancel')")
-            i.fas.fa-times-circle#close
-
-
-        Tabs(
-          :tabs="tabs"
-          :selectedTab="selectedTab"
-          @setTab="setTab"
-        )
-        .lang-table(v-if="selectedTab === 'Basic Price'")
-          LangTable(
-            :dataArray="currentVendor.rates.basicPricesTable",
-            :vendorId="currentVendor._id",
-            :vendor="currentVendor"
-            @refreshResultTable="refreshResultTable",
-            :isEdit="isEdit"
-            @toggleCheck="toggleCheck"
-            @toggleAll="toggleAll"
+          Tabs(
+            :tabs="tabs"
+            :selectedTab="selectedTab"
+            @setTab="setTab"
           )
-        .step-table(v-if="selectedTab === 'Steps / Units'")
-          StepTable(
-            :dataArray="currentVendor.rates.stepMultipliersTable",
-            :vendorId="currentVendor._id",
-            :vendor="currentVendor"
-            @refreshResultTable="refreshResultTable",
-            :isEdit="isEdit"
-            @toggleCheck="toggleCheck"
-            @toggleAll="toggleAll"
+          .lang-table(v-if="selectedTab === 'Basic Price'")
+            LangTable(
+              :dataArray="currentVendor.rates.basicPricesTable",
+              :vendorId="currentVendor._id",
+              :vendor="currentVendor"
+              @refreshResultTable="refreshResultTable",
+              :isEdit="isEdit"
+              @toggleCheck="toggleCheck"
+              @toggleAll="toggleAll"
+            )
+          .step-table(v-if="selectedTab === 'Steps / Units'")
+            StepTable(
+              :dataArray="currentVendor.rates.stepMultipliersTable",
+              :vendorId="currentVendor._id",
+              :vendor="currentVendor"
+              @refreshResultTable="refreshResultTable",
+              :isEdit="isEdit"
+              @toggleCheck="toggleCheck"
+              @toggleAll="toggleAll"
+            )
+          .industry-table(v-if="selectedTab === 'Industries'")
+            IndustryTable(
+              :dataArray="currentVendor.rates.industryMultipliersTable",
+              :vendorId="currentVendor._id",
+              :vendor="currentVendor"
+              @refreshResultTable="refreshResultTable",
+              :isEdit="isEdit"
+              @toggleCheck="toggleCheck"
+              @toggleAll="toggleAll"
+            )
+          .result-table(v-if="selectedTab === 'Overall Prices'")
+            ResultTable(
+              :dataArray="currentVendor.rates.pricelistTable"
+              :vendorId="currentVendor._id",
+              :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
+              :steps="steps.map((i) => i.title)",
+              :units="units.map((i) => i.type)",
+              :industries="industries.map((i) => i.name)",
+              :isRefreshResultTable="isRefreshResultTable",
+              :refresh="isRefreshAfterServiceUpdate"
+              :isEdit="isEdit"
+              @toggleCheck="toggleCheck"
+              @toggleAll="toggleAll"
+            )
+          .chart(v-if="selectedTab === 'Discount Chart'")
+            FinanceMatrixWithReset(
+              :entity="currentVendor"
+              @getDefaultValues="getDefaultValuesDC"
+              @setMatrixData="setMatrixData"
+              :isEdit="isEdit"
+            )
+
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isPendingCompetencies')")
+          .title Pending Competencies
+          .icon(v-if="!isPendingCompetencies")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isPendingCompetencies")
+          PendingCompetencies(:pendingCompetenciesData="currentVendor.pendingCompetencies" @updateRates="updateRates")
+
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isCompetencies')")
+          .title Competencies
+          .icon(v-if="!isCompetencies")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isCompetencies")
+          VendorCompetencies(
+            :competenciesData="currentVendor.competencies"
+            :languages="languages",
+            :steps="steps",
+            :industries="industries",
+            :vendorIndustries="currentVendor.industries.map((i) => i.name)",
+            @updateRates="updateRates"
           )
-        .industry-table(v-if="selectedTab === 'Industries'")
-          IndustryTable(
-            :dataArray="currentVendor.rates.industryMultipliersTable",
-            :vendorId="currentVendor._id",
-            :vendor="currentVendor"
-            @refreshResultTable="refreshResultTable",
-            :isEdit="isEdit"
-            @toggleCheck="toggleCheck"
-            @toggleAll="toggleAll"
-          )
-        .result-table(v-if="selectedTab === 'Overall Prices'")
-          ResultTable(
-            :dataArray="currentVendor.rates.pricelistTable"
-            :vendorId="currentVendor._id",
-            :languages="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
-            :steps="steps.map((i) => i.title)",
-            :units="units.map((i) => i.type)",
-            :industries="industries.map((i) => i.name)",
-            :isRefreshResultTable="isRefreshResultTable",
-            :refresh="isRefreshAfterServiceUpdate"
-            :isEdit="isEdit"
-            @toggleCheck="toggleCheck"
-            @toggleAll="toggleAll"
-          )
-        .chart(v-if="selectedTab === 'Discount Chart'")
-          FinanceMatrixWithReset(
-            :entity="currentVendor"
-            @getDefaultValues="getDefaultValuesDC"
-            @setMatrixData="setMatrixData"
-            :isEdit="isEdit"
+
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isQualifications')")
+          .title Qualifications
+          .icon(v-if="!isQualifications")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isQualifications")
+          TableQualifications(
+            :qualificationData="currentVendor.qualifications",
+            :assessmentData="assessmentData",
+            :currentVendor="currentVendor",
+            @updateRates="updateRates"
           )
 
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isAssessment')")
+          .title Assessment
+          .icon(v-if="!isAssessment")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isAssessment")
+          TableAssessment(:assessmentData="currentVendor.assessments", :currentVendor="currentVendor",)
 
-      .title Documents
-      TableDocuments(:documentsData="currentVendor.documents", :vendorId="vendorId")
 
-      .title Professional experience
-      TableProfessionalExperience(:professionalExperienceData="currentVendor.profExperiences", :vendorId="vendorId",)
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isDocuments')")
+          .title Documents
+          .icon(v-if="!isDocuments")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isDocuments")
+          TableDocuments(:documentsData="currentVendor.documents", :vendorId="vendorId")
 
-      .title Education
-      TableEducation(:educationData="currentVendor.educations", :vendorId="vendorId")
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isProfessionalExperience')")
+          .title Professional Experience
+          .icon(v-if="!isProfessionalExperience")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isProfessionalExperience")
+          TableProfessionalExperience(:professionalExperienceData="currentVendor.profExperiences", :vendorId="vendorId",)
 
-      .title Notes & Comments
-      .vendor-info__notes-block
-        .vendor-info__notes
-          VendorCandidate(:candidateData="currentVendor")
-        .vendor-info__editor
-          ckeditor(v-model="getVendorUpdatedData.notes", :config="editorConfig")
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isEducation')")
+          .title Education
+          .icon(v-if="!isEducation")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isEducation")
+          TableEducation(:educationData="currentVendor.educations", :vendorId="vendorId")
+
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isNotes')")
+          .title Candidate & Notes
+          .icon(v-if="!isNotes")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isNotes")
+          .vendor-info__notes-block
+            .vendor-info__notes
+              VendorCandidate(:candidateData="currentVendor")
+            .vendor-info__editor
+              ckeditor(v-model="getVendorUpdatedData.notes", :config="editorConfig")
 
       //.title Vendor to memoq
         //div
@@ -209,6 +269,17 @@
 		mixins: [ photoPreview ],
 		data() {
 			return {
+				isGeneralInformation: true,
+				isPendingCompetencies: false,
+				isCompetencies: false,
+				isQualifications: false,
+				isAssessment: false,
+				isRates: false,
+				isDocuments: false,
+				isProfessionalExperience: false,
+				isEducation: false,
+				isNotes: false,
+
 				icons: {
 					edit: { icon: require("../../assets/images/latest-version/edit.png") },
 					cancel: { icon: require("../../assets/images/cancel-icon.png") }
@@ -217,7 +288,7 @@
 				paramsIsEdit: false,
 				isEdit: false,
 				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount Chart', 'Overall Prices' ],
-				selectedTab: 'Overall Prices',
+				selectedTab: 'Basic Price',
 				aliases: [],
 				currentVendorAliases: [],
 				memoqAction: "",
@@ -271,6 +342,9 @@
 				updateVendorGeneralData: "updateVendorGeneralData",
 				updateVendorRatesByKey: 'updateVendorRatesFromServer'
 			}),
+			toggleBlock(prop) {
+				this[prop] = !this[prop]
+			},
 			async setNewStepCombination() {
 				try {
 					const updatedVendor = await this.$http.post('/vendorsapi/updated-retest-from-settings', { vendorId: this.$route.params.id })
@@ -710,7 +784,6 @@
   .vendor-subinfo {
     &__general {
       padding: 20px;
-      margin-top: 66px;
       width: 350px;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
@@ -728,20 +801,48 @@
     }
   }
 
+  .block {
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      cursor: pointer;
+      align-items: center;
+      transition: .2s ease;
+      align-items: center;
+      letter-spacing: 0.2px;
+
+      .title {
+        font-size: 15px;
+        font-family: Myriad600;
+      }
+
+      .icon {
+        font-size: 15px;
+        color: $text;
+      }
+    }
+
+    &__data {
+      padding: 20px 20px 20px;
+      border-top: 2px solid $light-border;
+    }
+  }
+
   .vendor-info {
     position: relative;
     width: 1000px;
     min-width: 1000px;
 
-    &__competencies {
+    &__block {
       box-sizing: border-box;
-      padding: 20px;
+      margin-bottom: 25px;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       position: relative;
       border-radius: 4px;
       background-color: white;
-
     }
+
 
     &__notes-block {
       display: flex;
@@ -760,39 +861,6 @@
       z-index: 100;
     }
 
-    &__rates {
-      position: relative;
-      box-sizing: border-box;
-      padding: 20px;
-      border-radius: 4px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-      background: white;
-    }
-  }
-
-  .title {
-    font-size: 21px;
-    padding: 30px 0 10px;
-  }
-
-  .gen-info {
-    box-sizing: border-box;
-    padding: 20px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-  }
-
-  .gen-info {
-    display: flex;
-    justify-content: space-between;
-
-    &__block {
-      width: 35%;
-
-      &:first-child {
-        width: 22%;
-        text-align: center;
-      }
-    }
   }
 
   .block-item {

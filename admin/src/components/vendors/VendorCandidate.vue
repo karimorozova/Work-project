@@ -1,6 +1,6 @@
 <template lang="pug">
   .candidate
-    .candidate__title Candidate
+    .candidate__title Candidate:
     .candidate__row
       .candidate__row-key Years of experience:
       .candidate__row-value {{candidateData.experienceYears}}
@@ -32,17 +32,11 @@
 
   .candidate {
     width: 300px;
-    background: #fff;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     padding: 20px;
     margin-right: 40px;
-    border-radius: 4px;
-
 
     &__title {
-      font-size: 21px;
-      border-bottom: 1px solid $border;
-      padding-bottom: 5px;
+      font-family: 'Myriad600';
     }
 
     &__row {
