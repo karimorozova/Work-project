@@ -1,11 +1,32 @@
 <template lang="pug">
   .overallView
-    .row(v-if="isPm || isAdmin")
+    div(v-if="isAdmin")
+      .row
+        .col
+          AcceptedRequest( :projects="acceptedRequest")
+        .col
+          IncomingRequests( :projects="incomingRequests")
+      .row
+        .col
+          Dr1( :projects="dr1")
+        .col
+          Dr2( :projects ="dr2")
+      .row
+        .col
+          DueToday( :projects="dueToday")
+        .col
+          StartedToday( :projects="startedToday")
+      .row
+        .col
+          Quotes( :projects ="quotes")
+
+    div(v-else)
+    .row(v-if="isPm")
       .col
         AcceptedRequest( :projects="acceptedRequest")
       .col
         Dr1( :projects="dr1")
-    .row(v-if="isAm || isAdmin")
+    .row(v-if="isAm")
       .col
         IncomingRequests( :projects="incomingRequests")
       .col
