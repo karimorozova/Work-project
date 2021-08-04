@@ -21,24 +21,24 @@
           Quotes( :projects ="quotes")
 
     div(v-else)
-    .row(v-if="isPm")
-      .col
-        AcceptedRequest( :projects="acceptedRequest")
-      .col
-        Dr1( :projects="dr1")
-    .row(v-if="isAm")
-      .col
-        IncomingRequests( :projects="incomingRequests")
-      .col
-        Dr2( :projects ="dr2")
-    .row
-      .col
-        DueToday( :projects="dueToday")
-      .col
-        StartedToday( :projects="startedToday")
-    .row
-      .col
-        Quotes( :projects ="quotes")
+      .row(v-if="isPm")
+        .col
+          AcceptedRequest( :projects="acceptedRequest")
+        .col
+          Dr1( :projects="dr1")
+      .row(v-if="isAm")
+        .col
+          IncomingRequests( :projects="incomingRequests")
+        .col
+          Dr2( :projects ="dr2")
+      .row
+        .col
+          DueToday( :projects="dueToday")
+        .col
+          StartedToday( :projects="startedToday")
+      .row
+        .col
+          Quotes( :projects ="quotes")
 
 
     //.overallView__col

@@ -1,7 +1,7 @@
 <template lang="pug">
   .projectToXtrf
     .projectToXtrf__buttons
-      Button.margin-bottom(v-if="true" value="Send tasks to XTRF" color="#47A6A6" :outline="true"  @clicked="sendTo" :isDisabled="isDisable")
+      Button.margin-bottom(v-if="isShowingSendButton" value="Send tasks to XTRF" color="#47A6A6" :outline="true"  @clicked="sendTo" :isDisabled="isDisable")
       .xtrf-tasks(v-for="xtrfTask of project.xtrfLinks")
         span {{ xtrfTask.taskId}} : &nbsp;
         a( target="_blank" :href="xtrfTask.link")

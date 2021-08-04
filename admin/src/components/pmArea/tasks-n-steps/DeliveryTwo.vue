@@ -5,7 +5,14 @@
     .review__modal(v-if="isModalRollback")
       RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBackApprove")
 
-    .review__title Delivery Review 2
+    .review__title
+      span Delivery Review 2:
+      .review__delivery-name
+        input.field__name(type="text" placeholder="Delivery Name" v-model="deliveryName" :disabled="isCertificateExist")
+        .review__action-icon(v-if="deliveryName !== deliveryData.deliveryName")
+          i(class="fas fa-save" @click="setDeliveryName")
+          i(class="fas fa-times-circle" @click="setDefaultDeliveryName")
+
 
     .review__check
       .review__headers
@@ -41,18 +48,10 @@
           .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save Comment &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
     .relative__wrapper(v-if="isServiceForCertificate")
-      br(v-if="isCertificateExist ")
       .review__certificate
-        .inputs__group
-          .input__field
-            .input__title Delivery Name:
-            input.field__name(type="text" placeholder="Delivery Name" :value="deliveryData.deliveryName" @change="setDeliveryName" @keyup.13="setDeliveryName" :disabled="isCertificateExist")
-          .input__field
-            .input__title Add Certificate:
-            Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist ")
-        .certificate__info(v-if="isCertificateExist") For change Delivery Name you need to delete Certificate.
+        Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist ")
 
-    .review__table(:class="{'margin-65': isServiceForCertificate}")
+    .review__table
       TableDR2(
         :type="type"
         :task="task"
@@ -136,7 +135,8 @@
 				taskIdRollback: null,
 				selectedContacts: [],
 				comment: "",
-				isComment: false
+				isComment: false,
+        deliveryName: ''
 			}
 		},
 		beforeDestroy() {
@@ -397,14 +397,16 @@
 				const { firstName, surname } = this.project.clientContacts[0]
 				this.selectedContacts.push(`${ firstName } ${ surname }`)
 			},
-			async setDeliveryName(e) {
-				const { value } = e.target
+			async setDeliveryName() {
 				const deliveryId = this.deliveryData._id
 				const projectId = this.project._id
-				const updatedProject = await this.$http.post('/delivery/dr2-name-change', { projectId, deliveryId, deliveryName: value, type: this.type })
+				const updatedProject = await this.$http.post('/delivery/dr2-name-change', { projectId, deliveryId, deliveryName: this.deliveryName, type: this.type })
 				await this.setCurrentProject(updatedProject.data)
 
-			}
+			},
+      setDefaultDeliveryName() {
+			  this.deliveryName = this.deliveryData.deliveryName
+      }
 		},
 		computed: {
 			...mapGetters({
@@ -437,9 +439,11 @@
 				const { tasksDR2 } = this.project
 				if (this.type === 'single') {
 					const deliveryData = tasksDR2.singleLang.find(item => `${ item._id }` === `${ this.id }`)
+          this.deliveryName = deliveryData.deliveryName
 					return deliveryData
 				} else {
 					const deliveryData = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
+          this.deliveryName = deliveryData.deliveryName
 					return deliveryData
 				}
 			},
@@ -537,6 +541,29 @@
     width: 1000px;
     border-radius: 4px;
 
+    &__delivery-name{
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    &__action-icon{
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 5px;
+      font-size: 18px;
+      i {
+        transition: .2s ease-out;
+        color: $dark-border;
+        cursor: pointer;
+
+
+        &:hover {
+          color: $text;
+        }
+      }
+    }
+
     &__templateCommentRow {
       width: 100%;
       margin-top: 20px;
@@ -550,13 +577,7 @@
     }
 
     &__certificate {
-      position: absolute;
-      top: 20px;
-      z-index: 5;
-      background: #f7f7f7;
-      border: 1px solid #bfbfbf;
-      padding: 13px 12px 5px 12px;
-      border-radius: 4px;
+      padding: 15px 0;
 
       input {
         margin-right: 15px;
@@ -605,6 +626,9 @@
       font-size: 21px;
       margin-bottom: 20px;
       font-family: 'Myriad600';
+      display: flex;
+      align-items: center;
+      gap: 10px
     }
 
     &__close {
@@ -632,10 +656,7 @@
     }
 
     &__table {
-      margin-top: 20px;
-    }
-    .margin-65 {
-      margin-top: 65px;
+      //margin-top: 20px;
     }
 
     &__check-item {
