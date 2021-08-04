@@ -6,8 +6,11 @@
         span {{ xtrfTask.taskId}} : &nbsp;
         a( target="_blank" :href="xtrfTask.link")
           i(class="fas fa-link")
-        | &nbsp;&nbsp;
-        i(class="fas fa-sync-alt cursor-pointer" @click="updateFinance(xtrfTask.xtrfId, xtrfTask.taskId)")
+        | &nbsp;|&nbsp;
+        span(class="cursor-pointer" @click="updateFinance(xtrfTask.xtrfId, xtrfTask.taskId)")
+          i(class="fas fa-sync-alt") &nbsp;
+          | Update & Close
+
 
       //a( target="_blank" :href="project.xtrfLink || ''")
         //Button(value="Go to XTRF Project")
@@ -83,6 +86,12 @@
 						.finally(() => this.isDisable = false)
 			}
 		},
+    computed: {
+      isShowingSendButton() {
+        console.log(this.project.xtrfLinks.length !== this.project.tasks.length  )
+        return this.project.xtrfLinks.length !== this.project.tasks.length
+      }
+    },
 		components: { Button }
 	}
 </script>

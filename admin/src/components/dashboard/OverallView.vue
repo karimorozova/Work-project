@@ -114,7 +114,7 @@
 					return this.projects.filter(project => {
 						return project.hasOwnProperty('tasksDR2')
 								&& ((project.tasksDR2.singleLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.singleLang.filter(item => item.status !== 'Delivered').some(singleLang => singleLang.files.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
-										|| (project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').some(multiLang => multiLang.files.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
+										|| (project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').some(multiLang => multiLang.file.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
 								)
 					})
 				}
