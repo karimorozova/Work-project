@@ -1,4 +1,4 @@
-const { notifyDeliverablesDownloaded } = require('../projects/emails');
+// const { notifyDeliverablesDownloaded } = require('../projects/emails');
 const { updateProject } = require('../projects/getProjects');
 const { updateWithApprovedTasks } = require('../projects/updates');
 const { Clients } = require('../models');

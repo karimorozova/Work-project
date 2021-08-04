@@ -111,7 +111,7 @@ router.post('/:id/update-prop', async (req, res) => {
 		const requests = await updateClientRequestProps({ id, value })
 		if (value.status !== undefined) {
 			const message = pmAssignInRequest(requests)
-			await managerNotifyMail({ email: requests.projectManager.email }, message, `Client Request - ${ requests.requestForm.service.title }, has been assign to you (ID I0011.1)`)
+			await managerNotifyMail({ email: requests.projectManager.email }, message, `Client Request - ${ requests.requestForm.service.title }, has been assign to you (I0011.1)`)
 		}
 		res.send(requests)
 	} catch (err) {

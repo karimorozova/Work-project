@@ -173,38 +173,33 @@ async function getQuoteInfo(projectId, tasksIds) {
 
 async function stepCompletedNotifyPM(project, step) {
 	const { projectManager, accManager } = await getAMPMbyProject(project)
-	const subject = `Step completed: ${ step.stepId } ${ project.projectName } (ID I003.0)`
+	const subject = `Step completed: ${ step.stepId } ${ project.projectName } (I003.0)`
 	const messagePM = stepCompletedMessage({ ...project._doc, step }, projectManager)
-	const messageAM = stepCompletedMessage({ ...project._doc, step }, accManager)
+
+	// TODO (refactoring later, temporary hide notification for AM)
+	// const messageAM = stepCompletedMessage({ ...project._doc, step }, accManager)
 	try {
 		await sendEmail({ to: project.projectManager.email, subject }, messagePM)
-		await sendEmail({ to: project.accountManager.email, subject }, messageAM)
+
+		// TODO (refactoring later, temporary hide notification for AM)
+		// await sendEmail({ to: project.accountManager.email, subject }, messageAM)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in stepCompletedNotifyPM")
 	}
 }
 
-async function notifyReadyForDr2({ dr2Manager, project, taskId }) {
-	const { projectManager, accManager } = await getAMPMbyProject(project)
-	const messagePM = await readyForDr2Message({ ...project._doc, dr2Manager, taskId }, projectManager)
-	const messageAM = await readyForDr2Message({ ...project._doc, dr2Manager, taskId }, accManager)
-	try {
-		await managerNotifyMail({ email: project.projectManager.email }, messagePM, `Task is ready for DR2: ${ taskId } - ${ project.projectName } (I008.1)`)
-		await managerNotifyMail({ email: project.accountManager.email }, messageAM, `Task is ready for DR2: ${ taskId } - ${ project.projectName } (I008.1)`)
-	} catch (err) {
-		console.log(err)
-		console.log("Error in notifyReadyForDr2")
-	}
-}
-
 async function taskCompleteNotifyPM(project, task) {
 	const { projectManager, accManager } = await getAMPMbyProject(project)
 	const messagePM = await getPMnotificationMessage(project, task, projectManager)
-	const messageAM = await getPMnotificationMessage(project, task, accManager)
+
+	// TODO (refactoring later, temporary hide notification for AM)
+	// const messageAM = await getPMnotificationMessage(project, task, accManager)
 	try {
-		await managerNotifyMail({ email: project.projectManager.email }, messagePM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (ID I008.0)`)
-		await managerNotifyMail({ email: project.accountManager.email }, messageAM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (ID I008.0)`)
+		await managerNotifyMail({ email: project.projectManager.email }, messagePM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (I008.0)`)
+
+		// TODO (refactoring later, temporary hide notification for AM)
+		//await managerNotifyMail({ email: project.accountManager.email }, messageAM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (ID I008.0)`)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in taskCompleteNotifyPM")
@@ -440,28 +435,33 @@ async function sendClientDeliveries({ projectId, type, entityId, user, contacts,
 	}
 }
 
-async function notifyDeliverablesDownloaded(taskId, project, user) {
-	try {
-		const { projectManager, accManager } = await getAMPMbyProject(project)
-		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user)
-		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user)
-		await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`)
-		await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (ID I010.0)`)
-	} catch (err) {
-		console.log(err)
-		console.log("Error in notifyDeliverablesDownloaded")
-	}
-}
+// TODO check (I0010.0)
+// async function notifyDeliverablesDownloaded(taskId, project, user) {
+// 	try {
+// 		const { projectManager, accManager } = await getAMPMbyProject(project)
+// 		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user)
+// 		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user)
+// 		await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (I0010.0)`)
+// 		await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (I0010.0)`)
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log("Error in notifyDeliverablesDownloaded")
+// 	}
+// }
 
 
 async function notifyManagerStepStarted(project, step) {
 	const { projectManager, accManager } = await getAMPMbyProject(project)
-	const subject = `Step started: ${ step.stepId } - ${ project.projectName } (ID I002.0)`
+	const subject = `Step started: ${ step.stepId } - ${ project.projectName } (I002.0)`
 	const messagePM = stepStartedMessage({ ...project._doc, step }, projectManager)
-	const messageAM = stepStartedMessage({ ...project._doc, step }, accManager)
+
+	// TODO (refactoring later, temporary hide notification for AM)
+	// const messageAM = stepStartedMessage({ ...project._doc, step }, accManager)
 	try {
 		await sendEmail({ to: project.projectManager.email, subject }, messagePM)
-		await sendEmail({ to: project.accountManager.email, subject }, messageAM)
+
+		// TODO (refactoring later, temporary hide notification for AM)
+		// await sendEmail({ to: project.accountManager.email, subject }, messageAM)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in notifyManagerStepStarted")
@@ -473,10 +473,14 @@ async function notifyStepDecisionMade({ project, step, decision }) {
 	const messageId = decision === 'accept' ? 'I006.0' : 'I007.0'
 	const subject = `Vendor ${ decision === 'accept' ? 'approved' : 'rejected' } the job: ${ step.stepId } - ${ project.projectName } (ID ${ messageId })`
 	const messagePM = stepDecisionMessage({ project, step, decision }, projectManager)
-	const messageAM = stepDecisionMessage({ project, step, decision }, accManager)
+
+	// TODO (refactoring later, temporary hide notification for AM)
+	// const messageAM = stepDecisionMessage({ project, step, decision }, accManager)
 	try {
 		await sendEmail({ to: project.projectManager.email, subject }, messagePM)
-		await sendEmail({ to: project.accountManager.email, subject }, messageAM)
+
+		// TODO (refactoring later, temporary hide notification for AM)
+		// await sendEmail({ to: project.accountManager.email, subject }, messageAM)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in notifyManagerStepStarted")
@@ -535,11 +539,11 @@ module.exports = {
 	taskCompleteNotifyPM,
 	notifyClientDeliverablesReady,
 	sendClientDeliveries,
-	notifyDeliverablesDownloaded,
+	// notifyDeliverablesDownloaded,
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	notifyStepDecisionMade,
-	notifyReadyForDr2,
+	// notifyReadyForDr2,
 	notifyStepReopened,
 	notifyVendorStepStart,
 	sendQuoteMessage,

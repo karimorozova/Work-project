@@ -48,7 +48,7 @@ const {
 	updateNonWordsTaskTargetFiles,
 	storeFiles,
 	// notifyProjectDelivery,
-	notifyReadyForDr2,
+	// notifyReadyForDr2,
 	notifyStepReopened,
 	getPdf,
 	notifyVendorStepStart,
@@ -482,7 +482,7 @@ router.post('/projects/all/details', async (req, res) => {
 		const project = await getProject({ '_id': id })
 		await clientQuoteEmail({
 			...project.customer._doc,
-			subject: `Project details (ID C006, ${ project.projectId } - ${ project.projectName })`
+			subject: `Project details (C006, ${ project.projectId } - ${ project.projectName })`
 		}, message)
 		res.send('Project details sent')
 	} catch (err) {
