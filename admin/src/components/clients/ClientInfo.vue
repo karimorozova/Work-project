@@ -58,7 +58,17 @@
               )
 
           .client-info__block
-            .block__header(@click="toggleBlock('isRates')")
+            .block__header(@click="toggleBlock('isComments')" :class="{'block__header-grey': !isComments}")
+              .title Essential Comments
+              .icon(v-if="!isComments")
+                i.fas.fa-chevron-down
+              .icon(v-else)
+                i.fas.fa-chevron-right
+            .block__data(v-if="isComments")
+              ClientsNotes
+
+          .client-info__block
+            .block__header(@click="toggleBlock('isRates')" :class="{'block__header-grey': !isRates}")
               .title Rates
               .icon(v-if="!isRates")
                 i.fas.fa-chevron-down
@@ -134,7 +144,7 @@
                   )
 
           .client-info__block
-            .block__header(@click="toggleBlock('isServices')")
+            .block__header(@click="toggleBlock('isServices')" :class="{'block__header-grey': !isServices}")
               .title Services
               .icon(v-if="!isServices")
                 i.fas.fa-chevron-down
@@ -154,7 +164,7 @@
               )
 
           .client-info__block(v-if="!isIndividual")
-            .block__header(@click="toggleBlock('isContactDetails')")
+            .block__header(@click="toggleBlock('isContactDetails')" :class="{'block__header-grey': !isContactDetails}")
               .title Contact Details
               .icon(v-if="!isContactDetails")
                 i.fas.fa-chevron-down
@@ -171,7 +181,7 @@
               )
 
           .client-info__block
-            .block__header(@click="toggleBlock('isDocuments')")
+            .block__header(@click="toggleBlock('isDocuments')" :class="{'block__header-grey': !isDocuments}")
               .title Documents
               .icon(v-if="!isDocuments")
                 i.fas.fa-chevron-down
@@ -183,7 +193,7 @@
               )
 
           .client-info__block
-            .block__header(@click="toggleBlock('isSalesInformation')")
+            .block__header(@click="toggleBlock('isSalesInformation')" :class="{'block__header-grey': !isSalesInformation}")
               .title Sales Information
               .icon(v-if="!isSalesInformation")
                 i.fas.fa-chevron-down
@@ -193,7 +203,7 @@
               ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
 
           .client-info__block(v-if="!isIndividual")
-            .block__header(@click="toggleBlock('isBillingInformation')")
+            .block__header(@click="toggleBlock('isBillingInformation')" :class="{'block__header-grey': !isBillingInformation}")
               .title Billing Information
               .icon(v-if="!isBillingInformation")
                 i.fas.fa-chevron-down
@@ -203,14 +213,16 @@
               ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
 
           .client-info__block
-            .block__header(@click="toggleBlock('isComments')")
-              .title Comments
-              .icon(v-if="!isComments")
+            .block__header(@click="toggleBlock('isLogs')" :class="{'block__header-grey': !isLogs}")
+              .title Logs
+              .icon(v-if="!isLogs")
                 i.fas.fa-chevron-down
               .icon(v-else)
                 i.fas.fa-chevron-right
-            .block__data(v-if="isComments")
-              ClientsNotes
+            .block__data(v-if="isLogs")
+              .client-subinfo__date
+                OtherClientInformation
+
 
           .delete-approve(v-if="isApproveModal")
             p Are you sure you want to delete?
@@ -227,8 +239,6 @@
           //.client-subinfo__general
             SideGeneral(:isSaveClicked="isSaveClicked")
 
-          .client-subinfo__date
-            OtherClientInformation
 
 </template>
 
@@ -287,6 +297,7 @@
 				isDocuments: false,
 				isSalesInformation: false,
 				isBillingInformation: false,
+				isLogs: false,
 
 				icons: {
 					edit: { icon: require("../../assets/images/latest-version/edit.png") },
@@ -1011,13 +1022,7 @@
     }
 
     &__date {
-      margin-top: 40px;
-      margin-left: 40px;
       width: 390px;
-      height: 270px;
-      background: white;
-      border-radius: 4px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     }
   }
 
@@ -1032,9 +1037,12 @@
       align-items: center;
       letter-spacing: 0.2px;
 
+      &-grey {
+        background-color: $table-list;
+      }
+
       .title {
-        font-size: 15px;
-        font-family: Myriad600;
+        font-size: 16px;
       }
 
       .icon {

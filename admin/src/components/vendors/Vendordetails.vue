@@ -17,7 +17,7 @@
         )
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isRates')")
+        .block__header(@click="toggleBlock('isRates')" :class="{'block__header-grey': !isRates}")
           .title Rates
           .icon(v-if="!isRates")
             i.fas.fa-chevron-down
@@ -88,7 +88,7 @@
             )
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isPendingCompetencies')")
+        .block__header(@click="toggleBlock('isPendingCompetencies')" :class="{'block__header-grey': !isPendingCompetencies}")
           .title Pending Competencies
           .icon(v-if="!isPendingCompetencies")
             i.fas.fa-chevron-down
@@ -98,7 +98,7 @@
           PendingCompetencies(:pendingCompetenciesData="currentVendor.pendingCompetencies" @updateRates="updateRates")
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isCompetencies')")
+        .block__header(@click="toggleBlock('isCompetencies')" :class="{'block__header-grey': !isCompetencies}")
           .title Competencies
           .icon(v-if="!isCompetencies")
             i.fas.fa-chevron-down
@@ -115,7 +115,7 @@
           )
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isQualifications')")
+        .block__header(@click="toggleBlock('isQualifications')" :class="{'block__header-grey': !isQualifications}")
           .title Qualifications
           .icon(v-if="!isQualifications")
             i.fas.fa-chevron-down
@@ -130,7 +130,7 @@
           )
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isAssessment')")
+        .block__header(@click="toggleBlock('isAssessment')" :class="{'block__header-grey': !isAssessment}")
           .title Assessment
           .icon(v-if="!isAssessment")
             i.fas.fa-chevron-down
@@ -141,7 +141,7 @@
 
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isDocuments')")
+        .block__header(@click="toggleBlock('isDocuments')" :class="{'block__header-grey': !isDocuments}")
           .title Documents
           .icon(v-if="!isDocuments")
             i.fas.fa-chevron-down
@@ -151,7 +151,7 @@
           TableDocuments(:documentsData="currentVendor.documents", :vendorId="vendorId")
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isProfessionalExperience')")
+        .block__header(@click="toggleBlock('isProfessionalExperience')" :class="{'block__header-grey': !isProfessionalExperience}")
           .title Professional Experience
           .icon(v-if="!isProfessionalExperience")
             i.fas.fa-chevron-down
@@ -161,7 +161,7 @@
           TableProfessionalExperience(:professionalExperienceData="currentVendor.profExperiences", :vendorId="vendorId",)
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isEducation')")
+        .block__header(@click="toggleBlock('isEducation')" :class="{'block__header-grey': !isEducation}")
           .title Education
           .icon(v-if="!isEducation")
             i.fas.fa-chevron-down
@@ -171,7 +171,7 @@
           TableEducation(:educationData="currentVendor.educations", :vendorId="vendorId")
 
       .vendor-info__block
-        .block__header(@click="toggleBlock('isNotes')")
+        .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
           .title Candidate & Notes
           .icon(v-if="!isNotes")
             i.fas.fa-chevron-down
@@ -812,9 +812,12 @@
       align-items: center;
       letter-spacing: 0.2px;
 
+      &-grey{
+        background-color: $table-list;
+      }
+
       .title {
-        font-size: 15px;
-        font-family: Myriad600;
+        font-size: 16px;
       }
 
       .icon {

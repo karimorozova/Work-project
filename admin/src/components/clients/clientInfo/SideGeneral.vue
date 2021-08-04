@@ -105,15 +105,14 @@
 
   .block-items {
     padding: 20px;
-    border: 1px solid $border;
-    background: $table-list;
+    border: 2px solid $light-border;
     border-radius: 4px;
   }
 
   .title {
     font-size: 16px;
-    margin-bottom: 4px;
-    font-family: 'Myriad600';
+    margin-bottom: 5px;
+    letter-spacing: 0.2px;
   }
 
   .index-10 {

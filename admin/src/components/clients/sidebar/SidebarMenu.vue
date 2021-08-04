@@ -17,9 +17,7 @@
               i.fas.fa-clipboard
 
           .sidebarMenu__allActivities
-            .allActivities(@click="openAllActivities")
-              i.fas.fa-chart-line
-              span.allActivities__title View All Activities
+            Button(@clicked="openAllActivities" value="View All Activities" :isFullWidth="true" :outline="true" color="#47a6a6" )
 
           .sidebarMenu__generalInfo
             SideGeneral(:isSaveClicked="isSaveClicked")
@@ -43,6 +41,7 @@
 	import OpenActivities from "./OpenActivities"
 	import ActivityDetailTask from './ActivityDetailTask'
 	import SideGeneral from "../clientInfo/SideGeneral"
+	import Button from "../../Button"
 
 	export default {
 		props: {
@@ -50,7 +49,7 @@
 		},
 		data() {
 			return {
-				isShowMenu: false,
+				isShowMenu: true,
 				isShowDetailsTask: false,
 				taskData: null
 
@@ -91,6 +90,7 @@
 			}
 		},
 		components: {
+			Button,
 			SideGeneral,
 			OpenActivities,
 			ActivityDetailTask
@@ -137,7 +137,7 @@
       display: flex;
       padding: 0 20px 20px 20px;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     &__activityDetails {
@@ -160,7 +160,7 @@
       min-width: 40px;
       width: 40px;
       background: $light-green;
-      font-size: 20px;
+      font-size: 18px;
       border-radius: 40px;
       color: $green;
       display: flex;
@@ -181,7 +181,7 @@
     &__body {
       background: #fff;
       position: fixed;
-      width: 410px;
+      width: 430px;
       right: 0;
       top: 0;
       height: 100vh;
@@ -217,7 +217,7 @@
   }
 
   i {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .icon {
@@ -225,7 +225,7 @@
     min-width: 40px;
     width: 40px;
     background: $light-green;
-    font-size: 20px;
+    font-size: 18px;
     border-radius: 40px;
     color: $green;
     display: flex;

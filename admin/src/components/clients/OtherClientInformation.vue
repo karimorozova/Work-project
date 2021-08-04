@@ -13,9 +13,6 @@
             calendarClass="calendar-custom"
             :format="customFormatter"
           )
-      .icon(@click="openCalendar")
-        i.far.fa-calendar-alt
-
     .block-item
       .block-item__label First Quote Date:
       .block-item__time {{ currentClient.otherInfo.firstQuoteDate || emptyField }}
@@ -73,7 +70,6 @@
 </script>
 <style lang="scss" scoped>
   .other-information {
-    padding: 20px;
 
     .block-item:last-child {
       height: 30px;

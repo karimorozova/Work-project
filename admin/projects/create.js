@@ -21,8 +21,8 @@ async function createProject(project, user) {
   try {
     const { USD, GBP } = await CurrencyRatio.findOne();
     const { contacts, billingInfo, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
-    const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lt: todayEnd } });
-    const nextNumber = todayProjects.length < 10 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]";
+    const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lte: todayEnd } });
+    const nextNumber = todayProjects.length < 9 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]";
 
     project.status = project.status || "Draft";
     project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
@@ -62,7 +62,7 @@ const createProjectFromRequest = async (requestId) => {
 
   const { USD, GBP } = await CurrencyRatio.findOne()
   const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lt: todayEnd } })
-  const nextNumber = todayProjects.length < 10 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]"
+  const nextNumber = todayProjects.length < 9 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]"
 
   let project = {
     requestId: request._id,
