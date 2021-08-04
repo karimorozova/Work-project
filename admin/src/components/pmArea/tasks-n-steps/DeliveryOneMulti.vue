@@ -95,7 +95,6 @@
 	import TableDR1Multi from "../review/TableDR1Multi"
 	import DropsMulti from "../review/DropsMulti"
 
-	const Options = () => import("../review/Options")
 	const CheckBox = () => import("@/components/CheckBox")
 	const RollbackModal = () => import("../review/RollbackModal")
 
@@ -459,7 +458,6 @@
 			TableDR1,
 			DropsDR1,
 			Check,
-			Options,
 			CheckBox,
 			Button,
 			RollbackModal,

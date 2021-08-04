@@ -31,6 +31,7 @@
     display: flex;
     align-items: center;
     border: 1px solid $border;
+    background-color: $table-list;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 14px;
@@ -43,25 +44,12 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: $text;
-      // &:first-child {
-      //     border-right: 1px solid $main-color;
-      // }
-    }
-
-    &_bordered {
-      border-right: 1px solid $border;
-      border-left: 1px solid $border;
+      color: #33333370;
     }
 
     &_brown {
-      background-color: $dark-border;
-      color: $white;
-
-      &:first-child {
-        border-right-color: $white;
-        border-left-color: $white;
-      }
+      background-color: white;
+      color: $text;
     }
   }
 

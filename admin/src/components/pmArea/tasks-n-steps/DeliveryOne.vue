@@ -91,7 +91,6 @@
 	import Button from "@/components/Button"
 	import ApproveModal from "../../ApproveModal"
 
-	const Options = () => import("../review/Options")
 	const CheckBox = () => import("@/components/CheckBox")
 	const RollbackModal = () => import("../review/RollbackModal")
 
@@ -316,7 +315,6 @@
 			TableDR1,
 			DropsDR1,
 			Check,
-			Options,
 			CheckBox,
 			Button,
 			RollbackModal,

@@ -2,7 +2,7 @@
   .buttons
     .button(v-if="outline")
       .action-buttonOutline(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
-        input.action-buttonOutline__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
+        input.action-buttonOutline__button(type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'color': color, 'border': `2px solid ${color}`}")
     .button(v-else)
       .action-button(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
         input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
@@ -28,10 +28,10 @@
 				type: String,
 				default: "#d15f45"
 			},
-      isFullWidth: {
-			  type: Boolean,
-        default: false
-      }
+			isFullWidth: {
+				type: Boolean,
+				default: false
+			}
 		},
 		methods: {
 			clicked() {
@@ -48,11 +48,9 @@
     &__button {
       transition: .2s ease-out;
       text-align: center;
-      border: 2px solid $red;
       min-width: 110px;
       padding: 0 24px 0 24px;
       height: 32px;
-      color: $red;
       font-size: 14px;
       border-radius: 4px;
       background-color: white;
@@ -109,33 +107,9 @@
     }
   }
 
-  .main-nav_button {
-    .action-button__button {
-      min-width: 110px;
-      padding: 0 24px 0 24px;
-      height: 32px;
-      color: $white;
-      font-size: 14px;
-      border-radius: 4px;
-      background-color: $orange;
-      border: none;
-      transition: .1s ease;
-      outline: none;
-      letter-spacing: 0.2px;
-
-      &:hover {
-        cursor: pointer;
-        box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-      }
-
-      &:active {
-        transform: scale(.98);
-      }
-    }
-  }
-
   .disabled {
-    .action-button__button {
+    opacity: 0.3;
+/*    .action-button__button {
       opacity: 0.3;
       min-width: 110px;
       padding: 0 24px 0 24px;
@@ -157,26 +131,15 @@
       &:active {
         box-shadow: none;
       }
-    }
-  }
-
-  .width-191 {
-    .action-button__button {
-      width: 220px;
-    }
-  }
-
-  .width-140 {
-    .action-button__button {
-      width: 140px;
-    }
+    }*/
   }
 
   .middle {
     text-align: center;
   }
-  .fullWidthButton{
-    input{
+
+  .fullWidthButton {
+    input {
       width: 100%;
     }
   }

@@ -1,7 +1,7 @@
 <template lang="pug">
   .projectToXtrf
     .projectToXtrf__buttons
-      Button.margin-bottom(v-if="!project.isSendToXtrf && !project.xtrfLink" color='#999999' value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable" :isFullWidth="true")
+      Button.margin-bottom(v-if="!project.isSendToXtrf && !project.xtrfLink" color="#47A6A6" :outline="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
       span {{ project.projectId}} : &nbsp;
         a( target="_blank" :href="project.xtrfLink")
           i(class="fas fa-link")
