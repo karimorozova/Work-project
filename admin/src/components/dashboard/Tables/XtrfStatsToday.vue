@@ -15,7 +15,10 @@
             .table__data {{ row.name }}
 
           template(slot="value" slot-scope="{ row, index }")
-            .table__data {{ normalizeValue( row.value )}} EUR
+            .table__data
+              span(v-if="index !== 2 " style="color: #999;") &#36;
+              span(v-else  style="color: #999;") &#128;
+              span {{ normalizeValue( row.value )}}
 
       .component__content
         GeneralTable(
@@ -30,7 +33,11 @@
             .table__data {{ row.name }}
 
           template(slot="value" slot-scope="{ row, index }")
-            .table__data {{ normalizeValue( row.value )}} EUR
+            .table__data
+              span(v-if="index !== 2 " style="color: #999;") &#36;
+              span(v-else  style="color: #999;") &#128;
+              span {{ normalizeValue( row.value )}}
+
 
 </template>
 
@@ -38,24 +45,22 @@
 	import GeneralTable from '../../GeneralTable'
 
 	export default {
-		name: "DueToday.vue",
 		props: {
       xtrfStats: {
-				type: Array,
-				require: true
+				type: Object,
 			}
 		},
 		data() {
 			return {
         fieldsForDay: [
 					{
-						label: "Title",
+						label: "Today",
 						headerKey: "headerName",
 						key: "name",
 						style: { "width": "50%" }
 					},
 					{
-						label: "Sum per Day",
+						label: "",
 						headerKey: "headerValue",
 						key: "value",
 						style: { "width": "50%" }
@@ -63,13 +68,13 @@
 				],
         fieldsForMonth: [
           {
-            label: "Title",
+            label: "Month",
             headerKey: "headerName",
             key: "name",
             style: { "width": "50%" }
           },
           {
-            label: "Sum per Month",
+            label: "",
             headerKey: "headerValue",
             key: "value",
             style: { "width": "50%" }
@@ -127,7 +132,7 @@
       padding: 0 6px;
       width: 100%;
       display: flex;
-      justify-content: space-between;
+      gap: 4px;
     }
   }
 </style>

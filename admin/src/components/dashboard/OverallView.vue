@@ -72,7 +72,7 @@
 			return {
 				projects: [],
 				clientRequest: [],
-        todayStats: [],
+				todayStats: {},
 				startDateMonth: moment({ hour: 0, minute: 0, second: 0 }).subtract(30, 'days').toDate()
 			}
 		},
@@ -148,6 +148,9 @@
 				return this.filteredForPmAmOrAdmin.length
 						? this.filteredForPmAmOrAdmin.filter((project) => {
 							return moment(0, "HH").isSame(project.startDate, 'days')
+									&& project.status !== 'Draft'
+									&& project.status !== 'Cost Quote'
+									&& project.status !== 'Quote Sent'
 						})
 						: []
 			},
@@ -177,12 +180,12 @@
 		},
 		async created() {
 			this.projects = (await this.$http.get('/dashboard-api/all-projects')).data
-      this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
-      this.todayStats = (await this.$http.get('/dashboard-api/finance')).data
-    },
+			this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
+			this.todayStats = (await this.$http.get('/dashboard-api/finance')).data
+		},
 		components: {
 			DueToday,
-      XtrfStatsToday,
+			XtrfStatsToday,
 			StartedToday,
 			Quotes,
 			IncomingRequests,
