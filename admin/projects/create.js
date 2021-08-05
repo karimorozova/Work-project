@@ -22,10 +22,19 @@ async function createProject(project, user) {
     const { USD, GBP } = await CurrencyRatio.findOne();
     const { contacts, billingInfo, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
     const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lte: todayEnd } });
-    const nextNumber = todayProjects.length < 9 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]";
+
+    let currNumber = 0
+    if(todayProjects.length){
+      const pa = new RegExp(/(\[(?<num>\d.*)\])/)
+      const lastProject = todayProjects[todayProjects.length - 1]
+      const res = pa.exec(lastProject.projectId)
+      if(res) currNumber = parseFloat(res.groups.num)
+    }
+
+    const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]";
 
     project.status = project.status || "Draft";
-    project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + nextNumber;
+    project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber;
     project.projectManager  = (role === 'Project Managers') ? roleId : projectManager._id
     project.accountManager = accountManager._id;
     project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';

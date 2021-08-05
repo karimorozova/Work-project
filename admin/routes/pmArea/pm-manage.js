@@ -182,7 +182,6 @@ router.get('/language-pairs', async (req, res) => {
 })
 
 router.post('/new-project', async (req, res) => {
-	console.log('PROJ')
 	let { project, user } = req.body
 	try {
 		const result = await createProject(project, user)
