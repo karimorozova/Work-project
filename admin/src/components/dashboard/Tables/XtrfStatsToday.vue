@@ -16,8 +16,8 @@
 
           template(slot="value" slot-scope="{ row, index }")
             .table__data
-              span(v-if="index !== 2 " style="color: #999;") &#36;
-              span(v-else  style="color: #999;") &#128;
+              span(v-if="index !== 1 " style="color: #999;") &#128;
+              span(v-else  style="color: #999;") &#36;
               span {{ normalizeValue( row.value )}}
 
       .component__content
@@ -34,8 +34,8 @@
 
           template(slot="value" slot-scope="{ row, index }")
             .table__data
-              span(v-if="index !== 2 " style="color: #999;") &#36;
-              span(v-else  style="color: #999;") &#128;
+              span(v-if="index !== 1 " style="color: #999;") &#128;
+              span(v-else  style="color: #999;") &#36;
               span {{ normalizeValue( row.value )}}
 
 
