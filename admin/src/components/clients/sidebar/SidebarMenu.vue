@@ -143,7 +143,7 @@
     &__activityDetails {
       position: absolute;
       bottom: 0;
-      padding-bottom: 35px;
+      padding-bottom: 50px;
       width: 100%;
       z-index: 10;
       background: white;
