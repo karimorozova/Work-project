@@ -345,4 +345,4 @@ const updateFianceXTRF = async (id) => {
 
 }
 
-	module.exports = { createXtrfProjectWithFinance, updateFianceXTRF }
+	module.exports = { createXtrfProjectWithFinance, updateFianceXTRF, sendRequest }

@@ -3,6 +3,9 @@
     div(v-if="isAdmin")
       .row
         .col
+          XtrfStatsToday( :xtrfStats="todayStats")
+      .row
+        .col
           AcceptedRequest( :projects="acceptedRequest")
         .col
           IncomingRequests( :projects="incomingRequests")
@@ -54,6 +57,7 @@
 <script>
 	import ProjectFinanceStats from "./OverallViewChildrens/ProjectFinanceStats"
 	import moment from "moment"
+	import XtrfStatsToday from "./Tables/XtrfStatsToday"
 	import DueToday from "./Tables/DueToday"
 	import StartedToday from "./Tables/StartedToday"
 	import Quotes from "./Tables/Quotes"
@@ -68,6 +72,7 @@
 			return {
 				projects: [],
 				clientRequest: [],
+        todayStats: [],
 				startDateMonth: moment({ hour: 0, minute: 0, second: 0 }).subtract(30, 'days').toDate()
 			}
 		},
@@ -172,10 +177,12 @@
 		},
 		async created() {
 			this.projects = (await this.$http.get('/dashboard-api/all-projects')).data
-			this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
-		},
+      this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
+      this.todayStats = (await this.$http.get('/dashboard-api/finance')).data
+    },
 		components: {
 			DueToday,
+      XtrfStatsToday,
 			StartedToday,
 			Quotes,
 			IncomingRequests,
