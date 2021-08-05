@@ -2,7 +2,7 @@
   .projectToXtrf
     .projectToXtrf__buttons
       Button.margin-bottom(v-if="!project.isSendToXtrf && !project.xtrfLink" color="#47A6A6" :outline="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
-      span {{ project.projectId}} : &nbsp;
+      span(v-else) {{ project.projectId}} : &nbsp;
         a( target="_blank" :href="project.xtrfLink")
           i(class="fas fa-link")
         | &nbsp;&nbsp;

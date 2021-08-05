@@ -150,7 +150,7 @@
 							return moment(0, "HH").isSame(project.startDate, 'days')
 									&& project.status !== 'Draft'
 									&& project.status !== 'Cost Quote'
-									&& project.status !== 'Quote Sent'
+									&& project.status !== 'Quote sent'
 						})
 						: []
 			},
