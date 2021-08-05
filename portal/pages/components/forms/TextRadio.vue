@@ -1,13 +1,14 @@
 <template lang="pug">
   .text-radio(:class="{'text-radio_shadow': isChecked}" @click="check")
-    CustomRadio(:isChecked="isChecked")
+    .icon(v-if="isChecked") &#9745;
+    .icon(v-else) &#9744;
+
     .text-radio__text
       .text-radio__head {{ title }}
       .text-radio__inner {{ text }}
 </template>
 
 <script>
-	import CustomRadio from "~/components/CustomRadio"
 
 	export default {
 		props: {
@@ -19,15 +20,16 @@
 			check() {
 				this.$emit('check')
 			}
-		},
-		components: {
-			CustomRadio
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .icon {
+    font-size: 20px;
+  }
 
   .text-radio {
     width: 310px;

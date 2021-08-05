@@ -135,7 +135,14 @@ router.get('/projects', checkClientContact, async (req, res) => {
 		})
 		const languages = await Languages.find()
 		const user = client.contacts.find(item => item.email === verificationResult.contactEmail)
-		res.send({ client, user, projects, memoqProjects: [], requests, languages })
+		res.send({
+			client: Buffer.from(JSON.stringify(client)).toString('base64'),
+			user: Buffer.from(JSON.stringify(user)).toString('base64'),
+			projects: Buffer.from(JSON.stringify(projects)).toString('base64'),
+			memoqProjects: [],
+			requests: Buffer.from(JSON.stringify(requests)).toString('base64'),
+			languages
+		})
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -245,25 +252,6 @@ router.get('/reject', checkClientContact, async (req, res) => {
 	}
 })
 
-// router.post('/request', checkClientContact, upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]),async (req, res) => {
-//     const { ...request } = req.body;
-//     try {
-//         let createdRequest = await createRequest(request);
-//         const { detailFiles: sourceFiles, refFiles } = req.files;
-//         if(sourceFiles) {
-//             createdRequest.sourceFiles = await storeRequestFiles(sourceFiles, createdRequest.id);
-//         }
-//         if(refFiles) {
-//             createdRequest.refFiles = await storeRequestFiles(refFiles, createdRequest.id);
-//         }
-//         await createdRequest.save();
-//         await clientRequestNotification(createdRequest);
-//         res.send(createdRequest);
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).send('Error on creating a request!');
-//     }
-// });
 
 router.get('/deliverables', checkClientContact, async (req, res) => {
 	console.log('route IN DEV for clients  => /deliverables')
@@ -308,16 +296,5 @@ router.post('/task-status', checkClientContact, async (req, res) => {
 	}
 })
 
-// router.post('/cancel-quote', checkClientContact, async (req, res) => {
-// 	const { id } = req.body
-// 	try {
-// 		const request = await updateClientRequest({ "_id": id }, { status: "Cancelled" })
-// 		await notifyRequestCancelled(request)
-// 		res.send(request)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send("Error on request quote status update")
-// 	}
-// })
 
 module.exports = router

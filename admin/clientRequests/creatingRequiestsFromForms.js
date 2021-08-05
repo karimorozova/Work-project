@@ -27,7 +27,7 @@ const complianceService = async (formData, client) => {
 		projectManager: null,
 		accountManager: null,
 		status: "Client Request",
-		brief,
+		notes: brief,
 
 		requestForm: {
 			sourceLanguage,
