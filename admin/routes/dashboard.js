@@ -4,7 +4,7 @@ const { getProjectsForDashboard } = require('../dashboard/pmAmOrAdmin')
 const { getClientsRequestsForDashboard } = require('../dashboard/incomingRequests')
 const { sendRequest } = require("../projects/xtrfApi")
 const axios = require("axios")
-const { Projects } = require("../models")
+const { Projects, ClientsTasks, ClientsNotes} = require("../models")
 const moment = require("moment")
 
 
@@ -137,5 +137,17 @@ router.get("/finance", async (req, res) => {
 		res.status(500).send('Something wrong on Finance getting')
 	}
 })
+
+router.get("/all-client-activity", async (req, res) => {
+	try {
+		const clientsTasks = await ClientsTasks.find({status: {$ne: 'Completed'}}, {"associatedTo.password": 0}).populate(  'assignedTo',  ['firstName', 'lastName']).populate( 'client', ['name'])
+
+		res.send(clientsTasks)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on Finance getting')
+	}
+})
+
 
 module.exports = router
