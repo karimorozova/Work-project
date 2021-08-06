@@ -1,12 +1,9 @@
 <template lang="pug">
   .activity
-    div(v-if="isAdmin")
+    div
       .row
-        .col
+        .col(v-if="isAdmin")
           AllActivity( :allActivity="normalizedAllActivity")
-
-    div(v-else)
-      .row
         .col
           MyActivity( :allActivity="normalizedMyActivity")
 
@@ -32,10 +29,13 @@
 			}),
       normalizedAllActivity() {
         return this.allActivity.map(activity => {
-          activity.normAssociatedTo = activity.associatedTo.map(({firstName, surname}) => firstName+ ' ' + surname).join('; ')
+          activity.normAssociatedTo = activity.associatedTo.map(({firstName, surname}) => firstName+ ' ' + surname).join('; ') || '-'
           activity.normAssignedTo = activity.assignedTo.firstName + ' ' + activity.assignedTo.lastName
+          if (activity.client == null ) {
+            activity.client = {_id: '', name: 'N/A'}
+          }
           return activity
-        }).filter(activity => activity.client != null)
+        })
       },
       normalizedMyActivity() {
 			  return this.normalizedAllActivity.filter(activity => activity.assignedTo._id === this.user._id)
