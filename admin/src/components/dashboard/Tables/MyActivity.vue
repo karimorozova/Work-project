@@ -24,7 +24,7 @@
               span {{row.client.name}}
 
         template(slot="priority" slot-scope="{ row, index }")
-          .table__data {{row.priority}}
+          .table__data {{row.priority || '-'}}
 
         template(slot="normAssociatedTo" slot-scope="{ row, index }")
           .table__data {{ row.normAssociatedTo }}
