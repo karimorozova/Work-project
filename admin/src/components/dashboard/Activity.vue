@@ -35,7 +35,7 @@
           activity.normAssociatedTo = activity.associatedTo.map(({firstName, surname}) => firstName+ ' ' + surname).join('; ')
           activity.normAssignedTo = activity.assignedTo.firstName + ' ' + activity.assignedTo.lastName
           return activity
-        })
+        }).filter(activity => activity.client != null)
       },
       normalizedMyActivity() {
 			  return this.normalizedAllActivity.filter(activity => activity.assignedTo._id === this.user._id)
