@@ -50,6 +50,7 @@
           if (activity.client == null ) {
             activity.client = {_id: '', name: 'N/A'}
           }
+          activity.class = moment(activity.dateTime).diff(moment()) <= 0 ? 'red-row' : ''
           return activity
         })
       },
