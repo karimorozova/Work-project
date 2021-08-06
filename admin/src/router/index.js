@@ -32,6 +32,7 @@ import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
 // import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
+import Activity from '@/components/dashboard/Activity'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
 import { store } from '../vuex/store'
@@ -126,6 +127,11 @@ const router = new Router({
 							path: 'sales-perfomance',
 							name: 'sales-perfomance',
 							component: SalesPerformance
+						},
+						{
+							path: 'activities',
+							name: 'activities',
+							component: Activity
 						}
 
 					]

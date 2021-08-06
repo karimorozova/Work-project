@@ -38,6 +38,11 @@
 								name: 'Overall View',
 								path: '/pangea-dashboard/overall-view'
 							},
+              {
+								type: 'link',
+								name: 'Activities',
+								path: '/pangea-dashboard/activities'
+							},
 							// {
 							// 	type: 'link',
 							// 	name: 'Sales Performance',
