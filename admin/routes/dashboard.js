@@ -122,7 +122,6 @@ router.get("/finance", async (req, res) => {
 			return acc
 		}, 0)
 
-		console.log(projectFinanceMonth)
 
 		const result = {
 			today: [ { name: "XTRF", value: sumEuro }, { name: "XTRF", value: sumDolars }, { name: "Alfa [Not transferred]", value: sum }, { name: "Total", value: sum + sumEuroTotal } ],
