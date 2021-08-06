@@ -322,7 +322,9 @@ const ProjectsSchema = new mongoose.Schema({
 		nativeVendorRate: "",
 		vendorsClickedOffer: Array,
 		isVendorRead: { type: Boolean, default: false },
-		previousStatus: ""
+		previousStatus: "",
+		isInReport: {type: Boolean, default: false},
+		isPaid: {type: Boolean, default: false},
 	} ],
 	// TODO: refactoring
 	totalCost: {
