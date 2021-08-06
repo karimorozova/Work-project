@@ -1,5 +1,15 @@
 <template lang="pug">
   .component
+    .component__modal-wrapper
+      ApproveModal(
+        v-if="isDeleting"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="approveDelete"
+        @close="closeDeleteModal"
+        @notApprove="closeDeleteModal"
+      )
     .component__title All Open Activities
     .component__content
       GeneralTable(
@@ -24,7 +34,7 @@
               span {{row.client.name}}
 
         template(slot="priority" slot-scope="{ row, index }")
-          .table__data {{row.priority}}
+          .table__data {{row.priority || '-'}}
 
         template(slot="normAssociatedTo" slot-scope="{ row, index }")
           .table__data {{ row.normAssociatedTo }}
@@ -35,12 +45,17 @@
         template(slot="normAssignedTo" slot-scope="{ row, index }")
           .table__data {{ row.normAssignedTo}}
 
+        template(slot="action" slot-scope="{ row, index }")
+          .table__data.table__actions
+            i(class="fas fa-trash icon-button" @click.stop="deleteAction(row._id)")
+
 </template>
 
 <script>
 	import GeneralTable from '../../GeneralTable'
 	import moment from "moment"
 	import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
+	import ApproveModal from "../../ApproveModal"
 
 	export default {
 		mixins: [ tableSortAndFilter ],
@@ -61,7 +76,7 @@
             dataKey: "name",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { "width": "22%" }
+						style: { "width": "20%" }
 					},
 					{
 						label: "Associated",
@@ -69,7 +84,7 @@
 						key: "normAssociatedTo",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { "width": "30%" }
+						style: { "width": "27%" }
 					},
 					{
 						label: "Priority",
@@ -94,8 +109,18 @@
             sortInfo: { isSort: true, order: 'default' },
             filterInfo: { isFilter: true },
 						style: { "width": "20%" }
+					},
+					{
+						label: "",
+						headerKey: "headerAssigned",
+						key: "action",
+            sortInfo: { isSort: false, order: 'default' },
+            filterInfo: { isFilter: true },
+						style: { "width": "5%" }
 					}
-				]
+				],
+        isDeleting: false,
+        currentDelete: '',
 			}
 		},
 		computed: {
@@ -106,10 +131,23 @@
 		methods: {
 			customFormatter(date) {
 				return moment(date).format('MMM D, HH:mm')
-			}
+			},
+      deleteAction(id) {
+			  this.currentDelete = id
+        this.isDeleting = true
+      },
+      closeDeleteModal() {
+        this.currentDelete = ''
+        this.isDeleting = false
+      },
+      async approveDelete() {
+        this.$emit('deleteActivityTask', { id: this.currentDelete })
+        this.closeDeleteModal()
+      },
 		},
 		components: {
-			GeneralTable
+			GeneralTable,
+      ApproveModal
 		}
 	}
 </script>
@@ -123,6 +161,13 @@
       top: 17px;
       font-size: 18px;
       font-family: 'Myriad600';
+    }
+    &__modal-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
     }
   }
 
@@ -146,6 +191,18 @@
       width: 100%;
       display: flex;
       justify-content: space-between;
+    }
+    &__actions {
+      justify-content: center;
+    }
+  }
+  .icon-button{
+    transition: .2s ease-out;
+    color: $dark-border;
+    cursor: pointer;
+
+    &:hover {
+      color: $text;
     }
   }
 </style>

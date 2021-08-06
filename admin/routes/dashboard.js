@@ -149,5 +149,16 @@ router.get("/all-client-activity", async (req, res) => {
 	}
 })
 
+router.delete("/activity/task/:id/delete", async (req, res) => {
+	try {
+		const { id } = req.params
+		await ClientsTasks.deleteOne({ _id: id })
+		res.send('success')
+	} catch (e) {
+		res.status(500).send('Error on client delete')
+	}
+
+})
+
 
 module.exports = router

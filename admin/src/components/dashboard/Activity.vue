@@ -3,7 +3,7 @@
     div
       .row
         .col(v-if="isAdmin")
-          AllActivity( :allActivity="normalizedAllActivity")
+          AllActivity( :allActivity="normalizedAllActivity" @deleteActivityTask="deleteActivityTask")
         .col
           MyActivity( :allActivity="normalizedMyActivity")
 
@@ -12,7 +12,7 @@
 <script>
 	import ProjectFinanceStats from "./OverallViewChildrens/ProjectFinanceStats"
 	import moment from "moment"
-	import { mapGetters } from "vuex"
+  import { mapActions, mapGetters } from "vuex"
   import AllActivity from "./Tables/AllActivity"
   import MyActivity from "./Tables/MyActivity"
 
@@ -22,7 +22,23 @@
         allActivity: [],
 			}
 		},
-		methods: {},
+		methods: {
+      ...mapActions({
+        alertToggle: "alertToggle"
+      }),
+      async deleteActivityTask({ id }) {
+        try {
+          await this.$http.delete(`/dashboard-api/activity/task/${ id }/delete`)
+          await this.getTaskActivity()
+          this.alertToggle({ message: "Activity deleted", isShow: true, type: "success" })
+        } catch (e) {
+          this.alertToggle({ message: "Error on deleting Activity", isShow: true, type: "error" })
+        }
+      },
+      async getTaskActivity() {
+        this.allActivity = (await this.$http.get('/dashboard-api/all-client-activity')).data
+      }
+    },
 		computed: {
 			...mapGetters({
 				user: 'getUser'
@@ -54,10 +70,10 @@
 				if (!this.user.hasOwnProperty('group')) return false
 				const userGroup = this.user.group.name
 				return userGroup === 'Account Managers'
-			}
+			},
 		},
 		async created() {
-			this.allActivity = (await this.$http.get('/dashboard-api/all-client-activity')).data
+		  await this.getTaskActivity()
 		},
 		components: {
       AllActivity,
